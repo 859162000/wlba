@@ -37,7 +37,8 @@ class Trust (models.Model):
     available_region = models.TextField()
     scale = models.IntegerField(verbose_name="The scale of this trust, in the unit of RMB")
 
-    # period
+    investment_threshold = models.FloatField(verbose_name="The investment threshold in 10k")
+    period = models.FloatField(verbose_name="The period in months")
     issue_date = models.DateField()
     type = models.TextField(verbose_name="Trust type")
 
