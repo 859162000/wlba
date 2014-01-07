@@ -31,6 +31,7 @@ class Issuer(models.Model):
 
 class Trust (models.Model):
     name = models.TextField()
+    short_name = models.CharField(max_length=256)
     expected_earning_rate = models.FloatField()
     brief = models.TextField()
     issuer = models.ForeignKey(Issuer, verbose_name="The issuer of this trust")
@@ -44,6 +45,12 @@ class Trust (models.Model):
 
     earning_description = models.TextField()
     note = models.TextField(verbose_name="note on this trust")
+    usage = models.CharField(max_length=100, verbose_name="usage", choices=(
+        ('estate', 'estate'),
+        ('finance', 'finance'),
+        ('infrastructure', 'infrastructure'),
+        ('others', 'others')
+    ))
     usage_description = models.TextField()
 
     risk_management = models.TextField()

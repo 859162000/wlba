@@ -77,7 +77,7 @@
       <file leaf-file-name="models.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/trust/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="66" selection-start="1305" selection-end="1305" vertical-scroll-proportion="0.46153846" vertical-offset="390" max-vertical-offset="990">
+            <state line="38" column="40" selection-start="1143" selection-end="1143" vertical-scroll-proportion="0.2967033" vertical-offset="435" max-vertical-offset="1095">
               <folding />
             </state>
           </provider>
@@ -545,7 +545,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/trust/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="66" selection-start="1305" selection-end="1305" vertical-scroll-proportion="0.46153846" vertical-offset="390" max-vertical-offset="990">
+        <state line="38" column="40" selection-start="1143" selection-end="1143" vertical-scroll-proportion="0.2967033" vertical-offset="435" max-vertical-offset="1095">
           <folding />
         </state>
       </provider>
