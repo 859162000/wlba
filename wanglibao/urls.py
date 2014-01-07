@@ -1,19 +1,31 @@
 from django.conf.urls import patterns, include, url
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission, ContentType
 from rest_framework import viewsets, routers
 
 from django.contrib import admin
 admin.autodiscover()
 
+
 class UserViewSet(viewsets.ModelViewSet):
     model = User
+
 
 class GroupViewSet(viewsets.ModelViewSet):
     model = Group
 
+
+class PermissionViewSet(viewsets.ModelViewSet):
+    model = Permission
+
+
+class ContentTypeViewSet(viewsets.ModelViewSet):
+    model = ContentType
+
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
+router.register(r'permissions', PermissionViewSet)
+router.register(r'contentTypes', ContentTypeViewSet)
 
 
 urlpatterns = patterns('',
