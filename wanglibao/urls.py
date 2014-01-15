@@ -1,14 +1,23 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.auth.models import User, Group, Permission, ContentType
 from rest_framework import viewsets, routers
+from rest_framework.renderers import UnicodeJSONRenderer
+from rest_framework.serializers import HyperlinkedModelSerializer
 from trust.models import Trust, Issuer
 
 from django.contrib import admin
 admin.autodiscover()
 
 
+class UserSerializer (HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('url', 'id', 'username', 'first_name', 'last_name', 'email', 'date_joined')
+
+
 class UserViewSet(viewsets.ModelViewSet):
     model = User
+    serializer_class = UserSerializer
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -26,7 +35,6 @@ class ContentTypeViewSet(viewsets.ModelViewSet):
 class TrustViewSet(viewsets.ModelViewSet):
     model = Trust
 
-
 class IssuerViewSet(viewsets.ModelViewSet):
     model = Issuer
 
@@ -42,7 +50,9 @@ router.register(r'issuers', IssuerViewSet)
 
 urlpatterns = patterns(
     '',
+    url(r'^register', 'trust.views.register'),
     url(r'^', include(router.urls)),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^accounts/', include('registration.backends.default.urls')),
 )

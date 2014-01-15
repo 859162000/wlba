@@ -1,0 +1,5 @@
+{{ object.name }}
+{{ object.earning_description }}
+{{ object.note }}
+{{ object.usage }}
+{{ object.risk_management }}

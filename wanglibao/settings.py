@@ -27,9 +27,12 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 
+from registration_defaults.settings import *
+
 # Application definition
 
 INSTALLED_APPS = (
+    'registration_defaults',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,7 +42,10 @@ INSTALLED_APPS = (
     'rest_framework',
     'trust',
     'south',
+#    'debug_toolbar',
+    'registration',
 )
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -89,5 +95,16 @@ REST_FRAMEWORK = {
         'rest_framework.serializers.HyperlinkedModelSerializer',
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.UnicodeJSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
 }
+
+
+# email SMTP configuration
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_HOST_USER = 'postmaster@sandbox57322.mailgun.org'
+EMAIL_HOST_PASSWORD = '83x1ln8w5p64'
+DEFAULT_FROM_EMAIL = 'support@wanglibao.com'
