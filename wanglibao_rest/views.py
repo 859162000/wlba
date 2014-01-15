@@ -14,7 +14,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class TrustViewSet(viewsets.ModelViewSet):
     model = Trust
-    filter_fields = ('name', 'short_name', 'expected_earning_rate')
+    filter_fields = ('name', 'short_name', 'expected_earning_rate', 'issuer__name', 'available_region', 'investment_threshold')
 
 
 class IssuerViewSet(viewsets.ModelViewSet):

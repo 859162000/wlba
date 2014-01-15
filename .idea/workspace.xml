@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b124caf9-8c04-4637-b93d-ea0ba5f8fdb8" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/wanglibao_rest/serializers.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/wanglibao_rest/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/trust/serializers.py" afterPath="$PROJECT_DIR$/trust/serializers.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao/urls.py" afterPath="$PROJECT_DIR$/wanglibao/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/trust/views.py" afterPath="$PROJECT_DIR$/trust/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao/settings.py" afterPath="$PROJECT_DIR$/wanglibao/settings.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao_rest/views.py" afterPath="$PROJECT_DIR$/wanglibao_rest/views.py" />
     </list>
     <ignored path="wanglibao.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,68 +31,8 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="settings.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/wanglibao/settings.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="103" column="39" selection-start="2613" selection-end="2613" vertical-scroll-proportion="0.0" vertical-offset="1361" max-vertical-offset="1770">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/wanglibao_profile/views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="3" column="0" selection-start="63" selection-end="63" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/wanglibao_rest/views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="0" selection-start="508" selection-end="508" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="435">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="views.py" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/trust/views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="16" selection-start="570" selection-end="570" vertical-scroll-proportion="0.55012226" vertical-offset="30" max-vertical-offset="480">
-              <folding>
-                <element signature="e#0#46#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="serializers.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/trust/serializers.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="10" selection-start="283" selection-end="283" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="360">
-              <folding>
-                <element signature="e#0#43#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="urls.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/wanglibao_rest/urls.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="22" selection-start="347" selection-end="347" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="270">
-              <folding>
-                <element signature="e#0#51#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tests.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/wanglibao_rest/tests.py">
+      <file leaf-file-name="admin.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/wanglibao_rest/admin.py">
           <provider selected="true" editor-type-id="text-editor">
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
               <folding />
@@ -115,8 +51,46 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="models.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/wanglibao_profile/models.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="270">
+              <folding>
+                <element signature="e#0#28#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="tests.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/trust/tests.py">
+        <entry file="file://$PROJECT_DIR$/wanglibao_profile/tests.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/wanglibao_profile/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="3" column="0" selection-start="63" selection-end="63" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="settings.py" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/wanglibao/settings.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="104" column="47" selection-start="2675" selection-end="2675" vertical-scroll-proportion="0.48655257" vertical-offset="1361" max-vertical-offset="1785">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="models.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/wanglibao_rest/models.py">
           <provider selected="true" editor-type-id="text-editor">
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
               <folding />
@@ -125,9 +99,29 @@
         </entry>
       </file>
       <file leaf-file-name="urls.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/wanglibao/urls.py">
+        <entry file="file://$PROJECT_DIR$/wanglibao_rest/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1" column="0" selection-start="52" selection-end="52" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="285">
+            <state line="10" column="6" selection-start="355" selection-end="355" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="270">
+              <folding>
+                <element signature="e#0#51#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/wanglibao_rest/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="15" column="16" selection-start="438" selection-end="438" vertical-scroll-proportion="0.0" vertical-offset="26" max-vertical-offset="435">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tests.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/wanglibao_rest/tests.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
               <folding />
             </state>
           </provider>
@@ -159,14 +153,14 @@
         <option value="$PROJECT_DIR$/trust/templates/base.html" />
         <option value="$PROJECT_DIR$/trust/models.py" />
         <option value="$PROJECT_DIR$/wanglibao_profile/models.py" />
-        <option value="$PROJECT_DIR$/wanglibao/settings.py" />
         <option value="$PROJECT_DIR$/wanglibao_profile/views.py" />
         <option value="$PROJECT_DIR$/wanglibao_rest/serializers.py" />
         <option value="$PROJECT_DIR$/wanglibao/urls.py" />
         <option value="$PROJECT_DIR$/trust/serializers.py" />
-        <option value="$PROJECT_DIR$/wanglibao_rest/views.py" />
         <option value="$PROJECT_DIR$/wanglibao_rest/urls.py" />
         <option value="$PROJECT_DIR$/trust/views.py" />
+        <option value="$PROJECT_DIR$/wanglibao_rest/views.py" />
+        <option value="$PROJECT_DIR$/wanglibao/settings.py" />
       </list>
     </option>
   </component>
@@ -848,44 +842,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/wanglibao_profile/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="0" selection-start="428" selection-end="428" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="270">
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-            <marker date="1389714085000" expanded="true" signature="-1:-1" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../env/lib/python2.7/site-packages/rest_framework/generics.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="6" selection-start="1165" selection-end="1165" vertical-scroll-proportion="1.1413044" vertical-offset="0" max-vertical-offset="8055">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../env/lib/python2.7/site-packages/rest_framework/renderers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="93" column="24" selection-start="3419" selection-end="3419" vertical-scroll-proportion="0.0" vertical-offset="1020" max-vertical-offset="8805">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../env/lib/python2.7/site-packages/rest_framework/viewsets.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="110" column="48" selection-start="4073" selection-end="4073" vertical-scroll-proportion="0.0" vertical-offset="1543" max-vertical-offset="2115">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../env/lib/python2.7/site-packages/rest_framework/filters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="22" selection-start="705" selection-end="705" vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="2505">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../env/lib/python2.7/site-packages/registration/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="268" column="7" selection-start="10478" selection-end="10478" vertical-scroll-proportion="0.0" vertical-offset="3637" max-vertical-offset="4005">
@@ -900,55 +856,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/wanglibao_rest/serializers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="0" selection-start="112" selection-end="112" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
-          <folding>
-            <element signature="e#0#43#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/trust/tests.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="409">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/wanglibao_rest/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="0" selection-start="508" selection-end="508" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="435">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/wanglibao_rest/tests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="386">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/wanglibao_rest/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="22" selection-start="347" selection-end="347" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="270">
-          <folding>
-            <element signature="e#0#51#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/wanglibao_profile/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="0" selection-start="63" selection-end="63" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/wanglibao/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="103" column="39" selection-start="2613" selection-end="2613" vertical-scroll-proportion="0.0" vertical-offset="1372" max-vertical-offset="1770">
           <folding />
         </state>
       </provider>
@@ -964,10 +874,93 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/trust/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="16" selection-start="570" selection-end="570" vertical-scroll-proportion="0.55012226" vertical-offset="30" max-vertical-offset="480">
+        <state line="17" column="16" selection-start="570" selection-end="570" vertical-scroll-proportion="0.0" vertical-offset="30" max-vertical-offset="480">
           <folding>
             <element signature="e#0#46#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_rest/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="409">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_rest/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="432">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_rest/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="409">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_rest/tests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="386">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_rest/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="6" selection-start="355" selection-end="355" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="270">
+          <folding>
+            <element signature="e#0#51#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_rest/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="16" selection-start="438" selection-end="438" vertical-scroll-proportion="0.0" vertical-offset="26" max-vertical-offset="435">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_rest/serializers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="0" selection-start="112" selection-end="112" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
+          <folding>
+            <element signature="e#0#43#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_profile/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="409">
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_profile/tests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="409">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_profile/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="3" column="0" selection-start="63" selection-end="63" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="135">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="104" column="47" selection-start="2675" selection-end="2675" vertical-scroll-proportion="0.48655257" vertical-offset="1361" max-vertical-offset="1785">
+          <folding />
         </state>
       </provider>
     </entry>
