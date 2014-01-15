@@ -34,6 +34,7 @@ class ContentTypeViewSet(viewsets.ModelViewSet):
 
 class TrustViewSet(viewsets.ModelViewSet):
     model = Trust
+    filter_fields = ('name', 'short_name', 'expected_earning_rate')
 
 class IssuerViewSet(viewsets.ModelViewSet):
     model = Issuer
