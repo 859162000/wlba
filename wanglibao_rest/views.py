@@ -36,9 +36,14 @@ class TrustFilterSet(FilterSet):
 class TrustViewSet(viewsets.ModelViewSet):
     model = Trust
     filter_class = TrustFilterSet
+    paginate_by = 20
+    paginate_by_param = 'page_size'
+    max_paginate_by = 100
 
 
 class IssuerViewSet(viewsets.ModelViewSet):
     model = Issuer
-
+    paginate_by = 20
+    paginate_by_param = 'page_size'
+    max_paginate_by = 100
 
