@@ -6,7 +6,7 @@ import django_filters
 from rest_framework import viewsets
 from rest_framework.filters import FilterSet
 from trust.models import Trust, Issuer
-from wanglibao_rest.serializers import UserSerializer
+from wanglibao_rest.serializers import UserSerializer, TrustSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -36,6 +36,7 @@ class TrustFilterSet(FilterSet):
 class TrustViewSet(viewsets.ModelViewSet):
     model = Trust
     filter_class = TrustFilterSet
+    serializer_class = TrustSerializer
     paginate_by = 20
     paginate_by_param = 'page_size'
     max_paginate_by = 100
