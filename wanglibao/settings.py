@@ -42,8 +42,9 @@ INSTALLED_APPS = (
     'rest_framework',
     'trust',
     'south',
-#    'debug_toolbar',
     'registration',
+    'wanglibao_profile',
+    'wanglibao_rest'
 )
 
 
@@ -99,6 +100,7 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.UnicodeJSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework.renderers.JSONPRenderer',
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework.filters.DjangoFilterBackend',

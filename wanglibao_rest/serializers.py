@@ -19,7 +19,7 @@ class TrustSerializer (HyperlinkedModelSerializer):
     """
     class Meta:
         model = Trust
-        fields = ('url', 'name', 'short_name', 'expected_earning_rate', 'brief',
+        fields = ('url', 'id', 'name', 'short_name', 'expected_earning_rate', 'brief',
                   'issuer', 'issuer_short_name', 'available_region', 'scale', 'investment_threshold',
                   'period', 'issue_date', 'type', 'earning_description', 'note', 'usage', 'usage_description',
                   'risk_management', 'payment', 'product_name', 'related_info')

@@ -1,3 +1,4 @@
 from django.contrib import admin
+from wanglibao_profile.models import PhoneValidateCode
 
-# Register your models here.
+admin.site.register(PhoneValidateCode)
