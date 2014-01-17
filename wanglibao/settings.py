@@ -44,7 +44,9 @@ INSTALLED_APPS = (
     'south',
     'registration',
     'wanglibao_profile',
-    'wanglibao_rest'
+    'wanglibao_rest',
+    'provider',
+    'provider.oauth2',
 )
 
 
@@ -105,7 +107,11 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework.filters.DjangoFilterBackend',
         'rest_framework.filters.OrderingFilter',
-    )
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.OAuth2Authentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
 }
 
 # email SMTP configuration

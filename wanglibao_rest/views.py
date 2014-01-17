@@ -66,7 +66,7 @@ class PhoneValidateView(APIView):
     permission_classes = ()
 
     def post(self, request, format=None):
-        phone_number = request.DATA['phone_number']
+        phone_number = request.DATA['phone']
         phone_number = phone_number.strip()
 
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
