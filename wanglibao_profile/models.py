@@ -3,7 +3,7 @@ from registration.models import User
 
 
 class WanglibaoUserProfile(models.Model):
-    user = models.ForeignKey(User, primary_key=True)
+    user = models.OneToOneField(User, primary_key=True)
 
     phone = models.CharField(verbose_name="Mobile phone number", max_length=64)
     phone_verified = models.BooleanField(verbose_name="Mobile phone verified", default=False)
@@ -18,6 +18,9 @@ class WanglibaoUserProfile(models.Model):
     risk_level = models.PositiveIntegerField(verbose_name="How risky the user is, 1..5", default=2)
     investment_asset = models.IntegerField(verbose_name="How many money", default=0)
     total_asset = models.IntegerField(verbose_name="Total asset", default=0)
+
+    def __unicode__(self):
+        return "%s phone: %s" % (self.user.username, self.phone)
 
 
 class PhoneValidateCode(models.Model):

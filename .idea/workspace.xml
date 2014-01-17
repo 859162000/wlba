@@ -2,15 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b124caf9-8c04-4637-b93d-ea0ba5f8fdb8" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/wanglibao_profile/signals.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db.sqlite3" afterPath="$PROJECT_DIR$/db.sqlite3" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao_profile/__init__.py" afterPath="$PROJECT_DIR$/wanglibao_profile/__init__.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao_profile/admin.py" afterPath="$PROJECT_DIR$/wanglibao_profile/admin.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao_profile/models.py" afterPath="$PROJECT_DIR$/wanglibao_profile/models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao_rest/serializers.py" afterPath="$PROJECT_DIR$/wanglibao_rest/serializers.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao/settings.py" afterPath="$PROJECT_DIR$/wanglibao/settings.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao/urls.py" afterPath="$PROJECT_DIR$/wanglibao/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao_rest/urls.py" afterPath="$PROJECT_DIR$/wanglibao_rest/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao_profile/views.py" afterPath="$PROJECT_DIR$/wanglibao_profile/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wanglibao_rest/views.py" afterPath="$PROJECT_DIR$/wanglibao_rest/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="wanglibao.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -60,30 +57,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="importlib.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../env/lib/python2.7/site-packages/django/utils/importlib.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="0" selection-start="1351" selection-end="1351" vertical-scroll-proportion="0.0" vertical-offset="333" max-vertical-offset="675">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="__init__.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../env/lib/python2.7/site-packages/django/conf/urls/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="53" column="18" selection-start="2145" selection-end="2145" vertical-scroll-proportion="0.0" vertical-offset="646" max-vertical-offset="975">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/wanglibao_profile/views.py">
           <provider selected="true" editor-type-id="text-editor">
             <state line="15" column="39" selection-start="529" selection-end="529" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
+                <marker date="1389844451000" expanded="true" signature="168:529" placeholder="..." />
+                <marker date="1389844451000" expanded="true" signature="489:529" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -107,10 +88,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="views.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/wanglibao_rest/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="125" column="46" selection-start="4432" selection-end="4432" vertical-scroll-proportion="1.3563715" vertical-offset="1247" max-vertical-offset="2400">
+            <state line="16" column="0" selection-start="572" selection-end="572" vertical-scroll-proportion="0.0" vertical-offset="270" max-vertical-offset="2400">
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -118,12 +99,43 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="models.py" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="models.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/wanglibao_profile/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="35" column="90" selection-start="1512" selection-end="1512" vertical-scroll-proportion="0.0" vertical-offset="300" max-vertical-offset="750">
+            <state line="21" column="25" selection-start="932" selection-end="932" vertical-scroll-proportion="0.77868855" vertical-offset="30" max-vertical-offset="795">
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="admin.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/wanglibao_profile/admin.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="2" column="0" selection-start="110" selection-end="110" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="180">
+              <folding>
+                <element signature="e#0#32#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="__init__.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/wanglibao_profile/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="13" selection-start="13" selection-end="13" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="90">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="signals.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/wanglibao_profile/signals.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="12" column="21" selection-start="360" selection-end="360" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="300">
+              <folding>
+                <element signature="e#0#46#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -147,22 +159,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="dbtable:/d6fd87af/3d5fff75-8820-49f3-84ad-055bac6dc8b1/..south_migrationhistory" />
-        <option value="$PROJECT_DIR$/trust/templates/search/indexes/trust/trust_text.txt" />
         <option value="$PROJECT_DIR$/trust/templates/search/search.html" />
         <option value="$PROJECT_DIR$/trust/search_indexes.py" />
         <option value="$PROJECT_DIR$/trust/templates/base.html" />
         <option value="$PROJECT_DIR$/trust/models.py" />
         <option value="$PROJECT_DIR$/trust/serializers.py" />
         <option value="$PROJECT_DIR$/trust/views.py" />
-        <option value="$PROJECT_DIR$/wanglibao_profile/admin.py" />
         <option value="$PROJECT_DIR$/wanglibao/settings.py" />
         <option value="$PROJECT_DIR$/wanglibao_rest/serializers.py" />
-        <option value="$PROJECT_DIR$/wanglibao_profile/models.py" />
         <option value="$PROJECT_DIR$/wanglibao_profile/views.py" />
         <option value="$PROJECT_DIR$/wanglibao/urls.py" />
         <option value="$PROJECT_DIR$/wanglibao_rest/urls.py" />
         <option value="$PROJECT_DIR$/wanglibao_rest/views.py" />
+        <option value="$PROJECT_DIR$/wanglibao_profile/__init__.py" />
+        <option value="$PROJECT_DIR$/wanglibao_profile/signals.py" />
+        <option value="$PROJECT_DIR$/wanglibao_profile/admin.py" />
+        <option value="$PROJECT_DIR$/wanglibao_profile/models.py" />
       </list>
     </option>
   </component>
@@ -995,11 +1007,11 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3294893" sideWeight="0.7546875" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3306321" sideWeight="0.7859327" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3306321" sideWeight="0.69266057" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39908257" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21406728" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.30733946" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1024,29 +1036,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/wanglibao_profile/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="0" selection-start="88" selection-end="88" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="150">
-          <folding>
-            <element signature="e#0#32#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../env/lib/python2.7/site-packages/django/core/handlers/wsgi.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="90" column="13" selection-start="3076" selection-end="3076" vertical-scroll-proportion="0.33247423" vertical-offset="1011" max-vertical-offset="3105">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/Cellar/python/2.7.6/Frameworks/Python.framework/Versions/2.7/lib/python2.7/wsgiref/handlers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="97" column="0" selection-start="3344" selection-end="3344" vertical-scroll-proportion="0.757732" vertical-offset="1101" max-vertical-offset="6780">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="411">
@@ -1079,7 +1068,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="585">
           <folding>
-            <element signature="e#0#39#0" expanded="true" />
+            <element signature="e#0#39#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1098,15 +1087,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/wanglibao_profile/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="90" selection-start="1512" selection-end="1512" vertical-scroll-proportion="0.0" vertical-offset="300" max-vertical-offset="750">
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/wanglibao_rest/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="8" column="0" selection-start="360" selection-end="360" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="315">
@@ -1121,6 +1101,8 @@
         <state line="15" column="39" selection-start="529" selection-end="529" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
           <folding>
             <element signature="e#0#36#0" expanded="true" />
+            <marker date="1389844451000" expanded="true" signature="168:529" placeholder="..." />
+            <marker date="1389844451000" expanded="true" signature="489:529" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -1143,9 +1125,43 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/wanglibao_rest/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="125" column="46" selection-start="4432" selection-end="4432" vertical-scroll-proportion="1.3563715" vertical-offset="1247" max-vertical-offset="2400">
+        <state line="16" column="0" selection-start="572" selection-end="572" vertical-scroll-proportion="0.0" vertical-offset="270" max-vertical-offset="2400">
           <folding>
             <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_profile/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="13" selection-start="13" selection-end="13" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="440">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_profile/signals.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="21" selection-start="360" selection-end="360" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="300">
+          <folding>
+            <element signature="e#0#46#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_profile/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="0" selection-start="110" selection-end="110" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="180">
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wanglibao_profile/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="25" selection-start="932" selection-end="932" vertical-scroll-proportion="0.77868855" vertical-offset="30" max-vertical-offset="795">
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
