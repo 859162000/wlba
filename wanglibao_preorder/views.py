@@ -1,3 +1,7 @@
 from django.shortcuts import render
+from rest_framework.viewsets import ViewSet, ModelViewSet
+from wanglibao_preorder.models import PreOrder
 
-# Create your views here.
+
+class PreOrderViewSet(ModelViewSet):
+    model = PreOrder

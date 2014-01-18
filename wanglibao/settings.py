@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'wanglibao_profile',
     'wanglibao_rest',
     'wanglibao_portfolio',
+    'wanglibao_preorder',
     'provider',
     'provider.oauth2',
 )
