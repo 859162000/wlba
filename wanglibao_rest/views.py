@@ -7,10 +7,14 @@ from django.utils.timezone import utc
 import django_filters
 import random
 from rest_framework import viewsets
+from rest_framework import generics
+from rest_framework.decorators import link, action
 from rest_framework.filters import FilterSet
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from trust.models import Trust, Issuer
+from wanglibao_portfolio.models import UserPortfolio
+from wanglibao_portfolio.serializers import PortfolioSerializer, UserPortfolioSerializer
 from wanglibao_rest.serializers import UserSerializer, TrustSerializer
 from wanglibao_profile.models import PhoneValidateCode
 
@@ -18,6 +22,20 @@ from wanglibao_profile.models import PhoneValidateCode
 class UserViewSet(viewsets.ModelViewSet):
     model = User
     serializer_class = UserSerializer
+
+    @link()
+    def portfolio(self, request, *args, **kwargs):
+        user = self.get_object()
+        return Response(PortfolioSerializer(user.userportfolio.portfolio.all()[0]).data)
+
+
+class UserPortfolioView(generics.ListCreateAPIView):
+    queryset = UserPortfolio.objects.all()
+    serializer_class = UserPortfolioSerializer
+
+    def get_queryset(self):
+        user_pk = self.kwargs['user_pk']
+        return self.queryset.filter(user_id = user_pk)
 
 
 class TrustFilterSet(FilterSet):

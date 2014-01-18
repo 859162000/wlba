@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'registration',
     'wanglibao_profile',
     'wanglibao_rest',
+    'wanglibao_portfolio',
     'provider',
     'provider.oauth2',
 )
