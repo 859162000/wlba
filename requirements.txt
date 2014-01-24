@@ -1,0 +1,18 @@
+Django==1.6.1
+Markdown==2.3.1
+South==0.8.4
+django-filter==0.7
+-e git+https://github.com/caffeinehit/django-oauth2-provider.git@9ae7e652aff7410cc6f22427025fb508f6928880#egg=django_oauth2_provider-master
+django-registration==1.0
+django-registration-defaults==0.4.4
+djangorestframework==2.3.10
+elasticsearch==0.4.4
+ipython==1.1.0
+pyelasticsearch==0.6.1
+requests==2.1.0
+shortuuid==0.4
+simplejson==3.3.2
+six==1.5.2
+sqlparse==0.1.10
+urllib3==1.7.1
+wsgiref==0.1.2
