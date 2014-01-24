@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'trust',
     'south',
     'registration',
+    'wanglibao',
     'wanglibao_profile',
     'wanglibao_rest',
     'wanglibao_portfolio',
@@ -95,6 +96,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
 
 REST_FRAMEWORK = {
     'DEFAULT_MODEL_SERIALIZER_CLASS':

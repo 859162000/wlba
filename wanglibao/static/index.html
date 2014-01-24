@@ -1,21 +1,18 @@
-{% load staticfiles %}
-
 <!doctype html>
 <html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>首页 - 网利宝</title>
-
-    <link type="text/css" rel="stylesheet" href="{% static "wanglibao/css/bootstrap.min.css" %}"/>
-      <!--[if lte IE 6]>
-      <link rel="stylesheet" type="text/css" href="{% static "wanglibao/css/bootstrap-ie6.css" %}">
-      <![endif]-->
-      <!--[if lte IE 7]>
-      <link rel="stylesheet" type="text/css" href="{% static "wanglibao/css/ie.css" %}">
-      <![endif]-->
-    <link type="text/css" rel="stylesheet" href="{% static "wanglibao/css/style.css" %}" />
-  </head>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>首页 - 网利宝</title>
+<link href="wanglibao/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+  <!--[if lte IE 6]>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap-ie6.css">
+  <![endif]-->
+  <!--[if lte IE 7]>
+  <link rel="stylesheet" type="text/css" href="css/ie.css">
+  <![endif]-->
+<link href="wanglibao/css/style.css" type="text/css" rel="stylesheet" />
+</head>
 
 <body>
 <div class="wlb-header">
@@ -203,13 +200,13 @@
   </div>
 </div>
 <!--页尾 end-->
-<script src="{% static "wanglibao/js/jquery.min.js" %}"></script>
-<script type="text/javascript" src="{% static "wanglibao/js/bootstrap.min.js" %}"></script>
+<script src="wanglibao/js/jquery.min.js"></script>
+<script type="text/javascript" src="wanglibao/js/bootstrap.min.js"></script>
 <!--[if lte IE 6]>
-  <script type="text/javascript" src="{% static "wanglibao/js/bootstrap-ie.js" %}"></script>
+  <script type="text/javascript" src="js/bootstrap-ie.js"></script>
 <![endif]-->
 
-<script type="text/javascript" src="{% static "wanglibao/js/knockout-3.0.0.js" %}"></script>
+<script type="text/javascript" src="wanglibao/js/knockout-3.0.0.js"></script>
 <script type="text/javascript">
   $(document).ready(function(){
     $("#panel_adv").mouseover(function(){
