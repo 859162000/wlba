@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <!--Nav bar-->
+  <div class="wlb-navs">
+    <div class="row-fluid wlb-navs-cnt">
+      <div class="span3 wlb-logo" title="网利宝"></div>
+      <ul class="span6 wlb-sub-nav">
+        <li class="cus"><a href="index.html">首页</a></li>
+        <li><a href="guwen.html">个人理财</a></li>
+        <li><a href="xintuo.html">信托产品</a></li>
+        <li><a href="bank.html">银行理财</a></li>
+        <li><a href="fund.html">基金产品</a></li>
+      </ul>
+      <div class="span3 wlb-form input-prepend input-append">
+        <div class="btn-group">
+          <form>
+            <select class="add-on wlb-select">
+              <option>理财产品</option>
+              <option>信托产品</option>
+              <option>基金产品</option>
+            </select>
+            <input type="text" class="span4" /><button class="btn btn-wlbse" type="button"><em class="btn-wlbse-icon"></em></button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% block content-under-navigation %}
+  {% endblock %}
+{% endblock %}

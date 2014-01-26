@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %}
+{% load i18n %}
+
+{% url 'auth_password_reset' as auth_pwd_reset_url %}
+
+{% block title %} 用户登录 - 网利宝 {% endblock %}
+
+{% block content %}
+<!--用户登录 start-->
+<div class="wlb-login">
+  <div class="wlb-login-content">
+    <a href="/" class="pull-left wlb-login-logo" title="网利宝">&nbsp;</a>
+    <div class="pull-right">
+      <div class="wlb-login-form">
+        <form class="form-horizontal" method="post" action="/accounts/register/">
+          {{  form.password.errors }}
+          {{  form.email.errors }}
+          {{  form.username.errors }}
+          {% csrf_token %}
+          <h3>账号注册</h3>
+          <div>{% render_field form.username class+="login-input" placeholder="请输入用户名" %}</div><br/>
+          <div>{% render_field form.email class+="login-input" placeholder="请输入邮箱" %}</div><br/>
+          <div>{% render_field form.password1 class+="login-input" placeholder="请输入密码" %}</div><br />
+          <div>{% render_field form.password2 class+="login-input" placeholder="确认密码" %}</div><br />
+          <div>
+            <label class="checkbox"><input type="checkbox">
+              我已阅读并同意<a class="orange" href="#">《网利宝服务协议》</a>
+            </label>
+          </div>
+          <div><button type="submit" class="btn btn-login w354">{% trans "signup" %}</button></div>
+          <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+      </div>
+      <pre class="wlb-logined">已经有账号，直接登录&nbsp;&nbsp;<a class="btn btn-wlbdefault" href="/accounts/login">登录</a></pre>
+    </div>
+  </div>
+</div>
+<!--用户登录 end-->
+{% endblock %}
+
+

@@ -1,0 +1,171 @@
+{% load staticfiles %}
+
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>首页 - 网利宝</title>
+
+    <link type="text/css" rel="stylesheet" href="{% static "wanglibao/css/bootstrap.min.css" %}"/>
+      <!--[if lte IE 6]>
+      <link rel="stylesheet" type="text/css" href="{% static "wanglibao/css/bootstrap-ie6.css" %}">
+      <![endif]-->
+      <!--[if lte IE 7]>
+      <link rel="stylesheet" type="text/css" href="{% static "wanglibao/css/ie.css" %}">
+      <![endif]-->
+    <link type="text/css" rel="stylesheet" href="{% static "wanglibao/css/style.css" %}" />
+  </head>
+
+<body>
+<div class="wlb-header">
+  <div class="container-fluid">
+    <div class="wlb-welcome">
+
+      <!-- Header Top Bar
+        A top bar which contains phone number, user login information
+      -->
+      <div class="row-fluid wlb-welcome-cnt">
+        <div class="span2 wlb-tel">
+          <i class="wlb-tel-icon"></i>
+          <span>400-123-8888</span>
+        </div>
+        {% if user.is_authenticated %}
+          <div class="span10 wlb-user-info">欢迎你：
+            <span class="wlb-user-txt">
+            {{ user.username }}
+            <a href="/accounts/logout">退出</a>
+            </span></div>
+        {% else %}
+          <div class="span10">
+            <a href="/accounts/login">登陆</a>
+            <a href="/accounts/register">注册</a>
+          </div>
+        {% endif %}
+      </div>
+      <!-- End of Top Bar-->
+    </div>
+
+
+
+    {% block content %}
+
+    {% endblock %}
+
+<!--页尾 start-->
+<div class="wlb-footer">
+	<div class="container-fluid">
+    <div class="row-fluid wlb-footer-content">
+      <ul class="span3 wlb-about">
+        <li class="wlb-about-title">关于理财</li>
+        <li>怎么选择合适的理财产品？</li>
+        <li>为什么需要资产配置？</li>
+        <li>如何做资产配置？</li>
+       </ul>
+       <ul class="span2 wlb-about">
+         <li class="wlb-about-title">关于网利宝</li>
+         <li>关于我们</li>
+         <li>顾问团队</li>
+         <li>媒体报道</li>
+       </ul>
+       <div class="span7 wlb-contact">
+         <div class="wlb-contact-title">联系方式</div>
+         <div class="row-fluid">
+           <div class="span6 wlb-contact-location">北京经济技术开发区地盛北街1号北京经开北工大软件园1号楼</div>
+           <div class="span6 wlb-contact-phone">13810250118<br />13810250118</div>
+         </div>
+         <div class="row-fluid">
+           <div class="span6 wlb-contact-tel">010-67873388<br/>010-67873388</div>
+           <div class="span6 wlb-contact-email">master@wanglibao.com<br/>master@wanglibao.com</div>
+         </div>
+       </div>
+    </div>
+  </div>
+</div>
+<!--页尾 end-->
+<script src="{% static "wanglibao/js/jquery.min.js" %}"></script>
+<script type="text/javascript" src="{% static "wanglibao/js/bootstrap.min.js" %}"></script>
+<!--[if lte IE 6]>
+  <script type="text/javascript" src="{% static "wanglibao/js/bootstrap-ie.js" %}"></script>
+<![endif]-->
+
+<script type="text/javascript" src="{% static "wanglibao/js/knockout-3.0.0.js" %}"></script>
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("#panel_adv").mouseover(function(){
+      var top_adv = Math.abs(parseInt($("#sli_adv_txt").css("top")));
+      if(top_adv==0){
+        $("#sli_adv").animate({top:'-181px'});
+        $("#sli_adv_txt").animate({top:'-181px'});
+      }
+    }).mouseout(function(){
+      var top_adv1 = Math.abs(parseInt($("#sli_adv_txt").css("top")));
+      if(top_adv1==181) {
+        $("#sli_adv").animate({top:'0px'});
+        $("#sli_adv_txt").animate({top:'0px'});
+      }
+    });
+    $("#panel_pro").mouseover(function(){
+      var top_pro = Math.abs(parseInt($("#sli_pro_txt").css("top")));
+      if(top_pro==0){
+        $("#sli_pro").animate({top:'-181px'});
+        $("#sli_pro_txt").animate({top:'-181px'});
+      }
+    }).mouseout(function(){
+      var top_pro1 = Math.abs(parseInt($("#sli_pro_txt").css("top")));
+      if(top_pro1==181) {
+        $("#sli_pro").animate({top:'0px'});
+        $("#sli_pro_txt").animate({top:'0px'});
+      }
+    });
+    $("#panel_res").mouseover(function(){
+      var top_res = Math.abs(parseInt($("#sli_res_txt").css("top")));
+      if(top_res==0){
+        $("#sli_res").animate({top:'-181px'});
+        $("#sli_res_txt").animate({top:'-181px'});
+      }
+    }).mouseout(function(){
+      var top_res1 = Math.abs(parseInt($("#sli_res_txt").css("top")));
+      if(top_res1==181) {
+        $("#sli_res").animate({top:'0px'});
+        $("#sli_res_txt").animate({top:'0px'});
+      }
+    });
+  });
+
+  var DataViewModel = function(){
+    self = this;
+
+    self.trusts = ko.observable([]);
+
+    self.rows = ko.computed(function(){
+      var trusts = self.trusts();
+      trusts = trusts.slice(0, 6)
+      var result = [];
+      for (var i = 0; i < trusts.length; i += 3) {
+        var row = [];
+        for (var j = 0; j < 3; ++j) {
+            if (trusts[i + j]) {
+                row.push(trusts[i + j]);
+            }
+        }
+        result.push(row);
+      }
+      return result;
+    });
+  };
+  var model = new DataViewModel();
+  ko.applyBindings(model);
+
+  $.ajax('http://127.0.0.1:8000/api/trusts/.jsonp', {
+    'dataType': 'jsonp'
+  })
+          .done(function(data){
+            model.trusts(data.results);
+          })
+          .fail(function(xhr, status, error){
+            alert(status + error)
+          });
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %}
+{% load i18n %}
+
+{% url 'auth_password_reset' as auth_pwd_reset_url %}
+
+{% block title %} 用户登录 - 网利宝 {% endblock %}
+
+{% block content %}
+<!--用户登录 start-->
+<div class="wlb-login">
+  <div class="wlb-login-content">
+    <a href="/" class="pull-left wlb-login-logo" title="网利宝">&nbsp;</a>
+    <div class="pull-right">
+      <div class="wlb-login-form">
+        <form class="form-horizontal" method="post" action="{% url 'auth_login' %}">
+          {% csrf_token %}
+          <h3>用户登录</h3>
+          <br>
+          <div>{% render_field form.username class+="login-input" %}</div>
+          <br>
+          <div>{% render_field form.password class+="login-input" %}</div>
+          <br>
+          <div>
+            <label class="checkbox pull-left"><input type="checkbox">记住用户名 &nbsp;&nbsp;</label>
+            <label class="checkbox pull-left"><input type="checkbox">下次自动登录</label>
+            <a class="pull-right" href="/accounts/password/reset">忘记密码</a>
+          </div>
+          <div><button type="submit" class="btn btn-login w354">登 录</button></div>
+          <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+      </div>
+      <pre class="wlb-logined">还不是会员？<br/>注册成为会员，我们将为您提供专业的理财建议&nbsp;&nbsp;<a class="btn btn-wlbdefault" href="/accounts/register">注册</a></pre>
+    </div>
+
+    </form>
+  </div>
+</div>
+<!--用户登录 end-->
+{% endblock %}
