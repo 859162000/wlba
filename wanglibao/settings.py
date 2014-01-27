@@ -42,10 +42,11 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     'rest_framework',
-    'trust',
     'south',
     'registration',
 
+    'trust',
+    'wanglibao_bank_financing',
     'wanglibao_profile',
     'wanglibao_rest',
     'wanglibao_portfolio',
