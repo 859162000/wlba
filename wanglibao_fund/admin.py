@@ -1,3 +1,6 @@
 from django.contrib import admin
+from wanglibao_fund.models import Fund, FundIssuer
 
-# Register your models here.
+admin.site.register(Fund)
+admin.site.register(FundIssuer)
+
