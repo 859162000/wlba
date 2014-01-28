@@ -21,15 +21,16 @@
           {% csrf_token %}
           <h3>账号注册</h3>
           <div>{% render_field form.username class+="login-input" placeholder="请输入用户名" %}</div><br/>
-          <div>{% render_field form.email class+="login-input" placeholder="请输入邮箱" %}</div><br/>
-          <div>{% render_field form.password1 class+="login-input" placeholder="请输入密码" %}</div><br />
-          <div>{% render_field form.password2 class+="login-input" placeholder="确认密码" %}</div><br />
+          <div>{% render_field form.identifier class+="login-input" placeholder="请输入邮箱或手机" %}</div><br/>
+          <div>{% render_field form.validate_code class+="login-input" placeholder="请输入验证码" %}</div><br/>
+          <div>{% render_field form.password class+="login-input" placeholder="请输入密码" %}</div><br />
           <div>
             <label class="checkbox"><input type="checkbox">
               我已阅读并同意<a class="orange" href="#">《网利宝服务协议》</a>
             </label>
           </div>
           <div><button type="submit" class="btn btn-login w354">{% trans "signup" %}</button></div>
+          {% render_field form.type class+="hidden" value=form.type.value %}
           <input type="hidden" name="next" value="{{ next }}" />
         </form>
       </div>

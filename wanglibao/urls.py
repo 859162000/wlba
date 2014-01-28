@@ -5,8 +5,6 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth.views import login
 from django.views.generic import TemplateView
-from registration.backends.default.views import RegistrationView
-from wanglibao.forms import LoginForm
 from wanglibao.views import RegisterView
 
 admin.autodiscover()
