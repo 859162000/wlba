@@ -1,9 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.db import models
-from registration.models import User
 
 
 class WanglibaoUserProfile(models.Model):
-    user = models.OneToOneField(User, primary_key=True)
+    user = models.OneToOneField(get_user_model(), primary_key=True)
 
     phone = models.CharField(verbose_name="Mobile phone number", max_length=64)
     phone_verified = models.BooleanField(verbose_name="Mobile phone verified", default=False)

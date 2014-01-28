@@ -170,3 +170,19 @@ class RegisterByPhone(APIView):
                 "data": request.DATA
             }, status=400)
 
+
+class UserExisting(APIView):
+
+    permission_classes = ()
+
+    def get(self, request, format=None):
+        """
+        Get whether the user existing
+        """
+        username = request.GET['username']
+
+        user_existing = User.objects.exists(username=username)
+
+        return Response({
+            "existing": user_existing
+        }, status=200)
