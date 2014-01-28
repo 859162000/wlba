@@ -102,6 +102,9 @@ LOCALE_PATHS = (
 )
 
 
+# Authentication backend
+AUTHENTICATION_BACKENDS = ('wanglibao.auth_backends.EmailPhoneUsernameAuthBackend', )
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
