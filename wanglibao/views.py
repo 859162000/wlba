@@ -14,22 +14,21 @@ class RegisterView (RegistrationView):
 
         user = User.objects.create(username=username)
         user.set_password(password)
+        user.save()
 
         identifier = cleaned_data['identifier']
         identifier_type = cleaned_data['type']
         if identifier_type == 'email':
             user.email = identifier
             user.is_active = False
+            user.save()
             # TODO Trigger send activation mail by utilizing registration library
 
         elif identifier_type == 'phone':
-            profile = WanglibaoUserProfile.objects.create()
+            profile = user.wanglibaouserprofile
             profile.phone = identifier
             profile.phone_verified = True
             profile.save()
-            user.wanglibaouserprofile = profile
-
-        user.save()
 
         user.backend = "Backend: AutoLoginAfterAuthenticate"
         login(request, user)

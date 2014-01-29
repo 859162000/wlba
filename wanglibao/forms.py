@@ -40,13 +40,17 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         identifier = self.cleaned_data["identifier"]
         identifier_type = self.clean_type()
 
+        users = None
         if identifier_type == 'email':
             users = User.objects.filter(email=identifier, is_active=True)
-            if len(users) == 0:
-                return identifier
-            raise forms.ValidationError(
-                self.error_messages['duplicate_username'],
-                code='duplicate_username', )
+        elif identifier_type == 'phone':
+            users = User.objects.filter(wanglibaouserprofile__phone=identifier, is_active=True)
+
+        if len(users) == 0:
+            return identifier.strip()
+        raise forms.ValidationError(
+            self.error_messages['duplicate_username'],
+            code='duplicate_username', )
 
     def clean_type(self):
         identifier_type = self.data["type"]
@@ -59,7 +63,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     def clean_validate_code(self):
         validate_code = self.cleaned_data["validate_code"]
         if self.clean_type() == 'phone':
-            phone = self.cleaned_data.get("phone")
+            # phone = self.cleaned_data["identifier"]
+            phone = self.clean_identifier()
             try:
                 phone_validate = PhoneValidateCode.objects.get(phone=phone)
                 # TODO Check the validate_code period, 30 minutes
