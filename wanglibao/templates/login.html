@@ -15,17 +15,20 @@
     <div class="pull-right">
       <div class="wlb-login-form">
         <form class="form-horizontal" method="post" action="{% url 'auth_login' %}">
+          {{  form.password.errors }}
+          {{  form.email.errors }}
+          {{  form.username.errors }}
           {% csrf_token %}
           <h3>用户登录</h3>
           <br>
           <div>{% render_field form.username class+="login-input" %}</div>
           <br>
-          <div>{% render_field form.password class+="login-input" %}</div>
+          <div>
+            {% render_field form.password class+="login-input" %}
+            <a class="pull-right btn btn-wlbdefault" href="/accounts/password/reset">忘记密码</a>
+          </div>
           <br>
           <div>
-            <label class="checkbox pull-left"><input type="checkbox">记住用户名 &nbsp;&nbsp;</label>
-            <label class="checkbox pull-left"><input type="checkbox">下次自动登录</label>
-            <a class="pull-right" href="/accounts/password/reset">忘记密码</a>
           </div>
           <div><button type="submit" class="btn btn-login w354">登 录</button></div>
           <input type="hidden" name="next" value="{{ next }}" />

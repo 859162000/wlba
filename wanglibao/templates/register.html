@@ -30,7 +30,7 @@
             </label>
           </div>
           <div><button type="submit" class="btn btn-login w354">{% trans "signup" %}</button></div>
-          {% render_field form.type class+="hidden" value=form.type.value %}
+          {% render_field form.type class+="hidden" style="display:none" value=form.type.value %}
           <input type="hidden" name="next" value="{{ next }}" />
         </form>
       </div>
