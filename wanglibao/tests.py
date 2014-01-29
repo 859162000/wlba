@@ -11,7 +11,6 @@ class EmailOrPhoneRegisterFormTestCase(TestCase):
 
     def test_register_by_email(self):
         form_data = {
-            'username': 'test',
             'identifier': 'test@test.com',
             'type': 'email',
             'password': 'testpassword',
@@ -29,7 +28,6 @@ class EmailOrPhoneRegisterFormTestCase(TestCase):
         validate_code_record.save()
 
         form_data = {
-            'username': 'test',
             'identifier': '13810652323',
             'validate_code': '133223',
             'type': 'phone',
@@ -43,15 +41,14 @@ class EmailOrPhoneRegisterFormTestCase(TestCase):
 class RegisterViewTestCase(TestCase):
 
     def test_email_register(self):
-        response = self.client.post("/accounts/register/", {
-            'username': 'test',
+        self.client.post("/accounts/register/", {
             'identifier': 'test@test.com',
             'type': 'email',
             'password': 'testpassword',
         })
 
         user = User.objects.get(email='test@test.com')
-        self.assertEqual('test', user.username)
+        self.assertEqual('test@test.com', user.email)
 
     def test_phone_register(self):
         phone = '12345123232'
@@ -64,8 +61,7 @@ class RegisterViewTestCase(TestCase):
         )
         validate_code_record.save()
 
-        response = self.client.post("/accounts/register/", {
-            'username': 'test',
+        self.client.post("/accounts/register/", {
             'identifier': phone,
             'validate_code': validate_code,
             'type': 'phone',
@@ -73,5 +69,25 @@ class RegisterViewTestCase(TestCase):
         })
 
         user = User.objects.get(wanglibaouserprofile__phone=phone)
-        self.assertEqual('test', user.username)
+        self.assertEqual(phone, user.wanglibaouserprofile.phone)
 
+
+class LoginTestCase(TestCase):
+    def test_login_email(self):
+        user = User.objects.create(username='test', email='test@test.com')
+        user.set_password('pass')
+        user.save()
+
+        response = self.client.post("/accounts/login", {
+            'email': 'test@test.com',
+            'password': 'pass'
+        }, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post("/accounts/login", {
+            'email': 'test@test.com',
+            'password': 'pass_wrong'
+        }, follow=True)
+
+        self.assertEqual(response.status_code, 200)

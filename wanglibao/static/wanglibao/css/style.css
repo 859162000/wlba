@@ -1280,3 +1280,6 @@ a.sub-plan-name:active {
 .colorccc {color:#CCC;}
 .border-r {border-right:solid 1px #CCC;}
 
+.hidden {
+  display: none
+}

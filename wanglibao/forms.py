@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from wanglibao_profile.models import PhoneValidateCode, WanglibaoUserProfile
 
 User = get_user_model()
@@ -16,7 +16,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     account is not activated. When the user clicked the activation link, the account
     will be activated.
     """
-    username = forms.CharField(label="Username")
+    username = forms.CharField(label="Username", required=False)
     identifier = forms.CharField(label="Email/Phone")
     validate_code = forms.CharField(label="Validate code for phone", required=False)
     type = forms.CharField(initial="email")
@@ -82,27 +82,47 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                 )
         return validate_code
 
-    def save(self, commit=True):
-        username = self.cleaned_data['username']
-        password = self.cleaned_data['password']
+class EmailOrPhoneAuthenticationForm(forms.Form):
+    """
+    Base class for authenticating users. Extend this to get a form that accepts
+    username/password logins.
+    """
+    identifier = forms.CharField(max_length=254)
+    password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
-        user = User.objects.create(username=username)
-        user.set_password(password)
+    error_messages = {
+        'invalid_login': "Please enter a correct %(username)s and password. "
+                           "Note that both fields may be case-sensitive.",
+        'inactive': "This account is inactive.",
+    }
 
-        identifier = self.cleaned_data('identifier')
-        identifier_type = self.clearned_data('type')
-        if identifier_type == 'email':
-            user.email = identifier
-            user.is_active = False
-            # TODO Trigger send activation mail by utilizing registration library
+    def __init__(self, request=None, *args, **kwargs):
+        """
+        The 'request' parameter is set for custom auth use by subclasses.
+        The form data comes in via the standard 'data' kwarg.
+        """
+        self.request = request
+        self.user_cache = None
+        super(EmailOrPhoneAuthenticationForm, self).__init__(*args, **kwargs)
 
-        elif identifier_type == 'phone':
-            profile = WanglibaoUserProfile.objects.create()
-            profile.phone = identifier
-            profile.phone_verified = True
-            profile.save()
-            user.wanglibaouserprofile = profile
+    def clean(self):
+        identifier = self.cleaned_data.get('identifier')
+        password = self.cleaned_data.get('password')
 
-        if commit:
-            user.save()
-        return user
+        if identifier and password:
+            self.user_cache = authenticate(identifier=identifier, password=password)
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': self.username_field.verbose_name},
+                )
+        return self.cleaned_data
+
+    def get_user_id(self):
+        if self.user_cache:
+            return self.user_cache.id
+        return None
+
+    def get_user(self):
+        return self.user_cache

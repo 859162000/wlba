@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
+from rest_framework.urlpatterns import format_suffix_patterns
 from wanglibao_hotlist.views import HotTrustViewSet
 from wanglibao_portfolio.views import PortfolioViewSet, UserPortfolioViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -17,10 +18,11 @@ router.register(r'user_portfolio', UserPortfolioViewSet)
 
 router.register(r'hot_trusts', HotTrustViewSet)
 
+
 urlpatterns = patterns(
     '',
     url(r'^phonecode$', PhoneValidateView.as_view()),
-    url(r'^register_by_phone$', RegisterByPhone.as_view()),
-    url(r'^user_existing$', UserExisting.as_view()),
+    url(r'^register_by_phone/$', RegisterByPhone.as_view()),
+    url(r'^user_existing/$', UserExisting.as_view()),
     url(r'^', include(router.urls)),
 )

@@ -180,9 +180,7 @@ class UserExisting(APIView):
         Get whether the user existing
         """
         username = request.GET['username']
-
-        user_existing = User.objects.exists(username=username)
-
+        user_existing = User.objects.filter(username=username).count() > 0
         return Response({
             "existing": user_existing
         }, status=200)

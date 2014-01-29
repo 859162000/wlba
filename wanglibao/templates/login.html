@@ -21,7 +21,7 @@
           {% csrf_token %}
           <h3>用户登录</h3>
           <br>
-          <div>{% render_field form.username class+="login-input" %}</div>
+          <div>{% render_field form.identifier class+="login-input" %}</div>
           <br>
           <div>
             {% render_field form.password class+="login-input" %}

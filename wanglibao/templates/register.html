@@ -20,7 +20,6 @@
           {{  form.username.errors }}
           {% csrf_token %}
           <h3>账号注册</h3>
-          <div>{% render_field form.username class+="login-input" placeholder="请输入用户名" %}</div><br/>
           <div>{% render_field form.identifier class+="login-input" placeholder="请输入邮箱或手机" %}</div><br/>
           <div>{% render_field form.validate_code class+="login-input" placeholder="请输入验证码" %}</div><br/>
           <div>{% render_field form.password class+="login-input" placeholder="请输入密码" %}</div><br />

@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model, login
 from registration.views import RegistrationView
 from wanglibao.forms import EmailOrPhoneRegisterForm
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao.utils import generate_username
 
 User = get_user_model()
 class RegisterView (RegistrationView):
@@ -9,15 +10,19 @@ class RegisterView (RegistrationView):
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
+
         username = cleaned_data['username']
         password = cleaned_data['password']
+        identifier = cleaned_data['identifier']
+        identifier_type = cleaned_data['type']
+
+        if not username:
+            username = generate_username(identifier)
 
         user = User.objects.create(username=username)
         user.set_password(password)
         user.save()
 
-        identifier = cleaned_data['identifier']
-        identifier_type = cleaned_data['type']
         if identifier_type == 'email':
             user.email = identifier
             user.is_active = False

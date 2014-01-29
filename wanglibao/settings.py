@@ -103,7 +103,9 @@ LOCALE_PATHS = (
 
 
 # Authentication backend
-AUTHENTICATION_BACKENDS = ('wanglibao.auth_backends.EmailPhoneUsernameAuthBackend', )
+AUTHENTICATION_BACKENDS = (
+    'wanglibao.auth_backends.EmailPhoneUsernameAuthBackend',
+)
 
 # Template pre processor
 TEMPLATE_CONTEXT_PROCESSORS = (
