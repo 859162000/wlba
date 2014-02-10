@@ -4,114 +4,73 @@
 
 {% block content %}
   {{ block.super }}
-  <div class="wlb-search row-fluid">
-
-    <!-- Asset search-->
-    <div class="span6 wlb-personal clearfix">
-      <div class="wlb-bgalpha">
-        <h3>
-          <em class="wlb-personal-icon"></em>
-          <span>个人理财</span>
-        </h3>
-        <p class="f16">输入您的资产净值 <span class="wlb-question-icon" title="您的总资产减去总负债"></span></p>
-        <div class="wlb-se-ipt">
-          <input type="text" value="" /><span>万元</span>
-          <button class="btn btn-wlbse2">找方案</button>
-        </div>
-        <p>我们将推荐适合您的投资方案</p>
-        <p class="f16">或者花1分钟时间，我们为您<a href="#" class="orange">私人定制</a>。</p>
-      </div>
-    </div>
-    <!-- End of asset search-->
-
-    <!-- Product search-->
-    <div class="span6 wlb-product clearfix">
-      <div class="wlb-bgalpha">
-        <h3>
-          <em class="wlb-product-icon"></em><span>产品搜索</span>
-        </h3>
-        <p class="f16">输入投资金额</p>
-        <div class="wlb-se-ipt"><input type="text" value="" /><span>万元</span><button type="button" class="btn btn-wlbse2">搜 索</button></div>
-        <p>120096款 在售理财产品任您搜</p>
-        <p class="f16 orange"><a href="#">100万元信托</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#">10万元银行理财</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#">100万元基金</a></p>
-      </div>
-    </div>
-    <!-- End of product search-->
-  </div>
-
-  <!--热门推荐 start-->
-  <div class="wlb-hot">
-
-    <div class="container-fluid">
-      <div class="wlb-hot-item f16 row">
-        <h3 class="span2">热门推荐</h3>
-        <div class="span6 tab-wlbhotitem">
-          <span class="span2"><a href="#" class="active">信托产品</a></span>
-
-          <!-- Hide them for now -->
-          <!--
-          <span class="span2"><a href="#">银行理财</a></span>
-          <span class="span2"><a href="#">基金产品</a></span>
-          -->
-
-        </div>
-        <!--Hide for now-->
-        <!--
-        <span class="span1 offset4"><a href="#">更多</a></span>
-        -->
-      </div>
-
-      <div class="wlb-hot-content">
-        <!--信托产品 start-->
-        <div id="xintuo" data-bind="foreach: rows">
-          <div class="row-fluid" data-bind="foreach: $data">
-            <!--Single Product template-->
-            <div class="span4">
-              <div class="wlb-hot-product">
-                <a class="wlb-bespeak" data-bind="attr: { href: url }">预约</a>
-                <ul class="wlb-profit">
-                  <li class="profit-tle">预期收益</li>
-                  <li data-bind="text: expected_earning_rate"></li>
-                </ul>
-                <ul class="wlb-profit-info">
-                  <li class="info-tle" data-bind="text: name"></li>
-                  <li><span>投资期限：</span><span data-bind="text: period"></span></li>
-                  <li><span>投资门槛：</span><span data-bind="text: investment_threshold"></span></li>
-                  <li><span>点评: </span><span data-bind="text: brief"></span></li>
-                </ul>
-              </div>
+  <div class="big-background">
+    <div class="l-activity-panel">
+      <div class="space-vertical-xl"></div>
+      <div class="container">
+        <div class="search-box pull-left">
+          <div class="search-box-title"><span class="i-search-personal"></span><span class="search-box-title-text">个人理财</span></div>
+          <div class="search-box-body">
+            <p class="search-box-slug">输入您的资产净值</p>
+            <div class="search-box-input-container">
+              <input type="text" value=""><span class="search-box-add-on">万元</span>
+              <button class="btn-search-box">找方案</button>
             </div>
-            <!--End of single product template-->
+            <p class="search-box-description">我们将推荐适合您的投资方案</p>
+            <p class="font-m white-text">或者花1分钟时间，我们为您<a href="#" class="search-quicklink">私人定制</a></p>
           </div>
         </div>
-        <!--信托产品 end-->
-        <!--银行理财 start--><!--银行理财 end-->
-        <!--基金产品 start--><!--基金产品 end-->
-      </div>
-    </div>
-  </div>
-  <!--滑动图片 start-->
-  <div class="wlb-serv">
-    <div class="container-fluid">
-      <div class="wlb-serv-content">
-        <div class="row-fluid">
-          <div id="panel_adv" class="span4 wlb-serv-panel">
-            <div id="sli_adv" class="wlb-serv-gw" style="top:0;" title="专业顾问"></div>
-            <div id="sli_adv_txt" class="wlb-serv-txt" style="top:0;">资深理财团队打造智能评估系统</div>
-          </div>
-          <div id="panel_pro" class="span4 wlb-serv-panel">
-            <div id="sli_pro" class="wlb-serv-jx" style="top:0;" title="精选产品"></div>
-            <div id="sli_pro_txt" class="wlb-serv-txt" style="top:0;">资深理财团精选优质产品</div>
-          </div>
-          <div id="panel_res" class="span4 wlb-serv-panel">
-            <div id="sli_res" class="wlb-serv-xy" style="top:0;" title="快速响应"></div>
-            <div id="sli_res_txt" class="wlb-serv-txt" style="top:0;">专业客服人员第一时间响应预约</div>
+        <div class="search-box pull-left">
+          <div class="search-box-title"><span class="i-search-product"></span><span class="search-box-title-text">产品搜索</span></div>
+          <div class="search-box-body">
+            <p class="search-box-slug">输入投资金额</p>
+            <div class="search-box-input-container">
+              <input type="text" value=""><span class="search-box-add-on">万元</span>
+              <button type="button" class="btn-search-box">搜 索</button>
+            </div>
+            <p class="search-box-description">120096款 在售理财产品任您搜</p>
+            <p class="font-m orange"><a href="#" class="search-quicklink">100万元信托</a><a href="#" class="search-quicklink">10万元银行理财</a><a href="#" class="search-quicklink">100万元基金</a></p>
           </div>
         </div>
       </div>
+      <div class="space-vertical-xl"></div>
     </div>
   </div>
-  <!--滑动图片 end-->
+  <div class="space-vertical-s"></div>
+  <div class="container"><span class="font-l">热门推荐</span><a href="#">信托产品</a>
+    <div class="space-vertical-s"></div>
+    <div data-bind="foreach: rows" class="container">
+      <!-- ko foreach: $data-->
+      <div class="card card-trust">
+        <div class="card-left">
+          <div class="card-icon">
+            <dl>
+              <dt>预期收益</dt>
+              <dd data-bind="text: expected_earning_rate">10%</dd>
+            </dl>
+          </div><a data-bind="attr: { href: url }" class="card-orderlink">预约</a>
+        </div>
+        <div class="card-right">
+          <dl><span data-bind="text: name" class="card-title">网利宝金融平台信托产品</span>
+            <div>
+              <dt> 投资期限：</dt>
+              <dd data-bind="text: period">12个月</dd>
+            </div>
+            <div>
+              <dt>投资门槛：</dt>
+              <dd data-bind="text: investment_threshold">100万</dd>
+            </div>
+            <div>
+              <dt>点评:</dt>
+              <dd data-bind="text: brief" class="product-brief">不可错过，只有这么抑制了，如果还不买，可能就没有了，以后也不一定会除了</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+      <!-- /ko-->
+    </div>
+  </div>
+  <div class="space-vertical-m"></div>
 
 {% endblock %}
 

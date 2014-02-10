@@ -1,87 +1,73 @@
 {% load staticfiles %}
 
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>首页 - 网利宝</title>
 
-    <link type="text/css" rel="stylesheet" href="{% static "wanglibao/css/bootstrap.min.css" %}"/>
-      <!--[if lte IE 6]>
-      <link rel="stylesheet" type="text/css" href="{% static "wanglibao/css/bootstrap-ie6.css" %}">
-      <![endif]-->
-      <!--[if lte IE 7]>
-      <link rel="stylesheet" type="text/css" href="{% static "wanglibao/css/ie.css" %}">
-      <![endif]-->
-    <link type="text/css" rel="stylesheet" href="{% static "wanglibao/css/style.css" %}" />
+    <title> {% block title %} 网利宝-首页 {% endblock %} </title>
+
+    <link href="{% static "wanglibao/stylesheets/screen.css" %}" media="screen, projection" rel="stylesheet" type="text/css">
+    <link href="{% static "wanglibao/stylesheets/print.css" %}" media="print" rel="stylesheet" type="text/css">
+    <!-- if IElink(href="{% static "wanglibao/stylesheets/ie.css"  %}", media="screen, projection", rel="stylesheet", type="text/css")
+    -->
   </head>
 
 <body>
-<div class="wlb-header">
-  <div class="container-fluid">
-    <div class="wlb-welcome">
+    <div class="top-bar">
+      <div class="top-bar-container">
+        <div class="top-bar-phone"><i class="header-phone-icon images-original-logo"></i><span class="header-phone-text">400-123-8888</span></div>
 
-      <!-- Header Top Bar
-        A top bar which contains phone number, user login information
-      -->
-      <div class="row-fluid wlb-welcome-cnt">
-        <div class="span2 wlb-tel">
-          <i class="wlb-tel-icon"></i>
-          <span>400-123-8888</span>
-        </div>
         {% if user.is_authenticated %}
-          <div class="span10 wlb-user-info">欢迎你：
-            <span class="wlb-user-txt">
-            {{ user.username }}
-            <a href="/accounts/logout">退出</a>
-            </span></div>
+          <div class="user-info">
+            <span>欢迎您，</span>
+            <a href="#" class="username">{{ user.email }}</a>
+            <span class="white-v-line"></span>
+            <a href="/accounts/logout?next={{ request.path }}" class="logout">退出</a>
+          </div>
         {% else %}
-          <div class="span10">
-            <a href="/accounts/login?next={{ request.path }}">登陆</a>
-            <a href="/accounts/register">注册</a>
+          <div class="user-info">
+            <a href="/accounts/login?next={{ request.path }}">登录</a>
+            <span class="white-v-line"></span>
+            <a href="/accounts/register?next={{ request.path }}">注册</a>
           </div>
         {% endif %}
       </div>
-      <!-- End of Top Bar-->
     </div>
-
-
 
     {% block content %}
 
     {% endblock %}
 
-<!--页尾 start-->
-<div class="wlb-footer">
-	<div class="container-fluid">
-    <div class="row-fluid wlb-footer-content">
-      <ul class="span3 wlb-about">
-        <li class="wlb-about-title">关于理财</li>
-        <li>怎么选择合适的理财产品？</li>
-        <li>为什么需要资产配置？</li>
-        <li>如何做资产配置？</li>
-       </ul>
-       <ul class="span2 wlb-about">
-         <li class="wlb-about-title">关于网利宝</li>
-         <li>关于我们</li>
-         <li>顾问团队</li>
-         <li>媒体报道</li>
-       </ul>
-       <div class="span7 wlb-contact">
-         <div class="wlb-contact-title">联系方式</div>
-         <div class="row-fluid">
-           <div class="span6 wlb-contact-location">北京经济技术开发区地盛北街1号北京经开北工大软件园1号楼</div>
-           <div class="span6 wlb-contact-phone">13810250118<br />13810250118</div>
-         </div>
-         <div class="row-fluid">
-           <div class="span6 wlb-contact-tel">010-67873388<br/>010-67873388</div>
-           <div class="span6 wlb-contact-email">master@wanglibao.com<br/>master@wanglibao.com</div>
-         </div>
-       </div>
+    <!--页尾 start-->
+    <div class="footer">
+      <div class="footer--container">
+        <dl class="footer--section">
+          <dt class="section--title">关于理财</dt>
+          <dd class="section--item">怎么选择合适的理财产品？</dd>
+          <dd class="section--item">为什么需要资产配置？</dd>
+          <dd class="section--item">如何做资产配置？</dd>
+        </dl>
+        <dl class="footer--section">
+          <dt class="section--title">关于网利宝</dt>
+          <dd class="section--item">关于我们</dd>
+          <dd class="section--item">顾问团队</dd>
+          <dd class="section--item">媒体报道</dd>
+        </dl>
+        <dl class="footer--section__last">
+          <dt class="section--title">联系方式</dt>
+          <div class="section--row">
+            <dd class="contact-location section--column"><i class="i-location"></i><span>北京市霄云路40号10-1000</span></dd>
+            <dd class="contact-phone section--column"><i class="i-pad"></i><span>13810250118</span></dd>
+          </div>
+          <div class="section--row">
+            <dd class="contact-tel section--column"><i class="i-phone-icon"></i><span>010-67873388</span></dd>
+            <dd class="contact-email section--column"><i class="i-mail"></i><span>master@wanglibao.com</span></dd>
+          </div>
+        </dl>
+      </div>
     </div>
-  </div>
-</div>
 
   {% block javascript %}
     <!--页尾 end-->

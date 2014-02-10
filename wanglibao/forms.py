@@ -115,7 +115,7 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
                 raise forms.ValidationError(
                     self.error_messages['invalid_login'],
                     code='invalid_login',
-                    params={'username': self.username_field.verbose_name},
+                    params={'identifier': identifier},
                 )
         return self.cleaned_data
 
