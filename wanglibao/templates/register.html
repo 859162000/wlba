@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load static %}
 {% load widget_tweaks %}
 {% load i18n %}
 
@@ -8,36 +9,54 @@
 {% block title %} 用户登录 - 网利宝 {% endblock %}
 
 {% block content %}
-<!--用户登录 start-->
-<div class="wlb-login">
-  <div class="wlb-login-content">
-    <a href="/" class="pull-left wlb-login-logo" title="网利宝">&nbsp;</a>
-    <div class="pull-right">
-      <div class="wlb-login-form">
-        <form class="form-horizontal" method="post" action="/accounts/register/">
-          {{  form.password.errors }}
-          {{  form.email.errors }}
-          {{  form.username.errors }}
-          {% csrf_token %}
-          <h3>账号注册</h3>
-          <div>{% render_field form.identifier class+="login-input" placeholder="请输入邮箱或手机" %}</div><br/>
-          <div>{% render_field form.validate_code class+="login-input" placeholder="请输入验证码" %}</div><br/>
-          <div>{% render_field form.password class+="login-input" placeholder="请输入密码" %}</div><br />
-          <div>
-            <label class="checkbox"><input type="checkbox">
-              我已阅读并同意<a class="orange" href="#">《网利宝服务协议》</a>
-            </label>
+
+  <div class="l-activity-panel">
+      <div class="clearfix"><a href="/" title="网利宝" class="pull-left logo"> </a></div>
+      <div class="well clearfix">
+        <div class="pull-left account-background"></div>
+        <div class="pull-right">
+          <div class="form login-form">
+            <form class="form-horizontal" method="post" action="/accounts/register/?next={{ next }}">
+              {{  form.password.errors }}
+              {{  form.email.errors }}
+              {{  form.username.errors }}
+              {% csrf_token %}
+              {% render_field form.type class+="hidden" style="display:none" value=form.type.value %}
+              <dl>
+                <dt class="form-title">
+                  <label class="font-l">注册用户</label>
+                </dt>
+                <dd class="input-group form-row"><span class="input-group-icon">
+                  <div class="space-xs"></div><span title="请输入邮箱或手机号" class="icon i-people-white"></span></span>
+                  {% render_field form.identifier class+="input-large" placeholder="请输入邮箱或手机" %}
+                </dd>
+                <dd id="validate-code-container" class="row table form-row"><span class="table-cell">检测到手机号码</span>
+                  {% render_field form.validate_code class+="table-cell clear-margin" placeholder="请输入验证码" autocomplete='off' %}
+                  <div class="table-cell"><a href="#" class="button button-error button-small">获取</a></div>
+                </dd>
+                <dd class="input-group row form-row"><span class="input-group-icon">
+                  <div class="space-xs"></div><span title="请输入密码" class="i-lock"></span></span>
+                  {% render_field form.password class+="input-large" placeholder="请输入密码" autocomplete='off' %}
+                </dd>
+                <div class="space-vertical-s"></div>
+                <dd class="row form-row">
+                  <button type="submit" class="span12 button-error button-large">注 册</button>
+                </dd>
+                <div class="space-vertical-m"></div>
+                <div class="form-footer"><span class="inline-block"><span>已有账户</span></span>
+                  <div class="space-xs"></div><a href="register.html" class="button button-warning button-small">登录</a>
+                </div>
+              </dl>
+            </form>
           </div>
-          <div><button type="submit" class="btn btn-login w354">注 册</button></div>
-          {% render_field form.type class+="hidden" style="display:none" value=form.type.value %}
-          <input type="hidden" name="next" value="{{ next }}" />
-        </form>
+        </div>
       </div>
-      <pre class="wlb-logined">已经有账号，直接登录&nbsp;&nbsp;<a class="btn btn-wlbdefault" href="/accounts/login">登录</a></pre>
     </div>
-  </div>
-</div>
-<!--用户登录 end-->
+<!--用户登录 start-->
 {% endblock %}
 
-
+{% block javascript %}
+  {{  block.super }}
+  <script src="{% static "wanglibao/js/jquery.min.js" %}"></script>
+  <script src="{% static "wanglibao/javascripts/register.js" %}"></script>
+{% endblock %}
