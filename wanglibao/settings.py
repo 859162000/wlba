@@ -147,10 +147,18 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.OAuth2Authentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '1/minute'
+    }
 }
 
 # email SMTP configuration
 EMAIL_HOST = 'smtp.mailgun.org'
 EMAIL_HOST_USER = 'postmaster@sandbox57322.mailgun.org'
 EMAIL_HOST_PASSWORD = '83x1ln8w5p64'
-DEFAULT_FROM_EMAIL = 'support@wanglibao.com'
+DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
+
+# sms service configuration
+SMS_ACCOUNT = 'cf_zkrx'
+SMS_PASSWORD = 'S8o-mHH-fcc-x8g'
+SMS_URL = 'http://121.199.16.178/webservice/sms.php?method=Submit'

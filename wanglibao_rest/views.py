@@ -1,16 +1,19 @@
 import datetime
+from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission
 
 # Create your views here.
-from django.contrib.contenttypes.models import ContentType
+from django.template.loader import render_to_string
 from django.utils.timezone import utc
 import django_filters
 import random
+import requests
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.decorators import link, action
 from rest_framework.filters import FilterSet
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework.views import APIView
 from trust.models import Trust, Issuer
 from wanglibao_portfolio.models import UserPortfolio
@@ -82,9 +85,10 @@ class PhoneValidateView(APIView):
     The phone validate view which accept a post request and send a validate code to the phone
     """
     permission_classes = ()
+    throttle_classes = (UserRateThrottle,)
 
-    def post(self, request, format=None):
-        phone_number = request.DATA['phone']
+    def post(self, request, phone, format=None):
+        phone_number = phone
         phone_number = phone_number.strip()
 
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
@@ -94,6 +98,7 @@ class PhoneValidateView(APIView):
             phone_validate_code_item = PhoneValidateCode.objects.get(phone=phone_number)
 
             if (now - phone_validate_code_item.last_send_time) <= datetime.timedelta(minutes=1):
+                # TODO find a proper status code
                 return Response({
                     "error": "Called too frequently"
                 }, status=400)
@@ -101,14 +106,46 @@ class PhoneValidateView(APIView):
                 phone_validate_code_item.validate_code = validate_code
                 phone_validate_code_item.last_send_time = now
                 phone_validate_code_item.save()
-        except PhoneValidateCode.DoesNotExist,e:
+
+        except PhoneValidateCode.DoesNotExist:
             phone_validate_code_item = PhoneValidateCode.objects.create(
                 phone=phone_number,
                 validate_code=validate_code,
                 last_send_time=now)
             phone_validate_code_item.save()
 
-        # TODO send validate code to the phone number
+         # Send the validate message to mobile TODO Add throttling on ip, phone number
+        content = render_to_string('activation-sms.html', {'validation_code': validate_code})
+        params = {
+            'account': settings.SMS_ACCOUNT,
+            'password': settings.SMS_PASSWORD,
+            'mobile': phone_number,
+            'content': content
+        }
+
+        url = settings.SMS_URL
+        r = requests.post(url, params)
+
+        # TODO add more specific error detection code
+
+        if r.status_code != 200:
+            return Response({
+                "error": "Failed to send sms"
+            }, status=400)
+
+        import xml.etree.ElementTree as ET
+        doc = ET.fromstring(r.content)
+
+        namespace = doc.tag.lstrip('{').split('}')[0].join(['{', '}'])
+        return_code = int(next(doc.iter(namespace + 'code')).text)
+        message = next(doc.iter(namespace + 'msg')).text.encode('utf-8')
+
+        if return_code != 2:
+            return Response({
+                "phone": phone_number,
+                "message": "Failed to send sms"
+            }, status=400)
+
         return Response({
             "phone": phone_number,
             "last_send_time": now

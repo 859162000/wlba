@@ -21,8 +21,8 @@ router.register(r'hot_trusts', HotTrustViewSet)
 
 urlpatterns = patterns(
     '',
-    url(r'^phonecode$', PhoneValidateView.as_view()),
-    url(r'^register_by_phone/$', RegisterByPhone.as_view()),
+    # TODO add format check on phone
+    url(r'^phone_validation_code/(?P<phone>\d{11})/$', PhoneValidateView.as_view()),
     url(r'^user_existing/$', UserExisting.as_view()),
     url(r'^', include(router.urls)),
 )

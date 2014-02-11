@@ -63,7 +63,6 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     def clean_validate_code(self):
         validate_code = self.cleaned_data["validate_code"]
         if self.clean_type() == 'phone':
-            # phone = self.cleaned_data["identifier"]
             phone = self.clean_identifier()
             try:
                 phone_validate = PhoneValidateCode.objects.get(phone=phone)
