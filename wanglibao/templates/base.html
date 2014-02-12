@@ -75,14 +75,9 @@
       </div>
     </div>
 
-  {% block javascript %}
-    <!--页尾 end-->
-    <script src="{% static "wanglibao/js/jquery.min.js" %}"></script>
-    <script type="text/javascript" src="{% static "wanglibao/js/bootstrap.min.js" %}"></script>
-    <!--[if lte IE 6]>
-      <script type="text/javascript" src="{% static "wanglibao/js/bootstrap-ie.js" %}"></script>
-    <![endif]-->
-  {% endblock %}
-
-</body>
+    {% block javascript %}
+      <!--页尾 end-->
+      <script src="{% static "wanglibao/js/jquery.min.js" %}"></script>
+    {% endblock %}
+  </body>
 </html>
