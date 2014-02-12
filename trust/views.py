@@ -12,3 +12,4 @@ class TrustHomeView(TemplateView):
 
         latest_trusts = Trust.objects.order_by('-issue_date')[0:10] # TODO make this value configurable
         context['latest_trusts'] = latest_trusts
+        return context

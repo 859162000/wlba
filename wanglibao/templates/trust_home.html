@@ -84,19 +84,6 @@
         </tr>
         </thead>
         <tbody>
-         {% for trust in period_lt12_trusts %}
-            <tr>
-              <td colspan="1">{{ forloop.counter }}</td>
-              <td colspan="4">{{ trust.name }}</td>
-              <td colspan="2">{{ trust.investment_threshold | money_to_10k }}</td>
-              <td colspan="2">{{ trust.period | month }}</td>
-              <td colspan="2">{{ trust.expected_earning_rate | percentage }}</td>
-              <td colspan="2">{{ trust.usage }}</td>
-              <td colspan="2">{{ trust.type }}</td>
-              <td colspan="2">{{ trust.issuer.name }}</td>
-              <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-            </tr>
-         {% endfor %}
         </tbody>
       </table>
     </div>
