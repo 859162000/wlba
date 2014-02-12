@@ -1,3 +1,4 @@
+from requests import ConnectionError
 from rest_framework.renderers import JSONRenderer
 from rest_framework.serializers import ModelSerializer
 from django.db import models
@@ -33,17 +34,22 @@ class Issuer(models.Model):
     def __unicode__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
+    # Write this just to comment the function out. Dead code here but not happy live in
+    # history of git
+    def save_temp(self, *args, **kwargs):
         super(Issuer, self).save(*args, **kwargs)
 
         class IssuerSerializer(ModelSerializer):
             class Meta:
                 model = Issuer
 
-        serializer = IssuerSerializer(self)
-        json = JSONRenderer().render(serializer.data)
-        es = elasticsearch.Elasticsearch()
-        es.index(index="wanglibao", doc_type="issuer", body=json, id=self.id)
+        try:
+            serializer = IssuerSerializer(self)
+            json = JSONRenderer().render(serializer.data)
+            es = elasticsearch.Elasticsearch()
+            es.index(index="wanglibao", doc_type="issuer", body=json, id=self.id)
+        except ConnectionError:
+            pass
 
 
 class Trust (models.Model):
@@ -62,12 +68,7 @@ class Trust (models.Model):
 
     earning_description = models.TextField()
     note = models.TextField(verbose_name="note on this trust")
-    usage = models.CharField(max_length=100, verbose_name="usage", choices=(
-        ('estate', 'estate'),
-        ('finance', 'finance'),
-        ('infrastructure', 'infrastructure'),
-        ('others', 'others')
-    ))
+    usage = models.CharField(max_length=100, verbose_name="usage")
     usage_description = models.TextField()
 
     risk_management = models.TextField()
@@ -79,14 +80,19 @@ class Trust (models.Model):
     def __unicode__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
+    # Dead code, save for future TODO
+    def save_temp(self, *args, **kwargs):
         super(Trust, self).save(*args, **kwargs)
 
         class TrustSerializer(ModelSerializer):
             class Meta:
                 model = Trust
 
-        serializer = TrustSerializer(self)
-        json = JSONRenderer().render(serializer.data)
-        es = elasticsearch.Elasticsearch()
-        es.index(index="wanglibao", doc_type="trust", body=json, id=self.id)
+        try:
+            serializer = TrustSerializer(self)
+            json = JSONRenderer().render(serializer.data)
+            es = elasticsearch.Elasticsearch()
+            es.index(index="wanglibao", doc_type="trust", body=json, id=self.id)
+        except ConnectionError:
+            # TODO when not able to connect to elastic search, should fire some warning
+            pass

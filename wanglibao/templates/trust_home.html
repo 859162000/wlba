@@ -1,5 +1,7 @@
 {% extends "navigation_base.html" %}
 
+{% load formatters %}
+
 {% block content %}
   {{ block.super }}
   <div class="sub-navbar">
@@ -34,72 +36,20 @@
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td colspan="1">1</td>
-        <td colspan="4">圣宇农业产业园一期</td>
-        <td colspan="2">100万</td>
-        <td colspan="2">12个月</td>
-        <td colspan="2">13.00%</td>
-        <td colspan="2">房地产</td>
-        <td colspan="2">货款类</td>
-        <td colspan="2">甘肃信托</td>
-        <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-      </tr>
-      <tr>
-        <td colspan="1">2</td>
-        <td colspan="4">圣宇农业产业园一期</td>
-        <td colspan="2">100万</td>
-        <td colspan="2">12个月</td>
-        <td colspan="2">13.00%</td>
-        <td colspan="2">房地产</td>
-        <td colspan="2">货款类</td>
-        <td colspan="2">甘肃信托</td>
-        <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-      </tr>
-      <tr>
-        <td colspan="1">3</td>
-        <td colspan="4">圣宇农业产业园一期</td>
-        <td colspan="2">100万</td>
-        <td colspan="2">12个月</td>
-        <td colspan="2">13.00%</td>
-        <td colspan="2">房地产</td>
-        <td colspan="2">货款类</td>
-        <td colspan="2">甘肃信托</td>
-        <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-      </tr>
-      <tr>
-        <td colspan="1">4</td>
-        <td colspan="4">圣宇农业产业园一期</td>
-        <td colspan="2">100万</td>
-        <td colspan="2">12个月</td>
-        <td colspan="2">13.00%</td>
-        <td colspan="2">房地产</td>
-        <td colspan="2">货款类</td>
-        <td colspan="2">甘肃信托</td>
-        <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-      </tr>
-      <tr>
-        <td colspan="1">5</td>
-        <td colspan="4">圣宇农业产业园一期</td>
-        <td colspan="2">100万</td>
-        <td colspan="2">12个月</td>
-        <td colspan="2">13.00%</td>
-        <td colspan="2">房地产</td>
-        <td colspan="2">货款类</td>
-        <td colspan="2">甘肃信托</td>
-        <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-      </tr>
-      <tr>
-        <td colspan="1">6</td>
-        <td colspan="4">圣宇农业产业园一期</td>
-        <td colspan="2">100万</td>
-        <td colspan="2">12个月</td>
-        <td colspan="2">13.00%</td>
-        <td colspan="2">房地产</td>
-        <td colspan="2">货款类</td>
-        <td colspan="2">甘肃信托</td>
-        <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-      </tr>
+
+      {% for trust in latest_trusts %}
+        <tr>
+          <td colspan="1">{{ forloop.counter }}</td>
+          <td colspan="4">{{ trust.name }}</td>
+          <td colspan="2">{{ trust.investment_threshold | money_to_10k }}</td>
+          <td colspan="2">{{ trust.period | month }}</td>
+          <td colspan="2">{{ trust.expected_earning_rate | percentage }}</td>
+          <td colspan="2">{{ trust.usage }}</td>
+          <td colspan="2">{{ trust.type }}</td>
+          <td colspan="2">{{ trust.issuer.name }}</td>
+          <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
+        </tr>
+      {% endfor %}
       </tbody>
     </table>
   </div>
@@ -134,72 +84,19 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-          <td colspan="1">1</td>
-          <td colspan="4">圣宇农业产业园一期</td>
-          <td colspan="2">100万</td>
-          <td colspan="2">12个月</td>
-          <td colspan="2">13.00%</td>
-          <td colspan="2">房地产</td>
-          <td colspan="2">货款类</td>
-          <td colspan="2">甘肃信托</td>
-          <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-        </tr>
-        <tr>
-          <td colspan="1">2</td>
-          <td colspan="4">圣宇农业产业园一期</td>
-          <td colspan="2">100万</td>
-          <td colspan="2">12个月</td>
-          <td colspan="2">13.00%</td>
-          <td colspan="2">房地产</td>
-          <td colspan="2">货款类</td>
-          <td colspan="2">甘肃信托</td>
-          <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-        </tr>
-        <tr>
-          <td colspan="1">3</td>
-          <td colspan="4">圣宇农业产业园一期</td>
-          <td colspan="2">100万</td>
-          <td colspan="2">12个月</td>
-          <td colspan="2">13.00%</td>
-          <td colspan="2">房地产</td>
-          <td colspan="2">货款类</td>
-          <td colspan="2">甘肃信托</td>
-          <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-        </tr>
-        <tr>
-          <td colspan="1">4</td>
-          <td colspan="4">圣宇农业产业园一期</td>
-          <td colspan="2">100万</td>
-          <td colspan="2">12个月</td>
-          <td colspan="2">13.00%</td>
-          <td colspan="2">房地产</td>
-          <td colspan="2">货款类</td>
-          <td colspan="2">甘肃信托</td>
-          <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-        </tr>
-        <tr>
-          <td colspan="1">5</td>
-          <td colspan="4">圣宇农业产业园一期</td>
-          <td colspan="2">100万</td>
-          <td colspan="2">12个月</td>
-          <td colspan="2">13.00%</td>
-          <td colspan="2">房地产</td>
-          <td colspan="2">货款类</td>
-          <td colspan="2">甘肃信托</td>
-          <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-        </tr>
-        <tr>
-          <td colspan="1">6</td>
-          <td colspan="4">圣宇农业产业园一期</td>
-          <td colspan="2">100万</td>
-          <td colspan="2">12个月</td>
-          <td colspan="2">13.00%</td>
-          <td colspan="2">房地产</td>
-          <td colspan="2">货款类</td>
-          <td colspan="2">甘肃信托</td>
-          <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-        </tr>
+         {% for trust in period_lt12_trusts %}
+            <tr>
+              <td colspan="1">{{ forloop.counter }}</td>
+              <td colspan="4">{{ trust.name }}</td>
+              <td colspan="2">{{ trust.investment_threshold | money_to_10k }}</td>
+              <td colspan="2">{{ trust.period | month }}</td>
+              <td colspan="2">{{ trust.expected_earning_rate | percentage }}</td>
+              <td colspan="2">{{ trust.usage }}</td>
+              <td colspan="2">{{ trust.type }}</td>
+              <td colspan="2">{{ trust.issuer.name }}</td>
+              <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
+            </tr>
+         {% endfor %}
         </tbody>
       </table>
     </div>
