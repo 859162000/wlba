@@ -22,7 +22,13 @@
         {% if user.is_authenticated %}
           <div class="user-info">
             <span>欢迎您，</span>
-            <a href="#" class="username">{{ user.email }}</a>
+            <a href="#" class="username">
+              {%  if user.email %}
+                {{ user.email }}
+              {% else %}
+                {{ user.wanglibaouserprofile.phone }}
+              {% endif %}
+            </a>
             <span class="white-v-line"></span>
             <a href="/accounts/logout?next={{ request.path }}" class="logout">退出</a>
           </div>

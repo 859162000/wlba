@@ -109,14 +109,14 @@ class LoginTestCase(TestCase):
         user.save()
 
         response = self.client.post("/accounts/login", {
-            'email': 'test@test.com',
+            'identifier': 'test@test.com',
             'password': 'pass'
         }, follow=True)
 
         self.assertEqual(response.status_code, 200)
 
         response = self.client.post("/accounts/login", {
-            'email': 'test@test.com',
+            'identifier': 'test@test.com',
             'password': 'pass_wrong'
         }, follow=True)
 

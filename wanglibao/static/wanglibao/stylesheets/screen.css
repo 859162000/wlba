@@ -107,7 +107,7 @@ input {
 
 /* line 27, ../sass/partials/_basic.sass */
 .white-v-line {
-  margin: 0 20px;
+  margin: 0 10px;
   min-width: 1px;
   height: 15px;
   line-height: 15px;
@@ -1058,12 +1058,11 @@ a.button:active, .panel-sub-tab a.active:active, a.button:focus, .panel-sub-tab 
 .top-bar {
   background-color: #626972;
   height: 42px;
+  line-height: 42px;
 }
 
-/* line 11, ../sass/partials/_topbar.sass */
+/* line 12, ../sass/partials/_topbar.sass */
 .top-bar-container {
-  height: 42px;
-  line-height: 42px;
   *zoom: 1;
   max-width: 944px;
   max-width: 59rem;
@@ -1080,61 +1079,31 @@ a.button:active, .panel-sub-tab a.active:active, a.button:focus, .panel-sub-tab 
   clear: both;
 }
 
-/* line 16, ../sass/partials/_topbar.sass */
+/* line 15, ../sass/partials/_topbar.sass */
 .top-bar-phone {
-  width: 23.72881%;
-  float: left;
-  margin-right: 1.69492%;
   display: inline;
-  display: -moz-inline-stack;
-  display: inline-block;
-  vertical-align: middle;
-  *vertical-align: auto;
-  zoom: 1;
-  *display: inline;
-  height: 42px;
-  line-height: 42px;
+  float: left;
   text-indent: 10px;
-  text-align: left;
   color: #333333;
   font-size: 16px;
 }
 
-/* line 26, ../sass/partials/_topbar.sass */
+/* line 21, ../sass/partials/_topbar.sass */
 .header-phone-text {
-  height: 100%;
-  min-height: 100%;
-  display: -moz-inline-stack;
-  display: inline-block;
-  vertical-align: middle;
-  *vertical-align: auto;
-  zoom: 1;
-  *display: inline;
-  height: 42px;
-  line-height: 42px;
   color: #c1c1c1;
-  font-size: 16px;
   margin-left: 10px;
 }
 
-/* line 35, ../sass/partials/_topbar.sass */
+/* line 25, ../sass/partials/_topbar.sass */
 .user-info {
-  height: 100%;
-  min-height: 100%;
-  width: 23.72881%;
-  float: right;
-  margin-right: 0;
-  *margin-left: -1rem;
   display: inline;
-  height: 42px;
-  line-height: 42px;
+  float: right;
   text-align: right;
   padding-right: 10px;
-  margin-left: 0px;
   font-size: 13px;
   color: #c1c1c1;
 }
-/* line 46, ../sass/partials/_topbar.sass */
+/* line 32, ../sass/partials/_topbar.sass */
 .user-info a {
   text-decoration: none;
   color: #ffc410;
@@ -1152,9 +1121,10 @@ a.button:active, .panel-sub-tab a.active:active, a.button:focus, .panel-sub-tab 
   background-repeat: repeat-x;
   position: relative;
   z-index: 100;
+  overflow: auto;
 }
 
-/* line 14, ../sass/partials/_navbar.sass */
+/* line 15, ../sass/partials/_navbar.sass */
 .navigation-container {
   *zoom: 1;
   max-width: 944px;
@@ -1172,7 +1142,7 @@ a.button:active, .panel-sub-tab a.active:active, a.button:focus, .panel-sub-tab 
   clear: both;
 }
 
-/* line 17, ../sass/partials/_navbar.sass */
+/* line 18, ../sass/partials/_navbar.sass */
 .nav-items {
   width: 57.62712%;
   float: left;
@@ -1187,7 +1157,7 @@ a.button:active, .panel-sub-tab a.active:active, a.button:focus, .panel-sub-tab 
   *display: inline;
 }
 
-/* line 22, ../sass/partials/_navbar.sass */
+/* line 23, ../sass/partials/_navbar.sass */
 .nav-item {
   padding-left: 15px;
   padding-right: 15px;
@@ -1202,7 +1172,7 @@ a.button:active, .panel-sub-tab a.active:active, a.button:focus, .panel-sub-tab 
   text-align: center;
 }
 
-/* line 31, ../sass/partials/_navbar.sass */
+/* line 32, ../sass/partials/_navbar.sass */
 a.nav-item-anchor {
   width: 100%;
   height: 91px;
@@ -1224,12 +1194,12 @@ a.nav-item-anchor:hover {
 a.nav-item-anchor:active {
   color: #333333;
 }
-/* line 40, ../sass/partials/_navbar.sass */
+/* line 41, ../sass/partials/_navbar.sass */
 a.nav-item-anchor:active, a.nav-item-anchor:hover {
   border-bottom: 3px solid #aa0f13;
 }
 
-/* line 43, ../sass/partials/_navbar.sass */
+/* line 44, ../sass/partials/_navbar.sass */
 .logo {
   height: 59px;
   width: 165px;

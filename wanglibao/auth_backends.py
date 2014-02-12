@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from wanglibao.utils import detect_identifier_type
 
 User = get_user_model()
 
@@ -7,19 +8,24 @@ User = get_user_model()
 class EmailPhoneUsernameAuthBackend(object):
 
     def authenticate(self, **kwargs):
-        keys = ['username', 'email', 'phone', 'identifier']
-        identifier = next((kwargs[k] for k in keys if k in kwargs), None)
+        identifier = kwargs['identifier']
 
         if not identifier:
             return None
 
-        users = User.objects.filter(
-            Q(email=identifier) |
-            Q(wanglibaouserprofile__phone=identifier)
-        )
+        # TODO add a middleware for identifier_type detection and add it to the request
+        identifier_type = detect_identifier_type(identifier)
+
+        filter = None
+        if identifier_type == 'email':
+            filter = Q(email=identifier)
+        elif identifier_type == 'phone':
+            filter = Q(wanglibaouserprofile__phone=identifier) and Q(wanglibaouserprofile__phone_verified=True)
+        users = User.objects.filter(filter)
 
         password = kwargs['password']
 
+        # TODO fix the following logic, it made some assumptions, clean it and make it simple
         # The checking logic:
         # When there is one active user matched, then only check the active user
         # When no active user matched, then check each user to find the match.

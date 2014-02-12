@@ -14,41 +14,32 @@
       <div class="well clearfix">
         <div class="pull-left account-background"></div>
         <div class="pull-right">
-          <div class="form">
-            <form method="post" action="{% url 'auth_login' %}?next={{next}}">
-              <dl>
-                {{  form.password.errors }}
-                {{  form.email.errors }}
-                {{  form.username.errors }}
-                {% csrf_token %}
-                <dt class="form-title">
-                  <label class="font-l">用户登录</label>
-                </dt>
-                <dd class="input-group"><span class="input-group-icon">
-                  <div class="space-xs"></div><span title="请输入邮箱或手机号" class="icon i-people-white"></span></span>
-                  {% render_field form.identifier class+="input-large" placeholder="请输入邮箱或手机号" title="请输入邮箱或手机号"%}
-                </dd>
-                <div class="space-vertical-s"></div>
-                <dd class="input-group"><span class="input-group-icon">
-                  <div class="space-xs"></div><span title="请输入密码" class="i-lock"></span></span>
-                  {% render_field form.password class+="input-large" %}
-                </dd>
-                <div class="space-vertical-s"></div>
-                <dd>
-                  <div class="row">
-                    <button type="submit" class="span8 button-error button-large">登 录</button>
-                    <div class="span4-omega">
-                      <div class="space-s"></div><a href="/accounts/password/reset" class="row-height">忘记密码？</a>
-                    </div>
-                  </div>
-                </dd>
-                <div class="space-vertical-m"></div>
-                <div class="form-footer"><span class="inline-block"><span>注册成为会员，我们将为您提供专业的理财建议</span></span>
-                  <div class="space-xs"></div><a href="register.html" class="button button-warning button-small">注册</a>
-                </div>
-              </dl>
-            </form>
-          </div>
+          <form class="form" method="post" action="{% url 'auth_login' %}?next={{next}}">
+            <fieldset>
+              {{  form.password.errors }}
+              {{  form.email.errors }}
+              {{  form.username.errors }}
+              {% csrf_token %}
+              <div class="form-title">
+                <label class="font-l">用户登录</label>
+              </div>
+              <div class="form-row">
+                {% render_field form.identifier class+="input-large" placeholder="请输入邮箱或手机号" title="请输入邮箱或手机号"%}
+              </div>
+              <div class="form-row">
+                {% render_field form.password class+="input-large" placeholder="请输入密码" title="请输入密码"%}
+              </div>
+              <div class="form-row form-bottom-bar">
+                <button type="submit" class="span8 button-error button-large">登 录</button>
+                <div class="span4-omega"></div>
+                <div class="space-s"></div><a href="/accounts/password/reset">忘记密码？</a>
+              </div>
+              <div class="space-vertical-s"></div>
+              <div class="form-footer"><a href="register.html" class="button button-warning button-mini">注册</a>
+                <div class="space-xs"></div><span>成为会员，我们将为您提供专业的理财建议</span>
+              </div>
+            </fieldset>
+          </form>
         </div>
       </div>
     </div>
