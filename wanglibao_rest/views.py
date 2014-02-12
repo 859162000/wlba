@@ -126,8 +126,6 @@ class PhoneValidateView(APIView):
         url = settings.SMS_URL
         r = requests.post(url, params)
 
-        # TODO add more specific error detection code
-
         if r.status_code != 200:
             return Response({
                 "error": "Failed to send sms"
@@ -138,7 +136,10 @@ class PhoneValidateView(APIView):
 
         namespace = doc.tag.lstrip('{').split('}')[0].join(['{', '}'])
         return_code = int(next(doc.iter(namespace + 'code')).text)
-        message = next(doc.iter(namespace + 'msg')).text.encode('utf-8')
+
+        # TODO for errors log it out
+        # TODO for all logs, when pii data embeded, wrap the code with special tag [type=value] [phone=18888888888]
+        #      future mining can utilize this.
 
         if return_code != 2:
             return Response({

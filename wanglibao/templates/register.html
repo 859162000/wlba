@@ -15,40 +15,30 @@
       <div class="well clearfix">
         <div class="pull-left account-background"></div>
         <div class="pull-right">
-          <div class="form login-form">
-            <form class="form-horizontal" method="post" action="/accounts/register/?next={{ next }}">
-              {{  form.password.errors }}
-              {{  form.email.errors }}
-              {{  form.username.errors }}
-              {% csrf_token %}
-              {% render_field form.type class+="hidden" style="display:none" value=form.type.value %}
-              <dl>
-                <dt class="form-title">
-                  <label class="font-l">注册用户</label>
-                </dt>
-                <dd class="input-group form-row"><span class="input-group-icon">
-                  <div class="space-xs"></div><span title="请输入邮箱或手机号" class="icon i-people-white"></span></span>
-                  {% render_field form.identifier class+="input-large" placeholder="请输入邮箱或手机" %}
-                </dd>
-                <dd id="validate-code-container" class="row table form-row"><span class="table-cell">检测到手机号码</span>
-                  {% render_field form.validate_code class+="table-cell clear-margin" placeholder="请输入验证码" autocomplete='off' %}
-                  <div class="table-cell"><a href="#" class="button button-error button-small">获取</a></div>
-                </dd>
-                <dd class="input-group row form-row"><span class="input-group-icon">
-                  <div class="space-xs"></div><span title="请输入密码" class="i-lock"></span></span>
-                  {% render_field form.password class+="input-large" placeholder="请输入密码" autocomplete='off' %}
-                </dd>
-                <div class="space-vertical-s"></div>
-                <dd class="row form-row">
-                  <button type="submit" class="span12 button-error button-large">注 册</button>
-                </dd>
-                <div class="space-vertical-m"></div>
-                <div class="form-footer"><span class="inline-block"><span>已有账户</span></span>
-                  <div class="space-xs"></div><a href="register.html" class="button button-warning button-small">登录</a>
-                </div>
-              </dl>
-            </form>
-          </div>
+          <form id="register-form" class="form login-form" method="post" action="/accounts/register/?next={{ next }}">
+            {{  form.password.errors }}
+            {{  form.email.errors }}
+            {{  form.username.errors }}
+            {% csrf_token %}
+            <div class="form-title">
+              <label class="font-l">注册用户</label>
+            </div>
+            <div class="form-row">
+              <!-- id_identifier use the same name as django form id-->
+              {% render_field form.identifier class+="input-large" placeholder="请输入邮箱或手机" %}
+            </div>
+            <div id="validate-code-container" class="form-row">
+              {% render_field form.validate_code class+="table-cell clear-margin" placeholder="请输入验证码" autocomplete='off' %}
+              <div class="space-s"></div>
+              <button id="button-get-validate-code" href="#" class="button button-error button-mini">获取</button>
+            </div>
+            <div class="form-row">
+              {% render_field form.password class+="input-large" placeholder="请输入密码" autocomplete='off' %}
+            </div>
+            <div class="form-row form-bottom-bar"><span>已有账户请直接</span><a href="register.html">登录</a>
+              <button type="submit" id="button-submit" class="pull-right button-error button-large">注 册</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -58,5 +48,6 @@
 {% block javascript %}
   {{  block.super }}
   <script src="{% static "wanglibao/js/jquery.min.js" %}"></script>
+  <script src="{% static "wanglibao/js/jquery.validate.min.js" %}"></script>
   <script src="{% static "wanglibao/javascripts/register.js" %}"></script>
 {% endblock %}

@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils.datetime_safe import datetime
 from wanglibao.forms import EmailOrPhoneRegisterForm
+from wanglibao.utils import detect_identifier_type
 from wanglibao_profile.models import PhoneValidateCode
 
 
@@ -12,7 +13,6 @@ class EmailOrPhoneRegisterFormTestCase(TestCase):
     def test_register_by_email(self):
         form_data = {
             'identifier': 'test@test.com',
-            'type': 'email',
             'password': 'testpassword',
         }
 
@@ -30,7 +30,6 @@ class EmailOrPhoneRegisterFormTestCase(TestCase):
         form_data = {
             'identifier': '13810652323',
             'validate_code': '133223',
-            'type': 'phone',
             'password': 'testpassword',
         }
 
@@ -43,7 +42,6 @@ class RegisterViewTestCase(TestCase):
     def test_email_register(self):
         self.client.post("/accounts/register/", {
             'identifier': 'test@test.com',
-            'type': 'email',
             'password': 'testpassword',
         })
 
@@ -64,12 +62,44 @@ class RegisterViewTestCase(TestCase):
         self.client.post("/accounts/register/", {
             'identifier': phone,
             'validate_code': validate_code,
-            'type': 'phone',
             'password': 'testpassword',
         })
 
         user = User.objects.get(wanglibaouserprofile__phone=phone)
         self.assertEqual(phone, user.wanglibaouserprofile.phone)
+        self.assertTrue(user.is_active)
+        self.assertTrue(user.wanglibaouserprofile.phone_verified)
+
+    def test_phone_duplicate(self):
+        phone = '12345678901'
+
+        # fake user is validated by mail, but he has an unverified phone number
+        fake_user = User.objects.create(username='fake')
+        fake_user.wanglibaouserprofile.phone = phone
+        fake_user.wanglibaouserprofile.phone_verified = False
+        fake_user.wanglibaouserprofile.save()
+
+        # The real user not registered, but holds the true phone
+        validate_code = '123456'
+        validate_code_record = PhoneValidateCode()
+        validate_code_record.validate_code = validate_code
+        validate_code_record.phone = phone
+        validate_code_record.last_send_time = datetime.now()
+
+        validate_code_record.save()
+
+        self.client.post("/accounts/register/", {
+            'identifier': phone,
+            'validate_code': validate_code,
+            'password': 'testpassword'
+        })
+
+        user = User.objects.get(wanglibaouserprofile__phone=phone, wanglibaouserprofile__phone_verified=True)
+        self.assertTrue(user.wanglibaouserprofile.phone_verified)
+
+        validate_code = '123232'
+
+
 
 
 class LoginTestCase(TestCase):
@@ -91,3 +121,15 @@ class LoginTestCase(TestCase):
         }, follow=True)
 
         self.assertEqual(response.status_code, 200)
+
+
+class UtilTestCase(TestCase):
+    def test_detect_identifier_type(self):
+        type = detect_identifier_type('13000000000')
+        self.assertEqual('phone', type)
+
+        type = detect_identifier_type('x@c.com')
+        self.assertEqual('email', type)
+
+        type = detect_identifier_type('')
+        self.assertEqual('unknown', type)

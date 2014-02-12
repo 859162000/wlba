@@ -6,7 +6,7 @@ from registration.models import RegistrationProfile
 from registration.views import RegistrationView
 from wanglibao.forms import EmailOrPhoneRegisterForm
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao.utils import generate_username
+from wanglibao.utils import generate_username, detect_identifier_type
 from django.core.mail import EmailMultiAlternatives
 from django.template import Context, Template
 
@@ -18,11 +18,14 @@ class RegisterView (RegistrationView):
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
-
         username = cleaned_data['username']
         password = cleaned_data['password']
         identifier = cleaned_data['identifier']
-        identifier_type = cleaned_data['type']
+        identifier_type = detect_identifier_type(identifier)
+
+        if identifier_type == 'unknown':
+            # TODO raise a proper exception
+            return None
 
         if not username:
             username = generate_username(identifier)
@@ -59,8 +62,10 @@ class RegisterView (RegistrationView):
             profile.phone_verified = True
             profile.save()
 
-        user.backend = "Backend: AutoLoginAfterAuthenticate"
-        login(request, user)
+            # User already validated by phone, so he is an active user
+            user.is_active = True
+            user.save()
+
         return user
 
     def get_success_url(self, request=None, user=None):

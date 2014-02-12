@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
+from wanglibao.utils import detect_identifier_type
 from wanglibao_profile.models import PhoneValidateCode, WanglibaoUserProfile
 
 User = get_user_model()
@@ -19,12 +20,13 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     username = forms.CharField(label="Username", required=False)
     identifier = forms.CharField(label="Email/Phone")
     validate_code = forms.CharField(label="Validate code for phone", required=False)
-    type = forms.CharField(initial="email")
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
     error_messages = {
         'duplicate_email': 'The email is already registered',
-        'duplicate_phone': 'The phone number already registered'
+        'duplicate_phone': 'The phone number already registered',
+        'invalid_identifier_type': 'The identifier type invalid, please provide email address or phone number',
+        'validate_code_for_email': 'No validate code should be provided when identifier is email'
     }
 
     class Meta:
@@ -38,13 +40,18 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         """
 
         identifier = self.cleaned_data["identifier"]
-        identifier_type = self.clean_type()
+        identifier_type = detect_identifier_type(identifier)
 
         users = None
         if identifier_type == 'email':
             users = User.objects.filter(email=identifier, is_active=True)
         elif identifier_type == 'phone':
-            users = User.objects.filter(wanglibaouserprofile__phone=identifier, is_active=True)
+            users = User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True)
+        else:
+            raise forms.ValidationError(
+                self.error_messages['invalid_identifier_type'],
+                code='invalid_identifier_type'
+            )
 
         if len(users) == 0:
             return identifier.strip()
@@ -52,22 +59,16 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             self.error_messages['duplicate_username'],
             code='duplicate_username', )
 
-    def clean_type(self):
-        identifier_type = self.data["type"]
-        if identifier_type not in ['email', 'phone']:
-            raise forms.ValidationError(
-                self.error_messages['type_invalid'],
-                code='type_invalid',)
-        return identifier_type
-
     def clean_validate_code(self):
         validate_code = self.cleaned_data["validate_code"]
-        if self.clean_type() == 'phone':
+        identifier_type = detect_identifier_type(self.cleaned_data["identifier"])
+        if identifier_type == 'phone':
             phone = self.clean_identifier()
             try:
                 phone_validate = PhoneValidateCode.objects.get(phone=phone)
                 # TODO Check the validate_code period, 30 minutes
                 if phone_validate.validate_code == validate_code:
+                    # Normal exit point
                     return validate_code
                 else:
                     raise forms.ValidationError(
@@ -79,7 +80,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                     self.error_messages['validate code not exist'],
                     code='validate_code_error',
                 )
-        return validate_code
+        else:
+            return None
 
 class EmailOrPhoneAuthenticationForm(forms.Form):
     """
