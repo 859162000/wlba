@@ -1032,16 +1032,16 @@ a.button:active, .panel-sub-tab a.active:active, a.button:focus, .panel-sub-tab 
 }
 
 /* line 15, ../sass/partials/_form.sass */
-.form-row {
-  margin-top: 10px;
-  overflow: auto;
-}
-
-/* line 19, ../sass/partials/_form.sass */
 .form-title {
   color: #bf1b22;
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+/* line 20, ../sass/partials/_form.sass */
+.form-row {
+  margin-top: 10px;
+  overflow: auto;
 }
 
 /* line 24, ../sass/partials/_form.sass */
@@ -1894,29 +1894,26 @@ a.search-quicklink:active, a.search-quicklink:focus {
 /* line 4, ../sass/partials/_trust-table.sass */
 .trust-table {
   width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
-/* line 7, ../sass/partials/_trust-table.sass */
+/* line 9, ../sass/partials/_trust-table.sass */
 .trust-table thead {
   background-color: #ecf6fd;
 }
-/* line 10, ../sass/partials/_trust-table.sass */
+/* line 12, ../sass/partials/_trust-table.sass */
 .trust-table thead th {
   padding: 10px 0;
   text-align: center;
 }
-/* line 14, ../sass/partials/_trust-table.sass */
+/* line 16, ../sass/partials/_trust-table.sass */
 .trust-table td {
   padding: 10px 0;
   text-align: center;
 }
-/* line 18, ../sass/partials/_trust-table.sass */
+/* line 20, ../sass/partials/_trust-table.sass */
 .trust-table tr {
   border-bottom: 1px solid lightgrey;
-}
-
-/* line 21, ../sass/partials/_trust-table.sass */
-.trust-table--number {
-  width: 30px;
 }
 
 /* line 3, ../sass/partials/_product-filter.sass */
