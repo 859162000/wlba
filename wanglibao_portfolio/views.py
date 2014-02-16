@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.viewsets import ModelViewSet
-from wanglibao_portfolio.models import Portfolio, UserPortfolio
+from wanglibao_portfolio.models import ProductType, Portfolio, UserPortfolio
 
 
 class PortfolioViewSet(ModelViewSet):
@@ -11,3 +11,7 @@ class PortfolioViewSet(ModelViewSet):
 
 class UserPortfolioViewSet(ModelViewSet):
     model = UserPortfolio
+
+
+class ProductTypeViewSet(ModelViewSet):
+    model = ProductType

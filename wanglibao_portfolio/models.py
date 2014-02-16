@@ -1,5 +1,17 @@
+# This Python file uses the following encoding: utf-8
+
 from django.contrib.auth import get_user_model
 from django.db import models
+
+
+class ProductType(models.Model):
+    name = models.CharField(max_length=64)
+    description = models.TextField()
+    average_earning_rate = models.FloatField(help_text="The average earning rate", default=0)
+    average_risk_score = models.SmallIntegerField(default=0, help_text="The risk score for this type of product")
+
+    def __unicode__(self):
+        return '%s risk: %d rate: %.1f%%' % (self.name, self.average_risk_score, self.average_earning_rate)
 
 
 class Portfolio(models.Model):
@@ -10,14 +22,32 @@ class Portfolio(models.Model):
     asset_min = models.FloatField(help_text="The bottom line this portfolio applied")
     asset_max = models.FloatField(help_text="The top line this portfolio applied")
 
+    period_min = models.FloatField(help_text="The minimum period", default=0)
+    period_max = models.FloatField(help_text="The maximum period", default=0)
+
+    investment_preference = models.CharField(max_length=16, help_text="Investment preference", default=u'平衡型')
+
     expected_earning_rate = models.FloatField(help_text="The expected earning rate for this portfolio")
 
-    cash = models.FloatField(help_text="The percent of cash", default=0)
-    stock = models.FloatField(help_text="The percent of stock", default=0)
-    p2p = models.FloatField(help_text="The percent of p2p", default=0)
+    products = models.ManyToManyField(ProductType, through='PortfolioProductEntry')
 
     def __unicode__(self):
-        return "%s risk:%d rate:%f" % (self.name, self.risk_score, self.expected_earning_rate)
+        return "%s risk:%d rate:%.1f" % (self.name, self.risk_score, self.expected_earning_rate)
+
+
+class PortfolioProductEntry(models.Model):
+    portfolio = models.ForeignKey(Portfolio)
+    product = models.ForeignKey(ProductType)
+
+    value = models.FloatField(help_text="How much of this product, 20000 or 10")
+    type = models.CharField(max_length=16, default="percent",
+                            choices=(('percent', 'percent'),
+                                     ('amount', 'amount')),
+                            help_text="Whether the value is percent or absolute value")
+    description = models.TextField(help_text="Some description")
+
+    def __unicode__(self):
+        return '%s: %.2f %s' % (self.product.name, self.value, self.type)
 
 
 class UserPortfolio(models.Model):
