@@ -13,14 +13,14 @@ router.register(r'users', UserViewSet)
 router.register(r'trusts', TrustViewSet)
 router.register(r'issuers', IssuerViewSet)
 
-router.register(r'bank_financing', BankFinancingViewSet)
-router.register(r'bank', BankViewSet)
+router.register(r'bank_financings', BankFinancingViewSet)
+router.register(r'banks', BankViewSet)
 
-router.register(r'pre_order', PreOrderViewSet)
+router.register(r'pre_orders', PreOrderViewSet)
 
-router.register(r'portfolio', PortfolioViewSet)
+router.register(r'portfolios', PortfolioViewSet)
 router.register(r'products', ProductTypeViewSet)
-router.register(r'user_portfolio', UserPortfolioViewSet)
+router.register(r'user_portfolios', UserPortfolioViewSet)
 
 router.register(r'hot_trusts', HotTrustViewSet)
 
