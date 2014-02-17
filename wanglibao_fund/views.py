@@ -9,5 +9,6 @@ class FundViewSet(PaginatedModelViewSet):
     filter_class = FundFilterSet
     serializer_class = FundSerializer
 
+
 class FundIssuerViewSet(PaginatedModelViewSet):
     model = FundIssuer

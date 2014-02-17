@@ -38,6 +38,9 @@ class MockGenerator(object):
 
             fund.earned_per_10k = random.randrange(0, 10) / 5.0
             fund.profit_rate_7days = random.randrange(0, 10) / 100.0
+            fund.profit_rate_month = random.randrange(0, 30) / 100.0
+            fund.profit_rate_3months = random.randrange(0, 50) / 100.0
+            fund.profit_rate_6months = random.randrange(0, 100) / 100.0
             fund.profit_per_month = fund.rate_day * 30 * fund.face_value
             fund.type = (u'股票型', u'债券型', u'货币型', u'混合型', u'保本型', u'短期理财')[random.randrange(0, 6)]
 
@@ -70,12 +73,12 @@ class MockGenerator(object):
             # Generate redeem charge rate
             redeem_model = None
             issue_model = None
-            if random.randrange(0, 1) == 0:
+            if random.randrange(0, 2) == 0:
                 redeem_model = RedeemFrontEndChargeRate
             else:
                 redeem_model = RedeemBackEndChargeRate
 
-            if random.randrange(0, 1) == 0:
+            if random.randrange(0, 2) == 0:
                 issue_model = IssueFrontEndChargeRate
             else:
                 issue_model = IssueBackEndChargeRate
@@ -85,7 +88,7 @@ class MockGenerator(object):
                 redeem_charge_rate.bottom_line = i
                 redeem_charge_rate.top_line = i + 1
                 redeem_charge_rate.line_type = 'year'
-                redeem_charge_rate.value = random.randrange(0, 3) / 100.0
+                redeem_charge_rate.value = random.randrange(0, 4) / 100.0
                 redeem_charge_rate.value_type = 'percent'
                 redeem_charge_rate.fund = fund
                 redeem_charge_rate.save()
@@ -96,7 +99,7 @@ class MockGenerator(object):
                 issue_charge_rate.bottom_line = i
                 issue_charge_rate.top_line = i + 5
                 issue_charge_rate.line_type = 'amount'
-                issue_charge_rate.value = random.randrange(0, 3) / 100.0
+                issue_charge_rate.value = random.randrange(0, 4) / 100.0
                 issue_charge_rate.value_type = 'percent'
                 issue_charge_rate.fund = fund
                 issue_charge_rate.save()

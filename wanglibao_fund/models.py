@@ -22,8 +22,11 @@ class Fund(models.Model):
     accumulated_face_value = models.FloatField()
     rate_day = models.FloatField()
 
-    earned_per_10k = models.FloatField()
-    profit_rate_7days = models.FloatField()
+    earned_per_10k = models.FloatField(default=0)
+    profit_rate_7days = models.FloatField(default=0)
+    profit_rate_month = models.FloatField(default=0)
+    profit_rate_3months = models.FloatField(default=0)
+    profit_rate_6months = models.FloatField(default=0)
     profit_per_month = models.FloatField(help_text="Latest profilt per month")
     type = models.CharField(max_length=16, help_text="The type of fund, currency, debt, stock index etc")
 
