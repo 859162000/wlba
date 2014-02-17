@@ -1,3 +1,13 @@
-from django.shortcuts import render
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from wanglibao_fund.filters import FundFilterSet
+from wanglibao_fund.models import Fund, FundIssuer
+from wanglibao_fund.serializers import FundSerializer
 
-# Create your views here.
+
+class FundViewSet(PaginatedModelViewSet):
+    model = Fund
+    filter_class = FundFilterSet
+    serializer_class = FundSerializer
+
+class FundIssuerViewSet(PaginatedModelViewSet):
+    model = FundIssuer

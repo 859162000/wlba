@@ -31,6 +31,10 @@ class Fund(models.Model):
     sales_url = models.URLField()
     status = models.CharField(max_length=16)
 
+    issuable = models.BooleanField(default=True)
+    redeemable = models.BooleanField(default=True)
+    AIP_able = models.BooleanField(default=True, help_text="Automatic Investment Plan")
+
     mode = models.CharField(max_length=16, help_text="qi yue xing kai fang shi")
     scale = models.FloatField(help_text="How large the fund is now")
 
@@ -49,11 +53,36 @@ class Fund(models.Model):
     management_charge_rate = models.FloatField()
     frontend_hosting_charge_rate = models.FloatField()
 
-    buy_front_charge_rate = models.TextField(help_text="JSON")
-    buy_back_charge_rate = models.TextField()
-
-    sale_front_charge_rate = models.TextField()
-    sale_back_charge_rate = models.TextField()
-
     def __unicode__(self):
         return u'%s' % (self.name, )
+
+
+class ChargeRate(models.Model):
+    bottom_line = models.FloatField(help_text="bottom line in 10K units")
+    top_line = models.FloatField(help_text="top line in 10K unites")
+    line_type = models.CharField(max_length=8, help_text="line value type, amount, year")
+
+    value = models.FloatField()
+    value_type = models.CharField(max_length=8, help_text="percent or amount")
+
+    class Meta:
+        abstract = True
+
+    def __unicode__(self):
+        return u"%f - %f %s: %f %s" % (self.bottom_line, self.top_line, self.line_type, self.value, self.value_type)
+
+
+class IssueFrontEndChargeRate(ChargeRate):
+    fund = models.ForeignKey(Fund, related_name="issue_front_end_charge_rates")
+
+
+class IssueBackEndChargeRate(ChargeRate):
+    fund = models.ForeignKey(Fund, related_name="issue_back_end_charge_rates")
+
+
+class RedeemFrontEndChargeRate(ChargeRate):
+    fund = models.ForeignKey(Fund, related_name="redeem_front_end_charge_rates")
+
+
+class RedeemBackEndChargeRate(ChargeRate):
+    fund = models.ForeignKey(Fund, related_name="redeem_back_end_charge_rates")
