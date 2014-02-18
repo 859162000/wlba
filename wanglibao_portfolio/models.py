@@ -51,8 +51,8 @@ class PortfolioProductEntry(models.Model):
 
 class UserPortfolio(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)
-    portfolio = models.ManyToManyField(Portfolio)
+    portfolio = models.ForeignKey(Portfolio, null=True)
     created_at = models.DateTimeField(default=datetime.now)
 
     def __unicode__(self):
-        return u"%s portfolio:%s" % (self.user.username, '|'.join([unicode(p) for p in self.portfolio.all()]))
+        return u"%s portfolio:%s" % (self.user.username, unicode(self.portfolio))

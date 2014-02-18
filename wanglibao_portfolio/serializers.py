@@ -14,6 +14,7 @@ class PortfolioProductEntrySerializer(ModelSerializer):
     class Meta:
         model = PortfolioProductEntry
 
+
 class PortfolioSerializer(ModelSerializer):
     """
     The serializer which serialize the portfolio object

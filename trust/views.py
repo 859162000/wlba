@@ -1,6 +1,8 @@
-from django.db.models import Q
 from django.views.generic import TemplateView
-from trust.models import Trust
+from rest_framework import viewsets
+from trust.filters import TrustFilterSet
+from trust.models import Trust, Issuer
+from wanglibao_rest.serializers import TrustSerializer
 
 
 class TrustHomeView(TemplateView):
@@ -13,3 +15,19 @@ class TrustHomeView(TemplateView):
         latest_trusts = Trust.objects.order_by('-issue_date')[0:10] # TODO make this value configurable
         context['latest_trusts'] = latest_trusts
         return context
+
+
+class TrustViewSet(viewsets.ModelViewSet):
+    model = Trust
+    filter_class = TrustFilterSet
+    serializer_class = TrustSerializer
+    paginate_by = 20
+    paginate_by_param = 'page_size'
+    max_paginate_by = 100
+
+
+class IssuerViewSet(viewsets.ModelViewSet):
+    model = Issuer
+    paginate_by = 20
+    paginate_by_param = 'page_size'
+    max_paginate_by = 100

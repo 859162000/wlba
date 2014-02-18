@@ -1,24 +1,19 @@
 import datetime
 from django.conf import settings
-from django.contrib.auth.models import User, Group, Permission
-
-# Create your views here.
+from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.utils.timezone import utc
-import django_filters
 import random
 import requests
 from rest_framework import viewsets
 from rest_framework import generics
-from rest_framework.decorators import link, action
-from rest_framework.filters import FilterSet
+from rest_framework.decorators import link
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
-from trust.models import Trust, Issuer
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import PortfolioSerializer, UserPortfolioSerializer
-from wanglibao_rest.serializers import UserSerializer, TrustSerializer
+from wanglibao_rest.serializers import UserSerializer
 from wanglibao_profile.models import PhoneValidateCode
 
 
@@ -39,46 +34,6 @@ class UserPortfolioView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_pk = self.kwargs['user_pk']
         return self.queryset.filter(user_id = user_pk)
-
-
-class TrustFilterSet(FilterSet):
-    min_rate = django_filters.NumberFilter(name="expected_earning_rate", lookup_type='gte')
-    max_rate = django_filters.NumberFilter(name="expected_earning_rate", lookup_type='lt')
-    min_scale = django_filters.NumberFilter(name="scale", lookup_type='gte')
-    max_scale = django_filters.NumberFilter(name="scale", lookup_type='lt')
-    min_period = django_filters.NumberFilter(name="period", lookup_type='gte')
-    max_period = django_filters.NumberFilter(name="period", lookup_type='lt')
-    min_threshold = django_filters.NumberFilter(name="investment_threshold", lookup_type='gte')
-    max_threshold = django_filters.NumberFilter(name="investment_threshold", lookup_type='lt')
-
-    class Meta:
-        model = Trust
-        fields = ['name',
-                  'short_name',
-                  'expected_earning_rate',
-                  'issuer__name',
-                  'available_region',
-                  'investment_threshold',
-                  'min_rate', 'max_rate',
-                  'min_scale', 'max_scale',
-                  'min_period', 'max_period',
-                  ]
-
-
-class TrustViewSet(viewsets.ModelViewSet):
-    model = Trust
-    filter_class = TrustFilterSet
-    serializer_class = TrustSerializer
-    paginate_by = 20
-    paginate_by_param = 'page_size'
-    max_paginate_by = 100
-
-
-class IssuerViewSet(viewsets.ModelViewSet):
-    model = Issuer
-    paginate_by = 20
-    paginate_by_param = 'page_size'
-    max_paginate_by = 100
 
 
 def generate_validate_code():

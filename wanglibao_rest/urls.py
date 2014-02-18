@@ -1,12 +1,13 @@
 from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
 from rest_framework.urlpatterns import format_suffix_patterns
+from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
 from wanglibao_hotlist.views import HotTrustViewSet
 from wanglibao_portfolio.views import PortfolioViewSet, UserPortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
-from wanglibao_rest.views import UserViewSet, TrustViewSet, IssuerViewSet, PhoneValidateView, RegisterByPhone, UserExisting
+from wanglibao_rest.views import UserViewSet,  PhoneValidateView, RegisterByPhone, UserExisting
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)

@@ -82,12 +82,12 @@ class MockGenerator(object):
 
                     for preference in preferences:
                         p = Portfolio()
-                        p.name = u'%s %f-%f 风险%d' % (preference, period_min, period_max, risk)
+                        p.name = preference
+                        p.description = u'%s %f-%f 风险%d' % (preference, period_min, period_max, risk)
                         p.asset_max = asset_max
                         p.asset_min = asset_min
                         p.period_min = period_min
                         p.period_max = period_max
-                        p.description = u'没啥好说的'
                         p.expected_earning_rate = random.randrange(0, 20)
                         p.investment_preference = preference
                         p.risk_score = risk
@@ -106,6 +106,10 @@ class MockGenerator(object):
                                 rest -= ratio
                                 product_entry.value = ratio
                             else:
-                                product_entry.value = random.randrange(2, 20)
+                                product_entry.value = random.randrange(0, 20)
+
+                            if product_entry.value == 0:
+                                continue
+
                             product_entry.save()
 
