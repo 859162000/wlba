@@ -1,4 +1,5 @@
 # This Python file uses the following encoding: utf-8
+from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -29,14 +30,12 @@ class Portfolio(models.Model):
 
     expected_earning_rate = models.FloatField(help_text="The expected earning rate for this portfolio")
 
-    products = models.ManyToManyField(ProductType, through='PortfolioProductEntry')
-
     def __unicode__(self):
         return "%s risk:%d rate:%.1f" % (self.name, self.risk_score, self.expected_earning_rate)
 
 
 class PortfolioProductEntry(models.Model):
-    portfolio = models.ForeignKey(Portfolio)
+    portfolio = models.ForeignKey(Portfolio, related_name="products")
     product = models.ForeignKey(ProductType)
 
     value = models.FloatField(help_text="How much of this product, 20000 or 10")
@@ -53,6 +52,7 @@ class PortfolioProductEntry(models.Model):
 class UserPortfolio(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)
     portfolio = models.ManyToManyField(Portfolio)
+    created_at = models.DateTimeField(default=datetime.now)
 
     def __unicode__(self):
         return u"%s portfolio:%s" % (self.user.username, '|'.join([unicode(p) for p in self.portfolio.all()]))

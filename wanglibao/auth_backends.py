@@ -8,7 +8,14 @@ User = get_user_model()
 class EmailPhoneUsernameAuthBackend(object):
 
     def authenticate(self, **kwargs):
-        identifier = kwargs['identifier']
+        identifier = None
+
+        if 'identifier' in kwargs:
+            identifier = kwargs['identifier']
+        elif 'email' in kwargs:
+            identifier = kwargs['email']
+        elif 'username' in kwargs:
+            identifier = kwargs['username']
 
         if not identifier:
             return None
