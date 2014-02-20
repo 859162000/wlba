@@ -21,6 +21,16 @@ class TrustProductsView(TemplateView):
     template_name = "trust_products.html"
 
 
+class TrustDetailView(TemplateView):
+    template_name = "trust_detail.html"
+
+    def get_context_data(self, **kwargs):
+        id = kwargs['id']
+        context = super(TrustDetailView, self).get_context_data(**kwargs)
+        context['trust'] = Trust.objects.get(pk=id)
+        return context
+
+
 class TrustViewSet(viewsets.ModelViewSet):
     model = Trust
     filter_class = TrustFilterSet

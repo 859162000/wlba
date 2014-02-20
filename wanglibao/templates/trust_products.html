@@ -60,38 +60,7 @@
 {% endblock %}
 
 {% block ko-template %}
-  <!-- trust-table template render the model's trusts array into a table-->
-  <!-- It is used in trust_home, trust_products, personal page-->
-  <script type="text/html" id="trust-table">
-    <table class="trust-table">
-      <thead>
-        <tr>
-          <th colspan="1"></th>
-          <th colspan="4">产品名称</th>
-          <th colspan="2">资金门槛</th>
-          <th colspan="2">产品期限</th>
-          <th colspan="2">预期收益</th>
-          <th colspan="2">投资行业</th>
-          <th colspan="2">信托分类</th>
-          <th colspan="2">信托公司</th>
-          <th colspan="2"></th>
-        </tr>
-      </thead>
-      <tbody data-bind="foreach: $data">
-        <tr>
-          <td colspan="1" data-bind="text: ($index() + 1)"></td>
-          <td colspan="4" data-bind="text: name">名字</td>
-          <td colspan="2" data-bind="text: Math.round(investment_threshold) + '万'">100万</td>
-          <td colspan="2" data-bind="text: period + '个月'">12个月</td>
-          <td colspan="2" data-bind="text: expected_earning_rate.toFixed(2) + '%'">13.00%</td>
-          <td colspan="2" data-bind="text: usage">房地产</td>
-          <td colspan="2" data-bind="text: type">货款类</td>
-          <td colspan="2" data-bind="text: issuer_short_name">甘肃信托</td>
-          <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
-        </tr>
-      </tbody>
-    </table>
-  </script>
+  {% include "templates.html" %}
 {% endblock %}
 
 {% block javascript %}

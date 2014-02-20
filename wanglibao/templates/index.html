@@ -37,7 +37,7 @@
     </div>
   </div>
   <div class="space-vertical-s"></div>
-  <div class="container"><span class="font-l">热门推荐</span><a href="#">信托产品</a>
+  <div class="container"><span class="font-l">热门推荐</span>
     <div class="space-vertical-s"></div>
     <div data-bind="foreach: rows" class="container">
       <!-- ko foreach: $data-->
@@ -48,7 +48,7 @@
               <dt>预期收益</dt>
               <dd data-bind="text: expected_earning_rate">10%</dd>
             </dl>
-          </div><a data-bind="attr: { href: url }" class="card-orderlink">预约</a>
+          </div><a data-bind="attr: { href: '/trust/detail/' + id }" class="card-orderlink">预约</a>
         </div>
         <div class="card-right">
           <dl><span data-bind="text: name" class="card-title">网利宝金融平台信托产品</span>
