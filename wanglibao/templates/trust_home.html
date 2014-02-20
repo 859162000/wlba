@@ -1,18 +1,10 @@
-{% extends "navigation_base.html" %}
+{% extends "trust_base.html" %}
 
 {% load formatters %}
+{% load static %}
 
 {% block content %}
   {{ block.super }}
-  <div class="sub-navbar">
-    <div class="sub-navbar--list">
-      <ul>
-        <li class="sub-navbar--list-item"><a href="#" class="sub-navbar--anchor active">信托首页</a></li><span class="white-v-line pull-left"></span>
-        <li class="sub-navbar--list-item"><a href="#" class="sub-navbar--anchor">信托产品</a></li><span class="white-v-line pull-left"></span>
-        <li class="sub-navbar--list-item"><a href="#" class="sub-navbar--anchor">信托公司</a></li>
-      </ul>
-    </div>
-  </div>
   <div class="container">
     <div class="ad-panel"></div>
   </div>
@@ -57,20 +49,23 @@
   <div class="panel">
     <div class="panel-title-bar">
       <div class="panel-title">排行榜</div>
-      <div class="panel-tabs">
-        <div class="panel-tab active"><a href="javaScript:void(0);">按期限</a></div>
-        <div class="panel-tab"><a href="javaScript:void(0);">按起点</a></div>
-        <div class="panel-tab"><a href="javaScript:void(0);">按年收益</a></div>
+      <div data-bind="foreach: tabTree" class="panel-tabs">
+        <div data-bind="css: {active: name == ($root.selectedTab()).name}" class="panel-tab"><a href="#" data-bind="text: $data.name, click: $root.setSelectedTab">名字</a></div>
       </div>
     </div>
-    <div class="panel-sub-tabs">
-      <div class="panel-sub-tab"><a href="javascript:void(0);" class="active">12个月以下</a></div>
-      <div class="panel-sub-tab"><a href="javascript:void(0);">12个月-24个月</a></div>
-      <div class="panel-sub-tab"><a href="javascript:void(0);">24个月以上</a></div>
-    </div>
+    <div data-bind="foreach: selectedTab().values" class="panel-sub-tabs"><a href="#" data-bind="text: name, click: $root.setSelectedValue" class="panel-sub-tab">名字</a></div>
     <div class="panel-content">
-      <table class="trust-table">
-        <thead>
+      <!-- ko template: {name: 'trust-table', data: trusts}-->
+      <!-- /ko-->
+    </div>
+  </div>
+  <div class="space-vertical-m"></div>
+{% endblock content %}
+
+{% block ko-template %}
+  <script type="text/html" id="trust-table">
+    <table class="trust-table">
+      <thead>
         <tr>
           <th colspan="1"></th>
           <th colspan="4">产品名称</th>
@@ -82,17 +77,27 @@
           <th colspan="2">信托公司</th>
           <th colspan="2"></th>
         </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="space-vertical-m"></div>
-  <div class="panel">
-    <div class="panel-title-bar">
-      <div class="panel-title">合作信托机构</div>
-    </div>
-  </div>
-  <div class="space-vertical-m"></div>
-{% endblock content %}
+      </thead>
+      <tbody data-bind="foreach: $data">
+        <tr>
+          <td colspan="1" data-bind="text: ($index() + 1)"></td>
+          <td colspan="4" data-bind="text: name">名字</td>
+          <td colspan="2" data-bind="text: Math.round(investment_threshold) + '万'">100万</td>
+          <td colspan="2" data-bind="text: period + '个月'">12个月</td>
+          <td colspan="2" data-bind="text: expected_earning_rate.toFixed(2) + '%'">13.00%</td>
+          <td colspan="2" data-bind="text: usage">房地产</td>
+          <td colspan="2" data-bind="text: type">货款类</td>
+          <td colspan="2" data-bind="text: issuer_short_name">甘肃信托</td>
+          <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </script>
+{% endblock %}
+
+{% block javascript %}
+  {{  block.super }}
+  <script src="{% static "wanglibao/js/underscore-min.js" %}"></script>
+  <script src="{% static "wanglibao/js/knockout-3.0.0.js" %}"></script>
+  <script src="{% static "wanglibao/javascripts/trust_home.js" %}"></script>
+{% endblock %}

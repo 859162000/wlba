@@ -17,6 +17,10 @@ class TrustHomeView(TemplateView):
         return context
 
 
+class TrustProductsView(TemplateView):
+    template_name = "trust_products.html"
+
+
 class TrustViewSet(viewsets.ModelViewSet):
     model = Trust
     filter_class = TrustFilterSet

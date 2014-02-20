@@ -5,16 +5,20 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth.views import login
 from django.views.generic import TemplateView
-from trust.views import TrustHomeView
+from trust.views import TrustHomeView, TrustProductsView
 from wanglibao.forms import EmailOrPhoneAuthenticationForm
 from wanglibao.views import RegisterView
+from wanglibao_portfolio.views import PortfolioHomeView
 
 admin.autodiscover()
 
 urlpatterns = patterns(
     '',
     url(r'^$', TemplateView.as_view(template_name="index.html"), name="index"),
-    url(r'^trust/home$', TrustHomeView.as_view(), name="trust_home"),
+    url(r'^trust/home/', TrustHomeView.as_view(), name="trust_home"),
+    url(r'^trust/products/', TrustProductsView.as_view(), name="trust_products"),
+    url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
+
     url(r'^api/', include('wanglibao_rest.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

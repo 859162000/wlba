@@ -8,10 +8,12 @@
 
     <title> {% block title %} 网利宝-首页 {% endblock %} </title>
 
-    <link href="{% static "wanglibao/stylesheets/screen.css" %}" media="screen, projection" rel="stylesheet" type="text/css">
-    <link href="{% static "wanglibao/stylesheets/print.css" %}" media="print" rel="stylesheet" type="text/css">
-    <!-- if IElink(href="{% static "wanglibao/stylesheets/ie.css"  %}", media="screen, projection", rel="stylesheet", type="text/css")
-    -->
+    {% block stylesheet %}
+      <link href="{% static "wanglibao/stylesheets/screen.css" %}" media="screen, projection" rel="stylesheet" type="text/css">
+      <link href="{% static "wanglibao/stylesheets/print.css" %}" media="print" rel="stylesheet" type="text/css">
+      <!-- if IElink(href="{% static "wanglibao/stylesheets/ie.css"  %}", media="screen, projection", rel="stylesheet", type="text/css")
+      -->
+    {% endblock %}
   </head>
 
 <body>
@@ -74,6 +76,9 @@
         </dl>
       </div>
     </div>
+
+    {% block ko-template %}
+    {% endblock %}
 
     {% block javascript %}
       <!--页尾 end-->

@@ -1,0 +1,102 @@
+{% extends "trust_base.html" %}
+
+{% load static %}
+{% load formatters %}
+
+{% block title %} 信托产品搜索 {% endblock %}
+
+{% block content %}
+  {{ block.super }}
+
+  <div class="space-vertical-m"></div>
+  <div class="panel">
+    <div class="panel-title-bar">
+      <div class="panel-title">筛选条件</div>
+    </div>
+    <table class="trust-filter-container">
+      <thead>
+        <tr data-bind="foreach: filters">
+          <th colspan="1" data-bind="text: name, attr: {colspan: $data.values.length &gt; 7 ? '2' : '1'}">名字</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-bind="foreach: filters">
+          <td colspan="1">
+            <ul data-bind="foreach: values.slice(0, 7)">
+              <li class="vertical-filter-item"><a href="#" data-bind="text: name, css:{active: $root.isFilterActive($data)}, click:$root.clickOnFilter" class="filter-condition-item">name</a></li>
+            </ul>
+          </td>
+          <!-- ko if: $data.values.length > 7-->
+          <td colspan="1">
+            <ul data-bind="foreach: values.slice(7)">
+              <li class="vertical-filter-item"><a href="#" data-bind="text: name, css:{active: $root.isFilterActive($data)}, click:$root.clickOnFilter" class="filter-condition-item">name</a></li>
+            </ul>
+          </td>
+          <!-- /ko-->
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="space-vertical-m"></div>
+  <div class="panel">
+    <div class="panel-title-bar">
+      <div class="panel-title">筛选结果</div>
+    </div>
+    <div class="panel-content">
+      <!-- ko template: {name: 'trust-table', data: trusts}-->
+      <!-- /ko-->
+    </div>
+    <div class="pager">
+      <ul>
+        <li data-bind="css:{disabled: $root.pageNumber() == 1}" class="pager-prev"><a href="#" data-bind="click: $root.pageNumber($root.pageNumber() - 1)" class="pager-anchor"><上一页</a></li>
+        <!-- ko foreach: ko.utils.range(1, totalPageNumber)-->
+        <li data-bind="css:{active: $root.pageNumber() == $data}" class="pager-page-number"><a href="#" data-bind="text: $data, click: $root.setPageNumber" class="pager-anchor">1</a></li>
+        <!-- /ko-->
+        <li data-bind="css:{disabled: $root.pageNumber() == $root.totalPageNumber()}" class="pager-next"><a href="#" data-bind="click: $root.pageNumber($root.pageNumber() + 1)" class="pager-anchor">下一页></a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="space-vertical-s"></div>
+{% endblock %}
+
+{% block ko-template %}
+  <!-- trust-table template render the model's trusts array into a table-->
+  <!-- It is used in trust_home, trust_products, personal page-->
+  <script type="text/html" id="trust-table">
+    <table class="trust-table">
+      <thead>
+        <tr>
+          <th colspan="1"></th>
+          <th colspan="4">产品名称</th>
+          <th colspan="2">资金门槛</th>
+          <th colspan="2">产品期限</th>
+          <th colspan="2">预期收益</th>
+          <th colspan="2">投资行业</th>
+          <th colspan="2">信托分类</th>
+          <th colspan="2">信托公司</th>
+          <th colspan="2"></th>
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: $data">
+        <tr>
+          <td colspan="1" data-bind="text: ($index() + 1)"></td>
+          <td colspan="4" data-bind="text: name">名字</td>
+          <td colspan="2" data-bind="text: Math.round(investment_threshold) + '万'">100万</td>
+          <td colspan="2" data-bind="text: period + '个月'">12个月</td>
+          <td colspan="2" data-bind="text: expected_earning_rate.toFixed(2) + '%'">13.00%</td>
+          <td colspan="2" data-bind="text: usage">房地产</td>
+          <td colspan="2" data-bind="text: type">货款类</td>
+          <td colspan="2" data-bind="text: issuer_short_name">甘肃信托</td>
+          <td colspan="2"><a href="#" class="button button-mini button-warning">详情</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </script>
+{% endblock %}
+
+{% block javascript %}
+  {{  block.super }}
+  <script src="{% static "wanglibao/js/underscore-min.js" %}"></script>
+  <script src="{% static "wanglibao/js/knockout-3.0.0.js" %}"></script>
+  <script src="{% static "wanglibao/javascripts/trust_products.js" %}"></script>
+{% endblock %}
