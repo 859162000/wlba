@@ -48,8 +48,7 @@ class PhoneValidateView(APIView):
     throttle_classes = (UserRateThrottle,)
 
     def post(self, request, phone, format=None):
-        phone_number = phone
-        phone_number = phone_number.strip()
+        phone_number = phone.strip()
 
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         validate_code = generate_validate_code()
@@ -68,11 +67,10 @@ class PhoneValidateView(APIView):
                 phone_validate_code_item.save()
 
         except PhoneValidateCode.DoesNotExist:
-            phone_validate_code_item = PhoneValidateCode.objects.create(
+            PhoneValidateCode.objects.create(
                 phone=phone_number,
                 validate_code=validate_code,
                 last_send_time=now)
-            phone_validate_code_item.save()
 
          # Send the validate message to mobile TODO Add throttling on ip, phone number
         content = render_to_string('activation-sms.html', {'validation_code': validate_code})
@@ -98,7 +96,7 @@ class PhoneValidateView(APIView):
         return_code = int(next(doc.iter(namespace + 'code')).text)
 
         # TODO for errors log it out
-        # TODO for all logs, when pii data embeded, wrap the code with special tag [type=value] [phone=18888888888]
+        # TODO for all logs, when pii data embedded, wrap the code with special tag [type=value] [phone=18888888888]
         #      future mining can utilize this.
 
         if return_code != 2:

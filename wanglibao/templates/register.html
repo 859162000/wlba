@@ -6,7 +6,7 @@
 
 {% url 'auth_password_reset' as auth_pwd_reset_url %}
 
-{% block title %} 用户登录 - 网利宝 {% endblock %}
+{% block title %} 用户注册 - 网利宝 {% endblock %}
 
 {% block content %}
 
@@ -35,7 +35,7 @@
             <div class="form-row">
               {% render_field form.password class+="input-large" placeholder="请输入密码" autocomplete='off' %}
             </div>
-            <div class="form-row form-bottom-bar"><span>已有账户请直接</span><a href="register.html">登录</a>
+            <div class="form-row form-bottom-bar"><span>已有账户请直接</span><a href="/accounts/login/?next=/">登录</a>
               <button type="submit" id="button-submit" class="pull-right button-error button-large">注 册</button>
             </div>
           </form>

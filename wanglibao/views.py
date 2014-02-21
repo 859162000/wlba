@@ -13,6 +13,7 @@ from django.template import Context, Template
 
 User = get_user_model()
 
+
 class RegisterView (RegistrationView):
     template_name = "register.html"
     form_class = EmailOrPhoneRegisterForm

@@ -38,6 +38,10 @@ urlpatterns = patterns(
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }),
     url(r'^accounts/register/$', RegisterView.as_view()),
+    url(r'^accounts/activate/complete/$',
+                           TemplateView.as_view(template_name='activation_complete.html'),
+                           name='registration_activation_complete'),
+
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
 )

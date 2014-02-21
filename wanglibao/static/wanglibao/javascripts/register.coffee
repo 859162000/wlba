@@ -40,7 +40,7 @@ $(document).ready ->
     if checkMobile(phoneNumber)
       console.log "Phone number checked, now send the valdiation code"
       $.ajax(
-        url: "/api/phone_validation_code/" + phoneNumber + "/"
+        url: "/api/phone_validation_code/register/" + phoneNumber + "/"
         type: "POST"
       ).done ->
         intervalId
