@@ -7,6 +7,7 @@ class Bank(models.Model):
     phone = models.CharField(max_length=32)
     description = models.TextField()
     home_url = models.URLField()
+    logo = models.ImageField(upload_to='bank_logo', null=True, blank=True)
 
     def __unicode__(self):
         return u"%s" % (self.name, )
@@ -33,7 +34,7 @@ class BankFinancing(models.Model):
     product_type = models.CharField(max_length=32, help_text=u"The type, structure, etc")
     principle_guaranteed = models.BooleanField(default=False)
 
-    invest_threshold = models.FloatField(help_text="minimum investment in 10k")
+    invest_threshold = models.FloatField(help_text="Minimum investment in 10k")
     invest_step = models.FloatField()
     invest_method = models.TextField()
 

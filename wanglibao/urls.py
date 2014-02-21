@@ -41,3 +41,9 @@ urlpatterns = patterns(
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
 )
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+                            url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+                                {'document_root': settings.MEDIA_ROOT})
+    )

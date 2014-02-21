@@ -10,6 +10,8 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -128,6 +130,16 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+# Media files path
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+if DEBUG:
+    MEDIA_URL = 'http://127.0.0.1:8000/media/'
+else:
+    MEDIA_URL = '/media/'
+    raise ImproperlyConfigured("Need to configure the media path")
+
+# Django Rest Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_MODEL_SERIALIZER_CLASS':
         'rest_framework.serializers.HyperlinkedModelSerializer',

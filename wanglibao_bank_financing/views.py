@@ -2,7 +2,7 @@ from django.views.generic import TemplateView
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_bank_financing.filters import BankFinancingFilterSet
 from wanglibao_bank_financing.models import BankFinancing, Bank
-from wanglibao_bank_financing.serializers import BankFinancingSerializer
+from wanglibao_bank_financing.serializers import BankFinancingSerializer, BankSerializer
 
 
 class BankFinancingViewSet(PaginatedModelViewSet):
@@ -13,6 +13,7 @@ class BankFinancingViewSet(PaginatedModelViewSet):
 
 class BankViewSet(PaginatedModelViewSet):
     model = Bank
+    serializer_class = BankSerializer
 
 
 class FinancingHomeView(TemplateView):
