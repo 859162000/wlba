@@ -1,0 +1,60 @@
+{% extends "navigation_base.html" %}
+
+{% load static %}
+
+{% block content %}
+  {{ block.super }}
+
+  <div class="sub-navbar">
+    <div class="sub-navbar--list">
+      <ul>
+        <li class="sub-navbar--list-item"><a href="{% url 'financing_home' %}" class="sub-navbar--anchor active">理财首页</a></li>
+        <li class="sub-navbar--list-item"><a href="{% url 'financing_products' %}" class="sub-navbar--anchor">理财产品</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="space-vertical-s"></div>
+  <div class="panel">
+    <div class="panel-title-bar">
+      <div class="panel-title">筛选条件</div>
+    </div>
+    <div data-bind="foreach: filters" class="container">
+      <div class="filter-container"><span data-bind="text: name + ':'" class="filter-name">名字</span>
+        <!-- ko foreach: values--><a href="#" data-bind="text: name, css: {active: $root.activeFilters().indexOf($data) != -1}, click: $root.clickOnFilter" class="filter-item">名字</a>
+        <!-- /ko-->
+      </div>
+    </div>
+  </div>
+  <div class="space-vertical-s"></div>
+  <div class="panel">
+    <div class="panel-title-bar">
+      <div class="panel-title">筛选结果</div>
+    </div>
+    <div class="panel-content">
+      <!-- ko template: {name: 'financing-table', data: products}-->
+      <!-- /ko-->
+    </div>
+    <div class="pager">
+      <ul>
+        <li data-bind="css:{disabled: $root.pageNumber() == 1}" class="pager-prev"><a href="#" data-bind="click: $root.pageNumber($root.pageNumber() - 1)" class="pager-anchor"><上一页</a></li>
+        <!-- ko foreach: ko.utils.range(1, totalPageNumber)-->
+        <li data-bind="css:{active: $root.pageNumber() == $data}" class="pager-page-number"><a href="#" data-bind="text: $data, click: $root.setPageNumber" class="pager-anchor">1</a></li>
+        <!-- /ko-->
+        <li data-bind="css:{disabled: $root.pageNumber() == $root.totalPageNumber()}" class="pager-next"><a href="#" data-bind="click: $root.pageNumber($root.pageNumber() + 1)" class="pager-anchor">下一页></a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="space-vertical-m"></div>
+{% endblock %}
+
+{% block ko-template %}
+  {% include "templates.html" %}
+{% endblock %}
+
+{% block javascript %}
+  {{ block.super }}
+
+  <script src="{% static "wanglibao/js/underscore-min.js" %}"></script>
+  <script src="{% static "wanglibao/js/knockout-3.0.0.js" %}"></script>
+  <script src="{% static "wanglibao/javascripts/financing_products.js" %}"></script>
+{% endblock %}

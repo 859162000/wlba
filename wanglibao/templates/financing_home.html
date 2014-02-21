@@ -1,0 +1,191 @@
+{% extends "navigation_base.html" %}
+
+{% block content %}
+  {{ block.super }}
+
+   <div class="sub-navbar">
+    <div class="sub-navbar--list">
+      <ul>
+        <li class="sub-navbar--list-item"><a href="{% url 'financing_home' %}" class="sub-navbar--anchor active">理财首页</a></li>
+        <li class="sub-navbar--list-item"><a href="{% url 'financing_products' %}" class="sub-navbar--anchor">理财产品</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container">
+    <div class="ad-panel"></div>
+  </div>
+  <div class="space-vertical-s"></div>
+  <div class="panel">
+    <div class="panel-title-bar">
+      <div class="panel-title">热门产品</div><a href="#" class="panel-title-right-item">更多</a>
+    </div>
+    <div class="container">
+      <div class="card-financing">
+        <div class="card-top-container">
+          <p class="card-financing-title">高收益精选</p>
+          <div class="space-vertical-s"></div><img src="images/on-sale.png" class="card-annotation"><img src="images/pingan-logo.png" class="bank-logo">
+          <div class="space-vertical-s"></div>
+          <div class="card-financing-product-name">平安财富-结构类（非保本 挂钩ET）</div>
+        </div>
+        <dl class="card-detail-box">
+          <dt>投资收益:</dt>
+          <dd class="orange-text">12%</dd>
+          <dt>产品期限:</dt>
+          <dd class="orange-text">90天</dd>
+          <div class="space-vertical-s"></div>
+          <div class="space-vertical-s dashed-line"></div>
+          <dt>点评:</dt>
+          <dd>期限短，起点低，同类收益最高，保本浮动类型，稳健型首选</dd>
+        </dl>
+      </div>
+      <div class="card-financing">
+        <div class="card-top-container">
+          <p class="card-financing-title">高收益精选</p>
+          <div class="space-vertical-s"></div><img src="images/on-sale.png" class="card-annotation"><img src="images/pingan-logo.png" class="bank-logo">
+          <div class="space-vertical-s"></div>
+          <div class="card-financing-product-name">平安财富-结构类（非保本 挂钩ET）</div>
+        </div>
+        <dl class="card-detail-box">
+          <dt>投资收益:</dt>
+          <dd class="orange-text">12%</dd>
+          <dt>产品期限:</dt>
+          <dd class="orange-text">90天</dd>
+          <div class="space-vertical-s"></div>
+          <div class="space-vertical-s dashed-line"></div>
+          <dt>点评:</dt>
+          <dd>期限短，起点低，同类收益最高，保本浮动类型，稳健型首选</dd>
+        </dl>
+      </div>
+      <div class="card-financing">
+        <div class="card-top-container">
+          <p class="card-financing-title">高收益精选</p>
+          <div class="space-vertical-s"></div><img src="images/on-sale.png" class="card-annotation"><img src="images/pingan-logo.png" class="bank-logo">
+          <div class="space-vertical-s"></div>
+          <div class="card-financing-product-name">平安财富-结构类（非保本 挂钩ET）</div>
+        </div>
+        <dl class="card-detail-box">
+          <dt>投资收益:</dt>
+          <dd class="orange-text">12%</dd>
+          <dt>产品期限:</dt>
+          <dd class="orange-text">90天</dd>
+          <div class="space-vertical-s"></div>
+          <div class="space-vertical-s dashed-line"></div>
+          <dt>点评:</dt>
+          <dd>期限短，起点低，同类收益最高，保本浮动类型，稳健型首选</dd>
+        </dl>
+      </div>
+      <div class="card-financing">
+        <div class="card-top-container">
+          <p class="card-financing-title">高收益精选</p>
+          <div class="space-vertical-s"></div><img src="images/on-sale.png" class="card-annotation"><img src="images/pingan-logo.png" class="bank-logo">
+          <div class="space-vertical-s"></div>
+          <div class="card-financing-product-name">平安财富-结构类（非保本 挂钩ET）</div>
+        </div>
+        <dl class="card-detail-box">
+          <dt>投资收益:</dt>
+          <dd class="orange-text">12%</dd>
+          <dt>产品期限:</dt>
+          <dd class="orange-text">90天</dd>
+          <div class="space-vertical-s"></div>
+          <div class="space-vertical-s dashed-line"></div>
+          <dt>点评:</dt>
+          <dd>期限短，起点低，同类收益最高，保本浮动类型，稳健型首选</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="space-vertical-m"></div>
+  <div class="panel">
+    <div class="panel-title-bar">
+      <div class="panel-title">在售产品收益排行</div>
+      <div class="panel-tabs">
+        <div class="panel-tab">按起购金额</div>
+        <div class="panel-tab">按产品期限</div>
+        <div class="panel-tab">按收益类型</div>
+      </div>
+    </div>
+    <div class="panel-sub-tabs"><a href="#" class="panel-sub-tab">10万以下</a><a href="#" class="panel-sub-tab">10万-20万</a><a href="#" class="panel-sub-tab">20万以上</a></div>
+    <div class="panel-content">
+      <table class="trust-table">
+        <thead>
+          <tr>
+            <th colspan="1">排名</th>
+            <th colspan="4">产品名称</th>
+            <th colspan="2">发行银行</th>
+            <th colspan="2">管理期限</th>
+            <th colspan="2">收益类型</th>
+            <th colspan="2">预期收益</th>
+            <th colspan="2">起购金额</th>
+            <th colspan="1"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="1">1</td>
+            <td colspan="4">汇祥天下-人民币两年期结构理财</td>
+            <td colspan="2">汇丰银行</td>
+            <td colspan="2">24个月</td>
+            <td colspan="2">保本浮动</td>
+            <td colspan="2">10%</td>
+            <td colspan="2">10万</td>
+          </tr>
+          <tr>
+            <td colspan="1">1</td>
+            <td colspan="4">汇祥天下-人民币两年期结构理财</td>
+            <td colspan="2">汇丰银行</td>
+            <td colspan="2">24个月</td>
+            <td colspan="2">保本浮动</td>
+            <td colspan="2">10%</td>
+            <td colspan="2">10万</td>
+          </tr>
+          <tr>
+            <td colspan="1">1</td>
+            <td colspan="4">汇祥天下-人民币两年期结构理财</td>
+            <td colspan="2">汇丰银行</td>
+            <td colspan="2">24个月</td>
+            <td colspan="2">保本浮动</td>
+            <td colspan="2">10%</td>
+            <td colspan="2">10万</td>
+          </tr>
+          <tr>
+            <td colspan="1">1</td>
+            <td colspan="4">汇祥天下-人民币两年期结构理财</td>
+            <td colspan="2">汇丰银行</td>
+            <td colspan="2">24个月</td>
+            <td colspan="2">保本浮动</td>
+            <td colspan="2">10%</td>
+            <td colspan="2">10万</td>
+          </tr>
+          <tr>
+            <td colspan="1">1</td>
+            <td colspan="4">汇祥天下-人民币两年期结构理财</td>
+            <td colspan="2">汇丰银行</td>
+            <td colspan="2">24个月</td>
+            <td colspan="2">保本浮动</td>
+            <td colspan="2">10%</td>
+            <td colspan="2">10万</td>
+          </tr>
+          <tr>
+            <td colspan="1">1</td>
+            <td colspan="4">汇祥天下-人民币两年期结构理财</td>
+            <td colspan="2">汇丰银行</td>
+            <td colspan="2">24个月</td>
+            <td colspan="2">保本浮动</td>
+            <td colspan="2">10%</td>
+            <td colspan="2">10万</td>
+          </tr>
+          <tr>
+            <td colspan="1">1</td>
+            <td colspan="4">汇祥天下-人民币两年期结构理财</td>
+            <td colspan="2">汇丰银行</td>
+            <td colspan="2">24个月</td>
+            <td colspan="2">保本浮动</td>
+            <td colspan="2">10%</td>
+            <td colspan="2">10万</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="space-vertical-m"></div>
+{% endblock %}
