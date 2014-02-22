@@ -1,3 +1,6 @@
+# encoding: utf-8
+
+from django.utils.translation import ugettext as _
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
 from wanglibao.utils import detect_identifier_type
@@ -23,10 +26,12 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
     error_messages = {
-        'duplicate_email': 'The email is already registered',
-        'duplicate_phone': 'The phone number already registered',
-        'invalid_identifier_type': 'The identifier type invalid, please provide email address or phone number',
-        'validate_code_for_email': 'No validate code should be provided when identifier is email'
+        'duplicate_email': u'该邮箱已经注册',
+        'duplicate_phone': u'该手机号已经注册',
+        'invalid_identifier_type': u'请提供邮箱或者手机号',
+        'validate_code_for_email': u'邮箱注册时不需要提供验证码',
+        'validate code not match': u'验证码不正确',
+        'validate code not exist': u'没有发送验证码'
     }
 
     class Meta:
@@ -83,6 +88,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         else:
             return None
 
+
 class EmailOrPhoneAuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts
@@ -92,9 +98,7 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
     error_messages = {
-        'invalid_login': "Please enter a correct %(username)s and password. "
-                           "Note that both fields may be case-sensitive.",
-        'inactive': "This account is inactive.",
+        'invalid_login': u"用户名或者密码不正确",
     }
 
     def __init__(self, request=None, *args, **kwargs):
@@ -105,6 +109,8 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
         self.request = request
         self.user_cache = None
         super(EmailOrPhoneAuthenticationForm, self).__init__(*args, **kwargs)
+
+        self._errors = None
 
     def clean(self):
         identifier = self.cleaned_data.get('identifier')
