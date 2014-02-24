@@ -139,6 +139,12 @@ else:
     MEDIA_URL = '/media/'
     raise ImproperlyConfigured("Need to configure the media path")
 
+# The request rate for some apis
+request_rate = '1/minute'
+
+if DEBUG:
+    request_rate = '1/second'
+
 # Django Rest Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_MODEL_SERIALIZER_CLASS':
@@ -160,7 +166,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_THROTTLE_RATES': {
-        'user': '1/minute'
+        'user': request_rate
     },
     'DEFAULT_PAGINATION_SERIALIZER_CLASS': 'wanglibao_rest.pagination.PaginationSerializer',
 }

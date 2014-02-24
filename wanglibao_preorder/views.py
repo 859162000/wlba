@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.contrib.auth.models import AnonymousUser
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
-from rest_framework.viewsets import ViewSet, ModelViewSet
+from rest_framework.viewsets import ViewSet
+
 from wanglibao_preorder.models import PreOrder
 from wanglibao_preorder.serializers import PreOrderSerializer
 
@@ -22,9 +22,14 @@ class PreOrderViewSet(ViewSet):
         serializer = self.serializer(data=request.DATA)
 
         if serializer.is_valid():
+            user = None
+            if request.user and request.user.is_authenticated():
+                user = request.user
+
+            serializer.object.user = user
             serializer.object.save()
             return Response(serializer.data)
         else:
             return Response({
-                'message':'failed'
+                'message': 'failed'
             }, status=400)
