@@ -177,8 +177,8 @@ REST_FRAMEWORK = {
         'wanglibao.filters.OrderingFilter',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.OAuth2Authentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.OAuth2Authentication',
     ),
     'DEFAULT_THROTTLE_RATES': {
         'user': request_rate

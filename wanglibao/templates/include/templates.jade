@@ -24,7 +24,7 @@ script(type="text/html", id="trust-table")
         td(colspan="2" data-bind="text: type") 货款类
         td(colspan="2" data-bind="text: issuer_short_name") 甘肃信托
         td(colspan="2")
-          a.button.button-mini.button-happy(href="#") 详情
+          a.button.button-mini.button-happy(data-bind="attr{ href: '/trust/detail/' + id }") 详情
 
 // financing-table render model's products array as financing products
 // used by financing_products, financing_home, personal page

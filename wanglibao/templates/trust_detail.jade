@@ -1,3 +1,5 @@
+- load formatters
+
 doctype html
 - with '信托产品详情' as title
 include include/head
@@ -21,31 +23,31 @@ body
   .container
     .span8.panel.detail-header
       .panel-title-bar
-        #product_name.panel-title 胜于农业产业园
+        #product_name.panel-title {{ trust.name }}
 
       .panel-inner
         .well
           .span7
-            p 高收益，延安保障房项目，财政安排还款，国有土地抵押，国资委全资公司连带责任担保，风控完善，还款充裕！
+            p {{ trust.brief }}
           .span5-omega
             .span4
               .card-icon
                 dl
                   dt 预期收益
-                  dd(data-bind='text: expected_earning_rate') 10%
+                  dd {{ trust.expected_earning_rate | percentage }}
             .span4
               .card-icon
                 dl
                   dt 销售门槛
-                  dd 100万
+                  dd {{ trust.investment_threshold | money_to_10k }}
             .span4-omega
               .card-icon
                 dl
                   dt 投资期限
-                  dd 18个月
+                  dd {{ trust.period | month}}
 
     .span4-omega.panel.detail-header
-      p.font-m.padding-left-s.padding-top-xs 发售日期: 2014-1-1
+      p.font-m.padding-left-s.padding-top-xs 发售日期: {{ trust.issue_date | date:"Y年n月j日"}}
 
       form.order-form
         .form-row
@@ -72,54 +74,53 @@ body
           tbody
             tr
               th(colspan="1") 信托名称
-              td(colspan="2") 中航信托-天惠14号信贷及车贷结构化集合资金信托计划
+              td(colspan="2") {{ trust.name }}
               th(colspan="1") 预计发行规模
-              td(colspan="1") 4800万
+              td(colspan="1") {{ trust.scale | money_to_10k }}
             tr
               th(colspan="1") 信托公司
-              td(colspan="2") 甘肃信托
+              td(colspan="2") {{ trust.issuer.name }}
               th(colspan="1") 预计年收益
-              td(colspan="1") 10%
+              td(colspan="1") {{ trust.expected_earning_rate | percentage }}
             tr
               th(colspan="1") 存续期
-              td(colspan="2") 24个月
+              td(colspan="2") {{ trust.period | month}}
               th(colspan="1") 利息分配
-              td(colspan="1") 到期付息
+              td(colspan="1") {{ trust.payment }}
 
             tr
               th(colspan="1") 最低认购金额
-              td(colspan="2") 100万
+              td(colspan="2") {{ trust.investment_threshold | money_to_10k }}
               th(colspan="1") 信托类型
-              td(colspan="1") 贷款类
+              td(colspan="1") {{ trust.type }}
 
             tr
               th(colspan="1") 投资行业
-              td(colspan="2") 其他
+              td(colspan="2") {{ trust.usage }}
               th(colspan="1") 年化收益率
-              td(colspan="1") 10%
+              td(colspan="1") {{ trust.expected_earning_rate | percentage}}
 
             tr
               th(colspan="1") 收益说明
-              td(colspan="2") 100万及以上
+              td(colspan="2") {{ trust.earning_description }}
               th(colspan="1") 抵押率
-              td(colspan="1") -
+              td(colspan="1") TODO
 
             tr
               th(colspan="1") 抵押物
-              td(colspan="4") 车辆
+              td(colspan="4") TODO
 
             tr
               th(colspan="1") 产品说明
-              td(colspan="4") 受托人利用信托计划资金发放小微信贷和车辆抵押贷款，通过市场化的方式获得利息回报,以实现信托财产的保值增值，为优先级投资人获取稳定的投资收益
+              td(colspan="4") TODO
 
             tr
               th(colspan="1") 风险控制
-              td(colspan="4") 结构化设计，优先：劣后=10:1 <br/> 借款人车辆抵押担保+宜信承担连带保证责任
+              td(colspan="4") {{ trust.risk }}
 
             tr
               th(colspan="1") 受托人
-              td(colspan="4") 中航信托股份有限公司的前身为江西江南信托股份有限公司,是经中国银监会批准设立的股份制非银行金融机构,是经中国商务部核准的外商投资企业。公司于2009年12月底完成重新登记开业,并于2010年12月底完成名称变更并乔迁新址。 公司由中国航空工业集团公司、中国航空技术深圳有限公司和引进的战略投资者新加坡华侨银行等5家单位共同发起组建,作为中航工业旗下中航工业投资公司成员单位,专注于具有行业优势和区域优势并能可持续发展、形成核心能力的产品和业务,实现公司"高起点、高境界、可持续、快发展",努力把公司建设成为研究水平和服务水平领先、特色鲜明的专业化信托公司。 2012-01-05经中国银监会批准,中航信托成功将注册资本增加到15亿元。本次增资是中航信托在2011年内完成的第二次增资。 经中国银监会批准和公司登记机关核准，公司经营下列人民币和外币业务：（一）资金信托；（二）动产信托；（三）不动产信托；（四）有价证券信托；（五）其他财产或财产权信托；（六）作为投资基金或者基金管理公司的发起人从事投资基金业务；（七）经营企业资产的重组、并购及项目融资、公司理财、财务顾问等业务；（八）受托经营国务院有关部门批准的证券承销业务；（九）办理居间、咨询、资信调查等业务；（十）代保管及保管箱业务；（十一）以存放同业、拆放同业、贷款、租赁、投资方式运用固有资产；（十二）以固有财产为他人提供担保；（十三）从事同业拆借；（十四）法律法规规定或中国银监会批准的其他业务。
-
+              td(colspan="4") TODO
   .space-vertical-s
 
   include include/footer
