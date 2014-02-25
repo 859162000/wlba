@@ -48,9 +48,9 @@ class RegisterView (RegistrationView):
 
             context = {"activation_code": registration_profile.activation_key}
 
-            subject = render_to_string('activation-title.html', context).encode('utf-8')
-            text_content = render_to_string('activation-text.html', context).encode('utf-8')
-            html_content = render_to_string('activation-html.html', context).encode('utf-8')
+            subject = render_to_string('html/activation-title.html', context).encode('utf-8')
+            text_content = render_to_string('html/activation-text.html', context).encode('utf-8')
+            html_content = render_to_string('html/activation-html.html', context).encode('utf-8')
 
             subject = subject.strip('\n')
             email = EmailMultiAlternatives(subject, text_content, from_email, [to])
