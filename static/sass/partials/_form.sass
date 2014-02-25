@@ -1,0 +1,50 @@
+@import variables
+@import compass/css3
+
+$row-height: 40px
+
+.login-form
+  width: 420px
+
+.form
+  background: $form-background-color
+  padding: 10px 35px
+  +border-radius(5px)
+  border: 1px solid $border-color
+
+.form-title
+  color: $light-red
+  margin-top: 10px
+  margin-bottom: 10px
+
+.form-row
+  margin-top: $space-s
+  overflow: auto
+
+.form-row-label
+  line-height: $row-height
+  text-align: center
+
+.input-large
+  width: 100%
+
+.form-bottom-bar
+  line-height: $row-height
+
+
+.order-form
+  .form-row-label
+    line-height: 30px
+
+  .form-row
+    margin-top: $space-xs
+    line-height: 30px
+
+  input
+    min-height: 30px
+    height: 30px
+
+.search-form-row
+  line-height: 40px
+  padding: 5px 30px
+  overflow: auto

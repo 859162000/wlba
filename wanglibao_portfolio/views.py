@@ -24,4 +24,4 @@ class ProductTypeViewSet(ModelViewSet):
 
 
 class PortfolioHomeView(TemplateView):
-    template_name = "portfolio_home.html"
+    template_name = "consult.jade"

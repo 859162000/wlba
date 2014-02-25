@@ -16,4 +16,4 @@ class FundIssuerViewSet(PaginatedModelViewSet):
 
 
 class FundHomeView(TemplateView):
-    template_name = "fund_home.html"
+    template_name = "fund_home.jade"

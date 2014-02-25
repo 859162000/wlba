@@ -1,0 +1,72 @@
+@import compass/css3/images
+@import variables
+
+$value-bar-height: 60px
+$title-bar-color: #F6F6F6
+$value-bar-highlight: #5290DD
+$value-bar-background: #75A8F0
+
+.value-bar
+  margin: 0 auto
+
+  width: 98%
+  height: $value-bar-height
+  line-height: $value-bar-height
+  clear: left
+
+  font-size: 1.3em
+
+%value-bar-base
+  display: inline-block
+  height: 100%
+  text-align: center
+
+  border: 1px solid lighten(black, 50%)
+  border-left-width: 0
+  +float-left
+
+  &:first-child
+    border-left-width: 1px
+
+.value-bar--title, a.value-bar--title
+  line-height: inherit
+  overflow: hidden
+  width: 10%
+  max-width: 10%
+  min-width: 10%
+  @extend %value-bar-base
+  +background(linear-gradient(top, $title-bar-color, darken($title-bar-color, 5%)))
+
+  &:hover
+    +background(linear-gradient(top, darken($title-bar-color, 5%), darken($title-bar-color, 10%)))
+
+=value-bar-color($color, $darken-by:5%, $hover:true)
+  color: white
+
+  +background($color)
+  @if $hover
+    &:hover
+      +background(darken($color, $darken-by))
+
+.value-bar--selectable, a.value-bar--selectable
+  @extend %value-bar-base
+  $color: $value-bar-background
+  +value-bar-color($color)
+
+  &.active
+    +value-bar-color($value-bar-highlight)
+
+.value-bar--gray, a.value-bar--gray
+  @extend %value-bar-base
+  $color: $title-bar-color
+  +value-bar-color($color, $hover:false)
+  color: lighten(black, 10%)
+
+.value-bar--item-title, .value-bar--item-detail
+  // hidden to truncate the text when the screen is too small
+  overflow: hidden
+  display: block
+  line-height: $value-bar-height / 2
+  height: 50%
+  width: 100%
+  text-align: center

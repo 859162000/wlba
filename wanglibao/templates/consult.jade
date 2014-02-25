@@ -1,0 +1,80 @@
+doctype html
+- with '个人理财' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .bar.consult-background(style="margin-top:-10px")
+    .row
+      span.bar--title 您的资产净值
+    .row
+      .span5
+        div.pull-left.bar--input--group
+          input.pull-left.bar--input(type='text', value='', data-bind="value: asset")
+          span.pull-left.input--add-on 万元
+        a.pull-left.button.button-happy.button-large.margin-left-s 找方案
+      .span6-omega.prefix1
+        .pull-right
+          a.button.button-warning.button-small(href="#propertyPlan" rel="modal:open") 定制详细方案
+
+  .space-vertical-s
+  .panel
+    .panel-title-bar
+      .panel-title
+        span 根据您的资产
+        span(data-bind="text: asset")
+        span 万元，为您推荐如下配置方案：
+    .space-vertical-s
+    .panel-inner
+      .container(data-bind="foreach: portfolios")
+        // ko template: {name: 'portfolio-bar', data: $data}
+        // /ko
+        .space-vertical-s
+
+  .space-vertical-s
+  .panel
+    .panel-title-bar
+      .panel-title
+        span 推荐产品
+
+    // Use template-name to detect which template to use
+    // ko template: {name: template_name, data: products}
+    // /ko
+  .space-vertical-s
+
+  include include/footer
+  include include/templates
+
+  // The survey
+  #propertyPlan.modal(tabindex='-1')
+    .modal-header
+      h3.font-l 找到适合您的资产配置方案
+    .modal-body
+      form
+        .row(data-bind="foreach: questions")
+          .question-box
+            span.question-number.pull-left(data-bind="text: $index()+1") 1
+            dl.question-container
+              dt.question-title(data-bind="text: question")
+              //ko if: _.has($data, 'options')
+              //ko foreach: options
+              dd.question-choice
+                label
+                  input#plan1_1(type='radio', data-bind="checked: $parent.answer, checkedValue:$data, attr:{name: $parent.question, id: $parent.question + $index()}")
+                  span(data-bind="text: title")
+              // /ko
+              // /ko
+              //ko if: _.has($data, 'input')
+              dd.question-choice
+                input(type='text', data-bind="value: answer")
+                span(data-bind="text: $data.input.suffix")
+              // /ko
+
+        .space-vertical-s
+        .row
+          .prefix10.span2-omega
+            button.button-middle.button-warning(data-bind="click: finishSurvey") 完成
+        .space-vertical-s
+
+  script(src="/static/js/require.js", data-main="/static/js/consult")

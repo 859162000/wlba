@@ -1,0 +1,53 @@
+@import compass/typography/links
+@import "variables"
+
+$sb-border-radius:   5px         // Button border radius
+$sb-padding:         0.5em 1.5em  // Button padding
+
+a.button
+  +unstyled-link()
+  line-height: 1 //Work around the line-height make it 1 to have precious control on button size
+
+//sassy-button(gradient-style, border-radius, font-size, first-color, second-color, text-color, text-style, auto-states)
+.button-info, a.button-info
+  background: green
+
+.button-error, a.button-error
+  background: $red
+
+.button-warning, a.button-warning
+  background: $orange
+
+  &:hover, &:active
+    background: $red
+    color: white
+
+.button-happy, a.button-happy
+  background: $light-yellow
+
+  &:hover, &:active
+    background: $red
+    color: white
+
+
+.button-mini, a.button-mini
+  +border-radius($sb-border-radius)
+  font-size: 12px
+  line-height: 1
+  padding: $sb-padding
+
+
+.button-small, a.button-small
+  +border-radius($sb-border-radius)
+  font-size: $font-xs
+  padding: $sb-padding
+
+.button-middle, a.button-middle
+  +border-radius($sb-border-radius)
+  font-size: $font-s
+  padding: $sb-padding
+
+.button-large, a.button-large
+  +border-radius($sb-border-radius)
+  font-size: $font-m
+  padding: ((50- $font-m)/2/$font-m)+em 1em

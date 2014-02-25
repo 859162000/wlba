@@ -1,0 +1,40 @@
+@import compass/css3
+@import lemonade
+@import sprites/images-original
+
+.big-background
+  background: image_url('u4.jpg') no-repeat center -240px //TODO -240 px picture, fix it
+  position: relative
+  top: -10px
+  width: 100%
+  background-width: 100%
+
+.order-red-background
+  +images-original-sprite-dimensions(order-red)
+  line-height: images-original-sprite-height(order-red)
+  @include images-original-sprite(order-red)
+
+.order-yellow-background
+  +images-original-sprite-dimensions(order-yellow)
+  line-height: images-original-sprite-height(order-yellow)
+  @include images-original-sprite(order-yellow)
+
+.account-background
+  $file: 'login_bg.jpg'
+  +image-dimensions($file)
+  background: image_url($file) no-repeat center
+
+.consult-background
+  $file: 'personal_bg.jpg'
+  background: image_url($file) no-repeat center
+  width: 100%
+  height: 120px
+  background-size: 100% 100%
+
+.logo
+  +images-original-sprite-dimensions(logo-no-text)
+  @include images-original-sprite(logo-no-text)
+  +inline-block()
+
+.paper-background
+  background: image_url('bg_hot.png') repeat-x

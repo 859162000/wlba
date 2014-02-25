@@ -1,0 +1,85 @@
+@import compass/css3
+@import susy
+@import variables
+
+.search-box
+  width: 450px
+  height: 270px
+  margin-right: $space-m
+  background: rgb(58,69,81)
+  background: rgba(58,69,81,0.5)
+
+.search-box-title
+  line-height: 48px
+  background: #3a4551
+  text-align: center
+
+.search-box-title-text
+  font-size: $font-m
+  text-align: center
+  color: $white
+  margin-left: 10px
+
+.search-box-body
+  padding: 5px 10px 5px 20px
+
+.search-box-slug
+  +container
+  font-size: $font-m
+  color: $white
+  padding: .5em 0
+
+.search-box-input-container
+  +clearfix
+  +container
+  @extend .font-s
+  height: 60px
+  line-height: 60px
+
+  > input, > button, > span
+    border-radius: 0
+    height: 100%
+    margin-top: 0
+    margin-bottom: 0
+
+  > input
+    width: 280px
+    box-shadow: 0
+    border-width: 0
+    font-size: 25px
+    +float-left
+
+  > span
+    border-left: 1px solid $gray-add-on-text
+    color: $gray-add-on-text
+    +float-left
+
+  > button
+    border-radius: 5px
+    width: 70px
+
+    &:hover
+      background-color: $red
+      color: $white
+
+.btn-search-box
+  background-color: $light-yellow
+  margin-left: 10px
+  border-width: 0
+
+.search-box-add-on
+  width: 50px
+  text-align: center
+  background-color: $light-gray-add-on-bg
+
+.search-box-description
+  @extend .font-xs
+  @extend .white-text
+  padding: 1em 0
+
+a.search-quicklink
+  +unstyled-link
+  margin-right: 1em
+  +link-colors($orange)
+  +text-shadow(black 1px 1px 0)
+

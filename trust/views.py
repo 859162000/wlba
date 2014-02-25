@@ -7,7 +7,7 @@ from wanglibao_rest.serializers import TrustSerializer
 
 class TrustHomeView(TemplateView):
 
-    template_name = "trust_home.html"
+    template_name = "trust_home.jade"
 
     def get_context_data(self, **kwargs):
         context = super(TrustHomeView, self).get_context_data(**kwargs)
@@ -18,11 +18,11 @@ class TrustHomeView(TemplateView):
 
 
 class TrustProductsView(TemplateView):
-    template_name = "trust_products.html"
+    template_name = "trust_products.jade"
 
 
 class TrustDetailView(TemplateView):
-    template_name = "trust_detail.html"
+    template_name = "trust_detail.jade"
 
     def get_context_data(self, **kwargs):
         id = kwargs['id']

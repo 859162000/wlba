@@ -17,8 +17,8 @@ class BankViewSet(PaginatedModelViewSet):
 
 
 class FinancingHomeView(TemplateView):
-    template_name = "financing_home.html"
+    template_name = "financing_home.jade"
 
 
 class FinancingProductsView(TemplateView):
-    template_name = "financing_products.html"
+    template_name = "financing_products.jade"

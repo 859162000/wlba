@@ -1,0 +1,65 @@
+doctype html
+html
+  - with '产品搜索' as title
+  include include/head
+  - endwith
+  body
+    include include/header
+    include include/navigation
+
+    .panel
+      .panel-title-bar
+        .panel-title 理财产品搜索
+
+      form.clearfix
+        .search-form-row
+          label.span1 投资金额
+          input.span3(type="text", data-bind="value: asset")
+          span.span2
+            span 万元
+            .space-m
+            a.button.button-mini.button-happy 搜索
+
+      .row
+        .search-header 高级筛选
+
+      .container(data-bind="foreach: filters")
+        .filter-container
+          span.filter-name(data-bind="text: name + ':'") 名字
+          // ko foreach: values
+          a.filter-item(href="#", data-bind="text: name, css: {active: $root.activeFilters().indexOf($data) != -1}, click: $root.clickOnFilter") 名字
+          // /ko
+
+    .space-vertical-s
+    .panel
+      .panel-title-bar
+        .panel-title 搜索结果
+
+      .panel-content
+        // ko if: trusts().length > 0
+
+        // ko template: {name: 'trust-table', data: trusts}
+        // /ko
+
+        // /ko
+
+        // ko if: financings().length > 0
+
+        // ko template: {name: 'financing-table', data: financings}
+        // /ko
+
+        // /ko
+
+        // ko if: funds().length > 0
+
+        // ko template: {name: 'fund-table', data: funds}
+        // /ko
+
+        // /ko
+
+    .space-vertical-s
+
+    include include/footer
+    include include/templates
+
+    script(src="/static/js/require.js" data-main="/static/js/products_search")

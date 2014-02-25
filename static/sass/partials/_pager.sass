@@ -1,0 +1,29 @@
+@import variables
+
+.pager
+  padding: 10px 0
+  text-align: center
+
+.pager-prev, .pager-next, .pager-page-number
+  +inline-block()
+
+  .pager-anchor
+    height: 30px
+    width: 30px
+    line-height: 30px
+    margin: 0 1px
+    +inline-block()
+    +unstyled-link
+    color: gray
+    background: lighten(lightgray, 10%)
+
+  &.active, &:hover
+    .pager-anchor
+      color: white
+      background-color: $red
+
+  &:hover.disabled, &.disabled
+    .pager-anchor
+      color: darkgray
+      background-color: transparent
+      border-color: darkgray

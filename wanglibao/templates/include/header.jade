@@ -1,0 +1,19 @@
+.top-bar
+  .top-bar-container
+    .top-bar-phone
+      i.header-phone-icon.images-original-logo
+      span.header-phone-text 400-123-8889
+    .user-info
+      if user.is_authenticated
+        span 欢迎您，
+        a.username(href="#")
+          if user.email
+            {{ user.email }}
+          else
+            {{ user.wanglibaouserprofile.phone }}
+        span.white-v-line
+        a.logout(href="/accounts/logout?next={{ request.path }}") 退出
+      else
+        a(href="/accounts/login?next={{ request.path }}") 登录
+        span.white-v-line
+        a(href="/accounts/register?next={{ request.path }}") 注册

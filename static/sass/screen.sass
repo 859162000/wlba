@@ -1,0 +1,47 @@
+@charset "utf-8"
+
+@import compass/css3/inline-block
+@import compass/typography/links/link-colors
+@import compass/typography/links/hover-link
+@import compass/utilities/sprites
+@import compass/utilities/general/float
+@import compass/utilities/general/clearfix
+@import susy
+
+@import "partials/reset"
+@import "partials/basic"
+@import "partials/variables"
+@import "partials/images"
+@import "partials/utility"
+@import "partials/layout"
+@import "partials/icons"
+@import "partials/buttons"
+@import "partials/input"
+@import "partials/form"
+@import "partials/topbar"
+@import "partials/navbar"
+@import "partials/sub-navbar"
+@import "partials/bar"
+@import "partials/ad-panel"
+@import "partials/value-bar"
+@import "partials/panel"
+@import "partials/card"
+@import "partials/searchbox"
+@import "partials/footer"
+@import "partials/trust-table"
+@import "partials/product-filter"
+@import "partials/pager"
+@import "partials/letter-bar"
+@import "partials/card-financing"
+@import "partials/filter"
+@import "partials/modal"
+@import "partials/detail"
+
+
+.block-link
+  width: 20%
+  padding: 0.8em
+  +inline-block()
+
+  +unstyled-link
+  +link-colors(blue, $red)

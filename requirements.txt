@@ -18,6 +18,7 @@ fake-factory==0.3.2
 ipython==1.1.0
 pilkit==1.1.6
 pyelasticsearch==0.6.1
+pyjade==2.1.0
 pytz==2013.9
 requests==2.1.0
 shortuuid==0.4

@@ -1,0 +1,74 @@
+@import "compass/css3"
+@import "images"
+
+.card
+  display: block
+  +float-left
+  background: white
+  border: 1px solid lightgray
+  position: relative
+  margin-right: 1em
+  margin-bottom: 1em
+
+  &:hover
+    +box-shadow($red 0 0 3px)
+
+.card-trust
+  min-width: 300px
+  max-width: 300px
+  min-height: 130px
+  max-height: 130px
+
+.card-left
+  float: left
+  width: 33%
+
+.card-right
+  display: table-cell
+  width: 9999999em
+  padding: .5em 0
+
+.card-title
+  font-size: 1.1em
+
+a.card-orderlink
+  position: absolute
+  bottom: 10px
+  left: -5px
+  color: white
+  text-indent: 1em
+
+  @extend .order-yellow-background
+
+  &:hover
+    @extend .order-red-background
+
+  +unstyled-link
+  +link-colors(white)
+
+.card-icon
+  padding: .5em
+  width: 100%
+
+  dt
+    background: $gray-card-info-head
+    font-size: 13px
+    text-align: center
+    padding: .2em 0
+    color: white
+
+  dd
+    background: $light-gray-card-info-bg
+    font-size: 13px
+    text-align: center
+    color: $red
+    padding: .8em 0
+
+.card-right
+  dt
+    +float-left
+    clear: left
+
+  dd
+    display: inline
+    padding-left: .8em

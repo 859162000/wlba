@@ -1,0 +1,59 @@
+@import "susy"
+@import "icons"
+
+.footer
+  padding-top: 40px
+  padding-bottom: 40px
+  background-image: image_url('bg_footer.png')
+  color: white
+
+.footer--container
+  +container
+
++with-grid-settings(4, 12em, 1.5em, 0)
+  .footer--section
+    +span-columns(1, 4)
+
+  .footer--section__last
+    +span-columns(2 omega, 4)
+
++with-grid-settings(2, 12em, 0em, 0)
+  .section--row
+    width: 100%
+    margin-bottom: 10px
+    +clearfix
+
+  .section--column
+    +span-columns(1, 2)
+    +nth-omega(2n)
+
+.section--title
+  color: $orange
+  font-size: $font-m
+  line-height: 40px
+
+.section--item
+  font-size: $font-s
+  line-height: 40px
+
+%contact-item
+  padding-right: 10px
+  min-width: 150px
+
+  span
+    padding-left: 10px
+    +inline-block()
+
+.contact-location
+  @extend %contact-item
+
+.contact-phone
+  @extend %contact-item
+
+.contact-tel
+  @extend %contact-item
+
+.contact-email
+  @extend %contact-item
+
+

@@ -1,0 +1,49 @@
+doctype html
+- with '信托' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+
+  .sub-navbar
+    .sub-navbar--list
+      ul
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor.active(href="{% url 'trust_home' %}") 信托首页
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor(href="{% url 'trust_products' %}") 信托产品
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor(href="{% url 'trust_products' %}") 信托公司
+
+  .container
+    .ad-panel
+
+  .space-vertical-s
+
+  .panel
+    .panel-title-bar
+      .panel-title 最新信托产品
+      a.panel-title-right-item(href="#") 更多
+    // ko template: {name: 'trust-table', data: latestTrusts}
+    // /ko
+
+  .space-vertical-s
+  .panel
+    .panel-title-bar
+      .panel-title 排行榜
+      .panel-tabs(data-bind="foreach: tabTree")
+        .panel-tab(data-bind="css: {active: name == ($root.selectedTab()).name}")
+          a(href="#" data-bind="text: $data.name, click: $root.setSelectedTab") 名字
+    .panel-sub-tabs(data-bind="foreach: selectedTab().values")
+      a.panel-sub-tab(href="#" data-bind="text: name, click: $root.setSelectedValue") 名字
+    .panel-content
+      // ko template: {name: 'trust-table', data: trusts}
+      // /ko
+
+  .space-vertical-m
+
+  include include/footer
+  include include/templates
+
+  script(src="/static/js/require.js" data-main="/static/js/trust_home")

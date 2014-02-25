@@ -1,0 +1,35 @@
+@import compass/css3
+@import susy
+
+@import variables
+
+.sub-navbar
+  background-color: $light-yellow
+  margin-top: $navigation-follower-margin-top
+  line-height: 50px
+
+.sub-navbar--list
+  +container
+
+  >ul
+    list-style: none
+
+.sub-navbar--list-item
+  +float-left
+  margin: 0 auto
+  font-size: $font-m
+
+  &:first-child .sub-navbar--anchor
+    border-left: 0
+
+a.sub-navbar--anchor
+  border-left: 1px solid white
+  padding-left: 15px
+  padding-right: 15px
+  text-decoration: none
+  +unstyled-link
+  +link-colors(white, black)
+
+  &.active
+    color: black
+

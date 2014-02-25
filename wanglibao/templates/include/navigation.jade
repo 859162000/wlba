@@ -1,0 +1,15 @@
+.navigation
+  .navigation-container
+    .logo(title="logo")
+    .nav-items
+      ul
+        li.nav-item
+          a.nav-item-anchor(href="{% url 'index' %}") 首页
+        li.nav-item
+          a.nav-item-anchor(href="{% url 'portfolio_home' %}") 个人理财
+        li.nav-item
+          a.nav-item-anchor(href="{% url 'trust_home' %}") 信托产品
+        li.nav-item
+          a.nav-item-anchor(href="{% url 'financing_home' %}") 银行理财
+        li.nav-item
+          a.nav-item-anchor(href="{% url 'fund_home' %}") 基金产品

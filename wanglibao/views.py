@@ -15,7 +15,7 @@ User = get_user_model()
 
 
 class RegisterView (RegistrationView):
-    template_name = "register.html"
+    template_name = "html/register.html"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):

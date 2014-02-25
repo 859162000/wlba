@@ -1,0 +1,134 @@
+@import variables
+@import compass/css3
+
+// Basic
+body
+  font-family: "Microsoft YaHei", 'Hiragino Sans GB','Hiragino Sans GB W3', Helvetica,STXihei,Arial,sans-serif
+  font-size: $font-xs
+  line-height: 1.5
+  color: $black
+  background: $background-color
+
+button
+  font-size: $font-s
+
+a
+  &:link, &:visited
+    color: $black
+  &:hover, &:active
+    text-decoration: none
+
+input
+  padding: 5px
+  min-height: 40px
+  +border-radius(3px)
+  border: 1px solid darkgray
+
+.white-v-line
+  margin: 0 10px
+  min-width: 1px
+  height: 15px
+  line-height: 15px
+  background-color: $white
+  +inline-block()
+
+.dashed-line
+  heigth: 1px
+  border-top: 1px dashed gray
+
+.line
+  height: 1px
+  border-top: 1px solid gray
+
+.font-xs
+  font-size: $font-xs
+.font-s
+  font-size: $font-s
+.font-m
+  font-size: $font-m
+.font-l
+  font-size: $font-l
+
+.white-text
+  color: $white
+.orange-text
+  color: $orange
+
+.orange-anchor
+  +link-colors($orange)
+
+.pull-left
+  +float-left
+
+.pull-right
+  +float-right
+
+.inline-block
+  +inline-block
+
+.clearfix
+  +clearfix
+
+.hidden
+  display: none !important
+
+input
+  border-color: $border-color
+
+.space-xs
+  +inline-block
+  width: 5px
+
+.space-s
+  +inline-block
+  width: 10px
+
+.space-m
+  +inline-block
+  width: 20px
+
+.space-l
+  +inline-block
+  width: 40px
+
+@mixin vertical-spacing($spacing)
+  display: block
+  padding-bottom: $spacing
+
+.space-vertical-xs
+  +vertical-spacing($space-xs)
+
+.space-vertical-s
+  +vertical-spacing($space-s)
+
+.space-vertical-m
+  +vertical-spacing($space-m)
+
+.space-vertical-l
+  +vertical-spacing($space-l)
+
+.space-vertical-xl
+  +vertical-spacing(60px)
+
+.margin-left-s
+  margin-left: $space-s
+
+.margin-left-m
+  margin-left: $space-m
+
+.clear-margin
+  margin: 0
+
+.padding-left-s
+  padding-left: $space-s
+
+.padding-top-xs
+  padding-top: $space-xs
+
+.full-width
+  width: 100%
+
+.title
+  padding: .3em 0
+  font-size: $font-m
+

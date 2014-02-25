@@ -16,7 +16,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^$', TemplateView.as_view(template_name="index.html"), name="index"),
+    url(r'^$', TemplateView.as_view(template_name="index.jade"), name="index"),
 
     url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
 
@@ -34,7 +34,7 @@ urlpatterns = patterns(
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login',
         {
-            "template_name": "login.html",
+            "template_name": "html/login.html",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }),
     url(r'^accounts/register/$', RegisterView.as_view()),

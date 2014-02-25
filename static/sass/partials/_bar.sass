@@ -1,0 +1,39 @@
+@import compass/css3
+
+.bar
+  +text-shadow(white)
+
+.bar--title
+  font-size: $font-m
+  +inline-block()
+  height: 40px
+  line-height: 40px
+  margin-top: 5px
+
+.bar--input--group
+  +inline-block()
+  height: 50px
+
+  >input, >span
+    border-width: 1px
+    border-style: solid
+    border-color: lighten(#000, 30%)
+
+  .input--add-on
+    border-left-width: 0
+
+.bar--input
+  height: 100%
+  font-size: $font-l
+  +border-radius(0)
+  margin: 0
+
+.input--add-on
+  +inline-block()
+  +border-radius(0)
+  width: 50px
+  height: 50px //hard code it
+  line-height: 50px //hard code the line height to make it vertical center
+  background-color: $light-gray-add-on-bg
+  text-align: center
+

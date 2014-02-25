@@ -1,0 +1,78 @@
+doctype html
+html
+  - with '首页' as title
+  include include/head
+  - endwith
+
+  body
+    include include/header
+    include include/navigation
+
+    .big-background
+      .l-activity-panel
+        .space-vertical-xl
+        .container
+          .search-box.pull-left
+            .search-box-title
+              span.i-search-personal
+              span.search-box-title-text 个人理财
+            .search-box-body
+              p.search-box-slug 输入您的资产净值
+              .search-box-input-container
+                input(type='text', value='')
+                span.search-box-add-on 万元
+                button.btn-search-box 找方案
+              p.search-box-description 我们将推荐适合您的投资方案
+              p.font-m.white-text
+                | 或者花1分钟时间，我们为您
+                a.search-quicklink(href='#') 私人定制
+
+          .search-box.pull-left
+            .search-box-title
+              span.i-search-product
+              span.search-box-title-text 产品搜索
+            .search-box-body
+              p.search-box-slug 输入投资金额
+              .search-box-input-container
+                input(type='text', value='')
+                span.search-box-add-on 万元
+                button.btn-search-box(type='button') 搜 索
+              p.search-box-description 120096款 在售理财产品任您搜
+              p.font-m.orange
+                a.search-quicklink(href='#') 100万元信托
+                a.search-quicklink(href='#') 10万元银行理财
+                a.search-quicklink(href='#') 100万元基金
+        .space-vertical-xl
+
+    .space-vertical-s
+    .container
+      span.font-l 热门推荐
+
+      .space-vertical-xs
+
+      .container(data-bind='foreach: trusts')
+        .card.card-trust
+          .card-left
+            .card-icon
+              dl
+                dt 预期收益
+                dd(data-bind='text: expected_earning_rate') 10%
+            a.card-orderlink(data-bind='attr: { href: url }') 预约
+
+          .card-right
+            dl
+              span.card-title(data-bind='text: name') 网利宝金融平台信托产品
+              div
+                dt  投资期限：
+                dd(data-bind='text: period') 12个月
+              div
+                dt 投资门槛：
+                dd(data-bind='text: investment_threshold') 100万
+              div
+                dt 点评:
+                dd.product-brief(data-bind='text: brief') 不可错过，只有这么抑制了，如果还不买，可能就没有了，以后也不一定会除了
+
+    .space-vertical-m
+    include include/footer
+
+    script(src="/static/js/require.js" data-main="/static/js/index")

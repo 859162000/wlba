@@ -1,0 +1,22 @@
+// TODO there is already one filter related product-filter.sass That one based on
+// Trust products filter, it turns out the layout of financing filter is quite different
+// So create a new one. This should be fixed, one site should have consistent behavior
+
+.filter-container
+  padding: 0 30px
+  line-height: 40px
+  border-bottom: 1px solid lightgray
+
+.filter-item
+  font-size: $font-xs
+  text-align: center
+  padding: 0 10px
+  display: inline-block
+  line-height: 20px
+  margin: 0 5px
+
+  +unstyled-link
+
+  &.active, &:hover
+    background-color: #F60
+    color: white

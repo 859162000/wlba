@@ -1,0 +1,37 @@
+doctype html
+- with '信托公司' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .sub-navbar
+    .sub-navbar--list
+      ul
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor(href="#") 信托首页
+        span.white-v-line.pull-left
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor.active(href="#") 信托产品
+        span.white-v-line.pull-left
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor(href="#") 信托公司
+
+  .space-vertical-m
+
+  .panel
+    .panel-title-bar
+      .panel-title 全国信托公司
+
+    div.company-name-list
+      mixin company-link(name, href)
+        a.block-link.float-left(href=href)= name
+
+      - companies = [ '安建信托', '安信信托', '渤海信托', '北方信托', '北京国投', '百瑞信托', '长城新生信托']
+
+      each company in companies
+        +company-link(company, '#')
+
+  .space-vertical-m
+  include include/footer
+

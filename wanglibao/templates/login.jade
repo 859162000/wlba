@@ -1,0 +1,37 @@
+doctype html
+html
+  - with '用户登录' as title
+  include include/head
+  - endwith
+
+  body
+    include include/header
+
+    .container
+      div.clearfix
+        a.pull-left.logo(href='index.html', title='网利宝')  
+
+      div.well.clearfix
+        .pull-left.account-background
+        .pull-right
+          form.form
+            fieldset
+              .form-title
+                label.font-l 用户登录
+              .form-row
+                input#identifier.input-large(type='text', placeholder='请输入邮箱或手机号', title='请输入邮箱或手机号')
+              .form-row
+                input#password.input-large(type='password', placeholder='请输入密码', title='请输入密码')
+              .form-row.form-bottom-bar
+                button.span8.button-error.button-large(type='submit') 登 录
+                .span4-omega
+                .space-s
+                a(href='#') 忘记密码？
+              .space-vertical-s
+              .form-footer
+                a.button.button-warning.button-mini(href='register.html') 注册
+                .space-xs
+                span 成为会员，我们将为您提供专业的理财建议
+
+
+    include include/footer

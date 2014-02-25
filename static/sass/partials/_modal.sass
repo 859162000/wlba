@@ -1,0 +1,30 @@
+.modal
+  width: 1000px
+  padding: 0 10px
+
+.modal-header
+  border-top: 5px solid dimgray
+  padding: .2em
+
+.question-number
+  font-size: 4em
+  color: #F15C00
+
+.question-box
+  float: left
+  width: 33.3%
+
+.question-container
+  overflow: auto //generate a new BFC
+  +inline-block //inline to make margin take effect
+
+  width: 80%
+  margin-left: 1em
+  margin-top: 1em
+
+.question-title
+  font-size: 1.3em
+
+.question-choice
+  font-size: 1.2em
+  line-height: 2

@@ -1,0 +1,51 @@
+@import susy
+@import variables
+@import layout
+@import ../sprites/images-original
+
+.navigation
+  width: 100%
+  height: $navigation-bar-height
+  @include images-original-sprite(gray-bg)
+  background-repeat: repeat-x
+  position: relative
+  z-index: 1
+  overflow: auto
+
+.navigation-container
+  +container
+
+.nav-items
+  +span-columns(7, $total-columns)
+  float: left
+  +inline-block()
+
+.nav-item
+  padding-left: 15px
+  padding-right: 15px
+  margin: 0 auto
+  +inline-block()
+
+  font-size: $font-m
+  text-align: center
+
+a.nav-item-anchor
+  width: 100%
+  height: $navigation-bar-height - 9px
+  line-height: $navigation-bar-height - 9px
+  +inline-block()
+
+  +link-colors($gray-add-on-text, $black, $black)
+  text-decoration: none
+
+  &:active, &:hover
+    border-bottom: $border-width solid $red
+
+.logo
+  height: 59px
+  width: $logo-width
+  margin-right: 40px
+  margin-top: 15px
+  @include images-original-sprite(logo)
+  float: left
+  +inline-block()

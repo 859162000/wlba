@@ -109,6 +109,14 @@ AUTHENTICATION_BACKENDS = (
     'wanglibao.auth_backends.EmailPhoneUsernameAuthBackend',
 )
 
+# Template loader
+TEMPLATE_LOADERS = (
+    ('pyjade.ext.django.Loader',(
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    )),
+)
+
 # Template pre processor
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
@@ -124,13 +132,18 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'publish/static')
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
 
 # Media files path
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

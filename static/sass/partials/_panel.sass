@@ -1,0 +1,74 @@
+@import susy
+@import compass/css3
+
+@import variables
+
+.panel
+  +container
+  border-top: $border-width solid $red
+  min-height: 100px
+  box-shadow: 0px 2px 2px gray
+  background-color: white
+
+.panel-title-bar
+  +container
+  background-color: $light-gray-add-on-bg
+  box-shadow: 0px 1px 1px gray
+  border-bottom: 1px solid gray
+  line-height: 50px
+
+.panel-title
+  padding: 0 1em
+  font-size: $font-m
+  margin-right: 1em
+  +float-left
+
+.panel-title-right-item
+  +float-right
+  margin-right: 20px
+
+  +unstyled-link
+
+.panel-inner
+  display: block
+
+.panel-tabs
+  +float-left
+
+.panel-tab
+  +float-left
+  position: relative
+  font-size: $font-s
+  padding: 0 2em
+  border-right-width: 1px
+  border-style: solid
+  border-color: lightgray
+  background-color: transparent
+
+  &:first-child
+    border-left-width: 1px
+
+  &.active
+    background-color: $red
+
+    a
+      +link-colors(white, white)
+
+  a
+    +unstyled-link()
+    +link-colors(black, $red)
+
+.panel-sub-tabs
+  background: white
+  padding: 0 1em
+
+a.panel-sub-tab
+  display: inline-block
+  padding: 10px 15px
+
+  +unstyled-link
+
+  &.active
+    @extend .button
+    @extend .button-mini
+    @extend .button-warning
