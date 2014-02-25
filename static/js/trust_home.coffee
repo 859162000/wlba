@@ -4,7 +4,7 @@ require.config
     knockout: 'lib/knockout-3.0.0'
     underscore: 'lib/underscore-min'
 
-require ['jquery', 'underscore', 'knockout', 'lib/backend'], ($, _, ko, backend)->
+require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab'], ($, _, ko, backend, tab)->
   $(document).ready ->
     class DataViewModel
       constructor: ->
@@ -12,91 +12,79 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend'], ($, _, ko, backend)
         self.trusts = ko.observable []
         self.latestTrusts = ko.observable []
 
-        self.tabTree = [
-          {
+        self.tabTree =
+          tabs:[
             name: '按期限'
-            values:[
-              {
-                name: '12个月以内'
-                filter:
-                  max_period: 12
-              }
-              {
-                name: '12个月-24个月'
-                filter:
-                  min_period: 12
-                  max_period: 24
-              }
-              {
-                name: '24个月以上'
-                filter:
-                  min_period: 24
-              }
-            ]
-          }
-          {
+          ,
             name: '按起点'
-            values: [
-              {
-                name: '100万以下'
-                filter:
-                  'max_threshold': 100.0
-              }
-              {
-                name: '100万-300万'
-                filter:
-                  min_threshold: 100.0
-                  max_threshold: 300.0
-              }
-              {
-                name: '300万以上'
-                filter:
-                  min_threshold: 300
-              }
-            ]
-          }
-          {
+          ,
             name: '按收益'
-            values:[
-              {
-                name: '13%以上'
-                filter:
-                  min_rate: 13
-              }
-              {
-                name: '10%-13%'
-                filter:
-                  min_rate: 10
-                  max_rate: 13
-              }
-              {
-                name: '低于10%'
-                filter:
-                  max_rate: 10
-              }
+          ]
+          subTabs: [
+            [
+              name: '12个月以内'
+              values:
+                max_period: 12
+            ,
+              name: '12个月-24个月'
+              values:
+                min_period: 12
+                max_period: 24
+            ,
+              name: '24个月以上'
+              values:
+                min_period: 24
             ]
-          }
-        ]
+            [
+              name: '100万以下'
+              values:
+                'max_threshold': 100.0
+            ,
+              name: '100万-300万'
+              values:
+                min_threshold: 100.0
+                max_threshold: 300.0
+            ,
+              name: '300万以上'
+              values:
+                min_threshold: 300
+            ]
+            [
+              name: '13%以上'
+              values:
+                min_rate: 13
+            ,
+              name: '10%-13%'
+              values:
+                min_rate: 10
+                max_rate: 13
+            ,
+              name: '低于10%'
+              values:
+                max_rate: 10
+            ]
+          ]
 
-        self.selectedTab = ko.observable(self.tabTree[0])
-        self.selectedValue = ko.observable(self.selectedTab().values[0])
+        self.subTab = new tab.viewModel()
 
-        self.setSelectedTab = (tab)->
-          self.selectedTab(tab)
+        self.tab = new tab.viewModel
+          tabs: self.tabTree.tabs
+          events:
+            tabSelected: (data, event)->
+              index = _.indexOf self.tabTree.tabs, data
+              self.subTab.data
+                tabs: self.tabTree.subTabs[index]
+                events:
+                  tabSelected: (data, event)->
+                    backend.loadData 'trusts',
+                      _.extend data.values,
+                        page_size: 10
+                        ordering: '-issue_date'
+                    .done (data)->
+                      self.trusts(data.results)
+                    .fail ->
+                      alert '发生网络问题 加载内容失败'
 
-        self.setSelectedValue = (value)->
-          self.selectedValue(value)
-
-          params = _.extend
-            ordering: '-issue_date'
-            count: 10
-            , value.filter
-
-          backend.loadData('trust', params).done( (data)->
-            model.trusts data.results
-          ).fail( (xhr, status, error)->
-            alert(status + error)
-          )
 
     model = new DataViewModel()
     ko.applyBindings(model)

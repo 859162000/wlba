@@ -61,7 +61,6 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab'], ($, _,
                 gte_period: 12
             ]
             [
-
               name: '保本固定收益'
               values:
                 profit_type: '保本固定收益'
