@@ -47,7 +47,8 @@ def test():
             run("git clone ssh://lishuo@192.168.56.1/~lishuo/developer/django/wanglibao/wanglibao")
         else:
             print green('Found depot, pull changes')
-            run("git pull ssh://lishuo@192.168.56.1/~lishuo/developer/django/wanglibao/wanglibao")
+            with cd('wanglibao'):
+                run("git pull ssh://lishuo@192.168.56.1/~lishuo/developer/django/wanglibao/wanglibao")
 
         print green("Install pip and virtualenv")
         new_virtualenv()
@@ -56,23 +57,32 @@ def test():
                 run("pip install --index-url http://pypi.hustunique.com/simple/ -r requirements.txt")
 
                 print green('Collect static files')
-                run("python manage.py collectstatic")
+                run("python manage.py collectstatic --noinput")
 
                 print green('clean published files')
                 run("rm publish/static/config.rb")
                 run("rm -rf publish/static/sass")
                 run("rm -rf publish/static/images/images-original")
+                run("find . | grep .coffee | xargs rm")
 
                 print green("published files cleaned, copy it to /var/static/wanglibao")
                 sudo('mkdir -p /var/static/wanglibao')
                 sudo('cp -r publish/static/* /var/static/wanglibao/')
-                print green("static files copied")
+                sudo('rm -r publish')
+                # TODO set permission
+                print green("static files copied and cleaned")
+
+                print green("copy scripts to /var/wsgi/wanglibao/")
+                sudo('mkdir -p /var/wsgi/wanglibao')
+                sudo('cp -r . /var/wsgi/wanglibao')
+                sudo('chgrp -R webuser /var/wsgi/wanglibao')
+                sudo('chown -R www-data /var/wsgi/wanglibao')
 
                 print green("Copy apache config file")
                 sudo('cp wanglibao.conf /etc/apache2/sites-available')
-                sudo('a2ensite wanglibao')
+                sudo('a2ensite wanglibao.conf')
 
                 print green('apache server configured, restart it')
-                sudo('apache2ctl restart')
+                sudo('service apache2 reload')
                 print green('deploy finished')
 
