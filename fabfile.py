@@ -63,7 +63,8 @@ def test():
                 run("rm publish/static/config.rb")
                 run("rm -rf publish/static/sass")
                 run("rm -rf publish/static/images/images-original")
-                run("find . | grep .coffee | xargs rm")
+                with cd('publish'):
+                    run("find . | grep .coffee | xargs rm")
 
                 print green("published files cleaned, copy it to /var/static/wanglibao")
                 sudo('mkdir -p /var/static/wanglibao')
@@ -77,6 +78,13 @@ def test():
                 sudo('cp -r . /var/wsgi/wanglibao')
                 sudo('chgrp -R webuser /var/wsgi/wanglibao')
                 sudo('chown -R www-data /var/wsgi/wanglibao')
+
+                with cd('/var/wsgi/wanglibao'):
+                    run("python manage.py syncdb")
+                    run("python manage.py migrate")
+
+                print green("Grant write permission on /tmp/ db file")
+                sudo('chmod 777 /tmp/db.sqlite3')
 
                 print green("Copy apache config file")
                 sudo('cp wanglibao.conf /etc/apache2/sites-available')
