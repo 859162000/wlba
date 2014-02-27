@@ -3,6 +3,15 @@ import os
 from fabric.api import *
 from fabric.colors import green, red
 from fabric.contrib.files import exists
+from fabric.contrib import django
+
+django.project('wanglibao')
+from trust.mock_generator import MockGenerator as TrustMockGenerator
+
+
+def mock():
+    TrustMockGenerator.generate_issuer(clean=True)
+    TrustMockGenerator.generate_trust(clean=True)
 
 
 def prepare():
