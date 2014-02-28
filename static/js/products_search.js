@@ -20,7 +20,7 @@
           var asset_param, self;
           self = this;
           asset_param = parseInt(purl(document.location.href).param('asset'));
-          if ((asset_param == null) || asset_param === 0) {
+          if (isNaN(asset_param) || asset_param === 0) {
             asset_param = 30;
           }
           self.asset = ko.observable(asset_param);

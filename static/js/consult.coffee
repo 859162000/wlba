@@ -22,7 +22,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend',  'lib/templateLoader
         The user data: asset, risk, period
         ###
         asset_param = parseInt($.url(document.location.href).param('asset'))
-        if not asset_param or asset_param <= 0
+        if isNaN(asset_param) or asset_param <= 0
           asset_param = 30
         self.asset = ko.observable(asset_param)
         self.riskScore = ko.observable(null)

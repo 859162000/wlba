@@ -26,7 +26,7 @@
           The user data: asset, risk, period
            */
           asset_param = parseInt($.url(document.location.href).param('asset'));
-          if (!asset_param || asset_param <= 0) {
+          if (isNaN(asset_param) || asset_param <= 0) {
             asset_param = 30;
           }
           self.asset = ko.observable(asset_param);

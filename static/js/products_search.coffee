@@ -15,7 +15,7 @@ require ['jquery', 'underscore', 'knockout', 'jquery.purl', 'lib/backend', 'mode
           self = this
 
           asset_param = parseInt(purl(document.location.href).param('asset'))
-          if not asset_param? or asset_param == 0
+          if isNaN(asset_param) or asset_param == 0
             asset_param = 30
 
           self.asset = ko.observable(asset_param)
