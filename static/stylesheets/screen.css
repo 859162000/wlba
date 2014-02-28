@@ -347,9 +347,9 @@ input {
 
 /* line 22, ../sass/partials/_images.sass */
 .account-background {
-  height: 418px;
-  width: 555px;
-  background: url('../images/login_bg.jpg?1393314370') no-repeat center;
+  height: 317px;
+  width: 399px;
+  background: url('../images/login_bg.jpg?1393552537') no-repeat center;
 }
 
 /* line 27, ../sass/partials/_images.sass */
@@ -883,49 +883,59 @@ input {
 }
 
 /* line 7, ../sass/partials/_buttons.sass */
-a.button, a.panel-sub-tab.active {
+button, a.button, a.panel-sub-tab.active {
   color: inherit;
   text-decoration: inherit;
   cursor: inherit;
   line-height: 1;
+  border: 0;
 }
 /* line 6, ../../../../../../../../usr/local/Cellar/ruby/2.0.0-p195/lib/ruby/gems/2.0.0/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/typography/links/_unstyled-link.scss */
-a.button:active, a.panel-sub-tab.active:active, a.button:focus, a.panel-sub-tab.active:focus {
+button:active, button:focus, a.button:active, a.panel-sub-tab.active:active, a.button:focus, a.panel-sub-tab.active:focus {
   outline: none;
 }
-
 /* line 12, ../sass/partials/_buttons.sass */
+button:focus, a.button:focus, a.panel-sub-tab.active:focus {
+  outline: 0;
+}
+
+/* line 16, ../sass/partials/_buttons.sass */
 .button-info, a.button-info {
   background: green;
 }
 
-/* line 15, ../sass/partials/_buttons.sass */
+/* line 19, ../sass/partials/_buttons.sass */
 .button-error, a.button-error {
   background: #aa0f13;
+  color: white;
+}
+/* line 23, ../sass/partials/_buttons.sass */
+.button-error:hover, .button-error:active, a.button-error:hover, a.button-error:active {
+  background: #7b0b0e;
 }
 
-/* line 18, ../sass/partials/_buttons.sass */
+/* line 26, ../sass/partials/_buttons.sass */
 .button-warning, a.panel-sub-tab.active, a.button-warning, a.panel-sub-tab.active {
   background: #ff9900;
 }
-/* line 21, ../sass/partials/_buttons.sass */
+/* line 29, ../sass/partials/_buttons.sass */
 .button-warning:hover, a.panel-sub-tab.active:hover, .button-warning:active, a.panel-sub-tab.active:active, a.button-warning:hover, a.panel-sub-tab.active:hover, a.button-warning:active, a.panel-sub-tab.active:active {
   background: #aa0f13;
   color: white;
 }
 
-/* line 25, ../sass/partials/_buttons.sass */
+/* line 33, ../sass/partials/_buttons.sass */
 .button-happy, a.button-happy {
   background: #ffc410;
   color: white;
 }
-/* line 29, ../sass/partials/_buttons.sass */
+/* line 37, ../sass/partials/_buttons.sass */
 .button-happy:hover, .button-happy:active, a.button-happy:hover, a.button-happy:active {
   background: #aa0f13;
   color: white;
 }
 
-/* line 34, ../sass/partials/_buttons.sass */
+/* line 42, ../sass/partials/_buttons.sass */
 .button-mini, a.panel-sub-tab.active, a.button-mini, a.panel-sub-tab.active {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -937,7 +947,7 @@ a.button:active, a.panel-sub-tab.active:active, a.button:focus, a.panel-sub-tab.
   padding: 0.5em 1.5em;
 }
 
-/* line 41, ../sass/partials/_buttons.sass */
+/* line 49, ../sass/partials/_buttons.sass */
 .button-small, a.button-small {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -948,7 +958,7 @@ a.button:active, a.panel-sub-tab.active:active, a.button:focus, a.panel-sub-tab.
   padding: 0.5em 1.5em;
 }
 
-/* line 46, ../sass/partials/_buttons.sass */
+/* line 54, ../sass/partials/_buttons.sass */
 .button-middle, a.button-middle {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -959,7 +969,7 @@ a.button:active, a.panel-sub-tab.active:active, a.button:focus, a.panel-sub-tab.
   padding: 0.5em 1.5em;
 }
 
-/* line 51, ../sass/partials/_buttons.sass */
+/* line 59, ../sass/partials/_buttons.sass */
 .button-large, a.button-large {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;

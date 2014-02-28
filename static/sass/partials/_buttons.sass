@@ -4,9 +4,13 @@
 $sb-border-radius:   5px         // Button border radius
 $sb-padding:         0.5em 1.5em  // Button padding
 
-a.button
+button, a.button
   +unstyled-link()
   line-height: 1 //Work around the line-height make it 1 to have precious control on button size
+  border: 0
+
+  &:focus
+    outline: 0
 
 //sassy-button(gradient-style, border-radius, font-size, first-color, second-color, text-color, text-style, auto-states)
 .button-info, a.button-info
@@ -14,6 +18,10 @@ a.button
 
 .button-error, a.button-error
   background: $red
+  color: white
+
+  &:hover, &:active
+    background: darken($red, 10%)
 
 .button-warning, a.button-warning
   background: $orange
