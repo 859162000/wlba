@@ -5,14 +5,6 @@ from fabric.colors import green, red
 from fabric.contrib.files import exists
 from fabric.contrib import django
 
-django.project('wanglibao')
-from trust.mock_generator import MockGenerator as TrustMockGenerator
-
-
-def mock():
-    TrustMockGenerator.generate_issuer(clean=True)
-    TrustMockGenerator.generate_trust(clean=True)
-
 
 def prepare():
     local("python manage.py test wanglibao")
@@ -24,12 +16,25 @@ def testserver():
     env.host_string = '192.168.56.199'
     env.path = '/home/lishuo/wanglibao'
     env.activate = 'source /home/lishuo/wanglibao/virt-python/bin/activate'
+    env.depot = 'ssh://lishuo@192.168.56.1/~lishuo/developer/django/wanglibao/wanglibao'
+    env.depot_name = 'wanglibao'
 
+    env.pip_install = "pip install --index-url http://pypi.hustunique.com/simple/ -r requirements.txt"
+
+def production():
+    env.host_string = 'o-value.com'
+    env.path = '/home/lishuo/wanglibao'
+    env.activate = 'source /home/lishuo/wanglibao/virt-python/bin/activate'
+    env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
+    env.depot_name = 'wanglibao-backend'
+
+    env.pip_install = "pip install -r requirements.txt"
 
 def new_virtualenv():
     with cd(env.path):
         sudo("apt-get -q -y install gcc python-setuptools python-all-dev libpq-dev libjpeg-dev")
         sudo("easy_install pip virtualenv")
+        # TODO find a better path for virt env
         run("virtualenv virt-python")
 
 @contextmanager
@@ -39,7 +44,7 @@ def virtualenv():
             yield
 
 
-def test():
+def deploy():
     path = '/home/lishuo/wanglibao'
 
     print red("Begin deploy: ")
@@ -50,19 +55,22 @@ def test():
 
         print green("check out the build")
 
-        if not exists(os.path.join(path, 'wanglibao')):
+        if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, clone it from local depot')
             # TODO get the local git path instead of hard code
-            run("git clone ssh://lishuo@192.168.56.1/~lishuo/developer/django/wanglibao/wanglibao")
+            run("git clone %s" % env.depot)
         else:
             print green('Found depot, pull changes')
-            with cd('wanglibao'):
-                run("git pull ssh://lishuo@192.168.56.1/~lishuo/developer/django/wanglibao/wanglibao")
+            with cd(env.depot_name):
+                run("git pull %s" % env.depot)
+
+        print green("Refresh apt")
+        sudo("apt-get update")
 
         print green("Install pip and virtualenv")
         new_virtualenv()
         with virtualenv():
-            with cd(os.path.join(path, 'wanglibao')):
+            with cd(os.path.join(path, env.depot_name)):
                 run("pip install --index-url http://pypi.hustunique.com/simple/ -r requirements.txt")
 
                 print green('Collect static files')
@@ -103,3 +111,17 @@ def test():
                 sudo('service apache2 reload')
                 print green('deploy finished')
 
+
+def mock():
+    with virtualenv():
+        django.project('wanglibao')
+        from trust.mock_generator import MockGenerator as TrustMockGenerator
+
+        TrustMockGenerator.generate_issuer(clean=True)
+        TrustMockGenerator.generate_trust(clean=True)
+
+
+def mock_deployed():
+    with virtualenv():
+        with cd('/var/wsgi/wanglibao'):
+            sudo('fab mock')

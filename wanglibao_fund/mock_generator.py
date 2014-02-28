@@ -8,7 +8,10 @@ from wanglibao_fund.models import FundIssuer, Fund, IssueFrontEndChargeRate, Red
 class MockGenerator(object):
 
     @classmethod
-    def generate_fund_issuers(cls):
+    def generate_fund_issuers(cls, clean=False):
+        if clean:
+            FundIssuer.objects.all().delete()
+
         for index in range(0, 100):
             issuer = FundIssuer()
             issuer.name = u'发行机构' + str(index + 1)
@@ -18,7 +21,11 @@ class MockGenerator(object):
             issuer.save()
 
     @classmethod
-    def generate_fund(cls):
+    def generate_fund(cls, clean=False):
+        if clean:
+            for fund in Fund.objects.all():
+                fund.delete()
+
         issuers = FundIssuer.objects.all()
         issuer_count = len(issuers)
 
