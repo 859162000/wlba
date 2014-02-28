@@ -4,11 +4,13 @@ require.config(
     underscore: 'lib/underscore-min'
     knockout: 'lib/knockout-3.0.0'
     'jquery.modal': 'lib/jquery.modal.min'
+    purl: 'lib/purl'
   shim:
     'jquery.modal': ['jquery']
+    purl: ['jquery']
 )
 
-require ['jquery', 'underscore', 'knockout', 'lib/backend',  'lib/templateLoader', 'jquery.modal', 'model/portfolio'], ($, _, ko, backend, templateLoader, modal, portfolio)->
+require ['jquery', 'underscore', 'knockout', 'lib/backend',  'lib/templateLoader', 'jquery.modal', 'purl', 'model/portfolio'], ($, _, ko, backend, templateLoader, modal, purl, portfolio)->
   $ document
   .ready ->
     class ViewModel
@@ -19,7 +21,10 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend',  'lib/templateLoader
         ###
         The user data: asset, risk, period
         ###
-        self.asset = ko.observable(30)
+        asset_param = parseInt($.url(document.location.href).param('asset'))
+        if not asset_param or asset_param <= 0
+          asset_param = 30
+        self.asset = ko.observable(asset_param)
         self.riskScore = ko.observable(null)
         self.period = ko.observable(6)
 
@@ -125,9 +130,8 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend',  'lib/templateLoader
           amount = self.amount()
           if backend.isValidType type
             params =
-              type: type
               count: 10
-              max_threshold: amount
+              lte_threshold: amount
 
             backend.loadData type, params
             .done (data)->

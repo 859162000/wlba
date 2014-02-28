@@ -13,19 +13,20 @@ html
         .space-vertical-xl
         .container
           .search-box.pull-left
-            .search-box-title
-              span.i-search-personal
-              span.search-box-title-text 个人理财
-            .search-box-body
-              p.search-box-slug 输入您的资产净值
-              .search-box-input-container
-                input(type='text', value='')
-                span.search-box-add-on 万元
-                button.btn-search-box 找方案
-              p.search-box-description 我们将推荐适合您的投资方案
-              p.font-m.white-text
-                | 或者花1分钟时间，我们为您
-                a.search-quicklink(href='#') 私人定制
+            form(method="GET", action="/portfolio")
+              .search-box-title
+                span.i-search-personal
+                span.search-box-title-text 个人理财
+              .search-box-body
+                p.search-box-slug 输入您的资产净值
+                .search-box-input-container
+                  input(type='text', name="asset", value='')
+                  span.search-box-add-on 万元
+                  button.btn-search-box(type="submit") 找方案
+                p.search-box-description 我们将推荐适合您的投资方案
+                p.font-m.white-text
+                  | 或者花1分钟时间，我们为您
+                  a.search-quicklink(href='/portfolio', type="submit") 私人定制
 
           .search-box.pull-left
             .search-box-title

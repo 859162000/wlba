@@ -5,25 +5,31 @@
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
       knockout: 'lib/knockout-3.0.0',
-      'jquery.modal': 'lib/jquery.modal.min'
+      'jquery.modal': 'lib/jquery.modal.min',
+      purl: 'lib/purl'
     },
     shim: {
-      'jquery.modal': ['jquery']
+      'jquery.modal': ['jquery'],
+      purl: ['jquery']
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'jquery.modal', 'model/portfolio'], function($, _, ko, backend, templateLoader, modal, portfolio) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'jquery.modal', 'purl', 'model/portfolio'], function($, _, ko, backend, templateLoader, modal, purl, portfolio) {
     return $(document).ready(function() {
       var ViewModel, model;
       ViewModel = (function() {
         function ViewModel() {
-          var self;
+          var asset_param, self;
           self = this;
 
           /*
           The user data: asset, risk, period
            */
-          self.asset = ko.observable(30);
+          asset_param = parseInt($.url(document.location.href).param('asset'));
+          if (!asset_param || asset_param <= 0) {
+            asset_param = 30;
+          }
+          self.asset = ko.observable(asset_param);
           self.riskScore = ko.observable(null);
           self.period = ko.observable(6);
           self.finishSurvey = function(data, event) {
@@ -136,9 +142,8 @@
             amount = self.amount();
             if (backend.isValidType(type)) {
               params = {
-                type: type,
                 count: 10,
-                max_threshold: amount
+                lte_threshold: amount
               };
               return backend.loadData(type, params).done(function(data) {
                 self.products = data.results;
