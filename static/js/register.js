@@ -52,7 +52,9 @@
         e.preventDefault();
         phoneNumber = $("#id_identifier").val().trim();
         if (checkMobile(phoneNumber)) {
-          console.log("Phone number checked, now send the valdiation code");
+          if (typeof console !== "undefined" && console !== null) {
+            console.log("Phone number checked, now send the valdiation code");
+          }
           return $.ajax({
             url: "/api/phone_validation_code/register/" + phoneNumber + "/",
             type: "POST"

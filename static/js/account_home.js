@@ -72,7 +72,9 @@
                 }
               });
             } else {
-              console.log('The type not supported');
+              if (typeof console !== "undefined" && console !== null) {
+                console.log('The type not supported');
+              }
               self.products = null;
               return self.template_name('no-products-available');
             }

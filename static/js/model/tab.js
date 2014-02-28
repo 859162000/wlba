@@ -21,7 +21,9 @@
         if (_.has(this.events, 'tabSelected')) {
           return this.events.tabSelected(data, event);
         } else {
-          return console.log('tab selected ' + data);
+          if (typeof console !== "undefined" && console !== null) {
+            return console.log('tab selected ' + data);
+          }
         }
       };
 

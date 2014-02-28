@@ -56,7 +56,8 @@ define ['jquery'], ($)->
       })
     else
       # TODO use the similar as Defered syntax to return error
-      console.log "The type not supported"
+      if console?
+        console.log "The type not supported"
 
   loadPortfolio = (params)->
     url = apiurl + 'portfolios/.jsonp?' + $.param(params)

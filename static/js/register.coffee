@@ -45,7 +45,8 @@ require ['jquery', 'jquery.validate'], ($, validate)->
 
       phoneNumber = $("#id_identifier").val().trim()
       if checkMobile(phoneNumber)
-        console.log "Phone number checked, now send the valdiation code"
+        if console?
+          console.log "Phone number checked, now send the valdiation code"
         $.ajax(
           url: "/api/phone_validation_code/register/" + phoneNumber + "/"
           type: "POST"
