@@ -59,7 +59,7 @@
           dataType: 'jsonp'
         });
       } else {
-        if (console) {
+        if (typeof console !== "undefined" && console !== null) {
           return console.log("The type not supported");
         }
       }

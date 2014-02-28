@@ -72,7 +72,7 @@
                 }
               });
             } else {
-              if (console) {
+              if (typeof console !== "undefined" && console !== null) {
                 console.log('The type not supported');
               }
               self.products = null;

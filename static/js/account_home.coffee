@@ -67,7 +67,7 @@ require ['jquery', 'underscore', 'knockout',
                 self.template_name('no-products-available')
           else
             # TODO add a way to notice user alegently
-            if console
+            if console?
               console.log 'The type not supported'
             self.products = null
             self.template_name('no-products-available')

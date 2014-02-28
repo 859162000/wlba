@@ -42,7 +42,7 @@
             }), {
               page: self.pager.currentPageNumber()
             });
-            if (console) {
+            if (typeof console !== "undefined" && console !== null) {
               console.log('loading data');
             }
             return backend.loadData('financing', params).done(function(data) {

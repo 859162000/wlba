@@ -56,7 +56,7 @@ define ['jquery'], ($)->
       })
     else
       # TODO use the similar as Defered syntax to return error
-      if console
+      if console?
         console.log "The type not supported"
 
   loadPortfolio = (params)->

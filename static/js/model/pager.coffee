@@ -16,7 +16,8 @@ define ['underscore', 'knockout'], (_, ko)->
         if _.has(@events, 'pageNumberChanged')
           @events.pageNumberChanged(data, event)
         else
-          console.log 'page number changed: ' + data
+          if console?
+            console.log 'page number changed: ' + data
 
     # setter
     currentPageNumber: (data)=>

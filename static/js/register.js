@@ -52,7 +52,7 @@
         e.preventDefault();
         phoneNumber = $("#id_identifier").val().trim();
         if (checkMobile(phoneNumber)) {
-          if (console) {
+          if (typeof console !== "undefined" && console !== null) {
             console.log("Phone number checked, now send the valdiation code");
           }
           return $.ajax({

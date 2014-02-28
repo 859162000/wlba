@@ -26,7 +26,9 @@
           if (_.has(this.events, 'pageNumberChanged')) {
             return this.events.pageNumberChanged(data, event);
           } else {
-            return console.log('page number changed: ' + data);
+            if (typeof console !== "undefined" && console !== null) {
+              return console.log('page number changed: ' + data);
+            }
           }
         }
       };

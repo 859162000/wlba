@@ -16,7 +16,8 @@ define ['jquery', 'underscore', 'knockout'], ($, _, ko)->
       if _.has @events, 'tabSelected'
         @events.tabSelected data, event
       else
-        console.log 'tab selected ' + data
+        if console?
+          console.log 'tab selected ' + data
 
     data: (context)=>
       if context

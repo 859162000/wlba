@@ -24,7 +24,8 @@ define ['knockout', 'underscore'], (ko, _)->
         if _.has(self.events, 'productSelected')
           self.events.productSelected(product)
         else
-          console.log product
+          if console?
+            console.log product
 
     data: (data)->
       this.name(data.name)
