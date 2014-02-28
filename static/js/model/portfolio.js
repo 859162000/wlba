@@ -52,7 +52,7 @@
       };
 
       viewModel.prototype.productWidth = function(productEntry) {
-        return (100 - this.titleWidthPercent) / this.products().length + '%';
+        return (95 - this.titleWidthPercent) / this.products().length + '%';
       };
 
       return viewModel;

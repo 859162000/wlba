@@ -45,6 +45,7 @@ define ['knockout', 'underscore'], (ko, _)->
       return amount.toFixed(0) + '万 ' + percent.toFixed(0) + '%'
 
     productWidth: (productEntry)->
-      (100 - this.titleWidthPercent) / this.products().length + '%'
+      # instead of 100, give some breath, get rid of 1px problem
+      (95 - this.titleWidthPercent) / this.products().length + '%'
 
   viewModel: viewModel
