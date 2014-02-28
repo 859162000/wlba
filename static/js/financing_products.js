@@ -42,9 +42,7 @@
             }), {
               page: self.pager.currentPageNumber()
             });
-            if (typeof console !== "undefined" && console !== null) {
-              console.log('loading data');
-            }
+            console.log('loading data');
             return backend.loadData('financing', params).done(function(data) {
               self.products(data.results);
               return self.pager.totalPageNumber(data.num_pages);

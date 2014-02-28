@@ -59,9 +59,7 @@
           dataType: 'jsonp'
         });
       } else {
-        if (typeof console !== "undefined" && console !== null) {
-          return console.log("The type not supported");
-        }
+        return console.log("The type not supported");
       }
     };
     loadPortfolio = function(params) {

@@ -38,8 +38,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', '
           filters = _.chain(self.activeFilters()).pluck('values').flatten().compact().value()
           params = _(filters).reduce ((result, object)-> _.extend(result, object)), {page: self.pager.currentPageNumber()}
 
-          if console?
-            console.log 'loading data'
+          console.log 'loading data'
           backend.loadData 'financing', params
           .done( (data)->
             self.products data.results

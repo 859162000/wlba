@@ -24,9 +24,7 @@
           if (_.has(self.events, 'productSelected')) {
             return self.events.productSelected(product);
           } else {
-            if (typeof console !== "undefined" && console !== null) {
-              return console.log(product);
-            }
+            return console.log(product);
           }
         };
       }
