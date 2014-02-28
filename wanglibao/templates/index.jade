@@ -6,7 +6,10 @@ html
 
   body
     include include/header
+
+    - with '首页' as activeItem
     include include/navigation
+    - endwith
 
     .big-background
       .l-activity-panel

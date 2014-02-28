@@ -4,14 +4,17 @@ include include/head
 - endwith
 body
   include include/header
+
+  - with '银行理财' as activeItem
   include include/navigation
+  - endwith
   .sub-navbar
     .sub-navbar--list
       ul
         li.sub-navbar--list-item
-          a.sub-navbar--anchor.active(href="#") 理财首页
+          a.sub-navbar--anchor.active(href="{%url 'financing_home'%}") 理财首页
         li.sub-navbar--list-item
-          a.sub-navbar--anchor(href="#") 理财产品
+          a.sub-navbar--anchor(href="{%url 'financing_products'%}") 理财产品
   .container
     .ad-panel
   .space-vertical-s

@@ -1187,7 +1187,7 @@ a.nav-item-anchor:active {
   color: #333333;
 }
 /* line 41, ../sass/partials/_navbar.sass */
-a.nav-item-anchor:active, a.nav-item-anchor:hover {
+a.nav-item-anchor:active, a.nav-item-anchor:hover, a.nav-item-anchor.active {
   border-bottom: 3px solid #aa0f13;
 }
 

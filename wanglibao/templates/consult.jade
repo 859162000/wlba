@@ -4,7 +4,10 @@ include include/head
 - endwith
 body
   include include/header
+
+  - with '个人理财' as activeItem
   include include/navigation
+  - endwith
   .bar.consult-background(style="margin-top:-10px")
     .row
       span.bar--title 您的资产净值

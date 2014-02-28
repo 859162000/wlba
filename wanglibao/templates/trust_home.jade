@@ -4,7 +4,10 @@ include include/head
 - endwith
 body
   include include/header
+
+  - with '信托产品' as activeItem
   include include/navigation
+  - endwith
 
   .sub-navbar
     .sub-navbar--list
@@ -12,9 +15,9 @@ body
         li.sub-navbar--list-item
           a.sub-navbar--anchor.active(href="{% url 'trust_home' %}") 信托首页
         li.sub-navbar--list-item
-          a.sub-navbar--anchor(href="{% url 'trust_products' %}") 信托产品
+          a.sub-navbar--anchor(href="{% url 'trust_product' %}") 信托产品
         li.sub-navbar--list-item
-          a.sub-navbar--anchor(href="{% url 'trust_products' %}") 信托公司
+          a.sub-navbar--anchor(href="{% url 'trust_company' %}") 信托公司
 
   .container
     .ad-panel

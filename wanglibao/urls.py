@@ -21,13 +21,15 @@ urlpatterns = patterns(
     url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
 
     url(r'^trust/home/', TrustHomeView.as_view(), name="trust_home"),
-    url(r'^trust/products/', TrustProductsView.as_view(), name="trust_products"),
+    url(r'^trust/products/', TrustProductsView.as_view(), name="trust_product"),
+    url(r'^trust/companies/', TemplateView.as_view(template_name="trust_company.jade"), name="trust_company"),
     url(r'^trust/detail/(?P<id>\w+)', TrustDetailView.as_view(), name="trust_detail"),
 
     url(r'^financing/home/', FinancingHomeView.as_view(), name="financing_home"),
     url(r'^financing/products/', FinancingProductsView.as_view(), name="financing_products"),
 
     url(r'^fund/home/', FundHomeView.as_view(), name="fund_home"),
+    url(r'^fund/products/', TemplateView.as_view(template_name="fund_products.jade"), name="fund_products"),
 
     url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
 
