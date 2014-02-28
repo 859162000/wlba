@@ -39,7 +39,7 @@ urlpatterns = patterns(
         }),
     url(r'^accounts/register/$', RegisterView.as_view()),
     url(r'^accounts/activate/complete/$',
-                           TemplateView.as_view(template_name='activation_complete.html'),
+                           TemplateView.as_view(template_name='html/activation_complete.html'),
                            name='registration_activation_complete'),
 
     url(r'^accounts/', include('registration.backends.default.urls')),

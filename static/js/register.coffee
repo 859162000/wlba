@@ -1,71 +1,95 @@
-$(document).ready ->
-  checkEmail = (identifier) ->
-    re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    re.test identifier
+require.config
+  paths:
+    jquery: 'lib/jquery.min'
+    'jquery.validate': 'lib/jquery.validate.min'
 
-  checkMobile = (identifier) ->
-    re = /^1\d{10}$/
-    re.test identifier
+  shims:
+    'jquery.validate': ['jquery']
 
-  $('#id_identifier').keyup (e)->
-    value = $(this).val()
+require ['jquery', 'jquery.validate'], ($, validate)->
+  $(document).ready ->
+    checkEmail = (identifier) ->
+      re = undefined
+      re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      re.test identifier
 
-    isMobile = checkMobile value
-    isEmail = checkEmail value
+    checkMobile = (identifier) ->
+      re = undefined
+      re = /^1\d{10}$/
+      re.test identifier
 
-    if isMobile
-      $('#validate-code-container').slideDown()
-    else
-      $('#validate-code-container').hide()
-
-  $('#id_identifier').keyup()
-
-  # Add the validate rule function emailOrPhone
-  $.validator.addMethod "emailOrPhone", (value, element)->
-    return checkEmail(value) or checkMobile(value)
-
-  $('#register-form').validate {
-    rules:
-      identifier:
-        required: true
-        emailOrPhone: true
-      password:
-        required: true
-        minlength: 6
-      'validation_code':
-        required: true
-        depends: (e)->
-          checkMobile($('#id_identifier').val())
-
-    messages:
-      identifier:
-        required: '不能为空'
-        depends: '请输入邮箱或者手机号'
-      password:
-        required: '不能为空'
-        minlength: $.format("密码需要最少{0}位")
-      'validation_code':
-        required: '不能为空'
-  }
-
-  $('#button-get-validate-code').click (e)->
-    element = this
-
-    e.preventDefault()
-    alert('send ajax to server to send ajax')
-
-    intervalId
-    count = 60
-
-    $(element).attr 'disabled', 'disabled'
-    timerFunction = ()->
-      if count >= 1
-        count--
-        $(element).text('重新获取(' + count + ')')
+    $("#id_identifier").keyup (e) ->
+      isEmail = undefined
+      isMobile = undefined
+      value = undefined
+      value = $(this).val()
+      isMobile = checkMobile(value)
+      isEmail = checkEmail(value)
+      if isMobile
+        $("#id_type").val "phone"
+        $("#validate-code-container").show()
+      else if isEmail
+        $("#id_type").val "email"
+        $("#validate-code-container").hide()
       else
-        clearInterval(intervalId)
-        $(element).text('重新获取')
-        $(element).removeAttr 'disabled'
-    # Fire now and future
-    timerFunction()
-    intervalId = setInterval timerFunction, 1000
+        $("#id_type").val "email"
+        $("#validate-code-container").hide()
+
+    $("#id_identifier").keyup()
+    $("#button-get-validate-code").click (e) ->
+      e.preventDefault()
+
+      element = this
+
+      e.preventDefault()
+
+      phoneNumber = $("#id_identifier").val().trim()
+      if checkMobile(phoneNumber)
+        console.log "Phone number checked, now send the valdiation code"
+        $.ajax(
+          url: "/api/phone_validation_code/register/" + phoneNumber + "/"
+          type: "POST"
+        ).done ->
+          intervalId
+          count = 60
+
+          $(element).attr 'disabled', 'disabled'
+          timerFunction = ()->
+            if count >= 1
+              count--
+              $(element).text('重新获取(' + count + ')')
+            else
+              clearInterval(intervalId)
+              $(element).text('重新获取')
+              $(element).removeAttr 'disabled'
+
+          # Fire now and future
+          timerFunction()
+          intervalId = setInterval timerFunction, 1000
+
+    # Add the validate rule function emailOrPhone
+    $.validator.addMethod "emailOrPhone", (value, element)->
+      return checkEmail(value) or checkMobile(value)
+
+    $('#register-form').validate
+      rules:
+        identifier:
+          required: true
+          emailOrPhone: true
+        password:
+          required: true
+          minlength: 6
+        'validation_code':
+          required: true
+          depends: (e)->
+            checkMobile($('#id_identifier').val())
+
+      messages:
+        identifier:
+          required: '不能为空'
+          emailOrPhone: '请输入邮箱或者手机号'
+        password:
+          required: '不能为空'
+          minlength: $.format("密码需要最少{0}位")
+        'validation_code':
+          required: '不能为空'

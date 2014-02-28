@@ -36,7 +36,7 @@
               {% render_field form.password class+="input-large" placeholder="请输入密码" autocomplete='off' %}
             </div>
             <div class="form-row form-bottom-bar"><span>已有账户请直接</span><a href="/accounts/login/?next=/">登录</a>
-              <button type="submit" id="button-submit" class="pull-right button-error button-large">注 册</button>
+              <button type="submit" id="button-submit" class="pull-right button-error button-middle">注 册</button>
             </div>
           </form>
         </div>
@@ -47,7 +47,5 @@
 
 {% block javascript %}
   {{  block.super }}
-  <script src="{% static "wanglibao/js/jquery.min.js" %}"></script>
-  <script src="{% static "wanglibao/js/jquery.validate.min.js" %}"></script>
-  <script src="{% static "wanglibao/javascripts/register.js" %}"></script>
+  <script src="/static/js/require.js" data-main="/static/js/register"></script>
 {% endblock %}

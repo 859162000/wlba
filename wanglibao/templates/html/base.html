@@ -9,9 +9,9 @@
     <title> {% block title %} 网利宝-首页 {% endblock %} </title>
 
     {% block stylesheet %}
-      <link href="{% static "wanglibao/stylesheets/screen.css" %}" media="screen, projection" rel="stylesheet" type="text/css">
-      <link href="{% static "wanglibao/stylesheets/print.css" %}" media="print" rel="stylesheet" type="text/css">
-      <!-- if IElink(href="{% static "wanglibao/stylesheets/ie.css"  %}", media="screen, projection", rel="stylesheet", type="text/css")
+      <link href="{% static "stylesheets/screen.css" %}" media="screen, projection" rel="stylesheet" type="text/css">
+      <link href="{% static "stylesheets/print.css" %}" media="print" rel="stylesheet" type="text/css">
+      <!-- if IElink(href="{% static "stylesheets/ie.css"  %}", media="screen, projection", rel="stylesheet", type="text/css")
       -->
     {% endblock %}
   </head>
@@ -81,8 +81,6 @@
     {% endblock %}
 
     {% block javascript %}
-      <!--页尾 end-->
-      <script src="{% static "wanglibao/js/jquery.min.js" %}"></script>
     {% endblock %}
   </body>
 </html>

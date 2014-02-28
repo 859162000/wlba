@@ -8,9 +8,9 @@
         span 欢迎您，
         a.username(href="#")
           if user.email
-            {{ user.email }}
+            | {{ user.email }}
           else
-            {{ user.wanglibaouserprofile.phone }}
+            | {{ user.wanglibaouserprofile.phone }}
         span.white-v-line
         a.logout(href="/accounts/logout?next={{ request.path }}") 退出
       else

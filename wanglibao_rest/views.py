@@ -73,7 +73,7 @@ class PhoneValidateView(APIView):
                 last_send_time=now)
 
          # Send the validate message to mobile TODO Add throttling on ip, phone number
-        content = render_to_string('activation-sms.html', {'validation_code': validate_code})
+        content = render_to_string('html/activation-sms.html', {'validation_code': validate_code})
         params = {
             'account': settings.SMS_ACCOUNT,
             'password': settings.SMS_PASSWORD,
