@@ -4,18 +4,26 @@
     paths: {
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
-      knockout: 'lib/knockout-3.0.0'
+      knockout: 'lib/knockout-3.0.0',
+      'jquery.purl': 'lib/purl'
+    },
+    shims: {
+      'jquery.purl': ['jquery']
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund'], function($, _, ko, backend, fund) {
+  require(['jquery', 'underscore', 'knockout', 'jquery.purl', 'lib/backend', 'model/fund'], function($, _, ko, purl, backend, fund) {
     return $(document).ready(function() {
       var ViewModel, viewModel;
       ViewModel = (function() {
         function ViewModel() {
-          var self;
+          var asset_param, self;
           self = this;
-          self.asset = ko.observable();
+          asset_param = parseInt(purl(document.location.href).param('asset'));
+          if ((asset_param == null) || asset_param === 0) {
+            asset_param = 30;
+          }
+          self.asset = ko.observable(asset_param);
           self.trusts = ko.observable([]);
           self.financings = ko.observable([]);
           self.funds = ko.observable([]);

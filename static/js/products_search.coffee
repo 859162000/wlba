@@ -3,15 +3,22 @@ require.config
     jquery: 'lib/jquery.min'
     underscore: 'lib/underscore-min'
     knockout: 'lib/knockout-3.0.0'
+    'jquery.purl': 'lib/purl'
+  shims:
+    'jquery.purl': ['jquery']
 
-require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund'], ($, _, ko, backend, fund)->
+require ['jquery', 'underscore', 'knockout', 'jquery.purl', 'lib/backend', 'model/fund'], ($, _, ko, purl, backend, fund)->
   $ document
   .ready ()->
       class ViewModel
         constructor: ()->
           self = this
 
-          self.asset = ko.observable()
+          asset_param = parseInt(purl(document.location.href).param('asset'))
+          if not asset_param? or asset_param == 0
+            asset_param = 30
+
+          self.asset = ko.observable(asset_param)
 
           self.trusts = ko.observable []
           self.financings = ko.observable []

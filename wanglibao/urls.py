@@ -29,6 +29,8 @@ urlpatterns = patterns(
 
     url(r'^fund/home/', FundHomeView.as_view(), name="fund_home"),
 
+    url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
+
     url(r'^api/', include('wanglibao_rest.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
