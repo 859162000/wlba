@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* line 17, ../../../../../../../../usr/local/Cellar/ruby/2.0.0-p195/lib/ruby/gems/2.0.0/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -72,7 +73,7 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
 
 /* line 5, ../sass/partials/_basic.sass */
 body {
-  font-family: "Microsoft YaHei", "Hiragino Sans GB", "Hiragino Sans GB W3", Helvetica, STXihei, Arial, sans-serif;
+  font-family: "Microsoft Yahei", tahoma, arial, "Hiragino Sans GB", "宋体";
   font-size: 12px;
   line-height: 1.5;
   color: #333333;
@@ -323,13 +324,12 @@ input {
 /* line 5, ../sass/partials/_images.sass */
 .big-background {
   background: url('../images/u4.jpg?1393314370') no-repeat center -240px;
+  background-size: cover;
   position: relative;
   top: -10px;
-  width: 100%;
-  background-width: 100%;
 }
 
-/* line 12, ../sass/partials/_images.sass */
+/* line 11, ../sass/partials/_images.sass */
 .order-red-background, a.card-orderlink:hover {
   height: 27px;
   width: 81px;
@@ -337,7 +337,7 @@ input {
   background-position: 0 -586px;
 }
 
-/* line 17, ../sass/partials/_images.sass */
+/* line 16, ../sass/partials/_images.sass */
 .order-yellow-background, a.card-orderlink {
   height: 27px;
   width: 81px;
@@ -345,14 +345,14 @@ input {
   background-position: 0 -613px;
 }
 
-/* line 22, ../sass/partials/_images.sass */
+/* line 21, ../sass/partials/_images.sass */
 .account-background {
   height: 317px;
   width: 399px;
   background: url('../images/login_bg.jpg?1393552537') no-repeat center;
 }
 
-/* line 27, ../sass/partials/_images.sass */
+/* line 26, ../sass/partials/_images.sass */
 .consult-background {
   background: url('../images/personal_bg.jpg?1393314370') no-repeat center;
   width: 100%;
@@ -360,7 +360,7 @@ input {
   background-size: 100% 100%;
 }
 
-/* line 34, ../sass/partials/_images.sass */
+/* line 33, ../sass/partials/_images.sass */
 .logo {
   height: 59px;
   width: 59px;
@@ -373,7 +373,7 @@ input {
   *display: inline;
 }
 
-/* line 39, ../sass/partials/_images.sass */
+/* line 38, ../sass/partials/_images.sass */
 .paper-background {
   background: url('../images/bg_hot.png?1393314370') repeat-x;
 }
@@ -1667,22 +1667,28 @@ a.card-orderlink:active, a.card-orderlink:focus {
 }
 
 /* line 5, ../sass/partials/_searchbox.sass */
-.search-box {
-  width: 450px;
-  height: 270px;
-  margin-right: 26px;
-  background: #3a4551;
-  background: rgba(58, 69, 81, 0.5);
+.half {
+  width: 50%;
+  min-width: 400px;
 }
 
-/* line 12, ../sass/partials/_searchbox.sass */
+/* line 9, ../sass/partials/_searchbox.sass */
+.search-box {
+  width: 400px;
+  height: 270px;
+  margin: 10px auto;
+  background: #3a4551;
+  background: rgba(58, 69, 81, 0.7);
+}
+
+/* line 16, ../sass/partials/_searchbox.sass */
 .search-box-title {
   line-height: 48px;
   background: #3a4551;
   text-align: center;
 }
 
-/* line 17, ../sass/partials/_searchbox.sass */
+/* line 21, ../sass/partials/_searchbox.sass */
 .search-box-title-text {
   font-size: 16px;
   text-align: center;
@@ -1690,12 +1696,12 @@ a.card-orderlink:active, a.card-orderlink:focus {
   margin-left: 10px;
 }
 
-/* line 23, ../sass/partials/_searchbox.sass */
+/* line 27, ../sass/partials/_searchbox.sass */
 .search-box-body {
   padding: 5px 10px 5px 20px;
 }
 
-/* line 26, ../sass/partials/_searchbox.sass */
+/* line 30, ../sass/partials/_searchbox.sass */
 .search-box-slug {
   *zoom: 1;
   max-width: 1104px;
@@ -1715,7 +1721,7 @@ a.card-orderlink:active, a.card-orderlink:focus {
   clear: both;
 }
 
-/* line 32, ../sass/partials/_searchbox.sass */
+/* line 36, ../sass/partials/_searchbox.sass */
 .search-box-input-container {
   overflow: hidden;
   *zoom: 1;
@@ -1735,60 +1741,60 @@ a.card-orderlink:active, a.card-orderlink:focus {
   display: table;
   clear: both;
 }
-/* line 39, ../sass/partials/_searchbox.sass */
+/* line 43, ../sass/partials/_searchbox.sass */
 .search-box-input-container > input, .search-box-input-container > button, .search-box-input-container > span {
   border-radius: 0;
   height: 100%;
   margin-top: 0;
   margin-bottom: 0;
 }
-/* line 45, ../sass/partials/_searchbox.sass */
+/* line 49, ../sass/partials/_searchbox.sass */
 .search-box-input-container > input {
-  width: 280px;
+  width: 230px;
   box-shadow: 0;
   border-width: 0;
   font-size: 25px;
   display: inline;
   float: left;
 }
-/* line 52, ../sass/partials/_searchbox.sass */
+/* line 56, ../sass/partials/_searchbox.sass */
 .search-box-input-container > span {
   border-left: 1px solid #666666;
   color: #666666;
   display: inline;
   float: left;
 }
-/* line 57, ../sass/partials/_searchbox.sass */
+/* line 61, ../sass/partials/_searchbox.sass */
 .search-box-input-container > button {
   border-radius: 5px;
   width: 70px;
 }
-/* line 61, ../sass/partials/_searchbox.sass */
+/* line 65, ../sass/partials/_searchbox.sass */
 .search-box-input-container > button:hover {
   background-color: #aa0f13;
   color: white;
 }
 
-/* line 65, ../sass/partials/_searchbox.sass */
+/* line 69, ../sass/partials/_searchbox.sass */
 .btn-search-box {
   background-color: #ffc410;
   margin-left: 10px;
   border-width: 0;
 }
 
-/* line 70, ../sass/partials/_searchbox.sass */
+/* line 74, ../sass/partials/_searchbox.sass */
 .search-box-add-on {
   width: 50px;
   text-align: center;
   background-color: #efefef;
 }
 
-/* line 75, ../sass/partials/_searchbox.sass */
+/* line 79, ../sass/partials/_searchbox.sass */
 .search-box-description {
   padding: 1em 0;
 }
 
-/* line 80, ../sass/partials/_searchbox.sass */
+/* line 84, ../sass/partials/_searchbox.sass */
 a.search-quicklink {
   color: inherit;
   text-decoration: inherit;
