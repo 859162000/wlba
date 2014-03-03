@@ -10,15 +10,9 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend'], ($, _, ko, backend)
       constructor: ()->
         self = this
 
-        self.trusts = ko.observable []
+        self.trusts = ko.observable (_.pluck data.hot_trusts, 'trust')
+        self.funds = ko.observable (_.pluck data.hot_funds, 'fund')
+        self.financings = ko.observable (_.pluck data.hot_financings, 'bank_financing')
 
     model = new DataViewModel()
     ko.applyBindings(model)
-
-    backend.loadData 'trusts',
-      count: 6
-      ordering: '-issue_date'
-    .done (data) ->
-      model.trusts data.results
-    .fail (xhr, status, error) ->
-      alert(status + error)

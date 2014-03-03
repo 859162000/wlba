@@ -16,6 +16,7 @@ class Bank(models.Model):
 class BankFinancing(models.Model):
     name = models.CharField(max_length=128)
     status = models.CharField(max_length=8, default=u'在售')
+    brief = models.TextField(blank=True, null=True)
     product_code = models.CharField(max_length=128)
     bank = models.ForeignKey(Bank)
     period = models.FloatField(help_text="Count in month")

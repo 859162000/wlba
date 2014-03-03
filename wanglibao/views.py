@@ -2,9 +2,13 @@ import hashlib
 import random
 from django.contrib.auth import get_user_model, login
 from django.template.loader import get_template, render_to_string
+from django.views.generic import TemplateView
 from registration.models import RegistrationProfile
 from registration.views import RegistrationView
+from rest_framework.renderers import JSONRenderer
 from wanglibao.forms import EmailOrPhoneRegisterForm
+from wanglibao_hotlist.models import HotTrust, HotFund, HotFinancing
+from wanglibao_hotlist.serializers import HotTrustSerializer, HotFundSerializer, HotFinancingSerializer
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao.utils import generate_username, detect_identifier_type
 from django.core.mail import EmailMultiAlternatives
@@ -73,3 +77,20 @@ class RegisterView (RegistrationView):
         return u'/'
 
 
+class IndexView(TemplateView):
+    template_name = 'index.jade'
+
+    def get_context_data(self, **kwargs):
+        json = JSONRenderer()
+        hot_trusts = HotTrust.objects.all()[:6]
+        trust_serializer = HotTrustSerializer(hot_trusts)
+        hot_funds = HotFund.objects.all()[:6]
+        fund_serializer = HotFundSerializer(hot_funds)
+        hot_financings = HotFinancing.objects.all()[:6]
+        financing_serializer = HotFinancingSerializer(hot_financings)
+
+        return {
+            'hot_trusts': json.render(trust_serializer.data),
+            'hot_funds': json.render(fund_serializer.data),
+            'hot_financings': json.render(financing_serializer.data)
+            }

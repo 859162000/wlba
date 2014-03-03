@@ -2,7 +2,7 @@ from django.views.generic import TemplateView
 from rest_framework import viewsets
 from trust.filters import TrustFilterSet
 from trust.models import Trust, Issuer
-from wanglibao_rest.serializers import TrustSerializer
+from serializers import TrustSerializer
 
 
 class TrustHomeView(TemplateView):

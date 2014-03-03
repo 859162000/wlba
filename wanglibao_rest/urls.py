@@ -4,7 +4,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
-from wanglibao_hotlist.views import HotTrustViewSet
+from wanglibao_hotlist.views import HotTrustViewSet, HotFinancingViewSet, HotFundViewSet
 from wanglibao_portfolio.views import PortfolioViewSet, UserPortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_rest.views import UserViewSet,  PhoneValidateView, RegisterByPhone, UserExisting
@@ -28,6 +28,8 @@ router.register(r'products', ProductTypeViewSet)
 router.register(r'user_portfolios', UserPortfolioViewSet)
 
 router.register(r'hot_trusts', HotTrustViewSet)
+router.register(r'hot_financings', HotFinancingViewSet)
+router.register(r'hot_funds', HotFundViewSet)
 
 
 urlpatterns = patterns(

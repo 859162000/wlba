@@ -12,6 +12,9 @@ class HotTrust(models.Model):
                                  default=datetime.now,
                                  null=True)
 
+    class Meta:
+        ordering = ['-added']
+
     def __unicode__(self):
         return u'%s score: %d' % (self.trust.name, self.hot_score)
 
@@ -23,16 +26,22 @@ class HotFinancing(models.Model):
                                  default=datetime.now,
                                  null=True)
 
+    class Meta:
+        ordering = ['-added']
+
     def __unicode__(self):
         return u'%s score: %d' % (self.bank_financing.name, self.hot_score)
 
 
 class HotFund(models.Model):
-    Fund = models.OneToOneField(Fund)
+    fund = models.OneToOneField(Fund)
     hot_score = models.IntegerField(help_text="How hot is this")
     added = models.DateTimeField(help_text="When this guy appear in hot list",
                                  default=datetime.now,
                                  null=True)
+
+    class Meta:
+        ordering = ['-added']
 
     def __unicode__(self):
         return u'%s score: %d' % (self.fund.name, self.hot_score)

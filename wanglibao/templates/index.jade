@@ -58,28 +58,89 @@ html
       .space-vertical-xs
 
       .container(data-bind='foreach: trusts')
-        .card.card-trust
-          .card-left
-            .card-icon
-              dl
-                dt 预期收益
-                dd(data-bind="text: expected_earning_rate + '%'") 10%
-            a.card-orderlink(data-bind="attr: { href: '/trust/detail/' + id }") 预约
+        // ko template: {name: "trust-card"}
+        // /ko
 
-          .card-right
-            dl
-              span.card-title(data-bind='text: name') 网利宝金融平台信托产品
-              div
-                dt  投资期限：
-                dd(data-bind="text: period + '个月'") 12个月
-              div
-                dt 投资门槛：
-                dd(data-bind="text: investment_threshold + '万'") 100万
-              div
-                dt 点评:
-                dd.product-brief(data-bind='text: brief') 不可错过，只有这么抑制了，如果还不买，可能就没有了，以后也不一定会除了
+    .space-vertical-s
+    .container
+      span.font-l 热门基金产品
+      .container(data-bind="foreach: funds")
+        // ko template: {name: "fund-card"}
+        // /ko
+
+    .space-vertical-s
+    .container
+      span.font-l 热门银行理财
+      .container(data-bind="foreach: financings")
+        // ko template: {name: "financing-card"}
+        // /ko
+
 
     .space-vertical-m
     include include/footer
+
+    script(type="text/html" id="trust-card")
+      .card.card-trust
+        .card-left
+          .card-icon
+            dl
+              dt 预期收益
+              dd(data-bind="text: expected_earning_rate + '%'") 10%
+          a.card-orderlink(data-bind="attr: { href: '/trust/detail/' + id }") 预约
+
+        .card-right
+          dl
+            span.card-title(data-bind='text: name') 网利宝金融平台信托产品
+            div
+              dt  投资期限：
+              dd(data-bind="text: period + '个月'") 12个月
+            div
+              dt 投资门槛：
+              dd(data-bind="text: investment_threshold + '万'") 100万
+            div
+              dt 点评:
+              dd.product-brief(data-bind='text: brief') 不可错过，只有这么抑制了，如果还不买，可能就没有了，以后也不一定会除了
+
+
+    script(type="text/html" id="fund-card")
+      .card.card-trust
+        .card-left
+          .card-icon
+            dl
+              dt 七日收益率
+              dd(data-bind="text: profit_rate_7days + '%'") 10%
+          a.card-orderlink(data-bind="attr: { href: '/fund/detail/' + id }") 预约
+
+        .card-right
+          dl
+            span.card-title(data-bind='text: name') 网利宝金融平台信托产品
+            div
+              dt 点评:
+              dd.product-brief(data-bind='text: brief') 不可错过，只有这么抑制了，如果还不买，可能就没有了，以后也不一定会除了
+
+    script(type="text/html" id="financing-card")
+      .card.card-trust
+        .card-left
+          .card-icon
+            dl
+              dt 预期收益率
+              dd(data-bind="text: max_expected_profit_rate + '%'") 10%
+          a.card-orderlink(data-bind="attr: { href: '/financing/detail/' + id }") 预约
+
+        .card-right
+          dl
+            span.card-title(data-bind='text: name') 网利宝金融平台信托产品
+            div
+              dt 点评:
+              dd.product-brief(data-bind='text: brief') 不可错过，只有这么抑制了，如果还不买，可能就没有了，以后也不一定会除了
+
+    script.
+      {% autoescape off %}
+      var data = {
+        hot_trusts: {{ hot_trusts }},
+        hot_financings: {{ hot_financings }},
+        hot_funds: {{ hot_funds }}
+      };
+      {% endautoescape %}
 
     script(src="/static/js/require.js" data-main="/static/js/index")

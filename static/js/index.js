@@ -15,22 +15,16 @@
         function DataViewModel() {
           var self;
           self = this;
-          self.trusts = ko.observable([]);
+          self.trusts = ko.observable(_.pluck(data.hot_trusts, 'trust'));
+          self.funds = ko.observable(_.pluck(data.hot_funds, 'fund'));
+          self.financings = ko.observable(_.pluck(data.hot_financings, 'bank_financing'));
         }
 
         return DataViewModel;
 
       })();
       model = new DataViewModel();
-      ko.applyBindings(model);
-      return backend.loadData('trusts', {
-        count: 6,
-        ordering: '-issue_date'
-      }).done(function(data) {
-        return model.trusts(data.results);
-      }).fail(function(xhr, status, error) {
-        return alert(status + error);
-      });
+      return ko.applyBindings(model);
     });
   });
 

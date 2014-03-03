@@ -7,7 +7,7 @@ from django.contrib.auth.views import login
 from django.views.generic import TemplateView
 from trust.views import TrustHomeView, TrustProductsView, TrustDetailView
 from wanglibao.forms import EmailOrPhoneAuthenticationForm
-from wanglibao.views import RegisterView
+from wanglibao.views import RegisterView, IndexView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView
 from wanglibao_fund.views import FundHomeView
 from wanglibao_portfolio.views import PortfolioHomeView
@@ -16,7 +16,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^$', TemplateView.as_view(template_name="index.jade"), name="index"),
+    url(r'^$', IndexView.as_view(), name="index"),
 
     url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
 
