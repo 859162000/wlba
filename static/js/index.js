@@ -10,7 +10,7 @@
 
   require(['jquery', 'underscore', 'knockout', 'lib/backend'], function($, _, ko, backend) {
     return $(document).ready(function() {
-      var DataViewModel, model;
+      var DataViewModel, model, switchBackground, switchBackgroundWrapper;
       DataViewModel = (function() {
         function DataViewModel() {
           var self;
@@ -24,7 +24,24 @@
 
       })();
       model = new DataViewModel();
-      return ko.applyBindings(model);
+      ko.applyBindings(model);
+      switchBackground = function(max) {
+        var current, imageUrl, matches;
+        imageUrl = $('.big-background').css('background-image');
+        matches = imageUrl.match(/\/bg(\d).jpg/);
+        if (matches.length === 2) {
+          current = parseInt(matches[1]) + 1;
+          if (current > max) {
+            current = 1;
+          }
+          return $('.big-background').css('background-image', imageUrl.replace(/\/bg\d.jpg/, '/bg' + current + '.jpg'));
+        }
+      };
+      switchBackgroundWrapper = function() {
+        switchBackground(4);
+        return setTimeout(switchBackgroundWrapper, 10 * 1000);
+      };
+      return setTimeout(switchBackgroundWrapper, 10 * 1000);
     });
   });
 
