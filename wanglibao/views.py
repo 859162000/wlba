@@ -83,14 +83,11 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         json = JSONRenderer()
         hot_trusts = HotTrust.objects.all()[:6]
-        trust_serializer = HotTrustSerializer(hot_trusts)
         hot_funds = HotFund.objects.all()[:6]
-        fund_serializer = HotFundSerializer(hot_funds)
         hot_financings = HotFinancing.objects.all()[:6]
-        financing_serializer = HotFinancingSerializer(hot_financings)
 
         return {
-            'hot_trusts': json.render(trust_serializer.data),
-            'hot_funds': json.render(fund_serializer.data),
-            'hot_financings': json.render(financing_serializer.data)
+            'hot_trusts': hot_trusts,
+            'hot_funds': hot_funds,
+            'hot_financings': hot_financings
             }

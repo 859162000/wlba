@@ -1,3 +1,5 @@
+-load formatters
+
 doctype html
 html
   - with '首页' as title
@@ -5,142 +7,129 @@ html
   - endwith
 
   body
-    include include/header
-
-    - with '首页' as activeItem
-    include include/navigation
-    - endwith
-
     .big-background
+      include include/header
+
+      - with '首页' as activeItem
+      include include/navigation
+      - endwith
+
       .l-activity-panel
         .space-vertical-m
         .container
-          .half.pull-left
-            .search-box
-              form(method="GET", action="/portfolio")
-                .search-box-title
-                  span.i-search-personal
-                  span.search-box-title-text 理财方案
-                .search-box-body
-                  p.search-box-slug 输入您的资产净值
-                  .search-box-input-container
-                    input(type='text', name="asset", value='')
-                    span.search-box-add-on 万元
-                    button.btn-search-box(type="submit") 找方案
-                  p.search-box-description 我们将推荐适合您的投资方案
-                  p.font-m.white-text
-                    | 或者花1分钟时间，我们为您
-                    a.search-quicklink(href='/portfolio', type="submit") 私人定制
+          .container-search.clearfix
+            .half.pull-left
+              .search-box
+                form(method="GET", action="/portfolio")
+                  .search-box-title
+                    span.i-search-personal
+                    span.search-box-title-text 理财方案
+                  .search-box-body
+                    p.search-box-slug 输入您的资产净值
+                    .search-box-input-container
+                      input(type='text', name="asset", value='')
+                      span.search-box-add-on 万元
+                      button.btn-search-box(type="submit") 找方案
+                    p.search-box-description 我们将推荐适合您的投资方案
+                    p.font-m.white-text
+                      | 或者花1分钟时间，我们为您
+                      a.search-quicklink(href='/portfolio', type="submit") 私人定制
 
-          .half.pull-left
-            .search-box
-              form(method="GET", action="/products")
-                .search-box-title
-                  span.i-search-product
-                  span.search-box-title-text 理财产品
-                .search-box-body
-                  p.search-box-slug 输入投资金额
-                  .search-box-input-container
-                    input(type='text', name="asset", value='')
-                    span.search-box-add-on 万元
-                    button.btn-search-box(type='submit') 搜 索
-                  p.search-box-description 120096款 在售理财产品任您搜
-                  p.font-m.orange
-                    a.search-quicklink(href='/products?asset=100&type=trusts') 100万元信托
-                    a.search-quicklink(href='/products?asset=10&type=bank_financings') 10万元银行理财
-                    a.search-quicklink(href='/products?asset=100&type=funds') 100万元基金
+            .half.pull-left
+              .search-box
+                form(method="GET", action="/products")
+                  .search-box-title
+                    span.i-search-product
+                    span.search-box-title-text 理财产品
+                  .search-box-body
+                    p.search-box-slug 输入投资金额
+                    .search-box-input-container
+                      input(type='text', name="asset", value='')
+                      span.search-box-add-on 万元
+                      button.btn-search-box(type='submit') 搜 索
+                    p.search-box-description 120096款 在售理财产品任您搜
+                    p.font-m.orange
+                      a.search-quicklink(href='/products?asset=100&type=trusts') 100万元信托
+                      a.search-quicklink(href='/products?asset=10&type=bank_financings') 10万元银行理财
+                      a.search-quicklink(href='/products?asset=100&type=funds') 100万元基金
         .space-vertical-m
 
     .space-vertical-s
-    .container
-      span.font-l 热门信托产品
+    .container-card-holder
+      span.font-l 热门产品
+      ul.tabs
+        li.tab-item
+          a.tab-anchor.active(data-toggle="trust-products" href="#") 信托产品
+        li.tab-item
+          a.tab-anchor(data-toggle="financing-products" href="#") 银行理财
+        li.tab-item
+          a.tab-anchor(data-toggle="fund-products" href="#") 基金产品
 
       .space-vertical-xs
 
-      .container(data-bind='foreach: trusts')
-        // ko template: {name: "trust-card"}
-        // /ko
+      .container#trust-products
+        each hot_trust in hot_trusts
+          -with hot_trust.trust as trust
+          .card.card-trust
+            .card-left
+              .card-icon
+                dl
+                  dt 预期收益
+                  dd {{trust.expected_earning_rate | percentage}}
+              a.card-orderlink(href="/trust/detail/{{trust.id}}") 预约
 
-    .space-vertical-s
-    .container
-      span.font-l 热门基金产品
-      .container(data-bind="foreach: funds")
-        // ko template: {name: "fund-card"}
-        // /ko
+            .card-right
+              dl
+                span.card-title {{trust.name}}
+                div
+                  dt  投资期限：
+                  dd {{trust.period | month}}
+                div
+                  dt 投资门槛：
+                  dd {{trust.investment_threshold | money_to_10k}}
+                div
+                  dt 点评:
+                  dd.product-brief {{trust.brief}}
+          -endwith
 
-    .space-vertical-s
-    .container
-      span.font-l 热门银行理财
-      .container(data-bind="foreach: financings")
-        // ko template: {name: "financing-card"}
-        // /ko
+      .container#fund-products
+        each hot_fund in hot_funds
+          -with hot_fund.fund as fund
+          .card.card-trust
+            .card-left
+              .card-icon
+                dl
+                  dt 七日收益率
+                  dd {{fund.profit_rate_7days | percentage}}
+              a.card-orderlink(href="/fund/detail/{{fund.id}}") 预约
+            .card-right
+              dl
+                span.card-title {{fund.name}}
+                div
+                  dt 点评:
+                  dd.product-brief {{fund.brief}}
+          -endwith
+
+      .container#financing-products
+        each hot_financing in hot_financings
+          -with hot_financing.bank_financing as financing
+          .card.card-trust
+            .card-left
+              .card-icon
+                dl
+                  dt 最高收益率
+                  dd {{financing.max_expected_profit_rate | percentage}}
+              a.card-orderlink(href="/financing/detail/{{financing.id}}") 预约
+            .card-right
+              dl
+                span.card-title {{financing.name}}
+                div
+                  dt 点评:
+                  dd.product-brief {{financing.brief}}
+          -endwith
 
 
     .space-vertical-m
     include include/footer
-
-    script(type="text/html" id="trust-card")
-      .card.card-trust
-        .card-left
-          .card-icon
-            dl
-              dt 预期收益
-              dd(data-bind="text: expected_earning_rate + '%'") 10%
-          a.card-orderlink(data-bind="attr: { href: '/trust/detail/' + id }") 预约
-
-        .card-right
-          dl
-            span.card-title(data-bind='text: name') 网利宝金融平台信托产品
-            div
-              dt  投资期限：
-              dd(data-bind="text: period + '个月'") 12个月
-            div
-              dt 投资门槛：
-              dd(data-bind="text: investment_threshold + '万'") 100万
-            div
-              dt 点评:
-              dd.product-brief(data-bind='text: brief') 不可错过，只有这么抑制了，如果还不买，可能就没有了，以后也不一定会除了
-
-
-    script(type="text/html" id="fund-card")
-      .card.card-trust
-        .card-left
-          .card-icon
-            dl
-              dt 七日收益率
-              dd(data-bind="text: profit_rate_7days + '%'") 10%
-          a.card-orderlink(data-bind="attr: { href: '/fund/detail/' + id }") 预约
-
-        .card-right
-          dl
-            span.card-title(data-bind='text: name') 网利宝金融平台信托产品
-            div
-              dt 点评:
-              dd.product-brief(data-bind='text: brief') 不可错过，只有这么抑制了，如果还不买，可能就没有了，以后也不一定会除了
-
-    script(type="text/html" id="financing-card")
-      .card.card-trust
-        .card-left
-          .card-icon
-            dl
-              dt 预期收益率
-              dd(data-bind="text: max_expected_profit_rate + '%'") 10%
-          a.card-orderlink(data-bind="attr: { href: '/financing/detail/' + id }") 预约
-
-        .card-right
-          dl
-            span.card-title(data-bind='text: name') 网利宝金融平台信托产品
-            div
-              dt 点评:
-              dd.product-brief(data-bind='text: brief') 不可错过，只有这么抑制了，如果还不买，可能就没有了，以后也不一定会除了
-
-    script.
-      {% autoescape off %}
-      var data = {
-        hot_trusts: {{ hot_trusts }},
-        hot_financings: {{ hot_financings }},
-        hot_funds: {{ hot_funds }}
-      };
-      {% endautoescape %}
 
     script(src="/static/js/require.js" data-main="/static/js/index")

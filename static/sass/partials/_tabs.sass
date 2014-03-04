@@ -1,0 +1,18 @@
+.tabs
+  display: inline-block
+
+.tab-item
+  display: inline-block
+  font-size: $font-m
+  border-left: 1px solid $red
+  padding: 0px 1em
+
+  &:first-child
+    border-left: 0
+
+.tab-anchor
+  +unstyled-link
+  +link-colors(black, $red)
+
+.tab-anchor.active
+  +link-colors($red)

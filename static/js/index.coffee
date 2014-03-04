@@ -1,21 +1,9 @@
 require.config
   paths:
     jquery: 'lib/jquery.min'
-    underscore: 'lib/underscore-min'
-    knockout: 'lib/knockout-3.0.0'
 
-require ['jquery', 'underscore', 'knockout', 'lib/backend'], ($, _, ko, backend)->
+require ['jquery'], ($)->
   $(document).ready ->
-    class DataViewModel
-      constructor: ()->
-        self = this
-
-        self.trusts = ko.observable (_.pluck data.hot_trusts, 'trust')
-        self.funds = ko.observable (_.pluck data.hot_funds, 'fund')
-        self.financings = ko.observable (_.pluck data.hot_financings, 'bank_financing')
-
-    model = new DataViewModel()
-    ko.applyBindings(model)
 
     # setup the background switcher
     switchBackground = (max)->
@@ -34,3 +22,34 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend'], ($, _, ko, backend)
       setTimeout(switchBackgroundWrapper, 10 * 1000)
 
     setTimeout switchBackgroundWrapper, 10 * 1000
+
+    # setup tab logics
+    $('ul.tabs').each ()->
+
+      allAnchors = $(this).find('a.tab-anchor')
+
+      allTargets = allAnchors
+      .map ()->
+        $(this).attr('data-toggle')
+
+
+      $(this).find('a.tab-anchor').each ->
+        $(this).click (e)->
+          e.preventDefault()
+
+          targetId = $(this).attr('data-toggle')
+
+          $(allAnchors).each ->
+            $(this).removeClass 'active'
+
+          $(allTargets).each ->
+            if this != targetId
+              $('#'+this).hide()
+
+          $('#'+targetId).fadeIn()
+          $(this).addClass 'active'
+      .each (index)->
+        if index == 0
+          $(this).trigger('click')
+
+

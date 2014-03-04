@@ -2,29 +2,13 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'lib/jquery.min',
-      underscore: 'lib/underscore-min',
-      knockout: 'lib/knockout-3.0.0'
+      jquery: 'lib/jquery.min'
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend'], function($, _, ko, backend) {
+  require(['jquery'], function($) {
     return $(document).ready(function() {
-      var DataViewModel, model, switchBackground, switchBackgroundWrapper;
-      DataViewModel = (function() {
-        function DataViewModel() {
-          var self;
-          self = this;
-          self.trusts = ko.observable(_.pluck(data.hot_trusts, 'trust'));
-          self.funds = ko.observable(_.pluck(data.hot_funds, 'fund'));
-          self.financings = ko.observable(_.pluck(data.hot_financings, 'bank_financing'));
-        }
-
-        return DataViewModel;
-
-      })();
-      model = new DataViewModel();
-      ko.applyBindings(model);
+      var switchBackground, switchBackgroundWrapper;
       switchBackground = function(max) {
         var current, imageUrl, matches;
         imageUrl = $('.big-background').css('background-image');
@@ -41,7 +25,35 @@
         switchBackground(4);
         return setTimeout(switchBackgroundWrapper, 10 * 1000);
       };
-      return setTimeout(switchBackgroundWrapper, 10 * 1000);
+      setTimeout(switchBackgroundWrapper, 10 * 1000);
+      return $('ul.tabs').each(function() {
+        var allAnchors, allTargets;
+        allAnchors = $(this).find('a.tab-anchor');
+        allTargets = allAnchors.map(function() {
+          return $(this).attr('data-toggle');
+        });
+        return $(this).find('a.tab-anchor').each(function() {
+          return $(this).click(function(e) {
+            var targetId;
+            e.preventDefault();
+            targetId = $(this).attr('data-toggle');
+            $(allAnchors).each(function() {
+              return $(this).removeClass('active');
+            });
+            $(allTargets).each(function() {
+              if (this !== targetId) {
+                return $('#' + this).hide();
+              }
+            });
+            $('#' + targetId).fadeIn();
+            return $(this).addClass('active');
+          });
+        }).each(function(index) {
+          if (index === 0) {
+            return $(this).trigger('click');
+          }
+        });
+      });
     });
   });
 
