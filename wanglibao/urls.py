@@ -9,7 +9,7 @@ from trust.views import TrustHomeView, TrustProductsView, TrustDetailView
 from wanglibao.forms import EmailOrPhoneAuthenticationForm
 from wanglibao.views import RegisterView, IndexView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView
-from wanglibao_fund.views import FundHomeView
+from wanglibao_fund.views import FundHomeView, FundDetailView
 from wanglibao_portfolio.views import PortfolioHomeView
 
 admin.autodiscover()
@@ -30,6 +30,7 @@ urlpatterns = patterns(
 
     url(r'^fund/home/', FundHomeView.as_view(), name="fund_home"),
     url(r'^fund/products/', TemplateView.as_view(template_name="fund_products.jade"), name="fund_products"),
+    url(r'^fund/detail/(?P<id>\w+)', FundDetailView.as_view(), name="fund_detail"),
 
     url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
 

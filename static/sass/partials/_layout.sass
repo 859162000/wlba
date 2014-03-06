@@ -25,6 +25,7 @@ $container-style: magic
 
 .container
   +container
+  clear: both
 
 .container-card-holder
   width: 1010px
@@ -37,6 +38,7 @@ $container-style: magic
 
 .row
   +container
+  +clearfix
 
 @for $i from 1 to $total-columns + 1
   .span#{$i}

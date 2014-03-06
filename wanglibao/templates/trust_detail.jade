@@ -24,7 +24,7 @@ body
   .space-vertical-s
 
   .container
-    .span8.panel.detail-header
+    .span8.panel.panel-header
       .panel-title-bar
         #product_name.panel-title {{ trust.name }}
 
@@ -49,7 +49,7 @@ body
                   dt 投资期限
                   dd {{ trust.period | month}}
 
-    .span4-omega.panel.detail-header
+    .span4-omega.panel.panel-header
       p.font-m.padding-left-s.padding-top-xs 发售日期: {{ trust.issue_date | date:"Y年n月j日"}}
 
       form.order-form

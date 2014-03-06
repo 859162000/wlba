@@ -5,23 +5,55 @@
 
 .panel
   +container
+  position: relative // Make panel as a container can has absolute position children
+  margin-top: $space-s
   border-top: $border-width solid $red
   min-height: 100px
   box-shadow: 0px 2px 2px gray
   background-color: white
 
-.panel-title-bar
+.space-vertical-s+.panel
+  margin-top: 0
+
+.space-vertical-m+.panel
+  margin-top: 0
+
+.space-vertical-l+.panel
+  margin-top: 0
+
+$header-height: 170px
+
+.panel-header
+  height: $header-height
+
+.panel-bar
   +container
-  background-color: $light-gray-add-on-bg
-  box-shadow: 0px 1px 1px gray
-  border-bottom: 1px solid gray
   line-height: 50px
+
+.panel-bar-s
+  +container
+  line-height: 40px
+
+.panel-title-bar
+  @extend .panel-bar
+  background-color: $light-gray-add-on-bg
+  box-shadow: 0px 1px 1px lightgray
+  border-bottom: 1px solid lightgray
+
+.panel-title-bar-s
+  @extend .panel-bar-s
+  background-color: $red
+  color: white
 
 .panel-title
   padding: 0 1em
   font-size: $font-m
   margin-right: 1em
   +float-left
+
+.panel-title-l
+  @extend .panel-title
+  font-size: $font-l
 
 .panel-title-right-item
   +float-right
@@ -32,24 +64,37 @@
 .panel-inner
   display: block
 
+.panel-footer
+  position: absolute
+  bottom: 0
+  width: 100%
+
 .panel-tabs
   +float-left
+  border-left-width: 1px
+  border-right-width: 1px
+  border-color: lightgray
+  border-style: solid
+
+  &:first-child
+    border-left-width: 0
 
 .panel-tab
   +float-left
   position: relative
   font-size: $font-s
   padding: 0 2em
-  border-right-width: 1px
+  border-left-width: 1px
   border-style: solid
   border-color: lightgray
   background-color: transparent
 
   &:first-child
-    border-left-width: 1px
+    border-left-width: 0
 
   &.active
     background-color: $red
+    color: white
 
     a
       +link-colors(white, white)

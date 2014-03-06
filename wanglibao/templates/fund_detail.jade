@@ -1,3 +1,127 @@
-//
-   Created by lishuo on 14-3-6.
+- load formatters
+doctype html
+- with '基金产品详情' as title
+include include/head
+- endwith
+body
+  include include/header
+  - with '基金产品' as activeItem
+  include include/navigation
+  - endwith
+  .sub-navbar
+    .sub-navbar--list
+      ul
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor(href="{%url 'fund_home'%}") 基金首页
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor.active(href="{% url 'fund_products' %}") 基金产品
+  .container
+    .span8.panel.panel-header
+      .row
+        .span8
+          .panel-bar-s
+            .panel-title-l {{ fund.name }}
+          .well
+            .row
+              .span8
+                dl.span6.key-value
+                  dt 销售币种：
+                  dd 人民币
+                dl.span6-omega.key-value
+                  dt 收益类型：
+                  dd 浮动收益
+            .row
+              .span8
+                dl.span6.key-value
+                  dt 是否保本：
+                  dd 不保本
+                dl.span6-omega.key-value
+                  dt 销售状态：
+                  dd 在售
+        .span4-omega
+          .span6
+            .card-icon
+              dl
+                dt 7日年化收益
+                dd {{fund.profit_rate_7days | percentage}}
+          .span6-omega
+            .card-icon
+              dl
+                dt 产品期限
+                dd 50天
+        .row.panel-footer
+          .well
+            p.pull-left 银行客服电话: {{fund.issuer.phone}}
+            a.pull-right(href="#") 收藏
+    .span4-omega.panel.panel-header
+      .panel-title-bar-s
+        span.panel-title 收益计算器
+      form
+        .form-row
+          label.span3.form-row-label 投资额度
+          input.span8(type="text")
 
+  .panel
+    .panel-title-bar
+      .panel-tabs
+        .panel-tab.active 产品详情
+        .panel-tab 产品文档
+    .well
+      p 购买信息
+      table.bordered-table
+        tbody
+          tr
+            th 发行银行
+            td {{fund.hosted_bank}}
+            th 发行对象
+            td 个人
+            th 货币币种
+            td 人民币
+          tr
+            th 投资类型
+            td 保守型投资者
+            th 发行起始日期
+            td 2014-02-13
+            th 发行终止日期
+            td 2014-04-01
+          tr
+            th 委托管理期限
+            td 50天
+            th 委托币种起始金额
+            td 5.00万
+            th 起购金额递增单位
+            td 1000
+          tr
+            th 可否质押贷款
+            td 不详
+            th 银行是否可提前终止
+            td 是
+            th 客户是否可赎回
+            td 否
+          tr
+            th 销售地区
+            td(colspan="5") ---
+
+      p 其他说明
+      table.bordered-table
+        tbody
+          tr
+            th(colspan="1") 收益说明
+            td(colspan="5") 参考年化收益率为4.0%-6.5%
+          tr
+            th(colspan="1") 申购条件说明
+            td(colspan="5") 起售金额5万元 递增金额 1000元
+          tr
+            th(colspan="1") 银行提前终止条件
+            td(colspan="5") 投资者无权提前终止本产品，广西北部银行有权提前终止本产品
+          tr
+            th(colspan="1") 赎回规定说明
+            td(colspan="5") ---
+          tr
+            th(colspan="1") 投资风险说明
+            td(colspan="5") 好多内容
+
+
+  .space-vertical-s
+  include include/footer
+  script(src="/static/js/require.js" data-main="/static/js/fund_detail")

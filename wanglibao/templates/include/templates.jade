@@ -79,7 +79,7 @@ script(type="text/html", id="fund-table")
         td(colspan="2" data-bind="text: profit_rate_6months + '%'") 近六月涨幅
         td(colspan="2" data-bind="text: frontEndRate() + '|' + backEndRate()") 前端费率|后端费率
         td(colspan="2")
-          a.button.button-mini.button-happy(href="#") 详情
+          a.button.button-mini.button-happy(href="#", data-bind="attr{ href: '/fund/detail/' + id }") 详情
 
 script(type="text/html", id="no-products-available")
   div(style="text-align: center; font-size: 1.3em; padding: 1em;") 没有相关的推荐产品

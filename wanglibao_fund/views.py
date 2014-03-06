@@ -17,3 +17,13 @@ class FundIssuerViewSet(PaginatedModelViewSet):
 
 class FundHomeView(TemplateView):
     template_name = "fund_home.jade"
+
+
+class FundDetailView(TemplateView):
+    template_name = "fund_detail.jade"
+
+    def get_context_data(self, **kwargs):
+        id = kwargs['id']
+        return {
+            'fund': Fund.objects.get(pk=id)
+        }
