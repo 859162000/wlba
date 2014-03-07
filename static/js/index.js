@@ -2,24 +2,26 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'lib/jquery.min'
+      jquery: 'lib/jquery.min',
+      underscore: 'lib/underscore-min'
     }
   });
 
-  require(['jquery'], function($) {
+  require(['jquery', 'underscore'], function($, _) {
     return $(document).ready(function() {
       var switchBackground, switchBackgroundWrapper;
-      switchBackground = function(max) {
-        var current, imageUrl, matches;
-        imageUrl = $('.big-background').css('background-image');
-        matches = imageUrl.match(/\/bg(\d).jpg/);
-        if (matches.length === 2) {
-          current = parseInt(matches[1]) + 1;
-          if (current > max) {
-            current = 1;
-          }
-          return $('.big-background').css('background-image', imageUrl.replace(/\/bg\d.jpg/, '/bg' + current + '.jpg'));
-        }
+      switchBackground = function() {
+        var backgrounds, current, currentIndex, nextIndex;
+        backgrounds = $('.big-background');
+        current = _.find(backgrounds, function(value) {
+          return $(value).css('display') !== 'none';
+        });
+        currentIndex = _.indexOf(backgrounds, current);
+        nextIndex = (currentIndex + 1) % backgrounds.length;
+        $(backgrounds[currentIndex]).hide();
+        $(backgrounds[nextIndex]).fadeIn();
+        $($('.background-anchor')[currentIndex]).removeClass('active');
+        return $($('.background-anchor')[nextIndex]).addClass('active');
       };
       switchBackgroundWrapper = function() {
         switchBackground(4);

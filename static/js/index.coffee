@@ -1,21 +1,24 @@
 require.config
   paths:
     jquery: 'lib/jquery.min'
+    underscore: 'lib/underscore-min'
 
-require ['jquery'], ($)->
+require ['jquery', 'underscore'], ($, _)->
   $(document).ready ->
 
     # setup the background switcher
-    switchBackground = (max)->
-      imageUrl = $('.big-background').css('background-image')
-      matches = imageUrl.match(/\/bg(\d).jpg/)
-      if matches.length == 2
-        current = parseInt(matches[1]) + 1
-        if current > max
-          current = 1
+    switchBackground = ->
+      backgrounds = $('.big-background')
+      current = _.find backgrounds, (value)->
+        $(value).css('display') != 'none'
 
-        $('.big-background').css 'background-image',
-          imageUrl.replace /\/bg\d.jpg/, '/bg' + current + '.jpg'
+      currentIndex = _.indexOf(backgrounds, current)
+      nextIndex = (currentIndex + 1) % backgrounds.length
+      $(backgrounds[currentIndex]).hide()
+      $(backgrounds[nextIndex]).fadeIn()
+
+      $($('.background-anchor')[currentIndex]).removeClass('active')
+      $($('.background-anchor')[nextIndex]).addClass('active')
 
     switchBackgroundWrapper = ->
       switchBackground(4)

@@ -7,52 +7,66 @@ html
   - endwith
 
   body
-    .big-background
-      include include/header
+    .big-background-container
+      ul
+        li.big-background(style="background:url(/static/images/bg1.jpg) no-repeat center 0px")
+        li.big-background(style="display:none; background:url(/static/images/bg2.jpg) no-repeat center 0px")
+        li.big-background(style="display:none; background:url(/static/images/bg3.jpg) no-repeat center 0px")
+        li.big-background(style="display:none; background:url(/static/images/bg4.jpg) no-repeat center 0px")
+      ul.background-anchors
+        li
+          a.background-anchor.active(href="#") x
+        li
+          a.background-anchor(href="#") x
+        li
+          a.background-anchor(href="#") x
+        li
+          a.background-anchor(href="#") x
 
-      - with '首页' as activeItem
-      include include/navigation
-      - endwith
+    include include/header
+    - with '首页' as activeItem
+    include include/navigation
+    - endwith
 
-      .l-activity-panel
-        .space-vertical-m
-        .container
-          .container-search.clearfix
-            .half.pull-left
-              .search-box
-                form(method="GET", action="/portfolio")
-                  .search-box-title
-                    span.i-search-personal
-                    span.search-box-title-text 理财方案
-                  .search-box-body
-                    p.search-box-slug 输入您的资产净值
-                    .search-box-input-container
-                      input(type='text', name="asset", value='')
-                      span.search-box-add-on 万元
-                      button.btn-search-box(type="submit") 找方案
-                    p.search-box-description 我们将推荐适合您的投资方案
-                    p.font-m.white-text
-                      | 或者花1分钟时间，我们为您
-                      a.search-quicklink(href='/portfolio', type="submit") 私人定制
+    .l-activity-panel
+      .space-vertical-m
+      .container
+        .container-search.clearfix
+          .half.pull-left
+            .search-box
+              form(method="GET", action="/portfolio")
+                .search-box-title
+                  span.i-search-personal
+                  span.search-box-title-text 理财方案
+                .search-box-body
+                  p.search-box-slug 输入您的资产净值
+                  .search-box-input-container
+                    input(type='text', name="asset", value='')
+                    span.search-box-add-on 万元
+                    button.btn-search-box(type="submit") 找方案
+                  p.search-box-description 我们将推荐适合您的投资方案
+                  p.font-m.white-text
+                    | 或者花1分钟时间，我们为您
+                    a.search-quicklink(href='/portfolio', type="submit") 私人定制
 
-            .half.pull-left
-              .search-box
-                form(method="GET", action="/products")
-                  .search-box-title
-                    span.i-search-product
-                    span.search-box-title-text 理财产品
-                  .search-box-body
-                    p.search-box-slug 输入投资金额
-                    .search-box-input-container
-                      input(type='text', name="asset", value='')
-                      span.search-box-add-on 万元
-                      button.btn-search-box(type='submit') 搜 索
-                    p.search-box-description 120096款 在售理财产品任您搜
-                    p.font-m.orange
-                      a.search-quicklink(href='/products?asset=100&type=trusts') 100万元信托
-                      a.search-quicklink(href='/products?asset=10&type=bank_financings') 10万元银行理财
-                      a.search-quicklink(href='/products?asset=100&type=funds') 100万元基金
-        .space-vertical-m
+          .half.pull-left
+            .search-box
+              form(method="GET", action="/products")
+                .search-box-title
+                  span.i-search-product
+                  span.search-box-title-text 理财产品
+                .search-box-body
+                  p.search-box-slug 输入投资金额
+                  .search-box-input-container
+                    input(type='text', name="asset", value='')
+                    span.search-box-add-on 万元
+                    button.btn-search-box(type='submit') 搜 索
+                  p.search-box-description 120096款 在售理财产品任您搜
+                  p.font-m.orange
+                    a.search-quicklink(href='/products?asset=100&type=trusts') 100万元信托
+                    a.search-quicklink(href='/products?asset=10&type=bank_financings') 10万元银行理财
+                    a.search-quicklink(href='/products?asset=100&type=funds') 100万元基金
+      .space-vertical-m
 
     .space-vertical-s
     .container-card-holder

@@ -3,7 +3,34 @@
 @import sprites/images-original
 
 .big-background
-  background: image_url('bg3.jpg') no-repeat center 0px //TODO -180 px picture, fix it
+  width: 100%
+  height: 490px
+
+.big-background-container
+  position: absolute
+  width: 100%
+  z-index: -1
+
+.background-anchors
+  position: absolute
+  bottom: 10px
+  text-align: center
+  width: 100%
+  z-index: 1
+  li
+    display: inline-block
+
+.background-anchor
+  display: inline-block
+  width: 16px
+  height: 16px
+  +border-radius(8px)
+  background: #d3d3d3
+  text-indent: 9000em
+  margin: 0 3px
+
+  &.active
+    background: $red
 
 .order-red-background
   +images-original-sprite-dimensions(order-red)
