@@ -30,13 +30,13 @@
             <div id="validate-code-container" class="form-row">
               {% render_field form.validate_code class+="table-cell clear-margin" placeholder="请输入验证码" autocomplete='off' %}
               <div class="space-s"></div>
-              <button id="button-get-validate-code" href="#" class="button button-error button-mini">获取</button>
+              <button id="button-get-validate-code" href="#" class="button button-red button-mini">获取</button>
             </div>
             <div class="form-row">
               {% render_field form.password class+="input-large" placeholder="请输入密码" autocomplete='off' %}
             </div>
             <div class="form-row form-bottom-bar"><span>已有账户请直接</span><a href="/accounts/login/?next=/">登录</a>
-              <button type="submit" id="button-submit" class="pull-right button-error button-middle">注 册</button>
+              <button type="submit" id="button-submit" class="pull-right button-red button-middle">注 册</button>
             </div>
           </form>
         </div>

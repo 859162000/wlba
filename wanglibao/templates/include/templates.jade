@@ -24,7 +24,7 @@ script(type="text/html", id="trust-table")
         td(colspan="2" data-bind="text: type") 货款类
         td(colspan="2" data-bind="text: issuer_short_name") 甘肃信托
         td(colspan="2")
-          a.button.button-mini.button-happy(data-bind="attr{ href: '/trust/detail/' + id }") 详情
+          a.button.button-mini.button-yellow(data-bind="attr{ href: '/trust/detail/' + id }") 详情
 
 // financing-table render model's products array as financing products
 // used by financing_products, financing_home, personal page
@@ -50,7 +50,7 @@ script(type="text/html", id="financing-table")
         td(colspan="2" data-bind="text: profit_type") 保本浮动
         td(colspan="2" data-bind="text: max_expected_profit_rate + '%'") 10%
         td(colspan="2")
-          a.button.button-mini.button-happy(href="#") 详情
+          a.button.button-mini.button-yellow(href="#") 详情
 
 // funds-table render
 script(type="text/html", id="fund-table")
@@ -79,7 +79,7 @@ script(type="text/html", id="fund-table")
         td(colspan="2" data-bind="text: profit_rate_6months + '%'") 近六月涨幅
         td(colspan="2" data-bind="text: frontEndRate() + '|' + backEndRate()") 前端费率|后端费率
         td(colspan="2")
-          a.button.button-mini.button-happy(href="#", data-bind="attr{ href: '/fund/detail/' + id }") 详情
+          a.button.button-mini.button-yellow(href="#", data-bind="attr{ href: '/fund/detail/' + id }") 详情
 
 script(type="text/html", id="no-products-available")
   div(style="text-align: center; font-size: 1.3em; padding: 1em;") 没有相关的推荐产品

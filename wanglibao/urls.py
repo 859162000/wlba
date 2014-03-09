@@ -7,7 +7,7 @@ from django.contrib.auth.views import login
 from django.views.generic import TemplateView
 from trust.views import TrustHomeView, TrustProductsView, TrustDetailView
 from wanglibao.forms import EmailOrPhoneAuthenticationForm
-from wanglibao.views import RegisterView, IndexView
+from wanglibao.views import RegisterView, IndexView, AccountSettingView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView
 from wanglibao_fund.views import FundHomeView, FundDetailView
 from wanglibao_portfolio.views import PortfolioHomeView
@@ -46,6 +46,8 @@ urlpatterns = patterns(
     url(r'^accounts/activate/complete/$',
                            TemplateView.as_view(template_name='html/activation_complete.html'),
                            name='registration_activation_complete'),
+    url(r'^accounts/home', TemplateView.as_view(template_name='account_home.jade')),
+    url(r'^accounts/setting', AccountSettingView.as_view(template_name='account_setting.jade')),
 
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),

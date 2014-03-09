@@ -1,0 +1,58 @@
+doctype html
+- with '我的账户' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+
+  .row
+    .span3
+      ul.sidebar
+        li.sidebar-item
+          a.sidebar-anchor(href="#") 投资方案
+        li.sidebar-item
+          a.sidebar-anchor(href="#") 产品收藏
+        li.sidebar-item.active
+          a.sidebar-anchor(href="#") 设置
+    .span9-omega
+      .panel
+        .panel-title-bar
+          .panel-title 基本信息
+
+        .well-s
+          .form-row.form-row-middle
+            span.ispan1 邮箱:
+            span.ispan2.margin-right-s {{user.email}}
+            a.ispan1.button.button-yellow.button-mini(href="#") 修改
+          .form-row.form-row-middle
+            span.ispan1 手机号码:
+            if user.wanglibao_profile.phone_verified
+              span.ispan2.margin-right-s 138xxxx2323
+              a.button.button-yellow.button-mini(href="#") 修改
+            else
+              input.ispan2.margin-right-s(type="text")
+              a.button.button-yellow.button-mini(href="#") 绑定
+
+      .panel
+        .panel-title-bar
+          .panel-title 修改密码
+
+        form.well-s(action="/accounts/password/change", method="POST")
+          .form-row
+            label.form-row-label.span1 原始密码
+            input.span5(type="password", name="original-password")
+
+          .form-row
+            label.form-row-label.span1 新密码
+            input.span5(type="password", name="password1")
+
+          .form-row
+            label.form-row-label.span1 再次输入
+            input.span5(type="password", name="password2")
+
+          .form-row
+            button.button.button-middle.button-yellow(type="submit") 提交
+
+  .space-vertical-m
+  include include/footer

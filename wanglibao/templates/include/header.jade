@@ -6,7 +6,7 @@
     .user-info
       if user.is_authenticated
         span 欢迎您，
-        a.username(href="#")
+        a.username(href="/accounts/home")
           if user.email
             | {{ user.email }}
           else

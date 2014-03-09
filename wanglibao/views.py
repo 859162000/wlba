@@ -91,3 +91,7 @@ class IndexView(TemplateView):
             'hot_funds': hot_funds,
             'hot_financings': hot_financings
             }
+
+
+class AccountSettingView(TemplateView):
+    pass
