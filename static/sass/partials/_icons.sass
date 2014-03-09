@@ -2,21 +2,6 @@
 @import compass/utilities/sprites
 @import ../sprites/images-original
 
-// Icons
-%i-search-form-title-icon
-  width: 21px
-  height: 23px
-  vertical-align: middle
-  display: inline-block
-
-.i-search-personal
-  @extend %i-search-form-title-icon
-  @include images-original-sprite(people)
-
-.i-search-product
-  @extend %i-search-form-title-icon
-  @include images-original-sprite(search)
-
 %i-12
   width: 12px
   height: 12px
@@ -32,13 +17,34 @@
   height: 13px
   +inline-block()
 
-.header-phone-icon
-  @extend %small-icon
-  @include images-original-sprite(phone_small)
-
-
 @each $name in location, mail, phone-icon, pad, people-white, lock
   .i-#{$name}
     +images-original-sprite-dimensions($name)
     +inline-block()
     @include images-original-sprite($name)
+
+
+@import "font-icons"
+@include font-icon-family(entypo)
+
+.icon-mini
+  font-size: 12px
+
+.icon-large
+  font-size: 24px
+
+@mixin icon-base($family)
+  @include font-icon-base($family, $font-size: 1em, $width: 1em, $margin: 0)
+
+.icon-phone
+  @include font-icon-base(entypo)
+  @extend %entypo-phone
+
+.icon-people
+  @include icon-base(entypo)
+  @extend %entypo-user
+
+.icon-search
+  @include icon-base(entypo)
+  @extend %entypo-search
+
