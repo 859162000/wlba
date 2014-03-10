@@ -10,11 +10,11 @@ body
     .span3
       ul.sidebar
         li.sidebar-item
-          a.sidebar-anchor(href="#") 投资方案
+          a.sidebar-anchor(href="/accounts/home/") 投资方案
         li.sidebar-item
-          a.sidebar-anchor(href="#") 产品收藏
+          a.sidebar-anchor(href="/accounts/favorite/") 产品收藏
         li.sidebar-item.active
-          a.sidebar-anchor(href="#") 设置
+          a.sidebar-anchor(href="/accounts/setting/") 设置
     .span9-omega
       .panel
         .panel-title-bar
@@ -38,21 +38,23 @@ body
         .panel-title-bar
           .panel-title 修改密码
 
-        form.well-s(action="/accounts/password/change", method="POST")
-          .form-row
+        form#passwordChangeForm.well-s(method="POST")
+          .form-row.form-row-middle
             label.form-row-label.span1 原始密码
-            input.span5(type="password", name="original-password")
+            input#old-password.span5(type="password", name="old-password")
 
-          .form-row
+          .form-row.form-row-middle
             label.form-row-label.span1 新密码
-            input.span5(type="password", name="password1")
+            input#new-password1.span5(type="password", name="new-password1")
 
-          .form-row
+          .form-row.form-row-middle
             label.form-row-label.span1 再次输入
-            input.span5(type="password", name="password2")
+            input#new-password2.span5(type="password", name="new-password2")
 
-          .form-row
-            button.button.button-middle.button-yellow(type="submit") 提交
+          .form-row.form-row-middle
+            button#passwordChangeButton.button.button-middle.button-yellow(type="submit") 提交
 
   .space-vertical-m
   include include/footer
+
+  script(src='/static/js/require.js', data-main='/static/js/account_setting')

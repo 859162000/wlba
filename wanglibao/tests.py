@@ -97,9 +97,44 @@ class RegisterViewTestCase(TestCase):
         user = User.objects.get(wanglibaouserprofile__phone=phone, wanglibaouserprofile__phone_verified=True)
         self.assertTrue(user.wanglibaouserprofile.phone_verified)
 
-        validate_code = '123232'
 
+class PasswordChangeTestCase(TestCase):
 
+    def test_password_change(self):
+        oldpassword = 'testpassword'
+        new_password = 'newtestpassword'
+        user = User.objects.create(username="testuser", email="testuser@test.com")
+        user.set_password(oldpassword)
+        user.save()
+
+        response = self.client.post("/accounts/password/change/", {
+            'old_password': oldpassword,
+            'new_password1': new_password,
+            'new_password2': new_password
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.)
+
+        self.assertTrue(self.client.login(identifier='testuser@test.com', password=oldpassword))
+
+        response = self.client.post("/accounts/password/change/", {
+            'old_password': oldpassword,
+            'new_password1': new_password,
+            'new_password2': new_password
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.find('done') >= 0)
+
+        # Now test one error case
+        response = self.client.post("/accounts/password/change/", {
+            'old_password': 'wrongpass',
+            'new_password1': new_password,
+            'new_password2': new_password
+        })
+
+        self.assertEqual(response.status_code, 400)
 
 
 class LoginTestCase(TestCase):

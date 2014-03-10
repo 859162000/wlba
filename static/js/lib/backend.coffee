@@ -81,9 +81,16 @@ define ['jquery'], ($)->
       phone: params.phone
     }
 
+  # change password
+  changePassword = (params)->
+    url = '/accounts/password/change/'
+    $.post url,
+      params
+
   loadData: loadData
   isValidType: isValidType
 
   loadPortfolio: loadPortfolio
 
   createPreOrder: createPreOrder
+  changePassword: changePassword

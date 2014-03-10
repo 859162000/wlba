@@ -1,7 +1,14 @@
 import hashlib
 import random
 from django.contrib.auth import get_user_model, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import resolve_url
 from django.template.loader import get_template, render_to_string
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
 from registration.models import RegistrationProfile
 from registration.views import RegistrationView
@@ -95,3 +102,32 @@ class IndexView(TemplateView):
 
 class AccountSettingView(TemplateView):
     pass
+
+
+
+@sensitive_post_parameters()
+@csrf_protect
+@login_required
+def password_change(request,
+                    post_change_redirect=None,
+                    password_change_form=PasswordChangeForm,
+                    extra_context=None):
+    if post_change_redirect is None:
+        post_change_redirect = reverse('password_change_done')
+    else:
+        post_change_redirect = resolve_url(post_change_redirect)
+    if request.method == "POST":
+        form = password_change_form(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(post_change_redirect)
+    else:
+        form = password_change_form(user=request.user)
+    context = {
+        'form': form,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+
+    # TODO find a proper status value and return error message
+    return HttpResponse(status=400)

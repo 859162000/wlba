@@ -43,6 +43,8 @@ urlpatterns = patterns(
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }),
     url(r'^accounts/register/$', RegisterView.as_view()),
+    url(r'^accounts/password/change/$', "wanglibao.views.password_change", name='password_change'),
+    url(r'^accounts/password/change/done/$', TemplateView.as_view(template_name='html/password_change_done.html'), name='password_change_done'),
     url(r'^accounts/activate/complete/$',
                            TemplateView.as_view(template_name='html/activation_complete.html'),
                            name='registration_activation_complete'),
