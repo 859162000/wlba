@@ -114,7 +114,6 @@ class PasswordChangeTestCase(TestCase):
         })
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.)
 
         self.assertTrue(self.client.login(identifier='testuser@test.com', password=oldpassword))
 
