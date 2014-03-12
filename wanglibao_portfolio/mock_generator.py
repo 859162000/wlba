@@ -10,7 +10,7 @@ class MockGenerator(object):
     @classmethod
     def generate_products(cls, clean=False):
         if clean:
-            ProductType.objects.all().delete()
+            [item.delete() for item in ProductType.objects.iterator()]
 
         ProductType.objects.create(
             name=u"现金",

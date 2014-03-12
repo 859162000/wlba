@@ -9,7 +9,7 @@ class MockGenerator(object):
     @classmethod
     def generate_issuer(cls, clean=False):
         if clean:
-            Issuer.objects.all().delete()
+            [item.delete() for item in Issuer.objects.iterator()]
 
         for i in range(0, 100):
             issuer = Issuer()

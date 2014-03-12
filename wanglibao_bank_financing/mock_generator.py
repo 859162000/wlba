@@ -10,7 +10,7 @@ class BankFinancingMockGenerator(object):
     @classmethod
     def generateBank(cls, clean=False):
         if clean:
-            Bank.objects.all().delete()
+            [item.delete() for item in Bank.objects.iterator()]
         # First Generate Bank information
         for i in range(0, 100):
             bank = Bank()
@@ -24,7 +24,7 @@ class BankFinancingMockGenerator(object):
     def generateBankFinancing(cls, clean=False):
         if clean:
             for financing in BankFinancing.objects.all():
-                financing.delelte()
+                financing.delete()
 
         bank_length = len(Bank.objects.all())
         # Generate some Bank Financing products

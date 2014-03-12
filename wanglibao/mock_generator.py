@@ -2,6 +2,7 @@ from trust.mock_generator import MockGenerator as TrustMockGenerator
 from wanglibao_fund.mock_generator import MockGenerator as FundMockGenerator
 from wanglibao_bank_financing.mock_generator import BankFinancingMockGenerator
 from wanglibao_portfolio.mock_generator import MockGenerator as PortfolioMockGenerator
+from wanglibao_hotlist.mock_generator import MockGenerator as HotlistMockGenerator
 
 class MockGenerator(object):
 
@@ -21,5 +22,8 @@ class MockGenerator(object):
 
         print 'Generating portfolios'
         PortfolioMockGenerator.generate_products(clean)
-        PortfolioMockGenerator.load_portfolio_from_file('fixture/portfolio.csv')
+        PortfolioMockGenerator.load_portfolio_from_file('fixture/portfolio.csv', clean)
+
+        print 'Generating hot list'
+        HotlistMockGenerator.generate(clean)
 

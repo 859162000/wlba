@@ -10,7 +10,7 @@ class MockGenerator(object):
     @classmethod
     def generate_hot_trusts(cls, clean=False):
         if clean:
-            HotTrust.objects.all().delete()
+            [item.delete() for item in HotTrust.objects.iterator()]
 
         trusts = Trust.objects.all()[:20]
 
@@ -26,7 +26,7 @@ class MockGenerator(object):
     @classmethod
     def generate_hot_funds(cls, clean=False):
         if clean:
-            HotFund.objects.all().delete()
+            [item.delete() for item in HotFund.objects.iterator()]
 
         funds = Fund.objects.all()[:20]
 
@@ -42,7 +42,7 @@ class MockGenerator(object):
     @classmethod
     def generate_hot_financings(cls, clean=False):
         if clean:
-            HotFinancing.objects.all().delete()
+            [item.delete() for item in HotFinancing.objects.iterator()]
 
         financings = BankFinancing.objects.all()[:20]
 

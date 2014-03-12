@@ -10,7 +10,7 @@ class MockGenerator(object):
     @classmethod
     def generate_fund_issuers(cls, clean=False):
         if clean:
-            FundIssuer.objects.all().delete()
+            [item.delete() for item in FundIssuer.objects.iterator()]
 
         for index in range(0, 100):
             issuer = FundIssuer()

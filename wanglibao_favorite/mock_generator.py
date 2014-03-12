@@ -10,7 +10,7 @@ class MockGenerator(object):
     @classmethod
     def _generate_fav_by_model(cls, item_model, fav_model, count, clean=False):
         if clean:
-            fav_model.objects.all().delete()
+            [item.delete() for item in fav_model.objects.iterator()]
 
         items = item_model.objects.all()
         items_count = len(items)
