@@ -1,0 +1,34 @@
+doctype html
+- with '收藏产品' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .row
+    .span3
+      ul.sidebar
+        li.sidebar-item
+          a.sidebar-anchor(href="/accounts/home/") 投资方案
+        li.sidebar-item.active
+          a.sidebar-anchor(href="/accounts/favorite/") 产品收藏
+        li.sidebar-item
+          a.sidebar-anchor(href="/accounts/setting/") 设置
+    .panel.span9-omega
+      .panel-title-bar
+        .panel-title 收藏产品
+
+      .container
+        //ko template: {name: 'trust-table', data: trusts}
+        // /ko
+
+        //ko template: {name: 'fund-table', data: funds}
+        // /ko
+
+        //ko template: {name: 'financing-table', data: financings}
+        // /ko
+
+  .space-vertical-m
+  include include/footer
+  include include/templates
+  script(src="/static/js/require.js", data-main="/static/js/account_favorite")

@@ -87,6 +87,16 @@ define ['jquery'], ($)->
     $.post url,
       params
 
+  addToFavorite = (type, id)->
+    url = apiurl + 'favorite/' + type + '/'
+    $.post url, {
+      item: id
+    }
+
+  loadFavorites = (type)->
+    url = apiurl + 'favorite/' + type + '/'
+    $.get url
+
   loadData: loadData
   isValidType: isValidType
 
@@ -94,3 +104,6 @@ define ['jquery'], ($)->
 
   createPreOrder: createPreOrder
   changePassword: changePassword
+
+  addToFavorite: addToFavorite
+  loadFavorites: loadFavorites

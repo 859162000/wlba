@@ -49,6 +49,7 @@ urlpatterns = patterns(
                            TemplateView.as_view(template_name='html/activation_complete.html'),
                            name='registration_activation_complete'),
     url(r'^accounts/home', TemplateView.as_view(template_name='account_home.jade')),
+    url(r'^accounts/favorite', TemplateView.as_view(template_name='account_favorite.jade')),
     url(r'^accounts/setting', AccountSettingView.as_view(template_name='account_setting.jade')),
 
     url(r'^accounts/', include('registration.backends.default.urls')),
