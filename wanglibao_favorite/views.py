@@ -1,3 +1,4 @@
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from trust.models import Trust
@@ -9,6 +10,8 @@ from wanglibao_fund.models import Fund
 
 
 class BaseFavoriteViewSet(PaginatedModelViewSet):
+    permission_classes = (IsAuthenticated,)
+
     def get_queryset(self):
         qs = super(BaseFavoriteViewSet, self).get_queryset()
         qs = qs.filter(user=self.request.user)

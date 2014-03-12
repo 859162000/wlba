@@ -3,6 +3,8 @@ from rest_framework import viewsets
 from trust.filters import TrustFilterSet
 from trust.models import Trust, Issuer
 from serializers import TrustSerializer
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from wanglibao.views import IsAdminUserOrReadOnly
 
 
 class TrustHomeView(TemplateView):
@@ -31,17 +33,13 @@ class TrustDetailView(TemplateView):
         return context
 
 
-class TrustViewSet(viewsets.ModelViewSet):
+class TrustViewSet(PaginatedModelViewSet):
     model = Trust
     filter_class = TrustFilterSet
     serializer_class = TrustSerializer
-    paginate_by = 20
-    paginate_by_param = 'page_size'
-    max_paginate_by = 100
+    permission_classes = (IsAdminUserOrReadOnly,)
 
 
-class IssuerViewSet(viewsets.ModelViewSet):
+class IssuerViewSet(PaginatedModelViewSet):
     model = Issuer
-    paginate_by = 20
-    paginate_by_param = 'page_size'
-    max_paginate_by = 100
+    permission_classes = (IsAdminUserOrReadOnly,)

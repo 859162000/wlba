@@ -12,6 +12,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
 from registration.models import RegistrationProfile
 from registration.views import RegistrationView
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.renderers import JSONRenderer
 from wanglibao.forms import EmailOrPhoneRegisterForm
 from wanglibao_hotlist.models import HotTrust, HotFund, HotFinancing
@@ -131,3 +132,14 @@ def password_change(request,
 
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
+
+
+class IsAdminUserOrReadOnly(BasePermission):
+    """
+    Allows access only to admin users.
+    """
+
+    def has_permission(self, request, view):
+        if request.user and request.user.is_staff or request.method in SAFE_METHODS:
+            return True
+        return False
