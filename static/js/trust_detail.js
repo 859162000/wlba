@@ -8,7 +8,7 @@
 
   require(['jquery', 'lib/backend'], function($, backend) {
     return $(document).ready(function() {
-      return $('#preorder_submit').click(function(event) {
+      $('#preorder_submit').click(function(event) {
         var name, phone;
         event.preventDefault();
         name = $('#name_input').val();
@@ -26,6 +26,12 @@
             return alert('预约失败，请稍后再试或者拨打400-9999999');
           });
         }
+      });
+      return $('#addToFavorite').click(function(e) {
+        var id;
+        e.preventDefault();
+        id = $(e.target).attr('data-id');
+        return backend.addToFavorite('trusts', id);
       });
     });
   });

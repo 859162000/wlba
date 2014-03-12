@@ -29,25 +29,29 @@ body
         #product_name.panel-title {{ trust.name }}
 
       .panel-inner
-        .well
-          .span7
-            p {{ trust.brief }}
-          .span5-omega
-            .span4
-              .card-icon
-                dl
-                  dt 预期收益
-                  dd {{ trust.expected_earning_rate | percentage }}
-            .span4
-              .card-icon
-                dl
-                  dt 销售门槛
-                  dd {{ trust.investment_threshold | money_to_10k }}
-            .span4-omega
-              .card-icon
-                dl
-                  dt 投资期限
-                  dd {{ trust.period | month}}
+        .well-s
+          .row
+            .span7
+              p {{ trust.brief }}
+            .span5-omega
+              .span4
+                .card-icon
+                  dl
+                    dt 预期收益
+                    dd {{ trust.expected_earning_rate | percentage }}
+              .span4
+                .card-icon
+                  dl
+                    dt 销售门槛
+                    dd {{ trust.investment_threshold | money_to_10k }}
+              .span4-omega
+                .card-icon
+                  dl
+                    dt 投资期限
+                    dd {{ trust.period | month}}
+          .row
+            .prefix10.span2-omega
+              a#addToFavorite.pull-right(href="#", data-id="{{trust.id}}") 收藏
 
     .span4-omega.panel.panel-header
       p.font-m.padding-left-s.padding-top-xs 发售日期: {{ trust.issue_date | date:"Y年n月j日"}}

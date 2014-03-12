@@ -23,3 +23,8 @@ require ['jquery', 'lib/backend'], ($, backend)->
         .fail ()->
             alert '预约失败，请稍后再试或者拨打400-9999999'
 
+    $('#addToFavorite').click (e)->
+      e.preventDefault()
+
+      id = $(e.target).attr('data-id')
+      backend.addToFavorite 'trusts', id
