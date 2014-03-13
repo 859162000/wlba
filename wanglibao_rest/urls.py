@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.urlpatterns import format_suffix_patterns
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
+from wanglibao_cash.views import CashViewSet, CashIssuerViewSet
 from wanglibao_favorite.views import FavoriteTrustViewSet, FavoriteFundViewSet, FavoriteFinancingViewSet
 from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
 from wanglibao_hotlist.views import HotTrustViewSet, HotFinancingViewSet, HotFundViewSet
@@ -21,6 +22,9 @@ router.register(r'banks', BankViewSet)
 
 router.register(r'funds', FundViewSet)
 router.register(r'fund_issuers', FundIssuerViewSet)
+
+router.register(r'cashes', CashViewSet)
+router.register(r'cash_issuers', CashIssuerViewSet)
 
 router.register(r'pre_orders', PreOrderViewSet)
 

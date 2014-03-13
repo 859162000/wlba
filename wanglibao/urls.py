@@ -1,14 +1,13 @@
 from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
-from django.conf.urls.static import static
 from django.conf import settings
-from django.contrib.auth.views import login
 from django.views.generic import TemplateView
 from trust.views import TrustHomeView, TrustProductsView, TrustDetailView
 from wanglibao.forms import EmailOrPhoneAuthenticationForm
 from wanglibao.views import RegisterView, IndexView, AccountSettingView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView
+from wanglibao_cash.views import CashHomeView
 from wanglibao_fund.views import FundHomeView, FundDetailView
 from wanglibao_portfolio.views import PortfolioHomeView
 
@@ -31,6 +30,11 @@ urlpatterns = patterns(
     url(r'^fund/home/', FundHomeView.as_view(), name="fund_home"),
     url(r'^fund/products/', TemplateView.as_view(template_name="fund_products.jade"), name="fund_products"),
     url(r'^fund/detail/(?P<id>\w+)', FundDetailView.as_view(), name="fund_detail"),
+
+    url(r'^cash/home/', CashHomeView.as_view(), name="cash_home"),
+    url(r'^cash/products/', TemplateView.as_view(template_name="cash_products.jade"), name="cash_products"),
+    #TODO:
+    url(r'^cash/detail/(?P<id>\w+)', FundDetailView.as_view(), name="cash_detail"),
 
     url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
 

@@ -47,6 +47,10 @@ define ['jquery'], ($)->
     'funds': 'funds'
     '基金': 'funds'
 
+    'cashs': 'cashes'
+    'cashes': 'cashes'
+    '现金类理财产品': 'cashes'
+
   loadData = (type, params)->
     if _.has(typeMapping, type)
       url = apiurl + typeMapping[type] + '/.jsonp?' + $.param(params)

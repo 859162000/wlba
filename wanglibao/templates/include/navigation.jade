@@ -30,3 +30,9 @@
             a.nav-item-anchor.active(href="{% url 'fund_home' %}") 基金产品
           else
             a.nav-item-anchor(href="{% url 'fund_home' %}") 基金产品
+        li.nav-item
+          if activeItem == '现金类理财产品'
+            a.nav-item-anchor.active(href="{% url 'cash_home' %}") 现金类理财产品
+          else
+            a.nav-item-anchor(href="{% url 'cash_home' %}") 现金类理财产品
+

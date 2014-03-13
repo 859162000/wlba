@@ -49,7 +49,10 @@
       'bank_financings': 'bank_financings',
       'fund': 'funds',
       'funds': 'funds',
-      '基金': 'funds'
+      '基金': 'funds',
+      'cashs': 'cashes',
+      'cashes': 'cashes',
+      '现金类理财产品': 'cashes'
     };
     loadData = function(type, params) {
       var url;
@@ -114,5 +117,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=backend.map

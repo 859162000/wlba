@@ -20,6 +20,10 @@ class BankSerializer(HyperlinkedModelSerializer):
 
     logo = serializers.SerializerMethodField('logo_url')
 
-    def logo_url(self, bank):
-        return bank.logo.url
+    @classmethod
+    def logo_url(cls, bank):
+        if bank.logo:
+            return bank.logo.url
+        else:
+            return ""
 

@@ -1,0 +1,27 @@
+doctype html
+- with '现金类理财产品' as title
+include include/head
+- endwith
+body
+  include include/header
+  - with '现金类理财首页' as activeItem
+  include include/navigation
+  - endwith
+  .sub-navbar
+    .sub-navbar--list
+      ul
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor.active(href="{%url 'cash_home'%}") 现金类理财首页
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor(href="{% url 'cash_home' %}") 现金类理财产品
+  .container
+  .space-vertical-s
+  .panel
+    .panel-content
+      // ko template: {name: 'cash-table', data: products}
+      // /ko
+
+  .space-vertical-m
+  include include/footer
+  include include/templates
+  script(src="/static/js/require.js" data-main="/static/js/cash_home.js")
