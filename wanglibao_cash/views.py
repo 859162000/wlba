@@ -21,3 +21,13 @@ class CashIssuerViewSet(PaginatedModelViewSet):
 
 class CashHomeView(TemplateView):
     template_name = "cash_home.jade"
+
+
+class CashDetailView(TemplateView):
+    template_name = "cash_detail.jade"
+
+    def get_context_data(self, **kwargs):
+        id = kwargs['id']
+        context = super(CashDetailView, self).get_context_data(**kwargs)
+        context['cash'] = Cash.objects.get(pk=id)
+        return context

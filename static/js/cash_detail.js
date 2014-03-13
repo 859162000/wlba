@@ -12,7 +12,7 @@
         var id;
         e.preventDefault();
         id = $(e.target).attr('data-id');
-        return backend.addToFavorite('funds', id);
+        return backend.addToFavorite('cashes', id);
       });
     });
   });

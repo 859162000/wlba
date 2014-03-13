@@ -1,0 +1,77 @@
+- load formatters
+doctype html
+- with '现金类理财产品详情' as title
+include include/head
+- endwith
+body
+  include include/header
+  - with '现金类理财产品' as activeItem
+  include include/navigation
+  - endwith
+  .container
+    .span8.panel.panel-header
+      .row
+        .span8
+          .panel-bar-s
+            .panel-title-l {{ cash.name }}
+          .well
+            .row
+              .span8
+                dl.span6.key-value
+                  dt 发行机构：
+                  dd {{ cash.issuer.name }}
+                dl.span6-omega.key-value
+                  dt 销售状态：
+                  dd {{ cash.status }}
+            .row
+              .span8
+                dl.span8-omega.key-value
+                  dt 购买方式：
+                  dd {{cash.how_to_buy}}
+        .span4-omega
+          .span6
+            .card-icon
+              dl
+                dt 7日年化收益
+                dd {{cash.profit_rate_7days}}
+          .span6-omega
+            .card-icon
+              dl
+                dt 投资期限
+                dd {{cash.period}}
+        .row.panel-footer
+          .well
+            p.pull-left 银行客服电话: {{cash.issuer.phone}}
+            a#addToFavorite.pull-right(href="#", data-id="{{cash.id}}") 收藏
+    .span4-omega.panel.panel-header
+      .panel-title-bar-s
+        span.panel-title 收益计算器
+      form
+        .form-row
+          label.span3.form-row-label 投资额度
+          input.span8(type="text")
+
+  .panel
+    .well
+      table.bordered-table
+        tbody
+          tr
+            th(colspan="1") 产品说明
+            td(colspan="5") {{cash.brief | linebreaksbr}}
+          tr
+            th(colspan="1") 收益说明
+            td(colspan="5") {{cash.profit_brief | linebreaksbr}}
+          tr
+            th(colspan="1") 购买说明
+            td(colspan="5") {{cash.buy_brief | linebreaksbr}}
+          tr
+            th(colspan="1") 赎回说明
+            td(colspan="5") {{cash.redeem_brief | linebreaksbr}}
+          tr
+            th(colspan="1") 投资风险说明
+            td(colspan="5") {{cash.safe_brief | linebreaksbr}}
+
+
+  .space-vertical-s
+  include include/footer
+  script(src="/static/js/require.js" data-main="/static/js/cash_detail")

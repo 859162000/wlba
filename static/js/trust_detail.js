@@ -37,5 +37,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=trust_detail.map

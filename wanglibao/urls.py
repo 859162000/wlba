@@ -7,7 +7,7 @@ from trust.views import TrustHomeView, TrustProductsView, TrustDetailView
 from wanglibao.forms import EmailOrPhoneAuthenticationForm
 from wanglibao.views import RegisterView, IndexView, AccountSettingView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView
-from wanglibao_cash.views import CashHomeView
+from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundHomeView, FundDetailView
 from wanglibao_portfolio.views import PortfolioHomeView
 
@@ -34,7 +34,7 @@ urlpatterns = patterns(
     url(r'^cash/home/', CashHomeView.as_view(), name="cash_home"),
     url(r'^cash/products/', TemplateView.as_view(template_name="cash_products.jade"), name="cash_products"),
     #TODO:
-    url(r'^cash/detail/(?P<id>\w+)', FundDetailView.as_view(), name="cash_detail"),
+    url(r'^cash/detail/(?P<id>\w+)', CashDetailView.as_view(), name="cash_detail"),
 
     url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
 

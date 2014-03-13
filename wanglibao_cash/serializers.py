@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from rest_framework.serializers import HyperlinkedModelSerializer
+from rest_framework.serializers import ModelSerializer
 from wanglibao_cash.models import Cash, CashIssuer
 
 
-class CashSerializer(HyperlinkedModelSerializer):
+class CashSerializer(ModelSerializer):
     class Meta:
         model = Cash
 
@@ -14,7 +14,7 @@ class CashSerializer(HyperlinkedModelSerializer):
         return cash.issuer.name
 
 
-class CashIssuerSerializer(HyperlinkedModelSerializer):
+class CashIssuerSerializer(ModelSerializer):
     class Meta:
         model = CashIssuer
 
