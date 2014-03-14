@@ -8,14 +8,95 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager'], function($, _, ko, backend, pager) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'model/table'], function($, _, ko, backend, pager, table) {
     return $(document).ready(function() {
       var DataViewModel, viewModel;
       DataViewModel = (function() {
         function DataViewModel() {
           var self;
           self = this;
-          self.trusts = ko.observable([]);
+          self.trustTable = new table.viewModel({
+            columns: [
+              {
+                name: '序号',
+                colspan: 1,
+                text: function(item, index) {
+                  return index + 1;
+                }
+              }, {
+                name: '名称',
+                colspan: 4,
+                text: function(item) {
+                  return item.name;
+                }
+              }, {
+                name: '资金门槛',
+                colspan: 2,
+                sortable: true,
+                text: function(item) {
+                  return item.investment_threshold + '万';
+                },
+                field: 'investment_threshold'
+              }, {
+                name: '产品期限',
+                colspan: 2,
+                sortable: true,
+                text: function(item) {
+                  return item.period + '个月';
+                },
+                field: 'period'
+              }, {
+                name: '预期收益',
+                colspan: 2,
+                sortable: true,
+                text: function(item) {
+                  return item.expected_earning_rate.toFixed(2) + '%';
+                },
+                field: 'expected_earning_rate'
+              }, {
+                name: '投资行业',
+                colspan: 2,
+                sortable: true,
+                text: function(item) {
+                  return item.usage;
+                },
+                field: 'usage'
+              }, {
+                name: '信托分类',
+                colspan: 2,
+                sortable: true,
+                text: function(item) {
+                  return item.type;
+                },
+                field: 'type'
+              }, {
+                name: '信托公司',
+                colspan: 2,
+                sortable: true,
+                text: function(item) {
+                  return item.issuer_short_name;
+                },
+                field: 'issuer_short_name'
+              }, {
+                name: '',
+                colspan: 2,
+                text: function(item) {
+                  return '<a class="button button-mini button-yellow" href="/trust/detail/' + item.id + '">详情</a>';
+                }
+              }
+            ],
+            events: {
+              sortHandler: function(column, order) {
+                var field;
+                field = column.field;
+                if (order === 'dsc') {
+                  field = '-' + field;
+                }
+                return self.orderBy(field);
+              }
+            }
+          });
+          self.orderBy = ko.observable();
 
           /*
           Pager
@@ -40,21 +121,6 @@
             });
             self.activeFilters.push(value);
             return self.pager.currentPageNumber(1);
-          };
-          self.queryData = function() {
-            var filters, params;
-            filters = _.chain(self.activeFilters()).pluck('values').flatten().compact().value();
-            params = _(filters).reduce((function(result, object) {
-              return _.extend(result, object);
-            }), {
-              page: self.pager.currentPageNumber()
-            });
-            return backend.loadData('trusts', params).done(function(data) {
-              self.trusts(data.results);
-              return self.pager.totalPageNumber(data.num_pages);
-            }).fail(function(xhr, status, error) {
-              return alert(status + error);
-            });
           };
           self.filters = [
             {
@@ -327,7 +393,20 @@
             return self.activeFilters.push(value.values[0]);
           });
           ko.computed(function() {
-            return self.queryData();
+            var filters, params;
+            filters = _.chain(self.activeFilters()).pluck('values').flatten().compact().value();
+            params = _(filters).reduce((function(result, object) {
+              return _.extend(result, object);
+            }), {
+              page: self.pager.currentPageNumber(),
+              ordering: self.orderBy()
+            });
+            return backend.loadData('trusts', params).done(function(data) {
+              self.trustTable.data(data.results);
+              return self.pager.totalPageNumber(data.num_pages);
+            }).fail(function(xhr, status, error) {
+              return alert(status + error);
+            });
           }).extend({
             throttle: 1
           });
