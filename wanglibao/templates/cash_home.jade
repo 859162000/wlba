@@ -11,12 +11,20 @@ body
   .container
     .ad-panel
 
-  .space-vertical-s
+
   .panel
     .panel-title-bar
-      .panel-tabs
-        .panel-tab.active
-          p 现金类理财产品
+      .panel-title 筛选条件
+    .container(data-bind="foreach: filters")
+      .filter-container
+        span.filter-name(data-bind="text: name + ':'") 名字
+        // ko foreach: values
+        a.filter-item(href="#", data-bind="text: name, css: {active: $root.activeFilters().indexOf($data) != -1}, click: $root.clickOnFilter") 名字
+        // /ko
+
+  .panel
+    .panel-title-bar
+    .panel-title 筛选结果
 
     .panel-content
       // ko template: {name: 'cash-table', data: products}
@@ -25,4 +33,4 @@ body
   .space-vertical-m
   include include/footer
   include include/templates
-  script(src="/static/js/require.js" data-main="/static/js/cash_home.js")
+  script(src="/static/js/require.js" data-main="/static/js/cash_home")

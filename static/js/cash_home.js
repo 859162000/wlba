@@ -8,7 +8,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash'], function($, _, ko, backend, cash) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model/pager'], function($, _, ko, backend, cash, pager) {
     return $(document).ready(function() {
       var DataViewModel, viewModel;
       DataViewModel = (function() {
@@ -16,18 +16,90 @@
           var self;
           self = this;
           self.products = ko.observable();
-          ko.computed(function() {
-            var params;
-            params = {
-              count: 10
-            };
-            return backend.loadData('cashes', params).done(function(data) {
-              return self.products(_.map(data.results, function(item) {
-                return new cash.viewModel({
-                  data: item
-                });
-              }));
+          self.pager = new pager.viewModel;
+          self.activeFilters = ko.observableArray();
+          self.clickOnFilter = function(value, event) {
+            var context;
+            context = ko.contextFor(event.target);
+            if (self.activeFilters.indexOf(value) >= 0) {
+              return;
+            }
+            _.each(context.$parent.values, function(value) {
+              return self.activeFilters.remove(value);
             });
+            self.activeFilters.push(value);
+            return self.pager.currentPageNumber(1);
+          };
+          self.queryData = function() {
+            var filters, params;
+            filters = _.chain(self.activeFilters()).pluck('values').flatten().compact().value();
+            params = _(filters).reduce((function(result, object) {
+              return _.extend(result, object);
+            }), {
+              page: self.pager.currentPageNumber()
+            });
+            if (typeof console !== "undefined" && console !== null) {
+              console.log('loading data');
+            }
+            return backend.loadData('cashes', params).done(function(data) {
+              self.products(data.results);
+              return self.pager.totalPageNumber(data.num_pages);
+            }).fail(function(xhr, status, error) {
+              return alert(status + error);
+            });
+          };
+          self.filters = [
+            {
+              name: '销售状态',
+              values: [
+                {
+                  name: '不限',
+                  values: null
+                }, {
+                  name: '开放',
+                  values: [
+                    {
+                      status: '开房'
+                    }
+                  ]
+                }, {
+                  name: '关闭',
+                  values: [
+                    {
+                      status: '关闭'
+                    }
+                  ]
+                }
+              ]
+            }, {
+              name: '投资期限',
+              values: [
+                {
+                  name: '不限',
+                  values: null
+                }, {
+                  name: '活期',
+                  values: [
+                    {
+                      status: '活期'
+                    }
+                  ]
+                }, {
+                  name: '三个月以内',
+                  values: [
+                    {
+                      status: '三个月以内'
+                    }
+                  ]
+                }
+              ]
+            }
+          ];
+          _.each(self.filters, function(value) {
+            return self.activeFilters.push(value.values[0]);
+          });
+          ko.computed(function() {
+            return self.queryData();
           }).extend({
             throttle: 1
           });

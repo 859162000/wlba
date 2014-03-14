@@ -25,20 +25,24 @@ body
                   dd {{ cash.status }}
             .row
               .span8
-                dl.span8-omega.key-value
+                dl.span12.key-value
                   dt 购买方式：
-                  dd {{cash.how_to_buy}}
+                  dd
+                    a(href="{{cash.buy_url}}") {{cash.buy_text}}
         .span4-omega
           .span6
             .card-icon
               dl
                 dt 7日年化收益
-                dd {{cash.profit_rate_7days}}
+                dd {{cash.profit_rate_7days}}%
           .span6-omega
             .card-icon
               dl
                 dt 投资期限
-                dd {{cash.period}}
+                if cash.peroid
+                    dd {{cash.period}}天
+                else
+                    dd 活期
         .row.panel-footer
           .well
             p.pull-left 银行客服电话: {{cash.issuer.phone}}

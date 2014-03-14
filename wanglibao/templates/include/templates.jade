@@ -133,10 +133,11 @@ script(type="text/html", id="cash-table")
       tr
         td(colspan="3" data-bind="text: name")
         td(colspan="2" data-bind="text: issuer_name")
-        td(colspan="2" data-bind="text: period")
+        td(colspan="2" data-bind="text: period == 0 ? '活期' : period + '天'")
         td(colspan="2" data-bind="text: profit_rate_7days + '%'")
         td(colspan="2" data-bind="text: profit_10000")
-        td(colspan="2" data-bind="text: how_to_buy")
+        td(colspan="2")
+          a(data-bind="attr{href: buy_url}, text: buy_text")
         td(colspan="2" data-bind="text: status")
         td(colspan="2")
           a.button.button-mini.button-yellow(href="#", data-bind="attr{ href: '/cash/detail/' + id }") 详情
