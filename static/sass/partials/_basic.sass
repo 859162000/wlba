@@ -1,5 +1,6 @@
 @import variables
 @import compass/css3
+@import compass/typography/links/unstyled-link
 
 // Basic
 body
@@ -36,7 +37,7 @@ input
   +inline-block()
 
 .dashed-line
-  heigth: 1px
+  height: 1px
   border-top: 1px dashed gray
 
 .line
@@ -153,3 +154,6 @@ input
 
 .error
   color: $red
+
+a.unstyled
+  +unstyled-link()

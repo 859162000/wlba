@@ -28,7 +28,7 @@ body
     .panel-title-bar
       .panel-title 最新信托产品
       a.panel-title-right-item(href="#") 更多
-    // ko template: {name: 'trust-table', data: latestTrusts}
+    // ko template: {name: 'data-table', data: trustTable}
     // /ko
 
   .space-vertical-s
@@ -40,7 +40,7 @@ body
     // ko template: {name: 'sub-tabs', data: subTab}
     // /ko
     .panel-content
-      // ko template: {name: 'trust-table', data: trusts}
+      // ko template: {name: 'data-table', data: filteredTable}
       // /ko
 
   .space-vertical-m

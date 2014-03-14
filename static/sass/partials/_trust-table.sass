@@ -22,6 +22,35 @@ $header-background: #ECF6FD
   tr
     border-bottom: 1px solid lightgray
 
+.updown
+  position: relative
+  width: 14px
+  height: 12px
+  display: inline-block
+  vertical-align: middle
+
+.up
+  position: absolute
+  top: 0
+  border: 3px solid transparent
+  border-bottom-width: 5px
+  border-top: 0
+  border-bottom-color: gray
+
+  &.active
+    border-bottom-color: red
+
+.down
+  position: absolute
+  bottom: 0
+  border: 3px solid transparent
+  border-top-width: 5px
+  border-bottom: 0
+  border-top-color: gray
+
+  &.active
+    border-top-color: red
+
 .bordered-table
   width: 100%
   table-layout: fixed

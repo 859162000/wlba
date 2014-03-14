@@ -8,15 +8,115 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab'], function($, _, ko, backend, tab) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/table'], function($, _, ko, backend, tab, table) {
     return $(document).ready(function() {
       var DataViewModel, model;
       DataViewModel = (function() {
         function DataViewModel() {
-          var self;
+          var self, trustColumns;
           self = this;
-          self.trusts = ko.observable([]);
-          self.latestTrusts = ko.observable([]);
+          trustColumns = [
+            {
+              name: '序号',
+              colspan: 1,
+              text: function(item, index) {
+                return index + 1;
+              }
+            }, {
+              name: '名称',
+              colspan: 4,
+              text: function(item) {
+                return item.name;
+              }
+            }, {
+              name: '资金门槛',
+              colspan: 2,
+              sortable: true,
+              text: function(item) {
+                return item.investment_threshold + '万';
+              },
+              field: 'investment_threshold'
+            }, {
+              name: '产品期限',
+              colspan: 2,
+              sortable: true,
+              text: function(item) {
+                return item.period + '个月';
+              },
+              field: 'period'
+            }, {
+              name: '预期收益',
+              colspan: 2,
+              sortable: true,
+              text: function(item) {
+                return item.expected_earning_rate.toFixed(2) + '%';
+              },
+              field: 'expected_earning_rate'
+            }, {
+              name: '投资行业',
+              colspan: 2,
+              sortable: true,
+              text: function(item) {
+                return item.usage;
+              },
+              field: 'usage'
+            }, {
+              name: '信托分类',
+              colspan: 2,
+              sortable: true,
+              text: function(item) {
+                return item.type;
+              },
+              field: 'type'
+            }, {
+              name: '信托公司',
+              colspan: 2,
+              sortable: true,
+              text: function(item) {
+                return item.issuer_short_name;
+              },
+              field: 'issuer_short_name'
+            }, {
+              name: '',
+              colspan: 2,
+              text: function(item) {
+                return '<a class="button button-mini button-yellow" href="/trust/detail/' + item.id + '">详情</a>';
+              }
+            }
+          ];
+          self.trustTable = new table.viewModel({
+            columns: trustColumns,
+            events: {
+              sortHandler: function(column, order) {
+                var items;
+                if (_.has(column, 'field')) {
+                  items = _.sortBy(self.trustTable.data(), function(item) {
+                    return item[column.field];
+                  });
+                  if (order === 'asc') {
+                    return self.trustTable.data(items);
+                  } else {
+                    return self.trustTable.data(items.reverse());
+                  }
+                }
+              }
+            }
+          });
+          self.filteredTable = new table.viewModel({
+            columns: trustColumns,
+            events: {
+              sortHandler: function(column, order) {
+                var field;
+                field = column.field;
+                if (order === 'dsc') {
+                  field = '-' + field;
+                }
+                return self.orderBy(field);
+              }
+            }
+          });
+          self.orderBy = ko.observable('-issue-date');
+          self.filters = ko.observable();
           self.tabTree = {
             tabs: [
               {
@@ -96,19 +196,23 @@
                   tabs: self.tabTree.subTabs[index],
                   events: {
                     tabSelected: function(data, event) {
-                      return backend.loadData('trusts', _.extend(data.values, {
-                        page_size: 10,
-                        ordering: '-issue_date'
-                      })).done(function(data) {
-                        return self.trusts(data.results);
-                      }).fail(function() {
-                        return alert('发生网络问题 加载内容失败');
-                      });
+                      return self.filters(_.extend(data.values, {
+                        page_size: 10
+                      }));
                     }
                   }
                 });
               }
             }
+          });
+          ko.computed(function() {
+            return backend.loadData('trusts', _.extend(self.filters(), {
+              ordering: self.orderBy()
+            })).done(function(data) {
+              return self.filteredTable.data(data.results);
+            }).fail(function() {
+              return alert('发生网络问题 加载内容失败');
+            });
           });
         }
 
@@ -121,7 +225,7 @@
         count: 10,
         ordering: '-issue_date'
       }).done(function(data) {
-        return model.latestTrusts(data.results);
+        return model.trustTable.data(data.results);
       });
     });
   });

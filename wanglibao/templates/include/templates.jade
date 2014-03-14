@@ -6,8 +6,18 @@ script(type="text/html", id="trust-table")
       tr
         th(colspan="1") 序号
         th(colspan="4") 产品名称
-        th(colspan="2") 资金门槛
-        th(colspan="2") 产品期限
+        th(colspan="2")
+          a.unstyled.container(href="#")
+            span 资金门槛
+            .updown
+              .up
+              .down.active
+        th(colspan="2")
+          a.unstyled.container(href="#")
+            span 产品期限
+            .updown
+              .up
+              .down.active
         th(colspan="2") 预期收益
         th(colspan="2") 投资行业
         th(colspan="2") 信托分类
@@ -25,6 +35,31 @@ script(type="text/html", id="trust-table")
         td(colspan="2" data-bind="text: issuer_short_name") 甘肃信托
         td(colspan="2")
           a.button.button-mini.button-yellow(data-bind="attr{ href: '/trust/detail/' + id }") 详情
+
+
+script(type="text/html", id="data-table")
+  table.trust-table
+    thead
+      tr(data-bind="foreach: columns")
+        // ko if: sortable
+        th(data-bind="attr:{colspan: colspan}")
+          a.unstyled(href="#", data-bind="click: $parent.sortHandler")
+            span(data-bind="text:name")
+            .updown
+              .up(data-bind="css:{active: $parent.sortedColumn().column == $data && $parent.sortedColumn().order == 'asc'}")
+              .down(data-bind="css:{active: $parent.sortedColumn().column == $data && $parent.sortedColumn().order == 'dsc'}")
+
+        // /ko
+
+        // ko if: !sortable
+        th(data-bind="attr:{colspan: colspan}, text: name")
+        // /ko
+
+    tbody(data-bind="foreach: {data: data, as:'item'}")
+
+      tr(data-bind="foreach: $parent.columns")
+        td(data-bind="attr:{colspan: colspan}, html: text(item, $parentContext.$index())")
+
 
 // financing-table render model's products array as financing products
 // used by financing_products, financing_home, personal page

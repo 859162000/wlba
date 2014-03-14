@@ -1,6 +1,5 @@
 # Require any additional compass plugins here.
 require 'susy'
-require 'toolkit'
 require 'font-icons'
 require 'compass/import-once/activate'
 
