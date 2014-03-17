@@ -25,7 +25,10 @@ body
                   dd {{ cash.status }}
             .row
               .span8
-                dl.span12.key-value
+                dl.span6.key-value
+                  dt 每万份收益：
+                  dd {{ cash.profit_10000 }}元
+                dl.span6-omega.key-value
                   dt 购买方式：
                   dd
                     a(href="{{cash.buy_url}}") {{cash.buy_text}}
@@ -39,10 +42,10 @@ body
             .card-icon
               dl
                 dt 投资期限
-                if cash.peroid
-                    dd {{cash.period}}天
+                if cash.period > 0
+                  dd {{cash.period}}个月
                 else
-                    dd 活期
+                  dd 活期
         .row.panel-footer
           .well
             p.pull-left 银行客服电话: {{cash.issuer.phone}}

@@ -3,6 +3,8 @@ from wanglibao_fund.mock_generator import MockGenerator as FundMockGenerator
 from wanglibao_bank_financing.mock_generator import BankFinancingMockGenerator
 from wanglibao_portfolio.mock_generator import MockGenerator as PortfolioMockGenerator
 from wanglibao_hotlist.mock_generator import MockGenerator as HotlistMockGenerator
+from wanglibao_cash.mock_generator import MockGenerator as CashMockGenerator
+
 
 class MockGenerator(object):
 
@@ -26,4 +28,8 @@ class MockGenerator(object):
 
         print 'Generating hot list'
         HotlistMockGenerator.generate(clean)
+
+        print 'Generating cashes'
+        CashMockGenerator.generate_cash_issuers(clean)
+        CashMockGenerator.generate_cashes(clean)
 

@@ -59,7 +59,7 @@
                   name: '开放',
                   values: [
                     {
-                      status: '开房'
+                      status: '开放'
                     }
                   ]
                 }, {
@@ -81,14 +81,46 @@
                   name: '活期',
                   values: [
                     {
-                      status: '活期'
+                      period: 0
                     }
                   ]
                 }, {
-                  name: '三个月以内',
+                  name: '3个月以内',
                   values: [
                     {
-                      status: '三个月以内'
+                      gt_period: 0,
+                      lte_period: 3
+                    }
+                  ]
+                }, {
+                  name: '3-6个月',
+                  values: [
+                    {
+                      gt_period: 3,
+                      lte_period: 6
+                    }
+                  ]
+                }, {
+                  name: '6-12个月',
+                  values: [
+                    {
+                      gt_period: 6,
+                      lte_period: 12
+                    }
+                  ]
+                }, {
+                  name: '1-3年',
+                  values: [
+                    {
+                      gt_period: 12,
+                      lte_period: 36
+                    }
+                  ]
+                }, {
+                  name: '3年以上',
+                  values: [
+                    {
+                      gt_period: 36
                     }
                   ]
                 }

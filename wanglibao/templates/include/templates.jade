@@ -125,15 +125,15 @@ script(type="text/html", id="cash-table")
         th(colspan="2") 发行机构
         th(colspan="2") 期限
         th(colspan="2") 七日年化利率
-        th(colspan="2") 万分收益
-        th(colspan="2") 购买方式
+        th(colspan="2") 每万份收益
+        th(colspan="2") 购买链接
         th(colspan="2") 状态
         th(colspan="2")
     tbody(data-bind="foreach: $data")
       tr
         td(colspan="3" data-bind="text: name")
         td(colspan="2" data-bind="text: issuer_name")
-        td(colspan="2" data-bind="text: period == 0 ? '活期' : period + '天'")
+        td(colspan="2" data-bind="text: period == 0 ? '活期' : period + '个月'")
         td(colspan="2" data-bind="text: profit_rate_7days + '%'")
         td(colspan="2" data-bind="text: profit_10000")
         td(colspan="2")
