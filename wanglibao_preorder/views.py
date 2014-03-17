@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AnonymousUser
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response

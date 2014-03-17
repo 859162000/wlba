@@ -33,7 +33,6 @@ urlpatterns = patterns(
 
     url(r'^cash/home/', CashHomeView.as_view(), name="cash_home"),
     url(r'^cash/products/', TemplateView.as_view(template_name="cash_products.jade"), name="cash_products"),
-    #TODO:
     url(r'^cash/detail/(?P<id>\w+)', CashDetailView.as_view(), name="cash_detail"),
 
     url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
@@ -57,6 +56,7 @@ urlpatterns = patterns(
     url(r'^accounts/setting', AccountSettingView.as_view(template_name='account_setting.jade')),
 
     url(r'^accounts/', include('registration.backends.default.urls')),
+
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
 )
 

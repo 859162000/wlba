@@ -113,6 +113,7 @@ LOCALE_PATHS = (
 # Authentication backend
 AUTHENTICATION_BACKENDS = (
     'wanglibao.auth_backends.EmailPhoneUsernameAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 # Template loader
@@ -126,6 +127,7 @@ TEMPLATE_LOADERS = (
 # Template pre processor
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
+    "django.contrib.messages.context_processors.messages",
     "django.core.context_processors.csrf",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
