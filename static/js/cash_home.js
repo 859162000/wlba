@@ -8,14 +8,89 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model/pager'], function($, _, ko, backend, cash, pager) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model/pager', 'model/table'], function($, _, ko, backend, cash, pager, table) {
     return $(document).ready(function() {
       var DataViewModel, viewModel;
       DataViewModel = (function() {
         function DataViewModel() {
           var self;
           self = this;
-          self.products = ko.observable();
+          self.products = new table.viewModel({
+            columns: [
+              {
+                name: '序号',
+                colspan: 1,
+                text: function(item, index) {
+                  return index + 1;
+                }
+              }, {
+                name: '名称',
+                colspan: 3,
+                text: function(item) {
+                  return item.name;
+                }
+              }, {
+                name: '发行机构',
+                colspan: 2,
+                sortable: true,
+                field: 'issuer__name',
+                text: function(item) {
+                  return item.issuer_name;
+                }
+              }, {
+                name: '期限',
+                colspan: 2,
+                sortable: true,
+                field: 'period',
+                text: function(item) {
+                  if (item.period) {
+                    return item.period + '个月';
+                  } else {
+                    return '活期';
+                  }
+                }
+              }, {
+                name: '七日年化利率',
+                colspan: 2,
+                sortable: true,
+                field: 'profit_rate_7days',
+                text: function(item) {
+                  return item.profit_rate_7days + '%';
+                }
+              }, {
+                name: '每万份收益',
+                colspan: 2,
+                sortable: true,
+                field: 'profit_10000',
+                text: function(item) {
+                  return item.profit_10000 + '元';
+                }
+              }, {
+                name: '购买链接',
+                colspan: 2,
+                text: function(item) {
+                  return '<a href="' + item.buy_url + '">' + item.buy_text + '</a>';
+                }
+              }, {
+                name: '',
+                colspan: 2,
+                text: function(item) {
+                  return '<a class="button button-mini button-yellow" href="/cash/detail/' + item.id + '">详情</a>';
+                }
+              }
+            ],
+            events: {
+              sortHandler: function(column, order) {
+                var field;
+                field = column.field;
+                if (order === 'dsc') {
+                  field = '-' + field;
+                }
+                return self.orderBy(field);
+              }
+            }
+          });
+          self.orderBy = ko.observable();
           self.pager = new pager.viewModel;
           self.activeFilters = ko.observableArray();
           self.clickOnFilter = function(value, event) {
@@ -36,13 +111,14 @@
             params = _(filters).reduce((function(result, object) {
               return _.extend(result, object);
             }), {
-              page: self.pager.currentPageNumber()
+              page: self.pager.currentPageNumber(),
+              ordering: self.orderBy()
             });
             if (typeof console !== "undefined" && console !== null) {
               console.log('loading data');
             }
             return backend.loadData('cashes', params).done(function(data) {
-              self.products(data.results);
+              self.products.data(data.results);
               return self.pager.totalPageNumber(data.num_pages);
             }).fail(function(xhr, status, error) {
               return alert(status + error);

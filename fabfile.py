@@ -14,17 +14,17 @@ def prepare():
 
 def testserver():
     env.host_string = '192.168.56.199'
-    env.path = '/home/lishuo/wanglibao'
-    env.activate = 'source /home/lishuo/wanglibao/virt-python/bin/activate'
-    env.depot = 'ssh://lishuo@192.168.56.1/~lishuo/developer/django/wanglibao/wanglibao'
+    env.path = '/var/deploy/wanglibao'
+    env.activate = 'source ' + env.path + '/virt-python/bin/activate'
+    env.depot = 'ssh://192.168.56.1/~/developer/django/wanglibao/wanglibao'
     env.depot_name = 'wanglibao'
 
     env.pip_install = "pip install --index-url http://pypi.hustunique.com/simple/ -r requirements.txt"
 
 def production():
     env.host_string = 'o-value.com'
-    env.path = '/home/lishuo/wanglibao'
-    env.activate = 'source /home/lishuo/wanglibao/virt-python/bin/activate'
+    env.path = '/var/deploy/wanglibao'
+    env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
 
@@ -45,7 +45,7 @@ def virtualenv():
 
 
 def deploy():
-    path = '/home/lishuo/wanglibao'
+    path = '/var/deploy/wanglibao'
 
     print red("Begin deploy: ")
     # todo if the folder not existed, create it
