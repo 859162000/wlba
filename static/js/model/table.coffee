@@ -4,7 +4,11 @@ define ['jquery', 'underscore', 'knockout'], ($, _, ko)->
       self = this
 
       self.columns = _(context.columns).map (item, index)->
-        _({sortable: false}).extend(item)
+        _(
+          {
+            sortable: false
+          }
+        ).extend(item)
       self.sortedColumn = ko.observable
         column: null
         order: 'asc'

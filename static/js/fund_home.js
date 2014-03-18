@@ -8,7 +8,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund'], function($, _, ko, backend, fund) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund', 'model/fundTable'], function($, _, ko, backend, fund, table) {
     return $(document).ready(function() {
       var DataViewModel, viewModel;
       DataViewModel = (function() {
@@ -51,14 +51,14 @@
             }
           ];
           self.selectedTab = ko.observable(self.tabTree[0]);
-          self.products = ko.observable();
+          self.fundTable = new table.viewModel({});
           ko.computed(function() {
             var params;
             params = _.extend({
               count: 10
             }, self.selectedTab().values);
             return backend.loadData('funds', params).done(function(data) {
-              return self.products(_.map(data.results, function(item) {
+              return self.fundTable.data(_.map(data.results, function(item) {
                 return new fund.viewModel({
                   data: item
                 });

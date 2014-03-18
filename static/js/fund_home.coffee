@@ -4,7 +4,7 @@ require.config
     underscore: 'lib/underscore-min'
     knockout: 'lib/knockout-3.0.0'
 
-require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund'], ($, _, ko, backend, fund)->
+require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund', 'model/fundTable'], ($, _, ko, backend, fund, table)->
   $ document
   .ready ->
     class DataViewModel
@@ -48,14 +48,14 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund'], ($, _
         ]
 
         self.selectedTab = ko.observable(self.tabTree[0])
-        self.products = ko.observable()
+        self.fundTable = new table.viewModel {}
 
         ko.computed ()->
           params = _.extend {count:10}, self.selectedTab().values
 
           backend.loadData 'funds', params
           .done (data)->
-            self.products _.map(data.results, (item)->
+            self.fundTable.data _.map(data.results, (item)->
               new fund.viewModel
                 data: item
             )
