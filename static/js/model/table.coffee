@@ -11,7 +11,17 @@ define ['jquery', 'underscore', 'knockout'], ($, _, ko)->
 
       self.data = ko.observable()
 
-      self.events = {}
+      self.events = {
+        sortHandler: (column, order)->
+          if _.has(column, 'field')
+            items = _.sortBy(self.data(), (item)->
+                item[column.field]
+            )
+            if order == 'asc'
+              self.data items
+            else
+              self.data items.reverse()
+      }
 
       if _.has(context, 'events')
         _(self.events).extend context.events

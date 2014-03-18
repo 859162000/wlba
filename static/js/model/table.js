@@ -16,7 +16,21 @@
           order: 'asc'
         });
         self.data = ko.observable();
-        self.events = {};
+        self.events = {
+          sortHandler: function(column, order) {
+            var items;
+            if (_.has(column, 'field')) {
+              items = _.sortBy(self.data(), function(item) {
+                return item[column.field];
+              });
+              if (order === 'asc') {
+                return self.data(items);
+              } else {
+                return self.data(items.reverse());
+              }
+            }
+          }
+        };
         if (_.has(context, 'events')) {
           _(self.events).extend(context.events);
         }

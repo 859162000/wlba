@@ -8,102 +8,15 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/table'], function($, _, ko, backend, tab, table) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/trustTable'], function($, _, ko, backend, tab, table) {
     return $(document).ready(function() {
       var DataViewModel, model;
       DataViewModel = (function() {
         function DataViewModel() {
-          var self, trustColumns;
+          var self;
           self = this;
-          trustColumns = [
-            {
-              name: '序号',
-              colspan: 1,
-              text: function(item, index) {
-                return index + 1;
-              }
-            }, {
-              name: '名称',
-              colspan: 4,
-              text: function(item) {
-                return item.name;
-              }
-            }, {
-              name: '资金门槛',
-              colspan: 2,
-              sortable: true,
-              text: function(item) {
-                return item.investment_threshold + '万';
-              },
-              field: 'investment_threshold'
-            }, {
-              name: '产品期限',
-              colspan: 2,
-              sortable: true,
-              text: function(item) {
-                return item.period + '个月';
-              },
-              field: 'period'
-            }, {
-              name: '预期收益',
-              colspan: 2,
-              sortable: true,
-              text: function(item) {
-                return item.expected_earning_rate.toFixed(2) + '%';
-              },
-              field: 'expected_earning_rate'
-            }, {
-              name: '投资行业',
-              colspan: 2,
-              sortable: true,
-              text: function(item) {
-                return item.usage;
-              },
-              field: 'usage'
-            }, {
-              name: '信托分类',
-              colspan: 2,
-              sortable: true,
-              text: function(item) {
-                return item.type;
-              },
-              field: 'type'
-            }, {
-              name: '信托公司',
-              colspan: 2,
-              sortable: true,
-              text: function(item) {
-                return item.issuer_short_name;
-              },
-              field: 'issuer_short_name'
-            }, {
-              name: '',
-              colspan: 2,
-              text: function(item) {
-                return '<a class="button button-mini button-yellow" href="/trust/detail/' + item.id + '">详情</a>';
-              }
-            }
-          ];
-          self.trustTable = new table.viewModel({
-            columns: trustColumns,
-            events: {
-              sortHandler: function(column, order) {
-                var items;
-                if (_.has(column, 'field')) {
-                  items = _.sortBy(self.trustTable.data(), function(item) {
-                    return item[column.field];
-                  });
-                  if (order === 'asc') {
-                    return self.trustTable.data(items);
-                  } else {
-                    return self.trustTable.data(items.reverse());
-                  }
-                }
-              }
-            }
-          });
+          self.trustTable = new table.viewModel({});
           self.filteredTable = new table.viewModel({
-            columns: trustColumns,
             events: {
               sortHandler: function(column, order) {
                 var field;
