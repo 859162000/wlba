@@ -31,9 +31,8 @@ define ['jquery', 'underscore', 'knockout'], ($, _, ko)->
         order = 'asc'
         if sortedColumn.column && sortedColumn.column.name == column.name
           order = 'dsc' if sortedColumn.order == 'asc'
-          self.sortedColumn {column: column, order: order}
-        else
-          self.sortedColumn {column: column, order: 'asc'}
+
+        self.sortedColumn {column: column, order: order}
 
         if _.has(self.events, 'sortHandler')
           self.events.sortHandler(column, order)

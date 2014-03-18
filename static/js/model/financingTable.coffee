@@ -27,7 +27,8 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             sortable: true
             text: (item)->
               item.bank_name
-            field: 'bank__name'
+            field: 'bank_name'
+            remote_field: 'bank__name'
           ,
             name: '管理期限'
             colspan: 2

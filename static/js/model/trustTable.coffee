@@ -53,6 +53,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             sortable: true
             text: (item)->
               item.issuer_short_name
+            remote_field: 'issuer__short_name'
             field: 'issuer_short_name'
           ,
             name: ''

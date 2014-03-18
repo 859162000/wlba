@@ -41,7 +41,8 @@
               text: function(item) {
                 return item.bank_name;
               },
-              field: 'bank__name'
+              field: 'bank_name',
+              remote_field: 'bank__name'
             }, {
               name: '管理期限',
               colspan: 2,

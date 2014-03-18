@@ -21,6 +21,9 @@
               sortHandler: function(column, order) {
                 var field;
                 field = column.field;
+                if (_.has(column, 'remote_field')) {
+                  field = column.remote_field;
+                }
                 if (order === 'dsc') {
                   field = '-' + field;
                 }

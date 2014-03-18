@@ -16,6 +16,8 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/
           events:
             sortHandler: (column, order)->
               field = column.field
+              if _.has(column, 'remote_field')
+                field = column.remote_field
               if order == 'dsc'
                 field = '-' + field
               self.orderBy field

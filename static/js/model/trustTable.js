@@ -71,6 +71,7 @@
               text: function(item) {
                 return item.issuer_short_name;
               },
+              remote_field: 'issuer__short_name',
               field: 'issuer_short_name'
             }, {
               name: '',

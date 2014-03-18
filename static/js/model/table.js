@@ -42,16 +42,11 @@
             if (sortedColumn.order === 'asc') {
               order = 'dsc';
             }
-            self.sortedColumn({
-              column: column,
-              order: order
-            });
-          } else {
-            self.sortedColumn({
-              column: column,
-              order: 'asc'
-            });
           }
+          self.sortedColumn({
+            column: column,
+            order: order
+          });
           if (_.has(self.events, 'sortHandler')) {
             return self.events.sortHandler(column, order);
           }
