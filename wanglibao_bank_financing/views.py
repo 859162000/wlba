@@ -13,6 +13,9 @@ class BankFinancingViewSet(PaginatedModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
 
 
+
+
+
 class BankViewSet(PaginatedModelViewSet):
     model = Bank
     serializer_class = BankSerializer

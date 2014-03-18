@@ -8,14 +8,26 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', 'model/pager'], function($, _, ko, backend, financing, pager) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', 'model/pager', 'model/financingTable'], function($, _, ko, backend, financing, pager, table) {
     return $(document).ready(function() {
       var ViewModel, model;
       ViewModel = (function() {
         function ViewModel() {
           var self;
           self = this;
-          self.products = ko.observable();
+          self.financingTable = new table.viewModel({
+            events: {
+              sortHandler: function(column, order) {
+                var field;
+                field = column.field;
+                if (order !== 'asc') {
+                  field = '-' + column.field;
+                }
+                return self.orderBy(field);
+              }
+            }
+          });
+          self.orderBy = ko.observable('-max_expected_profit_rate');
 
           /*
           Pager
@@ -40,13 +52,14 @@
             params = _(filters).reduce((function(result, object) {
               return _.extend(result, object);
             }), {
-              page: self.pager.currentPageNumber()
+              page: self.pager.currentPageNumber(),
+              ordering: self.orderBy()
             });
             if (typeof console !== "undefined" && console !== null) {
               console.log('loading data');
             }
             return backend.loadData('financing', params).done(function(data) {
-              self.products(data.results);
+              self.financingTable.data(data.results);
               return self.pager.totalPageNumber(data.num_pages);
             }).fail(function(xhr, status, error) {
               return alert(status + error);

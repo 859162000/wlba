@@ -4,14 +4,22 @@ require.config
     underscore: 'lib/underscore-min'
     knockout: 'lib/knockout-3.0.0'
 
-require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', 'model/pager'], ($, _, ko, backend, financing, pager)->
+require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', 'model/pager', 'model/financingTable'], ($, _, ko, backend, financing, pager, table)->
   $ document
   .ready ->
     class ViewModel
       constructor: ->
         self = this
 
-        self.products = ko.observable()
+        self.financingTable = new table.viewModel
+          events:
+            sortHandler: (column, order)->
+              field = column.field
+              if order != 'asc'
+                field = '-' + column.field
+              self.orderBy field
+
+        self.orderBy = ko.observable('-max_expected_profit_rate')
 
         ###
         Pager
@@ -36,13 +44,17 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', '
 
         self.queryData = ()->
           filters = _.chain(self.activeFilters()).pluck('values').flatten().compact().value()
-          params = _(filters).reduce ((result, object)-> _.extend(result, object)), {page: self.pager.currentPageNumber()}
+          params = _(filters).reduce ((result, object)-> _.extend(result, object)),
+            {
+              page: self.pager.currentPageNumber()
+              ordering: self.orderBy()
+            }
 
           if console?
             console.log 'loading data'
           backend.loadData 'financing', params
           .done( (data)->
-            self.products data.results
+            self.financingTable.data data.results
             self.pager.totalPageNumber data.num_pages
           ).fail( (xhr, status, error)->
             alert(status + error)

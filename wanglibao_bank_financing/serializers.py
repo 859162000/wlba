@@ -8,6 +8,7 @@ class BankFinancingSerializer(HyperlinkedModelSerializer):
         model = BankFinancing
 
     bank_name = serializers.SerializerMethodField('get_bank_name')
+    id = serializers.IntegerField('id')
 
     @classmethod
     def get_bank_name(cls, bank_financing):
@@ -19,6 +20,7 @@ class BankSerializer(HyperlinkedModelSerializer):
         model = Bank
 
     logo = serializers.SerializerMethodField('logo_url')
+    id = serializers.IntegerField('id')
 
     @classmethod
     def logo_url(cls, bank):

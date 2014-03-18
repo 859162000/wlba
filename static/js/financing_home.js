@@ -8,14 +8,27 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab'], function($, _, ko, backend, tab) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/financingTable'], function($, _, ko, backend, tab, table) {
     return $(document).ready(function() {
       var viewModel;
       viewModel = (function() {
         function viewModel() {
           var self;
           self = this;
-          self.products = ko.observable();
+          self.financingTable = new table.viewModel({
+            events: {
+              sortHandler: function(column, order) {
+                var field;
+                field = column.field;
+                if (order !== 'asc') {
+                  field = '-' + column.field;
+                }
+                return self.orderBy(field);
+              }
+            }
+          });
+          self.orderBy = ko.observable('-max_expected_profit_rate');
+          self.filters = ko.observable();
           self.tabTree = {
             tabs: [
               {
@@ -100,16 +113,20 @@
                   tabs: self.tabTree.subTabs[index],
                   events: {
                     tabSelected: function(data, event) {
-                      return backend.loadData('financings', _.extend({
-                        page_size: 10
-                      }, data.values)).done(function(data) {
-                        return self.products(data.results);
-                      });
+                      return self.filters(data.values);
                     }
                   }
                 });
               }
             }
+          });
+          ko.computed(function() {
+            return backend.loadData('financings', _.extend({
+              page_size: 10,
+              ordering: self.orderBy()
+            }, self.filters())).done(function(data) {
+              return self.financingTable.data(data.results);
+            });
           });
         }
 

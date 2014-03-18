@@ -4,14 +4,23 @@ require.config
     underscore: 'lib/underscore-min'
     knockout: 'lib/knockout-3.0.0'
 
-require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab'], ($, _, ko, backend, tab)->
+require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/financingTable'], ($, _, ko, backend, tab, table)->
   $ document
   .ready ->
     class viewModel
       constructor: ->
         self = this
 
-        self.products = ko.observable()
+        self.financingTable = new table.viewModel
+          events:
+            sortHandler: (column, order)->
+              field = column.field
+              if order != 'asc'
+                field = '-' + column.field
+              self.orderBy field
+
+        self.orderBy = ko.observable('-max_expected_profit_rate')
+        self.filters = ko.observable()
 
         self.tabTree =
           tabs:[
@@ -86,10 +95,15 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab'], ($, _,
                 tabs: self.tabTree.subTabs[index]
                 events:
                   tabSelected: (data, event)->
-                    backend.loadData 'financings',
-                      _.extend {page_size: 10}, data.values
-                    .done (data)->
-                      self.products(data.results)
+                    self.filters data.values
 
+        ko.computed ()->
+          backend.loadData 'financings',
+            _.extend {
+              page_size: 10
+              ordering: self.orderBy()
+            }, self.filters()
+          .done (data)->
+            self.financingTable.data(data.results)
 
     ko.applyBindings new viewModel()
