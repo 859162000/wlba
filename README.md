@@ -16,6 +16,7 @@ Install python packages
 Create db
 -----------------
 - python manage.py syncdb
+- python manage.py migrate
 - python manage.py generate_mock clean
 
 Install compass
