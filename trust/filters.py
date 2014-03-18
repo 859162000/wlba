@@ -1,6 +1,3 @@
-import django_filters
-from django_filters.filterset import get_declared_filters
-from rest_framework.filters import FilterSet
 from trust.models import Trust
 from wanglibao.filters import AutoNumberFilter
 

@@ -19,8 +19,6 @@ class AutoNumberFilter(filters.FilterSet):
         number_lookup_types = ('gt', 'gte', 'lt', 'lte', ('max', 'lt'), ('min', 'gte'))
 
     def __init__(self, *args, **kwargs):
-        super(AutoNumberFilter, self).__init__(*args, **kwargs)
-
         number_fields = self.Meta.number_fields
         number_lookup_types = self.Meta.number_lookup_types
         attrs = {}
@@ -37,3 +35,5 @@ class AutoNumberFilter(filters.FilterSet):
 
         for name, filter in attrs.items():
             self.base_filters[name] = filter
+
+        super(AutoNumberFilter, self).__init__(*args, **kwargs)
