@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+gem 'compass'
+gem 'sass', '3.2.13'
+gem 'susy', '1.0.5'
+gem 'font-icons'
+gem 'compass-import-once'
