@@ -46,10 +46,15 @@ define ['jquery'], ($)->
     'fund': 'funds'
     'funds': 'funds'
     '基金': 'funds'
+    '公募基金': 'funds'
 
     'cashs': 'cashes'
     'cashes': 'cashes'
     '现金类理财产品': 'cashes'
+    '现金': 'cashes'
+
+  normalizeType = (type)->
+    typeMapping[type]
 
   loadData = (type, params)->
     if _.has(typeMapping, type)
@@ -100,6 +105,8 @@ define ['jquery'], ($)->
   loadFavorites = (type)->
     url = apiurl + 'favorite/' + type + '/'
     $.get url
+
+  normalizeType: normalizeType
 
   loadData: loadData
   isValidType: isValidType

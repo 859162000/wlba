@@ -11,6 +11,7 @@
         data = context.data;
         self.name = ko.observable(data.name);
         self.products = ko.observableArray(data.products);
+        self.selectedProduct = ko.observable();
         if (context && _.has(context, 'asset')) {
           self.asset = context.asset;
         } else {
@@ -20,15 +21,18 @@
         if (_.has(context, 'events')) {
           self.events = _.extend(self.events, context.events);
         }
-        self.productSelected = function(product) {
-          if (_.has(self.events, 'productSelected')) {
-            return self.events.productSelected(product);
-          } else {
-            if (typeof console !== "undefined" && console !== null) {
-              return console.log(product);
+        self.productSelected = (function(_this) {
+          return function(product) {
+            self.selectedProduct(product);
+            if (_.has(self.events, 'productSelected')) {
+              return self.events.productSelected(product, _this);
+            } else {
+              if (typeof console !== "undefined" && console !== null) {
+                return console.log(product);
+              }
             }
-          }
-        };
+          };
+        })(this);
       }
 
       viewModel.prototype.data = function(data) {

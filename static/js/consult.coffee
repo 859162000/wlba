@@ -10,7 +10,19 @@ require.config(
     purl: ['jquery']
 )
 
-require ['jquery', 'underscore', 'knockout', 'lib/backend',  'lib/templateLoader', 'jquery.modal', 'purl', 'model/portfolio'], ($, _, ko, backend, templateLoader, modal, purl, portfolio)->
+require ['jquery',
+         'underscore',
+         'knockout',
+         'lib/backend',
+         'jquery.modal',
+         'purl',
+         'model/portfolio',
+         'model/trustTable',
+         'model/financingTable',
+         'model/cashTable',
+         'model/fundTable',
+         'model/fund',
+         'model/emptyTable'], ($, _, ko, backend, modal, purl, portfolio, trustTable, financingTable, cashTable, fundTable, fund, emptyTable)->
   class ViewModel
 
     constructor: ->
@@ -103,7 +115,10 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend',  'lib/templateLoader
               data: data
               asset: self.asset
               events:
-                productSelected: (value)->
+                productSelected: (value, portfolio)->
+                  for p in self.portfolios()
+                    if p != portfolio
+                      p.selectedProduct(null)
                   type = value.product.name
                   self.productsType(type)
 
@@ -118,9 +133,14 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend',  'lib/templateLoader
       ###
       The filtered products related stuff
       ###
-      self.products = null
+      self.trustTable = new trustTable.viewModel {}
+      self.financingTable = new financingTable.viewModel {}
+      self.cashTable = new cashTable.viewModel {}
+      self.fundTable = new fundTable.viewModel {}
+      self.emptyTable = new emptyTable.viewModel {}
+      self.dataTable = ko.observable()
+
       self.productsType = ko.observable()
-      self.template_name = ko.observable()
       self.amount = ko.observable(0)
 
       ko.computed ()->
@@ -128,24 +148,37 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend',  'lib/templateLoader
         amount = self.amount()
         if backend.isValidType type
           params =
-            count: 10
+            count: 5
             lte_threshold: amount
 
           backend.loadData type, params
           .done (data)->
-            self.products = data.results
-            #Hack to trigger the template_name change TODO Fix this
-            if self.products.length > 0
-              self.template_name('')
-              self.template_name(templateLoader.template type)
-            else
-              self.template_name('no-products-available')
+            if data.results.length > 0
+              normalizedType = backend.normalizeType(type)
+
+              switch normalizedType
+                when 'trusts'
+                  self.trustTable.data data.results
+                  self.dataTable self.trustTable
+                when 'bank_financings'
+                  self.financingTable.data data.results
+                  self.dataTable self.financingTable
+                when 'cashes'
+                  self.cashTable.data data.results
+                  self.dataTable self.cashTable
+                when 'funds'
+                  self.fundTable.data _.map(data.results, (item)->
+                    new fund.viewModel
+                      data: item
+                  )
+
+                  self.dataTable self.fundTable
+                else
+                  self.dataTable self.emptyTable
         else
-          # TODO add a way to notice user alegently
           if console?
             console.log 'The type not supported'
-          self.products = null
-          self.template_name('no-products-available')
+          self.dataTable self.emptyTable
 
       .extend {throttle: 1}
 

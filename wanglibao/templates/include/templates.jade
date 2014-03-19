@@ -1,42 +1,3 @@
-// trust-table template render the model's trusts array into a table
-// It is used in trust_home, trust_products, personal page
-script(type="text/html", id="trust-table")
-  table.trust-table
-    thead
-      tr
-        th(colspan="1") 序号
-        th(colspan="4") 产品名称
-        th(colspan="2")
-          a.unstyled.container(href="#")
-            span 资金门槛
-            .updown
-              .up
-              .down.active
-        th(colspan="2")
-          a.unstyled.container(href="#")
-            span 产品期限
-            .updown
-              .up
-              .down.active
-        th(colspan="2") 预期收益
-        th(colspan="2") 投资行业
-        th(colspan="2") 信托分类
-        th(colspan="2") 信托公司
-        th(colspan="2")
-    tbody(data-bind='foreach: $data')
-      tr
-        td(colspan="1" data-bind="text: ($index() + 1)")
-        td(colspan="4" data-bind="text: name") 名字
-        td(colspan="2" data-bind="text: Math.round(investment_threshold) + '万'") 100万
-        td(colspan="2" data-bind="text: period + '个月'") 12个月
-        td(colspan="2" data-bind="text: expected_earning_rate.toFixed(2) + '%'") 13.00%
-        td(colspan="2" data-bind="text: usage") 房地产
-        td(colspan="2" data-bind="text: type") 货款类
-        td(colspan="2" data-bind="text: issuer_short_name") 甘肃信托
-        td(colspan="2")
-          a.button.button-mini.button-yellow(data-bind="attr{ href: '/trust/detail/' + id }") 详情
-
-
 script(type="text/html", id="data-table")
   table.trust-table
     thead
@@ -60,97 +21,11 @@ script(type="text/html", id="data-table")
       tr(data-bind="foreach: $parent.columns")
         td(data-bind="attr:{colspan: colspan}, html: text(item, $parentContext.$index())")
 
-
-// financing-table render model's products array as financing products
-// used by financing_products, financing_home, personal page
-script(type="text/html", id="financing-table")
-  table.trust-table
-    thead
-      tr
-        th(colspan="1") 序号
-        th(colspan="4") 产品名称
-        th(colspan="2") 起购金额
-        th(colspan="2") 发行银行
-        th(colspan="2") 管理期限
-        th(colspan="2") 收益类型
-        th(colspan="2") 预期收益
-        th(colspan="2")
-    tbody(data-bind='foreach: $data')
-      tr
-        td(colspan="1" data-bind="text: $index() + 1") 1
-        td(colspan="4" data-bind="text: name")
-        td(colspan="2" data-bind="text: invest_threshold + '万'") 10万
-        td(colspan="2" data-bind="text: bank_name")
-        td(colspan="2" data-bind="text: period + '个月'") 24个月
-        td(colspan="2" data-bind="text: profit_type") 保本浮动
-        td(colspan="2" data-bind="text: max_expected_profit_rate + '%'") 10%
-        td(colspan="2")
-          a.button.button-mini.button-yellow(href="#") 详情
-
-// funds-table render
-script(type="text/html", id="fund-table")
-  table.trust-table
-    thead
-      tr
-        th(colspan="2") 代码
-        th(colspan="3") 基金名称
-        th(colspan="2") 基金类型
-        th(colspan="2") 单位净值
-        th(colspan="2") 日涨幅
-        th(colspan="2") 近一月涨幅
-        th(colspan="2") 近三月涨幅
-        th(colspan="2") 近半年涨幅
-        th(colspan="2") 前端|后端费率
-        th(colspan="2")
-    tbody(data-bind="foreach: $data")
-      tr
-        td(colspan="2" data-bind="text: product_code")
-        td(colspan="3" data-bind="text: name")
-        td(colspan="2" data-bind="text: type")
-        td(colspan="2" data-bind="text: face_value") 单位净值
-        td(colspan="2" data-bind="text: rate_day + '%'") 日涨幅
-        td(colspan="2" data-bind="text: profit_rate_month + '%'") 近一月涨幅
-        td(colspan="2" data-bind="text: profit_rate_3months + '%'") 近三月涨幅
-        td(colspan="2" data-bind="text: profit_rate_6months + '%'") 近六月涨幅
-        td(colspan="2" data-bind="text: frontEndRate() + '|' + backEndRate()") 前端费率|后端费率
-        td(colspan="2")
-          a.button.button-mini.button-yellow(href="#", data-bind="attr{ href: '/fund/detail/' + id }") 详情
-          // funds-table render
-
-script(type="text/html", id="cash-table")
-  table.trust-table
-    thead
-      tr
-        th(colspan="3") 名称
-        th(colspan="2") 发行机构
-        th(colspan="2") 期限
-        th(colspan="2") 七日年化利率
-        th(colspan="2") 每万份收益
-        th(colspan="2") 购买链接
-        th(colspan="2") 状态
-        th(colspan="2")
-    tbody(data-bind="foreach: $data")
-      tr
-        td(colspan="3" data-bind="text: name")
-        td(colspan="2" data-bind="text: issuer_name")
-        td(colspan="2" data-bind="text: period == 0 ? '活期' : period + '个月'")
-        td(colspan="2" data-bind="text: profit_rate_7days + '%'")
-        td(colspan="2" data-bind="text: profit_10000")
-        td(colspan="2")
-          a(data-bind="attr{href: buy_url}, text: buy_text")
-        td(colspan="2" data-bind="text: status")
-        td(colspan="2")
-          a.button.button-mini.button-yellow(href="#", data-bind="attr{ href: '/cash/detail/' + id }") 详情
-
-script(type="text/html", id="no-products-available")
-  div(style="text-align: center; font-size: 1.3em; padding: 1em;") 没有相关的推荐产品
-
-
 script(type="text/html", id="portfolio-bar")
   .value-bar
     span.value-bar--title(href='#',data-bind="text: name") 积极型
     // ko foreach: products
-    a.button.button-square.value-bar--selectable(href='#' data-bind="style:{width: $parent.productWidth($data)}, click:$parent.productSelected")
+    a.button.button-square.value-bar--selectable(href='#' data-bind="style:{width: $parent.productWidth($data)}, click:$parent.productSelected, css:{active: $parent.selectedProduct() == $data}")
       span.value-bar--item-title(data-bind="text: $data.product.name") 信托产品
       span.value-bar--item-detail(data-bind="text: $parent.productDescription($data)") 200万 40%
     // /ko

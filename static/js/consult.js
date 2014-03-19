@@ -14,7 +14,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'jquery.modal', 'purl', 'model/portfolio'], function($, _, ko, backend, templateLoader, modal, purl, portfolio) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'jquery.modal', 'purl', 'model/portfolio', 'model/trustTable', 'model/financingTable', 'model/cashTable', 'model/fundTable', 'model/fund', 'model/emptyTable'], function($, _, ko, backend, modal, purl, portfolio, trustTable, financingTable, cashTable, fundTable, fund, emptyTable) {
     var ViewModel, model;
     ViewModel = (function() {
       function ViewModel() {
@@ -109,8 +109,15 @@
                 data: data,
                 asset: self.asset,
                 events: {
-                  productSelected: function(value) {
-                    var amount, type;
+                  productSelected: function(value, portfolio) {
+                    var amount, p, type, _i, _len, _ref;
+                    _ref = self.portfolios();
+                    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                      p = _ref[_i];
+                      if (p !== portfolio) {
+                        p.selectedProduct(null);
+                      }
+                    }
                     type = value.product.name;
                     self.productsType(type);
                     amount = value.value;
@@ -131,9 +138,13 @@
         /*
         The filtered products related stuff
          */
-        self.products = null;
+        self.trustTable = new trustTable.viewModel({});
+        self.financingTable = new financingTable.viewModel({});
+        self.cashTable = new cashTable.viewModel({});
+        self.fundTable = new fundTable.viewModel({});
+        self.emptyTable = new emptyTable.viewModel({});
+        self.dataTable = ko.observable();
         self.productsType = ko.observable();
-        self.template_name = ko.observable();
         self.amount = ko.observable(0);
         ko.computed(function() {
           var amount, params, type;
@@ -141,24 +152,40 @@
           amount = self.amount();
           if (backend.isValidType(type)) {
             params = {
-              count: 10,
+              count: 5,
               lte_threshold: amount
             };
             return backend.loadData(type, params).done(function(data) {
-              self.products = data.results;
-              if (self.products.length > 0) {
-                self.template_name('');
-                return self.template_name(templateLoader.template(type));
-              } else {
-                return self.template_name('no-products-available');
+              var normalizedType;
+              if (data.results.length > 0) {
+                normalizedType = backend.normalizeType(type);
+                switch (normalizedType) {
+                  case 'trusts':
+                    self.trustTable.data(data.results);
+                    return self.dataTable(self.trustTable);
+                  case 'bank_financings':
+                    self.financingTable.data(data.results);
+                    return self.dataTable(self.financingTable);
+                  case 'cashes':
+                    self.cashTable.data(data.results);
+                    return self.dataTable(self.cashTable);
+                  case 'funds':
+                    self.fundTable.data(_.map(data.results, function(item) {
+                      return new fund.viewModel({
+                        data: item
+                      });
+                    }));
+                    return self.dataTable(self.fundTable);
+                  default:
+                    return self.dataTable(self.emptyTable);
+                }
               }
             });
           } else {
             if (typeof console !== "undefined" && console !== null) {
               console.log('The type not supported');
             }
-            self.products = null;
-            return self.template_name('no-products-available');
+            return self.dataTable(self.emptyTable);
           }
         }).extend({
           throttle: 1
