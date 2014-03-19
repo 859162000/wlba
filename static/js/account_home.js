@@ -8,7 +8,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'model/fund'], function($, _, ko, backend, templateLoader, portfolio) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'model/fund'], function($, _, ko, backend, templateLoader, portfolio, fund) {
     return $(document).ready(function() {
       var DataViewModel, viewModel;
       DataViewModel = (function() {
@@ -22,10 +22,9 @@
           ko.computed(function() {
             var params;
             params = {
-              asset_min: self.asset(),
-              asset_max: self.asset(),
-              period_min: self.period(),
-              period_max: self.period(),
+              lt_asset: self.asset(),
+              min_period: self.period(),
+              max_period: self.period(),
               risk_score: self.riskScore()
             };
             return backend.loadPortfolio(params).done(function(data) {

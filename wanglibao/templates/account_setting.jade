@@ -18,24 +18,6 @@ body
     .span9-omega
       .panel
         .panel-title-bar
-          .panel-title 基本信息
-
-        .well-s
-          .form-row.form-row-middle
-            span.ispan1 邮箱:
-            span.ispan2.margin-right-s {{user.email}}
-            a.ispan1.button.button-yellow.button-mini(href="#") 修改
-          .form-row.form-row-middle
-            span.ispan1 手机号码:
-            if user.wanglibao_profile.phone_verified
-              span.ispan2.margin-right-s 138xxxx2323
-              a.button.button-yellow.button-mini(href="#") 修改
-            else
-              input.ispan2.margin-right-s(type="text")
-              a.button.button-yellow.button-mini(href="#") 绑定
-
-      .panel
-        .panel-title-bar
           .panel-title 修改密码
 
         form#passwordChangeForm.well-s(method="POST")

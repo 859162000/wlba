@@ -148,9 +148,9 @@ script(type="text/html", id="no-products-available")
 
 script(type="text/html", id="portfolio-bar")
   .value-bar
-    a.button.value-bar--title(href='#',data-bind="text: name") 积极型
+    span.value-bar--title(href='#',data-bind="text: name") 积极型
     // ko foreach: products
-    a.button.value-bar--selectable(href='#' data-bind="style:{width: $parent.productWidth($data)}, click:$parent.productSelected")
+    a.button.button-square.value-bar--selectable(href='#' data-bind="style:{width: $parent.productWidth($data)}, click:$parent.productSelected")
       span.value-bar--item-title(data-bind="text: $data.product.name") 信托产品
       span.value-bar--item-detail(data-bind="text: $parent.productDescription($data)") 200万 40%
     // /ko

@@ -19,35 +19,30 @@ body
       .panel
         .panel-title-bar
           .panel-title 我的评估结果
-        .space-vertical-s
+          a.button.button-yellow.button-small(href="#") 重新评估
+
         .container
           .span2
             .card-icon
               dl
                 dt 风险承受能力
-                dd 1 (不能承受风险)
+                dd(data-bind="text: riskScore")
           .span2
             .card-icon
               dl
                 dt 可投资资金
-                dd 100万
+                dd(data-bind="text: asset() + '万'")
           .span2
             .card-icon
               dl
                 dt 投资期限
-                dd 3个月
-        .space-vertical-s
-        .line
+                dd(data-bind="text: period() + '个月'")
+      .panel
+        .panel-title-bar
+          .panel-title 资产配置方案
+
         .well-s
-          p.title 资产配置方案
-
           // ko template: {name: 'portfolio-bar', data: portfolio}
-          // /ko
-
-          p.title 适合您的产品
-
-          // ko template: {name: template_name, data: products}
-
           // /ko
 
   .space-vertical-m

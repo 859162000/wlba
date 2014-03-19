@@ -7,7 +7,7 @@ require.config(
 
 require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
-         'model/portfolio', 'model/fund'], ($, _, ko, backend, templateLoader, portfolio)->
+         'model/portfolio', 'model/fund'], ($, _, ko, backend, templateLoader, portfolio, fund)->
   $ document
   .ready ->
     class DataViewModel
@@ -22,10 +22,9 @@ require ['jquery', 'underscore', 'knockout',
 
         ko.computed ()->
           params =
-            asset_min: self.asset()
-            asset_max: self.asset()
-            period_min: self.period()
-            period_max: self.period()
+            lt_asset: self.asset()
+            min_period: self.period()
+            max_period: self.period()
             risk_score: self.riskScore()
           backend.loadPortfolio params
           .done (data)->
