@@ -7,13 +7,11 @@
   });
 
   require(['jquery', 'lib/backend'], function($, backend) {
-    return $(document).ready(function() {
-      return $('#addToFavorite').click(function(e) {
-        var id;
-        e.preventDefault();
-        id = $(e.target).attr('data-id');
-        return backend.addToFavorite('cashes', id);
-      });
+    return $('#addToFavorite').click(function(e) {
+      var id;
+      e.preventDefault();
+      id = $(e.target).attr('data-id');
+      return backend.addToFavorite('cashes', id);
     });
   });
 

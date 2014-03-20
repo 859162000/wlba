@@ -8,53 +8,51 @@
   });
 
   require(['jquery', 'underscore'], function($, _) {
-    return $(document).ready(function() {
-      var switchBackground, switchBackgroundWrapper;
-      switchBackground = function() {
-        var backgrounds, current, currentIndex, nextIndex;
-        backgrounds = $('.big-background');
-        current = _.find(backgrounds, function(value) {
-          return $(value).css('display') !== 'none';
-        });
-        currentIndex = _.indexOf(backgrounds, current);
-        nextIndex = (currentIndex + 1) % backgrounds.length;
-        $(backgrounds[currentIndex]).hide();
-        $(backgrounds[nextIndex]).fadeIn();
-        $($('.background-anchor')[currentIndex]).removeClass('active');
-        return $($('.background-anchor')[nextIndex]).addClass('active');
-      };
-      switchBackgroundWrapper = function() {
-        switchBackground(4);
-        return setTimeout(switchBackgroundWrapper, 10 * 1000);
-      };
-      setTimeout(switchBackgroundWrapper, 10 * 1000);
-      return $('ul.tabs').each(function() {
-        var allAnchors, allTargets;
-        allAnchors = $(this).find('a.tab-anchor');
-        allTargets = allAnchors.map(function() {
-          return $(this).attr('data-toggle');
-        });
-        return $(this).find('a.tab-anchor').each(function() {
-          return $(this).click(function(e) {
-            var targetId;
-            e.preventDefault();
-            targetId = $(this).attr('data-toggle');
-            $(allAnchors).each(function() {
-              return $(this).removeClass('active');
-            });
-            $(allTargets).each(function() {
-              if (this !== targetId) {
-                return $('#' + this).hide();
-              }
-            });
-            $('#' + targetId).fadeIn();
-            return $(this).addClass('active');
+    var switchBackground, switchBackgroundWrapper;
+    switchBackground = function() {
+      var backgrounds, current, currentIndex, nextIndex;
+      backgrounds = $('.big-background');
+      current = _.find(backgrounds, function(value) {
+        return $(value).css('display') !== 'none';
+      });
+      currentIndex = _.indexOf(backgrounds, current);
+      nextIndex = (currentIndex + 1) % backgrounds.length;
+      $(backgrounds[currentIndex]).hide();
+      $(backgrounds[nextIndex]).fadeIn();
+      $($('.background-anchor')[currentIndex]).removeClass('active');
+      return $($('.background-anchor')[nextIndex]).addClass('active');
+    };
+    switchBackgroundWrapper = function() {
+      switchBackground(4);
+      return setTimeout(switchBackgroundWrapper, 10 * 1000);
+    };
+    setTimeout(switchBackgroundWrapper, 10 * 1000);
+    return $('ul.tabs').each(function() {
+      var allAnchors, allTargets;
+      allAnchors = $(this).find('a.tab-anchor');
+      allTargets = allAnchors.map(function() {
+        return $(this).attr('data-toggle');
+      });
+      return $(this).find('a.tab-anchor').each(function() {
+        return $(this).click(function(e) {
+          var targetId;
+          e.preventDefault();
+          targetId = $(this).attr('data-toggle');
+          $(allAnchors).each(function() {
+            return $(this).removeClass('active');
           });
-        }).each(function(index) {
-          if (index === 0) {
-            return $(this).trigger('click');
-          }
+          $(allTargets).each(function() {
+            if (this !== targetId) {
+              return $('#' + this).hide();
+            }
+          });
+          $('#' + targetId).fadeIn();
+          return $(this).addClass('active');
         });
+      }).each(function(index) {
+        if (index === 0) {
+          return $(this).trigger('click');
+        }
       });
     });
   });

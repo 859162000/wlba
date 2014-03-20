@@ -24,3 +24,17 @@ def percentage(value):
     Convert float based percentage to string
     """
     return u'%.2f%%' % (value, )
+
+@register.filter
+def yes_no(value):
+    if value:
+        return u'是'
+    else:
+        return u'否'
+
+@register.filter
+def na_if_none(value):
+    if value is None:
+        return u'--'
+    else:
+        return value

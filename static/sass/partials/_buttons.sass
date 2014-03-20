@@ -4,7 +4,7 @@
 $button-border-radius:   5px         // Button border radius
 $button-padding:         0.5em 0.5em  // Button padding
 
-button, a.button
+.button
   +unstyled-link()
   line-height: 1 //Work around the line-height make it 1 to have precious control on button size
   border: 0
@@ -13,6 +13,9 @@ button, a.button
 
   &:focus
     outline: 0
+
+.button-square
+  +border-radius(0)
 
 .button-mini, a.button-mini
   @extend .button

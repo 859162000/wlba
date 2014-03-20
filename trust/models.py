@@ -1,3 +1,4 @@
+# encoding: utf-8
 from requests import ConnectionError
 from rest_framework.renderers import JSONRenderer
 from rest_framework.serializers import ModelSerializer
@@ -68,13 +69,17 @@ class Trust (models.Model):
 
     earning_description = models.TextField()
     note = models.TextField(verbose_name="note on this trust")
-    usage = models.CharField(max_length=100, verbose_name="usage")
-    usage_description = models.TextField()
+    usage = models.CharField(max_length=100, verbose_name=u'用途')
+    usage_description = models.TextField(u'用途描述')
 
     risk_management = models.TextField()
-    payment = models.TextField()
+    mortgage = models.TextField(blank=True, help_text=u'抵押物')
+    mortgage_rate = models.FloatField(default=0, help_text=u'抵押率')
+    consignee = models.TextField(blank=True, help_text=u'受托人')
+    payment = models.TextField(blank=True, help_text=u'支付情况')
 
     product_name = models.TextField()
+    product_description = models.TextField(blank=True)
     related_info = models.TextField()
 
     def __unicode__(self):

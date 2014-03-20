@@ -7,14 +7,14 @@
   });
 
   require(['jquery', 'lib/backend'], function($, backend) {
-    return $(document).ready(function() {
-      return $('#addToFavorite').click(function(e) {
-        var id;
-        e.preventDefault();
-        id = $(e.target).attr('data-id');
-        return backend.addToFavorite('funds', id);
-      });
+    return $('#addToFavorite').click(function(e) {
+      var id;
+      e.preventDefault();
+      id = $(e.target).attr('data-id');
+      return backend.addToFavorite('funds', id);
     });
   });
 
 }).call(this);
+
+//# sourceMappingURL=fund_detail.map

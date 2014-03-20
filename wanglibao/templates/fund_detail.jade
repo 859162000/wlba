@@ -65,7 +65,6 @@ body
     .panel-title-bar
       .panel-tabs
         .panel-tab.active 产品详情
-        .panel-tab 产品文档
     .well
       p 购买信息
       table.bordered-table
@@ -74,54 +73,56 @@ body
             th 发行银行
             td {{fund.hosted_bank}}
             th 发行对象
-            td 个人
+            td {{fund.target_user}}
             th 货币币种
-            td 人民币
+            td {{fund.currency}}
           tr
             th 投资类型
-            td 保守型投资者
+            td {{fund.invest_type}}
             th 发行起始日期
-            td 2014-02-13
+            td {{fund.start_date | na_if_none}}
             th 发行终止日期
-            td 2014-04-01
+            td {{fund.end_date | na_if_none}}
           tr
             th 委托管理期限
-            td 50天
+            td {{fund.management_period | month}}
             th 委托币种起始金额
-            td 5.00万
+            td {{fund.management_threshold}}
             th 起购金额递增单位
-            td 1000
+            td {{fund.invest_step}}
           tr
             th 可否质押贷款
-            td 不详
+            td {{fund.pledgable | yes_no}}
             th 银行是否可提前终止
-            td 是
+            td {{fund.bank_redeemable | yes_no}}
             th 客户是否可赎回
-            td 否
+            td {{fund.client_redeemable | yes_no}}
           tr
             th 销售地区
-            td(colspan="5") ---
+            td(colspan="5") {{fund.available_region}}
 
       p 其他说明
       table.bordered-table
         tbody
           tr
             th(colspan="1") 收益说明
-            td(colspan="5") 参考年化收益率为4.0%-6.5%
+            td(colspan="5") {{fund.profit_description}}
           tr
             th(colspan="1") 申购条件说明
-            td(colspan="5") 起售金额5万元 递增金额 1000元
+            td(colspan="5") {{fund.buy_description}}
           tr
             th(colspan="1") 银行提前终止条件
-            td(colspan="5") 投资者无权提前终止本产品，广西北部银行有权提前终止本产品
+            td(colspan="5") {{fund.bank_redeem_condition}}
           tr
             th(colspan="1") 赎回规定说明
-            td(colspan="5") ---
+            td(colspan="5") {{fund.client_redeem_description}}
           tr
             th(colspan="1") 投资风险说明
-            td(colspan="5") 好多内容
+            td(colspan="5") {{fund.risk_description}}
 
 
   .space-vertical-s
   include include/footer
   script(src="/static/js/require.js" data-main="/static/js/fund_detail")
+
+  include include/tracking

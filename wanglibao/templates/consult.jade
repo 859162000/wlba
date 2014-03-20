@@ -17,9 +17,6 @@ body
           input.pull-left.bar--input(type='text', value='', data-bind="value: asset")
           span.pull-left.input--add-on 万元
         a.pull-left.button.button-yellow.button-large.margin-left-s 找方案
-      .span6-omega.prefix1
-        .pull-right
-          a.button.button-orange.button-small(href="#propertyPlan" rel="modal:open") 定制详细方案
 
   .space-vertical-s
   .panel
@@ -28,6 +25,7 @@ body
         span 根据您的资产
         span(data-bind="text: asset")
         span 万元，为您推荐如下配置方案：
+        a.button.button-orange.button-small(href="#propertyPlan" rel="modal:open") 定制详细方案
     .space-vertical-s
     .panel-inner
       .container(data-bind="foreach: portfolios")
@@ -42,7 +40,7 @@ body
         span 推荐产品
 
     // Use template-name to detect which template to use
-    // ko template: {name: template_name, data: products}
+    // ko template: {name: "data-table", data: dataTable}
     // /ko
   .space-vertical-s
 
@@ -81,3 +79,5 @@ body
         .space-vertical-s
 
   script(src="/static/js/require.js", data-main="/static/js/consult")
+
+  include include/tracking

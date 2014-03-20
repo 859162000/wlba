@@ -37,24 +37,24 @@ $value-bar-background: #75A8F0
   @extend %value-bar-base
   +background(linear-gradient(top, $title-bar-color, darken($title-bar-color, 5%)))
 
-  &:hover
-    +background(linear-gradient(top, darken($title-bar-color, 5%), darken($title-bar-color, 10%)))
-
 =value-bar-color($color, $darken-by:5%, $hover:true)
   color: white
 
   +background($color)
+
+  &.active
+    +background($red)
+
   @if $hover
     &:hover
       +background(darken($color, $darken-by))
+    &.active:hover
+      +background($red)
 
 .value-bar--selectable, a.value-bar--selectable
   @extend %value-bar-base
   $color: $value-bar-background
   +value-bar-color($color)
-
-  &.active
-    +value-bar-color($value-bar-highlight)
 
 .value-bar--gray, a.value-bar--gray
   @extend %value-bar-base

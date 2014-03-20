@@ -10,6 +10,7 @@ define ['knockout', 'underscore'], (ko, _)->
 
       self.name = ko.observable data.name
       self.products = ko.observableArray data.products
+      self.selectedProduct = ko.observable()
 
       if context and _.has(context, 'asset')
         self.asset = context.asset
@@ -20,9 +21,11 @@ define ['knockout', 'underscore'], (ko, _)->
       if _.has(context, 'events')
         self.events = _.extend(self.events, context.events)
 
-      self.productSelected = (product)->
+      self.productSelected = (product)=>
+        self.selectedProduct product
+
         if _.has(self.events, 'productSelected')
-          self.events.productSelected(product)
+          self.events.productSelected(product, this)
         else
           if console?
             console.log product

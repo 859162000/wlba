@@ -45,12 +45,16 @@ define ['jquery'], ($)->
     'fund': 'funds'
     'funds': 'funds'
     '基金': 'funds'
+    '公募基金': 'funds'
 
     'cashs': 'cashes'
     'cashes': 'cashes'
     '现金类理财产品': 'cashes'
-
+    '现金': 'cashes'
     'favorite/trusts': 'favorite/trusts'
+
+  normalizeType = (type)->
+    typeMapping[type]
 
   loadData = (type, params)->
     if _.has(typeMapping, type)
@@ -153,7 +157,5 @@ define ['jquery'], ($)->
     addToFavorite: addToFavorite
     loadFavorites: loadFavorites
     joinFavorites: joinFavorites
+    normalizeType: normalizeType
   }
-
-
-
