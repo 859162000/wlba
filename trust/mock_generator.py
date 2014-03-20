@@ -60,5 +60,7 @@ class MockGenerator(object):
             trust.usage = (u'房地产', u'矿场企业')[random.randrange(0, 2)]
             trust.risk_management = u'风险控制说明'
             trust.usage_description = u'用途说明'
+            trust.mortgage = u'抵押物'
+            trust.mortgage_rate = 30
 
             trust.save()
