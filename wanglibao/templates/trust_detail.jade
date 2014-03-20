@@ -111,15 +111,15 @@ body
               th(colspan="1") 收益说明
               td(colspan="2") {{ trust.earning_description }}
               th(colspan="1") 抵押率
-              td(colspan="1") TODO
+              td(colspan="1") {{ trust.mortgage_rate }}
 
             tr
               th(colspan="1") 抵押物
-              td(colspan="4") TODO
+              td(colspan="4") {{ trust.mortgage }}
 
             tr
               th(colspan="1") 产品说明
-              td(colspan="4") TODO
+              td(colspan="4") {{ trust.product_description }}
 
             tr
               th(colspan="1") 风险控制
@@ -127,7 +127,7 @@ body
 
             tr
               th(colspan="1") 受托人
-              td(colspan="4") TODO
+              td(colspan="4") {{ trust.consignee }}
   .space-vertical-s
 
   include include/footer

@@ -72,9 +72,13 @@ class Trust (models.Model):
     usage_description = models.TextField()
 
     risk_management = models.TextField()
+    mortgage = models.TextField(blank=True)
+    mortgage_rate = models.FloatField(default=0)
+    consignee = models.TextField(blank=True)
     payment = models.TextField()
 
     product_name = models.TextField()
+    product_description = models.TextField(blank=True)
     related_info = models.TextField()
 
     def __unicode__(self):
