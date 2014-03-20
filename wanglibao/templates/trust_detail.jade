@@ -93,7 +93,7 @@ body
               th(colspan="1") 存续期
               td(colspan="2") {{ trust.period | month}}
               th(colspan="1") 利息分配
-              td(colspan="1") {{ trust.payment }}
+              td(colspan="1") {{ trust.payment | linebreaksbr }}
 
             tr
               th(colspan="1") 最低认购金额
@@ -103,27 +103,27 @@ body
 
             tr
               th(colspan="1") 投资行业
-              td(colspan="2") {{ trust.usage }}
+              td(colspan="2") {{ trust.usage | linebreaksbr }}
               th(colspan="1") 年化收益率
               td(colspan="1") {{ trust.expected_earning_rate | percentage}}
 
             tr
               th(colspan="1") 收益说明
-              td(colspan="2") {{ trust.earning_description }}
+              td(colspan="2") {{ trust.earning_description | linebreaksbr }}
               th(colspan="1") 抵押率
               td(colspan="1") {{ trust.mortgage_rate }}
 
             tr
               th(colspan="1") 抵押物
-              td(colspan="4") {{ trust.mortgage }}
+              td(colspan="4") {{ trust.mortgage | linebreaksbr }}
 
             tr
               th(colspan="1") 产品说明
-              td(colspan="4") {{ trust.product_description }}
+              td(colspan="4") {{ trust.product_description | linebreaksbr }}
 
             tr
               th(colspan="1") 风险控制
-              td(colspan="4") {{ trust.risk }}
+              td(colspan="4") {{ trust.risk | linebreaksbr }}
 
             tr
               th(colspan="1") 受托人
