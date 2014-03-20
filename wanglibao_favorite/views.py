@@ -1,6 +1,6 @@
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from trust.models import Trust
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_bank_financing.models import BankFinancing
@@ -37,6 +37,12 @@ class BaseFavoriteViewSet(PaginatedModelViewSet):
 
         serializer = self.serializer_class(fav_item)
         return Response(serializer.data)
+
+    def destroy(self, request, pk):
+        user = request.user
+        self.model.objects.filter(item__id=pk, user=user).delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FavoriteTrustViewSet(BaseFavoriteViewSet):

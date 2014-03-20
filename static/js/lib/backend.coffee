@@ -1,6 +1,5 @@
 define ['jquery'], ($)->
-  $ document
-  .ajaxSend (event, xhr, settings)->
+  $(document).ajaxSend (event, xhr, settings)->
     getCookie = (name)->
       cookieValue = null
       if document.cookie and document.cookie != ''
@@ -51,6 +50,8 @@ define ['jquery'], ($)->
     'cashes': 'cashes'
     '现金类理财产品': 'cashes'
 
+    'favorite/trusts': 'favorite/trusts'
+
   loadData = (type, params)->
     if _.has(typeMapping, type)
       url = apiurl + typeMapping[type] + '/.jsonp?' + $.param(params)
@@ -91,23 +92,68 @@ define ['jquery'], ($)->
     $.post url,
       params
 
-  addToFavorite = (type, id)->
+  addToFavorite = (e, type, id, is_favorited)->
     url = apiurl + 'favorite/' + type + '/'
-    $.post url, {
-      item: id
-    }
+    if is_favorited != '1'
+      $.post url, {
+        item: id
+      }
+      .done ()->
+        $(e.target).html('取消收藏')
+        $(e.target).attr('data-is-favorited', '1')
+      .fail (xhr)->
+        if xhr.status == 403
+          window.location.href = '/accounts/login/?next=' + window.location.href
+        else if xhr.status == 409
+          $(e.target).html('取消收藏')
+          $(e.target).attr('data-is-favorited', '1')
+        else
+          alert('收藏失败')
+    else
+      $.ajax {
+        url: url + id + '/'
+        type: 'DELETE'
+      }
+      .done ()->
+        e.target.textContent = '收藏'
+        $(e.target).attr('data-is-favorited', '0')
+      .fail ()->
+          alert '取消收藏失败'
+
+  joinFavorites = (products, type, table)->
+    loadData 'favorite/' + type, {}
+    .done (favorites)->
+      ids = _.map(favorites.results, (f)->
+        return f.item.id)
+      for i, product of products.results
+        if _.contains ids, product.id
+          product.is_favorited = 1
+      table.data(products.results)
 
   loadFavorites = (type)->
     url = apiurl + 'favorite/' + type + '/'
     $.get url
 
-  loadData: loadData
-  isValidType: isValidType
+  window.addToFavorite = (e)->
+    e.preventDefault()
 
-  loadPortfolio: loadPortfolio
+    id = $(e.target).attr('data-id')
+    is_favorited = $(e.target).attr('data-is-favorited')
+    addToFavorite e, 'trusts', id, is_favorited
 
-  createPreOrder: createPreOrder
-  changePassword: changePassword
+  return {
+    loadData: loadData
+    isValidType: isValidType
 
-  addToFavorite: addToFavorite
-  loadFavorites: loadFavorites
+    loadPortfolio: loadPortfolio
+
+    createPreOrder: createPreOrder
+    changePassword: changePassword
+
+    addToFavorite: addToFavorite
+    loadFavorites: loadFavorites
+    joinFavorites: joinFavorites
+  }
+
+
+

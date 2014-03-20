@@ -28,12 +28,15 @@
         }
       });
       return $('#addToFavorite').click(function(e) {
-        var id;
+        var id, is_favorited;
         e.preventDefault();
         id = $(e.target).attr('data-id');
-        return backend.addToFavorite('trusts', id);
+        is_favorited = $(e.target).attr('data-is-favorited');
+        return backend.addToFavorite(e, 'trusts', id, is_favorited);
       });
     });
   });
 
 }).call(this);
+
+//# sourceMappingURL=trust_detail.map

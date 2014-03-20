@@ -45,7 +45,7 @@ def virtualenv():
 
 
 def deploy():
-    path = '/var/deploy/wanglibao'
+    path = env.path
 
     print red("Begin deploy: ")
     # todo if the folder not existed, create it
@@ -57,6 +57,8 @@ def deploy():
 
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, clone it from local depot')
+            sudo("mkdir %s" % path)
+            sudo("chmod 777 %s" % path)
             # TODO get the local git path instead of hard code
             run("git clone %s" % env.depot)
         else:

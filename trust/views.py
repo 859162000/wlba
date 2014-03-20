@@ -1,10 +1,10 @@
 from django.views.generic import TemplateView
-from rest_framework import viewsets
 from trust.filters import TrustFilterSet
 from trust.models import Trust, Issuer
 from serializers import TrustSerializer
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.views import IsAdminUserOrReadOnly
+from wanglibao_favorite.models import FavoriteTrust
 
 
 class TrustHomeView(TemplateView):
@@ -29,7 +29,13 @@ class TrustDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         id = kwargs['id']
         context = super(TrustDetailView, self).get_context_data(**kwargs)
-        context['trust'] = Trust.objects.get(pk=id)
+        trust = Trust.objects.get(pk=id)
+        context['trust'] = trust
+        is_favorited = 0
+        if self.request.user.is_authenticated():
+            if FavoriteTrust.objects.filter(user=self.request.user, item=trust).exists():
+                is_favorited = 1
+        context['is_favorited'] = is_favorited
         return context
 
 

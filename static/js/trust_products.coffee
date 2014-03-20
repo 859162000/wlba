@@ -323,7 +323,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'mode
 
           backend.loadData 'trusts', params
           .done( (data)->
-            self.trustTable.data data.results
+            backend.joinFavorites(data, "trusts", self.trustTable)
             self.pager.totalPageNumber data.num_pages
           ).fail( (xhr, status, error)->
             alert(status + error)

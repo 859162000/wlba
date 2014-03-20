@@ -34,6 +34,14 @@
         if (_.has(context, 'events')) {
           _(self.events).extend(context.events);
         }
+        self.addToFavorite = function(data, e) {
+          var id, is_favorited;
+          e.preventDefault();
+          id = $(e.target).attr('data-id');
+          alert(id);
+          is_favorited = $(e.target).attr('data-is-favorited');
+          return backend.addToFavorite(e, 'trusts', id, is_favorited);
+        };
         self.sortHandler = function(column) {
           var order, sortedColumn;
           sortedColumn = self.sortedColumn();

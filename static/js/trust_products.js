@@ -333,7 +333,7 @@
               ordering: self.orderBy()
             });
             return backend.loadData('trusts', params).done(function(data) {
-              self.trustTable.data(data.results);
+              backend.joinFavorites(data, "trusts", self.trustTable);
               return self.pager.totalPageNumber(data.num_pages);
             }).fail(function(xhr, status, error) {
               return alert(status + error);

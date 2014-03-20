@@ -51,7 +51,10 @@ body
                     dd {{ trust.period | month}}
           .row
             .prefix10.span2-omega
-              a#addToFavorite.pull-right(href="#", data-id="{{trust.id}}") 收藏
+              if is_favorited != 1
+                a#addToFavorite.pull-right(href="#", data-id="{{trust.id}}", data-is-favorited="{{is_favorited}}")收藏
+              else
+                a#addToFavorite.pull-right(href="#", data-id="{{trust.id}}", data-is-favorited="{{is_favorited}}")取消收藏
 
     .span4-omega.panel.panel-header
       p.font-m.padding-left-s.padding-top-xs 发售日期: {{ trust.issue_date | date:"Y年n月j日"}}

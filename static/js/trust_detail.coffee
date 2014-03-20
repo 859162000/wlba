@@ -27,4 +27,5 @@ require ['jquery', 'lib/backend'], ($, backend)->
       e.preventDefault()
 
       id = $(e.target).attr('data-id')
-      backend.addToFavorite 'trusts', id
+      is_favorited = $(e.target).attr('data-is-favorited')
+      backend.addToFavorite e, 'trusts', id, is_favorited

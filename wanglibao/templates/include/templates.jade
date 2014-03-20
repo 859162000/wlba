@@ -35,6 +35,7 @@ script(type="text/html", id="trust-table")
         td(colspan="2" data-bind="text: issuer_short_name") 甘肃信托
         td(colspan="2")
           a.button.button-mini.button-yellow(data-bind="attr{ href: '/trust/detail/' + id }") 详情
+          a#addToFavorite.button.button-mini.button-yellow(href="#", data-bind="attr{'data-id': id}") 收藏
 
 
 script(type="text/html", id="data-table")
@@ -115,6 +116,7 @@ script(type="text/html", id="fund-table")
         td(colspan="2" data-bind="text: frontEndRate() + '|' + backEndRate()") 前端费率|后端费率
         td(colspan="2")
           a.button.button-mini.button-yellow(href="#", data-bind="attr{ href: '/fund/detail/' + id }") 详情
+          a#addToFavorite.button.button-mini.button-yellow(href="#", data-bind="attr{'data-id': id}") 收藏
           // funds-table render
 
 script(type="text/html", id="cash-table")
@@ -141,6 +143,7 @@ script(type="text/html", id="cash-table")
         td(colspan="2" data-bind="text: status")
         td(colspan="2")
           a.button.button-mini.button-yellow(href="#", data-bind="attr{ href: '/cash/detail/' + id }") 详情
+          a#addToFavorite.button.button-mini.button-yellow(href="#", data-id="{{trust.id}}") 收藏
 
 script(type="text/html", id="no-products-available")
   div(style="text-align: center; font-size: 1.3em; padding: 1em;") 没有相关的推荐产品
