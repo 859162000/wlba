@@ -13,9 +13,6 @@ class BankFinancingViewSet(PaginatedModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
 
 
-
-
-
 class BankViewSet(PaginatedModelViewSet):
     model = Bank
     serializer_class = BankSerializer
@@ -28,3 +25,13 @@ class FinancingHomeView(TemplateView):
 
 class FinancingProductsView(TemplateView):
     template_name = "financing_products.jade"
+
+
+class FinancingDetailView(TemplateView):
+    template_name = "financing_detail.jade"
+
+    def get_context_data(self, id, **kwargs):
+        financing = BankFinancing.objects.get(pk=id)
+        return {
+            'financing': financing
+        }

@@ -22,18 +22,18 @@
               name: '产品名称',
               colspan: 4,
               sortable: true,
+              field: 'name',
               text: function(item) {
                 return item.name;
-              },
-              field: 'name'
+              }
             }, {
               name: '起购金额',
               colspan: 2,
               sortable: true,
+              field: 'investment_threshold',
               text: function(item) {
-                return item.invest_threshold + '万';
-              },
-              field: 'invest_threshold'
+                return item.investment_threshold + '万';
+              }
             }, {
               name: '发行银行',
               colspan: 2,
@@ -64,9 +64,9 @@
               colspan: 2,
               sortable: true,
               text: function(item) {
-                return item.max_expected_profit_rate + '%';
+                return item.expected_rate + '%';
               },
-              field: 'max_expected_profit_rate'
+              field: 'expected_rate'
             }, {
               name: '',
               colspan: 2,
