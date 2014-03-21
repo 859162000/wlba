@@ -6,7 +6,7 @@ from django.views.generic import TemplateView
 from trust.views import TrustHomeView, TrustProductsView, TrustDetailView
 from wanglibao.forms import EmailOrPhoneAuthenticationForm
 from wanglibao.views import RegisterView, IndexView, AccountSettingView
-from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView
+from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundHomeView, FundDetailView
 from wanglibao_portfolio.views import PortfolioHomeView
@@ -26,6 +26,7 @@ urlpatterns = patterns(
 
     url(r'^financing/home/', FinancingHomeView.as_view(), name="financing_home"),
     url(r'^financing/products/', FinancingProductsView.as_view(), name="financing_products"),
+    url(r'^financing/detail/(?P<id>\w+)', FinancingDetailView.as_view(), name="financing_detail"),
 
     url(r'^fund/home/', FundHomeView.as_view(), name="fund_home"),
     url(r'^fund/products/', TemplateView.as_view(template_name="fund_products.jade"), name="fund_products"),

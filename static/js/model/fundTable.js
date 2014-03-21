@@ -47,33 +47,33 @@
               name: '日涨幅',
               colspan: 2,
               sortable: true,
-              field: 'rate_day',
+              field: 'rate_today',
               text: function(item) {
-                return item.rate_day + '%';
+                return item.rate_today + '%';
               }
             }, {
               name: '近一月涨幅',
               colspan: 2,
               sortable: true,
-              field: 'profit_rate_month',
+              field: 'rate_1_month',
               text: function(item) {
-                return item.profit_rate_month + '%';
+                return item.rate_1_month + '%';
               }
             }, {
               name: '近三月涨幅',
               colspan: 2,
               sortable: true,
-              field: 'profit_rate_3months',
+              field: 'rate_3_months',
               text: function(item) {
-                return item.profit_rate_3months + '%';
+                return item.rate_3_months + '%';
               }
             }, {
               name: '近半年涨幅',
               colspan: 2,
               sortable: true,
-              field: 'profit_rate_6months',
+              field: 'rate_6_months',
               text: function(item) {
-                return item.profit_rate_6months + '%';
+                return item.rate_6_months + '%';
               }
             }, {
               name: '前端|后端费率',

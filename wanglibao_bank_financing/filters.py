@@ -10,7 +10,7 @@ class BankFinancingFilterSet(AutoNumberFilter):
     class Meta(AutoNumberFilter.Meta):
         model = BankFinancing
         number_fields = (
-            ('threshold', 'invest_threshold'),
+            ('threshold', 'investment_threshold'),
             ('period', 'period'),
-            ('rate', 'max_expected_profit_rate'),
+            ('rate', 'expected_rate'),
         )

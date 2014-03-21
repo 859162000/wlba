@@ -29,7 +29,7 @@
             }
           }
         });
-        self.orderBy = ko.observable('-max_expected_profit_rate');
+        self.orderBy = ko.observable('-expected_rate');
         self.filters = ko.observable();
         self.tabTree = {
           tabs: [

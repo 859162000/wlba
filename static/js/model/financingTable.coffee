@@ -11,16 +11,16 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             name: '产品名称'
             colspan: 4
             sortable: true
+            field: 'name'
             text: (item)->
               item.name
-            field: 'name'
           ,
             name: '起购金额'
             colspan: 2
             sortable: true
+            field: 'investment_threshold'
             text: (item)->
-              item.invest_threshold + '万'
-            field: 'invest_threshold'
+              item.investment_threshold + '万'
           ,
             name: '发行银行'
             colspan: 2
@@ -48,8 +48,8 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             colspan: 2
             sortable: true
             text: (item)->
-              item.max_expected_profit_rate + '%'
-            field: 'max_expected_profit_rate'
+              item.expected_rate + '%'
+            field: 'expected_rate'
           ,
             name: ''
             colspan: 2
