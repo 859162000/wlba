@@ -114,7 +114,7 @@ html
               .card-icon
                 dl
                   dt 七日收益率
-                  dd {{fund.profit_rate_7days | percentage}}
+                  dd {{fund.rate_7_days | percentage}}
               a.card-orderlink(href="/fund/detail/{{fund.id}}") 预约
             .card-right
               dl
@@ -132,7 +132,7 @@ html
               .card-icon
                 dl
                   dt 最高收益率
-                  dd {{financing.max_expected_profit_rate | percentage}}
+                  dd {{financing.expected_rate | percentage}}
               a.card-orderlink(href="/financing/detail/{{financing.id}}") 预约
             .card-right
               dl
