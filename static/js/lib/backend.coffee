@@ -52,6 +52,9 @@ define ['jquery'], ($)->
     '现金类理财产品': 'cashes'
     '现金': 'cashes'
     'favorite/trusts': 'favorite/trusts'
+    'favorite/funds': 'favorite/funds'
+    'favorite/cashes': 'favorite/cashes'
+    'favorite/financings': 'favorite/financings'
 
   normalizeType = (type)->
     typeMapping[type]
@@ -96,7 +99,10 @@ define ['jquery'], ($)->
     $.post url,
       params
 
-  addToFavorite = (e, type, id, is_favorited)->
+  addToFavorite = (e, type)->
+    e.preventDefault()
+    id = $(e.target).attr('data-id')
+    is_favorited = $(e.target).attr('data-is-favorited')
     url = apiurl + 'favorite/' + type + '/'
     if is_favorited != '1'
       $.post url, {
@@ -124,7 +130,7 @@ define ['jquery'], ($)->
       .fail ()->
           alert '取消收藏失败'
 
-  joinFavorites = (products, type, table)->
+  joinFavorites = (products, type, table, transformer)->
     loadData 'favorite/' + type, {}
     .done (favorites)->
       ids = _.map(favorites.results, (f)->
@@ -132,18 +138,23 @@ define ['jquery'], ($)->
       for i, product of products.results
         if _.contains ids, product.id
           product.is_favorited = 1
-      table.data(products.results)
+      if transformer
+        data = transformer products
+        table.data data
+      else
+        table.data(products.results)
+
 
   loadFavorites = (type)->
     url = apiurl + 'favorite/' + type + '/'
     $.get url
 
-  window.addToFavorite = (e)->
+  window.addToFavorite = (e, type)->
     e.preventDefault()
 
     id = $(e.target).attr('data-id')
     is_favorited = $(e.target).attr('data-is-favorited')
-    addToFavorite e, 'trusts', id, is_favorited
+    addToFavorite e, type, id, is_favorited
 
   return {
     loadData: loadData

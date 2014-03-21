@@ -55,7 +55,10 @@
       'cashes': 'cashes',
       '现金类理财产品': 'cashes',
       '现金': 'cashes',
-      'favorite/trusts': 'favorite/trusts'
+      'favorite/trusts': 'favorite/trusts',
+      'favorite/funds': 'favorite/funds',
+      'favorite/cashes': 'favorite/cashes',
+      'favorite/financings': 'favorite/financings'
     };
     normalizeType = function(type) {
       return typeMapping[type];
@@ -99,8 +102,11 @@
       url = '/accounts/password/change/';
       return $.post(url, params);
     };
-    addToFavorite = function(e, type, id, is_favorited) {
-      var url;
+    addToFavorite = function(e, type) {
+      var id, is_favorited, url;
+      e.preventDefault();
+      id = $(e.target).attr('data-id');
+      is_favorited = $(e.target).attr('data-is-favorited');
       url = apiurl + 'favorite/' + type + '/';
       if (is_favorited !== '1') {
         return $.post(url, {
@@ -130,9 +136,9 @@
         });
       }
     };
-    joinFavorites = function(products, type, table) {
+    joinFavorites = function(products, type, table, transformer) {
       return loadData('favorite/' + type, {}).done(function(favorites) {
-        var i, ids, product, _ref;
+        var data, i, ids, product, _ref;
         ids = _.map(favorites.results, function(f) {
           return f.item.id;
         });
@@ -143,7 +149,12 @@
             product.is_favorited = 1;
           }
         }
-        return table.data(products.results);
+        if (transformer) {
+          data = transformer(products);
+          return table.data(data);
+        } else {
+          return table.data(products.results);
+        }
       });
     };
     loadFavorites = function(type) {
@@ -151,12 +162,12 @@
       url = apiurl + 'favorite/' + type + '/';
       return $.get(url);
     };
-    window.addToFavorite = function(e) {
+    window.addToFavorite = function(e, type) {
       var id, is_favorited;
       e.preventDefault();
       id = $(e.target).attr('data-id');
       is_favorited = $(e.target).attr('data-is-favorited');
-      return addToFavorite(e, 'trusts', id, is_favorited);
+      return addToFavorite(e, type, id, is_favorited);
     };
     return {
       loadData: loadData,

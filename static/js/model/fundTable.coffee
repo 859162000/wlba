@@ -59,8 +59,14 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
           name: ''
           colspan: 2
           text: (item)->
-            '<a class="button button-mini button-yellow" href="/fund/detail/' + item.id + '">详情</a>'
-        ]
+            link_text = '收 藏'
+            if item.is_favorited == 1
+              link_text = '取消收藏'
+            '<a class="button button-mini button-yellow" href="/fund/detail/' + item.id + '">详情</a>' +
+              ' <a class="button button-mini button-yellow" onclick="addToFavorite(event,' + "'funds');" +
+              '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' +
+              link_text + '</a>'
+      ]
 
       _.extend(context, defaultContext)
       super context

@@ -4,7 +4,4 @@ require.config
 
 require ['jquery', 'lib/backend'], ($, backend)->
   $('#addToFavorite').click (e)->
-    e.preventDefault()
-
-    id = $(e.target).attr('data-id')
-    backend.addToFavorite 'funds', id
+    backend.addToFavorite e, 'funds'

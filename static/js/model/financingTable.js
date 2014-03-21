@@ -71,7 +71,12 @@
               name: '',
               colspan: 2,
               text: function(item) {
-                return '<a class="button button-mini button-yellow" href="/financing/detail/' + item.id + '">详情</a>';
+                var link_text;
+                link_text = '收 藏';
+                if (item.is_favorited === 1) {
+                  link_text = '取消收藏';
+                }
+                return '<a class="button button-mini button-yellow" href="/financing/detail/' + item.id + '">详情</a>' + ' <a class="button button-mini button-yellow" onclick="addToFavorite(event,' + "'financings');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
               }
             }
           ]

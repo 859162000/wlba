@@ -5,63 +5,11 @@ require.config
     knockout: 'lib/knockout-3.0.0'
 
 require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model/pager',
-         'model/table'], ($, _, ko, backend, cash, pager, table)->
+         'model/cashTable'], ($, _, ko, backend, cash, pager, table)->
   class DataViewModel
     constructor: ->
       self = this
       self.products = new table.viewModel
-        columns: [
-          name: '序号'
-          colspan: 1
-          text: (item, index)->
-            index + 1
-        ,
-          name: '名称'
-          colspan: 3
-          text: (item)->
-            item.name
-        ,
-          name: '发行机构'
-          colspan: 2
-          sortable: true
-          field: 'issuer__name'
-          text: (item)->
-            item.issuer_name
-        ,
-          name: '期限'
-          colspan: 2
-          sortable: true
-          field: 'period'
-          text: (item)->
-            if item.period
-              item.period + '个月'
-            else
-              '活期'
-        ,
-          name: '七日年化利率'
-          colspan: 2
-          sortable: true
-          field: 'profit_rate_7days'
-          text: (item)->
-            item.profit_rate_7days + '%'
-        ,
-          name: '每万份收益'
-          colspan: 2
-          sortable: true
-          field: 'profit_10000'
-          text: (item)->
-            item.profit_10000 + '元'
-        ,
-          name: '购买链接'
-          colspan: 2
-          text: (item)->
-            '<a href="' + item.buy_url + '">' + item.buy_text + '</a>'
-        ,
-          name: ''
-          colspan: 2
-          text: (item)->
-            '<a class="button button-mini button-yellow" href="/cash/detail/' + item.id + '">详情</a>'
-        ]
         events:
           sortHandler: (column, order)->
             field = column.field
@@ -102,7 +50,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
           console.log 'loading data'
         backend.loadData 'cashes', params
         .done( (data)->
-          self.products.data data.results
+          backend.joinFavorites(data, 'cashes', self.products)
           self.pager.totalPageNumber data.num_pages
         ).fail( (xhr, status, error)->
           alert(status + error)

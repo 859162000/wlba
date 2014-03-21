@@ -57,11 +57,13 @@
             count: 10
           }, self.selectedTab().values);
           return backend.loadData('funds', params).done(function(data) {
-            return self.fundTable.data(_.map(data.results, function(item) {
-              return new fund.viewModel({
-                data: item
+            return backend.joinFavorites(data, 'funds', self.fundTable, function(data) {
+              return _.map(data.results, function(item) {
+                return new fund.viewModel({
+                  data: item
+                });
               });
-            }));
+            });
           });
         }).extend({
           throttle: 1

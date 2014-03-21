@@ -127,7 +127,7 @@
             page_size: 10,
             ordering: self.orderBy()
           }, self.filters())).done(function(data) {
-            return self.financingTable.data(data.results);
+            return backend.joinFavorites(data, 'financings', self.financingTable);
           });
         });
       }

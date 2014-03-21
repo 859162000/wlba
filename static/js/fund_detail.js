@@ -8,10 +8,7 @@
 
   require(['jquery', 'lib/backend'], function($, backend) {
     return $('#addToFavorite').click(function(e) {
-      var id;
-      e.preventDefault();
-      id = $(e.target).attr('data-id');
-      return backend.addToFavorite('funds', id);
+      return backend.addToFavorite(e, 'funds');
     });
   });
 

@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from trust.models import Trust
 from wanglibao_bank_financing.models import BankFinancing
+from wanglibao_cash.models import Cash
 from wanglibao_fund.models import Fund
 
 
@@ -29,3 +30,9 @@ class FavoriteFund(models.Model):
     item = models.ForeignKey(Fund)
 
 
+class FavoriteCash(models.Model):
+    """
+    The favorite fund relation defines user's collection of fund
+    """
+    user = models.ForeignKey(get_user_model())
+    item = models.ForeignKey(Cash)

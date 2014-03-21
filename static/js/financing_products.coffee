@@ -54,7 +54,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', '
           console.log 'loading data'
         backend.loadData 'financing', params
         .done( (data)->
-          self.financingTable.data data.results
+          backend.joinFavorites(data, 'financings', self.financingTable)
           self.pager.totalPageNumber data.num_pages
         ).fail( (xhr, status, error)->
           alert(status + error)

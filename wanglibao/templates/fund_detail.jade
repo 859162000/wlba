@@ -52,7 +52,11 @@ body
         .row.panel-footer
           .well
             p.pull-left 银行客服电话: {{fund.issuer.phone}}
-            a#addToFavorite.pull-right(href="#", data-id="{{fund.id}}") 收藏
+            if is_favorited != 1
+              a#addToFavorite.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")收藏
+            else
+              a#addToFavorite.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")取消收藏
+
     .span4-omega.panel.panel-header
       .panel-title-bar-s
         span.panel-title 收益计算器

@@ -4,8 +4,10 @@ from rest_framework.response import Response
 from trust.models import Trust
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_bank_financing.models import BankFinancing
-from wanglibao_favorite.models import FavoriteTrust, FavoriteFinancing, FavoriteFund
-from wanglibao_favorite.serializers import FavoriteTrustSerializer, FavoriteFinancingSerializer, FavoriteFundSerializer
+from wanglibao_cash.models import Cash
+from wanglibao_favorite.models import FavoriteTrust, FavoriteFinancing, FavoriteFund, FavoriteCash
+from wanglibao_favorite.serializers import FavoriteTrustSerializer, FavoriteFinancingSerializer, FavoriteFundSerializer, \
+    FavoriteCashSerializer
 from wanglibao_fund.models import Fund
 
 
@@ -61,3 +63,10 @@ class FavoriteFundViewSet(BaseFavoriteViewSet):
     model = FavoriteFund
     product_model = Fund
     serializer_class = FavoriteFundSerializer
+
+
+class FavoriteCashViewSet(BaseFavoriteViewSet):
+    model = FavoriteCash
+    product_model = Cash
+    serializer_class = FavoriteCashSerializer
+

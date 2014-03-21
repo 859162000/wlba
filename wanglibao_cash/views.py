@@ -4,6 +4,7 @@ from wanglibao.views import IsAdminUserOrReadOnly
 from wanglibao_cash.filters import CashFilterSet
 from wanglibao_cash.models import Cash, CashIssuer
 from wanglibao_cash.serializers import CashSerializer, CashIssuerSerializer
+from wanglibao_favorite.models import FavoriteCash
 
 
 class CashViewSet(PaginatedModelViewSet):
@@ -29,5 +30,11 @@ class CashDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         id = kwargs['id']
         context = super(CashDetailView, self).get_context_data(**kwargs)
-        context['cash'] = Cash.objects.get(pk=id)
+        cash = Cash.objects.get(pk=id)
+        is_favorited = 0
+        if self.request.user.is_authenticated():
+            if FavoriteCash.objects.filter(item=cash, user=self.request.user).exists():
+                is_favorited = 1
+        context['is_favorited'] = is_favorited
+        context['cash'] = cash
         return context

@@ -61,7 +61,7 @@
             console.log('loading data');
           }
           return backend.loadData('financing', params).done(function(data) {
-            self.financingTable.data(data.results);
+            backend.joinFavorites(data, 'financings', self.financingTable);
             return self.pager.totalPageNumber(data.num_pages);
           }).fail(function(xhr, status, error) {
             return alert(status + error);

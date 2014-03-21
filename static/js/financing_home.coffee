@@ -104,6 +104,6 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/
             ordering: self.orderBy()
           }, self.filters()
         .done (data)->
-          self.financingTable.data(data.results)
+          backend.joinFavorites(data, 'financings', self.financingTable)
 
   ko.applyBindings new viewModel()
