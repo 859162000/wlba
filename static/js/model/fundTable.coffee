@@ -6,8 +6,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
           name: '代码'
           colspan: 2
           field: 'product_code'
-          text: (item)->
-            item.product_code
+          text: (item)->item.product_code
         ,
           name: '基金名称'
           colspan: 3
@@ -30,26 +29,26 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
           name: '日涨幅'
           colspan: 2
           sortable: true
-          field: 'rate_day'
-          text: (item)->item.rate_day + '%'
+          field: 'rate_today'
+          text: (item)->item.rate_today + '%'
         ,
           name: '近一月涨幅'
           colspan: 2
           sortable: true
-          field: 'profit_rate_month'
-          text: (item)->item.profit_rate_month + '%'
+          field: 'rate_1_month'
+          text: (item)->item.rate_1_month + '%'
         ,
           name: '近三月涨幅'
           colspan: 2
           sortable: true
-          field: 'profit_rate_3months'
-          text: (item)->item.profit_rate_3months + '%'
+          field: 'rate_3_months'
+          text: (item)->item.rate_3_months + '%'
         ,
           name: '近半年涨幅'
           colspan: 2
           sortable: true
-          field: 'profit_rate_6months'
-          text: (item)->item.profit_rate_6months + '%'
+          field: 'rate_6_months'
+          text: (item)->item.rate_6_months + '%'
         ,
           name: '前端|后端费率'
           colspan: 2

@@ -25,25 +25,25 @@ body
             .row
               .span8
                 dl.span6.key-value
-                  dt 销售币种：
-                  dd 人民币
+                  dt 基金全名：
+                  dd {{ fund.full_name }}
                 dl.span6-omega.key-value
-                  dt 收益类型：
-                  dd 浮动收益
+                  dt 基金公司：
+                  dd {{ fund.issuer.name }}
             .row
               .span8
                 dl.span6.key-value
-                  dt 是否保本：
-                  dd 不保本
+                  dt 基金类型：
+                  dd {{ fund.type }}
                 dl.span6-omega.key-value
-                  dt 销售状态：
-                  dd 在售
+                  dt 交易状态：
+                  dd {{ fund.status }}
         .span4-omega
           .span6
             .card-icon
               dl
                 dt 7日年化收益
-                dd {{fund.profit_rate_7days | percentage}}
+                dd {{fund.rate_7_days | percentage}}
           .span6-omega
             .card-icon
               dl
@@ -51,7 +51,7 @@ body
                 dd 50天
         .row.panel-footer
           .well
-            p.pull-left 银行客服电话: {{fund.issuer.phone}}
+            p.pull-left 客服电话: {{fund.issuer.phone}}
             a#addToFavorite.pull-right(href="#", data-id="{{fund.id}}") 收藏
     .span4-omega.panel.panel-header
       .panel-title-bar-s
@@ -63,63 +63,52 @@ body
 
   .panel
     .panel-title-bar
-      .panel-tabs
-        .panel-tab.active 产品详情
+      .panel-title 产品详情
     .well
-      p 购买信息
       table.bordered-table
         tbody
           tr
-            th 发行银行
-            td {{fund.hosted_bank}}
-            th 发行对象
-            td {{fund.target_user}}
-            th 货币币种
-            td {{fund.currency}}
+            th 基金经理
+            td {{fund.manager}}
+            th 托管银行
+            td {{fund.hosting_bank}}
           tr
-            th 投资类型
-            td {{fund.invest_type}}
-            th 发行起始日期
-            td {{fund.start_date | na_if_none}}
-            th 发行终止日期
-            td {{fund.end_date | na_if_none}}
+            th 基金管理费
+            td {{fund.management_fee}}
+            th 基金托管费
+            td {{fund.hosting_fee}}
           tr
-            th 委托管理期限
-            td {{fund.management_period | month}}
-            th 委托币种起始金额
-            td {{fund.management_threshold}}
-            th 起购金额递增单位
-            td {{fund.invest_step}}
+            th 成立日期
+            td {{fund.found_date | na_if_none}}
+            th 最新份额
+            td {{fund.latest_shares | na_if_none}}
           tr
-            th 可否质押贷款
-            td {{fund.pledgable | yes_no}}
-            th 银行是否可提前终止
-            td {{fund.bank_redeemable | yes_no}}
-            th 客户是否可赎回
-            td {{fund.client_redeemable | yes_no}}
-          tr
-            th 销售地区
-            td(colspan="5") {{fund.available_region}}
+            th 首募规模
+            td {{fund.init_scale | na_if_none}}
+            th 最新规模
+            td {{fund.latest_scale | na_if_none}}
 
-      p 其他说明
-      table.bordered-table
-        tbody
-          tr
-            th(colspan="1") 收益说明
-            td(colspan="5") {{fund.profit_description}}
-          tr
-            th(colspan="1") 申购条件说明
-            td(colspan="5") {{fund.buy_description}}
-          tr
-            th(colspan="1") 银行提前终止条件
-            td(colspan="5") {{fund.bank_redeem_condition}}
-          tr
-            th(colspan="1") 赎回规定说明
-            td(colspan="5") {{fund.client_redeem_description}}
-          tr
-            th(colspan="1") 投资风险说明
-            td(colspan="5") {{fund.risk_description}}
+  .panel
+    .panel-title-bar
+      .panel-title 投资目标
 
+    p.well {{fund.investment_target | linebreaksbr}}
+
+  .panel
+    .panel-title-bar
+      .panel-title 投资范围
+
+    p.well {{fund.investment_scope | linebreaksbr}}
+
+  .panel
+    .panel-title-bar
+      .panel-title 投资策略
+    p.well {{fund.investment_strategy | linebreaksbr}}
+
+  .panel
+    .panel-title-bar
+      .panel-title 风险收益特征
+    p.well {{fund.risk_character | linebreaksbr}}
 
   .space-vertical-s
   include include/footer

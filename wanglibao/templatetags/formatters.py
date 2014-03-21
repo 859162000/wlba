@@ -34,7 +34,7 @@ def yes_no(value):
 
 @register.filter
 def na_if_none(value):
-    if value is None:
+    if value is None or value == '':
         return u'--'
     else:
         return value
