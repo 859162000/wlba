@@ -18,17 +18,50 @@
         self.cashTable = new cash.viewModel({});
         self.fundTable = new fund.viewModel({});
         self.financingTable = new financing.viewModel({});
-        backend.loadFavorites('trusts').done(function(data) {
-          return self.trustTable.transform_favorite(data);
+        self.tabTree = {
+          tabs: [
+            {
+              name: '信托',
+              value: {
+                type: 'trusts',
+                table: self.trustTable
+              }
+            }, {
+              name: '银行理财',
+              value: {
+                type: 'financings',
+                table: self.financingTable
+              }
+            }, {
+              name: '基金',
+              value: {
+                type: 'funds',
+                table: self.fundTable
+              }
+            }, {
+              name: '现金类理财',
+              value: {
+                type: 'cashes',
+                table: self.cashTable
+              }
+            }
+          ]
+        };
+        self.type = ko.observable();
+        self.dataTable = ko.observable();
+        self.tab = new tab.viewModel({
+          tabs: self.tabTree.tabs,
+          events: {
+            tabSelected: function(data, event) {
+              self.dataTable(data.value.table);
+              return self.type(data.value.type);
+            }
+          }
         });
-        backend.loadFavorites('cashes').done(function(data) {
-          return self.cashTable.transform_favorite(data);
-        });
-        backend.loadFavorites('funds').done(function(data) {
-          return self.fundTable.transform_favorite(data);
-        });
-        backend.loadFavorites('financings').done(function(data) {
-          return self.financingTable.transform_favorite(data);
+        ko.computed(function() {
+          return backend.loadFavorites(self.type()).done(function(data) {
+            return self.dataTable().transform_favorite(data);
+          });
         });
       }
 

@@ -14,21 +14,46 @@ require ['jquery', 'knockout', 'underscore', 'lib/backend', 'model/fundTable', '
       self.fundTable = new fund.viewModel {}
       self.financingTable = new financing.viewModel {}
 
+      self.tabTree =
+        tabs:[
+          name: '信托'
+          value: {
+            type: 'trusts'
+            table: self.trustTable
+          }
+        ,
+          name: '银行理财'
+          value: {
+            type: 'financings'
+            table: self.financingTable
+          }
+        ,
+          name: '基金'
+          value: {
+            type: 'funds'
+            table: self.fundTable
+          }
+        ,
+          name: '现金类理财'
+          value: {
+            type: 'cashes'
+            table: self.cashTable
+          }
+        ]
 
-      backend.loadFavorites 'trusts'
-      .done (data)->
-        self.trustTable.transform_favorite data
+      self.type = ko.observable()
+      self.dataTable = ko.observable()
 
-      backend.loadFavorites 'cashes'
-      .done (data)->
-          self.cashTable.transform_favorite data
+      self.tab = new tab.viewModel
+        tabs: self.tabTree.tabs
+        events:
+          tabSelected: (data, event)->
+            self.dataTable data.value.table
+            self.type data.value.type
 
-      backend.loadFavorites 'funds'
-      .done (data) ->
-        self.fundTable.transform_favorite data
-
-      backend.loadFavorites 'financings'
-      .done (data) ->
-        self.financingTable.transform_favorite data
+      ko.computed ()->
+        backend.loadFavorites(self.type())
+        .done (data)->
+            self.dataTable().transform_favorite(data)
 
   ko.applyBindings(new viewModel())
