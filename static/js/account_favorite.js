@@ -8,31 +8,27 @@
     }
   });
 
-  require(['jquery', 'knockout', 'underscore', 'lib/backend', 'model/fund', 'model/financing', 'model/tab'], function($, ko, _, backend, fund, financing, tab) {
+  require(['jquery', 'knockout', 'underscore', 'lib/backend', 'model/fundTable', 'model/financingTable', 'model/trustTable', 'model/cashTable', 'model/tab'], function($, ko, _, backend, fund, financing, trust, cash, tab) {
     var viewModel;
     viewModel = (function() {
       function viewModel() {
         var self;
         self = this;
-        self.trusts = ko.observable();
-        self.funds = ko.observable();
-        self.financings = ko.observable();
+        self.trustTable = new trust.viewModel({});
+        self.cashTable = new cash.viewModel({});
+        self.fundTable = new fund.viewModel({});
+        self.financingTable = new financing.viewModel({});
         backend.loadFavorites('trusts').done(function(data) {
-          return self.trusts(_.pluck(data.results, 'item'));
+          return self.trustTable.transform_favorite(data);
+        });
+        backend.loadFavorites('cashes').done(function(data) {
+          return self.cashTable.transform_favorite(data);
         });
         backend.loadFavorites('funds').done(function(data) {
-          return self.funds(_.pluck(data.results, 'item').map(function(element) {
-            return new fund.viewModel({
-              data: element
-            });
-          }));
+          return self.fundTable.transform_favorite(data);
         });
         backend.loadFavorites('financings').done(function(data) {
-          return self.financings(_.pluck(data.results, 'item').map(function(element) {
-            return new financing.viewModel({
-              data: element
-            });
-          }));
+          return self.financingTable.transform_favorite(data);
         });
       }
 

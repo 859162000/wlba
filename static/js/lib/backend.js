@@ -138,17 +138,23 @@
     };
     joinFavorites = function(products, type, table, transformer) {
       return loadData('favorite/' + type, {}).done(function(favorites) {
-        var data, i, ids, product, _ref;
+        var i, ids, product, _ref, _results;
         ids = _.map(favorites.results, function(f) {
           return f.item.id;
         });
         _ref = products.results;
+        _results = [];
         for (i in _ref) {
           product = _ref[i];
           if (_.contains(ids, product.id)) {
-            product.is_favorited = 1;
+            _results.push(product.is_favorited = 1);
+          } else {
+            _results.push(void 0);
           }
         }
+        return _results;
+      }).always(function() {
+        var data;
         if (transformer) {
           data = transformer(products);
           return table.data(data);

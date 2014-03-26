@@ -1,4 +1,4 @@
-define ['jquery', 'underscore', 'model/table'], ($, _, table)->
+define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table, financing)->
   class viewModel extends table.viewModel
     constructor: (context)->
       defaultContext =
@@ -65,5 +65,13 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
 
       _.extend(context, defaultContext)
       super context
+
+    transform_favorite: (products)->
+      items = _.pluck(products.results, 'item')
+      _.each items, (item)->
+        item.is_favorited = 1
+      @data _.map(items, (item)->
+        new financing.viewModel
+          data: item)
 
   viewModel: viewModel

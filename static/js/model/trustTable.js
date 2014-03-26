@@ -91,6 +91,15 @@
         viewModel.__super__.constructor.call(this, context);
       }
 
+      viewModel.prototype.transform_favorite = function(products) {
+        var items;
+        items = _.pluck(products.results, 'item');
+        _.each(items, function(item) {
+          return item.is_favorited = 1;
+        });
+        return this.data(items);
+      };
+
       return viewModel;
 
     })(table.viewModel);

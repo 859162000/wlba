@@ -53,10 +53,8 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund', 'model
 
         backend.loadData 'funds', params
         .done (data)->
-          backend.joinFavorites(data, 'funds', self.fundTable,
-            (data)->
-              return _.map(data.results,
-                (item)->
+          backend.joinFavorites(data, 'funds', self.fundTable, (data)->
+              return _.map(data.results, (item)->
                   new fund.viewModel
                     data: item))
       .extend {throttle: 1}

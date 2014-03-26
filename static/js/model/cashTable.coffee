@@ -62,4 +62,11 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
 
       super _(defaultContext).extend context
 
+    transform_favorite: (products)->
+      items = _.pluck(products.results, 'item')
+      _.each(items, (item)->
+        item.is_favorited = 1)
+      @data items
+
+
   viewModel: viewModel
