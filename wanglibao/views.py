@@ -27,7 +27,7 @@ User = get_user_model()
 
 
 class RegisterView (RegistrationView):
-    template_name = "html/register.html"
+    template_name = "register.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
@@ -82,7 +82,9 @@ class RegisterView (RegistrationView):
         return user
 
     def get_success_url(self, request=None, user=None):
-        return u'/'
+        if request.GET.get('next'):
+            return request.GET.get('next')
+        return u'accounts/email/sent/'
 
 
 class IndexView(TemplateView):
@@ -99,7 +101,6 @@ class IndexView(TemplateView):
             'hot_funds': hot_funds,
             'hot_financings': hot_financings
             }
-
 
 class AccountSettingView(TemplateView):
     pass

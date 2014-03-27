@@ -56,7 +56,7 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
             item.frontEndRate() + '|' + item.backEndRate()
         ,
           name: ''
-          colspan: 2
+          colspan: 4
           text: (item)->
             link_text = '收 藏'
             if item.is_favorited == 1

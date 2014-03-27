@@ -26,8 +26,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
     error_messages = {
-        'duplicate_email': u'该邮箱已经注册',
-        'duplicate_phone': u'该手机号已经注册',
+        'duplicate_username': u'该邮箱or phone已经注册',
         'invalid_identifier_type': u'请提供邮箱或者手机号',
         'validate_code_for_email': u'邮箱注册时不需要提供验证码',
         'validate code not match': u'验证码不正确',

@@ -10,6 +10,7 @@ from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsV
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundHomeView, FundDetailView
 from wanglibao_portfolio.views import PortfolioHomeView
+from django.contrib.auth.decorators import login_required
 
 admin.autodiscover()
 
@@ -43,16 +44,17 @@ urlpatterns = patterns(
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login',
         {
-            "template_name": "html/login.html",
+            "template_name": "login.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }),
     url(r'^accounts/register/$', RegisterView.as_view()),
     url(r'^accounts/password/change/$', "wanglibao.views.password_change", name='password_change'),
     url(r'^accounts/password/change/done/$', TemplateView.as_view(template_name='html/password_change_done.html'), name='password_change_done'),
     url(r'^accounts/activate/complete/$',
-                           TemplateView.as_view(template_name='html/activation_complete.html'),
+                           TemplateView.as_view(template_name='activation_complete.jade'),
                            name='registration_activation_complete'),
-    url(r'^accounts/home', TemplateView.as_view(template_name='account_home.jade')),
+    url(r'^accounts/email/sent/$', TemplateView.as_view(template_name='email_sent.jade'), name='email_sent'),
+    url(r'^accounts/home', login_required(TemplateView.as_view(template_name='account_home.jade'))),
     url(r'^accounts/favorite', TemplateView.as_view(template_name='account_favorite.jade')),
     url(r'^accounts/setting', AccountSettingView.as_view(template_name='account_setting.jade')),
 

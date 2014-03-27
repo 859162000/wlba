@@ -83,7 +83,7 @@
               }
             }, {
               name: '',
-              colspan: 2,
+              colspan: 4,
               text: function(item) {
                 var link_text;
                 link_text = '收 藏';
