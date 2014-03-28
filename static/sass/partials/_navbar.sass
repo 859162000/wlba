@@ -5,47 +5,34 @@
 
 .navigation
   width: 100%
-  height: $navigation-bar-height
-  @include images-original-sprite(gray-bg)
-  background-repeat: repeat-x
-  position: relative
-  z-index: 1
-  overflow: auto
+  background-color: $red
 
 .navigation-container
-  +container
+  width: $content-width
+  margin: 0 auto
+  +clearfix
 
 .nav-items
-  +span-columns(7, $total-columns)
-  float: left
   +inline-block()
+  padding: 10px
 
 .nav-item
-  padding-left: 15px
-  padding-right: 15px
+  padding-left: 35px
+  padding-right: 25px
   margin: 0 auto
   +inline-block()
 
-  font-size: $font-m
+  font-size: 14px
   text-align: center
 
 a.nav-item-anchor
   width: 100%
-  height: $navigation-bar-height - 9px
-  line-height: $navigation-bar-height - 9px
   +inline-block()
 
-  +link-colors($gray-add-on-text, $black, $black)
+  +link-colors($white, $white, $white)
   text-decoration: none
 
   &:active, &:hover, &.active
     border-bottom: $border-width solid $red
 
-.logo
-  height: 59px
-  width: $logo-width
-  margin-right: 40px
-  margin-top: 15px
-  @include images-original-sprite(logo)
-  float: left
-  +inline-block()
+

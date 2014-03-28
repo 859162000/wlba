@@ -1,5 +1,5 @@
-.top-bar
-  .top-bar-container
+.full-container-top-bar
+  .container-top-bar
     .top-bar-phone
       span.header-phone-text.icon-phone 400-123-8889
     .user-info
@@ -16,3 +16,8 @@
         a(href="/accounts/login?next={{ request.path }}") 登录
         span.white-v-line
         a(href="/accounts/register") 注册
+
+.full-container
+  .container
+    .logo-img
+      img(src='/static/images/logo.png')

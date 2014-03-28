@@ -22,10 +22,23 @@ $container-style: magic
   +container
   padding: 10px 10px
 
+.full-container
+  width: 100%
+
+.full-container-home
+  $file: 'home.jpg'
+  background-image: image-url($file)
+  height: image-height($file)
+  background-position: center
 
 .container
   +container
+  width: $content-width
   clear: both
+  margin: 0 auto
+
+.container-home
+  @extend .container
 
 .container-card-holder
   width: 1010px

@@ -4,19 +4,21 @@
 @import variables
 @import layout
 
-.top-bar
-  background-color: $blue-gray
+.full-container-top-bar
+  @extend .full-container
+  border-bottom: 1px solid lightgrey
+  background-color: white
+
+.container-top-bar
+  @extend .container
   height: $top-bar-height
   line-height: $top-bar-height
-  overflow: auto
-
-.top-bar-container
-  +container
+  +clearfix
 
 .top-bar-phone
   +float-left
   color: $black
-  font-size: $font-m
+  font-size: $font-xs
 
 .header-phone-text
   color: $light-gray-text
@@ -25,9 +27,19 @@
   +float-right
   text-align: right
   padding-right: 10px
-  font-size: $font-xs
-  color: $light-gray-text
+  font-size: $font-s
+  color: $dark-gray
 
   a
     +hover-link
-    +link-colors($light-yellow)
+    +link-colors($dark-gray)
+
+.logo-bar
+  width: $content-width
+  margin: 0 auto
+  +clearfix
+
+.logo-img
+  float: left
+  padding-left: 10px
+
