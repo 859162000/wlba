@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'registration',
 
     'trust',
+    'wanglibao_sms',
     'wanglibao_bank_financing',
     'wanglibao_fund',
     'wanglibao_cash',
@@ -204,3 +205,50 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 SMS_ACCOUNT = 'cf_zkrx'
 SMS_PASSWORD = 'S8o-mHH-fcc-x8g'
 SMS_URL = 'http://121.199.16.178/webservice/sms.php?method=Submit'
+
+SMS_BACKEND = 'wanglibao_sms.backends.TestBackEnd'
+if PRODUCTION:
+    SMS_BACKEND = 'wanglibao_sms.backends.UrlBasedSMSBackEnd'
+
+# Logger
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'mysite.log',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'wanglibao_sms': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        }
+    }
+}
+
+if DEBUG:
+    for logger in LOGGING['loggers']:
+        LOGGING['loggers'][logger]['handlers'] = ['console']

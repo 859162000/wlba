@@ -1,9 +1,8 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.utils.datetime_safe import datetime
 from wanglibao.forms import EmailOrPhoneRegisterForm
 from wanglibao.utils import detect_identifier_type
-from wanglibao_profile.models import PhoneValidateCode
+from wanglibao_sms.utils import send_validation_code
 
 
 class EmailOrPhoneRegisterFormTestCase(TestCase):
@@ -20,15 +19,11 @@ class EmailOrPhoneRegisterFormTestCase(TestCase):
         self.assertEqual(form.is_valid(), True)
 
     def test_register_by_phone(self):
-        validate_code_record = PhoneValidateCode.objects.create(
-            phone="13810652323",
-            validate_code="133223",
-            last_send_time=datetime.now(),
-        )
-        validate_code_record.save()
-
+        phone = "13811111111"
+        validate_code = "133223"
+        send_validation_code(phone, validate_code)
         form_data = {
-            'identifier': '13810652323',
+            'identifier': '13811111111',
             'validate_code': '133223',
             'password': 'testpassword',
         }
@@ -52,12 +47,7 @@ class RegisterViewTestCase(TestCase):
         phone = '12345123232'
         validate_code = "132232"
 
-        validate_code_record = PhoneValidateCode.objects.create(
-            phone=phone,
-            validate_code=validate_code,
-            last_send_time=datetime.now(),
-        )
-        validate_code_record.save()
+        send_validation_code(phone, validate_code)
 
         self.client.post("/accounts/register/", {
             'identifier': phone,
@@ -81,12 +71,7 @@ class RegisterViewTestCase(TestCase):
 
         # The real user not registered, but holds the true phone
         validate_code = '123456'
-        validate_code_record = PhoneValidateCode()
-        validate_code_record.validate_code = validate_code
-        validate_code_record.phone = phone
-        validate_code_record.last_send_time = datetime.now()
-
-        validate_code_record.save()
+        send_validation_code(phone, validate_code)
 
         self.client.post("/accounts/register/", {
             'identifier': phone,

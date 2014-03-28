@@ -70,7 +70,7 @@ def deploy():
         sudo("apt-get update")
 
         print green("Install pip and virtualenv")
-        new_virtualenv()
+        # new_virtualenv()
         with virtualenv():
             with cd(os.path.join(path, env.depot_name)):
                 run("pip install --index-url http://pypi.hustunique.com/simple/ -r requirements.txt")

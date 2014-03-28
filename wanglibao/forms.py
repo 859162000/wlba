@@ -1,10 +1,13 @@
 # encoding: utf-8
+from django.contrib.formtools.wizard.views import SessionWizardView
+from django.http import HttpResponseRedirect
 
 from django.utils.translation import ugettext as _
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
 from wanglibao.utils import detect_identifier_type
-from wanglibao_profile.models import PhoneValidateCode, WanglibaoUserProfile
+from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_sms.utils import validate_validation_code
 
 User = get_user_model()
 
@@ -69,18 +72,11 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         identifier_type = detect_identifier_type(self.cleaned_data["identifier"])
         if identifier_type == 'phone':
             phone = self.clean_identifier()
-            try:
-                phone_validate = PhoneValidateCode.objects.get(phone=phone)
-                # TODO Check the validate_code period, 30 minutes
-                if phone_validate.validate_code == validate_code:
-                    # Normal exit point
-                    return validate_code
-                else:
-                    raise forms.ValidationError(
-                        self.error_messages['validate code not match'],
-                        code='validate_code_error',
-                    )
-            except PhoneValidateCode.DoesNotExist, e:
+            status, message = validate_validation_code(phone, validate_code)
+            if status == 200:
+                return validate_code
+
+            else:
                 raise forms.ValidationError(
                     self.error_messages['validate code not exist'],
                     code='validate_code_error',
@@ -133,3 +129,7 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
 
     def get_user(self):
         return self.user_cache
+
+
+class ResetPasswordGetIdentifierForm(forms.Form):
+    identifier = forms.CharField(max_length=254)
