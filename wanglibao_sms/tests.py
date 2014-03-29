@@ -2,6 +2,7 @@
 import datetime
 
 from django.test import TestCase
+from django.utils import timezone
 from wanglibao_sms.backends import TestBackEnd, UrlBasedSMSBackEnd
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_sms.utils import send_validation_code, validate_validation_code
@@ -28,7 +29,7 @@ class BackEndTestCase(TestCase):
         self.assertEqual(status, 200)
 
         record = PhoneValidateCode.objects.get(phone=phone)
-        record.last_send_time = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+        record.last_send_time = timezone.now() - datetime.timedelta(hours=1)
         record.save()
         status, message = validate_validation_code(phone, validate_code)
 

@@ -1,13 +1,11 @@
 # encoding: utf-8
-from django.contrib.formtools.wizard.views import SessionWizardView
-from django.http import HttpResponseRedirect
 
-from django.utils.translation import ugettext as _
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
-from wanglibao.utils import detect_identifier_type
-from wanglibao_profile.models import WanglibaoUserProfile
+
+from utils import detect_identifier_type
 from wanglibao_sms.utils import validate_validation_code
+
 
 User = get_user_model()
 

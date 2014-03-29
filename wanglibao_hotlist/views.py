@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from wanglibao.views import IsAdminUserOrReadOnly
+from wanglibao_account.permissions import IsAdminUserOrReadOnly
 from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund
 from wanglibao_hotlist.serializers import HotFundSerializer
 

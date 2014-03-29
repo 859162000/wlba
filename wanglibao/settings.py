@@ -113,7 +113,7 @@ LOCALE_PATHS = (
 
 # Authentication backend
 AUTHENTICATION_BACKENDS = (
-    'wanglibao.auth_backends.EmailPhoneUsernameAuthBackend',
+    'wanglibao_account.auth_backends.EmailPhoneUsernameAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -249,6 +249,6 @@ LOGGING = {
     }
 }
 
-if DEBUG:
-    for logger in LOGGING['loggers']:
-        LOGGING['loggers'][logger]['handlers'] = ['console']
+#if DEBUG:
+#    for logger in LOGGING['loggers']:
+#        LOGGING['loggers'][logger]['handlers'] = ['console']
