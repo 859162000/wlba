@@ -233,7 +233,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'mysite.log',
+            'filename': '/var/log/wanglibao/mysite.log',
             'formatter': 'verbose'
         }
     },

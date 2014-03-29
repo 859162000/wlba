@@ -48,8 +48,9 @@ def deploy():
     path = env.path
 
     print red("Begin deploy: ")
-    # todo if the folder not existed, create it
     run('mkdir -p %s' % path)
+    sudo('mkdir -p /var/log/wanglibao/')
+    sudo('chown -R www-data /var/log/wanglibao')
     with cd(path):
         run("pwd")
 
