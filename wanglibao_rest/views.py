@@ -1,10 +1,13 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.db.models import Q
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.decorators import link
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
+from wanglibao_account.utils import detect_identifier_type
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import PortfolioSerializer, UserPortfolioSerializer
 from wanglibao_rest.serializers import UserSerializer
@@ -27,7 +30,7 @@ class UserPortfolioView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user_pk = self.kwargs['user_pk']
-        return self.queryset.filter(user_id = user_pk)
+        return self.queryset.filter(user_id=user_pk)
 
 
 class SendValidationCodeView(APIView):
@@ -41,20 +44,31 @@ class SendValidationCodeView(APIView):
         phone_number = phone.strip()
         status, message = send_validation_code(phone_number)
         return Response({
-            'message': message
-        }, status=status)
+                            'message': message
+                        }, status=status)
 
 
 class UserExisting(APIView):
-
     permission_classes = ()
 
-    def get(self, request, format=None):
+    def get(self, request, identifier, format=None):
         """
         Get whether the user existing
         """
-        username = request.GET['username']
-        user_existing = User.objects.filter(username=username).count() > 0
-        return Response({
-            "existing": user_existing
-        }, status=200)
+
+        query = Q(email=identifier) \
+            or \
+                (Q(wanglibaouserprofile__phone=identifier) and
+                 Q(wanglibaouserprofile__phone_varified=True))
+
+        try:
+            get_user_model().objects.get(query)
+
+            return Response({
+                                "existing": True
+                            }, status=200)
+        except get_user_model().DoesNotExist:
+            return Response({
+                                "existing": False
+                            }, status=404)
+

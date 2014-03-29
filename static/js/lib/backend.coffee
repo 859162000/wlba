@@ -144,9 +144,12 @@ define ['jquery'], ($)->
       else
         table.data(products.results)
 
-
   loadFavorites = (type)->
     url = apiurl + 'favorite/' + type + '/'
+    $.get url
+
+  userExists = (identifier)->
+    url = apiurl + 'user_exists/' + identifier + '/'
     $.get url
 
   window.addToFavorite = (e, type)->
@@ -169,4 +172,6 @@ define ['jquery'], ($)->
     loadFavorites: loadFavorites
     joinFavorites: joinFavorites
     normalizeType: normalizeType
+
+    userExists: userExists
   }

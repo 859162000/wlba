@@ -43,9 +43,8 @@ router.register(r'favorite/cashes', FavoriteCashViewSet)
 
 urlpatterns = patterns(
     '',
-    # TODO add format check on phone
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
-    url(r'^user_existing/$', UserExisting.as_view()),
+    url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^', include(router.urls)),
 )
