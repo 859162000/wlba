@@ -90,10 +90,15 @@ def deploy():
                 sudo('mkdir -p /var/static/wanglibao')
                 sudo('cp -r publish/static/* /var/static/wanglibao/')
                 sudo('rm -r publish')
-                # TODO set permission
                 print green("static files copied and cleaned")
 
                 print green("copy scripts to /var/wsgi/wanglibao/")
+
+                print green("move the old deploy to back up folder")
+                if exists('/var/wsgi/wanglibao-backup'):
+                    sudo('rm -r /var/wsgi/wanglibao-backup')
+                if exists('/var/wsgi/wanglibao'):
+                    sudo('mv /var/wsgi/wanglibao /var/wsgi/wanglibao-backup')
                 sudo('mkdir -p /var/wsgi/wanglibao')
                 sudo('cp -r . /var/wsgi/wanglibao')
                 sudo('chgrp -R webuser /var/wsgi/wanglibao')
