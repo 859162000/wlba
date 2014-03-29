@@ -8,7 +8,7 @@ urlpatterns = patterns(
     '',
     url(r'^login/$', 'django.contrib.auth.views.login',
         {
-            "template_name": "html/login.html",
+            "template_name": "login.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
     url(r'^register/$', RegisterView.as_view()),
@@ -21,7 +21,7 @@ urlpatterns = patterns(
     url(r'^password/change/done/$', TemplateView.as_view(template_name='html/password_change_done.html'),
         name='password_change_done'),
     url(r'^activate/complete/$',
-        TemplateView.as_view(template_name='html/activation_complete.html'),
+        TemplateView.as_view(template_name='activation_complete.jade'),
         name='registration_activation_complete'),
     url(r'^password/reset/identifier/', PasswordResetGetIdentifierView.as_view(), name="password_reset"),
     url(r'^password/reset/validate/', PasswordResetGetIdentifierView.as_view(), name="password_reset_validate"),

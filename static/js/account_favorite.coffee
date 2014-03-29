@@ -4,34 +4,56 @@ require.config
     knockout: 'lib/knockout-3.0.0'
     underscore: 'lib/underscore-min'
 
-require ['jquery', 'knockout', 'underscore', 'lib/backend', 'model/fund', 'model/financing', 'model/tab'], ($, ko, _, backend, fund, financing, tab)->
+require ['jquery', 'knockout', 'underscore', 'lib/backend', 'model/fundTable', 'model/financingTable', 'model/trustTable', 'model/cashTable', 'model/tab'], ($, ko, _, backend, fund, financing, trust, cash, tab)->
   class viewModel
     constructor: ->
       self = this
 
-      self.trusts = ko.observable()
-      self.funds = ko.observable()
-      self.financings = ko.observable()
+      self.trustTable = new trust.viewModel {}
+      self.cashTable = new cash.viewModel {}
+      self.fundTable = new fund.viewModel {}
+      self.financingTable = new financing.viewModel {}
 
-
-      backend.loadFavorites 'trusts'
-      .done (data)->
-        self.trusts(_.pluck(data.results, 'item'))
-
-      backend.loadFavorites 'funds'
-      .done (data) ->
-        self.funds(_.pluck(data.results, 'item').map (element)->
-          new fund.viewModel {
-            data: element
+      self.tabTree =
+        tabs:[
+          name: '信托'
+          value: {
+            type: 'trusts'
+            table: self.trustTable
           }
-        )
-
-      backend.loadFavorites 'financings'
-      .done (data) ->
-        self.financings(_.pluck(data.results, 'item').map (element)->
-          new financing.viewModel {
-            data: element
+        ,
+          name: '银行理财'
+          value: {
+            type: 'financings'
+            table: self.financingTable
           }
-        )
+        ,
+          name: '基金'
+          value: {
+            type: 'funds'
+            table: self.fundTable
+          }
+        ,
+          name: '现金类理财'
+          value: {
+            type: 'cashes'
+            table: self.cashTable
+          }
+        ]
+
+      self.type = ko.observable()
+      self.dataTable = ko.observable()
+
+      self.tab = new tab.viewModel
+        tabs: self.tabTree.tabs
+        events:
+          tabSelected: (data, event)->
+            self.dataTable data.value.table
+            self.type data.value.type
+
+      ko.computed ()->
+        backend.loadFavorites(self.type())
+        .done (data)->
+            self.dataTable().transform_favorite(data)
 
   ko.applyBindings(new viewModel())

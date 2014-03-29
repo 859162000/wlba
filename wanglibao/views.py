@@ -1,7 +1,6 @@
 from django.views.generic import TemplateView
 from wanglibao_hotlist.models import HotTrust, HotFund, HotFinancing
 
-
 class IndexView(TemplateView):
     template_name = 'index.jade'
 

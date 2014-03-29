@@ -8,31 +8,60 @@
     }
   });
 
-  require(['jquery', 'knockout', 'underscore', 'lib/backend', 'model/fund', 'model/financing', 'model/tab'], function($, ko, _, backend, fund, financing, tab) {
+  require(['jquery', 'knockout', 'underscore', 'lib/backend', 'model/fundTable', 'model/financingTable', 'model/trustTable', 'model/cashTable', 'model/tab'], function($, ko, _, backend, fund, financing, trust, cash, tab) {
     var viewModel;
     viewModel = (function() {
       function viewModel() {
         var self;
         self = this;
-        self.trusts = ko.observable();
-        self.funds = ko.observable();
-        self.financings = ko.observable();
-        backend.loadFavorites('trusts').done(function(data) {
-          return self.trusts(_.pluck(data.results, 'item'));
+        self.trustTable = new trust.viewModel({});
+        self.cashTable = new cash.viewModel({});
+        self.fundTable = new fund.viewModel({});
+        self.financingTable = new financing.viewModel({});
+        self.tabTree = {
+          tabs: [
+            {
+              name: '信托',
+              value: {
+                type: 'trusts',
+                table: self.trustTable
+              }
+            }, {
+              name: '银行理财',
+              value: {
+                type: 'financings',
+                table: self.financingTable
+              }
+            }, {
+              name: '基金',
+              value: {
+                type: 'funds',
+                table: self.fundTable
+              }
+            }, {
+              name: '现金类理财',
+              value: {
+                type: 'cashes',
+                table: self.cashTable
+              }
+            }
+          ]
+        };
+        self.type = ko.observable();
+        self.dataTable = ko.observable();
+        self.tab = new tab.viewModel({
+          tabs: self.tabTree.tabs,
+          events: {
+            tabSelected: function(data, event) {
+              self.dataTable(data.value.table);
+              return self.type(data.value.type);
+            }
+          }
         });
-        backend.loadFavorites('funds').done(function(data) {
-          return self.funds(_.pluck(data.results, 'item').map(function(element) {
-            return new fund.viewModel({
-              data: element
-            });
-          }));
-        });
-        backend.loadFavorites('financings').done(function(data) {
-          return self.financings(_.pluck(data.results, 'item').map(function(element) {
-            return new financing.viewModel({
-              data: element
-            });
-          }));
+        ko.computed(function() {
+          return backend.loadFavorites(self.type()).done(function(data) {
+            return self.dataTable().transform_favorite(data);
+          });
         });
       }
 

@@ -138,6 +138,7 @@ define ['jquery'], ($)->
       for i, product of products.results
         if _.contains ids, product.id
           product.is_favorited = 1
+    .always ()->
       if transformer
         data = transformer products
         table.data data

@@ -3,7 +3,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'model/table'], function($, _, table) {
+  define(['jquery', 'underscore', 'model/table', 'model/fund'], function($, _, table, fund) {
     var viewModel;
     viewModel = (function(_super) {
       __extends(viewModel, _super);
@@ -83,7 +83,7 @@
               }
             }, {
               name: '',
-              colspan: 2,
+              colspan: 4,
               text: function(item) {
                 var link_text;
                 link_text = '收 藏';
@@ -98,6 +98,19 @@
         _.extend(context, defaultContext);
         viewModel.__super__.constructor.call(this, context);
       }
+
+      viewModel.prototype.transform_favorite = function(products) {
+        var items;
+        items = _.pluck(products.results, 'item');
+        _.each(items, function(item) {
+          return item.is_favorited = 1;
+        });
+        return this.data(_.map(items, function(item) {
+          return new fund.viewModel({
+            data: item
+          });
+        }));
+      };
 
       return viewModel;
 

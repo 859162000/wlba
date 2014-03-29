@@ -1,8 +1,8 @@
 # encoding: utf-8
 import datetime
 import logging
-from django.conf import settings
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
@@ -15,22 +15,20 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
 from registration.models import RegistrationProfile
 from registration.views import RegistrationView
-from rest_framework.permissions import BasePermission, SAFE_METHODS
 from django.core.mail import EmailMultiAlternatives
 
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm
-from wanglibao_hotlist.models import HotTrust, HotFund, HotFinancing
 from utils import generate_username, detect_identifier_type
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
 
 class RegisterView (RegistrationView):
-    template_name = "html/register.html"
+    template_name = "register.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
@@ -77,7 +75,9 @@ class RegisterView (RegistrationView):
         return user
 
     def get_success_url(self, request=None, user=None):
-        return u'/'
+        if request.GET.get('next'):
+            return request.GET.get('next')
+        return u'/accounts/email/sent/'
 
 
 @sensitive_post_parameters()
@@ -176,6 +176,7 @@ def send_validation_phone_code(request, **kwargs):
 
     return HttpResponse(
         str({"message": message}), status=status)
+
 
 def validate_phone_code(request):
     logger.info("Enter validate_phone_code")

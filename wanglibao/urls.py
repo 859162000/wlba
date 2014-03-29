@@ -8,6 +8,7 @@ from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsV
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundHomeView, FundDetailView
 from wanglibao_portfolio.views import PortfolioHomeView
+from django.contrib.auth.decorators import login_required
 
 admin.autodiscover()
 
