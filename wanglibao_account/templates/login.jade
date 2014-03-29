@@ -31,7 +31,7 @@ html
                 button.span8.button-red.button-middle(type='submit') 登 录
                 .span4-omega
                 .space-s
-                a(href='/accounts/password/reset') 忘记密码？
+                a(href='{% url "password_reset" %}') 忘记密码？
               .space-vertical-s
               .form-footer
                 a.button.button-orange.button-mini(href='/accounts/register/?next=/') 注册
