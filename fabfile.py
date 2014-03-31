@@ -91,17 +91,17 @@ def deploy():
         print green("Install pip and virtualenv")
         new_virtualenv()
 
-        print green("Generate config file for the environment")
-        if env.production:
-            print yellow('Replacing wanglibao/settings.py PRODUCTION')
-            run("fab config 'wanglibao/settings.py','PRODUCTION \= False', 'PRODUCTION \= True'")
-        if not env.debug:
-            print yellow('Replacing wanglibao/settings.py DEBUG')
-            run("fab config 'wanglibao/settings.py','DEBUG \= True', 'DEBUG \= False'")
-
         with virtualenv():
             with cd(os.path.join(path, env.depot_name)):
                 run("pip install --index-url http://pypi.hustunique.com/simple/ -r requirements.txt")
+
+                print green("Generate config file for the environment")
+                if env.production:
+                    print yellow('Replacing wanglibao/settings.py PRODUCTION')
+                    run("fab config 'wanglibao/settings.py','PRODUCTION \= False','PRODUCTION \= True'")
+                if not env.debug:
+                    print yellow('Replacing wanglibao/settings.py DEBUG')
+                    run("fab config 'wanglibao/settings.py','DEBUG \= True','DEBUG \= False'")
 
                 print green('Collect static files')
                 run("python manage.py collectstatic --noinput")
