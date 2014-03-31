@@ -4,10 +4,8 @@
 @import variables
 @import layout
 
-.full-container-top-bar
-  @extend .full-container
-  border-bottom: 1px solid lightgrey
-  background-color: white
+$logo-height: image-height('logo.png')
+$red: #CA2109
 
 .container-top-bar
   @extend .container
@@ -15,31 +13,91 @@
   line-height: $top-bar-height
   +clearfix
 
-.top-bar-phone
-  +float-left
-  color: $black
-  font-size: $font-xs
-
-.header-phone-text
-  color: $light-gray-text
-
-.user-info
-  +float-right
-  text-align: right
-  padding-right: 10px
-  font-size: $font-s
-  color: $dark-gray
-
-  a
-    +hover-link
-    +link-colors($dark-gray)
-
 .logo-bar
-  width: $content-width
-  margin: 0 auto
+  @extend .container
+  margin: 20px auto
   +clearfix
+  height: $logo-height
 
 .logo-img
-  float: left
+  display: inline-block
   padding-left: 10px
 
+.search-bar
+  height: $logo-height
+  margin-left: 100px
+  display: inline-block
+  vertical-align: top
+  font-size: 14px
+
+.category
+  ul li
+    display: inline-block
+    padding: 0
+    margin: 0
+    list-style: none
+
+.category-anchor
+  padding: 2px 6px
+  margin: 0
+  +link-colors($dark-gray)
+  text-decoration: none
+
+  &:hover, &:active, &.active
+    background-color: $red
+    color: white
+    border-top-left-radius: 3px
+    border-top-right-radius: 3px
+
+.input-bar
+  border: 2px solid $red
+  min-height: 20px
+  border-radius: 2px
+  border-top-left-radius: 0
+  margin: 0
+  padding: 0
+  vertical-align: middle
+
+  span
+    padding: 10px
+    color: #818181
+
+.input-base
+  border: 0
+  border-radius: 0
+  margin: 0
+  padding: 5px
+  min-height: 23px
+  height: 25px
+  vertical-align: middle
+  font-size: 14px
+
+.input-button
+  @extend .input-base
+  background-color: $red
+  margin-left: 0
+  padding: 0 20px
+  color: white
+
+
+.user-info
+  float: right
+  padding-right: 10px
+  font-size: $logo-height - 10
+  color: #666666
+  height: $logo-height
+  line-height: $logo-height
+  vertical-align: text-bottom
+
+  a
+    font-size: $font-m
+    +hover-link
+
+.gray-v-line
+  margin: 0 10px
+  min-width: 1px
+  height: $font-s
+  line-height: $font-s
+  background-color: $dark-gray
+  +inline-block()
+  vertical-align: baseline

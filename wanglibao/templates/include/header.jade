@@ -1,23 +1,40 @@
-.full-container-top-bar
-  .container-top-bar
-    .top-bar-phone
-      span.header-phone-text.icon-phone 400-123-8889
+.full-container
+  .logo-bar
+    .logo-img
+      img(src='/static/images/logo.png')
+    .search-bar
+      .category
+        ul
+          li
+            a.category-anchor.active(href='') 个人理财
+          li
+            a.category-anchor(href='') 信托理财
+          li
+            a.category-anchor(href='') 银行理财
+          li
+            a.category-anchor(href='') 基金产品
+          li
+            a.category-anchor(href='') 现金理财
+      .input-bar
+        span 投资金额
+        input.input-base(type='text', size=25)
+        span 期限:
+        select.input-base
+          option(value='3') 3个月
+          option(value='6') 6个月
+          option(value='12') 1年
+        input.input-button(type='button', value='搜索')
     .user-info
       if user.is_authenticated
-        span 欢迎您，
         a.username(href="/accounts/home")
           if user.email
             | {{ user.email }}
           else
             | {{ user.wanglibaouserprofile.phone }}
-        span.white-v-line
+        span.gray-v-line
         a.logout(href="/accounts/logout?next={{ request.path }}") 退出
       else
         a(href="/accounts/login?next={{ request.path }}") 登录
-        span.white-v-line
+        span.gray-v-line
         a(href="/accounts/register") 注册
 
-.full-container
-  .container
-    .logo-img
-      img(src='/static/images/logo.png')
