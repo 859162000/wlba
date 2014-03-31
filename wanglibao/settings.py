@@ -29,8 +29,7 @@ PRODUCTION = False
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 from registration_defaults.settings import *
 
