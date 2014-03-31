@@ -5,7 +5,7 @@
       jquery: 'lib/jquery.min',
       'jquery.validate': 'lib/jquery.validate.min'
     },
-    shims: {
+    shim: {
       'jquery.validate': ['jquery']
     }
   });

@@ -3,7 +3,7 @@ require.config
     jquery: 'lib/jquery.min'
     'jquery.validate': 'lib/jquery.validate.min'
 
-  shims:
+  shim:
     'jquery.validate': ['jquery']
 
 require ['jquery', 'jquery.validate', 'lib/backend'], ($, validate, backend)->
