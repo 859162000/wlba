@@ -26,11 +26,7 @@
         input.input-button(type='button', value='搜索')
     .user-info
       if user.is_authenticated
-        a.username(href="/accounts/home")
-          if user.email
-            | {{ user.email }}
-          else
-            | {{ user.wanglibaouserprofile.phone }}
+        a.username(href="/accounts/home") {{ user.wanglibaouserprofile.nick_name }}
         span.gray-v-line
         a.logout(href="/accounts/logout?next={{ request.path }}") 退出
       else

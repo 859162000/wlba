@@ -3,10 +3,10 @@ require.config
     jquery: 'lib/jquery.min'
     'jquery.validate': 'lib/jquery.validate.min'
 
-  shims:
+  shim:
     'jquery.validate': ['jquery']
 
-require ['jquery', 'jquery.validate'], ($, validate)->
+require ['jquery', 'jquery.validate', 'lib/backend'], ($, validate, backend)->
   checkEmail = (identifier) ->
     re = undefined
     re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/

@@ -4,7 +4,7 @@ require.config
     underscore: 'lib/underscore-min'
     knockout: 'lib/knockout-3.0.0'
     'jquery.purl': 'lib/purl'
-  shims:
+  shim:
     'jquery.purl': ['jquery']
 
 require ['jquery', 'underscore', 'knockout', 'jquery.purl', 'lib/backend', 'model/fund'], ($, _, ko, purl, backend, fund)->

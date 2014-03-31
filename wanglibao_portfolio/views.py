@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao.views import IsAdminUserOrReadOnly
+from wanglibao_account.permissions import IsAdminUserOrReadOnly
 from wanglibao_portfolio.filters import PortfolioFilterSet
 from wanglibao_portfolio.models import ProductType, Portfolio, UserPortfolio
 from wanglibao_portfolio.serializers import PortfolioSerializer

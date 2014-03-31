@@ -7,7 +7,7 @@
       knockout: 'lib/knockout-3.0.0',
       'jquery.purl': 'lib/purl'
     },
-    shims: {
+    shim: {
       'jquery.purl': ['jquery']
     }
   });

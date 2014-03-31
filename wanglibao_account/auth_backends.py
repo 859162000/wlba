@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from wanglibao.utils import detect_identifier_type
+from utils import detect_identifier_type
 
 User = get_user_model()
 

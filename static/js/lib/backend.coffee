@@ -149,6 +149,10 @@ define ['jquery'], ($)->
     url = apiurl + 'favorite/' + type + '/'
     $.get url
 
+  userExists = (identifier)->
+    url = apiurl + 'user_exists/' + identifier + '/'
+    $.get url
+
   window.addToFavorite = (e, type)->
     e.preventDefault()
 
@@ -169,4 +173,6 @@ define ['jquery'], ($)->
     loadFavorites: loadFavorites
     joinFavorites: joinFavorites
     normalizeType: normalizeType
+
+    userExists: userExists
   }

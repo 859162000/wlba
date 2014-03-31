@@ -3,7 +3,6 @@ from requests import ConnectionError
 from rest_framework.renderers import JSONRenderer
 from rest_framework.serializers import ModelSerializer
 from django.db import models
-import elasticsearch
 import logging
 
 logger = logging.getLogger(__name__)
@@ -34,23 +33,6 @@ class Issuer(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    # Write this just to comment the function out. Dead code here but not happy live in
-    # history of git
-    def save_temp(self, *args, **kwargs):
-        super(Issuer, self).save(*args, **kwargs)
-
-        class IssuerSerializer(ModelSerializer):
-            class Meta:
-                model = Issuer
-
-        try:
-            serializer = IssuerSerializer(self)
-            json = JSONRenderer().render(serializer.data)
-            es = elasticsearch.Elasticsearch()
-            es.index(index="wanglibao", doc_type="issuer", body=json, id=self.id)
-        except ConnectionError:
-            pass
 
 
 class Trust (models.Model):
@@ -84,20 +66,3 @@ class Trust (models.Model):
 
     def __unicode__(self):
         return self.name
-
-    # Dead code, save for future TODO
-    def save_temp(self, *args, **kwargs):
-        super(Trust, self).save(*args, **kwargs)
-
-        class TrustSerializer(ModelSerializer):
-            class Meta:
-                model = Trust
-
-        try:
-            serializer = TrustSerializer(self)
-            json = JSONRenderer().render(serializer.data)
-            es = elasticsearch.Elasticsearch()
-            es.index(index="wanglibao", doc_type="trust", body=json, id=self.id)
-        except ConnectionError:
-            # TODO when not able to connect to elastic search, should fire some warning
-            pass
