@@ -9,6 +9,7 @@ from wanglibao_sms.utils import validate_validation_code
 
 User = get_user_model()
 
+
 class EmailOrPhoneRegisterForm(forms.ModelForm):
     """
     A form that creates a user, with no privileges

@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, url, include
+from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 from forms import EmailOrPhoneAuthenticationForm
 from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword
@@ -12,8 +13,8 @@ urlpatterns = patterns(
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
-
-    url(r'^home/', TemplateView.as_view(template_name='account_home.jade')),
+    url(r'^email/sent/$', TemplateView.as_view(template_name='email_sent.jade'), name='email_sent'),
+    url(r'^home', login_required(TemplateView.as_view(template_name='account_home.jade'))),
     url(r'^favorite/', TemplateView.as_view(template_name='account_favorite.jade')),
     url(r'^setting/', TemplateView.as_view(template_name='account_setting.jade')),
 
