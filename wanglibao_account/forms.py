@@ -28,7 +28,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
     error_messages = {
-        'duplicate_username': u'该邮箱or phone已经注册',
+        'duplicate_username': u'该邮箱或手机号已经注册',
         'invalid_identifier_type': u'请提供邮箱或者手机号',
         'validate_code_for_email': u'邮箱注册时不需要提供验证码',
         'validate code not match': u'验证码不正确',
@@ -64,23 +64,20 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             self.error_messages['duplicate_username'],
             code='duplicate_username', )
 
-    def clean_validate_code(self):
+    def clean(self):
         validate_code = self.cleaned_data["validate_code"]
-        identifier_type = detect_identifier_type(self.cleaned_data["identifier"])
-        if identifier_type == 'phone':
-            phone = self.clean_identifier()
-            status, message = validate_validation_code(phone, validate_code)
-            if status == 200:
-                return validate_code
-
-            else:
-                raise forms.ValidationError(
-                    self.error_messages['validate code not exist'],
-                    code='validate_code_error',
-                )
-        else:
-            return None
-
+        if 'identifier' in self.cleaned_data:
+            identifier = self.cleaned_data["identifier"]
+            identifier_type = detect_identifier_type(identifier)
+            if identifier_type == 'phone':
+                phone = identifier
+                status, message = validate_validation_code(phone, validate_code)
+                if status != 200:
+                    raise forms.ValidationError(
+                        self.error_messages['validate code not matct'],
+                        code='validate_code_error',
+                    )
+        return self.cleaned_data
 
 class EmailOrPhoneAuthenticationForm(forms.Form):
     """
