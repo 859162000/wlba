@@ -10,7 +10,7 @@
     }
   });
 
-  require(['jquery', 'jquery.validate'], function($, validate) {
+  require(['jquery', 'jquery.validate', 'lib/backend'], function($, validate, backend) {
     var checkEmail, checkMobile;
     checkEmail = function(identifier) {
       var re;

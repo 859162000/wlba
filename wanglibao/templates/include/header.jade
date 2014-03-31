@@ -6,10 +6,7 @@
       if user.is_authenticated
         span 欢迎您，
         a.username(href="/accounts/home")
-          if user.email
-            | {{ user.email }}
-          else
-            | {{ user.wanglibaouserprofile.phone }}
+          {{ user.wanglibaouserprofile.nick_name }}
         span.white-v-line
         a.logout(href="/accounts/logout?next={{ request.path }}") 退出
       else

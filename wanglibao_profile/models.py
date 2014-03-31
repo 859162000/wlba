@@ -1,3 +1,4 @@
+# encoding: utf-8
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -5,19 +6,14 @@ from django.db import models
 class WanglibaoUserProfile(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)
 
-    phone = models.CharField(verbose_name="Mobile phone number", max_length=64, default="")
-    phone_verified = models.BooleanField(verbose_name="Mobile phone verified", default=False)
+    nick_name = models.CharField(max_length=32, blank=True, help_text=u'昵称')
 
-    identity_type = models.CharField(verbose_name="Identity type: id, passport etc", max_length=10, default="id", choices=(
-        ('id', 'id card number'),
-        ('passport', 'passport number'),
-        ('military', 'military id')
-    ))
-    identity = models.CharField(verbose_name="Identity", max_length=128, default="")
+    phone = models.CharField(max_length=64, blank=True, help_text=u'手机号码')
+    phone_verified = models.BooleanField(default=False, help_text=u'手机号码是否已验证')
 
-    risk_level = models.PositiveIntegerField(verbose_name="How risky the user is, 1..5", default=2)
-    investment_asset = models.IntegerField(verbose_name="How many money", default=0)
-    total_asset = models.IntegerField(verbose_name="Total asset", default=0)
+    risk_level = models.PositiveIntegerField(help_text=u'用户的风险等级', default=2)
+    investment_asset = models.IntegerField(help_text=u'可投资额度(万)', default=0)
+    total_asset = models.IntegerField(help_text=u"总资产(万)", default=0)
 
     def __unicode__(self):
         return "%s phone: %s" % (self.user.username, self.phone)

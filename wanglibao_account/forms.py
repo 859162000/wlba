@@ -21,7 +21,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     account is not activated. When the user clicked the activation link, the account
     will be activated.
     """
-    username = forms.CharField(label="Username", required=False)
+    nickname = forms.CharField(label="Nick name", required=True)
     identifier = forms.CharField(label="Email/Phone")
     validate_code = forms.CharField(label="Validate code for phone", required=False)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
@@ -36,7 +36,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ("username", "email")
+        fields = ("email",)
 
     def clean_identifier(self):
         """
@@ -47,7 +47,6 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         identifier = self.cleaned_data["identifier"]
         identifier_type = detect_identifier_type(identifier)
 
-        users = None
         if identifier_type == 'email':
             users = User.objects.filter(email=identifier, is_active=True)
         elif identifier_type == 'phone':

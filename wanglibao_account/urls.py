@@ -6,19 +6,19 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
     '',
-    url(r'^login/$', 'django.contrib.auth.views.login',
+    url(r'^login/', 'django.contrib.auth.views.login',
         {
             "template_name": "login.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
-    url(r'^register/$', RegisterView.as_view()),
+    url(r'^register/$', RegisterView.as_view(), name='auth_register'),
 
     url(r'^home/', TemplateView.as_view(template_name='account_home.jade')),
     url(r'^favorite/', TemplateView.as_view(template_name='account_favorite.jade')),
     url(r'^setting/', TemplateView.as_view(template_name='account_setting.jade')),
 
-    url(r'^password/change/$', "wanglibao_account.views.password_change", name='password_change'),
-    url(r'^password/change/done/$', TemplateView.as_view(template_name='html/password_change_done.html'),
+    url(r'^password/change/', "wanglibao_account.views.password_change", name='password_change'),
+    url(r'^password/change/done/', TemplateView.as_view(template_name='html/password_change_done.html'),
         name='password_change_done'),
     url(r'^activate/complete/$',
         TemplateView.as_view(template_name='activation_complete.jade'),

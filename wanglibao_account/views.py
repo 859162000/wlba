@@ -32,18 +32,20 @@ class RegisterView (RegistrationView):
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
-        username = cleaned_data['username']
+        nickname = cleaned_data['nickname']
         password = cleaned_data['password']
         identifier = cleaned_data['identifier']
         identifier_type = detect_identifier_type(identifier)
 
-        if not username:
-            username = generate_username(identifier)
+        username = generate_username(identifier)
 
         # Use the model create model, call save later manually
         user = User(username=username)
         user.set_password(password)
         user.save()
+
+        user.wanglibaouserprofile.nick_name = nickname
+        user.wanglibaouserprofile.save()
 
         if identifier_type == 'email':
             user.email = identifier
