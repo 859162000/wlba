@@ -208,3 +208,6 @@ SMS_URL = 'http://121.199.16.178/webservice/sms.php?method=Submit'
 SMS_BACKEND = 'wanglibao_sms.backends.TestBackEnd'
 if PRODUCTION:
     SMS_BACKEND = 'wanglibao_sms.backends.UrlBasedSMSBackEnd'
+
+# Default login redirect url
+LOGIN_REDIRECT_URL = '/'

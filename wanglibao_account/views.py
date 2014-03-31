@@ -146,7 +146,7 @@ class PasswordResetGetIdentifierView(TemplateView):
                     'user_to_reset': users[0]
                 })
         else:
-            return HttpResponse("Bad")
+            return HttpResponse(form.errors, status=400)
 
     def get_context_data(self, **kwargs):
         return {
