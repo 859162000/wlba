@@ -2,36 +2,17 @@
   .navigation-container
     .nav-items
       ul
-        li.nav-item
-          if activeItem == '首页'
-            a.nav-item-anchor.active(href="{% url 'index' %}") 首页
+        mixin nav-item(name, link)
+          if activeItem == name
+            li.nav-item.active
+              a.nav-item-anchor(href=link)= name
           else
-            a.nav-item-anchor(href="{% url 'index' %}") 首页
+            li.nav-item
+              a.nav-item-anchor(href=link)= name
 
-        li.nav-item
-          if activeItem == '个人理财'
-            a.nav-item-anchor.active(href="{% url 'portfolio_home' %}") 个人理财
-          else
-            a.nav-item-anchor(href="{% url 'portfolio_home' %}") 个人理财
-
-        li.nav-item
-          if activeItem == '信托产品'
-            a.nav-item-anchor.active(href="{% url 'trust_home' %}") 信托产品
-          else
-            a.nav-item-anchor(href="{% url 'trust_home' %}") 信托产品
-        li.nav-item
-          if activeItem == '银行理财'
-            a.nav-item-anchor.active(href="{% url 'financing_home' %}") 银行理财
-          else
-            a.nav-item-anchor(href="{% url 'financing_home' %}") 银行理财
-        li.nav-item
-          if activeItem == '基金产品'
-            a.nav-item-anchor.active(href="{% url 'fund_home' %}") 基金产品
-          else
-            a.nav-item-anchor(href="{% url 'fund_home' %}") 基金产品
-        li.nav-item
-          if activeItem == '现金类理财'
-            a.nav-item-anchor.active(href="{% url 'cash_home' %}") 现金类理财
-          else
-            a.nav-item-anchor(href="{% url 'cash_home' %}") 现金类理财
-
+        +nav-item('首页', '/')
+        +nav-item('个人理财', '/portfolio')
+        +nav-item('信托产品', '/trust/home')
+        +nav-item('银行理财', '/financing/home')
+        +nav-item('基金产品', '/fund/home')
+        +nav-item('现金类理财', '/cash/home')

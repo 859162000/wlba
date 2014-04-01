@@ -14,25 +14,20 @@
 
 .nav-items
   +inline-block()
-  padding: 5px
+  line-height: 35px
 
 .nav-item
-  padding-left: 35px
-  padding-right: 25px
-  margin: 0 auto
+  padding: 0 2.3em
   +inline-block()
 
   font-size: 14px
   text-align: center
 
+  &.active
+    background: lighten(#C52D28, 10%)
+
 a.nav-item-anchor
-  width: 100%
-  +inline-block()
-
-  +link-colors($white, $white, $white)
-  text-decoration: none
-
-  &:active, &:hover, &.active
-    border-bottom: $border-width solid $red
-
+  margin: 0 auto
+  +unstyled-link
+  +link-colors($white, $white)
 
