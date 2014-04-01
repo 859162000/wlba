@@ -1,6 +1,7 @@
 #encoding: utf-8
 import datetime
 from django.db import models
+from django.utils import timezone
 
 
 class FundIssuer(models.Model):
@@ -49,7 +50,7 @@ class Fund(models.Model):
     rate_1_year = models.FloatField(default=0, help_text=u'近1年收益率')
     profit_month = models.FloatField(default=0, help_text=u"当月收益")
 
-    added = models.DateTimeField(default=datetime.datetime.now, help_text=u'加入系统时间')
+    added = models.DateTimeField(default=timezone.now, help_text=u'加入系统时间')
 
     def __unicode__(self):
         return u'%s' % (self.name, )

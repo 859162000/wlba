@@ -29,8 +29,7 @@ PRODUCTION = False
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 from registration_defaults.settings import *
 
@@ -51,6 +50,8 @@ INSTALLED_APPS = (
     'registration',
 
     'trust',
+    'wanglibao_account',
+    'wanglibao_sms',
     'wanglibao_bank_financing',
     'wanglibao_fund',
     'wanglibao_cash',
@@ -112,7 +113,7 @@ LOCALE_PATHS = (
 
 # Authentication backend
 AUTHENTICATION_BACKENDS = (
-    'wanglibao.auth_backends.EmailPhoneUsernameAuthBackend',
+    'wanglibao_account.auth_backends.EmailPhoneUsernameAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -160,7 +161,6 @@ if DEBUG:
     MEDIA_URL = 'http://127.0.0.1:8000/media/'
 else:
     MEDIA_URL = '/media/'
-    raise ImproperlyConfigured("Need to configure the media path")
 
 # The request rate for some apis
 request_rate = '1/minute'
@@ -204,3 +204,10 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 SMS_ACCOUNT = 'cf_zkrx'
 SMS_PASSWORD = 'S8o-mHH-fcc-x8g'
 SMS_URL = 'http://121.199.16.178/webservice/sms.php?method=Submit'
+
+SMS_BACKEND = 'wanglibao_sms.backends.TestBackEnd'
+if PRODUCTION:
+    SMS_BACKEND = 'wanglibao_sms.backends.UrlBasedSMSBackEnd'
+
+# Default login redirect url
+LOGIN_REDIRECT_URL = '/'

@@ -3,7 +3,7 @@ from trust.filters import TrustFilterSet
 from trust.models import Trust, Issuer
 from serializers import TrustSerializer
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao.views import IsAdminUserOrReadOnly
+from wanglibao_account.permissions import IsAdminUserOrReadOnly
 from wanglibao_favorite.models import FavoriteTrust
 
 

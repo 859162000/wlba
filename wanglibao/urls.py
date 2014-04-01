@@ -3,9 +3,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf import settings
 from django.views.generic import TemplateView
-from trust.views import TrustHomeView, TrustProductsView, TrustDetailView
-from wanglibao.forms import EmailOrPhoneAuthenticationForm
-from wanglibao.views import RegisterView, IndexView, AccountSettingView
+from wanglibao.views import IndexView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundHomeView, FundDetailView
@@ -20,11 +18,7 @@ urlpatterns = patterns(
 
     url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
 
-    url(r'^trust/home/', TrustHomeView.as_view(), name="trust_home"),
-    url(r'^trust/products/', TrustProductsView.as_view(), name="trust_product"),
-    url(r'^trust/companies/', TemplateView.as_view(template_name="trust_company.jade"), name="trust_company"),
-    url(r'^trust/detail/(?P<id>\w+)', TrustDetailView.as_view(), name="trust_detail"),
-
+    url(r'^trust/', include('trust.urls')),
     url(r'^financing/home/', FinancingHomeView.as_view(), name="financing_home"),
     url(r'^financing/products/', FinancingProductsView.as_view(), name="financing_products"),
     url(r'^financing/detail/(?P<id>\w+)', FinancingDetailView.as_view(), name="financing_detail"),
@@ -42,25 +36,8 @@ urlpatterns = patterns(
     url(r'^api/', include('wanglibao_rest.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^accounts/login/$', 'django.contrib.auth.views.login',
-        {
-            "template_name": "login.jade",
-            "authentication_form": EmailOrPhoneAuthenticationForm,
-        }),
-    url(r'^accounts/register/$', RegisterView.as_view()),
-    url(r'^accounts/password/change/$', "wanglibao.views.password_change", name='password_change'),
-    url(r'^accounts/password/change/done/$', TemplateView.as_view(template_name='html/password_change_done.html'), name='password_change_done'),
-    url(r'^accounts/activate/complete/$',
-                           TemplateView.as_view(template_name='activation_complete.jade'),
-                           name='registration_activation_complete'),
-    url(r'^accounts/email/sent/$', TemplateView.as_view(template_name='email_sent.jade'), name='email_sent'),
-    url(r'^accounts/home', login_required(TemplateView.as_view(template_name='account_home.jade'))),
-    url(r'^accounts/favorite', TemplateView.as_view(template_name='account_favorite.jade')),
-    url(r'^accounts/setting', AccountSettingView.as_view(template_name='account_setting.jade')),
-
-    url(r'^accounts/', include('registration.backends.default.urls')),
-
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    url(r'^accounts/', include('wanglibao_account.urls'))
 )
 
 if settings.DEBUG:

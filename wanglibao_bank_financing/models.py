@@ -1,6 +1,7 @@
 # encoding:utf-8
 import datetime
 from django.db import models
+from django.utils import timezone
 
 
 class Bank(models.Model):
@@ -49,7 +50,7 @@ class BankFinancing(models.Model):
     redeem_description = models.TextField(blank=True, help_text=u'赎回规定说明')
     risk_description = models.TextField(blank=True, help_text=u'投资风险说明')
 
-    added = models.DateTimeField(default=datetime.datetime.now, help_text=u'添加时间')
+    added = models.DateTimeField(default=timezone.now, help_text=u'添加时间')
 
     def __unicode__(self):
         return u"%s" % (self.name,)

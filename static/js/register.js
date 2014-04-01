@@ -5,12 +5,12 @@
       jquery: 'lib/jquery.min',
       'jquery.validate': 'lib/jquery.validate.min'
     },
-    shims: {
+    shim: {
       'jquery.validate': ['jquery']
     }
   });
 
-  require(['jquery', 'jquery.validate'], function($, validate) {
+  require(['jquery', 'jquery.validate', 'lib/backend'], function($, validate, backend) {
     var checkEmail, checkMobile;
     checkEmail = function(identifier) {
       var re;

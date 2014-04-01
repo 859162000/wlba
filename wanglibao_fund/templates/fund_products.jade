@@ -1,0 +1,33 @@
+doctype html
+- with '基金产品' as title
+include include/head
+- endwith
+body
+  include include/header
+
+  - with '基金产品' as activeItem
+  include include/navigation
+  - endwith
+  .sub-navbar
+    .sub-navbar--list
+      ul
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor(href="{% url 'fund_home' %}") 基金首页
+        li.sub-navbar--list-item
+          a.sub-navbar--anchor.active(href="{% url 'fund_products' %}") 基金产品
+  .space-vertical-s
+  .panel
+    .panel-title-bar
+      .panel-tabs(data-bind="foreach: tabTree")
+        .panel-tab
+          a(data-bind="text:name, click:$root.selectedTab($data), css:{active:$root.selectedTab() === $data}") 全部
+    .panel-content
+      // ko template: {name: 'fund-table', data: products }
+      // /ko
+  .space-vertical-m
+  include include/footer
+  include include/templates
+
+  script.
+    require(['/static/js/fund_products.js'])
+  include include/tracking

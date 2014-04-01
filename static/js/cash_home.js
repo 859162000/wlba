@@ -12,7 +12,7 @@
     var DataViewModel, viewModel;
     DataViewModel = (function() {
       function DataViewModel() {
-        var self;
+        var queries, self;
         self = this;
         self.products = new table.viewModel({
           events: {
@@ -63,6 +63,7 @@
         self.filters = [
           {
             name: '销售状态',
+            param_name: 'status',
             values: [
               {
                 name: '不限',
@@ -85,6 +86,7 @@
             ]
           }, {
             name: '投资期限',
+            param_name: 'period',
             values: [
               {
                 name: '不限',
@@ -93,9 +95,10 @@
                 name: '活期',
                 values: [
                   {
-                    period: 0
+                    period: "0"
                   }
-                ]
+                ],
+                range: '0'
               }, {
                 name: '3个月以内',
                 values: [
@@ -103,7 +106,8 @@
                     gt_period: 0,
                     lte_period: 3
                   }
-                ]
+                ],
+                range: '0-3'
               }, {
                 name: '3-6个月',
                 values: [
@@ -111,7 +115,8 @@
                     gt_period: 3,
                     lte_period: 6
                   }
-                ]
+                ],
+                range: '3-6'
               }, {
                 name: '6-12个月',
                 values: [
@@ -119,7 +124,8 @@
                     gt_period: 6,
                     lte_period: 12
                   }
-                ]
+                ],
+                range: "6-12"
               }, {
                 name: '1-3年',
                 values: [
@@ -127,20 +133,31 @@
                     gt_period: 12,
                     lte_period: 36
                   }
-                ]
+                ],
+                range: "12-36"
               }, {
                 name: '3年以上',
                 values: [
                   {
                     gt_period: 36
                   }
-                ]
+                ],
+                range: ">36"
               }
             ]
           }
         ];
+        queries = backend.parseQuery(window.location.search);
         _.each(self.filters, function(value) {
-          return self.activeFilters.push(value.values[0]);
+          if (queries[value.param_name]) {
+            return _.each(value.values, function(item) {
+              if (queries[value.param_name] === item['range']) {
+                return self.activeFilters.push(item);
+              }
+            });
+          } else {
+            return self.activeFilters.push(value.values[0]);
+          }
         });
         ko.computed(function() {
           return self.queryData();

@@ -1,0 +1,42 @@
+doctype html
+- with '现金类理财' as title
+include include/head
+- endwith
+body
+  include include/header
+  - with '现金类理财' as activeItem
+  include include/navigation
+  - endwith
+
+  .container
+    .ad-panel
+
+
+  .panel
+    .panel-title-bar
+      .panel-title 筛选条件
+    .container(data-bind="foreach: filters")
+      .filter-container
+        span.filter-name(data-bind="text: name + ':'") 名字
+        // ko foreach: values
+        a.filter-item(href="#", data-bind="text: name, css: {active: $root.activeFilters().indexOf($data) != -1}, click: $root.clickOnFilter") 名字
+        // /ko
+
+  .panel
+    .panel-title-bar
+      .panel-title 筛选结果
+
+    .panel-content
+      // ko template: {name: 'data-table', data: products}
+      // /ko
+
+    // ko template: {name: 'pager', data: pager}
+    // /ko
+
+  .space-vertical-m
+  include include/footer
+  include include/templates
+  script.
+    require(['/static/js/cash_home.js'])
+
+  include include/tracking

@@ -12,7 +12,7 @@ class OrderingFilter(filters.OrderingFilter):
 
         return qs
 
-    def remove_invalid_fields(self, queryset, ordering):
+    def remove_invalid_fields(self, queryset, ordering, view):
         """
         Overwrite the default behavior
         Prevent remove field names in format related__sub_field

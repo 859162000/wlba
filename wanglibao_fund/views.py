@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao.views import IsAdminUserOrReadOnly
+from wanglibao_account.permissions import IsAdminUserOrReadOnly
 from wanglibao_favorite.models import FavoriteFund
 from wanglibao_fund.filters import FundFilterSet
 from wanglibao_fund.models import Fund, FundIssuer

@@ -38,3 +38,22 @@ def na_if_none(value):
         return u'--'
     else:
         return value
+
+@register.filter
+def safe_identifier(user):
+    """
+    Show part of user identifier, used in password reset page
+    """
+
+    result = u''
+    if user.email:
+        components = user.email.split('@')
+        name = components[0]
+        name = name[0] + '*' * (len(name)-2) + name[-1]
+        result = name + '@' + components[1]
+
+    elif user.wanglibaoprofile.phone:
+        phone = user.wanglibaoprofile.phone
+        result = phone[:3] + '*' * (len(phone) - 4 - 3) + phone[-4:]
+
+    return result

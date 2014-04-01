@@ -1,0 +1,44 @@
+-load formatters
+-load widget_tweaks
+
+doctype html
+html
+  - with '登录' as title
+  include include/head
+  - endwith
+  body
+    include include/header
+    .l-activity-panel
+      .clearfix
+        a.pull-left.logo(href='/', title='网利宝')  
+      .well.clearfix
+        .pull-left.account-background
+        .pull-right
+          form.form(method='post', action='/accounts/login/?next={{next}}')
+            fieldset
+               #{ form.non_field_errors }
+               #{ form.password.errors }
+               #{ form.email.errors }
+               #{ form.username.errors }
+               - csrf_token
+              .form-title
+                label.font-l 用户登录
+              .form-row
+                - render_field form.identifier class+="input-large" placeholder="请输入邮箱或手机号" title="请输入邮箱或手机号"
+              .form-row
+                - render_field form.password class+="input-large" placeholder="请输入密码" title="请输入密码"
+              .form-row.form-bottom-bar
+                button.span8.button-red.button-middle(type='submit') 登 录
+                .span4-omega
+                .space-s
+                a(href='{% url "password_reset" %}') 忘记密码？
+              .space-vertical-s
+              .form-footer
+                a.button.button-orange.button-mini(href='/accounts/register/?next=/') 注册
+                .space-xs
+                span 成为会员，我们将为您提供专业的理财建议
+
+    .space-vertical-m
+    include include/footer
+
+    include include/tracking
