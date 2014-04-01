@@ -3,7 +3,12 @@ define ['jquery', 'underscore', 'knockout'], ($, _, ko)->
     constructor: (context)->
       self = this
 
-      self.columns = _(context.columns).map (item, index)->
+      columns = context.columns
+      if _.has context, 'fields'
+        columns = _.filter columns, (data)->
+          _.contains context.fields, data.name
+
+      self.columns = _(columns).map (item, index)->
         _(
           {
             sortable: false

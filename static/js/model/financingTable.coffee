@@ -8,8 +8,8 @@ define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table,
             text: (item, index)->
               index + 1
           ,
-            name: '产品名称'
-            colspan: 4
+            name: '名称'
+            colspan: 3
             sortable: true
             field: 'name'
             text: (item)->
@@ -52,15 +52,19 @@ define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table,
             field: 'expected_rate'
           ,
             name: ''
-            colspan: 2
+            colspan: 1
             text: (item)->
-              link_text = '收 藏'
+              link_text = '收藏'
               if item.is_favorited == 1
                 link_text = '取消收藏'
-              '<a class="button button-mini button-yellow" href="/financing/detail/' + item.id + '">详情</a>' +
-                ' <a class="button button-mini button-yellow" onclick="addToFavorite(event,' + "'financings');" +
+              '<a class="button button-mini button-pink" onclick="addToFavorite(event,' + "'financings');" +
                 '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' +
                 link_text + '</a>'
+          ,
+            name: ''
+            colspan: 1
+            text: (item)->
+              '<a class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>'
           ]
 
       _.extend(context, defaultContext)

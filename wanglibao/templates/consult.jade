@@ -8,40 +8,90 @@ body
   - with '个人理财' as activeItem
   include include/navigation
   - endwith
-  .bar.consult-background(style="margin-top:-10px")
-    .row
-      span.bar--title 您的资产净值
-    .row
-      .span5
-        div.pull-left.bar--input--group
-          input.pull-left.bar--input(type='text', value='', data-bind="value: asset")
-          span.pull-left.input--add-on 万元
-        a.pull-left.button.button-yellow.button-large.margin-left-s 找方案
 
-  .space-vertical-s
   .panel
     .panel-title-bar
       .panel-title
-        span 根据您的资产
-        span(data-bind="text: asset")
-        span 万元，为您推荐如下配置方案：
-        a.button.button-orange.button-small(href="#propertyPlan" rel="modal:open") 定制详细方案
-    .space-vertical-s
+        span 我的理财方案：
+        span(data-bind="text: portfolioName")
+    .panel-bar-s
+      dl.ispan11
+        dt 投资金额：
+        dd(data-bind="text: asset() + '万'")
+        dt 投资期限：
+        dd(data-bind="text: period() + '个月'")
+        dt 风险承受能力：
+        dd(data-bind="text: riskDescription")
+
+      .ispan1
+        a.button.button-round-mini.button-red(href="#") 重新定制
+
     .panel-inner
-      .container(data-bind="foreach: portfolios")
-        // ko template: {name: 'portfolio-bar', data: $data}
-        // /ko
-        .space-vertical-s
+      .row
+        .span3
+          #portfolio.portfolio-chart
+          p.chart-annotation 全额配比分析图
 
-  .space-vertical-s
-  .panel
+        .span9-omega.margin-top-m
+          .row
+            .pull-right(style="width:80%")
+              // ko template: {name: 'portfolio-product-table', data: dataTable}
+              // /ko
+
+            .pull-left(style="width:20%")
+              ul(data-bind="foreach: productTypes()")
+                li.product-tab.active(data-bind="css:{active: $data.productType == $root.productsType()}")
+                  span.icon-color(data-bind="style:{background: color}")
+                  a.product-tabs--cash(href="#", data-bind="text: productType, click:$root.selectProduct") 现金
+
+      .row
+        .well-s
+          .button.button-red.button-large.pull-right(href="#") 保存我的投资方案
+
     .panel-title-bar
-      .panel-title
-        span 推荐产品
+      .panel-title 收益预览
+    .panel-bar-s 以下为该方案，您未来三个月的收益预览
 
-    // Use template-name to detect which template to use
-    // ko template: {name: "data-table", data: dataTable}
-    // /ko
+    .row.margin-top-m
+      .span6
+        table.portfolio-income-table
+          thead
+            tr
+              th 类型
+              th 11月
+              th 12月
+              th 1月
+          tbody
+            tr
+              td 现金理财
+              td 1,257.93
+              td 888.00
+              td 355
+            tr
+              td 银行理财
+              td 90
+              td 90
+              td 90
+            tr
+              td 货币基金
+              td 1,257.93
+              td 888.00
+              td 355
+            tr
+              td 公募基金
+              td 1,257.93
+              td 888.00
+              td 355
+            tr
+              td 保险
+              td 1,257.93
+              td 888.00
+              td 355
+
+    .row.padding-s
+      i.icon-info.margin-right-s
+      span 该数据为网利宝根据目前收益预测数据，仅供参考
+
   .space-vertical-s
 
   include include/footer

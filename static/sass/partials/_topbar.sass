@@ -83,21 +83,14 @@ $red: #CA2109
 .user-info
   float: right
   padding-right: 10px
-  font-size: $logo-height - 10
-  color: #666666
-  height: $logo-height
+  color: $black
   line-height: $logo-height
-  vertical-align: text-bottom
 
   a
-    font-size: $font-m
+    font-size: $font-s
+    padding: 0 .7em
     +hover-link
+    border-left: 1px solid $dark-gray
 
-.gray-v-line
-  margin: 0 10px
-  min-width: 1px
-  height: $font-s
-  line-height: $font-s
-  background-color: $dark-gray
-  +inline-block()
-  vertical-align: baseline
+    &:first-child
+      border-left: 0

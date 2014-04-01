@@ -1,0 +1,56 @@
+.portfolio-income-table
+  table-layout: fixed
+  width: 100%
+  border: 1px solid #D6CEC6
+
+  thead
+    background: #D6CEC6
+
+  tbody
+    background: #F9F9F9
+
+  th, td
+    padding-left: .3em
+
+.chart-annotation
+  text-align: center
+  color: #878787
+
+$border-width: 2px
+
+.product-table
+  table-layout: fixed
+  width: 100%
+  border: $border-width solid #E0E0E0
+
+  th, td
+    text-align: center
+    line-height: 30px
+
+  tbody tr:nth-child(odd)
+    background: #F2F2F2
+
+.product-tab
+  line-height: 30px
+  height: 30px
+  padding: 0 1em
+  position: relative
+  right: -$border-width
+  border: $border-width solid transparent
+  border-right: 0
+
+  a
+    vertical-align: middle
+    padding: 0 1em
+    +unstyled_link
+
+  &.active
+    background: white
+    border-color: #E0E0E0
+    height: 34px
+
+.icon-color
+  display: inline-block
+  min-width: 18px
+  min-height: 18px
+  vertical-align: middle

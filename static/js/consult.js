@@ -6,7 +6,8 @@
       underscore: 'lib/underscore-min',
       knockout: 'lib/knockout-3.0.0',
       'jquery.modal': 'lib/jquery.modal.min',
-      purl: 'lib/purl'
+      purl: 'lib/purl',
+      raphael: 'lib/raphael-min'
     },
     shim: {
       'jquery.modal': ['jquery'],
@@ -14,23 +15,45 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'jquery.modal', 'purl', 'model/portfolio', 'model/trustTable', 'model/financingTable', 'model/cashTable', 'model/fundTable', 'model/fund', 'model/emptyTable'], function($, _, ko, backend, modal, purl, portfolio, trustTable, financingTable, cashTable, fundTable, fund, emptyTable) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/chart', 'jquery.modal', 'purl', 'model/trustTable', 'model/financingTable', 'model/cashTable', 'model/fundTable', 'model/fund', 'model/emptyTable'], function($, _, ko, backend, chart, modal, purl, trustTable, financingTable, cashTable, fundTable, fund, emptyTable) {
     var ViewModel, model;
     ViewModel = (function() {
       function ViewModel() {
-        var asset_param, self;
+        var asset_param, period_param, risk_param, self;
         self = this;
 
         /*
         The user data: asset, risk, period
          */
         asset_param = parseInt($.url(document.location.href).param('asset'));
+        period_param = parseInt($.url(document.location.href).param('period'));
+        risk_param = parseInt($.url(document.location.href).param('risk'));
         if (isNaN(asset_param) || asset_param <= 0) {
           asset_param = 30;
         }
+        if (isNaN(period_param) || period_param <= 0) {
+          period_param = 3;
+        }
+        if (isNaN(risk_param) || risk_param <= 0) {
+          risk_param = 1;
+        }
         self.asset = ko.observable(asset_param);
-        self.riskScore = ko.observable(null);
-        self.period = ko.observable(6);
+        self.riskScore = ko.observable(risk_param);
+        self.period = ko.observable(period_param);
+        self.riskDescription = ko.observable();
+        self.portfolioName = ko.observable();
+        ko.computed(function() {
+          var risk, risks;
+          risks = {
+            1: '完全不能承担任何风险',
+            2: '可以承担极小的风险',
+            3: '可以承担一定风险',
+            4: '可以承担较大的风险来追求高收益',
+            5: '绝对追求高收益'
+          };
+          risk = self.riskScore();
+          return self.riskDescription(risks[risk]);
+        });
         self.finishSurvey = function(data, event) {
           var asset, period, risk;
           asset = self.questions[0].answer();
@@ -92,7 +115,11 @@
         /*
         The portfolio related stuff
          */
-        self.portfolios = ko.observableArray([]);
+        self.myPortfolio = ko.observable();
+        self.productTypes = ko.observable();
+        self.selectProduct = function(value) {
+          return self.productsType(value.productType);
+        };
         ko.computed(function() {
           var params;
           params = {
@@ -103,45 +130,70 @@
             risk_score: self.riskScore()
           };
           return backend.loadPortfolio(params).done(function(data) {
-            var portfolios;
-            portfolios = _.map(data.results, function(data) {
-              return new portfolio.viewModel({
-                data: data,
-                asset: self.asset,
-                events: {
-                  productSelected: function(value, portfolio) {
-                    var amount, p, type, _i, _len, _ref;
-                    _ref = self.portfolios();
-                    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                      p = _ref[_i];
-                      if (p !== portfolio) {
-                        p.selectedProduct(null);
-                      }
-                    }
-                    type = value.product.name;
-                    self.productsType(type);
-                    amount = value.value;
-                    if (value.type === 'percent') {
-                      amount = amount / 100 * self.asset();
-                    }
-                    return self.amount(amount);
-                  }
-                }
-              });
-            });
-            return self.portfolios(portfolios);
+            return self.myPortfolio(_.first(data.results));
           });
         }).extend({
           throttle: 1
+        });
+        ko.computed(function() {
+          var portfolio;
+          portfolio = self.myPortfolio();
+          if (portfolio != null) {
+            self.portfolioName(portfolio.name);
+            self.productTypes(_.map(portfolio.products, function(value) {
+              var color, percent;
+              percent = value.value;
+              color = 'blue';
+              if (value.product.name === '现金') {
+                color = '#7EBA19';
+              } else if (value.product.name === '信托产品') {
+                color = 'lightblue';
+              } else if (value.product.name === '银行理财') {
+                color = '#C3D40A';
+              } else if (value.product.name === '货币基金') {
+                color = '#EC830A';
+              } else if (value.product.name === '公募基金') {
+                color = '#E24809';
+              } else if (value.product.name === '保险') {
+                color = '#DE1F0E';
+              }
+              return {
+                percent: percent,
+                color: color,
+                productType: value.product.name
+              };
+            }));
+            return chart.PieChart($('#portfolio')[0], {
+              x: 130,
+              y: 120,
+              r: 80,
+              pieces: self.productTypes(),
+              events: {
+                click: function(data) {
+                  console.log('set product type to' + data.productType);
+                  self.productsType(data.productType);
+                  return self.amount(self.asset() * data.percent / 100);
+                }
+              }
+            });
+          }
         });
 
         /*
         The filtered products related stuff
          */
-        self.trustTable = new trustTable.viewModel({});
-        self.financingTable = new financingTable.viewModel({});
-        self.cashTable = new cashTable.viewModel({});
-        self.fundTable = new fundTable.viewModel({});
+        self.trustTable = new trustTable.viewModel({
+          fields: ['名称', '资金门槛', '产品期限', '预期收益', '']
+        });
+        self.financingTable = new financingTable.viewModel({
+          fields: ['名称', '起购金额', '发行银行', '管理期限', '预期收益', '']
+        });
+        self.cashTable = new cashTable.viewModel({
+          fields: ['名称', '发行机构', '期限', '七日年化利率', '']
+        });
+        self.fundTable = new fundTable.viewModel({
+          fields: ['代码', '名称', '管理期限', '基金类型', '日涨幅', '近一月涨幅', '']
+        });
         self.emptyTable = new emptyTable.viewModel({});
         self.dataTable = ko.observable();
         self.productsType = ko.observable();

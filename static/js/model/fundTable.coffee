@@ -8,7 +8,7 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
           field: 'product_code'
           text: (item)->item.product_code
         ,
-          name: '基金名称'
+          name: '名称'
           colspan: 3
           sortable: true
           field: 'name'
@@ -56,15 +56,19 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
             item.frontEndRate() + '|' + item.backEndRate()
         ,
           name: ''
-          colspan: 4
+          colspan: 2
           text: (item)->
-            link_text = '收 藏'
+            link_text = '收藏'
             if item.is_favorited == 1
               link_text = '取消收藏'
-            '<a class="button button-mini button-yellow" href="/fund/detail/' + item.id + '">详情</a>' +
-              ' <a class="button button-mini button-yellow" onclick="addToFavorite(event,' + "'funds');" +
+            ' <a class="button button-mini button-pink" onclick="addToFavorite(event,' + "'funds');" +
               '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' +
               link_text + '</a>'
+        ,
+          name: ''
+          colspan: 2
+          text: (item)->
+            '<a class="button button-mini button-pink" href="/fund/detail/' + item.id + '">详情</a>'
       ]
 
       _.extend(context, defaultContext)

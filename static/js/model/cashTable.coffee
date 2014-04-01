@@ -49,15 +49,20 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
           '<a href="' + item.buy_url + '">' + item.buy_text + '</a>'
       ,
         name: ''
-        colspan: 2
+        colspan: 1
         text: (item)->
-          link_text = '收 藏'
+          link_text = '收藏'
           if item.is_favorited == 1
             link_text = '取消收藏'
-          '<a class="button button-mini button-yellow" href="/cash/detail/' + item.id + '">详情</a>' +
-            ' <a class="button button-mini button-yellow" onclick="addToFavorite(event,' + "'cashes');" +
+          '<a class="button button-mini button-pink" onclick="addToFavorite(event,' + "'cashes');" +
             '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' +
             link_text + '</a>'
+      ,
+        name: ''
+        colspan: 1
+        text: (item)->
+          '<a class="button button-mini button-pink" href="/cash/detail/' + item.id + '">详情</a>'
+
       ]
 
       super _(defaultContext).extend context

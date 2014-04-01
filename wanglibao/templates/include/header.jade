@@ -27,10 +27,7 @@
     .user-info
       if user.is_authenticated
         a.username(href="/accounts/home") {{ user.wanglibaouserprofile.nick_name }}
-        span.gray-v-line
         a.logout(href="/accounts/logout?next={{ request.path }}") 退出
       else
         a(href="/accounts/login?next={{ request.path }}") 登录
-        span.gray-v-line
         a(href="/accounts/register") 注册
-

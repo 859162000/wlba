@@ -20,7 +20,7 @@
                 return item.product_code;
               }
             }, {
-              name: '基金名称',
+              name: '名称',
               colspan: 3,
               sortable: true,
               field: 'name',
@@ -83,14 +83,20 @@
               }
             }, {
               name: '',
-              colspan: 4,
+              colspan: 2,
               text: function(item) {
                 var link_text;
-                link_text = '收 藏';
+                link_text = '收藏';
                 if (item.is_favorited === 1) {
                   link_text = '取消收藏';
                 }
-                return '<a class="button button-mini button-yellow" href="/fund/detail/' + item.id + '">详情</a>' + ' <a class="button button-mini button-yellow" onclick="addToFavorite(event,' + "'funds');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
+                return ' <a class="button button-mini button-pink" onclick="addToFavorite(event,' + "'funds');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
+              }
+            }, {
+              name: '',
+              colspan: 2,
+              text: function(item) {
+                return '<a class="button button-mini button-pink" href="/fund/detail/' + item.id + '">详情</a>';
               }
             }
           ]

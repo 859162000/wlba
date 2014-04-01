@@ -10,12 +10,19 @@ $button-padding:         0.5em 0.5em  // Button padding
   border: 0
   text-align: center
   +border-radius($button-border-radius)
+  display: inline-block
 
   &:focus
     outline: 0
 
 .button-square
   +border-radius(0)
+
+.button-round-mini
+  @extend .button
+  line-height: 20px
+  +border-radius(10px)
+  padding: 0 1em
 
 .button-mini, a.button-mini
   @extend .button
@@ -36,6 +43,7 @@ $button-padding:         0.5em 0.5em  // Button padding
   @extend .button
   font-size: $font-m
   padding: ((50- $font-m)/2/$font-m)+em 1em
+  line-height: .3
 
 // Colored buttons
 .button-red, a.button-red
@@ -45,13 +53,6 @@ $button-padding:         0.5em 0.5em  // Button padding
   &:hover, &:active
     background: darken($red, 10%)
 
-.button-orange, a.button-orange
-  background: $orange
-
-  &:hover, &:active
-    background: $red
-    color: white
-
 .button-yellow, a.button-yellow
   background: $light-yellow
   color: white
@@ -59,3 +60,8 @@ $button-padding:         0.5em 0.5em  // Button padding
   &:hover, &:active
     background: $red
     color: white
+
+.button-pink, a.button-pink
+  background: #DC8883
+  color: white
+  padding: .3em 1em

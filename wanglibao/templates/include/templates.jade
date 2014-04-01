@@ -21,14 +21,30 @@ script(type="text/html", id="data-table")
       tr(data-bind="foreach: $parent.columns")
         td(data-bind="attr:{colspan: colspan}, html: text(item, $parentContext.$index())")
 
-script(type="text/html", id="portfolio-bar")
-  .value-bar
-    span.value-bar--title(href='#',data-bind="text: name") 积极型
-    // ko foreach: products
-    a.button.button-square.value-bar--selectable(href='#' data-bind="style:{width: $parent.productWidth($data)}, click:$parent.productSelected, css:{active: $parent.selectedProduct() == $data}")
-      span.value-bar--item-title(data-bind="text: $data.product.name") 信托产品
-      span.value-bar--item-detail(data-bind="text: $parent.productDescription($data)") 200万 40%
-    // /ko
+script(type="text/html", id="portfolio-product-table")
+  table.product-table
+    thead
+      tr(data-bind="foreach: columns")
+        // ko if: sortable
+        th(data-bind="attr:{colspan: colspan}")
+          a.unstyled(href="#", data-bind="click: $parent.sortHandler")
+            span(data-bind="text:name")
+            .updown
+              .up(data-bind="css:{active: $parent.sortedColumn().column == $data && $parent.sortedColumn().order == 'asc'}")
+              .down(data-bind="css:{active: $parent.sortedColumn().column == $data && $parent.sortedColumn().order == 'dsc'}")
+
+        // /ko
+
+        // ko if: !sortable
+        th(data-bind="attr:{colspan: colspan}, text: name")
+        // /ko
+
+    tbody(data-bind="foreach: {data: data, as:'item'}")
+
+      tr(data-bind="foreach: $parent.columns")
+        td(data-bind="attr:{colspan: colspan}, html: text(item, $parentContext.$index())")
+
+
 
 script(type="text/html", id="pager")
   .pager

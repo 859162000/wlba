@@ -19,8 +19,8 @@
                 return index + 1;
               }
             }, {
-              name: '产品名称',
-              colspan: 4,
+              name: '名称',
+              colspan: 3,
               sortable: true,
               field: 'name',
               text: function(item) {
@@ -69,14 +69,20 @@
               field: 'expected_rate'
             }, {
               name: '',
-              colspan: 2,
+              colspan: 1,
               text: function(item) {
                 var link_text;
-                link_text = '收 藏';
+                link_text = '收藏';
                 if (item.is_favorited === 1) {
                   link_text = '取消收藏';
                 }
-                return '<a class="button button-mini button-yellow" href="/financing/detail/' + item.id + '">详情</a>' + ' <a class="button button-mini button-yellow" onclick="addToFavorite(event,' + "'financings');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
+                return '<a class="button button-mini button-pink" onclick="addToFavorite(event,' + "'financings');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
+              }
+            }, {
+              name: '',
+              colspan: 1,
+              text: function(item) {
+                return '<a class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>';
               }
             }
           ]

@@ -4,9 +4,15 @@
     var viewModel;
     viewModel = (function() {
       function viewModel(context) {
-        var self;
+        var columns, self;
         self = this;
-        self.columns = _(context.columns).map(function(item, index) {
+        columns = context.columns;
+        if (_.has(context, 'fields')) {
+          columns = _.filter(columns, function(data) {
+            return _.contains(context.fields, data.name);
+          });
+        }
+        self.columns = _(columns).map(function(item, index) {
           return _({
             sortable: false
           }).extend(item);
@@ -34,14 +40,6 @@
         if (_.has(context, 'events')) {
           _(self.events).extend(context.events);
         }
-        self.addToFavorite = function(data, e) {
-          var id, is_favorited;
-          e.preventDefault();
-          id = $(e.target).attr('data-id');
-          alert(id);
-          is_favorited = $(e.target).attr('data-is-favorited');
-          return backend.addToFavorite(e, 'trusts', id, is_favorited);
-        };
         self.sortHandler = function(column) {
           var order, sortedColumn;
           sortedColumn = self.sortedColumn();

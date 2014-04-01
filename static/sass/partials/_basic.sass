@@ -20,7 +20,7 @@ a
   &:link, &:visited
     color: $blue-gray
   &:hover, &:active
-    color: $light-yellow
+    color: $red
     text-decoration: none
 
 input
@@ -58,12 +58,6 @@ input
 
 .white-text, .white
   color: $white
-
-.orange-text
-  color: $orange
-
-.orange-anchor
-  +link-colors($orange)
 
 .pull-left
   +float-left
@@ -127,6 +121,9 @@ input
 .margin-right-s
   margin-right: $space-s
 
+.margin-top-m
+  margin-top: $space-m
+
 .clear-margin
   margin: 0
 
@@ -158,3 +155,11 @@ input
 
 a.unstyled
   +unstyled-link()
+
+.block-link
+  width: 20%
+  padding: 0.8em
+  +inline-block()
+
+  +unstyled-link
+  +link-colors(blue, $red)

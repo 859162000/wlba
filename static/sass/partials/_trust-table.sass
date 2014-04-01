@@ -1,26 +1,20 @@
-
-$header-background: #ECF6FD
-
 .trust-table
   width: 100%
   table-layout: fixed
   border-collapse: collapse
+  border-top: 2px solid $red
 
   thead
-    background-color: $header-background
+    border-bottom: 1px solid #DADADA
 
   th
     padding: 10px 0
     text-align: center
-    background: $header-background
 
   td
     padding: 10px 0
     text-align: center
     background: white
-
-  tr
-    border-bottom: 1px solid lightgray
 
 .updown
   position: relative
@@ -38,7 +32,7 @@ $header-background: #ECF6FD
   border-bottom-color: gray
 
   &.active
-    border-bottom-color: red
+    border-bottom-color: $red
 
 .down
   position: absolute
@@ -49,7 +43,7 @@ $header-background: #ECF6FD
   border-top-color: gray
 
   &.active
-    border-top-color: red
+    border-top-color: $red
 
 .bordered-table
   width: 100%
