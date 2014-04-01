@@ -4,9 +4,8 @@
 @import variables
 
 .sub-navbar
-  background-color: $light-yellow
-  margin-top: $navigation-follower-margin-top
-  line-height: 50px
+  background-color: $sub-nav-background
+  line-height: 30px
 
 .sub-navbar--list
   +container
@@ -17,19 +16,19 @@
 .sub-navbar--list-item
   +float-left
   margin: 0 auto
-  font-size: $font-m
+  font-size: $font-s
 
   &:first-child .sub-navbar--anchor
     border-left: 0
 
 a.sub-navbar--anchor
-  border-left: 1px solid white
+  border-left: 1px solid lightgray
   padding-left: 15px
   padding-right: 15px
   text-decoration: none
   +unstyled-link
-  +link-colors(white, black)
+  +link-colors($black, $red)
 
   &.active
-    color: black
+    +link-colors($red, $red)
 
