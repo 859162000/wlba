@@ -115,6 +115,6 @@ body
 
   .space-vertical-s
   include include/footer
-  script(src="/static/js/require.js" data-main="/static/js/fund_detail")
-
+  script.
+    require(['/static/js/fund_detail.js'])
   include include/tracking

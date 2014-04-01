@@ -59,6 +59,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
       self.filters = [
         {
           name : '销售状态'
+          param_name: 'status'
           values: [
             {
               name: '不限'
@@ -80,6 +81,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
         },
         {
           name : '投资期限'
+          param_name: 'period'
           values: [
             {
               name: '不限'
@@ -88,8 +90,9 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
             {
               name: '活期'
               values: [
-                period: 0
+                period: "0"
               ]
+              range: '0'
             }
             {
               name: '3个月以内'
@@ -97,6 +100,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
                 gt_period: 0
                 lte_period: 3
               ]
+              range: '0-3'
             }
             {
               name: '3-6个月'
@@ -104,6 +108,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
                 gt_period: 3
                 lte_period: 6
               ]
+              range: '3-6'
             }
             {
               name: '6-12个月'
@@ -111,6 +116,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
                 gt_period: 6
                 lte_period: 12
               ]
+              range: "6-12"
             }
             {
               name: '1-3年'
@@ -118,19 +124,28 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
                 gt_period: 12
                 lte_period: 36
               ]
+              range: "12-36"
             }
             {
               name: '3年以上'
               values: [
                 gt_period: 36
               ]
+              range: ">36"
             }
          ]
         }
       ]
 
+      queries = backend.parseQuery(window.location.search)
+
       _.each self.filters, (value)->
-        self.activeFilters.push value.values[0]
+        if queries[value.param_name]
+          _.each value.values, (item)->
+            if queries[value.param_name] == item['range']
+              self.activeFilters.push item
+        else
+          self.activeFilters.push value.values[0]
 
       ko.computed ()->
         self.queryData()

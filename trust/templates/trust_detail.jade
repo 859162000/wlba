@@ -135,6 +135,7 @@ body
 
   include include/footer
 
-  script(src="/static/js/require.js" data-main="/static/js/trust_detail")
+  script.
+    require(['/static/js/trust_detail.js'])
 
   include include/tracking

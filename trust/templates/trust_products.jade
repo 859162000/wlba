@@ -56,6 +56,7 @@ body
   include include/footer
   include include/templates
 
-  script(src="/static/js/require.js", data-main="/static/js/trust_products")
+  script.
+    require(['/static/js/trust_products.js'])
 
   include include/tracking

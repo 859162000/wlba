@@ -160,6 +160,64 @@ define ['jquery'], ($)->
     is_favorited = $(e.target).attr('data-is-favorited')
     addToFavorite e, type, id, is_favorited
 
+  parseQuery = (search)->
+    queries = {};
+    $.each(search.substr(1).split('&'), (index,value)->
+      pair = value.split('=');
+      if pair.length == 2
+        queries[pair[0].toString()] = pair[1].toString())
+    return queries
+
+  deepCompare = (x, y)->
+    compare2Objects = (x, y) ->
+      p = undefined
+
+      # remember that NaN === NaN returns false
+      # and isNaN(undefined) returns true
+      return true  if isNaN(x) and isNaN(y) and typeof x is "number" and typeof y is "number"
+
+      # Compare primitives and functions.
+      # Check if both arguments link to the same object.
+      # Especially useful on step when comparing prototypes
+      return true  if x is y
+
+      # Works in case when functions are created in constructor.
+      # Comparing dates is a common scenario. Another built-ins?
+      # We can even handle functions passed across iframes
+      return x.toString() is y.toString()  if (typeof x is "function" and typeof y is "function") or (x instanceof Date and y instanceof Date) or (x instanceof RegExp and y instanceof RegExp) or (x instanceof String and y instanceof String) or (x instanceof Number and y instanceof Number)
+
+      # At last checking prototypes as good a we can
+      return false  unless x instanceof Object and y instanceof Object
+      return false  if x.isPrototypeOf(y) or y.isPrototypeOf(x)
+
+      # check for infinitive linking loops
+      return false  if leftChain.indexOf(x) > -1 or rightChain.indexOf(y) > -1
+
+      # Quick checking of one object beeing a subset of another.
+      # todo: cache the structure of arguments[0] for performance
+      for p of y
+        if y.hasOwnProperty(p) isnt x.hasOwnProperty(p)
+          return false
+        else return false  if typeof y[p] isnt typeof x[p]
+      for p of x
+        if y.hasOwnProperty(p) isnt x.hasOwnProperty(p)
+          return false
+        else return false  if typeof y[p] isnt typeof x[p]
+        switch typeof (x[p])
+          when "object", "function"
+            leftChain.push x
+            rightChain.push y
+            return false  unless compare2Objects(x[p], y[p])
+            leftChain.pop()
+            rightChain.pop()
+          else
+            return false  if x[p] isnt y[p]
+      true
+
+    leftChain = []
+    rightChain = []
+    compare2Objects(x, y)
+
   return {
     loadData: loadData
     isValidType: isValidType
@@ -175,4 +233,6 @@ define ['jquery'], ($)->
     normalizeType: normalizeType
 
     userExists: userExists
+    parseQuery: parseQuery
+    deepCompare: deepCompare
   }

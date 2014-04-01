@@ -126,5 +126,6 @@ body
             td(colspan="5") {{ financing.risk_description | linebreaksbr }}
   .space-vertical-s
   include include/footer
-  script(src="/static/js/require.js" data-main="/static/js/financing_detail")
+  script.
+    require(['/static/js/financing_detail.js'])
   include include/tracking
