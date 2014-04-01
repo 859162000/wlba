@@ -5,7 +5,6 @@
 @import layout
 
 $logo-height: image-height('logo.png')
-$red: #CA2109
 
 .container-top-bar
   @extend .container
@@ -25,7 +24,7 @@ $red: #CA2109
 
 .search-bar
   height: $logo-height
-  margin-left: 100px
+  margin-left: 160px
   display: inline-block
   vertical-align: top
   font-size: 14px
@@ -38,7 +37,7 @@ $red: #CA2109
     list-style: none
 
 .category-anchor
-  padding: 2px 6px
+  padding: 2px 10px
   margin: 0
   +link-colors($dark-gray)
   text-decoration: none
@@ -57,6 +56,7 @@ $red: #CA2109
   margin: 0
   padding: 0
   vertical-align: middle
+  font-size: $font-s
 
   span
     padding: 10px
@@ -68,17 +68,16 @@ $red: #CA2109
   margin: 0
   padding: 5px
   min-height: 23px
-  height: 25px
+  height: 26px
   vertical-align: middle
-  font-size: 14px
 
-.input-button
+a.input-button
   @extend .input-base
   background-color: $red
-  margin-left: 0
-  padding: 0 20px
+  margin: 0
+  padding: 5px 20px
   color: white
-
+  text-decoration: none
 
 .user-info
   float: right

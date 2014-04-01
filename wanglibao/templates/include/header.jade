@@ -6,24 +6,24 @@
       .category
         ul
           li
-            a.category-anchor.active(href='') 个人理财
+            a.category-anchor.active(href='#') 个人理财
           li
-            a.category-anchor(href='') 信托理财
+            a.category-anchor(href='#') 信托理财
           li
-            a.category-anchor(href='') 银行理财
+            a.category-anchor(href='#') 银行理财
           li
-            a.category-anchor(href='') 基金产品
+            a.category-anchor(href='#') 基金产品
           li
-            a.category-anchor(href='') 现金理财
+            a.category-anchor(href='#') 现金理财
       .input-bar
         span 投资金额
-        input.input-base(type='text', size=25)
+        input.input-base(type='text', size=30)
         span 期限:
         select.input-base
           option(value='3') 3个月
           option(value='6') 6个月
           option(value='12') 1年
-        input.input-button(type='button', value='搜索')
+        a.input-button(href='#') 搜索
     .user-info
       if user.is_authenticated
         a.username(href="/accounts/home")
