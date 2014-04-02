@@ -4,25 +4,6 @@ require.config
     underscore: 'lib/underscore-min'
 
 require ['jquery', 'underscore'], ($, _)->
-  # setup the background switcher
-  switchBackground = ->
-    backgrounds = $('.big-background')
-    current = _.find backgrounds, (value)->
-      $(value).css('display') != 'none'
-
-    currentIndex = _.indexOf(backgrounds, current)
-    nextIndex = (currentIndex + 1) % backgrounds.length
-    $(backgrounds[currentIndex]).hide()
-    $(backgrounds[nextIndex]).fadeIn()
-
-    $($('.background-anchor')[currentIndex]).removeClass('active')
-    $($('.background-anchor')[nextIndex]).addClass('active')
-
-  switchBackgroundWrapper = ->
-    switchBackground(4)
-    setTimeout(switchBackgroundWrapper, 10 * 1000)
-
-  setTimeout switchBackgroundWrapper, 10 * 1000
 
   # setup tab logics
   $('ul.tabs').each ()->
