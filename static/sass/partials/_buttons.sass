@@ -45,6 +45,13 @@ $button-padding:         0.5em 0.5em  // Button padding
   padding: ((50- $font-m)/2/$font-m)+em 1em
   line-height: .3
 
+.button-round-large, a.button-round-large
+  @extend .button
+  font-size: $font-m
+  line-height: 40px
+  +border-radius(20px)
+  padding: 0 1em
+
 // Colored buttons
 .button-red, a.button-red
   background: $red
