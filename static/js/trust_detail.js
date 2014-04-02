@@ -2,11 +2,34 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'lib/jquery.min'
+      jquery: 'lib/jquery.min',
+      'jquery.modal': 'lib/jquery.modal.min'
+    },
+    shim: {
+      'jquery.modal': ['jquery']
     }
   });
 
-  require(['jquery', 'lib/backend'], function($, backend) {
+  require(['jquery', 'jquery.modal', 'lib/backend'], function($, modal, backend) {
+    $.modal.defaults = {
+      overlay: "#000",
+      opacity: 0,
+      zIndex: 1,
+      escapeClose: true,
+      clickClose: true,
+      closeText: 'Close',
+      closeClass: '',
+      showClose: false,
+      modalClass: "modal",
+      spinnerHtml: null,
+      showSpinner: true,
+      fadeDuration: 100,
+      fadeDelay: 1.0
+    };
+    $('#order-button').click(function(e) {
+      e.preventDefault();
+      return $(this).modal();
+    });
     $('#preorder_submit').click(function(event) {
       var name, phone;
       event.preventDefault();
@@ -19,8 +42,11 @@
           product_name: $('#product_name').text(),
           user_name: name,
           phone: phone
-        }).done(function(data) {
-          return alert('预约成功，稍后我们的客户经理会联系您');
+        }).done(function() {
+          alert('预约成功，稍后我们的客户经理会联系您');
+          $('#name_input').val('');
+          $('#phone_input').val('');
+          return $.modal.close();
         }).fail(function() {
           return alert('预约失败，请稍后再试或者拨打400-9999999');
         });

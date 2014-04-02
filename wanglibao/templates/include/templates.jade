@@ -70,16 +70,16 @@ script(type="text/html", id="pager")
 
 
       // ko if: currentPageNumber() > 2 && currentPageNumber() < totalPageNumber() - 1
-      span ......
+      span ...
 
       li.pager-page-number.active
         a.pager-anchor(href="#", data-bind="text: currentPageNumber(), click: pageNumberChanged") 1
 
-      span ......
+      span ...
       // /ko
 
       // ko if: currentPageNumber() <= 2 || currentPageNumber() >= totalPageNumber() - 1
-      span ......
+      span ...
       // /ko
 
       // ko foreach: ko.utils.range(totalPageNumber() - 1, totalPageNumber())

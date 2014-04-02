@@ -12,6 +12,11 @@
   padding: 0 18px
   +border-radius(5px)
 
+.panel-nopadding
+  @extend .panel
+  padding: 0
+  padding-top: 1px
+
 .space-vertical-s+.panel
   margin-top: 0
 
@@ -21,7 +26,7 @@
 .space-vertical-l+.panel
   margin-top: 0
 
-$header-height: 170px
+$header-height: 150px
 
 .panel-header
   height: $header-height
@@ -50,10 +55,18 @@ $header-height: 170px
 .panel-title-bar
   @extend .panel-bar
 
-.panel-title-bar-s
-  @extend .panel-bar-s
-  background-color: $red
-  color: white
+.panel-product-title-bar
+  @extend .panel-bar
+  border-bottom: 1px solid #d3d3d3
+  line-height: 55px
+
+.panel-product-title
+  padding: 0 1.4em
+  margin: 1em 0
+  border-left: 2px solid $red
+  line-height: 1
+  font-size: $font-l
+
 
 .panel-title
   padding: 0
@@ -118,3 +131,8 @@ a.panel-sub-tab
 .panel-text
   padding: 20px
   font-size: 14px
+
+.panel-preorder
+  padding: 2em
+  text-align: center
+  line-height: 35px
