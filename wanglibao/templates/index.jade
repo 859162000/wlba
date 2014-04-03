@@ -23,21 +23,22 @@ html
               tr
                 td 投资金额：
                 td.portfolio-td-last
-                  input.portfolio-input(type='text')
+                  input.portfolio-input#portfolio-asset(type='text')
                   span 万元
               tr
                 td 投资期限：
                 td.portfolio-td-last
-                  input.portfolio-input(type='text')
+                  input.portfolio-input#portfolio-period(type='text')
                   span 个月
               tr
                 td 风险承受能力：
                 td.portfolio-td-last
-                  select.portfolio-input
-                    option() 不能承担任何风险
-                    option() 可承担一定的风险来换取较高的收益
-                    option() 可以承担很大的风险来追求高收益
-
+                  select.portfolio-input#portfolio-risk
+                    option(value='1') 不能承担任何风险
+                    option(value='2') 可以承担极小的风险
+                    option(value='3') 可以承担一定风险
+                    option(value='4') 可以承担较大的风险来追求高收益
+                    option(value='5') 绝对追求高收益
               tr
                 td.portfolio-td-last(colspan='2')
                   button.portfolio-submit(type='submit') 定制方案

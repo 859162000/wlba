@@ -19,4 +19,9 @@ require ['jquery', 'lib/backend'], ($, backend)->
       uri += '/home/'
     else
       uri += '/products/'
-    window.location.href= uri + '?period=' + period
+    window.location.href= uri + '?period=' + period + '&asset=' + $('.header-asset')[0].value
+
+
+  $('.header-input-base').keyup (e)->
+    if e.keyCode == 13
+      $('.header-button').click()

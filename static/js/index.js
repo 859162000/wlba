@@ -8,7 +8,7 @@
   });
 
   require(['jquery', 'underscore'], function($, _) {
-    return $('ul.tabs').each(function() {
+    $('ul.tabs').each(function() {
       var allAnchors, allTargets;
       allAnchors = $(this).find('a.tab-anchor');
       allTargets = allAnchors.map(function() {
@@ -35,6 +35,18 @@
           return $(this).trigger('click');
         }
       });
+    });
+    $('.portfolio-submit').click(function() {
+      var asset, period, risk;
+      asset = $('#portfolio-asset')[0].value;
+      period = $('#portfolio-period')[0].value;
+      risk = $('#portfolio-risk')[0].value;
+      return window.location.href = '/portfolio/?period=' + period + '&asset=' + asset + '&risk=' + risk;
+    });
+    return $('.portfolio-input').keyup(function(e) {
+      if (e.keyCode === 13) {
+        return $('.portfolio-submit').click();
+      }
     });
   });
 

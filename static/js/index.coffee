@@ -34,4 +34,13 @@ require ['jquery', 'underscore'], ($, _)->
       if index == 0
         $(this).trigger('click')
 
+  $('.portfolio-submit').click ()->
+    asset = $('#portfolio-asset')[0].value
+    period = $('#portfolio-period')[0].value
+    risk = $('#portfolio-risk')[0].value
 
+    window.location.href = '/portfolio/?period=' + period + '&asset=' + asset + '&risk=' + risk
+
+  $('.portfolio-input').keyup (e)->
+    if e.keyCode == 13
+      $('.portfolio-submit').click()
