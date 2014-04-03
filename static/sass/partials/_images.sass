@@ -55,9 +55,13 @@
   background-size: 100% 100%
 
 .logo
-  +images-original-sprite-dimensions(logo-no-text)
-  @include images-original-sprite(logo-no-text)
   +inline-block()
+  background: image-url('logo.png')
+  width: 130px
+  height: 60px
+
+  .svg &
+    background: image-url('logo.svg')
 
 .paper-background
-  background: image_url('bg_hot.png') repeat-x
+  background: image-url('bg_hot.png') repeat-x
