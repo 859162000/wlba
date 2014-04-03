@@ -61,36 +61,33 @@ body
               th 11月
               th 12月
               th 1月
-          tbody
+          tbody(data-bind="foreach: productTypes()")
             tr
-              td 现金理财
-              td 1,257.93
-              td 888.00
-              td 355
-            tr
-              td 银行理财
-              td 90
-              td 90
-              td 90
-            tr
-              td 货币基金
-              td 1,257.93
-              td 888.00
-              td 355
-            tr
-              td 公募基金
-              td 1,257.93
-              td 888.00
-              td 355
-            tr
-              td 保险
-              td 1,257.93
-              td 888.00
-              td 355
+              td(data-bind="text: productType")
+              td(data-bind="text: Math.floor($root.asset() * $data.percent / 100 * $data.earning_rate / 100 / 12 * 10000)")
+              td(data-bind="text: Math.floor($root.asset() * $data.percent / 100 * $data.earning_rate / 100 / 12 * 2 * 10000)")
+              td(data-bind="text: Math.floor($root.asset() * $data.percent / 100 * $data.earning_rate / 100 / 12 * 3 * 10000)")
 
-    .row.padding-s
-      i.icon-info.margin-right-s
-      span 该数据为网利宝根据目前收益预测数据，仅供参考
+        .row.padding-s
+          i.icon-info.margin-right-s
+          span 该数据为网利宝根据目前收益预测数据，仅供参考
+      .span6-omega
+        .earning-rate-panel(style="position: relative")
+          .huoqi
+            p(style="position: relative; top: -20px; text-align:center") 活期
+          .wanglibao-bar(data-bind="style: {height: timesBankRate() * 5 + 'px'}")
+            p(style="position: relative; top: -20px; text-align:center") 网利宝
+
+          div.earning-rate-content
+            p
+              |是银行活期存款收益的
+              span.numberpad(data-bind="text: (timesBankRate()/10).toFixed()") 2
+              span.numberpad(data-bind="text: timesBankRate()%10") 8
+              |倍
+            p 该方案预期年收益
+              span.earning-text(data-bind="text: Math.floor(portfolioEarningRate() / 100 * asset() * 10000)")
+              |元
+
 
   .space-vertical-s
 

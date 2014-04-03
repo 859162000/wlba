@@ -50,6 +50,9 @@ require ['jquery',
       self.riskDescription = ko.observable()
 
       self.portfolioName = ko.observable()
+      self.portfolioEarningRate = ko.observable(0)
+      self.bankRate = .35
+      self.timesBankRate = ko.observable(1)
 
       ko.computed ->
         risks =
@@ -155,19 +158,26 @@ require ['jquery',
 
         if portfolio?
           self.portfolioName portfolio.name
+          self.productsType portfolio.products[0].product.name
 
+          rate = 0
           self.productTypes(_.map portfolio.products, (value)->
             percent = value.value
-            color = 'blue'
+            color = '#159629'
             if _.has productTypeColorMapping, value.product.name
               color = productTypeColorMapping[value.product.name]
+
+            rate += value.product.average_earning_rate * percent / 100
 
             return {
               percent: percent
               color: color
               productType: value.product.name
+              earning_rate: value.product.average_earning_rate
             }
           )
+          self.portfolioEarningRate rate
+          self.timesBankRate Math.floor(rate / self.bankRate)
 
           chart.PieChart( $('#portfolio')[0],
             x: 130
