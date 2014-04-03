@@ -28,7 +28,9 @@
             }
           });
           $('#' + targetId).fadeIn();
-          return $(this).addClass('active');
+          $(this).addClass('active');
+          $('.tab-arrow').remove();
+          return $($(this).parent()).append("<img class='tab-arrow' src='/static/images/red-arrow.png'/>");
         });
       }).each(function(index) {
         if (index === 0) {

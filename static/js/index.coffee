@@ -30,6 +30,8 @@ require ['jquery', 'underscore'], ($, _)->
 
         $('#'+targetId).fadeIn()
         $(this).addClass 'active'
+        $('.tab-arrow').remove()
+        $($(this).parent()).append("<img class='tab-arrow' src='/static/images/red-arrow.png'/>")
     .each (index)->
       if index == 0
         $(this).trigger('click')
@@ -38,7 +40,6 @@ require ['jquery', 'underscore'], ($, _)->
     asset = $('#portfolio-asset')[0].value
     period = $('#portfolio-period')[0].value
     risk = $('#portfolio-risk')[0].value
-
     window.location.href = '/portfolio/?period=' + period + '&asset=' + asset + '&risk=' + risk
 
   $('.portfolio-input').keyup (e)->
