@@ -36,7 +36,7 @@ script(type="text/html", id="portfolio-product-table")
         // /ko
 
         // ko if: !sortable
-        th(data-bind="attr:{colspan: colspan}, text: name")
+        th(data-bind="attr:{colspan: colspan}, html: name")
         // /ko
 
     tbody(data-bind="foreach: {data: data, as:'item'}")

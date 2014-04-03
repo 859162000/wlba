@@ -126,6 +126,7 @@ require ['jquery',
 
       self.selectProduct = (value)->
         self.productsType value.productType
+        self.amount(self.asset() * value.percent / 100)
 
       ko.computed ()->
         params =
@@ -141,6 +142,14 @@ require ['jquery',
           self.myPortfolio(_.first data.results)
       .extend {throttle: 1}
 
+      productTypeColorMapping =
+        '现金': '#159629'
+        '信托': '#7CB718'
+        '银行理财': '#C3D40A'
+        '货币基金': '#EC830A'
+        '公募基金': '#E24809'
+        'P2P': '#DE1F0E'
+        '保险': '#BC0082'
       ko.computed ()->
         portfolio = self.myPortfolio()
 
@@ -150,18 +159,8 @@ require ['jquery',
           self.productTypes(_.map portfolio.products, (value)->
             percent = value.value
             color = 'blue'
-            if value.product.name == '现金'
-              color = '#7EBA19'
-            else if value.product.name == '信托产品'
-              color = 'lightblue'
-            else if value.product.name == '银行理财'
-              color = '#C3D40A'
-            else if value.product.name == '货币基金'
-              color = '#EC830A'
-            else if value.product.name == '公募基金'
-              color = '#E24809'
-            else if value.product.name == '保险'
-              color = '#DE1F0E'
+            if _.has productTypeColorMapping, value.product.name
+              color = productTypeColorMapping[value.product.name]
 
             return {
               percent: percent
@@ -235,7 +234,7 @@ require ['jquery',
         amount = self.amount()
         if backend.isValidType type
           params =
-            count: 5
+            count: 7
             lte_threshold: amount
 
           backend.loadData type, params

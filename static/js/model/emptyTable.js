@@ -13,7 +13,7 @@
         defaultContext = {
           columns: [
             {
-              name: '点击产品类别 查找符合条件的产品',
+              name: '<p class="product-table-message">点击产品类别 查找符合条件的产品</p>',
               colspan: 1
             }
           ]

@@ -19,7 +19,7 @@
     var ViewModel, model;
     ViewModel = (function() {
       function ViewModel() {
-        var asset_param, period_param, risk_param, self;
+        var asset_param, period_param, productTypeColorMapping, risk_param, self;
         self = this;
 
         /*
@@ -118,7 +118,8 @@
         self.myPortfolio = ko.observable();
         self.productTypes = ko.observable();
         self.selectProduct = function(value) {
-          return self.productsType(value.productType);
+          self.productsType(value.productType);
+          return self.amount(self.asset() * value.percent / 100);
         };
         ko.computed(function() {
           var params;
@@ -135,6 +136,15 @@
         }).extend({
           throttle: 1
         });
+        productTypeColorMapping = {
+          '现金': '#159629',
+          '信托': '#7CB718',
+          '银行理财': '#C3D40A',
+          '货币基金': '#EC830A',
+          '公募基金': '#E24809',
+          'P2P': '#DE1F0E',
+          '保险': '#BC0082'
+        };
         ko.computed(function() {
           var portfolio;
           portfolio = self.myPortfolio();
@@ -144,18 +154,8 @@
               var color, percent;
               percent = value.value;
               color = 'blue';
-              if (value.product.name === '现金') {
-                color = '#7EBA19';
-              } else if (value.product.name === '信托产品') {
-                color = 'lightblue';
-              } else if (value.product.name === '银行理财') {
-                color = '#C3D40A';
-              } else if (value.product.name === '货币基金') {
-                color = '#EC830A';
-              } else if (value.product.name === '公募基金') {
-                color = '#E24809';
-              } else if (value.product.name === '保险') {
-                color = '#DE1F0E';
+              if (_.has(productTypeColorMapping, value.product.name)) {
+                color = productTypeColorMapping[value.product.name];
               }
               return {
                 percent: percent,
@@ -204,7 +204,7 @@
           amount = self.amount();
           if (backend.isValidType(type)) {
             params = {
-              count: 5,
+              count: 7,
               lte_threshold: amount
             };
             return backend.loadData(type, params).done(function(data) {
