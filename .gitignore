@@ -4,3 +4,5 @@ db.sqlite3
 media
 publish/
 *.log
+static/sass/partials/*.css
+static/sass/*.css

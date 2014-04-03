@@ -23,21 +23,22 @@ html
               tr
                 td 投资金额：
                 td.portfolio-td-last
-                  input.portfolio-input(type='text')
+                  input.portfolio-input#portfolio-asset(type='text')
                   span 万元
               tr
                 td 投资期限：
                 td.portfolio-td-last
-                  input.portfolio-input(type='text')
+                  input.portfolio-input#portfolio-period(type='text')
                   span 个月
               tr
                 td 风险承受能力：
                 td.portfolio-td-last
-                  select.portfolio-input
-                    option() 不能承担任何风险
-                    option() 可承担一定的风险来换取较高的收益
-                    option() 可以承担很大的风险来追求高收益
-
+                  select.portfolio-input#portfolio-risk
+                    option(value='1') 不能承担任何风险
+                    option(value='2') 可以承担极小的风险
+                    option(value='3') 可以承担一定风险
+                    option(value='4') 可以承担较大的风险来追求高收益
+                    option(value='5') 绝对追求高收益
               tr
                 td.portfolio-td-last(colspan='2')
                   button.portfolio-submit(type='submit') 定制方案
@@ -59,60 +60,63 @@ html
     .container#trust-products
       each hot_trust in hot_trusts
         -with hot_trust.trust as trust
-        .card
-          .card-top-container
-            p.card-title 高收益精选
-            .space-vertical-s
-            img.card-annotation(src="/static/images/on-sale.png")
-            img.bank-logo(src="/static/images/pingan-logo.png")
-          .card-detail-box
-            .card-product-name {{trust.name}}
-            dt 产品期限:
-            dd.orange-text {{trust.period | month}}
-            dt.profit-title 投资收益:
-            dd.profit-text {{trust.expected_earning_rate | percentage}}
-            .space-vertical-s
-            .space-vertical-s.dashed-line
-            dt 点评:
-            dd {{trust.brief}}
+        a(href='/trust/detail/{{trust.id}}')
+          .card
+            .card-top-container
+              p.card-title 高收益精选
+              .space-vertical-s
+              img.card-annotation(src="/static/images/on-sale.png")
+              img.bank-logo(src="/static/images/pingan-logo.png")
+            .card-detail-box
+              .card-product-name {{trust.name}}
+              dt 产品期限:
+              dd.orange-text {{trust.period | month}}
+              dt.profit-title 投资收益:
+              dd.profit-text {{trust.expected_earning_rate | percentage}}
+              .space-vertical-s
+              .space-vertical-s.dashed-line
+              dt 点评:
+              dd {{trust.brief}}
         -endwith
 
     .container#fund-products
       each hot_fund in hot_funds
         -with hot_fund.fund as fund
-        .card
-          .card-top-container
-            p.card-title 高收益精选
-            .space-vertical-s
-            img.card-annotation(src="/static/images/on-sale.png")
-            img.bank-logo(src="/static/images/pingan-logo.png")
-          .card-detail-box
-            .card-product-name {{fund.name}}
-            dt.profit-title 七日年化利率:
-            dd.profit-text {{fund.rate_7_days | percentage}}
-            .space-vertical-s
-            .space-vertical-s.dashed-line
-            dt 点评:
-            dd {{fund.brief}}
+        a(href='/fund/detail/{{fund.id}}')
+          .card
+            .card-top-container
+              p.card-title 高收益精选
+              .space-vertical-s
+              img.card-annotation(src="/static/images/on-sale.png")
+              img.bank-logo(src="/static/images/pingan-logo.png")
+            .card-detail-box
+              .card-product-name {{fund.name}}
+              dt.profit-title 七日年化利率:
+              dd.profit-text {{fund.rate_7_days | percentage}}
+              .space-vertical-s
+              .space-vertical-s.dashed-line
+              dt 点评:
+              dd {{fund.brief}}
         -endwith
 
     .container#financing-products
       each hot_financing in hot_financings
         -with hot_financing.bank_financing as financing
-        .card
-          .card-top-container
-            p.card-title 高收益精选
-            .space-vertical-s
-            img.card-annotation(src="/static/images/on-sale.png")
-            img.bank-logo(src="/static/images/pingan-logo.png")
-          .card-detail-box
-            .card-product-name {{financing.name}}
-            dt.profit-title 七日年化利率:
-            dd.profit-text {{financing.expected_rate | percentage}}
-            .space-vertical-s
-            .space-vertical-s.dashed-line
-            dt 点评:
-            dd {{financing.brief}}
+        a(href='/financing/detail/{{financing.id}}')
+          .card
+            .card-top-container
+              p.card-title 高收益精选
+              .space-vertical-s
+              img.card-annotation(src="/static/images/on-sale.png")
+              img.bank-logo(src="/static/images/pingan-logo.png")
+            .card-detail-box
+              .card-product-name {{financing.name}}
+              dt.profit-title 七日年化利率:
+              dd.profit-text {{financing.expected_rate | percentage}}
+              .space-vertical-s
+              .space-vertical-s.dashed-line
+              dt 点评:
+              dd {{financing.brief}}
         -endwith
 
     .space-vertical-m

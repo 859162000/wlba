@@ -15,7 +15,7 @@
       $(e.target).addClass('active');
       return previous = e.target;
     });
-    return $('.header-button').click(function() {
+    $('.header-button').click(function() {
       var period, type, uri;
       period = $('.header-select')[0].value;
       type = $(previous).attr('data-type');
@@ -25,7 +25,12 @@
       } else {
         uri += '/products/';
       }
-      return window.location.href = uri + '?period=' + period;
+      return window.location.href = uri + '?period=' + period + '&asset=' + $('.header-asset')[0].value;
+    });
+    return $('.header-input-base').keyup(function(e) {
+      if (e.keyCode === 13) {
+        return $('.header-button').click();
+      }
     });
   });
 

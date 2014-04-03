@@ -3,16 +3,18 @@
 
 .tab-item
   display: inline-block
-  font-size: $font-m
-  border-left: 1px solid $red
-  padding: 0px 1em
-
-  &:first-child
-    border-left: 0
+  font-size: $font-s
+  padding: 7px 1em
+  position: relative
 
 .tab-anchor
   +unstyled-link
   +link-colors(black, $red)
 
 .tab-anchor.active
-  +link-colors($red)
+  font-weight: bold
+
+.tab-arrow
+  position: absolute
+  bottom: -2px
+  left: 37%

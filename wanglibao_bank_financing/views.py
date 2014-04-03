@@ -5,6 +5,7 @@ from wanglibao_bank_financing.filters import BankFinancingFilterSet
 from wanglibao_bank_financing.models import BankFinancing, Bank
 from wanglibao_bank_financing.serializers import BankFinancingSerializer, BankSerializer
 from wanglibao_favorite.models import FavoriteFinancing
+from wanglibao_hotlist.models import HotFinancing
 
 
 class BankFinancingViewSet(PaginatedModelViewSet):
@@ -22,6 +23,12 @@ class BankViewSet(PaginatedModelViewSet):
 
 class FinancingHomeView(TemplateView):
     template_name = "financing_home.jade"
+
+    def get_context_data(self, **kwargs):
+        hot_financings = HotFinancing.objects.all()[:4]
+        return {
+            'hot_financings': hot_financings
+        }
 
 
 class FinancingProductsView(TemplateView):

@@ -1,3 +1,4 @@
+-load formatters
 doctype html
 - with '银行理财' as title
 include include/head
@@ -22,78 +23,26 @@ body
     .panel-title-bar
       .panel-title 热门产品
       a.panel-title-right-item(href="#") 更多
-    .container
-      .card-financing
-        .card-top-container
-          p.card-financing-title 高收益精选
-          .space-vertical-s
-          img.card-annotation(src="/static/images/on-sale.png")
-          img.bank-logo(src="/static/images/pingan-logo.png")
-          .space-vertical-s
-          .card-financing-product-name 平安财富-结构类（非保本 挂钩ET）
-        dl.card-detail-box
-          dt 投资收益:
-          dd.orange-text 12%
-          dt 产品期限:
-          dd.orange-text 90天
-          .space-vertical-s
-          .space-vertical-s.dashed-line
-          dt 点评:
-          dd 期限短，起点低，同类收益最高，保本浮动类型，稳健型首选
 
-      .card-financing
-        .card-top-container
-          p.card-financing-title 高收益精选
-          .space-vertical-s
-          img.card-annotation(src="/static/images/on-sale.png")
-          img.bank-logo(src="/static/images/pingan-logo.png")
-          .space-vertical-s
-          .card-financing-product-name 平安财富-结构类（非保本 挂钩ET）
-        dl.card-detail-box
-          dt 投资收益:
-          dd.orange-text 12%
-          dt 产品期限:
-          dd.orange-text 90天
-          .space-vertical-s
-          .space-vertical-s.dashed-line
-          dt 点评:
-          dd 期限短，起点低，同类收益最高，保本浮动类型，稳健型首选
-
-      .card-financing
-        .card-top-container
-          p.card-financing-title 高收益精选
-          .space-vertical-s
-          img.card-annotation(src="/static/images/on-sale.png")
-          img.bank-logo(src="/static/images/pingan-logo.png")
-          .space-vertical-s
-          .card-financing-product-name 平安财富-结构类（非保本 挂钩ET）
-        dl.card-detail-box
-          dt 投资收益:
-          dd.orange-text 12%
-          dt 产品期限:
-          dd.orange-text 90天
-          .space-vertical-s
-          .space-vertical-s.dashed-line
-          dt 点评:
-          dd 期限短，起点低，同类收益最高，保本浮动类型，稳健型首选
-
-      .card-financing
-        .card-top-container
-          p.card-financing-title 高收益精选
-          .space-vertical-s
-          img.card-annotation(src="/static/images/on-sale.png")
-          img.bank-logo(src="/static/images/pingan-logo.png")
-          .space-vertical-s
-          .card-financing-product-name 平安财富-结构类（非保本 挂钩ET）
-        dl.card-detail-box
-          dt 投资收益:
-          dd.orange-text 12%
-          dt 产品期限:
-          dd.orange-text 90天
-          .space-vertical-s
-          .space-vertical-s.dashed-line
-          dt 点评:
-          dd 期限短，起点低，同类收益最高，保本浮动类型，稳健型首选
+    .container#financing-products
+      each hot_financing in hot_financings
+        -with hot_financing.bank_financing as financing
+        a(href='/financing/detail/{{financing.id}}')
+          .card
+            .card-top-container
+              p.card-title 高收益精选
+              .space-vertical-s
+              img.card-annotation(src="/static/images/on-sale.png")
+              img.bank-logo(src="/static/images/pingan-logo.png")
+            .card-detail-box
+              .card-product-name {{financing.name}}
+              dt.profit-title 七日年化利率:
+              dd.profit-text {{financing.expected_rate | percentage}}
+              .space-vertical-s
+              .space-vertical-s.dashed-line
+              dt 点评:
+              dd {{financing.brief}}
+        -endwith
 
   .space-vertical-s
   .panel
