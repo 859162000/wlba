@@ -5,9 +5,10 @@ class IndexView(TemplateView):
     template_name = 'index.jade'
 
     def get_context_data(self, **kwargs):
-        hot_trusts = HotTrust.objects.all()[:6]
-        hot_funds = HotFund.objects.all()[:6]
-        hot_financings = HotFinancing.objects.all()[:6]
+        count = 4
+        hot_trusts = HotTrust.objects.all()[:count]
+        hot_funds = HotFund.objects.all()[:count]
+        hot_financings = HotFinancing.objects.all()[:count]
 
         return {
             'hot_trusts': hot_trusts,

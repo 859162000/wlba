@@ -2,22 +2,55 @@
 @import "images"
 
 .card
+  min-width: 260px
+  max-width: 260px
+  margin-left: 10px
+  margin-top: 10px
+  margin-bottom: 10px
+  background-color: white
+  padding: 10px
+  color: #868686
+
   display: block
-  +float-left
-  background: white
-  border: 1px solid lightgray
   position: relative
-  margin-right: 1em
-  margin-bottom: 1em
+  +box-shadow(0px 0px 3px gray)
+  +float-left
 
-  &:hover
-    +box-shadow($red 0 0 3px)
+.card-top-container
+  padding: 10px
 
-.card-trust
-  min-width: 324px
-  max-width: 324px
-  min-height: 150px
-  max-height: 150px
+.card-title
+  color: $orange
+  font-size: $font-l
+
+.card-product-name
+  color: black
+  padding-bottom: 10px
+
+.bank-logo
+  min-width: 125px
+  max-width: 125px
+  min-height: 30px
+  max-height: 30px
+
+.card-detail-box
+  padding: 10px
+
+  >dt
+    float: left
+    clear: left
+    margin-right: 5px
+
+
+.profit-text
+  color: $red
+  font-size: $font-xl
+  clear: both
+
+.card-annotation
+  position: absolute
+  right: 1px
+  top: 1px
 
 .card-left
   float: left
@@ -27,9 +60,6 @@
   display: table-cell
   width: 9999999px
   padding: .5em 0
-
-.card-title
-  font-size: 1.1em
 
 a.card-orderlink
   position: absolute

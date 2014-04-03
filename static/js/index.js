@@ -8,25 +8,6 @@
   });
 
   require(['jquery', 'underscore'], function($, _) {
-    var switchBackground, switchBackgroundWrapper;
-    switchBackground = function() {
-      var backgrounds, current, currentIndex, nextIndex;
-      backgrounds = $('.big-background');
-      current = _.find(backgrounds, function(value) {
-        return $(value).css('display') !== 'none';
-      });
-      currentIndex = _.indexOf(backgrounds, current);
-      nextIndex = (currentIndex + 1) % backgrounds.length;
-      $(backgrounds[currentIndex]).hide();
-      $(backgrounds[nextIndex]).fadeIn();
-      $($('.background-anchor')[currentIndex]).removeClass('active');
-      return $($('.background-anchor')[nextIndex]).addClass('active');
-    };
-    switchBackgroundWrapper = function() {
-      switchBackground(4);
-      return setTimeout(switchBackgroundWrapper, 10 * 1000);
-    };
-    setTimeout(switchBackgroundWrapper, 10 * 1000);
     return $('ul.tabs').each(function() {
       var allAnchors, allTargets;
       allAnchors = $(this).find('a.tab-anchor');
