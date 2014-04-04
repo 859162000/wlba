@@ -3,29 +3,31 @@
 
 @import variables
 
-.panel
+%panel-base
   +container
   position: relative // Make panel as a container can has absolute position children
   margin-top: $space-s
   background: white
   min-height: 100px
-  padding: 0 18px
   +border-radius(5px)
   overflow: hidden
   padding-bottom: 1em
 
 .panel-nopadding
-  @extend .panel
-  padding: 0
+  @extend %panel-base
+
+.panel-padding
+  @extend %panel-base
+  padding: 0 18px
   padding-top: 1px
 
-.space-vertical-s+.panel
+.space-vertical-s+.panel-nopadding
   margin-top: 0
 
-.space-vertical-m+.panel
+.space-vertical-m+.panel-nopadding
   margin-top: 0
 
-.space-vertical-l+.panel
+.space-vertical-l+.panel-nopadding
   margin-top: 0
 
 $header-height: 150px
@@ -58,10 +60,6 @@ $header-height: 150px
   @extend .panel-bar
   border-bottom: 2px solid $red
 
-  .panel-nopadding &
-    padding: 0 1em
-
-
 .panel-product-title-bar
   @extend .panel-bar
   border-bottom: 1px solid #d3d3d3
@@ -79,6 +77,9 @@ $header-height: 150px
   font-size: $font-l
   margin-right: 1em
   +float-left
+
+.panel-nopadding .panel-title
+  padding: 0 1em
 
 .panel-title-l
   @extend .panel-title

@@ -8,7 +8,7 @@ body
   include include/navigation
   - endwith
 
-  .panel
+  .panel-nopadding
     .panel-title-bar
       .panel-title 筛选条件
     .container(data-bind="foreach: filters")
@@ -18,7 +18,7 @@ body
         a.filter-item(href="#", data-bind="text: name, css: {active: $root.activeFilters().indexOf($data) != -1}, click: $root.clickOnFilter") 名字
         // /ko
 
-  .panel
+  .panel-nopadding
     .panel-title-bar
       .panel-title 筛选结果
 

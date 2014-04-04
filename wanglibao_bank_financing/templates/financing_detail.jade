@@ -16,7 +16,7 @@ body
         li.sub-navbar--list-item
           a.sub-navbar--anchor.active(href="{%url 'financing_products'%}") 理财产品
   .container
-    .span8.panel.panel-header
+    .span8.panel-nopadding.panel-header
       .row
         .span8
           .panel-bar-s
@@ -60,14 +60,14 @@ body
             else
               a#addToFavorite.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")取消收藏
 
-    .span4-omega.panel.panel-header
+    .span4-omega.panel-nopadding.panel-header
       .panel-product-title-bar
         span.panel-title 收益计算器
       form
         .form-row
           label.span3.form-row-label 投资额度
           input.span8(type="text")
-  .panel
+  .panel-nopadding
     .panel-title-bar
       .panel-tabs
         .panel-tab.active 产品详情

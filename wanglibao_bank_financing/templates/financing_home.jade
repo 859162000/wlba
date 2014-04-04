@@ -16,7 +16,7 @@ body
           a.sub-navbar--anchor.active(href="{%url 'financing_home'%}") 理财首页
         li.sub-navbar--list-item
           a.sub-navbar--anchor(href="{%url 'financing_products'%}") 理财产品
-  .panel
+  .panel-nopadding
     .panel-title-bar
       .panel-title 热门产品
       a.panel-title-right-item(href="#") 更多
@@ -41,7 +41,7 @@ body
               dd {{financing.brief}}
         -endwith
 
-  .panel
+  .panel-nopadding
     .panel-title-bar
       .panel-title 在售产品收益排行
       // ko template: { name: 'tabs', data: tab }
