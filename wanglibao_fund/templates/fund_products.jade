@@ -15,7 +15,6 @@ body
           a.sub-navbar--anchor(href="{% url 'fund_home' %}") 基金首页
         li.sub-navbar--list-item
           a.sub-navbar--anchor.active(href="{% url 'fund_products' %}") 基金产品
-  .space-vertical-s
   .panel
     .panel-title-bar
       .panel-tabs(data-bind="foreach: tabTree")
@@ -24,7 +23,7 @@ body
     .panel-content
       // ko template: {name: 'fund-table', data: products }
       // /ko
-  .space-vertical-m
+
   include include/footer
   include include/templates
 

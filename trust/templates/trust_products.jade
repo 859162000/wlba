@@ -18,8 +18,6 @@ body
         li.sub-navbar--list-item
           a.sub-navbar--anchor(href="{% url 'trust_company' %}") 信托公司
 
-  .space-vertical-s
-
   .panel
     .panel-title-bar
       .panel-title 筛选条件
@@ -40,7 +38,6 @@ body
                 a.filter-condition-item(href="#", data-bind="text: name, css:{active: $root.isFilterActive($data)}, click:$root.clickOnFilter") name
           // /ko
 
-  .space-vertical-s
   .panel
     .panel-title-bar
       .panel-title 筛选结果
@@ -52,7 +49,6 @@ body
     // ko template: {name: 'pager', data: pager}
     // /ko
 
-  .space-vertical-m
   include include/footer
   include include/templates
 

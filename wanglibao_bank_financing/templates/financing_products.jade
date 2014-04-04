@@ -15,7 +15,6 @@ body
           a.sub-navbar--anchor(href="{%url 'financing_home'%}") 理财首页
         li.sub-navbar--list-item
           a.sub-navbar--anchor.active(href="{%url 'financing_products'%}") 理财产品
-  .space-vertical-s
   .panel
     .panel-title-bar
       .panel-title 筛选条件
@@ -25,7 +24,6 @@ body
         // ko foreach: values
         a.filter-item(href="#", data-bind="text: name, css: {active: $root.activeFilters().indexOf($data) != -1}, click: $root.clickOnFilter") 名字
         // /ko
-  .space-vertical-s
   .panel
     .panel-title-bar
       .panel-title 筛选结果
@@ -36,7 +34,6 @@ body
     // ko template: {name: 'pager', data: pager}
     // /ko
 
-  .space-vertical-m
   include include/footer
   include include/templates
 

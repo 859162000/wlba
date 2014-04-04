@@ -19,11 +19,6 @@ body
         li.sub-navbar--list-item
           a.sub-navbar--anchor(href="{% url 'trust_company' %}") 信托公司
 
-  .container
-    .ad-panel
-
-  .space-vertical-s
-
   .panel
     .panel-title-bar
       .panel-title 最新信托产品
@@ -31,7 +26,6 @@ body
     // ko template: {name: 'data-table', data: trustTable}
     // /ko
 
-  .space-vertical-s
   .panel
     .panel-title-bar
       .panel-title 排行榜
@@ -42,8 +36,6 @@ body
     .panel-content
       // ko template: {name: 'data-table', data: filteredTable}
       // /ko
-
-  .space-vertical-m
 
   include include/footer
   include include/templates
