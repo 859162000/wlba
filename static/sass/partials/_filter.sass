@@ -6,8 +6,10 @@
   padding: 0 30px
   line-height: 40px
   border-bottom: 1px solid lightgray
+  color: #999
 
 .filter-item
+  @extend .button-round-mini
   font-size: $font-xs
   text-align: center
   padding: 0 10px
@@ -18,5 +20,5 @@
   +unstyled-link
 
   &.active, &:hover
-    background-color: #F60
+    background-color: $red
     color: white

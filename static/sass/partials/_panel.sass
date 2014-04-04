@@ -58,6 +58,10 @@ $header-height: 150px
   @extend .panel-bar
   border-bottom: 2px solid $red
 
+  .panel-nopadding &
+    padding: 0 1em
+
+
 .panel-product-title-bar
   @extend .panel-bar
   border-bottom: 1px solid #d3d3d3
@@ -117,17 +121,16 @@ $header-height: 150px
 
 .panel-sub-tabs
   background: white
-  padding: 0 1em
+  padding: 10px 1em
   border-bottom: 1px solid #DDD
 
 a.panel-sub-tab
   display: inline-block
-  padding: 10px 15px
   +unstyled-link
+  @extend .button-round-mini
 
   &.active
     background: $red
-    @extend .button-round-mini
     +link-colors(white)
 
 .panel-text
