@@ -56,6 +56,7 @@ $header-height: 150px
 
 .panel-title-bar
   @extend .panel-bar
+  border-bottom: 2px solid $red
 
 .panel-product-title-bar
   @extend .panel-bar
@@ -68,7 +69,6 @@ $header-height: 150px
   border-left: 2px solid $red
   line-height: 1
   font-size: $font-l
-
 
 .panel-title
   padding: 0
@@ -118,17 +118,17 @@ $header-height: 150px
 .panel-sub-tabs
   background: white
   padding: 0 1em
+  border-bottom: 1px solid #DDD
 
 a.panel-sub-tab
   display: inline-block
   padding: 10px 15px
-
   +unstyled-link
 
   &.active
-    @extend .button
-    @extend .button-mini
-    @extend .button-orange
+    background: $red
+    @extend .button-round-mini
+    +link-colors(white)
 
 .panel-text
   padding: 20px
