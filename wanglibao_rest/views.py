@@ -57,9 +57,9 @@ class UserExisting(APIView):
         """
 
         query = Q(email=identifier) \
-            or \
-                (Q(wanglibaouserprofile__phone=identifier) and
-                 Q(wanglibaouserprofile__phone_varified=True))
+            | \
+                (Q(wanglibaouserprofile__phone=identifier) &
+                 Q(wanglibaouserprofile__phone_verified=True))
 
         try:
             get_user_model().objects.get(query)

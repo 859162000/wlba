@@ -3,6 +3,18 @@ require.config
     jquery: 'lib/jquery.min'
 
 require ['jquery', 'lib/backend'], ($, backend)->
+  $('#validate_method').change (e)->
+    selected = $(e.target).children('option:selected')[0]
+    value = $(selected).val()
+    console.log value
+
+    if value == '手机'
+      $('#email-form').hide()
+      $('#phone-form').show()
+    else if value == '邮箱'
+      $('#email-form').show()
+      $('#phone-form').hide()
+
   $('#sendMailButton').click (e)->
     target = $(e.target).attr('data-url')
     $.post target

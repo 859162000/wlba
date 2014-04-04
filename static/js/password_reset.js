@@ -10,10 +10,10 @@
     return $('#submitButton').click(function(e) {
       var identifier, url;
       e.preventDefault();
-      url = $('.form').attr('action');
+      url = $('form#identifier').attr('action');
       identifier = $('input[name="identifier"]').val();
       return backend.userExists(identifier).done(function() {
-        return $('.form').submit();
+        return $('form#identifier').submit();
       }).fail(function() {
         return alert('用户不存在');
       });
