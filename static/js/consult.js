@@ -119,6 +119,21 @@
             ]
           }
         ];
+        self.savePortfolio = function() {
+          return backend.userProfile({
+            investment_asset: self.asset(),
+            investment_period: self.period(),
+            risk_level: self.riskScore()
+          }).done(function() {
+            return alert('投资方案已保存');
+          }).fail(function(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 403) {
+              return window.location.href = '/accounts/login/?next=' + window.location.href;
+            } else {
+              return alert('保存投资方案失败');
+            }
+          });
+        };
 
         /*
         The portfolio related stuff
@@ -263,9 +278,14 @@
     })();
     model = new ViewModel();
     ko.applyBindings(model);
-    return $('#question-button').click(function(e) {
+    $('#question-button').click(function(e) {
       e.preventDefault();
       return $(this).modal();
+    });
+    return backend.userProfile().done(function(data) {
+      model.asset(data.investment_asset);
+      model.period(data.investment_period);
+      return model.riskScore(data.risk_level);
     });
   });
 
