@@ -15,7 +15,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/chart', 'jquery.modal', 'purl', 'model/trustTable', 'model/financingTable', 'model/cashTable', 'model/fundTable', 'model/fund', 'model/emptyTable'], function($, _, ko, backend, chart, modal, purl, trustTable, financingTable, cashTable, fundTable, fund, emptyTable) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/chart', 'lib/modal', 'purl', 'model/trustTable', 'model/financingTable', 'model/cashTable', 'model/fundTable', 'model/fund', 'model/emptyTable'], function($, _, ko, backend, chart, modal, purl, trustTable, financingTable, cashTable, fundTable, fund, emptyTable) {
     var ViewModel, model;
     ViewModel = (function() {
       function ViewModel() {
@@ -75,33 +75,38 @@
         };
         self.questions = [
           {
-            question: '您的可投资资产是多少？',
-            answer: ko.observable(),
+            question: '投资金额',
+            answer: ko.observable(self.asset()),
             input: {
               suffix: '万元'
             }
           }, {
-            question: '可以投资的期限是？',
-            answer: ko.observable(),
+            question: '投资期限',
+            answer: ko.observable(self.period()),
             input: {
               suffix: '个月'
             }
           }, {
-            question: '您的投资目标是？',
+            question: '风险承受能力',
             answer: ko.observable(),
             options: [
               {
                 title: '不能承担任何风险',
                 value: {
+                  risk_score: 1
+                }
+              }, {
+                title: '可以承担极小的风险',
+                value: {
                   risk_score: 2
                 }
               }, {
-                title: '可承担一定的风险来换取较高的收益',
+                title: '可以承担一定风险',
                 value: {
                   risk_score: 3
                 }
               }, {
-                title: '可以承担很大的风险来追求高收益',
+                title: '可以承担较大风险',
                 value: {
                   risk_score: 4
                 }
@@ -257,7 +262,11 @@
 
     })();
     model = new ViewModel();
-    return ko.applyBindings(model);
+    ko.applyBindings(model);
+    return $('#question-button').click(function(e) {
+      e.preventDefault();
+      return $(this).modal();
+    });
   });
 
 }).call(this);

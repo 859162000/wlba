@@ -28,7 +28,7 @@
         a.header-button(href='#') 搜索
     .user-info
       if user.is_authenticated
-        a(href="") 我的投资方案
+        a(href="/portfolio") 我的投资方案
         .user-center
           #username {{ user.wanglibaouserprofile.nick_name }}
           ul#user-items

@@ -54,6 +54,7 @@
         self = this;
         this.context = context;
         this.strokeWidth = "3px";
+        $(element).html('');
         this.paper = new Raphael(element);
         this.events = {};
         if (_.has(context, 'events')) {
