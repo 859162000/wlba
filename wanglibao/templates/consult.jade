@@ -24,7 +24,30 @@ body
         dd(data-bind="text: riskDescription")
 
       .ispan1
-        a.button.button-round-mini.button-red(href="#") 重新定制
+        a#question-button.button.button-round-mini.button-red(href="#question-form") 重新定制
+
+        form#question-form.order-form(style="display:none")
+          .modal-title-bar
+            span.modal-title 定制我的理财方案
+            a.icon-cancel.pull-right(rel="modal:close")
+          .padding-s
+            //ko foreach: questions
+            div.maring-top-s
+              label.ispan3.align-right(data-bind="text:$data.question + '：'")
+              //ko if: _.has($data, 'options')
+              select.ispan7(data-bind="options: $data.options, optionsText: 'title', value:answer")
+              // /ko
+
+              //ko if: _.has($data, 'input')
+              span(style="position:relative")
+                input.ispan7(type='text', data-bind="value: answer")
+                span(style="position:absolute; right: 5px", data-bind="text: $data.input.suffix")
+              // /ko
+            // /ko
+
+            div.margin-top-s.clearfix
+              a.button-middle.button-red.prefix3.span6(data-bind="click: $root.finishSurvey") 完成
+
 
     .panel-inner
       .row

@@ -54,6 +54,7 @@ define ['jquery', 'underscore', 'raphael'], ($, _, raphael)->
       self = this
       @context = context
       @strokeWidth = "3px"
+      $(element).html('') #clear the old graph
       @paper = new Raphael(element)
 
       @events = {}

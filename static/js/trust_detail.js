@@ -10,22 +10,7 @@
     }
   });
 
-  require(['jquery', 'jquery.modal', 'lib/backend'], function($, modal, backend) {
-    $.modal.defaults = {
-      overlay: "#000",
-      opacity: 0,
-      zIndex: 1,
-      escapeClose: true,
-      clickClose: true,
-      closeText: 'Close',
-      closeClass: '',
-      showClose: false,
-      modalClass: "modal",
-      spinnerHtml: null,
-      showSpinner: true,
-      fadeDuration: 100,
-      fadeDelay: 1.0
-    };
+  require(['jquery', 'lib/modal', 'lib/backend'], function($, modal, backend) {
     $('#order-button').click(function(e) {
       e.preventDefault();
       return $(this).modal();
