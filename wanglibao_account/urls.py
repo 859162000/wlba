@@ -15,10 +15,10 @@ urlpatterns = patterns(
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
     url(r'^email/sent/$', TemplateView.as_view(template_name='email_sent.jade'), name='email_sent'),
     url(r'^home', login_required(TemplateView.as_view(template_name='account_home.jade'))),
-    url(r'^favorite/', TemplateView.as_view(template_name='account_favorite.jade')),
-    url(r'^setting/', TemplateView.as_view(template_name='account_setting.jade')),
+    url(r'^favorite/', login_required(TemplateView.as_view(template_name='account_favorite.jade'))),
+    url(r'^setting/', login_required(TemplateView.as_view(template_name='account_setting.jade'))),
 
-    url(r'^password/change/', "wanglibao_account.views.password_change", name='password_change'),
+    url(r'^password/change/$', "wanglibao_account.views.password_change", name='password_change'),
     url(r'^password/change/done/', TemplateView.as_view(template_name='html/password_change_done.html'),
         name='password_change_done'),
     url(r'^activate/complete/$',

@@ -6,38 +6,35 @@ body
   include include/header
   include include/navigation
 
-  .row
-    .span3
-      ul.sidebar
-        li.sidebar-item
-          a.sidebar-anchor(href="/accounts/home/") 投资方案
-        li.sidebar-item
-          a.sidebar-anchor(href="/accounts/favorite/") 产品收藏
-        li.sidebar-item.active
-          a.sidebar-anchor(href="/accounts/setting/") 设置
-    .span9-omega
-      .panel-nopadding
-        .panel-title-bar
-          .panel-title 修改密码
+  .container
+    .panel-padding
+      .panel-title-bar
+        .panel-title
+          span 修改密码
 
+      .panel-inner
         form#passwordChangeForm.well-s(method="POST")
-          .form-row.form-row-m
-            label.form-row-label.span1 原始密码
-            input#old-password.span5(type="password", name="old-password")
-
-          .form-row.form-row-m
-            label.form-row-label.span1 新密码
-            input#new-password1.span5(type="password", name="new-password1")
-
-          .form-row.form-row-m
-            label.form-row-label.span1 再次输入
-            input#new-password2.span5(type="password", name="new-password2")
-
-          .form-row.form-row-m
-            button#passwordChangeButton.button.button-middle.button-yellow(type="submit") 提交
+          table
+            tr
+              td 原始密码
+              td
+                input#old-password(type="password", name="old-password")
+            tr
+              td 新密码
+              td
+                input#new-password1(type="password", name="new-password1")
+            tr
+              td 再次输入
+              td
+                input#new-password2(type="password", name="new-password2")
+            tr
+              td
+              td
+                button#passwordChangeButton(type="submit") 提交
 
   include include/footer
 
-  script(src='/static/js/require.js', data-main='/static/js/account_setting')
+  script.
+    require(['/static/js/account_setting.js'])
 
   include include/tracking
