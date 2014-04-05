@@ -28,7 +28,14 @@
         a.header-button(href='#') 搜索
     .user-info
       if user.is_authenticated
-        a.username(href="/accounts/home") {{ user.wanglibaouserprofile.nick_name }}
+        a(href="") 我的投资方案
+        .user-center
+          span#username {{ user.wanglibaouserprofile.nick_name }}
+          ul#user-items
+            li
+              a(href="#") 产品收藏
+            li
+              a(href="#") 修改密码
         a.logout(href="/accounts/logout?next={{ request.path }}") 退出
       else
         a(href="/accounts/login?next={{ request.path }}") 登录
