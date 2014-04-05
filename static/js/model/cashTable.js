@@ -67,7 +67,7 @@
                 return '<a href="' + item.buy_url + '">' + item.buy_text + '</a>';
               }
             }, {
-              name: '',
+              name: '收藏',
               colspan: 1,
               text: function(item) {
                 var link_text;
@@ -78,7 +78,7 @@
                 return '<a class="button button-mini button-pink" onclick="addToFavorite(event,' + "'cashes');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
               }
             }, {
-              name: '',
+              name: '详情',
               colspan: 1,
               text: function(item) {
                 return '<a class="button button-mini button-pink" href="/cash/detail/' + item.id + '">详情</a>';

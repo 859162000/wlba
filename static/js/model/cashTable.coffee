@@ -48,7 +48,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
         text: (item)->
           '<a href="' + item.buy_url + '">' + item.buy_text + '</a>'
       ,
-        name: ''
+        name: '收藏'
         colspan: 1
         text: (item)->
           link_text = '收藏'
@@ -58,7 +58,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' +
             link_text + '</a>'
       ,
-        name: ''
+        name: '详情'
         colspan: 1
         text: (item)->
           '<a class="button button-mini button-pink" href="/cash/detail/' + item.id + '">详情</a>'

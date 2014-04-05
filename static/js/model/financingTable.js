@@ -68,7 +68,7 @@
               },
               field: 'expected_rate'
             }, {
-              name: '',
+              name: '收藏',
               colspan: 1,
               text: function(item) {
                 var link_text;
@@ -79,7 +79,7 @@
                 return '<a class="button button-mini button-pink" onclick="addToFavorite(event,' + "'financings');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
               }
             }, {
-              name: '',
+              name: '详情',
               colspan: 1,
               text: function(item) {
                 return '<a class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>';

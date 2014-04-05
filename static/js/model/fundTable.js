@@ -82,8 +82,8 @@
                 return item.frontEndRate() + '|' + item.backEndRate();
               }
             }, {
-              name: '',
-              colspan: 2,
+              name: '收藏',
+              colspan: 1,
               text: function(item) {
                 var link_text;
                 link_text = '收藏';
@@ -93,8 +93,8 @@
                 return ' <a class="button button-mini button-pink" onclick="addToFavorite(event,' + "'funds');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
               }
             }, {
-              name: '',
-              colspan: 2,
+              name: '详情',
+              colspan: 1,
               text: function(item) {
                 return '<a class="button button-mini button-pink" href="/fund/detail/' + item.id + '">详情</a>';
               }

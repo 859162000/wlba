@@ -33,9 +33,9 @@
           span#username {{ user.wanglibaouserprofile.nick_name }}
           ul#user-items
             li
-              a(href="#") 产品收藏
+              a(href="/accounts/favorite/") 产品收藏
             li
-              a(href="#") 修改密码
+              a(href="/accounts/setting/") 修改密码
         a.logout(href="/accounts/logout?next={{ request.path }}") 退出
       else
         a(href="/accounts/login?next={{ request.path }}") 登录

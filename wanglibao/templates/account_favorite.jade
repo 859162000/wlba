@@ -5,25 +5,19 @@ include include/head
 body
   include include/header
   include include/navigation
-  .row
-    .span3
-      ul.sidebar
-        li.sidebar-item
-          a.sidebar-anchor(href="/accounts/home/") 投资方案
-        li.sidebar-item.active
-          a.sidebar-anchor(href="/accounts/favorite/") 产品收藏
-        li.sidebar-item
-          a.sidebar-anchor(href="/accounts/setting/") 设置
-    .panel-nopadding.span9-omega
-      .panel-title-bar
+  .container
+    .panel-padding
+      .panel-product-title-no-border 我的产品收藏
+      .panel-title-bar-gray
         // ko template: {name: 'tabs', data: tab}
         // /ko
-        .panel-container
-          //ko template: {name: 'data-table', data: dataTable}
-          // /ko
+      .panel-container
+        //ko template: {name: 'data-table', data: dataTable}
+        // /ko
 
   include include/footer
   include include/templates
-  script(src="/static/js/require.js", data-main="/static/js/account_favorite")
+  script.
+    require(['/static/js/account_favorite.js'])
 
   include include/tracking

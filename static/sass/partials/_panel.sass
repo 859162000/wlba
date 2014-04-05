@@ -61,6 +61,10 @@ $header-height: 150px
   @extend .panel-bar
   border-bottom: 2px solid $red
 
+.panel-title-bar-gray
+  @extend .panel-title-bar
+  background-color: $background-color
+
 .panel-product-title-bar
   @extend .panel-bar
   border-bottom: 1px solid #d3d3d3
@@ -72,6 +76,11 @@ $header-height: 150px
   border-left: 2px solid $red
   line-height: 1
   font-size: $font-l
+
+.panel-product-title-no-border
+  @extend .panel-product-title
+  border-left: 0
+  padding: 0
 
 .panel-title
   padding: 0

@@ -55,8 +55,8 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
           text: (item)->
             item.frontEndRate() + '|' + item.backEndRate()
         ,
-          name: ''
-          colspan: 2
+          name: '收藏'
+          colspan: 1
           text: (item)->
             link_text = '收藏'
             if item.is_favorited == 1
@@ -65,8 +65,8 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
               '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' +
               link_text + '</a>'
         ,
-          name: ''
-          colspan: 2
+          name: '详情'
+          colspan: 1
           text: (item)->
             '<a class="button button-mini button-pink" href="/fund/detail/' + item.id + '">详情</a>'
       ]
