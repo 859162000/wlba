@@ -17,31 +17,34 @@ body
           a.sub-navbar--anchor.active(href="{%url 'financing_products'%}") 理财产品
   .container
     .span8.panel-nopadding.panel-header
+      .penel-product-title-bar
+        .panel-product-title {{ financing.name }}
+          if is_favorited != 1
+            a#addToFavorite.button-mini.button-pink.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")收藏
+          else
+            a#addToFavorite.button-mini.button-pink.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")取消收藏
+
       .row
-        .span8
-          .panel-bar-s
-            .panel-title-l {{ financing.name }}
+        .span7
           .well
             .row
-              .span8
-                dl.span6.key-value
-                  dt 销售币种：
-                  dd {{ financing.currency }}
-                dl.span6-omega.key-value
-                  dt 收益类型：
-                  dd {{ financing.profit_type }}
+              dl.span6.key-value
+                dt 销售币种：
+                dd {{ financing.currency }}
+              dl.span6-omega.key-value
+                dt 收益类型：
+                dd {{ financing.profit_type }}
             .row
-              .span8
-                dl.span6.key-value
-                  dt 是否保本：
-                  if financing.principle_guaranteed
-                    dd 保本
-                  else
-                    dd 不保本
-                dl.span6-omega.key-value
-                  dt 销售状态：
-                  dd {{ financing.status }}
-        .span4-omega
+              dl.span6.key-value
+                dt 是否保本：
+                if financing.principle_guaranteed
+                  dd 保本
+                else
+                  dd 不保本
+              dl.span6-omega.key-value
+                dt 销售状态：
+                dd {{ financing.status }}
+        .span5-omega
           .span6
             .card-icon
               dl
@@ -55,10 +58,6 @@ body
         .row.panel-footer
           .well
             p.pull-left 银行客服电话: {{financing.bank.phone}}
-            if is_favorited != 1
-              a#addToFavorite.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")收藏
-            else
-              a#addToFavorite.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")取消收藏
 
     .span4-omega.panel-nopadding.panel-header
       .panel-product-title-bar
@@ -71,59 +70,58 @@ body
     .panel-title-bar
       .panel-tabs
         .panel-tab.active 产品详情
-    .well
-      p(style='padding: 1em 0') 购买信息
-      table.bordered-table
-        tbody
-          tr
-            th 发行银行
-            td {{ financing.bank.name }}
-            th 发行对象
-            td {{ financing.issue_target }}
-            th 货币币种
-            td {{ financing.currency }}
-          tr
-            th 投资类型
-            td {{ financing.investment_type }}
-            th 发行起始日期
-            td {{ financing.issue_start_date | na_if_none }}
-            th 发行终止日期
-            td {{ financing.issue_end_date | na_if_none }}
-          tr
-            th 委托管理期限
-            td {{ financing.period }}天
-            th 委托币种起始金额
-            td {{ financing.investment_threshold }}万元
-            th 起购金额递增单位
-            td {{ financing.investment_step }}
-          tr
-            th 可否质押贷款
-            td {{ financing.pledgable | yes_no }}
-            th 银行是否可提前终止
-            td {{ financing.bank_pre_redeemable | yes_no }}
-            th 客户是否可赎回
-            td {{ financing.client_redeemable | yes_no }}
-          tr
-            th 销售地区
-            td(colspan="5") {{ financing.region }}
-      p(style='padding: 1em 0') 其他说明
-      table.bordered-table
-        tbody
-          tr
-            th(colspan="1") 收益说明
-            td(colspan="5") {{ financing.profit_description | linebreaksbr }}
-          tr
-            th(colspan="1") 申购条件说明
-            td(colspan="5") {{ financing.buy_description | linebreaksbr }}
-          tr
-            th(colspan="1") 银行提前终止条件
-            td(colspan="5") {{ financing.bank_pre_redeem_description | linebreaksbr }}
-          tr
-            th(colspan="1") 赎回规定说明
-            td(colspan="5") {{ financing.redeem_description | linebreaksbr }}
-          tr
-            th(colspan="1") 投资风险说明
-            td(colspan="5") {{ financing.risk_description | linebreaksbr }}
+    p.well-s 购买信息
+    table.bordered-table
+      tbody
+        tr
+          th 发行银行
+          td {{ financing.bank.name }}
+          th 发行对象
+          td {{ financing.issue_target }}
+          th 货币币种
+          td {{ financing.currency }}
+        tr
+          th 投资类型
+          td {{ financing.investment_type }}
+          th 发行起始日期
+          td {{ financing.issue_start_date | na_if_none }}
+          th 发行终止日期
+          td {{ financing.issue_end_date | na_if_none }}
+        tr
+          th 委托管理期限
+          td {{ financing.period }}天
+          th 委托币种起始金额
+          td {{ financing.investment_threshold }}万元
+          th 起购金额递增单位
+          td {{ financing.investment_step }}
+        tr
+          th 可否质押贷款
+          td {{ financing.pledgable | yes_no }}
+          th 银行是否可提前终止
+          td {{ financing.bank_pre_redeemable | yes_no }}
+          th 客户是否可赎回
+          td {{ financing.client_redeemable | yes_no }}
+        tr
+          th 销售地区
+          td(colspan="5") {{ financing.region }}
+    p.well-s 其他说明
+    table.bordered-table
+      tbody
+        tr
+          th(colspan="1") 收益说明
+          td(colspan="5") {{ financing.profit_description | linebreaksbr }}
+        tr
+          th(colspan="1") 申购条件说明
+          td(colspan="5") {{ financing.buy_description | linebreaksbr }}
+        tr
+          th(colspan="1") 银行提前终止条件
+          td(colspan="5") {{ financing.bank_pre_redeem_description | linebreaksbr }}
+        tr
+          th(colspan="1") 赎回规定说明
+          td(colspan="5") {{ financing.redeem_description | linebreaksbr }}
+        tr
+          th(colspan="1") 投资风险说明
+          td(colspan="5") {{ financing.risk_description | linebreaksbr }}
 
   include include/footer
   script.
