@@ -112,13 +112,13 @@
         return $.post(url, {
           item: id
         }).done(function() {
-          $(e.target).html('取消收藏');
+          $(e.target).html('取消');
           return $(e.target).attr('data-is-favorited', '1');
         }).fail(function(xhr) {
           if (xhr.status === 403) {
             return window.location.href = '/accounts/login/?next=' + window.location.href;
           } else if (xhr.status === 409) {
-            $(e.target).html('取消收藏');
+            $(e.target).html('取消');
             return $(e.target).attr('data-is-favorited', '1');
           } else {
             return alert('收藏失败');

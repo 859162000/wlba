@@ -73,7 +73,7 @@
                 var link_text;
                 link_text = '收藏';
                 if (item.is_favorited === 1) {
-                  link_text = '取消收藏';
+                  link_text = '取消';
                 }
                 return '<a class="button button-mini button-pink" onclick="addToFavorite(event,' + "'cashes');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
               }

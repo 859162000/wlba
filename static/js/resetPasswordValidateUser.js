@@ -7,6 +7,19 @@
   });
 
   require(['jquery', 'lib/backend'], function($, backend) {
+    $('#validate_method').change(function(e) {
+      var selected, value;
+      selected = $(e.target).children('option:selected')[0];
+      value = $(selected).val();
+      console.log(value);
+      if (value === '手机') {
+        $('#email-form').hide();
+        return $('#phone-form').show();
+      } else if (value === '邮箱') {
+        $('#email-form').show();
+        return $('#phone-form').hide();
+      }
+    });
     $('#sendMailButton').click(function(e) {
       var target;
       target = $(e.target).attr('data-url');

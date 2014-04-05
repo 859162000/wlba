@@ -40,7 +40,7 @@ def na_if_none(value):
         return value
 
 @register.filter
-def safe_identifier(user):
+def safe_mail(user):
     """
     Show part of user identifier, used in password reset page
     """
@@ -52,8 +52,23 @@ def safe_identifier(user):
         name = name[0] + '*' * (len(name)-2) + name[-1]
         result = name + '@' + components[1]
 
-    elif user.wanglibaoprofile.phone:
-        phone = user.wanglibaoprofile.phone
+    return result
+
+@register.filter
+def safe_phone(user):
+    """
+    Show part of user identifier, used in password reset page
+    """
+
+    result = u''
+    if user.wanglibaouserprofile.phone:
+        phone = user.wanglibaouserprofile.phone
         result = phone[:3] + '*' * (len(phone) - 4 - 3) + phone[-4:]
 
     return result
+
+@register.filter
+def not_bool_to_display(flag):
+    if flag:
+        return 'display: none'
+    return ''

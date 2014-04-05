@@ -18,30 +18,17 @@ body
         li.sub-navbar--list-item
           a.sub-navbar--anchor(href="{% url 'trust_company' %}") 信托公司
 
-  .space-vertical-s
-
-  .panel
+  .panel-nopadding
     .panel-title-bar
       .panel-title 筛选条件
-    table.trust-filter-container
-      thead
-        tr(data-bind="foreach: filters")
-          th(colspan="1", data-bind="text: name, attr: {colspan: $data.values.length > 7 ? '2' : '1'}") 名字
-      tbody
-        tr(data-bind="foreach: filters")
-          td(colspan="1")
-            ul(data-bind="foreach: values.slice(0, 7)")
-              li.vertical-filter-item
-                a.filter-condition-item(href="#", data-bind="text: name, css:{active: $root.isFilterActive($data)}, click:$root.clickOnFilter") name
-          // ko if: $data.values.length > 7
-          td(colspan="1")
-            ul(data-bind="foreach: values.slice(7)")
-              li.vertical-filter-item
-                a.filter-condition-item(href="#", data-bind="text: name, css:{active: $root.isFilterActive($data)}, click:$root.clickOnFilter") name
-          // /ko
+    .container(data-bind="foreach: filters")
+      .filter-container
+        span.filter-name(data-bind="text: name + ':'") 名字
+        // ko foreach: values
+        a.filter-item(href="#", data-bind="text: name, css: {active: $root.activeFilters().indexOf($data) != -1}, click: $root.clickOnFilter") 名字
+        // /ko
 
-  .space-vertical-s
-  .panel
+  .panel-nopadding
     .panel-title-bar
       .panel-title 筛选结果
 
@@ -52,7 +39,6 @@ body
     // ko template: {name: 'pager', data: pager}
     // /ko
 
-  .space-vertical-m
   include include/footer
   include include/templates
 

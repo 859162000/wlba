@@ -14,7 +14,7 @@ body
           a.sidebar-anchor(href="/accounts/favorite/") 产品收藏
         li.sidebar-item
           a.sidebar-anchor(href="/accounts/setting/") 设置
-    .panel.span9-omega
+    .panel-nopadding.span9-omega
       .panel-title-bar
         // ko template: {name: 'tabs', data: tab}
         // /ko
@@ -22,7 +22,6 @@ body
           //ko template: {name: 'data-table', data: dataTable}
           // /ko
 
-  .space-vertical-m
   include include/footer
   include include/templates
   script(src="/static/js/require.js", data-main="/static/js/account_favorite")

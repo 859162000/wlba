@@ -16,27 +16,26 @@ body
         li.sidebar-item.active
           a.sidebar-anchor(href="/accounts/setting/") 设置
     .span9-omega
-      .panel
+      .panel-nopadding
         .panel-title-bar
           .panel-title 修改密码
 
         form#passwordChangeForm.well-s(method="POST")
-          .form-row.form-row-middle
+          .form-row.form-row-m
             label.form-row-label.span1 原始密码
             input#old-password.span5(type="password", name="old-password")
 
-          .form-row.form-row-middle
+          .form-row.form-row-m
             label.form-row-label.span1 新密码
             input#new-password1.span5(type="password", name="new-password1")
 
-          .form-row.form-row-middle
+          .form-row.form-row-m
             label.form-row-label.span1 再次输入
             input#new-password2.span5(type="password", name="new-password2")
 
-          .form-row.form-row-middle
+          .form-row.form-row-m
             button#passwordChangeButton.button.button-middle.button-yellow(type="submit") 提交
 
-  .space-vertical-m
   include include/footer
 
   script(src='/static/js/require.js', data-main='/static/js/account_setting')

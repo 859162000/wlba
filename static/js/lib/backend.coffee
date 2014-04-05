@@ -109,13 +109,13 @@ define ['jquery'], ($)->
         item: id
       }
       .done ()->
-        $(e.target).html('取消收藏')
+        $(e.target).html('取消')
         $(e.target).attr('data-is-favorited', '1')
       .fail (xhr)->
         if xhr.status == 403
           window.location.href = '/accounts/login/?next=' + window.location.href
         else if xhr.status == 409
-          $(e.target).html('取消收藏')
+          $(e.target).html('取消')
           $(e.target).attr('data-is-favorited', '1')
         else
           alert('收藏失败')

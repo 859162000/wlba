@@ -3,28 +3,32 @@
 
 @import variables
 
-.panel
+%panel-base
   +container
   position: relative // Make panel as a container can has absolute position children
   margin-top: $space-s
   background: white
   min-height: 100px
-  padding: 0 18px
   +border-radius(5px)
   overflow: hidden
-
-.panel-nopadding
-  @extend .panel
-  padding: 0
+  padding-bottom: 1em
   padding-top: 1px
 
-.space-vertical-s+.panel
+.panel-nopadding
+  @extend %panel-base
+
+.panel-padding
+  @extend %panel-base
+  padding-left: 18px
+  padding-right: 18px
+
+.space-vertical-s+.panel-nopadding
   margin-top: 0
 
-.space-vertical-m+.panel
+.space-vertical-m+.panel-nopadding
   margin-top: 0
 
-.space-vertical-l+.panel
+.space-vertical-l+.panel-nopadding
   margin-top: 0
 
 $header-height: 150px
@@ -55,6 +59,7 @@ $header-height: 150px
 
 .panel-title-bar
   @extend .panel-bar
+  border-bottom: 2px solid $red
 
 .panel-product-title-bar
   @extend .panel-bar
@@ -68,12 +73,14 @@ $header-height: 150px
   line-height: 1
   font-size: $font-l
 
-
 .panel-title
   padding: 0
   font-size: $font-l
   margin-right: 1em
   +float-left
+
+.panel-nopadding .panel-title
+  padding: 0 1em
 
 .panel-title-l
   @extend .panel-title
@@ -116,18 +123,17 @@ $header-height: 150px
 
 .panel-sub-tabs
   background: white
-  padding: 0 1em
+  padding: 10px 1em
+  border-bottom: 1px solid #DDD
 
 a.panel-sub-tab
   display: inline-block
-  padding: 10px 15px
-
   +unstyled-link
+  @extend .button-round-mini
 
   &.active
-    @extend .button
-    @extend .button-mini
-    @extend .button-orange
+    background: $red
+    +link-colors(white)
 
 .panel-text
   padding: 20px
