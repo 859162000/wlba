@@ -1,20 +1,17 @@
 import django_filters
-from rest_framework.filters import FilterSet
+from wanglibao.filters import AutoNumberFilter
 from wanglibao_fund.models import Fund
 
 
-class FundFilterSet(FilterSet):
-    name = django_filters.CharFilter(name="name")
-    type = django_filters.CharFilter(name="type")
-    status = django_filters.CharFilter(name="status")
-    issuer_name = django_filters.CharFilter(name="issuer__name", )
-    product_code = django_filters.CharFilter(name="product_code")
-
-    class Meta:
+class FundFilterSet(AutoNumberFilter):
+    class Meta(AutoNumberFilter.Meta):
         model = Fund
-        fields = ['name',
-                  'type',
-                  'status',
-                  'issuer_name',
-                  'product_code',
-                 ]
+        number_fields = (
+            ('rate_today', 'rate_today'),
+            ('earned_per_10k', 'earned_per_10k'),
+            ('rate_7_days', 'rate_7_days'),
+            ('rate_1_month', 'rate_1_month'),
+            ('rate_3_months', 'rate_3_months'),
+            ('rate_6_months', 'rate_6_months'),
+            ('rate_1_year', 'rate_1_year'),
+        )
