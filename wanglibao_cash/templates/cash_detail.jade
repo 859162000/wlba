@@ -10,29 +10,32 @@ body
   - endwith
   .container
     .span8.panel-nopadding.panel-header
+      .panel-product-title-bar
+        .panel-product-title {{ cash.name }}
+          if is_favorited != 1
+            a#addToFavorite.button-mini.button-pink.pull-right(href="#", data-id="{{cash.id}}", data-is-favorited="{{is_favorited}}")收藏
+          else
+            a#addToFavorite.button-mini.button-pink.pull-right(href="#", data-id="{{cash.id}}", data-is-favorited="{{is_favorited}}")取消收藏
+
       .row
-        .span8
-          .panel-bar-s
-            .panel-title-l {{ cash.name }}
+        .span7
           .well
             .row
-              .span8
-                dl.span6.key-value
-                  dt 发行机构：
-                  dd {{ cash.issuer.name }}
-                dl.span6-omega.key-value
-                  dt 销售状态：
-                  dd {{ cash.status }}
+              dl.span6.key-value
+                dt 发行机构：
+                dd {{ cash.issuer.name }}
+              dl.span6-omega.key-value
+                dt 销售状态：
+                dd {{ cash.status }}
             .row
-              .span8
-                dl.span6.key-value
-                  dt 每万份收益：
-                  dd {{ cash.profit_10000 }}元
-                dl.span6-omega.key-value
-                  dt 购买方式：
-                  dd
-                    a(href="{{cash.buy_url}}") {{cash.buy_text}}
-        .span4-omega
+              dl.span6.key-value
+                dt 每万份收益：
+                dd {{ cash.profit_10000 }}元
+              dl.span6-omega.key-value
+                dt 购买方式：
+                dd
+                  a(href="{{cash.buy_url}}") {{cash.buy_text}}
+        .span5-omega
           .span6
             .card-icon
               dl
@@ -49,10 +52,6 @@ body
         .row.panel-footer
           .well
             p.pull-left 银行客服电话: {{cash.issuer.phone}}
-            if is_favorited != 1
-              a#addToFavorite.pull-right(href="#", data-id="{{cash.id}}", data-is-favorited="{{is_favorited}}")收藏
-            else
-              a#addToFavorite.pull-right(href="#", data-id="{{cash.id}}", data-is-favorited="{{is_favorited}}")取消收藏
 
     .span4-omega.panel-nopadding.panel-header
       .panel-product-title-bar
@@ -63,24 +62,25 @@ body
           input.span8(type="text")
 
   .panel-nopadding
-    .well
-      table.bordered-table
-        tbody
-          tr
-            th(colspan="1") 产品说明
-            td(colspan="5") {{cash.brief | linebreaksbr}}
-          tr
-            th(colspan="1") 收益说明
-            td(colspan="5") {{cash.profit_brief | linebreaksbr}}
-          tr
-            th(colspan="1") 购买说明
-            td(colspan="5") {{cash.buy_brief | linebreaksbr}}
-          tr
-            th(colspan="1") 赎回说明
-            td(colspan="5") {{cash.redeem_brief | linebreaksbr}}
-          tr
-            th(colspan="1") 投资风险说明
-            td(colspan="5") {{cash.safe_brief | linebreaksbr}}
+    .panel-product-title-bar
+      .panel-product-title 产品信息
+    table.bordered-table.margin-top-m1
+      tbody
+        tr
+          th(colspan="1") 产品说明
+          td(colspan="5") {{cash.brief | linebreaksbr}}
+        tr
+          th(colspan="1") 收益说明
+          td(colspan="5") {{cash.profit_brief | linebreaksbr}}
+        tr
+          th(colspan="1") 购买说明
+          td(colspan="5") {{cash.buy_brief | linebreaksbr}}
+        tr
+          th(colspan="1") 赎回说明
+          td(colspan="5") {{cash.redeem_brief | linebreaksbr}}
+        tr
+          th(colspan="1") 投资风险说明
+          td(colspan="5") {{cash.safe_brief | linebreaksbr}}
 
 
   include include/footer
