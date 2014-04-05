@@ -27,8 +27,8 @@ require ['jquery', 'lib/backend'], ($, backend)->
 
   $('.user-center').mouseenter ()->
     $('#user-items').css('display', 'block')
-    $('#username').toggleClass('background-white')
+    $('#username').toggleClass('username-hover')
 
   $('.user-center').mouseleave ()->
     $('#user-items').css('display', 'none')
-    $('#username').toggleClass('background-white')
+    $('#username').toggleClass('username-hover')

@@ -34,11 +34,11 @@
     });
     $('.user-center').mouseenter(function() {
       $('#user-items').css('display', 'block');
-      return $('#username').toggleClass('background-white');
+      return $('#username').toggleClass('username-hover');
     });
     return $('.user-center').mouseleave(function() {
       $('#user-items').css('display', 'none');
-      return $('#username').toggleClass('background-white');
+      return $('#username').toggleClass('username-hover');
     });
   });
 

@@ -16,7 +16,6 @@ $logo-height: image-height('logo.png')
   padding-left: 10px
 
 .search-bar
-  height: $logo-height
   margin-left: 160px
   display: inline-block
   vertical-align: top
@@ -75,7 +74,7 @@ a.header-button
 .user-info
   float: right
   color: $black
-  line-height: $logo-height
+  margin-top: 20px
 
   a
     font-size: $font-s
@@ -85,25 +84,28 @@ a.header-button
     &:first-child
       border-left: 0
 
-#username
-  font-size: $font-s
-  color: #626972
-  padding: 5px
-
-.background-white
-  background-color: white
-
 .user-center
   position: relative
   display: inline-block
   margin: 0 5px
+  color: $blue-gray
+
+#username
+  font-size: $font-s
+  padding: 5px
+  min-width: 100px
+  text-align: center
+
+.username-hover
+  background-color: white
+  color: $red
 
 #user-items
   position: absolute
   background-color: white
   display: none
-  top: 38px
   left: 0
+  top: 100%
   width: 100%
   line-height: $font-s
 
