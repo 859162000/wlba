@@ -10,7 +10,6 @@ require ['jquery', 'lib/backend'], ($, backend)->
     $(e.target).addClass('active')
     previous = e.target
 
-
   $('.header-button').click ()->
     period = $('.header-select')[0].value
     type = $(previous).attr('data-type')
@@ -21,7 +20,15 @@ require ['jquery', 'lib/backend'], ($, backend)->
       uri += '/products/'
     window.location.href= uri + '?period=' + period + '&asset=' + $('.header-asset')[0].value
 
-
   $('.header-input-base').keyup (e)->
     if e.keyCode == 13
       $('.header-button').click()
+
+
+  $('.user-center').mouseenter ()->
+    $('#user-items').css('display', 'block')
+    $('#username').toggleClass('background-white')
+
+  $('.user-center').mouseleave ()->
+    $('#user-items').css('display', 'none')
+    $('#username').toggleClass('background-white')

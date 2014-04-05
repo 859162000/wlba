@@ -6,16 +6,9 @@
 
 $logo-height: image-height('logo.png')
 
-.container-top-bar
-  @extend .container
-  height: $top-bar-height
-  line-height: $top-bar-height
-  +clearfix
-
 .logo-bar
   @extend .container
   margin: 20px auto
-  +clearfix
   height: $logo-height
 
 .logo-img
@@ -81,15 +74,42 @@ a.header-button
 
 .user-info
   float: right
-  padding-right: 10px
   color: $black
   line-height: $logo-height
 
   a
     font-size: $font-s
-    padding: 0 .7em
     +hover-link
-    border-left: 1px solid $dark-gray
+    padding: 5px
 
     &:first-child
       border-left: 0
+
+#username
+  font-size: $font-s
+  color: #626972
+  padding: 5px
+
+.background-white
+  background-color: white
+
+.user-center
+  position: relative
+  display: inline-block
+  margin: 0 5px
+
+#user-items
+  position: absolute
+  background-color: white
+  display: none
+  top: 38px
+  left: 0
+  width: 100%
+  line-height: $font-s
+
+  li
+    text-align: center
+    padding: 10px
+
+    &:first-child
+      border-bottom: 1px dotted $light-gray-text
