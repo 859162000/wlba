@@ -218,7 +218,8 @@ require ['jquery',
           '资金门槛'
           '产品期限'
           '预期收益'
-          ''
+          '收藏'
+          '详情'
         ]
       }
       self.financingTable = new financingTable.viewModel {
@@ -228,7 +229,8 @@ require ['jquery',
           '发行银行'
           '管理期限'
           '预期收益'
-          ''
+          '收藏'
+          '详情'
         ]
       }
       self.cashTable = new cashTable.viewModel {
@@ -237,7 +239,8 @@ require ['jquery',
           '发行机构'
           '期限'
           '七日年化利率'
-          ''
+          '收藏'
+          '详情'
         ]
       }
       self.fundTable = new fundTable.viewModel {
@@ -248,7 +251,8 @@ require ['jquery',
           '基金类型'
           '日涨幅'
           '近一月涨幅'
-          ''
+          '收藏'
+          '详情'
         ]
       }
       self.emptyTable = new emptyTable.viewModel {}

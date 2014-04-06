@@ -212,16 +212,16 @@
         The filtered products related stuff
          */
         self.trustTable = new trustTable.viewModel({
-          fields: ['名称', '资金门槛', '产品期限', '预期收益', '']
+          fields: ['名称', '资金门槛', '产品期限', '预期收益', '收藏', '详情']
         });
         self.financingTable = new financingTable.viewModel({
-          fields: ['名称', '起购金额', '发行银行', '管理期限', '预期收益', '']
+          fields: ['名称', '起购金额', '发行银行', '管理期限', '预期收益', '收藏', '详情']
         });
         self.cashTable = new cashTable.viewModel({
-          fields: ['名称', '发行机构', '期限', '七日年化利率', '']
+          fields: ['名称', '发行机构', '期限', '七日年化利率', '收藏', '详情']
         });
         self.fundTable = new fundTable.viewModel({
-          fields: ['代码', '名称', '管理期限', '基金类型', '日涨幅', '近一月涨幅', '']
+          fields: ['代码', '名称', '管理期限', '基金类型', '日涨幅', '近一月涨幅', '收藏', '详情']
         });
         self.emptyTable = new emptyTable.viewModel({});
         self.dataTable = ko.observable();
