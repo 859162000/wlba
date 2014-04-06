@@ -1,5 +1,5 @@
 doctype html
-- with '收藏产品' as title
+- with '联系方式' as title
 include include/head
 - endwith
 body
@@ -7,17 +7,9 @@ body
   include include/navigation
   .container
     .panel-nopadding.span3
-      ul.sidebar
-        li.sidebar-item
-          a(href="/about") 关于网利宝
-        li.sidebar-item
-          a(href="/team") 顾问团队
-        li.sidebar-item
-          a(href="/media") 媒体报道
-        li.sidebar-item
-          a(href="/howto") 关于理财
-        li.sidebar-item.active
-          a(href="/contact_us") 联系方式
+      - with '联系方式' as title
+      include include/about_sidebar
+      - endwith
     .panel-padding.span9-omega
       .well-s
         div(style="width:785px; margin:auto")

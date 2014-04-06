@@ -1,10 +1,12 @@
-@import "susy"
 @import "icons"
 
 .footer
   background: #696969
   color: #BBBBBB
   margin-top: $space-s
+
+  a
+    +link-colors(#BBBBBB, white)
 
 .section--title
   font-size: $font-s
@@ -27,7 +29,6 @@
 
 .footer-line
   width: 100%
-  border-width: 1px
   border-top: 1px solid #565656
   border-bottom: 2px solid #747474
 

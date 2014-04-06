@@ -1,0 +1,14 @@
+ul.sidebar
+  mixin sidebar-item(name, link, expected_title)
+    if title == expected_title
+      li.sidebar-item.active
+        a(href=link)= name
+    else
+      li.sidebar-item
+        a(href=link)= name
+
+  +sidebar-item('关于网利宝', '/about', '关于网利宝')
+  //  +sidebar-item('顾问团队', '/about', '关于网利宝')
+  //  +sidebar-item('媒体报道', '/about', '关于网利宝')
+  +sidebar-item('关于理财', '/howto', '关于理财')
+  +sidebar-item('联系方式', '/contact_us', '联系方式')
