@@ -6,6 +6,7 @@ South==0.8.4
 django-appconf==0.6
 django-filter==0.7
 django-imagekit==3.2
+django-mathfilters==0.2.1
 -e git+https://github.com/caffeinehit/django-oauth2-provider.git@9ae7e652aff7410cc6f22427025fb508f6928880#egg=django_oauth2_provider-dev
 django-registration==1.0
 django-registration-defaults==0.4.4
