@@ -35,6 +35,14 @@ $container-style: magic
   @extend .full-container
   background-color: white
 
+.full-container-login
+  @extend .full-container
+  $file: 'login.jpg'
+  background-image: image-url($file)
+  height: image-height($file)
+  background-position: center
+  padding: 100px 0 0 0
+
 .container
   +container
   width: $content-width
@@ -53,12 +61,41 @@ $container-style: magic
 .container-login
   @extend .container
   width: 900px
-  margin-top: 30px
+
+.login-left-div
+  padding: 25px 0
+  border-top: 3px solid $red
+  width: 66%
+  float: left
   background-color: white
 
-.login-div
-  border-right: 1px solid $background-color
-  padding: 15px 0
+.login-right-div
+  background-color: $background-color
+  border-top: 3px solid #D96E68
+  width: 33%
+  float: left
+  height: 264px
+  padding: 35px 30px
+  font-size: $font-s
+  color: $dark-gray
+
+  p
+    padding: 3px 0
+
+.hot-line
+  @extend .font-l
+  color: black
+
+  span
+    color: $red
+
+#register-now
+  +link-colors($red)
+
+.slogan
+  @extend .font-l
+  color: #1771AE
+  margin-top: 5px
 
 .portfolio-container
   float: right

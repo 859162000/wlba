@@ -1,25 +1,32 @@
-// 页尾 start
-.footer
+mixin innerFooter()
   .container
-    .row
-      dl.span4.padding-s
-        dt.section--title 关于理财
-        dd.section--item 怎么选择合适的理财产品？
-        dd.section--item 为什么需要资产配置？
-        dd.section--item 如何做资产配置？
-      dl.span4.padding-s
-        dt.section--title 关于网利宝
-        dd.section--item 关于我们
-        dd.section--item 顾问团队
-        dd.section--item 媒体报道
-      dl.span4-omega.padding-s
-        dt.section--title 联系方式
-        dd.section--item
-          span 地址：北京市霄云路40号10-1000
-        dd.section--item
-          span 电话：13810250118
-        dd.section--item
-          span 邮箱：support@wanglibao.com
+  .row
+    dl.span4.padding-s
+      dt.section--title 关于理财
+      dd.section--item 怎么选择合适的理财产品？
+      dd.section--item 为什么需要资产配置？
+      dd.section--item 如何做资产配置？
+    dl.span4.padding-s
+      dt.section--title 关于网利宝
+      dd.section--item 关于我们
+      dd.section--item 顾问团队
+      dd.section--item 媒体报道
+    dl.span4-omega.padding-s
+      dt.section--title 联系方式
+      dd.section--item
+        span 地址：北京市霄云路40号10-1000
+      dd.section--item
+        span 电话：13810250118
+      dd.section--item
+        span 邮箱：support@wanglibao.com
 
   .footer-line
   .footer-copyright Copyright&copy;2014 wanglibao.com Inc. All Right Reserved. 京ICP备12006409号 京公安网 【110102000000-2】
+
+if no_margin
+  .footer-no-margin
+    +innerFooter()
+else
+  .footer
+    +innerFooter()
+
