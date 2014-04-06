@@ -17,11 +17,11 @@ button
   font-size: $font-s
 
 a
+  +unstyled-link
   &:link, &:visited
     color: $blue-gray
   &:hover, &:active
     color: $red
-    text-decoration: none
 
 input
   padding: 5px
@@ -167,6 +167,26 @@ input
 .title
   padding: .3em 0
   font-size: $font-m
+  text-align: center
+
+.sub-title
+  font-weight: bolder
+  font-size: 14px
+  margin: 1em 0
+  background: lightgray
+  padding: 1em
+
+.release-time
+  background: #ECECEC
+  color: #959595
+  text-align: right
+  padding: .4em 1em
+  margin: $space-s 0
+  font-size: $font-s
+
+.para
+  text-indent: 2em
+  font-size: $font-s
 
 .key-value
   dt
@@ -191,3 +211,19 @@ a.unstyled
 
 .align-right
   text-align: right !important
+
+
+.iw_poi_title
+  color: #CC5522
+  font-size: 14px
+  font-weight: bold
+  overflow: hidden
+  padding-right: 13px
+  white-space: nowrap
+
+.iw_poi_content
+  font: 12px arial, sans-serif
+  overflow: visible
+  padding-top: 4px
+  white-space: -moz-pre-wrap
+  word-wrap: break-word
