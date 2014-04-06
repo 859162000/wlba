@@ -13,7 +13,7 @@ class WanglibaoUserProfile(models.Model):
 
     risk_level = models.PositiveIntegerField(help_text=u'用户的风险等级', default=2)
     investment_asset = models.IntegerField(help_text=u'可投资额度(万)', default=0)
-    total_asset = models.IntegerField(help_text=u"总资产(万)", default=0)
+    investment_period = models.IntegerField(help_text=u'可投资期限(月)', default=3)
 
     def __unicode__(self):
         return "%s phone: %s" % (self.user.username, self.phone)

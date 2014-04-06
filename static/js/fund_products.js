@@ -8,19 +8,213 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', ''], function($, _, ko) {
-    var viewModel;
-    viewModel = (function() {
-      function viewModel() {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'model/fundTable', 'model/fund'], function($, _, ko, backend, pager, table, fund) {
+    var DataViewModel, viewModel;
+    DataViewModel = (function() {
+      function DataViewModel() {
         var self;
         self = this;
-        self.products = ko.observable();
+        self.fundTable = new table.viewModel({
+          events: {
+            sortHandler: function(column, order) {
+              var field;
+              field = column.field;
+              if (order === 'dsc') {
+                field = '-' + field;
+              }
+              return self.orderBy(field);
+            }
+          }
+        });
+        self.orderBy = ko.observable();
+
+        /*
+        Pager
+         */
+        self.pager = new pager.viewModel();
+
+        /*
+        The filters
+         */
+        self.activeFilters = ko.observableArray([]);
+        self.isFilterActive = function(value) {
+          return self.activeFilters.indexOf(value) >= 0;
+        };
+        self.clickOnFilter = function(value, event) {
+          var context;
+          context = ko.contextFor(event.target);
+          if (self.activeFilters.indexOf(value) >= 0) {
+            return;
+          }
+          _.each(context.$parent.values, function(value) {
+            return self.activeFilters.remove(value);
+          });
+          self.activeFilters.push(value);
+          return self.pager.currentPageNumber(1);
+        };
+        self.filters = [
+          {
+            name: '基金类型',
+            values: [
+              {
+                name: '不限',
+                values: null
+              }, {
+                name: '股票型',
+                values: [
+                  {
+                    type: '股票型'
+                  }
+                ]
+              }, {
+                name: '债券型',
+                values: [
+                  {
+                    type: '债券型'
+                  }
+                ]
+              }, {
+                name: '货币型',
+                values: [
+                  {
+                    type: '货币型'
+                  }
+                ]
+              }, {
+                name: '混合型',
+                values: [
+                  {
+                    type: '混合型'
+                  }
+                ]
+              }, {
+                name: '保本型',
+                values: [
+                  {
+                    type: '保本型'
+                  }
+                ]
+              }, {
+                name: '短期理财',
+                values: [
+                  {
+                    type: '短期理财'
+                  }
+                ]
+              }
+            ]
+          }, {
+            name: '日涨幅',
+            values: [
+              {
+                name: '不限',
+                values: null
+              }, {
+                name: '0%以下',
+                values: [
+                  {
+                    'lt_rate_today': 0
+                  }
+                ]
+              }, {
+                name: '0%-3%',
+                values: [
+                  {
+                    lt_rate_today: 3,
+                    gte_rate_today: 0
+                  }
+                ]
+              }, {
+                name: '3%-6%',
+                values: [
+                  {
+                    lt_rate_today: 6,
+                    gte_rate_today: 3
+                  }
+                ]
+              }, {
+                name: '6%以上',
+                values: [
+                  {
+                    gte_rate_today: 6
+                  }
+                ]
+              }
+            ]
+          }, {
+            name: '月涨幅',
+            values: [
+              {
+                name: '不限',
+                values: null
+              }, {
+                name: '0%以下',
+                values: [
+                  {
+                    'lt_rate_1_month': 0
+                  }
+                ]
+              }, {
+                name: '0%-3%',
+                values: [
+                  {
+                    lt_rate_1_month: 3,
+                    gte_rate_1_month: 0
+                  }
+                ]
+              }, {
+                name: '3%-6%',
+                values: [
+                  {
+                    lt_rate_1_month: 6,
+                    gte_rate_1_month: 3
+                  }
+                ]
+              }, {
+                name: '6%以上',
+                values: [
+                  {
+                    gte_rate_1_month: 6
+                  }
+                ]
+              }
+            ]
+          }
+        ];
+        _.each(self.filters, function(value) {
+          return self.activeFilters.push(value.values[0]);
+        });
+        ko.computed(function() {
+          var filters, params;
+          filters = _.chain(self.activeFilters()).pluck('values').flatten().compact().value();
+          params = _(filters).reduce((function(result, object) {
+            return _.extend(result, object);
+          }), {
+            page: self.pager.currentPageNumber(),
+            ordering: self.orderBy()
+          });
+          return backend.loadData('funds', params).done(function(data) {
+            backend.joinFavorites(data, "funds", self.fundTable, function(items) {
+              return _.map(items.results, function(item) {
+                return new fund.viewModel({
+                  data: item
+                });
+              });
+            });
+            return self.pager.totalPageNumber(data.num_pages);
+          }).fail(function(xhr, status, error) {
+            return alert(status + error);
+          });
+        }).extend({
+          throttle: 1
+        });
       }
 
-      return viewModel;
+      return DataViewModel;
 
     })();
-    return ko.applyBindings(new viewModel());
+    viewModel = new DataViewModel();
+    return ko.applyBindings(viewModel);
   });
 
 }).call(this);

@@ -12,7 +12,7 @@ html
     .container-login
       .login-div.span8
         form.login-form(method='post', action='/accounts/login/?next={{next}}')
-          fieldset
+         fieldset
              #{ form.non_field_errors }
              #{ form.password.errors }
              #{ form.email.errors }
@@ -31,7 +31,6 @@ html
               a(href='{% url "password_reset" %}') 忘记密码？
             .space-vertical-s
       .span4
-
     include include/footer
 
     include include/tracking

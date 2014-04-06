@@ -126,6 +126,19 @@ require ['jquery',
         }
       ]
 
+      self.savePortfolio = ->
+        backend.userProfile
+          investment_asset: self.asset()
+          investment_period: self.period()
+          risk_level: self.riskScore()
+        .done ->
+          alert '投资方案已保存'
+        .fail (jqXHR, textStatus, errorThrown)->
+          if jqXHR.status == 403
+            window.location.href = '/accounts/login/?next=' + window.location.href
+          else
+            alert '保存投资方案失败'
+
       ###
       The portfolio related stuff
       ###
@@ -290,4 +303,9 @@ require ['jquery',
     e.preventDefault()
     $(this).modal()
 
-
+  # load the portfolio if user logged in
+  backend.userProfile()
+  .done (data)->
+    model.asset(data.investment_asset)
+    model.period(data.investment_period)
+    model.riskScore(data.risk_level)

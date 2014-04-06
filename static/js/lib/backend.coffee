@@ -153,6 +153,16 @@ define ['jquery'], ($)->
     url = apiurl + 'user_exists/' + identifier + '/'
     $.get url
 
+  userProfile = (data)->
+    url = apiurl + 'profile/'
+    if not data?
+      $.get url
+    else
+      $.ajax
+        url: url
+        type: 'PUT'
+        data: data
+
   window.addToFavorite = (e, type)->
     e.preventDefault()
 
@@ -233,6 +243,7 @@ define ['jquery'], ($)->
     normalizeType: normalizeType
 
     userExists: userExists
+    userProfile: userProfile
     parseQuery: parseQuery
     deepCompare: deepCompare
   }
