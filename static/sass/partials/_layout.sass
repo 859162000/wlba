@@ -61,26 +61,63 @@ $container-style: magic
 .container-login
   @extend .container
   width: 900px
+  background-color: white
+  padding: 0
 
-.login-left-div
+.login-left-div, .register-left-div
   padding: 25px 0
-  border-top: 3px solid $red
   width: 66%
   float: left
   background-color: white
 
 .login-right-div
-  background-color: $background-color
-  border-top: 3px solid #D96E68
-  width: 33%
+  width: 34%
   float: left
-  height: 264px
   padding: 35px 30px
   font-size: $font-s
   color: $dark-gray
 
   p
     padding: 3px 0
+
+.register-nav
+  font-size: $font-m
+  color: white
+  background-color: #DA736E
+
+  li
+    display: inline-block
+    width: 32%
+    padding: 5px
+    text-align: center
+    position: relative
+
+    &.active
+      background-color: $red
+
+    &:after
+      position: absolute
+      left: 100%
+      top: 0
+      content: ''
+      width: 17px
+      border-left: 17px solid transparent
+      border-top: 17px solid transparent
+      border-bottom: 17px solid transparent
+
+    &.active:after
+      border-left-color: $red
+
+.register
+  padding: 100px
+  font-size: $font-m
+
+.register-right-div
+  @extend .login-right-div
+  padding-top: 50px
+
+  p
+    padding: 10px
 
 .hot-line
   @extend .font-l

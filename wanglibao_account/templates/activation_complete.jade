@@ -2,7 +2,7 @@
 
 doctype html
 html
-  - with '邮件已发送' as title
+  - with '注册成功' as title
   include include/head
   - endwith
 
@@ -13,10 +13,10 @@ html
         .register-nav
           ol
             li 1 设置账户及密码
-            li.active 2 进入邮箱验证
-            li 3 恭喜！注册成功
+            li 2 进入邮箱验证
+            li.active.end 3 恭喜！注册成功
         .register
-          p 验证邮件已发送，请查看您的收件箱并根据邮件指示完成注册。
+          p 欢迎您，邮箱验证成功。请&nbsp;<a href="/accounts/login/?&next=/">登录</a>
 
     - with 1 as no_margin
     include include/footer

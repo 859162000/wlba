@@ -7,32 +7,46 @@ html
   include include/head
   - endwith
   body
-    include include/header
-    .l-activity-panel
-      form#register-form.form.login-form.prefix3.span6(method='post', action='/accounts/register/?next=/accounts/email/sent/')
-        - csrf_token
-        .form-title
-          label.font-l 注册用户
-        .form-row
-          - render_field form.nickname class+="input-large" placeholder="昵称"
-          #{ form.nickname.errors }
-        .form-row
-          - render_field form.identifier class+="input-large" placeholder="请输入邮箱或手机"
-          #{ form.identifier.errors }
-        #validate-code-container.form-row(style="display:none")
-          - render_field form.validate_code class+="table-cell clear-margin" placeholder="请输入验证码" autocomplete='off'
-          #{ form.password.errors }
-          .space-s
-          button#button-get-validate-code.button.button-red.button-mini(type='button') 获取
-        .form-row
-          - render_field form.password class+="input-large" placeholder="请输入密码" autocomplete='off'
-        .form-row.form-bottom-bar
-          span 已有账户请直接
-          a(href='/accounts/login/?next=/') 登录
-          button#button-submit.pull-right.button-red.button-middle(type='submit') 注 册
+    include include/login_nav
+    .full-container-login
+      .container-login
+        .register-nav
+          ol
+            li.active 1 设置账户及密码
+            li 2 进入邮箱验证
+            li.end 3 恭喜！注册成功
 
+        .register-left-div
+          form#register-form.login-form(method='post', action='/accounts/register/?next=/accounts/email/sent/')
+            - csrf_token
+            .form-title
+              label.font-l 注册用户
+            .form-row
+              - render_field form.nickname class+="input-large" placeholder="昵称"
+              #{ form.nickname.errors }
+            .form-row
+              - render_field form.identifier class+="input-large" placeholder="请输入邮箱或手机"
+              #{ form.identifier.errors }
+            #validate-code-container.form-row(style="display:none")
+              - render_field form.validate_code class+="table-cell clear-margin" placeholder="请输入验证码" autocomplete='off'
+              #{ form.password.errors }
+              .space-s
+              button#button-get-validate-code.button.button-red.button-mini(type='button') 获取
+            .form-row
+              - render_field form.password class+="input-large" placeholder="请输入密码" autocomplete='off'
+            .form-row.form-bottom-bar
+              button#button-submit.button-red.button-middle.span12(type='submit') 注 册
+        .register-right-div
+          p.slogan 网利宝 收益好
+          p.hot-line 在线咨询 <span>4008-588-066<span>
+          p 已有网利宝账号&nbsp;
+            a#register-now(href='/accounts/login') 直接登陆>>
+
+
+    - with 1 as no_margin
     include include/footer
+    - endwith
 
-    script(src="/static/js/require.js" data-main="/static/js/register")
+    script(src="/static/js/require.js", data-main="/static/js/register")
 
     include include/tracking
