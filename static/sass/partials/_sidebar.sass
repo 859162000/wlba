@@ -1,21 +1,25 @@
 .sidebar
   background: white
-  +border-radius(5px)
-  border: 1px solid lightgray
-  +box-shadow(lightgray 1px 1px 3px)
-  margin-top: 12px
 
 .sidebar-item
   font-size: $font-m
-  line-height: 40px
+  line-height: 50px
 
-  border-bottom: 1px solid lightgray
   border-top: 1px solid lightgray
   margin-top: -1px
   padding: 0 1em
+  text-align: center
+
+  &:first-child
+    border-top: 0
 
   &.active
-    border-left: 3px solid $red
+    a
+      +link-colors($red)
+
+  a
+    +unstyled-link
+    +link-colors(#666, #333)
 
 .sidebar-anchor
   +unstyled-link

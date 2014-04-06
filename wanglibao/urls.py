@@ -37,7 +37,13 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
-    url(r'^accounts/', include('wanglibao_account.urls'))
+    url(r'^accounts/', include('wanglibao_account.urls')),
+
+    url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
+    url(r'^about/', TemplateView.as_view(template_name="about.jade")),
+    url(r'^contact_us/', TemplateView.as_view(template_name="contact_us.jade")),
+    url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
+    url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),
 )
 
 if settings.DEBUG:
