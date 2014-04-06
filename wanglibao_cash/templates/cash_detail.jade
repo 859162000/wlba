@@ -40,7 +40,7 @@ body
             .card-icon
               dl
                 dt 7日年化收益
-                dd {{cash.profit_rate_7days}}%
+                dd.highlight {{cash.profit_rate_7days}}%
           .span6-omega
             .card-icon
               dl
@@ -55,11 +55,17 @@ body
 
     .span4-omega.panel-nopadding.panel-header
       .panel-product-title-bar
-        span.panel-title 收益计算器
+        .panel-product-title 收益计算器
       form
-        .form-row
-          label.span3.form-row-label 投资额度
-          input.span8(type="text")
+        .form-row-m.padding-left-s.margin-top-s
+          label.form-row-label 投资金额：
+          span.ispan4.relative-pos
+            input.ispan12(type="text", data-rate="{{cash.profit_rate_7days}}",  /
+              data-period="30", data-target="#earning", data-role="earning-calculator")
+            span.absolute-pos.pos-r-s 万
+          span &nbsp;&nbsp;&nbsp;一个月预期收益：
+          span#earning.highlight 0.0
+          span 元
 
   .panel-nopadding
     .panel-product-title-bar

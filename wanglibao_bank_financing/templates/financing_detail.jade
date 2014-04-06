@@ -17,7 +17,7 @@ body
           a.sub-navbar--anchor.active(href="{%url 'financing_products'%}") 理财产品
   .container
     .span8.panel-nopadding.panel-header
-      .penel-product-title-bar
+      .panel-product-title-bar
         .panel-product-title {{ financing.name }}
           if is_favorited != 1
             a#addToFavorite.button-mini.button-pink.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")收藏
@@ -49,7 +49,7 @@ body
             .card-icon
               dl
                 dt 预期收益率
-                dd {{ financing.expected_rate | percentage }}
+                dd.highlight {{ financing.expected_rate | percentage }}
           .span6-omega
             .card-icon
               dl
@@ -61,15 +61,24 @@ body
 
     .span4-omega.panel-nopadding.panel-header
       .panel-product-title-bar
-        span.panel-title 收益计算器
+        span.panel-product-title 收益计算器
       form
-        .form-row
-          label.span3.form-row-label 投资额度
-          input.span8(type="text")
+        .form-row-m.padding-left-s.margin-top-s
+          label.form-row-label 投资金额：
+          span.ispan4.relative-pos
+            input.ispan12(type="text", data-rate="{{financing.expected_rate}}",  /
+              data-period="{{financing.period}}", data-target="#earning", data-role="earning-calculator")
+            span.absolute-pos.pos-r-s 万
+          span &nbsp;&nbsp;&nbsp;预期收益：
+          span#earning.highlight 0.0
+          span 元
+
+        .form-row-m.padding-left-s
+          span.txt-info （起购金额 {{financing.investment_threshold}}万元 递增金额 {{financing.investment_step}}元)
+
   .panel-nopadding
-    .panel-title-bar
-      .panel-tabs
-        .panel-tab.active 产品详情
+    .panel-product-title-bar
+      .panel-product-title 产品详情
     p.well-s 购买信息
     table.bordered-table
       tbody

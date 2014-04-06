@@ -23,7 +23,7 @@ def percentage(value):
     """
     Convert float based percentage to string
     """
-    return u'%.2f%%' % (value, )
+    return u'%.1f%%' % (value, )
 
 @register.filter
 def yes_no(value):

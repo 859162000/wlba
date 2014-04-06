@@ -6,7 +6,7 @@
     }
   });
 
-  require(['jquery', 'lib/backend'], function($, backend) {
+  require(['jquery', 'lib/backend', 'lib/calculator'], function($, backend) {
     return $('#addToFavorite').click(function(e) {
       return backend.addToFavorite(e, 'cashes');
     });

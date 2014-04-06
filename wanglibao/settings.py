@@ -66,6 +66,7 @@ INSTALLED_APPS = (
     'provider.oauth2',
 
     'widget_tweaks',
+    'mathfilters',
 )
 
 

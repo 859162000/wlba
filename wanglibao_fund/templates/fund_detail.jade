@@ -1,4 +1,5 @@
 - load formatters
+- load mathfilters
 doctype html
 - with '基金产品详情' as title
 include include/head
@@ -44,27 +45,26 @@ body
               dl.span6.key-value
                 dt 客服电话：
                 dd {{fund.issuer.phone}}
-        .span6-omega
-          .span6
+        .span3-omega
+          .span12
             .card-icon
               dl
                 dt 7日年化收益
                 dd.highlight {{fund.rate_7_days | percentage}}
-          .span6-omega
-            .card-icon
-              dl
-                dt 产品期限
-                dd 50天
 
     .span4-omega.panel-nopadding.panel-header
       .panel-product-title-bar
         .panel-product-title 收益计算器
       form(data-period="50", data-rate="5")
-        .form-row
-          label.ispan3.form-row-label 投资金额：
-          input.input-simple.ispan3(type="text", placeholder="30")
-          span.ispan3.form-row-label 预期收益：
-          span.ispan2.form-row-label 5000元
+        .form-row-m.padding-left-s.margin-top-s
+          label.form-row-label 投资金额：
+          span.ispan4.relative-pos
+            input.ispan12(type="text", data-rate="{{fund.rate_7_days}}",  /
+              data-period="30", data-target="#earning", data-role="earning-calculator")
+            span.absolute-pos.pos-r-s 万
+          span &nbsp;&nbsp;&nbsp;月预期收益：
+          span#earning.highlight 0.0
+          span 元
 
   .panel-nopadding
     .panel-product-title-bar
