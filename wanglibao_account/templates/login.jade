@@ -7,11 +7,12 @@ html
   include include/head
   - endwith
   body
-    include include/header
-    .l-activity-panel
-      .well.clearfix
-        form.prefix4.span4.form(method='post', action='/accounts/login/?next={{next}}')
-          fieldset
+    include include/login_nav
+
+    .container-login
+      .login-div.span8
+        form.login-form(method='post', action='/accounts/login/?next={{next}}')
+         fieldset
              #{ form.non_field_errors }
              #{ form.password.errors }
              #{ form.email.errors }
@@ -29,11 +30,7 @@ html
               .space-s
               a(href='{% url "password_reset" %}') 忘记密码？
             .space-vertical-s
-            .form-footer
-              a.button.button-orange.button-mini(href='/accounts/register/?next=/') 注册
-              .space-xs
-              span 成为会员，我们将为您提供专业的理财建议
-
+      .span4
     include include/footer
 
     include include/tracking
