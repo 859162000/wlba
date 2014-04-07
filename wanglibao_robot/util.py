@@ -4,6 +4,8 @@ from datetime import datetime
 
 
 def parse_time(str):
+    if str is None:
+        return None
     try:
         return datetime.strptime(str, '%Y-%m-%d')
     except ValueError:
@@ -11,6 +13,8 @@ def parse_time(str):
 
 
 def parse_float(str):
+    if str is None:
+        return 0
     try:
         return float(str)
     except ValueError:
@@ -18,6 +22,8 @@ def parse_float(str):
 
 
 def parse_int(str):
+    if str is None:
+        return 0
     try:
         return int(str)
     except ValueError:

@@ -4,6 +4,7 @@ import urllib2
 from pyquery import PyQuery
 from wanglibao_bank_financing.models import BankFinancing, Bank
 from wanglibao_robot.util import *
+import time
 
 
 def get_info(uri):
@@ -34,7 +35,13 @@ def get_info(uri):
         bf.investment_type = ''
     bf.issue_start_date = parse_time(tree('tbody tr').eq(2).find('td')[1].text)
     bf.issue_end_date = parse_time(tree('tbody tr').eq(2).find('td')[2].text)
-    bf.investment_threshold = parse_float(tree('tbody tr').eq(3).find('td')[1].text.strip(u'万元'))
+
+    threshold = tree('tbody tr').eq(3).find('td')[1].text
+    threshold_float = parse_float(threshold.strip(u'万'))
+    if threshold is not None and threshold[-1] != u'万':
+        threshold_float /= 1000
+    bf.investment_threshold = threshold_float
+
     bf.investment_step = parse_float(tree('tbody tr').eq(3).find('td')[2].text)
     bf.pledgable = parse_bool(tree('tbody tr').eq(4).find('td')[0].text)
     bf.bank_pre_redeemable = parse_bool(tree('tbody tr').eq(4).find('td')[1].text)
@@ -77,6 +84,7 @@ def run_robot(clean):
             for link in links:
                 uri = PyQuery(link).attr("href")
                 get_info(uri)
+                time.sleep(0.5)
         except urllib2.URLError, e:
             print "Error code: ", e.code
             print "Reason: ", e.reason
