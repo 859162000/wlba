@@ -25,7 +25,7 @@ def testserver():
     env.production = False
 
 def production():
-    env.host_string = 'o-value.com'
+    env.host_string = '221.123.143.222'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
@@ -39,7 +39,8 @@ def production():
 def new_virtualenv():
     with cd(env.path):
         sudo("apt-get -q -y install gcc python-setuptools python-all-dev libpq-dev libjpeg-dev")
-        sudo("easy_install pip virtualenv")
+        sudo("easy_install pip")
+        sudo("pip install --index-url http://pypi.hustunique.com/simple/ virtualenv")
         if not exists('virt-python'):
             run("virtualenv virt-python")
 
@@ -68,25 +69,28 @@ def deploy():
     path = env.path
 
     print red("Begin deploy: ")
-    run('mkdir -p %s' % path)
+    sudo('mkdir -p %s' % path)
     sudo('mkdir -p /var/log/wanglibao/')
     sudo('chown -R www-data /var/log/wanglibao')
     with cd(path):
 
         print green("check out the build")
+
+        # TODO check git existence
+
         if not exists(os.path.join(path, env.depot_name)):
-            print green('Git folder not there, clone it from local depot')
-            sudo("mkdir %s" % path)
+            print green('Git folder not there, create it')
             sudo("chmod 777 %s" % path)
             run("git clone %s" % env.depot)
         else:
             print green('Found depot, pull changes')
             with cd(env.depot_name):
                 run('git reset --hard HEAD')
-                run("git pull %s" % env.depot)
+                run("git pull")
 
         print green("Refresh apt")
         sudo("apt-get update")
+        sudo("apt-get install libmysqlclient-dev")
 
         print green("Install pip and virtualenv")
         new_virtualenv()
@@ -117,6 +121,10 @@ def deploy():
                 sudo('mkdir -p /var/static/wanglibao')
                 sudo('cp -r publish/static/* /var/static/wanglibao/')
                 sudo('rm -r publish')
+
+                print green("Generate media folder")
+                sudo('mkdir -p /var/media/wanglibao')
+                sudo('chmod -R 775 /var/media/wanglibao')
                 print green("static files copied and cleaned")
 
                 print green("copy scripts to /var/wsgi/wanglibao/")
@@ -128,7 +136,7 @@ def deploy():
                     sudo('mv /var/wsgi/wanglibao /var/wsgi/wanglibao-backup')
                 sudo('mkdir -p /var/wsgi/wanglibao')
                 sudo('cp -r . /var/wsgi/wanglibao')
-                sudo('chgrp -R webuser /var/wsgi/wanglibao')
+                sudo('chgrp -R www-data /var/wsgi/wanglibao')
                 sudo('chown -R www-data /var/wsgi/wanglibao')
 
                 with cd('/var/wsgi/wanglibao'):

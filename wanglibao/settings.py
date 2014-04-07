@@ -158,12 +158,8 @@ STATICFILES_DIRS = (
 
 
 # Media files path
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-if DEBUG:
-    MEDIA_URL = 'http://127.0.0.1:8000/media/'
-else:
-    MEDIA_URL = '/media/'
+MEDIA_ROOT = '/var/media/wanglibao/'
+MEDIA_URL = '/media/'
 
 # The request rate for some apis
 request_rate = '1/minute'
