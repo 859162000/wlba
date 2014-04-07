@@ -27,3 +27,4 @@ six==1.6.1
 sqlparse==0.1.10
 urllib3==1.7.1
 wsgiref==0.1.2
+pyquery==1.2.8
