@@ -1,0 +1,5 @@
+[client]
+database = wanglibao
+user = wanglibao
+password = wanglibank
+default-charactor-set = utf8
