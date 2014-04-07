@@ -1,6 +1,7 @@
 Django==1.6.2
 Fabric==1.8.3
 Markdown==2.3.1
+MySQL-python==1.2.5
 Pillow==2.3.0
 South==0.8.4
 django-appconf==0.6
