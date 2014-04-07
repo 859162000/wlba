@@ -64,41 +64,41 @@
               {
                 name: '3个月以下',
                 values: {
-                  lt_period: 3
+                  lt_period: 90
                 }
               }, {
                 name: '3-6个月',
                 values: {
-                  gte_period: 3,
-                  lt_period: 6
+                  gte_period: 90,
+                  lt_period: 180
                 }
               }, {
                 name: '6-12个月',
                 values: {
-                  gte_period: 6,
-                  lt_period: 12
+                  gte_period: 180,
+                  lt_period: 365
                 }
               }, {
                 name: '1年以上',
                 values: {
-                  gte_period: 12
+                  gte_period: 365
                 }
               }
             ], [
               {
                 name: '保本固定收益',
                 values: {
-                  profit_type: '保本固定收益'
+                  profit_type: '保本固定收益型'
                 }
               }, {
                 name: '保本浮动收益',
                 values: {
-                  profit_type: '保本浮动收益'
+                  profit_type: '保本浮动收益型'
                 }
               }, {
                 name: '非保本浮动收益',
                 values: {
-                  profit_type: '非保本浮动收益'
+                  profit_type: '非保本浮动收益型'
                 }
               }
             ]

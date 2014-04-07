@@ -1,12 +1,20 @@
+@import "compass/css3/transition"
+
 // TODO there is already one filter related product-filter.sass That one based on
 // Trust products filter, it turns out the layout of financing filter is quite different
 // So create a new one. This should be fixed, one site should have consistent behavior
 
 .filter-container
+  position: relative
   padding: 0 30px
   line-height: 40px
   border-bottom: 1px solid lightgray
   color: #999
+  +transition-duration(400ms)
+
+  &.expandable
+    overflow: hidden
+    max-height: 40px
 
 .filter-item
   @extend .button-round-mini
