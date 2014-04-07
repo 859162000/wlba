@@ -16,7 +16,17 @@ def get_info(uri):
     bf.expected_rate = parse_float(tree('.sidetoplist ul li:first p:last').text().strip('%'))
     bf.period = parse_int(tree('.sidetoplist ul li:last p:last').text().strip(u'天'))
 
-    #bf.bank_name = tree('tbody tr').eq(1).find('td')[0].text
+    bank_name = tree('tbody tr').eq(1).find('td')[0].text
+    bank = Bank()
+    if not Bank.objects.filter(name=bank_name).exists():
+        bank.name = bank_name
+        bank.description = ''
+        bank.phone = ''
+        bank.home_url = ''
+        bank.save()
+    else:
+        bank = Bank.objects.get(name=bank_name)
+
     bf.issue_target = tree('tbody tr').eq(1).find('td')[1].text
     bf.currency = tree('tbody tr').eq(1).find('td')[2].text
     bf.investment_type = tree('tbody tr').eq(2).find('td')[0].text
@@ -48,7 +58,7 @@ def get_info(uri):
     bf.redeem_description = tree('tbody tr').eq(15).find('td')[0].text
     bf.risk_description = tree('tbody tr').eq(16).find('td')[0].text
 
-    bf.bank = Bank.objects.get(pk=1)
+    bf.bank = bank
     bf.save()
 
 
