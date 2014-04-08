@@ -41,26 +41,42 @@ def get_info(uri, date):
     name = tree('thead tr td')[0].text
     trust.name = name
     trust.short_name = name
-    trust.expected_earning_rate = parse_percentage(tree('tbody tr').eq(1).find('td')[1].text)
     trust.brief = ''
     trust.available_region = ''
     trust.scale = parse_10k_float(tree('tbody tr').eq(0).find('td')[1].text)
-    trust.investment_threshold = parse_10k_float(tree('tbody tr ').eq(2).find('td')[0].text)
     trust.period = parse_float_with_unit(tree('tbody tr').eq(1).find('td')[0].text, u'个月')
+    trust.expected_earning_rate = parse_percentage(tree('tbody tr').eq(1).find('td')[1].text)
 
+    trust.investment_threshold = parse_10k_float(tree('tbody tr ').eq(2).find('td')[0].text)
     trust.issue_date = parse_time(date)
-    trust.type = tree('tbody tr').eq(3).find('td')[1].text
-    earning_description = tree('tbody tr').eq(4).find('td')
-    trust.earning_description = parse_str(earning_description[0].text)
-    if len(earning_description) == 2:
-        trust.earning_description += parse_str(earning_description[1].text)
-    trust.note = parse_str(tree('tbody tr').eq(6).find('td')[0].text)
     trust.usage = tree('tbody tr').eq(3).find('td')[0].text
-    trust.usage_description = parse_str(tree('tbody tr').eq(7).find('td')[0].text)
-    trust.risk_management = parse_str(PyQuery(tree('tbody tr').eq(8).find('td')[0]).html())
-    trust.mortgage = tree('tbody tr').eq(5).find('td')[0].text
-    trust.mortgage_rate = parse_percentage(tree('tbody tr').eq(5).find('td')[1].text)
-    trust.consignee = parse_str(PyQuery(PyQuery(tree('tbody tr')[-1]).find('td')[0]).html())
+    trust.type = tree('tbody tr').eq(3).find('td')[1].text
+
+    trs = tree('tbody tr')
+    earning_description = trs.filter(lambda i: PyQuery(this).find('th').text() == '收益说明')
+    rowspan = earning_description.eq(0).find('th').eq(0).attr('rowspan')
+    if rowspan is None:
+        rowspan = 1
+    else:
+        rowspan = int(rowspan)
+    rowspan -= 1
+
+    earning_description_all = ''
+    for i in range(0, rowspan):
+        earning_description_tds = tree('tbody tr').eq(4 + i).find('td')
+        earning_description = parse_str(earning_description_tds[0].text)
+        if len(earning_description_tds) == 2:
+            earning_description += parse_str(earning_description_tds[1].text)
+        earning_description_all += earning_description.replace('\n', ' ') + '\n'
+    trust.earning_description = earning_description_all.strip('\n\r\t ')
+
+    trust.mortgage = parse_str(tree('tbody tr').eq(5 + rowspan).find('td')[0].text)
+    trust.mortgage_rate = parse_percentage(tree('tbody tr').eq(5 + rowspan).find('td')[1].text)
+
+    trust.note = parse_str(tree('tbody tr').eq(6 + rowspan).find('td')[0].text)
+    trust.usage_description = parse_str(tree('tbody tr').eq(7 + rowspan).find('td')[0].text)
+    trust.risk_management = parse_str(trs.filter(lambda i: PyQuery(this).find('th').text() == '风险控制').eq(0).find('td').eq(0).html())
+    trust.consignee = parse_str(trs.filter(lambda i: PyQuery(this).find('th').text() == '受托人').eq(0).find('td').eq(0).html())
     trust.payment = ''
     trust.product_name = name
     trust.product_description = tree('.fl .txttip a').attr('title')
@@ -75,6 +91,7 @@ def run_robot(clean):
         for trust in Trust.objects.all():
             trust.delete()
 
+    i = 1
     for page in range(1, 678):
         try:
             r = urllib2.urlopen("http://www.jinfuzi.com/xintuo/xtlist-0-0-0-0-0-0-0-0-0-0-" +
@@ -87,6 +104,8 @@ def run_robot(clean):
                 uri = PyQuery(link).attr("href")
                 date = PyQuery(link).parent().parent().find('td')[4].text
                 get_info(uri, date)
+                print "trust " + i
+                i += 1
                 time.sleep(1)
         except urllib2.URLError, e:
             print "Error code: ", e.code

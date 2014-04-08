@@ -61,4 +61,4 @@ def parse_str(str):
     if str is None:
         return ''
     return str.replace('&#13;', ' ').replace('<br>', '\n').replace('<br />', '\n').replace('<br/>', '\n').\
-        replace('<p>', ' ').replace('</p>', '\n')
+        replace('<p>', ' ').replace('</p>', '\n').replace('\r\n', '\n')
