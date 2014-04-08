@@ -19,19 +19,21 @@ def testserver():
     env.depot = 'ssh://192.168.56.1/~/developer/django/wanglibao/wanglibao'
     env.depot_name = 'wanglibao'
 
-    env.pip_install = "pip install --index-url http://pypi.hustunique.com/simple/ -r requirements.txt"
+    env.pip_install = "pip install --index-url http://pypi.douban.com/simple/ -r requirements.txt"
+    env.pip_install_command = "pip install --index-url http://pypi.douban.com/simple/"
 
     env.debug = True
     env.production = False
 
 def production():
-    env.host_string = '221.123.143.222'
+    env.host_string = '115.28.151.49'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
 
     env.pip_install = "pip install -r requirements.txt"
+    env.pip_install_command = "pip install "
 
     env.debug = False
     env.production = True
@@ -40,7 +42,7 @@ def new_virtualenv():
     with cd(env.path):
         sudo("apt-get -q -y install gcc python-setuptools python-all-dev libpq-dev libjpeg-dev")
         sudo("easy_install pip")
-        sudo("pip install --index-url http://pypi.hustunique.com/simple/ virtualenv")
+        sudo(env.pip_install_command + "virtualenv")
         if not exists('virt-python'):
             run("virtualenv virt-python")
 
@@ -97,7 +99,7 @@ def deploy():
 
         with virtualenv():
             with cd(os.path.join(path, env.depot_name)):
-                run("pip install --index-url http://pypi.hustunique.com/simple/ -r requirements.txt")
+                run(env.pip_install)
 
                 print green("Generate config file for the environment")
                 if env.production:
