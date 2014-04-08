@@ -85,7 +85,7 @@ def run_robot(clean):
             for link in links:
                 uri = PyQuery(link).attr("href")
                 get_info(uri)
-                print "bf " + i
+                print "bf %d" % i
                 time.sleep(0.5)
         except urllib2.URLError, e:
             print "Error code: ", e.code

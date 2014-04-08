@@ -104,7 +104,7 @@ def run_robot(clean):
                 uri = PyQuery(link).attr("href")
                 date = PyQuery(link).parent().parent().find('td')[4].text
                 get_info(uri, date)
-                print "trust " + i
+                print "trust %d" % i
                 i += 1
                 time.sleep(1)
         except urllib2.URLError, e:
