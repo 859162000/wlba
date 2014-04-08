@@ -76,12 +76,6 @@
                 return item.rate_6_months + '%';
               }
             }, {
-              name: '前端|后端费率',
-              colspan: 2,
-              text: function(item) {
-                return item.frontEndRate() + '|' + item.backEndRate();
-              }
-            }, {
               name: '收藏',
               colspan: 1,
               text: function(item) {

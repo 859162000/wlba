@@ -50,11 +50,6 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
           field: 'rate_6_months'
           text: (item)->item.rate_6_months + '%'
         ,
-          name: '前端|后端费率'
-          colspan: 2
-          text: (item)->
-            item.frontEndRate() + '|' + item.backEndRate()
-        ,
           name: '收藏'
           colspan: 1
           text: (item)->

@@ -8,47 +8,13 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund', 'model/fundTable'], function($, _, ko, backend, fund, table) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund', 'model/fundTable', 'lib/filter'], function($, _, ko, backend, fund, table, filter) {
     var DataViewModel, viewModel;
     DataViewModel = (function() {
       function DataViewModel() {
         var self;
         self = this;
-        self.tabTree = [
-          {
-            name: '全部'
-          }, {
-            name: '股票型',
-            values: {
-              type: '股票型'
-            }
-          }, {
-            name: '债券型',
-            values: {
-              type: '债券型'
-            }
-          }, {
-            name: '货币型',
-            values: {
-              type: '货币型'
-            }
-          }, {
-            name: '混合型',
-            values: {
-              type: '混合型'
-            }
-          }, {
-            name: '保本型',
-            values: {
-              type: '保本型'
-            }
-          }, {
-            name: '短期理财',
-            values: {
-              type: '短期理财'
-            }
-          }
-        ];
+        self.tabTree = filter.arrayToFilter(['混合型', '结构型', '债券型', '理财型', '指数型', '保本型', '封闭式', 'QDII', '股票型', '货币型'], 'type', '全部');
         self.selectedTab = ko.observable(self.tabTree[0]);
         self.fundTable = new table.viewModel({});
         ko.computed(function() {

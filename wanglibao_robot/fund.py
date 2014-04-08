@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 
 import urllib2
 from pyquery import PyQuery
@@ -7,7 +8,7 @@ from wanglibao_robot.util import *
 import time
 
 
-def get_keyvalues(pq):
+def get_keyvalues_table(pq):
     trs = pq('tr')
     pairs = [PyQuery(tr)('td') for tr in trs if len(tr.getchildren()) == 2]
     results = {}
@@ -16,6 +17,58 @@ def get_keyvalues(pq):
         value = v.text_content()
         results[key] = value
     return results
+
+
+def get_keyvalues_div_t_c(pq):
+    pairs = [(PyQuery(div)('div.t'), PyQuery(div)('div.c')) for div in pq('div.t').parent()]
+
+    results = {}
+    for k, v in pairs:
+        key = k.text().strip()
+        value = ''
+        if v.html():
+            linebreaked = v.html().replace('<br />', '\n').strip()
+            if len(linebreaked) > 0:
+                value = PyQuery(linebreaked).text().strip()
+        else:
+            value = ''
+        results[key] = value
+
+    return results
+
+
+def get_today_rate(pq):
+    text = pq('.LatestNet p').text()
+
+    if text.find(u'日增长率') != -1:
+        matches = re.compile('(?P<earning_10k>[\-\d\.]+)\D*(?P<rate_today>[\-\d\.%]+)').match(text)
+        rate_today = '0'
+        earning_10k = '0'
+        if matches:
+            match_result = matches.groupdict()
+            rate_today = str(match_result['rate_today'])
+            earning_10k = str(match_result['earning_10k'])
+        return {
+            u'日涨幅': rate_today,
+            u'万份收益': earning_10k
+        }
+    else:
+        face_value, value_delta, rate = text.strip(')').replace(' ', '(').split('(')
+        return {
+            u'日涨幅': rate,
+            u'净值': face_value,
+            u'日净值涨幅': value_delta
+        }
+
+
+def get_7days_accumulated_value(pq):
+    key, value = pq('.LatestNet dl dt').text().split(':')
+    key = key.strip()
+    value = value.strip()
+
+    return {
+        key: value
+    }
 
 
 mappings = {
@@ -39,11 +92,16 @@ mappings = {
     u'投资策略': 'investment_strategy',
     u'收益分配原则': 'profit_allocation',
     u'风险收益特征': 'risk_character',
-    u'近一周增长率': ('rate_7_days', 'percent'),
+    u'近一周增长率': ('rate_1_week', 'percent'),
     u'近一月增长率': ('rate_1_month', 'percent'),
     u'近三月增长率': ('rate_3_months', 'percent'),
     u'近半年增长率': ('rate_6_months', 'percent'),
-    u'近一年增长率': ('rate_1_year', 'percent')
+    u'近一年增长率': ('rate_1_year', 'percent'),
+    u'日涨幅': ('rate_today', 'percent'),
+    u'净值': ('face_value', 'float'),
+    u'万份收益': ('earned_per_10k', 'float'),
+    u'累计净值': ('accumulated_face_value', 'float'),
+    u'7日年化回报': ('rate_7_days', 'percent')
 }
 
 
@@ -51,10 +109,14 @@ def get_info(pq):
     fund = Fund()
 
     # Get key values from table
-    key_values = get_keyvalues(pq)
+    key_values = get_keyvalues_table(pq)
+    key_values.update(get_keyvalues_div_t_c(pq))
+    key_values.update(get_today_rate(pq))
+    key_values.update(get_7days_accumulated_value(pq))
 
     for key, value in key_values.items():
-        value = unicode(value)
+        value = unicode(value.strip())
+        key = key.strip(':').strip(u'：')
         if key in mappings:
             type = 'string'
             if isinstance(mappings[key], tuple):
@@ -87,24 +149,49 @@ def get_info(pq):
     return fund
 
 
-def run_robot(clean=False):
+def handle_link(link):
+    uri = PyQuery(link).attr('href')
+    pq = PyQuery(urllib2.urlopen('http://www.howbuy.com' + uri + 'jjgk/').read())
+    get_info(pq)
+
+
+def run_robot(clean=False, offset=0):
     if clean:
         for fund in Fund.objects.all():
             fund.delete()
 
-    # Get all company
     try:
         tree = PyQuery(urllib2.urlopen("http://www.howbuy.com/fundtool/filter.htm?action=filter&categories=all&companies=all&asserts=all&establish=all&risks=all").read())
-        links = tree.find('table tbody tr td:nth-child(3) a') # + tree('.result_list textarea tr td:nth-child(3) a')
-        #links = tree.find('table tbody tr td:nth-child(3) a') + tree('.result_list textarea tr td:nth-child(3) a')
+        links = tree.find('table tbody tr td:nth-child(3) a') + tree('.result_list textarea tr td:nth-child(3) a')
+        links = links[offset:]
 
         print 'Get %d fund links, now get detail information on each of them' % len(links)
 
+        count = 0
         for link in links:
-            uri = PyQuery(link).attr('href')
-            pq = PyQuery(urllib2.urlopen('http://www.howbuy.com' + uri + 'jjgk/').read())
-            get_info(pq)
-            time.sleep(.5)
+            error_count = 0
+            try:
+                count += 1
+                handle_link(link)
+                time.sleep(.5)
+                if error_count > 0: # Auto healing
+                    error_count -= 1
+
+                if count % 50 == 0:
+                    print '%d processed, %d to go' % (count, len(links) - count)
+            except:
+                print 'Meet error at count: %d link: %s' % (count, PyQuery(link).attr('href'))
+                error_count += 1
+                if error_count >= 10:
+                    raise
+                time.sleep(10)
+
+                # Handle the link again
+                try:
+                    handle_link(link)
+                except:
+                    print 'Meet error again, ignore it'
+
     except urllib2.URLError, e:
         print "Error code: ", e.code
         print "Reason: ", e.reason
