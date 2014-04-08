@@ -78,11 +78,16 @@ def deploy():
 
         print green("check out the build")
 
-        # TODO check git existence
+        print green("Install git")
+        sudo("apt-get install git")
+
         # TODO check mysql
-        # TODO check libxml2-dev libxslt1-dev
-        # TODO check wsgi mod
-        # TODO disable the default site
+        print green("Install lxml dependency")
+        sudo("apt-get -q -y install libxml2-dev libxslt1-dev")
+
+        print green("Install apache2 and wsgi mod")
+        sudo("apt-get -q -y install apache2 python-setuptools libapache2-mod-wsgi")
+        sudo("a2dissite default")
 
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, create it')

@@ -226,7 +226,6 @@ require ['jquery',
         fields:[
           '名称'
           '起购金额'
-          '发行银行'
           '管理期限'
           '预期收益'
           '收藏'
@@ -245,7 +244,6 @@ require ['jquery',
       }
       self.fundTable = new fundTable.viewModel {
         fields: [
-          '代码'
           '名称'
           '管理期限'
           '基金类型'
