@@ -9,6 +9,7 @@ class FundIssuer(models.Model):
     description = models.TextField()
     home_page = models.URLField()
     phone = models.CharField(max_length=64)
+    logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'发行方图标')
 
     def __unicode__(self):
         return u'%s' % (self.name, )
@@ -41,13 +42,14 @@ class Fund(models.Model):
 
     face_value = models.FloatField(default=0, help_text=u'净值')
     accumulated_face_value = models.FloatField(default=0, help_text=u'累计净值')
-    rate_today = models.FloatField(default=0, help_text=u'当日收益率')
+    rate_today = models.FloatField(default=0, help_text=u'当日收益率(非年化)')
     earned_per_10k = models.FloatField(default=0, help_text=u'万元收益')
-    rate_7_days = models.FloatField(default=0, help_text=u'近7日增长率')
-    rate_1_month = models.FloatField(default=0, help_text=u'近1月增长率')
-    rate_3_months = models.FloatField(default=0, help_text=u'近3月收益率')
-    rate_6_months = models.FloatField(default=0, help_text=u'近6月收益率')
-    rate_1_year = models.FloatField(default=0, help_text=u'近1年收益率')
+    rate_7_days = models.FloatField(default=0, help_text=u'7日年化增长率')
+    rate_1_week = models.FloatField(default=0, help_text=u'近1周增长率(非年化)')
+    rate_1_month = models.FloatField(default=0, help_text=u'近1月增长率(非年化)')
+    rate_3_months = models.FloatField(default=0, help_text=u'近3月增长率(非年化)')
+    rate_6_months = models.FloatField(default=0, help_text=u'近6月增长率(非年化)')
+    rate_1_year = models.FloatField(default=0, help_text=u'近1年收益率(非年化)')
     profit_month = models.FloatField(default=0, help_text=u"当月收益")
 
     added = models.DateTimeField(default=timezone.now, help_text=u'加入系统时间')

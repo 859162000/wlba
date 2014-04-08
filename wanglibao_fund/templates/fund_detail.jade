@@ -28,29 +28,33 @@ body
         .span6
           .well
             .row
-              dl.span6.key-value
+              dl.span12.key-value
                 dt 基金全名：
                 dd {{ fund.full_name }}
-              dl.span6-omega.key-value
+            .row
+              dl.span6.key-value
                 dt 基金公司：
                 dd {{ fund.issuer.name }}
-            .row
-              dl.span6.key-value
+              dl.span6-omega.key-value
                 dt 基金类型：
                 dd {{ fund.type }}
-              dl.span6-omega.key-value
-                dt 交易状态：
-                dd {{ fund.status }}
             .row
               dl.span6.key-value
+                dt 交易状态：
+                dd {{ fund.status }}
+              dl.span6-omega.key-value
                 dt 客服电话：
                 dd {{fund.issuer.phone}}
         .span3-omega
           .span12
             .card-icon
               dl
-                dt 7日年化收益
-                dd.highlight {{fund.rate_7_days | percentage}}
+                if fund.rate_7_days
+                  dt 7日年化收益
+                  dd.highlight {{fund.rate_7_days | percentage}}
+                else
+                  dt 当日涨幅
+                  dd.highlight {{fund.rate_today | percentage}}
 
     .span4-omega.panel-nopadding.panel-header
       .panel-product-title-bar
@@ -59,8 +63,12 @@ body
         .form-row-m.padding-left-s.margin-top-s
           label.form-row-label 投资金额：
           span.ispan4.relative-pos
-            input.ispan12(type="text", data-rate="{{fund.rate_7_days}}",  /
-              data-period="30", data-target="#earning", data-role="earning-calculator")
+            if fund.rate_7_days
+              input.ispan12(type="text", data-rate="{{fund.rate_7_days}}",  /
+                data-period="30", data-target="#earning", data-role="earning-calculator")
+            else
+              input.ispan12(type="text", data-rate="{{fund.rate_1_year}}",  /
+                data-period="30", data-target="#earning", data-role="earning-calculator")
             span.absolute-pos.pos-r-s 万
           span &nbsp;&nbsp;&nbsp;月预期收益：
           span#earning.highlight 0.0
@@ -83,7 +91,7 @@ body
           td {{fund.hosting_fee}}
         tr
           th 成立日期
-          td {{fund.found_date | na_if_none}}
+          td {{fund.found_date | date:"Y年n月j日" | na_if_none}}
           th 最新份额
           td {{fund.latest_shares | na_if_none}}
         tr
