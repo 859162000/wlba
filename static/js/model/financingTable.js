@@ -48,7 +48,7 @@
               colspan: 2,
               sortable: true,
               text: function(item) {
-                return item.period + '个月';
+                return item.period + '天';
               },
               field: 'period'
             }, {

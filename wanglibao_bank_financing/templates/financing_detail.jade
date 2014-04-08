@@ -93,9 +93,9 @@ body
           th 投资类型
           td {{ financing.investment_type }}
           th 发行起始日期
-          td {{ financing.issue_start_date | na_if_none }}
+          td {{ financing.issue_start_date | date:"Y年n月j日" | na_if_none}}
           th 发行终止日期
-          td {{ financing.issue_end_date | na_if_none }}
+          td {{ financing.issue_end_date | date:"Y年n月j日" | na_if_none }}
         tr
           th 委托管理期限
           td {{ financing.period }}天

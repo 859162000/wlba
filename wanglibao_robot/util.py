@@ -35,6 +35,13 @@ def parse_percentage(str):
     return parse_float_with_unit(str, '%')
 
 
+def parse_percent(str):
+    try:
+        return float(str.strip().strip('%'))
+    except ValueError:
+        return 0
+
+
 def parse_int(str):
     if str is None:
         return 0

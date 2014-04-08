@@ -34,7 +34,7 @@ define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table,
             colspan: 2
             sortable: true
             text: (item)->
-              item.period + '个月'
+              item.period + '天'
             field: 'period'
           ,
             name: '收益类型'

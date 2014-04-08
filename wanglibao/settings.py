@@ -94,8 +94,15 @@ DATABASES = {
         'OPTIONS': {
             'read_default_file': os.path.join(BASE_DIR, 'wanglibao/mysql.cnf'),
         }
-    }
+    },
 }
+
+import sys
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/tmp/db.sqlite3'
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
