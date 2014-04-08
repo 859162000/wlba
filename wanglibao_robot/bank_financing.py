@@ -7,12 +7,13 @@ from wanglibao_robot.util import *
 import time
 
 
-def get_info(uri):
+def get_info(uri, short_name):
     bf = BankFinancing()
     r = urllib2.urlopen("http://www.jinfuzi.com" + uri)
     html = r.read()
     tree = PyQuery(html)
     bf.name = tree('.bankinfoname a').attr('title')
+    bf.short_name = short_name
     bf.brief = ''
     bf.expected_rate = parse_float(tree('.sidetoplist ul li:first p:last').text().strip('%'))
     bf.period = parse_int(tree('.sidetoplist ul li:last p:last').text().strip(u'天'))
@@ -84,8 +85,10 @@ def run_robot(clean):
             links = tree('.index-producs-name a:last')
             for link in links:
                 uri = PyQuery(link).attr("href")
-                get_info(uri)
+                short_name = PyQuery(link).text()
+                get_info(uri, short_name)
                 print "bf %d" % i
+                i += 1
                 time.sleep(0.5)
         except urllib2.URLError, e:
             print "Error code: ", e.code

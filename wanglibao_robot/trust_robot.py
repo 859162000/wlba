@@ -7,7 +7,7 @@ from wanglibao_robot.util import *
 import time
 
 
-def get_info(uri, date):
+def get_info(uri, date, short_name):
     r = urllib2.urlopen(uri)
     html = r.read()
     tree = PyQuery(html)
@@ -40,7 +40,7 @@ def get_info(uri, date):
 
     name = tree('thead tr td')[0].text
     trust.name = name
-    trust.short_name = name
+    trust.short_name = short_name
     trust.brief = ''
     trust.available_region = ''
     trust.scale = parse_10k_float(tree('tbody tr').eq(0).find('td')[1].text)
@@ -103,7 +103,8 @@ def run_robot(clean):
             for link in links:
                 uri = PyQuery(link).attr("href")
                 date = PyQuery(link).parent().parent().find('td')[4].text
-                get_info(uri, date)
+                short_name = PyQuery(link).text()
+                get_info(uri, date, short_name)
                 print "trust %d" % i
                 i += 1
                 time.sleep(1)
