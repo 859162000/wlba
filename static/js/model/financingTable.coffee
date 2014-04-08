@@ -11,9 +11,9 @@ define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table,
             name: '名称'
             colspan: 3
             sortable: true
-            field: 'name'
+            field: 'short_name'
             text: (item)->
-              item.name
+              item.short_name
           ,
             name: '起购金额'
             colspan: 2

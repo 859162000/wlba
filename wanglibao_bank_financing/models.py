@@ -17,6 +17,7 @@ class Bank(models.Model):
 
 class BankFinancing(models.Model):
     name = models.CharField(max_length=128, help_text=u'名字')
+    short_name = models.CharField(max_length=32, help_text=u'短名字', blank=True)
     brief = models.TextField(blank=True, null=True, help_text=u'产品点评')
     expected_rate = models.FloatField(default=0, help_text=u'预期收益')
     period = models.IntegerField(default=0, help_text=u"产品管理期限 (天)")

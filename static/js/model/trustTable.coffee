@@ -11,7 +11,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             name: '名称'
             colspan: 3
             text: (item)->
-              item.name
+              item.short_name
           ,
             name: '资金门槛'
             colspan: 2

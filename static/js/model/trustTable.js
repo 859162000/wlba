@@ -22,7 +22,7 @@
               name: '名称',
               colspan: 3,
               text: function(item) {
-                return item.name;
+                return item.short_name;
               }
             }, {
               name: '资金门槛',

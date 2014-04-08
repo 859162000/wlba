@@ -32,8 +32,8 @@ def production():
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
 
-    env.pip_install = "pip install -r requirements.txt"
-    env.pip_install_command = "pip install "
+    env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
+    env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
 
     env.debug = False
     env.production = True
@@ -79,6 +79,10 @@ def deploy():
         print green("check out the build")
 
         # TODO check git existence
+        # TODO check mysql
+        # TODO check libxml2-dev libxslt1-dev
+        # TODO check wsgi mod
+        # TODO disable the default site
 
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, create it')
@@ -145,9 +149,7 @@ def deploy():
                     run("python manage.py syncdb")
                     run("python manage.py migrate")
 
-                print green("Grant write permission on /tmp/ db file")
-                sudo('chmod 777 /tmp/db.sqlite3')
-
+                # TODO check apache first
                 print green("Copy apache config file")
                 sudo('cp wanglibao.conf /etc/apache2/sites-available')
                 sudo('a2ensite wanglibao.conf')

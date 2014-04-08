@@ -22,9 +22,9 @@
               name: '名称',
               colspan: 3,
               sortable: true,
-              field: 'name',
+              field: 'short_name',
               text: function(item) {
-                return item.name;
+                return item.short_name;
               }
             }, {
               name: '起购金额',
