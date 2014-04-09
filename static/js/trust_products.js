@@ -13,7 +13,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'model/trustTable', 'purl'], function($, _, ko, backend, pager, table, purl) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'model/trustTable', 'purl', 'lib/filter'], function($, _, ko, backend, pager, table, purl, filter) {
     var DataViewModel, viewModel;
     DataViewModel = (function() {
       function DataViewModel() {
@@ -56,6 +56,21 @@
           });
           self.activeFilters.push(value);
           return self.pager.currentPageNumber(1);
+        };
+        self.hookExpandButton = function(elements, data) {
+          return $('a[data-role=expand]').click(function(e) {
+            var maxHeight, parent;
+            e.preventDefault();
+            parent = $(e.target).parent('.expandable')[0];
+            maxHeight = '1000px';
+            if ($(parent).css('max-height') !== maxHeight) {
+              $(parent).css('max-height', maxHeight);
+              return $(e.target).text('收起');
+            } else {
+              $(parent).css('max-height', '');
+              return $(e.target).text('展开');
+            }
+          });
         };
         self.filters = [
           {
@@ -298,38 +313,8 @@
             ]
           }, {
             name: '信托公司',
-            width: '2',
-            fieldName: 'issuer_short_name',
-            values: [
-              {
-                name: '不限',
-                values: null
-              }, {
-                name: '中信信托'
-              }, {
-                name: '长安信托'
-              }, {
-                name: '华信信托'
-              }, {
-                name: '新华信托'
-              }, {
-                name: '新时代信托'
-              }, {
-                name: '湖南信托'
-              }, {
-                name: '天融信托'
-              }, {
-                name: '天津信托'
-              }, {
-                name: '中行信托'
-              }, {
-                name: '四川信托'
-              }, {
-                name: '苏州信托'
-              }, {
-                name: '更多'
-              }
-            ]
+            expandable: true,
+            values: filter.arrayToFilter(['爱建信托', '安信信托', '百瑞信托', '北方信托', '北京国投', '渤海信托', '长安信托', '长城新盛信托', '大业信托', '东莞信托', '方正东亚信托', '甘肃信托', '国联信托', '国民信托', '国投信托', '国元信托', '杭州工商信托', '华澳信托', '华宝信托', '华宸信托', '华能贵诚', '华融国际信托', '华润信托', '华信信托', '华鑫信托', '湖南信托', '江苏信托', '建信信托', '交银国际信托', '吉林信托', '金谷信托', '昆仑信托', '陆家嘴信托', '民生信托', '平安信托', '厦门信托', '山东信托', '上海信托', '陕国投', '山西信托', '四川信托', '苏州信托', '天津信托', '外贸信托', '万向信托', '五矿国际信托', '西部信托', '西藏信托', '兴业国际信托', '新华信托', '新时代信托', '英大信托', '粤财信托', '云国投', '浙金信托', '中诚信托', '中海信托', '中航信托', '中江信托', '中粮信托', '重庆信托', '中融信托', '中泰信托', '中铁信托', '中投信托', '中信信托', '中原信托', '紫金信托'], 'issuer_name')
           }
         ];
         queries = $.url(window.location.href).param();
