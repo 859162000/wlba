@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
 from django.conf import settings
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from wanglibao.views import IndexView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
@@ -15,6 +15,7 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     url(r'^$', IndexView.as_view(), name="index"),
+    url(r'^favicon.ico', RedirectView.as_view(url="/static/favicon.ico")),
 
     url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
 
