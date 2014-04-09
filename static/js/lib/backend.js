@@ -51,6 +51,11 @@
       'funds': 'funds',
       '基金': 'funds',
       '公募基金': 'funds',
+      '货币基金': [
+        'funds', {
+          type: '货币型'
+        }
+      ],
       'cashs': 'cashes',
       'cashes': 'cashes',
       '现金类理财产品': 'cashes',
@@ -61,12 +66,24 @@
       'favorite/financings': 'favorite/financings'
     };
     normalizeType = function(type) {
-      return typeMapping[type];
+      var typeRecord;
+      typeRecord = typeMapping[type];
+      if (typeof typeRecord === 'string') {
+        return typeRecord;
+      } else {
+        return typeRecord[0];
+      }
     };
     loadData = function(type, params) {
-      var url;
+      var normalizedType, typeRecord, url;
       if (_.has(typeMapping, type)) {
-        url = apiurl + typeMapping[type] + '/.jsonp?' + $.param(params);
+        typeRecord = typeMapping[type];
+        normalizedType = typeRecord;
+        if (typeof typeRecord !== 'string') {
+          normalizedType = typeRecord[0];
+          params = _.extend(params, typeRecord[1]);
+        }
+        url = apiurl + normalizedType + '/.jsonp?' + $.param(params);
         return $.ajax(url, {
           dataType: 'jsonp'
         });

@@ -47,21 +47,35 @@ define ['jquery'], ($)->
     '基金': 'funds'
     '公募基金': 'funds'
 
+    '货币基金': ['funds', {type:'货币型'}]
+
     'cashs': 'cashes'
     'cashes': 'cashes'
     '现金类理财产品': 'cashes'
     '现金': 'cashes'
+
     'favorite/trusts': 'favorite/trusts'
     'favorite/funds': 'favorite/funds'
     'favorite/cashes': 'favorite/cashes'
     'favorite/financings': 'favorite/financings'
 
   normalizeType = (type)->
-    typeMapping[type]
+    typeRecord = typeMapping[type]
+    if typeof typeRecord == 'string'
+      return typeRecord
+    else
+      return typeRecord[0]
 
   loadData = (type, params)->
     if _.has(typeMapping, type)
-      url = apiurl + typeMapping[type] + '/.jsonp?' + $.param(params)
+      typeRecord = typeMapping[type]
+
+      normalizedType = typeRecord
+      if typeof typeRecord != 'string'
+        normalizedType = typeRecord[0]
+        params = _.extend(params, typeRecord[1])
+
+      url = apiurl + normalizedType + '/.jsonp?' + $.param(params)
 
       $.ajax(url, {
         dataType: 'jsonp'
