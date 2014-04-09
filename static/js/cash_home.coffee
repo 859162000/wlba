@@ -3,9 +3,10 @@ require.config
     jquery: 'lib/jquery.min'
     underscore: 'lib/underscore-min'
     knockout: 'lib/knockout-3.0.0'
+    purl: 'lib/purl'
 
 require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model/pager',
-         'model/cashTable'], ($, _, ko, backend, cash, pager, table)->
+         'model/cashTable', 'purl'], ($, _, ko, backend, cash, pager, table, purl)->
   class DataViewModel
     constructor: ->
       self = this
@@ -92,7 +93,6 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
               values: [
                 period: "0"
               ]
-              range: '0'
             }
             {
               name: '3个月以内'
@@ -137,13 +137,16 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
         }
       ]
 
-      queries = backend.parseQuery(window.location.search)
+      queries = $.url(window.location.href).param()
 
       _.each self.filters, (value)->
         if queries[value.param_name]
-          _.each value.values, (item)->
-            if queries[value.param_name] == item['range']
+          _.every value.values, (item)->
+            if backend.isInRange(queries[value.param_name], item['range'])
               self.activeFilters.push item
+              return false
+            else
+              return true
         else
           self.activeFilters.push value.values[0]
 

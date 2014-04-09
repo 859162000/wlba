@@ -4,11 +4,12 @@
     paths: {
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
-      knockout: 'lib/knockout-3.0.0'
+      knockout: 'lib/knockout-3.0.0',
+      purl: 'lib/purl'
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model/pager', 'model/cashTable'], function($, _, ko, backend, cash, pager, table) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model/pager', 'model/cashTable', 'purl'], function($, _, ko, backend, cash, pager, table, purl) {
     var DataViewModel, viewModel;
     DataViewModel = (function() {
       function DataViewModel() {
@@ -97,8 +98,7 @@
                   {
                     period: "0"
                   }
-                ],
-                range: '0'
+                ]
               }, {
                 name: '3个月以内',
                 values: [
@@ -147,12 +147,15 @@
             ]
           }
         ];
-        queries = backend.parseQuery(window.location.search);
+        queries = $.url(window.location.href).param();
         _.each(self.filters, function(value) {
           if (queries[value.param_name]) {
-            return _.each(value.values, function(item) {
-              if (queries[value.param_name] === item['range']) {
-                return self.activeFilters.push(item);
+            return _.every(value.values, function(item) {
+              if (backend.isInRange(queries[value.param_name], item['range'])) {
+                self.activeFilters.push(item);
+                return false;
+              } else {
+                return true;
               }
             });
           } else {

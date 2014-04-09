@@ -25,7 +25,7 @@
       } else {
         uri += '/products/';
       }
-      return window.location.href = uri + '?period=' + period + '&asset=' + $('.header-asset')[0].value;
+      return window.location.href = uri + '?period=' + period + '&asset=' + $('.header-asset-input')[0].value;
     });
     $('.header-input-base').keyup(function(e) {
       if (e.keyCode === 13) {

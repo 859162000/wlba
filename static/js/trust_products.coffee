@@ -3,8 +3,12 @@ require.config
     jquery: 'lib/jquery.min'
     underscore: 'lib/underscore-min'
     knockout: 'lib/knockout-3.0.0'
+    purl: 'lib/purl'
+  shim:
+    'jquery.modal': ['jquery']
+    purl: ['jquery']
 
-require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'model/trustTable'], ($, _, ko, backend, pager, table)->
+require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'model/trustTable', 'purl'], ($, _, ko, backend, pager, table, purl)->
   class DataViewModel
     constructor: ()->
       self = this
@@ -49,6 +53,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'mode
       self.filters = [
         {
           name: '资金门槛'
+          param_name: 'asset'
           values: [
             {
               name: '不限',
@@ -59,6 +64,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'mode
               values: [
                 max_threshold: 50
               ]
+              range: '0-50'
             }
             {
               name: '50-100万'
@@ -66,6 +72,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'mode
                 max_threshold: 100
                 min_threshold: 50
               ]
+              range: '50-100'
             }
             {
               name: '100-300万'
@@ -73,12 +80,20 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'mode
                 min_threshold: 100
                 max_threshold: 300
               ]
+              range: '100-300'
             }
-
+            {
+              name: '300万以上'
+              values: [
+                min_threshold: 300
+              ]
+              range: '>300'
+            }
           ]
         }
         {
           name: '产品期限'
+          param_name: 'period'
           values: [
             {
               name: '不限'
@@ -89,26 +104,22 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'mode
               values:[
                 max_period: 12
               ]
+              range: '0-12'
             }
             {
-              name: '12-24个月'
+              name: '12-36个月'
               values:[
                 min_period: 12
-                max_period: 24
-              ]
-            }
-            {
-              name: '24-36个月'
-              values:[
-                min_period: 24
                 max_period: 36
               ]
+              range: '12-36'
             }
             {
               name: '36个月以上'
               values: [
                 min_period: 36
               ]
+              range: '>36'
             }
           ]
         }
@@ -308,9 +319,18 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'mode
         }
       ]
 
+      queries = $.url(window.location.href).param()
+
       _.each self.filters, (value)->
-        # push the first one as default, which is no filter
-        self.activeFilters.push value.values[0]
+        if queries[value.param_name]
+          _.every value.values, (item)->
+            if backend.isInRange(queries[value.param_name], item['range'])
+              self.activeFilters.push item
+              return false
+            else
+              return true
+        else
+          self.activeFilters.push value.values[0]
 
       ko.computed ()->
         filters = _.chain(self.activeFilters()).pluck('values').flatten().compact().value()

@@ -4,15 +4,20 @@
     paths: {
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
-      knockout: 'lib/knockout-3.0.0'
+      knockout: 'lib/knockout-3.0.0',
+      purl: 'lib/purl'
+    },
+    shim: {
+      'jquery.modal': ['jquery'],
+      purl: ['jquery']
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'model/trustTable'], function($, _, ko, backend, pager, table) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'model/trustTable', 'purl'], function($, _, ko, backend, pager, table, purl) {
     var DataViewModel, viewModel;
     DataViewModel = (function() {
       function DataViewModel() {
-        var self;
+        var queries, self;
         self = this;
         self.trustTable = new table.viewModel({
           events: {
@@ -55,6 +60,7 @@
         self.filters = [
           {
             name: '资金门槛',
+            param_name: 'asset',
             values: [
               {
                 name: '不限',
@@ -65,7 +71,8 @@
                   {
                     max_threshold: 50
                   }
-                ]
+                ],
+                range: '0-50'
               }, {
                 name: '50-100万',
                 values: [
@@ -73,7 +80,8 @@
                     max_threshold: 100,
                     min_threshold: 50
                   }
-                ]
+                ],
+                range: '50-100'
               }, {
                 name: '100-300万',
                 values: [
@@ -81,11 +89,21 @@
                     min_threshold: 100,
                     max_threshold: 300
                   }
-                ]
+                ],
+                range: '100-300'
+              }, {
+                name: '300万以上',
+                values: [
+                  {
+                    min_threshold: 300
+                  }
+                ],
+                range: '>300'
               }
             ]
           }, {
             name: '产品期限',
+            param_name: 'period',
             values: [
               {
                 name: '不限',
@@ -96,30 +114,25 @@
                   {
                     max_period: 12
                   }
-                ]
+                ],
+                range: '0-12'
               }, {
-                name: '12-24个月',
+                name: '12-36个月',
                 values: [
                   {
                     min_period: 12,
-                    max_period: 24
-                  }
-                ]
-              }, {
-                name: '24-36个月',
-                values: [
-                  {
-                    min_period: 24,
                     max_period: 36
                   }
-                ]
+                ],
+                range: '12-36'
               }, {
                 name: '36个月以上',
                 values: [
                   {
                     min_period: 36
                   }
-                ]
+                ],
+                range: '>36'
               }
             ]
           }, {
@@ -319,8 +332,20 @@
             ]
           }
         ];
+        queries = $.url(window.location.href).param();
         _.each(self.filters, function(value) {
-          return self.activeFilters.push(value.values[0]);
+          if (queries[value.param_name]) {
+            return _.every(value.values, function(item) {
+              if (backend.isInRange(queries[value.param_name], item['range'])) {
+                self.activeFilters.push(item);
+                return false;
+              } else {
+                return true;
+              }
+            });
+          } else {
+            return self.activeFilters.push(value.values[0]);
+          }
         });
         ko.computed(function() {
           var filters, params;

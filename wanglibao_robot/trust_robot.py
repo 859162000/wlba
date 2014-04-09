@@ -12,7 +12,7 @@ def get_info(uri, date, short_name):
     html = r.read()
     tree = PyQuery(html)
 
-    issuer_name = tree('tbody tr ').eq(0).find('td')[0].text
+    issuer_name = parse_str(tree('tbody tr ').eq(0).find('td')[0].text)
     issuer = Issuer()
     if not Issuer.objects.filter(name=issuer_name).exists():
         issuer.name = issuer_name
@@ -103,7 +103,7 @@ def run_robot(clean):
             for link in links:
                 uri = PyQuery(link).attr("href")
                 date = PyQuery(link).parent().parent().find('td')[4].text
-                short_name = PyQuery(link).text()
+                short_name = PyQuery(link).parent().parent().find('#index-producs-name a')[0].text
                 get_info(uri, date, short_name)
                 print "trust %d" % i
                 i += 1
