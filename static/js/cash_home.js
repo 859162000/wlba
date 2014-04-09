@@ -6,6 +6,10 @@
       underscore: 'lib/underscore-min',
       knockout: 'lib/knockout-3.0.0',
       purl: 'lib/purl'
+    },
+    shim: {
+      'jquery.modal': ['jquery'],
+      purl: ['jquery']
     }
   });
 
