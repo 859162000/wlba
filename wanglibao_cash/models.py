@@ -1,3 +1,4 @@
+# encoding: utf-8
 from django.db import models
 
 
@@ -19,7 +20,7 @@ class Cash(models.Model):
     period = models.IntegerField()
     profit_rate_7days = models.FloatField(default=0)
     profit_10000 = models.FloatField(default=0)
-    buy_url = models.URLField()
+    buy_url = models.URLField(max_length=1024, help_text=u'购买链接')
     buy_text = models.CharField(max_length=25)
     brief = models.TextField()
     buy_brief = models.TextField(blank=True, null=True)
