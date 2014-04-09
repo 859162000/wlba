@@ -18,7 +18,8 @@ body
   .container
     .span8.panel-nopadding.panel-header
       .panel-product-title-bar
-        .panel-product-title {{ financing.name }}
+        .panel-product-title
+          .product-title.ispan11 {{ financing.name }}
           if is_favorited != 1
             a#addToFavorite.button-mini.button-pink.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")收藏
           else

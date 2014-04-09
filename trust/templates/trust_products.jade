@@ -19,11 +19,15 @@ body
   .panel-nopadding
     .panel-title-bar
       .panel-title 筛选条件
-    .container(data-bind="foreach: filters")
-      .filter-container
+    .container(data-bind="foreach: {data: filters, afterRender: hookExpandButton}")
+      .filter-container(data-bind="css:{expandable: _.has($data, 'expandable')}")
         span.filter-name(data-bind="text: name + ':'") 名字
         // ko foreach: values
         a.filter-item(href="#", data-bind="text: name, css: {active: $root.activeFilters().indexOf($data) != -1}, click: $root.clickOnFilter") 名字
+        // /ko
+
+        // ko if: _.has($data, 'expandable')
+        a.button-mini.button-pink.absolute-pos.pos-r-s.pos-b-10px(href="#", data-role="expand", data-toggle="expand") 展开
         // /ko
 
   .panel-nopadding
