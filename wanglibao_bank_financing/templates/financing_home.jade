@@ -30,7 +30,8 @@ body
               p.card-title 高收益精选
               .space-vertical-s
               img.card-annotation(src="/static/images/on-sale.png")
-              img.bank-logo(src="/static/images/pingan-logo.png")
+              img.bank-logo(src="/media/{{financing.bank.logo}}")
+              span.bank-name {{financing.bank.name}}
             .card-detail-box
               .card-product-name {{financing.short_name}}
               dt.profit-title 七日年化利率:

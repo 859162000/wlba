@@ -11,25 +11,26 @@ logger = logging.getLogger(__name__)
 class Issuer(models.Model):
     name = models.TextField()
     short_name = models.TextField()
-    english_name = models.TextField()
+    english_name = models.TextField(blank=True, null=True)
 
-    registered_capital = models.IntegerField(verbose_name="registered capital in W")
+    registered_capital = models.IntegerField(blank=True, null=True, verbose_name="registered capital in W")
 
-    legal_presentative = models.TextField()
-    chairman_of_board = models.TextField()
-    manager = models.TextField()
+    legal_presentative = models.TextField(blank=True, null=True)
+    chairman_of_board = models.TextField(blank=True, null=True)
+    manager = models.TextField(blank=True, null=True)
 
-    founded_at = models.DateField()
-    appear_on_market = models.BooleanField()
-    geo_region = models.TextField()
+    founded_at = models.DateField(blank=True, null=True)
+    appear_on_market = models.BooleanField(blank=True)
+    geo_region = models.TextField(blank=True, null=True)
 
-    shareholder_background = models.TextField()
-    major_stockholder = models.TextField()
-    shareholders = models.TextField()
+    shareholder_background = models.TextField(blank=True, null=True)
+    major_stockholder = models.TextField(blank=True, null=True)
+    shareholders = models.TextField(blank=True, null=True)
 
-    note = models.TextField() # Some note on the company
+    note = models.TextField(blank=True, null=True) # Some note on the company
 
-    business_range = models.TextField()
+    business_range = models.TextField(blank=True, null=True)
+    logo = models.ImageField(upload_to='trust_logo', null=True, blank=True, help_text=u'信托公司logo')
 
     def __unicode__(self):
         return self.name
