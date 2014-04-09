@@ -68,7 +68,7 @@ html
               img.card-annotation(src="/static/images/on-sale.png")
               img.bank-logo(src="/static/images/pingan-logo.png")
             .card-detail-box
-              .card-product-name {{trust.name}}
+              .card-product-name {{trust.short_name}}
               dt 产品期限:
               dd.orange-text {{trust.period | month}}
               dt.profit-title 投资收益:
@@ -76,7 +76,7 @@ html
               .space-vertical-s
               .space-vertical-s.dashed-line
               dt 点评:
-              dd {{trust.brief}}
+              dd.card-brief {{trust.brief}}
         -endwith
 
     .container#fund-products
@@ -91,12 +91,17 @@ html
               img.bank-logo(src="/static/images/pingan-logo.png")
             .card-detail-box
               .card-product-name {{fund.name}}
-              dt.profit-title 七日年化利率:
-              dd.profit-text {{fund.rate_7_days | percentage}}
+              if fund.rate_7_days
+                dt.profit-title 七日年化利率:
+                dd.profit-text {{fund.rate_7_days | percentage}}
+              else
+                dt.profit-title 当日涨幅
+                dd.profit-text {{fund.rate_today | percentage}}
+
               .space-vertical-s
               .space-vertical-s.dashed-line
               dt 点评:
-              dd {{fund.brief}}
+              dd.card-brief {{fund.brief}}
         -endwith
 
     .container#financing-products
@@ -110,13 +115,13 @@ html
               img.card-annotation(src="/static/images/on-sale.png")
               img.bank-logo(src="/static/images/pingan-logo.png")
             .card-detail-box
-              .card-product-name {{financing.name}}
+              .card-product-name {{financing.short_name}}
               dt.profit-title 七日年化利率:
               dd.profit-text {{financing.expected_rate | percentage}}
               .space-vertical-s
               .space-vertical-s.dashed-line
               dt 点评:
-              dd {{financing.brief}}
+              dd.card-brief {{financing.brief}}
         -endwith
 
     include include/footer
