@@ -42,7 +42,7 @@ $logo-height: image-height('logo.png')
 
 .input-bar
   border: 2px solid $red
-  min-height: 20px
+  line-height: 26px
   border-radius: 2px
   border-top-left-radius: 0
   margin: 0
@@ -50,10 +50,10 @@ $logo-height: image-height('logo.png')
   vertical-align: middle
   font-size: $font-s
 
-  span
-    padding: 10px
-    vertical-align: middle
-    color: #818181
+.input-title
+  padding: 0 1em
+  color: #818181
+  vertical-align: middle
 
 .header-asset
   position: relative
@@ -61,10 +61,8 @@ $logo-height: image-height('logo.png')
 
 #header-asset-unit
   position: absolute
+  line-height: 30px
   right: 5px
-  top: 2px
-  padding: 0
-  margin: 0
   color: $dark-gray
   font-size: 13px
 
@@ -72,18 +70,21 @@ $logo-height: image-height('logo.png')
   border: 0
   border-radius: 0
   margin: 0
-  padding: 5px
-  min-height: 23px
-  height: 26px
+  padding: 7px 0
   vertical-align: middle
+  line-height: 30px
+  height: 30px
 
 a.header-button
   @extend .header-input-base
   background-color: $red
   margin: 0
-  padding: 5px 20px
+  padding: 0 20px
   color: white
   text-decoration: none
+  line-height: 30px
+  height: 30px
+  +inline-block
 
 .user-info
   float: right
