@@ -27,10 +27,11 @@ $container-style: magic
   width: 100%
 
 .full-container-home
-  $file: 'home.jpg'
-  background-image: image-url($file)
+  $file: 'home0.jpg'
   height: image-height($file)
   background-position: center
+  background-repeat: no-repeat
+  background-image: image-url($file)
 
 .full-container-white
   @extend .full-container
@@ -42,7 +43,7 @@ $container-style: magic
   background-image: image-url($file)
   height: image-height($file)
   background-position: center
-  padding: 100px 0 0 0
+  padding-top: 100px
 
 .container
   +container

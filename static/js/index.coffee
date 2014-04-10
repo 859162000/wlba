@@ -45,3 +45,10 @@ require ['jquery', 'underscore'], ($, _)->
   $('.portfolio-input').keyup (e)->
     if e.keyCode == 13
       $('.portfolio-submit').click()
+
+  currentBanner = 0
+  setInterval(()->
+      currentBanner = (currentBanner + 1) % 3
+      uri = "url('/static/images/home" + currentBanner + ".jpg')"
+      $('.full-container-home').css('background-image', uri)
+    , 6000)

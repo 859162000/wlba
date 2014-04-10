@@ -8,6 +8,7 @@
   });
 
   require(['jquery', 'underscore'], function($, _) {
+    var currentBanner;
     $('ul.tabs').each(function() {
       var allAnchors, allTargets;
       allAnchors = $(this).find('a.tab-anchor');
@@ -45,11 +46,18 @@
       risk = $('#portfolio-risk')[0].value;
       return window.location.href = '/portfolio/?period=' + period + '&asset=' + asset + '&risk=' + risk;
     });
-    return $('.portfolio-input').keyup(function(e) {
+    $('.portfolio-input').keyup(function(e) {
       if (e.keyCode === 13) {
         return $('.portfolio-submit').click();
       }
     });
+    currentBanner = 0;
+    return setInterval(function() {
+      var uri;
+      currentBanner = (currentBanner + 1) % 3;
+      uri = "url('/static/images/home" + currentBanner + ".jpg')";
+      return $('.full-container-home').css('background-image', uri);
+    }, 6000);
   });
 
 }).call(this);
