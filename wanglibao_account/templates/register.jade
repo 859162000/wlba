@@ -28,7 +28,7 @@ html
               - render_field form.identifier class+="input-large" placeholder="请输入邮箱或手机"
               #{ form.identifier.errors }
             #validate-code-container.form-row(style="display:none")
-              - render_field form.validate_code class+="table-cell clear-margin" placeholder="请输入验证码" autocomplete='off'
+              - render_field form.validate_code class+="ispan5 table-cell clear-margin" placeholder="请输入验证码" autocomplete='off'
               #{ form.password.errors }
               .space-s
               button#button-get-validate-code.button.button-red.button-mini(type='button') 获取

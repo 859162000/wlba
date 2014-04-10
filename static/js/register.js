@@ -45,7 +45,7 @@
     });
     $("#id_identifier").keyup();
     $("#button-get-validate-code").click(function(e) {
-      var element, phoneNumber;
+      var count, element, intervalId, phoneNumber, timerFunction;
       e.preventDefault();
       element = this;
       e.preventDefault();
@@ -54,27 +54,25 @@
         if (typeof console !== "undefined" && console !== null) {
           console.log("Phone number checked, now send the valdiation code");
         }
-        return $.ajax({
+        $.ajax({
           url: "/api/phone_validation_code/register/" + phoneNumber + "/",
           type: "POST"
-        }).done(function() {
-          intervalId;
-          var count, intervalId, timerFunction;
-          count = 60;
-          $(element).attr('disabled', 'disabled');
-          timerFunction = function() {
-            if (count >= 1) {
-              count--;
-              return $(element).text('重新获取(' + count + ')');
-            } else {
-              clearInterval(intervalId);
-              $(element).text('重新获取');
-              return $(element).removeAttr('disabled');
-            }
-          };
-          timerFunction();
-          return intervalId = setInterval(timerFunction, 1000);
         });
+        intervalId;
+        count = 60;
+        $(element).attr('disabled', 'disabled');
+        timerFunction = function() {
+          if (count >= 1) {
+            count--;
+            return $(element).text('重新获取(' + count + ')');
+          } else {
+            clearInterval(intervalId);
+            $(element).text('重新获取');
+            return $(element).removeAttr('disabled');
+          }
+        };
+        timerFunction();
+        return intervalId = setInterval(timerFunction, 1000);
       }
     });
     $.validator.addMethod("emailOrPhone", function(value, element) {

@@ -46,26 +46,28 @@ require ['jquery', 'jquery.validate', 'lib/backend'], ($, validate, backend)->
     if checkMobile(phoneNumber)
       if console?
         console.log "Phone number checked, now send the valdiation code"
+
       $.ajax(
         url: "/api/phone_validation_code/register/" + phoneNumber + "/"
         type: "POST"
-      ).done ->
-        intervalId
-        count = 60
+      )
 
-        $(element).attr 'disabled', 'disabled'
-        timerFunction = ()->
-          if count >= 1
-            count--
-            $(element).text('重新获取(' + count + ')')
-          else
-            clearInterval(intervalId)
-            $(element).text('重新获取')
-            $(element).removeAttr 'disabled'
+      intervalId
+      count = 60
 
-        # Fire now and future
-        timerFunction()
-        intervalId = setInterval timerFunction, 1000
+      $(element).attr 'disabled', 'disabled'
+      timerFunction = ()->
+        if count >= 1
+          count--
+          $(element).text('重新获取(' + count + ')')
+        else
+          clearInterval(intervalId)
+          $(element).text('重新获取')
+          $(element).removeAttr 'disabled'
+
+      # Fire now and future
+      timerFunction()
+      intervalId = setInterval timerFunction, 1000
 
   # Add the validate rule function emailOrPhone
   $.validator.addMethod "emailOrPhone", (value, element)->
