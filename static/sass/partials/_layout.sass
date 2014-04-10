@@ -27,10 +27,34 @@ $container-style: magic
   width: 100%
 
 .full-container-home
+  @extend .full-container
+  position: relative
+
+.home-banner
   $file: 'home0.jpg'
   height: image-height($file)
   background-position: center
   background-repeat: no-repeat
+  position: absolute
+  top: 0
+  width: 100%
+  z-index: -1
+  display: none
+
+.home-banner-1
+  @extend .home-banner
+  $file: 'home0.jpg'
+  background-image: image-url($file)
+  display: block
+
+.home-banner-2
+  @extend .home-banner
+  $file: 'home1.jpg'
+  background-image: image-url($file)
+
+.home-banner-3
+  @extend .home-banner
+  $file: 'home2.jpg'
   background-image: image-url($file)
 
 .full-container-white

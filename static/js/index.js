@@ -8,7 +8,7 @@
   });
 
   require(['jquery', 'underscore'], function($, _) {
-    var currentBanner;
+    var banners, currentBanner;
     $('ul.tabs').each(function() {
       var allAnchors, allTargets;
       allAnchors = $(this).find('a.tab-anchor');
@@ -52,11 +52,11 @@
       }
     });
     currentBanner = 0;
+    banners = $('*[class^="home-banner"]');
     return setInterval(function() {
-      var uri;
+      $(banners[currentBanner]).hide();
       currentBanner = (currentBanner + 1) % 3;
-      uri = "url('/static/images/home" + currentBanner + ".jpg')";
-      return $('.full-container-home').css('background-image', uri);
+      return $(banners[currentBanner]).fadeIn();
     }, 6000);
   });
 

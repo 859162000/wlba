@@ -47,8 +47,9 @@ require ['jquery', 'underscore'], ($, _)->
       $('.portfolio-submit').click()
 
   currentBanner = 0
+  banners = $('*[class^="home-banner"]')
   setInterval(()->
+      $(banners[currentBanner]).hide()
       currentBanner = (currentBanner + 1) % 3
-      uri = "url('/static/images/home" + currentBanner + ".jpg')"
-      $('.full-container-home').css('background-image', uri)
+      $(banners[currentBanner]).fadeIn()
     , 6000)
