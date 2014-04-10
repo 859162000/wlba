@@ -141,7 +141,6 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
       ]
 
       queries = $.url(window.location.href).param()
-
       _.each self.filters, (value)->
         if queries[value.param_name]
           _.every value.values, (item)->

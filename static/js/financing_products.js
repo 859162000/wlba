@@ -4,15 +4,20 @@
     paths: {
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
-      knockout: 'lib/knockout-3.0.0'
+      knockout: 'lib/knockout-3.0.0',
+      purl: 'lib/purl'
+    },
+    shim: {
+      'jquery.modal': ['jquery'],
+      purl: ['jquery']
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', 'model/pager', 'model/financingTable'], function($, _, ko, backend, financing, pager, table) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', 'model/pager', 'model/financingTable', 'purl'], function($, _, ko, backend, financing, pager, table, purl) {
     var ViewModel, model;
     ViewModel = (function() {
       function ViewModel() {
-        var arrayToFilter, self;
+        var arrayToFilter, queries, self;
         self = this;
         self.financingTable = new table.viewModel({
           events: {
@@ -106,37 +111,37 @@
             values: arrayToFilter(['人民币', '港币', '美元', '日元', '英镑', '欧元', '加拿大元', '其他'], 'currency')
           }, {
             name: '产品期限',
+            param_name: 'period',
             values: [
               {
                 name: '不限'
               }, {
-                name: '1个月内',
-                values: {
-                  lt_period: 30
-                }
-              }, {
-                name: '1-3个月',
+                name: '3个月以内',
                 values: {
                   gte_period: 30,
                   lt_period: 90
-                }
+                },
+                range: '0-3'
               }, {
                 name: '3-6个月',
                 values: {
                   gte_period: 90,
                   lt_period: 180
-                }
+                },
+                range: '3-6'
               }, {
                 name: '6-12个月',
                 values: {
                   gte_period: 180,
                   lt_period: 365
-                }
+                },
+                range: '6-12'
               }, {
                 name: '1年以上',
                 values: {
                   gte_period: 365
-                }
+                },
+                range: '>12'
               }
             ]
           }, {
@@ -198,8 +203,20 @@
             ]
           }
         ];
+        queries = $.url(window.location.href).param();
         _.each(self.filters, function(value) {
-          return self.activeFilters.push(value.values[0]);
+          if (queries[value.param_name]) {
+            return _.every(value.values, function(item) {
+              if (backend.isInRange(queries[value.param_name], item['range'])) {
+                self.activeFilters.push(item);
+                return false;
+              } else {
+                return true;
+              }
+            });
+          } else {
+            return self.activeFilters.push(value.values[0]);
+          }
         });
         ko.computed(function() {
           return self.queryData();
@@ -216,5 +233,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=financing_products.map

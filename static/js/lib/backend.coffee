@@ -223,7 +223,6 @@ define ['jquery'], ($)->
         else
           return false
 
-
   return {
     loadData: loadData
     isValidType: isValidType

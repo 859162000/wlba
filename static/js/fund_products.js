@@ -171,5 +171,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=fund_products.map

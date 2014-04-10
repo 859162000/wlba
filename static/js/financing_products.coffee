@@ -3,8 +3,12 @@ require.config
     jquery: 'lib/jquery.min'
     underscore: 'lib/underscore-min'
     knockout: 'lib/knockout-3.0.0'
+    purl: 'lib/purl'
+  shim:
+    'jquery.modal': ['jquery']
+    purl: ['jquery']
 
-require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', 'model/pager', 'model/financingTable'], ($, _, ko, backend, financing, pager, table)->
+require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', 'model/pager', 'model/financingTable', 'purl'], ($, _, ko, backend, financing, pager, table, purl)->
   class ViewModel
     constructor: ->
       self = this
@@ -186,37 +190,37 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', '
         }
         {
           name: '产品期限'
+          param_name: 'period'
           values:[
             {
               name: '不限'
             }
             {
-              name: '1个月内'
-              values:
-                lt_period: 30
-            }
-            {
-              name: '1-3个月'
+              name: '3个月以内'
               values:
                 gte_period: 30
                 lt_period: 90
+              range: '0-3'
             }
             {
               name: '3-6个月'
               values:
                 gte_period: 90
                 lt_period: 180
+              range: '3-6'
             }
             {
               name: '6-12个月'
               values:
                 gte_period: 180
                 lt_period: 365
+              range: '6-12'
             }
             {
               name: '1年以上'
               values:
                 gte_period: 365
+              range: '>12'
             }
           ]
         }
@@ -281,8 +285,17 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', '
         }
       ]
 
+      queries = $.url(window.location.href).param()
       _.each self.filters, (value)->
-        self.activeFilters.push value.values[0]
+        if queries[value.param_name]
+          _.every value.values, (item)->
+            if backend.isInRange(queries[value.param_name], item['range'])
+              self.activeFilters.push item
+              return false
+            else
+              return true
+        else
+          self. activeFilters.push value.values[0]
 
       ko.computed ()->
         self.queryData()
