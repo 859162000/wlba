@@ -306,8 +306,9 @@ require ['jquery',
     $(this).modal()
 
   # load the portfolio if user logged in
-  backend.userProfile()
-  .done (data)->
-    model.asset(data.investment_asset)
-    model.period(data.investment_period)
-    model.riskScore(data.risk_level)
+  if not $.url(document.location.href).param('asset')
+    backend.userProfile()
+    .done (data)->
+      model.asset(data.investment_asset)
+      model.period(data.investment_period)
+      model.riskScore(data.risk_level)

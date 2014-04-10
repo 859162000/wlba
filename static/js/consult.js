@@ -282,11 +282,13 @@
       e.preventDefault();
       return $(this).modal();
     });
-    return backend.userProfile().done(function(data) {
-      model.asset(data.investment_asset);
-      model.period(data.investment_period);
-      return model.riskScore(data.risk_level);
-    });
+    if (!$.url(document.location.href).param('asset')) {
+      return backend.userProfile().done(function(data) {
+        model.asset(data.investment_asset);
+        model.period(data.investment_period);
+        return model.riskScore(data.risk_level);
+      });
+    }
   });
 
 }).call(this);
