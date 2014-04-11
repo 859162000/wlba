@@ -16,7 +16,8 @@ html
             li.active 2 进入邮箱验证
             li 3 恭喜！注册成功
         .register
-          p 验证邮件已发送，请查看您的收件箱并根据邮件指示完成注册。
+          img.register-img(src='/static/images/email_sent.png')
+          p.register-text 验证邮件已发送至 <span>{{email}}</span>，请查看您的收件箱并根据邮件指示完成注册。
 
     - with 1 as no_margin
     include include/footer

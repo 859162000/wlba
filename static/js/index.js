@@ -8,7 +8,7 @@
   });
 
   require(['jquery', 'underscore'], function($, _) {
-    var banners, currentBanner;
+    var anchors, banners, currentBanner;
     $('ul.tabs').each(function() {
       var allAnchors, allTargets;
       allAnchors = $(this).find('a.tab-anchor');
@@ -53,11 +53,29 @@
     });
     currentBanner = 0;
     banners = $('*[class^="home-banner"]');
-    return setInterval(function() {
+    anchors = $('.background-anchor');
+    setInterval(function() {
       $(banners[currentBanner]).hide();
+      $(anchors[currentBanner]).toggleClass('active');
       currentBanner = (currentBanner + 1) % 3;
-      return $(banners[currentBanner]).fadeIn();
+      $(banners[currentBanner]).fadeIn();
+      return $(anchors[currentBanner]).toggleClass('active');
     }, 6000);
+    $('.background-anchor').click(function(e) {
+      var index;
+      e.preventDefault();
+      index = $(e.target).parent().index();
+      if (index !== currentBanner) {
+        $(banners[currentBanner]).hide();
+        $(anchors[currentBanner]).toggleClass('active');
+        $(banners[index]).fadeIn();
+        $(anchors[index]).toggleClass('active');
+        return currentBanner = index;
+      }
+    });
+    return $('.home-banner-2').click(function() {
+      return window.location.href = '/trust/detail/1';
+    });
   });
 
 }).call(this);

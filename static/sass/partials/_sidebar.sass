@@ -9,6 +9,7 @@
   margin-top: -1px
   padding: 0 1em
   text-align: center
+  position: relative
 
   &:first-child
     border-top: 0
@@ -23,3 +24,24 @@
 
 .sidebar-anchor
   +unstyled-link
+
+.siderbar-div
+  width: 25%
+  float: left
+  overflow: visible
+
+  &:after
+    content: " " /* Older browser do not support empty content */
+    visibility: hidden
+    display: block
+    height: 0
+    clear: both
+
+.sidebar-secondary
+  position: absolute
+  left: 100%
+  top: 0
+  width: 200px
+  z-index: 999
+  background-color: white
+  display: none

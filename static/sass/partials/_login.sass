@@ -1,0 +1,108 @@
+@import layout
+
+.full-container-login
+  @extend .full-container
+  $file: 'login.jpg'
+  background-image: image-url($file)
+  height: image-height($file)
+  background-position: center
+  padding-top: 100px
+
+.container-login-nav
+  @extend .container
+  width: 900px
+  padding-top: 15px
+  background-color: white
+
+.container-login
+  @extend .container
+  width: 900px
+  background-color: white
+  padding: 0
+
+.login-left-div, .register-left-div
+  padding: 25px 0
+  width: 66%
+  float: left
+  background-color: white
+
+.login-right-div
+  width: 34%
+  float: left
+  padding: 35px 30px
+  font-size: $font-s
+  color: $dark-gray
+
+  p
+    padding: 3px 0
+
+.register-nav
+  font-size: $font-m
+  color: white
+  background-color: #DA736E
+
+  li
+    display: inline-block
+    width: 32%
+    padding: 5px
+    text-align: center
+    position: relative
+
+    &.active
+      background-color: $red
+
+    &:after
+      position: absolute
+      left: 100%
+      top: 0
+      content: ''
+      width: 17px
+      border-left: 17px solid transparent
+      border-top: 17px solid transparent
+      border-bottom: 17px solid transparent
+
+    &.active:after
+      border-left-color: $red
+
+.register
+  padding: 100px 150px
+  font-size: $font-m
+  +clearfix()
+
+.register-img
+  float: left
+
+.register-text
+  float: left
+  padding-left: 10px
+  line-height: 54px
+  vertical-align: bottom
+
+  span
+    color: #0F6FB0
+
+.welcome-text
+  color: #90B175
+
+.register-right-div
+  @extend .login-right-div
+  padding-top: 50px
+
+  p
+    padding: 10px
+
+.hot-line
+  @extend .font-l
+  color: black
+
+  span
+    color: $red
+
+#register-now
+  +link-colors($red)
+
+.slogan
+  @extend .font-l
+  color: #1771AE
+  margin-top: 5px
+

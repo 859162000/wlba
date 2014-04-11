@@ -30,6 +30,7 @@ User = get_user_model()
 class RegisterView (RegistrationView):
     template_name = "register.jade"
     form_class = EmailOrPhoneRegisterForm
+    email = ''
 
     def register(self, request, **cleaned_data):
         nickname = cleaned_data['nickname']
@@ -79,7 +80,16 @@ class RegisterView (RegistrationView):
     def get_success_url(self, request=None, user=None):
         if request.GET.get('next'):
             return request.GET.get('next')
-        return u'/accounts/email/sent/'
+        return u'/accounts/email/sent/?email=' + self.email
+
+
+class EmailSentView(TemplateView):
+    template_name = 'email_sent.jade'
+
+    def get_context_data(self, **kwargs):
+        return {
+            'email': self.request.GET.get('email')
+        }
 
 
 @sensitive_post_parameters()

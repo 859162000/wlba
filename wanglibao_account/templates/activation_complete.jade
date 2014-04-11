@@ -16,7 +16,8 @@ html
             li 2 进入邮箱验证
             li.active.end 3 恭喜！注册成功
         .register
-          p 欢迎您，邮箱验证成功。请&nbsp;<a href="/accounts/login/?&next=/">登录</a>
+          img.register-img(src='/static/images/register_done.png')
+          p.register-text <span>恭喜您，注册成功，欢迎加入网利宝！</span>请&nbsp;<a href="/accounts/login/?&next=/">登录</a>
 
     - with 1 as no_margin
     include include/footer

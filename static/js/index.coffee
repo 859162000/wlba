@@ -48,8 +48,25 @@ require ['jquery', 'underscore'], ($, _)->
 
   currentBanner = 0
   banners = $('*[class^="home-banner"]')
+  anchors = $('.background-anchor')
   setInterval(()->
       $(banners[currentBanner]).hide()
+      $(anchors[currentBanner]).toggleClass('active')
       currentBanner = (currentBanner + 1) % 3
       $(banners[currentBanner]).fadeIn()
+      $(anchors[currentBanner]).toggleClass('active')
     , 6000)
+
+  $('.background-anchor').click (e)->
+    e.preventDefault()
+    index = $(e.target).parent().index()
+    if(index != currentBanner)
+      $(banners[currentBanner]).hide()
+      $(anchors[currentBanner]).toggleClass('active')
+      $(banners[index]).fadeIn()
+      $(anchors[index]).toggleClass('active')
+      currentBanner = index
+
+  $('.home-banner-2').click ()->
+    window.location.href='/trust/detail/1'
+
