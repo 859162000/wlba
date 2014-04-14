@@ -17,7 +17,9 @@ html
             li 3 恭喜！注册成功
         .register
           img.register-img(src='/static/images/email_sent.png')
-          p.register-text 验证邮件已发送至 <span>{{email}}</span>，请查看您的收件箱并根据邮件指示完成注册。
+          .register-text
+            p 验证邮件已发送至 <span>{{email}}</span>
+            p 请查看您的收件箱并根据邮件指示完成注册
 
     - with 1 as no_margin
     include include/footer

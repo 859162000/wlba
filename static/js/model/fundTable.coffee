@@ -56,7 +56,7 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
             link_text = '收藏'
             if item.is_favorited == 1
               link_text = '取消'
-            ' <a class="button button-mini button-pink" onclick="addToFavorite(event,' + "'funds');" +
+            ' <a class="button button-mini button-white" onclick="addToFavorite(event,' + "'funds');" +
               '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' +
               link_text + '</a>'
         ,

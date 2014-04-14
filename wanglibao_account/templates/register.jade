@@ -14,10 +14,10 @@ html
           ol
             li.active 1 设置账户及密码
             li 2 进入邮箱验证
-            li.end 3 恭喜！注册成功
+            li 3 恭喜！注册成功
 
         .register-left-div
-          form#register-form.login-form(method='post', action='/accounts/register/?next=/accounts/email/sent/')
+          form#register-form.login-form(method='post', action='/accounts/register/')
             - csrf_token
             .form-title
               label.font-l 注册用户

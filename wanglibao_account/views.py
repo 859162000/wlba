@@ -50,6 +50,7 @@ class RegisterView (RegistrationView):
 
         if identifier_type == 'email':
             user.email = identifier
+            self.email = identifier
             user.is_active = False
             registration_profile = RegistrationProfile.objects.create_profile(user)
             user.save()
