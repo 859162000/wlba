@@ -82,7 +82,7 @@
                 if (item.is_favorited === 1) {
                   link_text = '取消';
                 }
-                return '<a class="button button-mini button-pink" onclick="addToFavorite(event, ' + "'trusts'" + ');" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
+                return '<a class="button button-mini button-white" onclick="addToFavorite(event, ' + "'trusts'" + ');" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
               }
             }, {
               name: '详情',
