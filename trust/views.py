@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.views.generic import TemplateView
 from trust.filters import TrustFilterSet
 from trust.models import Trust, Issuer
@@ -29,7 +30,11 @@ class TrustDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         id = kwargs['id']
         context = super(TrustDetailView, self).get_context_data(**kwargs)
-        trust = Trust.objects.get(pk=id)
+        try:
+            trust = Trust.objects.get(pk=id)
+        except Trust.DoesNotExist, e:
+            raise Http404
+
         context['trust'] = trust
         is_favorited = 0
         if self.request.user.is_authenticated():

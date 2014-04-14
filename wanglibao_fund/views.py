@@ -1,3 +1,6 @@
+# encoding:utf-8
+
+from django.http import Http404
 from django.views.generic import TemplateView
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.permissions import IsAdminUserOrReadOnly
@@ -30,7 +33,11 @@ class FundDetailView(TemplateView):
         id = kwargs['id']
         context = super(FundDetailView, self).get_context_data(**kwargs)
         is_favorited = 0
-        fund=Fund.objects.get(pk=id)
+        try:
+            fund=Fund.objects.get(pk=id)
+        except Fund.DoesNotExist:
+            raise Http404(u'您查找的产品不存在')
+
         if self.request.user.is_authenticated():
             if FavoriteFund.objects.filter(user=self.request.user, item=fund).exists():
                 is_favorited = 1

@@ -1,3 +1,5 @@
+# encoding: utf-8
+from django.http import Http404
 from django.views.generic import TemplateView
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.permissions import IsAdminUserOrReadOnly
@@ -39,7 +41,10 @@ class FinancingDetailView(TemplateView):
     template_name = "financing_detail.jade"
 
     def get_context_data(self, id, **kwargs):
-        financing = BankFinancing.objects.get(pk=id)
+        try:
+            financing = BankFinancing.objects.get(pk=id)
+        except BankFinancing.DoesNotExist:
+            raise Http404(u'您查找的产品不存在')
         is_favorited = 0
         if self.request.user.is_authenticated():
             if FavoriteFinancing.objects.filter(user=self.request.user, item=financing).exists():
