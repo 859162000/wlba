@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
+from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
 from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView
 from django.contrib.auth import views as auth_views
@@ -24,6 +25,9 @@ urlpatterns = patterns(
     url(r'^activate/complete/$',
         TemplateView.as_view(template_name='activation_complete.jade'),
         name='registration_activation_complete'),
+    url(r'^activate/(?P<activation_key>\w+)/$',
+                           ActivationView.as_view(template_name="activate.jade"),
+                           name='registration_activate'),
     url(r'^password/reset/identifier/', PasswordResetGetIdentifierView.as_view(), name="password_reset"),
     url(r'^password/reset/validate/', PasswordResetGetIdentifierView.as_view(), name="password_reset_validate"),
     url(r'^password/reset/send_mail/', "wanglibao_account.views.send_validation_mail", name="send_validation_mail"),

@@ -1,0 +1,24 @@
+-load formatters
+doctype html
+html
+  - with '注册成功' as title
+  include include/head
+  - endwith
+  body
+    include include/login_nav
+    .full-container-login
+      .container-login
+        .register
+          if account
+            img.register-img(src='/static/images/email_sent.png')
+            .register-text
+              p 谢谢 #{account}，邮箱激活成功！
+          else
+            img.register-img(src='/static/images/account_error.jpg')
+            .register-text
+              p 您的激活码不正确，请再次确认链接。
+
+    - with 1 as no_margin
+    include include/footer
+    - endwith
+    include include/tracking
