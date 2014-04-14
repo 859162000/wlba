@@ -1,29 +1,4 @@
 @import compass/css3
-@import compass/utilities/sprites
-@import ../sprites/images-original
-
-%i-12
-  width: 12px
-  height: 12px
-  vertical-align: middle
-  +inline-block()
-
-.i-search-question-mark
-  @extend %i-12
-  @include images-original-sprite(help)
-
-%small-icon
-  width: 13px
-  height: 13px
-  +inline-block()
-
-@each $name in location, mail, phone-icon, pad, people-white, lock
-  .i-#{$name}
-    +images-original-sprite-dimensions($name)
-    +inline-block()
-    @include images-original-sprite($name)
-
-
 @import "font-icons"
 @include font-icon-family(entypo)
 
