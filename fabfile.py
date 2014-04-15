@@ -25,6 +25,7 @@ def testserver():
     env.debug = True
     env.production = False
 
+
 def production():
     env.host_string = '115.28.151.49'
     env.path = '/var/deploy/wanglibao'
@@ -51,7 +52,6 @@ def staging():
     env.debug = False
     env.production = True
 
-
 def new_virtualenv():
     with cd(env.path):
         sudo("apt-get -q -y install gcc python-setuptools python-all-dev libpq-dev libjpeg-dev")
@@ -59,6 +59,7 @@ def new_virtualenv():
         sudo(env.pip_install_command + " virtualenv")
         if not exists('virt-python'):
             run("virtualenv virt-python")
+
 
 @contextmanager
 def virtualenv():
@@ -80,6 +81,16 @@ def config(filename, key, value):
     config_file.write(content)
     config_file.close()
 
+
+def publish():
+    files = [
+        'home0.jpg',
+        'home1.jpg',
+        'home2.jpg',
+        ]
+
+    for file in files:
+        local('osscmd.py put static/images/%s oss://wanglibao/images/%s' % (file, file))
 
 def deploy():
     path = env.path
@@ -171,7 +182,6 @@ def deploy():
                     run("python manage.py syncdb")
                     run("python manage.py migrate")
 
-                # TODO check apache first
                 print green("Copy apache config file")
                 sudo('cp wanglibao.conf /etc/apache2/sites-available')
                 sudo('a2ensite wanglibao.conf')
