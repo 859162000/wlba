@@ -38,11 +38,25 @@ def production():
     env.debug = False
     env.production = True
 
+def staging():
+    env.host_string = '192.168.1.12'
+    env.path = '/var/deploy/wanglibao'
+    env.activate = 'source ' + env.path + '/virt-python/bin/activate'
+    env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
+    env.depot_name = 'wanglibao-backend'
+
+    env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
+    env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
+
+    env.debug = False
+    env.production = True
+
+
 def new_virtualenv():
     with cd(env.path):
         sudo("apt-get -q -y install gcc python-setuptools python-all-dev libpq-dev libjpeg-dev")
         sudo("easy_install pip")
-        sudo(env.pip_install_command + "virtualenv")
+        sudo(env.pip_install_command + " virtualenv")
         if not exists('virt-python'):
             run("virtualenv virt-python")
 
@@ -88,6 +102,9 @@ def deploy():
         print green("Install apache2 and wsgi mod")
         sudo("apt-get -q -y install apache2 python-setuptools libapache2-mod-wsgi")
         sudo("a2dissite default")
+
+        print green("Install mysql server")
+        sudo("apt-get -q -y install mysql-server mysql-client")
 
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, create it')
