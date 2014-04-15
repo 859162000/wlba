@@ -16,6 +16,9 @@ class CashViewSet(PaginatedModelViewSet):
     serializer_class = CashSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
 
+    def get_queryset(self):
+        return Cash.objects.all().prefetch_related('issuer')
+
 
 class CashIssuerViewSet(PaginatedModelViewSet):
     model = CashIssuer

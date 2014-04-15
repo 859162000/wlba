@@ -50,6 +50,9 @@ class TrustViewSet(PaginatedModelViewSet):
     serializer_class = TrustSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
 
+    def get_queryset(self):
+        return Trust.objects.all().prefetch_related('issuer')
+
 
 class IssuerViewSet(PaginatedModelViewSet):
     model = Issuer

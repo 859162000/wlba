@@ -16,6 +16,9 @@ class BankFinancingViewSet(PaginatedModelViewSet):
     serializer_class = BankFinancingSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
 
+    def get_queryset(self):
+        return BankFinancing.objects.all().prefetch_related('bank')
+
 
 class BankViewSet(PaginatedModelViewSet):
     model = Bank
@@ -27,7 +30,7 @@ class FinancingHomeView(TemplateView):
     template_name = "financing_home.jade"
 
     def get_context_data(self, **kwargs):
-        hot_financings = HotFinancing.objects.all()[:4]
+        hot_financings = HotFinancing.objects.all().prefetch_related('bank')[:4]
         return {
             'hot_financings': hot_financings
         }

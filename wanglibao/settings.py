@@ -72,8 +72,8 @@ INSTALLED_APPS = (
     'raven.contrib.django.raven_compat',
 )
 
-
 MIDDLEWARE_CLASSES = (
+    'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -122,7 +122,6 @@ USE_TZ = True
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'local')
 )
-
 
 # Authentication backend
 AUTHENTICATION_BACKENDS = (
