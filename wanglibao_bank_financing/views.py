@@ -30,7 +30,7 @@ class FinancingHomeView(TemplateView):
     template_name = "financing_home.jade"
 
     def get_context_data(self, **kwargs):
-        hot_financings = HotFinancing.objects.all().prefetch_related('bank')[:4]
+        hot_financings = HotFinancing.objects.all().prefetch_related('bank_financing').prefetch_related('bank_financing__bank')[:4]
         return {
             'hot_financings': hot_financings
         }
