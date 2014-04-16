@@ -19,6 +19,13 @@ def month(value):
     return u'%d个月' % (int(value), )
 
 @register.filter
+def day(value):
+    """
+    Convert the float based month to string
+    """
+    return u'%d天' % (int(value), )
+
+@register.filter
 def percentage(value):
     """
     Convert float based percentage to string

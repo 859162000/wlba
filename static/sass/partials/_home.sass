@@ -1,0 +1,97 @@
+.full-container-home
+  @extend .full-container
+  position: relative
+
+.home-banner
+  $file: 'home0.jpg'
+  height: image-height($file)
+  background-position: center
+  background-repeat: no-repeat
+  position: absolute
+  top: 0
+  width: 100%
+  display: none
+
+.home-banner-1
+  @extend .home-banner
+  background-image: url('http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/home0.jpg')
+  display: block
+
+.home-banner-2
+  @extend .home-banner
+  background-image: url('http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/home1.jpg')
+  cursor: pointer
+
+.home-banner-3
+  @extend .home-banner
+  background-image: url('http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/home2.jpg')
+
+.full-container-white
+  @extend .full-container
+  background-color: white
+
+
+.container-home
+  @extend .container
+
+.portfolio-container
+  position: relative
+  float: right
+  margin-top: 20px
+  background: rgba(#8B867F, .7)
+  padding: 10px 20px 20px 20px
+  font-size: $font-s
+  color: white
+  z-index: 999
+
+  span
+    position: absolute
+    color: $dark-gray
+    right: 25px
+    top: 5px
+    font-size: $font-s
+
+  td
+    padding: 10px 0
+    text-align: right
+
+.portfolio-input
+  min-height: $font-s
+  border: 1px
+  width: 190px
+  border-radius: 1
+  font-size: $font-s
+  background-color: white
+  font-family: 'Microsoft Yahei', tahoma, arial, 'Hiragino Sans GB', '宋体'
+
+.portfolio-thead
+  font-size: $font-xl
+  color: white
+  border-bottom: 1px dashed black
+
+.portfolio-td-last
+  padding-right: 20px
+  position: relative
+
+.portfolio-submit
+  width: 94%
+  background-color: $red
+  border: 0
+  color: white
+  padding: 7px
+  border-radius: 2px
+
+  &:hover
+    cursor: pointer
+
+.container-card-holder
+  width: $content-width
+  margin: 0 auto
+  position: relative
+  padding-left: 10px
+  padding-bottom: 0
+  border-bottom: 1px solid $red
+
+.container-search
+  width: 950px
+  margin: 0 auto

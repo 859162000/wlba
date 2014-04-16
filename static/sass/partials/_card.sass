@@ -18,7 +18,7 @@
     +box-shadow(0px 0px 9px gray)
 
 .card-top-container
-  padding: 10px
+  padding: 0px 10px
 
 .card-title
   color: $orange
@@ -31,7 +31,7 @@
 
 .card-product-name
   color: black
-  padding-bottom: 10px
+  padding-bottom: 5px
 
 .bank-logo
   width: 45px
@@ -39,10 +39,16 @@
   border: 1px solid #d5d5d5
 
 .bank-name
-  font-size: $font-m
   color: $red
   vertical-align: top
   padding: 0 0 0 10px
+  font-size: $font-m
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+  display: inline-block
+  width: 62%
+  display: inline-block
 
 .card-detail-box
   padding: 10px
@@ -55,8 +61,12 @@
 
 .profit-text
   color: $red
-  font-size: $font-xl
-  clear: both
+  font-size: $font-xxl
+  font-weight: bold
+
+.profit-title
+  line-height: 39px
+  vertical-align: middle
 
 .card-annotation
   position: absolute
@@ -71,21 +81,6 @@
   display: table-cell
   width: 9999999px
   padding: .5em 0
-
-a.card-orderlink
-  position: absolute
-  bottom: 10px
-  left: -3px
-  color: white
-  text-indent: 1em
-
-  @extend .order-yellow-background
-
-  &:hover
-    @extend .order-red-background
-
-  +unstyled-link
-  +link-colors(white)
 
 .card-icon
   padding: 0 1em

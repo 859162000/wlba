@@ -121,6 +121,7 @@ def deploy():
             print green('Git folder not there, create it')
             sudo("chmod 777 %s" % path)
             run("git clone %s" % env.depot)
+            sudo("chmod 777 %s" % env.depot)
         else:
             print green('Found depot, pull changes')
             with cd(env.depot_name):

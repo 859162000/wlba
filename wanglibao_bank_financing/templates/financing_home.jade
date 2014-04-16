@@ -31,9 +31,10 @@ body
               .space-vertical-s
               img.card-annotation(src="/static/images/on-sale.png")
               img.bank-logo(src="/media/{{financing.bank.logo}}")
-              span.bank-name {{financing.bank.name}}
+              span.bank-name {{financing.short_name}}
             .card-detail-box
-              .card-product-name {{financing.short_name}}
+              dt 产品期限:
+              dd.orange-text {{financing.period | day}}
               dt.profit-title 七日年化利率:
               dd.profit-text {{financing.expected_rate | percentage}}
               .space-vertical-s
