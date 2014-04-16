@@ -43,7 +43,7 @@ class Trust (models.Model):
     brief = models.TextField(blank=True, null=True, verbose_name=u'点评')
     issuer = models.ForeignKey(Issuer, verbose_name=u"发行机构")
     available_region = models.TextField(blank=True, null=True, verbose_name=u'发行区域')
-    scale = models.IntegerField(blank=True, null=True, verbose_name=u"发行规模(元)")
+    scale = models.IntegerField(blank=True, null=True, verbose_name=u"发行规模(万元)")
 
     investment_threshold = models.FloatField(blank=True, null=True, verbose_name=u"投资限额（万元）")
     period = models.FloatField(blank=True, null=True, verbose_name=u"期限（月）")
