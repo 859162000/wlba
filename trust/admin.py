@@ -5,11 +5,6 @@ from trust.models import Trust, Issuer
 
 
 class TrustAdmin (admin.ModelAdmin):
-    formfield_overrides = {
-        models.TextField: {
-            'widget': Textarea(attrs= {'rows':3, 'cols':40})
-        }
-    }
     list_display = ('id', 'short_name', 'issuer', 'type')
 
 admin.site.register(Trust, TrustAdmin)

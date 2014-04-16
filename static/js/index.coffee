@@ -68,5 +68,5 @@ require ['jquery', 'underscore'], ($, _)->
       currentBanner = index
 
   $('.home-banner-2').click ()->
-    window.location.href='/trust/detail/1'
+    window.location.href='/trust/detail/8526'
 
