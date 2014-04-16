@@ -72,3 +72,27 @@ def not_bool_to_display(flag):
     if flag:
         return 'display: none'
     return ''
+
+mapping = {
+  'gmail.com': 'https://mail.google.com/',
+  '163.com': 'http://mail.163.com/',
+  '126.com': 'http://mail.126.com/',
+  'qq.com': 'http://mail.qq.com/',
+  'sina.com': 'http://mail.sina.com/',
+  'sohu.com': 'http://mail.sohu.com/',
+  'yahoo.com.cn': 'http://mail.yahoo.com.cn/',
+  'yahoo.com': 'http://mail.yahoo.com/',
+  'yahoo.cn': 'http://mail.cn.yahoo.com/',
+  '21.cn': 'http://mail.21cn.com/',
+  '139.com': 'http://mail.139.com/',
+  '263.net': 'http://mail.263.net/',
+  'hotmail.com': 'http://www.hotmail.com/',
+  'msn.com': 'http://www.hotmail.com/',
+}
+
+@register.filter
+def mail_login_url(email):
+    domain = email.strip().split('@')[1]
+    if domain in mapping:
+        return mapping[domain]
+    return 'http://www.baidu.com/#wd=%' % domain
