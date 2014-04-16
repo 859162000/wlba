@@ -125,7 +125,7 @@
             investment_period: self.period(),
             risk_level: self.riskScore()
           }).done(function() {
-            return alert('投资方案已保存');
+            return alert('投资方案已保存！预约理财热线：400-8588-066。');
           }).fail(function(jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 403) {
               return window.location.href = '/accounts/login/?next=' + window.location.href;

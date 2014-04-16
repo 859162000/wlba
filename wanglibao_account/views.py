@@ -79,6 +79,8 @@ class RegisterView (RegistrationView):
         return user
 
     def get_success_url(self, request=None, user=None):
+        if self.email == "":
+            return u'/accounts/active/complete'
         if request.GET.get('next'):
             return request.GET.get('next')
         return u'/accounts/email/sent/?email=' + self.email

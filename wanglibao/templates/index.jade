@@ -71,7 +71,7 @@ html
 
     .space-vertical-xs
 
-    .container#trust-products
+    .container-hidden#trust-products
       each hot_trust in hot_trusts
         -with hot_trust.trust as trust
         a(href='/trust/detail/{{trust.id}}')
@@ -93,7 +93,7 @@ html
               dd.card-brief {{trust.brief}}
         -endwith
 
-    .container#fund-products
+    .container-hidden#fund-products
       each hot_fund in hot_funds
         -with hot_fund.fund as fund
         a(href='/fund/detail/{{fund.id}}')
@@ -120,7 +120,7 @@ html
               dd.card-brief {{fund.brief}}
         -endwith
 
-    .container#financing-products
+    .container-hidden#financing-products
       each hot_financing in hot_financings
         -with hot_financing.bank_financing as financing
         a(href='/financing/detail/{{financing.id}}')

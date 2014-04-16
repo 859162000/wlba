@@ -99,6 +99,8 @@ mapping = {
 
 @register.filter
 def mail_login_url(email):
+    if not email:
+        return ''
     domain = email.strip().split('@')[1]
     if domain in mapping:
         return mapping[domain]
