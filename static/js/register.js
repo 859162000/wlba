@@ -89,7 +89,7 @@
           minlength: 6
         },
         password2: {
-          equalTo: "#password"
+          equalTo: "#id_password"
         },
         'validation_code': {
           required: true,
