@@ -88,6 +88,9 @@
           required: true,
           minlength: 6
         },
+        password2: {
+          equalTo: "#password"
+        },
         'validation_code': {
           required: true,
           depends: function(e) {
@@ -106,6 +109,9 @@
         },
         'validation_code': {
           required: '不能为空'
+        },
+        password2: {
+          equalTo: '密码不一致'
         }
       }
     });

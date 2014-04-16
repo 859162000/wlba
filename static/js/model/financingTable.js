@@ -24,7 +24,7 @@
               sortable: true,
               field: 'short_name',
               text: function(item) {
-                return item.short_name;
+                return '<a href="/financing/detail/' + item.id + '">' + item.short_name + '</a>';
               }
             }, {
               name: '起购金额',

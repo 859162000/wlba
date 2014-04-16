@@ -12,7 +12,8 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
           colspan: 3
           sortable: true
           field: 'name'
-          text: (item)->item.name
+          text: (item)->
+            '<a href="/fund/detail/' + item.id + '">' + item.name + '</a>'
         ,
           name: '基金类型'
           colspan: 2

@@ -11,7 +11,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             name: '名称'
             colspan: 3
             text: (item)->
-              item.short_name
+              '<a href="/trust/detail/' + item.id + '">' + item.short_name + '</a>'
           ,
             name: '资金门槛'
             colspan: 2

@@ -25,7 +25,7 @@
               sortable: true,
               field: 'name',
               text: function(item) {
-                return item.name;
+                return '<a href="/fund/detail/' + item.id + '">' + item.name + '</a>';
               }
             }, {
               name: '基金类型',

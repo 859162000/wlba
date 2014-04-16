@@ -13,7 +13,7 @@ define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table,
             sortable: true
             field: 'short_name'
             text: (item)->
-              item.short_name
+              '<a href="/financing/detail/' + item.id + '">' + item.short_name + '</a>'
           ,
             name: '起购金额'
             colspan: 2

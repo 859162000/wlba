@@ -22,7 +22,7 @@
               name: '名称',
               colspan: 3,
               text: function(item) {
-                return item.name;
+                return '<a href="/cash/detail/' + item.id + '">' + item.name + '</a>';
               }
             }, {
               name: '发行机构',

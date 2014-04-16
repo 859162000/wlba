@@ -81,6 +81,8 @@ require ['jquery', 'jquery.validate', 'lib/backend'], ($, validate, backend)->
       password:
         required: true
         minlength: 6
+      password2:
+        equalTo: "#password"
       'validation_code':
         required: true
         depends: (e)->
@@ -95,3 +97,5 @@ require ['jquery', 'jquery.validate', 'lib/backend'], ($, validate, backend)->
         minlength: $.format("密码需要最少{0}位")
       'validation_code':
         required: '不能为空'
+      password2:
+        equalTo: '密码不一致'

@@ -19,8 +19,6 @@ html
         .register-left-div
           form#register-form.login-form(method='post', action='/accounts/register/')
             - csrf_token
-            .form-title
-              label.font-l 注册用户
             .form-row
               - render_field form.nickname class+="input-large" placeholder="昵称"
               #{ form.nickname.errors }
@@ -34,6 +32,8 @@ html
               button#button-get-validate-code.button.button-red.button-mini(type='button') 获取
             .form-row
               - render_field form.password class+="input-large" placeholder="请输入密码" autocomplete='off'
+            .form-row
+              input.input-large(type="password", name="password2", placeholder="请确认密码", autocomplete='off')
             .form-row.form-bottom-bar
               button#button-submit.button-red.button-middle.span12(type='submit') 注 册
         .register-right-div

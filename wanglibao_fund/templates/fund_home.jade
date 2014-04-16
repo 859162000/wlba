@@ -19,6 +19,7 @@ body
       .panel-tabs(data-bind="foreach: tabTree")
         .panel-tab(data-bind="css:{active:$root.selectedTab() === $data}")
           a(href="#", data-bind="text:name, click:$root.selectedTab") 全部
+      a.panel-title-right-item(href="{% url 'fund_products' %}") 更多
     .panel-content
       // ko template: {name: 'data-table', data: fundTable}
       // /ko

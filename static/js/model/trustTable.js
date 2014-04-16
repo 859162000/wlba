@@ -22,7 +22,7 @@
               name: '名称',
               colspan: 3,
               text: function(item) {
-                return item.short_name;
+                return '<a href="/trust/detail/' + item.id + '">' + item.short_name + '</a>';
               }
             }, {
               name: '资金门槛',
