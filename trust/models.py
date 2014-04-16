@@ -55,10 +55,10 @@ class Trust (models.Model):
     usage_description = models.TextField(blank=True, null=True, verbose_name=u'用途描述')
 
     risk_management = models.TextField(blank=True, null=True, verbose_name=u'风险控制')
-    mortgage = models.TextField(blank=True, help_text=u'抵押物')
-    mortgage_rate = models.FloatField(default=0, help_text=u'抵押率')
-    consignee = models.TextField(blank=True, help_text=u'受托人')
-    payment = models.TextField(blank=True, help_text=u'支付情况')
+    mortgage = models.TextField(blank=True, verbose_name=u'抵押物')
+    mortgage_rate = models.FloatField(default=0, verbose_name=u'抵押率')
+    consignee = models.TextField(blank=True, verbose_name=u'受托人')
+    payment = models.TextField(blank=True, verbose_name=u'支付情况')
 
     product_description = models.TextField(blank=True, verbose_name=u'产品说明')
     related_info = models.TextField(blank=True, null=True, verbose_name=u'相关信息')
