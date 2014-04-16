@@ -37,33 +37,31 @@ class Issuer(models.Model):
 
 
 class Trust (models.Model):
-    name = models.TextField()
-    short_name = models.CharField(max_length=256)
-    expected_earning_rate = models.FloatField()
-    brief = models.TextField()
-    issuer = models.ForeignKey(Issuer, verbose_name="the issuer of this trust")
-    available_region = models.TextField()
-    scale = models.IntegerField(verbose_name="the scale of this trust, in the unit of RMB")
+    name = models.TextField(verbose_name=u'信托名称')
+    short_name = models.CharField(max_length=256, verbose_name=u'短名称')
+    expected_earning_rate = models.FloatField(verbose_name=u'预期收益')
+    brief = models.TextField(blank=True, null=True, verbose_name=u'点评')
+    issuer = models.ForeignKey(Issuer, verbose_name=u"发行机构")
+    available_region = models.TextField(blank=True, null=True, verbose_name=u'发行区域')
+    scale = models.IntegerField(blank=True, null=True, verbose_name=u"发行规模(元)")
 
-    investment_threshold = models.FloatField(verbose_name="the investment threshold in 10k")
-    period = models.FloatField(verbose_name="the period in months")
-    issue_date = models.DateField()
-    type = models.TextField(verbose_name="trust type")
+    investment_threshold = models.FloatField(blank=True, null=True, verbose_name=u"投资限额（万元）")
+    period = models.FloatField(blank=True, null=True, verbose_name=u"期限（月）")
+    issue_date = models.DateField(blank=True, null=True, verbose_name=u'发行时间')
+    type = models.TextField(blank=True, null=True, verbose_name=u"类型")
 
-    earning_description = models.TextField()
-    note = models.TextField(verbose_name="note on this trust")
-    usage = models.CharField(max_length=100, verbose_name=u'用途')
-    usage_description = models.TextField(u'用途描述')
+    earning_description = models.TextField(blank=True, null=True, verbose_name=u'收益说明')
+    usage = models.CharField(blank=True, null=True, max_length=100, verbose_name=u'投资行业')
+    usage_description = models.TextField(blank=True, null=True, verbose_name=u'用途描述')
 
-    risk_management = models.TextField()
+    risk_management = models.TextField(blank=True, null=True, verbose_name=u'风险控制')
     mortgage = models.TextField(blank=True, help_text=u'抵押物')
     mortgage_rate = models.FloatField(default=0, help_text=u'抵押率')
     consignee = models.TextField(blank=True, help_text=u'受托人')
     payment = models.TextField(blank=True, help_text=u'支付情况')
 
-    product_name = models.TextField()
-    product_description = models.TextField(blank=True)
-    related_info = models.TextField()
+    product_description = models.TextField(blank=True, verbose_name=u'产品说明')
+    related_info = models.TextField(blank=True, null=True, verbose_name=u'相关信息')
 
     def __unicode__(self):
         return self.name
