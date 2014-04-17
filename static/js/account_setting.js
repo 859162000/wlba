@@ -22,7 +22,8 @@
         };
         return backend.changePassword(params).done(function() {
           $('#passwordChangeForm').find('input').val('');
-          return alert('密码修改成功');
+          alert('密码修改成功，请重新登录');
+          return window.location.href = '/accounts/logout/?next=/accounts/login/';
         }).fail(function() {
           console.log('Failed to update password, do it again');
           return alert('密码修改失败 请重试');

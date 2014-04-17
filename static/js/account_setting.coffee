@@ -19,7 +19,8 @@ require ['jquery', 'jquery.validate', 'lib/backend'], ($, validate, backend)->
       backend.changePassword params
       .done ->
         $('#passwordChangeForm').find('input').val('')
-        alert '密码修改成功'
+        alert '密码修改成功，请重新登录'
+        window.location.href = '/accounts/logout/?next=/accounts/login/'
       .fail ->
         console.log 'Failed to update password, do it again'
         alert '密码修改失败 请重试'

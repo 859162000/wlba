@@ -8,7 +8,7 @@ $logo-height: image-height('logo.png')
 
 .logo-bar
   @extend .container
-  margin: 20px auto
+  margin: 20px auto 25px auto
   height: $logo-height
 
 .logo
@@ -98,7 +98,7 @@ a.header-button
   a
     font-size: $font-s
     +hover-link
-    padding: 5px
+    padding: 0 5px
 
     &:first-child
       border-left: 0
@@ -127,6 +127,7 @@ a.header-button
   top: 100%
   width: 100%
   line-height: $font-s
+  z-index: 20
 
   li
     text-align: center
