@@ -113,24 +113,23 @@ define ['jquery'], ($)->
     $.post url,
       params
 
-  addToFavorite = (e, type)->
-    e.preventDefault()
-    id = $(e.target).attr('data-id')
-    is_favorited = $(e.target).attr('data-is-favorited')
+  addToFavorite = (target, type)->
+    id = $(target).data('id')
+    is_favorited = $(target).attr('data-is-favorited')
     url = apiurl + 'favorite/' + type + '/'
     if is_favorited != '1'
       $.post url, {
         item: id
       }
       .done ()->
-        $(e.target).html('取消')
-        $(e.target).attr('data-is-favorited', '1')
+        $(target).html('取消')
+        $(target).attr('data-is-favorited', '1')
       .fail (xhr)->
         if xhr.status == 403
           window.location.href = '/accounts/login/?next=' + window.location.href
         else if xhr.status == 409
-          $(e.target).html('取消')
-          $(e.target).attr('data-is-favorited', '1')
+          $(target).html('取消')
+          $(target).attr('data-is-favorited', '1')
         else
           alert('收藏失败')
     else
@@ -139,8 +138,8 @@ define ['jquery'], ($)->
         type: 'DELETE'
       }
       .done ()->
-        e.target.textContent = '收藏'
-        $(e.target).attr('data-is-favorited', '0')
+        $(target).html('收藏')
+        $(target).attr('data-is-favorited', '0')
       .fail ()->
           alert '取消收藏失败'
 
@@ -178,11 +177,11 @@ define ['jquery'], ($)->
         data: data
 
   window.addToFavorite = (e, type)->
-    e.preventDefault()
-
-    id = $(e.target).attr('data-id')
-    is_favorited = $(e.target).attr('data-is-favorited')
-    addToFavorite e, type, id, is_favorited
+    e = e || window.event;
+    target = e.target || e.srcElement;
+    if(e.preventDefault)
+      e.preventDefault();
+    addToFavorite target, type
 
   isInRange = (param, range)->
     if param == range

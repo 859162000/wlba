@@ -119,24 +119,23 @@
       url = '/accounts/password/change/';
       return $.post(url, params);
     };
-    addToFavorite = function(e, type) {
+    addToFavorite = function(target, type) {
       var id, is_favorited, url;
-      e.preventDefault();
-      id = $(e.target).attr('data-id');
-      is_favorited = $(e.target).attr('data-is-favorited');
+      id = $(target).data('id');
+      is_favorited = $(target).attr('data-is-favorited');
       url = apiurl + 'favorite/' + type + '/';
       if (is_favorited !== '1') {
         return $.post(url, {
           item: id
         }).done(function() {
-          $(e.target).html('取消');
-          return $(e.target).attr('data-is-favorited', '1');
+          $(target).html('取消');
+          return $(target).attr('data-is-favorited', '1');
         }).fail(function(xhr) {
           if (xhr.status === 403) {
             return window.location.href = '/accounts/login/?next=' + window.location.href;
           } else if (xhr.status === 409) {
-            $(e.target).html('取消');
-            return $(e.target).attr('data-is-favorited', '1');
+            $(target).html('取消');
+            return $(target).attr('data-is-favorited', '1');
           } else {
             return alert('收藏失败');
           }
@@ -146,8 +145,8 @@
           url: url + id + '/',
           type: 'DELETE'
         }).done(function() {
-          e.target.textContent = '收藏';
-          return $(e.target).attr('data-is-favorited', '0');
+          $(target).html('收藏');
+          return $(target).attr('data-is-favorited', '0');
         }).fail(function() {
           return alert('取消收藏失败');
         });
@@ -204,11 +203,13 @@
       }
     };
     window.addToFavorite = function(e, type) {
-      var id, is_favorited;
-      e.preventDefault();
-      id = $(e.target).attr('data-id');
-      is_favorited = $(e.target).attr('data-is-favorited');
-      return addToFavorite(e, type, id, is_favorited);
+      var target;
+      e = e || window.event;
+      target = e.target || e.srcElement;
+      if (e.preventDefault) {
+        e.preventDefault();
+      }
+      return addToFavorite(target, type);
     };
     isInRange = function(param, range) {
       var params, ranges;
