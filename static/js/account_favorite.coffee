@@ -1,7 +1,7 @@
 require.config
   paths:
     jquery: 'lib/jquery.min'
-    knockout: 'lib/knockout-3.0.0'
+    knockout: 'lib/knockout'
     underscore: 'lib/underscore-min'
 
 require ['jquery', 'knockout', 'underscore', 'lib/backend', 'model/fundTable', 'model/financingTable', 'model/trustTable', 'model/cashTable', 'model/tab'], ($, ko, _, backend, fund, financing, trust, cash, tab)->

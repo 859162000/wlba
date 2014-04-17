@@ -2,7 +2,7 @@ require.config(
   paths:
     jquery: 'lib/jquery.min'
     underscore: 'lib/underscore-min'
-    knockout: 'lib/knockout-3.0.0'
+    knockout: 'lib/knockout'
     'jquery.modal': 'lib/jquery.modal.min'
     purl: 'lib/purl'
     raphael: 'lib/raphael-min'

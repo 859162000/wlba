@@ -2,7 +2,7 @@ require.config
   paths:
     jquery: 'lib/jquery.min'
     underscore: 'lib/underscore-min'
-    knockout: 'lib/knockout-3.0.0'
+    knockout: 'lib/knockout'
 
 require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund', 'model/fundTable', 'lib/filter'], ($, _, ko, backend, fund, table, filter)->
   class DataViewModel

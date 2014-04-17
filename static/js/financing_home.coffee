@@ -2,7 +2,7 @@ require.config
   paths:
     jquery: 'lib/jquery.min'
     underscore: 'lib/underscore-min'
-    knockout: 'lib/knockout-3.0.0'
+    knockout: 'lib/knockout'
 
 require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/financingTable'], ($, _, ko, backend, tab, table)->
   class viewModel

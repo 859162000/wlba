@@ -3,7 +3,7 @@
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      knockout: 'lib/knockout-3.0.0',
+      knockout: 'lib/knockout',
       underscore: 'lib/underscore-min'
     }
   });

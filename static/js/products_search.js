@@ -4,7 +4,7 @@
     paths: {
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
-      knockout: 'lib/knockout-3.0.0',
+      knockout: 'lib/knockout',
       'jquery.purl': 'lib/purl'
     },
     shim: {
