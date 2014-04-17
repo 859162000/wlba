@@ -87,6 +87,7 @@ def publish():
         'home0.jpg',
         'home1.jpg',
         'home2.jpg',
+        'banner0.jpg',
         ]
 
     for file in files:
