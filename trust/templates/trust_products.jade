@@ -23,7 +23,7 @@ body
       .filter-container(data-bind="css:{expandable: _.has($data, 'expandable')}")
         span.filter-name(data-bind="text: name + ':'") 名字
         // ko foreach: values
-        a.filter-item(href="#", data-bind="text: name, css: {active: $root.activeFilters().indexOf($data) != -1}, click: $root.clickOnFilter") 名字
+        a.filter-item(href="#", data-bind="text: name, css: {active: $root.activeFilters.indexOf($data) != -1}, click: $root.clickOnFilter") 名字
         // /ko
 
         // ko if: _.has($data, 'expandable')

@@ -62,28 +62,6 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
 
       self.filters = [
         {
-          name : '销售状态'
-          param_name: 'status'
-          values: [
-            {
-              name: '不限'
-              values: null
-            }
-            {
-              name: '开放'
-              values: [
-                status: '开放'
-              ]
-            }
-            {
-              name: '关闭'
-              values: [
-                status: '关闭'
-              ]
-            }
-         ]
-        },
-        {
           name : '投资期限'
           param_name: 'period'
           values: [
