@@ -114,37 +114,6 @@ body
   include include/footer
   include include/templates
 
-  // The survey
-  #propertyPlan.modal(tabindex='-1')
-    .modal-header
-      h3.font-l 找到适合您的资产配置方案
-    .modal-body
-      form
-        .row(data-bind="foreach: questions")
-          .question-box
-            span.question-number.pull-left(data-bind="text: $index()+1") 1
-            dl.question-container
-              dt.question-title(data-bind="text: question")
-              //ko if: _.has($data, 'options')
-              //ko foreach: options
-              dd.question-choice
-                label
-                  input#plan1_1(type='radio', data-bind="checked: $parent.answer, checkedValue:$data, attr:{name: $parent.question, id: $parent.question + $index()}")
-                  span(data-bind="text: title")
-              // /ko
-              // /ko
-              //ko if: _.has($data, 'input')
-              dd.question-choice
-                input(type='text', data-bind="value: answer")
-                span(data-bind="text: $data.input.suffix")
-              // /ko
-
-        .space-vertical-s
-        .row
-          .prefix10.span2-omega
-            button.button-middle.button-orange(data-bind="click: finishSurvey") 完成
-        .space-vertical-s
-
   script.
     require(["/static/js/consult.js"])
 

@@ -12,7 +12,7 @@ html
     .full-container-login
       .container-login
         .login-left-div
-          form#login-form(method='post', action='/accounts/login/?next={{next}}')
+          form#login-form.login-form(method='post', action='/accounts/login/?next={{next}}')
            fieldset
                #{ form.non_field_errors }
                #{ form.password.errors }
