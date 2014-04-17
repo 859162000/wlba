@@ -10,7 +10,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/fund', 'model
       self = this
 
       self.tabTree = filter.arrayToFilter ['混合型','结构型','债券型','理财型','指数型','保本型','封闭式','QDII','股票型','货币型'],
-        'type', '全部'
+        'type', '综合'
 
       self.selectedTab = ko.observable(self.tabTree[0])
       self.fundTable = new table.viewModel {}

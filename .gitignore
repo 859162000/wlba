@@ -7,3 +7,4 @@ publish/
 static/sass/partials/*.css
 static/sass/*.css
 .swp
+.DS_Store

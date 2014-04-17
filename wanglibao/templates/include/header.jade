@@ -1,24 +1,14 @@
 .full-container
   .logo-bar
-    a(href="/")
-      .logo
+    .logo-div
+      a(href="/")
+        .logo
+
     .search-bar
-      .category
-        ul
-          li
-            a.category-anchor.active(href='#', data-type='portfolio') 个人理财
-          li
-            a.category-anchor(href='#', data-type='trust') 信托理财
-          li
-            a.category-anchor(href='#', data-type='financing') 银行理财
-          li
-            a.category-anchor(href='#', data-type='fund') 基金产品
-          li
-            a.category-anchor(href='#', data-type='cash') 现金理财
       .input-bar
-        span.input-title 投资金额
+        span.input-title 金额
         .header-asset
-          input.header-input-base.header-asset-input(type='text', size=30)
+          input.header-input-base.header-asset-input(type='text', size=20)
           span#header-asset-unit 万元
         span.input-title 期限
         select.header-input-base.header-select
@@ -27,7 +17,15 @@
           option(value='6-12') 6-12个月
           option(value='12-36') 1-3年
           option(value='>36') 3年以上
+        span.input-title 产品
+        select.header-input-base.header-select
+          option(value='portfolio') 个人理财
+          option(value='3-6') 信托理财
+          option(value='6-12') 银行理财
+          option(value='12-36') 基金产品
+          option(value='>36') 现金理财
         a.header-button(href='#') 搜索
+
     .user-info
       if user.is_authenticated
         a(href="/portfolio") 我的投资方案

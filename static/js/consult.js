@@ -242,20 +242,22 @@
                 normalizedType = backend.normalizeType(type);
                 switch (normalizedType) {
                   case 'trusts':
-                    self.trustTable.data(data.results);
+                    backend.joinFavorites(data, "trusts", self.trustTable);
                     return self.dataTable(self.trustTable);
                   case 'bank_financings':
-                    self.financingTable.data(data.results);
+                    backend.joinFavorites(data, 'financings', self.financingTable);
                     return self.dataTable(self.financingTable);
                   case 'cashes':
-                    self.cashTable.data(data.results);
+                    backend.joinFavorites(data, 'cashes', self.cashTable);
                     return self.dataTable(self.cashTable);
                   case 'funds':
-                    self.fundTable.data(_.map(data.results, function(item) {
-                      return new fund.viewModel({
-                        data: item
+                    backend.joinFavorites(data, 'funds', self.fundTable, function(data) {
+                      return _.map(data.results, function(item) {
+                        return new fund.viewModel({
+                          data: item
+                        });
                       });
-                    }));
+                    });
                     return self.dataTable(self.fundTable);
                   default:
                     return self.dataTable(self.emptyTable);

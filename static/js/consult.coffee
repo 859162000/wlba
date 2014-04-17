@@ -274,19 +274,19 @@ require ['jquery',
 
               switch normalizedType
                 when 'trusts'
-                  self.trustTable.data data.results
+                  backend.joinFavorites(data, "trusts", self.trustTable)
                   self.dataTable self.trustTable
                 when 'bank_financings'
-                  self.financingTable.data data.results
+                  backend.joinFavorites(data, 'financings', self.financingTable)
                   self.dataTable self.financingTable
                 when 'cashes'
-                  self.cashTable.data data.results
+                  backend.joinFavorites(data, 'cashes', self.cashTable)
                   self.dataTable self.cashTable
                 when 'funds'
-                  self.fundTable.data _.map(data.results, (item)->
-                    new fund.viewModel
-                      data: item
-                  )
+                  backend.joinFavorites(data, 'funds', self.fundTable, (data)->
+                    return _.map(data.results, (item)->
+                        new fund.viewModel
+                          data: item))
 
                   self.dataTable self.fundTable
                 else
