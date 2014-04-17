@@ -223,6 +223,16 @@ define ['jquery'], ($)->
         else
           return false
 
+  checkEmail = (identifier) ->
+    re = undefined
+    re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    re.test identifier
+
+  checkMobile = (identifier) ->
+    re = undefined
+    re = /^1\d{10}$/
+    re.test identifier
+
   return {
     loadData: loadData
     isValidType: isValidType
@@ -240,4 +250,6 @@ define ['jquery'], ($)->
     userExists: userExists
     userProfile: userProfile
     isInRange: isInRange
+    checkEmail: checkEmail
+    checkMobile: checkMobile
   }

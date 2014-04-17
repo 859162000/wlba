@@ -74,7 +74,7 @@
       }
     });
     return $('.home-banner-2').click(function() {
-      return window.location.href = '/trust/detail/1';
+      return window.location.href = '/trust/detail/8526';
     });
   });
 
