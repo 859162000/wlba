@@ -10,7 +10,13 @@ $logo-height: image-height('logo.png')
   @extend .container
   margin: 20px auto 25px auto
   line-height: $logo-height
-  +clearfix
+
+  &:after
+    content: " " /* Older browser do not support empty content */
+    visibility: hidden
+    display: block
+    height: 0
+    clear: both
 
 .logo-div
   width: 20%
@@ -60,14 +66,14 @@ $logo-height: image-height('logo.png')
   border: 0
   border-radius: 0
   margin: 0
-  padding: 0
   vertical-align: middle
   line-height: 30px
   height: 30px
 
 .header-select
-  padding: 5px 0
-  border-radius: 0
+  padding: 3px 0
+  background: white
+  display: inline
 
 a.header-button
   @extend .header-input-base
@@ -80,11 +86,14 @@ a.header-button
   height: 30px
   +inline-block
 
+.user-div
+  float: left
+  width: 25%
+  vertical-align: middle
+
 .user-info
   float: right
   color: $black
-  width: 23%
-  vertical-align: middle
 
   a
     font-size: $font-s
@@ -105,7 +114,7 @@ a.header-button
   padding: 5px
   min-width: 100px
   text-align: center
-  line-height: 24px
+  line-height: 20px
 
 .username-hover
   background-color: white

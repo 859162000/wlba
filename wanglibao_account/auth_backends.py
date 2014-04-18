@@ -49,10 +49,6 @@ class EmailPhoneUsernameAuthBackend(object):
                 return active_user
             else:
                 return None
-        else:
-            for u in users:
-                if u.check_password(password):
-                    return u
 
         return None
 

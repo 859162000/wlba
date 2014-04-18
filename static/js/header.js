@@ -31,7 +31,7 @@
     $('.header-button').click(function() {
       var period, type, uri;
       period = $('.header-select')[0].value;
-      type = $(previous).attr('data-type');
+      type = $('.header-select')[1].value;
       uri = '/' + type;
       if (type === 'cash') {
         uri += '/home/';

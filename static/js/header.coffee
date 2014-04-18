@@ -24,7 +24,7 @@ require ['jquery', 'lib/backend', 'iealert'], ($, backend, iealert)->
 
   $('.header-button').click ()->
     period = $('.header-select')[0].value
-    type = $(previous).attr('data-type')
+    type = $('.header-select')[1].value
     uri = '/' + type
     if type == 'cash'
       uri += '/home/'
