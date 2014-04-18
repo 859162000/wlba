@@ -92,6 +92,8 @@ html
               dt 点评:
               dd.card-brief {{trust.brief}}
         -endwith
+      .check-more
+        a.button-round-mini.button-red(href="/trust/products") 查看更多
 
     .container-hidden#fund-products
       each hot_fund in hot_funds
@@ -119,6 +121,8 @@ html
               dt 点评:
               dd.card-brief {{fund.brief}}
         -endwith
+      .check-more
+        a.button-round-mini.button-red(href="/fund/products") 查看更多
 
     .container-hidden#financing-products
       each hot_financing in hot_financings
@@ -141,11 +145,15 @@ html
               dt 点评:
               dd.card-brief {{financing.brief}}
         -endwith
+      .check-more
+        a.button-round-mini.button-red(href="/financing/products") 查看更多
 
     .row
-      img(src="http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/banner0.jpg", style="margin:auto; text-align: center")
+      img(src="http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/banner0.jpg", style="margin:0 auto; display: block")
 
+    - with 1 as no_margin
     include include/footer
+    - endwith
 
     script.
       require(['/static/js/index.js'])
