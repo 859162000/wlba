@@ -1,4 +1,6 @@
 [client]
+host = rds3e3ivbfamqyb.mysql.rds.aliyuncs.com
+port = 3306
 database = wanglibao
 user = wanglibao
 password = wanglibank

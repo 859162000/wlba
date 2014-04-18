@@ -99,6 +99,14 @@ DATABASES = {
     },
 }
 
+if not PRODUCTION:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wanglibao',
+        'USER': 'wanglibao',
+        'PASSWORD': 'wanglibank',
+    }
+
 import sys
 if 'test' in sys.argv:
     DATABASES['default'] = {
