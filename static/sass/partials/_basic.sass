@@ -8,7 +8,7 @@ body
   font-family: 'Microsoft Yahei', tahoma, arial, 'Hiragino Sans GB', '宋体'
   font-size: $font-xs
   line-height: 1.5
-  color: $black
+  color: #666
   background-color: $background-color
 
   min-width: 1104px
@@ -177,15 +177,20 @@ input
 
 .title
   padding: .3em 0
-  font-size: $font-m
+  font-size: $font-xl
   text-align: center
 
 .sub-title
-  font-weight: bolder
-  font-size: 14px
-  margin: 1em 0
-  background: lightgray
-  padding: 1em
+  font-size: $font-m
+  color: $red
+  padding: 1em 0
+  margin-top: 1em
+
+.sub-sub-title
+  font-weight: bold
+  color: #333
+  font-size: $font-s
+  line-height: 2
 
 .release-time
   background: #ECECEC
@@ -196,8 +201,9 @@ input
   font-size: $font-s
 
 .para
-  text-indent: 2em
   font-size: $font-s
+  line-height: 2
+  text-align: justify
 
 .key-value
   dt
