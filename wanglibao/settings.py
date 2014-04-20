@@ -234,5 +234,8 @@ RAVEN_CONFIG = {
     'dsn': 'https://efd164e25b604da7b2f38b88d0594ff5:4b1fb0cd10774161a51e33be79e88e84@app.getsentry.com/22349',
 }
 
+if not PRODUCTION:
+    RAVEN_CONFIG = {}
+
 import mimetypes
 mimetypes.add_type("text/x-component", ".htc")
