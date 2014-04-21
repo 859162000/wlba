@@ -27,7 +27,7 @@ class EmailPhoneUsernameAuthBackend(object):
         if identifier_type == 'email':
             filter = Q(email=identifier)
         elif identifier_type == 'phone':
-            filter = Q(wanglibaouserprofile__phone=identifier) and Q(wanglibaouserprofile__phone_verified=True)
+            filter = Q(wanglibaouserprofile__phone=identifier) & Q(wanglibaouserprofile__phone_verified=True)
         users = User.objects.filter(filter)
 
         password = kwargs['password']
