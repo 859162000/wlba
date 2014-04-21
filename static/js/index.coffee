@@ -48,11 +48,12 @@ require ['jquery', 'underscore'], ($, _)->
 
   currentBanner = 0
   banners = $('*[class^="home-banner"]')
+  bannerCount = banners.length
   anchors = $('.background-anchor')
   setInterval(()->
       $(banners[currentBanner]).hide()
       $(anchors[currentBanner]).toggleClass('active')
-      currentBanner = (currentBanner + 1) % 3
+      currentBanner = (currentBanner + 1) % bannerCount
       $(banners[currentBanner]).fadeIn()
       $(anchors[currentBanner]).toggleClass('active')
     , 6000)
