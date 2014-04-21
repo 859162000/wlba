@@ -33,8 +33,9 @@ $row-height: 40px
 
 .form-row
   margin-top: $space-s
-  overflow: auto
+  overflow: visible
   text-align: left
+  position: relative
 
 .form-row-m
   line-height: 40px
@@ -84,3 +85,35 @@ $row-height: 40px
   color: white
   border-radius: 2px
 
+.password-strength-container
+  position: absolute
+  left: 103%
+  top: 25%
+  height: 10px
+  width: 160px
+
+  &.low
+    .password-strength-1
+      background: #ED4509
+
+    .password-strength-2, .password-strength-3
+      background: #D5D5D5
+
+  &.soso
+    .password-strength-1, .password-strength-2
+      background: #EEA332
+    .password-strength-3
+      background: #D5D5D5
+
+  &.strong
+    .password-strength-1, .password-strength-2, .password-strength-3
+      background: #92D81C
+
+.password-strength-1, .password-strength-2, .password-strength-3
+  display: inline-block
+  min-width: 30px
+  min-height: 10px
+  max-height: 10px
+  margin-right: 2px
+  overflow: hidden
+  text-indent: -1000px
