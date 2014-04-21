@@ -52,7 +52,7 @@ require ['jquery', 'underscore'], ($, _)->
   setInterval(()->
       $(banners[currentBanner]).hide()
       $(anchors[currentBanner]).toggleClass('active')
-      currentBanner = (currentBanner + 1) % 3
+      currentBanner = (currentBanner + 1) % banners.length
       $(banners[currentBanner]).fadeIn()
       $(anchors[currentBanner]).toggleClass('active')
     , 6000)

@@ -57,7 +57,7 @@
     setInterval(function() {
       $(banners[currentBanner]).hide();
       $(anchors[currentBanner]).toggleClass('active');
-      currentBanner = (currentBanner + 1) % 3;
+      currentBanner = (currentBanner + 1) % banners.length;
       $(banners[currentBanner]).fadeIn();
       return $(anchors[currentBanner]).toggleClass('active');
     }, 6000);
