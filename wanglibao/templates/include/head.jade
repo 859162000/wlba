@@ -1,18 +1,2 @@
 head
-  meta(http-equiv="content-type", content="text/html; charset=utf-8")
-  meta(http-equiv="X-UA-Compatible", content="IE=edge")
-
-  title {{title}}
-
-  // TODO LOAD css for modal, don't load it for other pages
-  link(rel="stylesheet", href="/static/stylesheets/jquery.modal.css",type="text/css",media="screen")
-  link(rel="stylesheet", href="/static/stylesheets/iealert/style.css",type="text/css",media="screen")
-
-  link(rel='shortcut icon', href='/favicon.ico', type='image/x-icon')
-  link(href="/static/stylesheets/screen.css", media="screen, projection", rel="stylesheet", type="text/css")
-  link(href="/static/stylesheets/print.css", media="print", rel="stylesheet", type="text/css")
-  // if IE
-    link(href="/static/stylesheets/ie.css", media="screen, projection", rel="stylesheet", type="text/css")
-    link(href="/static/stylesheets/pie.css", rel="stylesheet", type="text/css")
-
-  script(src="/static/js/lib/modernizr.js")
+  include include/common_head

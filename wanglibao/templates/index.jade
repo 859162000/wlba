@@ -2,9 +2,12 @@
 
 doctype html
 html
-  - with '网利宝首页' as title
-  include include/head
-  - endwith
+  head
+    - with '网利金融-网利宝' as title
+    include include/common_head
+    meta(name="keywords", content="网利金融，网利宝")
+    meta(name="description", content="网利宝/网利金融是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
+    - endwith
 
   body
     include include/header
@@ -145,7 +148,7 @@ html
         a.button-round-mini.button-red(href="/financing/products") 查看更多
 
     .row
-      img(src="http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/banner0.jpg", style="margin:0 auto; display: block")
+      img(src="http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/banner0.jpg", style="margin:0 auto; display: block", alt="网利宝网上银行")
 
     - with 1 as no_margin
     include include/footer
