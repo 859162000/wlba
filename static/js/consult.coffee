@@ -24,28 +24,14 @@ require ['jquery',
          'model/fundTable',
          'model/fund',
          'model/emptyTable'], ($, _, ko, backend, chart, modal, purl, trustTable, financingTable, cashTable, fundTable, fund, emptyTable)->
+
   class ViewModel
-
-    constructor: ->
+    constructor: (asset_param, period_param, risk_param)->
       self = this
-
-      ###
-      The user data: asset, risk, period
-      ###
-      asset_param = parseInt($.url(document.location.href).param('asset'))
-      period_param = parseInt($.url(document.location.href).param('period'))
-      risk_param = parseInt($.url(document.location.href).param('risk'))
-
-      if isNaN(asset_param) or asset_param <= 0
-        asset_param = 30
-      if isNaN(period_param) or period_param <= 0
-        period_param = 3
-      if isNaN(risk_param) or risk_param <= 0
-        risk_param = 1
-
       self.asset = ko.observable(asset_param)
       self.riskScore = ko.observable(risk_param)
       self.period = ko.observable(period_param)
+
 
       self.riskDescription = ko.observable()
 
@@ -76,7 +62,7 @@ require ['jquery',
 
         risk = self.questions[2].answer()
         if risk
-          self.riskScore(risk.value.risk_score)
+          self.riskScore(risk)
 
         $.modal.close()
 
@@ -95,32 +81,27 @@ require ['jquery',
         }
         {
           question: '风险承受能力'
-          answer: ko.observable()
+          answer: ko.observable(self.riskScore())
           options:[
             {
               title: '不能承担任何风险'
-              value:
-                risk_score: 1
+              value: 1
             }
             {
               title: '可以承担极小的风险'
-              value:
-                risk_score: 2
+              value: 2
             }
             {
               title: '可以承担一定风险'
-              value:
-                risk_score: 3
+              value: 3
             }
             {
               title: '可以承担较大风险'
-              value:
-                risk_score: 4
+              value: 4
             }
             {
               title: '绝对追求高收益'
-              value:
-                risk_score: 5
+              value: 5
             }
           ]
         }
@@ -298,17 +279,35 @@ require ['jquery',
 
       .extend {throttle: 1}
 
-  model = new ViewModel()
-  ko.applyBindings model
+  if not $.url(document.location.href).param('asset')
+    backend.userProfile()
+    .done (data)->
+      asset_param = data.investment_asset
+      period_param = data.investment_period
+      risk_param = data.risk_level
+      model = new ViewModel(asset_param, period_param, risk_param)
+      ko.applyBindings model
+    .fail ->
+      model = new ViewModel(30, 3, 1)
+      ko.applyBindings model
+  else
+    asset_param = parseInt($.url(document.location.href).param('asset'))
+    period_param = parseInt($.url(document.location.href).param('period'))
+    risk_param = parseInt($.url(document.location.href).param('risk'))
+
+    if isNaN(asset_param) or asset_param <= 0
+      asset_param = 30
+
+    if isNaN(period_param) or period_param <= 0
+      period_param = 3
+
+    if isNaN(risk_param) or risk_param <= 0
+      risk_param = 1
+
+    model = new ViewModel(asset_param, period_param, risk_param)
+    ko.applyBindings model
 
   $('#question-button').click (e)->
     e.preventDefault()
     $(this).modal()
 
-  # load the portfolio if user logged in
-  if not $.url(document.location.href).param('asset')
-    backend.userProfile()
-    .done (data)->
-      model.asset(data.investment_asset)
-      model.period(data.investment_period)
-      model.riskScore(data.risk_level)

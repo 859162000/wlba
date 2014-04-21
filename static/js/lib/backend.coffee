@@ -123,12 +123,14 @@ define ['jquery'], ($)->
       }
       .done ()->
         $(target).html('取消')
+        $(target).addClass('button-no-border')
         $(target).attr('data-is-favorited', '1')
       .fail (xhr)->
         if xhr.status == 403
           window.location.href = '/accounts/login/?next=' + window.location.href
         else if xhr.status == 409
           $(target).html('取消')
+          $(target).addClass('button-no-border')
           $(target).attr('data-is-favorited', '1')
         else
           alert('收藏失败')
@@ -140,6 +142,7 @@ define ['jquery'], ($)->
       .done ()->
         $(target).html('收藏')
         $(target).attr('data-is-favorited', '0')
+        $(target).removeClass('button-no-border')
       .fail ()->
           alert '取消收藏失败'
 
