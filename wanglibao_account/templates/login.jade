@@ -19,7 +19,8 @@ html
                #{ form.email.errors }
                #{ form.username.errors }
                - csrf_token
-              .form-title
+              .form-login-title
+                img.user-icon(src='/static/images/user.png')
                 label.font-l 用户登录
               .form-row
                 - render_field form.identifier class+="input-large" placeholder="请输入邮箱或手机号" title="请输入邮箱或手机号"

@@ -20,11 +20,16 @@
   background-color: white
   padding: 0
 
-.login-left-div, .register-left-div
+.register-left-div
   padding: 25px 0
   width: 66%
   float: left
   background-color: white
+
+.login-left-div
+  @extend .register-left-div
+  border-top: 3px solid $red
+  padding-top: 30px
 
 .login-right-div
   width: 34%
@@ -32,6 +37,9 @@
   padding: 35px 30px
   font-size: $font-s
   color: $dark-gray
+  background-color: #f0f0f0
+  border-top: 3px solid #DA736E
+  height: 270px
 
   p
     padding: 3px 0
@@ -96,8 +104,11 @@
   color: #90B175
 
 .register-right-div
-  @extend .login-right-div
-  padding-top: 50px
+  width: 34%
+  float: left
+  padding: 50px 30px 35px 30px
+  font-size: $font-s
+  color: $dark-gray
 
   p
     padding: 10px
@@ -117,3 +128,6 @@
   color: #1771AE
   margin-top: 5px
 
+.user-icon
+  float: left
+  padding-right: 5px
