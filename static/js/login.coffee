@@ -2,11 +2,15 @@ require.config
   paths:
     jquery: 'lib/jquery.min'
     'jquery.validate': 'lib/jquery.validate.min'
+    'jquery.placeholder': 'lib/jquery.placeholder'
 
   shim:
     'jquery.validate': ['jquery']
+    'jquery.placehoder': ['jquery']
 
-require ['jquery', 'jquery.validate', 'lib/backend'], ($, validate, backend)->
+require ['jquery', 'jquery.validate', 'lib/backend', 'jquery.placeholder'], ($, validate, backend, placeholder)->
+
+  $('input, textarea').placeholder()
 
 # Add the validate rule function emailOrPhone
   $.validator.addMethod "emailOrPhone", (value, element)->

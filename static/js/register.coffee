@@ -3,12 +3,17 @@ require.config
     jquery: 'lib/jquery.min'
     'jquery.validate': 'lib/jquery.validate.min'
     'jquery.complexify': 'lib/jquery.complexify.min'
+    'jquery.placeholder': 'lib/jquery.placeholder'
 
   shim:
     'jquery.validate': ['jquery']
     'jquery.complexify': ['jquery']
+    'jquery.placehoder': ['jquery']
 
-require ['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend'], ($, validate, complexify, backend)->
+require ['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquery.placeholder'], ($, validate, complexify, backend, placeholder)->
+
+  $('input, textarea').placeholder()
+
   checkEmail = (identifier) ->
     re = undefined
     re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/

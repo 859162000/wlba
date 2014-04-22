@@ -4,16 +4,19 @@
     paths: {
       jquery: 'lib/jquery.min',
       'jquery.validate': 'lib/jquery.validate.min',
-      'jquery.complexify': 'lib/jquery.complexify.min'
+      'jquery.complexify': 'lib/jquery.complexify.min',
+      'jquery.placeholder': 'lib/jquery.placeholder'
     },
     shim: {
       'jquery.validate': ['jquery'],
-      'jquery.complexify': ['jquery']
+      'jquery.complexify': ['jquery'],
+      'jquery.placehoder': ['jquery']
     }
   });
 
-  require(['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend'], function($, validate, complexify, backend) {
+  require(['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquery.placeholder'], function($, validate, complexify, backend, placeholder) {
     var checkEmail, checkMobile, container;
+    $('input, textarea').placeholder();
     checkEmail = function(identifier) {
       var re;
       re = void 0;

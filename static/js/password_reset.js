@@ -7,16 +7,26 @@
   });
 
   require(['jquery', 'lib/backend'], function($, backend) {
-    return $('#submitButton').click(function(e) {
-      var identifier, url;
-      e.preventDefault();
-      url = $('form#identifier').attr('action');
+    var submit_form;
+    submit_form = function() {
+      var identifier;
       identifier = $('input[name="identifier"]').val();
       return backend.userExists(identifier).done(function() {
-        return $('form#identifier').submit();
+        $('form#identifier').submit();
+        return true;
       }).fail(function() {
         return alert('用户不存在');
       });
+    };
+    $('#submitButton').click(function(e) {
+      e.preventDefault();
+      return submit_form();
+    });
+    return $('input').keyup(function(e) {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        return submit_form();
+      }
     });
   });
 

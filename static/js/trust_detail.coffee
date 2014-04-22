@@ -2,11 +2,16 @@ require.config
   paths:
     jquery: 'lib/jquery.min'
     'jquery.modal': 'lib/jquery.modal.min'
+    'jquery.placeholder': 'lib/jquery.placeholder'
 
   shim:
     'jquery.modal': ['jquery']
+    'jquery.placehoder': ['jquery']
 
-require ['jquery', 'lib/modal', 'lib/backend'], ($, modal, backend)->
+require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder'], ($, modal, backend, placehoder)->
+
+  $('input, textarea').placeholder()
+
   $('#order-button').click (e)->
     e.preventDefault()
     $(this).modal()

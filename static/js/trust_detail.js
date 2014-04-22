@@ -3,14 +3,17 @@
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      'jquery.modal': 'lib/jquery.modal.min'
+      'jquery.modal': 'lib/jquery.modal.min',
+      'jquery.placeholder': 'lib/jquery.placeholder'
     },
     shim: {
-      'jquery.modal': ['jquery']
+      'jquery.modal': ['jquery'],
+      'jquery.placehoder': ['jquery']
     }
   });
 
-  require(['jquery', 'lib/modal', 'lib/backend'], function($, modal, backend) {
+  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder'], function($, modal, backend, placehoder) {
+    $('input, textarea').placeholder();
     $('#order-button').click(function(e) {
       e.preventDefault();
       return $(this).modal();
