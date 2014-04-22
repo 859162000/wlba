@@ -26,9 +26,8 @@ html
               - render_field form.identifier class+="input-large" placeholder="* 请输入邮箱或手机" title="* 请输入邮箱或手机"
               #{ form.identifier.errors }
             #validate-code-container.form-row(style="display:none")
-              - render_field form.validate_code class+="ispan5 table-cell clear-margin" placeholder="* 请输入验证码" autocomplete='off' title="* 请输入验证码"
-              .space-s
-              button#button-get-validate-code.button.button-red.button-mini(type='button') 获取
+              - render_field form.validate_code class+="ispan6 clear-margin" placeholder="* 请输入验证码" autocomplete='off' title="* 请输入验证码"
+              button.ispan4-omega#button-get-validate-code.button.button-red.button-mini(type='button') 获取
             .form-row
               - render_field form.password class+="input-large" placeholder="* 请输入密码" autocomplete='off' title="* 请输入密码"
               .password-strength-container

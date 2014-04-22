@@ -39,6 +39,7 @@ def production():
     env.debug = False
     env.production = True
 
+
 def staging():
     env.host_string = '192.168.1.12'
     env.path = '/var/deploy/wanglibao'
@@ -51,6 +52,7 @@ def staging():
 
     env.debug = False
     env.production = True
+
 
 def new_virtualenv():
     with cd(env.path):
@@ -107,7 +109,6 @@ def deploy():
         print green("Install git")
         sudo("apt-get install git")
 
-        # TODO check mysql
         print green("Install lxml dependency")
         sudo("apt-get -q -y install libxml2-dev libxslt1-dev")
 
@@ -118,11 +119,13 @@ def deploy():
         print green("Install mysql server")
         sudo("apt-get -q -y install mysql-server mysql-client")
 
+        # TODO setup database
+
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, create it')
             sudo("chmod 777 %s" % path)
             run("git clone %s" % env.depot)
-            sudo("chmod 777 %s" % env.depot)
+            sudo("chmod 777 %s" % env.depot_name)
         else:
             print green('Found depot, pull changes')
             with cd(env.depot_name):
