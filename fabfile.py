@@ -24,6 +24,7 @@ def testserver():
 
     env.debug = True
     env.production = False
+    env.mysql = True
 
 
 def production():
@@ -39,6 +40,8 @@ def production():
     env.debug = False
     env.production = True
 
+    env.mysql = False  # Use RDS, so we no need to install mysql
+
 
 def staging():
     env.host_string = '192.168.1.12'
@@ -52,6 +55,8 @@ def staging():
 
     env.debug = False
     env.production = True
+
+    env.mysql = True
 
 
 def new_virtualenv():
@@ -116,9 +121,13 @@ def deploy():
         sudo("apt-get -q -y install apache2 python-setuptools libapache2-mod-wsgi")
         sudo("a2dissite default")
 
-        print green("Install mysql server")
-        sudo("apt-get -q -y install mysql-server mysql-client")
+        print green("Setup mysql")
+        if env.mysql:
+            print yellow("Install mysql server")
+            sudo("apt-get -q -y install mysql-server ")
 
+        print green("Install mysql client")
+        sudo("apt-get -q -y install mysql-client")
         # TODO setup database
 
         if not exists(os.path.join(path, env.depot_name)):
