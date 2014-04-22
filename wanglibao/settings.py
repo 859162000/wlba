@@ -99,7 +99,10 @@ DATABASES = {
     },
 }
 
-if not PRODUCTION:
+# The deploy file will overwrite this based on flag local db
+LOCAL_MYSQL = not PRODUCTION
+
+if LOCAL_MYSQL:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'wanglibao',
