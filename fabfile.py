@@ -18,6 +18,7 @@ def testserver():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'ssh://192.168.56.1/~/developer/django/wanglibao/wanglibao'
     env.depot_name = 'wanglibao'
+    env.branch = "master"
 
     env.pip_install = "pip install --index-url http://pypi.douban.com/simple/ -r requirements.txt"
     env.pip_install_command = "pip install --index-url http://pypi.douban.com/simple/"
@@ -33,6 +34,7 @@ def production():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
+    env.branch = 'master'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -49,6 +51,7 @@ def staging():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
+    env.branch = 'logging'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -107,6 +110,8 @@ def deploy():
     sudo('mkdir -p %s' % path)
     sudo('mkdir -p /var/log/wanglibao/')
     sudo('chown -R www-data /var/log/wanglibao')
+    sudo('chgrp -R www-data /var/log/wanglibao')
+    sudo('chmod -R 770 /var/log/wanglibao')
     with cd(path):
 
         print green("check out the build")
@@ -135,11 +140,14 @@ def deploy():
             sudo("chmod 777 %s" % path)
             run("git clone %s" % env.depot)
             sudo("chmod 777 %s" % env.depot_name)
+            with cd(env.depot_name):
+                run("git checkout %s" % env.branch)
         else:
             print green('Found depot, pull changes')
             with cd(env.depot_name):
                 run('git reset --hard HEAD')
                 run("git pull")
+                run("git checkout %s" % env.branch)
 
         print green("Refresh apt")
         sudo("apt-get update")
@@ -159,6 +167,9 @@ def deploy():
                 if not env.debug:
                     print yellow('Replacing wanglibao/settings.py DEBUG')
                     run("fab config:'wanglibao/settings.py','DEBUG \= True','DEBUG \= False'")
+                if env.mysql:
+                    print red('Overwriting setting file to use local MYSQL')
+                    run("fab config:'wanglibao/settings.py','LOCAL_MYSQL \= not PRODUCTION','LOCAL_MYSQL \= True'")
 
                 print green('Collect static files')
                 run("python manage.py collectstatic --noinput")
