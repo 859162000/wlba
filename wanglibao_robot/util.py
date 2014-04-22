@@ -32,6 +32,9 @@ def parse_10k_float(str):
 
 
 def parse_percentage(str):
+    strs = str.replace(' ', '').split('-')
+    if len(strs) > 1:
+        return parse_float_with_unit(strs[-1], '%')
     return parse_float_with_unit(str, '%')
 
 

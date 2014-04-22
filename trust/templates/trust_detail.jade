@@ -94,7 +94,7 @@ body
             th(colspan="1") 收益说明
             td(colspan="2") {{ trust.earning_description | linebreaksbr }}
             th(colspan="1") 抵押率
-            td(colspan="1") {{ trust.mortgage_rate }}
+            td(colspan="1") {{ trust.mortgage_rate | percentage }}
 
           tr
             th(colspan="1") 抵押物
