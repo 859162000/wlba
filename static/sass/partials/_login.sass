@@ -17,8 +17,13 @@
 .container-login
   @extend .container
   width: 900px
-  background-color: white
   padding: 0
+  background-color: #f0f0f0
+  +clearfix
+
+.container-register
+  @extend .container-login
+  background-color: white
 
 .register-left-div
   padding: 25px 0
@@ -39,7 +44,6 @@
   color: $dark-gray
   background-color: #f0f0f0
   border-top: 3px solid #DA736E
-  height: 270px
 
   p
     padding: 3px 0
