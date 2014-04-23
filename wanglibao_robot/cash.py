@@ -88,7 +88,7 @@ def load_cash_from_file(filename, encoding="UTF-16", clean=False):
 
         si = ScrawlItem.objects.filter(type='cash', name=cash.name, issuer_name=cash.issuer.name)
         if si.exists():
-            cash.id = si.first().id
+            cash.id = si.first().item_id
             cash.save()
         else:
             cash.save()

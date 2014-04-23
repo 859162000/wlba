@@ -12,4 +12,4 @@ class ScrawlItem(models.Model):
     item_id = models.IntegerField(default=0, db_index=True)
 
     def __unicode__(self):
-        return u'type: %s issuer: %s name: %s' % (self.type, self.issuer_name, self.name)
+        return u'%d type: %s issuer: %s name: %s item id: %d' % (self.id, self.type, self.issuer_name, self.name, self.item_id)
