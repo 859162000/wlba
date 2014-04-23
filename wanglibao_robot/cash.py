@@ -62,6 +62,7 @@ def load_cash_from_file(filename, encoding="UTF-16", clean=False):
     if clean:
         print 'cleaning old data'
         Cash.objects.all().delete()
+        ScrawlItem.objects.filter(type="cash").delete()
         print 'cleaning done'
 
     items = load_items_from_file(filename, encoding=encoding)
@@ -81,11 +82,11 @@ def load_cash_from_file(filename, encoding="UTF-16", clean=False):
                 if hasattr(cash, field_name):
                     setattr(cash, field_name, v)
                 else:
-                    print "field: %s not exist on object" % (field_name,)
+                    print "field: %s not exist on object" % field_name
             else:
-                print 'Field %s not in mapping' % (k,)
+                print 'Field %s not in mapping' % k
 
-        si = ScrawlItem.objects.filter(name=cash.name, issuer_name=cash.issuer.name)
+        si = ScrawlItem.objects.filter(type='cash', name=cash.name, issuer_name=cash.issuer.name)
         if si.exists():
             cash.id = si.first().id
             cash.save()
@@ -96,6 +97,7 @@ def load_cash_from_file(filename, encoding="UTF-16", clean=False):
             si.issuer_name = cash.issuer.name
             si.last_updated = timezone.now()
             si.item_id = cash.id
+            si.type = 'cash'
             si.save()
 
         sys.stdout.write('.')
