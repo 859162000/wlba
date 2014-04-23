@@ -62,7 +62,7 @@ def get_info(uri, date, short_name):
     trust_name = get_td_by_th(ths, u'信托全称')
     if not trust_name:
         trust_name = short_name
-    trust_set = Trust.objects.filter(short_name=short_name, issuer__name=issuer_name)
+    trust_set = Trust.objects.filter(short_name=short_name, name=trust_name, issuer__name=issuer_name)
     if trust_set.exists():
         trust = trust_set.first()
         print "update " + trust_name
