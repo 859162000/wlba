@@ -65,3 +65,4 @@ def parse_str(str):
         return ''
     return str.replace('&#13;', ' ').replace('<br>', '\n').replace('<br />', '\n').replace('<br/>', '\n').\
         replace('<p>', ' ').replace('</p>', '\n').replace('\r\n', '\n')
+

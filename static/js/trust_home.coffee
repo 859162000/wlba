@@ -95,7 +95,10 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/
 
       ko.computed ()->
         backend.loadData 'trusts',
-          _.extend self.filters(), ordering: self.orderBy()
+          _.extend self.filters(), {
+            ordering: self.orderBy()
+            status: '在售'
+          }
         .done (trusts)->
             backend.joinFavorites trusts, 'trusts', self.filteredTable
         .fail ->
@@ -107,6 +110,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/
   backend.loadData 'trust',
     count: 10
     ordering: '-issue_date'
+    status: '在售'
   .done (trusts)->
       backend.joinFavorites(trusts, "trusts", model.trustTable)
 

@@ -60,21 +60,15 @@ def get_info(uri, date, short_name):
     trust.issuer = issuer
 
     trust_name = get_td_by_th(ths, u'信托全称')
-    trust_set = Trust.objects.filter(name=trust_name, issuer__name=issuer_name)
+    if not trust_name:
+        trust_name = short_name
+    trust_set = Trust.objects.filter(short_name=short_name, issuer__name=issuer_name)
     if trust_set.exists():
         trust = trust_set.first()
-
-    scrawl_item = ScrawlItem()
-    scrawl_set = ScrawlItem.objects.filter(name=trust_name, issuer_name=issuer_name, type='trust')
-    if scrawl_set.exists():
-        scrawl_item = scrawl_set.first()
-        print "update " + scrawl_item.name
-    else:
-        scrawl_item.name = trust_name
-        scrawl_item.issuer_name = issuer_name
-        scrawl_item.type = 'trust'
+        print "update " + trust_name
 
     trust.short_name = short_name
+    trust.name = trust_name
     trust.brief = get_td_by_th(ths, u'产品点评')
     trust.available_region = ''
     trust.scale = parse_10k_float(get_td_by_th(ths, u'预计发行规模'))
@@ -99,7 +93,16 @@ def get_info(uri, date, short_name):
 
     trust.save()
 
+    scrawl_item = ScrawlItem()
+    scrawl_set = ScrawlItem.objects.filter(name=trust_name, issuer_name=issuer_name, type='trust')
+    if scrawl_set.exists():
+        scrawl_item = scrawl_set.first()
+    else:
+        scrawl_item.name = trust_name
+        scrawl_item.issuer_name = issuer_name
+        scrawl_item.type = 'trust'
     scrawl_item.last_updated = timezone.now()
+    scrawl_item.source_url = uri
     scrawl_item.item_id = trust.id
     scrawl_item.save()
 
@@ -133,12 +136,7 @@ def run_robot(clean):
                 i += 1
                 time.sleep(1)
         except urllib2.URLError, e:
-            print "Error code: ", e.code
             print "Reason: ", e.reason
 
-    items = ScrawlItem.objects.filter(last_updated__lte=(timezone.now() - datetime.timedelta(weeks=2)), type='trust')
-    if items.exists():
-        for item in items:
-            print item.item_id
-            Trust.objects.get(pk=item.item_id).delete()
-            item.delete()
+    Trust.objects.filter(issue_date__lte=(timezone.now() - datetime.timedelta(weeks=8))).update(status=Trust.EXPIRED)
+    Trust.objects.filter(issue_date__isnull=True).update(status=Trust.EXPIRED)

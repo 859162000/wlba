@@ -193,5 +193,4 @@ def run_robot(clean=False, offset=0):
                     print 'Meet error again, ignore it'
 
     except urllib2.URLError, e:
-        print "Error code: ", e.code
         print "Reason: ", e.reason

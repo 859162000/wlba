@@ -15,6 +15,13 @@ define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table,
             text: (item)->
               '<a href="/financing/detail/' + item.id + '">' + item.short_name + '</a>'
           ,
+            name: '状态'
+            colspan: 1
+            sortable: true
+            field: 'status'
+            text: (item)->
+              item.status
+          ,
             name: '起购金额'
             colspan: 2
             sortable: true

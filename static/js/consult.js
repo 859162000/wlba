@@ -186,7 +186,7 @@
         The filtered products related stuff
          */
         self.trustTable = new trustTable.viewModel({
-          fields: ['名称', '资金门槛', '产品期限', '预期收益', '收藏', '详情']
+          fields: ['名称', '状态', '资金门槛', '产品期限', '预期收益', '收藏', '详情']
         });
         self.financingTable = new financingTable.viewModel({
           fields: ['名称', '起购金额', '管理期限', '预期收益', '收藏', '详情']

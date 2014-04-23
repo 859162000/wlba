@@ -13,6 +13,13 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             text: (item)->
               '<a href="/trust/detail/' + item.id + '">' + item.short_name + '</a>'
           ,
+            name: '状态'
+            colspan: 1
+            sortable: true
+            field: 'status'
+            text: (item)->
+              item.status
+          ,
             name: '资金门槛'
             colspan: 2
             sortable: true

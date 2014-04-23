@@ -196,6 +196,7 @@ require ['jquery',
       self.trustTable = new trustTable.viewModel {
         fields:[
           '名称'
+          '状态'
           '资金门槛'
           '产品期限'
           '预期收益'

@@ -117,6 +117,28 @@
               }
             ]
           }, {
+            name: '销售状态',
+            values: [
+              {
+                name: '不限',
+                values: null
+              }, {
+                name: '在售',
+                values: [
+                  {
+                    status: '在售'
+                  }
+                ]
+              }, {
+                name: '停售',
+                values: [
+                  {
+                    status: '停售'
+                  }
+                ]
+              }
+            ]
+          }, {
             name: '产品期限',
             param_name: 'period',
             values: [

@@ -16,12 +16,20 @@ class Bank(models.Model):
 
 
 class BankFinancing(models.Model):
+    ON_SALE = u'在售'
+    PRE_SALE = u'预售'
+    EXPIRED = u'停售'
+    PRODUCT_STATUS = (
+        (ON_SALE, ON_SALE),
+        (PRE_SALE, PRE_SALE),
+        (EXPIRED, EXPIRED)
+    )
     name = models.CharField(max_length=128, help_text=u'名字')
     short_name = models.CharField(max_length=32, help_text=u'短名字', blank=True)
     brief = models.TextField(blank=True, null=True, help_text=u'产品点评')
     expected_rate = models.FloatField(default=0, help_text=u'预期收益')
     period = models.IntegerField(default=0, help_text=u"产品管理期限 (天)")
-    status = models.CharField(max_length=8, default=u'在售', help_text=u'销售状态')
+    status = models.CharField(max_length=8, default=u'在售', help_text=u'销售状态', choices=PRODUCT_STATUS)
     bank = models.ForeignKey(Bank)
     issue_target = models.CharField(max_length=16, default=u'个人', help_text=u'发行对象')
     currency = models.CharField(default=u'人民币', max_length=32, help_text=u'货币币种')
