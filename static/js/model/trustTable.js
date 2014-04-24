@@ -22,7 +22,7 @@
               name: '名称',
               colspan: 3,
               text: function(item) {
-                return '<a href="/trust/detail/' + item.id + '">' + item.short_name + '</a>';
+                return '<a target="_blank" href="/trust/detail/' + item.id + '">' + item.short_name + '</a>';
               }
             }, {
               name: '状态',
@@ -95,7 +95,7 @@
               name: '详情',
               colspan: 1,
               text: function(item) {
-                return '<a class="button button-mini button-pink" href="/trust/detail/' + item.id + '">详情</a>';
+                return '<a target="_blank" class="button button-mini button-pink" href="/trust/detail/' + item.id + '">详情</a>';
               }
             }
           ]

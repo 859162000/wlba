@@ -22,6 +22,11 @@
           order: 'asc'
         });
         self.data = ko.observable();
+        self.isEmpty = ko.observable();
+        self.colspan = ko.observable();
+        self.colspan(_.reduce(self.columns, function(memo, column) {
+          return memo + column.colspan;
+        }, 0));
         self.events = {
           sortHandler: function(column, order) {
             var items;

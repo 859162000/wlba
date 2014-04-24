@@ -22,7 +22,7 @@
               name: '名称',
               colspan: 3,
               text: function(item) {
-                return '<a href="/cash/detail/' + item.id + '">' + item.name + '</a>';
+                return '<a target="_blank" href="/cash/detail/' + item.id + '">' + item.name + '</a>';
               }
             }, {
               name: '发行机构',
@@ -80,7 +80,7 @@
               name: '详情',
               colspan: 1,
               text: function(item) {
-                return '<a class="button button-mini button-pink" href="/cash/detail/' + item.id + '">详情</a>';
+                return '<a target="_blank" class="button button-mini button-pink" href="/cash/detail/' + item.id + '">详情</a>';
               }
             }
           ]

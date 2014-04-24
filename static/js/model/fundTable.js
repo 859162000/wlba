@@ -25,7 +25,7 @@
               sortable: true,
               field: 'name',
               text: function(item) {
-                return '<a href="/fund/detail/' + item.id + '">' + item.name + '</a>';
+                return '<a target="_blank" href="/fund/detail/' + item.id + '">' + item.name + '</a>';
               }
             }, {
               name: '基金类型',
@@ -89,7 +89,7 @@
               name: '详情',
               colspan: 1,
               text: function(item) {
-                return '<a class="button button-mini button-pink" href="/fund/detail/' + item.id + '">详情</a>';
+                return '<a target="_blank" class="button button-mini button-pink" href="/fund/detail/' + item.id + '">详情</a>';
               }
             }
           ]

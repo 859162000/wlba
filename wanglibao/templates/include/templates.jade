@@ -16,8 +16,13 @@ script(type="text/html", id="data-table")
         th(data-bind="attr:{colspan: colspan}, text: name")
         // /ko
 
-    tbody(data-bind="foreach: {data: data, as:'item'}")
+    // ko if: isEmpty
+    tbody
+      tr
+        td(data-bind="attr:{colspan: colspan}", style="font-size: 14px") 对不起,暂时没有符合条件的产品
+    // /ko
 
+    tbody(data-bind="foreach: {data: data, as:'item'}")
       tr(data-bind="foreach: $parent.columns")
         td(data-bind="attr:{colspan: colspan}, html: text(item, $parentContext.$index())")
 

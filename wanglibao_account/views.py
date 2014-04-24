@@ -97,7 +97,7 @@ class EmailSentView(TemplateView):
 
 @sensitive_post_parameters()
 @csrf_protect
-@login_required
+@login_required(login_url='/accounts/register/')
 def password_change(request,
                     post_change_redirect=None,
                     password_change_form=PasswordChangeForm,

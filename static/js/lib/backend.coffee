@@ -127,7 +127,7 @@ define ['jquery'], ($)->
         $(target).attr('data-is-favorited', '1')
       .fail (xhr)->
         if xhr.status == 403
-          window.location.href = '/accounts/login/?next=' + window.location.href
+          window.location.href = '/accounts/register/?next=' + window.location.href
         else if xhr.status == 409
           $(target).html('取消')
           $(target).addClass('button-no-border')
@@ -160,6 +160,7 @@ define ['jquery'], ($)->
         table.data data
       else
         table.data(products.results)
+      table.isEmpty table.data().length == 0
 
   loadFavorites = (type)->
     url = apiurl + 'favorite/' + type + '/'

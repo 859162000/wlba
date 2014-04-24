@@ -13,7 +13,7 @@ define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table,
             sortable: true
             field: 'short_name'
             text: (item)->
-              '<a href="/financing/detail/' + item.id + '">' + item.short_name + '</a>'
+              '<a target="_blank" href="/financing/detail/' + item.id + '">' + item.short_name + '</a>'
           ,
             name: '状态'
             colspan: 1
@@ -71,7 +71,7 @@ define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table,
             name: '详情'
             colspan: 1
             text: (item)->
-              '<a class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>'
+              '<a target="_blank" class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>'
           ]
 
       _.extend(context, defaultContext)

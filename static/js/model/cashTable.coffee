@@ -10,7 +10,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
         name: '名称'
         colspan: 3
         text: (item)->
-          '<a href="/cash/detail/' + item.id + '">' + item.name + '</a>'
+          '<a target="_blank" href="/cash/detail/' + item.id + '">' + item.name + '</a>'
       ,
         name: '发行机构'
         colspan: 2
@@ -61,7 +61,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
         name: '详情'
         colspan: 1
         text: (item)->
-          '<a class="button button-mini button-pink" href="/cash/detail/' + item.id + '">详情</a>'
+          '<a target="_blank" class="button button-mini button-pink" href="/cash/detail/' + item.id + '">详情</a>'
 
       ]
 

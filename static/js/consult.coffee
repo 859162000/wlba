@@ -116,7 +116,7 @@ require ['jquery',
           alert '投资方案已保存！预约理财热线：400-8588-066。'
         .fail (jqXHR, textStatus, errorThrown)->
           if jqXHR.status == 403
-            window.location.href = '/accounts/login/?next=' + window.location.href
+            window.location.href = '/accounts/register/?next=' + window.location.href
           else
             alert '保存投资方案失败'
 
