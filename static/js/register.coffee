@@ -14,32 +14,19 @@ require ['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquer
 
   $('input, textarea').placeholder()
 
-  checkEmail = (identifier) ->
-    re = undefined
-    re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    re.test identifier
-
   checkMobile = (identifier) ->
     re = undefined
     re = /^1\d{10}$/
     re.test identifier
 
   $("#id_identifier").keyup (e) ->
-    isEmail = undefined
     isMobile = undefined
     value = undefined
     value = $(this).val()
     isMobile = checkMobile(value)
-    isEmail = checkEmail(value)
     if isMobile
       $("#id_type").val "phone"
       $("#validate-code-container").show()
-    else if isEmail
-      $("#id_type").val "email"
-      $("#validate-code-container").hide()
-    else
-      $("#id_type").val "email"
-      $("#validate-code-container").hide()
 
   $("#id_identifier").keyup()
   $("#button-get-validate-code").click (e) ->

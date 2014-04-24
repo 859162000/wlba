@@ -15,14 +15,8 @@
   });
 
   require(['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquery.placeholder'], function($, validate, complexify, backend, placeholder) {
-    var checkEmail, checkMobile, container;
+    var checkMobile, container;
     $('input, textarea').placeholder();
-    checkEmail = function(identifier) {
-      var re;
-      re = void 0;
-      re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return re.test(identifier);
-    };
     checkMobile = function(identifier) {
       var re;
       re = void 0;
@@ -30,22 +24,14 @@
       return re.test(identifier);
     };
     $("#id_identifier").keyup(function(e) {
-      var isEmail, isMobile, value;
-      isEmail = void 0;
+      var isMobile, value;
       isMobile = void 0;
       value = void 0;
       value = $(this).val();
       isMobile = checkMobile(value);
-      isEmail = checkEmail(value);
       if (isMobile) {
         $("#id_type").val("phone");
         return $("#validate-code-container").show();
-      } else if (isEmail) {
-        $("#id_type").val("email");
-        return $("#validate-code-container").hide();
-      } else {
-        $("#id_type").val("email");
-        return $("#validate-code-container").hide();
       }
     });
     $("#id_identifier").keyup();
