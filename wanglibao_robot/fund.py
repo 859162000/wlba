@@ -150,10 +150,11 @@ def get_info(pq):
 
     si = ScrawlItem.objects.filter(type='fund', name=fund.name, issuer_name=fund.issuer.name)
     if si.exists():
-        fund.id = si.first().item_id
+        scrawl_item = si.first()
+        fund.id = scrawl_item.item_id
         fund.save()
-        si.first().last_updated = timezone.now()
-        si.first().save()
+        scrawl_item.last_updated = timezone.now()
+        scrawl_item.save()
 
         sys.stdout.write('u')
         sys.stdout.flush()
@@ -165,6 +166,7 @@ def get_info(pq):
         item.item_id = fund.id
         item.name = fund.name
         item.issuer_name = fund.issuer.name
+        item.last_updated = timezone.now()
         item.save()
 
         sys.stdout.write('.')
