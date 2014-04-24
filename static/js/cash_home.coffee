@@ -23,7 +23,6 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
 
       self.orderBy = ko.observable()
 
-
       self.pager = new pager.viewModel
 
       self.activeFilters = ko.observableArray()

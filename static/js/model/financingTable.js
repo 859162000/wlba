@@ -24,7 +24,7 @@
               sortable: true,
               field: 'short_name',
               text: function(item) {
-                return '<a href="/financing/detail/' + item.id + '">' + item.short_name + '</a>';
+                return '<a target="_blank" href="/financing/detail/' + item.id + '">' + item.short_name + '</a>';
               }
             }, {
               name: '状态',
@@ -89,7 +89,7 @@
               name: '详情',
               colspan: 1,
               text: function(item) {
-                return '<a class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>';
+                return '<a target="_blank" class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>';
               }
             }
           ]

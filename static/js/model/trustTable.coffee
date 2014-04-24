@@ -11,7 +11,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             name: '名称'
             colspan: 3
             text: (item)->
-              '<a href="/trust/detail/' + item.id + '">' + item.short_name + '</a>'
+              '<a target="_blank" href="/trust/detail/' + item.id + '">' + item.short_name + '</a>'
           ,
             name: '状态'
             colspan: 1
@@ -76,7 +76,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             name: '详情'
             colspan: 1
             text: (item)->
-              '<a class="button button-mini button-pink" href="/trust/detail/' + item.id + '">详情</a>'
+              '<a target="_blank" class="button button-mini button-pink" href="/trust/detail/' + item.id + '">详情</a>'
           ]
 
       _.extend(context, defaultContext)
