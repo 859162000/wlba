@@ -24,8 +24,7 @@ urlpatterns = patterns(
     url(r'^financing/products/', FinancingProductsView.as_view(), name="financing_products"),
     url(r'^financing/detail/(?P<id>\w+)', FinancingDetailView.as_view(), name="financing_detail"),
 
-    url(r'^fund/home/', FundHomeView.as_view(), name="fund_home"),
-    url(r'^fund/products/', TemplateView.as_view(template_name="fund_products.jade"), name="fund_products"),
+    url(r'^fund/home/', TemplateView.as_view(template_name="fund_products.jade"), name="fund_home"),
     url(r'^fund/detail/(?P<id>\w+)', FundDetailView.as_view(), name="fund_detail"),
 
     url(r'^cash/home/', CashHomeView.as_view(), name="cash_home"),
