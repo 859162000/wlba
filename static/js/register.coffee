@@ -64,14 +64,14 @@ require ['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquer
       intervalId = setInterval timerFunction, 1000
 
   # Add the validate rule function emailOrPhone
-  $.validator.addMethod "emailOrPhone", (value, element)->
-    return checkEmail(value) or checkMobile(value)
+  $.validator.addMethod "isMobile", (value, element)->
+    return checkMobile(value)
 
   $('#register-form').validate
     rules:
       identifier:
         required: true
-        emailOrPhone: true
+        isMobile: true
       password:
         required: true
         minlength: 6
@@ -85,7 +85,7 @@ require ['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquer
     messages:
       identifier:
         required: '不能为空'
-        emailOrPhone: '请输入邮箱或者手机号'
+        isMobile: '请输入手机号'
       password:
         required: '不能为空'
         minlength: $.format("密码需要最少{0}位")

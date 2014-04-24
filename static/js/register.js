@@ -66,14 +66,14 @@
         return intervalId = setInterval(timerFunction, 1000);
       }
     });
-    $.validator.addMethod("emailOrPhone", function(value, element) {
-      return checkEmail(value) || checkMobile(value);
+    $.validator.addMethod("isMobile", function(value, element) {
+      return checkMobile(value);
     });
     $('#register-form').validate({
       rules: {
         identifier: {
           required: true,
-          emailOrPhone: true
+          isMobile: true
         },
         password: {
           required: true,
@@ -92,7 +92,7 @@
       messages: {
         identifier: {
           required: '不能为空',
-          emailOrPhone: '请输入邮箱或者手机号'
+          isMobile: '请输入手机号'
         },
         password: {
           required: '不能为空',
