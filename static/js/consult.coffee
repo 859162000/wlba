@@ -185,7 +185,6 @@ require ['jquery',
             pieces: self.productTypes()
             events:
               click: (data)->
-                console.log 'set product type to' + data.productType
                 self.productsType data.productType
                 self.amount(self.asset() * data.percent / 100)
           )

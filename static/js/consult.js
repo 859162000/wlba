@@ -173,7 +173,6 @@
               pieces: self.productTypes(),
               events: {
                 click: function(data) {
-                  console.log('set product type to' + data.productType);
                   self.productsType(data.productType);
                   return self.amount(self.asset() * data.percent / 100);
                 }
