@@ -22,6 +22,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/cash', 'model
             self.orderBy(field)
 
       self.orderBy = ko.observable()
+      self.orderBy '-profit_rate_7days'
 
       self.pager = new pager.viewModel
 

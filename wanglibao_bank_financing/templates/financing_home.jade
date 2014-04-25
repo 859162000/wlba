@@ -39,8 +39,11 @@ body
               dd.profit-text {{financing.expected_rate | percentage}}
               .space-vertical-s
               .space-vertical-s.dashed-line
-              dt 点评:
-              dd.card-brief {{financing.brief}}
+              if financing.brief
+                dt 点评:
+                dd.card-brief {{financing.brief}}
+              else
+                dd.card-brief
         -endwith
 
   .panel-nopadding

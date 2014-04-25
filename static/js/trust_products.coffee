@@ -22,6 +22,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'mode
             self.orderBy(field)
 
       self.orderBy = ko.observable()
+      self.orderBy '-expected_earning_rate'
 
       ###
       Pager
