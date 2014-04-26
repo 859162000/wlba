@@ -107,10 +107,11 @@ def publish():
 def deploy():
     path = env.path
     scrawl_job_file = '/usr/bin/scrawl_job'
-    manage_py = os.join(env.path, env.depot_name, 'manage.py')
+    manage_py = os.path.join(env.path, env.depot_name, 'manage.py')
     log_file = '/var/log/wanglibao/scrawl.log'
 
     print red("Begin deploy: ")
+    sudo('touch log_file')
     sudo('mkdir -p %s' % path)
     sudo('mkdir -p /var/log/wanglibao/')
     sudo('chown -R www-data /var/log/wanglibao')
@@ -139,12 +140,15 @@ def deploy():
         sudo("apt-get -q -y install mysql-client")
         # TODO setup database
 
-        sudo('echo "%s" > %s' % env.activate, scrawl_job_file)
-        sudo('echo "python %s %s > %s">> %s' % manage_py, 'run_robot', log_file, scrawl_job_file)
-        sudo('echo "python %s %s >> %s">> %s' % manage_py, 'load_cash', log_file, scrawl_job_file)
-        sudo('echo "python %s %s >> %s">> %s' % manage_py, 'scrawl_fund', log_file, scrawl_job_file)
+        print green('add crontab')
+        sudo('echo "date > %s" > %s' % (log_file, scrawl_job_file))
+        sudo('echo %s >> %s' % (env.activate, scrawl_job_file))
+        sudo('echo "python %s %s >> %s">> %s' % (manage_py, 'run_robot', log_file, scrawl_job_file))
+        sudo('echo "python %s %s >> %s">> %s' % (manage_py, 'load_cash', log_file, scrawl_job_file))
+        sudo('echo "python %s %s >> %s">> %s' % (manage_py, 'scrawl_fund', log_file, scrawl_job_file))
+        sudo('echo "date >> %s" >> %s' % (log_file, scrawl_job_file))
         sudo('chmod +x %s' % scrawl_job_file)
-        sudo('echo 0 0 * * * %s > /tmp/scrawl_tab' % scrawl_job_file)
+        sudo('echo "0 0 * * * %s" > /tmp/scrawl_tab' % scrawl_job_file)
         sudo('crontab /tmp/scrawl_tab')
 
         if not exists(os.path.join(path, env.depot_name)):

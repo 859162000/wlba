@@ -38,12 +38,6 @@ body
               dt.profit-title 七日年化利率:
               dd.profit-text {{financing.expected_rate | percentage}}
               .space-vertical-s
-              .space-vertical-s.dashed-line
-              if financing.brief
-                dt 点评:
-                dd.card-brief {{financing.brief}}
-              else
-                dd.card-brief
         -endwith
 
   .panel-nopadding
