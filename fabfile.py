@@ -132,6 +132,7 @@ def deploy():
         sudo("a2dissite default")
         sudo("a2enmod ssl")
         sudo("a2enmod headers")
+        sudo("a2enmod rewrite")
 
         print green("Setup mysql")
         if env.mysql:
