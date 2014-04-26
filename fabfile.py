@@ -103,8 +103,12 @@ def publish():
     for file in files:
         local('osscmd.py put static/images/%s oss://wanglibao/images/%s' % (file, file))
 
+
 def deploy():
     path = env.path
+    scrawl_job_file = '/usr/bin/scrawl_job'
+    manage_py = os.join(env.path, env.depot_name, 'manage.py')
+    log_file = '/var/log/wanglibao/scrawl.log'
 
     print red("Begin deploy: ")
     sudo('mkdir -p %s' % path)
@@ -134,6 +138,14 @@ def deploy():
         print green("Install mysql client")
         sudo("apt-get -q -y install mysql-client")
         # TODO setup database
+
+        sudo('echo "%s" > %s' % env.activate, scrawl_job_file)
+        sudo('echo "python %s %s > %s">> %s' % manage_py, 'run_robot', log_file, scrawl_job_file)
+        sudo('echo "python %s %s >> %s">> %s' % manage_py, 'load_cash', log_file, scrawl_job_file)
+        sudo('echo "python %s %s >> %s">> %s' % manage_py, 'scrawl_fund', log_file, scrawl_job_file)
+        sudo('chmod +x %s' % scrawl_job_file)
+        sudo('echo 0 0 * * * %s > /tmp/scrawl_tab' % scrawl_job_file)
+        sudo('crontab /tmp/scrawl_tab')
 
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, create it')
