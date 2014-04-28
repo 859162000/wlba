@@ -27,7 +27,7 @@
           }
         });
         self.orderBy = ko.observable();
-        self.orderBy('-rate_7_days');
+        self.orderBy('-status,-rate_7_days');
 
         /*
         Pager

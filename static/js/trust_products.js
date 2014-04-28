@@ -32,7 +32,7 @@
           }
         });
         self.orderBy = ko.observable();
-        self.orderBy('-expected_earning_rate');
+        self.orderBy('-status,-expected_earning_rate');
 
         /*
         Pager
