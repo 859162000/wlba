@@ -62,6 +62,7 @@ INSTALLED_APPS = (
     'wanglibao_hotlist',
     'wanglibao_favorite',
     'wanglibao_robot',
+    'shumi_backend',
 
     'provider',
     'provider.oauth2',
