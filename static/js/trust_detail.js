@@ -41,11 +41,8 @@
       }
     });
     return $('#addToFavorite').click(function(e) {
-      var id, is_favorited;
       e.preventDefault();
-      id = $(e.target).attr('data-id');
-      is_favorited = $(e.target).attr('data-is-favorited');
-      return backend.addToFavorite(e, 'trusts', id, is_favorited);
+      return backend.addToFavorite(e.target, 'trusts');
     });
   });
 

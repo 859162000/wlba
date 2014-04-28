@@ -40,6 +40,4 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder'], ($, modal,
 
   $('#addToFavorite').click (e)->
     e.preventDefault()
-    id = $(e.target).attr('data-id')
-    is_favorited = $(e.target).attr('data-is-favorited')
-    backend.addToFavorite e, 'trusts', id, is_favorited
+    backend.addToFavorite e.target, 'trusts'

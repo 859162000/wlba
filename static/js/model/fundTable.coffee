@@ -21,17 +21,17 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
           field: 'type'
           text: (item)->item.type
         ,
-          name: '单位净值'
+          name: '基金状态'
           colspan: 2
           sortable: true
-          field: 'face_value'
-          text: (item)->item.face_value
+          field: 'type'
+          text: (item)->item.status
         ,
-          name: '日涨幅'
+          name: '七日年化利率'
           colspan: 2
           sortable: true
-          field: 'rate_today'
-          text: (item)->item.rate_today + '%'
+          field: 'rate_7_days'
+          text: (item)->item.rate_7_days+ '%'
         ,
           name: '近一月涨幅'
           colspan: 2
