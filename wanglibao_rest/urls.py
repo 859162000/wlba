@@ -5,6 +5,7 @@ from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_cash.views import CashViewSet, CashIssuerViewSet
 from wanglibao_favorite.views import FavoriteTrustViewSet, FavoriteFundViewSet, FavoriteFinancingViewSet, \
     FavoriteCashViewSet
+from wanglibao_feedback.views import FeedbackViewSet
 from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
 from wanglibao_hotlist.views import HotTrustViewSet, HotFinancingViewSet, HotFundViewSet
 from wanglibao_portfolio.views import PortfolioViewSet, UserPortfolioViewSet, ProductTypeViewSet
@@ -41,6 +42,8 @@ router.register(r'favorite/trusts', FavoriteTrustViewSet)
 router.register(r'favorite/funds', FavoriteFundViewSet)
 router.register(r'favorite/financings', FavoriteFinancingViewSet)
 router.register(r'favorite/cashes', FavoriteCashViewSet)
+
+router.register(r'feedbacks', FeedbackViewSet)
 
 urlpatterns = patterns(
     '',

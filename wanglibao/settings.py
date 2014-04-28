@@ -63,6 +63,7 @@ INSTALLED_APPS = (
     'wanglibao_favorite',
     'wanglibao_robot',
     'wanglibao_page',
+    'wanglibao_feedback',
 
     'provider',
     'provider.oauth2',
