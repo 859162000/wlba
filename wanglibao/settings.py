@@ -63,6 +63,7 @@ INSTALLED_APPS = (
     'wanglibao_favorite',
     'wanglibao_robot',
     'shumi_backend',
+    'wanglibao_page',
 
     'provider',
     'provider.oauth2',
@@ -71,6 +72,8 @@ INSTALLED_APPS = (
     'mathfilters',
 
     'raven.contrib.django.raven_compat',
+
+    'ckeditor',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -231,6 +234,9 @@ if PRODUCTION:
 
 # Default login redirect url
 LOGIN_REDIRECT_URL = '/'
+
+#ckeditor setting
+CKEDITOR_UPLOAD_PATH = "uploads/"
 
 # Sentry maven client configuration
 # Set your DSN value

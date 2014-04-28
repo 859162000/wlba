@@ -7,6 +7,7 @@ South==0.8.4
 alioss==0.22.4
 cssselect==0.9.1
 django-appconf==0.6
+django-ckeditor-updated==4.2.8
 django-filter==0.7
 django-imagekit==3.2
 django-mathfilters==0.2.1

@@ -21,9 +21,9 @@ body
         .panel-product-title
           .product-title.ispan11 {{ financing.name }}
           if is_favorited != 1
-            a#addToFavorite.button-mini.button-pink.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")收藏
+            a#addToFavorite.button-mini.button-white.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")收藏
           else
-            a#addToFavorite.button-mini.button-pink.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")取消
+            a#addToFavorite.button-mini.button-white.pull-right(href="#", data-id="{{financing.id}}", data-is-favorited="{{is_favorited}}")取消
 
       .row
         .span7

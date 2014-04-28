@@ -8,7 +8,7 @@
 
   require(['jquery', 'lib/backend', 'lib/calculator'], function($, backend) {
     return $('#addToFavorite').click(function(e) {
-      return backend.addToFavorite(e, 'financings');
+      return backend.addToFavorite(e.target, 'financings');
     });
   });
 

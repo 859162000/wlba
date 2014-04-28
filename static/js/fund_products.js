@@ -27,6 +27,7 @@
           }
         });
         self.orderBy = ko.observable();
+        self.orderBy('-rate_7_days');
 
         /*
         Pager
@@ -57,7 +58,7 @@
             name: '基金类型',
             values: filter.arrayToFilter(['混合型', '结构型', '债券型', '理财型', '指数型', '保本型', '封闭式', 'QDII', '股票型', '货币型'], 'type')
           }, {
-            name: '日涨幅',
+            name: '七日年化利率',
             values: [
               {
                 name: '不限',
@@ -66,30 +67,30 @@
                 name: '0%以下',
                 values: [
                   {
-                    'lt_rate_today': 0
+                    'lt_rate_7_days': 0
                   }
                 ]
               }, {
                 name: '0%-3%',
                 values: [
                   {
-                    lt_rate_today: 3,
-                    gte_rate_today: 0
+                    lt_rate_7_days: 3,
+                    gte_rate_7_days: 0
                   }
                 ]
               }, {
                 name: '3%-6%',
                 values: [
                   {
-                    lt_rate_today: 6,
-                    gte_rate_today: 3
+                    lt_rate_7_days: 6,
+                    gte_rate_7_days: 3
                   }
                 ]
               }, {
                 name: '6%以上',
                 values: [
                   {
-                    gte_rate_today: 6
+                    gte_rate_7_days: 6
                   }
                 ]
               }
