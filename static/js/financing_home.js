@@ -125,7 +125,8 @@
         ko.computed(function() {
           return backend.loadData('financings', _.extend({
             page_size: 10,
-            ordering: self.orderBy()
+            ordering: self.orderBy(),
+            status: '在售'
           }, self.filters())).done(function(data) {
             return backend.joinFavorites(data, 'financings', self.financingTable);
           });

@@ -8,7 +8,7 @@ body
   font-family: 'Microsoft Yahei', tahoma, arial, 'Hiragino Sans GB', '宋体'
   font-size: $font-xs
   line-height: 1.5
-  color: $black
+  color: #666
   background-color: $background-color
 
   min-width: 1104px
@@ -40,6 +40,11 @@ select
   line-height: 15px
   background-color: $white
   +inline-block()
+
+.seperator-gray-line
+  width: 100%
+  height: 1px
+  border-top: 1px #d3d3d3 solid
 
 .dashed-line
   height: 1px
@@ -177,15 +182,20 @@ input
 
 .title
   padding: .3em 0
-  font-size: $font-m
+  font-size: $font-xl
   text-align: center
 
 .sub-title
-  font-weight: bolder
-  font-size: 14px
-  margin: 1em 0
-  background: lightgray
-  padding: 1em
+  font-size: $font-m
+  color: $red
+  padding: 1em 0
+  margin-top: 1em
+
+.sub-sub-title
+  font-weight: bold
+  color: #333
+  font-size: $font-s
+  line-height: 2
 
 .release-time
   background: #ECECEC
@@ -196,8 +206,9 @@ input
   font-size: $font-s
 
 .para
-  text-indent: 2em
   font-size: $font-s
+  line-height: 2
+  text-align: justify
 
 .key-value
   dt
@@ -238,3 +249,21 @@ a.unstyled
   padding-top: 4px
   white-space: -moz-pre-wrap
   word-wrap: break-word
+
+.vertical-middle
+  vertical-align: middle
+
+.hiring-list
+  color: #739ABB
+  line-height: 2em
+  font-size: 14px
+
+  li:before
+    content: "\25C6"
+    font-size: 8px
+    vertical-align: middle
+    line-height: 14px
+    margin-right: 3em
+
+.lh-s
+  line-height: 1.5

@@ -8,7 +8,7 @@
   });
 
   require(['jquery', 'underscore'], function($, _) {
-    var anchors, banners, currentBanner;
+    var anchors, bannerCount, banners, currentBanner;
     $('ul.tabs').each(function() {
       var allAnchors, allTargets;
       allAnchors = $(this).find('a.tab-anchor');
@@ -53,11 +53,12 @@
     });
     currentBanner = 0;
     banners = $('*[class^="home-banner"]');
+    bannerCount = banners.length;
     anchors = $('.background-anchor');
     setInterval(function() {
       $(banners[currentBanner]).hide();
       $(anchors[currentBanner]).toggleClass('active');
-      currentBanner = (currentBanner + 1) % 3;
+      currentBanner = (currentBanner + 1) % bannerCount;
       $(banners[currentBanner]).fadeIn();
       return $(anchors[currentBanner]).toggleClass('active');
     }, 6000);

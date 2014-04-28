@@ -3,87 +3,108 @@
 import urllib2
 from pyquery import PyQuery
 from trust.models import Trust, Issuer
+from wanglibao_robot.models import ScrawlItem
 from wanglibao_robot.util import *
+from django.utils import timezone
 import time
+import datetime
+
+def get_td_by_th(ths, name):
+    th = ths.filter(lambda i: PyQuery(this).text() == name)
+    if len(th) > 0:
+        return th.eq(0).nextAll().eq(0).text()
+    return ''
+
+
+def get_earning_description(ths):
+    th = ths.filter(lambda i: PyQuery(this).text() == u'收益说明')
+    if len(th) > 0:
+        text = ''
+        tds = th.eq(0).nextAll().eq(0).find('td')
+        for td in tds:
+            text += PyQuery(td).text() + '\n'
+        return text
+    return ''
+
+
+def get_txt_by_h3(h3s, name):
+    h3 = h3s.filter(lambda i: PyQuery(this).text() == name)
+    if len(h3) > 0:
+        text = ''
+        ps = h3.parent().nextAll().find('li p')
+        if len(ps) == 0:
+            ps = h3.parent().nextAll().find('li .sub_con_bd')
+        for p in ps:
+            text += parse_str(PyQuery(p).html()) + '\n'
+        return text
+    return ''
 
 
 def get_info(uri, date, short_name):
     r = urllib2.urlopen(uri)
     html = r.read()
     tree = PyQuery(html)
+    ths = tree('tbody th')
 
-    issuer_name = parse_str(tree('tbody tr ').eq(0).find('td')[0].text)
+    issuer_name = get_td_by_th(ths, u'信托公司')
     issuer = Issuer()
     if not Issuer.objects.filter(name=issuer_name).exists():
         issuer.name = issuer_name
         issuer.short_name = issuer_name
         issuer.appear_on_market = True
-        issuer.business_range = ''
-        issuer.chairman_of_board = ''
-        issuer.english_name = ''
-        issuer.founded_at = parse_time('2013-4-1')
-        issuer.geo_region = ''
-        issuer.shareholder_background = ''
-        issuer.legal_presentative = ''
-        issuer.major_stockholder = ''
-        issuer.manager = ''
-        issuer.note = ''
-        issuer.registered_capital = 0
-        issuer.shareholders = ''
 
         issuer.save()
     else:
         issuer = Issuer.objects.get(name=issuer_name)
-
     trust = Trust()
     trust.issuer = issuer
 
-    name = tree('thead tr td')[0].text
-    trust.name = name
+    trust_name = get_td_by_th(ths, u'信托全称')
+    if not trust_name:
+        trust_name = short_name
+    trust_set = Trust.objects.filter(short_name=short_name, name=trust_name, issuer__name=issuer_name)
+    if trust_set.exists():
+        trust = trust_set.first()
+        print "update " + trust_name
+
     trust.short_name = short_name
-    trust.brief = ''
+    trust.name = trust_name
+    trust.brief = get_td_by_th(ths, u'产品点评')
     trust.available_region = ''
-    trust.scale = parse_10k_float(tree('tbody tr').eq(0).find('td')[1].text)
-    trust.period = parse_float_with_unit(tree('tbody tr').eq(1).find('td')[0].text, u'个月')
-    trust.expected_earning_rate = parse_percentage(tree('tbody tr').eq(1).find('td')[1].text)
-
-    trust.investment_threshold = parse_10k_float(tree('tbody tr ').eq(2).find('td')[0].text)
+    trust.scale = parse_10k_float(get_td_by_th(ths, u'预计发行规模'))
+    trust.period = parse_float_with_unit(get_td_by_th(ths, u'存续期'), u'个月')
+    trust.expected_earning_rate = parse_percentage(get_td_by_th(ths, u'预期年收益率'))
+    trust.investment_threshold = parse_10k_float(get_td_by_th(ths, u'最低认购金额'))
     trust.issue_date = parse_time(date)
-    trust.usage = tree('tbody tr').eq(3).find('td')[0].text
-    trust.type = tree('tbody tr').eq(3).find('td')[1].text
+    trust.usage = get_td_by_th(ths, u'投资行业')
+    trust.type = get_td_by_th(ths, u'信托类型')
+    trust.mortgage = get_td_by_th(ths, u'抵押物')
+    trust.mortgage_rate = parse_percentage(get_td_by_th(ths, u'抵押率'))
+    trust.product_description = get_td_by_th(ths, u'产品说明')
 
-    trs = tree('tbody tr')
-    earning_description = trs.filter(lambda i: PyQuery(this).find('th').text() == '收益说明')
-    rowspan = earning_description.eq(0).find('th').eq(0).attr('rowspan')
-    if rowspan is None:
-        rowspan = 1
-    else:
-        rowspan = int(rowspan)
-    rowspan -= 1
+    trust.earning_description = get_earning_description(ths)
 
-    earning_description_all = ''
-    for i in range(0, rowspan):
-        earning_description_tds = tree('tbody tr').eq(4 + i).find('td')
-        earning_description = parse_str(earning_description_tds[0].text)
-        if len(earning_description_tds) == 2:
-            earning_description += parse_str(earning_description_tds[1].text)
-        earning_description_all += earning_description.replace('\n', ' ') + '\n'
-    trust.earning_description = earning_description_all.strip('\n\r\t ')
-
-    trust.mortgage = parse_str(tree('tbody tr').eq(5 + rowspan).find('td')[0].text)
-    trust.mortgage_rate = parse_percentage(tree('tbody tr').eq(5 + rowspan).find('td')[1].text)
-
-    trust.note = parse_str(tree('tbody tr').eq(6 + rowspan).find('td')[0].text)
-    trust.usage_description = parse_str(tree('tbody tr').eq(7 + rowspan).find('td')[0].text)
-    trust.risk_management = parse_str(trs.filter(lambda i: PyQuery(this).find('th').text() == '风险控制').eq(0).find('td').eq(0).html())
-    trust.consignee = parse_str(trs.filter(lambda i: PyQuery(this).find('th').text() == '受托人').eq(0).find('td').eq(0).html())
+    h3s = tree('.item_hd h3')
+    trust.usage_description = get_txt_by_h3(h3s, u'资金用途')
+    trust.risk_management = get_txt_by_h3(h3s, u'风险控制')
+    trust.consignee = get_txt_by_h3(h3s, u'担保方')
     trust.payment = ''
-    trust.product_name = name
-    trust.product_description = tree('.fl .txttip a').attr('title')
-    trust.brief = trust.product_description
     trust.related_info = ''
 
     trust.save()
+
+    scrawl_item = ScrawlItem()
+    scrawl_set = ScrawlItem.objects.filter(name=trust_name, issuer_name=issuer_name, type='trust')
+    if scrawl_set.exists():
+        scrawl_item = scrawl_set.first()
+    else:
+        scrawl_item.name = trust_name
+        scrawl_item.issuer_name = issuer_name
+        scrawl_item.type = 'trust'
+    scrawl_item.last_updated = timezone.now()
+    scrawl_item.source_url = uri
+    scrawl_item.item_id = trust.id
+    scrawl_item.save()
 
 
 def run_robot(clean):
@@ -91,10 +112,16 @@ def run_robot(clean):
         for trust in Trust.objects.all():
             trust.delete()
 
+    r = urllib2.urlopen("http://www.jinfuzi.com/xintuo/xtlist-1-0-0-0-0-0-0-0-0-0-1")
+    html = r.read()
+    html = html.decode('utf-8')
+    tree = PyQuery(html)
+    pages = int(tree('#prdTotalCount').text())
+
     i = 1
-    for page in range(1, 678):
+    for page in range(1, pages):
         try:
-            r = urllib2.urlopen("http://www.jinfuzi.com/xintuo/xtlist-0-0-0-0-0-0-0-0-0-0-" +
+            r = urllib2.urlopen("http://www.jinfuzi.com/xintuo/xtlist-1-0-0-0-0-0-0-0-0-0-" +
                                 str(page))
             html = r.read()
             html = html.decode('utf-8')
@@ -109,6 +136,7 @@ def run_robot(clean):
                 i += 1
                 time.sleep(1)
         except urllib2.URLError, e:
-            print "Error code: ", e.code
             print "Reason: ", e.reason
 
+    Trust.objects.filter(issue_date__lte=(timezone.now() - datetime.timedelta(weeks=8))).update(status=Trust.EXPIRED)
+    Trust.objects.filter(issue_date__isnull=True).update(status=Trust.EXPIRED)

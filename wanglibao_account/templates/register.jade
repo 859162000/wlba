@@ -9,31 +9,28 @@ html
   body
     include include/login_nav
     .full-container-login
-      .container-login
-        .register-nav
-          ol
-            li.active 1 设置账户及密码
-            li 2 进入邮箱验证
-            li 3 恭喜！注册成功
-
+      .container-register
         .register-left-div
           form#register-form.login-form(method='post', action='/accounts/register/')
             - csrf_token
             .form-row
-              - render_field form.nickname class+="input-large" placeholder="* 昵称"
+              - render_field form.nickname class+="input-large" placeholder="* 昵称" title="* 昵称"
               #{ form.nickname.errors }
             .form-row
-              - render_field form.identifier class+="input-large" placeholder="* 请输入邮箱或手机"
+              - render_field form.identifier class+="input-large" placeholder="* 请输入手机号码" title="* 请输入邮箱或手机"
               #{ form.identifier.errors }
-            #validate-code-container.form-row(style="display:none")
-              - render_field form.validate_code class+="ispan5 table-cell clear-margin" placeholder="* 请输入验证码" autocomplete='off'
+            #validate-code-container.form-row
+              - render_field form.validate_code class+="ispan6 clear-margin" placeholder="* 请输入验证码" autocomplete='off' title="* 请输入验证码"
+              button.ispan4-omega#button-get-validate-code.button.button-red.button-mini(type='button') 获取
+            .form-row
+              - render_field form.password class+="input-large" placeholder="* 请输入密码" autocomplete='off' title="* 请输入密码"
+              .password-strength-container
+                span.password-strength-1 低
+                span.password-strength-2 中
+                span.password-strength-3 高
               #{ form.password.errors }
-              .space-s
-              button#button-get-validate-code.button.button-red.button-mini(type='button') 获取
             .form-row
-              - render_field form.password class+="input-large" placeholder="* 请输入密码" autocomplete='off'
-            .form-row
-              input.input-large(type="password", name="password2", placeholder="* 请确认密码", autocomplete='off')
+              input.input-large(type="password", name="password2", placeholder="* 请确认密码", autocomplete='off', title="* 请确认密码")
             .form-row.form-bottom-bar
               button#button-submit.button-red.button-middle.span12(type='submit') 注 册
         .register-right-div

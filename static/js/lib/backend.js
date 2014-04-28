@@ -129,12 +129,14 @@
           item: id
         }).done(function() {
           $(target).html('取消');
+          $(target).addClass('button-no-border');
           return $(target).attr('data-is-favorited', '1');
         }).fail(function(xhr) {
           if (xhr.status === 403) {
-            return window.location.href = '/accounts/login/?next=' + window.location.href;
+            return window.location.href = '/accounts/register/?next=' + window.location.href;
           } else if (xhr.status === 409) {
             $(target).html('取消');
+            $(target).addClass('button-no-border');
             return $(target).attr('data-is-favorited', '1');
           } else {
             return alert('收藏失败');
@@ -146,7 +148,8 @@
           type: 'DELETE'
         }).done(function() {
           $(target).html('收藏');
-          return $(target).attr('data-is-favorited', '0');
+          $(target).attr('data-is-favorited', '0');
+          return $(target).removeClass('button-no-border');
         }).fail(function() {
           return alert('取消收藏失败');
         });
@@ -173,10 +176,11 @@
         var data;
         if (transformer) {
           data = transformer(products);
-          return table.data(data);
+          table.data(data);
         } else {
-          return table.data(products.results);
+          table.data(products.results);
         }
+        return table.isEmpty(table.data().length === 0);
       });
     };
     loadFavorites = function(type) {

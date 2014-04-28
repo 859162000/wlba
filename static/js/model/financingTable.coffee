@@ -13,7 +13,14 @@ define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table,
             sortable: true
             field: 'short_name'
             text: (item)->
-              '<a href="/financing/detail/' + item.id + '">' + item.short_name + '</a>'
+              '<a target="_blank" href="/financing/detail/' + item.id + '">' + item.short_name + '</a>'
+          ,
+            name: '状态'
+            colspan: 1
+            sortable: true
+            field: 'status'
+            text: (item)->
+              item.status
           ,
             name: '起购金额'
             colspan: 2
@@ -54,17 +61,17 @@ define ['jquery', 'underscore', 'model/table', 'model/financing'], ($, _, table,
             name: '收藏'
             colspan: 1
             text: (item)->
-              link_text = '收藏'
               if item.is_favorited == 1
-                link_text = '取消'
-              '<a class="button button-mini button-white" onclick="addToFavorite(event,' + "'financings');" +
-                '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' +
-                link_text + '</a>'
+                '<a class="button button-mini button-white button-no-border" onclick="addToFavorite(event,' + "'financings');" +
+                  '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">取消</a>'
+              else
+                '<a class="button button-mini button-white" onclick="addToFavorite(event,' + "'financings');" +
+                  '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">收藏</a>'
           ,
             name: '详情'
             colspan: 1
             text: (item)->
-              '<a class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>'
+              '<a target="_blank" class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>'
           ]
 
       _.extend(context, defaultContext)

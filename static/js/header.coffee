@@ -25,11 +25,7 @@ require ['jquery', 'lib/backend', 'iealert'], ($, backend, iealert)->
   $('.header-button').click ()->
     period = $('.header-select')[0].value
     type = $('.header-select')[1].value
-    uri = '/' + type
-    if type == 'cash'
-      uri += '/home/'
-    else
-      uri += '/products/'
+    uri = '/' + type + '/products/'
     window.location.href= uri + '?period=' + period + '&asset=' + $('.header-asset-input')[0].value
 
   $('.header-input-base').keyup (e)->

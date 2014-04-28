@@ -55,5 +55,6 @@ require ['jquery', 'knockout', 'underscore', 'lib/backend', 'model/fundTable', '
         backend.loadFavorites(self.type())
         .done (data)->
             self.dataTable().transform_favorite(data)
+            self.dataTable().isEmpty data.results.length == 0
 
   ko.applyBindings(new viewModel())

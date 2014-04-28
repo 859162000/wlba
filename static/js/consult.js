@@ -16,27 +16,11 @@
   });
 
   require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/chart', 'lib/modal', 'purl', 'model/trustTable', 'model/financingTable', 'model/cashTable', 'model/fundTable', 'model/fund', 'model/emptyTable'], function($, _, ko, backend, chart, modal, purl, trustTable, financingTable, cashTable, fundTable, fund, emptyTable) {
-    var ViewModel, model;
+    var ViewModel, asset_param, model, period_param, risk_param;
     ViewModel = (function() {
-      function ViewModel() {
-        var asset_param, period_param, productTypeColorMapping, risk_param, self;
+      function ViewModel(asset_param, period_param, risk_param) {
+        var productTypeColorMapping, self;
         self = this;
-
-        /*
-        The user data: asset, risk, period
-         */
-        asset_param = parseInt($.url(document.location.href).param('asset'));
-        period_param = parseInt($.url(document.location.href).param('period'));
-        risk_param = parseInt($.url(document.location.href).param('risk'));
-        if (isNaN(asset_param) || asset_param <= 0) {
-          asset_param = 30;
-        }
-        if (isNaN(period_param) || period_param <= 0) {
-          period_param = 3;
-        }
-        if (isNaN(risk_param) || risk_param <= 0) {
-          risk_param = 1;
-        }
         self.asset = ko.observable(asset_param);
         self.riskScore = ko.observable(risk_param);
         self.period = ko.observable(period_param);
@@ -69,7 +53,7 @@
           }
           risk = self.questions[2].answer();
           if (risk) {
-            self.riskScore(risk.value.risk_score);
+            self.riskScore(risk);
           }
           return $.modal.close();
         };
@@ -88,33 +72,23 @@
             }
           }, {
             question: '风险承受能力',
-            answer: ko.observable(),
+            answer: ko.observable(self.riskScore()),
             options: [
               {
                 title: '不能承担任何风险',
-                value: {
-                  risk_score: 1
-                }
+                value: 1
               }, {
                 title: '可以承担极小的风险',
-                value: {
-                  risk_score: 2
-                }
+                value: 2
               }, {
                 title: '可以承担一定风险',
-                value: {
-                  risk_score: 3
-                }
+                value: 3
               }, {
                 title: '可以承担较大风险',
-                value: {
-                  risk_score: 4
-                }
+                value: 4
               }, {
                 title: '绝对追求高收益',
-                value: {
-                  risk_score: 5
-                }
+                value: 5
               }
             ]
           }
@@ -128,7 +102,7 @@
             return alert('投资方案已保存！预约理财热线：400-8588-066。');
           }).fail(function(jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 403) {
-              return window.location.href = '/accounts/login/?next=' + window.location.href;
+              return window.location.href = '/accounts/register/?next=' + window.location.href;
             } else {
               return alert('保存投资方案失败');
             }
@@ -199,7 +173,6 @@
               pieces: self.productTypes(),
               events: {
                 click: function(data) {
-                  console.log('set product type to' + data.productType);
                   self.productsType(data.productType);
                   return self.amount(self.asset() * data.percent / 100);
                 }
@@ -212,7 +185,7 @@
         The filtered products related stuff
          */
         self.trustTable = new trustTable.viewModel({
-          fields: ['名称', '资金门槛', '产品期限', '预期收益', '收藏', '详情']
+          fields: ['名称', '状态', '资金门槛', '产品期限', '预期收益', '收藏', '详情']
         });
         self.financingTable = new financingTable.viewModel({
           fields: ['名称', '起购金额', '管理期限', '预期收益', '收藏', '详情']
@@ -278,19 +251,39 @@
       return ViewModel;
 
     })();
-    model = new ViewModel();
-    ko.applyBindings(model);
-    $('#question-button').click(function(e) {
+    if (!$.url(document.location.href).param('asset')) {
+      backend.userProfile().done(function(data) {
+        var asset_param, model, period_param, risk_param;
+        asset_param = data.investment_asset;
+        period_param = data.investment_period;
+        risk_param = data.risk_level;
+        model = new ViewModel(asset_param, period_param, risk_param);
+        return ko.applyBindings(model);
+      }).fail(function() {
+        var model;
+        model = new ViewModel(30, 3, 1);
+        return ko.applyBindings(model);
+      });
+    } else {
+      asset_param = parseInt($.url(document.location.href).param('asset'));
+      period_param = parseInt($.url(document.location.href).param('period'));
+      risk_param = parseInt($.url(document.location.href).param('risk'));
+      if (isNaN(asset_param) || asset_param <= 0) {
+        asset_param = 30;
+      }
+      if (isNaN(period_param) || period_param <= 0) {
+        period_param = 3;
+      }
+      if (isNaN(risk_param) || risk_param <= 0) {
+        risk_param = 1;
+      }
+      model = new ViewModel(asset_param, period_param, risk_param);
+      ko.applyBindings(model);
+    }
+    return $('#question-button').click(function(e) {
       e.preventDefault();
       return $(this).modal();
     });
-    if (!$.url(document.location.href).param('asset')) {
-      return backend.userProfile().done(function(data) {
-        model.asset(data.investment_asset);
-        model.period(data.investment_period);
-        return model.riskScore(data.risk_level);
-      });
-    }
   });
 
 }).call(this);

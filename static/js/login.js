@@ -3,14 +3,17 @@
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      'jquery.validate': 'lib/jquery.validate.min'
+      'jquery.validate': 'lib/jquery.validate.min',
+      'jquery.placeholder': 'lib/jquery.placeholder'
     },
     shim: {
-      'jquery.validate': ['jquery']
+      'jquery.validate': ['jquery'],
+      'jquery.placehoder': ['jquery']
     }
   });
 
-  require(['jquery', 'jquery.validate', 'lib/backend'], function($, validate, backend) {
+  require(['jquery', 'jquery.validate', 'lib/backend', 'jquery.placeholder'], function($, validate, backend, placeholder) {
+    $('input, textarea').placeholder();
     $.validator.addMethod("emailOrPhone", function(value, element) {
       return backend.checkEmail(value) || backend.checkMobile(value);
     });

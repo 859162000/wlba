@@ -19,6 +19,12 @@ define ['jquery', 'underscore', 'knockout'], ($, _, ko)->
         order: 'asc'
 
       self.data = ko.observable()
+      self.isEmpty = ko.observable()
+      self.colspan = ko.observable()
+
+      self.colspan _.reduce(self.columns, (memo, column)->
+                      return memo + column.colspan
+                    ,0)
 
       self.events = {
         sortHandler: (column, order)->

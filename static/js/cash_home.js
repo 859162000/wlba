@@ -32,6 +32,7 @@
           }
         });
         self.orderBy = ko.observable();
+        self.orderBy('-profit_rate_7days');
         self.pager = new pager.viewModel;
         self.activeFilters = ko.observableArray();
         self.clickOnFilter = function(value, event) {

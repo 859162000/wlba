@@ -100,7 +100,10 @@ DATABASES = {
     },
 }
 
-if not PRODUCTION:
+# The deploy file will overwrite this based on flag local db
+LOCAL_MYSQL = not PRODUCTION
+
+if LOCAL_MYSQL:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'wanglibao',
@@ -235,5 +238,62 @@ RAVEN_CONFIG = {
     'dsn': 'https://efd164e25b604da7b2f38b88d0594ff5:4b1fb0cd10774161a51e33be79e88e84@app.getsentry.com/22349',
 }
 
+if not PRODUCTION:
+    RAVEN_CONFIG = {}
+
 import mimetypes
 mimetypes.add_type("text/x-component", ".htc")
+
+# Logger
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/mysite.log',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'wanglibao_sms': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        }
+    }
+}
+
+if PRODUCTION:
+    LOGGING['loggers']['django']['level'] = 'INFO'
+    LOGGING['loggers']['wanglibao_sms']['level'] = 'INFO'
+
+    # secure proxy SSL header and secure cookies
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # session expire at browser close
+    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+    # wsgi scheme
+    os.environ['wsgi.url_scheme'] = 'https'

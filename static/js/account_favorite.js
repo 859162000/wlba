@@ -60,7 +60,8 @@
         });
         ko.computed(function() {
           return backend.loadFavorites(self.type()).done(function(data) {
-            return self.dataTable().transform_favorite(data);
+            self.dataTable().transform_favorite(data);
+            return self.dataTable().isEmpty(data.results.length === 0);
           });
         });
       }

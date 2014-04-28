@@ -32,6 +32,7 @@
           }
         });
         self.orderBy = ko.observable();
+        self.orderBy('-expected_earning_rate');
 
         /*
         Pager
@@ -114,6 +115,28 @@
                   }
                 ],
                 range: '>300'
+              }
+            ]
+          }, {
+            name: '销售状态',
+            values: [
+              {
+                name: '不限',
+                values: null
+              }, {
+                name: '在售',
+                values: [
+                  {
+                    status: '在售'
+                  }
+                ]
+              }, {
+                name: '停售',
+                values: [
+                  {
+                    status: '停售'
+                  }
+                ]
               }
             ]
           }, {

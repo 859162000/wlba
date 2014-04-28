@@ -5,7 +5,7 @@ include include/head
 - endwith
 body
   include include/header
-  - with '现金类理财产品' as activeItem
+  - with '现金类理财' as activeItem
   include include/navigation
   - endwith
   .container
@@ -49,9 +49,6 @@ body
                   dd {{cash.period}}个月
                 else
                   dd 活期
-        .row.panel-footer
-          .well
-            p.pull-left 银行客服电话: {{cash.issuer.phone}}
 
     .span4-omega.panel-nopadding.panel-header
       .panel-product-title-bar

@@ -102,6 +102,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/
           _.extend {
             page_size: 10
             ordering: self.orderBy()
+            status: '在售'
           }, self.filters()
         .done (data)->
           backend.joinFavorites(data, 'financings', self.financingTable)

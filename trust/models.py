@@ -37,8 +37,18 @@ class Issuer(models.Model):
 
 
 class Trust (models.Model):
+    ON_SALE = u'在售'
+    PRE_SALE = u'预售'
+    EXPIRED = u'停售'
+    PRODUCT_STATUS = (
+        (ON_SALE, ON_SALE),
+        (PRE_SALE, PRE_SALE),
+        (EXPIRED, EXPIRED)
+    )
+
     name = models.TextField(verbose_name=u'信托名称')
     short_name = models.CharField(max_length=256, verbose_name=u'短名称')
+    status = models.CharField(max_length=10, verbose_name=u'销售状态', choices=PRODUCT_STATUS, default=ON_SALE, blank=True, null=True)
     expected_earning_rate = models.FloatField(verbose_name=u'预期收益')
     brief = models.TextField(blank=True, null=True, verbose_name=u'点评')
     issuer = models.ForeignKey(Issuer, verbose_name=u"发行机构")

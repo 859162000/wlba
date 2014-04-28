@@ -18,12 +18,14 @@ def testserver():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'ssh://192.168.56.1/~/developer/django/wanglibao/wanglibao'
     env.depot_name = 'wanglibao'
+    env.branch = "master"
 
     env.pip_install = "pip install --index-url http://pypi.douban.com/simple/ -r requirements.txt"
     env.pip_install_command = "pip install --index-url http://pypi.douban.com/simple/"
 
     env.debug = True
     env.production = False
+    env.mysql = True
 
 
 def production():
@@ -32,12 +34,16 @@ def production():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
+    env.branch = 'master'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
 
     env.debug = False
     env.production = True
+
+    env.mysql = False  # Use RDS, so we no need to install mysql
+
 
 def staging():
     env.host_string = '192.168.1.12'
@@ -45,12 +51,16 @@ def staging():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
+    env.branch = 'ssl'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
 
     env.debug = False
     env.production = True
+
+    env.mysql = True
+
 
 def new_virtualenv():
     with cd(env.path):
@@ -93,13 +103,20 @@ def publish():
     for file in files:
         local('osscmd.py put static/images/%s oss://wanglibao/images/%s' % (file, file))
 
+
 def deploy():
     path = env.path
+    scrawl_job_file = '/usr/bin/scrawl_job'
+    manage_py = os.path.join(env.path, env.depot_name, 'manage.py')
+    log_file = '/var/log/wanglibao/scrawl.log'
 
     print red("Begin deploy: ")
+    sudo('touch log_file')
     sudo('mkdir -p %s' % path)
     sudo('mkdir -p /var/log/wanglibao/')
     sudo('chown -R www-data /var/log/wanglibao')
+    sudo('chgrp -R www-data /var/log/wanglibao')
+    sudo('chmod -R 770 /var/log/wanglibao')
     with cd(path):
 
         print green("check out the build")
@@ -107,27 +124,49 @@ def deploy():
         print green("Install git")
         sudo("apt-get install git")
 
-        # TODO check mysql
         print green("Install lxml dependency")
         sudo("apt-get -q -y install libxml2-dev libxslt1-dev")
 
         print green("Install apache2 and wsgi mod")
         sudo("apt-get -q -y install apache2 python-setuptools libapache2-mod-wsgi")
         sudo("a2dissite default")
+        sudo("a2enmod ssl")
+        sudo("a2enmod headers")
+        sudo("a2enmod rewrite")
 
-        print green("Install mysql server")
-        sudo("apt-get -q -y install mysql-server mysql-client")
+        print green("Setup mysql")
+        if env.mysql:
+            print yellow("Install mysql server")
+            sudo("apt-get -q -y install mysql-server ")
+
+        print green("Install mysql client")
+        sudo("apt-get -q -y install mysql-client")
+        # TODO setup database
+
+        print green('add crontab')
+        sudo('echo "date > %s" > %s' % (log_file, scrawl_job_file))
+        sudo('echo %s >> %s' % (env.activate, scrawl_job_file))
+        sudo('echo "python %s %s >> %s">> %s' % (manage_py, 'run_robot', log_file, scrawl_job_file))
+        sudo('echo "python %s %s >> %s">> %s' % (manage_py, 'load_cash', log_file, scrawl_job_file))
+        sudo('echo "python %s %s >> %s">> %s' % (manage_py, 'scrawl_fund', log_file, scrawl_job_file))
+        sudo('echo "date >> %s" >> %s' % (log_file, scrawl_job_file))
+        sudo('chmod +x %s' % scrawl_job_file)
+        sudo('echo "0 0 * * * %s" > /tmp/scrawl_tab' % scrawl_job_file)
+        sudo('crontab /tmp/scrawl_tab')
 
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, create it')
             sudo("chmod 777 %s" % path)
             run("git clone %s" % env.depot)
-            sudo("chmod 777 %s" % env.depot)
+            sudo("chmod 777 %s" % env.depot_name)
+            with cd(env.depot_name):
+                run("git checkout %s" % env.branch)
         else:
             print green('Found depot, pull changes')
             with cd(env.depot_name):
                 run('git reset --hard HEAD')
                 run("git pull")
+                run("git checkout %s" % env.branch)
 
         print green("Refresh apt")
         sudo("apt-get update")
@@ -147,6 +186,9 @@ def deploy():
                 if not env.debug:
                     print yellow('Replacing wanglibao/settings.py DEBUG')
                     run("fab config:'wanglibao/settings.py','DEBUG \= True','DEBUG \= False'")
+                if env.mysql:
+                    print red('Overwriting setting file to use local MYSQL')
+                    run("fab config:'wanglibao/settings.py','LOCAL_MYSQL \= not PRODUCTION','LOCAL_MYSQL \= True'")
 
                 print green('Collect static files')
                 run("python manage.py collectstatic --noinput")

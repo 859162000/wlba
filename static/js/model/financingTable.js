@@ -24,7 +24,15 @@
               sortable: true,
               field: 'short_name',
               text: function(item) {
-                return '<a href="/financing/detail/' + item.id + '">' + item.short_name + '</a>';
+                return '<a target="_blank" href="/financing/detail/' + item.id + '">' + item.short_name + '</a>';
+              }
+            }, {
+              name: '状态',
+              colspan: 1,
+              sortable: true,
+              field: 'status',
+              text: function(item) {
+                return item.status;
               }
             }, {
               name: '起购金额',
@@ -71,18 +79,17 @@
               name: '收藏',
               colspan: 1,
               text: function(item) {
-                var link_text;
-                link_text = '收藏';
                 if (item.is_favorited === 1) {
-                  link_text = '取消';
+                  return '<a class="button button-mini button-white button-no-border" onclick="addToFavorite(event,' + "'financings');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">取消</a>';
+                } else {
+                  return '<a class="button button-mini button-white" onclick="addToFavorite(event,' + "'financings');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">收藏</a>';
                 }
-                return '<a class="button button-mini button-white" onclick="addToFavorite(event,' + "'financings');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
               }
             }, {
               name: '详情',
               colspan: 1,
               text: function(item) {
-                return '<a class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>';
+                return '<a target="_blank" class="button button-mini button-pink" href="/financing/detail/' + item.id + '">详情</a>';
               }
             }
           ]

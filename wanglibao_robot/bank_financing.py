@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import urllib2
+from django.utils import timezone
 from pyquery import PyQuery
 from wanglibao_bank_financing.models import BankFinancing, Bank
+from wanglibao_robot.models import ScrawlItem
 from wanglibao_robot.util import *
 import time
 
@@ -12,11 +14,6 @@ def get_info(uri, short_name):
     r = urllib2.urlopen("http://www.jinfuzi.com" + uri)
     html = r.read()
     tree = PyQuery(html)
-    bf.name = tree('.bankinfoname a').attr('title')
-    bf.short_name = short_name
-    bf.brief = ''
-    bf.expected_rate = parse_float(tree('.sidetoplist ul li:first p:last').text().strip('%'))
-    bf.period = parse_int(tree('.sidetoplist ul li:last p:last').text().strip(u'天'))
 
     bank_name = tree('tbody tr').eq(1).find('td')[0].text
     bank = Bank()
@@ -29,6 +26,19 @@ def get_info(uri, short_name):
     else:
         bank = Bank.objects.get(name=bank_name)
 
+    bf.name = tree('.bankinfoname a').attr('title')
+    if not bf.name:
+        bf.name = short_name
+
+    bf_set = BankFinancing.objects.filter(short_name=short_name, name=bf.name, bank__name=bank_name)
+    if bf_set.exists():
+        bf = bf_set.first()
+        print 'update ' + bf.name
+
+    bf.short_name = short_name
+    bf.brief = ''
+    bf.expected_rate = parse_float(tree('.sidetoplist ul li:first p:last').text().strip('%'))
+    bf.period = parse_int(tree('.sidetoplist ul li:last p:last').text().strip(u'天'))
     bf.issue_target = tree('tbody tr').eq(1).find('td')[1].text
     bf.currency = tree('tbody tr').eq(1).find('td')[2].text
     bf.investment_type = tree('tbody tr').eq(2).find('td')[0].text
@@ -65,9 +75,23 @@ def get_info(uri, short_name):
     bf.bank_pre_redeemable = tree('tbody tr').eq(14).find('td')[0].text
     bf.redeem_description = tree('tbody tr').eq(15).find('td')[0].text
     bf.risk_description = tree('tbody tr').eq(16).find('td')[0].text
+    bf.status = u'在售'
 
     bf.bank = bank
     bf.save()
+
+    scrawl_item = ScrawlItem()
+    scrawl_set = ScrawlItem.objects.filter(name=bf.name, issuer_name=bank_name, type='financing')
+    if scrawl_set.exists():
+        scrawl_item = scrawl_set.first()
+    else:
+        scrawl_item.name = bf.name
+        scrawl_item.issuer_name = bank_name
+        scrawl_item.type = 'financing'
+    scrawl_item.last_updated = timezone.now()
+    scrawl_item.source_url = uri
+    scrawl_item.item_id = bf.id
+    scrawl_item.save()
 
 
 def run_robot(clean):
@@ -75,8 +99,12 @@ def run_robot(clean):
         for financing in BankFinancing.objects.all():
             financing.delete()
 
+    r = urllib2.urlopen("http://www.jinfuzi.com/yinhang/list-2-0-0-0-0-0-0-0-0-0-0-0-0-0-0-1")
+    html = r.read()
+    tree = PyQuery(html)
+    pages = int(tree('.tb-tabbar-wrap .tb-support-dropdown span').eq(0).text().split('/')[1])
     i = 1
-    for page in range(1, 42):
+    for page in range(1, pages):
         try:
             r = urllib2.urlopen("http://www.jinfuzi.com/yinhang/list-2-0-0-0-0-0-0-0-0-0-0-0-0-0-0-" +
                                 str(page) + ".html")
@@ -91,5 +119,6 @@ def run_robot(clean):
                 i += 1
                 time.sleep(0.5)
         except urllib2.URLError, e:
-            print "Error code: ", e.code
             print "Reason: ", e.reason
+
+    BankFinancing.objects.filter(issue_end_date__lt=timezone.now()).update(status=u'停售')

@@ -2,9 +2,12 @@
 
 doctype html
 html
-  - with '网利宝首页' as title
-  include include/head
-  - endwith
+  head
+    - with '网利金融-网利宝' as title
+    include include/common_head
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
 
   body
     include include/header
@@ -14,13 +17,10 @@ html
 
     .full-container-home
       .home-banner-1
-      .home-banner-2
       .home-banner-3
       ul.background-anchors
         li
           a.background-anchor.active(href="#") x
-        li
-          a.background-anchor(href="#") x
         li
           a.background-anchor(href="#") x
       .container-home
@@ -34,13 +34,13 @@ html
                 td 投资金额：
                 td
                   .portfolio-td-last
-                    input.portfolio-input#portfolio-asset(type='text' placeholder='30')
+                    input.portfolio-input#portfolio-asset(type='text' value='30')
                     span 万元
               tr
                 td 投资期限：
                 td
                   .portfolio-td-last
-                    input.portfolio-input#portfolio-period(type='text' placeholder='3')
+                    input.portfolio-input#portfolio-period(type='text' value='3')
                     span 个月
               tr
                 td 风险承受能力：
@@ -80,8 +80,7 @@ html
               p.card-title 高收益精选
               .space-vertical-s
               img.card-annotation(src="/static/images/on-sale.png")
-              img.bank-logo(src="/media/{{trust.issuer.logo}}")
-              span.bank-name {{trust.short_name}}
+              span.trust-name {{trust.short_name}}
             .card-detail-box
               dt 产品期限:
               dd.orange-text {{trust.period | month}}
@@ -89,8 +88,11 @@ html
               dd.profit-text {{trust.expected_earning_rate | percentage}}
               .space-vertical-s
               .space-vertical-s.dashed-line
-              dt 点评:
-              dd.card-brief {{trust.brief}}
+              if trust.brief
+                dt 点评:
+                dd.card-brief {{trust.brief}}
+              else
+                dd.card-brief
         -endwith
       .check-more
         a.button-round-mini.button-red(href="/trust/products") 查看更多
@@ -115,11 +117,7 @@ html
               else
                 dt.profit-title 当日涨幅:
                 dd.profit-text {{fund.rate_today | percentage}}
-
               .space-vertical-s
-              .space-vertical-s.dashed-line
-              dt 点评:
-              dd.card-brief {{fund.brief}}
         -endwith
       .check-more
         a.button-round-mini.button-red(href="/fund/products") 查看更多
@@ -141,15 +139,12 @@ html
               dt.profit-title 七日年化利率:
               dd.profit-text {{financing.expected_rate | percentage}}
               .space-vertical-s
-              .space-vertical-s.dashed-line
-              dt 点评:
-              dd.card-brief {{financing.brief}}
         -endwith
       .check-more
         a.button-round-mini.button-red(href="/financing/products") 查看更多
 
     .row
-      img(src="http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/banner0.jpg", style="margin:0 auto; display: block")
+      img(src="http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/banner0.jpg", style="margin:0 auto; display: block", alt="网利宝 网上银行")
 
     - with 1 as no_margin
     include include/footer

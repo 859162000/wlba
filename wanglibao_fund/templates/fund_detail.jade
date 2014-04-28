@@ -9,13 +9,6 @@ body
   - with '基金产品' as activeItem
   include include/navigation
   - endwith
-  .sub-navbar
-    .sub-navbar--list
-      ul
-        li.sub-navbar--list-item
-          a.sub-navbar--anchor(href="{%url 'fund_home'%}") 基金首页
-        li.sub-navbar--list-item
-          a.sub-navbar--anchor.active(href="{% url 'fund_products' %}") 基金产品
   .container
     .span8.panel-nopadding.panel-header
       .panel-product-title-bar

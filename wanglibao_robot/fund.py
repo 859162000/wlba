@@ -2,10 +2,14 @@
 import re
 
 import urllib2
+from datetime import timedelta
 from pyquery import PyQuery
-from wanglibao_fund.models import Fund, FundIssuer
-from wanglibao_robot.util import *
 import time
+from wanglibao_fund.models import Fund, FundIssuer
+from wanglibao_robot.models import ScrawlItem
+from wanglibao_robot.util import *
+from django.utils import timezone
+import sys
 
 
 def get_keyvalues_table(pq):
@@ -144,8 +148,30 @@ def get_info(pq):
     else:
         fund.issuer = FundIssuer.objects.get(name=issuer_name)
 
-    fund.brief = ''
-    fund.save()
+    si = ScrawlItem.objects.filter(type='fund', name=fund.name, issuer_name=fund.issuer.name)
+    if si.exists():
+        scrawl_item = si.first()
+        fund.id = scrawl_item.item_id
+        fund.save()
+        scrawl_item.last_updated = timezone.now()
+        scrawl_item.save()
+
+        sys.stdout.write('u')
+        sys.stdout.flush()
+    else:
+        fund.brief = ''
+        fund.save()
+        item = ScrawlItem()
+        item.type = 'fund'
+        item.item_id = fund.id
+        item.name = fund.name
+        item.issuer_name = fund.issuer.name
+        item.last_updated = timezone.now()
+        item.save()
+
+        sys.stdout.write('.')
+        sys.stdout.flush()
+
     return fund
 
 
@@ -192,6 +218,10 @@ def run_robot(clean=False, offset=0):
                 except:
                     print 'Meet error again, ignore it'
 
+        for si in ScrawlItem.objects.filter(last_updated__lt=timezone.now() - timedelta(weeks=2), type='fund'):
+            f = Fund.objects.get(id=si.item_id)
+            f.status = u'停售'
+            f.save()
+
     except urllib2.URLError, e:
-        print "Error code: ", e.code
         print "Reason: ", e.reason

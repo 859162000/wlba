@@ -1,7 +1,9 @@
 import codecs
 import sys
+from django.utils import timezone
 import requests
 from wanglibao_cash.models import Cash, CashIssuer
+from wanglibao_robot.models import ScrawlItem
 from wanglibao_robot.util import parse_percent
 
 
@@ -60,6 +62,7 @@ def load_cash_from_file(filename, encoding="UTF-16", clean=False):
     if clean:
         print 'cleaning old data'
         Cash.objects.all().delete()
+        ScrawlItem.objects.filter(type="cash").delete()
         print 'cleaning done'
 
     items = load_items_from_file(filename, encoding=encoding)
@@ -79,11 +82,24 @@ def load_cash_from_file(filename, encoding="UTF-16", clean=False):
                 if hasattr(cash, field_name):
                     setattr(cash, field_name, v)
                 else:
-                    print "field: %s not exist on object" % (field_name,)
+                    print "field: %s not exist on object" % field_name
             else:
-                print 'Field %s not in mapping' % (k,)
+                print 'Field %s not in mapping' % k
 
-        cash.save()
+        si = ScrawlItem.objects.filter(type='cash', name=cash.name, issuer_name=cash.issuer.name)
+        if si.exists():
+            cash.id = si.first().item_id
+            cash.save()
+        else:
+            cash.save()
+            si = ScrawlItem()
+            si.name = cash.name
+            si.issuer_name = cash.issuer.name
+            si.last_updated = timezone.now()
+            si.item_id = cash.id
+            si.type = 'cash'
+            si.save()
+
         sys.stdout.write('.')
         results.append(cash)
 
@@ -91,8 +107,9 @@ def load_cash_from_file(filename, encoding="UTF-16", clean=False):
 
 
 def scrawl_cash():
+    date_string = str(timezone.datetime.today()).split(' ')[0]
     response = requests.post('http://stock.finance.sina.com.cn/box/api/openapi.php/MoneyFinanceFundInfoService.getProfit',
-                             data={'start': '2014-04-08', 'end': '2014-04-08'})
+                             data={'start': date_string, 'end': date_string})
 
     results = []
     for item in response.json()['result']['data']:

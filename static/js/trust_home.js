@@ -122,7 +122,8 @@
         });
         ko.computed(function() {
           return backend.loadData('trusts', _.extend(self.filters(), {
-            ordering: self.orderBy()
+            ordering: self.orderBy(),
+            status: '在售'
           })).done(function(trusts) {
             return backend.joinFavorites(trusts, 'trusts', self.filteredTable);
           }).fail(function() {
@@ -138,7 +139,8 @@
     ko.applyBindings(model);
     return backend.loadData('trust', {
       count: 10,
-      ordering: '-issue_date'
+      ordering: '-issue_date',
+      status: '在售'
     }).done(function(trusts) {
       return backend.joinFavorites(trusts, "trusts", model.trustTable);
     });

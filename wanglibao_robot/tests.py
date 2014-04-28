@@ -41,7 +41,19 @@ class FundRobotTest(TestCase):
         cashes = load_cash_from_file(filename, encoding="UTF-16")
         self.assertEqual(len(cashes), item_count)
 
+        cashes = load_cash_from_file(filename, encoding="UTF-16")
+        self.assertEqual(len(cashes), item_count)
+
         cashes = scrawl_cash()
         print cashes
         self.assertTrue(len(cashes) > 0)
+
+    def test_cash_load_idem(self):
+        filename = 'fixture/cash_data.txt'
+        load_cash_from_file(filename, encoding="UTF-16")
+        scrawl_cash()
+
+        load_cash_from_file(filename, encoding="UTF-16")
+        scrawl_cash()
+
 

@@ -22,7 +22,7 @@
               name: '名称',
               colspan: 3,
               text: function(item) {
-                return '<a href="/cash/detail/' + item.id + '">' + item.name + '</a>';
+                return '<a target="_blank" href="/cash/detail/' + item.id + '">' + item.name + '</a>';
               }
             }, {
               name: '发行机构',
@@ -70,18 +70,17 @@
               name: '收藏',
               colspan: 1,
               text: function(item) {
-                var link_text;
-                link_text = '收藏';
                 if (item.is_favorited === 1) {
-                  link_text = '取消';
+                  return '<a class="button button-mini button-white button-no-border" onclick="addToFavorite(event,' + "'cashes');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">取消</a>';
+                } else {
+                  return '<a class="button button-mini button-white" onclick="addToFavorite(event,' + "'cashes');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">收藏</a>';
                 }
-                return '<a class="button button-mini button-white" onclick="addToFavorite(event,' + "'cashes');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">' + link_text + '</a>';
               }
             }, {
               name: '详情',
               colspan: 1,
               text: function(item) {
-                return '<a class="button button-mini button-pink" href="/cash/detail/' + item.id + '">详情</a>';
+                return '<a target="_blank" class="button button-mini button-pink" href="/cash/detail/' + item.id + '">详情</a>';
               }
             }
           ]

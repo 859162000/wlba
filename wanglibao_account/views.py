@@ -97,7 +97,7 @@ class EmailSentView(TemplateView):
 
 @sensitive_post_parameters()
 @csrf_protect
-@login_required
+@login_required(login_url='/accounts/register/')
 def password_change(request,
                     post_change_redirect=None,
                     password_change_form=PasswordChangeForm,
@@ -172,11 +172,13 @@ def send_validation_mail(request, **kwargs):
     user_email = get_user_model().objects.get(pk=user_id).email
 
     form = PasswordResetForm(data={
-        'email': user_email
-    })
+                'email': user_email
+            })
 
     if form.is_valid():
-        form.save(request=request)
+        form.save(request=request,
+             subject_template_name='registration/password_reset_subject.txt',
+             email_template_name='password_reset_email.html')
         return HttpResponse(u'验证邮件已发送，请您登录邮箱完成验证')
     else:
         return HttpResponse(u'没有有效的邮箱地址', status=500)
