@@ -4,4 +4,4 @@ require.config
 
 require ['jquery', 'lib/backend', 'lib/calculator'], ($, backend)->
   $('#addToFavorite').click (e)->
-    backend.addToFavorite e, 'financings'
+    backend.addToFavorite e.target, 'financings'

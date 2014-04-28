@@ -25,9 +25,9 @@ body
         #product_name.panel-product-title
           .product-title.ispan11 {{ trust.short_name }}
           if is_favorited != 1
-            a#addToFavorite.button.button-pink.button-mini.pull-right(href="#", data-id="{{trust.id}}", data-is-favorited="{{is_favorited}}") 收藏
+            a#addToFavorite.button.button-white.button-mini.pull-right(href="#", data-id="{{trust.id}}", data-is-favorited="{{is_favorited}}") 收藏
           else
-            a#addToFavorite.button.button-pink.button-mini.pull-right(href="#", data-id="{{trust.id}}", data-is-favorited="{{is_favorited}}") 取消收藏
+            a#addToFavorite.button.button-white.button-mini.pull-right(href="#", data-id="{{trust.id}}", data-is-favorited="{{is_favorited}}") 取消
 
       .panel-inner
         .row

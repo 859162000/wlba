@@ -15,9 +15,9 @@ body
         .panel-product-title
           .product-title.ispan11 {{ fund.name }}
           if is_favorited != 1
-            a#addToFavorite.button.button-mini.button-pink.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")收藏
+            a#addToFavorite.button.button-mini.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")收藏
           else
-            a#addToFavorite.button.button-mini.button-pink.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")取消收藏
+            a#addToFavorite.button.button-mini.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")取消
       .row
         .span6
           .well
@@ -44,7 +44,7 @@ body
             .card-icon
               dl
                 if fund.rate_7_days
-                  dt 7日年化收益
+                  dt 七日年化收益
                   dd.highlight {{fund.rate_7_days | percentage}}
                 else
                   dt 当日涨幅
@@ -93,7 +93,16 @@ body
           td {{fund.init_scale | na_if_none}}
           th 最新规模
           td {{fund.latest_scale | na_if_none}}
-
+        tr
+          th 近一月涨幅
+          td {{fund.rate_1_month | percentage}}
+          th 近三月涨幅
+          td {{fund.rate_3_months| percentage}}
+        tr
+          th 近半年涨幅
+          td {{fund.rate_6_months | percentage}}
+          th 近一年涨幅
+          td {{fund.rate_1_year | percentage}}
   .panel-nopadding
     .panel-product-title-bar
       .panel-product-title 投资目标

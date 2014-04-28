@@ -144,11 +144,12 @@ def deploy():
         # TODO setup database
 
         print green('add crontab')
+        sudo('echo "#!/bin/bash" > %s' % scrawl_job_file)
+        sudo('echo %s &>> %s' % (env.activate, scrawl_job_file))
         sudo('echo "date > %s" > %s' % (log_file, scrawl_job_file))
-        sudo('echo %s >> %s' % (env.activate, scrawl_job_file))
-        sudo('echo "python %s %s >> %s">> %s' % (manage_py, 'run_robot', log_file, scrawl_job_file))
-        sudo('echo "python %s %s >> %s">> %s' % (manage_py, 'load_cash', log_file, scrawl_job_file))
-        sudo('echo "python %s %s >> %s">> %s' % (manage_py, 'scrawl_fund', log_file, scrawl_job_file))
+        sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'run_robot', log_file, scrawl_job_file))
+        sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'load_cash', log_file, scrawl_job_file))
+        sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'scrawl_fund', log_file, scrawl_job_file))
         sudo('echo "date >> %s" >> %s' % (log_file, scrawl_job_file))
         sudo('chmod +x %s' % scrawl_job_file)
         sudo('echo "0 0 * * * %s" > /tmp/scrawl_tab' % scrawl_job_file)

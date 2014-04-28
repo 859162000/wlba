@@ -4,6 +4,7 @@ import urllib2
 from django.utils import timezone
 from pyquery import PyQuery
 from wanglibao_bank_financing.models import BankFinancing, Bank
+from wanglibao_hotlist.models import HotFinancing
 from wanglibao_robot.models import ScrawlItem
 from wanglibao_robot.util import *
 import time
@@ -122,3 +123,10 @@ def run_robot(clean):
             print "Reason: ", e.reason
 
     BankFinancing.objects.filter(issue_end_date__lt=timezone.now()).update(status=u'停售')
+    HotFinancing.objects.all().delete()
+    hot_list = BankFinancing.objects.filter(status=u'在售').order_by('-expected_rate')[:4]
+    for item in hot_list:
+        hf = HotFinancing()
+        hf.bank_financing = item
+        hf.hot_score = time.time()
+        hf.save()

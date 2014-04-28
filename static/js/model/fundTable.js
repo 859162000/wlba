@@ -36,20 +36,20 @@
                 return item.type;
               }
             }, {
-              name: '单位净值',
+              name: '基金状态',
               colspan: 2,
               sortable: true,
-              field: 'face_value',
+              field: 'type',
               text: function(item) {
-                return item.face_value;
+                return item.status;
               }
             }, {
-              name: '日涨幅',
+              name: '七日年化利率',
               colspan: 2,
               sortable: true,
-              field: 'rate_today',
+              field: 'rate_7_days',
               text: function(item) {
-                return item.rate_today + '%';
+                return item.rate_7_days + '%';
               }
             }, {
               name: '近一月涨幅',

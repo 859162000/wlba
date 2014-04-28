@@ -97,6 +97,28 @@ html
       .check-more
         a.button-round-mini.button-red(href="/trust/products") 查看更多
 
+    .container-hidden#financing-products
+      each hot_financing in hot_financings
+        -with hot_financing.bank_financing as financing
+        a(href='/financing/detail/{{financing.id}}')
+          .card
+            .card-top-container
+              p.card-title 高收益精选
+              .space-vertical-s
+              img.card-annotation(src="/static/images/on-sale.png")
+              span.trust-name {{financing.short_name}}
+            .card-detail-box
+              dt 产品期限:
+              dd.orange-text {{financing.period | day}}
+              dt 发行银行:
+              dd.orange-text {{financing.bank.name}}
+              dt.profit-title 预期收益:
+              dd.profit-text {{financing.expected_rate | percentage}}
+              .space-vertical-s
+        -endwith
+      .check-more
+        a.button-round-mini.button-red(href="/financing/products") 查看更多
+
     .container-hidden#fund-products
       each hot_fund in hot_funds
         -with hot_fund.fund as fund
@@ -106,11 +128,12 @@ html
               p.card-title 高收益精选
               .space-vertical-s
               img.card-annotation(src="/static/images/on-sale.png")
-              img.bank-logo(src="/media/{{fund.issuer.logo}}")
-              span.bank-name {{fund.name}}
+              span.trust-name {{fund.name}}
             .card-detail-box
               dt 基金公司:
               dd {{fund.issuer.name}}
+              dt 基金类型:
+              dd {{fund.type}}
               if fund.rate_7_days
                 dt.profit-title 七日年化利率:
                 dd.profit-text {{fund.rate_7_days | percentage}}
@@ -121,27 +144,6 @@ html
         -endwith
       .check-more
         a.button-round-mini.button-red(href="/fund/products") 查看更多
-
-    .container-hidden#financing-products
-      each hot_financing in hot_financings
-        -with hot_financing.bank_financing as financing
-        a(href='/financing/detail/{{financing.id}}')
-          .card
-            .card-top-container
-              p.card-title 高收益精选
-              .space-vertical-s
-              img.card-annotation(src="/static/images/on-sale.png")
-              img.bank-logo(src="/media/{{financing.bank.logo}}")
-              span.bank-name {{financing.short_name}}
-            .card-detail-box
-              dt 产品期限:
-              dd.orange-text {{financing.period | day}}
-              dt.profit-title 七日年化利率:
-              dd.profit-text {{financing.expected_rate | percentage}}
-              .space-vertical-s
-        -endwith
-      .check-more
-        a.button-round-mini.button-red(href="/financing/products") 查看更多
 
     .row
       img(src="http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/banner0.jpg", style="margin:0 auto; display: block", alt="网利宝 网上银行")
