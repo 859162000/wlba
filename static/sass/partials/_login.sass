@@ -44,9 +44,15 @@
   color: $dark-gray
   background-color: #f0f0f0
   border-top: 3px solid #DA736E
+  position: relative
+  height: 270px
 
   p
     padding: 3px 0
+
+.register-right-div
+  @extend .login-right-div
+  height: 398px
 
 .register-nav
   font-size: $font-m
@@ -107,31 +113,25 @@
 .welcome-text
   color: #90B175
 
-.register-right-div
-  width: 34%
-  float: left
-  padding: 50px 30px 35px 30px
-  font-size: $font-s
-  color: $dark-gray
-
-  p
-    padding: 10px
-
 .hot-line
-  @extend .font-l
+  @extend .font-s
   color: black
 
   span
-    color: $red
+    color: #1771AE
 
 #register-now
   +link-colors($red)
 
 .slogan
-  @extend .font-l
+  @extend .font-s
   color: #1771AE
-  margin-top: 5px
+  margin-top: 40px
 
 .user-icon
   float: left
   padding-right: 5px
+
+.slogan-div
+  position: absolute
+  bottom: 25px

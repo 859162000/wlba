@@ -9,10 +9,13 @@ html
   body
     include include/login_nav
     .full-container-login
-      .container-register
-        .register-left-div
+      .container-login
+        .login-left-div
           form#register-form.login-form(method='post', action='/accounts/register/')
             - csrf_token
+            .form-login-title
+              img.user-icon(src='/static/images/user.png')
+              label.font-l 用户注册
             .form-row
               - render_field form.nickname class+="input-large" placeholder="* 昵称" title="* 昵称"
               #{ form.nickname.errors }
@@ -34,10 +37,11 @@ html
             .form-row.form-bottom-bar
               button#button-submit.button-red.button-middle.span12(type='submit') 注 册
         .register-right-div
-          p.slogan 网利宝 收益好
-          p.hot-line 在线咨询 <span>400-8588-066<span>
           p 已有网利宝账号&nbsp;
             a#register-now(href='/accounts/login') 直接登录>>
+          .slogan-div
+            p.slogan 网利宝 收益好
+            p.hot-line 在线咨询 <span>400-8588-066<span>
 
 
     - with 1 as no_margin

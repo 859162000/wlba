@@ -147,6 +147,7 @@ def deploy():
         sudo('echo "#!/bin/bash" > %s' % scrawl_job_file)
         sudo('echo %s &>> %s' % (env.activate, scrawl_job_file))
         sudo('echo "date > %s" >> %s' % (log_file, scrawl_job_file))
+        sudo('echo "cd /var/wsgi/wanglibao/" >> %s' % scrawl_job_file)
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'run_robot', log_file, scrawl_job_file))
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'load_cash', log_file, scrawl_job_file))
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'scrawl_fund', log_file, scrawl_job_file))
