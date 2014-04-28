@@ -90,7 +90,7 @@
                 name: '6%以上',
                 values: [
                   {
-                    gte_rate_todays: 6
+                    gte_rate_7_days: 6
                   }
                 ]
               }
