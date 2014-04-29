@@ -47,6 +47,10 @@ urlpatterns = patterns(
     (r'^ckeditor/', include('ckeditor.urls')),
 )
 
+urlpatterns += patterns('',
+    url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token')
+)
+
 if settings.DEBUG:
     urlpatterns += patterns('',
                             url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
