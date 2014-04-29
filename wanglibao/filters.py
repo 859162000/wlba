@@ -26,6 +26,7 @@ class AutoNumberFilter(filters.FilterSet):
 
     class Meta:
         number_lookup_types = ('gt', 'gte', 'lt', 'lte', ('max', 'lt'), ('min', 'gte'))
+        number_fields = []
 
     def __init__(self, *args, **kwargs):
         number_fields = self.Meta.number_fields

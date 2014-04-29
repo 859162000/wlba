@@ -1,3 +1,5 @@
+# encoding:utf-8
+
 from django.db import models
 from django.utils import timezone
 from trust.models import Trust
@@ -5,43 +7,45 @@ from wanglibao_bank_financing.models import BankFinancing
 from wanglibao_fund.models import Fund
 
 
-class HotTrust(models.Model):
-    trust = models.OneToOneField(Trust)
-    hot_score = models.IntegerField(help_text="How hot is this")
-    added = models.DateTimeField(help_text="When this guy appear in hot list",
-                                 default=timezone.now,
-                                 null=True)
+class HotItemBase(models.Model):
+    hot_score = models.IntegerField(default=0, help_text=u'热力指数 越高排名越靠前')
+    added = models.DateTimeField(help_text=u'创建时间', default=timezone.now, null=True)
 
     class Meta:
-        ordering = ['-added']
+        abstract = True
+        ordering = ['-hot_score']
+
+
+class HotTrust(HotItemBase):
+    trust = models.OneToOneField(Trust)
 
     def __unicode__(self):
         return u'%s score: %d' % (self.trust.name, self.hot_score)
 
 
-class HotFinancing(models.Model):
+class HotFinancing(HotItemBase):
     bank_financing = models.OneToOneField(BankFinancing)
-    hot_score = models.IntegerField(help_text="How hot is this")
-    added = models.DateTimeField(help_text="When this guy appear in hot list",
-                                 default=timezone.now,
-                                 null=True)
-
-    class Meta:
-        ordering = ['-added']
 
     def __unicode__(self):
         return u'%s score: %d' % (self.bank_financing.name, self.hot_score)
 
 
-class HotFund(models.Model):
+class HotFund(HotItemBase):
     fund = models.OneToOneField(Fund)
-    hot_score = models.IntegerField(help_text="How hot is this")
-    added = models.DateTimeField(help_text="When this guy appear in hot list",
-                                 default=timezone.now,
-                                 null=True)
-
-    class Meta:
-        ordering = ['-added']
 
     def __unicode__(self):
         return u'%s score: %d' % (self.fund.name, self.hot_score)
+
+
+class MobileHotFund(HotFund):
+    """
+    The hot fund list for mobile
+    """
+    pass
+
+
+class MobileHotTrust(HotTrust):
+    """
+    The hot trust list for mobile
+    """
+    pass

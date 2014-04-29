@@ -18,3 +18,11 @@ class HotFundSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = HotFund
         depth = 3
+
+
+class MobileHotFundSerializer(HotFundSerializer):
+    pass
+
+
+class MobileHotTrustSerializer(HotTrustSerializer):
+    pass
