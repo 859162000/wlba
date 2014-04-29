@@ -10,7 +10,7 @@
     shim: {
       'jquery.validate': ['jquery'],
       'jquery.complexify': ['jquery'],
-      'jquery.placehoder': ['jquery']
+      'jquery.placeholder': ['jquery']
     }
   });
 

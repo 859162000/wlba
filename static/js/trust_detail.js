@@ -8,11 +8,11 @@
     },
     shim: {
       'jquery.modal': ['jquery'],
-      'jquery.placehoder': ['jquery']
+      'jquery.placeholder': ['jquery']
     }
   });
 
-  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder'], function($, modal, backend, placehoder) {
+  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder'], function($, modal, backend, placeholder) {
     $('input, textarea').placeholder();
     $('#order-button').click(function(e) {
       e.preventDefault();

@@ -41,6 +41,7 @@ urlpatterns = patterns(
     url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', TemplateView.as_view(template_name="hiring.jade")),
     url(r'^about/', TemplateView.as_view(template_name="about.jade")),
+    url(r'^team/', TemplateView.as_view(template_name="team.jade")),
     url(r'^contact_us/', TemplateView.as_view(template_name="contact_us.jade")),
     url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
     url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),

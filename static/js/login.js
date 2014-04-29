@@ -8,7 +8,7 @@
     },
     shim: {
       'jquery.validate': ['jquery'],
-      'jquery.placehoder': ['jquery']
+      'jquery.placeholder': ['jquery']
     }
   });
 
