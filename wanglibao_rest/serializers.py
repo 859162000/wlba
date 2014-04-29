@@ -1,16 +1,9 @@
 from django.contrib.auth.models import User
 from rest_framework.serializers import HyperlinkedModelSerializer
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
-
-
-class UserSerializer (HyperlinkedModelSerializer):
-    """
-    The user serializer for wanglibao user resource
-    """
-    class Meta:
-        model = User
-        fields = ('url', 'id', 'username', 'first_name', 'last_name', 'email', 'date_joined')
+from wanglibao_account.utils import detect_identifier_type
+from wanglibao_sms.utils import validate_validation_code
 
 
 class AuthTokenSerializer(serializers.Serializer):
@@ -32,4 +25,37 @@ class AuthTokenSerializer(serializers.Serializer):
             else:
                 raise serializers.ValidationError('Unable to login with provided credentials.')
         else:
-            raise serializers.ValidationError('Must include "username" and "password"')
+            raise serializers.ValidationError('Must include "identifier" and "password"')
+
+
+class RegisterUserSerializer(serializers.Serializer):
+    """
+    This serializer is used to do validation on the register api endpoint
+    """
+    identifier = serializers.CharField()
+    password = serializers.CharField()
+    nickname = serializers.CharField()
+    validate_code = serializers.CharField()
+
+    def validate(self, attrs):
+        identifier = attrs.get('identifier')
+        password = attrs.get('password')
+        validate_code = attrs.get('validate_code')
+        nickname = attrs.get('nickname')
+
+        if identifier and password and validate_code and nickname:
+            identifier_type = detect_identifier_type(identifier)
+
+            if identifier_type != 'phone':
+                raise serializers.ValidationError('Identifier must be phone format')
+            else:
+                status, message = validate_validation_code(identifier, validate_code)
+                if status != 200:
+                    raise serializers.ValidationError('Validate code not valid')
+
+                if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
+                    raise serializers.ValidationError('User with same identifier already existed')
+            return super(RegisterUserSerializer, self).validate(attrs)
+
+        else:
+            raise serializers.ValidationError('Must include identifier, password, validate_code and nickname')

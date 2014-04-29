@@ -58,18 +58,25 @@ def send_validation_code(phone, validate_code=None):
 
 
 def validate_validation_code(phone, code):
+    status_code, message = 404, ''
     try:
         phone_validate_item = PhoneValidateCode.objects.get(phone=phone)
         now = timezone.now()
 
         if phone_validate_item.validate_code == code:
             if (now - phone_validate_item.last_send_time) >= datetime.timedelta(minutes=30):
-                return 410, 'The code is expired'
+                status_code, message = 410, 'The code is expired'
 
-            phone_validate_item.is_validated = True
-            phone_validate_item.save()
+            else:
+                phone_validate_item.is_validated = True
+                phone_validate_item.save()
 
-            return 200, None
+                status_code, message = 200, ''
+
+        else:
+            pass
 
     except PhoneValidateCode.DoesNotExist:
-        return 404, None
+        pass
+
+    return status_code, message

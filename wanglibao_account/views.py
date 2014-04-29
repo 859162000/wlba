@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
 from registration.models import RegistrationProfile
@@ -18,7 +18,7 @@ from registration.views import RegistrationView
 from django.core.mail import EmailMultiAlternatives
 
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm
-from utils import generate_username, detect_identifier_type
+from utils import generate_username, detect_identifier_type, create_user
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
 
@@ -30,60 +30,18 @@ User = get_user_model()
 class RegisterView (RegistrationView):
     template_name = "register.jade"
     form_class = EmailOrPhoneRegisterForm
-    email = ''
 
     def register(self, request, **cleaned_data):
         nickname = cleaned_data['nickname']
         password = cleaned_data['password']
         identifier = cleaned_data['identifier']
-        identifier_type = detect_identifier_type(identifier)
 
-        username = generate_username(identifier)
-
-        # Use the model create model, call save later manually
-        user = User(username=username)
-        user.set_password(password)
-        user.save()
-
-        user.wanglibaouserprofile.nick_name = nickname
-        user.wanglibaouserprofile.save()
-
-        if identifier_type == 'email':
-            user.email = identifier
-            self.email = identifier
-            user.is_active = False
-            registration_profile = RegistrationProfile.objects.create_profile(user)
-            user.save()
-
-            from_email, to = settings.DEFAULT_FROM_EMAIL, user.email
-            context = {"activation_code": registration_profile.activation_key}
-
-            subject = render_to_string('html/activation-title.html', context).strip('\n').encode('utf-8')
-            text_content = render_to_string('html/activation-text.html', context).encode('utf-8')
-            html_content = render_to_string('html/activation-html.html', context).encode('utf-8')
-
-            email = EmailMultiAlternatives(subject, text_content, from_email, [to])
-            email.attach_alternative(html_content, "text/html")
-            email.send()
-
-        elif identifier_type == 'phone':
-            profile = user.wanglibaouserprofile
-            profile.phone = identifier
-            profile.phone_verified = True
-            profile.save()
-
-            # User already validated by phone, so he is an active user
-            user.is_active = True
-            user.save()
-
+        user = create_user(identifier, password, nickname)
         return user
 
     def get_success_url(self, request=None, user=None):
-        if self.email == "":
-            return u'/accounts/activate/complete'
         if request.GET.get('next'):
             return request.GET.get('next')
-        return u'/accounts/email/sent/?email=' + self.email
 
 
 class EmailSentView(TemplateView):

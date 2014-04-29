@@ -13,10 +13,9 @@ from wanglibao_hotlist.views import HotTrustViewSet, HotFinancingViewSet, HotFun
 from wanglibao_portfolio.views import PortfolioViewSet, UserPortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
-from wanglibao_rest.views import UserViewSet,  SendValidationCodeView, UserExisting
+from wanglibao_rest.views import SendValidationCodeView, UserExisting, RegisterAPIView
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet)
 
 router.register(r'trusts', TrustViewSet)
 router.register(r'issuers', IssuerViewSet)
@@ -53,6 +52,8 @@ router.register(r'buy_info', BuyInfoViewSet)
 
 urlpatterns = patterns(
     '',
+    url(r'^register/', RegisterAPIView.as_view()),
+    url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
