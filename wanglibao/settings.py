@@ -212,6 +212,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.OAuth2Authentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_THROTTLE_RATES': {
         'user': request_rate
