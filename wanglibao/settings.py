@@ -303,3 +303,9 @@ if PRODUCTION:
 
     # wsgi scheme
     os.environ['wsgi.url_scheme'] = 'https'
+
+# starting shumi_backend config
+SM_CONSUMER_KEY = 'smb'
+SM_CONSUMER_SECRET = 'smb888'
+SM_API_BASE_URL = 'http://sandbox.trade.fund123.cn/openapi/get.json/'
+

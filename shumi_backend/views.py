@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView, View
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRequest
-
+from django.utils.decorators import method_decorator
 from django.core.exceptions import ObjectDoesNotExist
 
 from models import ShumiProfile
@@ -43,13 +43,18 @@ class OAuthCallbackView(View):
 
 
 
-class OauthRequestTokenView(View):
+class OAuthView(View):
     """
     Generate ShumiProfile object, store unauthorized resource owner key/secret.
     """
 
+
+class GetAuthorizeStatusView(OAuthView):
+
     def get(self, request, *args, **kwargs):
-        pass
+        user = request.user
+        auth_status = ShumiProfile.objects.filter(user=user).exists()
+        return HttpResponse(auth_status)
 
 class OauthTriggerView(TemplateView):
     """

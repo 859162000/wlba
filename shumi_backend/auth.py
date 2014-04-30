@@ -19,7 +19,7 @@ class OAuthRequestToken(object):
         self.oauth_callback = oauth_callback
         self.authorize_url = authorize_url
 
-    def _get_oauth_token_secret(self):
+    def get_oauth_token_secret(self):
         """
         return tuple of unauthorized oauth token and secret
         """
@@ -33,7 +33,7 @@ class OAuthRequestToken(object):
         else:
             raise ValueError
 
-    def _get_redirect_address(self):
+    def get_redirect_address(self, resource_owner_token):
         """
         return oauth redirect address,
         redirect user to this address in web browser.
@@ -41,9 +41,8 @@ class OAuthRequestToken(object):
         oauth provider will callback to our side with oauth token and verifier
         handle this callback with OAuthExchangeAccessToken class or it's sub class.
         """
-        resource_owner_token, resource_owner_secret = self._get_oauth_token_secret()
         authorize_url = self.authorize_url + resource_owner_token
-        return authorize_url, resource_owner_token, resource_owner_secret
+        return authorize_url
 
 
 class DevRequestToken(OAuthRequestToken):
@@ -79,7 +78,7 @@ class OAuthExchangeAccessToken(object):
         self.verifier = verifier
         self.access_token_url = access_token_url
 
-    def _exchange_access_token(self):
+    def exchange_access_token(self):
         """
         exchange access token,
         return granted access token and secret

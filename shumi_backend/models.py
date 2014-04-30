@@ -14,3 +14,7 @@ class ShumiProfile(models.Model):
 
     def __unicode__(self):
         return "%s's authorized status is %s" % (self.user.username, self.authorized)
+
+
+
+
