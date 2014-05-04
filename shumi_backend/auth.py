@@ -5,6 +5,8 @@ from urlparse import parse_qs
 import requests
 from requests_oauthlib import OAuth1
 
+from exception import FetchException
+
 
 class OAuthRequestToken(object):
     """
@@ -83,7 +85,7 @@ class OAuthExchangeAccessToken(object):
         exchange access token,
         return granted access token and secret
         """
-        oauth_helper = OAuth1(client_key= self.client_key,
+        oauth_helper = OAuth1(client_key=self.client_key,
                               client_secret=self.client_secret,
                               resource_owner_key=self.resource_owner_key,
                               resource_owner_secret=self.resource_owner_secret,
@@ -94,6 +96,8 @@ class OAuthExchangeAccessToken(object):
             resource_owner_key = credentials.get('oauth_token')[0]
             resource_owner_secret = credentials.get('oauth_token_secret')[0]
             return resource_owner_key, resource_owner_secret
+        else:
+            raise FetchException(request_access_token.text)
 
 
 class DevExchangeAccessToken(OAuthExchangeAccessToken):
