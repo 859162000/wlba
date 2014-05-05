@@ -16,6 +16,7 @@ class WanglibaoUserProfile(models.Model):
 
     shumi_request_token = models.CharField(max_length=64, blank=True, help_text=u'数米基金request token')
     shumi_access_token = models.CharField(max_length=64, blank=True, help_text=u'数米基金access token')
+    shumi_access_token_secret = models.CharField(max_length=64, blank=True, help_text=u'数米基金access token secret')
 
     risk_level = models.PositiveIntegerField(help_text=u'用户的风险等级', default=2)
     investment_asset = models.IntegerField(help_text=u'可投资额度(万)', default=30)
