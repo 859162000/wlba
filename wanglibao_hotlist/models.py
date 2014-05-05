@@ -37,15 +37,21 @@ class HotFund(HotItemBase):
         return u'%s score: %d' % (self.fund.name, self.hot_score)
 
 
-class MobileHotFund(HotFund):
+class MobileHotFund(HotItemBase):
     """
     The hot fund list for mobile
     """
-    pass
+    fund = models.OneToOneField(Fund)
+
+    def __unicode__(self):
+        return u'%s score: %d' % (self.fund.name, self.hot_score)
 
 
-class MobileHotTrust(HotTrust):
+class MobileHotTrust(HotItemBase):
     """
     The hot trust list for mobile
     """
-    pass
+    trust = models.OneToOneField(Trust)
+
+    def __unicode__(self):
+        return u'%s score: %d' % (self.trust.name, self.hot_score)
