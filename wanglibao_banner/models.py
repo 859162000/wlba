@@ -1,9 +1,11 @@
 # encoding: utf-8
 from django.db import models
-import time
 
 
 class Banner(models.Model):
+    class Meta:
+        ordering = ['-priority', '-last_updated']
+
     MOBILE = 'mobile'
     PC = 'PC'
     DEVICES = (

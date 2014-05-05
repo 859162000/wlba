@@ -10,4 +10,3 @@ class BannerViewSet(PaginatedModelViewSet):
     model = Banner
     serializer_class = BannerSerializer
     filter_class = BannerFilterSet
-    queryset = Banner.objects.all().order_by('-priority', '-last_updated')
