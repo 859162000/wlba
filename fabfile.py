@@ -211,6 +211,8 @@ def deploy():
 
                 print green("Generate media folder")
                 sudo('mkdir -p /var/media/wanglibao')
+                sudo('chown -R www-data /var/media')
+                sudo('chgrp -R www-data /var/media')
                 sudo('chmod -R 775 /var/media/wanglibao')
                 print green("static files copied and cleaned")
 
