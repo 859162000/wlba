@@ -9,12 +9,12 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Rename field 'Fund' to 'fund'
-        db.rename_column(u'wanglibao_hotlist_hotfund', 'Fund', 'fund')
+        db.rename_column(u'wanglibao_hotlist_hotfund', 'Fund_id', 'fund_id')
 
 
     def backwards(self, orm):
         # Rename field 'fund' to 'Fund'
-        db.rename_column(u'wanglibao_hotlist_hotfund', 'fund', 'Fund')
+        db.rename_column(u'wanglibao_hotlist_hotfund', 'fund_id', 'Fund_id')
 
     models = {
         u'trust.issuer': {
