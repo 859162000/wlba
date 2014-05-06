@@ -3,7 +3,9 @@ import os
 from fabric.api import *
 from fabric.colors import green, red, yellow
 from fabric.contrib.files import exists
-from fabric.contrib import django
+from fabric_components.folder import create_folder
+from fabric_components.apache import install_apache
+from fabric_components.mysql import install_mysql, db_env, create_database, create_user, apt_get
 
 
 def prepare():
@@ -43,6 +45,7 @@ def production():
     env.production = True
 
     env.mysql = False  # Use RDS, so we no need to install mysql
+    env.create_ssl_cert = False  # Production's key is maintained differently
 
 
 def staging():
@@ -60,12 +63,29 @@ def staging():
     env.production = True
 
     env.mysql = True
+    env.create_ssl_cert = True
+
+
+def ftp():
+    env.host_string = '192.168.1.150'
+    env.path = '/var/deploy/wanglibao'
+    env.activate = 'source ' + env.path + '/virt-python/bin/activate'
+    env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
+    env.depot_name = 'wanglibao-backend'
+    env.branch = 'master'
+
+    env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
+    env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
+
+    env.debug = False
+    env.production = True
+
+    env.mysql = True
+    env.create_ssl_cert = True
 
 
 def new_virtualenv():
     with cd(env.path):
-        sudo("apt-get -q -y install gcc python-setuptools python-all-dev libpq-dev libjpeg-dev")
-        sudo("easy_install pip")
         sudo(env.pip_install_command + " virtualenv")
         if not exists('virt-python'):
             run("virtualenv virt-python")
@@ -111,37 +131,32 @@ def deploy():
     log_file = '/var/log/wanglibao/scrawl.log'
 
     print red("Begin deploy: ")
-    sudo('touch log_file')
-    sudo('mkdir -p %s' % path)
-    sudo('mkdir -p /var/log/wanglibao/')
-    sudo('chown -R www-data /var/log/wanglibao')
-    sudo('chgrp -R www-data /var/log/wanglibao')
-    sudo('chmod -R 770 /var/log/wanglibao')
-    with cd(path):
+    create_folder(path, mod="777")
 
+    print green("Create log folder")
+    create_folder('/var/log/wanglibao/', owner='www-data', group='www-data', mod='770')
+    # Add deploy account to www-data to inherit the permission on log folder, prevent permission issue
+    sudo('adduser `whoami` www-data')
+
+    with cd(path):
         print green("check out the build")
 
         print green("Install git")
-        sudo("apt-get install git")
+        apt_get("git")
 
         print green("Install lxml dependency")
-        sudo("apt-get -q -y install libxml2-dev libxslt1-dev")
+        apt_get('libxml2-dev', 'libxslt1-dev')
 
         print green("Install apache2 and wsgi mod")
-        sudo("apt-get -q -y install apache2 python-setuptools libapache2-mod-wsgi")
-        sudo("a2dissite default")
-        sudo("a2enmod ssl")
-        sudo("a2enmod headers")
-        sudo("a2enmod rewrite")
+        install_apache(mods=['ssl', 'headers', 'rewrite'], disable_sites=['default'])
 
         print green("Setup mysql")
-        if env.mysql:
-            print yellow("Install mysql server")
-            sudo("apt-get -q -y install mysql-server ")
+        install_mysql(server=True, client=True)
+        db_env(database='wanglibao', database_user='wanglibao', password='wanglibank', database_password='wanglibank')
+        create_database()
+        create_user()
 
-        print green("Install mysql client")
-        sudo("apt-get -q -y install mysql-client")
-        # TODO setup database
+        apt_get('libmysqlclient-dev')
 
         print green('add crontab')
         sudo('echo "#!/bin/bash" > %s' % scrawl_job_file)
@@ -159,7 +174,6 @@ def deploy():
 
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, create it')
-            sudo("chmod 777 %s" % path)
             run("git clone %s" % env.depot)
             sudo("chmod 777 %s" % env.depot_name)
             with cd(env.depot_name):
@@ -172,11 +186,10 @@ def deploy():
                 run("git pull")
                 run("git checkout %s" % env.branch)
 
-        print green("Refresh apt")
-        sudo("apt-get update")
-        sudo("apt-get install libmysqlclient-dev")
-
+        apt_get("gcc", "python-setuptools", "python-all-dev", "libpq-dev", "libjpeg-dev")
         print green("Install pip and virtualenv")
+        sudo("easy_install pip")
+
         new_virtualenv()
 
         with virtualenv():
@@ -208,16 +221,12 @@ def deploy():
                 sudo('mkdir -p /var/static/wanglibao')
                 sudo('cp -r publish/static/* /var/static/wanglibao/')
                 sudo('rm -r publish')
-
-                print green("Generate media folder")
-                sudo('mkdir -p /var/media/wanglibao')
-                sudo('chown -R www-data /var/media')
-                sudo('chgrp -R www-data /var/media')
-                sudo('chmod -R 775 /var/media/wanglibao')
                 print green("static files copied and cleaned")
 
-                print green("copy scripts to /var/wsgi/wanglibao/")
+                print green("Generate media folder")
+                create_folder('/var/media/wanglibao', owner='www-data', group='www-data', mod='775')
 
+                print green("copy build to /var/wsgi/wanglibao/")
                 print green("move the old deploy to back up folder")
                 if exists('/var/wsgi/wanglibao-backup'):
                     sudo('rm -r /var/wsgi/wanglibao-backup')
@@ -229,8 +238,12 @@ def deploy():
                 sudo('chown -R www-data /var/wsgi/wanglibao')
 
                 with cd('/var/wsgi/wanglibao'):
-                    run("python manage.py syncdb")
+                    # use --noinput to prevent create super user. When super user created, then a profile object needs
+                    # to be created, at that point, that table is not created yet. Then it crashes.
+                    run("python manage.py syncdb --noinput")
                     run("python manage.py migrate")
+
+                # TODO generate a testing ssl key and crt file. Otherwise, apache server won't restart
 
                 print green("Copy apache config file")
                 sudo('cp wanglibao.conf /etc/apache2/sites-available')
