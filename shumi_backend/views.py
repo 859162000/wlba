@@ -1,12 +1,12 @@
-from django.shortcuts import render
 from django.views.generic import TemplateView, View
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRequest
-from django.utils.decorators import method_decorator
 from django.core.exceptions import ObjectDoesNotExist
 
 from models import ShumiProfile
 # Create your views here.
+
+
 class OAuthCallbackView(View):
     """
     Handle OAuth provider call back,
@@ -38,9 +38,7 @@ class OAuthCallbackView(View):
         shumi_profile.oauth_verifier = oauth_verifier
         shumi_profile.save()
 
-
         return HttpResponse('oauth token: %s <br>oauth_verifier: %s' % (oauth_token, oauth_verifier))
-
 
 
 class OAuthView(View):
@@ -56,6 +54,7 @@ class GetAuthorizeStatusView(OAuthView):
         auth_status = ShumiProfile.objects.filter(user=user).exists()
         return HttpResponse(auth_status)
 
+
 class OauthTriggerView(TemplateView):
     """
 
@@ -63,4 +62,7 @@ class OauthTriggerView(TemplateView):
     template_name = 'trigger.jade'
 
     def get_context_data(self, **kwargs):
-        pass
+        context = super(OauthTriggerView, self).get_context_data(**kwargs)
+        context['pageTitle'] = 'Test trigger'
+        context['buyurl'] = 'http://www.baidu.com/'
+        return context
