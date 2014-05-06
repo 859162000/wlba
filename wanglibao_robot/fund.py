@@ -195,7 +195,7 @@ def run_robot(clean=False, offset=0):
         print 'Get %d fund links, now get detail information on each of them' % len(links)
 
         count = 0
-        for link in ():
+        for link in links:
             error_count = 0
             try:
                 count += 1

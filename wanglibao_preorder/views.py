@@ -1,24 +1,22 @@
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
-from rest_framework.viewsets import ViewSet
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from wanglibao.permissions import AllowAnyPostOnlyAdminList
 
 from wanglibao_preorder.models import PreOrder
 from wanglibao_preorder.serializers import PreOrderSerializer
 
 
-class PreOrderViewSet(ViewSet):
+class PreOrderViewSet(PaginatedModelViewSet):
     model = PreOrder
     serializer = PreOrderSerializer
     throttle_classes = (UserRateThrottle,)
-    permission_classes = (AllowAny,)
+    permission_classes = AllowAnyPostOnlyAdminList,
 
     @property
     def allowed_methods(self):
-        return 'POST',
+        return 'POST', 'GET'
 
-    @csrf_exempt
     def create(self, request):
         serializer = self.serializer(data=request.DATA)
 

@@ -33,13 +33,14 @@ html
                 a(href='{% url "password_reset" %}') 忘记密码？
               .space-vertical-s
         .login-right-div
-          p.hot-line 在线咨询 <span>400-8588-066<span>
-          p 还不是会员？请先注册
+          p 还不是会员？
+            a#register-now(href='/accounts/register/?next=/accounts/login') 现在就注册>>
           p 注册后可以保存专属于您的理财方案
           p 收藏您喜欢的产品
-          p
-            a#register-now(href='/accounts/register/?next=/accounts/login') 现在就注册>>
-          p.slogan 网利宝 收益好
+
+          .slogan-div
+            p.slogan 网利宝 收益好
+            p.hot-line 在线咨询 <span>400-8588-066<span>
 
     -with 1 as no_margin
     include include/footer

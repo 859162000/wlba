@@ -1,6 +1,4 @@
-from django.db import models
 from django.contrib import admin
-from django.forms import Textarea
 from trust.models import Trust, Issuer
 
 

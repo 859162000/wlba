@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,8 +21,9 @@ class ProfileView(APIView):
         Update current user's profile
         """
         user = request.user
-        profile_serializer = ProfileSerializer(user.wanglibaouserprofile)
-        profile_serializer.from_native(request.DATA, None)
-        profile_serializer.save()
+        profile_serializer = ProfileSerializer(user.wanglibaouserprofile, data=request.DATA, partial=True)
+        if not profile_serializer.is_valid():
+            return Response(profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(profile_serializer.data)
+        profile_serializer.save()
+        return Response(profile_serializer.data, status=status.HTTP_200_OK)

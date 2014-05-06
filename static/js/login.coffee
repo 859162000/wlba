@@ -6,7 +6,7 @@ require.config
 
   shim:
     'jquery.validate': ['jquery']
-    'jquery.placehoder': ['jquery']
+    'jquery.placeholder': ['jquery']
 
 require ['jquery', 'jquery.validate', 'lib/backend', 'jquery.placeholder'], ($, validate, backend, placeholder)->
 

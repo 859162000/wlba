@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     'rest_framework',
+    'rest_framework.authtoken',
     'south',
     'registration',
 
@@ -64,6 +65,9 @@ INSTALLED_APPS = (
     'wanglibao_robot',
     'shumi_backend',
     'wanglibao_page',
+    'wanglibao_feedback',
+    'wanglibao_buy',
+    'wanglibao_banner',
 
     'provider',
     'provider.oauth2',
@@ -210,6 +214,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.OAuth2Authentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_THROTTLE_RATES': {
         'user': request_rate

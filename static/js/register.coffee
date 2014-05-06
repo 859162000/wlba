@@ -8,7 +8,7 @@ require.config
   shim:
     'jquery.validate': ['jquery']
     'jquery.complexify': ['jquery']
-    'jquery.placehoder': ['jquery']
+    'jquery.placeholder': ['jquery']
 
 require ['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquery.placeholder'], ($, validate, complexify, backend, placeholder)->
 

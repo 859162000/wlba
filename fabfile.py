@@ -51,7 +51,7 @@ def staging():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'ssl'
+    env.branch = 'master'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -147,6 +147,7 @@ def deploy():
         sudo('echo "#!/bin/bash" > %s' % scrawl_job_file)
         sudo('echo %s &>> %s' % (env.activate, scrawl_job_file))
         sudo('echo "date > %s" >> %s' % (log_file, scrawl_job_file))
+        sudo('echo "cd /var/wsgi/wanglibao/" >> %s' % scrawl_job_file)
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'run_robot', log_file, scrawl_job_file))
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'load_cash', log_file, scrawl_job_file))
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'scrawl_fund', log_file, scrawl_job_file))
@@ -167,6 +168,7 @@ def deploy():
             print green('Found depot, pull changes')
             with cd(env.depot_name):
                 run('git reset --hard HEAD')
+                run('git remote set-url origin %s' % env.depot)
                 run("git pull")
                 run("git checkout %s" % env.branch)
 
@@ -209,6 +211,8 @@ def deploy():
 
                 print green("Generate media folder")
                 sudo('mkdir -p /var/media/wanglibao')
+                sudo('chown -R www-data /var/media')
+                sudo('chgrp -R www-data /var/media')
                 sudo('chmod -R 775 /var/media/wanglibao')
                 print green("static files copied and cleaned")
 

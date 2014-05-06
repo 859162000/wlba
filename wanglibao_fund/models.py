@@ -2,6 +2,7 @@
 import datetime
 from django.db import models
 from django.utils import timezone
+from wanglibao.models import ProductBase
 
 
 class FundIssuer(models.Model):
@@ -15,7 +16,7 @@ class FundIssuer(models.Model):
         return u'%s' % (self.name, )
 
 
-class Fund(models.Model):
+class Fund(ProductBase):
     brief = models.TextField(blank=True, help_text=u"基金点评")
 
     name = models.CharField(max_length=64, help_text=u'基金名称')
@@ -34,6 +35,7 @@ class Fund(models.Model):
     init_scale = models.TextField(blank=True, help_text=u'首募规模 x.xx亿')
     latest_scale = models.TextField(blank=True, help_text=u'最新规模 x.xx亿 (年-月-日)')
     hosting_bank = models.CharField(max_length=32, blank=True, help_text=u'托管银行')
+    investment_threshold = models.IntegerField(default=0, help_text=u'起投金额(元)')
     investment_target = models.TextField(blank=True, help_text=u'投资方向')
     investment_scope = models.TextField(blank=True, help_text=u'投资范围')
     investment_strategy = models.TextField(blank=True, help_text=u'投资策略')

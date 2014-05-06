@@ -23,7 +23,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/financing', '
               field = '-' + column.field
             self.orderBy field
 
-      self.orderBy = ko.observable('-max_expected_profit_rate')
+      self.orderBy = ko.observable('-status,-max_expected_profit_rate')
 
       ###
       Pager

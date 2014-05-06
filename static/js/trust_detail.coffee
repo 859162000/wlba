@@ -6,9 +6,9 @@ require.config
 
   shim:
     'jquery.modal': ['jquery']
-    'jquery.placehoder': ['jquery']
+    'jquery.placeholder': ['jquery']
 
-require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder'], ($, modal, backend, placehoder)->
+require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder'], ($, modal, backend, placeholder)->
 
   $('input, textarea').placeholder()
 

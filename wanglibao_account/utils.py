@@ -1,6 +1,11 @@
 import string
 import uuid
 import re
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from registration.models import RegistrationProfile
 
 
 ALPHABET = string.ascii_uppercase + string.ascii_lowercase + \
@@ -41,3 +46,42 @@ def detect_identifier_type(identifier):
         return 'email'
 
     return 'unknown'
+
+User = get_user_model()
+
+def create_user(identifier, password, nickname):
+    username = generate_username(identifier)
+    identifier_type = detect_identifier_type(identifier)
+
+    user = User(username=username)
+    user.set_password(password)
+    user.save()
+
+    user.wanglibaouserprofile.nick_name = nickname
+    user.wanglibaouserprofile.save()
+    if identifier_type == 'email':
+        user.email = identifier
+        user.is_active = False
+        registration_profile = RegistrationProfile.objects.create_profile(user)
+        user.save()
+
+        from_email, to = settings.DEFAULT_FROM_EMAIL, user.email
+        context = {"activation_code": registration_profile.activation_key}
+
+        subject = render_to_string('html/activation-title.html', context).strip('\n').encode('utf-8')
+        text_content = render_to_string('html/activation-text.html', context).encode('utf-8')
+        html_content = render_to_string('html/activation-html.html', context).encode('utf-8')
+
+        email = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        email.attach_alternative(html_content, "text/html")
+        email.send()
+
+    elif identifier_type == 'phone':
+        profile = user.wanglibaouserprofile
+        profile.phone = identifier
+        profile.phone_verified = True
+        profile.save()
+
+        user.is_active = True
+        user.save()
+    return user
