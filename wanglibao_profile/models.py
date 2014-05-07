@@ -24,4 +24,4 @@ class WanglibaoUserProfile(models.Model):
     investment_period = models.IntegerField(help_text=u'可投资期限(月)', default=3)
 
     def __unicode__(self):
-        return "%s phone: %s" % (self.user.username, self.phone)
+        return "%s phone: %s nickname: %s" % (self.user.username, self.phone, self.nick_name)

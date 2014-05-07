@@ -1,5 +1,9 @@
 from django.contrib import admin
 from wanglibao_profile.models import WanglibaoUserProfile
 
-admin.site.register(WanglibaoUserProfile)
+
+class WanglibaoUserProfileAdmin (admin.ModelAdmin):
+    list_display = ('phone', 'nick_name', 'user', 'id_number')
+
+admin.site.register(WanglibaoUserProfile, WanglibaoUserProfileAdmin)
 
