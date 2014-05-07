@@ -42,6 +42,7 @@ class RegisterView (RegistrationView):
     def get_success_url(self, request=None, user=None):
         if request.GET.get('next'):
             return request.GET.get('next')
+        return '/accounts/login'
 
 
 class EmailSentView(TemplateView):

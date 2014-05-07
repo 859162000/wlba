@@ -38,6 +38,6 @@
         a.logout(href="/accounts/logout?next={{ request.path }}") 退出
       else
         a(href="/accounts/login?next={{ request.path }}") 登录
-        a(href="/accounts/register") 注册
+        a(href="/accounts/register?next=/accounts/login") 注册
 
   script(src="/static/js/require.js", data-main="/static/js/header")
