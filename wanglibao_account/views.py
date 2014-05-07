@@ -2,23 +2,22 @@
 import datetime
 import logging
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import resolve_url
-from django.template.loader import render_to_string
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
-from registration.models import RegistrationProfile
 from registration.views import RegistrationView
-from django.core.mail import EmailMultiAlternatives
+from rest_framework.permissions import IsAdminUser
 
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm
-from utils import generate_username, detect_identifier_type, create_user
+from utils import detect_identifier_type, create_user
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from wanglibao_account.serializers import UserSerializer
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
 
@@ -203,3 +202,8 @@ class ResetPassword(TemplateView):
         else:
             return HttpResponse(u'验证超时，请重新验证', status=400)
 
+
+class UserViewSet(PaginatedModelViewSet):
+    model = get_user_model()
+    serializer_class = UserSerializer
+    permission_classes = IsAdminUser,

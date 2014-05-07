@@ -1,22 +1,17 @@
 # encoding:utf-8
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.decorators import link
-from rest_framework.permissions import IsAdminUser
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.utils import create_user
-from wanglibao_account.views import RegisterView
 from wanglibao_portfolio.models import UserPortfolio
-from wanglibao_portfolio.serializers import PortfolioSerializer, UserPortfolioSerializer
+from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer, RegisterUserSerializer
 from wanglibao_sms.utils import send_validation_code
 
@@ -88,3 +83,5 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
 
 
 obtain_auth_token = ObtainAuthTokenCustomized.as_view()
+
+

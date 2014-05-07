@@ -1,9 +1,11 @@
 from urlparse import urlparse
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
+
 from forms import EmailOrPhoneRegisterForm
-from utils import detect_identifier_type, num_encode
+from utils import detect_identifier_type
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_sms.utils import send_validation_code
 
