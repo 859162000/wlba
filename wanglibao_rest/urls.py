@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
+from wanglibao_account.views import UserViewSet
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import BuyInfoViewSet
@@ -52,6 +53,8 @@ router.register(r'feedbacks', FeedbackViewSet)
 router.register(r'buy_info', BuyInfoViewSet)
 
 router.register(r'banners', BannerViewSet)
+
+router.register(r'users', UserViewSet)
 
 urlpatterns = patterns(
     '',
