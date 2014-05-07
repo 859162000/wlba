@@ -72,14 +72,18 @@ class UserLevel(ShuMiAPI):
         api_query = 'trade_cash.getcashsharelist'
         return self._oauth_get(api_query)
 
-    def _get_cash_history(self, begin, end, business, capital_flow):
+    def _get_cash_history(self, begin, end, business=7, capital_flow=1):
+        """
+        input format: begin/end "yyyy-mm-dd" exp: "2012-01-01"
+        """
         data = dict()
         data['begin'] = begin
         data['end'] = end
         data['business'] = business
         data['capitalflow'] = capital_flow
         api_query = 'trade_cash.getcashapplylistbycapitalflow?begin={begin}&end={end}' \
-                    '&business={business}&capitalflow={capitalflow}'.format(data)
+                    '&business={business}&capitalflow={capitalflow}'.format(begin=begin, end=end, business=business,
+                                                                            capitalflow=capital_flow)
         return self._oauth_get(api_query)
 
     def get_cash_history_by_month(self, month):

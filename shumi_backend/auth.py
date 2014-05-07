@@ -1,7 +1,6 @@
 #
 import re
 from urlparse import parse_qs
-from urllib import urlencode
 
 import requests
 from requests_oauthlib import OAuth1
@@ -136,16 +135,4 @@ class ShuMiExchangeAccessToken(OAuthExchangeAccessToken):
                                                        resource_owner_secret, verifier, self.access_token_url)
 
 
-class OAuthAutoLogin(object):
 
-    auto_login_url = settings.SM_AUTO_LOGIN_URL
-
-    def __init__(self, dest_url, return_url):
-        self.dest_url = dest_url
-        self.return_url = return_url
-
-    def gen_url(self):
-        data = dict()
-        data['dest'] = self.dest_url
-        data['returnUrl'] = self.return_url
-        return self.auto_login_url + urlencode(data)
