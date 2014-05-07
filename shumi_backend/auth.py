@@ -4,6 +4,7 @@ from urlparse import parse_qs
 
 import requests
 from requests_oauthlib import OAuth1
+from django.conf import settings
 
 from exception import FetchException
 
@@ -62,9 +63,21 @@ class DevRequestToken(OAuthRequestToken):
     def __init__(self, callback_url):
         if self.test_scheme.match(callback_url):
             super(DevRequestToken, self).__init__(self.c_key, self.c_secret, self.request_url, self.authorize_url,
-                                              callback_url)
+                                                  callback_url)
         else:
             raise ValueError("%s is not a valid call back uri" % callback_url)
+
+
+class ShuMiRequestToken(OAuthRequestToken):
+    consumer_key = settings.SM_CONSUMER_KEY
+    consumer_secret = settings.SM_CONSUMER_SECRET
+    request_url = settings.SM_REQUEST_TOKEN_URL
+    authorize_base_url = settings.SM_AUTHORIZE_BASE_URL
+    authorize_url = authorize_base_url + '?oauth_token='
+
+    def __init__(self, callback_url):
+        super(ShuMiRequestToken, self).__init__(self.consumer_key, self.consumer_secret, self.request_url,
+                                                self.authorize_url, callback_url)
 
 
 class OAuthExchangeAccessToken(object):
@@ -108,4 +121,18 @@ class DevExchangeAccessToken(OAuthExchangeAccessToken):
 
     def __init__(self, resource_owner_key, resource_owner_secret, verifier):
         super(DevExchangeAccessToken, self).__init__(self.client_key, self.client_secret, resource_owner_key,
-                                              resource_owner_secret, verifier, self.access_token_url)
+                                                     resource_owner_secret, verifier, self.access_token_url)
+
+
+class ShuMiExchangeAccessToken(OAuthExchangeAccessToken):
+
+    consumer_key = settings.SM_CONSUMER_KEY
+    consumer_secret = settings.SM_CONSUMER_SECRET
+    access_token_url = settings.SM_ACCESS_TOKEN_URL
+
+    def __init__(self, resource_owner_key, resource_owner_secret, verifier):
+        super(ShuMiExchangeAccessToken, self).__init__(self.consumer_key, self.consumer_secret, resource_owner_key,
+                                                       resource_owner_secret, verifier, self.access_token_url)
+
+
+

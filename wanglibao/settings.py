@@ -310,7 +310,11 @@ if PRODUCTION:
     os.environ['wsgi.url_scheme'] = 'https'
 
 # starting shumi_backend config
-SM_CONSUMER_KEY = 'smb'
-SM_CONSUMER_SECRET = 'smb888'
-SM_API_BASE_URL = 'http://sandbox.trade.fund123.cn/openapi/get.json/'
-
+SM_CONSUMER_KEY = 'iphone_smb'
+SM_CONSUMER_SECRET = 'iphone_smb'
+SM_API_BASE_URL = 'https://trade.fund123.cn/openapi/get.json/'
+SM_AUTO_LOGIN_URL = 'https://account.fund123.cn/oauth/Partner/AutoLogin.aspx?'
+SM_REQUEST_TOKEN_URL = 'https://account.fund123.cn/oauth/request_token.ashx'
+SM_AUTHORIZE_BASE_URL = 'https://account.fund123.cn/oauth/Partner/Authorize.aspx'
+SM_ACCESS_TOKEN_URL = 'https://account.fund123.cn/oauth/access_token.ashx'
+SM_TRADE_URL_TEMPLATE = 'https://trade.fund123.cn/GoTrade/{trade_type}?fundcode={fund_code}'

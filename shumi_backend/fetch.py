@@ -4,7 +4,9 @@ from shumi_backend.exception import FetchException
 
 
 class ShuMiAPI(object):
-
+    """
+    ShuMi base API, configure api url, consumer key/secret in django setting file.
+    """
     api_base_url = settings.SM_API_BASE_URL
     consumer_key = settings.SM_CONSUMER_KEY
     consumer_secret = settings.SM_CONSUMER_SECRET
@@ -28,7 +30,9 @@ class ShuMiAPI(object):
 
 
 class AppLevel(ShuMiAPI):
-
+    """
+    App level API(call without user access token.
+    """
     # input: None
     # output: string of current fund
     def get_current_fund(self):
@@ -47,6 +51,12 @@ class AppLevel(ShuMiAPI):
         api_query = 'trade_common.getavailablefunds'
         return self._oauth_get(api_query)
 
+    # input: None
+    # output: all available cash funds list
+    def get_cash_funds(self):
+        api_query = 'trade_cash.getfunds'
+        return self._oauth_get(api_query)
+
 
 class UserLevel(ShuMiAPI):
 
@@ -61,3 +71,23 @@ class UserLevel(ShuMiAPI):
     def get_cash_share_list(self):
         api_query = 'trade_cash.getcashsharelist'
         return self._oauth_get(api_query)
+
+    def _get_cash_history(self, begin, end, business=7, capital_flow=1):
+        """
+        input format: begin/end "yyyy-mm-dd" exp: "2012-01-01"
+        """
+        data = dict()
+        data['begin'] = begin
+        data['end'] = end
+        data['business'] = business
+        data['capitalflow'] = capital_flow
+        api_query = 'trade_cash.getcashapplylistbycapitalflow?begin={begin}&end={end}' \
+                    '&business={business}&capitalflow={capitalflow}'.format(begin=begin, end=end, business=business,
+                                                                            capitalflow=capital_flow)
+        return self._oauth_get(api_query)
+
+    def get_cash_history_by_month(self, month):
+        pass
+
+    def get_cash_histhory_by_week(self, week):
+        pass

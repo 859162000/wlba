@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
-from views import OAuthCallbackView, GetAuthorizeStatusView
+from views import OAuthCallbackView, OAuthTriggerView
 
 urlpatterns = patterns('',
-    url(r'^callback/(?P<pk>\d+)/$', OAuthCallbackView.as_view(), name='callback-view'),
-    url(r'^get_auth_status/', login_required(GetAuthorizeStatusView.as_view()), name='get_auth_status-view'),
+    url(r'^callback/(?P<pk>\d+)/$', OAuthCallbackView.as_view(), name='oauth-callback-view'),
+    url(r'^test/trigger/', login_required(OAuthTriggerView.as_view()), name='test-trigger-view'),
 )
