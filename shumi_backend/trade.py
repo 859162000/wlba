@@ -2,18 +2,41 @@
 from urllib import quote, urlencode
 from oauthlib import oauth1
 
+from django.http import HttpRequest
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 test_dest = 'https://trade.fund123.cn/Cash/Do/Recharge?fundcode=202301'
 test_return_url = 'https://www.wanglibao.com'
 
 
-def gen_trade_url(fund_code, action):
-    trade_type_dict = {'sub': quote('申购'), 'redeem': quote('赎回')}
-    trade_type = trade_type_dict[action]
-    url_template = settings.SM_TRADE_URL_TEMPLATE
-    url = url_template.format(trade_type=trade_type, fund_code=fund_code)
-    return url
+class Utility(object):
+
+    # todo get trade action from shumi
+    @classmethod
+    def gen_trade_url(cls, fund_code, action):
+        """
+        input: fund code(6 length string)
+               action()
+        """
+        trade_type_dict = {'sub': quote('申购'), 'redeem': quote('赎回')}
+        trade_type = trade_type_dict[action]
+        url_template = settings.SM_TRADE_URL_TEMPLATE
+        url = url_template.format(trade_type=trade_type, fund_code=fund_code)
+        return url
+
+    @classmethod
+    def gen_return_url(cls, request):
+        """
+        input: django user object, get user_obj.wanglibaouserprofile.pk as callback url path
+        """
+        if not isinstance(request, HttpRequest):
+            raise TypeError('%s is not a valid HttpRequest instance.' % request)
+        pk = request.user.wanglibaouserprofile.pk
+        full_uri = request.build_absolute_uri()
+        base_url = full_uri.scheme + '://' + full_uri.netloc
+        user_spec_url = reverse('oauth-callback-view', kwargs={'pk': str(pk)})
+        return base_url + user_spec_url
 
 
 class TradeWithAutoLogin(object):
