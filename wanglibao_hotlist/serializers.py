@@ -5,7 +5,7 @@ from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund
 class HotTrustSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = HotTrust
-        depth = 1
+        depth = 2
 
 
 class HotFinancingSerializer(serializers.HyperlinkedModelSerializer):

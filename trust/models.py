@@ -69,6 +69,9 @@ class Trust (models.Model):
     mortgage_rate = models.FloatField(default=0, verbose_name=u'抵押率')
     consignee = models.TextField(blank=True, verbose_name=u'受托人')
     payment = models.TextField(blank=True, verbose_name=u'支付情况')
+    guarantee = models.TextField(blank=True, verbose_name=u'担保')
+    financing_party = models.TextField(blank=True, verbose_name=u'融资方')
+    source_of_repayment = models.TextField(blank=True, verbose_name=u'还款来源')
 
     product_description = models.TextField(blank=True, verbose_name=u'产品说明')
     related_info = models.TextField(blank=True, null=True, verbose_name=u'相关信息')
