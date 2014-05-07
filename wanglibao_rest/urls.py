@@ -11,7 +11,7 @@ from wanglibao_favorite.views import FavoriteTrustViewSet, FavoriteFundViewSet, 
 from wanglibao_feedback.views import FeedbackViewSet
 from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
 from wanglibao_hotlist.views import HotTrustViewSet, HotFinancingViewSet, HotFundViewSet, MobileHotTrustViewSet, \
-    MobileHotFundViewSet
+    MobileHotFundViewSet, MobileMainPageViewSet
 from wanglibao_portfolio.views import PortfolioViewSet, UserPortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
@@ -42,6 +42,7 @@ router.register(r'hot_financings', HotFinancingViewSet)
 router.register(r'hot_funds', HotFundViewSet)
 router.register(r'mobile_hot_trusts', MobileHotTrustViewSet)
 router.register(r'mobile_hot_funds', MobileHotFundViewSet)
+router.register(r'mobile_main', MobileMainPageViewSet)
 
 router.register(r'favorite/trusts', FavoriteTrustViewSet)
 router.register(r'favorite/funds', FavoriteFundViewSet)

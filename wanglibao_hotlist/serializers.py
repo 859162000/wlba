@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund
+from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund, MobileMainPage
 
 
 class HotTrustSerializer(serializers.HyperlinkedModelSerializer):
@@ -26,3 +26,9 @@ class MobileHotFundSerializer(HotFundSerializer):
 
 class MobileHotTrustSerializer(HotTrustSerializer):
     pass
+
+
+class MobileMainPageSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = MobileMainPage
+        depth = 3

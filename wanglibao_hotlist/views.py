@@ -2,8 +2,9 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.permissions import IsAdminUserOrReadOnly
-from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund, MobileHotFund, MobileHotTrust
-from wanglibao_hotlist.serializers import HotFundSerializer, MobileHotFundSerializer, MobileHotTrustSerializer
+from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund, MobileHotFund, MobileHotTrust, MobileMainPage
+from wanglibao_hotlist.serializers import HotFundSerializer, MobileHotFundSerializer, MobileHotTrustSerializer, \
+    MobileMainPageSerializer
 
 
 class HotTrustViewSet(viewsets.ModelViewSet):
@@ -31,4 +32,10 @@ class MobileHotFundViewSet(PaginatedModelViewSet):
 class MobileHotTrustViewSet(PaginatedModelViewSet):
     model = MobileHotTrust
     serializer_class = MobileHotTrustSerializer
+    permission_classes = IsAdminUserOrReadOnly,
+
+
+class MobileMainPageViewSet(PaginatedModelViewSet):
+    model = MobileMainPage
+    serializer_class = MobileMainPageSerializer
     permission_classes = IsAdminUserOrReadOnly,

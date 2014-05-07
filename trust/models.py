@@ -1,7 +1,4 @@
 # encoding: utf-8
-from requests import ConnectionError
-from rest_framework.renderers import JSONRenderer
-from rest_framework.serializers import ModelSerializer
 from django.db import models
 import logging
 

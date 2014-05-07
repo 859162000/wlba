@@ -55,3 +55,14 @@ class MobileHotTrust(HotItemBase):
 
     def __unicode__(self):
         return u'%s score: %d' % (self.trust.name, self.hot_score)
+
+
+class MobileMainPage(HotItemBase):
+    """
+    The mobile main page, now it is fund, in future it may contain other products
+    TODO Figure out a better way to fullfil the hot list requirements
+    """
+    item = models.OneToOneField(Fund)
+
+    def __unicode__(self):
+        return u'%s score: %d' % (self.item.name, self.hot_score)
