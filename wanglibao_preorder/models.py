@@ -11,7 +11,7 @@ class PreOrder(models.Model):
         ('financing', 'financing'),
         ('fund', 'fund'),
     ))
-    created_at = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True)
     product_url = models.TextField(default='')
     user_name = models.CharField(max_length=64)
     phone = models.CharField(max_length=64)
