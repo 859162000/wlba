@@ -37,6 +37,7 @@ urlpatterns = patterns(
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
+    url(r'^oauth/', include('shumi_backend.urls')),
 
     url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', TemplateView.as_view(template_name="hiring.jade")),

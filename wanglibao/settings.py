@@ -63,6 +63,7 @@ INSTALLED_APPS = (
     'wanglibao_hotlist',
     'wanglibao_favorite',
     'wanglibao_robot',
+    'shumi_backend',
     'wanglibao_page',
     'wanglibao_feedback',
     'wanglibao_buy',
@@ -307,3 +308,9 @@ if PRODUCTION:
 
     # wsgi scheme
     os.environ['wsgi.url_scheme'] = 'https'
+
+# starting shumi_backend config
+SM_CONSUMER_KEY = 'smb'
+SM_CONSUMER_SECRET = 'smb888'
+SM_API_BASE_URL = 'http://sandbox.trade.fund123.cn/openapi/get.json/'
+
