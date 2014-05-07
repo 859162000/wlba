@@ -26,7 +26,13 @@ class TrustSerializer(HyperlinkedModelSerializer):
         model = Trust
 
     issuer_short_name = serializers.SerializerMethodField('get_issuer_short_name')
+    issuer_description = serializers.SerializerMethodField('get_issuer_description')
     id = serializers.IntegerField('id')
 
-    def get_issuer_short_name(self, trust):
+    @staticmethod
+    def get_issuer_short_name(trust):
         return trust.issuer.short_name
+
+    @staticmethod
+    def get_issuer_description(trust):
+        return trust.issuer.note
