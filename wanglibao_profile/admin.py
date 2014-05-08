@@ -3,7 +3,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 
 
 class WanglibaoUserProfileAdmin (admin.ModelAdmin):
-    list_display = ('phone', 'nick_name', 'user', 'id_number')
+    list_display = ('user', 'phone', 'nick_name', 'id_number')
 
 admin.site.register(WanglibaoUserProfile, WanglibaoUserProfileAdmin)
 
