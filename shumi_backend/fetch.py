@@ -54,6 +54,11 @@ class AppLevel(ShuMiAPI):
         api_query = 'trade_common.getavailablefunds'
         return self._oauth_get(api_query)
 
+    def get_available_cash_funds(self):
+        funds = self.get_available_funds()
+        cash_funds = [fund for fund in funds if fund['FundType'] == '2']
+        return cash_funds
+
     # input: None
     # output: all available cash funds list
     def get_cash_funds(self):

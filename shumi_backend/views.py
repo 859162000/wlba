@@ -118,13 +118,13 @@ class OAuthStartView(RedirectView):
         profile = self.request.user.wanglibaouserprofile
         #host = request.get_host()
         host = 'https://www.wanglibao.com'
-        path = reverse('oauth-callback-view', pk=self.request.user.pk)
+        path = reverse('oauth-callback-view', kwargs={'pk': self.request.user.pk})
         requester = ShuMiRequestToken(host+path)
-        request_token, request_token_secret = requester.get_oauth_token_secret()
+        request_token, request_token_secret = requester.get_request_token_secret()
         profile.shumi_request_token = request_token
         profile.shumi_request_token_secret = request_token_secret
         profile.save()
-        self.url = requester.get_redirect_address(profile.shumi_request_token)
+        self.url = requester.get_redirect_address()
         return super(OAuthStartView, self).get_redirect_url(*args, **kwargs)
 
 
