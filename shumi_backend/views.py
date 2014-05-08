@@ -1,12 +1,13 @@
 from django.views.generic import TemplateView, View, RedirectView
+
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRequest, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
-
 from exception import FetchException
 from auth import ShuMiExchangeAccessToken, ShuMiRequestToken
+from trade import Utility, TradeWithAutoLogin
 
 # Create your views here.
 
@@ -53,12 +54,7 @@ class OAuthCallbackView(View):
         profile.shumi_access_token_secret = access_token_secret
         profile.save()
 
-        return_url = request.session.get('trade_return_url', '')
-        fund_code = request.session.get('trade_fund_code', '')
-        # todo redirect to return url
-        if not return_url:
-            return_url = 'something'
-        return HttpResponseRedirect(return_url)
+        return HttpResponseRedirect(reverse('oauth-status-view'))
 
 
 class OAuthTriggerView(TemplateView):
@@ -68,9 +64,15 @@ class OAuthTriggerView(TemplateView):
     template_name = 'trigger.jade'
 
     def get_context_data(self, **kwargs):
+        profile = self.request.user.wanglibaouserprofile
         context = super(OAuthTriggerView, self).get_context_data(**kwargs)
+        trade_helper = Utility(self.request)
+        origin_trade_url = Utility.gen_trade_url('202301', action='buy')
+        return_url = trade_helper.gen_trade_return_url()
+        trader = TradeWithAutoLogin(profile.shumi_access_token, profile.shumi_access_token_secret,
+                                    origin_trade_url, return_url)
         context['pageTitle'] = 'Test trigger'
-        context['buyurl'] = 'http://www.baidu.com/'
+        context['buyurl'] = trader.get_trade_url()
         return context
 
 
@@ -80,33 +82,56 @@ class OAuthStatusView(RedirectView):
     query_string = True
 
     def get_redirect_url(self, *args, **kwargs):
-        fund_code = self.request.get('fund_code', '')
-        return_url = self.request.get('return_url', '')
+        fund_code = self.request.GET.get('fund_code', '')
+        return_url = self.request.GET.get('return_url', '')
         if fund_code and return_url:
-            self.request.session['trade_fund_code'] = fund_code
-            self.request.session['trade_return_url'] = return_url
+            self.request.session['fund_code'] = fund_code
+            self.request.session['return_url'] = return_url
         else:
             return HttpResponseBadRequest()
         profile = self.request.user.wanglibaouserprofile
         # if user have access token and access token secret, redirect to trade view.
         if profile.shumi_access_token and profile.shumi_access_token_secret:
-            self.pattern_name = 'trade-view'
+            self.pattern_name = 'trade-redirect-view'
         # if user have no token or secret, redirect to oauth view
         else:
             self.pattern_name = 'oauth-start-view'
         return super(OAuthStatusView, self).get_redirect_url(*args, **kwargs)
 
 
-class TradeView(TemplateView):
+class TradeView(View):
 
-    template_name = 'trade.jade'
+    def get(self, request, *args, **kwargs):
 
-    def get_context_data(self, **kwargs):
-        context = super(TradeView, self).get_context_data(**kwargs)
-        context['oauth_uri'], context['oauth_body'] = ''
+        try:
+            fund_code = self.request.session['fund_code']
+            return_url = self.request.session['return_url']
+        except KeyError:
+            # todo redirect to funds list view instead of raise error
+            return HttpResponseBadRequest('no fund code or return url in session')
 
-        # todo oauth sign function
-        return context
+        action = self.request.GET.get('action', 'buy')
+
+        trade_url = Utility.gen_trade_url(fund_code, action)
+        profile = self.request.user.wanglibaouserprofile
+        access_token = profile.shumi_access_token
+        access_token_secret = profile.shumi_access_token_secret
+        trader = TradeWithAutoLogin(access_token, access_token_secret,
+                                    trade_url, return_url)
+        return HttpResponseRedirect(trader.get_trade_url())
+
+
+class TradeCallbackView(View):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            order_id = self.request.GET['orderId']
+        except KeyError:
+            # todo show some fail info
+            return HttpResponseBadRequest('No orderId')
+
+        # todo store order id or fetch order detail
+        return HttpResponse('order id is %s ' % order_id)
 
 
 class OAuthStartView(RedirectView):
@@ -117,9 +142,10 @@ class OAuthStartView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         profile = self.request.user.wanglibaouserprofile
         #host = request.get_host()
-        host = 'https://www.wanglibao.com'
-        path = reverse('oauth-callback-view', kwargs={'pk': self.request.user.pk})
-        requester = ShuMiRequestToken(host+path)
+        #host = 'https://www.wanglibao.com'
+        #path = reverse('oauth-callback-view', kwargs={'pk': self.request.user.pk})
+        call_back_url = Utility.gen_oauth_callback_url(self.request)
+        requester = ShuMiRequestToken(call_back_url)
         request_token, request_token_secret = requester.get_request_token_secret()
         profile.shumi_request_token = request_token
         profile.shumi_request_token_secret = request_token_secret

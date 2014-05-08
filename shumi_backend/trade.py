@@ -1,5 +1,6 @@
 # encoding: utf-8
 from urllib import quote, urlencode
+from urlparse import urlparse
 from oauthlib import oauth1
 
 from django.http import HttpRequest
@@ -13,30 +14,38 @@ test_return_url = 'https://www.wanglibao.com'
 class Utility(object):
 
     # todo get trade action from shumi
+    def __init__(self, request):
+        if not isinstance(request, HttpRequest):
+            raise TypeError('%s is not a valid HttpRequest instance.' % request)
+        self.request = request
+
     @classmethod
-    def gen_trade_url(cls, fund_code, action):
+    def gen_trade_url(cls, fund_code, action=''):
         """
         input: fund code(6 length string)
                action()
         """
-        trade_type_dict = {'sub': quote('申购'), 'redeem': quote('赎回')}
-        trade_type = trade_type_dict[action]
-        url_template = settings.SM_TRADE_URL_TEMPLATE
-        url = url_template.format(trade_type=trade_type, fund_code=fund_code)
+        url = 'https://trade.fund123.cn/Cash/Do/Recharge?fundcode=202301'
         return url
 
-    @classmethod
-    def gen_return_url(cls, request):
+    def gen_oauth_callback_url(self):
         """
         input: django user object, get user_obj.wanglibaouserprofile.pk as callback url path
         """
-        if not isinstance(request, HttpRequest):
-            raise TypeError('%s is not a valid HttpRequest instance.' % request)
-        pk = request.user.wanglibaouserprofile.pk
-        full_uri = request.build_absolute_uri()
-        base_url = full_uri.scheme + '://' + full_uri.netloc
+        pk = self.request.user.wanglibaouserprofile.pk
         user_spec_url = reverse('oauth-callback-view', kwargs={'pk': str(pk)})
+        base_url = self.get_base_url()
         return base_url + user_spec_url
+
+    def gen_trade_return_url(self):
+        return_path = reverse('trade-callback-view')
+        base_url = self.get_base_url()
+        return base_url + return_path
+
+    def get_base_url(self):
+        full_uri = urlparse(self.request.build_absolute_uri())
+        base_url = full_uri.scheme + '://' + full_uri.netloc
+        return base_url
 
 
 class TradeWithAutoLogin(object):
