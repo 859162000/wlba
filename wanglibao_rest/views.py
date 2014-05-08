@@ -1,14 +1,16 @@
 # encoding:utf-8
+import json
+import urlparse
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+import requests
 from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework import status
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
-from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
@@ -50,7 +52,7 @@ class RegisterAPIView(APIView):
         if serializer.is_valid():
             create_user(serializer.object['identifier'], serializer.object['password'], serializer.object['nickname'])
             return Response({'message': 'user generated'})
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserExisting(APIView):
@@ -83,5 +85,31 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
 
 
 obtain_auth_token = ObtainAuthTokenCustomized.as_view()
+
+
+# REST Wrapper is a wrapper api which gets a list of api calls and return their result in one request
+class RestWrapper(APIView):
+    permission_classes = ()
+
+    def get(self, request, *args, **kwargs):
+        query_params = request.QUERY_PARAMS
+        urls = query_params.get('urls').split(',')
+        if urls is None:
+            return Response(status=status.HTTP_200_OK)
+
+        results = []
+        for url in urls:
+            parse_result = urlparse.urlparse(url)
+            if parse_result.netloc == '':
+                response = requests.get(request.META['wsgi.url_scheme'] + "://" + request.META['HTTP_HOST'] + url)
+                results.append({
+                    'url': url,
+                    'status_code': response.status_code,
+                    'result': response.json()
+                })
+
+        return Response({
+            'results': results,
+        })
 
 
