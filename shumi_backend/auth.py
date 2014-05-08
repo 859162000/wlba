@@ -21,8 +21,9 @@ class OAuthRequestToken(object):
         self.request_url = request_url
         self.oauth_callback = oauth_callback
         self.authorize_url = authorize_url
+        self.request_token, self.request_token_secret = self._fetch_token_secret_from_shumi()
 
-    def get_oauth_token_secret(self):
+    def _fetch_token_secret_from_shumi(self):
         """
         return tuple of unauthorized oauth token and secret
         """
@@ -36,7 +37,10 @@ class OAuthRequestToken(object):
         else:
             raise ValueError
 
-    def get_redirect_address(self, resource_owner_token):
+    def get_request_token_secret(self):
+        return self.request_token, self.request_token_secret
+
+    def get_redirect_address(self):
         """
         return oauth redirect address,
         redirect user to this address in web browser.
@@ -44,7 +48,7 @@ class OAuthRequestToken(object):
         oauth provider will callback to our side with oauth token and verifier
         handle this callback with OAuthExchangeAccessToken class or it's sub class.
         """
-        authorize_url = self.authorize_url + resource_owner_token
+        authorize_url = self.authorize_url + self.request_token
         return authorize_url
 
 

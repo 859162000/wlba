@@ -1,3 +1,4 @@
+import json
 from requests_oauthlib import OAuth1Session
 from django.conf import settings
 from shumi_backend.exception import FetchException
@@ -20,7 +21,9 @@ class ShuMiAPI(object):
         api_url = self.api_base_url + api_query
         response = self.oauth.get(api_url)
         if response.status_code == 200:
-            return response.text
+            json_string = response.text
+            return json.loads(json_string)
+
         else:
             raise FetchException('%s' % response.text)
 
@@ -50,6 +53,11 @@ class AppLevel(ShuMiAPI):
     def get_available_funds(self):
         api_query = 'trade_common.getavailablefunds'
         return self._oauth_get(api_query)
+
+    def get_available_cash_funds(self):
+        funds = self.get_available_funds()
+        cash_funds = [fund for fund in funds if fund['FundType'] == '2']
+        return cash_funds
 
     # input: None
     # output: all available cash funds list
