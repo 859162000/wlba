@@ -23,3 +23,7 @@ Install compass
 -----------------
 - gem install bundle
 - bundle install
+
+Languages or skills required
+-----------------
+Programming language: Python, Sass + Compass, jade (pyjade)
