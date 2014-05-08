@@ -61,12 +61,6 @@ class OAuthCallbackView(View):
         return HttpResponseRedirect(return_url)
 
 
-class OAuthView(View):
-    """
-    Generate ShumiProfile object, store unauthorized resource owner key/secret.
-    """
-
-
 class OAuthTriggerView(TemplateView):
     """
 

@@ -1,3 +1,4 @@
+import json
 from requests_oauthlib import OAuth1Session
 from django.conf import settings
 from shumi_backend.exception import FetchException
@@ -20,7 +21,9 @@ class ShuMiAPI(object):
         api_url = self.api_base_url + api_query
         response = self.oauth.get(api_url)
         if response.status_code == 200:
-            return response.text
+            json_string = response.text
+            return json.loads(json_string)
+
         else:
             raise FetchException('%s' % response.text)
 
