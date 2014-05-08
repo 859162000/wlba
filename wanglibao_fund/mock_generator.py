@@ -8,11 +8,11 @@ from wanglibao_fund.models import FundIssuer, Fund, IssueFrontEndChargeRate, Red
 class MockGenerator(object):
 
     @classmethod
-    def generate_fund_issuers(cls, clean=False):
+    def generate_fund_issuers(cls, count=100, clean=False):
         if clean:
             [item.delete() for item in FundIssuer.objects.iterator()]
 
-        for index in range(0, 100):
+        for index in range(0, count):
             issuer = FundIssuer()
             issuer.name = u'发行机构' + str(index + 1)
             issuer.description = u'国内第%d家发行机构' % (index + 1, )
@@ -21,7 +21,7 @@ class MockGenerator(object):
             issuer.save()
 
     @classmethod
-    def generate_fund(cls, clean=False):
+    def generate_fund(cls, count=1000, clean=False):
         if clean:
             for fund in Fund.objects.all():
                 fund.delete()
@@ -29,14 +29,14 @@ class MockGenerator(object):
         issuers = FundIssuer.objects.all()
         issuer_count = len(issuers)
 
-        for index in range(0, 1000):
+        for index in range(0, count):
             fund = Fund()
 
             fund.name = u'基金产品' + str(index + 1)
             fund.full_name = u'基金全名'
 
             fund.product_code = str(random.randrange(100000, 900000))
-            fund.issuer = issuers.get(pk=random.randrange(1, issuer_count))
+            fund.issuer = issuers.get(pk=random.randrange(1, issuer_count + 1))
             fund.brief = u'难得一见的基金产品 快抢'
 
             fund.face_value = random.randrange(50, 200) / 100.0

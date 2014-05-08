@@ -1,16 +1,29 @@
+from django.db.models import F
 from django.shortcuts import render
 
 # Create your views here.
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from trust.models import Trust
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao_buy.models import BuyInfo
-from wanglibao_buy.serializers import BuyInfoSerializer
+from wanglibao_buy.models import TradeInfo
+from wanglibao_buy.serializers import TradeInfoSerializer
+from wanglibao_fund.models import Fund
 
 
-class BuyInfoViewSet(PaginatedModelViewSet):
-    model = BuyInfo
-    serializer_class = BuyInfoSerializer
+def get_product_qs(type):
+    if type == 'fund':
+        return Fund.objects.all()
+    if type == 'trust':
+        return Trust.objects.all()
+
+    raise NotImplementedError('The type not supported yet')
+
+
+class TradeInfoViewSet(PaginatedModelViewSet):
+    model = TradeInfo
+    serializer_class = TradeInfoSerializer
     permission_classes = IsAuthenticated,
 
     def create(self, request, *args, **kwargs):
@@ -21,9 +34,26 @@ class BuyInfoViewSet(PaginatedModelViewSet):
             if request.user and request.user.is_authenticated():
                 user = request.user
 
+
+            item_type = serializer.object.type
+            item_id = serializer.object.item_id
+            amount = serializer.object.amount
+
+            already_bought = TradeInfo.objects.filter(type=item_type, item_id=item_id, user=user).exists()
+
             serializer.object.created_by = user
             serializer.object.save()
-            return Response(serializer.data)
+
+            # Now find the product and update the buy info
+            product = get_product_qs(item_type).filter(pk=item_id).first()
+            product.bought_count = F('bought_count') + 1
+            if not already_bought:
+                product.bought_people_count = F('bought_people_count') + 1
+            product.bought_amount = F('bought_amount') + amount
+
+            product.save()
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response({
                 'message': serializer.errors

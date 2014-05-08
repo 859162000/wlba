@@ -4,7 +4,7 @@ from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import UserViewSet
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
-from wanglibao_buy.views import BuyInfoViewSet
+from wanglibao_buy.views import TradeInfoViewSet
 from wanglibao_cash.views import CashViewSet, CashIssuerViewSet
 from wanglibao_favorite.views import FavoriteTrustViewSet, FavoriteFundViewSet, FavoriteFinancingViewSet, \
     FavoriteCashViewSet
@@ -51,7 +51,7 @@ router.register(r'favorite/cashes', FavoriteCashViewSet)
 
 router.register(r'feedbacks', FeedbackViewSet)
 
-router.register(r'buy_info', BuyInfoViewSet)
+router.register(r'trade_info', TradeInfoViewSet)
 
 router.register(r'banners', BannerViewSet)
 
