@@ -36,7 +36,7 @@ def production():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'master'
+    env.branch = 'production'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -48,13 +48,13 @@ def production():
     env.create_ssl_cert = False  # Production's key is maintained differently
 
 
-def staging():
-    env.host_string = '192.168.1.12'
+def production_staging():
+    env.host_string = '192.168.1.150'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'master'
+    env.branch = 'production'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -66,8 +66,8 @@ def staging():
     env.create_ssl_cert = True
 
 
-def ftp():
-    env.host_string = '192.168.1.150'
+def staging():
+    env.host_string = '192.168.1.12'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
@@ -241,6 +241,7 @@ def deploy():
                     # use --noinput to prevent create super user. When super user created, then a profile object needs
                     # to be created, at that point, that table is not created yet. Then it crashes.
                     run("python manage.py syncdb --noinput")
+                    run("python manage.py migrate --list | grep -B 1 \"( ) 0001_initial\" | grep -v 0001 | tr -d \" -\" |  awk '{ if($0 != \"\") { system( \"python manage.py migrate \"  $0  \" 0001 --fake\") } }'")
                     run("python manage.py migrate")
 
                 # TODO generate a testing ssl key and crt file. Otherwise, apache server won't restart
