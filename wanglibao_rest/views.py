@@ -101,7 +101,8 @@ class RestWrapper(APIView):
         for url in urls:
             parse_result = urlparse.urlparse(url)
             if parse_result.netloc == '':
-                response = requests.get(request.META['wsgi.url_scheme'] + "://" + request.META['HTTP_HOST'] + url)
+                response = requests.get(request.META['wsgi.url_scheme'] + "://" + request.META['HTTP_HOST'] + url,
+                                        verify=False)
                 results.append({
                     'url': url,
                     'status_code': response.status_code,
