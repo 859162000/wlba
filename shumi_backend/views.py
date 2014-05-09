@@ -1,3 +1,4 @@
+from urllib import urlencode
 from django.views.generic import TemplateView, View, RedirectView
 
 from django.contrib.auth import get_user_model
@@ -67,12 +68,13 @@ class OAuthTriggerView(TemplateView):
         profile = self.request.user.wanglibaouserprofile
         context = super(OAuthTriggerView, self).get_context_data(**kwargs)
         trade_helper = Utility(self.request)
-        origin_trade_url = Utility.gen_trade_url('202301', action='buy')
-        return_url = trade_helper.gen_trade_return_url()
-        trader = TradeWithAutoLogin(profile.shumi_access_token, profile.shumi_access_token_secret,
-                                    origin_trade_url, return_url)
+        data = dict()
+        data['fund_code'] = '202301'
+        data['return_url'] = trade_helper.gen_trade_return_url()
+        oauth_redirect_base_url = reverse('oauth-status-view')
+
         context['pageTitle'] = 'Test trigger'
-        context['buyurl'] = trader.get_trade_url()
+        context['buyurl'] = oauth_redirect_base_url + '?' + urlencode(data)
         return context
 
 
@@ -84,11 +86,15 @@ class OAuthStatusView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         fund_code = self.request.GET.get('fund_code', '')
         return_url = self.request.GET.get('return_url', '')
+        session = self.request.session
         if fund_code and return_url:
             self.request.session['fund_code'] = fund_code
             self.request.session['return_url'] = return_url
+        elif 'fund_code' in session and 'return_url' in session:
+            fund_code = self.request.session['fund_code']
+            return_url = self.request.session['return_url']
         else:
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest('get no fund_code and return in either request string or session')
         profile = self.request.user.wanglibaouserprofile
         # if user have access token and access token secret, redirect to trade view.
         if profile.shumi_access_token and profile.shumi_access_token_secret:
@@ -144,7 +150,8 @@ class OAuthStartView(RedirectView):
         #host = request.get_host()
         #host = 'https://www.wanglibao.com'
         #path = reverse('oauth-callback-view', kwargs={'pk': self.request.user.pk})
-        call_back_url = Utility.gen_oauth_callback_url(self.request)
+        hepler = Utility(self.request)
+        call_back_url = hepler.gen_oauth_callback_url()
         requester = ShuMiRequestToken(call_back_url)
         request_token, request_token_secret = requester.get_request_token_secret()
         profile.shumi_request_token = request_token
