@@ -69,3 +69,18 @@ class TradeInfoAPITest(TestCase):
         self.assertEqual(fund.bought_people_count, 1)
         self.assertEqual(fund.bought_count, 2)
         self.assertEqual(fund.bought_amount, 6000)
+
+        self.client.post('/api/trade_info/', json.dumps({
+            'type': 'fund',
+            'trade_type': u'申购',
+            'fund_code': fund.product_code,
+            'item_name': u'测试名字',
+            'amount': 3000,
+            'user': 1,
+            'verify_info': '1321412412321',
+            'related_info': '扣款时间 你不知道'
+        }), content_type="application/json")
+
+        fund = Fund.objects.all().get(pk=fund.id)
+        self.assertEqual(fund.bought_people_count, 1)
+        self.assertEqual(fund.bought_count, 3)
