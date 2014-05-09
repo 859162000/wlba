@@ -12,6 +12,13 @@ def money_to_10k(value):
     return u'%d万' % (int(value),)
 
 @register.filter
+def money(value):
+    """
+    Convert the number into 10k based string
+    """
+    return u'%d元' % (int(value),)
+
+@register.filter
 def month(value):
     """
     Convert the float based month to string
@@ -105,3 +112,8 @@ def mail_login_url(email):
     if domain in mapping:
         return mapping[domain]
     return 'http://www.baidu.com/#wd=%' % domain
+
+@register.filter
+def current_deposit_times(profit):
+    times = profit / 0.35
+    return '%.1f' % times

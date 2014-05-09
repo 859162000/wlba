@@ -1,3 +1,4 @@
+from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from utils import detect_identifier_type

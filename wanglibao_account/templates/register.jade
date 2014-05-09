@@ -11,7 +11,7 @@ html
     .full-container-login
       .container-login
         .login-left-div
-          form#register-form.login-form(method='post', action='/accounts/register/')
+          form#register-form.login-form(method='post', action='/accounts/register/?next={{next}}')
             - csrf_token
             .form-login-title
               img.user-icon(src='/static/images/user.png')
@@ -38,7 +38,7 @@ html
               button#button-submit.button-red.button-middle.span12(type='submit') 注 册
         .register-right-div
           p 已有网利宝账号&nbsp;
-            a#register-now(href='/accounts/login') 直接登录>>
+            a#register-now(href='/accounts/login/?next={{next}}') 直接登录>>
           .slogan-div
             p.slogan 网利宝 收益好
             p.hot-line 在线咨询 <span>400-8588-066<span>

@@ -1,8 +1,9 @@
 # encoding: utf-8
 import datetime
 import logging
+from django.contrib import auth
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.urlresolvers import reverse
@@ -36,12 +37,21 @@ class RegisterView (RegistrationView):
         identifier = cleaned_data['identifier']
 
         user = create_user(identifier, password, nickname)
+        auth_user = authenticate(identifier=identifier, password=password)
+        auth.login(request, auth_user)
         return user
 
     def get_success_url(self, request=None, user=None):
         if request.GET.get('next'):
             return request.GET.get('next')
         return '/accounts/login'
+
+    def get_context_data(self, **kwargs):
+        context = super(RegisterView, self).get_context_data(**kwargs)
+        context.update({
+            'next': self.request.GET.get('next', None)
+        })
+        return context
 
 
 class EmailSentView(TemplateView):

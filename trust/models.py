@@ -67,7 +67,9 @@ class Trust (models.Model):
     consignee = models.TextField(blank=True, verbose_name=u'受托人')
     payment = models.TextField(blank=True, verbose_name=u'支付情况')
     guarantee = models.TextField(blank=True, verbose_name=u'担保')
-    financing_party = models.TextField(blank=True, verbose_name=u'融资方')
+    financing_party = models.CharField(max_length=100, blank=True, verbose_name=u'融资方')
+    financing_party_description = models.TextField(blank=True, verbose_name=u'融资方介绍')
+    interest_method = models.CharField(max_length=25, blank=True, verbose_name=u'付息方式')
     source_of_repayment = models.TextField(blank=True, verbose_name=u'还款来源')
 
     product_description = models.TextField(blank=True, verbose_name=u'产品说明')

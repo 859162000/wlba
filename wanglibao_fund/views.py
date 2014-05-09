@@ -37,7 +37,7 @@ class FundDetailView(TemplateView):
         context = super(FundDetailView, self).get_context_data(**kwargs)
         is_favorited = 0
         try:
-            fund=Fund.objects.get(pk=id)
+            fund = Fund.objects.get(pk=id)
         except Fund.DoesNotExist:
             raise Http404(u'您查找的产品不存在')
 
@@ -46,4 +46,8 @@ class FundDetailView(TemplateView):
                 is_favorited = 1
         context['is_favorited'] = is_favorited
         context['fund'] = fund
+        if fund.type == u'货币型':
+            self.template_name = 'monetary_fund_detail.jade'
+        else:
+            self.template_name = 'fund_detail.jade'
         return context
