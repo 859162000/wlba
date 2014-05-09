@@ -17,3 +17,30 @@ class TradeInfo(models.Model):
 
     def __unicode__(self):
         return u'%s买了%s %s %d元' % (self.user.wanglibaouserprofile.phone, self.type, self.item_name, self.amount)
+
+
+class FundHoldInfo(models.Model):
+    user = models.ForeignKey(get_user_model())
+    trade_account = models.CharField(help_text=u'用户数米交易账户', max_length=20)
+    fund_code = models.CharField(help_text=u'基金代码', max_length=10)
+    fund_name = models.CharField(help_text=u'基金名称', max_length=100)
+    share_type = models.CharField(help_text=u'收费方式', max_length=10)
+    current_remain_share = models.DecimalField(help_text=u'当前份额余额',  max_digits=20, decimal_places=2)
+    usable_remain_share = models.DecimalField(help_text=u'可用份额余额',  max_digits=20, decimal_places=2)
+    freeze_remain_share = models.DecimalField(help_text=u'冻结份额余额', max_digits=20, decimal_places=2)
+    melon_method = models.CharField(help_text=u'分红方式', max_length=10)
+    t_freeze_remain_share = models.DecimalField(help_text=u'交易冻结份额', max_digits=20, decimal_places=2)
+    expire_shares = models.DecimalField(help_text=u'到期可用余额',  max_digits=20, decimal_places=2)
+    unpaid_income = models.DecimalField(help_text=u'未付收益',  max_digits=20, decimal_places=2)
+    pernet_value = models.DecimalField(help_text=u'单位净值',  max_digits=20, decimal_places=2)
+    market_value = models.DecimalField(help_text=u'基金市值',  max_digits=20, decimal_places=3)
+    nav_date = models.DateField(help_text=u'净值日期')
+    bank_account = models.CharField(help_text=u'银行帐号', max_length=20)
+    bank_name = models.CharField(help_text=u'银行名称', max_length=20)
+    bank_serial = models.CharField(help_text=u'银行编号', max_length=10)
+    fund_type = models.CharField(help_text=u'基金类型', max_length=10)
+    fund_type_to_cn = models.CharField(help_text=u'基金类型名称', max_length=20)
+    rapid_redeem = models.BooleanField(help_text=u'是否支持快速赎回')
+
+    def __unicode__(self):
+        return u'用户%s 持仓 %s: %s 余额<%s>' % (self.user, self.fund_code, self.fund_name, self.current_remain_share)

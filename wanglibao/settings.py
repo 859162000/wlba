@@ -317,4 +317,6 @@ SM_AUTO_LOGIN_URL = 'https://account.fund123.cn/oauth/Partner/AutoLogin.aspx?'
 SM_REQUEST_TOKEN_URL = 'https://account.fund123.cn/oauth/request_token.ashx'
 SM_AUTHORIZE_BASE_URL = 'https://account.fund123.cn/oauth/Partner/Authorize.aspx'
 SM_ACCESS_TOKEN_URL = 'https://account.fund123.cn/oauth/access_token.ashx'
-SM_TRADE_URL_TEMPLATE = 'https://trade.fund123.cn/GoTrade/{trade_type}?fundcode={fund_code}'
+SM_PURCHASE_TEMPLATE = 'https://trade.fund123.cn/Trading/Do/Purchase?fundcode={fund_code}'
+SM_REDEEM_TEMPLATE = 'https://trade.fund123.cn/Trading/Do/Redeem?tradeAccount={trade_account}' \
+                     '&fundCode={fund_code}&sharetype={share_type}&UsableRemainShare={usable_remain_share}'

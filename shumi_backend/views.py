@@ -8,7 +8,8 @@ from django.core.urlresolvers import reverse
 
 from exception import FetchException
 from auth import ShuMiExchangeAccessToken, ShuMiRequestToken
-from trade import Utility, TradeWithAutoLogin
+from trade import TradeWithAutoLogin
+from utility import UrlTools, purchase
 
 # Create your views here.
 
@@ -67,7 +68,7 @@ class OAuthTriggerView(TemplateView):
     def get_context_data(self, **kwargs):
         profile = self.request.user.wanglibaouserprofile
         context = super(OAuthTriggerView, self).get_context_data(**kwargs)
-        trade_helper = Utility(self.request)
+        trade_helper = UrlTools(self.request)
         data = dict()
         data['fund_code'] = '202301'
         data['return_url'] = trade_helper.gen_trade_return_url()
@@ -91,8 +92,9 @@ class OAuthStatusView(RedirectView):
             self.request.session['fund_code'] = fund_code
             self.request.session['return_url'] = return_url
         elif 'fund_code' in session and 'return_url' in session:
-            fund_code = self.request.session['fund_code']
-            return_url = self.request.session['return_url']
+            #fund_code = self.request.session['fund_code']
+            #return_url = self.request.session['return_url']
+            pass
         else:
             return HttpResponseBadRequest('get no fund_code and return in either request string or session')
         profile = self.request.user.wanglibaouserprofile
@@ -118,7 +120,7 @@ class TradeView(View):
 
         action = self.request.GET.get('action', 'buy')
 
-        trade_url = Utility.gen_trade_url(fund_code, action)
+        trade_url = purchase(fund_code)
         profile = self.request.user.wanglibaouserprofile
         access_token = profile.shumi_access_token
         access_token_secret = profile.shumi_access_token_secret
@@ -150,8 +152,8 @@ class OAuthStartView(RedirectView):
         #host = request.get_host()
         #host = 'https://www.wanglibao.com'
         #path = reverse('oauth-callback-view', kwargs={'pk': self.request.user.pk})
-        hepler = Utility(self.request)
-        call_back_url = hepler.gen_oauth_callback_url()
+        helper = UrlTools(self.request)
+        call_back_url = helper.gen_oauth_callback_url()
         requester = ShuMiRequestToken(call_back_url)
         request_token, request_token_secret = requester.get_request_token_secret()
         profile.shumi_request_token = request_token
