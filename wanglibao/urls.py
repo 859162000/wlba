@@ -32,6 +32,7 @@ urlpatterns = patterns(
 
     url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
 
+    url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^api/', include('wanglibao_rest.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -47,10 +48,6 @@ urlpatterns = patterns(
     url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
     url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),
     (r'^ckeditor/', include('ckeditor.urls')),
-)
-
-urlpatterns += patterns('',
-    url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token')
 )
 
 if settings.DEBUG:

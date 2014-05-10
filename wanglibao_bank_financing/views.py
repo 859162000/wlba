@@ -2,7 +2,7 @@
 from django.http import Http404
 from django.views.generic import TemplateView
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao_account.permissions import IsAdminUserOrReadOnly
+from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_bank_financing.filters import BankFinancingFilterSet
 from wanglibao_bank_financing.models import BankFinancing, Bank
 from wanglibao_bank_financing.serializers import BankFinancingSerializer, BankSerializer
@@ -11,6 +11,9 @@ from wanglibao_hotlist.models import HotFinancing
 
 
 class BankFinancingViewSet(PaginatedModelViewSet):
+    """
+    银行理财
+    """
     model = BankFinancing
     filter_class = BankFinancingFilterSet
     serializer_class = BankFinancingSerializer

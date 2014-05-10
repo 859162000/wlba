@@ -3,7 +3,7 @@
 from django.http import Http404
 from django.views.generic import TemplateView
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao_account.permissions import IsAdminUserOrReadOnly
+from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_cash.filters import CashFilterSet
 from wanglibao_cash.models import Cash, CashIssuer
 from wanglibao_cash.serializers import CashSerializer, CashIssuerSerializer

@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url, include
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import SimpleRouter, DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import UserViewSet
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
@@ -31,11 +31,8 @@ router.register(r'fund_issuers', FundIssuerViewSet)
 router.register(r'cashes', CashViewSet)
 router.register(r'cash_issuers', CashIssuerViewSet)
 
-router.register(r'pre_orders', PreOrderViewSet)
-
 router.register(r'portfolios', PortfolioViewSet)
 router.register(r'products', ProductTypeViewSet)
-router.register(r'user_portfolios', UserPortfolioViewSet)
 
 router.register(r'hot_trusts', HotTrustViewSet)
 router.register(r'hot_financings', HotFinancingViewSet)
@@ -49,12 +46,10 @@ router.register(r'favorite/funds', FavoriteFundViewSet)
 router.register(r'favorite/financings', FavoriteFinancingViewSet)
 router.register(r'favorite/cashes', FavoriteCashViewSet)
 
+router.register(r'pre_orders', PreOrderViewSet)
 router.register(r'feedbacks', FeedbackViewSet)
-
 router.register(r'trade_info', TradeInfoViewSet)
-
 router.register(r'banners', BannerViewSet)
-
 router.register(r'users', UserViewSet)
 
 
@@ -67,5 +62,10 @@ urlpatterns = patterns(
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^profile/', ProfileView.as_view()),
     url(r'^wrapper/', RestWrapper.as_view()),
-    url(r'^', include(router.urls)),
+
+    url(r'', include(router.urls)),
+)
+
+urlpatterns += patterns('',
+    url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token')
 )
