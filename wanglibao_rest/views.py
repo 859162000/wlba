@@ -1,10 +1,10 @@
 # encoding:utf-8
-import json
 import urlparse
 
 from django.contrib.auth import get_user_model
+from django.core.urlresolvers import resolve
 from django.db.models import Q
-import requests
+from django.http import QueryDict
 from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
@@ -98,19 +98,24 @@ class RestWrapper(APIView):
             return Response(status=status.HTTP_200_OK)
 
         results = []
+        store_query_params = request.QUERY_PARAMS
         for url in urls:
             parse_result = urlparse.urlparse(url)
             if parse_result.netloc == '':
-                response = requests.get(request.META['wsgi.url_scheme'] + "://" + request.META['HTTP_HOST'] + url,
-                                        verify=False)
-                results.append({
-                    'url': url,
-                    'status_code': response.status_code,
-                    'result': response.json()
-                })
+                r = resolve(parse_result.path)
+
+                if issubclass(r.func.cls, APIView):
+                    url_query_params = QueryDict(parse_result.query)
+                    request._request.GET = url_query_params
+                    response = r.func(request, **query_params)
+                    results.append({
+                        'url': url,
+                        'status_code': response.status_code,
+                        'result': response.data
+                    })
+
+        request._request.GET = store_query_params
 
         return Response({
             'results': results,
         })
-
-
