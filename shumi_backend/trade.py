@@ -23,7 +23,7 @@ class TradeWithAutoLogin(object):
         uri, headers, body = self.signer.sign(target_url)
         return uri
 
-    def get_trade_url(self):
+    def get_trade_auto_login_url(self):
         dest = {'dest': self.trade_url+'&ReturnUrl='+self.return_url}
         trade_full_path = self.auto_login_url + urlencode(dest)
         return self.get_oauth_string(trade_full_path)

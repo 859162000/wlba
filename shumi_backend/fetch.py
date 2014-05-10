@@ -1,7 +1,12 @@
 import json
 from requests_oauthlib import OAuth1Session
+
 from django.conf import settings
-from shumi_backend.exception import FetchException
+from django.contrib.auth import get_user_model
+
+from wanglibao_buy.models import FundHoldInfo
+from exception import FetchException
+from utility import mapping_fund_hold_info
 
 
 class ShuMiAPI(object):
@@ -94,8 +99,34 @@ class UserLevel(ShuMiAPI):
                                                                             capitalflow=capital_flow)
         return self._oauth_get(api_query)
 
-    def get_cash_history_by_month(self, month):
-        pass
+    def get_fund_hold_info(self):
+        api_query = 'trade_foundation.getfundshares'
+        return self._oauth_get(api_query)
 
-    def get_cash_histhory_by_week(self, week):
-        pass
+
+class UserInfoFetcher(UserLevel):
+
+    def __init__(self, user_obj):
+        if not isinstance(user_obj, get_user_model()):
+            raise TypeError('%s is not valid user object' % user_obj)
+        self.user = user_obj
+        profile = user_obj.wanglibaouserprofile
+        access_token = profile.shumi_access_token
+        access_token_secret = profile.shumi_access_token_secret
+        super(UserInfoFetcher, self).__init__(access_token, access_token_secret)
+
+    def save_user_fund_hold_info(self):
+        # todo retrieve new hold info
+        funds = self.get_fund_hold_info()
+
+        if funds:
+            old_info = FundHoldInfo.objects.filter(pk=self.user)
+            if old_info.exists():
+                # todo delete all
+                pass
+            for fund in funds:
+                hold = FundHoldInfo(user=self.user, **mapping_fund_hold_info(fund))
+                hold.save()
+
+        return len(funds)
+

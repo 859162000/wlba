@@ -63,3 +63,37 @@ def redeem(fund_code, share_type, trade_account, usable_remain_share):
                               trade_account=trade_account, usable_remain_share=usable_remain_share)
     return url
 
+
+def mapping_fund_hold_info(shumi_json_dict):
+    try:
+        hold = dict()
+        hold['bank_account'] = shumi_json_dict['BankAccount']
+        hold['bank_name'] = shumi_json_dict['BankName']
+        hold['bank_serial'] = shumi_json_dict['BankSerial']
+        hold['capital_mode'] = shumi_json_dict['CapitalMode']
+        hold['current_remain_share'] = shumi_json_dict['CurrentRemainShare']
+        hold['expire_shares'] = shumi_json_dict['ExpireShares']
+        hold['freeze_remain_share'] = shumi_json_dict['FreezeRemainShare']
+        hold['fund_code'] = shumi_json_dict['FundCode']
+        hold['fund_name'] = shumi_json_dict['FundName']
+        hold['fund_type'] = shumi_json_dict['FundType']
+        hold['fund_type_to_cn'] = shumi_json_dict['FundTypeToCN']
+        hold['market_value'] = shumi_json_dict['MarketValue']
+        hold['melon_method'] = shumi_json_dict['MelonMethod']
+        hold['nav_date'] = shumi_json_dict['NavDate']
+        hold['pernet_value'] = shumi_json_dict['PernetValue']
+        hold['rapid_redeem'] = shumi_json_dict['RapidRedeem']
+        hold['share_type'] = shumi_json_dict['ShareType']
+        hold['t_freeze_remain_share'] = shumi_json_dict['TfreezeRemainShare']
+        hold['trade_account'] = shumi_json_dict['TradeAccount']
+        hold['unpaid_income'] = shumi_json_dict['UnpaidIncome']
+        hold['usable_remain_share'] = shumi_json_dict['UsableRemainShare']
+
+    except KeyError:
+        raise KeyError('unpack error.')
+
+    return hold
+
+
+def mapping_funds_info():
+    pass

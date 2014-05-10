@@ -6,10 +6,11 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRe
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
+from wanglibao_buy.models import FundHoldInfo
 from exception import FetchException
 from auth import ShuMiExchangeAccessToken, ShuMiRequestToken
 from trade import TradeWithAutoLogin
-from utility import UrlTools, purchase
+from utility import UrlTools, purchase, redeem
 
 # Create your views here.
 
@@ -71,7 +72,7 @@ class OAuthTriggerView(TemplateView):
         trade_helper = UrlTools(self.request)
         data = dict()
         data['fund_code'] = '202301'
-        data['return_url'] = trade_helper.gen_trade_return_url()
+        data['action'] = 'purchase'
         oauth_redirect_base_url = reverse('oauth-status-view')
 
         context['pageTitle'] = 'Test trigger'
@@ -86,25 +87,61 @@ class OAuthStatusView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         fund_code = self.request.GET.get('fund_code', '')
-        return_url = self.request.GET.get('return_url', '')
+        return_url = self.request.GET.get('action', '')
         session = self.request.session
         if fund_code and return_url:
             self.request.session['fund_code'] = fund_code
-            self.request.session['return_url'] = return_url
-        elif 'fund_code' in session and 'return_url' in session:
+            self.request.session['action'] = return_url
+        elif 'fund_code' in session and 'action' in session:
             #fund_code = self.request.session['fund_code']
             #return_url = self.request.session['return_url']
             pass
         else:
-            return HttpResponseBadRequest('get no fund_code and return in either request string or session')
+            return HttpResponseBadRequest('get no fund_code and action in either request string or session')
         profile = self.request.user.wanglibaouserprofile
         # if user have access token and access token secret, redirect to trade view.
         if profile.shumi_access_token and profile.shumi_access_token_secret:
-            self.pattern_name = 'trade-redirect-view'
+            self.pattern_name = 'broker-view'
         # if user have no token or secret, redirect to oauth view
         else:
             self.pattern_name = 'oauth-start-view'
         return super(OAuthStatusView, self).get_redirect_url(*args, **kwargs)
+
+
+class BrokerView(View):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            fund_code = request.GET['fund_code']
+            action = request.GET['action']
+        except KeyError:
+            return HttpResponseBadRequest('no fund code or action posted')
+
+        if action == 'purchase':
+            trade_url = purchase(fund_code)
+        elif action == 'redeem':
+            target_fund = FundHoldInfo.objects.filter(user__exact=self.request.user).filter(fund_code__exact=fund_code)
+            if not target_fund.exists():
+                return HttpResponseBadRequest('current user do not have fund %s.' % fund_code)
+            target_fund = target_fund.first()
+            share_type = target_fund.share_type
+            trade_account = target_fund.trade_account
+            usble_remain_share = target_fund.usable_remain_share
+
+            trade_url = redeem(fund_code, share_type=share_type, trade_account=trade_account,
+                               usable_remain_share=usble_remain_share)
+        else:
+            pass
+
+        return_url = UrlTools(request).gen_trade_return_url()
+
+        data = dict()
+        data['trade_url'] = trade_url
+        data['return_url'] = return_url
+
+        redirect_url = reverse('trade-redirect-view') + '?' + urlencode(data)
+
+        return HttpResponseRedirect(redirect_url)
 
 
 class TradeView(View):
@@ -112,21 +149,19 @@ class TradeView(View):
     def get(self, request, *args, **kwargs):
 
         try:
-            fund_code = self.request.session['fund_code']
-            return_url = self.request.session['return_url']
+            trade_url = request.GET['trade_url']
+            return_url = request.GET['return_url']
+
         except KeyError:
             # todo redirect to funds list view instead of raise error
-            return HttpResponseBadRequest('no fund code or return url in session')
+            return HttpResponseBadRequest('no trade url or return url in request')
 
-        action = self.request.GET.get('action', 'buy')
-
-        trade_url = purchase(fund_code)
         profile = self.request.user.wanglibaouserprofile
         access_token = profile.shumi_access_token
         access_token_secret = profile.shumi_access_token_secret
         trader = TradeWithAutoLogin(access_token, access_token_secret,
                                     trade_url, return_url)
-        return HttpResponseRedirect(trader.get_trade_url())
+        return HttpResponseRedirect(trader.get_trade_auto_login_url())
 
 
 class TradeCallbackView(View):
