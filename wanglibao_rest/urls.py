@@ -12,10 +12,10 @@ from wanglibao_feedback.views import FeedbackViewSet
 from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
 from wanglibao_hotlist.views import HotTrustViewSet, HotFinancingViewSet, HotFundViewSet, MobileHotTrustViewSet, \
     MobileHotFundViewSet, MobileMainPageViewSet
-from wanglibao_portfolio.views import PortfolioViewSet, UserPortfolioViewSet, ProductTypeViewSet
+from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
-from wanglibao_rest.views import SendValidationCodeView, UserExisting, RegisterAPIView, RestWrapper
+from wanglibao_rest.views import SendValidationCodeView, UserExisting, RegisterAPIView
 
 router = DefaultRouter()
 
@@ -61,11 +61,10 @@ urlpatterns = patterns(
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^profile/', ProfileView.as_view()),
-    url(r'^wrapper/', RestWrapper.as_view()),
-
     url(r'', include(router.urls)),
 )
 
 urlpatterns += patterns('',
-    url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token')
+    url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token'),
+    url(r'wrapper/', 'drf_wrapper.views.wrapper_view'),
 )
