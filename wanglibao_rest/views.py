@@ -107,7 +107,7 @@ class RestWrapper(APIView):
                 if issubclass(r.func.cls, APIView):
                     url_query_params = QueryDict(parse_result.query)
                     request._request.GET = url_query_params
-                    response = r.func(request, **query_params)
+                    response = r.func(request)
                     results.append({
                         'url': url,
                         'status_code': response.status_code,
