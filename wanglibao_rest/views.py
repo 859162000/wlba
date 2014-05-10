@@ -119,3 +119,10 @@ class RestWrapper(APIView):
         return Response({
             'results': results,
         })
+
+
+class APIRoot(generics.GenericAPIView):
+    """
+    My API Document
+    """
+    permission_classes = ()

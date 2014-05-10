@@ -47,6 +47,7 @@ INSTALLED_APPS = (
 
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_swagger',
     'south',
     'registration',
 
@@ -320,3 +321,20 @@ SM_ACCESS_TOKEN_URL = 'https://account.fund123.cn/oauth/access_token.ashx'
 SM_PURCHASE_TEMPLATE = 'https://trade.fund123.cn/Trading/Do/Purchase?fundcode={fund_code}'
 SM_REDEEM_TEMPLATE = 'https://trade.fund123.cn/Trading/Do/Redeem?tradeAccount={trade_account}' \
                      '&fundCode={fund_code}&sharetype={share_type}&UsableRemainShare={usable_remain_share}'
+
+
+# rest api document swagger settings
+SWAGGER_SETTINGS = {
+    "exclude_namespaces": [], # List URL namespaces to ignore
+    "api_version": '1.0',  # Specify your API's version
+    "enabled_methods": [  # Specify which methods to enable in Swagger UI
+        'get',
+        'post',
+        'put',
+        'patch',
+        'delete'
+    ],
+    "api_key": '', # An API key
+    "is_authenticated": False,  # Set to True to enforce user authentication,
+    "is_superuser": False,  # Set to True to enforce admin only access
+}
