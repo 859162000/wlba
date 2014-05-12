@@ -87,14 +87,14 @@ class OAuthStatusView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         fund_code = self.request.GET.get('fund_code', '')
-        return_url = self.request.GET.get('action', '')
+        action = self.request.GET.get('action', '')
         session = self.request.session
-        if fund_code and return_url:
+        if fund_code and action:
             self.request.session['fund_code'] = fund_code
-            self.request.session['action'] = return_url
+            self.request.session['action'] = action
         elif 'fund_code' in session and 'action' in session:
             #fund_code = self.request.session['fund_code']
-            #return_url = self.request.session['return_url']
+            #return_url = self.request.session['action']
             pass
         else:
             return HttpResponseBadRequest('get no fund_code and action in either request string or session')
