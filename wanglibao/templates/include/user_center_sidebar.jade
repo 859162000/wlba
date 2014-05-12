@@ -1,0 +1,20 @@
+mixin sidebar-item(name, link, target)
+  unless target
+    target = '_self'
+  if activeItem == name
+    li.sidebar-item.active
+      a(href=link, target=target)= name
+  else
+    li.sidebar-item
+      a(href=link, target=target)= name
+
+ul.sidebar
+  +sidebar-item('账务总览', '/accounts/home/')
+  +sidebar-item('取现', '/accounts/home/')
+  +sidebar-item('交易记录', '/accounts/home/')
+  +sidebar-item('银行卡', '/accounts/home/')
+
+ul.sidebar
+  +sidebar-item('我的理财方案', '/portfolio/', '_blank')
+  +sidebar-item('我的收藏', '/accounts/favorite/')
+

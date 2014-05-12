@@ -44,7 +44,7 @@ body
         .span4-omega
           .well-m
             if user.is_authenticated
-              a.button.button-middle.button-red(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.product_code}}&return_url=http://127.0.0.1:8000/shumi/trade/callback/?fund_code={{fund.product_code}}" target='_blank') 立即购买
+              a.button.button-middle.button-red(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.product_code}}&action=purchase" target='_blank') 立即购买
             else
               a.button.button-middle.button-red(href="/accounts/register/?next=/fund/detail/{{fund.id}}") 立即购买
             p 申请人数{{fund.bought_count}}人

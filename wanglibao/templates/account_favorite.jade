@@ -5,8 +5,13 @@ include include/head
 body
   include include/header
   include include/navigation
-  .container
-    .panel-padding
+  .row
+    .span3
+      - with '我的收藏' as activeItem
+      include include/user_center_sidebar
+      - endwith
+
+    .span9-omega.panel-padding
       .panel-product-title-no-border 我的产品收藏
       .panel-title-bar-gray
         // ko template: {name: 'tabs', data: tab}

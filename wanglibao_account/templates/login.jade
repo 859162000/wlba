@@ -35,7 +35,7 @@ html
               .space-vertical-s
         .login-right-div
           p 还不是会员？
-            a#register-now(href='/accounts/register/?next=/accounts/login') 现在就注册>>
+            a#register-now(href='/accounts/register/?next={{next | urlencode}}') 现在就注册>>
           p 注册后可以保存专属于您的理财方案
           p 收藏您喜欢的产品
 
