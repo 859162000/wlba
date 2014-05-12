@@ -18,18 +18,58 @@ body
           span.nickname {{ user.wanglibaouserprofile.nick_name }}
           下午好
           span.phone ({{user.wanglibaouserprofile.phone}})
-        .row.panel-padding(style='background-color: #FAFAFA')
-          .span4
+        .card-panel
+          .gray-card3
             p 总资产
-            p 123元
-          .span4
-            p 总资产
-            p 123元
-          .span4-omega
-            p 总资产
-            p 123元
+            p
+              span.big_number 123
+              元
+          .gray-card3
+            p 累计收益
+            p
+              span.big_number 123
+              元
+          .gray-card3
+            p 加权收益率
+            p
+              span.big_number 123
+              %
 
       .panel-padding
+        .panel-product-title-red
+          货币基金
+          a.button-mini.pull-right(href='#') 交易记录
+        .card-panel
+          .gray-card4
+            p 总资产
+            p
+              span.big_number 123
+              元
+          .gray-card4
+            p 累积收益
+            p
+              span.big_number 123
+              元
+          .gray-card4
+            p 近一周收益
+            p
+              span.big_number 123
+              元
+          .gray-card4
+            p 近一月收益
+            p
+              span.big_number 123
+              元
+
+        .space-vertical-s
+
+        table.trust-table
+          thead
+            tr
+              th 产品名称
+              th 金额
+              th 收益
+              th 操作
 
   include include/footer
   include include/templates
