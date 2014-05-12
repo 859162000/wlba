@@ -20,7 +20,7 @@ class TradeInfo(models.Model):
 
 
 class FundHoldInfo(models.Model):
-    user = models.ForeignKey(get_user_model(), primary_key=True)
+    user = models.ForeignKey(get_user_model())
     trade_account = models.CharField(help_text=u'用户数米交易账户', max_length=20)
     fund_code = models.CharField(help_text=u'基金代码', max_length=10)
     fund_name = models.CharField(help_text=u'基金名称', max_length=100)
@@ -42,6 +42,7 @@ class FundHoldInfo(models.Model):
     fund_type_to_cn = models.CharField(help_text=u'基金类型名称', max_length=20)
     rapid_redeem = models.BooleanField(help_text=u'是否支持快速赎回')
     capital_mode = models.CharField(help_text=u'资金类型', max_length=10)
+    create_date = models.DateField(help_text=u'持仓更新时间', auto_now=True)
 
     def __unicode__(self):
         return u'用户%s 持仓 %s: %s 余额<%s>' % (self.user, self.fund_code, self.fund_name, self.current_remain_share)

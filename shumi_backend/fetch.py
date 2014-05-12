@@ -113,17 +113,21 @@ class UserInfoFetcher(UserLevel):
         profile = user_obj.wanglibaouserprofile
         access_token = profile.shumi_access_token
         access_token_secret = profile.shumi_access_token_secret
-        super(UserInfoFetcher, self).__init__(access_token, access_token_secret)
+        if access_token and access_token_secret:
+            super(UserInfoFetcher, self).__init__(access_token, access_token_secret)
+        else:
+            raise FetchException('user %s did not bind shumi access token.' % user_obj)
 
     def save_user_fund_hold_info(self):
         # todo retrieve new hold info
         funds = self.get_fund_hold_info()
 
         if funds:
-            old_info = FundHoldInfo.objects.filter(pk=self.user)
+            # if funds hold info exists. delete it.
+            old_info = FundHoldInfo.objects.filter(user__exact=self.user)
             if old_info.exists():
-                # todo delete all
-                pass
+                old_info.delete()
+            # store new funds hold info.
             for fund in funds:
                 hold = FundHoldInfo(user=self.user, **mapping_fund_hold_info(fund))
                 hold.save()
