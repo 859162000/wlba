@@ -73,17 +73,8 @@ class AppLevel(ShuMiAPI):
 
 class UserLevel(ShuMiAPI):
 
-    def get_record(self):
-        api_query = 'action.getrecord'
-        return self._oauth_get(api_query)
-
-    def get_cash_share_detail(self):
-        api_query = 'trade_cash.getcashsharedetailv3'
-        return self._oauth_get(api_query)
-
-    def get_cash_share_list(self):
-        api_query = 'trade_cash.getcashsharelist'
-        return self._oauth_get(api_query)
+    def _get_apply_history(self, begin, end, page_index, page_size):
+        pass
 
     def _get_cash_history(self, begin, end, business=7, capital_flow=1):
         """
@@ -103,6 +94,10 @@ class UserLevel(ShuMiAPI):
         api_query = 'trade_foundation.getfundshares'
         return self._oauth_get(api_query)
 
+    def get_bind_banks(self):
+        api_query = 'trade_payment.getbindbankcards'
+        return self._oauth_get(api_query)
+
 
 class UserInfoFetcher(UserLevel):
 
@@ -118,19 +113,20 @@ class UserInfoFetcher(UserLevel):
         else:
             raise FetchException('user %s did not bind shumi access token.' % user_obj)
 
-    def save_user_fund_hold_info(self):
-        # todo retrieve new hold info
+    def fetch_user_fund_hold_info(self):
         funds = self.get_fund_hold_info()
 
         if funds:
             # if funds hold info exists. delete it.
-            old_info = FundHoldInfo.objects.filter(user__exact=self.user)
-            if old_info.exists():
-                old_info.delete()
+            old_funds = FundHoldInfo.objects.filter(user__exact=self.user)
+            if old_funds.exists():
+                old_funds.delete()
             # store new funds hold info.
             for fund in funds:
                 hold = FundHoldInfo(user=self.user, **mapping_fund_hold_info(fund))
                 hold.save()
 
-        return len(funds)
+        return funds
 
+    def save_user_trade_history(self, delta=''):
+        pass
