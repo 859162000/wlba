@@ -8,42 +8,28 @@ body
 
   .row
     .span3
-      ul.sidebar
-        li.sidebar-item.active
-          a.sidebar-anchor(href="/accounts/home/") 投资方案
-        li.sidebar-item
-          a.sidebar-anchor(href="/accounts/favorite/") 产品收藏
-        li.sidebar-item
-          a.sidebar-anchor(href="/accounts/setting/") 设置
+      - with '账务总览' as activeItem
+      include include/user_center_sidebar
+      - endwith
+
     .span9-omega
-      .panel-nopadding
-        .panel-title-bar
-          .panel-title 我的评估结果
-          a.button.button-yellow.button-small(href="#") 重新评估
+      .panel-padding
+        p.font-m
+          span.nickname {{ user.wanglibaouserprofile.nick_name }}
+          下午好
+          span.phone ({{user.wanglibaouserprofile.phone}})
+        .row.panel-padding(style='background-color: #FAFAFA')
+          .span4
+            p 总资产
+            p 123元
+          .span4
+            p 总资产
+            p 123元
+          .span4-omega
+            p 总资产
+            p 123元
 
-        .container
-          .span2
-            .card-icon
-              dl
-                dt 风险承受能力
-                dd(data-bind="text: riskScore")
-          .span2
-            .card-icon
-              dl
-                dt 可投资资金
-                dd(data-bind="text: asset() + '万'")
-          .span2
-            .card-icon
-              dl
-                dt 投资期限
-                dd(data-bind="text: period() + '个月'")
-      .panel-nopadding
-        .panel-title-bar
-          .panel-title 资产配置方案
-
-        .well-s
-          // ko template: {name: 'portfolio-bar', data: portfolio}
-          // /ko
+      .panel-padding
 
   include include/footer
   include include/templates

@@ -14,10 +14,18 @@
       function viewModel() {
         var self;
         self = this;
-        self.trustTable = new trust.viewModel({});
-        self.cashTable = new cash.viewModel({});
-        self.fundTable = new fund.viewModel({});
-        self.financingTable = new financing.viewModel({});
+        self.trustTable = new trust.viewModel({
+          fields: ['名称', '状态', '资金门槛', '产品期限', '预期收益', '收藏', '详情']
+        });
+        self.financingTable = new financing.viewModel({
+          fields: ['名称', '起购金额', '管理期限', '预期收益', '收藏', '详情']
+        });
+        self.cashTable = new cash.viewModel({
+          fields: ['名称', '发行机构', '期限', '七日年化利率', '收藏', '详情']
+        });
+        self.fundTable = new fund.viewModel({
+          fields: ['名称', '管理期限', '基金类型', '近一月涨幅', '近三月涨幅', '收藏', '详情']
+        });
         self.tabTree = {
           tabs: [
             {
