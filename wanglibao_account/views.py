@@ -16,6 +16,7 @@ from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm
+from shumi_backend.exception import FetchException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
@@ -224,8 +225,11 @@ class AccountHome(TemplateView):
     template_name = 'account_home.jade'
 
     def get_context_data(self, **kwargs):
-        fetcher = UserInfoFetcher(self.request.user)
-        fund_hold_info = fetcher.fetch_user_fund_hold_info()
+        try:
+            fetcher = UserInfoFetcher(self.request.user)
+            fund_hold_info = fetcher.fetch_user_fund_hold_info()
+        except FetchException:
+            fund_hold_info = []
         return {
             'fund_hold_info': fund_hold_info
         }

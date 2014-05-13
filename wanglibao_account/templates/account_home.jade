@@ -72,16 +72,22 @@ body
               th 未付收益
               th 操作
           tbody
-            each fund in fund_hold_info
-              -with fund as fund
-              td {{fund.fund_name}}
-              td {{fund.current_remain_share}}元
-              td {{fund.unpaid_income}}元
-              td
-                a(href="#") 继续购买
-                &nbsp;
-                a(href="#") 赎回
-              -endwith
+            if fund_hold_info
+              each fund in fund_hold_info
+                -with fund as fund
+                tr
+                  td {{fund.fund_name}}
+                  td {{fund.current_remain_share}}元
+                  td {{fund.unpaid_income}}元
+                  td
+                    a(href="#") 继续购买
+                    &nbsp;
+                    a(href="#") 赎回
+                -endwith
+            else
+              tr
+                td(colspan='4') 无持仓记录
+
 
   include include/footer
   include include/templates
