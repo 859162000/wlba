@@ -8,6 +8,10 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
     '',
+    url(r'^home', login_required(AccountHome.as_view(),
+                                 login_url='/accounts/register/')),
+    url(r'^bankcard', login_required(TemplateView.as_view(template_name='account_bankcard.jade'),
+                                 login_url='/accounts/register/')),
     url(r'^login/', 'django.contrib.auth.views.login',
         {
             "template_name": "login.jade",
@@ -15,8 +19,6 @@ urlpatterns = patterns(
         }, name="auth_login"),
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
     url(r'^email/sent/$', EmailSentView.as_view(), name='email_sent'),
-    url(r'^home', login_required(AccountHome.as_view(),
-                                 login_url='/accounts/register/')),
     url(r'^favorite/', login_required(TemplateView.as_view(template_name='account_favorite.jade'),
                                       login_url='/accounts/register/')),
     url(r'^setting/', login_required(TemplateView.as_view(template_name='account_setting.jade'),
