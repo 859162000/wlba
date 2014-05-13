@@ -1,0 +1,38 @@
+doctype html
+- with '我的账户' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .row
+    .span3
+      - with '银行卡' as activeItem
+      include include/user_center_sidebar
+      - endwith
+    .span9-omega
+      .panel-padding
+        .bar
+          .card-category-bar 基金专用账户
+        .space-vertical-m
+        .row
+          .bank-card.span6
+            .bank-card--title-bar.row
+              .span2
+                .bank-card--bank-logo
+              .bank-card--bank-name.span6 招商银行
+              .bank-card--actions.span3-omega
+                a(href="#") 解除绑定
+            .row.margin-top-m
+              dl.bank-card--info-row
+                dt.bank-card--info-title 账户名
+                dd.bank-card--info-value 李琦
+            .row
+              dl.bank-card--info-row
+                dt.bank-card--info-title 账号
+                dd.bank-card--info-value 6220 **** **** 7819
+
+  include include/footer
+  include include/templates
+  script(src="/static/js/require.js", data-main="/static/js/account_home")
+  include include/tracking

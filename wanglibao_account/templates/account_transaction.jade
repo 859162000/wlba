@@ -1,0 +1,28 @@
+doctype html
+- with '收藏产品' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .row
+    .span3
+      - with '交易记录' as activeItem
+      include include/user_center_sidebar
+      - endwith
+
+    .span9-omega.panel-padding
+      .space-vertical-s
+      .panel-title-bar-gray
+        .panel-tab.active
+          货币基金
+      .panel-container
+        //ko template: {name: 'data-table', data: dataTable}
+        // /ko
+
+  include include/footer
+  include include/templates
+  script.
+    require(['/static/js/account_favorite.js'])
+
+  include include/tracking

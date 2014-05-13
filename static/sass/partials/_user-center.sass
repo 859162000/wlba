@@ -6,5 +6,75 @@
 .phone
   margin-left: 1em
 
+.card-panel
+  background-color: $light-gray-background
+  border: 1px solid $light-gray-border
+  border-left-width: 0
+  width: 100%
+  margin-top: 10px
+  +clearfix()
 
-.card3
+.gray-card
+  padding: 25px 30px
+  float: left
+  font-size: $font-s
+  border-left: 1px solid $light-gray-border
+
+.gray-card3
+  @extend .gray-card
+  width: 33.33%
+
+.gray-card4
+  @extend .gray-card
+  width: 25%
+
+.big_number
+  color: black
+  font-size: $font-xl
+  font-weight: bold
+
+.card-category-bar
+  @extend .info-bar
+
+.bank-card
+  width: 370px
+  height: 220px
+  border: 1px solid #d3d3d3
+  border-radius: 5px
+  overflow: hidden
+
+.bank-card--title-bar
+  background: #F5F5F5
+  line-height: 52px
+  padding: 0 1em
+  border-bottom: 1px solid #d3d3d3
+
+.bank-card--bank-logo
+  width: 40px
+  height: 40px
+  background: lightskyblue
+  margin-top: 6px
+
+.bank-card--bank-name
+  font-size: $font-m
+
+.bank-card--actions
+  display: inline-block
+  text-align: right
+
+.bank-card--info-row
+  text-align: center
+  margin-top: 20px
+  font-size: $font-s
+
+.bank-card--info-title
+  @extend .span2
+  @extend .prefix2
+  color: #999
+  text-align: right
+
+.bank-card--info-value
+  @extend .span6
+  color: #666
+  text-align: left
+  padding-left: 1em
