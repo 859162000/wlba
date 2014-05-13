@@ -229,3 +229,12 @@ class AccountHome(TemplateView):
         return {
             'fund_hold_info': fund_hold_info
         }
+
+
+class AccountTransaction(TemplateView):
+    template_name = 'account_transaction.jade'
+
+    def get_context_data(self, **kwargs):
+        return {
+
+        }
