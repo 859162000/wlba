@@ -68,8 +68,19 @@ body
             tr
               th 产品名称
               th 金额
-              th 收益
+              th 未付收益
               th 操作
+          tbody
+            each fund in fund_hold_info
+              -with fund as fund
+              td {{fund.fund_name}}
+              td {{fund.current_remain_share}}元
+              td {{fund.unpaid_income}}元
+              td
+                a(href="#") 继续购买
+                &nbsp;
+                a(href="#") 赎回
+              -endwith
 
   include include/footer
   include include/templates

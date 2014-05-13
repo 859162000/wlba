@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
-from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView
+from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -15,7 +15,7 @@ urlpatterns = patterns(
         }, name="auth_login"),
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
     url(r'^email/sent/$', EmailSentView.as_view(), name='email_sent'),
-    url(r'^home', login_required(TemplateView.as_view(template_name='account_home.jade'),
+    url(r'^home', login_required(AccountHome.as_view(),
                                  login_url='/accounts/register/')),
     url(r'^favorite/', login_required(TemplateView.as_view(template_name='account_favorite.jade'),
                                       login_url='/accounts/register/')),

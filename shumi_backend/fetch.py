@@ -126,7 +126,7 @@ class UserInfoFetcher(UserLevel):
                 hold = FundHoldInfo(user=self.user, **mapping_fund_hold_info(fund))
                 hold.save()
 
-        return funds
+        return FundHoldInfo.objects.filter(user__exact=self.user)
 
     def save_user_trade_history(self, delta=''):
         pass
