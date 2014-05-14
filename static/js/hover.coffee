@@ -4,7 +4,6 @@ require.config
 
 require ['jquery'], ->
   $(document).ready ->
-    console.log 'hello'
     $('[data-role=hover]').each (index, elem)->
       $(elem).mouseenter (e)->
         e.preventDefault()

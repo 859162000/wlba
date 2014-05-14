@@ -1,0 +1,25 @@
+.job-list
+  list-style: none
+  padding-top: 5px
+
+.job-item
+  @extend .span3
+  color: black
+  font-size: $font-s
+  margin: 5px 0
+
+  &:before
+    content: " "
+    border-left: 7px $red solid
+    border-top: 5px solid transparent
+    border-bottom: 5px solid transparent
+    margin-right: 10px
+
+    display: inline-block
+
+  a
+    +link-colors(black, $red)
+
+.job-modal
+  width: 600px
+  font-size: $font-s

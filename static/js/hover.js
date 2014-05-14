@@ -8,7 +8,6 @@
 
   require(['jquery'], function() {
     return $(document).ready(function() {
-      console.log('hello');
       return $('[data-role=hover]').each(function(index, elem) {
         $(elem).mouseenter(function(e) {
           var target;
