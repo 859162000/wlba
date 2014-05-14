@@ -6,13 +6,17 @@ body
   include include/header
   include include/navigation
   .container
-    .panel-nopadding.siderbar-div
-      - with '招贤纳士' as title
-      include include/about_sidebar
-      - endwith
+    .siderbar-div
+      .panel-nopadding
+        - with '招贤纳士' as title
+        include include/about_sidebar
+        - endwith
+      .space-vertical-s
+      .panel-nopadding
+        include include/licai_sidebar
     .panel-padding.span9-omega
       .well
-        h1.title 招贤纳士
+        h1.about-title 招贤纳士
         p.para “网利宝，中国第一家互联网私人银行”招募核心创始团队成员，我们期待“热情阳光、充满激情、热爱奋斗、有能力、有自信的你”与我们并肩奋斗！
         br
         p.para 成员关爱工程：

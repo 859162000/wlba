@@ -1,7 +1,7 @@
 @import "icons"
 
 .footer
-  background: #696969
+  background: #464646
   color: #BBBBBB
   margin-top: $space-s
 
@@ -12,20 +12,49 @@
   @extend .footer
   margin-top: 0
 
+.footer-section--container
+  @extend .row
+  padding: 25px 0
+  height: 220px
+  overflow: visible
+
+.footer-section
+  +float-left
+  width: 20%
+  height: 100%
+  position: relative
+  padding-left: 30px
+
+  &:before
+    border: 1px solid
+    border-left-color: #5C5C5C
+    border-right-color: #383838
+    content: " "
+    border-top: 0
+    border-bottom: 0
+    position: absolute
+    left: 0
+    height: 100%
+
+  &:first-child:before
+    display: none
+
+
 .section--title
-  font-size: $font-s
+  font-size: $font-m
   line-height: 25px
-  text-align: center
-  @extend .span4
+  color: darken(white, 10%)
+  margin-top: 10px
+  margin-bottom: 10px
 
 .section--item
   font-size: $font-xs
   line-height: 25px
-  @extend .span8-omega
 
 %contact-item
   padding-right: 10px
   min-width: 150px
+  color: #7c7c7c
 
   span
     padding-left: 10px
@@ -33,9 +62,49 @@
 
 .footer-line
   width: 100%
-  border-top: 1px solid #565656
-  border-bottom: 2px solid #747474
+  border-bottom: 1px solid #525050
+  border-top: 1px solid #383838
 
 .footer-copyright
   text-align: center
   padding: 1em
+  color: #7c7c7c
+
+.footer-bottom
+  background: #3b3b3b
+
+%footer-button-base
+  min-width: 40px
+  min-height: 40px
+  display: inline-block
+  text-indent: -10000px
+
+.weibo-button
+  @extend %footer-button-base
+  background: image-url('weibo.png')
+
+  &:hover
+    background: image-url('weibo-hover.png')
+
+.weixin-button
+  @extend %footer-button-base
+  background: image-url('weixin.png')
+  position: relative
+
+  &:hover
+    background: image-url('weixin-hover.png')
+
+.footer--weixin-qr-code
+  position: absolute
+  bottom: 100%
+  left: -56px
+  z-index: 1
+
+.phone
+  font-size: $font-xl
+  color: darken(white, 10%)
+
+.contact-section
+  text-align: center
+
+
