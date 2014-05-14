@@ -1,12 +1,15 @@
+# encoding:utf-8
+
 import json
 from requests_oauthlib import OAuth1Session
+from datetime import date
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from wanglibao_buy.models import FundHoldInfo
+from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory
 from exception import FetchException
-from utility import mapping_fund_hold_info
+from utility import mapping_fund_hold_info, mapping_bind_banks, mapping_trade_history
 
 
 class ShuMiAPI(object):
@@ -121,20 +124,48 @@ class UserInfoFetcher(UserLevel):
     def fetch_user_fund_hold_info(self):
         funds = self.get_fund_hold_info()
 
-        if funds:
-            # if funds hold info exists. delete it.
-            old_funds = FundHoldInfo.objects.filter(user__exact=self.user)
-            if old_funds.exists():
-                old_funds.delete()
-            # store new funds hold info.
-            for fund in funds:
-                hold = FundHoldInfo(user=self.user, **mapping_fund_hold_info(fund))
-                hold.save()
+        # delete old fund hold info
+        old_funds = FundHoldInfo.objects.filter(user__exact=self.user)
+
+        if old_funds.exists():
+            old_funds.delete()
+        # store new funds hold info. if shumi return null list. ignore it.
+        for fund in funds:
+            hold = FundHoldInfo(user=self.user, **mapping_fund_hold_info(fund))
+            hold.save()
 
         return FundHoldInfo.objects.filter(user__exact=self.user)
 
-    def fetch_user_trade_history(self):
-        pass
+    def fetch_user_trade_history(self, start_time='2010-01-01'):
+        # todo fix fetch index and size hard code
+        today = date.today()
+        records = self._get_cash_apply_history(start_time, today.strftime('%Y-%m-%d'))
+        records = records['Items']
+
+        old_records = TradeHistory.objects.filter(user__exact=self.user)
+
+        if old_records.exists():
+            old_records.delete()
+        # store newest 100 trade records
+        for record in records:
+            trade = TradeHistory(user=self.user, **mapping_trade_history(record))
+            trade.save()
+
+        return TradeHistory.objects.filter(user__exact=self.user)
+
 
     def fetch_bind_banks(self):
-        pass
+        banks = self.get_bind_banks()
+
+        old_bank = BindBank.objects.filter(user__exact=self.user)
+        if old_bank.exists():
+            old_bank.delete()
+
+        for bank in banks:
+            bind = BindBank(user=self.user, **mapping_bind_banks(bank))
+            bind.save()
+
+        return BindBank.objects.filter(user__exact=self.user)
+
+
+

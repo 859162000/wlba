@@ -53,6 +53,7 @@ class BindBank(models.Model):
     no = models.CharField(help_text=u'银行卡号', max_length=20)
     balance = models.DecimalField(help_text=u'当前剩余限额', max_digits=20, decimal_places=2)
     bank_name = models.CharField(help_text=u'银行名称', max_length=20)
+    bank_serial = models.CharField(help_text=u'银行编号', max_length=10)
     bind_way = models.IntegerField(help_text=u'绑定方式')
     capital_mode = models.CharField(help_text=u'资金方式', max_length=20)
     content_describe = models.CharField(help_text=u'内容描述', max_length=500)
@@ -62,13 +63,13 @@ class BindBank(models.Model):
     priority = models.CharField(help_text=u'', max_length=20)
     status = models.CharField(help_text=u'当前银行卡状态', max_length=10)
     status_to_cn = models.CharField(help_text=u'当前银行卡状态说明', max_length=20)
-    sub_trade_account = models.CharField(help_text=u'交易子帐号', max_length=20)
+    sub_trade_account = models.CharField(help_text=u'交易子帐号', max_length=1000)
     support_auto_pay = models.BooleanField(help_text=u'是否支持自动交易')
     trade_account = models.CharField(help_text=u'交易帐号', max_length=20)
     create_date = models.DateField(help_text=u'创建时间', auto_now=True)
 
     def __unicode__(self):
-        return u'% : %' % (self.bank_name, self.no)
+        return u'%s:  %s' % (self.bank_name, self.no)
 
 
 class AvailableFund(models.Model):
@@ -106,7 +107,7 @@ class AvailableFund(models.Model):
 class TradeHistory(models.Model):
     user = models.ForeignKey(get_user_model())
     amount = models.DecimalField(help_text=u'数量', max_digits=20, decimal_places=2)
-    apply_date_time = models.DateField(help_text=u'发生时间')
+    apply_date_time = models.DateTimeField(help_text=u'发生时间')
     apply_serial = models.CharField(help_text=u'流水号', max_length=50)
     bank_account = models.CharField(help_text=u'银行卡号', max_length=20)
     bank_name = models.CharField(help_text=u'银行名称', max_length=20)
@@ -126,10 +127,12 @@ class TradeHistory(models.Model):
     status = models.IntegerField(help_text=u'订单状态')
     status_to_cn = models.CharField(help_text=u'订单状态描述', max_length=100)
     trade_account = models.CharField(help_text=u'交易帐号', max_length=20)
-    create_date = models.DateField(help_text=u'创建时间')
+    create_date = models.DateField(help_text=u'创建时间', auto_now=True)
 
     def __unicode__(self):
         return u'流水号: %s ,用户 %s %s <%s: %s> 数量 %s' % (self.apply_serial, self.user,
                                                            self.business_type_to_cn, self.fund_code,
                                                            self.fund_name, self.amount)
 
+    class Meta:
+        ordering = ['-apply_date_time']
