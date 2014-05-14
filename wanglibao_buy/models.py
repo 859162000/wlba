@@ -106,7 +106,7 @@ class AvailableFund(models.Model):
 class TradeHistory(models.Model):
     user = models.ForeignKey(get_user_model())
     amount = models.DecimalField(help_text=u'数量', max_digits=20, decimal_places=2)
-    apply_date_time = models.DecimalField(help_text=u'发生时间')
+    apply_date_time = models.DateFieldField(help_text=u'发生时间')
     apply_serial = models.CharField(help_text=u'流水号', max_length=50)
     bank_account = models.CharField(help_text=u'银行卡号', max_length=20)
     bank_name = models.CharField(help_text=u'银行名称', max_length=20)
@@ -118,7 +118,7 @@ class TradeHistory(models.Model):
     fund_name = models.CharField(help_text=u'基金名称', max_length=100)
     is_cash_buy = models.BooleanField(help_text=u'是否现金宝')
     pay_result = models.IntegerField(help_text=u'支付结果')
-    pay_status_to_cn = models.CharField(help_text=u'支付状态描述')
+    pay_status_to_cn = models.CharField(help_text=u'支付状态描述', max_length=50)
     pound_age = models.DecimalField(help_text=u'手续费', max_digits=20, decimal_places=2)
     share_type = models.CharField(help_text=u'收费方式', max_length=10)
     share_type_to_cn = models.CharField(help_text=u'收费方式描述', max_length=20)
