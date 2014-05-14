@@ -169,5 +169,29 @@ class UserInfoFetcher(UserLevel):
 class AppInfoFetcher(AppLevel):
 
     def fetch_available_cash_fund(self):
-        pass
+        funds = self.get_available_cash_funds()
+        fund_codes_dict = {fund['FundCode']: fund for fund in funds}
+
+        old_fund_codes = AvailableFund.objects.existed_fund_code_list()
+
+        new_set = set(fund_codes_dict.keys())
+        old_set = set(old_fund_codes)
+
+        create_set = new_set - old_set
+        delete_set = old_set - new_set
+        update_set = new_set & old_set
+
+        for fund_code in delete_set:
+            delete_fund = AvailableFund.objects.filter(fund_code__exact=fund_code)
+            delete_fund.delete()
+
+        for fund_code in create_set:
+            create_fund = AvailableFund(**mapping_available_funds_info(fund_codes_dict[fund_code]))
+            create_fund.save()
+
+        for fund_code in update_set:
+            update_fund = AvailableFund.objects.filter(fund_code__exact=fund_code)
+            update_fund.update(**mapping_available_funds_info(fund_codes_dict[fund_code]))
+
+        return {'delete': len(delete_set), 'create': len(create_set), 'update': len(update_set)}
 

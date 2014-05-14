@@ -37,9 +37,9 @@ mixin innerFooter()
         p 客服热线 9:00 - 21:00
 
         .space-vertical-s
-        a.weibo-button(href="http://weibo.com/u/5000682691?topnav=1&wvr=5") 微博
+        a.weibo-button(href="http://weibo.com/u/5000682691?topnav=1&wvr=5", target="_blank") 微博
         .space-s
-        a.weixin-button(href="#", data-role="hover", data-target="#qrcode") 微信
+        a.weixin-button(href="javascript:void(0)", data-role="hover", data-target="#qrcode") 微信
           img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none")
 
   .footer-line
