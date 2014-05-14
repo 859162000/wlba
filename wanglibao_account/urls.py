@@ -3,15 +3,23 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
-from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView
+from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome, \
+    AccountTransaction
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
     '',
-    url(r'^home', login_required(TemplateView.as_view(template_name='account_home.jade'),
+    url(r'^home', login_required(AccountHome.as_view(),
+                                 login_url='/accounts/register/')),
+    url(r'^transaction', login_required(AccountTransaction.as_view(),
                                  login_url='/accounts/register/')),
     url(r'^bankcard', login_required(TemplateView.as_view(template_name='account_bankcard.jade'),
                                  login_url='/accounts/register/')),
+    url(r'^favorite/', login_required(TemplateView.as_view(template_name='account_favorite.jade'),
+                                      login_url='/accounts/register/')),
+    url(r'^setting/', login_required(TemplateView.as_view(template_name='account_setting.jade'),
+                                     login_url='/accounts/register/')),
+
     url(r'^login/', 'django.contrib.auth.views.login',
         {
             "template_name": "login.jade",
@@ -19,10 +27,6 @@ urlpatterns = patterns(
         }, name="auth_login"),
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
     url(r'^email/sent/$', EmailSentView.as_view(), name='email_sent'),
-    url(r'^favorite/', login_required(TemplateView.as_view(template_name='account_favorite.jade'),
-                                      login_url='/accounts/register/')),
-    url(r'^setting/', login_required(TemplateView.as_view(template_name='account_setting.jade'),
-                                     login_url='/accounts/register/')),
 
     url(r'^password/change/$', "wanglibao_account.views.password_change", name='password_change'),
     url(r'^password/change/done/', TemplateView.as_view(template_name='html/password_change_done.html'),
@@ -33,6 +37,7 @@ urlpatterns = patterns(
     url(r'^activate/(?P<activation_key>\w+)/$',
                            ActivationView.as_view(template_name="activate.jade"),
                            name='registration_activate'),
+
     url(r'^password/reset/identifier/', PasswordResetGetIdentifierView.as_view(), name="password_reset"),
     url(r'^password/reset/validate/', PasswordResetGetIdentifierView.as_view(), name="password_reset_validate"),
     url(r'^password/reset/send_mail/', "wanglibao_account.views.send_validation_mail", name="send_validation_mail"),

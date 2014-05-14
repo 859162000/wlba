@@ -73,10 +73,15 @@ class AppLevel(ShuMiAPI):
 
 class UserLevel(ShuMiAPI):
 
-    def _get_apply_history(self, begin, end, page_index, page_size):
-        pass
+    def _get_cash_apply_history(self, start_time, end_time, page_index=0, page_size=100):
+        api_query = 'trade_foundation.getapplyrecordsbymonetary?starttime={start_time}' \
+                    '&endtime={end_time}&pageindex={page_index}&pagesize={page_size} '.format(start_time=start_time,
+                                                                                              end_time=end_time,
+                                                                                              page_index=page_index,
+                                                                                              page_size=page_size)
+        return self._oauth_get(api_query)
 
-    def _get_cash_history(self, begin, end, business=7, capital_flow=1):
+    def _get_xianjinbao_history(self, begin, end, business=7, capital_flow=1):
         """
         input format: begin/end "yyyy-mm-dd" exp: "2012-01-01"
         """
@@ -126,7 +131,10 @@ class UserInfoFetcher(UserLevel):
                 hold = FundHoldInfo(user=self.user, **mapping_fund_hold_info(fund))
                 hold.save()
 
-        return funds
+        return FundHoldInfo.objects.filter(user__exact=self.user)
 
-    def save_user_trade_history(self, delta=''):
+    def fetch_user_trade_history(self):
+        pass
+
+    def fetch_bind_banks(self):
         pass

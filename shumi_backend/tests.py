@@ -1,10 +1,15 @@
 import json
 
 from django.test import TestCase
+from django.contrib.auth import get_user_model
 
 from utility import mapping_fund_hold_info
 from fetch import UserInfoFetcher
 # Create your tests here.
+
+
+user = get_user_model().objects.filter(pk__exact=2).first()
+fetcher = UserInfoFetcher(user)
 
 
 class UtilityTestCase(TestCase):

@@ -6,6 +6,33 @@
 .phone
   margin-left: 1em
 
+.card-panel
+  background-color: $light-gray-background
+  border: 1px solid $light-gray-border
+  border-left-width: 0
+  width: 100%
+  margin-top: 10px
+  +clearfix()
+
+.gray-card
+  padding: 25px 30px
+  float: left
+  font-size: $font-s
+  border-left: 1px solid $light-gray-border
+
+.gray-card3
+  @extend .gray-card
+  width: 33.33%
+
+.gray-card4
+  @extend .gray-card
+  width: 25%
+
+.big_number
+  color: black
+  font-size: $font-xl
+  font-weight: bold
+
 .card-category-bar
   @extend .info-bar
 

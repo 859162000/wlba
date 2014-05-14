@@ -93,5 +93,91 @@ def mapping_fund_hold_info(shumi_json_dict):
     return hold
 
 
-def mapping_funds_info():
-    pass
+def mapping_available_funds_info(shumi_json_dict):
+    fund = dict()
+    try:
+        fund['declare_status'] = shumi_json_dict['DeclareState']
+        fund['fund_code'] = shumi_json_dict['FundCode']
+        fund['fund_name'] = shumi_json_dict['FundName']
+        fund['fund_state'] = shumi_json_dict['FundState']
+        fund['fund_type'] = shumi_json_dict['FundType']
+        fund['last_update'] = shumi_json_dict['LastUpdate']
+        fund['min_shares'] = shumi_json_dict['MinShares']
+        fund['purchase_limit_max'] = shumi_json_dict['PurchaseLimitMax']
+        fund['purchase_limit_min'] = shumi_json_dict['PurchaseLimitMin']
+        fund['purchase_second_limit_min'] = shumi_json_dict['PurchaseSecondLimitMin']
+        fund['quick_cash_limit_max'] = shumi_json_dict['QuickcashLimitMax']
+        fund['quick_cash_limit_min'] = shumi_json_dict['QuickcashLimitMin']
+        fund['ration_limit_max'] = shumi_json_dict['RationLimitMax']
+        fund['ration_limit_min'] = shumi_json_dict['RationLimitMin']
+        fund['redeem_limit_max'] = shumi_json_dict['RedeemLimitMax']
+        fund['redeem_limit_min'] = shumi_json_dict['RedeemLimitMin']
+        fund['risk_level'] = shumi_json_dict['RiskLevel']
+        fund['share_type'] = shumi_json_dict['ShareType']
+        fund['subscribe_limit_max'] = shumi_json_dict['SubscribeLimitMax']
+        fund['subscribe_limit_min'] = shumi_json_dict['SubscribeLimitMax']
+        fund['subscribe_state'] = shumi_json_dict['SubscribeState']
+        fund['transform_limit_max'] = shumi_json_dict['TransformLimitMax']
+        fund['transform_limit_min'] = shumi_json_dict['TransformLimitMin']
+        fund['valuagr_state'] = shumi_json_dict['ValuagrState']
+        fund['withdraw_state'] = shumi_json_dict['WithdrawState']
+    except KeyError:
+        raise KeyError('Unpack error.')
+
+    return fund
+
+
+def mapping_bind_banks(shumi_json_dict):
+    try:
+        bank = dict()
+        bank['no'] = shumi_json_dict['No']
+        bank['balance'] = shumi_json_dict['Balance']
+        bank['bank_name'] = shumi_json_dict['BankName']
+        bank['bank_serial'] = shumi_json_dict['BankSerial']
+        bank['bind_way'] = shumi_json_dict['BindWay']
+        bank['capital_mode'] = shumi_json_dict['CapitalMode']
+        bank['content_describe'] = shumi_json_dict['ContentDescribe']
+        bank['is_freeze'] = shumi_json_dict['IsFreeze']
+        bank['is_vaild'] = shumi_json_dict['IsVaild']
+        bank['limit_describe'] = shumi_json_dict['LimitDescribe']
+        bank['priority'] = shumi_json_dict['Priority']
+        bank['status'] = shumi_json_dict['Status']
+        bank['status_to_cn'] = shumi_json_dict['StatusToCN']
+        bank['sub_trade_account'] = shumi_json_dict['SubTradeAccount']
+        bank['support_auto_pay'] = shumi_json_dict['SupportAutoPay']
+        bank['trade_account'] = shumi_json_dict['TradeAccount']
+    except KeyError:
+        raise KeyError('Unpack error.')
+
+    return bank
+
+
+def mapping_trade_history(shumi_json_dict):
+    try:
+        record = dict()
+        record['amount'] = shumi_json_dict['Amount']
+        record['apply_date_time'] = shumi_json_dict['ApplyDateTime']
+        record['apply_serial'] = shumi_json_dict['ApplySerial']
+        record['bank_account'] = shumi_json_dict['BankAccount']
+        record['bank_name'] = shumi_json_dict['BankName']
+        record['bank_serial'] = shumi_json_dict['BankSerial']
+        record['business_type'] = shumi_json_dict['BusinessType']
+        record['business_type_to_cn'] = shumi_json_dict['BusinessTypeToCN']
+        record['can_cancel'] = shumi_json_dict['CanCancel']
+        record['fund_code'] = shumi_json_dict['FundCode']
+        record['fund_name'] = shumi_json_dict['FundName']
+        record['is_cash_buy'] = shumi_json_dict['IsCashBuy']
+        record['pay_result'] = shumi_json_dict['PayResult']
+        record['pay_status_to_cn'] = shumi_json_dict['PayStatusToCN']
+        record['pound_age'] = shumi_json_dict['PoundAge']
+        record['share_type'] = shumi_json_dict['ShareType']
+        record['share_type_to_cn'] = shumi_json_dict['ShareTypeToCN']
+        record['shares'] = shumi_json_dict['Shares']
+        record['status'] = shumi_json_dict['Status']
+        record['status_to_cn'] = shumi_json_dict['StatusToCN']
+        record['trade_account'] = shumi_json_dict['TradeAccount']
+    except KeyError:
+        raise KeyError('Unpack error.')
+
+    return record
+
