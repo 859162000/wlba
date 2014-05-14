@@ -240,6 +240,25 @@ class AccountTransaction(TemplateView):
     template_name = 'account_transaction.jade'
 
     def get_context_data(self, **kwargs):
+        try:
+            fetcher = UserInfoFetcher(self.request.user)
+            transactions = fetcher.fetch_user_trade_history()
+        except FetchException:
+            transactions = []
         return {
+            "transactions" : transactions
+        }
 
+
+class AccountBankCard(TemplateView):
+    template_name = 'account_bankcard.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            fetcher = UserInfoFetcher(self.request.user)
+            cards = fetcher.fetch_bind_banks()
+        except FetchException:
+            cards = []
+        return {
+            "cards" : cards
         }
