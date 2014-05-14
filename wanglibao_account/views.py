@@ -16,11 +16,12 @@ from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm
-from shumi_backend.exception import FetchException
+from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.serializers import UserSerializer
+from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
 
@@ -227,10 +228,13 @@ class AccountHome(TemplateView):
     def get_context_data(self, **kwargs):
         try:
             fetcher = UserInfoFetcher(self.request.user)
-            fund_hold_info = fetcher.fetch_user_fund_hold_info()
+            fetcher.fetch_user_fund_hold_info()
         except FetchException:
-            fund_hold_info = []
+            message = u'获取数据失败，请稍后重试'
+        except AccessException:
+            pass
 
+        fund_hold_info = FundHoldInfo.objects.filter(user__exact=self.request.user)
         return {
             'fund_hold_info': fund_hold_info
         }
@@ -242,11 +246,15 @@ class AccountTransaction(TemplateView):
     def get_context_data(self, **kwargs):
         try:
             fetcher = UserInfoFetcher(self.request.user)
-            transactions = fetcher.fetch_user_trade_history()
+            fetcher.fetch_user_trade_history()
         except FetchException:
-            transactions = []
+            message = u'获取数据失败，请稍后重试'
+        except AccessException:
+            pass
+
+        transactions = TradeHistory.objects.filter(user__exact=self.request.user)
         return {
-            "transactions" : transactions
+            "transactions": transactions
         }
 
 
@@ -256,9 +264,13 @@ class AccountBankCard(TemplateView):
     def get_context_data(self, **kwargs):
         try:
             fetcher = UserInfoFetcher(self.request.user)
-            cards = fetcher.fetch_bind_banks()
+            fetcher.fetch_bind_banks()
         except FetchException:
-            cards = []
+            pass
+        except AccessException:
+            pass
+
+        cards = BindBank.objects.filter(user__exact=self.request.user)
         return {
             "cards" : cards
         }

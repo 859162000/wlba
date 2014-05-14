@@ -20,10 +20,10 @@ body
           each card in cards
             .bank-card.span6
               .bank-card--title-bar.row
-                .bank-card--bank-name.span6 card.bank_name
+                .bank-card--bank-name.span6 {{card.bank_name}}
                 .bank-card--actions.span3-omega
                   a(href="#") 解除绑定
-              .row.margin-top-m
+              .row
                 dl.bank-card--info-row
                   dt.bank-card--info-title 账号
                   dd.bank-card--info-value {{card.no}}

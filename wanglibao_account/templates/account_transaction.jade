@@ -23,14 +23,16 @@ body
               th 产品名称
               th 金额
               th 操作
+              th 状态
               th 时间
           tbody
             if transactions
               each transaction in transactions
                 tr
                   td {{transaction.fund_name}}
-                  td {{transaction.amount}}元
+                  td {{transaction.shares}}元
                   td {{transaction.business_type_to_cn}}
+                  td {{transaction.status_to_cn}}
                   td {{transaction.apply_date_time}}
             else
               tr
