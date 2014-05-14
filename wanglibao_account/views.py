@@ -230,6 +230,7 @@ class AccountHome(TemplateView):
             fund_hold_info = fetcher.fetch_user_fund_hold_info()
         except FetchException:
             fund_hold_info = []
+
         return {
             'fund_hold_info': fund_hold_info
         }
