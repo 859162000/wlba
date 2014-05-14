@@ -106,7 +106,7 @@ class AvailableFund(models.Model):
 class TradeHistory(models.Model):
     user = models.ForeignKey(get_user_model())
     amount = models.DecimalField(help_text=u'数量', max_digits=20, decimal_places=2)
-    apply_date_time = models.DateFieldField(help_text=u'发生时间')
+    apply_date_time = models.DateField(help_text=u'发生时间')
     apply_serial = models.CharField(help_text=u'流水号', max_length=50)
     bank_account = models.CharField(help_text=u'银行卡号', max_length=20)
     bank_name = models.CharField(help_text=u'银行名称', max_length=20)

@@ -6,13 +6,18 @@ body
   include include/header
   include include/navigation
   .container
-    .panel-nopadding.siderbar-div
-      - with '关于理财' as title
-      include include/about_sidebar
-      - endwith
+    .siderbar-div
+      .panel-nopadding
+        - with '资产配置' as title
+        include include/about_sidebar
+      .space-vertical-s
+      .panel-nopadding
+        include include/licai_sidebar
+        - endwith
+
     .panel-padding.span9-omega
       .well-s
-        h1.title 为什么要进行资产配置
+        h1.about-title 为什么要进行资产配置
         p.para 资产配置是成熟投资者必须掌握的一种投资方法，通过分散化自己的投资渠道和标的，以此来规避单一投资标的的不理性波动。
         br
         p.para 例如，在2007年下半年开始投资国内A股，那相信绝大多数投资者到现在还是在亏钱。如果配置成：20%A股、20%黄金、30%银行理财、30%百度股票。那这个投资组合到现在是大赚特赚的。

@@ -6,10 +6,17 @@ body
   include include/header
   include include/navigation
   .container
-    .panel-nopadding.siderbar-div
-      - with '联系方式' as title
-      include include/about_sidebar
-      - endwith
+    .siderbar-div
+      .panel-nopadding
+        - with '联系方式' as title
+        include include/about_sidebar
+        - endwith
+
+      .space-vertical-s
+
+      .panel-nopadding
+        include include/licai_sidebar
+
     .panel-padding.span9-omega
       .well-s
         div(style="width:785px; margin:auto")

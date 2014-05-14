@@ -6,13 +6,17 @@ body
   include include/header
   include include/navigation
   .container
-    .panel-nopadding.siderbar-div
-      - with '管理团队' as title
-      include include/about_sidebar
-      - endwith
+    .siderbar-div
+      .panel-nopadding
+        - with '管理团队' as title
+        include include/about_sidebar
+        - endwith
+      .space-vertical-s
+      .panel-nopadding
+        include include/licai_sidebar
     .panel-padding.span9-omega
       .well
-        h1.title 管理团队
+        h1.about-title 管理团队
         .row
           h1.sub-title 创始合伙人/网利金融CEO 赵润龙
           .span3
