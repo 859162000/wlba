@@ -7,15 +7,9 @@ body
   include include/navigation
   .container
     .siderbar-div
-      .panel-nopadding
-        - with '联系方式' as title
-        include include/about_sidebar
-        - endwith
-
-      .space-vertical-s
-
-      .panel-nopadding
-        include include/licai_sidebar
+      - with '联系方式' as title
+      include include/about_sidebar
+      - endwith
 
     .panel-padding.span9-omega
       .well-s
