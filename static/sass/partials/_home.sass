@@ -101,3 +101,128 @@
   +clearfix
   padding-right: 5px
   padding-bottom: 30px
+
+
+//new style
+.hot-list
+  height: $fund-height
+  background-color: $white
+
+.fund-picture-title
+  +float-left
+  width: $fund-img-width
+
+.fund-container
+  +float-left
+  height: $fund-height
+  width: $fund-width-content
+  overflow: hidden
+  border: solid 1px $fund-border-color
+  border-left: 0
+
+.fund-content
+  height: $fund-height-content
+  border-bottom: solid 1px $fund-border-color
+
+  >:first-child
+    border-right: solid 1px $fund-border-color
+
+  >:last-child
+    border-left: solid 1px $fund-border-color
+
+.fund-icon
+  text-align: center
+  padding-top: 5px
+
+.hot-item-highlight
+  float: left
+  width: $fund-width-hot
+  height: $fund-height-content
+  overflow: hidden
+  padding-top: $space-s
+  padding-left: $space-s
+
+.hot-item-normal
+  width: $fund-width-normal
+  height: $fund-height-content
+  overflow: hidden
+  float: left
+  padding-top: $space-s
+
+.fund-title
+  font-size: $font-l
+  font-weight: bold
+  color: $orange
+  padding-left: $space-s
+//padding-bottom: $space-s
+
+.hot-item-list
+  font-size: $font-s
+  //width: $width-200
+  margin-top: $space-xs
+  margin-left: $space-s
+  color: $gray-text
+
+  dl
+    +float-left
+    width: 200px
+
+    dt
+      font-size: $font-m
+      padding-bottom: $space-xs
+
+    dd
+      line-height: normal
+      padding: $space-xs 0
+
+  ul
+    +float-left
+    width: 190px
+
+    li
+      border-bottom: dotted 1px $fund-border-color
+      line-height: 33px
+
+    li.no-border-bottom
+      border-bottom: 0
+
+.hot-item-highlight
+
+  dl
+    width: 250px
+
+.hot-item-comments
+  border-top: dotted 1px $fund-border-color
+  padding: $space-xs $space-s
+  color: $gray-text
+  margin-top: 10px
+  font-size: $font-s
+
+.dark-gray
+  color: $dark-gray
+
+.button-m
+  width: 85px
+
+.button-l
+  width: 150px
+
+.fund-num-m
+  color: $red
+  font-size: $font-xxxl
+  font-family: Arial
+  font-weight: bold
+  line-height: 43px
+
+.fund-num-l
+  color: $red
+  font-size: $font-xxxxxl
+  font-family: Arial
+  font-weight: bold
+  padding-bottom: $space-m
+
+.fund-border-left
+  border-left: solid 1px $fund-border-color
+
+.no-border
+  border: 0
