@@ -7,23 +7,9 @@ ul.sidebar
       li.sidebar-item
         a(href=link)= name
 
-
-  +sidebar-item('关于网利宝', '/about', '关于网利宝')
-  +sidebar-item('管理团队', '/team', '管理团队')
-  //  +sidebar-item('媒体报道', '/about', '关于网利宝')
-
-  li.sidebar-item#about-financing
-    a 关于理财
-    ul.sidebar-secondary
-      li.sidebar-item
-        a(href='/newbie') 理财小白必读
-      li.sidebar-item
-        a(href='/why_portfolio') 资产配置
-      li.sidebar-item
-        a(href='/howto') 选择理财产品
-
-  +sidebar-item('招贤纳士', '/hiring', '招贤纳士')
-  +sidebar-item('联系方式', '/contact_us', '联系方式')
-
-script.
-  require(['/static/js/sider_bar.js'])
+  p.sidebar-title 关于网利宝
+  div
+    +sidebar-item('网利宝介绍', '/about', '网利宝介绍')
+    +sidebar-item('管理团队', '/team', '管理团队')
+    +sidebar-item('招贤纳士', '/hiring', '招贤纳士')
+    +sidebar-item('联系方式', '/contact_us', '联系方式')

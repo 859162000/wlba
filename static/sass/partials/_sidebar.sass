@@ -1,13 +1,19 @@
 .sidebar
   background: white
+  border-top: 3px solid $red
+
+.sidebar-title
+  padding: 10px 20px
+  color: #9d9d9d
+  font-size: $font-m
 
 .sidebar-item
   font-size: $font-m
-  line-height: 50px
+  line-height: 45px
 
-  border-top: 1px solid lightgray
-  padding: 0 1em
-  text-align: center
+  border-top: 1px dotted lightgray
+  padding: 0 20px
+  text-align: left
   position: relative
 
   &:first-child
@@ -16,6 +22,10 @@
   &.active
     a
       +link-colors($red)
+
+  &.active:before
+    color: $red
+    content: '> '
 
   a
     +unstyled-link

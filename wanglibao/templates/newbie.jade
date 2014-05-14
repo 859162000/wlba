@@ -6,13 +6,17 @@ body
   include include/header
   include include/navigation
   .container
-    .panel-nopadding.siderbar-div
-      - with '关于理财' as title
-      include include/about_sidebar
-      - endwith
+    .siderbar-div
+      .panel-nopadding
+        - with '理财小白必读' as title
+        include include/about_sidebar
+      .space-vertical-s
+      .panel-nopadding
+        include include/licai_sidebar
+        - endwith
     .panel-padding.span9-omega
       .well-s
-        h1.title 理财小白必读
+        h1.about-title 理财小白必读
         p.para 工作三四年，攒了好几万，可这钱放手里没大用，存银行只等着贬值，想炒股又怕亏钱。余额宝的收益眼瞅着往下掉，P2P的收益高可是风险大，有没有更好的理财方法、更方便的投资途径，理财小白应该怎么办？
         br
         p.para 网利宝从成立的那天起，就为了帮助客户进行更专业的投资而努力。
