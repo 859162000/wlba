@@ -1,5 +1,4 @@
 # encoding:utf-8
-
 import json
 from requests_oauthlib import OAuth1Session
 from datetime import date
@@ -7,9 +6,9 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory
-from exception import FetchException
-from utility import mapping_fund_hold_info, mapping_bind_banks, mapping_trade_history
+from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory, AvailableFund
+from exception import FetchException, AccessException
+from utility import mapping_fund_hold_info, mapping_bind_banks, mapping_trade_history, mapping_available_funds_info
 
 
 class ShuMiAPI(object):
@@ -119,7 +118,7 @@ class UserInfoFetcher(UserLevel):
         if access_token and access_token_secret:
             super(UserInfoFetcher, self).__init__(access_token, access_token_secret)
         else:
-            raise FetchException('user %s did not bind shumi access token.' % user_obj)
+            raise AccessException('user %s did not bind shumi access token.' % user_obj)
 
     def fetch_user_fund_hold_info(self):
         funds = self.get_fund_hold_info()
@@ -134,7 +133,7 @@ class UserInfoFetcher(UserLevel):
             hold = FundHoldInfo(user=self.user, **mapping_fund_hold_info(fund))
             hold.save()
 
-        return FundHoldInfo.objects.filter(user__exact=self.user)
+        return len(funds)
 
     def fetch_user_trade_history(self, start_time='2010-01-01'):
         # todo fix fetch index and size hard code
@@ -151,8 +150,7 @@ class UserInfoFetcher(UserLevel):
             trade = TradeHistory(user=self.user, **mapping_trade_history(record))
             trade.save()
 
-        return TradeHistory.objects.filter(user__exact=self.user)
-
+        return len(records)
 
     def fetch_bind_banks(self):
         banks = self.get_bind_banks()
@@ -165,7 +163,11 @@ class UserInfoFetcher(UserLevel):
             bind = BindBank(user=self.user, **mapping_bind_banks(bank))
             bind.save()
 
-        return BindBank.objects.filter(user__exact=self.user)
+        return len(banks)
 
 
+class AppInfoFetcher(AppLevel):
+
+    def fetch_available_cash_fund(self):
+        pass
 
