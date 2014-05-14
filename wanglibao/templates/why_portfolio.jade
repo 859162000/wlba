@@ -7,14 +7,9 @@ body
   include include/navigation
   .container
     .siderbar-div
-      .panel-nopadding
-        - with '资产配置' as title
-        include include/about_sidebar
-      .space-vertical-s
-      .panel-nopadding
-        include include/licai_sidebar
-        - endwith
-
+      - with '资产配置' as title
+      include include/about_sidebar
+      - endwith
     .panel-padding.span9-omega
       .well-s
         h1.about-title 为什么要进行资产配置
