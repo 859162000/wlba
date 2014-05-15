@@ -2,6 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+from wanglibao_fund.models import Fund
 
 
 class TradeInfo(models.Model):
@@ -109,6 +110,8 @@ class AvailableFund(models.Model):
     withdraw_state = models.BooleanField(help_text=u'赎回状态')
     create_date = models.DateField(help_text=u'创建时间', auto_now=True)
     objects = AvailableFundManager()
+
+    fund = models.OneToOneField(Fund, null=True)
 
     def __unicode__(self):
         return u'<%s: %s> %s' % (self.fund_code, self.fund_name, self.fund_type)
