@@ -8,21 +8,20 @@ mixin innerFooter()
         dd.section--item
           a(href="/about") 关于我们
         dd.section--item
-          a 顾问团队
-        dd.section--item
-          a 媒体报道
+          a(href="/team") 管理团队
         dd.section--item
           a(href="/hiring") 招贤纳士
-
+        dd.section--item
+          a(href="/contact_us") 联系方式
 
       dl.footer-section
         dt.section--title 关于理财
         dd.section--item
-          a(href="/howto") 怎么选择理财产品？
-        dd.section--item
           a(href="/newbie") 理财小白必读
         dd.section--item
-          a(href="/why_portfolio") 为什么需要资产配置？
+          a(href="/howto") 怎么选择理财产品
+        dd.section--item
+          a(href="/why_portfolio") 为什么需要资产配置
 
       dl.footer-section
         dt.section--title 关注我们
@@ -37,7 +36,7 @@ mixin innerFooter()
         p 客服热线 9:00 - 21:00
 
         .space-vertical-s
-        a.weibo-button(href="http://weibo.com/u/5000682691?topnav=1&wvr=5", target="_blank") 微博
+        a.weibo-button(href="http://weibo.com/u/5000682691", target="_blank") 微博
         .space-s
         a.weixin-button(href="javascript:void(0)", data-role="hover", data-target="#qrcode") 微信
           img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none")
