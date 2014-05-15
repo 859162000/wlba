@@ -293,7 +293,12 @@ LOGGING = {
         'wanglibao_sms': {
             'handlers': ['file'],
             'level': 'DEBUG',
+        },
+        'shumi': {
+            'handlers': ['file'],
+            'level': 'DEBUG'
         }
+
     }
 }
 
