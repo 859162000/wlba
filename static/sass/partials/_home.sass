@@ -136,11 +136,21 @@
 
 .hot-item-highlight
   float: left
+  position: relative
   width: $fund-width-hot
   height: $fund-height-content
   overflow: hidden
   padding-top: $space-s
   padding-left: $space-s
+
+.hot-item-highlight-icon
+  background: url("/static/images/home_recomment.png")
+  width: 72px
+  height: 72px
+  position: absolute
+  z-index: 99
+  top: 1px
+  right: 1px
 
 .hot-item-normal
   width: $fund-width-normal
@@ -154,11 +164,9 @@
   font-weight: bold
   color: $orange
   padding-left: $space-s
-//padding-bottom: $space-s
 
 .hot-item-list
   font-size: $font-s
-  //width: $width-200
   margin-top: $space-xs
   margin-left: $space-s
   color: $gray-text
@@ -168,7 +176,7 @@
     width: 200px
 
     dt
-      font-size: $font-m
+      font-size: $font-s
       padding-bottom: $space-xs
 
     dd
