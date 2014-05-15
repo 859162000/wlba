@@ -6,7 +6,8 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRe
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
-from wanglibao_buy.models import FundHoldInfo
+from wanglibao_buy.models import FundHoldInfo, TradeInfo
+from wanglibao_fund.models import Fund
 from exception import FetchException
 from auth import ShuMiExchangeAccessToken, ShuMiRequestToken
 from trade import TradeWithAutoLogin
@@ -175,10 +176,23 @@ class TradeCallbackView(TemplateView):
         except KeyError:
             return context
 
+        # get trade record from shumi
         try:
             record_obj = UserInfoFetcher(self.request.user).get_apply_history_by_serial(order_id)
         except Exception:
             return context
+        # store buy info
+        item_id = Fund.objects.get(product_code=record_obj.fund_code).id
+        if int(record_obj.amount) == 0:
+            amount = record_obj.shares
+        else:
+            amount = record_obj.amount
+        buy_info = TradeInfo(user=self.request.user, type='Fund',
+                             item_id=item_id, item_name=record_obj.fund_name,
+                             amount=amount, verify_info=record_obj.apply_serial,
+                             trade_type=record_obj.business_type_to_cn)
+        buy_info.save()
+        # return template context
         context['record'] = record_obj
         return context
 
@@ -191,9 +205,6 @@ class OAuthStartView(RedirectView):
     # todo get hostname and schema from request.
     def get_redirect_url(self, *args, **kwargs):
         profile = self.request.user.wanglibaouserprofile
-        #host = request.get_host()
-        #host = 'https://www.wanglibao.com'
-        #path = reverse('oauth-callback-view', kwargs={'pk': self.request.user.pk})
         helper = UrlTools(self.request)
         call_back_url = helper.gen_oauth_callback_url()
         requester = ShuMiRequestToken(call_back_url)

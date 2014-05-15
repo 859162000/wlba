@@ -148,3 +148,12 @@ class TradeHistory(models.Model):
         ordering = ['-apply_date_time']
 
 
+class MonetaryFundNetValue(models.Model):
+    code = models.CharField(help_text=u'基金代码', max_length=10)
+    curr_date = models.DateField(help_text=u'公布日期')
+    income_per_ten_thousand = models.FloatField(help_text=u'万份收益')
+    create_date = models.DateField(help_text=u'创建日期', auto_now=True)
+
+    class Meta:
+        ordering = ['-create_date']
+
