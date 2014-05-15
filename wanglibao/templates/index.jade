@@ -60,18 +60,18 @@ html
     .space-vertical-m
 
     .container.hot-list.clearfix
-      .fund-picture-title
+      .hot-picture-title
         img(src="/static/images/home_moneyfund.jpg", alt="货币基金")
-      .fund-container
-        .fund-content
+      .hot-list-container
+        .hot-list-content
           .hot-item-highlight
             .hot-item-highlight-icon
-            h1.fund-title 高收益南方货币
+            h1.hot-item-title 高收益南方货币
             .hot-item-list.clearfix
               dl
                 dt 银行活期利率
                 dd.font-m
-                  span.fund-num-l 16.5
+                  span.hot-list-num-l 16.5
                   倍
                 dd
                   七日年化收益：
@@ -101,12 +101,12 @@ html
                   span.dark-gray 3000元
 
           .hot-item-normal
-            h1.fund-title 高收益南方货币
+            h1.hot-item-title 高收益南方货币
             .hot-item-list.clearfix
               dl
                 dt 银行活期利率
                 dd.font-m
-                  span.fund-num-l 16.5
+                  span.hot-list-num-l 16.5
                   倍
                 dd
                   七日年化收益：
@@ -119,12 +119,12 @@ html
                   a.button.button-middle.button-gray.button-m(href="#", target="_blank") 售完
 
           .hot-item-normal
-            h1.fund-title 高收益南方货币
+            h1.hot-item-title 高收益南方货币
             .hot-item-list.clearfix
               dl
                 dt 银行活期利率
                 dd.font-m
-                  span.fund-num-l 16.5
+                  span.hot-list-num-l 16.5
                   倍
                 dd
                   七日年化收益：
@@ -136,24 +136,24 @@ html
                 dd
                   a.button.button-middle.button-red.button-m(href="#", target="_blank") 抢购
 
-        .fund-icon
-          img(src="/static/images/home_moneyfund_icon.jpg", alt="")
+        .buy_process
+          img(src="/static/images/home_moneyfund_icon.jpg", alt="货币基金购买流程")
 
     .space-vertical-m
 
     .container.hot-list.clearfix
-      .fund-picture-title
+      .hot-picture-title
         img(src="/static/images/home_trustfund.jpg", alt="货币基金")
-      .fund-container
-        .fund-content
+      .hot-list-container
+        .hot-list-content
           .hot-item-highlight
             .hot-item-highlight-icon
-            h1.fund-title 平安财富-结构类（非保本挂钩ET）
+            h1.hot-item-title 平安财富-结构类（非保本挂钩ET）
             .hot-item-list.clearfix
               dl
                 dt 投资收益
                 dd
-                  span.fund-num-l 12-17%
+                  span.hot-list-num-l 16.5%
                 dd
                   a.button.button-middle.button-red.button-l(href="#", target="_blank") 立即预约
 
@@ -179,12 +179,12 @@ html
             //.hot-item-highlight-icon
 
           .hot-item-normal
-            h1.fund-title 平安财富
+            h1.hot-item-title 平安财富
             .hot-item-list.clearfix
               dl
                 dd 投资收益
                 dd.font-m
-                  span.fund-num-m 12-17%
+                  span.hot-list-num-m 16.6%
                 dd
                   产品期限：
                   span.dark-gray 12个月
@@ -198,12 +198,12 @@ html
                   点 评：期限短，起点低，同类收益最高，稳健型首选
 
           .hot-item-normal
-            h1.fund-title 平安财富
+            h1.hot-item-title 平安财富
             .hot-item-list.clearfix
               dl
                 dd 投资收益
                 dd.font-m
-                  span.fund-num-m 12-17%
+                  span.hot-list-num-m 12-17%
                 dd
                   产品期限：
                   span.dark-gray 12个月
@@ -216,100 +216,10 @@ html
             .hot-item-comments
                 点 评：期限短，起点低，同类收益最高，稳健型首选
 
-        .fund-icon
-                img(src="/static/images/home_trustfund_icon.jpg", alt="")
-
+        .buy_process
+                img(src="/static/images/home_trustfund_icon.jpg", alt="信托基金购买流程")
 
     .space-vertical-m
-
-    //.container-card-holder
-      span.font-l 热门产品
-      ul.tabs
-        li.tab-item
-          a.tab-anchor.active(data-toggle="trust-products" href="#") 信托产品
-        li.tab-item
-          a.tab-anchor(data-toggle="financing-products" href="#") 银行理财
-        li.tab-item
-          a.tab-anchor(data-toggle="fund-products" href="#") 基金产品
-
-    //.space-vertical-xs
-
-    //.container-hidden#trust-products
-      each hot_trust in hot_trusts
-        -with hot_trust.trust as trust
-        a(href='/trust/detail/{{trust.id}}')
-          .card
-            .card-top-container
-              p.card-title 高收益精选
-              .space-vertical-s
-              img.card-annotation(src="/static/images/on-sale.png")
-              span.trust-name {{trust.short_name}}
-            .card-detail-box
-              dt 产品期限:
-              dd.orange-text {{trust.period | month}}
-              dt.profit-title 投资收益:
-              dd.profit-text {{trust.expected_earning_rate | percentage}}
-              .space-vertical-s
-              .space-vertical-s.dashed-line
-              if trust.brief
-                dt 点评:
-                dd.card-brief {{trust.brief}}
-              else
-                dd.card-brief
-        -endwith
-      .check-more
-        a.button-round-mini.button-red(href="/trust/products") 查看更多
-
-    //.container-hidden#financing-products
-      each hot_financing in hot_financings
-        -with hot_financing.bank_financing as financing
-        a(href='/financing/detail/{{financing.id}}')
-          .card
-            .card-top-container
-              p.card-title 高收益精选
-              .space-vertical-s
-              img.card-annotation(src="/static/images/on-sale.png")
-              span.trust-name {{financing.short_name}}
-            .card-detail-box
-              dt 产品期限:
-              dd.orange-text {{financing.period | day}}
-              dt 发行银行:
-              dd.orange-text {{financing.bank.name}}
-              dt.profit-title 预期收益:
-              dd.profit-text {{financing.expected_rate | percentage}}
-              .space-vertical-s
-        -endwith
-      .check-more
-        a.button-round-mini.button-red(href="/financing/products") 查看更多
-
-    //.container-hidden#fund-products
-      each hot_fund in hot_funds
-        -with hot_fund.fund as fund
-        a(href='/fund/detail/{{fund.id}}')
-          .card
-            .card-top-container
-              p.card-title 高收益精选
-              .space-vertical-s
-              img.card-annotation(src="/static/images/on-sale.png")
-              span.trust-name {{fund.name}}
-            .card-detail-box
-              dt 基金公司:
-              dd {{fund.issuer.name}}
-              dt 基金类型:
-              dd {{fund.type}}
-              if fund.rate_7_days
-                dt.profit-title 七日年化利率:
-                dd.profit-text {{fund.rate_7_days | percentage}}
-              else
-                dt.profit-title 当日涨幅:
-                dd.profit-text {{fund.rate_today | percentage}}
-              .space-vertical-s
-        -endwith
-      .check-more
-        a.button-round-mini.button-red(href="/fund/products") 查看更多
-
-    //.row
-      img(src="http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/banner0.jpg", style="margin:0 auto; display: block", alt="网利宝 网上银行")
 
     - with 1 as no_margin
     include include/footer
