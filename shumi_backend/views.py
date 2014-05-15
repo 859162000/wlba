@@ -113,10 +113,10 @@ class BrokerView(View):
 
     def get(self, request, *args, **kwargs):
         try:
-            fund_code = request.GET['fund_code']
-            action = request.GET['action']
+            fund_code = request.session['fund_code']
+            action = request.session['action']
         except KeyError:
-            return HttpResponseBadRequest('no fund code or action posted')
+            return HttpResponseBadRequest('no fund code or action in session')
 
         if action == 'purchase':
             trade_url = purchase(fund_code)
