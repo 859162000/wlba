@@ -11,6 +11,7 @@ from exception import FetchException
 from auth import ShuMiExchangeAccessToken, ShuMiRequestToken
 from trade import TradeWithAutoLogin
 from utility import UrlTools, purchase, redeem
+from fetch import UserInfoFetcher
 
 # Create your views here.
 
@@ -164,17 +165,23 @@ class TradeView(View):
         return HttpResponseRedirect(trader.get_trade_auto_login_url())
 
 
-class TradeCallbackView(View):
+class TradeCallbackView(TemplateView):
 
-    def get(self, request, *args, **kwargs):
+    template_name = ''
+    def get_context_data(self, **kwargs):
+        context = super(TradeCallbackView, self).get_context_data(**kwargs)
         try:
             order_id = self.request.GET['orderId']
         except KeyError:
-            # todo show some fail info
-            return HttpResponseBadRequest('No orderId')
+            return context
 
-        # todo store order id or fetch order detail
-        return HttpResponse('order id is %s ' % order_id)
+        try:
+            record_obj = UserInfoFetcher(self.request.user).get_apply_history_by_serial(order_id)
+        except Exception:
+            return context
+        context['record'] = record_obj
+        return context
+
 
 
 class OAuthStartView(RedirectView):

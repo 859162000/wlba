@@ -105,6 +105,11 @@ class UserLevel(ShuMiAPI):
         api_query = 'trade_payment.getbindbankcards'
         return self._oauth_get(api_query)
 
+    def get_apply_history_by_serial(self, serial):
+        api_query = 'trade_foundation.getapplyrecord?' \
+                    'applyserial={apply_serial}'.format(apply_serial=serial)
+        return self._oauth_get(api_query)
+
 
 class UserInfoFetcher(UserLevel):
 
@@ -165,6 +170,13 @@ class UserInfoFetcher(UserLevel):
 
         return len(banks)
 
+    def get_user_trade_history_by_serial(self, serial):
+        record = self.get_apply_history_by_serial(serial)
+        trade = TradeHistory(user=self.user, **mapping_trade_history(record))
+
+        return trade
+
+
 
 class AppInfoFetcher(AppLevel):
 
@@ -194,4 +206,5 @@ class AppInfoFetcher(AppLevel):
             update_fund.update(**mapping_available_funds_info(fund_codes_dict[fund_code]))
 
         return {'delete': len(delete_set), 'create': len(create_set), 'update': len(update_set)}
+
 
