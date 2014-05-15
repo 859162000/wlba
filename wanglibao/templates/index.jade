@@ -81,7 +81,7 @@ html
                   span.dark-gray 421人
                   申购
                 dd
-                  a.button.button-middle.button-red.button-l(href="#", target="_blank") 立即预约
+                  a.order-button.button.button-middle.button-red.button-l(href="#order-form") 立即预约
 
               ul
                 li
@@ -116,7 +116,7 @@ html
                   span.dark-gray 421人
                   申购
                 dd
-                  a.button.button-middle.button-gray.button-m(href="#", target="_blank") 售完
+                  a.button.button-middle.button-gray.button-m(href="javascript:;") 售完
 
           .hot-item-normal
             h1.hot-item-title 高收益南方货币
@@ -134,7 +134,7 @@ html
                   span.dark-gray 421人
                   申购
                 dd
-                  a.button.button-middle.button-red.button-m(href="#", target="_blank") 抢购
+                  a.order-button.button.button-middle.button-red.button-m(href="#order-form") 抢购
 
         .buy_process
           img(src="/static/images/home_moneyfund_icon.jpg", alt="货币基金购买流程")
@@ -155,7 +155,7 @@ html
                 dd
                   span.hot-list-num-l 16.5%
                 dd
-                  a.button.button-middle.button-red.button-l(href="#", target="_blank") 立即预约
+                  a.order-button.button.button-middle.button-red.button-l(href="#order-form") 立即预约
 
               ul
                 li
@@ -192,7 +192,7 @@ html
                   付息方式：
                   span.dark-gray 一次还清
                 dd
-                  a.button.button-middle.button-red.button-m(href="#", target="_blank") 立即预约
+                  a.order-button.button.button-middle.button-red.button-m(href="#order-form") 立即预约
 
             .hot-item-comments
                   点 评：期限短，起点低，同类收益最高，稳健型首选
@@ -211,7 +211,7 @@ html
                   付息方式：
                   span.dark-gray 一次还清
                 dd
-                  a.button.button-middle.button-red.button-m(href="#", target="_blank") 立即预约
+                  a.order-button.button.button-middle.button-red.button-m(href="#order-form") 立即预约
 
             .hot-item-comments
                 点 评：期限短，起点低，同类收益最高，稳健型首选
@@ -225,7 +225,21 @@ html
     include include/footer
     - endwith
 
+    form#order-form.order-form(style="display:none")
+      .modal-title-bar
+          span.modal-title 填写个人信息
+          a.icon-cancel.pull-right(rel="modal:close")
+      .padding-xl
+          div
+              input#name_input.full-width(type="text", placeholder="姓名")
+          div.margin-top-s
+              input#phone_input.full-width(type="text", placeholder="电话")
+          div.margin-top-s
+              button#preorder_submit.button.button-middle.button-red.full-width(href="#", type="submit") 立即预约
+          div.margin-top-s.light-gray-text 该产品限量发售，留下您的电话投资顾问火速协助抢购
+
     script.
       require(['/static/js/index.js'])
+      require(['/static/js/trust_detail.js'])
 
     include include/tracking
