@@ -10,7 +10,6 @@ require.config(
 require ['jquery',
          'underscore',
          'lib/modal'], ($, _, modal)->
-  $(document).ready ->
-    $('a[data-role=modal]').click (e)->
-      e.preventDefault()
-      $(this).modal()
+  $('a[data-role=modal]').click (e)->
+    e.preventDefault()
+    $(this).modal()

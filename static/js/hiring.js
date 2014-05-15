@@ -12,11 +12,9 @@
   });
 
   require(['jquery', 'underscore', 'lib/modal'], function($, _, modal) {
-    return $(document).ready(function() {
-      return $('a[data-role=modal]').click(function(e) {
-        e.preventDefault();
-        return $(this).modal();
-      });
+    return $('a[data-role=modal]').click(function(e) {
+      e.preventDefault();
+      return $(this).modal();
     });
   });
 

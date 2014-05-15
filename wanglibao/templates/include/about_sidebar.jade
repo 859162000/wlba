@@ -1,7 +1,7 @@
 mixin sidebar-item(name, link, expected_title)
   if title == expected_title
     li.sidebar-item.active
-      a(href=link)= name
+      a= name
   else
     li.sidebar-item
       a(href=link)= name
@@ -9,7 +9,7 @@ mixin sidebar-item(name, link, expected_title)
 ul.sidebar
   p.sidebar-title 关于网利宝
   div
-    +sidebar-item('网利宝介绍', '/about', '网利宝介绍')
+    +sidebar-item('关于我们', '/about', '关于我们')
     +sidebar-item('管理团队', '/team', '管理团队')
     +sidebar-item('招贤纳士', '/hiring', '招贤纳士')
     +sidebar-item('联系方式', '/contact_us', '联系方式')
@@ -18,5 +18,5 @@ ul.sidebar
   p.sidebar-title 理财建议
   div
     +sidebar-item('理财小白必读', '/newbie', '理财小白必读')
-    +sidebar-item('资产配置', '/why_portfolio', '资产配置')
-    +sidebar-item('选择理财产品', '/howto', '选择理财产品')
+    +sidebar-item('怎么选择理财产品', '/howto', '怎么选择理财产品')
+    +sidebar-item('为什么需要资产配置', '/why_portfolio', '为什么需要资产配置')
