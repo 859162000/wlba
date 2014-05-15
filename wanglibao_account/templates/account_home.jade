@@ -39,7 +39,7 @@ body
       .panel-padding
         .panel-product-title-red
           货币基金
-          a.button-mini.pull-right(href='#') 交易记录
+          a.button-mini.pull-right(href='/accounts/transaction/') 交易记录
         .card-panel
           .gray-card4
             p 总资产
@@ -79,9 +79,9 @@ body
                   td {{fund.current_remain_share}}元
                   td {{fund.unpaid_income}}元
                   td
-                    a(href="#") 继续购买
+                    a.button.button-mini.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=purchase" target="_blank") 继续购买
                     &nbsp;
-                    a(href="#") 赎回
+                    a.button.button-mini.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=redeem" target="_blank") 赎回
             else
               tr
                 td(colspan='4') 无持仓记录

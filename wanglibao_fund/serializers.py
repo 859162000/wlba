@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from wanglibao_buy.serializers import AvailableFundSerializer
 from wanglibao_fund.models import Fund, IssueBackEndChargeRate, IssueFrontEndChargeRate, RedeemFrontEndChargeRate, RedeemBackEndChargeRate
 
 
@@ -39,6 +40,7 @@ class FundSerializer(serializers.ModelSerializer):
     issue_front_end_charge_rates = IssueFrontEndChargeRateSerializer(many=True)
     redeem_front_end_charge_rates = RedeemFrontEndChargeRateSerializer(many=True)
     redeem_back_end_charge_rates = RedeemBackEndChargeRateSerializer(many=True)
+    availablefund = AvailableFundSerializer()
 
     class Meta:
         model = Fund

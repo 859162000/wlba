@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory, AvailableFund
 from exception import FetchException, AccessException
 from utility import mapping_fund_hold_info, mapping_bind_banks, mapping_trade_history, mapping_available_funds_info
+from wanglibao_fund.models import Fund
 
 
 class ShuMiAPI(object):
@@ -177,7 +178,6 @@ class UserInfoFetcher(UserLevel):
         return trade
 
 
-
 class AppInfoFetcher(AppLevel):
 
     def fetch_available_cash_fund(self):
@@ -199,6 +199,12 @@ class AppInfoFetcher(AppLevel):
 
         for fund_code in create_set:
             create_fund = AvailableFund(**mapping_available_funds_info(fund_codes_dict[fund_code]))
+            fund = Fund.objects.filter(product_code=create_fund.fund_code)
+            if fund.exists():
+                create_fund.fund = fund.first()
+            else:
+                print 'shumi fund is not available in fund table: %s' % fund_code
+
             create_fund.save()
 
         for fund_code in update_set:

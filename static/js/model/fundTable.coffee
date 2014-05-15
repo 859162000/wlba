@@ -13,7 +13,7 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
           sortable: true
           field: 'name'
           text: (item)->
-            '<a target="_blank" href="/fund/detail/' + item.id + '">' + item.name + '</a>'
+            '<a class="blue" target="_blank" href="/fund/detail/' + item.id + '">' + item.name + '</a>'
         ,
           name: '基金类型'
           colspan: 2
@@ -51,6 +51,14 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
           field: 'rate_6_months'
           text: (item)->item.rate_6_months + '%'
         ,
+          name: '购买'
+          colspan: 1
+          text: (item)->
+            if item.availablefund
+              '<a class="button button-mini button-pink" href="/shumi/oauth/check_oauth_status/?fund_code=' + item.product_code + '&action=purchase" target="_blank"> 购买 </a>'
+            else
+              '<a class="button button-mini button-gray" href="javascript:void(0)"> 购买 </a>'
+        ,
           name: '收藏'
           colspan: 1
           text: (item)->
@@ -60,11 +68,7 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
             else
               '<a class="button button-mini button-white" onclick="addToFavorite(event,' + "'funds');" +
                 '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">收藏</a>'
-        ,
-          name: '详情'
-          colspan: 1
-          text: (item)->
-            '<a target="_blank" class="button button-mini button-pink" href="/fund/detail/' + item.id + '">详情</a>'
+
       ]
 
       _.extend(context, defaultContext)

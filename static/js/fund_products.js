@@ -27,7 +27,7 @@
           }
         });
         self.orderBy = ko.observable();
-        self.orderBy('-status,-rate_7_days');
+        self.orderBy('-availablefund__fund_type,-status,-rate_7_days');
 
         /*
         Pager
