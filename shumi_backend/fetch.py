@@ -2,11 +2,11 @@
 import json
 from requests_oauthlib import OAuth1Session
 from datetime import date
-
+import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory, AvailableFund
+from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory, AvailableFund, MonetaryFundNetValue, DailyIncome
 from exception import FetchException, AccessException
 from utility import mapping_fund_hold_info, mapping_bind_banks, mapping_trade_history, mapping_available_funds_info
 from wanglibao_fund.models import Fund
@@ -213,4 +213,39 @@ class AppInfoFetcher(AppLevel):
 
         return {'delete': len(delete_set), 'create': len(create_set), 'update': len(update_set)}
 
+    def fetch_monetary_fund_net_value(self):
+        net_value_url = settings.SM_MONETARY_FUND_NET_VALUE
+        today = date.today().strftime('%Y-%m-%d')
+        api_query = net_value_url.format(date=today)
+        response = requests.get(api_query)
+        if response.status_code != 200:
+            raise FetchException(response.text)
+        values = json.loads(response.text)['datatable']
+        for value in values:
+            net_value = MonetaryFundNetValue(code=value['code'],
+                                             curr_date=value['curr_date'],
+                                             income_per_ten_thousand=value['income_per_ten_thousand'])
+            net_value.save()
 
+    def cal_user_daily_income(self):
+        users = get_user_model().objects.exclude(wanglibaouserprofile__shumi_access_token='')
+        for user in users:
+            try:
+                fetcher = UserInfoFetcher(user)
+                fetcher.fetch_user_fund_hold_info()
+            except Exception:
+                continue
+            hold_funds = FundHoldInfo.objects.filter(user__exact=user)
+
+            income = 0
+            for fund in hold_funds:
+                value_info = MonetaryFundNetValue.objects.filter(code__exact=fund.fund_code).first()
+                per_ten_thousand = value_info.income_per_ten_thousand
+                fund_amount = float(fund.usable_remain_share.to_eng_string())
+                income += fund_amount * per_ten_thousand / 10000
+
+            try:
+                daily_income = DailyIncome(user=user, income=income)
+                daily_income.save()
+            except Exception:
+                continue

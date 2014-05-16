@@ -159,4 +159,20 @@ class MonetaryFundNetValue(models.Model):
 
     class Meta:
         ordering = ['-create_date']
+        unique_together = ('code', 'curr_date')
 
+    def __unicode__(self):
+        return u'%s 万份收益 %s 元' % (self.code, self.income_per_ten_thousand)
+
+
+class DailyIncome(models.Model):
+    user = models.ForeignKey(get_user_model())
+    date = models.DateField(help_text=u'收益日期', auto_now_add=True)
+    income = models.DecimalField(help_text=u'当日收益', max_digits=20, decimal_places=3)
+
+    class Meta:
+        ordering = ['-date']
+        unique_together = ('user', 'date')
+
+    def __unicode__(self):
+        return u'%s 于 %s 日的收益为 %s 元' % (self.user, self.date, self.income)
