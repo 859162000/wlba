@@ -6,7 +6,7 @@ class IndexView(TemplateView):
     template_name = 'index.jade'
 
     def get_context_data(self, **kwargs):
-        count = 4
+        count = 3
 
         hot_trusts = HotTrust.objects.all().prefetch_related('trust').\
                          prefetch_related('trust__issuer')[:count]

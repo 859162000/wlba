@@ -125,3 +125,7 @@ def bank_card(no):
 @register.filter()
 def get_range(start, end):
     return range(start, end)
+
+@register.filter()
+def buy_fund_url(code):
+    return '/shumi/oauth/check_oauth_status/?fund_code='+ code + '&action=purchase'
