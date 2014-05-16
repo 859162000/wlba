@@ -80,7 +80,7 @@ class AppLevel(ShuMiAPI):
 
 class UserLevel(ShuMiAPI):
 
-    def _get_cash_apply_history(self, start_time, end_time, page_index=0, page_size=100):
+    def _get_cash_apply_history(self, start_time, end_time, page_index=1, page_size=100):
         api_query = 'trade_foundation.getapplyrecordsbymonetary?starttime={start_time}' \
                     '&endtime={end_time}&pageindex={page_index}&pagesize={page_size} '.format(start_time=start_time,
                                                                                               end_time=end_time,
