@@ -59,85 +59,7 @@ html
 
     .space-vertical-m
 
-    .container.hot-list.clearfix
-      .hot-list-picture-title
-        img(src="/static/images/home_moneyfund.jpg", alt="货币基金")
-      .hot-list-container
-        .hot-list-content
-          .hot-item-highlight
-            .hot-item-highlight-icon
-            h1.hot-item-title 高收益南方货币
-            .hot-item-list.clearfix
-              dl
-                dt 银行活期利率
-                dd.font-m
-                  span.hot-list-num-l 16.5
-                  倍
-                dd
-                  七日年化收益：
-                  span.dark-gray 5.42%
-                dd
-                  已有
-                  span.dark-gray 421人
-                  申购
-                dd
-                  a.order-button.button.button-middle.button-red.button-l(href="#order-form") 立即预约
-
-              ul
-                li
-                  取现到帐：
-                  span.dark-gray T+0实时到帐
-                li
-                  起购金额：
-                  span.dark-gray 50万
-                li
-                  半年涨幅：
-                  span.dark-gray 13%
-                li
-                  一年涨幅：
-                  span.dark-gray 15%
-                li
-                  万元效益：
-                  span.dark-gray 3000元
-
-          .hot-item-normal
-            h1.hot-item-title 高收益南方货币
-            .hot-item-list.clearfix
-              dl
-                dt 银行活期利率
-                dd.font-m
-                  span.hot-list-num-l 16.5
-                  倍
-                dd
-                  七日年化收益：
-                  span.dark-gray 5.42%
-                dd
-                  已有
-                  span.dark-gray 421人
-                  申购
-                dd
-                  a.button.button-middle.button-gray.button-m(href="javascript:;") 售完
-
-          .hot-item-normal
-            h1.hot-item-title 高收益南方货币
-            .hot-item-list.clearfix
-              dl
-                dt 银行活期利率
-                dd.font-m
-                  span.hot-list-num-l 16.5
-                  倍
-                dd
-                  七日年化收益：
-                  span.dark-gray 5.42%
-                dd
-                  已有
-                  span.dark-gray 421人
-                  申购
-                dd
-                  a.order-button.button.button-middle.button-red.button-m(href="#order-form") 抢购
-
-        .buy_process
-          img(src="/static/images/home_moneyfund_icon.jpg", alt="货币基金购买流程")
+    include include/hot_funds
 
     .space-vertical-m
 
@@ -146,75 +68,59 @@ html
         img(src="/static/images/home_trustfund.jpg", alt="货币基金")
       .hot-list-container
         .hot-list-content
+
+          first_item = hot_trusts[0].trust
           .hot-item-highlight
             .hot-item-highlight-icon
-            h1.hot-item-title 平安财富-结构类（非保本挂钩ET）
+            h1.hot-item-title {{first_item.short_name}}
             .hot-item-list.clearfix
               dl
                 dt 投资收益
                 dd
-                  span.hot-list-num-l 16.5%
+                  span.hot-list-num-l {{first_item.expected_earning_rate | percentage}}
                 dd
                   a.order-button.button.button-middle.button-red.button-l(href="#order-form") 立即预约
 
               ul
                 li
                   产品期限：
-                  span.dark-gray 12个月
+                  span.dark-gray {{first_item.period | month}}
                 li
                   起购金额：
-                  span.dark-gray 100万
+                  span.dark-gray {{first_item.investment_threshold}}万
                 li
                   投资行业：
-                  span.dark-gray 房地产
+                  span.dark-gray {{first_item.usage}}
                 li
                   付息方式：
-                  span.dark-gray 一次还清
+                  span.dark-gray {{first_item.interest_method}}
                 li.no-border-bottom
                   投资行业：
-                  span.dark-gray 房地产？
+                  span.dark-gray {{first_item.usage}}
 
             .hot-item-comments
-              点 评：期限短，起点低，同类收益最高，保本浮动类型，稳健型首选
-            //.hot-item-highlight-icon
+              点 评：{{first_item.brief}}
 
-          .hot-item-normal
-            h1.hot-item-title 平安财富
-            .hot-item-list.clearfix
-              dl
-                dd 投资收益
-                dd.font-m
-                  span.hot-list-num-m 16.6%
-                dd
-                  产品期限：
-                  span.dark-gray 12个月
-                dd
-                  付息方式：
-                  span.dark-gray 一次还清
-                dd
-                  a.order-button.button.button-middle.button-red.button-m(href="#order-form") 立即预约
+          - for index in 1|get_range:3
+            item = hot_trusts[index].trust
+            .hot-item-normal
+              h1.hot-item-title {{item.short_name}}
+              .hot-item-list.clearfix
+                dl
+                  dd 投资收益
+                  dd.font-m
+                    span.hot-list-num-m {{item.expected_earning_rate | percentage}}
+                  dd
+                    产品期限：
+                    span.dark-gray {{item.period | month}}
+                  dd
+                    付息方式：
+                    span.dark-gray {{item.interest_method}}
+                  dd
+                    a.order-button.button.button-middle.button-red.button-m(href="#order-form") 立即预约
 
-            .hot-item-comments
-                  点 评：期限短，起点低，同类收益最高，稳健型首选
-
-          .hot-item-normal
-            h1.hot-item-title 平安财富
-            .hot-item-list.clearfix
-              dl
-                dd 投资收益
-                dd.font-m
-                  span.hot-list-num-m 12-17%
-                dd
-                  产品期限：
-                  span.dark-gray 12个月
-                dd
-                  付息方式：
-                  span.dark-gray 一次还清
-                dd
-                  a.order-button.button.button-middle.button-red.button-m(href="#order-form") 立即预约
-
-            .hot-item-comments
-                点 评：期限短，起点低，同类收益最高，稳健型首选
+              .hot-item-comments
+                    点 评：{{item.brief}}
 
         .buy_process
                 img(src="/static/images/home_trustfund_icon.jpg", alt="信托基金购买流程")

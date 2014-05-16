@@ -4,7 +4,7 @@ from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import UserViewSet
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
-from wanglibao_buy.views import TradeInfoViewSet
+from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet
 from wanglibao_cash.views import CashViewSet, CashIssuerViewSet
 from wanglibao_favorite.views import FavoriteTrustViewSet, FavoriteFundViewSet, FavoriteFinancingViewSet, \
     FavoriteCashViewSet
@@ -52,6 +52,7 @@ router.register(r'trade_info', TradeInfoViewSet)
 router.register(r'banners', BannerViewSet)
 router.register(r'users', UserViewSet)
 
+router.register(r'daily_income', DailyIncomeViewSet)
 
 urlpatterns = patterns(
     '',

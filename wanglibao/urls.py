@@ -6,7 +6,7 @@ from django.views.generic import TemplateView, RedirectView
 from wanglibao.views import IndexView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
-from wanglibao_fund.views import FundHomeView, FundDetailView
+from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from django.contrib.auth.decorators import login_required
 
@@ -24,7 +24,7 @@ urlpatterns = patterns(
     url(r'^financing/products/', FinancingProductsView.as_view(), name="financing_products"),
     url(r'^financing/detail/(?P<id>\w+)', FinancingDetailView.as_view(), name="financing_detail"),
 
-    url(r'^fund/products/', TemplateView.as_view(template_name="fund_products.jade"), name="fund_home"),
+    url(r'^fund/products/', FundProductsView.as_view(), name="fund_home"),
     url(r'^fund/detail/(?P<id>\w+)', FundDetailView.as_view(), name="fund_detail"),
 
     url(r'^cash/products/', CashHomeView.as_view(), name="cash_home"),

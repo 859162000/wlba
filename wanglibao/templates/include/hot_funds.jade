@@ -1,0 +1,63 @@
+- load formatters
+
+.container.hot-list.clearfix
+  .hot-list-picture-title
+    img(src="/static/images/home_moneyfund.jpg", alt="货币基金")
+  .hot-list-container
+    .hot-list-content
+      first_item = hot_funds[0].fund
+      .hot-item-highlight
+        .hot-item-highlight-icon
+        h1.hot-item-title {{first_item.name}}
+        .hot-item-list.clearfix
+          dl
+            dt 银行活期利率
+            dd.font-m
+              span.hot-list-num-l {{first_item.rate_7_days | current_deposit_times}}
+              倍
+            dd
+              七日年化收益：
+              span.dark-gray {{first_item.rate_7_days | percentage}}
+            dd
+              已有
+              span.dark-gray {{first_item.bought_people_count}}人
+              申购
+            dd
+              a.button.button-middle.button-red.button-l(href="{{first_item.product_code|buy_fund_url}}", target='_blank') 抢购
+
+          ul
+            li
+              起购金额：
+              span.dark-gray {{first_item.investment_threshold}}万
+            li
+              半年涨幅：
+              span.dark-gray {{first_item.rate_6_months | percentage}}
+            li
+              一年涨幅：
+              span.dark-gray {{first_item.rate_1_year | percentage}}
+            li
+              万元效益：
+              span.dark-gray {{first_item.earned_per_10k}}元
+
+      - for index in 1|get_range:3
+        item = hot_funds[index].fund
+        .hot-item-normal
+          h1.hot-item-title {{item.name}}
+          .hot-item-list.clearfix
+            dl
+              dt 银行活期利率
+              dd.font-m
+                span.hot-list-num-l {{item.rate_7_days | current_deposit_times}}
+                倍
+              dd
+                七日年化收益：
+                span.dark-gray {{item.rate_7_days | percentage}}
+              dd
+                已有
+                span.dark-gray {{item.bought_people_count}}人
+                申购
+              dd
+                a.button.button-middle.button-red.button-m(href="{{first_item.product_code|buy_fund_url}}", target='_blank') 抢购
+
+    .buy_process
+      img(src="/static/images/home_moneyfund_icon.jpg", alt="货币基金购买流程")

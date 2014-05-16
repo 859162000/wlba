@@ -5,10 +5,11 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from trust.models import Trust
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao_buy.models import TradeInfo
-from wanglibao_buy.serializers import TradeInfoSerializer
+from wanglibao_buy.models import TradeInfo, DailyIncome
+from wanglibao_buy.serializers import TradeInfoSerializer, DailyIncomeSerializer
 from wanglibao_fund.models import Fund
 
 
@@ -63,3 +64,13 @@ class TradeInfoViewSet(PaginatedModelViewSet):
             return Response({
                 'message': serializer.errors
             }, status=400)
+
+
+class DailyIncomeViewSet(ReadOnlyModelViewSet):
+    model = DailyIncome
+    permission_classes = IsAuthenticated,
+    serializer_class = DailyIncomeSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return DailyIncome.objects.filter(user=user)

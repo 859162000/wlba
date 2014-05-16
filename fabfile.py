@@ -166,6 +166,7 @@ def deploy():
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'run_robot', log_file, scrawl_job_file))
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'load_cash', log_file, scrawl_job_file))
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'scrawl_fund', log_file, scrawl_job_file))
+        sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'syncsm', log_file, scrawl_job_file))
         sudo('echo "date >> %s" >> %s' % (log_file, scrawl_job_file))
         sudo('chmod +x %s' % scrawl_job_file)
         sudo('echo "SHELL=/bin/bash" > /tmp/scrawl_tab')

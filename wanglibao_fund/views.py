@@ -8,6 +8,7 @@ from wanglibao_favorite.models import FavoriteFund
 from wanglibao_fund.filters import FundFilterSet
 from wanglibao_fund.models import Fund, FundIssuer
 from wanglibao_fund.serializers import FundSerializer
+from wanglibao_hotlist.models import HotFund
 
 
 class FundViewSet(PaginatedModelViewSet):
@@ -25,8 +26,13 @@ class FundIssuerViewSet(PaginatedModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
 
 
-class FundHomeView(TemplateView):
-    template_name = "fund_home.jade"
+class FundProductsView(TemplateView):
+    template_name = "fund_products.jade"
+
+    def get_context_data(self, **kwargs):
+        return {
+            'hot_funds': HotFund.objects.all().prefetch_related('fund').prefetch_related('fund__issuer')[:3]
+        }
 
 
 class FundDetailView(TemplateView):

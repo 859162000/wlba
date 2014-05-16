@@ -281,6 +281,7 @@ class AccountBankCard(TemplateView):
     template_name = 'account_bankcard.jade'
 
     def get_context_data(self, **kwargs):
+        message = ''
         try:
             fetcher = UserInfoFetcher(self.request.user)
             fetcher.fetch_bind_banks()
