@@ -6,6 +6,7 @@ from django.contrib import auth
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
+from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import resolve_url
@@ -226,6 +227,7 @@ class AccountHome(TemplateView):
     template_name = 'account_home.jade'
 
     def get_context_data(self, **kwargs):
+        message = ''
         try:
             fetcher = UserInfoFetcher(self.request.user)
             fetcher.fetch_user_fund_hold_info()
@@ -234,9 +236,19 @@ class AccountHome(TemplateView):
         except AccessException:
             pass
 
+        hour = datetime.datetime.now().hour
+        if hour < 12:
+            greeting = u'早上好'
+        elif hour < 18:
+            greeting = u'下午好'
+        else:
+            greeting = u'晚上好'
+
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=self.request.user)
         return {
-            'fund_hold_info': fund_hold_info
+            'fund_hold_info': fund_hold_info,
+            'greeting': greeting,
+            'message': message
         }
 
 
@@ -244,6 +256,7 @@ class AccountTransaction(TemplateView):
     template_name = 'account_transaction.jade'
 
     def get_context_data(self, **kwargs):
+        message = ''
         try:
             fetcher = UserInfoFetcher(self.request.user)
             fetcher.fetch_user_trade_history()
@@ -253,8 +266,14 @@ class AccountTransaction(TemplateView):
             pass
 
         transactions = TradeHistory.objects.filter(user__exact=self.request.user)
+        pager = Paginator(transactions, 20)
+        page = self.request.GET.get('page')
+        if not page:
+            page = 1
+        transactions = pager.page(page)
         return {
-            "transactions": transactions
+            "transactions": transactions,
+            "message": message
         }
 
 
@@ -266,11 +285,12 @@ class AccountBankCard(TemplateView):
             fetcher = UserInfoFetcher(self.request.user)
             fetcher.fetch_bind_banks()
         except FetchException:
-            pass
+            message = u'获取数据失败，请稍后重试'
         except AccessException:
             pass
 
         cards = BindBank.objects.filter(user__exact=self.request.user)
         return {
-            "cards" : cards
+            "cards" : cards,
+            "message": message
         }

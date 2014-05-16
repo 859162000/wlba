@@ -117,3 +117,11 @@ def mail_login_url(email):
 def current_deposit_times(profit):
     times = profit / 0.35
     return '%.1f' % times
+
+@register.filter()
+def bank_card(no):
+    return no[:4] + ' **** **** ' + no[-4:]
+
+@register.filter()
+def get_range(start, end):
+    return range(start, end)

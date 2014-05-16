@@ -1,3 +1,5 @@
+-load formatters
+
 doctype html
 - with '收藏产品' as title
 include include/head
@@ -37,6 +39,10 @@ body
             else
               tr
                 td(colspan='4') 无交易记录
+
+      - with data=transactions uri='/accounts/transactions/'
+      include include/pager
+      - endwith
 
 
   include include/footer
