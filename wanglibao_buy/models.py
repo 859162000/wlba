@@ -168,7 +168,7 @@ class MonetaryFundNetValue(models.Model):
 class DailyIncome(models.Model):
     user = models.ForeignKey(get_user_model())
     date = models.DateField(help_text=u'收益日期', auto_now_add=True)
-    income = models.DecimalField(help_text=u'当日收益', max_digits=20, decimal_places=3)
+    income = models.DecimalField(help_text=u'当日收益', max_digits=20, decimal_places=5)
 
     class Meta:
         ordering = ['-date']

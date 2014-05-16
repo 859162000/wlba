@@ -233,7 +233,7 @@ class AppInfoFetcher(AppLevel):
             except Exception:
                 continue
 
-    def cal_user_daily_income(self):
+    def compute_user_daily_income(self):
         # get user list who had shumi access token
         users = get_user_model().objects.exclude(wanglibaouserprofile__shumi_access_token='')
         today = date.today()
