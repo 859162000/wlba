@@ -1,3 +1,4 @@
+# encoding:utf-8
 from urllib import urlencode
 from django.views.generic import TemplateView, View, RedirectView
 
@@ -6,12 +7,12 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRe
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
-from wanglibao_buy.models import FundHoldInfo, TradeInfo
+from wanglibao_buy.models import FundHoldInfo, TradeInfo, TradeHistory
 from wanglibao_fund.models import Fund
 from exception import FetchException
 from auth import ShuMiExchangeAccessToken, ShuMiRequestToken
 from trade import TradeWithAutoLogin
-from utility import UrlTools, purchase, redeem
+from utility import UrlTools, purchase, redeem, mapping_trade_history
 from fetch import UserInfoFetcher
 
 # Create your views here.
@@ -168,7 +169,7 @@ class TradeView(View):
 
 class TradeCallbackView(TemplateView):
 
-    template_name = ''
+    template_name = 'shumi_callback.jade'
     def get_context_data(self, **kwargs):
         context = super(TradeCallbackView, self).get_context_data(**kwargs)
         try:
@@ -178,7 +179,7 @@ class TradeCallbackView(TemplateView):
 
         # get trade record from shumi
         try:
-            record_obj = UserInfoFetcher(self.request.user).get_apply_history_by_serial(order_id)
+            record_obj = UserInfoFetcher(self.request.user).get_user_trade_history_by_serial(order_id)
         except Exception:
             return context
         # store buy info
@@ -193,8 +194,17 @@ class TradeCallbackView(TemplateView):
                              trade_type=record_obj.business_type_to_cn)
         buy_info.save()
         # return template context
-        context['record'] = record_obj
-        return context
+
+        action = ''
+        if record_obj.business_type == '022':
+            action = u'申购'
+        else:
+            action = u'赎回'
+
+        return {
+            'action': action,
+            'record': record_obj
+        }
 
 
 

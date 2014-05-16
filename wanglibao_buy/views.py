@@ -28,13 +28,14 @@ class TradeInfoViewSet(PaginatedModelViewSet):
     permission_classes = IsAuthenticated,
 
     def create(self, request, *args, **kwargs):
-        type = request.DATA.get('type')
+        data = request.DATA.copy()
+        type = data.get('type')
         if type == 'fund':
-            fund_code = request.DATA.get('fund_code')
+            fund_code = data.get('fund_code')
             if fund_code is not None:
-                request.DATA['item_id'] = Fund.objects.get(product_code=fund_code).id
+                data['item_id'] = Fund.objects.filter(product_code=fund_code).first().id
 
-        serializer = self.get_serializer(data=request.DATA)
+        serializer = self.get_serializer(data=data)
 
         if serializer.is_valid():
             user = None
@@ -47,7 +48,7 @@ class TradeInfoViewSet(PaginatedModelViewSet):
 
             already_bought = TradeInfo.objects.filter(type=item_type, item_id=item_id, user=user).exists()
 
-            serializer.object.created_by = user
+            serializer.object.user = user
             serializer.object.save()
 
             # Now find the product and update the buy info
@@ -64,6 +65,10 @@ class TradeInfoViewSet(PaginatedModelViewSet):
             return Response({
                 'message': serializer.errors
             }, status=400)
+
+    def get_queryset(self):
+        user = self.request.user
+        return TradeInfo.objects.filter(user=user)
 
 
 class DailyIncomeViewSet(ReadOnlyModelViewSet):

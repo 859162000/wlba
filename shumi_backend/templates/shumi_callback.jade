@@ -2,32 +2,38 @@ doctype html
 
 html
   head
+    - with '交易结果' as title
     include include/common_head
+    - endwith
 
   body
     include include/header
     include include/navigation
     .container
       .callback-content
-        if true
+        if record and record.status != 0
           .success-icon
-          h1 购买成功
+          h1 {{action}}成功
           p
-            您申购的
-            span.highlight 10000
-            元 银河货币基金，将在2-3个交易日内完成确认
-
+            您{{action}}的
+            span.highlight {{record.amount}}
+            元 {{record.fund_name}}
+            ，将在2-3个交易日内完成确认
         else
-          .error-icon
-          h1 购买失败
-          p
-            您申购的
-            span.highlight 10000
-            元 银河货币基金，购买失败，请尝试重新购买
+          if record
+            .error-icon
+            h1 购买失败
+            p
+              您{{action}}的
+              span.highlight {{record.amount}}
+              元 {{record.fund_name}}，购买失败，请尝试重新购买
+          else
+            .error-icon
+            h1 购买失败
 
         p
           您可以查看
-          a.blue(href="#",title="全部购买记录") 全部购买记录
+          a.blue(href="/accounts/transactions",title="全部购买记录") 全部购买记录
           ，或者回到
           a.blue(href="/",title="首页") 首页
 

@@ -173,6 +173,8 @@ def deploy():
         sudo('echo "0 0 * * * %s" >> /tmp/scrawl_tab' % scrawl_job_file)
         sudo('crontab /tmp/scrawl_tab')
 
+        print green('add crontab sync monetary ')
+
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, create it')
             run("git clone %s" % env.depot)

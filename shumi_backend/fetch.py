@@ -1,10 +1,14 @@
 # encoding:utf-8
 import json
-from requests_oauthlib import OAuth1Session
 from datetime import date, timedelta
+from logging import getLogger
+
 import requests
+from requests_oauthlib import OAuth1Session
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.utils import IntegrityError
 
 from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory, AvailableFund, MonetaryFundNetValue, DailyIncome
 from exception import FetchException, AccessException
@@ -76,7 +80,7 @@ class AppLevel(ShuMiAPI):
 
 class UserLevel(ShuMiAPI):
 
-    def _get_cash_apply_history(self, start_time, end_time, page_index=0, page_size=100):
+    def _get_cash_apply_history(self, start_time, end_time, page_index=1, page_size=100):
         api_query = 'trade_foundation.getapplyrecordsbymonetary?starttime={start_time}' \
                     '&endtime={end_time}&pageindex={page_index}&pagesize={page_size} '.format(start_time=start_time,
                                                                                               end_time=end_time,
@@ -230,13 +234,14 @@ class AppInfoFetcher(AppLevel):
                                                  income_per_ten_thousand=value['income_per_ten_thousand'])
                 net_value.save()
             # ignore exception, help for run this case multi times.
-            except Exception:
+            except IntegrityError:
                 continue
 
     def compute_user_daily_income(self):
         # get user list who had shumi access token
         users = get_user_model().objects.exclude(wanglibaouserprofile__shumi_access_token='')
         today = date.today()
+        logger = getLogger('shumi')
         for user in users:
             # if user already had daily income info continue
             if DailyIncome.objects.filter(user__exact=user, date__exact=today).exists():
@@ -245,8 +250,10 @@ class AppInfoFetcher(AppLevel):
             try:
                 fetcher = UserInfoFetcher(user)
                 fetcher.fetch_user_fund_hold_info()
-            except Exception:
+            except IntegrityError:
                 continue
+            except AccessException:
+                logger.error('user: %s access token fail or expired.' % user)
             hold_funds = FundHoldInfo.objects.filter(user__exact=user)
 
             # init income.

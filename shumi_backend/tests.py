@@ -4,12 +4,13 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 
 from utility import mapping_fund_hold_info
-from fetch import UserInfoFetcher
+from fetch import UserInfoFetcher, AppInfoFetcher
 # Create your tests here.
 
 
 user = get_user_model().objects.filter(pk__exact=2).first()
 fetcher = UserInfoFetcher(user)
+app = AppInfoFetcher()
 
 
 class UtilityTestCase(TestCase):
@@ -43,4 +44,8 @@ class UtilityTestCase(TestCase):
 
 
 class FetchTestCase(TestCase):
-    pass
+
+    def setUp(self):
+        self.user = user
+        self.fetcher = fetcher
+        self.app = app

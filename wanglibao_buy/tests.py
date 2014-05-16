@@ -76,7 +76,6 @@ class TradeInfoAPITest(TestCase):
             'fund_code': fund.product_code,
             'item_name': u'测试名字',
             'amount': 3000,
-            'user': 1,
             'verify_info': '1321412412321',
             'related_info': '扣款时间 你不知道'
         }), content_type="application/json")
