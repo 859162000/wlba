@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url, include
 from rest_framework.routers import SimpleRouter, DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
-from wanglibao_account.views import UserViewSet
+from wanglibao_account.views import UserViewSet, ResetPasswordAPI
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet
@@ -57,6 +57,7 @@ router.register(r'daily_income', DailyIncomeViewSet)
 urlpatterns = patterns(
     '',
     url(r'^register/', RegisterAPIView.as_view()),
+    url(r'^reset_password/', ResetPasswordAPI.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),

@@ -15,6 +15,8 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm
 from shumi_backend.exception import FetchException, AccessException
@@ -295,3 +297,31 @@ class AccountBankCard(TemplateView):
             "cards" : cards,
             "message": message
         }
+
+
+class ResetPasswordAPI(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        password = request.DATA.get('new_password').strip()
+        identifier = request.DATA.get('identifier')
+        validate_code = request.DATA.get('validate_code')
+        identifier_type = detect_identifier_type(identifier)
+        if identifier_type == 'phone':
+            user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
+        else:
+            return Response({
+                'message': u'请输入手机号码'
+            }, status=400)
+
+        status, message = validate_validation_code(identifier, validate_code)
+        if status == 200:
+            user.set_password(password)
+            user.save()
+            return Response({
+                'message': u'修改成功'
+            })
+        else:
+            return Response({
+                'message': u'验证码验证失败'
+            }, status=400)
