@@ -24,7 +24,7 @@ class BindBankAdmin(admin.ModelAdmin):
     pass
 
 
-class MonetrayFundNetValueAdmin(admin.ModelAdmin):
+class MonetaryFundNetValueAdmin(admin.ModelAdmin):
 
     pass
 
@@ -38,5 +38,5 @@ admin.site.register(FundHoldInfo, FundHoldInfoAdmin)
 admin.site.register(AvailableFund, AvailableFundAdmin)
 admin.site.register(TradeHistory, TradeHistoryAdmin)
 admin.site.register(BindBank, BindBankAdmin)
-admin.site.register(MonetaryFundNetValue, MonetrayFundNetValueAdmin)
+admin.site.register(MonetaryFundNetValue, MonetaryFundNetValueAdmin)
 admin.site.register(DailyIncome, DailyIncomeAdmin)

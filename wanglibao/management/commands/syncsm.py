@@ -11,11 +11,11 @@ logger = logging.getLogger('shumi')
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('--monetray',
+        make_option('--monetary',
                     action='store_true',
-                    dest='fetch_monetray_net_values',
+                    dest='fetch_monetary_net_values',
                     default=False,
-                    help='fetch monetray funds net value form shumi.'),
+                    help='fetch monetary funds net value form shumi.'),
         make_option('--daily-income',
                     action='store_true',
                     dest='compute_daily_income',
@@ -40,9 +40,9 @@ class Command(BaseCommand):
             except Exception, e:
                 logger.error(e)
 
-        if options['fetch_monetray_net_values']:
+        if options['fetch_monetary_net_values']:
             try:
-                print('Starting sync monetray funds net values.')
+                print('Starting sync monetary funds net values.')
                 fetcher.fetch_monetary_fund_net_value()
             except Exception, e:
                 logger.error(e)
