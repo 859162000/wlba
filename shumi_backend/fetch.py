@@ -1,7 +1,7 @@
 # encoding:utf-8
 import json
 from requests_oauthlib import OAuth1Session
-from datetime import date
+from datetime import date, timedelta
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -215,21 +215,33 @@ class AppInfoFetcher(AppLevel):
 
     def fetch_monetary_fund_net_value(self):
         net_value_url = settings.SM_MONETARY_FUND_NET_VALUE
+        # structure today date string
         today = date.today().strftime('%Y-%m-%d')
         api_query = net_value_url.format(date=today)
         response = requests.get(api_query)
         if response.status_code != 200:
             raise FetchException(response.text)
+        # shumi fund detail api return a json dict. datatable is the key of values data
         values = json.loads(response.text)['datatable']
         for value in values:
-            net_value = MonetaryFundNetValue(code=value['code'],
-                                             curr_date=value['curr_date'],
-                                             income_per_ten_thousand=value['income_per_ten_thousand'])
-            net_value.save()
+            try:
+                net_value = MonetaryFundNetValue(code=value['code'],
+                                                 curr_date=value['curr_date'],
+                                                 income_per_ten_thousand=value['income_per_ten_thousand'])
+                net_value.save()
+            # ignore exception, help for run this case multi times.
+            except Exception:
+                continue
 
-    def cal_user_daily_income(self):
+    def compute_user_daily_income(self):
+        # get user list who had shumi access token
         users = get_user_model().objects.exclude(wanglibaouserprofile__shumi_access_token='')
+        today = date.today()
         for user in users:
+            # if user already had daily income info continue
+            if DailyIncome.objects.filter(user__exact=user, date__exact=today).exists():
+                continue
+            # try to fetch funds hold info, in case shumi open api down.
             try:
                 fetcher = UserInfoFetcher(user)
                 fetcher.fetch_user_fund_hold_info()
@@ -237,6 +249,7 @@ class AppInfoFetcher(AppLevel):
                 continue
             hold_funds = FundHoldInfo.objects.filter(user__exact=user)
 
+            # init income.
             income = 0
             for fund in hold_funds:
                 value_info = MonetaryFundNetValue.objects.filter(code__exact=fund.fund_code).first()

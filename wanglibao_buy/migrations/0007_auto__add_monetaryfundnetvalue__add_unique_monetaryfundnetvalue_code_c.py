@@ -25,8 +25,8 @@ class Migration(SchemaMigration):
         db.create_table(u'wanglibao_buy_dailyincome', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('date', self.gf('django.db.models.fields.DateField')()),
-            ('income', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=3)),
+            ('date', self.gf('django.db.models.fields.DateField')(auto_now_add=True, blank=True)),
+            ('income', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=5)),
         ))
         db.send_create_signal(u'wanglibao_buy', ['DailyIncome'])
 
@@ -140,9 +140,9 @@ class Migration(SchemaMigration):
         },
         u'wanglibao_buy.dailyincome': {
             'Meta': {'ordering': "['-date']", 'unique_together': "(('user', 'date'),)", 'object_name': 'DailyIncome'},
-            'date': ('django.db.models.fields.DateField', [], {}),
+            'date': ('django.db.models.fields.DateField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'income': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '3'}),
+            'income': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '5'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'wanglibao_buy.fundholdinfo': {
