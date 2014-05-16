@@ -47,7 +47,7 @@ class TradeInfoViewSet(PaginatedModelViewSet):
 
             already_bought = TradeInfo.objects.filter(type=item_type, item_id=item_id, user=user).exists()
 
-            serializer.object.created_by = user
+            serializer.object.user = user
             serializer.object.save()
 
             # Now find the product and update the buy info
@@ -64,6 +64,10 @@ class TradeInfoViewSet(PaginatedModelViewSet):
             return Response({
                 'message': serializer.errors
             }, status=400)
+
+    def get_queryset(self):
+        user = self.request.user
+        return TradeInfo.objects.filter(user=user)
 
 
 class DailyIncomeViewSet(ReadOnlyModelViewSet):
