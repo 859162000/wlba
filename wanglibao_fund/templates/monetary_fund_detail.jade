@@ -13,11 +13,14 @@ body
     .span8.panel-nopadding.panel-header
       .panel-product-title-bar
         .panel-product-title
-          .product-title.ispan11 {{ fund.name }}
-          if is_favorited != 1
-            a#addToFavorite.button.button-mini.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")收藏
-          else
-            a#addToFavorite.button.button-mini.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")取消
+            if is_favorited != 1
+              a#addToFavorite.favorite.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")
+                span.star
+                添加到我的收藏
+            else
+              a#addToFavorite.favorite.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")取消
+
+            {{ fund.name }}
       .row
         .span4
           .span12
@@ -25,36 +28,34 @@ body
               dl
                 dt 是银行活期利率的
                 dd
-                  span.highlight {{fund.rate_7_days | current_deposit_times}}
+                  span.hot-list-num-l {{fund.rate_7_days | current_deposit_times}}
                   span.font-m.light-gray-text 倍
         .span4
           .well-m
-            .row
-              dl.span12.key-value(style='line-height: 27px')
-                dt 七日年化收益：
-                dd.highlight.font-l {{fund.rate_7_days | percentage}}
-            .row
-              dl.span12.key-value
-                dt 起购金额：
-                dd {{fund.investment_threshold | money}}
-            .row
-              dl.span12.key-value
-                dt 随买随卖
-                dd
+            dl(style='line-height: 30px;height:125px;border-right:solid 1px #d3d3d3')
+              dd
+                七日年化收益：
+                span.highlight.font-xxl {{fund.rate_7_days | percentage}}
+              dd
+                起购金额：
+                {{fund.investment_threshold | money}}
+              dd
+                随买随卖
+
         .span4-omega
-          .well-m
+          .well-m.make-money
             if user.is_authenticated
-              a.button.button-middle.button-red(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.product_code}}&action=purchase" target='_blank') 立即购买
+              a.button.button-round-large.button-red(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.product_code}}&action=purchase" target='_blank') 立即赚钱
             else
-              a.button.button-middle.button-red(href="/accounts/register/?next=/fund/detail/{{fund.id}}") 立即购买
+              a.button.button-round-large.button-red(href="/accounts/register/?next=/fund/detail/{{fund.id}}") 立即赚钱
             p 申请人数{{fund.bought_count}}人
 
     .span4-omega.panel-nopadding.panel-header
       .panel-product-title-bar
         .panel-product-title 收益计算器
       form(data-period="50", data-rate="5")
-        .form-row-m.padding-left-s.margin-top-s
-          label.form-row-label 投资金额：
+        .form-row-m.padding-left-s.margin-top-s(style="line-height:30px")
+          label.form-row-label &nbsp;&nbsp;&nbsp;&nbsp;投资金额：
           span.ispan4.relative-pos
             if fund.rate_7_days
               input.ispan12(type="text", data-rate="{{fund.rate_7_days}}",  /
@@ -63,9 +64,14 @@ body
               input.ispan12(type="text", data-rate="{{fund.rate_1_year}}",  /
                 data-period="30", data-target="#earning", data-role="earning-calculator")
             span.absolute-pos.pos-r-s 万
-          span &nbsp;&nbsp;&nbsp;月预期收益：
-          span#earning.highlight 0.0
-          span 元
+          p
+            月预期收益：
+            span#earning.highlight 0.0
+            span 元
+          p
+            日预期收益：
+            span#earning-day.highlight 0.0
+            span 元
 
   .panel-nopadding
     .panel-product-title-bar

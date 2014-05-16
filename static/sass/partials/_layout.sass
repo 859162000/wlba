@@ -90,7 +90,6 @@ $container-style: magic
 .pos-t-s
   top: $space-s
 
-
 .callback-content
   background: $white
   padding: $space-xxl 0
@@ -104,15 +103,36 @@ $container-style: magic
     padding-bottom: $space-xs
 
 .success-icon
-  background: url("/static/images/success_error.png") 0 0
+  background: url("/static/images/success_failed.png") 0 0
   width: 84px
   height: 84px
   display: inline-block
   overflow: hidden
 
 .error-icon
-  background: url("/static/images/success_error.png") 0 -86px
+  background: url("/static/images/success_failed.png") 0 -86px
   width: 84px
   height: 84px
   display: inline-block
   overflow: hidden
+
+.star
+  +inline-block
+  width: 17px
+  height: 16px
+  background: url("/static/images/star.png")
+  margin-right: $space-xs
+  position: relative
+  top: -2px
+
+.favorite
+  font-size: $font-s
+
+.make-money
+  padding-top: $space-sl
+  text-align: center
+
+  a.button
+    margin-bottom: $space-s
+    +inline-block
+    width: 200px
