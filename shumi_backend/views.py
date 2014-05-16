@@ -6,12 +6,12 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRe
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
-from wanglibao_buy.models import FundHoldInfo, TradeInfo
+from wanglibao_buy.models import FundHoldInfo, TradeInfo, TradeHistory
 from wanglibao_fund.models import Fund
 from exception import FetchException
 from auth import ShuMiExchangeAccessToken, ShuMiRequestToken
 from trade import TradeWithAutoLogin
-from utility import UrlTools, purchase, redeem
+from utility import UrlTools, purchase, redeem, mapping_trade_history
 from fetch import UserInfoFetcher
 
 # Create your views here.
@@ -193,7 +193,7 @@ class TradeCallbackView(TemplateView):
                              trade_type=record_obj.business_type_to_cn)
         buy_info.save()
         # return template context
-        context['record'] = record_obj
+        context['record'] = TradeHistory(user=self.request.user, **mapping_trade_history(record_obj))
         return context
 
 
