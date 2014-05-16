@@ -67,7 +67,7 @@ class TradeInfoViewSet(PaginatedModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return TradeInfo.objects.filter(created_by=user)
+        return TradeInfo.objects.filter(user=user)
 
 
 class DailyIncomeViewSet(ReadOnlyModelViewSet):
