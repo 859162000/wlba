@@ -28,13 +28,14 @@ class TradeInfoViewSet(PaginatedModelViewSet):
     permission_classes = IsAuthenticated,
 
     def create(self, request, *args, **kwargs):
-        type = request.DATA.get('type')
+        data = request.DATA.copy()
+        type = data.get('type')
         if type == 'fund':
-            fund_code = request.DATA.get('fund_code')
+            fund_code = data.get('fund_code')
             if fund_code is not None:
-                request.DATA['item_id'] = Fund.objects.filter(product_code=fund_code).first().id
+                data['item_id'] = Fund.objects.filter(product_code=fund_code).first().id
 
-        serializer = self.get_serializer(data=request.DATA)
+        serializer = self.get_serializer(data=data)
 
         if serializer.is_valid():
             user = None
