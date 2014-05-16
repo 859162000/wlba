@@ -101,3 +101,126 @@
   +clearfix
   padding-right: 5px
   padding-bottom: 30px
+
+
+//new style
+.hot-list
+  height: $hot-list-height
+  background-color: $white
+
+.hot-list-picture-title
+  +float-left
+  width: $hot-list-img-width
+
+.hot-list-container
+  +float-left
+  height: $hot-list-height
+  width: $hot-list-width-content
+  overflow: hidden
+  border: solid 1px $hot-list-border-color
+  border-left: 0
+
+.hot-list-content
+  height: $hot-list-height-content
+  border-bottom: solid 1px $hot-list-border-color
+
+  >:nth-child(2)
+    border-right: solid 1px $hot-list-border-color
+    border-left: solid 1px $hot-list-border-color
+
+.hot-item-normal
+  width: $hot-list-width-normal
+  height: $hot-list-height-content
+  overflow: hidden
+  float: left
+  padding-top: $space-s
+
+.hot-item-title
+  font-size: $font-l
+  font-weight: bold
+  color: $orange
+  padding-left: $space-s
+
+.hot-item-list
+  font-size: $font-s
+  margin-top: $space-xs
+  margin-left: $space-s
+  color: $gray-text
+
+  dl
+    +float-left
+    width: 200px
+
+    dt
+      font-size: $font-s
+      padding-bottom: $space-xs
+
+    dd
+      line-height: normal
+      padding: $space-xs 0
+
+  ul
+    +float-left
+    width: 190px
+
+    li
+      border-bottom: dotted 1px $hot-list-border-color
+      line-height: 33px
+
+    li.no-border-bottom
+      border-bottom: 0
+
+.hot-item-highlight
+  float: left
+  position: relative
+  width: $hot-list-width-highlight
+  height: $hot-list-height-content
+  overflow: hidden
+  padding-top: $space-s
+  padding-left: $space-s
+
+  dl
+    width: 250px
+
+.hot-item-highlight-icon
+  background: url("/static/images/home_recomment.png")
+  width: 72px
+  height: 72px
+  position: absolute
+  top: 1px
+  right: 1px
+
+.hot-item-comments
+  border-top: dotted 1px $hot-list-border-color
+  padding: $space-xs $space-s
+  color: $gray-text
+  margin-top: 10px
+  font-size: $font-s
+
+.buy_process
+  text-align: center
+  padding-top: 5px
+
+.dark-gray
+  color: $dark-gray
+
+.button-m
+  width: 85px
+
+.button-l
+  width: 150px
+
+.hot-list-num-m
+  color: $red
+  font-size: $font-xxxl
+  font-family: Arial
+  font-weight: bold
+  line-height: 43px
+
+.hot-list-num-l
+  color: $red
+  font-size: $font-xxxxxl
+  font-family: Arial
+  font-weight: bold
+  padding-bottom: $space-m
+

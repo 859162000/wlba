@@ -16,6 +16,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder'], ($, modal,
     e.preventDefault()
     $(this).modal()
 
+  $('.order-button').click (e)->
+    e.preventDefault()
+    $(this).modal()
+
   $('#preorder_submit').click (event)->
     event.preventDefault()
 

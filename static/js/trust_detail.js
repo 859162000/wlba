@@ -18,6 +18,10 @@
       e.preventDefault();
       return $(this).modal();
     });
+    $('.order-button').click(function(e) {
+      e.preventDefault();
+      return $(this).modal();
+    });
     $('#preorder_submit').click(function(event) {
       var name, phone;
       event.preventDefault();
