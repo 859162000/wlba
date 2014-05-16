@@ -2,13 +2,14 @@
 import json
 from requests_oauthlib import OAuth1Session
 from datetime import date
-
+import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory, AvailableFund
+from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory, AvailableFund, MonetaryFundNetValue, DailyIncome
 from exception import FetchException, AccessException
 from utility import mapping_fund_hold_info, mapping_bind_banks, mapping_trade_history, mapping_available_funds_info
+from wanglibao_fund.models import Fund
 
 
 class ShuMiAPI(object):
@@ -105,6 +106,11 @@ class UserLevel(ShuMiAPI):
         api_query = 'trade_payment.getbindbankcards'
         return self._oauth_get(api_query)
 
+    def get_apply_history_by_serial(self, serial):
+        api_query = 'trade_foundation.getapplyrecord?' \
+                    'applyserial={apply_serial}'.format(apply_serial=serial)
+        return self._oauth_get(api_query)
+
 
 class UserInfoFetcher(UserLevel):
 
@@ -165,9 +171,81 @@ class UserInfoFetcher(UserLevel):
 
         return len(banks)
 
+    def get_user_trade_history_by_serial(self, serial):
+        record = self.get_apply_history_by_serial(serial)
+        trade = TradeHistory(user=self.user, **mapping_trade_history(record))
+
+        return trade
+
 
 class AppInfoFetcher(AppLevel):
 
     def fetch_available_cash_fund(self):
-        pass
+        funds = self.get_available_cash_funds()
+        fund_codes_dict = {fund['FundCode']: fund for fund in funds}
 
+        old_fund_codes = AvailableFund.objects.existed_fund_code_list()
+
+        new_set = set(fund_codes_dict.keys())
+        old_set = set(old_fund_codes)
+
+        create_set = new_set - old_set
+        delete_set = old_set - new_set
+        update_set = new_set & old_set
+
+        for fund_code in delete_set:
+            delete_fund = AvailableFund.objects.filter(fund_code__exact=fund_code)
+            delete_fund.delete()
+
+        for fund_code in create_set:
+            create_fund = AvailableFund(**mapping_available_funds_info(fund_codes_dict[fund_code]))
+            fund = Fund.objects.filter(product_code=create_fund.fund_code)
+            if fund.exists():
+                create_fund.fund = fund.first()
+            else:
+                print 'shumi fund is not available in fund table: %s' % fund_code
+
+            create_fund.save()
+
+        for fund_code in update_set:
+            update_fund = AvailableFund.objects.filter(fund_code__exact=fund_code)
+            update_fund.update(**mapping_available_funds_info(fund_codes_dict[fund_code]))
+
+        return {'delete': len(delete_set), 'create': len(create_set), 'update': len(update_set)}
+
+    def fetch_monetary_fund_net_value(self):
+        net_value_url = settings.SM_MONETARY_FUND_NET_VALUE
+        today = date.today().strftime('%Y-%m-%d')
+        api_query = net_value_url.format(date=today)
+        response = requests.get(api_query)
+        if response.status_code != 200:
+            raise FetchException(response.text)
+        values = json.loads(response.text)['datatable']
+        for value in values:
+            net_value = MonetaryFundNetValue(code=value['code'],
+                                             curr_date=value['curr_date'],
+                                             income_per_ten_thousand=value['income_per_ten_thousand'])
+            net_value.save()
+
+    def cal_user_daily_income(self):
+        users = get_user_model().objects.exclude(wanglibaouserprofile__shumi_access_token='')
+        for user in users:
+            try:
+                fetcher = UserInfoFetcher(user)
+                fetcher.fetch_user_fund_hold_info()
+            except Exception:
+                continue
+            hold_funds = FundHoldInfo.objects.filter(user__exact=user)
+
+            income = 0
+            for fund in hold_funds:
+                value_info = MonetaryFundNetValue.objects.filter(code__exact=fund.fund_code).first()
+                per_ten_thousand = value_info.income_per_ten_thousand
+                fund_amount = float(fund.usable_remain_share.to_eng_string())
+                income += fund_amount * per_ten_thousand / 10000
+
+            try:
+                daily_income = DailyIncome(user=user, income=income)
+                daily_income.save()
+            except Exception:
+                continue

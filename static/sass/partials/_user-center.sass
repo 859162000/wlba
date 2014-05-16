@@ -37,11 +37,11 @@
   @extend .info-bar
 
 .bank-card
-  width: 370px
-  height: 220px
+  width: 270px
   border: 1px solid #d3d3d3
   border-radius: 5px
   overflow: hidden
+  margin-top: $space-m
 
 .bank-card--title-bar
   background: #F5F5F5
@@ -58,23 +58,32 @@
 .bank-card--bank-name
   font-size: $font-m
 
-.bank-card--actions
+.bank-card--icon
   display: inline-block
   text-align: right
 
+  img
+    vertical-align: middle
+
 .bank-card--info-row
   text-align: center
-  margin-top: 20px
   font-size: $font-s
+  padding: 35px 0
+  +clearfix
 
 .bank-card--info-title
   @extend .span2
-  @extend .prefix2
+  @extend .prefix1
   color: #999
   text-align: right
 
 .bank-card--info-value
-  @extend .span6
+  @extend .span7
   color: #666
   text-align: left
   padding-left: 1em
+
+.no-content
+  text-align: center
+  padding: 10px
+  font-size: $font-m

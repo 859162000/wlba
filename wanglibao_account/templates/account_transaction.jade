@@ -1,3 +1,5 @@
+-load formatters
+
 doctype html
 - with '收藏产品' as title
 include include/head
@@ -17,12 +19,33 @@ body
         .panel-tab.active
           货币基金
       .panel-container
-        //ko template: {name: 'data-table', data: dataTable}
-        // /ko
+        table.trust-table
+          thead
+            tr
+              th 产品名称
+              th 金额
+              th 操作
+              th 状态
+              th 时间
+          tbody
+            if transactions
+              each transaction in transactions
+                tr
+                  td {{transaction.fund_name}}
+                  td {{transaction.shares}}元
+                  td {{transaction.business_type_to_cn}}
+                  td {{transaction.status_to_cn}}
+                  td {{transaction.apply_date_time}}
+            else
+              tr
+                td(colspan='4') 无交易记录
+
+      - with data=transactions uri='/accounts/transactions/'
+      include include/pager
+      - endwith
+
 
   include include/footer
   include include/templates
-  script.
-    require(['/static/js/account_favorite.js'])
 
   include include/tracking

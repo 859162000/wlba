@@ -2,6 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+from wanglibao_fund.models import Fund
 
 
 class TradeInfo(models.Model):
@@ -72,13 +73,22 @@ class BindBank(models.Model):
         return u'%s:  %s' % (self.bank_name, self.no)
 
 
+class AvailableFundManager(models.Manager):
+    def existed_fund_code_list(self):
+        code_list = list()
+        existed_funds = AvailableFund.objects.all()
+        for fund in existed_funds:
+            code_list.append(fund.fund_code)
+        return code_list
+
+
 class AvailableFund(models.Model):
     declare_status = models.BooleanField(help_text=u'申购状态')
     fund_code = models.CharField(help_text=u'基金代码', max_length=10)
     fund_name = models.CharField(help_text=u'基金名称', max_length=100)
     fund_state = models.CharField(help_text=u'基金状态', max_length=10)
     fund_type = models.CharField(help_text=u'基金类型', max_length=10)
-    last_update = models.CharField(help_text=u'更新时间', max_length=20)
+    last_update = models.DateTimeField(help_text=u'更新时间')
     min_shares = models.DecimalField(help_text=u'最低持有份额', max_digits=20, decimal_places=2)
     purchase_limit_max = models.DecimalField(help_text=u'申购最大限额', max_digits=20, decimal_places=2)
     purchase_limit_min = models.DecimalField(help_text=u'申购最小限额', max_digits=20, decimal_places=2)
@@ -99,6 +109,9 @@ class AvailableFund(models.Model):
     valuagr_state = models.BooleanField(help_text=u'定投状态')
     withdraw_state = models.BooleanField(help_text=u'赎回状态')
     create_date = models.DateField(help_text=u'创建时间', auto_now=True)
+    objects = AvailableFundManager()
+
+    fund = models.OneToOneField(Fund, null=True)
 
     def __unicode__(self):
         return u'<%s: %s> %s' % (self.fund_code, self.fund_name, self.fund_type)
@@ -136,3 +149,30 @@ class TradeHistory(models.Model):
 
     class Meta:
         ordering = ['-apply_date_time']
+
+
+class MonetaryFundNetValue(models.Model):
+    code = models.CharField(help_text=u'基金代码', max_length=10)
+    curr_date = models.DateField(help_text=u'公布日期')
+    income_per_ten_thousand = models.FloatField(help_text=u'万份收益')
+    create_date = models.DateField(help_text=u'创建日期', auto_now=True)
+
+    class Meta:
+        ordering = ['-create_date']
+        unique_together = ('code', 'curr_date')
+
+    def __unicode__(self):
+        return u'%s 万份收益 %s 元' % (self.code, self.income_per_ten_thousand)
+
+
+class DailyIncome(models.Model):
+    user = models.ForeignKey(get_user_model())
+    date = models.DateField(help_text=u'收益日期', auto_now_add=True)
+    income = models.DecimalField(help_text=u'当日收益', max_digits=20, decimal_places=3)
+
+    class Meta:
+        ordering = ['-date']
+        unique_together = ('user', 'date')
+
+    def __unicode__(self):
+        return u'%s 于 %s 日的收益为 %s 元' % (self.user, self.date, self.income)

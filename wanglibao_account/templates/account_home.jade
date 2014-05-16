@@ -17,7 +17,7 @@ body
         .space-vertical-s
         p.font-m
           span.nickname {{ user.wanglibaouserprofile.nick_name }}
-          下午好
+          {{greeting}}
           span.phone ({{user.wanglibaouserprofile.phone}})
         .card-panel
           .gray-card3
@@ -39,7 +39,7 @@ body
       .panel-padding
         .panel-product-title-red
           货币基金
-          a.button-mini.pull-right(href='#') 交易记录
+          a.button-mini.pull-right(href='/accounts/transaction/') 交易记录
         .card-panel
           .gray-card4
             p 总资产
@@ -74,16 +74,14 @@ body
           tbody
             if fund_hold_info
               each fund in fund_hold_info
-                -with fund as fund
                 tr
                   td {{fund.fund_name}}
                   td {{fund.current_remain_share}}元
                   td {{fund.unpaid_income}}元
                   td
-                    a(href="#") 继续购买
+                    a.button.button-mini.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=purchase" target="_blank") 继续购买
                     &nbsp;
-                    a(href="#") 赎回
-                -endwith
+                    a.button.button-mini.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=redeem" target="_blank") 赎回
             else
               tr
                 td(colspan='4') 无持仓记录

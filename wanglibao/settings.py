@@ -293,7 +293,12 @@ LOGGING = {
         'wanglibao_sms': {
             'handlers': ['file'],
             'level': 'DEBUG',
+        },
+        'shumi': {
+            'handlers': ['file'],
+            'level': 'DEBUG'
         }
+
     }
 }
 
@@ -323,6 +328,8 @@ SM_ACCESS_TOKEN_URL = 'https://account.fund123.cn/oauth/access_token.ashx'
 SM_PURCHASE_TEMPLATE = 'https://trade.fund123.cn/Trading/Do/Purchase?fundcode={fund_code}'
 SM_REDEEM_TEMPLATE = 'https://trade.fund123.cn/Trading/Do/Redeem?tradeAccount={trade_account}' \
                      '&fundCode={fund_code}&sharetype={share_type}&UsableRemainShare={usable_remain_share}'
+SM_MONETARY_FUND_NET_VALUE = 'http://funddata.smbserver.fund123.cn/' \
+                             'monetary_fund_net_value?format=json&date={date}'
 
 
 # rest api document swagger settings

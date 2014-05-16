@@ -25,7 +25,7 @@
               sortable: true,
               field: 'name',
               text: function(item) {
-                return '<a target="_blank" href="/fund/detail/' + item.id + '">' + item.name + '</a>';
+                return '<a class="blue" target="_blank" href="/fund/detail/' + item.id + '">' + item.name + '</a>';
               }
             }, {
               name: '基金类型',
@@ -76,6 +76,16 @@
                 return item.rate_6_months + '%';
               }
             }, {
+              name: '购买',
+              colspan: 1,
+              text: function(item) {
+                if (item.availablefund) {
+                  return '<a class="button button-mini button-pink" href="/shumi/oauth/check_oauth_status/?fund_code=' + item.product_code + '&action=purchase" target="_blank"> 购买 </a>';
+                } else {
+                  return '<a class="button button-mini button-gray" href="javascript:void(0)"> 购买 </a>';
+                }
+              }
+            }, {
               name: '收藏',
               colspan: 1,
               text: function(item) {
@@ -84,12 +94,6 @@
                 } else {
                   return '<a class="button button-mini button-white" onclick="addToFavorite(event,' + "'funds');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">收藏</a>';
                 }
-              }
-            }, {
-              name: '详情',
-              colspan: 1,
-              text: function(item) {
-                return '<a target="_blank" class="button button-mini button-pink" href="/fund/detail/' + item.id + '">详情</a>';
               }
             }
           ]

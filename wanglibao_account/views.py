@@ -6,6 +6,7 @@ from django.contrib import auth
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
+from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import resolve_url
@@ -16,11 +17,12 @@ from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm
-from shumi_backend.exception import FetchException
+from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.serializers import UserSerializer
+from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
 
@@ -225,14 +227,28 @@ class AccountHome(TemplateView):
     template_name = 'account_home.jade'
 
     def get_context_data(self, **kwargs):
+        message = ''
         try:
             fetcher = UserInfoFetcher(self.request.user)
-            fund_hold_info = fetcher.fetch_user_fund_hold_info()
+            fetcher.fetch_user_fund_hold_info()
         except FetchException:
-            fund_hold_info = []
+            message = u'获取数据失败，请稍后重试'
+        except AccessException:
+            pass
 
+        hour = datetime.datetime.now().hour
+        if hour < 12:
+            greeting = u'早上好'
+        elif hour < 18:
+            greeting = u'下午好'
+        else:
+            greeting = u'晚上好'
+
+        fund_hold_info = FundHoldInfo.objects.filter(user__exact=self.request.user)
         return {
-            'fund_hold_info': fund_hold_info
+            'fund_hold_info': fund_hold_info,
+            'greeting': greeting,
+            'message': message
         }
 
 
@@ -240,6 +256,41 @@ class AccountTransaction(TemplateView):
     template_name = 'account_transaction.jade'
 
     def get_context_data(self, **kwargs):
-        return {
+        message = ''
+        try:
+            fetcher = UserInfoFetcher(self.request.user)
+            fetcher.fetch_user_trade_history()
+        except FetchException:
+            message = u'获取数据失败，请稍后重试'
+        except AccessException:
+            pass
 
+        transactions = TradeHistory.objects.filter(user__exact=self.request.user)
+        pager = Paginator(transactions, 20)
+        page = self.request.GET.get('page')
+        if not page:
+            page = 1
+        transactions = pager.page(page)
+        return {
+            "transactions": transactions,
+            "message": message
+        }
+
+
+class AccountBankCard(TemplateView):
+    template_name = 'account_bankcard.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            fetcher = UserInfoFetcher(self.request.user)
+            fetcher.fetch_bind_banks()
+        except FetchException:
+            message = u'获取数据失败，请稍后重试'
+        except AccessException:
+            pass
+
+        cards = BindBank.objects.filter(user__exact=self.request.user)
+        return {
+            "cards" : cards,
+            "message": message
         }

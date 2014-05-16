@@ -6,11 +6,13 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRe
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
-from wanglibao_buy.models import FundHoldInfo
+from wanglibao_buy.models import FundHoldInfo, TradeInfo
+from wanglibao_fund.models import Fund
 from exception import FetchException
 from auth import ShuMiExchangeAccessToken, ShuMiRequestToken
 from trade import TradeWithAutoLogin
 from utility import UrlTools, purchase, redeem
+from fetch import UserInfoFetcher
 
 # Create your views here.
 
@@ -112,10 +114,10 @@ class BrokerView(View):
 
     def get(self, request, *args, **kwargs):
         try:
-            fund_code = request.GET['fund_code']
-            action = request.GET['action']
+            fund_code = request.session['fund_code']
+            action = request.session['action']
         except KeyError:
-            return HttpResponseBadRequest('no fund code or action posted')
+            return HttpResponseBadRequest('no fund code or action in session')
 
         if action == 'purchase':
             trade_url = purchase(fund_code)
@@ -164,17 +166,36 @@ class TradeView(View):
         return HttpResponseRedirect(trader.get_trade_auto_login_url())
 
 
-class TradeCallbackView(View):
+class TradeCallbackView(TemplateView):
 
-    def get(self, request, *args, **kwargs):
+    template_name = ''
+    def get_context_data(self, **kwargs):
+        context = super(TradeCallbackView, self).get_context_data(**kwargs)
         try:
             order_id = self.request.GET['orderId']
         except KeyError:
-            # todo show some fail info
-            return HttpResponseBadRequest('No orderId')
+            return context
 
-        # todo store order id or fetch order detail
-        return HttpResponse('order id is %s ' % order_id)
+        # get trade record from shumi
+        try:
+            record_obj = UserInfoFetcher(self.request.user).get_apply_history_by_serial(order_id)
+        except Exception:
+            return context
+        # store buy info
+        item_id = Fund.objects.get(product_code=record_obj.fund_code).id
+        if int(record_obj.amount) == 0:
+            amount = record_obj.shares
+        else:
+            amount = record_obj.amount
+        buy_info = TradeInfo(user=self.request.user, type='Fund',
+                             item_id=item_id, item_name=record_obj.fund_name,
+                             amount=amount, verify_info=record_obj.apply_serial,
+                             trade_type=record_obj.business_type_to_cn)
+        buy_info.save()
+        # return template context
+        context['record'] = record_obj
+        return context
+
 
 
 class OAuthStartView(RedirectView):
@@ -184,9 +205,6 @@ class OAuthStartView(RedirectView):
     # todo get hostname and schema from request.
     def get_redirect_url(self, *args, **kwargs):
         profile = self.request.user.wanglibaouserprofile
-        #host = request.get_host()
-        #host = 'https://www.wanglibao.com'
-        #path = reverse('oauth-callback-view', kwargs={'pk': self.request.user.pk})
         helper = UrlTools(self.request)
         call_back_url = helper.gen_oauth_callback_url()
         requester = ShuMiRequestToken(call_back_url)
