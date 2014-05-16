@@ -33,12 +33,16 @@ body
                 tr
                   td {{transaction.fund_name}}
                   td {{transaction.shares}}元
-                  td {{transaction.business_type_to_cn}}
-                  td {{transaction.status_to_cn}}
+                  td {{transaction.business_type}}{{transaction.business_type_to_cn}}
+                  td {{transaction.status}}{{transaction.status_to_cn}}
                   td {{transaction.apply_date_time}}
             else
               tr
-                td(colspan='4') 无交易记录
+                td(colspan='5')
+                  if message
+                    {{message}}
+                  else
+                    无交易记录
 
       - with data=transactions uri='/accounts/transactions/'
       include include/pager
