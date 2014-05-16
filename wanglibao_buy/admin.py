@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import FundHoldInfo, AvailableFund, TradeHistory, BindBank, MonetaryFundNetValue, DailyIncome
+from models import FundHoldInfo, AvailableFund, TradeHistory, BindBank, MonetaryFundNetValue, DailyIncome, TradeInfo
 
 # Register your models here.
 
@@ -34,6 +34,7 @@ class DailyIncomeAdmin(admin.ModelAdmin):
     pass
 
 
+admin.site.register(TradeInfo)
 admin.site.register(FundHoldInfo, FundHoldInfoAdmin)
 admin.site.register(AvailableFund, AvailableFundAdmin)
 admin.site.register(TradeHistory, TradeHistoryAdmin)

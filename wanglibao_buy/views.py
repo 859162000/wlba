@@ -32,7 +32,7 @@ class TradeInfoViewSet(PaginatedModelViewSet):
         if type == 'fund':
             fund_code = request.DATA.get('fund_code')
             if fund_code is not None:
-                request.DATA['item_id'] = Fund.objects.get(product_code=fund_code).id
+                request.DATA['item_id'] = Fund.objects.filter(product_code=fund_code).first().id
 
         serializer = self.get_serializer(data=request.DATA)
 
