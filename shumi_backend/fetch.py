@@ -9,7 +9,7 @@ from requests_oauthlib import OAuth1Session
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
-from django.utils.timezone import get_default_timezone
+from django.utils.timezone import get_default_timezone, now
 
 from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory, AvailableFund, MonetaryFundNetValue, DailyIncome
 from exception import FetchException, AccessException, InfoLackException
@@ -233,13 +233,14 @@ class AppInfoFetcher(AppLevel):
         for value in values:
             try:
                 current_tz = get_default_timezone()
-                curr_date = datetime.strptime(value['curr_date'], '%Y-%m-%d').replace(tzinfo=current_tz)
+                curr_date = datetime.strptime(value['curr_date'], '%Y-%m-%d')
                 net_value = MonetaryFundNetValue(code=value['code'],
                                                  curr_date=curr_date,
                                                  income_per_ten_thousand=value['income_per_ten_thousand'])
                 net_value.save()
-            # ignore exception, help for run this case multi times.
-            except IntegrityError:
+            #(tzinfo=current_tzi ignore exception, help for run this case multi times.
+            except IntegrityError, e:
+                print(e)
                 continue
 
     def compute_user_daily_income(self):
@@ -264,7 +265,7 @@ class AppInfoFetcher(AppLevel):
             # init income.
             income = 0
             for fund in hold_funds:
-                value_info = MonetaryFundNetValue.objects.filter(code__exact=fund.fund_code).first()
+                value_info = MonetaryFundNetValue.objects.filter(code__exact=fund.fund_code, curr_date__exact=now()).first()
                 if not value_info:
                     raise InfoLackException('No fund %s net value info in our database.' % fund.fund_code)
                 per_ten_thousand = value_info.income_per_ten_thousand

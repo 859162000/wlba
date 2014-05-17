@@ -158,7 +158,7 @@ class MonetaryFundNetValue(models.Model):
     create_date = models.DateField(help_text=u'创建日期', auto_now=True)
 
     class Meta:
-        ordering = ['-create_date']
+        ordering = ['-curr_date']
         unique_together = ('code', 'curr_date')
 
     def __unicode__(self):
