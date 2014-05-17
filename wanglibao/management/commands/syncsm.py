@@ -60,7 +60,7 @@ class Command(BaseCommand):
             try:
                 print('Starting compute users daily income.')
                 fetcher.compute_user_daily_income()
-            except InfoLackException, e:
+            except FetchException, e:
                 print(e)
                 logger.error(e)
 
