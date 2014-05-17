@@ -1,3 +1,4 @@
+- load formatters
 doctype html
 - with '我的账户' as title
 include include/head
@@ -23,17 +24,17 @@ body
           .gray-card3
             p 总资产
             p
-              span.big_number 123
+              span.big_number {{total_asset|money_f_2}}
               元
           .gray-card3
             p 累计收益
             p
-              span.big_number 123
+              span.big_number {{total_income|money_f_2}}
               元
           .gray-card3
             p 加权收益率
             p
-              span.big_number 123
+              span.big_number {{income_rate|money_f_2}}
               %
 
       .panel-padding
@@ -44,22 +45,22 @@ body
           .gray-card4
             p 总资产
             p
-              span.big_number 123
+              span.big_number {{total_asset|money_f_2}}
               元
           .gray-card4
             p 累积收益
             p
-              span.big_number 123
+              span.big_number {{total_income|money_f_2}}
               元
           .gray-card4
             p 近一周收益
             p
-              span.big_number 123
+              span.big_number {{fund_income_week|money_f_2}}
               元
           .gray-card4
             p 近一月收益
             p
-              span.big_number 123
+              span.big_number {{fund_income_month|money_f_2}}
               元
 
         .space-vertical-s

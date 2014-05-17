@@ -8,8 +8,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
+from django.db.models import Sum
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import resolve_url
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
@@ -24,7 +26,7 @@ from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.serializers import UserSerializer
-from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo
+from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
 
@@ -247,8 +249,33 @@ class AccountHome(TemplateView):
             greeting = u'晚上好'
 
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=self.request.user)
+
+        total_asset = 0
+        income_rate = 0
+
+        fund_income_week = 0
+        fund_income_month = 0
+
+        if fund_hold_info.exists():
+            for hold_info in fund_hold_info:
+                total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+
+        today = timezone.datetime.today()
+
+        total_income = DailyIncome.objects.filter(user=self.request.user).aggregate(Sum('income'))['income__sum']
+        fund_income_week = DailyIncome.objects.filter(user=self.request.user, date__gt=today+datetime.timedelta(days=-7)).aggregate(Sum('income'))['income__sum']
+        fund_income_month = DailyIncome.objects.filter(user=self.request.user, date__gt=today+datetime.timedelta(days=-30)).aggregate(Sum('income'))['income__sum']
+
+        if total_asset != 0:
+            income_rate = total_income / total_asset
+
         return {
             'fund_hold_info': fund_hold_info,
+            'total_asset': total_asset,
+            'total_income': total_income,
+            'income_rate': income_rate,
+            'fund_income_week': fund_income_week,
+            'fund_income_month': fund_income_month,
             'greeting': greeting,
             'message': message
         }

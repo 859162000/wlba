@@ -19,6 +19,13 @@ def money(value):
     return u'%d元' % (int(value),)
 
 @register.filter
+def money_f_2(value):
+    """
+    Convert the number into xx.xx
+    """
+    return u'%.2f' % value
+
+@register.filter
 def month(value):
     """
     Convert the float based month to string
