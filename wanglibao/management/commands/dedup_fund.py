@@ -37,6 +37,6 @@ class Command(BaseCommand):
         else:
             # Show them
             print 'Ids: '
-            print ','.join(ids_to_dedup)
+            print ','.join([str(id) for id in ids_to_dedup])
 
         print 'done'
