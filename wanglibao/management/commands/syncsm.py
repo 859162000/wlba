@@ -1,6 +1,6 @@
 import logging
 from optparse import make_option
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand, CommandError
 from shumi_backend.fetch import AppInfoFetcher
 from wanglibao_fund.models import Fund
@@ -26,7 +26,13 @@ class Command(BaseCommand):
                     action='store_true',
                     dest='fetch_available_cash_funds',
                     default=False,
-                    help='fetch shumi available cash funds')
+                    help='fetch shumi available cash funds'),
+        make_option('--init-monetary-net-values', '-M',
+                    action='store_true',
+                    dest='init_monetary-net-values',
+                    default=False,
+                    help='fetch cash fund net value info from shumi for last 30 days.'
+                    )
     )
     def handle(self, *args, **options):
         try:
@@ -58,3 +64,8 @@ class Command(BaseCommand):
                 print(e)
                 logger.error(e)
 
+        if options['init_monetary-net-values']:
+            base = datetime.today()
+            date_list = [(base-timedelta(days=x)).strftime('%Y-%m-%d') for x in range(0, 30)]
+            for date in date_list:
+                fetcher.fetch_monetary_fund_net_value(date)
