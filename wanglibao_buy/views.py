@@ -1,10 +1,11 @@
-from django.db.models import F
+from django.db.models import F, Sum
 from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from trust.models import Trust
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
@@ -79,3 +80,15 @@ class DailyIncomeViewSet(ReadOnlyModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return DailyIncome.objects.filter(user=user)
+
+
+class TotalIncome(APIView):
+    permission_classes = IsAuthenticated,
+
+    def get(self, request, *args, **kwargs):
+
+        user = request.user
+        total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))
+        return Response({
+            'total_income': total_income['income__sum']
+        })
