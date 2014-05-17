@@ -4,7 +4,7 @@ from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import UserViewSet, ResetPasswordAPI
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
-from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet
+from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
 from wanglibao_cash.views import CashViewSet, CashIssuerViewSet
 from wanglibao_favorite.views import FavoriteTrustViewSet, FavoriteFundViewSet, FavoriteFinancingViewSet, \
     FavoriteCashViewSet
@@ -63,6 +63,7 @@ urlpatterns = patterns(
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^profile/', ProfileView.as_view()),
+    url(r'^total_income', TotalIncome.as_view()),
     url(r'', include(router.urls)),
 )
 

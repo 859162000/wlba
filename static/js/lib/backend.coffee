@@ -140,7 +140,7 @@ define ['jquery'], ($)->
         type: 'DELETE'
       }
       .done ()->
-        $(target).html('收藏')
+        $(target).html('<span class="star"></span>添加到我的收藏')
         $(target).attr('data-is-favorited', '0')
         $(target).removeClass('button-no-border')
       .fail ()->

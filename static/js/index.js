@@ -3,42 +3,16 @@
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      underscore: 'lib/underscore-min'
+      underscore: 'lib/underscore-min',
+      'jquery.modal': 'lib/jquery.modal.min'
+    },
+    shim: {
+      'jquery.modal': ['jquery']
     }
   });
 
-  require(['jquery', 'underscore'], function($, _) {
-    var anchors, bannerCount, banners, currentBanner;
-    $('ul.tabs').each(function() {
-      var allAnchors, allTargets;
-      allAnchors = $(this).find('a.tab-anchor');
-      allTargets = allAnchors.map(function() {
-        return $(this).attr('data-toggle');
-      });
-      return $(this).find('a.tab-anchor').each(function() {
-        return $(this).click(function(e) {
-          var targetId;
-          e.preventDefault();
-          targetId = $(this).attr('data-toggle');
-          $(allAnchors).each(function() {
-            return $(this).removeClass('active');
-          });
-          $(allTargets).each(function() {
-            if (this !== targetId) {
-              return $('#' + this).hide();
-            }
-          });
-          $('#' + targetId).fadeIn();
-          $(this).addClass('active');
-          $('.tab-arrow').remove();
-          return $($(this).parent()).append("<img class='tab-arrow' src='/static/images/red-arrow.png'/>");
-        });
-      }).each(function(index) {
-        if (index === 0) {
-          return $(this).trigger('click');
-        }
-      });
-    });
+  require(['jquery', 'underscore', 'lib/backend', 'lib/modal'], function($, _, backend, modal) {
+    var anchors, bannerCount, banners, currentBanner, trustId, trustName;
     $('.portfolio-submit').click(function() {
       var asset, period, risk;
       asset = $('#portfolio-asset')[0].value;
@@ -74,8 +48,38 @@
         return currentBanner = index;
       }
     });
-    return $('.home-banner-2').click(function() {
+    $('.home-banner-2').click(function() {
       return window.location.href = '/trust/detail/8526';
+    });
+    trustId = 0;
+    trustName = '';
+    $('.order-button').click(function(e) {
+      e.preventDefault();
+      trustId = $(e.target).attr('data-trust-id');
+      trustName = $(e.target).attr('data-trust-name');
+      return $(this).modal();
+    });
+    return $('#preorder_submit').click(function(event) {
+      var name, phone;
+      event.preventDefault();
+      name = $('#name_input').val();
+      phone = $('#phone_input').val();
+      if (name && phone) {
+        return backend.createPreOrder({
+          product_url: trustId,
+          product_type: 'trust',
+          product_name: trustName,
+          user_name: name,
+          phone: phone
+        }).done(function() {
+          alert('预约成功，稍后我们的客户经理会联系您');
+          $('#name_input').val('');
+          $('#phone_input').val('');
+          return $.modal.close();
+        }).fail(function() {
+          return alert('预约失败，请稍后再试或者拨打400-9999999');
+        });
+      }
     });
   });
 

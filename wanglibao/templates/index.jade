@@ -73,13 +73,13 @@ html
           .hot-item-highlight
             .hot-item-highlight-icon
             h1.hot-item-title {{first_item.short_name}}
-            .hot-item-list.clearfix
+            .hot-item-list.clearfix(style="height:170px")
               dl
                 dt 投资收益
                 dd
                   span.hot-list-num-l {{first_item.expected_earning_rate | percentage}}
                 dd
-                  a.order-button.button.button-middle.button-red.button-l(href="#order-form") 立即预约
+                  a.order-button.button.button-middle.button-red.button-l(href="#order-form", data-trust-id="{{first_item.id}}", data-trust-name="{{first_item.short_name}}") 立即预约
 
               ul
                 li
@@ -106,21 +106,18 @@ html
             .hot-item-normal
               h1.hot-item-title {{item.short_name}}
               .hot-item-list.clearfix
-                dl
+                dl(style="height:170px")
                   dd 投资收益
                   dd.font-m
                     span.hot-list-num-m {{item.expected_earning_rate | percentage}}
-                  dd
-                    产品期限：
+                  dd 产品期限：
                     span.dark-gray {{item.period | month}}
-                  dd
-                    付息方式：
+                  dd 付息方式：
                     span.dark-gray {{item.interest_method}}
                   dd
-                    a.order-button.button.button-middle.button-red.button-m(href="#order-form") 立即预约
+                    a.order-button.button.button-middle.button-red.button-m(href="#order-form", data-trust-id="{{item.id}}", data-trust-name="{{item.short_name}}") 立即预约
 
-              .hot-item-comments
-                    点 评：{{item.brief}}
+              .hot-item-comments 点 评：{{item.brief}}
 
         .buy_process
                 img(src="/static/images/home_trustfund_icon.jpg", alt="信托基金购买流程")
@@ -146,6 +143,5 @@ html
 
     script.
       require(['/static/js/index.js'])
-      require(['/static/js/trust_detail.js'])
 
     include include/tracking

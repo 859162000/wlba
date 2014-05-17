@@ -147,7 +147,7 @@
           url: url + id + '/',
           type: 'DELETE'
         }).done(function() {
-          $(target).html('收藏');
+          $(target).html('<span class="star"></span>添加到我的收藏');
           $(target).attr('data-is-favorited', '0');
           return $(target).removeClass('button-no-border');
         }).fail(function() {

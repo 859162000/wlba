@@ -147,7 +147,7 @@ def get_info(pq):
         issuer.save()
         fund.issuer = issuer
     else:
-        fund.issuer = FundIssuer.objects.get(name=issuer_name)
+        fund.issuer = FundIssuer.objects.get(name=issuer_name).order_by('id')
 
     qs = Fund.objects.filter(product_code=fund.product_code)
     if qs.exists():

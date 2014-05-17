@@ -33,6 +33,7 @@
 
 .container-home
   @extend .container
+  height: 320px
 
 .portfolio-container
   @extend .pie-element
@@ -138,7 +139,7 @@
 .hot-item-title
   font-size: $font-l
   font-weight: bold
-  color: $orange
+  color: $red
   padding-left: $space-s
 
 .hot-item-list
@@ -170,6 +171,14 @@
     li.no-border-bottom
       border-bottom: 0
 
+.hot-item-comments
+  border-top: dotted 1px $hot-list-border-color
+  margin: $space-xs $space-s
+  color: $gray-text
+  padding-top: 5px
+  font-size: $font-s
+  height: 55px
+
 .hot-item-highlight
   float: left
   position: relative
@@ -182,6 +191,9 @@
   dl
     width: 250px
 
+  .hot-item-comments
+    width: 440px
+
 .hot-item-highlight-icon
   background: url("/static/images/home_recomment.png")
   width: 72px
@@ -190,12 +202,7 @@
   top: 1px
   right: 1px
 
-.hot-item-comments
-  border-top: dotted 1px $hot-list-border-color
-  padding: $space-xs $space-s
-  color: $gray-text
-  margin-top: 10px
-  font-size: $font-s
+
 
 .buy_process
   text-align: center
@@ -222,5 +229,4 @@
   font-size: $font-xxxxxl
   font-family: Arial
   font-weight: bold
-  padding-bottom: $space-m
 
