@@ -4,3 +4,7 @@ class FetchException(Exception):
 
 class AccessException(Exception):
     pass
+
+
+class InfoLackException(Exception):
+    pass

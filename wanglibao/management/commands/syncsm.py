@@ -4,6 +4,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand, CommandError
 from shumi_backend.fetch import AppInfoFetcher
 from wanglibao_fund.models import Fund
+from shumi_backend.exception import FetchException, InfoLackException
 
 
 logger = logging.getLogger('shumi')
@@ -11,17 +12,17 @@ logger = logging.getLogger('shumi')
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('--monetary',
+        make_option('--monetary', '-m',
                     action='store_true',
                     dest='fetch_monetary_net_values',
                     default=False,
                     help='fetch monetary funds net value form shumi.'),
-        make_option('--daily-income',
+        make_option('--daily-income', '-i',
                     action='store_true',
                     dest='compute_daily_income',
                     default=False,
                     help='Compute user daily income.'),
-        make_option('--available-cash-funds',
+        make_option('--available-cash-funds', '-f',
                     action='store_true',
                     dest='fetch_available_cash_funds',
                     default=False,
@@ -37,20 +38,23 @@ class Command(BaseCommand):
             try:
                 print('Starting sync available cash funds.')
                 fetcher.fetch_available_cash_fund()
-            except Exception, e:
+            except FetchException:
+                print e
                 logger.error(e)
 
         if options['fetch_monetary_net_values']:
             try:
                 print('Starting sync monetary funds net values.')
                 fetcher.fetch_monetary_fund_net_value()
-            except Exception, e:
+            except FetchException, e:
+                print e
                 logger.error(e)
 
         if options['compute_daily_income']:
             try:
                 print('Starting compute users daily income.')
                 fetcher.compute_user_daily_income()
-            except Exception, e:
+            except InfoLackException, e:
+                print(e)
                 logger.error(e)
 

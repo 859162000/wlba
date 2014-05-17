@@ -1,8 +1,10 @@
+from datetime import datetime
 from urlparse import urlparse
 
 from django.core.urlresolvers import reverse
 from django.http.request import HttpRequest
 from django.conf import settings
+from django.utils.timezone import get_default_timezone
 
 
 class UrlTools(object):
@@ -123,6 +125,10 @@ def mapping_available_funds_info(shumi_json_dict):
         fund['withdraw_state'] = shumi_json_dict['WithdrawState']
     except KeyError:
         raise KeyError('Unpack error.')
+
+    current_tz = get_default_timezone()
+    last_update = datetime.strptime(fund['last_update'], '%Y-%m-%dT%H:%M:%S.%f').replace(tzinfo=current_tz)
+    fund['last_update'] = last_update
 
     return fund
 
