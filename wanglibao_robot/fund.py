@@ -149,19 +149,22 @@ def get_info(pq):
     else:
         fund.issuer = FundIssuer.objects.get(name=issuer_name)
 
-    si = ScrawlItem.objects.filter(type='fund', name=fund.name, issuer_name=fund.issuer.name)
-    if si.exists():
-        scrawl_item = si.first()
-        fund.id = scrawl_item.item_id
+    qs = Fund.objects.filter(product_code=fund.product_code)
+    if qs.exists():
+        fund.id = qs.last().id
         fund.save()
-        scrawl_item.last_updated = timezone.now()
-        scrawl_item.save()
-
         sys.stdout.write('u')
-        sys.stdout.flush()
     else:
         fund.brief = ''
         fund.save()
+        sys.stdout.write('.')
+
+    scrawl_item = ScrawlItem.objects.filter(type='fund', item_id=fund.id).first()
+    if scrawl_item is not None:
+        scrawl_item.last_updated = timezone.now()
+        scrawl_item.save()
+        sys.stdout.write('u')
+    else:
         item = ScrawlItem()
         item.type = 'fund'
         item.item_id = fund.id
@@ -169,10 +172,10 @@ def get_info(pq):
         item.issuer_name = fund.issuer.name
         item.last_updated = timezone.now()
         item.save()
+        sys.stdout.write('+')
 
-        sys.stdout.write('.')
-        sys.stdout.flush()
-
+    sys.stdout.write(' ')
+    sys.stdout.flush()
     return fund
 
 
