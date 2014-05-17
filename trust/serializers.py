@@ -15,6 +15,7 @@ class TrustSerializer(HyperlinkedModelSerializer):
     """
     class Meta:
         model = Trust
+        depth = 1
 
     issuer_short_name = serializers.SerializerMethodField('get_issuer_short_name')
     issuer_description = serializers.SerializerMethodField('get_issuer_description')
