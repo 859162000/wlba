@@ -1,4 +1,5 @@
 - load formatters
+- load mathfilters
 doctype html
 - with '我的账户' as title
 include include/head
@@ -34,7 +35,7 @@ body
           .gray-card3
             p 加权收益率
             p
-              span.big_number {{income_rate|money_f_2}}
+              span.big_number {{income_rate|mul:100}}
               %
 
       .panel-padding
