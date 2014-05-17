@@ -265,15 +265,17 @@ class AppInfoFetcher(AppLevel):
             # init income.
             income = 0
             for fund in hold_funds:
-                value_info = MonetaryFundNetValue.objects.filter(code__exact=fund.fund_code, curr_date__exact=now()).first()
-                if not value_info:
-                    raise InfoLackException('No fund %s net value info in our database.' % fund.fund_code)
-                per_ten_thousand = value_info.income_per_ten_thousand
-                fund_amount = float(fund.usable_remain_share.to_eng_string())
-                income += fund_amount * per_ten_thousand / 10000
+                value_info_set = MonetaryFundNetValue.objects.filter(code__exact=fund.fund_code,
+                                                                 curr_date__exact=now())
+                if value_info_set.exists():
+                    value_info = value_info_set.first()
+                    per_ten_thousand = value_info.income_per_ten_thousand
+                    fund_amount = float(fund.usable_remain_share.to_eng_string())
+                    income += fund_amount * per_ten_thousand / 10000
 
-            try:
-                daily_income = DailyIncome(user=user, income=income)
-                daily_income.save()
-            except Exception:
-                continue
+            if income != 0:
+                try:
+                    daily_income = DailyIncome(user=user, income=income)
+                    daily_income.save()
+                except IntegrityError:
+                    continue
