@@ -36,7 +36,7 @@ def production():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'production'
+    env.branch = 'master'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -207,8 +207,8 @@ def deploy():
             with cd(env.depot_name):
                 run('git reset --hard HEAD')
                 run('git remote set-url origin %s' % env.depot)
-                run("git pull")
                 run("git checkout %s" % env.branch)
+                run("git pull")
 
         apt_get("gcc", "python-setuptools", "python-all-dev", "libpq-dev", "libjpeg-dev")
         print green("Install pip and virtualenv")

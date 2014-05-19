@@ -23,6 +23,25 @@ def get_product_qs(type):
     raise NotImplementedError('The type not supported yet')
 
 
+def update_and_save_product_trade_info(trade_info):
+    item_type = trade_info.type
+    item_id = trade_info.item_id
+    amount = trade_info.amount
+    user = trade_info.user
+
+    already_bought = TradeInfo.objects.filter(type=item_type, item_id=item_id, user=user).exists()
+
+    # Now find the product and update the buy info
+    product = get_product_qs(item_type).filter(pk=item_id).first()
+    product.bought_count = F('bought_count') + 1
+    if not already_bought:
+        product.bought_people_count = F('bought_people_count') + 1
+    product.bought_amount = F('bought_amount') + amount
+
+    trade_info.save()
+    product.save()
+
+
 class TradeInfoViewSet(PaginatedModelViewSet):
     model = TradeInfo
     serializer_class = TradeInfoSerializer
@@ -43,23 +62,8 @@ class TradeInfoViewSet(PaginatedModelViewSet):
             if request.user and request.user.is_authenticated():
                 user = request.user
 
-            item_type = serializer.object.type
-            item_id = serializer.object.item_id
-            amount = serializer.object.amount
-
-            already_bought = TradeInfo.objects.filter(type=item_type, item_id=item_id, user=user).exists()
-
             serializer.object.user = user
-            serializer.object.save()
-
-            # Now find the product and update the buy info
-            product = get_product_qs(item_type).filter(pk=item_id).first()
-            product.bought_count = F('bought_count') + 1
-            if not already_bought:
-                product.bought_people_count = F('bought_people_count') + 1
-            product.bought_amount = F('bought_amount') + amount
-
-            product.save()
+            update_and_save_product_trade_info(serializer.object)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:

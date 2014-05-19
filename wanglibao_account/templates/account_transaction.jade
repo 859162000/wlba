@@ -23,7 +23,8 @@ body
           thead
             tr
               th 产品名称
-              th 金额
+              th 金额(元)
+              th 份额
               th 操作
               th 状态
               th 时间
@@ -32,9 +33,10 @@ body
               each transaction in transactions
                 tr
                   td {{transaction.fund_name}}
-                  td {{transaction.shares}}元
-                  td {{transaction.business_type}}{{transaction.business_type_to_cn}}
-                  td {{transaction.status}}{{transaction.status_to_cn}}
+                  td {{transaction.amount}}
+                  td {{transaction.shared}}
+                  td {{transaction.business_type_to_cn}}
+                  td {{transaction.status_to_cn}}
                   td {{transaction.apply_date_time}}
             else
               tr

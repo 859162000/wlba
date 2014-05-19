@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
 from wanglibao_buy.models import FundHoldInfo, TradeInfo, TradeHistory
+from wanglibao_buy.views import update_and_save_product_trade_info
 from wanglibao_fund.models import Fund
 from exception import FetchException
 from auth import ShuMiExchangeAccessToken, ShuMiRequestToken
@@ -192,8 +193,8 @@ class TradeCallbackView(TemplateView):
                              item_id=item_id, item_name=record_obj.fund_name,
                              amount=amount, verify_info=record_obj.apply_serial,
                              trade_type=record_obj.business_type_to_cn)
-        buy_info.save()
-        # return template context
+
+        update_and_save_product_trade_info(buy_info)
 
         action = ''
         if record_obj.business_type == '022':
@@ -205,7 +206,6 @@ class TradeCallbackView(TemplateView):
             'action': action,
             'record': record_obj
         }
-
 
 
 class OAuthStartView(RedirectView):
