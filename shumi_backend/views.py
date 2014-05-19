@@ -189,7 +189,7 @@ class TradeCallbackView(TemplateView):
             amount = record_obj.shares
         else:
             amount = record_obj.amount
-        buy_info = TradeInfo(user=self.request.user, type='Fund',
+        buy_info = TradeInfo(user=self.request.user, type='fund',
                              item_id=item_id, item_name=record_obj.fund_name,
                              amount=amount, verify_info=record_obj.apply_serial,
                              trade_type=record_obj.business_type_to_cn)
