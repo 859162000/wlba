@@ -137,7 +137,7 @@ def add_cron_tab(job_file, job_log_file, env, period_string, manage_py, manage_a
     sudo('chmod +x %s' % job_file)
     if _start:
         sudo('echo "SHELL=/bin/bash" > /tmp/tmp_tab')
-    sudo('echo "%s %s" >> /tmp/tmp_tab' % (period_string, job_file))
+    sudo('echo "%s %s >/dev/null 2>&1" >> /tmp/tmp_tab' % (period_string, job_file))
     if _end:
         sudo('crontab /tmp/tmp_tab')
 
@@ -149,7 +149,7 @@ def deploy():
 
     sync_sm_info = '/usr/bin/sync_sm_info'
     sync_sm_income = '/usr/bin/sync_sm_income'
-    sync_sm_log = '/usr/log/wanglibao/sync_sm.log'
+    sync_sm_log = '/var/log/wanglibao/sync_sm.log'
 
     print red("Begin deploy: ")
     create_folder(path, mod="777")
