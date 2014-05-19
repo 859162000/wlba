@@ -123,21 +123,23 @@ def publish():
     for file in files:
         local('osscmd.py put static/images/%s oss://wanglibao/images/%s' % (file, file))
 
-def add_cron_tab(job_file, job_log_file, env, period_string, manage_py, *manage_actions):
+def add_cron_tab(job_file, job_log_file, env, period_string, manage_py, manage_actions, _start=False, _end=False):
 
-    print green('Starting add cronjob %s, job log file in  %' % (job_file, job_log_file))
+    print green('Starting add cronjob %s, job log file in  %s' % (job_file, job_log_file))
 
     sudo('echo "#!/bin/bash" > %s' % job_file)
-    sudo('echo %s &>> %s' % (env.action, job_file))
+    sudo('echo %s &>> %s' % (env.activate, job_file))
     sudo('echo "date > %s" >> %s' % (job_log_file, job_file))
     sudo('echo "cd /var/wsgi/wanglibao/" >> %s' % job_file)
     for action in manage_actions:
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, action, job_log_file, job_file))
     sudo('echo "date >> %s" >> %s' % (job_log_file, job_file))
     sudo('chmod +x %s' % job_file)
-    sudo('echo "SHELL=/bin/bash" > /tmp/tmp_tab')
-    sudo('echo "0 0 * * * %s" >> /tmp/tmp_tab' % job_file)
-    sudo('crontab /tmp/tmp_tab')
+    if _start:
+        sudo('echo "SHELL=/bin/bash" > /tmp/tmp_tab')
+    sudo('echo "%s %s" >> /tmp/tmp_tab' % (period_string, job_file))
+    if _end:
+        sudo('crontab /tmp/tmp_tab')
 
 def deploy():
     path = env.path
@@ -145,9 +147,9 @@ def deploy():
     manage_py = '/var/wsgi/wanglibao/manage.py'
     log_file = '/var/log/wanglibao/scrawl.log'
 
-    sync_sm_info = 'usr/bin/sync_sm_info'
-    sync_sm_income = 'usr/bin/sync_sm_income'
-    sync_sm_log = 'usr/log/wanglibao/sync_sm.log'
+    sync_sm_info = '/usr/bin/sync_sm_info'
+    sync_sm_income = '/usr/bin/sync_sm_income'
+    sync_sm_log = '/usr/log/wanglibao/sync_sm.log'
 
     print red("Begin deploy: ")
     create_folder(path, mod="777")
@@ -187,12 +189,12 @@ def deploy():
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'scrawl_fund', log_file, scrawl_job_file))
         sudo('echo "date >> %s" >> %s' % (log_file, scrawl_job_file))
         sudo('chmod +x %s' % scrawl_job_file)
-        sudo('echo "SHELL=/bin/bash" > /tmp/scrawl_tab')
-        sudo('echo "0 0 * * * %s" >> /tmp/scrawl_tab' % scrawl_job_file)
-        sudo('crontab /tmp/scrawl_tab')
+        sudo('echo "SHELL=/bin/bash" > /tmp/tmp_tab')
+        sudo('echo "0 0 * * * %s" >> /tmp/tmp_tab' % scrawl_job_file)
+        sudo('crontab /tmp/tmp_tab')
 
         add_cron_tab(sync_sm_info, sync_sm_log, env, '* */1 * * *', manage_py, ['syncsm -f', 'syncsm -m'])
-        add_cron_tab(sync_sm_income, sync_sm_log, env, '* 18-23/1 * * *', manage_py, ['syncsm -i'])
+        add_cron_tab(sync_sm_income, sync_sm_log, env, '* 18-23/1 * * *', manage_py, ['syncsm -i'], _end=True)
 
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, create it')
