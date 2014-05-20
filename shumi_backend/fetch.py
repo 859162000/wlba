@@ -12,7 +12,7 @@ from django.db.utils import IntegrityError
 from django.utils.timezone import get_default_timezone, now
 
 from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory, AvailableFund, MonetaryFundNetValue, DailyIncome
-from exception import FetchException, AccessException, InfoLackException
+from exception import FetchException, AccessException
 from utility import mapping_fund_hold_info, mapping_bind_banks, mapping_trade_history, mapping_available_funds_info
 from wanglibao_fund.models import Fund
 
@@ -249,33 +249,40 @@ class AppInfoFetcher(AppLevel):
         today = date.today()
         logger = getLogger('shumi')
         for user in users:
-            # if user already had daily income info continue
-            if DailyIncome.objects.filter(user__exact=user, date__exact=today).exists():
-                continue
             # try to fetch funds hold info, in case shumi open api down.
             try:
                 fetcher = UserInfoFetcher(user)
                 fetcher.fetch_user_fund_hold_info()
-            except IntegrityError:
-                continue
             except AccessException:
                 logger.error('user: %s access token fail or expired.' % user)
+            # Shumi open api may random down or user store a expired token.
+            except FetchException:
+                continue
+
             hold_funds = FundHoldInfo.objects.filter(user__exact=user)
+            user_income = DailyIncome.objects.filter(user__exact=user, date__exact=today)
+            computable_hold = MonetaryFundNetValue.objects.filter(code__in = [hold.fund_code for hold in hold_funds],
+                                                                  curr_date__exact=today)
+
+            if user_income.exists():
+                income_info = user_income.first()
+                if income_info == computable_hold:
+                    continue
+                else:
+                    user_income.delete()
 
             # init income.
             income = 0
-            for fund in hold_funds:
-                value_info_set = MonetaryFundNetValue.objects.filter(code__exact=fund.fund_code,
-                                                                 curr_date__exact=now())
-                if value_info_set.exists():
-                    value_info = value_info_set.first()
-                    per_ten_thousand = value_info.income_per_ten_thousand
-                    fund_amount = float(fund.usable_remain_share.to_eng_string())
-                    income += fund_amount * per_ten_thousand / 10000
+            for hold in computable_hold:
+                print hold
+                per_ten_thousand = hold.income_per_ten_thousand
+                related_hold_info = hold_funds.filter(fund_code__exact=hold.code).first()
+                fund_amount = float(related_hold_info.usable_remain_share.to_eng_string())
+                income += fund_amount * per_ten_thousand / 10000
 
             if income != 0:
                 try:
-                    daily_income = DailyIncome(user=user, income=income)
+                    daily_income = DailyIncome(user=user, income=income, count=len(computable_hold))
                     daily_income.save()
                 except IntegrityError:
                     continue
