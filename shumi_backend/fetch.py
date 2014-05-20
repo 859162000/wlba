@@ -69,7 +69,7 @@ class AppLevel(ShuMiAPI):
 
     def get_available_cash_funds(self):
         funds = self.get_available_funds()
-        cash_funds = [fund for fund in funds if fund['FundType'] == '2']
+        cash_funds = [fund for fund in funds if (fund['FundType'] == '2' and float(fund['PurchaseLimitMin']) <= 1000)]
         return cash_funds
 
     # input: None
