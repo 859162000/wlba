@@ -58,10 +58,10 @@ body
           span.ispan4.relative-pos
             if fund.rate_7_days
               input.ispan12(type="text", data-rate="{{fund.rate_7_days}}",  /
-                data-period="30", data-target="#earning", data-role="earning-calculator")
+                data-period="30,1", data-target="#earning,#earning-day", data-role="earning-calculator", value='10')
             else
               input.ispan12(type="text", data-rate="{{fund.rate_1_year}}",  /
-                data-period="30", data-target="#earning", data-role="earning-calculator")
+                data-period="30,1", data-target="#earning,#earning-day", data-role="earning-calculator")
             span.absolute-pos.pos-r-s 万
           p
             月预期收益：

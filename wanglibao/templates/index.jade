@@ -88,7 +88,7 @@ html
                   span.dark-gray {{first_item.period | month}}
                 li
                   起购金额：
-                  span.dark-gray {{first_item.investment_threshold}}万
+                  span.dark-gray {{first_item.investment_threshold | money_to_10k}}
                 li
                   投资行业：
                   span.dark-gray {{first_item.usage}}
@@ -97,7 +97,7 @@ html
                   span.dark-gray {{first_item.interest_method}}
                 li.no-border-bottom
                   信托公司：
-                  span.dark-gray {{first_item.usage}}
+                  span.dark-gray {{first_item.issuer.name}}
 
             .hot-item-comments
               点 评：{{first_item.brief}}
@@ -122,7 +122,7 @@ html
               .hot-item-comments 点 评：{{item.brief}}
 
         .buy_process
-                img(src="/static/images/home_trustfund_icon.jpg", alt="信托基金购买流程")
+          img(src="/static/images/home_trustfund_icon.jpg", alt="信托基金购买流程")
 
     .space-vertical-m
 
