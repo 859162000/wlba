@@ -29,7 +29,7 @@
           ul
             li
               起购金额：
-              span.dark-gray {{first_item.investment_threshold}}万
+              span.dark-gray {{first_item.investment_threshold | money}}
             li
               半年涨幅：
               span.dark-gray {{first_item.rate_6_months | percentage}}

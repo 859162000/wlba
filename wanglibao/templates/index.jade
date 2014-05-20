@@ -88,7 +88,7 @@ html
                   span.dark-gray {{first_item.period | month}}
                 li
                   起购金额：
-                  span.dark-gray {{first_item.investment_threshold}}万
+                  span.dark-gray {{first_item.investment_threshold | money_to_10k}}
                 li
                   投资行业：
                   span.dark-gray {{first_item.usage}}
@@ -96,8 +96,8 @@ html
                   付息方式：
                   span.dark-gray {{first_item.interest_method}}
                 li.no-border-bottom
-                  投资行业：
-                  span.dark-gray {{first_item.usage}}
+                  信托公司：
+                  span.dark-gray {{first_item.issuer.name}}
 
             .hot-item-comments
               点 评：{{first_item.brief}}
