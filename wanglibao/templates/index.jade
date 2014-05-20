@@ -96,7 +96,7 @@ html
                   付息方式：
                   span.dark-gray {{first_item.interest_method}}
                 li.no-border-bottom
-                  投资行业：
+                  信托公司：
                   span.dark-gray {{first_item.usage}}
 
             .hot-item-comments
@@ -141,7 +141,9 @@ html
               input#phone_input.full-width(type="text", placeholder="电话")
           div.margin-top-s
               button#preorder_submit.button.button-middle.button-red.full-width(href="#", type="submit") 立即预约
-          div.margin-top-s.light-gray-text 该产品限量发售，留下您的电话投资顾问火速协助抢购
+          div.margin-top-s.light-gray-text.align-center
+            预约成功后，我们奖在第一时间联系您<br/>或直接拨打
+            span.highlight 400-8588-066
 
     script.
       require(['/static/js/index.js'])
