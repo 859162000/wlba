@@ -10,7 +10,7 @@ body
   include include/navigation
   - endwith
   .container
-    .span8.panel-nopadding.panel-header
+    .span8.panel-nopadding.fund-panel-header
       .panel-product-title-bar
         .panel-product-title
             if is_favorited != 1
@@ -24,22 +24,21 @@ body
       .row
         .span4
           .span12
-            .card-icon
-              dl
-                dt 是银行活期利率的
-                dd
-                  span.hot-list-num-l {{fund.rate_7_days | current_deposit_times}}
-                  span.font-m.light-gray-text 倍
+            .card-icon.fund-card-icon
+              p.padding-left-s 是银行活期利率的
+              p.padding-left-s
+                span.hot-list-num-s {{fund.rate_7_days | current_deposit_times}}
+                span.font-l.light-gray-text 倍
         .span4
           .well-m
-            dl(style='line-height: 30px;height:125px;border-right:solid 1px #d3d3d3')
-              dd
+            .card-list
+              p
                 七日年化收益：
                 span.highlight.font-xxl {{fund.rate_7_days | percentage}}
-              dd
+              p
                 起购金额：
                 {{fund.investment_threshold | money}}
-              dd
+              p
                 随买随卖
 
         .span4-omega
@@ -50,25 +49,24 @@ body
               a.button.button-round-large.button-red(href="/accounts/register/?next=/fund/detail/{{fund.id}}") 立即赚钱
             p 申请人数{{fund.bought_count}}人
 
-    .span4-omega.panel-nopadding.panel-header
+    .span4-omega.panel-nopadding.fund-panel-header
       .panel-product-title-bar
         .panel-product-title 收益计算器
       form(data-period="50", data-rate="5")
-        .form-row-m.padding-left-s.margin-top-s(style="line-height:30px")
+        .form-row-m.padding-left-s.margin-top-s
           label.form-row-label &nbsp;&nbsp;&nbsp;&nbsp;投资金额：
           span.ispan4.relative-pos
             if fund.rate_7_days
               input.ispan12(type="text", data-rate="{{fund.rate_7_days}}",  /
-                data-period="30", data-target="#earning", data-role="earning-calculator")
+                data-period="30,1", data-target="#earning,#earning-day", data-role="earning-calculator", value='10')
             else
               input.ispan12(type="text", data-rate="{{fund.rate_1_year}}",  /
-                data-period="30", data-target="#earning", data-role="earning-calculator")
+                data-period="30,1", data-target="#earning,#earning-day", data-role="earning-calculator")
             span.absolute-pos.pos-r-s 万
           p
             月预期收益：
             span#earning.highlight 0.0
-            span 元
-          p
+            span 元 &nbsp;&nbsp;&nbsp;&nbsp;
             日预期收益：
             span#earning-day.highlight 0.0
             span 元

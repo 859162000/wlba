@@ -2,9 +2,13 @@ define ['jquery'], ($)->
   $('input[data-role=earning-calculator]').keyup (e)->
     target = $(e.target)
     rate = target.attr 'data-rate'
-    period = target.attr 'data-period'
+    periods = (target.attr 'data-period').split(',')
     amount = target.val()
-    earning_element = $(target.attr 'data-target')
+    earning_elements = (target.attr 'data-target').split(',')
+    for earning_element, i in earning_elements
+      period = periods[i]
+      $(earning_element).text (rate / 100 * amount * 10000 / 365 * period).toFixed(1)
 
     console.log 'rate: ' + rate + ' amount:' + amount
-    earning_element.text (rate / 100 * amount * 10000 / 365 * period).toFixed(1)
+
+

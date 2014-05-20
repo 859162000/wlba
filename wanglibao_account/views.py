@@ -330,10 +330,29 @@ class ResetPasswordAPI(APIView):
     permission_classes = ()
 
     def post(self, request):
-        password = request.DATA.get('new_password').strip()
+        password = request.DATA.get('new_password')
         identifier = request.DATA.get('identifier')
         validate_code = request.DATA.get('validate_code')
+
+        if password is None:
+            return Response({
+                'message': u'缺少new_password这个字段'
+            }, status=400)
+        else:
+            password = password.strip()
+
+        if identifier is None:
+            return Response({
+                'message': u'缺少identifier这个字段'
+            }, status=400)
+
+        if validate_code is None:
+            return Response({
+                'message': u'缺少validate_code'
+            }, status=400)
+
         identifier_type = detect_identifier_type(identifier)
+
         if identifier_type == 'phone':
             user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
         else:

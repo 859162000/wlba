@@ -6,7 +6,7 @@ from datetime import timedelta
 from pyquery import PyQuery
 import time
 from wanglibao_fund.models import Fund, FundIssuer
-from wanglibao_hotlist.models import HotFund
+from wanglibao_hotlist.models import HotFund, MobileHotFund
 from wanglibao_robot.models import ScrawlItem
 from wanglibao_robot.util import *
 from django.utils import timezone
@@ -228,12 +228,18 @@ def run_robot(clean=False, offset=0):
             f.save()
 
         HotFund.objects.all().delete()
-        hot_list = Fund.objects.filter(status=u'正常', type=u'货币型').order_by('-rate_7_days')[:4]
+        MobileHotFund.all().delete()
+        hot_list = Fund.objects.filter(status=u'正常', type=u'货币型', availablefund__isnull=False).order_by('-rate_7_days')[:4]
         for item in hot_list:
             hf = HotFund()
             hf.fund = item
             hf.hot_score = time.time()
             hf.save()
+
+            mhf = MobileHotFund()
+            mhf.fund = item
+            mhf.hot_score = time.time()
+            mhf.save()
 
     except urllib2.URLError, e:
         print "Reason: ", e.reason

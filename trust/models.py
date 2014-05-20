@@ -1,6 +1,7 @@
 # encoding: utf-8
 from django.db import models
 import logging
+from wanglibao.models import ProductBase
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ class Issuer(models.Model):
     major_stockholder = models.TextField(blank=True, null=True)
     shareholders = models.TextField(blank=True, null=True)
 
-    note = models.TextField(blank=True, null=True) # Some note on the company
+    note = models.TextField(blank=True, null=True)
 
     business_range = models.TextField(blank=True, null=True)
     logo = models.ImageField(upload_to='trust_logo', null=True, blank=True, help_text=u'信托公司logo')
@@ -33,7 +34,7 @@ class Issuer(models.Model):
         return self.name
 
 
-class Trust (models.Model):
+class Trust (ProductBase):
     ON_SALE = u'在售'
     PRE_SALE = u'预售'
     EXPIRED = u'停售'
