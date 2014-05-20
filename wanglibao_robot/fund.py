@@ -228,6 +228,7 @@ def run_robot(clean=False, offset=0):
             f.save()
 
         HotFund.objects.all().delete()
+        MobileHotFund.all().delete()
         hot_list = Fund.objects.filter(status=u'正常', type=u'货币型').order_by('-rate_7_days')[:4]
         for item in hot_list:
             hf = HotFund()
