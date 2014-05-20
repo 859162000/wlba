@@ -64,26 +64,6 @@ class OAuthCallbackView(View):
         return HttpResponseRedirect(reverse('oauth-status-view'))
 
 
-class OAuthTriggerView(TemplateView):
-    """
-
-    """
-    template_name = 'trigger.jade'
-
-    def get_context_data(self, **kwargs):
-        profile = self.request.user.wanglibaouserprofile
-        context = super(OAuthTriggerView, self).get_context_data(**kwargs)
-        trade_helper = UrlTools(self.request)
-        data = dict()
-        data['fund_code'] = '202301'
-        data['action'] = 'purchase'
-        oauth_redirect_base_url = reverse('oauth-status-view')
-
-        context['pageTitle'] = 'Test trigger'
-        context['buyurl'] = oauth_redirect_base_url + '?' + urlencode(data)
-        return context
-
-
 class OAuthStatusView(RedirectView):
 
     permanent = False
@@ -181,7 +161,7 @@ class TradeCallbackView(TemplateView):
         # get trade record from shumi
         try:
             record_obj = UserInfoFetcher(self.request.user).get_user_trade_history_by_serial(order_id)
-        except Exception:
+        except FetchException:
             return context
         # store buy info
         item_id = Fund.objects.get(product_code=record_obj.fund_code).id

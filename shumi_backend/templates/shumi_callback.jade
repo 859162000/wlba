@@ -11,7 +11,7 @@ html
     include include/navigation
     .container
       .callback-content
-        if record and record.status != 0
+        if record and record.pay_result != 101
           .success-icon
           h1 {{action}}成功
           p
@@ -29,7 +29,7 @@ html
               元 {{record.fund_name}}，购买失败，请尝试重新购买
           else
             .error-icon
-            h1 购买失败
+            h1 购买记录查询失败
 
         p
           您可以查看
