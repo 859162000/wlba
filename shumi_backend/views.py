@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from wanglibao_buy.models import FundHoldInfo, TradeInfo, TradeHistory
 from wanglibao_buy.views import update_and_save_product_trade_info
 from wanglibao_fund.models import Fund
-from exception import FetchException
+from exception import FetchException, AccessException
 from auth import ShuMiExchangeAccessToken, ShuMiRequestToken
 from trade import TradeWithAutoLogin
 from utility import UrlTools, purchase, redeem, mapping_trade_history
@@ -30,11 +30,16 @@ class OAuthCallbackView(View):
         pk = kwargs.get('pk', None)
         #try if user matched
         try:
-            user = get_user_model().objects.get(pk=pk)
-            profile = user.wanglibaouserprofile
+            callback_user = get_user_model().objects.get(pk=pk)
         except ObjectDoesNotExist:
             return HttpResponseServerError('Can not fetch user with pk %s' % pk)
         #try if callback with expected params
+        if callback_user != self.request.user:
+            return HttpResponseBadRequest('callback user object do not match request user.')
+
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+
         try:
             qs = request.GET
             oauth_token = qs['oauth_token']
@@ -60,6 +65,14 @@ class OAuthCallbackView(View):
         profile.shumi_access_token = access_token
         profile.shumi_access_token_secret = access_token_secret
         profile.save()
+
+        try:
+            user_info_fetcher = UserInfoFetcher(user)
+            user_info_fetcher.fetch_user_info()
+        except AccessException:
+            pass
+        except FetchException:
+            pass
 
         return HttpResponseRedirect(reverse('oauth-status-view'))
 

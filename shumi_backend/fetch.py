@@ -116,6 +116,10 @@ class UserLevel(ShuMiAPI):
                     'applyserial={apply_serial}'.format(apply_serial=serial)
         return self._oauth_get(api_query)
 
+    def get_user_info(self):
+        api_query = 'trade_account.getaccount'
+        return self._oauth_get(api_query)
+
 
 class UserInfoFetcher(UserLevel):
 
@@ -181,6 +185,15 @@ class UserInfoFetcher(UserLevel):
         trade = TradeHistory(user=self.user, **mapping_trade_history(record))
 
         return trade
+
+    def fetch_user_info(self):
+        info = self.get_user_info()
+        profile = self.user.wanglibaouserprofile
+        profile.id_number = info['CertificateNumber']
+        profile.name = info['RealName']
+        profile.save()
+
+        return '%s id is %s' %(profile.id_number, profile.name)
 
 
 class AppInfoFetcher(AppLevel):
