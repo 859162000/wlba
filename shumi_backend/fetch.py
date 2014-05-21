@@ -218,6 +218,14 @@ class AppInfoFetcher(AppLevel):
 
         return {'delete': len(delete_set), 'create': len(create_set), 'update': len(update_set)}
 
+    def sync_fund_and_available_fund(self):
+        available_set = AvailableFund.objects.all()
+        for available_fund in available_set:
+            target_fund = Fund.objects.filter(product_code=available_fund.fund_code).first()
+            if target_fund:
+                target_fund.investment_threshold = available_fund.purchase_limit_min
+                target_fund.save()
+
     def fetch_monetary_fund_net_value(self, _date=None):
         net_value_url = settings.SM_MONETARY_FUND_NET_VALUE
         if not _date:

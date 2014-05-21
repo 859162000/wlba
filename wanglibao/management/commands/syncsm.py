@@ -44,6 +44,7 @@ class Command(BaseCommand):
             try:
                 print('Starting sync available cash funds.')
                 fetcher.fetch_available_cash_fund()
+                fetcher.sync_fund_and_available_fund()
             except FetchException:
                 print e
                 logger.error(e)
