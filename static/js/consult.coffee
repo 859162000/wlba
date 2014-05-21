@@ -179,12 +179,11 @@ require ['jquery',
       self.fundTable = new fundTable.viewModel {
         fields: [
           '名称'
-          '管理期限'
-          '基金类型'
+          '七日年化利率'
           '近一月涨幅'
-          '近三月涨幅'
+          '起购金额(元)'
+          '购买'
           '收藏'
-          '详情'
         ]
       }
       self.emptyTable = new emptyTable.viewModel {}

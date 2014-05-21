@@ -28,22 +28,6 @@
                 return '<a class="blue" target="_blank" href="/fund/detail/' + item.id + '">' + item.name + '</a>';
               }
             }, {
-              name: '基金类型',
-              colspan: 2,
-              sortable: true,
-              field: 'type',
-              text: function(item) {
-                return item.type;
-              }
-            }, {
-              name: '基金状态',
-              colspan: 2,
-              sortable: true,
-              field: 'type',
-              text: function(item) {
-                return item.status;
-              }
-            }, {
               name: '七日年化利率',
               colspan: 2,
               sortable: true,
