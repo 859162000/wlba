@@ -217,9 +217,12 @@ def run_robot(clean=False, offset=0):
                     print 'Meet error again, ignore it'
 
         for si in ScrawlItem.objects.filter(last_updated__lt=timezone.now() - timedelta(weeks=2), type='fund'):
-            f = Fund.objects.get(id=si.item_id)
-            f.status = u'停售'
-            f.save()
+            try:
+                f = Fund.objects.get(id=si.item_id)
+                f.status = u'停售'
+                f.save()
+            except Exception:
+                si.delete()
 
         today = timezone.now().date()
         if not Formular.objects.all().exists():
