@@ -15,6 +15,7 @@ from wanglibao_buy.models import FundHoldInfo, BindBank, TradeHistory, Available
 from exception import FetchException, AccessException
 from utility import mapping_fund_hold_info, mapping_bind_banks, mapping_trade_history, mapping_available_funds_info
 from wanglibao_fund.models import Fund
+from wanglibao_hotlist.models import HotFund, MobileHotFund
 
 
 class ShuMiAPI(object):
@@ -253,7 +254,6 @@ class AppInfoFetcher(AppLevel):
 
         for value in values:
             try:
-                current_tz = get_default_timezone()
                 curr_date = datetime.strptime(value['curr_date'], '%Y-%m-%d')
                 net_value = MonetaryFundNetValue(code=value['code'],
                                                  curr_date=curr_date,
@@ -263,6 +263,22 @@ class AppInfoFetcher(AppLevel):
             except IntegrityError, e:
                 print(e)
                 continue
+
+        HotFund.objects.all().delete()
+        MobileHotFund.objects.all().delete()
+        hot_list = Fund.objects.filter(availablefund__isnull=False).order_by('-rate_7_days')[:4]
+
+        for index, item in enumerate(hot_list):
+            hf = HotFund()
+            hf.fund = item
+            hf.hot_score = len(hot_list) - index
+            hf.save()
+
+            mhf = MobileHotFund()
+            mhf.fund = item
+            mhf.hot_score = len(hot_list) - index
+            mhf.save()
+
 
     def compute_user_daily_income(self):
         # get user list who had shumi access token

@@ -97,16 +97,8 @@ mappings = {
     u'投资策略': 'investment_strategy',
     u'收益分配原则': 'profit_allocation',
     u'风险收益特征': 'risk_character',
-    u'近一周增长率': ('rate_1_week', 'percent'),
-    u'近一月增长率': ('rate_1_month', 'percent'),
-    u'近三月增长率': ('rate_3_months', 'percent'),
-    u'近半年增长率': ('rate_6_months', 'percent'),
-    u'近一年增长率': ('rate_1_year', 'percent'),
     u'日涨幅': ('rate_today', 'percent'),
     u'净值': ('face_value', 'float'),
-    u'万份收益': ('earned_per_10k', 'float'),
-    u'累计净值': ('accumulated_face_value', 'float'),
-    u'7日年化回报': ('rate_7_days', 'percent')
 }
 
 
@@ -226,20 +218,6 @@ def run_robot(clean=False, offset=0):
             f = Fund.objects.get(id=si.item_id)
             f.status = u'停售'
             f.save()
-
-        HotFund.objects.all().delete()
-        MobileHotFund.all().delete()
-        hot_list = Fund.objects.filter(status=u'正常', type=u'货币型', availablefund__isnull=False).order_by('-rate_7_days')[:4]
-        for item in hot_list:
-            hf = HotFund()
-            hf.fund = item
-            hf.hot_score = time.time()
-            hf.save()
-
-            mhf = MobileHotFund()
-            mhf.fund = item
-            mhf.hot_score = time.time()
-            mhf.save()
 
     except urllib2.URLError, e:
         print "Reason: ", e.reason
