@@ -3,8 +3,12 @@ define ['jquery', 'underscore', 'raphael'], ($, _, raphael)->
     if percent > 1
       percent = percent / 100
 
+    if percent > 0.99
+      percent = 0.99
+
     if startPercent > 1
       startPercent = startPercent / 100
+
     moveTo = 'M' + cx + ' ' + cy
     tx = r * Math.sin(startPercent * Math.PI * 2)
     ty = r * Math.cos(startPercent * Math.PI * 2)
@@ -30,8 +34,8 @@ define ['jquery', 'underscore', 'raphael'], ($, _, raphael)->
     xmiddle = cx + txmiddle
     ymiddle = cy - tymiddle
 
-    tx2middle = r * 1.2 * Math.sin(middlePercent * Math.PI * 2)
-    ty2middle = r * 1.2 * Math.cos(middlePercent * Math.PI * 2)
+    tx2middle = r * 1.1 * Math.sin(middlePercent * Math.PI * 2)
+    ty2middle = r * 1.1 * Math.cos(middlePercent * Math.PI * 2)
     x2middle = cx + tx2middle
     y2middle = cy - ty2middle
 
@@ -39,13 +43,13 @@ define ['jquery', 'underscore', 'raphael'], ($, _, raphael)->
     if middlePercent > 0.5
       flag = -1
 
-    annotation = 'M' + xmiddle + ' ' + ymiddle + 'L' + x2middle + ' ' + y2middle + 'H' + (cx + flag * r * 1.2)
+    annotation = 'M' + xmiddle + ' ' + ymiddle + 'L' + x2middle + ' ' + y2middle + 'H' + (cx + flag * r * 1.1)
 
     return {
       pie: result
       annotation: annotation
       'right-side': flag >= 1
-      'text-position': [cx + flag * r * 1.2, y2middle]
+      'text-position': [cx + flag * r * 1.1, y2middle]
       direction: [(xmiddle - cx)/r, (ymiddle - cy)/r]
     }
 

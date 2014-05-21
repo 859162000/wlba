@@ -16,33 +16,19 @@
   });
 
   require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/chart', 'lib/modal', 'purl', 'model/trustTable', 'model/financingTable', 'model/cashTable', 'model/fundTable', 'model/fund', 'model/emptyTable'], function($, _, ko, backend, chart, modal, purl, trustTable, financingTable, cashTable, fundTable, fund, emptyTable) {
-    var ViewModel, asset_param, model, period_param, risk_param;
+    var ViewModel, asset_param, model, period_param;
     ViewModel = (function() {
-      function ViewModel(asset_param, period_param, risk_param) {
+      function ViewModel(asset_param, period_param) {
         var productTypeColorMapping, self;
         self = this;
         self.asset = ko.observable(asset_param);
-        self.riskScore = ko.observable(risk_param);
         self.period = ko.observable(period_param);
-        self.riskDescription = ko.observable();
         self.portfolioName = ko.observable();
         self.portfolioEarningRate = ko.observable(0);
         self.bankRate = .35;
         self.timesBankRate = ko.observable(1);
-        ko.computed(function() {
-          var risk, risks;
-          risks = {
-            1: '完全不能承担任何风险',
-            2: '可以承担极小的风险',
-            3: '可以承担一定风险',
-            4: '可以承担较大的风险来追求高收益',
-            5: '绝对追求高收益'
-          };
-          risk = self.riskScore();
-          return self.riskDescription(risks[risk]);
-        });
         self.finishSurvey = function(data, event) {
-          var asset, period, risk;
+          var asset, period;
           asset = self.questions[0].answer();
           if (asset && parseInt(asset) > 0) {
             self.asset(parseInt(asset));
@@ -50,10 +36,6 @@
           period = self.questions[1].answer();
           if (period && parseInt(period) > 0) {
             self.period(period);
-          }
-          risk = self.questions[2].answer();
-          if (risk) {
-            self.riskScore(risk);
           }
           return $.modal.close();
         };
@@ -70,34 +52,12 @@
             input: {
               suffix: '个月'
             }
-          }, {
-            question: '风险承受能力',
-            answer: ko.observable(self.riskScore()),
-            options: [
-              {
-                title: '不能承担任何风险',
-                value: 1
-              }, {
-                title: '可以承担极小的风险',
-                value: 2
-              }, {
-                title: '可以承担一定风险',
-                value: 3
-              }, {
-                title: '可以承担较大风险',
-                value: 4
-              }, {
-                title: '绝对追求高收益',
-                value: 5
-              }
-            ]
           }
         ];
         self.savePortfolio = function() {
           return backend.userProfile({
             investment_asset: self.asset(),
-            investment_period: self.period(),
-            risk_level: self.riskScore()
+            investment_period: self.period()
           }).done(function() {
             return alert('投资方案已保存！预约理财热线：400-8588-066。');
           }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -124,8 +84,7 @@
             asset_min: self.asset(),
             asset_max: self.asset(),
             period_min: self.period(),
-            period_max: self.period(),
-            risk_score: self.riskScore()
+            period_max: self.period()
           };
           return backend.loadPortfolio(params).done(function(data) {
             return self.myPortfolio(_.first(data.results));
@@ -253,11 +212,10 @@
     })();
     if (!$.url(document.location.href).param('asset')) {
       backend.userProfile().done(function(data) {
-        var asset_param, model, period_param, risk_param;
+        var asset_param, model, period_param;
         asset_param = data.investment_asset;
         period_param = data.investment_period;
-        risk_param = data.risk_level;
-        model = new ViewModel(asset_param, period_param, risk_param);
+        model = new ViewModel(asset_param, period_param);
         return ko.applyBindings(model);
       }).fail(function() {
         var model;
@@ -267,17 +225,13 @@
     } else {
       asset_param = parseInt($.url(document.location.href).param('asset'));
       period_param = parseInt($.url(document.location.href).param('period'));
-      risk_param = parseInt($.url(document.location.href).param('risk'));
       if (isNaN(asset_param) || asset_param <= 0) {
         asset_param = 30;
       }
       if (isNaN(period_param) || period_param <= 0) {
         period_param = 3;
       }
-      if (isNaN(risk_param) || risk_param <= 0) {
-        risk_param = 1;
-      }
-      model = new ViewModel(asset_param, period_param, risk_param);
+      model = new ViewModel(asset_param, period_param);
       ko.applyBindings(model);
     }
     return $('#question-button').click(function(e) {

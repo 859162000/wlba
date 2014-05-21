@@ -26,30 +26,15 @@ require ['jquery',
          'model/emptyTable'], ($, _, ko, backend, chart, modal, purl, trustTable, financingTable, cashTable, fundTable, fund, emptyTable)->
 
   class ViewModel
-    constructor: (asset_param, period_param, risk_param)->
+    constructor: (asset_param, period_param)->
       self = this
       self.asset = ko.observable(asset_param)
-      self.riskScore = ko.observable(risk_param)
       self.period = ko.observable(period_param)
-
-
-      self.riskDescription = ko.observable()
 
       self.portfolioName = ko.observable()
       self.portfolioEarningRate = ko.observable(0)
       self.bankRate = .35
       self.timesBankRate = ko.observable(1)
-
-      ko.computed ->
-        risks =
-          1: '完全不能承担任何风险'
-          2: '可以承担极小的风险'
-          3: '可以承担一定风险'
-          4: '可以承担较大的风险来追求高收益'
-          5: '绝对追求高收益'
-
-        risk = self.riskScore()
-        self.riskDescription risks[risk]
 
       self.finishSurvey = (data, event)->
         asset = self.questions[0].answer()
@@ -59,10 +44,6 @@ require ['jquery',
         period = self.questions[1].answer()
         if period and parseInt(period) > 0
           self.period(period)
-
-        risk = self.questions[2].answer()
-        if risk
-          self.riskScore(risk)
 
         $.modal.close()
 
@@ -79,39 +60,12 @@ require ['jquery',
           input:
             suffix: '个月'
         }
-        {
-          question: '风险承受能力'
-          answer: ko.observable(self.riskScore())
-          options:[
-            {
-              title: '不能承担任何风险'
-              value: 1
-            }
-            {
-              title: '可以承担极小的风险'
-              value: 2
-            }
-            {
-              title: '可以承担一定风险'
-              value: 3
-            }
-            {
-              title: '可以承担较大风险'
-              value: 4
-            }
-            {
-              title: '绝对追求高收益'
-              value: 5
-            }
-          ]
-        }
       ]
 
       self.savePortfolio = ->
         backend.userProfile
           investment_asset: self.asset()
           investment_period: self.period()
-          risk_level: self.riskScore()
         .done ->
           alert '投资方案已保存！预约理财热线：400-8588-066。'
         .fail (jqXHR, textStatus, errorThrown)->
@@ -136,7 +90,6 @@ require ['jquery',
           asset_max: self.asset()
           period_min: self.period()
           period_max: self.period()
-          risk_score: self.riskScore()
 
         # TODO add error handling logic
         backend.loadPortfolio params
@@ -284,8 +237,7 @@ require ['jquery',
     .done (data)->
       asset_param = data.investment_asset
       period_param = data.investment_period
-      risk_param = data.risk_level
-      model = new ViewModel(asset_param, period_param, risk_param)
+      model = new ViewModel(asset_param, period_param)
       ko.applyBindings model
     .fail ->
       model = new ViewModel(30, 3, 1)
@@ -293,7 +245,6 @@ require ['jquery',
   else
     asset_param = parseInt($.url(document.location.href).param('asset'))
     period_param = parseInt($.url(document.location.href).param('period'))
-    risk_param = parseInt($.url(document.location.href).param('risk'))
 
     if isNaN(asset_param) or asset_param <= 0
       asset_param = 30
@@ -301,10 +252,7 @@ require ['jquery',
     if isNaN(period_param) or period_param <= 0
       period_param = 3
 
-    if isNaN(risk_param) or risk_param <= 0
-      risk_param = 1
-
-    model = new ViewModel(asset_param, period_param, risk_param)
+    model = new ViewModel(asset_param, period_param)
     ko.applyBindings model
 
   $('#question-button').click (e)->
