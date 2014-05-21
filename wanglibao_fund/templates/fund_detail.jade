@@ -15,9 +15,9 @@ body
         .panel-product-title
           .product-title.ispan11 {{ fund.name }}
           if is_favorited != 1
-            a#addToFavorite.button.button-mini.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")收藏
+            a#addToFavorite.button.button-mini.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}") 收藏
           else
-            a#addToFavorite.button.button-mini.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")取消
+            a#addToFavorite.button.button-mini.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}") 取消
       .row
         .span6
           .well
@@ -46,6 +46,8 @@ body
                 if fund.rate_7_days
                   dt 七日年化收益
                   dd.highlight {{fund.rate_7_days | percentage}}
+                  amount = fund.rate_7_days + fund.rate_7_days
+                  dd.highlight {{amount}}
                 else
                   dt 当日涨幅
                   dd.highlight {{fund.rate_today | percentage}}
