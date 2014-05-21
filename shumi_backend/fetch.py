@@ -264,6 +264,30 @@ class AppInfoFetcher(AppLevel):
                 print(e)
                 continue
 
+        delta = timedelta(days=1)
+        yesterday = date.today() - delta
+        yesterday_api_query = net_value_url.format(date=yesterday.strftime('%Y-%m-%d'))
+        yesterday_response = requests.get(yesterday_api_query)
+        if yesterday_response.status_code != 200:
+            raise FetchException(yesterday_response.text)
+        yesterday_values = json.loads(yesterday_response.text)['datatable']
+
+        def multi100(may_null_value):
+            if not may_null_value:
+                may_null_value = 0
+            return float(may_null_value) * 100
+
+        for value in yesterday_values:
+            fund_model = Fund.objects.filter(product_code=value['code']).first()
+            if fund_model:
+                fund_model.rate_7_days = multi100(value['percent_seven_days'])
+                fund_model.rate_1_year = multi100(value['rr_since_this_year'])
+                fund_model.earned_per_10k = value['income_per_ten_thousand']
+                try:
+                    fund_model.save()
+                except IntegrityError, e:
+                    pass
+
         HotFund.objects.all().delete()
         MobileHotFund.objects.all().delete()
         hot_list = Fund.objects.filter(availablefund__isnull=False).order_by('-rate_7_days')[:4]
