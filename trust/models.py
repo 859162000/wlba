@@ -48,6 +48,7 @@ class Trust (ProductBase):
     short_name = models.CharField(max_length=256, verbose_name=u'短名称')
     status = models.CharField(max_length=10, verbose_name=u'销售状态', choices=PRODUCT_STATUS, default=ON_SALE, blank=True, null=True)
     expected_earning_rate = models.FloatField(verbose_name=u'预期收益')
+    expected_earning_rate_high = models.FloatField(verbose_name=u'最高预期收益', default=0)
     brief = models.TextField(blank=True, null=True, verbose_name=u'点评')
     issuer = models.ForeignKey(Issuer, verbose_name=u"发行机构")
     available_region = models.TextField(blank=True, null=True, verbose_name=u'发行区域')
