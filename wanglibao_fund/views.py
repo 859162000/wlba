@@ -18,7 +18,7 @@ class FundViewSet(PaginatedModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
 
     def get_queryset(self):
-        return Fund.objects.all().prefetch_related('issuer')
+        return Fund.objects.exclude(availablefund__isnull=True).prefetch_related('issuer')
 
 
 class FundIssuerViewSet(PaginatedModelViewSet):
