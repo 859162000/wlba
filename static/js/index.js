@@ -14,11 +14,10 @@
   require(['jquery', 'underscore', 'lib/backend', 'lib/modal'], function($, _, backend, modal) {
     var anchors, bannerCount, banners, currentBanner, trustId, trustName;
     $('.portfolio-submit').click(function() {
-      var asset, period, risk;
+      var asset, period;
       asset = $('#portfolio-asset')[0].value;
       period = $('#portfolio-period')[0].value;
-      risk = $('#portfolio-risk')[0].value;
-      return window.location.href = '/portfolio/?period=' + period + '&asset=' + asset + '&risk=' + risk;
+      return window.location.href = '/portfolio/?period=' + period + '&asset=' + asset;
     });
     $('.portfolio-input').keyup(function(e) {
       if (e.keyCode === 13) {
