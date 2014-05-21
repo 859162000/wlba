@@ -68,12 +68,12 @@
                 return item.rate_3_months + '%';
               }
             }, {
-              name: '近半年涨幅',
+              name: '起购金额(元)',
               colspan: 2,
               sortable: true,
-              field: 'rate_6_months',
+              field: 'investment_threshold',
               text: function(item) {
-                return item.rate_6_months + '%';
+                return item.investment_threshold;
               }
             }, {
               name: '购买',
