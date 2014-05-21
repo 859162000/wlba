@@ -3,6 +3,7 @@ import re
 
 import urllib2
 from datetime import timedelta
+import math
 from pyquery import PyQuery
 import time
 from wanglibao_fund.models import Fund, FundIssuer
@@ -139,7 +140,7 @@ def get_info(pq):
         issuer.save()
         fund.issuer = issuer
     else:
-        fund.issuer = FundIssuer.objects.get(name=issuer_name).order_by('id')
+        fund.issuer = FundIssuer.objects.get(name=issuer_name)
 
     qs = Fund.objects.filter(product_code=fund.product_code)
     if qs.exists():
@@ -196,13 +197,13 @@ def run_robot(clean=False, offset=0):
                 count += 1
                 handle_link(link)
                 time.sleep(.5)
-                if error_count > 0: # Auto healing
+                if error_count > 0:
                     error_count -= 1
 
                 if count % 50 == 0:
                     print '%d processed, %d to go' % (count, len(links) - count)
-            except:
-                print 'Meet error at count: %d link: %s' % (count, PyQuery(link).attr('href'))
+            except Exception, e:
+                print 'Meet error %s at count: %d link: %s' % (e.message, count, PyQuery(link).attr('href'))
                 error_count += 1
                 if error_count >= 10:
                     raise
@@ -217,6 +218,22 @@ def run_robot(clean=False, offset=0):
         for si in ScrawlItem.objects.filter(last_updated__lt=timezone.now() - timedelta(weeks=2), type='fund'):
             f = Fund.objects.get(id=si.item_id)
             f.status = u'停售'
+            f.save()
+
+        today = timezone.now().date()
+        days = (today - timezone.datetime.strptime('2014-05-02', '%Y-%m-%d').date()).days
+        for f in Fund.objects.all():
+            if f.rate_7_days <= 5.21:
+                bought_people_count = 20 + 4 * days
+            else:
+                bought_people_count = (100 * days + 2000) * math.log(100 * f.rate_7_days - 4.2, 2) + 3 * days
+
+            bought_count = bought_people_count * f.bought_count_random
+            bought_amount_per_people = f.bought_amount_random * 2000
+            bought_amount = bought_people_count * bought_amount_per_people
+            f.bought_amount = bought_amount
+            f.bought_people_count = bought_people_count
+            f.bought_count = bought_count
             f.save()
 
     except urllib2.URLError, e:
