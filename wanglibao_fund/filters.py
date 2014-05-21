@@ -14,4 +14,5 @@ class FundFilterSet(AutoNumberFilter):
             ('rate_3_months', 'rate_3_months'),
             ('rate_6_months', 'rate_6_months'),
             ('rate_1_year', 'rate_1_year'),
+            ('investment_threshold', 'investment_threshold')
         )
