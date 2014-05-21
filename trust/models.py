@@ -44,10 +44,18 @@ class Trust (ProductBase):
         (EXPIRED, EXPIRED)
     )
 
+    TYPES = (
+        (u'信托', u'信托'),
+        (u'有限合伙', u'有限合伙'),
+        (u'资管', u'资管')
+    )
+
     name = models.TextField(verbose_name=u'信托名称')
     short_name = models.CharField(max_length=256, verbose_name=u'短名称')
     status = models.CharField(max_length=10, verbose_name=u'销售状态', choices=PRODUCT_STATUS, default=ON_SALE, blank=True, null=True)
     expected_earning_rate = models.FloatField(verbose_name=u'预期收益')
+    expected_earning_rate_high = models.FloatField(verbose_name=u'最高预期收益', default=0)
+    product_type = models.CharField(max_length=20, verbose_name=u'产品类型', choices=TYPES, default=u'信托')
     brief = models.TextField(blank=True, null=True, verbose_name=u'点评')
     issuer = models.ForeignKey(Issuer, verbose_name=u"发行机构")
     available_region = models.TextField(blank=True, null=True, verbose_name=u'发行区域')
