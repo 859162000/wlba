@@ -226,40 +226,37 @@ def run_robot(clean=False, offset=0):
                 si.delete()
 
         today = timezone.now().date()
-        if not Formular.objects.all().exists():
-            f = Formular()
-            f.save()
+        if Formular.objects.all().exists():
+            formular = Formular.objects.all().first()
 
-        formular = Formular.objects.all().first()
+            d = (today - timezone.datetime.strptime('2014-05-02', '%Y-%m-%d').date()).days
+            from math import log
 
-        d = (today - timezone.datetime.strptime('2014-05-02', '%Y-%m-%d').date()).days
-        from math import log
+            for f in Fund.objects.all():
+                x = f.rate_7_days
+                ra = f.bought_count_random
+                rp = f.bought_amount_random
 
-        for f in Fund.objects.all():
-            x = f.rate_7_days
-            ra = f.bought_count_random
-            rp = f.bought_amount_random
+                if f.rate_7_days <= 5.21:
+                    rand = randrange(1, 101)
+                    bought_people_count = eval(formular.bought_people_count_le_521)
+                else:
+                    rand = randrange(1, 101)
+                    bought_people_count = eval(formular.bought_people_count_gt_521)
 
-            if f.rate_7_days <= 5.21:
+                count = bought_people_count
+
                 rand = randrange(1, 101)
-                bought_people_count = eval(formular.bought_people_count_le_521)
-            else:
+                bought_count = eval(formular.bought_count)
+
                 rand = randrange(1, 101)
-                bought_people_count = eval(formular.bought_people_count_gt_521)
+                bought_amount_per_people = eval(formular.bought_amount_per_people)
+                bought_amount = bought_people_count * bought_amount_per_people
 
-            count = bought_people_count
-
-            rand = randrange(1, 101)
-            bought_count = eval(formular.bought_count)
-
-            rand = randrange(1, 101)
-            bought_amount_per_people = eval(formular.bought_amount_per_people)
-            bought_amount = bought_people_count * bought_amount_per_people
-
-            f.bought_amount = bought_amount
-            f.bought_people_count = bought_people_count
-            f.bought_count = bought_count
-            f.save()
+                f.bought_amount = bought_amount
+                f.bought_people_count = bought_people_count
+                f.bought_count = bought_count
+                f.save()
 
     except urllib2.URLError, e:
         print "Reason: ", e.reason
