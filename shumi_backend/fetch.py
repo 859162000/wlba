@@ -283,6 +283,10 @@ class AppInfoFetcher(AppLevel):
                 fund_model.rate_7_days = multi100(value['percent_seven_days'])
                 fund_model.rate_1_year = multi100(value['rr_since_this_year'])
                 fund_model.earned_per_10k = value['income_per_ten_thousand']
+                fund_model.rate_1_week = multi100(value['rr_in_single_week'])
+                fund_model.rate_1_month = multi100(value['rr_in_single_month'])
+                fund_model.rate_3_months = multi100(value['rr_in_three_month'])
+                fund_model.rate_6_months = multi100(value['rr_in_six_month'])
                 try:
                     fund_model.save()
                 except IntegrityError, e:
