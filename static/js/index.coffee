@@ -11,8 +11,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal'], ($, _, backend, mo
   $('.portfolio-submit').click ()->
     asset = $('#portfolio-asset')[0].value
     period = $('#portfolio-period')[0].value
-    risk = $('#portfolio-risk')[0].value
-    window.location.href = '/portfolio/?period=' + period + '&asset=' + asset + '&risk=' + risk
+    window.location.href = '/portfolio/?period=' + period + '&asset=' + asset
 
   $('.portfolio-input').keyup (e)->
     if e.keyCode == 13

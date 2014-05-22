@@ -6,6 +6,7 @@ from datetime import timedelta
 import math
 from pyquery import PyQuery
 import time
+from wanglibao_fake.models import Formular
 from wanglibao_fund.models import Fund, FundIssuer
 from wanglibao_hotlist.models import HotFund, MobileHotFund
 from wanglibao_robot.models import ScrawlItem
@@ -216,21 +217,39 @@ def run_robot(clean=False, offset=0):
                     print 'Meet error again, ignore it'
 
         for si in ScrawlItem.objects.filter(last_updated__lt=timezone.now() - timedelta(weeks=2), type='fund'):
-            f = Fund.objects.get(id=si.item_id)
-            f.status = u'停售'
-            f.save()
+            try:
+                f = Fund.objects.get(id=si.item_id)
+                f.status = u'停售'
+                f.save()
+            except Exception:
+                si.delete()
 
         today = timezone.now().date()
-        days = (today - timezone.datetime.strptime('2014-05-02', '%Y-%m-%d').date()).days
-        for f in Fund.objects.all():
-            if f.rate_7_days <= 5.21:
-                bought_people_count = 20 + 4 * days
-            else:
-                bought_people_count = (100 * days + 2000) * math.log(100 * f.rate_7_days - 4.2, 2) + 3 * days
+        if not Formular.objects.all().exists():
+            f = Formular()
+            f.save()
 
-            bought_count = bought_people_count * f.bought_count_random
-            bought_amount_per_people = f.bought_amount_random * 2000
+        formular = Formular.objects.all().first()
+
+        d = (today - timezone.datetime.strptime('2014-05-02', '%Y-%m-%d').date()).days
+        from math import log
+
+        for f in Fund.objects.all():
+            x = f.rate_7_days
+            ra = f.bought_count_random
+            rp = f.bought_amount_random
+
+            if f.rate_7_days <= 5.21:
+                bought_people_count = eval(formular.bought_people_count_le_521)
+            else:
+                bought_people_count = eval(formular.bought_people_count_gt_521)
+
+            count = bought_people_count
+
+            bought_count = eval(formular.bought_count)
+            bought_amount_per_people = eval(formular.bought_amount_per_people)
             bought_amount = bought_people_count * bought_amount_per_people
+
             f.bought_amount = bought_amount
             f.bought_people_count = bought_people_count
             f.bought_count = bought_count
