@@ -294,13 +294,14 @@ class AppInfoFetcher(AppLevel):
 
         HotFund.objects.all().delete()
         MobileHotFund.objects.all().delete()
-        hot_list = Fund.objects.filter(availablefund__isnull=False).order_by('-rate_7_days')[:4]
+        hot_list = Fund.objects.filter(availablefund__isnull=False).order_by('-rate_7_days')[:20]
 
         for index, item in enumerate(hot_list):
-            hf = HotFund()
-            hf.fund = item
-            hf.hot_score = len(hot_list) - index
-            hf.save()
+            if index < 4:
+                hf = HotFund()
+                hf.fund = item
+                hf.hot_score = len(hot_list) - index
+                hf.save()
 
             mhf = MobileHotFund()
             mhf.fund = item
