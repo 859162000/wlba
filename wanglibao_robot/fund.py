@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from random import randrange
 import re
 
 import urllib2
@@ -240,13 +241,18 @@ def run_robot(clean=False, offset=0):
             rp = f.bought_amount_random
 
             if f.rate_7_days <= 5.21:
+                rand = randrange(1, 101)
                 bought_people_count = eval(formular.bought_people_count_le_521)
             else:
+                rand = randrange(1, 101)
                 bought_people_count = eval(formular.bought_people_count_gt_521)
 
             count = bought_people_count
 
+            rand = randrange(1, 101)
             bought_count = eval(formular.bought_count)
+
+            rand = randrange(1, 101)
             bought_amount_per_people = eval(formular.bought_amount_per_people)
             bought_amount = bought_people_count * bought_amount_per_people
 
