@@ -79,7 +79,7 @@ body
           div.earning-rate-content
             p
               |是银行活期存款收益的
-              span.numberpad(data-bind="text: (timesBankRate()/10).toFixed()") 2
+              span.numberpad(data-bind="text: Math.floor((timesBankRate()/10))") 2
               span.numberpad(data-bind="text: timesBankRate()%10") 8
               |倍
             p 该方案预期年收益
