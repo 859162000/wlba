@@ -21,13 +21,13 @@ define ['jquery', 'underscore', 'model/table', 'model/fund'], ($, _, table, fund
           field: 'rate_7_days'
           text: (item)->item.rate_7_days+ '%'
         ,
-          name: '近一月涨幅'
+          name: '近一月收益率'
           colspan: 2
           sortable: true
           field: 'rate_1_month'
           text: (item)->item.rate_1_month + '%'
         ,
-          name: '近三月涨幅'
+          name: '近三月收益率'
           colspan: 2
           sortable: true
           field: 'rate_3_months'

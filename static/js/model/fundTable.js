@@ -36,7 +36,7 @@
                 return item.rate_7_days + '%';
               }
             }, {
-              name: '近一月涨幅',
+              name: '近一月收益率',
               colspan: 2,
               sortable: true,
               field: 'rate_1_month',
@@ -44,7 +44,7 @@
                 return item.rate_1_month + '%';
               }
             }, {
-              name: '近三月涨幅',
+              name: '近三月收益率',
               colspan: 2,
               sortable: true,
               field: 'rate_3_months',

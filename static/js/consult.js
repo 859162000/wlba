@@ -153,7 +153,7 @@
           fields: ['名称', '发行机构', '期限', '七日年化利率', '收藏', '详情']
         });
         self.fundTable = new fundTable.viewModel({
-          fields: ['名称', '七日年化利率', '近一月涨幅', '起购金额(元)', '购买', '收藏']
+          fields: ['名称', '七日年化利率', '近一月收益率', '起购金额(元)', '购买', '收藏']
         });
         self.emptyTable = new emptyTable.viewModel({});
         self.dataTable = ko.observable();

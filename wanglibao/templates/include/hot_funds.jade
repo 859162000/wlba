@@ -31,13 +31,13 @@
               起购金额：
               span.dark-gray {{first_item.investment_threshold | money}}
             li
-              半年涨幅：
+              半年收益：
               span.dark-gray {{first_item.rate_6_months | percentage}}
             li
-              一年涨幅：
+              今年收益：
               span.dark-gray {{first_item.rate_1_year | percentage}}
             li
-              万元效益：
+              万份收益：
               span.dark-gray {{first_item.earned_per_10k}}元
 
       - for index in 1|get_range:3
