@@ -277,3 +277,9 @@ def deploy():
                 print green('apache server configured, restart it')
                 sudo('service apache2 reload')
                 print green('deploy finished')
+
+
+def execute(command):
+    with virtualenv():
+        with cd('/var/wsgi/wanglibao'):
+            run(command)
