@@ -194,7 +194,7 @@ def mapping_fund_details(shumi_json_dict, include_fund_code=True):
     fund_type = {1: u'封闭式基金',
                  2: u'开放式基金',
                  6: u'创新型',
-                 7: u'货币基金',
+                 7: u'货币型',
                  8: u'集合理财'}
 
     investment_type = {1: u'股票',
