@@ -21,7 +21,6 @@ class FundRobot(object):
         issuer_dict = {issuer_record['guid']: issuer_record for issuer_record in issuer_info}
 
         for cash in cash_info:
-            print cash
             issuer = FundIssuer.objects.filter(uuid=cash['invest_advisor_guid']).first()
 
             if not issuer:
@@ -62,8 +61,8 @@ class FundRobot(object):
     def sync_issuer(self):
         try:
             info = self.fetcher.fund_issuers()
-        except FetchException:
-            pass
+        except FetchException, e:
+            raise FetchException('Can not fetch from shumi api with fail info %s' % e)
 
         issuers = FundIssuer.objects.all()
         issuers_dict = {issuer.name: issuer for issuer in issuers}
@@ -80,8 +79,8 @@ class FundRobot(object):
     def update_issuer(self):
         try:
             info = self.fetcher.fund_issuers()
-        except FetchException:
-            pass
+        except FetchException, e:
+            raise FetchException('Can not fetch from shumi api with fail info %s' % e)
 
         issuers = FundIssuer.objects.all()
         issuers_dict = {issuer.uuid: issuer for issuer in issuers}
