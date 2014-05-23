@@ -12,7 +12,7 @@
           a.hot-item-title-link(href="/fund/detail/{{first_item.id}}", target="_blank") {{first_item.name}}
         .hot-item-list.clearfix
           dl
-            dt 银行活期利率
+            dt.hot-item-list-title 银行活期利率
             dd.font-m
               span.hot-list-num-l {{first_item.rate_7_days | current_deposit_times}}
               倍
@@ -47,7 +47,7 @@
             a.hot-item-title-link(href="/fund/detail/{{item.id}}", target="_blank") {{item.name}}
           .hot-item-list.clearfix
             dl
-              dt 银行活期利率
+              dt.hot-item-list-title 银行活期利率
               dd.font-m
                 span.hot-list-num-l {{item.rate_7_days | current_deposit_times}}
                 倍
