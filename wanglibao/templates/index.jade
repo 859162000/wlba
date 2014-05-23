@@ -62,7 +62,7 @@ html
           .hot-item-highlight
             .hot-item-highlight-icon
             h1.hot-item-title
-              a.red-link(href="/trust/detail/{{first_item.id}}", target="_blank") {{first_item.short_name}}
+              a.hot-item-title-link(href="/trust/detail/{{first_item.id}}", target="_blank") {{first_item.short_name}}
             .hot-item-list.clearfix.hot-trust-info-container.lh-m
               dl
                 dt 投资收益
@@ -95,7 +95,7 @@ html
             item = hot_trusts[index].trust
             .hot-item-normal
               h1.hot-item-title
-                a.red-link(href="/trust/detail/{{item.id}}", target="_blank") {{item.short_name}}
+                a.hot-item-title-link(href="/trust/detail/{{item.id}}", target="_blank") {{item.short_name}}
               .hot-item-list.clearfix
                 dl.hot-trust-info-container.lh-xs
                   dd 投资收益
