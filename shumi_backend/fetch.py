@@ -23,6 +23,7 @@ class ShuMiAPI(object):
     ShuMi base API, configure api url, consumer key/secret in django setting file.
     """
     api_base_url = settings.SM_API_BASE_URL
+    fund_details_base_url = settings.SM_FUND_DETAILS_API_BASE
     consumer_key = settings.SM_CONSUMER_KEY
     consumer_secret = settings.SM_CONSUMER_SECRET
 
@@ -44,6 +45,15 @@ class ShuMiAPI(object):
     # wrapper oauth session post method
     def _oauth_post(self):
         pass
+
+    def _get_data_table(self, api_query):
+        api_url = self.fund_details_base_url + api_query
+        response = requests.get(api_url)
+        if response.status_code == 200:
+            json_string = response.text
+            return json.loads(json_string)['datatable']
+        else:
+            raise FetchException('%s' % response.text)
 
 
 class AppLevel(ShuMiAPI):
@@ -78,6 +88,22 @@ class AppLevel(ShuMiAPI):
     def get_cash_funds(self):
         api_query = 'trade_cash.getfunds'
         return self._oauth_get(api_query)
+
+    def fund_details(self):
+        api_query = 'fund_archive_base?format=json'
+        return self._get_data_table(api_query)
+
+    def fund_details_plus(self, fund_code):
+        api_query = 'fund_archive?format=json&fund_code={fund_code}'.format(fund_code=fund_code)
+        return self._get_data_table(api_query)
+
+    def fund_manager_by_fund_code(self, fund_code):
+        api_query = 'fund_manager?format=j&fund_code={fund_code}'.format(fund_code=fund_code)
+        return self._get_data_table(api_query)
+
+    def fund_issuers(self):
+        api_query = 'fund_invest_advisor?format=json'
+        return self._get_data_table(api_query)
 
 
 class UserLevel(ShuMiAPI):

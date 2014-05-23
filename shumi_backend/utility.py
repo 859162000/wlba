@@ -1,3 +1,4 @@
+#encoding: utf-8
 from datetime import datetime
 from urlparse import urlparse
 
@@ -186,4 +187,79 @@ def mapping_trade_history(shumi_json_dict):
         raise KeyError('Unpack error.')
 
     return record
+
+
+def mapping_fund_details(shumi_json_dict, include_fund_code=True):
+
+    fund_type = {1: u'封闭式基金',
+                 2: u'开放式基金',
+                 6: u'创新型',
+                 7: u'货币基金',
+                 8: u'集合理财'}
+
+    investment_type = {1: u'股票',
+                       3: u'混合',
+                       6: u'债券',
+                       9: u'保本',
+                       24: u'指数',
+                       25: u'QDII'}
+
+    fund_state = {1: u'发行前',
+                  2: u'募集期',
+                  3: u'募集结束',
+                  4: u'已成立',
+                  5: u'已退市',
+                  6: u'募集失败'}
+
+
+
+    try:
+        record = dict()
+        if include_fund_code:
+            record['product_code']= shumi_json_dict['fund_code']
+        record['name'] = shumi_json_dict['fund_name_abbr']
+        record['type'] = fund_type[shumi_json_dict['fund_type']]
+        record['status'] = fund_state[shumi_json_dict['fund_state']]
+        record['found_date'] = shumi_json_dict['establishment_date']
+        record['latest_shares'] = shumi_json_dict['latest_holder_shares']
+        record['latest_scale'] = shumi_json_dict['latest_total_asset']
+        record['hosting_bank'] = shumi_json_dict['trustee_name']
+        record['init_scale'] = shumi_json_dict['founded_holder_shares']
+
+
+    except KeyboardInterrupt:
+        raise KeyError('Unpack error.')
+
+    return record
+
+
+def mapping_fund_details_plus(shumi_json_dict):
+
+    try:
+        record = dict()
+        record['investment_target'] = shumi_json_dict['investment_target']
+        record['investment_scope'] = shumi_json_dict['investment_field']
+        record['investment_strategy'] = shumi_json_dict['investment_orientation']
+
+    except KeyError:
+        raise KeyError('Unpack error.')
+
+    return record
+
+
+def mapping_fund_issuer(shumi_json_dict):
+
+    try:
+        record = dict()
+        record['name'] = shumi_json_dict['name']
+        record['description'] = shumi_json_dict['background'] or ''
+        record['home_page'] = shumi_json_dict['direct_sell_url'] or ''
+        record['phone'] = shumi_json_dict['tel'] or ''
+        record['uuid'] = shumi_json_dict['guid']
+
+    except KeyError:
+        raise KeyError('Unpack error.')
+
+    return record
+
 

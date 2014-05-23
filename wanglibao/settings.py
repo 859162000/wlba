@@ -331,6 +331,7 @@ SM_REDEEM_TEMPLATE = 'https://trade.fund123.cn/Trading/Do/Redeem?tradeAccount={t
                      '&fundCode={fund_code}&sharetype={share_type}&UsableRemainShare={usable_remain_share}'
 SM_MONETARY_FUND_NET_VALUE = 'http://funddata.smbserver.fund123.cn/' \
                              'monetary_fund_net_value?format=json&date={date}'
+SM_FUND_DETAILS_API_BASE = 'http://funddata.smbserver.fund123.cn/'
 
 
 # rest api document swagger settings

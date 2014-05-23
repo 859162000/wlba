@@ -129,7 +129,7 @@ def add_cron_tab(job_file, job_log_file, env, period_string, manage_py, manage_a
 
     sudo('echo "#!/bin/bash" > %s' % job_file)
     sudo('echo %s &>> %s' % (env.activate, job_file))
-    sudo('echo "date > %s" >> %s' % (job_log_file, job_file))
+    sudo('echo "date >> %s" >> %s' % (job_log_file, job_file))
     sudo('echo "cd /var/wsgi/wanglibao/" >> %s' % job_file)
     for action in manage_actions:
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, action, job_log_file, job_file))

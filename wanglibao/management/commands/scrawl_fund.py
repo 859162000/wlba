@@ -1,22 +1,26 @@
-from optparse import make_option
+from logging import getLogger
 from django.core.management.base import BaseCommand, CommandError
 from wanglibao_robot import fund
-import sys
-
+from shumi_backend.exception import FetchException
 
 class Command(BaseCommand):
 
-    option_list = BaseCommand.option_list + (
-        make_option('--offset', type='int', default=0, help='Specify the offset, default is 0'),
-    )
 
     def handle(self, *args, **options):
-        reload(sys)
-        sys.setdefaultencoding('utf-8')
+        robot = fund.FundRobot()
+        logger = getLogger('shumi')
 
-        offset = options['offset']
-        clean = False
-        if len(args) >= 1 and args[0] == "clean":
-            clean = True
+        try:
+            robot.sync_issuer()
+        except FetchException, e:
+            logger(e)
 
-        fund.run_robot(clean, offset=offset)
+        try:
+            robot.update_issuer()
+        except FetchException:
+            logger(e)
+
+        try:
+            robot.run_robot()
+        except Exception, e:
+            logger(e)

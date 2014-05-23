@@ -7,10 +7,11 @@ from wanglibao.models import ProductBase
 
 class FundIssuer(models.Model):
     name = models.CharField(max_length=64)
-    description = models.TextField()
-    home_page = models.URLField()
-    phone = models.CharField(max_length=64)
+    description = models.TextField(default='')
+    home_page = models.URLField(blank=True, default='')
+    phone = models.CharField(max_length=64, default='')
     logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'发行方图标')
+    uuid = models.CharField(help_text=u'invest advisor guid', max_length=50, default='' )
 
     def __unicode__(self):
         return u'%s' % (self.name, )
