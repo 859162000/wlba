@@ -8,8 +8,8 @@ class ProductBase(models.Model):
     bought_count = models.IntegerField(default=0, help_text=u'购买次数')
     bought_amount = models.BigIntegerField(default=0, help_text=u'产品购买总金额（元）')
 
-    bought_count_random = models.FloatField(default=randrange(101, 121)/100.0, help_text=u'产品购买笔数随机数')
-    bought_amount_random = models.FloatField(default=randrange(90, 131)/100.0, help_text=u'人均购买金额随机数')
+    bought_count_random = models.FloatField(default=0, help_text=u'产品购买笔数随机数')
+    bought_amount_random = models.FloatField(default=0, help_text=u'人均购买金额随机数')
 
     class Meta:
         abstract = True

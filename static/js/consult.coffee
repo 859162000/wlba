@@ -129,7 +129,7 @@ require ['jquery',
             }
           )
           self.portfolioEarningRate rate
-          self.timesBankRate Math.floor(rate / self.bankRate)
+          self.timesBankRate Math.round(rate / self.bankRate)
 
           chart.PieChart( $('#portfolio')[0],
             x: 130

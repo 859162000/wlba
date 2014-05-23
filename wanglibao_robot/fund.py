@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from wanglibao_fund.models import Fund, FundIssuer
 from shumi_backend.fetch import AppLevel
 from shumi_backend.utility import mapping_fund_details, mapping_fund_issuer, mapping_fund_details_plus
@@ -100,4 +101,3 @@ class FundRobot(object):
     def model_setter(self, model, value_dict):
         for key in value_dict.keys():
             setattr(model, key, value_dict[key])
-
