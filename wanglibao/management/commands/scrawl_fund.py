@@ -13,14 +13,14 @@ class Command(BaseCommand):
         try:
             robot.sync_issuer()
         except FetchException, e:
-            logger(e)
+            logger.error(e)
 
         try:
             robot.update_issuer()
         except FetchException:
-            logger(e)
+            logger.error(e)
 
         try:
             robot.run_robot()
         except Exception, e:
-            logger(e)
+            logger.error(e)
