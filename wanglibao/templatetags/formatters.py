@@ -12,6 +12,14 @@ def money_to_10k(value):
     return u'%d万' % (int(value),)
 
 @register.filter
+def convert_to_10k(value):
+    """
+    Convert the number into 10k or 10000k based string
+    """
+    value = int(float(value))
+    return u'%s 万' % (value/10000)
+
+@register.filter
 def money(value):
     """
     Convert the number into 10k based string

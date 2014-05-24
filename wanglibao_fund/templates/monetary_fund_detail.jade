@@ -82,20 +82,15 @@ body
           th 托管银行
           td {{fund.hosting_bank}}
         tr
-          th 基金管理费
-          td {{fund.management_fee}}
-          th 基金托管费
-          td {{fund.hosting_fee}}
-        tr
           th 成立日期
           td {{fund.found_date | date:"Y年n月j日" | na_if_none}}
           th 最新份额
-          td {{fund.latest_shares | na_if_none}}
+          td {{fund.latest_shares | convert_to_10k |na_if_none}}
         tr
           th 首募规模
-          td {{fund.init_scale | na_if_none}}
+          td {{fund.init_scale | convert_to_10k | na_if_none}}
           th 最新规模
-          td {{fund.latest_scale | na_if_none}}
+          td {{fund.latest_scale | convert_to_10k | na_if_none}}
         tr
           th 近一月收益率
           td {{fund.rate_1_month | percentage}}
