@@ -255,6 +255,11 @@ class AppInfoFetcher(AppLevel):
         for fund_code in update_set:
             update_fund = AvailableFund.objects.filter(fund_code__exact=fund_code)
             update_fund.update(**mapping_available_funds_info(fund_codes_dict[fund_code]))
+            fund = Fund.objects.filter(product_code=fund_code)
+            update_target = update_fund.first()
+            if fund.exists():
+                update_target.fund = fund.first()
+            update_target.save()
 
         return {'delete': len(delete_set), 'create': len(create_set), 'update': len(update_set)}
 
@@ -334,7 +339,6 @@ class AppInfoFetcher(AppLevel):
             mhf.hot_score = len(hot_list) - index
             mhf.save()
 
-
     def compute_user_daily_income(self):
         # get user list who had shumi access token
         users = get_user_model().objects.exclude(wanglibaouserprofile__shumi_access_token='')
@@ -378,3 +382,11 @@ class AppInfoFetcher(AppLevel):
                     daily_income.save()
                 except IntegrityError:
                     continue
+
+    def retrieve_fund_managers(self, fund_code):
+        managers = self.fund_manager_by_fund_code(fund_code)
+        name_list = list()
+        for manager in managers:
+            name_list.append(manager['name'])
+
+        return ', '.join(name_list)

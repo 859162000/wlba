@@ -5,14 +5,14 @@ from django.utils import timezone
 
 from wanglibao_fake.models import Formular
 from wanglibao_fund.models import Fund, FundIssuer
-from shumi_backend.fetch import AppLevel
+from shumi_backend.fetch import AppInfoFetcher
 from shumi_backend.utility import mapping_fund_details, mapping_fund_issuer, mapping_fund_details_plus
 from shumi_backend.exception import FetchException
 
 class FundRobot(object):
 
     def __init__(self):
-        self.fetcher = AppLevel()
+        self.fetcher = AppInfoFetcher()
 
     def run_robot(self):
         # run sync_issuer before run_robot, in case guarantee related fund issuers existed.
@@ -57,6 +57,14 @@ class FundRobot(object):
                 pass
             except KeyError:
                 pass
+
+            try:
+                managers = self.fetcher.retrieve_fund_managers(target_fund.product_code)
+                target_fund.manager = managers
+            except FetchException:
+                pass
+            except Exception, e:
+                print(e)
 
             try:
                 target_fund.save()
@@ -133,7 +141,6 @@ class FundRobot(object):
                                            home_page=issuer_info['direct_sell_url'] or '', uuid=issuer_info['guid'])
 
             target_issuer.save()
-
 
     def model_setter(self, model, value_dict):
         for key in value_dict.keys():
