@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+from random import randrange
+
+from django.utils import timezone
+
+from wanglibao_fake.models import Formular
 from wanglibao_fund.models import Fund, FundIssuer
 from shumi_backend.fetch import AppLevel
 from shumi_backend.utility import mapping_fund_details, mapping_fund_issuer, mapping_fund_details_plus
@@ -57,6 +62,39 @@ class FundRobot(object):
                 target_fund.save()
             except Exception, e:
                 print(e)
+
+            today = timezone.now().date()
+            if Formular.objects.all().exists():
+                formular = Formular.objects.all().first()
+
+                d = (today - timezone.datetime.strptime('2014-05-02', '%Y-%m-%d').date()).days
+                from math import log
+
+                for f in Fund.objects.all():
+                    x = f.rate_7_days
+                    ra = f.bought_count_random
+                    rp = f.bought_amount_random
+
+                    if f.rate_7_days <= 5.21:
+                        rand = randrange(1, 101)
+                        bought_people_count = eval(formular.bought_people_count_le_521)
+                    else:
+                        rand = randrange(1, 101)
+                        bought_people_count = eval(formular.bought_people_count_gt_521)
+
+                    count = bought_people_count
+
+                    rand = randrange(1, 101)
+                    bought_count = eval(formular.bought_count)
+
+                    rand = randrange(1, 101)
+                    bought_amount_per_people = eval(formular.bought_amount_per_people)
+                    bought_amount = bought_people_count * bought_amount_per_people
+
+                    f.bought_amount = bought_amount
+                    f.bought_people_count = bought_people_count
+                    f.bought_count = bought_count
+                    f.save()
 
     def sync_issuer(self):
         try:
