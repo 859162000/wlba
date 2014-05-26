@@ -20,7 +20,7 @@ body
             else
               a#addToFavorite.favorite.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")取消
 
-            {{ fund.name }}
+            {{ fund.name }} ({{ fund.product_code }})
       .row
         .span4
           .span12
