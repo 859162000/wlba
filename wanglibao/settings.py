@@ -332,8 +332,7 @@ SM_REDEEM_TEMPLATE = 'https://trade.fund123.cn/Trading/Do/Redeem?tradeAccount={t
 SM_MONETARY_FUND_NET_VALUE = 'http://funddata.smbserver.fund123.cn/' \
                              'monetary_fund_net_value?format=json&date={date}'
 SM_FUND_DETAILS_API_BASE = 'http://funddata.smbserver.fund123.cn/'
-SM_ALL_VALUE_BY_DATE = 'http://funddata.smbserver.fund123.cn/fund_value_by_date_up_bound?date={date}' \
-                       '&format=json'
+SM_FUND_ALL = 'http://jrsj1.data.fund123.cn/ShumiData/FundNav.ashx?applyrecordno=10000&sort=C1'
 
 
 # rest api document swagger settings

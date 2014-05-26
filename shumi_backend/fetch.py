@@ -273,7 +273,7 @@ class AppInfoFetcher(AppLevel):
 
     def fetch_monetary_fund_net_value(self, _date=None):
         net_value_url = settings.SM_MONETARY_FUND_NET_VALUE
-        net_value_all_url = settings.SM_ALL_VALUE_BY_DATE
+        net_value_all_url = settings.SM_FUND_ALL
 
         if not _date:
             today = date.today().strftime('%Y-%m-%d')
@@ -299,7 +299,7 @@ class AppInfoFetcher(AppLevel):
 
         delta = timedelta(days=1)
         yesterday = date.today() - delta
-        yesterday_api_query = net_value_all_url.format(date=yesterday.strftime('%Y-%m-%d'))
+        yesterday_api_query = net_value_all_url
         yesterday_response = requests.get(yesterday_api_query)
         if yesterday_response.status_code != 200:
             raise FetchException(yesterday_response.text)
