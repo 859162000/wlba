@@ -47,7 +47,7 @@ body
               a.button.button-round-large.button-red(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.product_code}}&action=purchase" target='_blank') 立即赚钱
             else
               a.button.button-round-large.button-red(href="/accounts/register/?next=/fund/detail/{{fund.id}}") 立即赚钱
-            p 申请人数{{fund.bought_count}}人
+            p 申请人数{{fund.bought_people_count}}人
 
     .span4-omega.panel-nopadding.fund-panel-header
       .panel-product-title-bar
