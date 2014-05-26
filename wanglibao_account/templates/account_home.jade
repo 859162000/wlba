@@ -71,13 +71,14 @@ body
             tr
               th 产品名称
               th 金额
-              th 未付收益
+              th 收益
               th 操作
           tbody
             if fund_hold_info
               each fund in fund_hold_info
                 tr
-                  td {{fund.fund_name}}
+                  td
+                    a(href="/fund/detail/{{fund.id}}/") {{fund.fund_name}}
                   td {{fund.current_remain_share}}元
                   td {{fund.unpaid_income}}元
                   td
