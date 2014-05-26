@@ -18,7 +18,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'mode
             self.orderBy(field)
 
       self.orderBy = ko.observable()
-      self.orderBy '-availablefund__fund_type,-status,-rate_7_days'
+      self.orderBy '-rate_7_days'
 
       ###
       Pager
