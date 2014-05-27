@@ -388,7 +388,8 @@ class AppInfoFetcher(AppLevel):
     def retrieve_fund_managers(self, fund_code):
         managers = self.fund_manager_by_fund_code(fund_code)
         name_list = list()
-        for manager in managers:
-            name_list.append(manager['name'])
+        if managers:
+            for manager in managers:
+                name_list.append(manager['name'])
 
         return ', '.join(name_list)

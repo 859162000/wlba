@@ -70,10 +70,11 @@ class FundRobot(object):
             try:
                 target_fund.save()
                 sys.stdout.write('.')
+                sys.stdout.flush()
             except Exception, e:
                 print(e)
 
-        print('Starting compute formular.')
+        print('\nStarting compute formular.')
         today = timezone.now().date()
         if Formular.objects.all().exists():
             formular = Formular.objects.all().first()
