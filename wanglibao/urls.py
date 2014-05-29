@@ -48,6 +48,7 @@ urlpatterns = patterns(
     url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),
     url(r'^agreement/', TemplateView.as_view(template_name="agreement.jade")),
     url(r'^mobile/agreement/', TemplateView.as_view(template_name="mobile_agreement.jade")),
+    url(r'^mobile/about/', TemplateView.as_view(template_name="mobile_about.jade")),
     url(r'^ckeditor/', include('ckeditor.urls')),
 )
 
