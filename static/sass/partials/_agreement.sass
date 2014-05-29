@@ -1,0 +1,32 @@
+.agreement-panel
+  @extend .panel-nopadding
+  border-top: 3px solid $red
+  padding: 0 30px
+  line-height: 2
+
+  h1
+    text-align: center
+    color: $red
+    font-size: $font-m
+    border-bottom: 1px dotted #d3d3d3
+    padding: 10px 0
+    margin-bottom: 20px
+
+  h2
+    font-weight: bolder
+    margin-top: 1em
+
+  p
+    text-indent: 2em
+    margin-bottom: 1em
+
+  li
+    @extend .row
+
+  .agreement-number
+    display: inline-block
+    @extend .span1
+
+  .agreement-line
+    display: inline-block
+    @extend .span11-omega

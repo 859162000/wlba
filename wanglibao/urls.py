@@ -47,7 +47,8 @@ urlpatterns = patterns(
     url(r'^contact_us/', TemplateView.as_view(template_name="contact_us.jade")),
     url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
     url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),
-    (r'^ckeditor/', include('ckeditor.urls')),
+    url(r'^agreement/', TemplateView.as_view(template_name="agreement.jade")),
+    url(r'^ckeditor/', include('ckeditor.urls')),
 )
 
 if settings.DEBUG:
