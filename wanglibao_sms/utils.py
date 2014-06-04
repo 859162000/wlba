@@ -34,7 +34,7 @@ def send_validation_code(phone, validate_code=None):
     try:
         phone_validate_code_item = PhoneValidateCode.objects.get(phone=phone)
 
-        if (now - phone_validate_code_item.last_send_time) <= datetime.timedelta(minutes=1):
+        if (now - phone_validate_code_item.last_send_time) <= datetime.timedelta(seconds=30):
             return 429, "Called too frequently"
         else:
             phone_validate_code_item.validate_code = validate_code
