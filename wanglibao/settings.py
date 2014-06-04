@@ -194,7 +194,7 @@ MEDIA_ROOT = '/var/media/wanglibao/'
 MEDIA_URL = '/media/'
 
 # The request rate for some apis
-request_rate = '1/minute'
+request_rate = '2/minute'
 
 if DEBUG:
     request_rate = '1/second'
