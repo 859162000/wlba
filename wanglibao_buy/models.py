@@ -5,6 +5,15 @@ from django.utils import timezone
 from wanglibao_fund.models import Fund
 
 
+class Bank(models.Model):
+    name = models.CharField(max_length=16, verbose_name=u'名字')
+    logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'银行图标 用于理财产品的展示')
+    threshold_info = models.TextField(verbose_name=u'限额信息')
+
+    def __unicode__(self):
+        return u'%s' % self.name
+
+
 class TradeInfo(models.Model):
     type = models.CharField(help_text=u'产品种类', max_length=64)
     trade_type = models.CharField(help_text=u'交易类型（申购，购买，赎回）', max_length=16, blank=True)
