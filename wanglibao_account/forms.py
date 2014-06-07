@@ -1,11 +1,11 @@
 # encoding: utf-8
+from captcha.fields import CaptchaField
 
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
 
 from utils import detect_identifier_type
 from wanglibao_sms.utils import validate_validation_code
-
 
 User = get_user_model()
 
@@ -79,6 +79,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                     )
         return self.cleaned_data
 
+
 class EmailOrPhoneAuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts
@@ -86,6 +87,7 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
     """
     identifier = forms.CharField(max_length=254)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    captcha = CaptchaField()
 
     error_messages = {
         'invalid_login': u"用户名或者密码不正确",
