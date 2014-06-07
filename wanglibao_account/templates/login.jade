@@ -15,21 +15,22 @@ html
           form#login-form.login-form(method='post', action='/accounts/login/?next={{next | urlencode}}')
             fieldset
               #{ form.non_field_errors }
-              #{ form.password.errors }
-              #{ form.email.errors }
-              #{ form.username.errors }
-              #{ form.captcha.errors }
             - csrf_token
             .form-login-title
               img.user-icon(src='/static/images/user.png')
               label.font-l 用户登录
             .form-row
               - render_field form.identifier class+="input-large" placeholder="请输入手机号" title="请输入手机号"
+            #{ form.username.errors }
+            #{ form.email.errors }
             .form-row
               - render_field form.password class+="input-large" placeholder="请输入密码" title="请输入密码"
+
+            #{ form.password.errors }
             .form-row
               - render_field form.captcha class+="captcha"
               button.captcha-refresh(type="button") 刷新
+            #{ form.captcha.errors }
             .form-row.form-bottom-bar
               button.span8.button-red.button-middle(type='submit') 登 录
               .span4-omega
