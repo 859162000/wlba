@@ -1,3 +1,6 @@
+-load formatters
+-load widget_tweaks
+
 .full-container
   .logo-bar
     .logo-div
@@ -25,12 +28,13 @@
           option(value='cash') 现金理财
         a.header-button(href='#') 搜索
 
-    .user-info
+    .user-info#user-info-ajax
       if user.is_authenticated
-        a(href="/accounts/home/") {{ user.wanglibaouserprofile.nick_name }}的个人中心
+        a(href="/accounts/home/") {{ user.wanglibaouserprofile.nick_name }} 的个人中心
         a.logout(href="/accounts/logout?next={{ request.path }}") 退出
       else
-        a(href="/accounts/login?next={{ request.path }}") 登录
-        a(href="/accounts/register?next={{ request.path }}") 注册
+        a.login-modal(href="#login-modal-form") 登录
+        a.register-modal(href="#register-modal-form") 注册
+
 
   script(src="/static/js/require.js", data-main="/static/js/header")

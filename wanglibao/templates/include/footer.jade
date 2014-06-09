@@ -45,6 +45,50 @@ mixin innerFooter()
   .footer-bottom
     .footer-copyright Copyright&copy;2014 wanglibao.com Inc. All Right Reserved. 北京网利科技有限公司
 
+  #login-modal-form(style="display:none")
+    .modal-title-bar
+      span.modal-title 用户登录
+      a.icon-cancel.pull-right(rel="modal:close")
+    .padding-s
+      form#login-form.login-form(method='post', action='/accounts/login/ajax/')
+        .form-row
+          input#id_identifier.identifier.full-width(type="text", name="identifier", placeholder="请输入手机号")
+        .form-row
+          input#id_password.password.full-width(type="password", name="password", placeholder="请输入密码")
+        .form-row.form-bottom-bar
+          button#login_submit.span8.button-red.button-middle(type='submit') 登 录
+          .span4-omega
+          .space-s
+          a(href='{% url "password_reset" %}') 忘记密码？
+        .space-vertical-s
+
+  #register-modal-form(style="display:none")
+    .modal-title-bar
+      span.modal-title 用户注册
+      a.icon-cancel.pull-right(rel="modal:close")
+    .padding-s
+      form#register-form.login-form(method='post', action='/accounts/register?next={{ next }}')
+        .form-row
+          input#id_nickname.full-width(type="text",name="nickname", placeholder="* 请输入昵称")
+        .form-row
+          input#id_identifier.identifier.full-width(type="text", name="identifier", placeholder="* 请输入手机号")
+        #validate-code-container.form-row
+          input#id_validate_code.validate_code.ispan6.clear-margin(placeholder="* 请输入验证码", autocomplete='off', title="* 请输入验证码")
+          button.ispan4-omega#button-get-validate-code.button.button-red.button-mini(type='button') 获取
+        .form-row
+          input#id_password_r.password.full-width(type="password", placeholder="请输入密码")
+          .password-strength-container
+            span.password-strength-1 低
+            span.password-strength-2 中
+            span.password-strength-3 高
+        .form-row
+          input.input-large(type="password", name="password2", placeholder="* 请确认密码", autocomplete='off', title="* 请确认密码")
+        .form-row.form-bottom-bar
+          button#register_submit.span12.button-red.button-middle(type='submit') 注 册
+          .span4-omega
+          .space-s
+        .space-vertical-s
+
 if no_margin
   .footer-no-margin
     +innerFooter()
@@ -52,5 +96,7 @@ else
   .footer
     +innerFooter()
 
+
+
 script.
-  require(['/static/js/hover.js'])
+  require(['/static/js/hover.js','/static/js/footer.js'])

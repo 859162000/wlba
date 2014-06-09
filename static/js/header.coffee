@@ -40,3 +40,4 @@ require ['jquery', 'lib/backend', 'iealert'], ($, backend, iealert)->
   $('.user-center').mouseleave ()->
     $('#user-items').css('display', 'none')
     $('#username').toggleClass('username-hover')
+
