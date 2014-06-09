@@ -44,7 +44,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.placeh
             $('#user-info-ajax').html(
               '<a href="/accounts/home">'
               + return_data.nick_name +
-              ' 的个人中心</a> <a href="/accounts/logout">退出</a>'
+              ' 的个人中心</a> <a class="logout" href="/accounts/logout">退出</a>'
             )
             $('#id_identifier').val ''
             $('#id_password').val ''

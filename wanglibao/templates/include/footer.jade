@@ -51,6 +51,7 @@ mixin innerFooter()
       a.icon-cancel.pull-right(rel="modal:close")
     .padding-s
       form#login-form.login-form(method='post', action='/accounts/login/ajax/')
+        - csrf_token
         .form-row
           input#id_identifier.identifier.full-width(type="text", name="identifier", placeholder="请输入手机号")
         .form-row
@@ -68,6 +69,7 @@ mixin innerFooter()
       a.icon-cancel.pull-right(rel="modal:close")
     .padding-s
       form#register-form.login-form(method='post', action='/accounts/register?next={{ next }}')
+        - csrf_token
         .form-row
           input#id_nickname.full-width(type="text",name="nickname", placeholder="* 请输入昵称")
         .form-row

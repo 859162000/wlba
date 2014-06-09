@@ -45,7 +45,7 @@
         },
         submitHandler: function(form) {
           return $.post($('#login-form').attr('action'), $("#login-form").serialize().done(function(return_data) {
-            $('#user-info-ajax').html('<a href="/accounts/home">', +return_data.nick_name + ' 的个人中心</a> <a href="/accounts/logout">退出</a>');
+            $('#user-info-ajax').html('<a href="/accounts/home">', +return_data.nick_name + ' 的个人中心</a> <a class="logout" href="/accounts/logout">退出</a>');
             $('#id_identifier').val('');
             $('#id_password').val('');
             return $.modal.close();
