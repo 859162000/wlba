@@ -10,31 +10,33 @@
   ul li a
     +link-colors($dark-gray, $red)
 
-.navigation
-  width: 100%
-  background-color: $red
-
-.navigation-container
+.container-navigation
   width: $content-width
   margin: 0 auto
   +clearfix
 
 .nav-items
   +inline-block()
-  line-height: 35px
+  line-height: 100px
+  vertical-align: middle
 
 .nav-item
-  padding: 0 2em
   +inline-block()
 
-  font-size: 14px
+  font-size: $font-m
   text-align: center
 
-  &.active
-    background: darken($red, 10%)
+  position: relative
+
+  &.active .nav-item-anchor
+    +link-colors($color-primary)
+
+  &:first-child a.nav-item-anchor
+    border-left: 0
 
 a.nav-item-anchor
   margin: 0 auto
+  padding: 0 2em
+  border-left: 1px dotted gray
   +unstyled-link
-  +link-colors($white, $white)
-
+  +link-colors($color-text-d3, $color-primary)
