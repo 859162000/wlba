@@ -52,6 +52,10 @@ urlpatterns = patterns(
     url(r'^ckeditor/', include('ckeditor.urls')),
 )
 
+urlpatterns += patterns('',
+    url(r'^captcha/', include('captcha.urls')),
+)
+
 if settings.DEBUG:
     urlpatterns += patterns('',
                             url(r'^media/(?P<path>.*)$', 'django.views.static.serve',

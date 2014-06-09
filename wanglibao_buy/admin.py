@@ -1,43 +1,12 @@
 from django.contrib import admin
-from models import FundHoldInfo, AvailableFund, TradeHistory, BindBank, MonetaryFundNetValue, DailyIncome, TradeInfo
-
-# Register your models here.
-
-
-class FundHoldInfoAdmin(admin.ModelAdmin):
-
-    pass
-
-
-class AvailableFundAdmin(admin.ModelAdmin):
-
-    pass
-
-
-class TradeHistoryAdmin(admin.ModelAdmin):
-
-    pass
-
-
-class BindBankAdmin(admin.ModelAdmin):
-
-    pass
-
-
-class MonetaryFundNetValueAdmin(admin.ModelAdmin):
-
-    pass
-
-
-class DailyIncomeAdmin(admin.ModelAdmin):
-
-    pass
+from models import FundHoldInfo, AvailableFund, TradeHistory, BindBank, MonetaryFundNetValue, DailyIncome, TradeInfo, Bank
 
 
 admin.site.register(TradeInfo)
-admin.site.register(FundHoldInfo, FundHoldInfoAdmin)
-admin.site.register(AvailableFund, AvailableFundAdmin)
-admin.site.register(TradeHistory, TradeHistoryAdmin)
-admin.site.register(BindBank, BindBankAdmin)
-admin.site.register(MonetaryFundNetValue, MonetaryFundNetValueAdmin)
-admin.site.register(DailyIncome, DailyIncomeAdmin)
+admin.site.register(FundHoldInfo)
+admin.site.register(AvailableFund)
+admin.site.register(TradeHistory)
+admin.site.register(BindBank)
+admin.site.register(Bank)
+admin.site.register(MonetaryFundNetValue)
+admin.site.register(DailyIncome)

@@ -59,6 +59,7 @@ INSTALLED_APPS = (
     'wanglibao_bank_financing',
     'wanglibao_fund',
     'wanglibao_cash',
+    'wanglibao_p2p',
     'wanglibao_profile',
     'wanglibao_rest',
     'wanglibao_portfolio',
@@ -82,6 +83,7 @@ INSTALLED_APPS = (
     'raven.contrib.django.raven_compat',
 
     'ckeditor',
+    'captcha',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -350,3 +352,6 @@ SWAGGER_SETTINGS = {
     "is_authenticated": False,  # Set to True to enforce user authentication,
     "is_superuser": False,  # Set to True to enforce admin only access
 }
+
+# Captcha setting
+CAPTCHA_IMAGE_BEFORE_FIELD = False
