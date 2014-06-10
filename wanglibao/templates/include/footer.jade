@@ -1,3 +1,6 @@
+-load formatters
+-load widget_tweaks
+
 mixin innerFooter()
   .container
     .footer-section--container.row
@@ -54,8 +57,16 @@ mixin innerFooter()
         - csrf_token
         .form-row
           input#id_identifier.identifier.full-width(type="text", name="identifier", placeholder="请输入手机号")
+          span#errMessage1
         .form-row
           input#id_password.password.full-width(type="password", name="password", placeholder="请输入密码")
+          span#errMessage2
+        .form-row
+          input#id_captcha_0.captcha(type="hidden", name="captcha_0", autocomplete="off")
+          input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off")
+          img.captcha(alt="captcha", src="")
+          button.captcha-refresh(type="button") 刷新
+          span#errMessage3
         .form-row.form-bottom-bar
           button#login_submit.span8.button-red.button-middle(type='submit') 登 录
           .span4-omega

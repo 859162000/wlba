@@ -11,6 +11,27 @@
 @mixin icon-base($family)
   @include font-icon-base($family, $font-size: 1em, $width: 1em, $margin: 0)
 
+.icon
+  +inline-block()
+  position: relative
+
+.icon-service-line
+  width: 16px
+  height: 16px
+  background: url("/static/images/icon-top-bar.png") no-repeat left top
+  margin-right: 5px
+
+.icon-weibo
+  width: 20px
+  height: 16px
+  background: url("/static/images/icon-top-bar.png") no-repeat left -20px
+  margin-right: 10px
+
+.icon-weixin
+  width: 20px
+  height: 16px
+  background: url("/static/images/icon-top-bar.png") no-repeat left -40px
+
 .icon-phone
   @include font-icon-base(entypo)
   @extend %entypo-phone

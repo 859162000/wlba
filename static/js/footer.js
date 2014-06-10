@@ -17,6 +17,12 @@
 
   require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.placeholder'], function($, modal, backend, validate, placeholder) {
     $('.login-modal').click(function(e) {
+      var url;
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/";
+      $.getJSON(url, {}, function(json) {
+        $('input[name="captcha_0"]').val(json.key);
+        return $('img.captcha').attr('src', json.image_url);
+      });
       e.preventDefault();
       $(this).modal();
       $.validator.addMethod("emailOrPhone", function(value, element) {
@@ -31,6 +37,10 @@
           password: {
             required: true,
             minlength: 6
+          },
+          captcha_1: {
+            required: true,
+            minlength: 4
           }
         },
         messages: {
@@ -41,8 +51,21 @@
           password: {
             required: '不能为空',
             minlength: $.format("密码需要最少{0}位")
+          },
+          captcha_1: {
+            required: '不能为空',
+            minlength: $.format("验证码要输入4位")
           }
-        },
+        }
+      }, $('.captcha-refresh').click(function() {
+        var $form;
+        $form = $(this).parents('form');
+        url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/";
+        return $.getJSON(url, {}, function(json) {
+          $form.find('input[name="captcha_0"]').val(json.key);
+          return $form.find('img.captcha').attr('src', json.image_url);
+        });
+      }), {
         submitHandler: function(form) {
           return $.ajax({
             url: $('#login-form').attr('action'),

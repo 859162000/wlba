@@ -11,8 +11,12 @@ require.config
 
 require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.placeholder'], ($, modal, backend, validate, placeholder)->
 
-
   $('.login-modal').click (e)->
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/"
+    $.getJSON url, {}, (json)->
+      $('input[name="captcha_0"]').val(json.key)
+      $('img.captcha').attr('src', json.image_url)
+
     e.preventDefault()
     $(this).modal()
 
@@ -27,6 +31,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.placeh
         password:
           required: true
           minlength: 6
+        captcha_1:
+          required: true
+          minlength: 4
 
       messages:
         identifier:
@@ -35,6 +42,20 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.placeh
         password:
           required: '不能为空'
           minlength: $.format("密码需要最少{0}位")
+        captcha_1:
+          required: '不能为空'
+          minlength: $.format("验证码要输入4位")
+
+      #errorContainer:
+        #"#errMessage1, #errMessage2, #errMessage3"
+
+      $('.captcha-refresh').click ->
+        $form = $(this).parents('form')
+        url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/"
+
+        $.getJSON url, {}, (json)->
+          $form.find('input[name="captcha_0"]').val(json.key)
+          $form.find('img.captcha').attr('src', json.image_url)
 
       submitHandler: (form) ->
         $.ajax(
@@ -42,7 +63,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.placeh
           type: "POST"
           beforeSend: (XMLHttpRequest) ->
             XMLHttpRequest.setRequestHeader("X-Requested-With","XMLHttpRequest")
-
           data: $("#login-form").serialize()
           dataType: "json"
         )
