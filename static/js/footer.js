@@ -44,27 +44,24 @@
           }
         },
         submitHandler: function(form) {
-          return $.post($('#login-form').attr('action'), $("#login-form").serialize().done(function(return_data) {
-            $('#user-info-ajax').html('<a href="/accounts/home">', +return_data.nick_name + ' 的个人中心</a> <a class="logout" href="/accounts/logout">退出</a>');
+          return $.ajax({
+            url: $('#login-form').attr('action'),
+            type: "POST",
+            beforeSend: function(XMLHttpRequest) {
+              return XMLHttpRequest.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            },
+            data: $("#login-form").serialize(),
+            dataType: "json"
+          }).done(function(data, textStatus) {
+            $('#user-info-ajax').html('<a href="/accounts/home">', +data.nick_name + ' 的个人中心</a> <a class="logout" href="/accounts/logout">退出</a>');
             $('#id_identifier').val('');
             $('#id_password').val('');
             return $.modal.close();
           }).fail(function(xhr) {
             return alert('登录失败，请重新登录');
-          }));
+          });
         }
       });
-      /*$('#login_submit').click (data) ->
-        $.post(
-          $('#login-form').attr('action')
-          $("#login-form").serialize()
-          (return_data) ->
-            alert(return_data)
-      
-      
-        )
-      */
-
     });
     return $('.register-modal').click(function(e) {
       e.preventDefault();

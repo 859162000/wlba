@@ -37,33 +37,28 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.placeh
           minlength: $.format("密码需要最少{0}位")
 
       submitHandler: (form) ->
-        $.post(
-          $('#login-form').attr('action')
-          $("#login-form").serialize()
-          .done (return_data) ->
-            $('#user-info-ajax').html(
-              '<a href="/accounts/home">'
-              + return_data.nick_name +
-              ' 的个人中心</a> <a class="logout" href="/accounts/logout">退出</a>'
-            )
-            $('#id_identifier').val ''
-            $('#id_password').val ''
-            $.modal.close()
-          .fail (xhr)->
-            #if xhr.status == '4xx'
-            alert('登录失败，请重新登录')
+        $.ajax(
+          url: $('#login-form').attr('action')
+          type: "POST"
+          beforeSend: (XMLHttpRequest) ->
+            XMLHttpRequest.setRequestHeader("X-Requested-With","XMLHttpRequest")
 
-
+          data: $("#login-form").serialize()
+          dataType: "json"
         )
-    ###$('#login_submit').click (data) ->
-      $.post(
-        $('#login-form').attr('action')
-        $("#login-form").serialize()
-        (return_data) ->
-          alert(return_data)
+        .done (data,textStatus) ->
+          $('#user-info-ajax').html(
+            '<a href="/accounts/home">'
+            + data.nick_name +
+            ' 的个人中心</a> <a class="logout" href="/accounts/logout">退出</a>'
+          )
+          $('#id_identifier').val ''
+          $('#id_password').val ''
+          $.modal.close()
+        .fail (xhr)->
+          #if xhr.status == '4xx'
+          alert('登录失败，请重新登录')
 
-
-      )###
 
   $('.register-modal').click (e)->
     e.preventDefault()
