@@ -24,15 +24,13 @@ html
         li
           a.background-anchor(href="#") x
       .container-home
-        .portfolio-container
-          h1 网利宝年化收益率
-          p 最高 <span class="highlight">13.24%</span>
-          p 30倍活期存款收益24倍定期存款收益
-
-          a.button-large.button-red(href="#") 免费注册
-
-          p
-            span 已有账号？<a href="#">立即登录</a>
+        .banner-form
+          h1.banner-form--title 网利宝年化收益率
+          p.banner-form--row 最高 <em class="highlight">13.24%</em>
+          p.banner-form--row <span class="highlight">30</span>倍活期存款收益<span class="highlight">24</span>倍定期存款收益
+          a.banner-form--button.full-width(href="#") 免费注册
+          p.align-right
+            span 已有账号？<a class="login-button" href="#">立即登录</a>
 
     .full-container-white
       .sales-data-container
@@ -40,92 +38,81 @@ html
           .span5
             p 第三方担保，<em class="highlight">100元</em>起投，投标次日计息。
             p 每工作日 <em>10:30、14:30、20:00</em> 更新总额度。
-          .span2
-            dt 投资人总收益
-            dd
-              em 46,271,471.00
-          .span2
-            dt 累计交易额
-            dd
-              em 46,271,471.00
-          .span3-omega
-            dt 年化收益率
-            dd
-              em.highlight 10%-15%
+          .span7-omega
+            .span4
+              dt 投资人总收益
+              dd
+                em 46,271,471.00
+            .span4
+              dt 累计交易额
+              dd
+                em 46,271,471.00
+            .span4-omega
+              dt 年化收益率
+              dd
+                em.highlight 10%-15%
     .container
       .row
-        .span8
-          .panel-p2p-product
-            .panel-title-bar 昆明个人房产抵押贷款
-            .panel-content
-              .row
-                .span2
-                  p 1,000,000
-                  p 融资金额(元)
-                .span2
-                  p 12个月
-                  p 还款期限
-                .span2
-                  p 15%
-                  p 年化收益
-                .span2
-                  p 500,000
-                  p 可投资金额(元)
-                .span4-omega
-                  p
-                    a.button-middle.button-red(href="#") 正在招标
-                  p 剩余时间：00:00:00
-            .panel-content
-              .row
-                .span3
-                  span 进度：
-                  span ------------
-                  span 100%
-                .span3
-                  span 担保机构:
-                  span 安家世行
-                .span3-omega
-                  span 还款方式:
-                  span 一次性还清
+        .span9
+          mixin p2pproduct
+            .panel-p2p-product
+              .panel-title-bar 昆明个人房产抵押贷款
+              .panel-content
+                .row
+                  .span3
+                    p
+                      em 1,000,000
+                    p 融资金额(元)
+                  .span2
+                    p
+                      em 12个月
+                    p 还款期限
+                  .span2
+                    p
+                      em.highlight 15%
+                    p 年化收益
+                  .span2
+                    p
+                      em 500,000
+                    p 可投资金额(元)
+                  .span3-omega.align-right
+                    p
+                      a.button-primary(href="#") 正在招标
+                    p 剩余时间：00:00:00
+              .panel-p2p--footer
+                .row
+                  .span4
+                    span 进度：
+                    .progress-container
+                      .progress-indicator(style="width:80%")
+                    span.highlight &nbsp;&nbsp;100%
+                  .span3.align-right
+                    span 担保机构: &nbsp;&nbsp;
+                    span 安家世行
+                  .span3-omega.align-right
+                    span 还款方式: &nbsp;&nbsp;
+                    span 一次性还清
 
-          .panel-nopadding
-            p 昆明个人房产抵押贷款
-          .panel-nopadding
-            p 昆明个人房产抵押贷款
-          .panel-nopadding
-            p 昆明个人房产抵押贷款
-
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
+          +p2pproduct
           a(href="#") 点击查看更多 >>
 
-        .span4-omega
+        .span3-omega
           .panel-nopadding
-            p 新闻报道
-
-          .panel-nopadding
-            .panel-title-bar
-              .panel-title 网站收费情况
-            ul
-              li
-                dt 管理费
-                dd 不收取
-              li
-                dt 充值
-                dd 免费
-              li
-                dt 1000元以上提现
-                dd 免费
-              li
-                dt 1000元以下提现
-                dd 2元/笔
-              li
-                dt 其他收费
-                dd 无
-              li
-                dt 提取规则
-                dd 已在网利宝投资的资金，本息到期后或者债券转让成功后申请提现，会在一个工作日之内审核完毕。提现审核通过后，资金会在第二个工作日内到账。
-              li
-                dt 收益到账
-                dd 用户投资收益到账时间为产品到期日当日23:00以前
+            p 媒体报道
 
           .panel-nopadding
             .panel-title-bar

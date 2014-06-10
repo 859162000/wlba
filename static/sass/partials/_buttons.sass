@@ -87,3 +87,11 @@ $button-padding:         0.5em 0.5em  // Button padding
 .button-no-border, a.button-no-border
   border: 0
   background: transparent
+
+// Following is the new button family
+.button-primary
+  @extend .button
+  @extend .button-red
+  padding: 8px 28px
+  background: $color-primary
+  font-size: $font-m

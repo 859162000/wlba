@@ -31,17 +31,35 @@ $home-banner-height: image-height('home0.jpg')
   @extend .container
   height: $home-banner-height
 
-.portfolio-container
+.banner-form
   @extend .pie-element
   position: relative
   float: right
   margin-top: 60px
   background: #8B867F
   background: rgba(80, 80, 80, .7)
-  padding: 10px 20px 20px 20px
-  font-size: $font-s
+  padding: 30px
+  font-size: $font-m
   color: white
   z-index: 11
+  height: 265px
+
+  em
+    font-size: $font-xxxl
+
+  a.login-button
+    +link-colors($color-text-d5, $color-primary)
+    text-decoration: underline
+
+.banner-form--title
+  font-size: $font-l
+
+.banner-form--row
+  margin-bottom: 10px
+
+.banner-form--button
+  @extend .button-primary
+  margin-bottom: 10px
 
 .sales-data-container
   @extend .container
@@ -57,6 +75,9 @@ $home-banner-height: image-height('home0.jpg')
 
     &.highlight
       color: $color-primary
+
+  dt, dd
+    text-align: right
 
 .container-card-holder
   width: $content-width
