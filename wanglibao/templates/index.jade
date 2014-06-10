@@ -1,4 +1,5 @@
 -load formatters
+-load mathfilters
 
 doctype html
 html
@@ -54,60 +55,50 @@ html
     .container
       .row
         .span9
-          mixin p2pproduct
+          for product in p2p_products
             .panel-p2p-product
-              .panel-title-bar 昆明个人房产抵押贷款
+              .panel-title-bar {{product.name}}
               .panel-content
                 .row
                   .span3
                     p
-                      em 1,000,000
+                      em {{product.total_amount | money_format}}
                     p 融资金额(元)
                   .span2
                     p
-                      em 12个月
+                      em {{product.period}}个月
                     p 还款期限
                   .span2
                     p
-                      em.highlight 15%
+                      em.highlight {{product.expected_earning_rate | percentage}}
                     p 年化收益
                   .span2
                     p
-                      em 500,000
+                      amount = product.total_amount - product.ordered_amount
+                      em {{amount | money_format}}
                     p 可投资金额(元)
                   .span3-omega.align-right
                     p
-                      a.button-primary(href="#") 正在招标
+                      if product.status == '正在招标'
+                        a.button-primary(href="#") 正在招标
+                      else
+                        a.button-disabled(href="javascript:void(0)", disabled) {{product.status}}
                     p 剩余时间：00:00:00
               .panel-p2p--footer
                 .row
                   .span4
                     span 进度：
                     .progress-container
-                      .progress-indicator(style="width:80%")
-                    span.highlight &nbsp;&nbsp;100%
+                      percent = float(product.ordered_amount) / product.total_amount * 100
+                      .progress-indicator(style="width:{{percent | percentage}}")
+                    span.highlight &nbsp;&nbsp; {{percent | percentage}}
                   .span3.align-right
                     span 担保机构: &nbsp;&nbsp;
-                    span 安家世行
+                    span {{product.warrant_company.name}}
                   .span3-omega.align-right
                     span 还款方式: &nbsp;&nbsp;
-                    span 一次性还清
+                    span {{product.pay_method}}
 
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
-          +p2pproduct
           a(href="#") 点击查看更多 >>
 
         .span3-omega

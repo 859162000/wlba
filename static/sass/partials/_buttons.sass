@@ -95,3 +95,11 @@ $button-padding:         0.5em 0.5em  // Button padding
   padding: 8px 28px
   background: $color-primary
   font-size: $font-m
+
+.button-disabled
+  @extend .button
+  @extend .button-gray
+
+  padding: 8px 28px
+  font-size: $font-m
+  cursor: default

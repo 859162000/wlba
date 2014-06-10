@@ -34,6 +34,21 @@ def money_f_2(value):
     return u'%.2f' % value
 
 @register.filter
+def money_format(value):
+    components = str(value).split('.')
+    if len(components) > 1:
+        left, right = components
+        right = '.' + right
+    else:
+        left, right = components[0], ''
+
+    result = ''
+    while left:
+        result = left[-3:] + ',' + result
+        left = left[:-3]
+    return result.strip(',') + right
+
+@register.filter
 def month(value):
     """
     Convert the float based month to string
