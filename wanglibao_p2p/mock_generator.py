@@ -23,18 +23,18 @@ class MockGenerator(object):
             warrant_company.name = u'担保公司 %d' % index
             warrant_company.save()
 
-            for index in range(0, 20):
+            for index in range(0, 3):
                 p2p = P2PProduct()
 
                 p2p.name = u'P2P产品' + str(index + 1)
                 p2p.short_name = u'P2P 短名'
                 p2p.pay_method = u'按月还款 等额本息'
-                p2p.expected_earning_rate = 14.2
-                p2p.public_time = timezone.now()
+                p2p.expected_earning_rate = random.randrange(100, 200) / 10.0
+                p2p.public_time = timezone.now() + datetime.timedelta(days=random.randrange(-10, 10))
                 p2p.end_time = timezone.now() + datetime.timedelta(days=7)
 
-                p2p.total_amount = 50000000
-                p2p.ordered_amount = 5000000
+                p2p.total_amount = random.randrange(100000, 4000000)
+                p2p.ordered_amount = p2p.total_amount * random.randrange(1, 100) / 100.0
 
                 p2p.warrant_company = warrant_company
 

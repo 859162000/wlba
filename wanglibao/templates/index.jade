@@ -83,7 +83,7 @@ html
                         a.button-primary(href="#") 正在招标
                       else
                         a.button-disabled(href="javascript:void(0)", disabled) {{product.status}}
-                    p 剩余时间：00:00:00
+                    p 剩余时间：{{product.end_time | timedelta_now }}
               .panel-p2p--footer
                 .row
                   .span4
@@ -103,41 +103,47 @@ html
 
         .span3-omega
           .panel-nopadding
-            p 媒体报道
+            .panel-title-bar__no-border
+              .panel-title 媒体报道
+            .panel-content-container.padding-l-r-s
 
           .panel-nopadding
-            .panel-title-bar
+            .panel-title-bar__no-border
              .panel-title 投资记录
-            table
-              thead
-                tr
-                  th 申购时间
-                  th 投资人
-                  th 金额
-              tbody
-                mixin invest-entry(date, time, user, money)
+            .panel-content-container.padding-l-r-s
+              table.invest-history-table
+                thead
                   tr
-                    td
-                      p=date
-                      p=time
-                    td=user
-                    td=money
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
-                +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000元')
+                    th 申购时间
+                    th 投资人
+                    th 金额
+                tbody
+                  mixin invest-entry(date, time, user, money)
+                    tr
+                      td
+                        p=date
+                        p=time
+                      td
+                        em=user
+                      td
+                        span.money-highlight=money
+                        span 元
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
 
     script(src="/static/js/require.js", data-main="/static/js/index")
 

@@ -1,6 +1,7 @@
 # coding=UTF-8
 
 from django import template
+from django.utils import timezone
 
 register = template.Library()
 
@@ -159,3 +160,11 @@ def get_range(start, end):
 @register.filter()
 def buy_fund_url(code):
     return '/shumi/oauth/check_oauth_status/?fund_code='+ code + '&action=purchase'
+
+@register.filter
+def timedelta_now(time):
+    time_delta = time - timezone.now()
+    hours, seconds = divmod(time_delta.seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    hours += time_delta.days * 24
+    return "%d:%02d:%02d" % (hours, minutes, seconds)
