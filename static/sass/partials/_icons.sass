@@ -11,9 +11,9 @@
 @mixin icon-base($family)
   @include font-icon-base($family, $font-size: 1em, $width: 1em, $margin: 0)
 
-.icon-phone
-  @include font-icon-base(entypo)
-  @extend %entypo-phone
+.icon
+  +inline-block()
+  position: relative
 
 .icon-people
   @include icon-base(entypo)

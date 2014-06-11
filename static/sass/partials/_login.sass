@@ -1,5 +1,13 @@
 @import layout
 
+.full-container-top-bar
+  @extend  .full-container
+  background: $dark-gray
+  height: $top-bar-height
+  line-height: $top-bar-height
+  font-size: $font-s
+  color: $white
+
 .full-container-login
   @extend .full-container
   $file: 'login.jpg'
@@ -10,6 +18,7 @@
 
 .container-login-nav
   @extend .container
+  width: $content-width
   padding: 15px 0
   background-color: white
 

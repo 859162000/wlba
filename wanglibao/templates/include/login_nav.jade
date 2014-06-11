@@ -1,0 +1,22 @@
+.full-container-top-bar
+  .container
+    .top-bar-service.pull-left
+      span.icon.icon-service-line
+      客服热线：4008-588-066
+      &nbsp;&nbsp;关注我们：
+      span.icon.icon-weibo
+      span.icon.icon-weixin
+    .top-bar-login.white.pull-right#user-info-ajax
+      if user.is_authenticated
+        a(href="/accounts/home/") {{ user.wanglibaouserprofile.nick_name }} 的个人中心
+        a.logout(href="/accounts/logout?next={{ request.path }}") 退出
+      else
+        a.login-modal(href="#login-modal-form") 登录&nbsp;&nbsp;
+        a.register-modal(href="#register-modal-form") 注册 &nbsp;&nbsp;
+
+.full-container-white
+  .container-login-nav
+    a(href='/')
+      .logo
+    .login-nav
+      include include/nav_common
