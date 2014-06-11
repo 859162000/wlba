@@ -1,16 +1,17 @@
 .full-container
   .topbar
     .container
+      i.icon-phone.font-l
       span 客服热线：
       span 4008-588-066
 
-      span 关注我们：
-      a(href="javascript:void(0)") 微信
-      a(href="javascript:void(0)") 微博
+      span.margin-left-m 关注我们：
+      a.topbar-anchor.icon-weibo(href="javascript:void(0)")
+      a.topbar-anchor.icon-weixin(href="javascript:void(0)")
       .user-info
         if user.is_authenticated
           span {{ user.wanglibaouserprofile.nick_name }}
           a.logout(href="/accounts/logout?next={{ request.path }}") 退出
         else
-          a(href="/accounts/login?next={{ request.path }}") 登录
-          a(href="/accounts/register?next={{ request.path }}") 注册
+          a.user-info--login(href="/accounts/login?next={{ request.path }}") 登录
+          a.user-info--register(href="/accounts/register?next={{ request.path }}") 注册
