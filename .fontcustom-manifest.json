@@ -1,0 +1,86 @@
+{
+  "checksum": {
+    "previous": "eb80696237c0c5c8aeaf61ffe11a1e49fd283d75715b79c058e72659d245fe75",
+    "current": "eb80696237c0c5c8aeaf61ffe11a1e49fd283d75715b79c058e72659d245fe75"
+  },
+  "fonts": [
+    "fontcustom/fontcustom_eb80696237c0c5c8aeaf61ffe11a1e49.ttf",
+    "fontcustom/fontcustom_eb80696237c0c5c8aeaf61ffe11a1e49.svg",
+    "fontcustom/fontcustom_eb80696237c0c5c8aeaf61ffe11a1e49.woff",
+    "fontcustom/fontcustom_eb80696237c0c5c8aeaf61ffe11a1e49.eot"
+  ],
+  "glyphs": {
+    "check": {
+      "codepoint": 61696,
+      "source": "static/vectors/vectors/check.svg"
+    },
+    "check-shield": {
+      "codepoint": 61697,
+      "source": "static/vectors/vectors/check-shield.svg"
+    },
+    "phone": {
+      "codepoint": 61698,
+      "source": "static/vectors/vectors/phone.svg"
+    },
+    "phone-footer": {
+      "codepoint": 61699,
+      "source": "static/vectors/vectors/phone-footer.svg"
+    },
+    "refresh": {
+      "codepoint": 61700,
+      "source": "static/vectors/vectors/refresh.svg"
+    },
+    "shield": {
+      "codepoint": 61701,
+      "source": "static/vectors/vectors/shield.svg"
+    },
+    "star": {
+      "codepoint": 61702,
+      "source": "static/vectors/vectors/star.svg"
+    },
+    "weibo": {
+      "codepoint": 61703,
+      "source": "static/vectors/vectors/weibo.svg"
+    },
+    "weibo-circle": {
+      "codepoint": 61704,
+      "source": "static/vectors/vectors/weibo-circle.svg"
+    },
+    "weixin": {
+      "codepoint": 61705,
+      "source": "static/vectors/vectors/weixin.svg"
+    },
+    "weixin-circle": {
+      "codepoint": 61706,
+      "source": "static/vectors/vectors/weixin-circle.svg"
+    }
+  },
+  "options": {
+    "autowidth": false,
+    "config": false,
+    "css_selector": ".icon-{{glyph}}",
+    "debug": false,
+    "font_name": "fontcustom",
+    "force": false,
+    "input": {
+      "templates": "static/vectors/vectors",
+      "vectors": "static/vectors/vectors"
+    },
+    "no_hash": false,
+    "output": {
+      "css": "fontcustom",
+      "fonts": "fontcustom",
+      "preview": "fontcustom"
+    },
+    "preprocessor_path": null,
+    "quiet": false,
+    "templates": [
+      "css",
+      "preview"
+    ]
+  },
+  "templates": [
+    "fontcustom/fontcustom.css",
+    "fontcustom/fontcustom-preview.html"
+  ]
+}

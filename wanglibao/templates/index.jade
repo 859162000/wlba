@@ -76,7 +76,7 @@ html
                   .span3-omega.align-right
                     p
                       if product.status == '正在招标'
-                        a.button-primary(href="#") 正在招标
+                        a.button-primary(href="/p2p/detail/{{product.id}}/") 正在招标
                       else
                         a.button-disabled(href="javascript:void(0)", disabled) {{product.status}}
                     p 剩余时间：{{product.end_time | timedelta_now }}

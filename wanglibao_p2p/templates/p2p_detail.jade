@@ -1,0 +1,22 @@
+- load formatters
+- load mathfilters
+doctype html
+- with p2p.name as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .container
+    .span8.panel-nopadding.panel-header
+      .panel-product-title-bar
+        .panel-product-title
+          .product-title.ispan11 {{ p2p.name }}
+      .row
+        .span6
+          .well
+            .row
+
+
+  include include/footer
+  include include/tracking

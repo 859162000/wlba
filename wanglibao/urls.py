@@ -7,6 +7,7 @@ from wanglibao.views import IndexView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
+from wanglibao_p2p.views import P2PDetailView
 from wanglibao_portfolio.views import PortfolioHomeView
 
 admin.autodiscover()
@@ -28,6 +29,8 @@ urlpatterns = patterns(
 
     url(r'^cash/products/', CashHomeView.as_view(), name="cash_home"),
     url(r'^cash/detail/(?P<id>\w+)', CashDetailView.as_view(), name="cash_detail"),
+
+    url(r'^p2p/detail/(?P<id>\w+)', P2PDetailView.as_view(), name="p2p_detail"),
 
     url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
 
