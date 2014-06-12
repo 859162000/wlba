@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'wanglibao',
     'registration_defaults',
     'django.contrib.admin',
@@ -73,6 +74,7 @@ INSTALLED_APPS = (
     'wanglibao_buy',
     'wanglibao_banner',
     'wanglibao_fake',
+    'wanglibao_pay',
 
     'provider',
     'provider.oauth2',

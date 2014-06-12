@@ -1,0 +1,32 @@
+- load formatters
+- load mathfilters
+- load widget_tweaks
+
+doctype html
+- with '支付' as title
+include include/head
+- endwith
+body
+  include include/header
+  - with '首页' as activeItem
+  include include/navigation
+  - endwith
+  .pay-container
+    .row
+      .pull-left 充值
+      .pull-right << 返回上级
+
+
+    form(action="{{form.url}}", method='post')
+      input#amount(type='text', name='amount', placeholder='金额', value='500.00')
+      input#gate_id(type='text', name='gate_id', placeholder='银行', value='09')
+      input#pay.button-red.button-l(type='button', value='充值')
+
+    form#huifu-form(method='post')
+
+  script.
+    require(['/static/js/pay.js'])
+  - with 1 as no_margin
+  include include/footer
+  - endwith
+  include include/tracking

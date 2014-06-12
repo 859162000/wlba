@@ -10,13 +10,22 @@ from django.contrib.auth import get_user_model
 user_model = get_user_model()
 
 
+class WarrantCompany(models.Model):
+    name = models.CharField(max_length=64, verbose_name=u'名字')
+
+    def __unicode__(self):
+        return u'%s' % self.name
+
+
 class P2PProduct(ProductBase):
     name = models.CharField(max_length=256, verbose_name=u'名字')
     short_name = models.CharField(max_length=64, verbose_name=u'短名字')
+
+    status = models.CharField(max_length=16, default=u'正在招标', verbose_name=u'产品装态(正在招标，已满表，还款中)')
+
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)')
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)')
-    status = models.CharField(verbose_name=u'产品状态', max_length=20)
     closed = models.BooleanField(verbose_name=u'是否完结', default=False)
 
     pay_method = models.CharField(max_length=32, verbose_name=u'还款方式')
@@ -26,11 +35,13 @@ class P2PProduct(ProductBase):
 
     extra_data = JSONField(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
-    public_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间')
+    publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间')
     end_time = models.DateTimeField(default=timezone.now, verbose_name=u'终止时间')
 
     type = models.CharField(max_length=32, verbose_name=u'产品类型')
     limit_per_user = models.FloatField(verbose_name=u'单用户购买限额', default=0.2)
+
+    warrant_company = models.ForeignKey(WarrantCompany)
 
     def __unicode__(self):
         return u'%s %f' % (self.name, self.expected_earning_rate)
