@@ -12,6 +12,7 @@ from wanglibao_feedback.views import FeedbackViewSet
 from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
 from wanglibao_hotlist.views import HotTrustViewSet, HotFinancingViewSet, HotFundViewSet, MobileHotTrustViewSet, \
     MobileHotFundViewSet, MobileMainPageViewSet
+from wanglibao_pay.views import Pay
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
@@ -57,6 +58,7 @@ router.register(r'daily_income', DailyIncomeViewSet)
 urlpatterns = patterns(
     '',
     url(r'^register/', RegisterAPIView.as_view()),
+    url(r'^pay/', Pay.as_view()),
     url(r'^reset_password/', ResetPasswordAPI.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),

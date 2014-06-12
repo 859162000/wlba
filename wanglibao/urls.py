@@ -41,6 +41,7 @@ urlpatterns = patterns(
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
     url(r'^shumi/', include('shumi_backend.urls')),
+    url(r'^pay/', include('wanglibao_pay.urls')),
 
     url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', TemplateView.as_view(template_name="hiring.jade")),
