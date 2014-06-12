@@ -1,36 +1,18 @@
 .full-container
-  .logo-bar
-    .logo-div
-      a(href="/")
-        .logo
+  .topbar
+    .container
+      i.icon-phone.font-l &nbsp;
+      span 客服热线：
+      span 4008-588-066
 
-    .search-bar
-      .input-bar
-        span.input-title 投资金额
-        .header-asset
-          input.header-input-base.header-asset-input(type='text', size=20)
-          span#header-asset-unit 万元
-        span.input-title 期限
-        select.header-input-base.header-select
-          option(value='0-3') 3个月以内
-          option(value='3-6') 3-6个月
-          option(value='6-12') 6-12个月
-          option(value='12-36') 1-3年
-          option(value='>36') 3年以上
-        span.input-title 类型
-        select.header-input-base.header-select
-          option(value='trust') 信托理财
-          option(value='financing') 银行理财
-          option(value='fund') 基金产品
-          option(value='cash') 现金理财
-        a.header-button(href='#') 搜索
+      span.margin-left-m 关注我们：
+      a.topbar-anchor.icon-weibo(href="javascript:void(0)")
+      a.topbar-anchor.icon-weixin(href="javascript:void(0)")
 
-    .user-info
-      if user.is_authenticated
-        a(href="/accounts/home/") {{ user.wanglibaouserprofile.nick_name }}的个人中心
-        a.logout(href="/accounts/logout?next={{ request.path }}") 退出
-      else
-        a(href="/accounts/login?next={{ request.path }}") 登录
-        a(href="/accounts/register?next={{ request.path }}") 注册
-
-  script(src="/static/js/require.js", data-main="/static/js/header")
+      .user-info#user-info-ajax
+        if user.is_authenticated
+          span {{ user.wanglibaouserprofile.nick_name }}
+          a.logout(href="/accounts/logout?next={{ request.path }}") 退出
+        else
+          a.login-modal.user-info--login(href="#login-modal-form") 登录
+          a.register-modal.user-info--register(href="#register-modal-form") 注册

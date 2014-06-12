@@ -29,12 +29,6 @@ $logo-height: image-height('logo.png')
   height: $logo-height
   width: image-width('logo.png')
 
-.search-bar
-  width: 55%
-  vertical-align: middle
-  text-align: center
-  float: left
-
 .input-bar
   border: 2px solid $red
   line-height: 26px
@@ -103,6 +97,9 @@ a.header-button
     &:first-child
       border-left: 0
 
+a.user-info--register, a.user-info--login
+  +link-colors($color-text-d5)
+
 .user-center
   position: relative
   display: inline-block
@@ -136,3 +133,15 @@ a.header-button
 
     &:first-child
       border-bottom: 1px dotted $light-gray-text
+
+.topbar
+  background: $color-topbar
+  line-height: 30px
+  color: $color-text-d5
+  font-size: $font-s
+
+a.topbar-anchor
+  +link-colors($color-text-d5, $color-text-d6)
+  margin-left: 10px
+  font-size: $font-xl
+

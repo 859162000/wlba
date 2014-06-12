@@ -1,23 +1,18 @@
+# encoding: utf8
+from django.utils import timezone
+
 from django.views.generic import TemplateView
 from wanglibao_hotlist.models import HotTrust, HotFund, HotFinancing
+from wanglibao_p2p.models import P2PProduct
 
 
 class IndexView(TemplateView):
     template_name = 'index.jade'
 
     def get_context_data(self, **kwargs):
-        count = 3
-
-        hot_trusts = HotTrust.objects.all().prefetch_related('trust').\
-                         prefetch_related('trust__issuer')[:count]
-        hot_funds = HotFund.objects.all().prefetch_related('fund').\
-                        prefetch_related('fund__issuer')[:count]
-        hot_financings = HotFinancing.objects.all().prefetch_related('bank_financing').\
-                             prefetch_related('bank_financing__bank')[:count]
-
+        # p2p_products = P2PProduct.objects.filter(publish_time__lte=timezone.now())[:20]
+        p2p_products = P2PProduct.objects.all()[:20]
         return {
-            'hot_trusts': hot_trusts,
-            'hot_funds': hot_funds,
-            'hot_financings': hot_financings
-            }
+            "p2p_products": p2p_products
+        }
 

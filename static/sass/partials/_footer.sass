@@ -74,25 +74,17 @@
   background: #3b3b3b
 
 %footer-button-base
-  min-width: 40px
-  min-height: 40px
-  display: inline-block
-  text-indent: -10000px
+  +link-colors($color-text-d4, $color-text-d6)
+  font-size: 40px
 
 .weibo-button
   @extend %footer-button-base
-  background: image-url('weibo.png')
-
-  &:hover
-    background: image-url('weibo-hover.png')
+  @extend .icon-weibo-circle
 
 .weixin-button
   @extend %footer-button-base
-  background: image-url('weixin.png')
+  @extend .icon-weixin-circle
   position: relative
-
-  &:hover
-    background: image-url('weixin-hover.png')
 
 .footer--weixin-qr-code
   position: absolute
@@ -107,4 +99,8 @@
 .contact-section
   text-align: center
 
+.icon-phone-footer, .icon-weibo-circle, .icon-weixin-circle
+  line-height: 1
 
+.icon-phone-footer
+  color: $color-text-d6

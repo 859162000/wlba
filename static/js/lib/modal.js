@@ -11,7 +11,10 @@
       closeClass: '',
       showClose: false,
       modalClass: "modal",
-      spinnerHtml: null
+      spinnerHtml: null,
+      showSpinner: false,
+      fadeDuration: null,
+      fadeDelay: 1.0
     };
   });
 
