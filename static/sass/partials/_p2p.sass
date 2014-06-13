@@ -1,0 +1,200 @@
+.panel-p2p-product
+  @extend .panel-nopadding
+
+  .panel-title-bar
+    line-height: 55px
+    border-bottom: 1px dotted $color-text-d4
+    font-size: $font-m
+    color: $color-text-d2
+    padding: 0 24px
+
+  .panel-content
+    border-bottom: 1px dotted $color-text-d4
+    color: $color-text-d4
+    padding: 15px 24px
+    line-height: 35px
+
+    &:last-child
+      border-bottom: 0
+
+  em
+    color: $color-text-d3
+    font-size: $font-xl
+
+    &.highlight
+      color: $color-primary
+
+  .panel-p2p--footer
+    @extend .panel-content
+
+    padding-top: 0
+    padding-bottom: 0
+
+.progress-container
+  height: 12px
+  border: 1px solid $color-primary
+  width: 110px
+  padding: 1px
+  display: inline-block
+
+  .progress-indicator
+    background: $color-primary
+    height: 100%
+
+.p2p-container
+  +container
+  background: $white
+
+.p2p-detail-container
+  +container
+  color: $gray-text
+  background: $white
+  padding: 20px 30px
+
+  h1
+    font-size: $font-xl
+    padding: 10px 0
+    color: $dark-gray
+
+.p2p-detail-bar
+  padding-bottom: 10px
+  font-size: $font-s
+
+.p2p-detail-title
+  font-size: $font-xxl
+  color: $dark-gray
+
+.p2p-warrant-way
+  color: $color-money-highlight
+  padding-top: 13px
+
+  .icon-shield
+    width: 14px
+    height: 16px
+    background: url("/static/images/icon-top-bar.png") no-repeat left -62px
+    margin-right: 5px
+    margin-left: 10px
+    top: -2px
+
+.p2p-detail-endtime
+  padding-top: 10px
+
+.p2p-detail-content
+  padding: 10px 0
+  text-align: center
+  font-size: $font-s
+
+.p2p-detail-footer
+  font-size: $font-s
+  margin: 10px 0
+  padding: 15px 0
+  border-top: dotted 1px $dark-ddd
+  border-bottom: dotted 1px $dark-ddd
+
+.p2p-detail-intro
+  padding: 10px 0 0 0
+  font-size: $font-s
+  overflow: hidden
+
+  dt
+    float: left
+    width: 70px
+
+  dd
+    float: left
+    width: 598px
+    color: $dark-gray
+
+.p2p-detail-list
+  margin: 10px 0
+  padding-bottom: 20px
+  line-height: 35px
+  border-bottom: dotted 1px $dark-ddd
+
+  &:last-child
+    border-bottom: 0
+
+  dl
+    float: left
+    width: 90px
+    font-size: $font-s
+    text-align: right
+    color: #999999
+
+  ul
+    float: left
+    width: 540px
+    font-size: $font-s
+    margin-left: 30px
+    color: #999999
+
+  ul.p2p-no-login
+    background: #f0f4f7
+    height: 160px
+    margin-top: 10px
+    text-align: center
+
+    li
+      padding-top: 60px
+
+.invest-form
+  padding: 20px 30px
+  background: #fafafa
+  height: 320px
+  font-size: $font-s
+  color: $gray-text
+  line-height: 40px
+
+  h1
+    font-size: $font-xl
+    padding-bottom: 10px
+    color: $dark-gray
+
+  .span4
+    text-align: right
+    padding-right: 15px
+
+  button
+    font-size: $font-m
+
+.sold-out
+  padding-top: 50px
+  line-height: 25px
+
+  button
+    width: 200px
+    margin: 0 auto
+
+.guarantee-company
+  border-bottom: solid 1px $dark-ddd
+
+  table
+    border: solid 1px $dark-ddd
+    border-right: 0
+    margin: 0 auto
+    width: 100%
+
+    caption
+      border: solid 1px $dark-ddd
+      border-bottom: 0
+      text-align: center
+      font-size: $font-l
+      padding: 5px 0
+      color: $dark-gray
+
+    td
+      border-bottom: solid 1px $dark-ddd
+      border-right: solid 1px $dark-ddd
+      padding: 5px 0
+      font-size: $font-s
+      text-align: center
+
+    span
+      color: $color-money-highlight
+
+  .icon-approve
+    width: 12px
+    height: 12px
+    background: url("/static/images/icon-top-bar.png") no-repeat left -85px
+    margin-right: 5px
+    top: -2px

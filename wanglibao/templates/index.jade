@@ -1,4 +1,5 @@
 -load formatters
+-load mathfilters
 
 doctype html
 html
@@ -17,104 +18,135 @@ html
 
     .full-container-home.clearfix
       .home-banner-1
-      .home-banner-3
+      .home-banner-2
       ul.background-anchors
         li
           a.background-anchor.active(href="#") x
         li
           a.background-anchor(href="#") x
       .container-home
-        .portfolio-container
-          table
-            thead.portfolio-thead
-              tr
-                td(colspan='2', style='text-align: left') 我的理财方案
-            tbody
-              tr
-                td 投资金额：
-                td
-                  .portfolio-td-last
-                    input.portfolio-input#portfolio-asset(type='text' value='30')
-                    span 万元
-              tr
-                td 投资期限：
-                td
-                  .portfolio-td-last
-                    input.portfolio-input#portfolio-period(type='text' value='3')
-                    span 个月
-              tr
-                td(colspan='2')
-                  .portfolio-td-last
-                    button.portfolio-submit(type='submit') 定制方案
+        .banner-form
+          h1.banner-form--title 网利宝年化收益率
+          p.banner-form--row 最高 <em class="highlight">13.24%</em>
+          p.banner-form--row <span class="highlight">30</span>倍活期存款收益<span class="highlight">24</span>倍定期存款收益
+          a.banner-form--button.full-width.register-modal(href="#login-modal") 免费注册
+          p.align-right
+            span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
+
+    .full-container-white
+      .sales-data-container
+        .row.align-center
+          span 第三方担保，<em class="highlight">100元</em>起投，投标次日计息。
+          span 每工作日 <em>10:30、14:30、20:00</em> 更新总额度。
+        .row
+          .span4
+            span 投资人总收益：
+            em 46,271,471.00
+          .span4
+            span 累计交易额：
+            em 46,271,471.00
+          .span4-omega
+            span 年化收益率：
+            em.highlight 10%-15%
+    .container
+      .row
+        .span9
+          for product in p2p_products
+            .panel-p2p-product
+              .panel-title-bar
+                a(href="/p2p/detail/{{product.id}}") {{product.name}}
+              .panel-content
+                .row
+                  .span3
+                    p
+                      em {{product.total_amount | money_format}}
+                    p 融资金额(元)
+                  .span2
+                    p
+                      em {{product.period}}个月
+                    p 还款期限
+                  .span2
+                    p
+                      em.highlight {{product.expected_earning_rate | percentage}}
+                    p 年化收益
+                  .span2
+                    p
+                      amount = product.total_amount - product.ordered_amount
+                      em {{amount | money_format}}
+                    p 可投资金额(元)
+                  .span3-omega.align-right
+                    p
+                      if product.status == '正在招标'
+                        a.button-primary(href="#") 正在招标
+                      else
+                        a.button-disabled(href="javascript:void(0)", disabled) {{product.status}}
+                    p 剩余时间：{{product.end_time | timedelta_now }}
+              .panel-p2p--footer
+                .row
+                  .span4
+                    span 进度：
+                    .progress-container
+                      percent = float(product.ordered_amount) / product.total_amount * 100
+                      .progress-indicator(style="width:{{percent | percentage}}")
+                    span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                  .span3.align-right
+                    span 担保机构: &nbsp;&nbsp;
+                    span {{product.warrant_company.name}}
+                  .span3-omega.align-right
+                    span 还款方式: &nbsp;&nbsp;
+                    span {{product.pay_method}}
+
+          a(href="#") 点击查看更多 >>
+
+        .span3-omega
+          .panel-nopadding
+            .panel-title-bar__no-border
+              .panel-title 媒体报道
+            .panel-content-container.padding-l-r-s
+
+          .panel-nopadding
+            .panel-title-bar__no-border
+             .panel-title 投资记录
+            .panel-content-container.padding-l-r-s
+              table.invest-history-table
+                thead
+                  tr
+                    th 申购时间
+                    th 投资人
+                    th 金额
+                tbody
+                  mixin invest-entry(date, time, user, money)
+                    tr
+                      td
+                        p=date
+                        p=time
+                      td
+                        em=user
+                      td
+                        span.money-highlight=money
+                        span 元
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+
+    script(src="/static/js/require.js", data-main="/static/js/index")
 
     .space-vertical-m
-
-    include include/hot_funds
-
-    .space-vertical-m
-
-    .container.hot-list.clearfix
-      .hot-list-picture-title
-        img(src="/static/images/home_trustfund.jpg", alt="信托产品")
-      .hot-list-container
-        .hot-list-content.trust-hot-list-content
-          first_item = hot_trusts[0].trust
-          .hot-item-highlight
-            .hot-item-highlight-icon
-            h1.hot-item-title
-              a.hot-item-title-link(href="/trust/detail/{{first_item.id}}", target="_blank") {{first_item.short_name}}
-            .hot-item-list.clearfix.hot-trust-info-container.lh-m
-              dl
-                dt 投资收益
-                dd
-                  span.hot-list-num-l {{first_item.expected_earning_rate | percentage}}
-                dd
-                  a.order-button.button.button-middle.button-red.button-l(href="#order-form", data-trust-id="{{first_item.id}}", data-trust-name="{{first_item.short_name}}") 立即预约
-
-              ul
-                li
-                  产品期限：
-                  span.dark-gray {{first_item.period | month}}
-                li
-                  起购金额：
-                  span.dark-gray {{first_item.investment_threshold | money_to_10k}}
-                li
-                  投资行业：
-                  span.dark-gray {{first_item.usage}}
-                li
-                  付息方式：
-                  span.dark-gray {{first_item.interest_method}}
-                li.no-border-bottom
-                  信托公司：
-                  span.dark-gray {{first_item.issuer.name}}
-
-            .hot-item-comments
-              点 评：{{first_item.brief}}
-
-          - for index in 1|get_range:3
-            item = hot_trusts[index].trust
-            .hot-item-normal
-              h1.hot-item-title
-                a.hot-item-title-link(href="/trust/detail/{{item.id}}", target="_blank") {{item.short_name}}
-              .hot-item-list.clearfix
-                dl.hot-trust-info-container.lh-xs
-                  dd 投资收益
-                  dd.font-m
-                    span.hot-list-num-m {{item.expected_earning_rate | percentage}}
-                  dd 产品期限：
-                    span.dark-gray {{item.period | month}}
-                  dd 付息方式：
-                    span.dark-gray {{item.interest_method}}
-                  dd
-                    a.order-button.button.button-middle.button-red.button-m(href="#order-form", data-trust-id="{{item.id}}", data-trust-name="{{item.short_name}}") 立即预约
-
-              .hot-item-comments 点 评：{{item.brief}}
-
-        .buy_process
-          img(src="/static/images/home_trustfund_icon.jpg", alt="信托基金购买流程")
-
-    .space-vertical-m
-
+    .full-container
+      div(style="background:url('/static/images/footer-banner.jpg') no-repeat center; height:240px")
     - with 1 as no_margin
     include include/footer
     - endwith
@@ -134,7 +166,5 @@ html
             预约成功后，我们将在第一时间联系您<br/>或直接拨打
             span.highlight 400-8588-066
 
-    script.
-      require(['/static/js/index.js'])
 
     include include/tracking

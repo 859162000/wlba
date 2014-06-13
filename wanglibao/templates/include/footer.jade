@@ -34,14 +34,14 @@ mixin innerFooter()
           span 362121062
 
       dl.footer-section.contact-section
-        img(src="/static/images/icon-phone.png")
+        .icon-phone-footer.font-xxxl
         .footer--phone 4008-588-066
         p 客服热线 9:00 - 21:00
 
         .space-vertical-s
-        a.weibo-button(href="http://weibo.com/u/5000682691", target="_blank") 微博
+        a.weibo-button(href="http://weibo.com/u/5000682691", target="_blank")
         .space-s
-        a.weixin-button(href="javascript:void(0)", data-role="hover", data-target="#qrcode") 微信
+        a.weixin-button(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
           img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none")
 
   .footer-line
@@ -76,7 +76,7 @@ mixin innerFooter()
             a.forgot-password(href='{% url "password_reset" %}') 忘记密码？
         .space-vertical-s
 
-      form#register-modal-form.login-form(method='post', action='/accounts/register?next={{ next }}', style='display:none')
+      form#register-modal-form.login-form(method='post', action='/accounts/register?next={{ next }}')
         - csrf_token
         .form-row
           input#reg_identifier.full-width(type="text", name="identifier", placeholder="请输入手机号")
@@ -99,7 +99,7 @@ mixin innerFooter()
           button#register_submit.span12.button-red.button-middle(type='submit') 注 册
           .agreement.clearfix
             label(for="agreement")
-              input(type="checkbox", name="agreement", id="agreement")
+              input(type="checkbox", name="agreement", checked="checked", id="agreement")
               | 我同意《网利宝注册协议》
         .space-vertical-s
 
@@ -111,7 +111,5 @@ else
   .footer
     +innerFooter()
 
-
-
 script.
-  require(['/static/js/hover.js','/static/js/footer.js'])
+  require(['/static/js/hover.js','/static/js/login_modal.js'])

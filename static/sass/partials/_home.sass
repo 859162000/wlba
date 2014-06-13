@@ -2,9 +2,11 @@
   @extend .full-container
   position: relative
 
+$home-banner-height: image-height('home0.jpg')
+
 .home-banner
   $file: 'home0.jpg'
-  height: image-height($file)
+  height: $home-banner-height
   background-position: center
   background-repeat: no-repeat
   position: absolute
@@ -14,76 +16,66 @@
 
 .home-banner-1
   @extend .home-banner
-  background-image: url('http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/home0.jpg')
+  background-image: url('/static/images/home0.jpg')
   display: block
 
 .home-banner-2
   @extend .home-banner
-  background-image: url('http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/home1.jpg')
-  cursor: pointer
-
-.home-banner-3
-  @extend .home-banner
-  background-image: url('http://wanglibao.oss-cn-hangzhou.aliyuncs.com/images/home2.jpg')
+  background-image: url('/static/images/home1.jpg')
 
 .full-container-white
   @extend .full-container
   background-color: white
-
+  border-bottom: solid 1px $dark-ddd
 
 .container-home
   @extend .container
-  height: 320px
+  height: $home-banner-height
 
-.portfolio-container
+.banner-form
   @extend .pie-element
   position: relative
   float: right
-  margin-top: 20px
+  margin-top: 60px
   background: #8B867F
-  background: rgba(#8B867F, .7)
-  padding: 10px 20px 20px 20px
-  font-size: $font-s
+  background: rgba(80, 80, 80, .7)
+  padding: 30px
+  font-size: $font-m
   color: white
   z-index: 11
+  height: 265px
 
-  span
-    position: absolute
-    color: $dark-gray
-    right: 25px
-    top: 5px
-    font-size: $font-s
+  em
+    font-size: $font-xxxl
 
-  td
-    padding: 10px 0
-    text-align: right
+  a.login-button
+    +link-colors($color-text-d5, $color-primary)
+    text-decoration: underline
 
-.portfolio-input
-  border: 1px
-  width: 190px
-  border-radius: 3px
-  font-size: $font-s
-  background-color: white
+.banner-form--title
+  font-size: $font-l
 
-.portfolio-thead
-  font-size: $font-xl
-  color: white
-  border-bottom: 1px dashed black
+.banner-form--row
+  margin-bottom: 10px
 
-.portfolio-td-last
-  padding-right: 20px
-  position: relative
+.banner-form--button
+  @extend .button-primary
+  margin-bottom: 10px
 
-.portfolio-submit
-  width: 94%
-  background-color: $red
-  border: 0
-  color: white
-  padding: 7px
-  border-radius: 2px
+.sales-data-container
+  @extend .container
+  padding-top: 30px
+  padding-bottom: 30px
+  line-height: 30px
+  font-size: $font-m
+  color: $color-text-d4
 
-  &:hover
-    cursor: pointer
+  em
+    font-size: $font-xl
+    color: $color-text-d3
+
+    &.highlight
+      color: $color-primary
 
 .container-card-holder
   width: $content-width
@@ -103,8 +95,6 @@
   padding-right: 5px
   padding-bottom: 30px
 
-
-//new style
 .hot-list
   height: $hot-list-height
   background-color: $white
@@ -256,3 +246,28 @@ a.hot-item-title-link
 .hot-item-list-title
   position: relative
   top: 5px
+
+.invest-history-table
+  table-layout: fixed
+  width: 100%
+  color: $color-text-d4
+
+  thead
+    background: #ECF1F5
+    line-height: 25px
+
+  td, th
+    text-align: center
+
+  tbody tr
+    border-bottom: 1px solid lightgray
+    height: 60px
+
+    em
+      color: $color-text-d2
+
+    .money-highlight
+      color: $color-money-highlight
+
+    &:last-child
+      border-bottom: 0

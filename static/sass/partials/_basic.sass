@@ -79,7 +79,7 @@ select
       color: $red
 
 .highlight
-  color: $red
+  color: $color-primary
 
 .txt-info
   color: #999999
@@ -185,6 +185,14 @@ input
 .padding-l-r-2em
   padding-left: 2em !important
   padding-right: 2em !important
+
+.padding-l-r-s
+  padding-left: $space-s !important
+  padding-right: $space-s !important
+
+.padding-l-r-m
+  padding-left: $space-m !important
+  padding-right: $space-m !important
 
 .padding-t-d-2em
   padding-top: 2em
@@ -296,5 +304,24 @@ a.red-link
 .bold
   font-weight: bold
 
+.blue,
 a.blue
   +link-colors($blue)
+
+.border-all
+  border: solid 1px $dark-ddd
+
+.border-left
+  border-left: solid 1px $dark-ddd
+
+.border-right
+  border-right: solid 1px $dark-ddd
+
+.border-top
+  border-top: solid 1px $dark-ddd
+
+.border-bottom
+  border-bottom: solid 1px $dark-ddd
+
+.border-none
+  border: 0

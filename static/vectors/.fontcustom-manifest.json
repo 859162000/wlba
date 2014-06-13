@@ -1,0 +1,71 @@
+{
+  "checksum": {
+    "previous": "0321f299a3a5c1533224bbee1842a134291e8fbe97ef805c897ed25473c6a8f9",
+    "current": "0321f299a3a5c1533224bbee1842a134291e8fbe97ef805c897ed25473c6a8f9"
+  },
+  "fonts": [
+    "../stylesheets/fonts//fontcustom_0321f299a3a5c1533224bbee1842a134.ttf",
+    "../stylesheets/fonts//fontcustom_0321f299a3a5c1533224bbee1842a134.svg",
+    "../stylesheets/fonts//fontcustom_0321f299a3a5c1533224bbee1842a134.woff",
+    "../stylesheets/fonts//fontcustom_0321f299a3a5c1533224bbee1842a134.eot"
+  ],
+  "glyphs": {
+    "phone": {
+      "codepoint": 61700,
+      "source": "vectors/phone.svg"
+    },
+    "phone-footer": {
+      "codepoint": 61707,
+      "source": "vectors/phone-footer.svg"
+    },
+    "star": {
+      "codepoint": 61705,
+      "source": "vectors/star.svg"
+    },
+    "weibo": {
+      "codepoint": 61701,
+      "source": "vectors/weibo.svg"
+    },
+    "weibo-circle": {
+      "codepoint": 61702,
+      "source": "vectors/weibo-circle.svg"
+    },
+    "weixin": {
+      "codepoint": 61703,
+      "source": "vectors/weixin.svg"
+    },
+    "weixin-circle": {
+      "codepoint": 61704,
+      "source": "vectors/weixin-circle.svg"
+    }
+  },
+  "options": {
+    "autowidth": false,
+    "config": "fontcustom.yml",
+    "css_selector": ".icon-{{glyph}}",
+    "debug": false,
+    "font_name": "fontcustom",
+    "force": false,
+    "input": {
+      "templates": "vectors",
+      "vectors": "vectors"
+    },
+    "no_hash": false,
+    "output": {
+      "css": "../stylesheets/fonts/",
+      "fonts": "../stylesheets/fonts/",
+      "preview": "assets/styleguide",
+      "scss": "../sass/partials/"
+    },
+    "preprocessor_path": "",
+    "quiet": false,
+    "templates": [
+      "scss",
+      "preview"
+    ]
+  },
+  "templates": [
+    "../stylesheets/fonts/_fontcustom.scss",
+    "assets/styleguide/fontcustom-preview.html"
+  ]
+}

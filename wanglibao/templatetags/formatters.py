@@ -1,6 +1,7 @@
 # coding=UTF-8
 
 from django import template
+from django.utils import timezone
 
 register = template.Library()
 
@@ -32,6 +33,21 @@ def money_f_2(value):
     Convert the number into xx.xx
     """
     return u'%.2f' % value
+
+@register.filter
+def money_format(value):
+    components = str(value).split('.')
+    if len(components) > 1:
+        left, right = components
+        right = '.' + right
+    else:
+        left, right = components[0], ''
+
+    result = ''
+    while left:
+        result = left[-3:] + ',' + result
+        left = left[:-3]
+    return result.strip(',') + right
 
 @register.filter
 def month(value):
@@ -144,3 +160,11 @@ def get_range(start, end):
 @register.filter()
 def buy_fund_url(code):
     return '/shumi/oauth/check_oauth_status/?fund_code='+ code + '&action=purchase'
+
+@register.filter
+def timedelta_now(time):
+    time_delta = time - timezone.now()
+    hours, seconds = divmod(time_delta.seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    hours += time_delta.days * 24
+    return "%d:%02d:%02d" % (hours, minutes, seconds)
