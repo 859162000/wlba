@@ -38,13 +38,21 @@ class P2PProduct(ProductBase):
     publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间')
     end_time = models.DateTimeField(default=timezone.now, verbose_name=u'终止时间')
 
-    type = models.CharField(max_length=32, verbose_name=u'产品类型')
     limit_per_user = models.FloatField(verbose_name=u'单用户购买限额', default=0.2)
 
     warrant_company = models.ForeignKey(WarrantCompany)
 
     def __unicode__(self):
         return u'%s %f' % (self.name, self.expected_earning_rate)
+
+    @property
+    def remain(self):
+        return self.total_amount - self.ordered_amount
+
+    def has_amount(self, amount):
+        if amount >= self.remain:
+            return True
+        return False
 
 
 class Warrant(models.Model):
@@ -64,7 +72,7 @@ class TradeRecordType(models.Model):
 
 
 class TradeRecord(models.Model):
-    type = models.ForeignKey(TradeRecordType, help_text=u'流水类型')
+    catalog = models.ForeignKey(TradeRecordType, help_text=u'流水类型')
     serial_number = models.IntegerField(verbose_name=u'序列号')
     amount = models.DecimalField(verbose_name=u'发生数', max_digits=20, decimal_places=2)
 
@@ -74,14 +82,14 @@ class TradeRecord(models.Model):
 
     user = models.ForeignKey(user_model)
     user_balance_before = models.DecimalField(verbose_name=u'用户前余额', help_text=u'该笔流水发生前用户余额', max_digits=20,
-                                              decimal_places=3)
+                                              decimal_places=2)
     user_balance_after = models.DecimalField(verbose_name=u'用户后余额', help_text=u'该笔流水发生后用户余额', max_digits=20,
-                                             decimal_places=3)
+                                             decimal_places=2)
 
     cancelable = models.BooleanField(verbose_name=u'可撤单', default=False)
 
-    operation_ip = models.IPAddressField(verbose_name=u'流水ip')
-    operation_request_headers = models.TextField(verbose_name=u'流水请求信息', max_length=1000,
+    operation_ip = models.IPAddressField(verbose_name=u'流水ip', default='')
+    operation_request_headers = models.TextField(verbose_name=u'流水请求信息', max_length=1000, default='',
                                                  help_text=u'存储流水产生时request headers信息')
 
     create_time = models.DateTimeField(verbose_name=u'发生时间', auto_now_add=True)

@@ -29,7 +29,9 @@ class ProductRestriction(RestrictionException):
     ErrorMessage = {
         '200000': u'不是合法的产品对象',
         '200001': u'产品售罄',
-        '200002': u'产品已停售',
+        '200002': u'产品售罄',
+        '200003': u'找不到产品对象',
+        '200004': u'只能申购整数份额的产品'
     }
     __error__ = 'ProductRestriction'
 
