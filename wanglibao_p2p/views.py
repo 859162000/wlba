@@ -1,3 +1,4 @@
-from django.shortcuts import render
+from django.views.generic import TemplateView
 
-# Create your views here.
+class p2pDetailView(TemplateView):
+    template_name = "p2p_detail.jade"

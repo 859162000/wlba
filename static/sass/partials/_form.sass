@@ -11,15 +11,20 @@ $row-height: 40px
   border: 1px solid $border-color
 
 .login-form
-  width: 250px
+  width: 350px
   background: $form-background-color
   margin: 0 auto
 
   input
-    height: 35px
+    height: 45px
+    font-size: $font-m
+
+  label
+    line-height: 30px
 
   button
-    height: 35px
+    height: 45px
+    font-size: $font-xl
 
 .form-title
   color: $red
@@ -32,7 +37,7 @@ $row-height: 40px
   vertical-align: middle
 
 .form-row
-  margin-top: $space-s
+  //margin-top: $space-s
   overflow: visible
   text-align: left
   position: relative
@@ -87,8 +92,8 @@ $row-height: 40px
 
 .password-strength-container
   position: absolute
-  left: 103%
-  top: 25%
+  left: 70%
+  top: 23%
   height: 10px
   width: 160px
 
@@ -122,4 +127,57 @@ $row-height: 40px
   vertical-align: middle
 
 input.captcha
-  width: 100px
+  width: 160px
+  margin-right: 10px
+
+.captcha-img
+  width: 140px
+  height: 45px
+
+.refresh-button
+  cursor: pointer
+  width: 33px
+  height: 43px
+  border: 0
+  background: url("/static/images/refresh.png") no-repeat
+  position: relative
+  top: 5px
+
+.login-modal-tab
+  font-size: $font-l
+  border-bottom: solid 1px #cccccc
+  margin: 10px 30px 20px 30px
+  padding: 0 32px
+  height: 45px
+
+  li
+    float: left
+    position: relative
+    background: $white
+    width: 175px
+    height: 45px
+    line-height: 45px
+    text-align: center
+    bottom: 1px
+    overflow: hidden
+    cursor: pointer
+
+  li.active
+    color: $red
+    border: solid 1px #cccccc
+    border-bottom: solid 1px #ffffff
+    bottom: -1px
+    border-radius: 3px 3px 0 0
+
+.remember-me,
+.agreement
+  font-size: $font-s
+  color: $dark-gray
+  text-align: center
+  line-height: normal
+  clear: both
+  padding-top: 15px
+  margin: 0 auto
+
+  input
+    height: 16px

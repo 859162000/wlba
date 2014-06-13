@@ -34,7 +34,7 @@ output:
 
 
 # --------------------------------------------------------------------------- #
-# Templates
+# templates
 #   Included in Font Custom: preview, css, scss, scss-rails
 #   Custom templates should be saved in the INPUT[:templates] directory and
 #   referenced by their baserame.
