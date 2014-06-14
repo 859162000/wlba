@@ -20,6 +20,7 @@ urlpatterns = patterns(
     url(r'^setting/', login_required(TemplateView.as_view(template_name='account_setting.jade'),
                                      login_url='/accounts/register/')),
 
+    url(r'^login/ajax/', 'wanglibao_account.views.ajax_login'),
     url(r'^login/', 'django.contrib.auth.views.login',
         {
             "template_name": "login.jade",
