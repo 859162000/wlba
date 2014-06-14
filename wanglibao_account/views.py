@@ -384,7 +384,7 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
     def messenger(message, user=None):
         res = dict()
         if user:
-            res['nick_name'] = user.nick_name
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
         res['message'] = message
         return json.dumps(res)
 
@@ -393,7 +393,7 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
             form = authentication_form(request, data=request.POST)
             if form.is_valid():
                 auth_login(request, form.get_user())
-                return HttpResponse(messenger('done'))
+                return HttpResponse(messenger('done', user=request.user))
             else:
                 return HttpResponseForbidden(messenger(form.errors))
         else:
