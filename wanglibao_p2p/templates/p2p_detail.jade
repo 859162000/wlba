@@ -26,37 +26,38 @@ html
                 span.p2p-warrant-way
                   span.icon-check-shield
                   | 100%本息担保
-              .span4-omega.p2p-detail-endtime.align-right 剩余时间：00:00:00
+              .span4-omega.p2p-detail-endtime.align-right 剩余时间：{{p2p.end_time | timedelta_now }}
           .p2p-detail-content.clearfix
             .row
               .span4
-                p.dark-gray.font-xxl 1,000,000
+                p.dark-gray.font-xxl {{p2p.total_amount | money_format}}
                 p 投资金额（元）
               .span5
                 p.dark-gray
-                  span.font-xxl 12
+                  span.font-xxl {{p2p.period}}
                   span.font-xl 个月
                 p 还款期限
               .span3-omega
                 p.highlight
-                  span.font-xxl 15
+                  span.font-xxl {{p2p.expected_earning_rate}}
                   span.font-xl %
                 p 年化收益
           .p2p-detail-footer
             .row
               .span8
                 |还款方式：
-                span.dark-gray 按月还款/等额本息
+                span.dark-gray {{p2p.pay_method}}
               .span4-omega
                 span 进度：
                   .progress-container
-                    .progress-indicator(style="width:80px")
-                span.highlight &nbsp;&nbsp; 80%
+                    percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                    .progress-indicator(style="width:{{percent | percentage}}")
+                  span.highlight &nbsp;&nbsp; {{percent | percentage}}
 
           dl.p2p-detail-intro.clearfix
             dt 项目用途：
             dd
-              | 客户在石家庄市经营一家砖厂多年，收入稳定，本借款用于资金周转。本借款于2014年6月10日通过中安信业初审并被推荐到网利宝；中安信业提供全额本息担保。
+              | {{p2p.short_usage}}
               a.blue(href="") [详情]
 
         .span4-omega.invest-form.border-left
@@ -65,7 +66,7 @@ html
             .row
               span.span4 可投资金额
               span.span8-omega
-                span.dark-gray.font-m 42,400
+                span.dark-gray.font-m {{p2p.remain | money_format}}
                 | 元
             .row
               span.span4 投资金额
@@ -98,52 +99,24 @@ html
     .full-container-home.clearfix
       .p2p-container
         .span8.p2p-detail-container
-          .p2p-detail-list.clearfix
-            h1 个人信息
-            dl
-              dd 用户ID
-              dd 性别
-              dd 年龄
-              dd 学历
-              dd 婚姻状况
-              dd 子女状况
-              dd 户籍城市
-            ul
-              li 100001
-              li 男
-              li 36
-              li 本科
-              li 已婚
-              li 有
-              li 河北石家庄
-          .p2p-detail-list.clearfix
-            h1 个人资产及征信信息
-            dl
-              dd 收入水平
-              dd 房产
-              dd 车产
-              dd 其他信用贷款
-              dd 未销户信用卡
-            ul.p2p-no-login
-              li
-                | 只有
-                span.blue 注册用户
-                |才能看到，现在
-                a.login-modal.blue(href="#login-modal") 登陆
-          .p2p-detail-list.clearfix
-            h1 个人资产及征信信息
-            dl
-              dd 工作城市
-              dd 公司工作时间
-              dd 公司行业
-              dd 公司性质
-              dd 岗位
-            ul.p2p-no-login
-              li
-                | 只有
-                span.blue 注册用户
-                |才能看到，现在
-                a.login-modal.blue(href="#login-modal") 登陆
+          r = p2p.extra_data.items()
+          for section_name, section_values in r
+            .p2p-detail-list.clearfix
+              h1 {{section_name}}
+              dl
+                for item_name, item_value in section_values
+                  dd {{item_name}}
+              if user.is_authenticated
+                ul
+                  for item_name, item_value in section_values
+                    li {{item_value}}
+              else
+                ul.p2p-no-login
+                  li
+                    | 只有
+                    span.blue 注册用户
+                    |才能看到，现在
+                    a.login-modal.blue(href="#login-modal") 登陆
         .span4-omega.border-left.clearfix
           .p2p-detail-container.guarantee-company
             h1 担保机构

@@ -41,6 +41,8 @@ class P2PProduct(ProductBase):
     limit_per_user = models.FloatField(verbose_name=u'单用户购买限额', default=0.2)
 
     warrant_company = models.ForeignKey(WarrantCompany)
+    usage = models.TextField(blank=True, verbose_name=u'项目用途')
+    short_usage = models.TextField(blank=True, verbose_name=u'项目用途摘要')
 
     def __unicode__(self):
         return u'%s %f' % (self.name, self.expected_earning_rate)
