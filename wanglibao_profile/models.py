@@ -13,6 +13,7 @@ class WanglibaoUserProfile(models.Model):
 
     name = models.CharField(max_length=12, blank=True, help_text=u'姓名')
     id_number = models.CharField(max_length=64, blank=True, help_text=u'身份证号', db_index=True)
+    id_is_valid = models.BooleanField(help_text=u'身份证是否通过验证', default=False)
 
     shumi_request_token = models.CharField(max_length=64, blank=True, help_text=u'数米基金request token')
     shumi_request_token_secret = models.CharField(max_length=64, blank=True, help_text=u'数米基金request token secret')

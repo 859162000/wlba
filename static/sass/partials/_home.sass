@@ -26,6 +26,7 @@ $home-banner-height: image-height('home0.jpg')
 .full-container-white
   @extend .full-container
   background-color: white
+  border-bottom: solid 1px $dark-ddd
 
 .container-home
   @extend .container
@@ -267,3 +268,6 @@ a.hot-item-title-link
 
     .money-highlight
       color: $color-money-highlight
+
+    &:last-child
+      border-bottom: 0
