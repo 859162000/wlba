@@ -5,9 +5,8 @@ include include/head
 body
   include include/header
 
-  - with '信托产品' as activeItem
-  include include/navigation
-  - endwith
+  -with '信托' as activeItem
+    include include/navigation
 
   .sub-navbar
     .sub-navbar--list

@@ -53,8 +53,7 @@ mixin innerFooter()
       ul.login-modal-tab
         li#tab-login.active 用户登录
         li#tab-register 用户注册
-      form#login-modal-form.login-form(method='post', action='/accounts/login/ajax/')
-        - csrf_token
+      form#login-modal-form.login-form(method='POST', action='/accounts/login/ajax/')
         .form-row
           input#login_identifier.full-width(type="text", name="identifier", placeholder="请输入手机号")
           .errMessage
@@ -70,14 +69,10 @@ mixin innerFooter()
         .form-row.form-bottom-bar
           button#login_submit.span12.button-red.button-middle(type='submit') 登 录
           .remember-me
-            label(for="remember_me")
-              input(type="checkbox", name="remember_me", id="remember_me")
-              | 记住我
             a.forgot-password(href='{% url "password_reset" %}') 忘记密码？
         .space-vertical-s
 
       form#register-modal-form.login-form(method='post', action='/accounts/register?next={{ next }}')
-        - csrf_token
         .form-row
           input#reg_identifier.full-width(type="text", name="identifier", placeholder="请输入手机号")
           .errMessage

@@ -46,25 +46,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
         error.appendTo(element.next('.errMessage'))
 
     submitHandler: (form) ->
-      $.ajax(
+      $.ajax
         url: $('#login-modal-form').attr('action')
         type: "POST"
-        beforeSend: (XMLHttpRequest) ->
-          XMLHttpRequest.setRequestHeader("X-Requested-With","XMLHttpRequest")
         data: $("#login-modal-form").serialize()
-        dataType: "json"
-      )
       .done (data,textStatus) ->
-        $('#user-info-ajax').html(
-          '<a href="/accounts/home">'
-          + data.nick_name +
-          ' 的个人中心</a> <a class="logout" href="/accounts/logout">退出</a>'
-        )
-        $('#login_identifier').val ''
-        $('#login_password').val ''
-        $.modal.close()
+        location.reload()
       .fail (xhr)->
-        #if xhr.status == '4xx'
         alert('登录失败，请重新登录')
 
   $('#register-modal-form').validate

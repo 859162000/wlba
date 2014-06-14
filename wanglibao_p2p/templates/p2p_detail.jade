@@ -121,25 +121,18 @@ html
           .p2p-detail-container.guarantee-company
             h1 担保机构
             table
-              caption 中安信业
+              caption {{p2p.warrant_company.name}}
               tbody
+                warrants = p2p.warrant_set.all()
                 tr
-                  td 身份证
-                  td 信用报告
-                  td 收入证明
+                  for warrant in warrants
+                    td {{warrant.name}}
                 tr
-                  td
-                    span
-                      span.icon.icon-approve
-                      | 已认证
-                  td
-                    span
-                      span.icon.icon-approve
-                      | 已认证
-                  td
-                    span
-                      span.icon.icon-approve
-                      | 已认证
+                  for warrant in warrants
+                    td
+                      span
+                        span.icon.icon-approve
+                        | 已认证
           .clearfix
             .p2p-detail-container
               h1 投资记录

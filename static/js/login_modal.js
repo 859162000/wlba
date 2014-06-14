@@ -61,16 +61,9 @@
         return $.ajax({
           url: $('#login-modal-form').attr('action'),
           type: "POST",
-          beforeSend: function(XMLHttpRequest) {
-            return XMLHttpRequest.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-          },
-          data: $("#login-modal-form").serialize(),
-          dataType: "json"
+          data: $("#login-modal-form").serialize()
         }).done(function(data, textStatus) {
-          $('#user-info-ajax').html('<a href="/accounts/home">', +data.nick_name + ' 的个人中心</a> <a class="logout" href="/accounts/logout">退出</a>');
-          $('#login_identifier').val('');
-          $('#login_password').val('');
-          return $.modal.close();
+          return location.reload();
         }).fail(function(xhr) {
           return alert('登录失败，请重新登录');
         });
