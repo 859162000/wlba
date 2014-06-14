@@ -1,11 +1,13 @@
 # encoding: utf-8
+from decimal import Decimal
 from collections import OrderedDict
 import random
 import datetime
 from django.utils import timezone
-
-from models import P2PProduct, Warrant, WarrantCompany
-
+from django.contrib.auth import get_user_model
+from models import P2PProduct, Warrant, WarrantCompany, UserEquity, UserMargin, TradeRecord, TradeRecordType
+from trade import P2PTrader
+from exceptions import RestrictionException
 
 class MockGenerator(object):
 
@@ -19,10 +21,12 @@ class MockGenerator(object):
                 warrant_company.delete()
 
         for index in range(0, 20):
+            # generate warrant company
             warrant_company = WarrantCompany()
             warrant_company.name = u'担保公司 %d' % index
             warrant_company.save()
 
+            # generate p2p products
             for index in range(0, 3):
                 p2p = P2PProduct()
 
@@ -67,8 +71,6 @@ class MockGenerator(object):
                 p2p.period = random.randrange(0, 48)
 
                 p2p.brief = u'难得一见的现金类理财产品 快抢'
-                p2p.usage = u'客户在石家庄市经营一家砖厂多年，收入稳定，本借款用于资金周转。本借款于2014年6月10日通过中安信业初审并被推荐到网利宝；中安信业提供全额本息担保。'
-                p2p.short_usage = u'客户在石家庄市经营一家砖厂多年，收入稳定，本借款用于资金周转。本借款于2014年6月10日通过中安信业初审并被推荐到网利宝；中安信业提供全额本息担保。'
 
                 p2p.save()
 
@@ -77,3 +79,38 @@ class MockGenerator(object):
                     w.name = name
                     w.product = p2p
                     w.save()
+
+    @classmethod
+    def generate_trade(cls, clean=False):
+        if clean:
+            for equity in UserEquity.objects.all():
+                equity.delete()
+
+            for margin in UserMargin.objects.all():
+                margin.delete()
+
+            for record in TradeRecord.objects.all():
+                record.delete()
+
+            for catalog in TradeRecordType.objects.all():
+                catalog.delete()
+
+        users = get_user_model().objects.all()
+        products = P2PProduct.objects.all()
+
+        # generate user margin
+        for user in users:
+            margin, _ = UserMargin.objects.get_or_create(user=user)
+            margin.margin += Decimal(random.randrange(100000, 10000000))
+            margin.save()
+
+        # generate pseudo transaction.
+        for user in users:
+            for _ in range(random.randrange(10, 1000)):
+                rn = random.randrange(0, len(products))
+                trader = P2PTrader(products[rn], user)
+                try:
+                    trader.purchase(random.randrange(0, 10000))
+                except RestrictionException, e:
+                    print(u'模拟购买失败原因: %s' % e)
+                    continue
