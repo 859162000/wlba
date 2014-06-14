@@ -1,9 +1,8 @@
 - load formatters
 - load mathfilters
-- load widget_tweaks
 
 doctype html
-- with '支付' as title
+- with '充值' as title
 include include/head
 - endwith
 body
@@ -11,22 +10,87 @@ body
   - with '首页' as activeItem
   include include/navigation
   - endwith
-  .pay-container
-    .row
-      .pull-left 充值
-      .pull-right << 返回上级
+  .panel-nopadding
+    .well
+      .panel-title-bar__no-border
+        .panel-title 账户充值
+      .panel-content.padding-l-r-s
+        .row
+          form.payform(action="{{form.url}}", method='post')
+            .form-group
+              .span1
+                label 充值金额
+              .span11-omega
+                input#amount(type='text', name='amount', placeholder='金额', value='500.00')
+                span 元
+            .form-group
+              input#gate_id(type='hidden', name='gate_id', placeholder='银行', value='09')
+              .span1
+                label 选择银行
+              .span11-omega
+                .banks
+                  .row
+                    .span3
+                      a.bank-logos-gsyh.active(href="#", data-gate-id="09", title="工商银行")
+                    .span3
+                      a.bank-logos-nyyh(href="#", data-gate-id="09", title="中国农业银行")
+                    .span3
+                      a.bank-logos-zsyh(href="#", data-gate-id="09", title="招商银行")
+                    .span3-omega
+                      a.bank-logos-jtyh(href="#", data-gate-id="09", title="交通银行")
+                  .row
+                    .span3
+                      a.bank-logos-yzyh(href="#", data-gate-id="09", title="中国邮政储蓄银行")
+                    .span3
+                      a.bank-logos-gfyh(href="#", data-gate-id="09", title="广发银行")
+                    .span3
+                      a.bank-logos-jsyh(href="#", data-gate-id="09", title="中国建设银行")
+                    .span3-omega
+                      a.bank-logos-zgyh(href="#", data-gate-id="09", title="中国银行")
+                  .row
+                    .span3
+                      a.bank-logos-pfyh(href="#", data-gate-id="09", title="浦发银行")
+                    .span3
+                      a.bank-logos-zxyh(href="#", data-gate-id="09", title="中信银行")
+                    .span3
+                      a.bank-logos-hxyh(href="#", data-gate-id="09", title="华夏银行")
+                    .span3-omega
+                      a.bank-logos-payh(href="#", data-gate-id="09", title="平安银行")
+                  .row
+                    .prefix10.span1-omega
+                      a(href="#") 显示更多
 
+                .row.bank-description
+                  table
+                    thead
+                      tr
+                        th(rowspan=2) 卡种
+                        th(colspan=2) 专业版(签约客户)
+                        th(colspan=2) 大众版(非签约客户)
+                      tr
+                        th 单笔限额
+                        th 每日限额
+                        th 单笔限额
+                        th 每日限额
+                    tbody
+                      tr
+                        td 借记卡
+                        td 客户自行设定
+                        td 客户自行设定
+                        td 500
+                        td 500
+                      tr
+                        td 信用卡
+                        td(colspan=4) 不支持
+                .row
+                  label
+                    input(type="checkbox", checked)
+                    span 我同意《<a href="#">网利宝投资咨询与管理服务协议</a>》与《<a href="#">网利宝资金管理规定</a>》
 
-    form(action="{{form.url}}", method='post')
-      input#amount(type='text', name='amount', placeholder='金额', value='500.00')
-      input#gate_id(type='text', name='gate_id', placeholder='银行', value='09')
-      input#pay.button-red.button-l(type='button', value='充值')
+                .space-vertical-m
+                .row
+                  input#pay.button-pay(type='button', value='支 付')
 
-    form#huifu-form(method='post')
-
-  script.
-    require(['/static/js/pay.js'])
-  - with 1 as no_margin
+  script(src="/static/js/require.js", data-main="/static/js/pay")
   include include/footer
-  - endwith
   include include/tracking

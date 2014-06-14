@@ -1,0 +1,107 @@
+@import compass/utilities/sprites/base
+
+// General Sprite Defaults
+// You can override them before you import this file.
+$bank-logos-sprite-base-class: ".bank-logos-sprite" !default
+$bank-logos-sprite-dimensions: false !default
+$bank-logos-position: 0% !default
+$bank-logos-spacing: 0 !default
+$bank-logos-repeat: no-repeat !default
+$bank-logos-prefix: "" !default
+$bank-logos-clean-up: true !default
+$bank-logos-layout: vertical !default
+$bank-logos-inline: false !default
+
+// These variables control the generated sprite output
+// You can override them selectively before you import this file.
+
+$bank-logos-gfyh-position: $bank-logos-position !default
+$bank-logos-gfyh-spacing: $bank-logos-spacing !default
+$bank-logos-gfyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-gsyh-position: $bank-logos-position !default
+$bank-logos-gsyh-spacing: $bank-logos-spacing !default
+$bank-logos-gsyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-hxyh-position: $bank-logos-position !default
+$bank-logos-hxyh-spacing: $bank-logos-spacing !default
+$bank-logos-hxyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-jsyh-position: $bank-logos-position !default
+$bank-logos-jsyh-spacing: $bank-logos-spacing !default
+$bank-logos-jsyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-jtyh-position: $bank-logos-position !default
+$bank-logos-jtyh-spacing: $bank-logos-spacing !default
+$bank-logos-jtyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-nyyh-position: $bank-logos-position !default
+$bank-logos-nyyh-spacing: $bank-logos-spacing !default
+$bank-logos-nyyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-payh-position: $bank-logos-position !default
+$bank-logos-payh-spacing: $bank-logos-spacing !default
+$bank-logos-payh-repeat: $bank-logos-repeat !default
+
+$bank-logos-pfyh-position: $bank-logos-position !default
+$bank-logos-pfyh-spacing: $bank-logos-spacing !default
+$bank-logos-pfyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-yzyh-position: $bank-logos-position !default
+$bank-logos-yzyh-spacing: $bank-logos-spacing !default
+$bank-logos-yzyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-zgyh-position: $bank-logos-position !default
+$bank-logos-zgyh-spacing: $bank-logos-spacing !default
+$bank-logos-zgyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-zsyh-position: $bank-logos-position !default
+$bank-logos-zsyh-spacing: $bank-logos-spacing !default
+$bank-logos-zsyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-zxyh-position: $bank-logos-position !default
+$bank-logos-zxyh-spacing: $bank-logos-spacing !default
+$bank-logos-zxyh-repeat: $bank-logos-repeat !default
+
+$bank-logos-sprites: sprite-map("bank-logos/*.png", $bank_logos_gfyh_position: $bank-logos-gfyh-position, $bank_logos_gfyh_spacing: $bank-logos-gfyh-spacing, $bank_logos_gfyh_repeat: $bank-logos-gfyh-repeat, $bank_logos_gsyh_position: $bank-logos-gsyh-position, $bank_logos_gsyh_spacing: $bank-logos-gsyh-spacing, $bank_logos_gsyh_repeat: $bank-logos-gsyh-repeat, $bank_logos_hxyh_position: $bank-logos-hxyh-position, $bank_logos_hxyh_spacing: $bank-logos-hxyh-spacing, $bank_logos_hxyh_repeat: $bank-logos-hxyh-repeat, $bank_logos_jsyh_position: $bank-logos-jsyh-position, $bank_logos_jsyh_spacing: $bank-logos-jsyh-spacing, $bank_logos_jsyh_repeat: $bank-logos-jsyh-repeat, $bank_logos_jtyh_position: $bank-logos-jtyh-position, $bank_logos_jtyh_spacing: $bank-logos-jtyh-spacing, $bank_logos_jtyh_repeat: $bank-logos-jtyh-repeat, $bank_logos_nyyh_position: $bank-logos-nyyh-position, $bank_logos_nyyh_spacing: $bank-logos-nyyh-spacing, $bank_logos_nyyh_repeat: $bank-logos-nyyh-repeat, $bank_logos_payh_position: $bank-logos-payh-position, $bank_logos_payh_spacing: $bank-logos-payh-spacing, $bank_logos_payh_repeat: $bank-logos-payh-repeat, $bank_logos_pfyh_position: $bank-logos-pfyh-position, $bank_logos_pfyh_spacing: $bank-logos-pfyh-spacing, $bank_logos_pfyh_repeat: $bank-logos-pfyh-repeat, $bank_logos_yzyh_position: $bank-logos-yzyh-position, $bank_logos_yzyh_spacing: $bank-logos-yzyh-spacing, $bank_logos_yzyh_repeat: $bank-logos-yzyh-repeat, $bank_logos_zgyh_position: $bank-logos-zgyh-position, $bank_logos_zgyh_spacing: $bank-logos-zgyh-spacing, $bank_logos_zgyh_repeat: $bank-logos-zgyh-repeat, $bank_logos_zsyh_position: $bank-logos-zsyh-position, $bank_logos_zsyh_spacing: $bank-logos-zsyh-spacing, $bank_logos_zsyh_repeat: $bank-logos-zsyh-repeat, $bank_logos_zxyh_position: $bank-logos-zxyh-position, $bank_logos_zxyh_spacing: $bank-logos-zxyh-spacing, $bank_logos_zxyh_repeat: $bank-logos-zxyh-repeat, $layout: $bank-logos-layout, $cleanup: $bank-logos-clean-up)
+
+// All sprites should extend this class
+// The bank-logos-sprite mixin will do so for you.
+@if $bank-logos-inline
+  #{$bank-logos-sprite-base-class}
+    background-image: inline-sprite($bank-logos-sprites)
+@else
+  #{$bank-logos-sprite-base-class}
+    background: $bank-logos-sprites no-repeat
+
+//sass functions to return the dimensions of a sprite image as units
+
+@function bank-logos-sprite-width($name)
+  $file: sprite_file($bank-logos-sprites, $name)
+  @return image-width($file)
+
+@function bank-logos-sprite-height($name)
+  $file: sprite_file($bank-logos-sprites, $name)
+  @return image-height($file)
+
+// Use this to set the dimensions of an element
+// based on the size of the original image.
+=bank-logos-sprite-dimensions($name)
+  +sprite-dimensions($bank-logos-sprites, $name)
+
+// Move the background position to display the sprite.
+=bank-logos-sprite-position($name, $offset-x: 0, $offset-y: 0)
+  +sprite-background-position($bank-logos-sprites, $name, $offset-x, $offset-y)
+
+// Extends the sprite base class and set the background position for the desired sprite.
+// It will also apply the image dimensions if $dimensions is true.
+=bank-logos-sprite($name, $dimensions: $bank-logos-sprite-dimensions, $offset-x: 0, $offset-y: 0)
+  @extend #{$bank-logos-sprite-base-class}
+  +sprite($bank-logos-sprites, $name, $dimensions, $offset-x, $offset-y)
+
+=bank-logos-sprites($sprite-names, $dimensions: $bank-logos-sprite-dimensions, $prefix: sprite-map-name($bank-logos-sprites), $offset-x: 0, $offset-y: 0)
+  +sprites($bank-logos-sprites, $sprite-names, $bank-logos-sprite-base-class, $dimensions, $prefix, $offset-x, $offset-y)
+
+// Generates a class for each sprited image.
+=all-bank-logos-sprites($dimensions: $bank-logos-sprite-dimensions, $prefix: sprite-map-name($bank-logos-sprites), $offset-x: 0, $offset-y: 0)
+  +bank-logos-sprites(gfyh gsyh hxyh jsyh jtyh nyyh payh pfyh yzyh zgyh zsyh zxyh, $dimensions, $prefix, $offset-x, $offset-y)

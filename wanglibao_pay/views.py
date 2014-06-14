@@ -13,16 +13,8 @@ class BankListView(TemplateView):
     template_name = 'pay_banks.jade'
 
     def get_context_data(self, **kwargs):
-        order_id = self.request.GET.get('order_id')
-        post = {'OrdId': order_id,
-                'OrdAmt': '500.00',
-                'GateId': '09'}
-        pay = HuifuPay()
-        form = pay.pay(post)
-
         return {
             'banks': Bank.objects.all(),
-            'form': form
         }
 
 
