@@ -30,7 +30,7 @@ urlpatterns = patterns(
     url(r'^cash/products/', CashHomeView.as_view(), name="cash_home"),
     url(r'^cash/detail/(?P<id>\w+)', CashDetailView.as_view(), name="cash_detail"),
 
-    url(r'^p2p/detail/(?P<id>\w+)', P2PDetailView.as_view(), name="p2p_detail"),
+    url(r'^p2p/', include('wanglibao_p2p.urls')),
 
     url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
 
