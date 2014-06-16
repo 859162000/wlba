@@ -137,8 +137,8 @@ class UserMargin(models.Model):
 
 
 class UserEquity(models.Model):
-    user = models.ForeignKey(get_user_model())
-    product = models.ForeignKey(P2PProduct, help_text=u'产品')
+    user = models.ForeignKey(get_user_model(), related_name='equities')
+    product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
     equity = models.BigIntegerField(verbose_name=u'用户所持份额', default=0)
     confirm = models.BooleanField(verbose_name=u'确认成功', default=False)
 
