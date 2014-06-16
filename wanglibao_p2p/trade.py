@@ -28,8 +28,8 @@ class P2PTrader(object):
                 raise UserRestriction('100001')
 
             #lock product column
-            lock_product = P2PProduct.objects.select_for_update().filter(pk=self.product.pk)
-            if not lock_product:
+            self.product = P2PProduct.objects.select_for_update().filter(pk=self.product.pk).first()
+            if not self.product:
                 raise ProductRestriction('200003')
             if not self.product.has_amount(amount):
                 raise ProductRestriction('200002')
