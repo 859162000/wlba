@@ -21,7 +21,7 @@ class P2PProduct(ProductBase):
     name = models.CharField(max_length=256, verbose_name=u'名字')
     short_name = models.CharField(max_length=64, verbose_name=u'短名字')
 
-    status = models.CharField(max_length=16, default=u'正在招标', verbose_name=u'产品装态(正在招标，已满表，还款中)')
+    status = models.CharField(max_length=16, default=u'正在招标', verbose_name=u'产品装态(正在招标，已满标，还款中)')
 
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)')
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
@@ -134,6 +134,7 @@ class UserMargin(models.Model):
         if amount <= self.margin:
             return True
         return False
+
 
 class UserEquity(models.Model):
     user = models.ForeignKey(get_user_model())
