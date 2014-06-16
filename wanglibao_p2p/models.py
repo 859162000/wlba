@@ -76,6 +76,7 @@ class Warrant(models.Model):
 class TradeRecordType(models.Model):
     name = models.CharField(max_length=10, help_text=u'类型')
     description = models.CharField(max_length=200, help_text=u'类型说明')
+    catalog_id = models.IntegerField(verbose_name=u'类型序号', unique=True, null=True)
 
     def __unicode__(self):
         return u'<流水类型: %s>' % self.name
@@ -148,3 +149,7 @@ class UserEquity(models.Model):
     def related_records(self):
         records = list()
         return records
+
+    @property
+    def paymethod(self):
+        pass

@@ -44,7 +44,7 @@ class P2PTrader(object):
             self.__update_equity(amount)
             # record this trade
             # todo complete record method
-            catalog = TradeRecordType.objects.get(pk=1)
+            catalog = TradeRecordType.objects.get(catalog_id=1)
             self.__record(catalog, amount, self.product, product_balance_before, product_balance_after, self.user,
                           user_margin_before, user_margin_after)
 
