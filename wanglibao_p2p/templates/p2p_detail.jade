@@ -143,30 +143,33 @@ html
                     th 投资人
                     th 金额
                 tbody
-                  mixin invest-entry(date, time, user, money)
+                  trade_records = p2p.traderecord_set.all()[:40]
+                  top = trade_records[:15]
+                  rest = trade_records[15:]
+                  for trade in top
                     tr
                       td
-                        p=date
-                        p=time
+                        p {{trade.create_time | date:"Y-m-d"}}
+                        p {{trade.create_time | date:"h:m:s"}}
                       td
-                        em=user
+                        em {{trade.user | safe_phone}}
                       td
-                        span.money-highlight=money
+                        span.money-highlight {{trade.amount}}
                         span 元
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                tbody(style="display:none")
+                  for trade in rest
+                    tr
+                      td
+                        p {{trade.create_time | date:"Y-m-d"}}
+                        p {{trade.create_time | date:"h:m:s"}}
+                      td
+                        em {{trade.user | safe_phone}}
+                      td
+                        span.money-highlight {{trade.amount}}
+                        span 元
 
               p.check-more
                 a.blue.font-s(href="#") 显示更多
-
 
     .space-m
     - with 1 as no_margin
