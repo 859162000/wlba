@@ -30,7 +30,8 @@ class ProductRestriction(RestrictionException):
         '200001': 'stop sell.',
         '200002': 'sold out.',
         '200003': 'Can not get object.',
-        '200004': 'purchase amount must be integer numbe.'
+        '200004': 'purchase amount must be integer numbe.',
+        '300001': 'can not settle product which already have remain amount'
     }
     __error__ = 'ProductRestriction'
 
