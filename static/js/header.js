@@ -11,8 +11,7 @@
   });
 
   require(['jquery', 'lib/backend', 'iealert'], function($, backend, iealert) {
-    var previous;
-    $(document).ready(function() {
+    return $(document).ready(function() {
       return $("body").iealert({
         title: "您使用的IE浏览器版本过低",
         text: '为了获得更好的浏览体验，请点击下面的按钮升级您的浏览器',
@@ -20,33 +19,6 @@
         support: 'ie7',
         closeBtn: false
       });
-    });
-    previous = $('.category-anchor')[0];
-    $('.category-anchor').click(function(e) {
-      e.preventDefault();
-      $(previous).removeClass('active');
-      $(e.target).addClass('active');
-      return previous = e.target;
-    });
-    $('.header-button').click(function() {
-      var period, type, uri;
-      period = $('.header-select')[0].value;
-      type = $('.header-select')[1].value;
-      uri = '/' + type + '/products/';
-      return window.location.href = uri + '?period=' + period + '&asset=' + $('.header-asset-input')[0].value;
-    });
-    $('.header-input-base').keyup(function(e) {
-      if (e.keyCode === 13) {
-        return $('.header-button').click();
-      }
-    });
-    $('.user-center').mouseenter(function() {
-      $('#user-items').css('display', 'block');
-      return $('#username').toggleClass('username-hover');
-    });
-    return $('.user-center').mouseleave(function() {
-      $('#user-items').css('display', 'none');
-      return $('#username').toggleClass('username-hover');
     });
   });
 

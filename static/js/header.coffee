@@ -14,30 +14,3 @@ require ['jquery', 'lib/backend', 'iealert'], ($, backend, iealert)->
       support: 'ie7',
       closeBtn: false
     })
-
-  previous = $('.category-anchor')[0]
-  $('.category-anchor').click (e)->
-    e.preventDefault()
-    $(previous).removeClass('active')
-    $(e.target).addClass('active')
-    previous = e.target
-
-  $('.header-button').click ()->
-    period = $('.header-select')[0].value
-    type = $('.header-select')[1].value
-    uri = '/' + type + '/products/'
-    window.location.href= uri + '?period=' + period + '&asset=' + $('.header-asset-input')[0].value
-
-  $('.header-input-base').keyup (e)->
-    if e.keyCode == 13
-      $('.header-button').click()
-
-
-  $('.user-center').mouseenter ()->
-    $('#user-items').css('display', 'block')
-    $('#username').toggleClass('username-hover')
-
-  $('.user-center').mouseleave ()->
-    $('#user-items').css('display', 'none')
-    $('#username').toggleClass('username-hover')
-

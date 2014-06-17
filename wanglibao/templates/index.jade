@@ -140,7 +140,8 @@ html
                           span.money-highlight {{trade.amount}}
                             span 元
 
-    script(src="/static/js/require.js", data-main="/static/js/index")
+    script.
+      require(["/static/js/index.js"])
 
     .space-vertical-m
     .full-container

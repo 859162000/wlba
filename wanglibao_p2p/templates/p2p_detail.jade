@@ -1,5 +1,6 @@
 -load formatters
 -load mathfilters
+-load widget_tweaks
 
 doctype html
 html
@@ -62,38 +63,43 @@ html
 
         .span4-omega.invest-form.border-left
           h1 我要投资
-          form(name="invest-form",method="post", action="#")
-            .row
-              span.span4 可投资金额
-              span.span8-omega
-                span.dark-gray.font-m {{p2p.remain | money_format}}
-                | 元
-            .row
-              span.span4 投资金额
-              span.span8-omega
-                input.span12(type="text", name="invest_amount", placeholder="请输入50-42400的整数")
-            .row
-              span.span4 预期收益
-              span.span8-omega
-                span.highlight.font-m 00.00
-                | 元
-            .row
-              span.span4 输入验证码
-              span.span8-omega
-                input.span4(type="text", name="validate_code")
-            .row
-              span.span4
-              span.span8-omega
-                button.span12.button-red.button-middle(type='submit') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
-          .sold-out(style="display:none")
-            p.align-center
-              button.button-large.disabled(type="button")
-                span.font-xl 已售完
-            p.align-center.padding-s 05-10 15:30:30 售完
-            p
-              | 新的投资产品将在工作日
-              span.highlight 17:30
-              | 固定时间发布，请查看网站首页。
+          if status == 'open'
+            form(name="invest-form",method="post", action="#")
+              - csrf_token
+              .row
+                span.span4 可投资金额
+                span.span8-omega
+                  span.dark-gray.font-m {{p2p.remain | money_format}}
+                  | 元
+              .row
+                span.span4 投资金额
+                span.span8-omega
+                  -render_field form.amount class+="span12" placeholder="请输入50-42400的整数"
+              .row
+                span.span4 预期收益
+                span.span8-omega
+                  span.highlight.font-m 00.00
+                  | 元
+              .row
+                span.span4 输入验证码
+                span.span8-omega
+                  -render_field form.captcha
+              .row
+                span.span4
+                span.span8-omega
+                  button.span12.button-red.button-middle(type='submit') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+          if status == 'finished'
+            .sold-out
+              p.align-center
+                button.button-large.disabled(type="button")
+                  span.font-xl 已售完
+              p.align-center.padding-s {{p2p.end_time|date:"m-d H:i:s"}} 售完
+              p
+                | 新的投资产品将在工作日
+                span.highlight 17:30
+                | 固定时间发布，请查看网站<a href="/">首页</a>。
+          if status == 'not_started'
+            p 还没有开始
 
     .space-m
     .full-container-home.clearfix
