@@ -4,9 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from wanglibao_buy.models import Bank
 from wanglibao_pay.huifu_pay import HuifuPay
-from wanglibao_pay.models import PayInfo
+from wanglibao_pay.models import PayInfo, Bank
 
 
 class BankListView(TemplateView):

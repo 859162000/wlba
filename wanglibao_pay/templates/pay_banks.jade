@@ -16,72 +16,41 @@ body
         .panel-title 账户充值
       .panel-content.padding-l-r-s
         .row
-          form.payform(action="{{form.url}}", method='post')
+          form#payform.payform(action="/pay/deposit/", method='post')
+            csrf
             .form-group
               .span1
-                label 充值金额
+                label 金额(元)
               .span11-omega
-                input#amount(type='text', name='amount', placeholder='金额', value='500.00')
-                span 元
+                input#amount(type='text', name='amount', placeholder='金额', value='100.00')
             .form-group
               input#gate_id(type='hidden', name='gate_id', placeholder='银行', value='09')
               .span1
                 label 选择银行
               .span11-omega
                 .banks
-                  .row
-                    .span3
-                      a.bank-logos-gsyh.active(href="#", data-gate-id="09", title="工商银行")
-                    .span3
-                      a.bank-logos-nyyh(href="#", data-gate-id="09", title="中国农业银行")
-                    .span3
-                      a.bank-logos-zsyh(href="#", data-gate-id="09", title="招商银行")
-                    .span3-omega
-                      a.bank-logos-jtyh(href="#", data-gate-id="09", title="交通银行")
-                  .row
-                    .span3
-                      a.bank-logos-yzyh(href="#", data-gate-id="09", title="中国邮政储蓄银行")
-                    .span3
-                      a.bank-logos-gfyh(href="#", data-gate-id="09", title="广发银行")
-                    .span3
-                      a.bank-logos-jsyh(href="#", data-gate-id="09", title="中国建设银行")
-                    .span3-omega
-                      a.bank-logos-zgyh(href="#", data-gate-id="09", title="中国银行")
-                  .row
-                    .span3
-                      a.bank-logos-pfyh(href="#", data-gate-id="09", title="浦发银行")
-                    .span3
-                      a.bank-logos-zxyh(href="#", data-gate-id="09", title="中信银行")
-                    .span3
-                      a.bank-logos-hxyh(href="#", data-gate-id="09", title="华夏银行")
-                    .span3-omega
-                      a.bank-logos-payh(href="#", data-gate-id="09", title="平安银行")
-                  .row
-                    .prefix10.span1-omega
-                      a(href="#") 显示更多
+                  count = len(banks)
+                  rows = range(0, count/4)
+                  cols = range(0, 4)
 
+                  for row_index in rows
+                    .row
+                      for col_index in cols
+                        bank = banks[row_index * 4 + col_index]
+                        if col_index != 3
+                          .span3
+                            a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                        else
+                          .span3-omega
+                            a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
                 .row.bank-description
-                  table
-                    thead
-                      tr
-                        th(rowspan=2) 卡种
-                        th(colspan=2) 专业版(签约客户)
-                        th(colspan=2) 大众版(非签约客户)
-                      tr
-                        th 单笔限额
-                        th 每日限额
-                        th 单笔限额
-                        th 每日限额
-                    tbody
-                      tr
-                        td 借记卡
-                        td 客户自行设定
-                        td 客户自行设定
-                        td 500
-                        td 500
-                      tr
-                        td 信用卡
-                        td(colspan=4) 不支持
+                  for bank in banks
+                    if forloop.counter == 1
+                      div.bank-desc-container(id="bank-limit-{{bank.id}}")
+                        {{bank.limit | safe}}
+                    else
+                      div.bank-desc-container(style="display:none", id="bank-limit-{{bank.id}}")
+                        {{bank.limit | safe}}
                 .row
                   label
                     input(type="checkbox", checked)
@@ -89,8 +58,9 @@ body
 
                 .space-vertical-m
                 .row
-                  input#pay.button-pay(type='button', value='支 付')
+                  input#pay.button-pay(type='submit', value='支 付')
 
-  script(src="/static/js/require.js", data-main="/static/js/pay")
+  script.
+    require(["/static/js/pay.js"])
   include include/footer
   include include/tracking
