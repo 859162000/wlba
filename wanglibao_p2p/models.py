@@ -135,6 +135,8 @@ class UserMargin(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)
     margin = models.DecimalField(verbose_name=u'用户余额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     freeze = models.DecimalField(verbose_name=u'冻结金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    withdrawing = models.DecimalField(verbose_name=u'提款中金额', max_digits=20, decimal_places=2,
+                                        default=Decimal('0.00'))
 
     def __unicode__(self):
         return '%s margin: %s, freeze: %s' % (self.user, self.margin, self.freeze)
