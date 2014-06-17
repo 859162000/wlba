@@ -17,8 +17,9 @@ class P2PTrader(object):
         self.request = request
 
     def purchase(self, amount):
-        if not isinstance(amount, int):
+        if (not isinstance(amount, int)) and amount > 0:
             raise ProductRestriction('200004')
+
         with transaction.atomic():
             # lock user margin column
             self.margin = UserMargin.objects.select_for_update().filter(user=self.user).first()
@@ -44,7 +45,7 @@ class P2PTrader(object):
             self.__update_equity(amount)
             # record this trade
             # todo complete record method
-            catalog = TradeRecordType.objects.get(pk=1)
+            catalog = TradeRecordType.objects.get(catalog_id=1)
             self.__record(catalog, amount, self.product, product_balance_before, product_balance_after, self.user,
                           user_margin_before, user_margin_after)
 
@@ -56,7 +57,8 @@ class P2PTrader(object):
         """
         equity, _ = UserEquity.objects.get_or_create(user=self.user, product=self.product)
         equity.equity += amount
-        # todo check user purchase limit.
+        if equity.equity > self.product.limit_amount_per_user:
+            raise UserRestriction('100004')
         equity.save()
 
     def __record(self, catalog, amount, product, product_balance_before, product_balance_after, user,

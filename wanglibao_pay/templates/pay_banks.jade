@@ -17,7 +17,7 @@ body
       .panel-content.padding-l-r-s
         .row
           form#payform.payform(action="/pay/deposit/", method='post')
-            csrf
+            - csrf_token
             .form-group
               .span1
                 label 金额(元)

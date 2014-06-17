@@ -17,7 +17,8 @@ class UserRestriction(RestrictionException):
         '100000': 'Not valid User object.',
         '100001': 'User do not have enough margin.',
         '100002': 'User\'s ID not verified.',
-        '100003': 'Can not fount user margin info.'
+        '100003': 'Can not fount user margin info.',
+        '100004': 'Purchase amount over product per-user limit.'
     }
     __error__ = 'UserRestriction'
 
@@ -30,7 +31,8 @@ class ProductRestriction(RestrictionException):
         '200001': 'stop sell.',
         '200002': 'sold out.',
         '200003': 'Can not get object.',
-        '200004': 'purchase amount must be integer numbe.'
+        '200004': 'purchase amount must be a positive integer number.',
+        '300001': 'can not settle product which already have remain amount'
     }
     __error__ = 'ProductRestriction'
 

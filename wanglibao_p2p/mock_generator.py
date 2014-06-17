@@ -95,6 +95,7 @@ class MockGenerator(object):
             for catalog in TradeRecordType.objects.all():
                 catalog.delete()
 
+        TradeRecord.objects.create(name=u'申购', description=u'', catalog_id=1)
         users = get_user_model().objects.all()
         products = P2PProduct.objects.all()
 

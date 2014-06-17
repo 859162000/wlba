@@ -2,6 +2,7 @@
 import collections
 from decimal import Decimal
 from django.db import models
+from django.db.models import F
 from django.utils import timezone
 from jsonfield import JSONField
 from wanglibao.models import ProductBase
@@ -17,11 +18,17 @@ class WarrantCompany(models.Model):
         return u'%s' % self.name
 
 
+class P2PProductManager(models.Manager):
+    def get_queryset(self):
+        return super(P2PProductManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
+                                                                    status__exact=u'正在招标')
+
+
 class P2PProduct(ProductBase):
     name = models.CharField(max_length=256, verbose_name=u'名字')
     short_name = models.CharField(max_length=64, verbose_name=u'短名字')
 
-    status = models.CharField(max_length=16, default=u'正在招标', verbose_name=u'产品装态(正在招标，已满表，还款中)')
+    status = models.CharField(max_length=16, default=u'正在招标', verbose_name=u'产品装态(正在招标，已满标，还款中)')
 
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)')
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
@@ -44,6 +51,9 @@ class P2PProduct(ProductBase):
     usage = models.TextField(blank=True, verbose_name=u'项目用途')
     short_usage = models.TextField(blank=True, verbose_name=u'项目用途摘要')
 
+    objects = models.Manager()
+    sold_out = P2PProductManager()
+
     def __unicode__(self):
         return u'<%s %f, 总量: %s, 已募集: %s, 完成率: %s %%>' % (self.name, self.expected_earning_rate, self.total_amount,
                                             self.ordered_amount, self.completion_rate)
@@ -54,7 +64,13 @@ class P2PProduct(ProductBase):
 
     @property
     def completion_rate(self):
+        if not self.total_amount > 0:
+            return 0
         return float(self.ordered_amount) / float(self.total_amount) * 100
+
+    @property
+    def limit_amount_per_user(self):
+        return int(self.limit_per_user * self.total_amount)
 
     def has_amount(self, amount):
         if amount <= self.remain:
@@ -76,6 +92,7 @@ class Warrant(models.Model):
 class TradeRecordType(models.Model):
     name = models.CharField(max_length=10, help_text=u'类型')
     description = models.CharField(max_length=200, help_text=u'类型说明')
+    catalog_id = models.IntegerField(verbose_name=u'类型序号', unique=True, null=True)
 
     def __unicode__(self):
         return u'<流水类型: %s>' % self.name
@@ -124,6 +141,8 @@ class UserMargin(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)
     margin = models.DecimalField(verbose_name=u'用户余额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     freeze = models.DecimalField(verbose_name=u'冻结金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    withdrawing = models.DecimalField(verbose_name=u'提款中金额', max_digits=20, decimal_places=2,
+                                        default=Decimal('0.00'))
 
     def __unicode__(self):
         return '%s margin: %s, freeze: %s' % (self.user, self.margin, self.freeze)
@@ -134,11 +153,15 @@ class UserMargin(models.Model):
             return True
         return False
 
+
 class UserEquity(models.Model):
-    user = models.ForeignKey(get_user_model())
-    product = models.ForeignKey(P2PProduct, help_text=u'产品')
+    user = models.ForeignKey(get_user_model(), related_name='equities')
+    product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
     equity = models.BigIntegerField(verbose_name=u'用户所持份额', default=0)
     confirm = models.BooleanField(verbose_name=u'确认成功', default=False)
+
+    class Meta:
+        unique_together = (('user', 'product'),)
 
     def __unicode__(self):
         return u'%s 持有 %s 数量:%s' % (self.user, self.product, self.equity)
