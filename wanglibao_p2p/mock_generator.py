@@ -12,13 +12,15 @@ from exceptions import RestrictionException
 class MockGenerator(object):
 
     @classmethod
-    def generate_p2p(cls, clean=False):
+    def generate_p2p(cls, clean=False, init=False):
         if clean:
             for p2p in P2PProduct.objects.all():
                 p2p.delete()
 
             for warrant_company in WarrantCompany.objects.all():
                 warrant_company.delete()
+
+            return
 
         for index in range(0, 20):
             # generate warrant company
@@ -39,6 +41,8 @@ class MockGenerator(object):
 
                 p2p.total_amount = random.randrange(100000, 4000000)
                 p2p.ordered_amount = p2p.total_amount * random.randrange(1, 100) / 100.0
+                if init:
+                    p2p.ordered_amount = 0
 
                 p2p.warrant_company = warrant_company
 
@@ -94,8 +98,9 @@ class MockGenerator(object):
 
             for catalog in TradeRecordType.objects.all():
                 catalog.delete()
+            return
 
-        TradeRecord.objects.create(name=u'申购', description=u'', catalog_id=1)
+        TradeRecord.objects.create(name=u'申购', description=u'申购', catalog_id=1)
         users = get_user_model().objects.all()
         products = P2PProduct.objects.all()
 

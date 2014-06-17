@@ -1,0 +1,4285 @@
+[
+{
+    "pk": 81, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 0"
+    }
+},
+{
+    "pk": 82, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 1"
+    }
+},
+{
+    "pk": 83, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 2"
+    }
+},
+{
+    "pk": 84, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 3"
+    }
+},
+{
+    "pk": 85, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 4"
+    }
+},
+{
+    "pk": 86, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 5"
+    }
+},
+{
+    "pk": 87, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 6"
+    }
+},
+{
+    "pk": 88, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 7"
+    }
+},
+{
+    "pk": 89, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 8"
+    }
+},
+{
+    "pk": 90, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 9"
+    }
+},
+{
+    "pk": 91, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 10"
+    }
+},
+{
+    "pk": 92, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 11"
+    }
+},
+{
+    "pk": 93, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 12"
+    }
+},
+{
+    "pk": 94, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 13"
+    }
+},
+{
+    "pk": 95, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 14"
+    }
+},
+{
+    "pk": 96, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 15"
+    }
+},
+{
+    "pk": 97, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 16"
+    }
+},
+{
+    "pk": 98, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 17"
+    }
+},
+{
+    "pk": 99, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 18"
+    }
+},
+{
+    "pk": 100, 
+    "model": "wanglibao_p2p.warrantcompany", 
+    "fields": {
+        "name": "\u62c5\u4fdd\u516c\u53f8 19"
+    }
+},
+{
+    "pk": 241, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 5, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 2340000,
+        "warrant_company": 81, 
+        "expected_earning_rate": 11.0, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 242, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 25, 
+        "ordered_amount": 20000,
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 100000,
+        "warrant_company": 81, 
+        "expected_earning_rate": 13.1, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 243, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 26, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 1261959, 
+        "warrant_company": 81, 
+        "expected_earning_rate": 15.5, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 244, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 2, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 805993, 
+        "warrant_company": 82, 
+        "expected_earning_rate": 16.8, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 245, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 9, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 609934, 
+        "warrant_company": 82, 
+        "expected_earning_rate": 17.9, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 246, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 31, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 1391901, 
+        "warrant_company": 82, 
+        "expected_earning_rate": 11.1, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 247, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 41, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 523047, 
+        "warrant_company": 83, 
+        "expected_earning_rate": 12.2, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 248, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 2, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 2612611, 
+        "warrant_company": 83, 
+        "expected_earning_rate": 18.7, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 249, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 28, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 1510348, 
+        "warrant_company": 83, 
+        "expected_earning_rate": 16.5, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 250, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 45, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 257041, 
+        "warrant_company": 84, 
+        "expected_earning_rate": 18.7, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 251, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 0, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 2173893, 
+        "warrant_company": 84, 
+        "expected_earning_rate": 17.8, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 252, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 4, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 2261578, 
+        "warrant_company": 84, 
+        "expected_earning_rate": 18.1, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 253, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 6, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 2962001, 
+        "warrant_company": 85, 
+        "expected_earning_rate": 13.4, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 254, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 8, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 473544, 
+        "warrant_company": 85, 
+        "expected_earning_rate": 19.4, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 255, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 1, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 668241, 
+        "warrant_company": 85, 
+        "expected_earning_rate": 11.5, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 256, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 25, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 2318364, 
+        "warrant_company": 86, 
+        "expected_earning_rate": 19.1, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 257, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 28, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 2220425, 
+        "warrant_company": 86, 
+        "expected_earning_rate": 19.8, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 258, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 29, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 2509442, 
+        "warrant_company": 86, 
+        "expected_earning_rate": 12.8, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 259, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 0, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 1075088, 
+        "warrant_company": 87, 
+        "expected_earning_rate": 10.1, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 260, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 31, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 3037381, 
+        "warrant_company": 87, 
+        "expected_earning_rate": 14.3, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 261, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 16, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 2406435, 
+        "warrant_company": 87, 
+        "expected_earning_rate": 15.0, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 262, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 42, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 3806211, 
+        "warrant_company": 88, 
+        "expected_earning_rate": 11.2, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 263, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 9, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 3674748, 
+        "warrant_company": 88, 
+        "expected_earning_rate": 15.7, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 264, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 23, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 2356861, 
+        "warrant_company": 88, 
+        "expected_earning_rate": 14.1, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 265, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 11, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 2300395, 
+        "warrant_company": 89, 
+        "expected_earning_rate": 17.9, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 266, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 24, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 2958339, 
+        "warrant_company": 89, 
+        "expected_earning_rate": 15.3, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 267, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 32, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 272023, 
+        "warrant_company": 89, 
+        "expected_earning_rate": 10.4, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 268, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 15, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 2291932, 
+        "warrant_company": 90, 
+        "expected_earning_rate": 13.8, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 269, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 45, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 3779624, 
+        "warrant_company": 90, 
+        "expected_earning_rate": 18.2, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 270, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 2, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 199694, 
+        "warrant_company": 90, 
+        "expected_earning_rate": 15.3, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 271, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 4, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 1601509, 
+        "warrant_company": 91, 
+        "expected_earning_rate": 12.1, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 272, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 32, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 1620960, 
+        "warrant_company": 91, 
+        "expected_earning_rate": 11.9, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 273, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 34, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 479277, 
+        "warrant_company": 91, 
+        "expected_earning_rate": 17.0, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 274, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 27, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 3311083, 
+        "warrant_company": 92, 
+        "expected_earning_rate": 16.4, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 275, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 17, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 2704269, 
+        "warrant_company": 92, 
+        "expected_earning_rate": 19.2, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 276, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 33, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 2487994, 
+        "warrant_company": 92, 
+        "expected_earning_rate": 11.5, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 277, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 4, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 613547, 
+        "warrant_company": 93, 
+        "expected_earning_rate": 18.5, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 278, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 42, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 1087112, 
+        "warrant_company": 93, 
+        "expected_earning_rate": 13.9, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 279, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 45, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 954451, 
+        "warrant_company": 93, 
+        "expected_earning_rate": 14.4, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 280, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 35, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 2291227, 
+        "warrant_company": 94, 
+        "expected_earning_rate": 13.7, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 281, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 7, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 3751178, 
+        "warrant_company": 94, 
+        "expected_earning_rate": 14.8, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 282, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 13, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 3782293, 
+        "warrant_company": 94, 
+        "expected_earning_rate": 11.5, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 283, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 33, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 690943, 
+        "warrant_company": 95, 
+        "expected_earning_rate": 13.6, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 284, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 22, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 2804567, 
+        "warrant_company": 95, 
+        "expected_earning_rate": 11.4, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 285, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 20, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 1082277, 
+        "warrant_company": 95, 
+        "expected_earning_rate": 19.9, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 286, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 36, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 1447710, 
+        "warrant_company": 96, 
+        "expected_earning_rate": 13.7, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 287, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 6, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 545269, 
+        "warrant_company": 96, 
+        "expected_earning_rate": 15.7, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 288, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 44, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 1000521, 
+        "warrant_company": 96, 
+        "expected_earning_rate": 19.7, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 289, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 22, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 1770124, 
+        "warrant_company": 97, 
+        "expected_earning_rate": 13.2, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 290, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 17, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 2148528, 
+        "warrant_company": 97, 
+        "expected_earning_rate": 16.1, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 291, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 14, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 1933546, 
+        "warrant_company": 97, 
+        "expected_earning_rate": 16.8, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 292, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 30, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 2690698, 
+        "warrant_company": 98, 
+        "expected_earning_rate": 13.1, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 293, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 47, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 2564999, 
+        "warrant_company": 98, 
+        "expected_earning_rate": 17.8, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 294, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 27, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 2621641, 
+        "warrant_company": 98, 
+        "expected_earning_rate": 10.6, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 295, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 30, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 3180174, 
+        "warrant_company": 99, 
+        "expected_earning_rate": 18.5, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 296, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 44, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 3093686, 
+        "warrant_company": 99, 
+        "expected_earning_rate": 12.4, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 297, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 3, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 2545198, 
+        "warrant_company": 99, 
+        "expected_earning_rate": 16.6, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 298, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 35, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c11", 
+        "total_amount": 3152506, 
+        "warrant_company": 100, 
+        "expected_earning_rate": 10.8, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 299, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 16, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c12", 
+        "total_amount": 2201411, 
+        "warrant_company": 100, 
+        "expected_earning_rate": 11.5, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 300, 
+    "model": "wanglibao_p2p.p2pproduct", 
+    "fields": {
+        "short_usage": "", 
+        "bought_amount_random": 0.0, 
+        "period": 35, 
+        "ordered_amount": 0, 
+        "bought_people_count": 0, 
+        "bought_count_random": 0.0, 
+        "brief": "\u96be\u5f97\u4e00\u89c1\u7684\u73b0\u91d1\u7c7b\u7406\u8d22\u4ea7\u54c1 \u5feb\u62a2", 
+        "closed": false, 
+        "usage": "", 
+        "extra_data": "{\"\\u4e2a\\u4eba\\u4fe1\\u606f\":[[\"\\u7528\\u6237ID\",\"400998\"],[\"\\u6027\\u522b\",\"\\u7537\"],[\"\\u5e74\\u9f84\",25],[\"\\u5b66\\u5386\",\"\\u5176\\u4ed6\"],[\"\\u662f\\u5426\\u5df2\\u5a5a\",\"\\u5df2\\u5a5a\"],[\"\\u5b50\\u5973\\u72b6\\u51b5\",\"\\u6709\"],[\"\\u6237\\u7c4d\\u57ce\\u5e02\",\"\\u6d59\\u6c5f\\u7701\\u6e29\\u5dde\\u5e02\"]],\"\\u4e2a\\u4eba\\u8d44\\u4ea7\\u53ca\\u5f81\\u4fe1\\u4fe1\\u606f\":[[\"\\u6708\\u6536\\u5165\\u6c34\\u5e73\",\"5000-8000\\u5143\"],[\"\\u623f\\u4ea7\",\"\\u6709\"],[\"\\u8f66\\u4ea7\",\"\\u65e0\"],[\"\\u5176\\u4ed6\\u4fe1\\u7528\\u8d37\\u6b3e\",\"\\u6709\"],[\"\\u672a\\u9500\\u6237\\u4fe1\\u7528\\u5361\",\"\\u6709\"]],\"\\u5de5\\u4f5c\\u4fe1\\u606f\":[[\"\\u5de5\\u4f5c\\u57ce\\u5e02\",\"\\u798f\\u5efa\\u7701\\u53a6\\u95e8\\u5e02\"],[\"\\u73b0\\u6709\\u516c\\u53f8\\u5de5\\u4f5c\\u65f6\\u95f4\",\"2010\"],[\"\\u516c\\u53f8\\u884c\\u4e1a\",\"\\u5176\\u5b83\"],[\"\\u516c\\u53f8\\u6027\\u8d28\",\"\\u6c11\\u8425\"],[\"\\u5c97\\u4f4d\",\"\\u7ba1\\u7406\\u3001\\u6280\\u672f\\u3001\\u884c\\u653f\\u5c97\\u4f4d\"]]}", 
+        "end_time": "2014-06-24T09:16:10Z", 
+        "status": "\u6b63\u5728\u62db\u6807", 
+        "publish_time": "2014-06-17T09:16:10Z", 
+        "short_name": "P2P \u77ed\u540d", 
+        "limit_per_user": 0.2, 
+        "bought_count": 0, 
+        "name": "P2P\u4ea7\u54c13", 
+        "total_amount": 196560, 
+        "warrant_company": 100, 
+        "expected_earning_rate": 14.1, 
+        "pay_method": "\u6309\u6708\u8fd8\u6b3e \u7b49\u989d\u672c\u606f", 
+        "bought_amount": 0
+    }
+},
+{
+    "pk": 961, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 241, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 962, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 241, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 963, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 241, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 964, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 241, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 965, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 242, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 966, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 242, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 967, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 242, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 968, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 242, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 969, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 243, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 970, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 243, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 971, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 243, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 972, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 243, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 973, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 244, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 974, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 244, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 975, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 244, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 976, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 244, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 977, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 245, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 978, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 245, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 979, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 245, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 980, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 245, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 981, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 246, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 982, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 246, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 983, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 246, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 984, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 246, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 985, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 247, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 986, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 247, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 987, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 247, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 988, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 247, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 989, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 248, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 990, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 248, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 991, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 248, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 992, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 248, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 993, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 249, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 994, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 249, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 995, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 249, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 996, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 249, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 997, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 250, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 998, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 250, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 999, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 250, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1000, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 250, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1001, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 251, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1002, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 251, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1003, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 251, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1004, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 251, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1005, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 252, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1006, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 252, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1007, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 252, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1008, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 252, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1009, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 253, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1010, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 253, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1011, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 253, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1012, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 253, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1013, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 254, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1014, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 254, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1015, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 254, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1016, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 254, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1017, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 255, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1018, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 255, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1019, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 255, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1020, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 255, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1021, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 256, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1022, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 256, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1023, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 256, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1024, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 256, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1025, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 257, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1026, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 257, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1027, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 257, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1028, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 257, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1029, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 258, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1030, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 258, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1031, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 258, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1032, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 258, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1033, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 259, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1034, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 259, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1035, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 259, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1036, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 259, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1037, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 260, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1038, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 260, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1039, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 260, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1040, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 260, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1041, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 261, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1042, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 261, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1043, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 261, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1044, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 261, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1045, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 262, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1046, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 262, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1047, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 262, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1048, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 262, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1049, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 263, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1050, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 263, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1051, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 263, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1052, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 263, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1053, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 264, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1054, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 264, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1055, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 264, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1056, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 264, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1057, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 265, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1058, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 265, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1059, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 265, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1060, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 265, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1061, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 266, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1062, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 266, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1063, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 266, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1064, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 266, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1065, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 267, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1066, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 267, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1067, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 267, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1068, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 267, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1069, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 268, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1070, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 268, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1071, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 268, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1072, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 268, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1073, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 269, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1074, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 269, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1075, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 269, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1076, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 269, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1077, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 270, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1078, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 270, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1079, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 270, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1080, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 270, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1081, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 271, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1082, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 271, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1083, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 271, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1084, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 271, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1085, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 272, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1086, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 272, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1087, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 272, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1088, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 272, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1089, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 273, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1090, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 273, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1091, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 273, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1092, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 273, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1093, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 274, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1094, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 274, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1095, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 274, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1096, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 274, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1097, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 275, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1098, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 275, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1099, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 275, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1100, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 275, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1101, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 276, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1102, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 276, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1103, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 276, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1104, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 276, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1105, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 277, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1106, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 277, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1107, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 277, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1108, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 277, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1109, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 278, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1110, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 278, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1111, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 278, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1112, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 278, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1113, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 279, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1114, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 279, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1115, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 279, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1116, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 279, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1117, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 280, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1118, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 280, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1119, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 280, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1120, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 280, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1121, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 281, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1122, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 281, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1123, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 281, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1124, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 281, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1125, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 282, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1126, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 282, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1127, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 282, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1128, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 282, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1129, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 283, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1130, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 283, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1131, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 283, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1132, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 283, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1133, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 284, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1134, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 284, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1135, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 284, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1136, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 284, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1137, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 285, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1138, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 285, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1139, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 285, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1140, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 285, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1141, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 286, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1142, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 286, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1143, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 286, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1144, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 286, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1145, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 287, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1146, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 287, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1147, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 287, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1148, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 287, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1149, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 288, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1150, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 288, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1151, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 288, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1152, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 288, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1153, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 289, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1154, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 289, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1155, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 289, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1156, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 289, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1157, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 290, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1158, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 290, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1159, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 290, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1160, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 290, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1161, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 291, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1162, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 291, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1163, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 291, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1164, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 291, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1165, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 292, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1166, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 292, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1167, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 292, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1168, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 292, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1169, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 293, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1170, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 293, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1171, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 293, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1172, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 293, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1173, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 294, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1174, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 294, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1175, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 294, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1176, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 294, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1177, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 295, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1178, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 295, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1179, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 295, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1180, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 295, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1181, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 296, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1182, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 296, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1183, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 296, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1184, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 296, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1185, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 297, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1186, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 297, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1187, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 297, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1188, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 297, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1189, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 298, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1190, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 298, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1191, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 298, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1192, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 298, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1193, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 299, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1194, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 299, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1195, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 299, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1196, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 299, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1197, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 300, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u8eab\u4efd\u8bc1"
+    }
+},
+{
+    "pk": 1198, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 300, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u4fe1\u7528\u62a5\u544a"
+    }
+},
+{
+    "pk": 1199, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 300, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u5de5\u4f5c\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1200, 
+    "model": "wanglibao_p2p.warrant", 
+    "fields": {
+        "product": 300, 
+        "created_at": "2014-06-17T09:16:10Z", 
+        "warranted_at": "2014-06-17T09:16:10Z", 
+        "name": "\u6536\u5165\u8bc1\u660e"
+    }
+},
+{
+    "pk": 1, 
+    "model": "wanglibao_p2p.usermargin", 
+    "fields": {
+        "withdrawing": "0.00", 
+        "margin": "1000.00",
+        "freeze": "0.00"
+    }
+},
+{
+    "pk": 2, 
+    "model": "wanglibao_p2p.usermargin", 
+    "fields": {
+        "withdrawing": "0.00", 
+        "margin": "10000000.00",
+        "freeze": "0.00"
+    }
+},
+{
+    "pk": 3, 
+    "model": "wanglibao_p2p.usermargin", 
+    "fields": {
+        "withdrawing": "0.00", 
+        "margin": "0.00", 
+        "freeze": "0.00"
+    }
+},
+{
+    "pk": 4, 
+    "model": "wanglibao_p2p.usermargin", 
+    "fields": {
+        "withdrawing": "0.00", 
+        "margin": "0.00", 
+        "freeze": "0.00"
+    }
+},
+{
+    "pk": 5, 
+    "model": "wanglibao_p2p.usermargin", 
+    "fields": {
+        "withdrawing": "0.00", 
+        "margin": "0.00", 
+        "freeze": "0.00"
+    }
+},
+{
+    "pk": 6, 
+    "model": "wanglibao_p2p.usermargin", 
+    "fields": {
+        "withdrawing": "0.00", 
+        "margin": "0.00", 
+        "freeze": "0.00"
+    }
+},
+{
+    "pk": 7, 
+    "model": "wanglibao_p2p.usermargin", 
+    "fields": {
+        "withdrawing": "0.00", 
+        "margin": "0.00", 
+        "freeze": "0.00"
+    }
+}
+]
