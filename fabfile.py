@@ -2,7 +2,7 @@ from contextlib import contextmanager
 import os
 from fabric.api import *
 from fabric.colors import green, red, yellow
-from fabric.contrib.files import exists
+from fabric.contrib.files import exists, contains
 from fabric_components.folder import create_folder
 from fabric_components.apache import install_apache
 from fabric_components.mysql import install_mysql, db_env, create_database, create_user, apt_get
@@ -15,10 +15,10 @@ def prepare():
 
 
 def testserver():
-    env.host_string = '192.168.56.199'
+    env.host_string = '192.168.1.161'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'ssh://192.168.56.1/~/developer/django/wanglibao/wanglibao'
+    env.depot = 'ssh://192.168.1.100/~/developer/django/wanglibao-back'
     env.depot_name = 'wanglibao'
     env.branch = "master"
 
@@ -141,6 +141,19 @@ def add_cron_tab(job_file, job_log_file, env, period_string, manage_py, manage_a
     if _end:
         sudo('crontab /tmp/tmp_tab')
 
+
+def install_rabbit_mq():
+    apt_get("software-properties-common")
+
+    if not contains('/etc/apt/sources.list', 'rabbitmq'):
+        sudo("add-apt-repository \"deb http://www.rabbitmq.com/debian/ testing main\"")
+        run("wget http://www.rabbitmq.com/rabbitmq-signing-key-public.asc")
+        sudo("apt-key add rabbitmq-signing-key-public.asc")
+        sudo("apt-get update")
+
+    apt_get("rabbitmq-server")
+
+
 def deploy():
     path = env.path
     scrawl_job_file = '/usr/bin/scrawl_job'
@@ -209,6 +222,8 @@ def deploy():
                 run('git remote set-url origin %s' % env.depot)
                 run("git checkout %s" % env.branch)
                 run("git pull")
+
+        install_rabbit_mq()
 
         apt_get("gcc", "python-setuptools", "python-all-dev", "libpq-dev", "libjpeg-dev")
         print green("Install pip and virtualenv")

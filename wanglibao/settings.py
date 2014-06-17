@@ -358,3 +358,10 @@ SWAGGER_SETTINGS = {
 
 # Captcha setting
 CAPTCHA_IMAGE_BEFORE_FIELD = False
+
+# Celery configuration
+BROKER_URL = 'amqp://guest:guest@localhost//'
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
