@@ -64,7 +64,13 @@ class P2PProduct(ProductBase):
 
     @property
     def completion_rate(self):
+        if not self.total_amount > 0:
+            return 0
         return float(self.ordered_amount) / float(self.total_amount) * 100
+
+    @property
+    def limit_amount_per_user(self):
+        return int(self.limit_per_user * self.total_amount)
 
     def has_amount(self, amount):
         if amount <= self.remain:
@@ -154,6 +160,9 @@ class UserEquity(models.Model):
     equity = models.BigIntegerField(verbose_name=u'用户所持份额', default=0)
     confirm = models.BooleanField(verbose_name=u'确认成功', default=False)
 
+    class Meta:
+        unique_together = (('user', 'product'),)
+
     def __unicode__(self):
         return u'%s 持有 %s 数量:%s' % (self.user, self.product, self.equity)
 
@@ -162,7 +171,3 @@ class UserEquity(models.Model):
     def related_records(self):
         records = list()
         return records
-
-    @property
-    def paymethod(self):
-        pass
