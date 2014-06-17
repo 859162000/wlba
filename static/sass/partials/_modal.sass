@@ -1,13 +1,28 @@
 .modal
-  border: 3px solid #d3d3d3
-  padding: 0
+  border-top: 4px solid #e7360d
+  padding: 10px
   overflow: hidden
+  border-radius: 0
+  box-shadow: none
+  width: 525px
+
+  a
+    color: $blue
+    &:hover
+      color: $red
+
+  a.close-modal
+    position: absolute
+    top: 10px
+    right: 10px
+    display: block
+    width: 25px
+    height: 25px
+    background: url(/static/images/close.png) no-repeat 0 0
 
 .modal-title-bar
   line-height: 35px
-  background: #ECECEC
-  padding: 0 1em
-  font-size: $font-m
+  font-size: $font-xxl
   color: #666666
   width: 100%
 
@@ -41,3 +56,11 @@
 .modal--subtitle
   color: $red
   font-size: $font-m
+
+.errMessage
+  padding: 8px 10px 5px 10px
+  line-height: normal
+
+  .error
+    line-height: normal
+    padding: 0

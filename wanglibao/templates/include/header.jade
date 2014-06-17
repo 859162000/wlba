@@ -9,10 +9,11 @@
       a.topbar-anchor.icon-weibo(href="javascript:void(0)")
       a.topbar-anchor.icon-weixin(href="javascript:void(0)")
 
-      .user-info#user-info-ajax
+      .user-info.white#user-info-ajax
         if user.is_authenticated
-          span {{ user.wanglibaouserprofile.nick_name }}
+          span
+            a(href="/accounts/home") {{ user.wanglibaouserprofile.nick_name }} 的个人中心
           a.logout(href="/accounts/logout?next={{ request.path }}") 退出
         else
-          a.login-modal.user-info--login(href="#login-modal-form") 登录
-          a.register-modal.user-info--register(href="#register-modal-form") 注册
+          a.login-modal.user-info--login(href="#login-modal") 登录
+          a.register-modal.user-info--register(href="#login-modal") 注册

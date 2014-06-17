@@ -7,7 +7,7 @@
   });
 
   require(['jquery'], function($) {
-    return $('#pay').click(function(e) {
+    $('#pay').click(function(e) {
       var amount, gate_id;
       e.preventDefault();
       amount = $('#amount').val();
@@ -34,6 +34,11 @@
         $('#huifu-form').attr('action', json['form']['url']);
         return $('#huifu-form').submit();
       });
+    });
+    return $('.banks a').click(function(e) {
+      e.preventDefault();
+      $('.banks a').removeClass('active');
+      return $(e.target).addClass('active');
     });
   });
 

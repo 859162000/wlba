@@ -1,15 +1,27 @@
 {
   "checksum": {
-    "previous": "0321f299a3a5c1533224bbee1842a134291e8fbe97ef805c897ed25473c6a8f9",
-    "current": "0321f299a3a5c1533224bbee1842a134291e8fbe97ef805c897ed25473c6a8f9"
+    "previous": "2f20e14b3b14e40822d5abafd57f6d695ee7bd5e940d42658634b9d29cf93d10",
+    "current": "2f20e14b3b14e40822d5abafd57f6d695ee7bd5e940d42658634b9d29cf93d10"
   },
   "fonts": [
-    "../stylesheets/fonts//fontcustom_0321f299a3a5c1533224bbee1842a134.ttf",
-    "../stylesheets/fonts//fontcustom_0321f299a3a5c1533224bbee1842a134.svg",
-    "../stylesheets/fonts//fontcustom_0321f299a3a5c1533224bbee1842a134.woff",
-    "../stylesheets/fonts//fontcustom_0321f299a3a5c1533224bbee1842a134.eot"
+    "../stylesheets/fonts//fontcustom_2f20e14b3b14e40822d5abafd57f6d69.ttf",
+    "../stylesheets/fonts//fontcustom_2f20e14b3b14e40822d5abafd57f6d69.svg",
+    "../stylesheets/fonts//fontcustom_2f20e14b3b14e40822d5abafd57f6d69.woff",
+    "../stylesheets/fonts//fontcustom_2f20e14b3b14e40822d5abafd57f6d69.eot"
   ],
   "glyphs": {
+    "check": {
+      "codepoint": 61708,
+      "source": "vectors/check.svg"
+    },
+    "check-shield": {
+      "codepoint": 61709,
+      "source": "vectors/check-shield.svg"
+    },
+    "check-square": {
+      "codepoint": 61712,
+      "source": "vectors/check-square.svg"
+    },
     "phone": {
       "codepoint": 61700,
       "source": "vectors/phone.svg"
@@ -17,6 +29,14 @@
     "phone-footer": {
       "codepoint": 61707,
       "source": "vectors/phone-footer.svg"
+    },
+    "refresh": {
+      "codepoint": 61710,
+      "source": "vectors/refresh.svg"
+    },
+    "shield": {
+      "codepoint": 61711,
+      "source": "vectors/shield.svg"
     },
     "star": {
       "codepoint": 61705,

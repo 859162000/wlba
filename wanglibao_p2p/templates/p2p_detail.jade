@@ -1,0 +1,179 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    title = p2p.name
+    include include/common_head
+    meta(name="keywords", content="网利宝")
+    meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
+
+  body
+    include include/header
+    - with '首页' as activeItem
+    include include/navigation
+    - endwith
+    .space-m
+    .full-container-home.clearfix
+      .p2p-container.dark-gray.border-all
+        .span8.p2p-detail-container
+          .p2p-detail-bar.clearfix
+            .row
+              .span8
+                span.icon 担 &nbsp;
+                span.p2p-detail-title {{p2p.short_name}}
+                span.p2p-warrant-way
+                  span.icon-check-shield
+                  | 100%本息担保
+              .span4-omega.p2p-detail-endtime.align-right 剩余时间：{{p2p.end_time | timedelta_now }}
+          .p2p-detail-content.clearfix
+            .row
+              .span4
+                p.dark-gray.font-xxl {{p2p.total_amount | money_format}}
+                p 投资金额（元）
+              .span5
+                p.dark-gray
+                  span.font-xxl {{p2p.period}}
+                  span.font-xl 个月
+                p 还款期限
+              .span3-omega
+                p.highlight
+                  span.font-xxl {{p2p.expected_earning_rate}}
+                  span.font-xl %
+                p 年化收益
+          .p2p-detail-footer
+            .row
+              .span8
+                |还款方式：
+                span.dark-gray {{p2p.pay_method}}
+              .span4-omega
+                span 进度：
+                  .progress-container
+                    percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                    .progress-indicator(style="width:{{percent | percentage}}")
+                  span.highlight &nbsp;&nbsp; {{percent | percentage}}
+
+          dl.p2p-detail-intro.clearfix
+            dt 项目用途：
+            dd
+              | {{p2p.short_usage}}
+              a.blue(href="") [详情]
+
+        .span4-omega.invest-form.border-left
+          h1 我要投资
+          form(name="invest-form",method="post", action="#")
+            .row
+              span.span4 可投资金额
+              span.span8-omega
+                span.dark-gray.font-m {{p2p.remain | money_format}}
+                | 元
+            .row
+              span.span4 投资金额
+              span.span8-omega
+                input.span12(type="text", name="invest_amount", placeholder="请输入50-42400的整数")
+            .row
+              span.span4 预期收益
+              span.span8-omega
+                span.highlight.font-m 00.00
+                | 元
+            .row
+              span.span4 输入验证码
+              span.span8-omega
+                input.span4(type="text", name="validate_code")
+            .row
+              span.span4
+              span.span8-omega
+                button.span12.button-red.button-middle(type='submit') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+          .sold-out(style="display:none")
+            p.align-center
+              button.button-large.disabled(type="button")
+                span.font-xl 已售完
+            p.align-center.padding-s 05-10 15:30:30 售完
+            p
+              | 新的投资产品将在工作日
+              span.highlight 17:30
+              | 固定时间发布，请查看网站首页。
+
+    .space-m
+    .full-container-home.clearfix
+      .p2p-container
+        .span8.p2p-detail-container
+          r = p2p.extra_data.items()
+          for section_name, section_values in r
+            .p2p-detail-list.clearfix
+              h1 {{section_name}}
+              dl
+                for item_name, item_value in section_values
+                  dd {{item_name}}
+              if user.is_authenticated
+                ul
+                  for item_name, item_value in section_values
+                    li {{item_value}}
+              else
+                ul.p2p-no-login
+                  li
+                    | 只有
+                    span.blue 注册用户
+                    |才能看到，现在
+                    a.login-modal.blue(href="#login-modal") 登陆
+        .span4-omega.border-left.clearfix
+          .p2p-detail-container.guarantee-company
+            h1 担保机构
+            table
+              caption {{p2p.warrant_company.name}}
+              tbody
+                warrants = p2p.warrant_set.all()
+                tr
+                  for warrant in warrants
+                    td {{warrant.name}}
+                tr
+                  for warrant in warrants
+                    td
+                      span
+                        span.icon.icon-approve
+                        | 已认证
+          .clearfix
+            .p2p-detail-container
+              h1 投资记录
+              table.invest-history-table
+                thead
+                  tr
+                    th 申购时间
+                    th 投资人
+                    th 金额
+                tbody
+                  trade_records = p2p.traderecord_set.all()[:40]
+                  top = trade_records[:15]
+                  rest = trade_records[15:]
+                  for trade in top
+                    tr
+                      td
+                        p {{trade.create_time | date:"Y-m-d"}}
+                        p {{trade.create_time | date:"h:m:s"}}
+                      td
+                        em {{trade.user | safe_phone}}
+                      td
+                        span.money-highlight {{trade.amount}}
+                        span 元
+                tbody(style="display:none")
+                  for trade in rest
+                    tr
+                      td
+                        p {{trade.create_time | date:"Y-m-d"}}
+                        p {{trade.create_time | date:"h:m:s"}}
+                      td
+                        em {{trade.user | safe_phone}}
+                      td
+                        span.money-highlight {{trade.amount}}
+                        span 元
+
+              p.check-more
+                a.blue.font-s(href="#") 显示更多
+
+    .space-m
+    - with 1 as no_margin
+    include include/footer
+    - endwith
+
+    include include/tracking

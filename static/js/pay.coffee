@@ -26,3 +26,8 @@ require ['jquery'], ($)->
         $('#huifu-form').attr('action', json['form']['url'])
         $('#huifu-form').submit()
 
+  $('.banks a').click (e)->
+    e.preventDefault()
+
+    $('.banks a').removeClass 'active'
+    $(e.target).addClass 'active'

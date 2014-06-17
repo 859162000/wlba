@@ -16,7 +16,9 @@ class BankListView(TemplateView):
     template_name = 'pay_banks.jade'
 
     def get_context_data(self, **kwargs):
-        return dict(banks=Bank.objects.all())
+        return {
+            'banks': Bank.objects.all(),
+        }
 
 
 class Pay(APIView):

@@ -29,9 +29,9 @@ html
           h1.banner-form--title 网利宝年化收益率
           p.banner-form--row 最高 <em class="highlight">13.24%</em>
           p.banner-form--row <span class="highlight">30</span>倍活期存款收益<span class="highlight">24</span>倍定期存款收益
-          a.banner-form--button.full-width(href="#") 免费注册
+          a.banner-form--button.full-width.register-modal(href="#login-modal") 免费注册
           p.align-right
-            span 已有账号？<a class="login-button" href="#">立即登录</a>
+            span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
 
     .full-container-white
       .sales-data-container
@@ -50,10 +50,11 @@ html
             em.highlight 10%-15%
     .container
       .row
-        .span9
+        .span8
           for product in p2p_products
             .panel-p2p-product
-              .panel-title-bar {{product.name}}
+              .panel-title-bar
+                a(href="/p2p/detail/{{product.id}}") {{product.name}}
               .panel-content
                 .row
                   .span3
@@ -76,7 +77,7 @@ html
                   .span3-omega.align-right
                     p
                       if product.status == '正在招标'
-                        a.button-primary(href="#") 正在招标
+                        a.button-primary(href="/p2p/detail/{{product.id}}/") 正在招标
                       else
                         a.button-disabled(href="javascript:void(0)", disabled) {{product.status}}
                     p 剩余时间：{{product.end_time | timedelta_now }}
@@ -88,16 +89,16 @@ html
                       percent = float(product.ordered_amount) / product.total_amount * 100
                       .progress-indicator(style="width:{{percent | percentage}}")
                     span.highlight &nbsp;&nbsp; {{percent | percentage}}
-                  .span3.align-right
+                  .span4.align-right
                     span 担保机构: &nbsp;&nbsp;
                     span {{product.warrant_company.name}}
-                  .span3-omega.align-right
+                  .span4-omega.align-right
                     span 还款方式: &nbsp;&nbsp;
                     span {{product.pay_method}}
 
           a(href="#") 点击查看更多 >>
 
-        .span3-omega
+        .span4-omega
           .panel-nopadding
             .panel-title-bar__no-border
               .panel-title 媒体报道
@@ -114,32 +115,30 @@ html
                     th 投资人
                     th 金额
                 tbody
-                  mixin invest-entry(date, time, user, money)
+                  trade_records = trade_records
+                  top = trade_records[:15]
+                  rest = trade_records[15:]
+                  for trade in top
                     tr
                       td
-                        p=date
-                        p=time
+                        p {{trade.create_time | date:"Y-m-d"}}
+                        p {{trade.create_time | date:"h:m:s"}}
                       td
-                        em=user
+                        em {{trade.user | safe_phone}}
                       td
-                        span.money-highlight=money
+                        span.money-highlight {{trade.amount}}
                         span 元
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
-                  +invest-entry('2014-04-10', '21:29:11', '138****1212', '3000')
+                  tbody(style="display:none")
+                    for trade in rest
+                      tr
+                        td
+                          p {{trade.create_time | date:"Y-m-d"}}
+                          p {{trade.create_time | date:"h:m:s"}}
+                        td
+                          em {{trade.user | safe_phone}}
+                        td
+                          span.money-highlight {{trade.amount}}
+                            span 元
 
     script(src="/static/js/require.js", data-main="/static/js/index")
 

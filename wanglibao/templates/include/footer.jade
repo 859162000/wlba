@@ -48,57 +48,56 @@ mixin innerFooter()
   .footer-bottom
     .footer-copyright Copyright&copy;2014 wanglibao.com Inc. All Right Reserved. 北京网利科技有限公司
 
-  #login-modal-form(style="display:none")
-    .modal-title-bar
-      span.modal-title 用户登录
-      a.icon-cancel.pull-right(rel="modal:close")
+  #login-modal(style="display:none")
     .padding-s
-      form#login-form.login-form(method='post', action='/accounts/login/ajax/')
-        - csrf_token
+      ul.login-modal-tab
+        li#tab-login.active 用户登录
+        li#tab-register 用户注册
+      form#login-modal-form.login-form(method='POST', action='/accounts/login/ajax/')
         .form-row
-          input#id_identifier.identifier.full-width(type="text", name="identifier", placeholder="请输入手机号")
-          span#errMessage1
+          input#login_identifier.full-width(type="text", name="identifier", placeholder="请输入手机号")
+          .errMessage
         .form-row
-          input#id_password.password.full-width(type="password", name="password", placeholder="请输入密码")
-          span#errMessage2
+          input#login_password.full-width(type="password", name="password", placeholder="请输入密码")
+          .errMessage
         .form-row
-          input#id_captcha_0.captcha(type="hidden", name="captcha_0", autocomplete="off")
-          input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off")
-          img.captcha(alt="captcha", src="")
-          button.captcha-refresh(type="button") 刷新
-          span#errMessage3
+          input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+          input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入验证码", maxlength="4")
+          img.captcha.captcha-img(alt="captcha", src="")
+          button.captcha-refresh.refresh-button(type="button", title="点击刷新验证码") &nbsp;&nbsp;&nbsp;&nbsp;
+          .errMessage
         .form-row.form-bottom-bar
-          button#login_submit.span8.button-red.button-middle(type='submit') 登 录
-          .span4-omega
-          .space-s
-          a(href='{% url "password_reset" %}') 忘记密码？
+          button#login_submit.span12.button-red.button-middle(type='submit') 登 录
+          .remember-me
+            a.forgot-password(href='{% url "password_reset" %}') 忘记密码？
         .space-vertical-s
 
-  #register-modal-form(style="display:none")
-    .modal-title-bar
-      span.modal-title 用户注册
-      a.icon-cancel.pull-right(rel="modal:close")
-    .padding-s
-      form#register-form.login-form(method='post', action='/accounts/register?next={{ next }}')
-        - csrf_token
+      form#register-modal-form.login-form(method='post', action='/accounts/register?next={{ next }}')
         .form-row
-          input.identifier.full-width(type="text", name="identifier", placeholder="* 请输入手机号")
+          input#reg_identifier.full-width(type="text", name="identifier", placeholder="请输入手机号")
+          .errMessage
         #validate-code-container.form-row
-          input#id_validate_code.validate_code.ispan6.clear-margin(placeholder="* 请输入验证码", autocomplete='off', title="* 请输入验证码")
+          input#id_validate_code.ispan6.clear-margin(name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
           button.ispan4-omega#button-get-validate-code.button.button-red.button-mini(type='button') 获取
+          .errMessage
         .form-row
-          input.password.full-width(type="password", placeholder="请输入密码")
+          input#reg_password.full-width(type="password", name="password", placeholder="请输入密码")
           .password-strength-container
             span.password-strength-1 低
             span.password-strength-2 中
             span.password-strength-3 高
-        //.form-row
-          input.input-large(type="password", name="password2", placeholder="* 请确认密码", autocomplete='off', title="* 请确认密码")
+          .errMessage
+        .form-row
+          input#reg_password2.input-large(type="password", name="password2", placeholder="请确认密码", autocomplete='off', title="请确认密码")
+          .errMessage
         .form-row.form-bottom-bar
           button#register_submit.span12.button-red.button-middle(type='submit') 注 册
-          .span4-omega
-          .space-s
+          .agreement.clearfix
+            label(for="agreement")
+              input(type="checkbox", name="agreement", checked="checked", id="agreement")
+              | 我同意《网利宝注册协议》
         .space-vertical-s
+
 
 if no_margin
   .footer-no-margin
@@ -107,7 +106,5 @@ else
   .footer
     +innerFooter()
 
-
-
 script.
-  require(['/static/js/hover.js','/static/js/footer.js'])
+  require(['/static/js/hover.js','/static/js/login_modal.js'])

@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-
 class RestrictionException(Exception):
     ErrorMessage = {}
     __error__ = 'RestrictionException'
@@ -9,16 +8,16 @@ class RestrictionException(Exception):
         self.code = str(error_code)
 
     def __str__(self):
-        return "<%s Error %s: %s" % (self.__error__, self.code, self.ErrorMessage[self.code])
+        return u"<%s Error %s: %s>" % (self.__error__, self.code, self.ErrorMessage[self.code])
 
 
 
 class UserRestriction(RestrictionException):
     ErrorMessage = {
-        '100000': u'不是合法的用户对象',
-        '100001': u'用户余额不足',
-        '100002': u'用户身份证未验证',
-        '100003': u'获取用户资金失败'
+        '100000': 'Not valid User object.',
+        '100001': 'User do not have enough margin.',
+        '100002': 'User\'s ID not verified.',
+        '100003': 'Can not fount user margin info.'
     }
     __error__ = 'UserRestriction'
 
@@ -27,9 +26,11 @@ class UserRestriction(RestrictionException):
 
 class ProductRestriction(RestrictionException):
     ErrorMessage = {
-        '200000': u'不是合法的产品对象',
-        '200001': u'产品售罄',
-        '200002': u'产品已停售',
+        '200000': 'Not valid Product object.',
+        '200001': 'stop sell.',
+        '200002': 'sold out.',
+        '200003': 'Can not get object.',
+        '200004': 'purchase amount must be integer numbe.'
     }
     __error__ = 'ProductRestriction'
 

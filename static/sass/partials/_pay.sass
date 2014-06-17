@@ -1,6 +1,8 @@
+@import "../sprites/bank-logos"
+
 .pay-container
   @extend .container
-  margin-top: 85px
+  margin-top: $space-m
   padding: 35px 50px 100px 50px
   background-color: white
 
@@ -17,3 +19,62 @@
     height: 0
     clear: both
 
+.payform
+  label
+    font-size: $font-m
+
+  .form-group
+    line-height: 35px
+    margin-bottom: $space-m
+    @extend .row
+
+  input[type="text"]
+    +border-radius(0)
+    font-size: $font-m
+    height: 35px
+    text-align: right
+    margin-left: 0
+
+.banks
+  a
+    display: block
+    width: 170px
+    height: 40px
+    vertical-align: middle
+    border: 1px solid lightgray
+    margin-bottom: 10px
+
+    &.active
+      +link-colors(#1C78C1)
+      border: 1px solid #1C78C1
+      @extend .icon-check-square
+      position: relative
+
+    &.active::before
+      position: absolute
+      top: 0
+      right: 0
+
+.bank-description
+  table
+    table-layout: fixed
+    border-collapse: collapse
+    width: 100%
+    font-size: $font-m
+
+    thead
+      background: #ECF1F5
+
+    tr
+      height: 47px
+
+    th, td
+      border: 1px solid #d3d3d3
+      text-align: center
+
+@include all-bank-logos-sprites()
+
+.button-pay
+  @extend .button-primary
+  width: 230px
+  height: 40px

@@ -1,7 +1,9 @@
 # encoding: utf-8
 import datetime
 import logging
+import json
 from django.contrib import auth
+from django.contrib.auth import login as auth_login
 
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
@@ -9,11 +11,12 @@ from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
@@ -25,6 +28,7 @@ from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
@@ -371,3 +375,30 @@ class ResetPasswordAPI(APIView):
             return Response({
                 'message': u'验证码验证失败'
             }, status=400)
+
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
+    def messenger(message, user=None):
+        res = dict()
+        if user:
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
+        res['message'] = message
+        return json.dumps(res)
+
+    if request.method == "POST":
+        if request.is_ajax():
+            form = authentication_form(request, data=request.POST)
+            if form.is_valid():
+                auth_login(request, form.get_user())
+                return HttpResponse(messenger('done', user=request.user))
+            else:
+                return HttpResponseForbidden(messenger(form.errors))
+        else:
+            return HttpResponseForbidden('not valid ajax request')
+    else:
+        return HttpResponseNotAllowed()
+
+

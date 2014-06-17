@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'wanglibao',
     'registration_defaults',
     'django.contrib.admin',
+    'django_extensions',
 
     'rest_framework',
     'rest_framework.authtoken',
