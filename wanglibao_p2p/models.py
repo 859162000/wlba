@@ -2,6 +2,7 @@
 import collections
 from decimal import Decimal
 from django.db import models
+from django.db.models import F
 from django.utils import timezone
 from jsonfield import JSONField
 from wanglibao.models import ProductBase
@@ -15,6 +16,12 @@ class WarrantCompany(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.name
+
+
+class P2PProductManager(models.Manager):
+    def get_queryset(self):
+        return super(P2PProductManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
+                                                                    status__exact=u'正在招标')
 
 
 class P2PProduct(ProductBase):
@@ -43,6 +50,9 @@ class P2PProduct(ProductBase):
     warrant_company = models.ForeignKey(WarrantCompany)
     usage = models.TextField(blank=True, verbose_name=u'项目用途')
     short_usage = models.TextField(blank=True, verbose_name=u'项目用途摘要')
+
+    objects = models.Manager()
+    sold_out = P2PProductManager()
 
     def __unicode__(self):
         return u'<%s %f, 总量: %s, 已募集: %s, 完成率: %s %%>' % (self.name, self.expected_earning_rate, self.total_amount,
