@@ -3,9 +3,11 @@
 - load widget_tweaks
 
 doctype html
-- with '支付' as title
-include include/head
-- endwith
+head
+  - with '提现' as title
+  include include/common_head
+  - endwith
+  meta(http-equiv="content-type", content="text/html; charset=GBK")
 body
   include include/header
   - with '首页' as activeItem
@@ -13,18 +15,15 @@ body
   - endwith
   .pay-container
     .row
-      .pull-left 充值
+      .pull-left 提现
       .pull-right << 返回上级
 
 
-    form(action="{{form.url}}", method='post')
+    form(action="/pay/withdraw/complete/", method='post')
+      - csrf_token
       input#amount(type='text', name='amount', placeholder='金额', value='500.00')
-      input#gate_id(type='text', name='gate_id', placeholder='银行', value='09')
-      input#pay.button-red.button-l(type='button', value='充值')
+      input#withdraw.button-red.button-l(type='submit', value='提现')
 
-    form#huifu-form(method='post')
-
-  script(src='/static/js/require.js', data-main='/static/js/pay.js')
   - with 1 as no_margin
   include include/footer
   - endwith
