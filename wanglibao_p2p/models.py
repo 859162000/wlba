@@ -45,7 +45,8 @@ class P2PProduct(ProductBase):
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)')
     closed = models.BooleanField(verbose_name=u'是否完结', default=False)
 
-    payment = models.ForeignKey(P2PProductPayment)
+    # todo: delete null before deploy
+    payment = models.ForeignKey(P2PProductPayment, null=True)
 
     total_amount = models.BigIntegerField(default=0, verbose_name=u'借款总额')
     ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
