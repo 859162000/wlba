@@ -16,8 +16,10 @@ body
     .span9-omega.panel-padding
       .space-vertical-s
       .panel-title-bar-gray
-        .panel-tab.active
-          货币基金
+        .panel-tab
+          a(href="/accounts/transaction/p2p/") P2P
+        .panel-tab.active 货币基金
+
       .panel-container
         table.trust-table
           thead
@@ -46,7 +48,7 @@ body
                   else
                     无交易记录
 
-      - with data=transactions uri='/accounts/transactions/'
+      - with data=transactions uri='/accounts/transaction/'
       include include/pager
       - endwith
 

@@ -1,0 +1,48 @@
+-load formatters
+doctype html
+- with 'P2P交易记录' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .row
+    .span3
+      - with '交易记录' as activeItem
+      include include/user_center_sidebar
+      - endwith
+    .span9-omega.panel-padding
+      .space-vertical-s
+      .panel-title-bar-gray
+        .panel-tabs
+          .panel-tab.active P2P
+          .panel-tab
+            a(href='/accounts/transaction/fund/') 货币基金
+      .panel-container
+        table.trust-table
+          thead
+            tr
+              th 流水号
+              th 摘要
+              th 时间
+              th 对方
+              th 金额(元)
+              th 交易类型
+              th 余额(元)
+          tbody
+            each trade_record in trade_records
+              tr
+                td {{trade_record.id}}
+                td 陶瓷企业经营贷
+                td {{trade_record.create_time | date:"Y-i-d h:m:s"}}
+                td --
+                td {{trade_record.amount | money_format }}
+                td {{trade_record.catalog.name}}
+                td {{trade_record.user_margin_after | money_format}}
+      - with data=trade_records uri='/accounts/transaction/p2p/'
+      include include/pager
+      - endwith
+  include include/footer
+  include include/templates
+  include include/tracking
+

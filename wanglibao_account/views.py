@@ -31,6 +31,7 @@ from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
+from wanglibao_p2p.models import TradeRecord
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
 
@@ -307,6 +308,21 @@ class AccountTransaction(TemplateView):
         return {
             "transactions": transactions,
             "message": message
+        }
+
+
+class AccountTransactionP2P(TemplateView):
+    template_name = 'account_transaction_p2p.jade'
+
+    def get_context_data(self, **kwargs):
+        trade_records = TradeRecord.objects.filter(user=self.request.user)
+        pager = Paginator(trade_records, 20)
+        page = self.request.GET.get('page')
+        if not page:
+            page = 1
+        trade_records = pager.page(page)
+        return {
+            "trade_records": trade_records
         }
 
 
