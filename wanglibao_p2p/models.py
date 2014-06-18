@@ -24,6 +24,16 @@ class P2PProductManager(models.Manager):
                                                                     status__exact=u'正在招标')
 
 
+class P2PProductPayment(models.Model):
+    name = models.CharField(max_length=255, verbose_name=u'付款方式')
+    description = models.CharField(max_length=1000, verbose_name=u'描述', blank=u'', default=u'')
+
+    catalog_id = models.IntegerField(verbose_name=u'类别ID')
+
+    def __unicode__(self):
+        return u'%s, id:%s' % (self.name, self.catalog_id)
+
+
 class P2PProduct(ProductBase):
     name = models.CharField(max_length=256, verbose_name=u'名字')
     short_name = models.CharField(max_length=64, verbose_name=u'短名字')
@@ -34,6 +44,8 @@ class P2PProduct(ProductBase):
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)')
     closed = models.BooleanField(verbose_name=u'是否完结', default=False)
+
+    payment = models.ForeignKey(P2PProductPayment)
 
     total_amount = models.BigIntegerField(default=0, verbose_name=u'借款总额')
     ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
@@ -74,6 +86,45 @@ class P2PProduct(ProductBase):
         if amount <= self.remain:
             return True
         return False
+
+
+class ProductAmortization(models.Model):
+    product = models.ForeignKey(P2PProduct, related_name='amortizations')
+
+    term = models.IntegerField(verbose_name=u'还款期数')
+    amount = models.DecimalField(verbose_name=u'应付款项', max_digits=20, decimal_places=2)
+    penal_interest = models.DecimalField(verbose_name=u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
+    delay = models.IntegerField(verbose_name=u'逾期天数', default=0)
+
+    comment = models.CharField(verbose_name=u'摘要', max_length=500)
+    settled = models.BooleanField(verbose_name=u'已结算给客户')
+    settlement_time = models.DateTimeField(verbose_name=u'结算时间')
+
+    created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+
+    @property
+    def total_amount(self):
+        return self.amount + self.penal_interest
+
+    def __unicode__(self):
+        return u'产品<%s>: 第 %s 期，总额 %s 元' % (self.product.short_name, self.term, self.amount)
+
+
+class ProductUserAmortization(models.Model):
+    amortization = models.ForeignKey(ProductAmortization, related_name=u'to_users')
+
+    amount = models.DecimalField(verbose_name=u'还款金额', max_digits=20, decimal_places=2)
+    penal_interest = models.DecimalField(verbose_name=u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
+    delay = models.IntegerField(verbose_name=u'逾期天数', default=0)
+
+    created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+
+    @property
+    def total_amount(self):
+        return self.amount + self.penal_interest
+
+    def __unicode__(self):
+        return u'用户 %s 产品 %s 还款 %s'
 
 
 class Warrant(models.Model):
