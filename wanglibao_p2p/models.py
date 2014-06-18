@@ -7,6 +7,7 @@ from django.utils import timezone
 from jsonfield import JSONField
 from wanglibao.models import ProductBase
 from django.contrib.auth import get_user_model
+from utility import gen_hash_list
 
 user_model = get_user_model()
 
@@ -114,6 +115,7 @@ class ProductAmortization(models.Model):
 class ProductUserAmortization(models.Model):
     amortization = models.ForeignKey(ProductAmortization, related_name=u'to_users')
 
+    current_user_equity = models.BigIntegerField(verbose_name=u'分配时点用户所持份额')
     amount = models.DecimalField(verbose_name=u'还款金额', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(verbose_name=u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
     delay = models.IntegerField(verbose_name=u'逾期天数', default=0)
@@ -139,7 +141,7 @@ class Warrant(models.Model):
         return u'%s %s %s' % (self.product.name, self.name, str(self.warranted_at))
 
 
-class TradeRecordType(models.Model):
+class RecordCatalog(models.Model):
     name = models.CharField(max_length=10, help_text=u'类型')
     description = models.CharField(max_length=200, help_text=u'类型说明')
     catalog_id = models.IntegerField(verbose_name=u'类型序号', unique=True, null=True)
@@ -149,7 +151,7 @@ class TradeRecordType(models.Model):
 
 
 class TradeRecord(models.Model):
-    catalog = models.ForeignKey(TradeRecordType, help_text=u'流水类型')
+    catalog = models.ForeignKey(RecordCatalog, help_text=u'流水类型')
     amount = models.DecimalField(verbose_name=u'发生数', max_digits=20, decimal_places=2)
 
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品')
@@ -171,6 +173,7 @@ class TradeRecord(models.Model):
     create_time = models.DateTimeField(verbose_name=u'发生时间', auto_now_add=True)
 
     checksum = models.CharField(verbose_name=u'签名', max_length=1000, default='')
+    description = models.CharField(verbose_name=u'摘要', default='', max_length=1000)
 
     class Meta:
         ordering = ['-create_time']
@@ -179,15 +182,8 @@ class TradeRecord(models.Model):
         return u'流水号%s %s 发生金额%s' %(self.id, self.catalog.name, self.amount)
 
     def get_hash_list(self):
-        hash_list = list()
-        hash_list.append(self.catalog.id)
-        hash_list.append(self.amount)
-        hash_list.append(self.product.id)
-        hash_list.append(self.product_balance_before)
-        hash_list.append(self.product_balance_after)
-        hash_list.append(self.user.id)
-        hash_list.append(self.create_time)
-        return [str(item) for item in hash_list]
+        return gen_hash_list(self.catalog.catalog_id, self.amount, self.product.id, self.product_balance_before,
+                             self.product_balance_after, self.user.id, self.create_time)
 
 
 class UserMargin(models.Model):
@@ -207,6 +203,25 @@ class UserMargin(models.Model):
         return False
 
 
+class MarginRecord(models.Model):
+    catalog = models.ForeignKey(RecordCatalog, verbose_name=u'流水类型')
+    user = models.ForeignKey(get_user_model())
+    amount = models.DecimalField(verbose_name=u'发生金额', max_digits=20, decimal_places=2)
+    user_margin_before = models.DecimalField(verbose_name=u'用户前余额', max_digits=20, decimal_places=2)
+    user_margin_after = models.DecimalField(verbose_name=u'用户后余额', max_digits=20, decimal_places=2)
+    description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
+
+    checksum = models.CharField(verbose_name=u'签名', default='', max_length=1000)
+    create_time = models.DateTimeField(verbose_name=u'流水时间', auto_now_add=True)
+
+    def __unicode__(self):
+        return u'%s , %s' % (self.catalog, self.user)
+
+    def get_hash_list(self):
+        return gen_hash_list(self.catalog.catalog_id, self.user.id, self.user_margin_before, self.user_margin_after,
+                             self.create_time)
+
+
 class UserEquity(models.Model):
     user = models.ForeignKey(get_user_model(), related_name='equities')
     product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
@@ -219,8 +234,29 @@ class UserEquity(models.Model):
     def __unicode__(self):
         return u'%s 持有 %s 数量:%s' % (self.user, self.product, self.equity)
 
-    #todo define a method can return all related trade record.
     @property
     def related_records(self):
         records = list()
         return records
+
+    @property
+    def ratio(self):
+        return float(self.equity) / float(self.product.total_amount)
+
+
+class EquityRecord(models.Model):
+    catalog = models.ForeignKey(RecordCatalog, verbose_name=u'流水类型')
+    user = models.ForeignKey(get_user_model())
+    product = models.ForeignKey(P2PProduct, verbose_name=u'产品')
+    amount = models.DecimalField(verbose_name=u'发生数量', max_digits=20, decimal_places=2)
+    description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
+
+    checksum = models.CharField(verbose_name=u'签名', default=u'', max_length=1000)
+    create_time = models.DateTimeField(verbose_name=u'流水时间', auto_now_add=True)
+
+    def __unicode__(self):
+        return u'%s %s %s %s' %(self.catalog, self.user, self.product, self.amount)
+
+    def get_hash_list(self):
+        return gen_hash_list(self.catalog.catalog_id, self.user.id, self.product.id, self.amount, self.create_time)
+

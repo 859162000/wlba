@@ -4,7 +4,7 @@ from models import P2PProduct
 from django.contrib.auth import get_user_model
 from operate import Operator
 
-product = P2PProduct.objects.get(pk=1)
+product = P2PProduct.objects.all().first()
 user = get_user_model().objects.get(pk=1)
 trader = P2PTrader(product, user)
 op = Operator()
