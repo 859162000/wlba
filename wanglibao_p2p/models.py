@@ -35,8 +35,6 @@ class P2PProduct(ProductBase):
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)')
     closed = models.BooleanField(verbose_name=u'是否完结', default=False)
 
-    pay_method = models.CharField(max_length=32, verbose_name=u'还款方式')
-
     total_amount = models.BigIntegerField(default=0, verbose_name=u'借款总额')
     ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
 
