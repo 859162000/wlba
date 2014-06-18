@@ -236,6 +236,9 @@ define ['jquery'], ($)->
     re = /^1\d{10}$/
     re.test identifier
 
+  purchaseP2P = (data)->
+    $.post '/api/p2p/purchase/', data
+
   return {
     loadData: loadData
     isValidType: isValidType
@@ -255,4 +258,6 @@ define ['jquery'], ($)->
     isInRange: isInRange
     checkEmail: checkEmail
     checkMobile: checkMobile
+
+    purchaseP2P: purchaseP2P
   }

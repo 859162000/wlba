@@ -122,6 +122,9 @@ class TradeRecord(models.Model):
 
     checksum = models.CharField(verbose_name=u'签名', max_length=1000, default='')
 
+    class Meta:
+        ordering = ['-create_time']
+
     def __unicode__(self):
         return u'流水号%s %s 发生金额%s' %(self.id, self.catalog.name, self.amount)
 

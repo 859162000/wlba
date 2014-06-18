@@ -3,8 +3,13 @@
 from django.http import Http404
 from django.utils import timezone
 from django.views.generic import TemplateView
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.trade import P2PTrader
 
 
 class P2PDetailView(TemplateView):
@@ -15,7 +20,7 @@ class P2PDetailView(TemplateView):
 
         try:
             p2p = P2PProduct.objects.get(pk=id)
-            form = PurchaseForm()
+            form = PurchaseForm(initial={'product': p2p})
             if p2p.remain == 0:
                 status = 'finished'
             else:
@@ -32,3 +37,27 @@ class P2PDetailView(TemplateView):
             'form': form,
             'status': status
         }
+
+
+class PurchaseP2P(APIView):
+    permission_classes = IsAuthenticated,
+
+    @property
+    def allowed_methods(self):
+        return ['POST']
+
+    def post(self, request):
+        form = PurchaseForm(request.DATA)
+        if form.is_valid():
+            p2p = form.cleaned_data['product']
+            amount = form.cleaned_data['amount']
+
+            trader = P2PTrader(product=p2p, user=request.user)
+            trade_info = trader.purchase(amount)
+            return Response({
+                'data': trade_info.amount
+            })
+        else:
+            return Response({
+                "errors": form.errors
+            }, status=status.HTTP_400_BAD_REQUEST)

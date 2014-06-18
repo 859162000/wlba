@@ -64,8 +64,8 @@ html
         .span4-omega.invest-form.border-left
           h1 我要投资
           if status == 'open'
-            form(name="invest-form",method="post", action="#")
-              - csrf_token
+            form#purchase-form
+              {{form.product}}
               .row
                 span.span4 可投资金额
                 span.span8-omega
@@ -87,7 +87,7 @@ html
               .row
                 span.span4
                 span.span8-omega
-                  button.span12.button-red.button-middle(type='submit') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                  a.submit-button.span12.button-primary.button-middle(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
           if status == 'finished'
             .sold-out
               p.align-center
@@ -177,9 +177,7 @@ html
               p.check-more
                 a.blue.font-s(href="#") 显示更多
 
-    .space-m
-    - with 1 as no_margin
+    script.
+      require(['/static/js/p2p_detail.js'])
     include include/footer
-    - endwith
-
     include include/tracking
