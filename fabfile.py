@@ -280,10 +280,7 @@ def deploy():
                     # use --noinput to prevent create super user. When super user created, then a profile object needs
                     # to be created, at that point, that table is not created yet. Then it crashes.
                     run("python manage.py syncdb --noinput")
-                    run("python manage.py migrate --list | grep -B 1 \"( ) 0001_initial\" | grep -v 0001 | tr -d \" -\" |  awk '{ if($0 != \"\") { system( \"python manage.py migrate \"  $0  \" 0001 --fake\") } }'")
                     run("python manage.py migrate")
-
-                # TODO generate a testing ssl key and crt file. Otherwise, apache server won't restart
 
                 print green("Copy apache config file")
                 sudo('cp wanglibao.conf /etc/apache2/sites-available')
