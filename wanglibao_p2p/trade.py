@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.db import transaction
 from django.conf import settings
 
-from models import P2PProduct, UserMargin, TradeRecord, UserEquity, RecordCatalog, user_model
+from models import P2PProduct, UserMargin, P2PRecord, UserEquity, RecordCatalog, user_model
 from models import MarginRecord
 from exceptions import UserRestriction, ProductRestriction
 from utility import checksum
@@ -72,7 +72,7 @@ class P2PTrader(object):
         log record.
         :return:
         """
-        record = TradeRecord(catalog=catalog, amount=amount,
+        record = P2PRecord(catalog=catalog, amount=amount,
                              product=product, product_balance_before=product_balance_before,
                              product_balance_after=product_balance_after,
                              user=user, user_margin_before=user_margin_before, user_margin_after=user_margin_after,
@@ -131,6 +131,7 @@ class UserMarginManager(object):
                 self.margin.freeze -= amount
             record = MarginRecord(catalog=record_catalog, user=self.user, user_margin_before=margin_before,
                                   user_margin_after=margin_after, description=description, amount=amount)
+            record.save()
             record.checksum = checksum(record.get_hash_list())
             record.save()
             return record

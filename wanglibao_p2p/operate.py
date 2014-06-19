@@ -2,7 +2,7 @@
 
 from django.db import transaction, IntegrityError
 from models import UserMargin, UserEquity, P2PProduct, ProductAmortization, ProductUserAmortization,\
-    TradeRecord, RecordCatalog
+    P2PRecord, RecordCatalog
 from exceptions import ProductRestriction, UserRestriction
 
 
@@ -52,7 +52,7 @@ class Operator(object):
                                                        delay=amo.delay)
                     user_amo.save()
 
-                    record = TradeRecord(catalog=record_type, amount=user_amo.total_amount, product=amo.product,
+                    record = P2PRecord(catalog=record_type, amount=user_amo.total_amount, product=amo.product,
                                          product_balance_before=0, product_balance_after=0, user=equity.user)
 
         except IntegrityError, e:
