@@ -5,7 +5,7 @@ import random
 import datetime
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from models import P2PProduct, Warrant, WarrantCompany, UserEquity, UserMargin, TradeRecord, TradeRecordType
+from models import P2PProduct, Warrant, WarrantCompany, UserEquity, UserMargin, TradeRecord, RecordCatalog
 from trade import P2PTrader
 from exceptions import RestrictionException
 
@@ -96,11 +96,11 @@ class MockGenerator(object):
             for record in TradeRecord.objects.all():
                 record.delete()
 
-            for catalog in TradeRecordType.objects.all():
+            for catalog in RecordCatalog.objects.all():
                 catalog.delete()
             return
 
-        TradeRecord.objects.create(name=u'申购', description=u'申购', catalog_id=1)
+        RecordCatalog.objects.create(name=u'申购', description=u'申购', catalog_id=1)
         users = get_user_model().objects.all()
         products = P2PProduct.objects.all()
 

@@ -22,6 +22,9 @@ body
     form(action="/pay/withdraw/complete/", method='post')
       - csrf_token
       input#amount(type='text', name='amount', placeholder='金额', value='500.00')
+      select(name='card_id')
+        for card in cards
+          option(value='{{card.id}}') {{card.bank.name}}
       input#withdraw.button-red.button-l(type='submit', value='提现')
 
   - with 1 as no_margin

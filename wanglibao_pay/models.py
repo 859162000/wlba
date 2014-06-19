@@ -2,24 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
-
-
-class PayInfo(models.Model):
-    INITIAL = u'初始'
-    PROCESSING = u'处理中'
-    SUCCESS = u'成功'
-    FAIL = u'失败'
-
-    type = models.CharField(verbose_name=u'类型', help_text=u'充值：D 取款：W', max_length=5)
-    amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'金额')
-    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
-    update_time = models.DateTimeField(verbose_name=u'更新时间', auto_now=True)
-    request = models.TextField(verbose_name=u'请求数据', blank=True)
-    response = models.TextField(verbose_name=u'返回数据', blank=True)
-    status = models.CharField(max_length=15, verbose_name=u'状态')
-    error_code = models.CharField(max_length=10, verbose_name=u'错误码', blank=True)
-    error_message = models.CharField(max_length=100, verbose_name=u'错误原因', blank=True)
-    user = models.ForeignKey(get_user_model())
+from wanglibao_buy.models import BindBank
 
 
 class Bank(models.Model):
@@ -35,3 +18,43 @@ class Bank(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.name
+
+
+class Card(models.Model):
+    no = models.CharField(max_length=25, verbose_name=u'卡号')
+    bank = models.ForeignKey(Bank)
+    user = models.ForeignKey(get_user_model())
+    is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
+
+    def __unicode__(self):
+        return u'%s' % self.no
+
+
+class PayInfo(models.Model):
+    INITIAL = u'初始'
+    PROCESSING = u'处理中'
+    SUCCESS = u'成功'
+    FAIL = u'失败'
+    EXCEPTION = u'异常'
+    ACCEPTED = u'已受理'
+
+    DEPOSIT = 'D'
+    WITHDRAW = 'W'
+
+    type = models.CharField(verbose_name=u'类型', help_text=u'充值：D 取款：W', max_length=5)
+    amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'金额')
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    update_time = models.DateTimeField(verbose_name=u'更新时间', auto_now=True)
+    request = models.TextField(verbose_name=u'请求数据', blank=True)
+    response = models.TextField(verbose_name=u'返回数据', blank=True)
+    status = models.CharField(max_length=15, verbose_name=u'状态')
+    error_code = models.CharField(max_length=10, verbose_name=u'错误码', blank=True)
+    error_message = models.CharField(max_length=100, verbose_name=u'错误原因', blank=True)
+    request_ip = models.CharField(max_length=50, verbose_name=u'请求地址', blank=True, null=True)
+    response_ip = models.CharField(max_length=50, verbose_name=u'响应地址', blank=True, null=True)
+    user = models.ForeignKey(get_user_model())
+    card = models.ForeignKey(Card, blank=True, null=True)
+
+    def __unicode__(self):
+        return u'%s' % self.pk
+

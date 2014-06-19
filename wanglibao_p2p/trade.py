@@ -6,8 +6,10 @@ from decimal import Decimal
 from django.db import transaction
 from django.conf import settings
 
-from models import P2PProduct, UserMargin, TradeRecord, UserEquity, TradeRecordType, user_model
+from models import P2PProduct, UserMargin, TradeRecord, UserEquity, RecordCatalog, user_model
+from models import MarginRecord
 from exceptions import UserRestriction, ProductRestriction
+from utility import checksum
 
 class P2PTrader(object):
 
@@ -45,7 +47,7 @@ class P2PTrader(object):
             self.__update_equity(amount)
             # record this trade
             # todo complete record method
-            catalog = TradeRecordType.objects.get(catalog_id=1)
+            catalog = RecordCatalog.objects.get(catalog_id=1)
             record = self.__record(catalog, amount, self.product, product_balance_before, product_balance_after,
                                    self.user, user_margin_before, user_margin_after)
             #return record number
@@ -81,13 +83,8 @@ class P2PTrader(object):
             record.operation_ip = client_ip
             record.operation_request_headers = meta
 
-        salt = settings.SECRET_KEY
         hash_list = record.get_hash_list()
-        hash_list.sort()
-        hash_string = ''.join(hash_list) + salt
-        hasher = hashlib.sha512()
-        hasher.update(hash_string)
-        record.checksum = hasher.hexdigest()
+        record.checksum = checksum(hash_list)
         record.save()
         return record
 
@@ -114,3 +111,48 @@ class P2PTrader(object):
         self.product.ordered_amount += amount
         self.product.save()
         return product_balance_before, self.product.remain
+
+
+class UserMarginManager(object):
+
+    def __init__(self, user):
+        self.user = user
+        self.margin = None
+
+    def __cash(self, amount, record_catalog, savepoint=True, freeze=False ,description=u''):
+        with transaction.atomic(savepoint=savepoint):
+            amount = Decimal(amount)
+            self.margin = UserMargin.objects.select_for_update().filter(pk=self.user).first()
+            margin_before = self.margin.margin
+            self.margin.margin += amount
+            self.margin.save()
+            margin_after = self.margin.margin
+            if freeze:
+                self.margin.freeze -= amount
+            record = MarginRecord(catalog=record_catalog, user=self.user, user_margin_before=margin_before,
+                                  user_margin_after=margin_after, description=description, amount=amount)
+            record.checksum = checksum(record.get_hash_list())
+            record.save()
+            return record
+
+    def deposit(self, amount, savepoint=True, description=u''):
+        record_catalog = RecordCatalog.objects.get(catalog_id=500)
+        return self.__cash(amount, record_catalog, savepoint=savepoint, description=description)
+
+    def withdraw(self, amount, savepoint=True, description=u''):
+        record_catalog = RecordCatalog.objects.get(catalog_id=501)
+        return self.__cash(-amount, record_catalog, savepoint=savepoint, description=description)
+
+    def freeze(self, amount, savepoint=True):
+        record_catalog = RecordCatalog.objects.get(catalog_id=502)
+        description = u'交易冻结 %s 元' % amount
+        return self.__cash(-amount, record_catalog, freeze=True, description=description)
+
+    def unfreeze(self, amount, savepoint=True):
+        record_catalog = RecordCatalog.objects.get(catalog_id=503)
+        description = u'交易解冻 %s 元' % amount
+        return self.__cash(amount, record_catalog, freeze=True, description=description)
+
+    def settle(self, amount, savepoint=True):
+        pass
+

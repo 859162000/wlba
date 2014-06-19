@@ -1,20 +1,19 @@
 # encoding: utf-8
 
 from django.db import transaction, IntegrityError
-from models import UserMargin, UserEquity, P2PProduct
+from models import UserMargin, UserEquity, P2PProduct, ProductAmortization, ProductUserAmortization,\
+    TradeRecord, RecordCatalog
 from exceptions import ProductRestriction, UserRestriction
 
 
 class Operator(object):
 
-    @classmethod
     def watchdog(self):
         sold_out = P2PProduct.sold_out.all()
         for product in sold_out:
             self.settle(product)
 
     def settle(self, product):
-        print(product, product.pk)
         if product.remain != 0:
             # todo add this restriction type
             raise ProductRestriction('300001')
@@ -22,7 +21,6 @@ class Operator(object):
             with transaction.atomic():
                 # lock product
                 product = P2PProduct.objects.select_for_update().filter(pk=product.pk).first()
-                print(product, product.pk)
                 # get all related equities
                 equities = product.equities.all()
 
@@ -33,6 +31,29 @@ class Operator(object):
                         equity.save()
                 product.status = u'已满标'
                 product.save()
+
+        except IntegrityError, e:
+            # todo add logger
+            print(e)
+
+    def amortize(self, amo, amount):
+        # todo: check amo restriction
+        try:
+            with transaction.atomic():
+                #lock product amortization
+                amo = ProductAmortization.objects.select_for_update().filter(pk=amo.pk).first()
+                equities = UserEquity.objects.select_for_update().filter(product=amo.product)
+                record_type = RecordCatalog.objects.get(catalog_id=100)
+                for equity in equities:
+                    user_amo_amount = amo.amount * equity.ratio
+                    user_penal_interest = amo.penal_interest * equity.ratio
+                    user_amo = ProductUserAmortization(amortization=amo, current_user_equity=equity.equity,
+                                                       amount=user_amo_amount, penal_interest=user_penal_interest,
+                                                       delay=amo.delay)
+                    user_amo.save()
+
+                    record = TradeRecord(catalog=record_type, amount=user_amo.total_amount, product=amo.product,
+                                         product_balance_before=0, product_balance_after=0, user=equity.user)
 
         except IntegrityError, e:
             # todo add logger
