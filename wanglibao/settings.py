@@ -76,6 +76,7 @@ INSTALLED_APPS = (
     'wanglibao_banner',
     'wanglibao_fake',
     'wanglibao_pay',
+    'order',
 
     'provider',
     'provider.oauth2',
@@ -303,8 +304,11 @@ LOGGING = {
         'shumi': {
             'handlers': ['file'],
             'level': 'DEBUG'
+        },
+        'wanglibao_pay': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
         }
-
     }
 }
 

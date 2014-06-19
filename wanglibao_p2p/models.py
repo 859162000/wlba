@@ -147,6 +147,7 @@ class P2PRecord(models.Model):
     user_margin_after= models.DecimalField(verbose_name=u'用户后余额', help_text=u'该笔流水发生后用户余额', max_digits=20,
                                              decimal_places=2, null=True)
 
+
     operation_ip = models.IPAddressField(verbose_name=u'流水ip', default='')
     operation_request_headers = models.TextField(verbose_name=u'流水请求信息', max_length=1000, default='',
                                                  help_text=u'存储流水产生时request headers信息')

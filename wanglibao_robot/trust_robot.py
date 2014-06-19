@@ -138,5 +138,5 @@ def run_robot(clean):
         except urllib2.URLError, e:
             print "Reason: ", e.reason
 
-    Trust.objects.filter(issue_date__lte=(timezone.now() - datetime.timedelta(weeks=8))).update(status=Trust.EXPIRED)
+    Trust.objects.filter(issue_date__lte=(timezone.now() - datetime.timedelta(weeks=16))).update(status=Trust.EXPIRED)
     Trust.objects.filter(issue_date__isnull=True).update(status=Trust.EXPIRED)

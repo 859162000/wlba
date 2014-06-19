@@ -32,6 +32,7 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord
+
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
 
@@ -237,7 +238,9 @@ class AccountHome(TemplateView):
 
     def get_context_data(self, **kwargs):
         message = ''
+
         try:
+            raise FetchException()
             fetcher = UserInfoFetcher(self.request.user)
             fetcher.fetch_user_fund_hold_info()
         except FetchException:
@@ -258,9 +261,6 @@ class AccountHome(TemplateView):
         total_asset = 0
         income_rate = 0
 
-        fund_income_week = 0
-        fund_income_month = 0
-
         if fund_hold_info.exists():
             for hold_info in fund_hold_info:
                 total_asset += hold_info.current_remain_share + hold_info.unpaid_income
@@ -274,6 +274,9 @@ class AccountHome(TemplateView):
         if total_asset != 0:
             income_rate = total_income / total_asset
 
+        # Followings for p2p
+        p2p_equties = UserEquity.objects.filter(user=self.request.user)
+
         return {
             'fund_hold_info': fund_hold_info,
             'total_asset': total_asset,
@@ -282,7 +285,9 @@ class AccountHome(TemplateView):
             'fund_income_week': fund_income_week,
             'fund_income_month': fund_income_month,
             'greeting': greeting,
-            'message': message
+            'message': message,
+
+            'p2p_equities': p2p_equties,
         }
 
 
@@ -416,5 +421,3 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
             return HttpResponseForbidden('not valid ajax request')
     else:
         return HttpResponseNotAllowed()
-
-

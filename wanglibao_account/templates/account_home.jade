@@ -39,9 +39,60 @@ body
               %
 
       .panel-padding
-        .panel-product-title-red
-          货币基金
-          a.button-mini.pull-right(href='/accounts/transaction/') 交易记录
+        .panel-product-title-red P2P
+          a.button-mini.pull-right(href='/accounts/transaction/p2p/') 交易记录
+        .card-panel
+          .gray-card4
+            p 总资产
+            p
+              span.big_number {{total_asset|money_f_2}}
+              元
+          .gray-card4
+            p 累积收益
+            p
+              span.big_number {{total_income|money_f_2}}
+              元
+          .gray-card4
+            p 近一周收益
+            p
+              span.big_number {{fund_income_week|money_f_2}}
+              元
+          .gray-card4
+            p 近一月收益
+            p
+              span.big_number {{fund_income_month|money_f_2}}
+              元
+
+        .space-vertical-s
+
+        table.trust-table
+          thead
+            tr
+              th 投标时间
+              th 产品名称
+              th 投资金额
+              th 月收本息
+              th 下次回款
+              th 状态
+              th 已回款
+          tbody
+            if p2p_equities
+              each equity in p2p_equities
+                tr
+                  td {{equity.product.publish_time | date:"Y-m-d h:i:s"}}
+                  td {{equity.product.name}}
+                  td {{equity.equity | money_format}}
+                  td {{equity.equity | money_format}}
+                  td {{equity.equity | money_format}}
+                  td {{equity.product.status}}
+                  td {{equity.equity | money_format}}
+            else
+              tr
+                td(colspan='4') 无持仓记录
+
+      .panel-padding
+        .panel-product-title-red 货币基金
+          a.button-mini.pull-right(href='/accounts/transaction/fund/') 交易记录
         .card-panel
           .gray-card4
             p 总资产
