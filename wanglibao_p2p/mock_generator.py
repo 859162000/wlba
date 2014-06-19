@@ -5,7 +5,7 @@ import random
 import datetime
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from models import P2PProduct, Warrant, WarrantCompany, UserEquity, UserMargin, P2PRecord, RecordCatalog
+from models import P2PProduct, Warrant, WarrantCompany, P2PRecord
 from trade import P2PTrader
 from exceptions import RestrictionException
 
@@ -83,40 +83,3 @@ class MockGenerator(object):
                     w.name = name
                     w.product = p2p
                     w.save()
-
-    @classmethod
-    def generate_trade(cls, clean=False):
-        if clean:
-            for equity in UserEquity.objects.all():
-                equity.delete()
-
-            for margin in UserMargin.objects.all():
-                margin.delete()
-
-            for record in P2PRecord.objects.all():
-                record.delete()
-
-            for catalog in RecordCatalog.objects.all():
-                catalog.delete()
-            return
-
-        RecordCatalog.objects.create(name=u'申购', description=u'申购', catalog_id=1)
-        users = get_user_model().objects.all()
-        products = P2PProduct.objects.all()
-
-        # generate user margin
-        for user in users:
-            margin, _ = UserMargin.objects.get_or_create(user=user)
-            margin.margin += Decimal(random.randrange(100000, 10000000))
-            margin.save()
-
-        # generate pseudo transaction.
-        for user in users:
-            for _ in range(random.randrange(10, 1000)):
-                rn = random.randrange(0, len(products))
-                trader = P2PTrader(products[rn], user)
-                try:
-                    trader.purchase(random.randrange(0, 10000))
-                except RestrictionException, e:
-                    print(u'模拟购买失败原因: %s' % e)
-                    continue

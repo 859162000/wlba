@@ -1,8 +1,8 @@
 # encoding: utf-8
 
 from django.db import transaction, IntegrityError
-from models import UserMargin, UserEquity, P2PProduct, ProductAmortization, ProductUserAmortization,\
-    P2PRecord, RecordCatalog
+from models import P2PEquity, P2PProduct, ProductAmortization, ProductUserAmortization,\
+    P2PRecord
 from exceptions import ProductRestriction, UserRestriction
 
 
@@ -42,8 +42,7 @@ class Operator(object):
             with transaction.atomic():
                 #lock product amortization
                 amo = ProductAmortization.objects.select_for_update().filter(pk=amo.pk).first()
-                equities = UserEquity.objects.select_for_update().filter(product=amo.product)
-                record_type = RecordCatalog.objects.get(catalog_id=100)
+                equities = P2PEquity.objects.select_for_update().filter(product=amo.product)
                 for equity in equities:
                     user_amo_amount = amo.amount * equity.ratio
                     user_penal_interest = amo.penal_interest * equity.ratio

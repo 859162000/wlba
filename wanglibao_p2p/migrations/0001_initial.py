@@ -15,6 +15,15 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'wanglibao_p2p', ['WarrantCompany'])
 
+        # Adding model 'P2PProductPayment'
+        db.create_table(u'wanglibao_p2p_p2pproductpayment', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('description', self.gf('django.db.models.fields.CharField')(default=u'', max_length=1000, blank=u'')),
+            ('catalog_id', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal(u'wanglibao_p2p', ['P2PProductPayment'])
+
         # Adding model 'P2PProduct'
         db.create_table(u'wanglibao_p2p_p2pproduct', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -30,7 +39,7 @@ class Migration(SchemaMigration):
             ('brief', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('expected_earning_rate', self.gf('django.db.models.fields.FloatField')(default=0)),
             ('closed', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('pay_method', self.gf('django.db.models.fields.CharField')(max_length=32)),
+            ('payment', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProductPayment'], null=True)),
             ('total_amount', self.gf('django.db.models.fields.BigIntegerField')(default=0)),
             ('ordered_amount', self.gf('django.db.models.fields.BigIntegerField')(default=0)),
             ('extra_data', self.gf('jsonfield.fields.JSONField')(blank=True)),
@@ -53,55 +62,86 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'wanglibao_p2p', ['Warrant'])
 
-        # Adding model 'TradeRecordType'
-        db.create_table(u'wanglibao_p2p_traderecordtype', (
+        # Adding model 'ProductAmortization'
+        db.create_table(u'wanglibao_p2p_productamortization', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=200)),
-        ))
-        db.send_create_signal(u'wanglibao_p2p', ['TradeRecordType'])
-
-        # Adding model 'TradeRecord'
-        db.create_table(u'wanglibao_p2p_traderecord', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('catalog', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.TradeRecordType'])),
+            ('product', self.gf('django.db.models.fields.related.ForeignKey')(related_name='amortizations', to=orm['wanglibao_p2p.P2PProduct'])),
+            ('term', self.gf('django.db.models.fields.IntegerField')()),
             ('amount', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
-            ('product', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProduct'])),
-            ('product_balance_before', self.gf('django.db.models.fields.IntegerField')()),
-            ('product_balance_after', self.gf('django.db.models.fields.IntegerField')()),
+            ('penal_interest', self.gf('django.db.models.fields.DecimalField')(default='0', max_digits=20, decimal_places=2)),
+            ('delay', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('comment', self.gf('django.db.models.fields.CharField')(max_length=500)),
+            ('settled', self.gf('django.db.models.fields.BooleanField')()),
+            ('settlement_time', self.gf('django.db.models.fields.DateTimeField')()),
+            ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal(u'wanglibao_p2p', ['ProductAmortization'])
+
+        # Adding model 'ProductUserAmortization'
+        db.create_table(u'wanglibao_p2p_productuseramortization', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('amortization', self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'to_users', to=orm['wanglibao_p2p.ProductAmortization'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('user_margin_before', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
-            ('user_margin_after', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
-            ('cancelable', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('current_equity', self.gf('django.db.models.fields.BigIntegerField')()),
+            ('amount', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
+            ('description', self.gf('django.db.models.fields.CharField')(max_length=1000)),
+        ))
+        db.send_create_signal(u'wanglibao_p2p', ['ProductUserAmortization'])
+
+        # Adding model 'P2PRecord'
+        db.create_table(u'wanglibao_p2p_p2precord', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('catalog', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('order_id', self.gf('django.db.models.fields.IntegerField')()),
+            ('amount', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
+            ('product', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProduct'], null=True)),
+            ('product_balance_after', self.gf('django.db.models.fields.IntegerField')(null=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True)),
+            ('user_margin_after', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=20, decimal_places=2)),
             ('operation_ip', self.gf('django.db.models.fields.IPAddressField')(default='', max_length=15)),
             ('operation_request_headers', self.gf('django.db.models.fields.TextField')(default='', max_length=1000)),
             ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('checksum', self.gf('django.db.models.fields.CharField')(default='', max_length=1000)),
+            ('description', self.gf('django.db.models.fields.CharField')(default='', max_length=1000)),
         ))
-        db.send_create_signal(u'wanglibao_p2p', ['TradeRecord'])
+        db.send_create_signal(u'wanglibao_p2p', ['P2PRecord'])
 
-        # Adding model 'UserMargin'
-        db.create_table(u'wanglibao_p2p_usermargin', (
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True, primary_key=True)),
-            ('margin', self.gf('django.db.models.fields.DecimalField')(default='0.00', max_digits=20, decimal_places=2)),
-            ('freeze', self.gf('django.db.models.fields.DecimalField')(default='0.00', max_digits=20, decimal_places=2)),
-        ))
-        db.send_create_signal(u'wanglibao_p2p', ['UserMargin'])
-
-        # Adding model 'UserEquity'
-        db.create_table(u'wanglibao_p2p_userequity', (
+        # Adding model 'P2PEquity'
+        db.create_table(u'wanglibao_p2p_p2pequity', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('product', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProduct'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='equities', to=orm['auth.User'])),
+            ('product', self.gf('django.db.models.fields.related.ForeignKey')(related_name='equities', to=orm['wanglibao_p2p.P2PProduct'])),
             ('equity', self.gf('django.db.models.fields.BigIntegerField')(default=0)),
             ('confirm', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
-        db.send_create_signal(u'wanglibao_p2p', ['UserEquity'])
+        db.send_create_signal(u'wanglibao_p2p', ['P2PEquity'])
+
+        # Adding unique constraint on 'P2PEquity', fields ['user', 'product']
+        db.create_unique(u'wanglibao_p2p_p2pequity', ['user_id', 'product_id'])
+
+        # Adding model 'EquityRecord'
+        db.create_table(u'wanglibao_p2p_equityrecord', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('catalog', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('product', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProduct'])),
+            ('amount', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
+            ('description', self.gf('django.db.models.fields.CharField')(default=u'', max_length=1000)),
+            ('checksum', self.gf('django.db.models.fields.CharField')(default=u'', max_length=1000)),
+            ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal(u'wanglibao_p2p', ['EquityRecord'])
 
 
     def backwards(self, orm):
+        # Removing unique constraint on 'P2PEquity', fields ['user', 'product']
+        db.delete_unique(u'wanglibao_p2p_p2pequity', ['user_id', 'product_id'])
+
         # Deleting model 'WarrantCompany'
         db.delete_table(u'wanglibao_p2p_warrantcompany')
+
+        # Deleting model 'P2PProductPayment'
+        db.delete_table(u'wanglibao_p2p_p2pproductpayment')
 
         # Deleting model 'P2PProduct'
         db.delete_table(u'wanglibao_p2p_p2pproduct')
@@ -109,17 +149,20 @@ class Migration(SchemaMigration):
         # Deleting model 'Warrant'
         db.delete_table(u'wanglibao_p2p_warrant')
 
-        # Deleting model 'TradeRecordType'
-        db.delete_table(u'wanglibao_p2p_traderecordtype')
+        # Deleting model 'ProductAmortization'
+        db.delete_table(u'wanglibao_p2p_productamortization')
 
-        # Deleting model 'TradeRecord'
-        db.delete_table(u'wanglibao_p2p_traderecord')
+        # Deleting model 'ProductUserAmortization'
+        db.delete_table(u'wanglibao_p2p_productuseramortization')
 
-        # Deleting model 'UserMargin'
-        db.delete_table(u'wanglibao_p2p_usermargin')
+        # Deleting model 'P2PRecord'
+        db.delete_table(u'wanglibao_p2p_p2precord')
 
-        # Deleting model 'UserEquity'
-        db.delete_table(u'wanglibao_p2p_userequity')
+        # Deleting model 'P2PEquity'
+        db.delete_table(u'wanglibao_p2p_p2pequity')
+
+        # Deleting model 'EquityRecord'
+        db.delete_table(u'wanglibao_p2p_equityrecord')
 
 
     models = {
@@ -159,6 +202,25 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        u'wanglibao_p2p.equityrecord': {
+            'Meta': {'object_name': 'EquityRecord'},
+            'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
+            'catalog': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'checksum': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '1000'}),
+            'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '1000'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+        },
+        u'wanglibao_p2p.p2pequity': {
+            'Meta': {'unique_together': "(('user', 'product'),)", 'object_name': 'P2PEquity'},
+            'confirm': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'equity': ('django.db.models.fields.BigIntegerField', [], {'default': '0'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'product': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'equities'", 'to': u"orm['wanglibao_p2p.P2PProduct']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'equities'", 'to': u"orm['auth.User']"})
+        },
         u'wanglibao_p2p.p2pproduct': {
             'Meta': {'object_name': 'P2PProduct'},
             'bought_amount': ('django.db.models.fields.BigIntegerField', [], {'default': '0'}),
@@ -175,7 +237,7 @@ class Migration(SchemaMigration):
             'limit_per_user': ('django.db.models.fields.FloatField', [], {'default': '0.2'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
             'ordered_amount': ('django.db.models.fields.BigIntegerField', [], {'default': '0'}),
-            'pay_method': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'payment': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProductPayment']", 'null': 'True'}),
             'period': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'publish_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'short_name': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
@@ -185,42 +247,50 @@ class Migration(SchemaMigration):
             'usage': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'warrant_company': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.WarrantCompany']"})
         },
-        u'wanglibao_p2p.traderecord': {
-            'Meta': {'object_name': 'TradeRecord'},
+        u'wanglibao_p2p.p2pproductpayment': {
+            'Meta': {'object_name': 'P2PProductPayment'},
+            'catalog_id': ('django.db.models.fields.IntegerField', [], {}),
+            'description': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '1000', 'blank': "u''"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+        },
+        u'wanglibao_p2p.p2precord': {
+            'Meta': {'ordering': "['-create_time']", 'object_name': 'P2PRecord'},
             'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
-            'cancelable': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'catalog': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.TradeRecordType']"}),
-            'checksum': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1000'}),
+            'catalog': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1000'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'operation_ip': ('django.db.models.fields.IPAddressField', [], {'default': "''", 'max_length': '15'}),
             'operation_request_headers': ('django.db.models.fields.TextField', [], {'default': "''", 'max_length': '1000'}),
-            'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']"}),
-            'product_balance_after': ('django.db.models.fields.IntegerField', [], {}),
-            'product_balance_before': ('django.db.models.fields.IntegerField', [], {}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'user_margin_after': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
-            'user_margin_before': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'})
+            'order_id': ('django.db.models.fields.IntegerField', [], {}),
+            'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']", 'null': 'True'}),
+            'product_balance_after': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True'}),
+            'user_margin_after': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '20', 'decimal_places': '2'})
         },
-        u'wanglibao_p2p.traderecordtype': {
-            'Meta': {'object_name': 'TradeRecordType'},
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
+        u'wanglibao_p2p.productamortization': {
+            'Meta': {'object_name': 'ProductAmortization'},
+            'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
+            'comment': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
+            'created_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'delay': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '10'})
+            'penal_interest': ('django.db.models.fields.DecimalField', [], {'default': "'0'", 'max_digits': '20', 'decimal_places': '2'}),
+            'product': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'amortizations'", 'to': u"orm['wanglibao_p2p.P2PProduct']"}),
+            'settled': ('django.db.models.fields.BooleanField', [], {}),
+            'settlement_time': ('django.db.models.fields.DateTimeField', [], {}),
+            'term': ('django.db.models.fields.IntegerField', [], {})
         },
-        u'wanglibao_p2p.userequity': {
-            'Meta': {'object_name': 'UserEquity'},
-            'confirm': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'equity': ('django.db.models.fields.BigIntegerField', [], {'default': '0'}),
+        u'wanglibao_p2p.productuseramortization': {
+            'Meta': {'object_name': 'ProductUserAmortization'},
+            'amortization': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'to_users'", 'to': u"orm['wanglibao_p2p.ProductAmortization']"}),
+            'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
+            'created_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'current_equity': ('django.db.models.fields.BigIntegerField', [], {}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
-        },
-        u'wanglibao_p2p.usermargin': {
-            'Meta': {'object_name': 'UserMargin'},
-            'freeze': ('django.db.models.fields.DecimalField', [], {'default': "'0.00'", 'max_digits': '20', 'decimal_places': '2'}),
-            'margin': ('django.db.models.fields.DecimalField', [], {'default': "'0.00'", 'max_digits': '20', 'decimal_places': '2'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         u'wanglibao_p2p.warrant': {
             'Meta': {'object_name': 'Warrant'},

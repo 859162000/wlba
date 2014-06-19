@@ -19,16 +19,6 @@ class WarrantCompany(models.Model):
         return u'%s' % self.name
 
 
-class Warrant(models.Model):
-    name = models.CharField(max_length=16, verbose_name=u'名字')
-    warranted_at = models.DateTimeField(default=timezone.now, verbose_name=u'认证时间')
-    created_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间')
-
-    product = models.ForeignKey(P2PProduct)
-
-    def __unicode__(self):
-        return u'%s %s %s' % (self.product.name, self.name, str(self.warranted_at))
-
 
 class P2PProductManager(models.Manager):
     def get_queryset(self):
@@ -100,6 +90,17 @@ class P2PProduct(ProductBase):
         return False
 
 
+class Warrant(models.Model):
+    name = models.CharField(max_length=16, verbose_name=u'名字')
+    warranted_at = models.DateTimeField(default=timezone.now, verbose_name=u'认证时间')
+    created_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间')
+
+    product = models.ForeignKey(P2PProduct)
+
+    def __unicode__(self):
+        return u'%s %s %s' % (self.product.name, self.name, str(self.warranted_at))
+
+
 class ProductAmortization(models.Model):
     product = models.ForeignKey(P2PProduct, related_name='amortizations')
 
@@ -136,7 +137,7 @@ class ProductUserAmortization(models.Model):
 
 
 class P2PRecord(models.Model):
-    catalog = models.CharField(verbose_name=u'流水类型')
+    catalog = models.CharField(verbose_name=u'流水类型', max_length=100)
     order_id = models.IntegerField(verbose_name=u'关联订单编号')
     amount = models.DecimalField(verbose_name=u'发生数', max_digits=20, decimal_places=2)
 
@@ -160,7 +161,7 @@ class P2PRecord(models.Model):
         ordering = ['-create_time']
 
     def __unicode__(self):
-        return u'流水号%s %s 发生金额%s' %(self.id, self.catalog.name, self.amount)
+        return u'流水号%s %s 发生金额%s' %(self.id, self.catalog, self.amount)
 
 
 class P2PEquity(models.Model):

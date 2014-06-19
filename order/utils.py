@@ -1,5 +1,4 @@
 from order.models import Order, OrderNote
-import json
 
 
 class OrderHelper(object):
