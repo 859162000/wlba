@@ -107,9 +107,9 @@ class TradeRecord(models.Model):
     product_balance_after = models.IntegerField(verbose_name=u'标的后余额', help_text=u'该笔流水发生后标的剩余量')
 
     user = models.ForeignKey(user_model)
-    user_margin_before= models.DecimalField(verbose_name=u'用户前余额', help_text=u'该笔流水发生前用户余额', max_digits=20,
+    user_margin_before = models.DecimalField(verbose_name=u'用户前余额', help_text=u'该笔流水发生前用户余额', max_digits=20,
                                               decimal_places=2)
-    user_margin_after= models.DecimalField(verbose_name=u'用户后余额', help_text=u'该笔流水发生后用户余额', max_digits=20,
+    user_margin_after = models.DecimalField(verbose_name=u'用户后余额', help_text=u'该笔流水发生后用户余额', max_digits=20,
                                              decimal_places=2)
 
     cancelable = models.BooleanField(verbose_name=u'可撤单', default=False)

@@ -1,6 +1,5 @@
 .sidebar
   background: white
-  border-top: 3px solid $red
   margin-top: $space-s
 
 .sidebar-title
@@ -20,13 +19,12 @@
     border-top: 0
 
   &.active
+    border-left: 3px solid $color-primary
+    background: #F9FAF9
+
     a
       +link-colors($red, $red)
       cursor: default
-
-  &.active:before
-    color: $red
-    content: '> '
 
   a
     +unstyled-link
