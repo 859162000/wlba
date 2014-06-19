@@ -9,34 +9,33 @@ class SignException(Exception):
 
 
 class HuifuPay(Pay):
-    VERSION = '10'
-    PAY_BACK_RETURN_URL = 'http://111.206.165.46:8000/pay/pay/callback/'
+    PAY_BACK_RETURN_URL = 'http://111.206.165.46:8000/pay/deposit/callback/'
+    PAY_RET_URL = 'http://111.206.165.46:8000/pay/deposit/complete/'
     WITHDRAW_BACK_RETURN_URL = 'http://111.206.165.46:8000/pay/withdraw/callback/'
-    PAY_RET_URL = 'http://111.206.165.46:8000/pay/pay/callback/'
     MER_ID = '510672'
     CUSTOM_ID = '000010124821'
+    HOST = '192.168.0.12'
+    PORT = 8733
+    PAY_URL = 'http://test.chinapnr.com'
+    WITHDRAW_URL = 'http://test.chinapnr.com/buser'
+
+    VERSION = '10'
     PAY_FIELDS = ['Version', 'CmdId', 'MerId', 'OrdId', 'OrdAmt', 'CurCode', 'Pid', 'RetUrl', 'MerPriv',
                   'GateId', 'UsrMp', 'DivDetails', 'OrderType', 'PayUsrId', 'PnrNum', 'BgRetUrl', 'IsBalance', 'ChkValue']
     WITHDRAW_FIELDS = ['Version', 'CmdId', 'CustId', 'SubAcctId', 'OrdId', 'OrdAmt', 'MerPriv', 'AcctName', 'BankId',
                        'AcctId', 'IsSubAcctId', 'UserMp', 'CertType', 'CertId', 'PrType', 'ProvName', 'AreaName', 'BranchName',
                        'PrPurpose', 'RetUrl', 'Charset', 'ChkType', 'ChkValue']
-    HOST = '192.168.0.12'
-    PORT = 8733
     SIGN_REQUEST = 'S'
     VALIDATE_REQUEST = 'V'
-    PAY_URL = 'http://test.chinapnr.com'
-    WITHDRAW_URL = 'http://test.chinapnr.com/buser'
     CHARSET = 'UTF8'
-
-    def __init__(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((HuifuPay.HOST, HuifuPay.PORT))
 
     @classmethod
     def __format_len(cls, length):
         return "{:0>4d}".format(length)
 
     def __get_package(self, raw_data, fields, type):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((HuifuPay.HOST, HuifuPay.PORT))
         raw_str = u''
         for field in fields:
             if field != 'ChkValue' and field in raw_data:
@@ -50,7 +49,6 @@ class HuifuPay(Pay):
         package = type + HuifuPay.MER_ID + raw_len + raw_str
         package_len = self.__format_len(len(package.encode(HuifuPay.CHARSET)))
         package = (package_len + package).encode(HuifuPay.CHARSET)
-        print type, raw_data['CmdId'], package
 
         self.sock.sendall(package)
 
@@ -62,6 +60,7 @@ class HuifuPay(Pay):
             else:
                 sign += data
 
+        self.sock.close()
         return sign
 
     def sign_data(self, raw_data, fields):

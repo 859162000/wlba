@@ -1,35 +1,36 @@
 #encoding: utf8
-from pinyin import pinyin
-from wanglibao_pay.models import Bank
+from django.contrib.auth import get_user_model
+from wanglibao_pay.models import Bank, Card
 
 
-class MockGenerator(object):
+class PayMockGenerator(object):
     @classmethod
     def generate_bank(cls, clean=False):
         if clean:
             Bank.objects.all().delete()
 
         banks = [
-            (u'工商银行', '09', 'gsyh'),
-            (u'中国农业银行', '01', 'nyyh'),
-            (u'招商银行', '01', 'zsyh'),
-            (u'交通银行', '01', 'jtyh'),
-            (u'中国邮政储蓄银行', '01', 'yzyh'),
-            (u'广发银行', '01', 'gfyh'),
-            (u'中国建设银行', '01', 'jsyh'),
-            (u'中国银行', '01', 'zgyh'),
-            (u'浦发银行', '01', 'pfyh'),
-            (u'中信银行', '01', 'zxyh'),
-            (u'华夏银行', '01', 'hxyh'),
-            (u'平安银行', '01', 'payh')
+            (u'工商银行', '09', 'gsyh', 'ICBC'),
+            (u'中国农业银行', '01', 'nyyh', ''),
+            (u'招商银行', '01', 'zsyh', 'CMB'),
+            (u'交通银行', '01', 'jtyh', 'BOCOM'),
+            (u'中国邮政储蓄银行', '01', 'yzyh', ''),
+            (u'广发银行', '01', 'gfyh', ''),
+            (u'中国建设银行', '01', 'jsyh', 'CCB'),
+            (u'中国银行', '01', 'zgyh', ''),
+            (u'浦发银行', '01', 'pfyh', ''),
+            (u'中信银行', '01', 'zxyh', ''),
+            (u'华夏银行', '01', 'hxyh', ''),
+            (u'兴业银行', '01', 'xyyh', 'CIB'),
+            (u'平安银行', '01', 'payh', '')
         ]
 
-        for name, gate_id, logo in banks:
+        for name, gate_id, logo, code in banks:
             bank = Bank()
             bank.name = name
             bank.gate_id = gate_id
-            bank.code = pinyin.get_initial(name).upper()
-            bank.logo = '/static/images/bank-logos/'+ logo + '.png'
+            bank.code = code
+            bank.logo = '/static/images/bank-logos/' + logo + '.png'
             bank.limit = u"""
                 <table>
                   <thead>
@@ -62,3 +63,18 @@ class MockGenerator(object):
 """
             bank.save()
 
+    @classmethod
+    def generate_card(cls, clean=False):
+        if clean:
+            Card.objects.all().delete()
+
+        banks = Bank.objects.all()
+        users = get_user_model().objects.all()
+
+        for user in users:
+            for bank in banks:
+                card = Card()
+                card.bank = bank
+                card.user = user
+                card.no = '6228480402564890018'
+                card.save()

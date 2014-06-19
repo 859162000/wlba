@@ -1,0 +1,21 @@
+- load formatters
+- load mathfilters
+- load widget_tweaks
+
+doctype html
+- with '支付' as title
+include include/head
+- endwith
+body
+  include include/header
+  - with '首页' as activeItem
+  include include/navigation
+  - endwith
+  .pay-container
+    .row
+      .pull-left {{result}}
+
+  - with 1 as no_margin
+  include include/footer
+  - endwith
+  include include/tracking

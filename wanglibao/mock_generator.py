@@ -1,6 +1,7 @@
 from trust.mock_generator import MockGenerator as TrustMockGenerator
 from wanglibao_fund.mock_generator import MockGenerator as FundMockGenerator
 from wanglibao_bank_financing.mock_generator import BankFinancingMockGenerator
+from wanglibao_pay.mock_generator import PayMockGenerator
 from wanglibao_portfolio.mock_generator import MockGenerator as PortfolioMockGenerator
 from wanglibao_hotlist.mock_generator import MockGenerator as HotlistMockGenerator
 from wanglibao_cash.mock_generator import MockGenerator as CashMockGenerator
@@ -32,4 +33,8 @@ class MockGenerator(object):
         print 'Generating cashes'
         CashMockGenerator.generate_cash_issuers(clean)
         CashMockGenerator.generate_cashes(clean)
+
+        print 'Generating pay info'
+        PayMockGenerator.generate_bank(clean)
+        PayMockGenerator.generate_card(clean)
 

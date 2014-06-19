@@ -303,8 +303,11 @@ LOGGING = {
         'shumi': {
             'handlers': ['file'],
             'level': 'DEBUG'
+        },
+        'wanglibao_pay': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
         }
-
     }
 }
 
