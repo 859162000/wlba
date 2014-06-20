@@ -183,18 +183,13 @@ class P2PEquity(models.Model):
 
 class EquityRecord(models.Model):
     catalog = models.CharField(verbose_name=u'流水类型', max_length=100)
+    order_id = models.IntegerField(verbose_name=u'相关流水号')
     user = models.ForeignKey(get_user_model())
     product = models.ForeignKey(P2PProduct, verbose_name=u'产品')
     amount = models.DecimalField(verbose_name=u'发生数量', max_digits=20, decimal_places=2)
     description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
 
-    checksum = models.CharField(verbose_name=u'签名', default=u'', max_length=1000)
     create_time = models.DateTimeField(verbose_name=u'流水时间', auto_now_add=True)
 
     def __unicode__(self):
         return u'%s %s %s %s' %(self.catalog, self.user, self.product, self.amount)
-
-    def get_hash_list(self):
-        return gen_hash_list(self.catalog, self.user.id, self.product.id, self.amount, self.create_time)
-
-

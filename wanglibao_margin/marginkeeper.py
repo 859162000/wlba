@@ -5,7 +5,7 @@ from models import Margin, MarginRecord
 from exceptions import MarginLack, MarginNotExist
 
 
-class Keeper(object):
+class MarginKeeper(object):
 
     def __init__(self, user, order):
         if not Margin.objects.filter(user=user).exists():

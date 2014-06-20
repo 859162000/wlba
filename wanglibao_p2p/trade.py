@@ -8,11 +8,12 @@ from django.conf import settings
 from order.utils import OrderHelper
 
 from order.utils import OrderHelper
-from wanglibao_margin.keeper import Keeper
+from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_margin.exceptions import MarginLack, MarginNotExist
 from models import P2PProduct, P2PRecord, P2PEquity
-from exceptions import UserRestriction, ProductRestriction
 from utility import checksum
+from keeper import ProductKeeper, EquityKeeper
+from exceptions import ProductLack, ProductNotExist
 
 
 class P2PTrader(object):
@@ -22,75 +23,14 @@ class P2PTrader(object):
         self.product = product
         self.request = request
         self.order = OrderHelper.place_order(user).id
-        self.margin_keeper = Keeper(user, self.order)
+        self.margin_keeper = MarginKeeper(user, self.order)
+        self.product_keeper = ProductKeeper(product, self.order)
+        self.equity_keeper = EquityKeeper(user, product, self.order)
 
     def purchase(self, amount):
-        if (not isinstance(amount, int)) or amount <= 0:
-            raise ProductRestriction('200004')
-
+        description = u'购买P2P产品 %s %s 份' %(self.product.short_name, amount)
         with transaction.atomic():
-
-            self.product = P2PProduct.objects.select_for_update().filter(pk=self.product.pk).first()
-            if not self.product:
-                raise ProductRestriction('200003')
-            if not self.product.has_amount(amount):
-                raise ProductRestriction('200002')
-
-            # credit user account.
-            user_margin_before, user_margin_after = self.__update_user_margin(amount)
-
-            # debit product shares
-            product_balance_before, product_balance_after = self.__update_product_balance(amount)
-
-            # update user equity
-            self.__update_equity(amount)
-            # record this trade
-            # todo complete record method
-            record = self.__record(order.id, 'purchase', amount, self.product, product_balance_before, product_balance_after,
-                                   self.user, user_margin_before, user_margin_after)
-            #return record number
-            return record
-
-    def __update_equity(self, amount):
-        """
-        update user equity of current product.
-        :param amount:
-        :return: tuple(before equity, after equity)
-        """
-        equity, _ = P2PEquity.objects.get_or_create(user=self.user, product=self.product)
-        equity.equity += amount
-        # check per-user purchase limit
-        if equity.equity > self.product.limit_amount_per_user:
-            raise UserRestriction('100004')
-        equity.save()
-
-    def __record(self, order_id, catalog, amount, product, product_balance_before, product_balance_after, user,
-                 user_margin_before, user_margin_after, cancelable=False):
-        """
-        log record.
-        :return:
-        """
-        record = P2PRecord(order_id=order_id, catalog=catalog, amount=amount,
-                             product=product, product_balance_after=product_balance_after,
-                             user=user, user_margin_after=user_margin_after)
-        if self.request:
-            client_ip =self.request.META.get('REMOTE_ADDR', '')
-            meta = json.dumps(self.request.META)
-            record.operation_ip = client_ip
-            record.operation_request_headers = meta
-
-        hash_list = record.get_hash_list()
-        record.checksum = checksum(hash_list)
-        record.save()
-        return record
-
-    def __update_product_balance(self, amount):
-        """
-        update product balance.
-        :param amount:
-        :return: tuple (before balance, after balance)
-        """
-        product_balance_before = self.product.remain
-        self.product.ordered_amount += amount
-        self.product.save()
-        return product_balance_before, self.product.remain
+            self.product_keeper.purchase(amount, self.user, savepoint=False)
+            self.margin_keeper.freeze(amount, description=description, savepoint=False)
+            self.equity_keeper.purchase(amount, description=description, savepoint=False)
+            # todo update order info

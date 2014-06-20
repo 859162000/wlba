@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 from order.utils import OrderHelper
 from wanglibao_margin.exceptions import MarginLack
-from wanglibao_margin.keeper import Keeper
+from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import Bank, Card
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay.models import PayInfo
@@ -125,7 +125,7 @@ def handle_pay_result(request):
                 result = u'系统内部错误，请联系客服'
             else:
                 if code == '000000':
-                    keeper = Keeper(request.user, pay_info.order.pk)
+                    keeper = MarginKeeper(request.user, pay_info.order.pk)
                     keeper.deposit(amount)
                     pay_info.status = PayInfo.SUCCESS
                     result = u'充值成功'
@@ -200,7 +200,7 @@ def handle_withdraw_result(data):
     pay_info.error_message = data.get('RespDesc', '')
     transaction_status = data.get('TransStat', '')
 
-    keeper = Keeper(pay_info.user, pay_info.order.pk)
+    keeper = MarginKeeper(pay_info.user, pay_info.order.pk)
 
     try:
         pay = HuifuPay()
@@ -262,7 +262,7 @@ class WithdrawCompleteView(TemplateView):
             pay_info.status = PayInfo.INITIAL
             pay_info.save()
 
-            keeper = Keeper(request.user, pay_info.order.pk)
+            keeper = MarginKeeper(request.user, pay_info.order.pk)
             keeper.withdraw_pre_freeze(amount)
 
             post = dict()

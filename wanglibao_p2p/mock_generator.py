@@ -7,7 +7,6 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord
 from trade import P2PTrader
-from exceptions import RestrictionException
 
 
 class MockGenerator(object):
@@ -90,5 +89,6 @@ class MockGenerator(object):
                 try:
                     trader = P2PTrader(p, u)
                     trader.purchase(random.randrange(1000, 10000))
-                except:
-                    continue
+                except Exception, e:
+                    print(e)
+

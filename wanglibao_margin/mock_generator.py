@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from order.utils import OrderHelper
-from wanglibao_margin.keeper import Keeper
+from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_margin.models import Margin
 
 
@@ -18,6 +18,6 @@ class MockGenerator(object):
 
         for u in users:
             order = OrderHelper.place_order()
-            keeper = Keeper(order=order.id, user=u)
+            keeper = MarginKeeper(order=order.id, user=u)
             keeper.deposit(100000000)
 
