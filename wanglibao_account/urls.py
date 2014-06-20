@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
 from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome, \
-    AccountTransaction, AccountBankCard, AccountTransactionP2P
+    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -20,6 +20,7 @@ urlpatterns = patterns(
                                       login_url='/accounts/register/')),
     url(r'^setting/', login_required(TemplateView.as_view(template_name='account_setting.jade'),
                                      login_url='/accounts/register/')),
+    url(r'^id_verify/', login_required(IdVerificationView.as_view(), login_url='/accounts/register/')),
 
     url(r'^login/ajax/', 'wanglibao_account.views.ajax_login'),
     url(r'^login/', 'django.contrib.auth.views.login',

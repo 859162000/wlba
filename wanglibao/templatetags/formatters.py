@@ -113,6 +113,25 @@ def safe_phone(user):
     return result
 
 @register.filter
+def safe_id(id_number):
+    """
+    Show part of id_number
+    """
+
+    result = id_number[:6] + '*' * 8 + id_number[13:]
+    return result
+
+@register.filter
+def safe_name(name):
+    """
+    Show part of name
+    """
+
+    result = "*" + name[1:]
+    return result
+
+
+@register.filter
 def not_bool_to_display(flag):
     if flag:
         return 'display: none'

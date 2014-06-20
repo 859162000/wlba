@@ -13,19 +13,44 @@ body
   - with '首页' as activeItem
   include include/navigation
   - endwith
-  .pay-container
-    .row
-      .pull-left 提现
-      .pull-right << 返回上级
 
+   .row
+    .span3
+      - with '取现' as activeItem
+      include include/user_center_sidebar
+      - endwith
+    .span9-omega
+      .panel-padding
+        .withdraw-title 提现
 
-    form(action="/pay/withdraw/complete/", method='post')
-      - csrf_token
-      input#amount(type='text', name='amount', placeholder='金额', value='500.00')
-      select(name='card_id')
-        for card in cards
-          option(value='{{card.id}}') {{card.bank.name}}
-      input#withdraw.button-red.button-l(type='submit', value='提现')
+        form(action="/pay/withdraw/complete/", method='post')
+          - csrf_token
+          table.withdraw-table
+            tr
+              th 持卡人
+              td {{user_profile.name}}
+            tr
+              th 提现至银行卡
+              td
+                select.card-select(name='card_id')
+                  for card in cards
+                    option(value='{{card.id}}') {{card.bank.name}}
+            tr
+              th 可用余额
+              td {{margin}}
+            tr
+              th 提现金额(元)
+              td
+                input.withdraw-text(type='text', name='amount', placeholder='金额', value='500.00')
+            tr
+              th 手续费
+              td
+            tr
+              th 实际到账金额
+              td
+            tr
+              td(colspan=2)
+                input#withdraw.button-red.button-l(type='submit', value='提现')
 
   - with 1 as no_margin
   include include/footer

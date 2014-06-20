@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.db import models
 from django.contrib.auth import get_user_model
 
+
 # Create your models here.
 class Margin(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)

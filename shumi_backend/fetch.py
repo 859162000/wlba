@@ -218,6 +218,7 @@ class UserInfoFetcher(UserLevel):
         profile = self.user.wanglibaouserprofile
         profile.id_number = info['CertificateNumber']
         profile.name = info['RealName']
+        profile.id_is_valid = True
         profile.save()
 
         return '%s id is %s' %(profile.id_number, profile.name)

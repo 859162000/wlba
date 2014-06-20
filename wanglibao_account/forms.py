@@ -3,8 +3,9 @@ from captcha.fields import CaptchaField
 
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
+from django.core.exceptions import ValidationError
 
-from utils import detect_identifier_type
+from utils import detect_identifier_type, verify_id
 from wanglibao_sms.utils import validate_validation_code
 
 User = get_user_model()
@@ -129,3 +130,20 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
 
 class ResetPasswordGetIdentifierForm(forms.Form):
     identifier = forms.CharField(max_length=254)
+
+
+class IdVerificationForm(forms.Form):
+    name = forms.CharField(max_length=32, label=u'姓名')
+    id_number = forms.CharField(max_length=128, label=u'身份证号')
+
+    def clean(self):
+        cleaned_data = super(IdVerificationForm, self).clean()
+
+        name = cleaned_data.get('name')
+        id_number = cleaned_data.get('id_number')
+        verify_record, error = verify_id(name, id_number)
+
+        if not verify_record.is_valid:
+            raise ValidationError(u'验证失败，拨打客服电话进行人工验证')
+
+        return cleaned_data

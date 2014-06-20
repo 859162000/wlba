@@ -1,3 +1,56 @@
-//
-   Created by lishuo on 14-6-20.
+- load formatters
+- load mathfilters
+- load widget_tweaks
+doctype html
+- with '我的账户' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .row
+    .span3
+      - with '实名认证' as activeItem
+      include include/user_center_sidebar
+      - endwith
+    .span9-omega
+      .panel-padding
+        .panel-plain-title 实名认证
 
+          if user.wanglibaouserprofile.id_is_valid
+            p 已经验证
+
+            .row
+              label.span3.font-s 真实姓名
+              span {{user.wanglibaouserprofile.name | safe_name}}
+            .row
+              label.span3.font-s 身份证号
+              span {{user.wanglibaouserprofile.id_number | safe_id}}
+
+          else
+            .panel-annotation
+              p 根据法律，网上投资必须进行实名认证。
+              p 请花15秒钟完成免费的实名认证，以方便日后投资理财。
+
+            .row
+              form(method="POST").span5
+                - csrf_token
+                .error
+                  {{form.non_field_errors}}
+                .form-row-m.row
+                  {{form.name.errors}}
+                  label.span3.font-s 真实姓名
+                  - render_field form.name class+="font-l span9-omega"
+                .form-row-m.row
+                  {{form.id_number.errors}}
+                  label.span3.font-s 身份证号
+                  - render_field form.id_number class+="font-l span9-omega"
+                .form-row-m.row
+                  button.button-primary.prefix3.span9-omega(type="submit") 提交
+
+          .space-vertical-xl
+
+  include include/footer
+  include include/templates
+  script(src="/static/js/require.js", data-main="/static/js/account_home")
+  include include/tracking

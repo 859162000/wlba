@@ -2,10 +2,13 @@
 import logging
 import socket
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
+from order.utils import OrderHelper
+from wanglibao_margin.exceptions import MarginLack
+from wanglibao_margin.keeper import Keeper
 from wanglibao_pay.models import Bank, Card
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay.models import PayInfo
@@ -46,11 +49,15 @@ class PayView(TemplateView):
             amount = decimal.Decimal(amount_str).\
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             amount_str = str(amount)
+            if amount <= 0:
+                raise decimal.DecimalException()
 
             gate_id = request.POST.get('gate_id', '')
             Bank.objects.get(gate_id=gate_id)
 
+            order = OrderHelper().place_order(request.user)
             pay_info = PayInfo()
+            pay_info.order = order
             pay_info.amount = amount
             pay_info.type = PayInfo.DEPOSIT
             pay_info.status = PayInfo.INITIAL
@@ -118,6 +125,8 @@ def handle_pay_result(request):
                 result = u'系统内部错误，请联系客服'
             else:
                 if code == '000000':
+                    keeper = Keeper(request.user, pay_info.order.pk)
+                    keeper.deposit(amount)
                     pay_info.status = PayInfo.SUCCESS
                     result = u'充值成功'
                 else:
@@ -167,7 +176,9 @@ class WithdrawView(TemplateView):
     def get_context_data(self, **kwargs):
         cards = Card.objects.filter(user=self.request.user).select_related()
         return {
-            'cards': cards
+            'cards': cards,
+            'user_profile': self.request.user.wanglibaouserprofile,
+            'margin': self.request.user.margin.margin
         }
 
 
@@ -189,11 +200,15 @@ def handle_withdraw_result(data):
     pay_info.error_message = data.get('RespDesc', '')
     transaction_status = data.get('TransStat', '')
 
+    keeper = Keeper(pay_info.user, pay_info.order.pk)
+
     try:
         pay = HuifuPay()
         if pay.verify_sign(data, HuifuPay.WITHDRAW_FIELDS):
             if data['RespCode'] == '000':
                 if transaction_status == 'S':
+                    if pay_info.status != PayInfo.SUCCESS:
+                        keeper.withdraw_ack(pay_info.amount)
                     pay_info.status = PayInfo.SUCCESS
                     result = u'提款成功'
                 elif transaction_status == 'I':
@@ -202,9 +217,11 @@ def handle_withdraw_result(data):
                 else:
                     pay_info.status = PayInfo.FAIL
                     result = u'提款失败'
+                    keeper.withdraw_rollback(pay_info.amount)
             else:
                 pay_info.status = PayInfo.FAIL
                 result = u'提款失败'
+                keeper.withdraw_rollback(pay_info.amount)
         else:
             pay_info.status = PayInfo.EXCEPTION
             pay_info.error_message = 'Invalid signature'
@@ -230,16 +247,23 @@ class WithdrawCompleteView(TemplateView):
             amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             amount_str = str(amount)
+            if amount <= 0:
+                raise decimal.DecimalException
 
             card_id = request.POST.get('card_id', '')
             card = Card.objects.get(pk=card_id)
 
+            order = OrderHelper.place_order(request.user)
             pay_info = PayInfo()
+            pay_info.order = order
             pay_info.amount = amount_str
             pay_info.type = PayInfo.WITHDRAW
             pay_info.user = request.user
             pay_info.status = PayInfo.INITIAL
             pay_info.save()
+
+            keeper = Keeper(request.user, pay_info.order.pk)
+            keeper.withdraw_pre_freeze(amount)
 
             post = dict()
             post['OrdId'] = str(pay_info.pk)
@@ -260,11 +284,17 @@ class WithdrawCompleteView(TemplateView):
             result = u'金额格式错误'
         except Card.DoesNotExist:
             result = u'请选择有效的银行卡'
+        except MarginLack as e:
+            result = u'余额不足'
+            pay_info.error_message = str(e)
+            pay_info.status = PayInfo.FAIL
+            pay_info.save()
         except (socket.error, SignException) as e:
             result = u'系统内部错误,请重试'
             pay_info.error_message = str(e)
             pay_info.status = PayInfo.FAIL
             pay_info.save()
+            keeper.withdraw_rollback(amount)
             logger.fatal('sign error! order id: ' + str(pay_info.pk) + ' ' + str(e))
 
         if result:
@@ -283,14 +313,15 @@ class WithdrawCompleteView(TemplateView):
             result = u'系统内部错误,请重试'
             pay_info.status = PayInfo.FAIL
             pay_info.error_message = str(e)
-            logger.error('connection error. order id: %s. exception: %s', str(pay_info.pk), str(e))
             pay_info.save()
-        except (requests.exceptions.HTTPError, requests.exceptions.Timeout) as e:
+            keeper.withdraw_rollback(amount)
+            logger.error('connection error. order id: %s. exception: %s', str(pay_info.pk), str(e))
+        except (requests.exceptions.HTTPError, requests.exceptions.Timeout, ET.ParseError) as e:
             result = u'系统内部错误,请联系客服人员'
             pay_info.status = PayInfo.EXCEPTION
             pay_info.error_message = str(e)
-            logger.fatal('unexpected error. order id: %s. exception: %s', str(pay_info.pk), str(e))
             pay_info.save()
+            logger.fatal('unexpected error. order id: %s. exception: %s', str(pay_info.pk), str(e))
 
         if result:
             return self.render_to_response({

@@ -2,6 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+from order.models import Order
 from wanglibao_buy.models import BindBank
 
 
@@ -54,6 +55,7 @@ class PayInfo(models.Model):
     response_ip = models.CharField(max_length=50, verbose_name=u'响应地址', blank=True, null=True)
     user = models.ForeignKey(get_user_model())
     card = models.ForeignKey(Card, blank=True, null=True)
+    order = models.ForeignKey(Order, blank=True, null=True)
 
     def __unicode__(self):
         return u'%s' % self.pk
