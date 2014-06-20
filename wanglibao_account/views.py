@@ -240,7 +240,6 @@ class AccountHome(TemplateView):
         message = ''
 
         try:
-            raise FetchException()
             fetcher = UserInfoFetcher(self.request.user)
             fetcher.fetch_user_fund_hold_info()
         except FetchException:
