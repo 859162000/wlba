@@ -7,7 +7,7 @@ from django.utils import timezone
 from jsonfield import JSONField
 from wanglibao.models import ProductBase
 from django.contrib.auth import get_user_model
-from utility import gen_hash_list, checksum
+from utility import gen_hash_list
 
 user_model = get_user_model()
 
@@ -145,13 +145,6 @@ class P2PRecord(models.Model):
     product_balance_after = models.IntegerField(verbose_name=u'标的后余额', help_text=u'该笔流水发生后标的剩余量', null=True)
 
     user = models.ForeignKey(get_user_model(), null=True)
-    user_margin_after= models.DecimalField(verbose_name=u'用户后余额', help_text=u'该笔流水发生后用户余额', max_digits=20,
-                                             decimal_places=2, null=True)
-
-
-    operation_ip = models.IPAddressField(verbose_name=u'流水ip', default='')
-    operation_request_headers = models.TextField(verbose_name=u'流水请求信息', max_length=1000, default='',
-                                                 help_text=u'存储流水产生时request headers信息')
 
     create_time = models.DateTimeField(verbose_name=u'发生时间', auto_now_add=True)
 
@@ -198,7 +191,3 @@ class EquityRecord(models.Model):
 
     def __unicode__(self):
         return u'%s %s %s %s' %(self.catalog, self.user, self.product, self.amount)
-
-    def get_hash_list(self):
-        return gen_hash_list(self.catalog.catalog_id, self.user.id, self.product.id, self.amount, self.create_time)
-

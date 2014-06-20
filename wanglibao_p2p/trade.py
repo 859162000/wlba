@@ -6,7 +6,9 @@ from decimal import Decimal
 from django.db import transaction
 from django.conf import settings
 
-from wanglibao_margin.models import Margin, MarginRecord
+from order.utils import OrderHelper
+from wanglibao_margin.keeper import Keeper
+from wanglibao_margin.exceptions import MarginLack, MarginNotExist
 from models import P2PProduct, P2PRecord, P2PEquity
 from exceptions import UserRestriction, ProductRestriction
 from utility import checksum
@@ -17,20 +19,14 @@ class P2PTrader(object):
         self.user = user
         self.product = product
         self.request = request
+        self.order = OrderHelper.place_order(user).id
+        self.margin_keeper = Keeper(user, self.order)
 
     def purchase(self, amount):
         if (not isinstance(amount, int)) or amount <= 0:
             raise ProductRestriction('200004')
 
         with transaction.atomic():
-            # lock user margin column
-            self.margin = Margin.objects.select_for_update().filter(user=self.user).first()
-            if not self.margin:
-                raise UserRestriction('100003')
-            if not self.margin.has_margin(amount):
-                raise UserRestriction('100001')
-
-            #lock product column
             self.product = P2PProduct.objects.select_for_update().filter(pk=self.product.pk).first()
             if not self.product:
                 raise ProductRestriction('200003')
@@ -87,19 +83,6 @@ class P2PTrader(object):
         record.save()
         return record
 
-    def __update_user_margin(self, amount):
-        """
-        update user cash balance.
-        :param amount:
-        :return: Decimal type tuple (before balance, after balance)
-        """
-        amount = Decimal(amount)
-        margin_before = self.margin.margin
-        self.margin.margin -= amount
-        self.margin.freeze += amount
-        self.margin.save()
-        return margin_before, self.margin.margin
-
     def __update_product_balance(self, amount):
         """
         update product balance.
@@ -110,45 +93,3 @@ class P2PTrader(object):
         self.product.ordered_amount += amount
         self.product.save()
         return product_balance_before, self.product.remain
-
-
-class UserMarginManager(object):
-
-    def __init__(self, user):
-        self.user = user
-        self.margin = None
-
-    def __cash(self, amount, record_catalog, savepoint=True, freeze=False ,description=u''):
-        with transaction.atomic(savepoint=savepoint):
-            amount = Decimal(amount)
-            self.margin = Margin.objects.select_for_update().filter(pk=self.user).first()
-            margin_before = self.margin.margin
-            self.margin.margin += amount
-            self.margin.save()
-            margin_after = self.margin.margin
-            if freeze:
-                self.margin.freeze -= amount
-            record = MarginRecord(catalog=record_catalog, user=self.user, user_margin_before=margin_before,
-                                  user_margin_after=margin_after, description=description, amount=amount)
-            record.save()
-            record.checksum = checksum(record.get_hash_list())
-            record.save()
-            return record
-
-    def deposit(self, amount, savepoint=True, description=u''):
-        return self.__cash(amount, '', savepoint=savepoint, description=description)
-
-    def withdraw(self, amount, savepoint=True, description=u''):
-        return self.__cash(-amount, '', savepoint=savepoint, description=description)
-
-    def freeze(self, amount, savepoint=True):
-        description = u'交易冻结 %s 元' % amount
-        return self.__cash(-amount, '', freeze=True, description=description)
-
-    def unfreeze(self, amount, savepoint=True):
-        description = u'交易解冻 %s 元' % amount
-        return self.__cash(amount, '', freeze=True, description=description)
-
-    def settle(self, amount, savepoint=True):
-        pass
-

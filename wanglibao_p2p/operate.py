@@ -57,3 +57,4 @@ class Operator(object):
         except IntegrityError, e:
             # todo add logger
             print(e)
+

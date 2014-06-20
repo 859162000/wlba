@@ -13,10 +13,10 @@ class Keeper(object):
         self.user = user
         self.order = order
 
-    def freeze(self, amount, description=u''):
+    def freeze(self, amount, description=u'', savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
-        with transaction.atomic():
+        with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.margin:
                 raise MarginLack(u'201')
@@ -27,10 +27,10 @@ class Keeper(object):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def unfreeze(self, amount, description=u''):
+    def unfreeze(self, amount, description=u'', savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
-        with transaction.atomic():
+        with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.freeze:
                 raise MarginLack(u'202')
@@ -41,10 +41,10 @@ class Keeper(object):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def settle(self, amount, description=u''):
+    def settle(self, amount, description=u'', savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
-        with transaction.atomic():
+        with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.freeze:
                 raise MarginLack(u'202')
@@ -54,10 +54,10 @@ class Keeper(object):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def withdraw_pre_freeze(self, amount, description=u''):
+    def withdraw_pre_freeze(self, amount, description=u'', savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
-        with transaction.atomic():
+        with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.margin:
                 raise MarginLack(u'201')
@@ -68,10 +68,10 @@ class Keeper(object):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def withdraw_rollback(self, amount, description=u''):
+    def withdraw_rollback(self, amount, description=u'', savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
-        with transaction.atomic():
+        with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.withdrawing:
                 raise MarginLack(u'203')
@@ -82,10 +82,10 @@ class Keeper(object):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def withdraw_ack(self, amount, description=u''):
+    def withdraw_ack(self, amount, description=u'', savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
-        with transaction.atomic():
+        with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.withdrawing:
                 raise MarginLack(u'203')
@@ -95,10 +95,10 @@ class Keeper(object):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def deposit(self, amount, description=u''):
+    def deposit(self, amount, description=u'', savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
-        with transaction.atomic():
+        with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             margin.margin += amount
             margin.save()

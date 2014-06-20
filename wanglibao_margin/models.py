@@ -31,6 +31,5 @@ class MarginRecord(models.Model):
     margin_current = models.DecimalField(verbose_name=u'用户后余额', max_digits=20, decimal_places=2)
     description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
 
-
     def __unicode__(self):
         return u'%s , %s' % (self.catalog, self.user)
