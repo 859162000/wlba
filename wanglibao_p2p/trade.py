@@ -6,8 +6,8 @@ from decimal import Decimal
 from django.db import transaction
 from django.conf import settings
 
-from models import P2PProduct, UserMargin, P2PRecord, UserEquity, RecordCatalog, user_model
-from models import MarginRecord
+from wanglibao_margin.models import Margin, MarginRecord
+from models import P2PProduct, P2PRecord, P2PEquity
 from exceptions import UserRestriction, ProductRestriction
 from utility import checksum
 
@@ -24,7 +24,7 @@ class P2PTrader(object):
 
         with transaction.atomic():
             # lock user margin column
-            self.margin = UserMargin.objects.select_for_update().filter(user=self.user).first()
+            self.margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if not self.margin:
                 raise UserRestriction('100003')
             if not self.margin.has_margin(amount):
@@ -47,8 +47,7 @@ class P2PTrader(object):
             self.__update_equity(amount)
             # record this trade
             # todo complete record method
-            catalog = RecordCatalog.objects.get(catalog_id=1)
-            record = self.__record(catalog, amount, self.product, product_balance_before, product_balance_after,
+            record = self.__record(amount, self.product, product_balance_before, product_balance_after,
                                    self.user, user_margin_before, user_margin_after)
             #return record number
             return record
@@ -59,7 +58,7 @@ class P2PTrader(object):
         :param amount:
         :return: tuple(before equity, after equity)
         """
-        equity, _ = UserEquity.objects.get_or_create(user=self.user, product=self.product)
+        equity, _ = P2PEquity.objects.get_or_create(user=self.user, product=self.product)
         equity.equity += amount
         # check per-user purchase limit
         if equity.equity > self.product.limit_amount_per_user:
@@ -122,7 +121,7 @@ class UserMarginManager(object):
     def __cash(self, amount, record_catalog, savepoint=True, freeze=False ,description=u''):
         with transaction.atomic(savepoint=savepoint):
             amount = Decimal(amount)
-            self.margin = UserMargin.objects.select_for_update().filter(pk=self.user).first()
+            self.margin = Margin.objects.select_for_update().filter(pk=self.user).first()
             margin_before = self.margin.margin
             self.margin.margin += amount
             self.margin.save()
@@ -137,22 +136,18 @@ class UserMarginManager(object):
             return record
 
     def deposit(self, amount, savepoint=True, description=u''):
-        record_catalog = RecordCatalog.objects.get(catalog_id=500)
-        return self.__cash(amount, record_catalog, savepoint=savepoint, description=description)
+        return self.__cash(amount, '', savepoint=savepoint, description=description)
 
     def withdraw(self, amount, savepoint=True, description=u''):
-        record_catalog = RecordCatalog.objects.get(catalog_id=501)
-        return self.__cash(-amount, record_catalog, savepoint=savepoint, description=description)
+        return self.__cash(-amount, '', savepoint=savepoint, description=description)
 
     def freeze(self, amount, savepoint=True):
-        record_catalog = RecordCatalog.objects.get(catalog_id=502)
         description = u'交易冻结 %s 元' % amount
-        return self.__cash(-amount, record_catalog, freeze=True, description=description)
+        return self.__cash(-amount, '', freeze=True, description=description)
 
     def unfreeze(self, amount, savepoint=True):
-        record_catalog = RecordCatalog.objects.get(catalog_id=503)
         description = u'交易解冻 %s 元' % amount
-        return self.__cash(amount, record_catalog, freeze=True, description=description)
+        return self.__cash(amount, '', freeze=True, description=description)
 
     def settle(self, amount, savepoint=True):
         pass

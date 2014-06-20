@@ -77,6 +77,7 @@ INSTALLED_APPS = (
     'wanglibao_fake',
     'wanglibao_pay',
     'order',
+    'wanglibao_margin',
 
     'provider',
     'provider.oauth2',
