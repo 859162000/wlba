@@ -2,10 +2,11 @@
 import logging
 import socket
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
+from wanglibao_p2p.trade import UserMarginManager
 from wanglibao_pay.models import Bank, Card
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay.models import PayInfo
@@ -118,6 +119,8 @@ def handle_pay_result(request):
                 result = u'系统内部错误，请联系客服'
             else:
                 if code == '000000':
+                    #user_margin = UserMarginManager(request.user)
+                    #user_margin.deposit(amount)
                     pay_info.status = PayInfo.SUCCESS
                     result = u'充值成功'
                 else:
@@ -167,12 +170,13 @@ class WithdrawView(TemplateView):
     def get_context_data(self, **kwargs):
         cards = Card.objects.filter(user=self.request.user).select_related()
         return {
-            'cards': cards
+            'cards': cards,
+            'user_profile': self.request.user.wanglibaouserprofile
         }
 
 
 @transaction.atomic
-def handle_withdraw_result(data):
+def handle_withdraw_result(data, user):
     order_id = data.get('OrdId', '')
     try:
         pay_info = PayInfo.objects.select_for_update().get(pk=order_id)
@@ -189,6 +193,8 @@ def handle_withdraw_result(data):
     pay_info.error_message = data.get('RespDesc', '')
     transaction_status = data.get('TransStat', '')
 
+    user_margin = UserMarginManager(user)
+
     try:
         pay = HuifuPay()
         if pay.verify_sign(data, HuifuPay.WITHDRAW_FIELDS):
@@ -202,9 +208,11 @@ def handle_withdraw_result(data):
                 else:
                     pay_info.status = PayInfo.FAIL
                     result = u'提款失败'
+                    user_margin.unfreeze(pay_info.amount)
             else:
                 pay_info.status = PayInfo.FAIL
                 result = u'提款失败'
+                user_margin.unfreeze(pay_info.amount)
         else:
             pay_info.status = PayInfo.EXCEPTION
             pay_info.error_message = 'Invalid signature'
@@ -272,6 +280,8 @@ class WithdrawCompleteView(TemplateView):
                 'result': result
             })
 
+        user_margin = UserMarginManager(request.user)
+        user_margin.freeze(amount)
         try:
             r = requests.post(form['url'], form['post'])
             root = ET.fromstring(r.text.encode('utf-8'))
@@ -283,21 +293,22 @@ class WithdrawCompleteView(TemplateView):
             result = u'系统内部错误,请重试'
             pay_info.status = PayInfo.FAIL
             pay_info.error_message = str(e)
-            logger.error('connection error. order id: %s. exception: %s', str(pay_info.pk), str(e))
             pay_info.save()
-        except (requests.exceptions.HTTPError, requests.exceptions.Timeout) as e:
+            logger.error('connection error. order id: %s. exception: %s', str(pay_info.pk), str(e))
+            user_margin.unfreeze(amount)
+        except (requests.exceptions.HTTPError, requests.exceptions.Timeout, ET.ParseError) as e:
             result = u'系统内部错误,请联系客服人员'
             pay_info.status = PayInfo.EXCEPTION
             pay_info.error_message = str(e)
-            logger.fatal('unexpected error. order id: %s. exception: %s', str(pay_info.pk), str(e))
             pay_info.save()
+            logger.fatal('unexpected error. order id: %s. exception: %s', str(pay_info.pk), str(e))
 
         if result:
             return self.render_to_response({
                 'result': result
             })
 
-        result = handle_withdraw_result(data)
+        result = handle_withdraw_result(data, request.user)
         return self.render_to_response({
             'result': result
         })
