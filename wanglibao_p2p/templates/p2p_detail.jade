@@ -149,7 +149,7 @@ html
                     th 投资人
                     th 金额
                 tbody
-                  trade_records = p2p.traderecord_set.all()[:40]
+                  trade_records = p2p.p2precord_set.all()[:40]
                   top = trade_records[:15]
                   rest = trade_records[15:]
                   for trade in top
