@@ -2,7 +2,7 @@
 from django.test import TestCase, TransactionTestCase
 from django.contrib.auth import get_user_model
 from trade import P2PTrader
-from models import P2PProduct, RecordCatalog
+from models import P2PProduct
 from exceptions import UserRestriction, ProductRestriction
 # Create your tests here.
 
@@ -19,7 +19,6 @@ class P2PTestCase(TransactionTestCase):
         self.trader00 = P2PTrader(self.product0, self.user0)
         self.trader01 = P2PTrader(self.product0, self.user1)
         self.trader11 = P2PTrader(self.product1, self.user1)
-        RecordCatalog.objects.create(name=u'申购', description=u'申购', catalog_id=1)
 
 
     def testUserRestriction(self):
@@ -44,10 +43,8 @@ class P2PTestCase(TransactionTestCase):
         self.assertFalse(self.user0.usermargin.has_margin(1001))
 
     def testTradeRecord(self):
-        catalog = RecordCatalog.objects.get(catalog_id=1)
         record = self.trader00.purchase(1000)
         self.assertIsNotNone(record)
-        self.assertEqual(record.catalog, catalog)
         self.assertEqual(record.amount, 1000)
         self.assertEqual(record.product, self.product0)
         self.assertEqual(record.product_balance_before, 2340000)

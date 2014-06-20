@@ -5,11 +5,13 @@ import json
 from decimal import Decimal
 from django.db import transaction
 from django.conf import settings
+from order.utils import OrderHelper
 
 from wanglibao_margin.models import Margin, MarginRecord
 from models import P2PProduct, P2PRecord, P2PEquity
 from exceptions import UserRestriction, ProductRestriction
 from utility import checksum
+
 
 class P2PTrader(object):
 
@@ -23,6 +25,9 @@ class P2PTrader(object):
             raise ProductRestriction('200004')
 
         with transaction.atomic():
+            # Generate an order
+            order = OrderHelper.place_order(type=u'购买', status=u'新建')
+
             # lock user margin column
             self.margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if not self.margin:
@@ -47,7 +52,7 @@ class P2PTrader(object):
             self.__update_equity(amount)
             # record this trade
             # todo complete record method
-            record = self.__record(amount, self.product, product_balance_before, product_balance_after,
+            record = self.__record(order.id, 'purchase', amount, self.product, product_balance_before, product_balance_after,
                                    self.user, user_margin_before, user_margin_after)
             #return record number
             return record
@@ -65,17 +70,15 @@ class P2PTrader(object):
             raise UserRestriction('100004')
         equity.save()
 
-    def __record(self, catalog, amount, product, product_balance_before, product_balance_after, user,
+    def __record(self, order_id, catalog, amount, product, product_balance_before, product_balance_after, user,
                  user_margin_before, user_margin_after, cancelable=False):
         """
         log record.
         :return:
         """
-        record = P2PRecord(catalog=catalog, amount=amount,
-                             product=product, product_balance_before=product_balance_before,
-                             product_balance_after=product_balance_after,
-                             user=user, user_margin_before=user_margin_before, user_margin_after=user_margin_after,
-                             cancelable=cancelable)
+        record = P2PRecord(order_id=order_id, catalog=catalog, amount=amount,
+                             product=product, product_balance_after=product_balance_after,
+                             user=user, user_margin_after=user_margin_after)
         if self.request:
             client_ip =self.request.META.get('REMOTE_ADDR', '')
             meta = json.dumps(self.request.META)

@@ -11,7 +11,7 @@ def create_user_margin(sender, **kwargs):
     """
     if kwargs['created']:
         user = kwargs['instance']
-        margin =Margin(user=user)
+        margin = Margin(user=user)
         margin.save()
 
 

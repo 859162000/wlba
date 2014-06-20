@@ -9,6 +9,7 @@ from models import P2PProduct, Warrant, WarrantCompany, P2PRecord
 from trade import P2PTrader
 from exceptions import RestrictionException
 
+
 class MockGenerator(object):
 
     @classmethod
@@ -39,11 +40,7 @@ class MockGenerator(object):
                 p2p.public_time = timezone.now() + datetime.timedelta(days=random.randrange(-10, 10))
                 p2p.end_time = timezone.now() + datetime.timedelta(days=7)
 
-                p2p.total_amount = random.randrange(100000, 4000000)
-                p2p.ordered_amount = p2p.total_amount * random.randrange(1, 100) / 100.0
-                if init:
-                    p2p.ordered_amount = 0
-
+                p2p.total_amount = random.randrange(100000, 400000)
                 p2p.warrant_company = warrant_company
 
                 p2p.extra_data = OrderedDict([
@@ -83,3 +80,15 @@ class MockGenerator(object):
                     w.name = name
                     w.product = p2p
                     w.save()
+
+    @classmethod
+    def generate_trade(cls):
+        User = get_user_model()
+
+        for u in User.objects.all():
+            for p in P2PProduct.objects.all():
+                try:
+                    trader = P2PTrader(p, u)
+                    trader.purchase(random.randrange(1000, 10000))
+                except:
+                    continue

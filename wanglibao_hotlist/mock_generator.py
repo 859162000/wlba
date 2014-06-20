@@ -41,22 +41,6 @@ class MockGenerator(object):
 
 
     @classmethod
-    def generate_hot_financings(cls, clean=False):
-        if clean:
-            [item.delete() for item in HotFinancing.objects.iterator()]
-
-        financings = BankFinancing.objects.all()[:20]
-
-        for financing in financings:
-            hot_financing = HotFinancing()
-            hot_financing.hot_score = 0
-            hot_financing.added = datetime.today()
-            hot_financing.bank_financing = financing
-
-            hot_financing.save()
-
-
-    @classmethod
     def generate_mobile_hot_funds(cls, clean=False):
         if clean:
             [item.delete() for item in MobileHotFund.objects.all()]
@@ -88,7 +72,6 @@ class MockGenerator(object):
     def generate(cls, clean=False):
         cls.generate_hot_trusts(clean)
         cls.generate_hot_funds(clean)
-        cls.generate_hot_financings(clean)
         cls.generate_mobile_hot_funds(clean)
         cls.generate_mobile_hot_trusts(clean)
 

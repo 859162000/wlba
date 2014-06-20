@@ -19,7 +19,6 @@ class WarrantCompany(models.Model):
         return u'%s' % self.name
 
 
-
 class P2PProductManager(models.Manager):
     def get_queryset(self):
         return super(P2PProductManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
@@ -163,6 +162,9 @@ class P2PRecord(models.Model):
     def __unicode__(self):
         return u'流水号%s %s 发生金额%s' %(self.id, self.catalog, self.amount)
 
+    def get_hash_list(self):
+        return gen_hash_list(self.catalog, self.order_id, self.user.id, self.product.id, self.amount, self.create_time)
+
 
 class P2PEquity(models.Model):
     user = models.ForeignKey(get_user_model(), related_name='equities')
@@ -200,5 +202,5 @@ class EquityRecord(models.Model):
         return u'%s %s %s %s' %(self.catalog, self.user, self.product, self.amount)
 
     def get_hash_list(self):
-        return gen_hash_list(self.catalog.catalog_id, self.user.id, self.product.id, self.amount, self.create_time)
+        return gen_hash_list(self.catalog, self.user.id, self.product.id, self.amount, self.create_time)
 
