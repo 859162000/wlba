@@ -37,9 +37,9 @@ body
                     option(value='{{card.id}}') {{card.bank.name}}
             tr
               th 可用余额
-              td
+              td {{margin}}
             tr
-              th 提现金额
+              th 提现金额(元)
               td
                 input.withdraw-text(type='text', name='amount', placeholder='金额', value='500.00')
             tr
