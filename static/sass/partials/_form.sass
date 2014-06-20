@@ -37,13 +37,17 @@ $row-height: 40px
   vertical-align: middle
 
 .form-row
-  //margin-top: $space-s
   overflow: visible
   text-align: left
   position: relative
 
 .form-row-m
+  @extend .form-row
   line-height: 40px
+  margin-top: 20px
+
+  input
+    height: 40px
 
 .form-row-label
   line-height: $row-height

@@ -1,3 +1,5 @@
+# encoding: utf8
+
 from decimal import Decimal
 from django.db import models
 from django.contrib.auth import get_user_model

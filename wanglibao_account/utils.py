@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from registration.models import RegistrationProfile
+from wanglibao_account.models import IdVerification
 
 
 ALPHABET = string.ascii_uppercase + string.ascii_lowercase + \
@@ -49,6 +50,7 @@ def detect_identifier_type(identifier):
 
 User = get_user_model()
 
+
 def create_user(identifier, password, nickname):
     username = generate_username(identifier)
     identifier_type = detect_identifier_type(identifier)
@@ -85,3 +87,18 @@ def create_user(identifier, password, nickname):
         user.is_active = True
         user.save()
     return user
+
+
+def verify_id(name, id_number):
+    records = IdVerification.objects.filter(id_number=id_number)
+    if records.exists():
+        record = records.first()
+        return record, None
+
+    # Verify through backend, now mock as false
+    result = True
+
+    record = IdVerification(id_number=id_number, name=name, is_valid=result)
+    record.save()
+
+    return record, None

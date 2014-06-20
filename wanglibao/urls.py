@@ -7,7 +7,6 @@ from wanglibao.views import IndexView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
-from wanglibao_p2p.views import P2PDetailView
 from wanglibao_portfolio.views import PortfolioHomeView
 
 admin.autodiscover()
@@ -54,7 +53,6 @@ urlpatterns = patterns(
     url(r'^mobile/agreement/', TemplateView.as_view(template_name="mobile_agreement.jade")),
     url(r'^mobile/about/', TemplateView.as_view(template_name="mobile_about.jade")),
     url(r'^ckeditor/', include('ckeditor.urls')),
-    #url(r'^p2p/detail', TemplateView.as_view(template_name="p2p_detail.jade")),
 )
 
 urlpatterns += patterns('',

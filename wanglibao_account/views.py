@@ -17,13 +17,13 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm
+from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user
@@ -31,7 +31,7 @@ from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
-from wanglibao_p2p.models import P2PRecord
+from wanglibao_p2p.models import P2PRecord, P2PEquity
 
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
@@ -274,7 +274,7 @@ class AccountHome(TemplateView):
             income_rate = total_income / total_asset
 
         # Followings for p2p
-        p2p_equties = UserEquity.objects.filter(user=self.request.user)
+        p2p_equties = P2PEquity.objects.filter(user=self.request.user)
 
         return {
             'fund_hold_info': fund_hold_info,
@@ -420,3 +420,19 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
             return HttpResponseForbidden('not valid ajax request')
     else:
         return HttpResponseNotAllowed()
+
+
+class IdVerificationView(FormView):
+    template_name = 'verify_id.jade'
+    form_class = IdVerificationForm
+    success_url = '/accounts/id_verify/'
+
+    def form_valid(self, form):
+        user = self.request.user
+
+        user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number')
+        user.wanglibaouserprofile.name = form.cleaned_data.get('name')
+        user.wanglibaouserprofile.id_is_valid = True
+        user.wanglibaouserprofile.save()
+
+        return super(IdVerificationView, self).form_valid(form)
