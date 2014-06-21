@@ -38,10 +38,22 @@ class OrderHelper(object):
         order_note = OrderNote()
         order_note.type = order.type
         order_note.order = order
-        order_note.extra_data = fields
 
         if user:
+            fields.update({
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'phone': user.wanglibaouserprofile.phone
+                }
+            })
+
             order_note.user = user
+
+        fields.update({
+            'order_id': order.id,
+        })
+        order_note.extra_data = fields
 
         if 'message' in fields:
             order_note.message = fields['message']

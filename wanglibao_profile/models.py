@@ -6,6 +6,7 @@ from django.db import models
 class WanglibaoUserProfile(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)
 
+    frozen = models.BooleanField(u'冻结状态', default=False)
     nick_name = models.CharField(max_length=32, blank=True, help_text=u'昵称')
 
     phone = models.CharField(max_length=64, blank=True, help_text=u'手机号码')
