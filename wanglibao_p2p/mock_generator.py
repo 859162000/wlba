@@ -8,19 +8,19 @@ from django.contrib.auth import get_user_model
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord
 from trade import P2PTrader
 
+User = get_user_model()
+
 
 class MockGenerator(object):
 
     @classmethod
-    def generate_p2p(cls, clean=False, init=False):
+    def generate_p2p(cls, clean=False):
         if clean:
             for p2p in P2PProduct.objects.all():
                 p2p.delete()
 
             for warrant_company in WarrantCompany.objects.all():
                 warrant_company.delete()
-
-            return
 
         for index in range(0, 20):
             # generate warrant company
@@ -81,8 +81,9 @@ class MockGenerator(object):
                     w.save()
 
     @classmethod
-    def generate_trade(cls):
-        User = get_user_model()
+    def generate_trade(cls, clean=False):
+        if clean:
+            P2PRecord.objects.all().delete()
 
         for u in User.objects.all():
             for p in P2PProduct.objects.all():

@@ -4,6 +4,8 @@ from wanglibao_pay.mock_generator import PayMockGenerator
 from wanglibao_portfolio.mock_generator import MockGenerator as PortfolioMockGenerator
 from wanglibao_hotlist.mock_generator import MockGenerator as HotlistMockGenerator
 from wanglibao_p2p.mock_generator import MockGenerator as P2PMockGenerator
+from wanglibao_account.mock_generator import MockGenerator as AccountMockGenerator
+from wanglibao_margin.mock_generator import MockGenerator as MarginMockGenerator
 
 
 class MockGenerator(object):
@@ -25,9 +27,16 @@ class MockGenerator(object):
         print 'Generating hot list'
         HotlistMockGenerator.generate(clean)
 
+        print 'Generating user'
+        AccountMockGenerator.generate_user(clean)
+
+        print 'Generating margin'
+        MarginMockGenerator.generate(clean)
+
         print 'Generating pay info'
         PayMockGenerator.generate_bank(clean)
         PayMockGenerator.generate_card(clean)
 
         print 'Generating p2p'
         P2PMockGenerator.generate_p2p(clean)
+        P2PMockGenerator.generate_trade(clean)

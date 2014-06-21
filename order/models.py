@@ -23,8 +23,8 @@ class Order(models.Model):
 
 
 class OrderNote(models.Model):
-    order = models.ForeignKey(Order, related_name='notes', verbose_name=u'订单')
-    user = models.ForeignKey(get_user_model(), null=True, verbose_name=u'用户')
+    order = models.ForeignKey(Order, related_name='notes', verbose_name=u'订单', null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(get_user_model(), null=True, verbose_name=u'用户', on_delete=models.SET_NULL)
 
     # System generated note can't be edited
 
