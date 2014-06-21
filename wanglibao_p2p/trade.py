@@ -1,19 +1,8 @@
 # encoding: utf-8
-import functools
-import hashlib
-import json
-from decimal import Decimal
 from django.db import transaction
-from django.conf import settings
-from order.utils import OrderHelper
-
 from order.utils import OrderHelper
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_margin.exceptions import MarginLack, MarginNotExist
-from models import P2PProduct, P2PRecord, P2PEquity
-from utility import checksum
 from keeper import ProductKeeper, EquityKeeper
-from exceptions import ProductLack, ProductNotExist
 
 
 class P2PTrader(object):

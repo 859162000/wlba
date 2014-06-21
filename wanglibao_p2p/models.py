@@ -15,6 +15,10 @@ user_model = get_user_model()
 class WarrantCompany(models.Model):
     name = models.CharField(max_length=64, verbose_name=u'名字')
 
+    class Meta:
+        verbose_name = u'担保公司'
+        verbose_name_plural = u'担保公司'
+
     def __unicode__(self):
         return u'%s' % self.name
 
@@ -24,12 +28,15 @@ class P2PProductManager(models.Manager):
         return super(P2PProductManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
                                                                     status__exact=u'正在招标')
 
-
 class P2PProductPayment(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'付款方式')
     description = models.CharField(max_length=1000, verbose_name=u'描述', blank=u'', default=u'')
 
     catalog_id = models.IntegerField(verbose_name=u'类别ID')
+
+    class Meta:
+        verbose_name = u'还款方式'
+        verbose_name_plural = u'还款方式'
 
     def __unicode__(self):
         return u'%s, id:%s' % (self.name, self.catalog_id)
@@ -65,6 +72,9 @@ class P2PProduct(ProductBase):
     objects = models.Manager()
     sold_out = P2PProductManager()
 
+    class Meta:
+        verbose_name_plural = u'P2P产品'
+
     def __unicode__(self):
         return u'<%s %f, 总量: %s, 已募集: %s, 完成率: %s %%>' % (self.name, self.expected_earning_rate, self.total_amount,
                                             self.ordered_amount, self.completion_rate)
@@ -96,6 +106,9 @@ class Warrant(models.Model):
 
     product = models.ForeignKey(P2PProduct)
 
+    class Meta:
+        verbose_name_plural = u'产品担保'
+
     def __unicode__(self):
         return u'%s %s %s' % (self.product.name, self.name, str(self.warranted_at))
 
@@ -114,6 +127,9 @@ class ProductAmortization(models.Model):
 
     created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
+    class Meta:
+        verbose_name_plural = u'产品还款管理'
+
     @property
     def total_amount(self):
         return self.amount + self.penal_interest
@@ -130,6 +146,9 @@ class ProductUserAmortization(models.Model):
     current_equity = models.BigIntegerField(verbose_name=u'分配时点用户所持份额')
     amount = models.DecimalField(verbose_name=u'还款金额', max_digits=20, decimal_places=2)
     description = models.CharField(verbose_name=u'摘要', max_length=1000)
+
+    class Meta:
+        verbose_name_plural = u'用户还款'
 
     def __unicode__(self):
         return u'用户 %s 产品 %s 还款 %s'
@@ -151,6 +170,7 @@ class P2PRecord(models.Model):
 
     class Meta:
         ordering = ['-create_time']
+        verbose_name_plural = u'产品流水'
 
     def __unicode__(self):
         return u'流水号%s %s 发生金额%s' %(self.id, self.catalog, self.amount)
@@ -167,6 +187,7 @@ class P2PEquity(models.Model):
 
     class Meta:
         unique_together = (('user', 'product'),)
+        verbose_name_plural = u'用户持仓'
 
     def __unicode__(self):
         return u'%s 持有 %s 数量:%s' % (self.user, self.product, self.equity)
@@ -190,6 +211,9 @@ class EquityRecord(models.Model):
     description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
 
     create_time = models.DateTimeField(verbose_name=u'流水时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = u'持仓流水'
 
     def __unicode__(self):
         return u'%s %s %s %s' %(self.catalog, self.user, self.product, self.amount)

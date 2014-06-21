@@ -1,7 +1,7 @@
 # encoding:utf8
+import json
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.utils import timezone
 from jsonfield import JSONField
 
 
@@ -13,13 +13,13 @@ class Order(models.Model):
     type = models.CharField(max_length=64, verbose_name=u'订单类型')
     status = models.CharField(max_length=64, verbose_name=u'订单状态')
 
-    created_at = models.DateTimeField(default=timezone.now, verbose_name=u'订单创建时间')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'订单创建时间')
 
     # Field for storing extra data
     extra_data = JSONField(blank=True)
 
     def __unicode__(self):
-        return u"%s %s %s"
+        return u"%s %s %s" % (str(self.id), self.type, unicode(json.dumps(self.extra_data)))
 
 
 class OrderNote(models.Model):

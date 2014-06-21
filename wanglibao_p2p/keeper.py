@@ -4,10 +4,6 @@ from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord
 from exceptions import ProductLack, ProductNotExist
 
 
-class EquityKeeper(object):
-    pass
-
-
 class ProductKeeper(object):
 
     def __init__(self, product, order):
@@ -25,7 +21,6 @@ class ProductKeeper(object):
             catalog = u'申购'
             record = self.__tracer(catalog, amount, user, self.product.remain)
             return record
-
 
     def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
