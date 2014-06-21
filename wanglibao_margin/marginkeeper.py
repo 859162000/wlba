@@ -21,7 +21,7 @@ class MarginKeeper(object):
             if amount > margin.margin:
                 raise MarginLack(u'201')
             margin.margin -= amount
-            margin.freeze += amount
+            margin.reserve += amount
             margin.save()
             catalog = u'交易冻结'
             record = self.__tracer(catalog, amount, margin.margin, description)
@@ -32,9 +32,9 @@ class MarginKeeper(object):
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
-            if amount > margin.freeze:
+            if amount > margin.reserve:
                 raise MarginLack(u'202')
-            margin.freeze -= amount
+            margin.reserve -= amount
             margin.margin += amount
             margin.save()
             catalog = u'交易解冻'
@@ -46,9 +46,9 @@ class MarginKeeper(object):
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
-            if amount > margin.freeze:
+            if amount > margin.reserve:
                 raise MarginLack(u'202')
-            margin.freeze -= amount
+            margin.reserve -= amount
             margin.save()
             catalog = u'交易成功扣款'
             record = self.__tracer(catalog, amount, margin.margin, description)

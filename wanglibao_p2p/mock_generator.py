@@ -5,8 +5,9 @@ import random
 import datetime
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from models import P2PProduct, Warrant, WarrantCompany, P2PRecord
+from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, ProductAmortization
 from trade import P2PTrader
+from keeper import AmortizationKeeper
 
 
 class MockGenerator(object):
@@ -91,4 +92,23 @@ class MockGenerator(object):
                     trader.purchase(random.randrange(1000, 10000))
                 except Exception, e:
                     print(e)
+
+    @classmethod
+    def generate_amortization(cls):
+        Prodects = P2PProduct.objects.all()[:6]
+        for product in Prodects:
+            for term in range(product.period):
+                random_principal = Decimal(random.randrange(10000,100000))
+                penal = random.choice([True, False, False, False])
+                if penal:
+                    penal = random_principal * Decimal(0.12 * 0.2)
+                else:
+                    penal = Decimal(0)
+                p_amo = ProductAmortization(product=product, term=term, principal=random_principal,
+                                            interest=random_principal*Decimal(0.12), penal_interest=penal,
+                                            description=u'测试产品还款')
+                p_amo.save()
+        for amo in ProductAmortization.objects.all():
+            kp = AmortizationKeeper(amo, 1000)
+            kp.amortize(u'测试用户分配还款')
 

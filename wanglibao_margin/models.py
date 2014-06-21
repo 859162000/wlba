@@ -25,7 +25,7 @@ class Margin(models.Model):
 class MarginRecord(models.Model):
     catalog = models.CharField(verbose_name=u'流水类型', max_length=100)
     order_id = models.IntegerField(verbose_name=u'相关订单编号')
-    user = models.ForeignKey(get_user_model())
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
     create_time = models.DateTimeField(verbose_name=u'流水时间', auto_now_add=True)
 
     amount = models.DecimalField(verbose_name=u'发生金额', max_digits=20, decimal_places=2)
