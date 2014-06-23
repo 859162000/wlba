@@ -1,60 +1,75 @@
 # encoding: utf-8
+import json
+from datetime import date, timedelta
 from django.test import TestCase, TransactionTestCase
-from django.contrib.auth import get_user_model
-from trade import P2PTrader
-from models import P2PProduct
-from exceptions import UserRestriction, ProductRestriction
+from  ext import P2PTerm, P2PPeriod
 # Create your tests here.
 
 
-class P2PTestCase(TransactionTestCase):
+day = date(2014, 05, 01)
 
-    fixtures = ['user.json', 'p2p.json']
+
+class P2PPeriodTest(TestCase):
 
     def setUp(self):
-        self.product0 = P2PProduct.objects.get(pk=241)
-        self.product1 = P2PProduct.objects.get(pk=242)
-        self.user0 = get_user_model().objects.get(pk=1)
-        self.user1 = get_user_model().objects.get(pk=2)
-        self.trader00 = P2PTrader(self.product0, self.user0)
-        self.trader01 = P2PTrader(self.product0, self.user1)
-        self.trader11 = P2PTrader(self.product1, self.user1)
+        self.term0 = P2PTerm(day)
+        self.term1 = P2PTerm(day-timedelta(days=1), paid=True)
+        self.term2 = P2PTerm(day-timedelta(days=2), delay=True)
+        self.term3 = P2PTerm(day-timedelta(days=3), paid=True, delay=True)
+        self.period0 = P2PPeriod([self.term0, self.term1, self.term2, self.term3])
+        self.term0dict = {
+            'date': '2014-05-01',
+            'paid': False,
+            'delay': False
+        }
+        self.term1dict = {
+            'date': '2014-04-30',
+            'paid': True,
+            'delay': False
+        }
+        self.term2dict = {
+            'date': '2014-04-29',
+            'paid': False,
+            'delay': True
+        }
+        self.term3dict = {
+            'date': '2014-04-28',
+            'paid': True,
+            'delay': True
+        }
+        self.period0dict = {
+            'count': 4,
+            'terms': [self.term0.serializer(), self.term1.serializer(),
+                      self.term2.serializer(), self.term3.serializer()]
+        }
 
+    def testTermStatus(self):
+        self.assertEqual(self.term0.status, u'未到还款期限')
+        self.assertEqual(self.term1.status, u'已还')
+        self.assertEqual(self.term2.status, u'逾期未还')
+        self.assertEqual(self.term3.status, u'逾期已还')
 
-    def testUserRestriction(self):
-        self.assertRaises(UserRestriction, self.trader00.purchase, (1001))
-        self.assertRaises(UserRestriction, self.trader01.purchase, (468001))
+    def testTermSerializer(self):
+        self.assertEqual(self.term0.serializer(), self.term0dict)
+        self.assertEqual(self.term1.serializer(), self.term1dict)
+        self.assertEqual(self.term2.serializer(), self.term2dict)
+        self.assertEqual(self.term3.serializer(), self.term3dict)
 
-    def testProductRestriction(self):
-        self.assertRaises(ProductRestriction, self.trader00.purchase, (1.25))
-        self.assertRaises(ProductRestriction, self.trader11.purchase, (80001))
-        self.assertRaises(ProductRestriction, self.trader00.purchase, (-10))
-        self.assertRaises(ProductRestriction, self.trader00.purchase, (0))
+    def testTermToJson(self):
+        self.assertEqual(self.term0.to_json(), json.dumps(self.term0dict))
+        self.assertEqual(self.term1.to_json(), json.dumps(self.term1dict))
+        self.assertEqual(self.term2.to_json(), json.dumps(self.term2dict))
+        self.assertEqual(self.term3.to_json(), json.dumps(self.term3dict))
 
-    def testP2PProductModelMethod(self):
-        self.assertEqual(self.product1.remain, 80000)
-        self.assertEqual(self.product1.completion_rate, 20)
-        self.assertEqual(self.product1.limit_amount_per_user, 20000)
-        self.assertTrue(self.product1.has_amount(80000))
-        self.assertFalse(self.product1.has_amount(80001))
+    def testPeriodCount(self):
+        self.assertEqual(self.period0.count, 4)
+        term = self.period0.terms.pop()
+        self.assertEqual(self.period0.count, 3)
+        self.period0.terms.append(term)
+        self.assertEqual(self.period0.count, 4)
 
-    def testUserMarginModelMethod(self):
-        self.assertTrue(self.user0.usermargin.has_margin(1000))
-        self.assertFalse(self.user0.usermargin.has_margin(1001))
+    def testPeriodSerializer(self):
+        self.assertEqual(self.period0.serializer(), self.period0dict)
 
-    def testTradeRecord(self):
-        record = self.trader00.purchase(1000)
-        self.assertIsNotNone(record)
-        self.assertEqual(record.amount, 1000)
-        self.assertEqual(record.product, self.product0)
-        self.assertEqual(record.product_balance_before, 2340000)
-        self.assertEqual(record.product_balance_after, 2339000)
-        self.assertEqual(record.user, self.user0)
-        self.assertEqual(record.user_margin_before, self.user0.usermargin.margin + 1000)
-        self.assertEqual(record.user_margin_after, self.user0.usermargin.margin)
-        self.assertEqual(record.operation_ip, '')
-        self.assertEqual(record.operation_request_headers, '')
-        self.assertEqual(record.checksum, '26f912b2de0e5d5f54e4ff556b5601c3b37224d75f1e3d35b5e7b41b190657abb14fa1e92e6c'
-                                          'c432998ea0f05a04d74a257d8d16179246274c27ba89ac9bb0fa')
-
-
+    def testPeriodToJson(self):
+        self.assertEqual(self.period0.to_json(), json.dumps(self.period0dict))
