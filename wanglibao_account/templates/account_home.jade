@@ -71,10 +71,10 @@ body
               th 投标时间
               th 产品名称
               th 投资金额
-              th 月收本息
               th 下次回款
+              th 下次回款时间
               th 状态
-              th 已回款
+              th 已收益/预期收益
           tbody
             if p2p_equities
               each equity in p2p_equities
@@ -82,10 +82,10 @@ body
                   td {{equity.product.publish_time | date:"Y-m-d h:i:s"}}
                   td {{equity.product.name}}
                   td {{equity.equity | money_format}}
-                  td {{equity.equity | money_format}}
-                  td {{equity.equity | money_format}}
+                  td {{equity. | money_format}}
+                  td {{equity.next_term}}
                   td {{equity.product.status}}
-                  td {{equity.equity | money_format}}
+                  td {{equity.paid_interest | money_format}} /
             else
               tr
                 td(colspan='4') 无持仓记录

@@ -118,6 +118,7 @@ class ProductAmortization(models.Model):
     product = models.ForeignKey(P2PProduct, related_name='amortizations')
 
     term = models.IntegerField(verbose_name=u'还款期数')
+    term_date = models.DateTimeField(verbose_name=u'还款时间')
     principal = models.DecimalField(verbose_name=u'返还本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(verbose_name=u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(verbose_name=u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
@@ -125,12 +126,15 @@ class ProductAmortization(models.Model):
     settled = models.BooleanField(verbose_name=u'已结算给客户', default=False)
     settlement_time = models.DateTimeField(verbose_name=u'结算时间', auto_now=True)
 
+    ready_for_settle = models.BooleanField(verbose_name=u'是否可以开始结算', default=False)
+
     created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
     description = models.CharField(verbose_name=u'摘要', max_length=500)
 
     class Meta:
         verbose_name_plural = u'产品还款管理'
+        ordering = ['term']
 
     @property
     def total(self):

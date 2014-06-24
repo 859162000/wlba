@@ -273,7 +273,7 @@ class AccountHome(TemplateView):
             income_rate = total_income / total_asset
 
         # Followings for p2p
-        p2p_equties = P2PEquity.objects.filter(user=self.request.user)
+        p2p_equities = P2PEquity.objects.filter(user=self.request.user)
 
         return {
             'fund_hold_info': fund_hold_info,
@@ -285,7 +285,7 @@ class AccountHome(TemplateView):
             'greeting': greeting,
             'message': message,
 
-            'p2p_equities': p2p_equties,
+            'p2p_equities': p2p_equities,
         }
 
 
