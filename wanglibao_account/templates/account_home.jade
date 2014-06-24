@@ -79,13 +79,25 @@ body
             if p2p_equities
               each equity in p2p_equities
                 tr
+                  if equity.product_id in p2p_product_amortization
+                    next_amortization = p2p_product_amortization[equity.product_id] or 'None'
+                    next_term_date = next_amortization.term_date
+                    next_income = next_amortization.total * equity.ratio
+                    term = next_amortization.term + 1
+                    total_income = float(equity.ratio) * equity.product.expected_earning_rate / 12 * equity.product.period * equity.equity
+                  else
+                    next_term_date = "-"
+                    next_income = 0
+                    term = "-"
+                    total_income = 0
+
                   td {{equity.product.publish_time | date:"Y-m-d h:i:s"}}
                   td {{equity.product.name}}
                   td {{equity.equity | money_format}}
-                  td {{equity. | money_format}}
-                  td {{equity.next_term}}
-                  td {{equity.product.status}}
-                  td {{equity.paid_interest | money_format}} /
+                  td {{next_income | money_format | default:"--"}}
+                  td {{next_term_date | date:"Y-m-d" | default:"--"}}
+                  td 还款中{{term}}/{{equity.product.amortization_count}}
+                  td {{equity.paid_interest | money_format}} / {{total_income | money_format}}
             else
               tr
                 td(colspan='4') 无持仓记录
