@@ -29,20 +29,6 @@ class P2PProductManager(models.Manager):
         return super(P2PProductManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
                                                                     status__exact=u'正在招标')
 
-class P2PProductPayment(models.Model):
-    name = models.CharField(max_length=255, verbose_name=u'付款方式')
-    description = models.CharField(max_length=1000, verbose_name=u'描述', blank=u'', default=u'')
-    formula = models.TextField(verbose_name=u'计算公式')
-
-    catalog_id = models.IntegerField(verbose_name=u'类别ID')
-
-    class Meta:
-        verbose_name = u'还款方式'
-        verbose_name_plural = u'还款方式'
-
-    def __unicode__(self):
-        return u'%s, id:%s' % (self.name, self.catalog_id)
-
 
 class P2PProduct(ProductBase):
     name = models.CharField(max_length=256, verbose_name=u'名字')
@@ -53,9 +39,10 @@ class P2PProduct(ProductBase):
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)')
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)')
-    closed = models.BooleanField(verbose_name=u'是否完结', default=False)
+    closed = models.BooleanField(u'是否完结', default=False)
 
-    payment = models.ForeignKey(P2PProductPayment, null=True)
+    pay_method = models.CharField(u'支付方式', max_length=32, blank=True, default=u'等额本息')
+    amortization_count = models.IntegerField(u'还款期数', default=0)
 
     total_amount = models.BigIntegerField(default=0, verbose_name=u'借款总额')
     ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
@@ -131,7 +118,7 @@ class ProductAmortization(models.Model):
 
     created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
-    description = models.CharField(verbose_name=u'摘要', max_length=500)
+    description = models.CharField(verbose_name=u'摘要', max_length=500, blank=True)
 
     class Meta:
         verbose_name_plural = u'产品还款管理'
