@@ -1,5 +1,7 @@
 # encoding: utf-8
+from decimal import Decimal
 from django.db import transaction
+from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord
 from exceptions import ProductLack, ProductNotExist
 
@@ -47,6 +49,28 @@ class EquityKeeper(object):
             record = self.__tracer(catalog, amount, description)
             return record
 
+    def settle(self, description=u'', savepoint=True):
+        with transaction.atomic(savepoint=savepoint):
+            equity_query =  P2PEquity.objects.filter(user=self.user, product=self.product)
+            if (not equity_query.exists()) or (len(equity_query) != 1):
+                raise
+            self.equity = equity_query.first()
+            self.equity.confirm = True
+            self.equity.total_term = self.product.period
+            next_term = self.product.amortizations.all().first()
+            if next_term:
+                self.equity.next_term = next_term.term_date.strftime('%Y-%m-%d')
+                self.equity.next_amount = next_term.total * self.equity.ratio
+                self.equity.total_interest = Decimal(self.product.expected_earning_rate / 100) * self.equity.ratio\
+                                             * Decimal(self.equity.equity)
+            self.equity.save()
+            catalog = u'申购确认'
+            description = u''
+            self.__tracer(catalog, self.equity.equity, description)
+            user_margin_keeper = MarginKeeper(self.equity, savepoint=False)
+            user_margin_keeper.settle(self.equity.equity)
+
+
     def __tracer(self, catalog, amount, description=u''):
         trace = EquityRecord(catalog=catalog, amount=amount, description=description, user=self.user,
                              product=self.product, order_id=self.order)
@@ -78,7 +102,9 @@ class AmortizationKeeper(object):
                 catalog = u'P2P还款'
                 record = self.__tracer(catalog, equity.user, user_principal, user_interest, user_penal_interest,
                                        description)
-            self.amortization.settle = True
+                user_margin_keeper = MarginKeeper(equity.user, self.order)
+                user_margin_keeper.amortize(user_principal, user_interest, user_penal_interest, savepoint=False)
+            self.amortization.settled = True
             self.amortization.save()
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, description=u''):
