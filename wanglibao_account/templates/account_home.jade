@@ -45,12 +45,12 @@ body
           .gray-card4
             p 总资产
             p
-              span.big_number {{total_asset|money_f_2}}
+              span.big_number {{user.margin.margin|money_f_2}}
               元
           .gray-card4
-            p 累积收益
+            p 余额
             p
-              span.big_number {{total_income|money_f_2}}
+              span.big_number {{user.margin.margin | money_f_2}}
               元
           .gray-card4
             p 近一周收益

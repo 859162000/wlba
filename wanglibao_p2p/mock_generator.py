@@ -96,8 +96,8 @@ class MockGenerator(object):
 
     @classmethod
     def generate_amortization(cls):
-        Prodects = P2PProduct.objects.all()[:6]
-        for product in Prodects:
+        products = P2PProduct.objects.all()[:6]
+        for product in products:
             for term in range(product.period):
                 random_principal = Decimal(random.randrange(10000,100000))
                 penal = random.choice([True, False, False, False])

@@ -140,9 +140,12 @@ class ProductAmortization(models.Model):
         return u'产品<%s>: 第 %s 期，总额 %s 元' % (self.product.short_name, self.term, self.total)
 
 
-class UserAmortization(models.Model):
-    product =models.ForeignKey(P2PProduct)
-    user = models.ForeignKey(get_user_model())
+class P2PEquity(models.Model):
+    user = models.ForeignKey(get_user_model(), related_name='equities')
+    product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
+    equity = models.BigIntegerField(verbose_name=u'用户所持份额', default=0)
+    confirm = models.BooleanField(verbose_name=u'确认成功', default=False)
+
     paid_principal = models.DecimalField(verbose_name=u'已付本金', max_digits=20, decimal_places=2, default=Decimal(0))
     paid_interest = models.DecimalField(verbose_name=u'已付利息', max_digits=20, decimal_places=2, default=Decimal(0))
     penal_interest = models.DecimalField(verbose_name=u'已得罚息', max_digits=20, decimal_places=2, default=Decimal(0))
@@ -153,10 +156,20 @@ class UserAmortization(models.Model):
     total_interest = models.DecimalField(verbose_name=u'应付利息', max_digits=20, decimal_places=2, default=Decimal(0))
 
     class Meta:
-        verbose_name_plural = u'用户还款状态'
+        unique_together = (('user', 'product'),)
+        verbose_name_plural = u'用户持仓'
 
     def __unicode__(self):
-        return u'%s 用户 %s 还款状态' %(self.product, self.user)
+        return u'%s 持有 %s 数量:%s' % (self.user, self.product, self.equity)
+
+    @property
+    def related_orders(self):
+        records = list()
+        return records
+
+    @property
+    def ratio(self):
+        return Decimal(self.equity) / Decimal(self.product.total_amount)
 
 
 class AmortizationRecord(models.Model):
@@ -207,29 +220,6 @@ class P2PRecord(models.Model):
 
     def get_hash_list(self):
         return gen_hash_list(self.catalog, self.order_id, self.user.id, self.product.id, self.amount, self.create_time)
-
-
-class P2PEquity(models.Model):
-    user = models.ForeignKey(get_user_model(), related_name='equities')
-    product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
-    equity = models.BigIntegerField(verbose_name=u'用户所持份额', default=0)
-    confirm = models.BooleanField(verbose_name=u'确认成功', default=False)
-
-    class Meta:
-        unique_together = (('user', 'product'),)
-        verbose_name_plural = u'用户持仓'
-
-    def __unicode__(self):
-        return u'%s 持有 %s 数量:%s' % (self.user, self.product, self.equity)
-
-    @property
-    def related_orders(self):
-        records = list()
-        return records
-
-    @property
-    def ratio(self):
-        return Decimal(self.equity) / Decimal(self.product.total_amount)
 
 
 class EquityRecord(models.Model):

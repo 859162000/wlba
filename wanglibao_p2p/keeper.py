@@ -1,6 +1,6 @@
 # encoding: utf-8
 from django.db import transaction
-from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, UserAmortization
+from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord
 from exceptions import ProductLack, ProductNotExist
 
 
@@ -64,9 +64,7 @@ class AmortizationKeeper(object):
         with transaction.atomic(savepoint=savepoint):
             equities = self.amortization.product.equities.all()
             for equity in equities:
-                user_amo, _ = UserAmortization.objects.get_or_create(product=self.amortization.product,
-                                                                     user=equity.user)
-
+                user_amo = equity
                 user_principal = self.amortization.principal * equity.ratio
                 user_interest = self.amortization.interest * equity.ratio
                 user_penal_interest = self.amortization.penal_interest * equity.ratio
@@ -89,7 +87,7 @@ class AmortizationKeeper(object):
             penal_interest=penal_interest, description=description, user=user, catalog=catalog
         )
         trace.save()
-        return  trace
+        return trace
 
 
 def check_amount(amount):
