@@ -77,7 +77,7 @@ class P2PProduct(ProductBase):
         verbose_name_plural = u'P2P产品'
 
     def __unicode__(self):
-        return u'<%s %f, 总量: %s, 已募集: %s, 完成率: %s %%>' % (self.name, self.expected_earning_rate, self.total_amount,
+        return u'<%s %f, 总量: %s, 已募集: %s, 完成率: %.2f %%>' % (self.name, self.expected_earning_rate, self.total_amount,
                                             self.ordered_amount, self.completion_rate)
 
     @property
