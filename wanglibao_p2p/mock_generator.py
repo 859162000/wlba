@@ -36,6 +36,7 @@ class MockGenerator(object):
                 p2p.name = u'P2P产品' + str(index + 1)
                 p2p.short_name = u'P2P 短名'
                 p2p.pay_method = u'按月还款 等额本息'
+                p2p.amortization_count = random.randrange(4, 12)
                 p2p.expected_earning_rate = random.randrange(100, 200) / 10.0
                 p2p.public_time = timezone.now() + datetime.timedelta(days=random.randrange(-10, 10))
                 p2p.end_time = timezone.now() + datetime.timedelta(days=7)
@@ -96,8 +97,8 @@ class MockGenerator(object):
 
     @classmethod
     def generate_amortization(cls):
-        Prodects = P2PProduct.objects.all()[:6]
-        for product in Prodects:
+        products = P2PProduct.objects.all()[:6]
+        for product in products:
             for term in range(product.period):
                 random_principal = Decimal(random.randrange(10000,100000))
                 penal = random.choice([True, False, False, False])

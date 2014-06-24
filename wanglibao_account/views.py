@@ -31,7 +31,7 @@ from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
-from wanglibao_p2p.models import P2PRecord, P2PEquity
+from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
 
@@ -273,7 +273,13 @@ class AccountHome(TemplateView):
             income_rate = total_income / total_asset
 
         # Followings for p2p
-        p2p_equties = P2PEquity.objects.filter(user=self.request.user)
+        p2p_equities = P2PEquity.objects.filter(user=self.request.user)
+        amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False)
+
+        p2p_product_amortization = {}
+        for amortization in amortizations:
+            if not amortization.product_id in p2p_product_amortization:
+                p2p_product_amortization[amortization.product_id] = amortization
 
         return {
             'fund_hold_info': fund_hold_info,
@@ -285,7 +291,8 @@ class AccountHome(TemplateView):
             'greeting': greeting,
             'message': message,
 
-            'p2p_equities': p2p_equties,
+            'p2p_equities': p2p_equities,
+            'p2p_product_amortization': p2p_product_amortization
         }
 
 
