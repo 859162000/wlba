@@ -3,7 +3,7 @@
 - load widget_tweaks
 
 doctype html
-- with '支付' as title
+- with '取款结果' as title
 include include/head
 - endwith
 body
@@ -11,9 +11,19 @@ body
   - with '首页' as activeItem
   include include/navigation
   - endwith
-  .pay-container
-    .row
-      .pull-left {{result}}
+
+  .callback-container
+    .callback-content
+      if result == '曲矿成功'
+        .success-icon
+        .callback-description
+          h1 恭喜，您已经成功取款<span class='red-text'>{{amount}}</span>元。
+          p 您可以点击<a class='blue' href='/accounts/home'>查看余额</a>，或者<a class='blue' href='/'>立即投资</a>
+      else
+        .error-icon
+        .callback-description
+          h1 取款失败
+          p {{result}}
 
   - with 1 as no_margin
   include include/footer

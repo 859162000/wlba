@@ -38,6 +38,15 @@ class BankListView(TemplateView):
         }
 
 
+class PayResult(object):
+    DEPOSIT_SUCCESS = u'充值成功'
+    DEPOSIT_FAIL = u'充值失败'
+    WITHDRAW_SUCCESS = u'取款成功'
+    WITHDRAW_FAIL = u'取款失败'
+    RETRY = u'系统内部错误，请重试'
+    EXCEPTION = u'系统内部错误，请联系客服'
+
+
 class PayView(TemplateView):
     template_name = 'pay_jump.jade'
 
@@ -80,7 +89,7 @@ class PayView(TemplateView):
         except Bank.DoesNotExist:
             message = u'请选择有效的银行'
         except (socket.error, SignException) as e:
-            message = u'系统内部错误,请重试'
+            message = PayResult.RETRY
             pay_info.status = PayInfo.FAIL
             pay_info.error_message = str(e)
             pay_info.save()
@@ -100,10 +109,10 @@ def handle_pay_result(request):
         pay_info = PayInfo.objects.select_for_update().get(pk=order_id)
     except PayInfo.DoesNotExist:
         logger.warning('Order not found, order id: ' + order_id + ', response: ' + request.body)
-        return u'系统内部错误，请联系客服'
+        return PayResult.EXCEPTION
 
     if pay_info.status == PayInfo.SUCCESS:
-        return u'充值成功'
+        return PayResult.DEPOSIT_SUCCESS
 
     amount = request.POST.get('OrdAmt', '')
     code = request.POST.get('RespCode', '')
@@ -122,24 +131,26 @@ def handle_pay_result(request):
                 pay_info.error_message += u' 金额不匹配'
                 logger.error('Amount mismatch, order id: %s request amount: %f response amount: %s',
                              order_id, float(pay_info.amount), amount)
-                result = u'系统内部错误，请联系客服'
+                result = PayResult.EXCEPTION
             else:
                 if code == '000000':
                     keeper = MarginKeeper(request.user, pay_info.order.pk)
                     keeper.deposit(amount)
                     pay_info.status = PayInfo.SUCCESS
-                    result = u'充值成功'
+                    result = PayResult.DEPOSIT_SUCCESS
                 else:
                     pay_info.status = PayInfo.FAIL
-                    result = u'充值失败'
+                    result = PayResult.DEPOSIT_FAIL
         else:
             pay_info.error_message = 'Invalid signature. Order id: ' + order_id
             logger.error(pay_info.error_message)
             pay_info.status = PayInfo.EXCEPTION
+            result = PayResult.EXCEPTION
     except (socket.error, SignException) as e:
         pay_info.error_message = str(e)
         pay_info.status = PayInfo.EXCEPTION
         logger.fatal('sign error! order id: ' + order_id + ' ' + str(e))
+        result = PayResult.EXCEPTION
 
     pay_info.save()
     return result
@@ -150,8 +161,10 @@ class PayCompleteView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         result = handle_pay_result(request)
+        amount = request.POST.get('OrdAmt', '')
         return self.render_to_response({
-            'result': result
+            'result': result,
+            'amount': amount
         })
 
     @method_decorator(csrf_exempt)
@@ -189,10 +202,10 @@ def handle_withdraw_result(data):
         pay_info = PayInfo.objects.select_for_update().get(pk=order_id)
     except PayInfo.DoesNotExist:
         logger.warning('Order not found, order id: ' + order_id + ', response: ' + str(data))
-        return u'系统内部错误,请联系客服人员'
+        return PayResult.EXCEPTION
 
     if pay_info.status == PayInfo.FAIL:
-        return u'提款失败'
+        return PayResult.WITHDRAW_FAIL
 
     pay_info = PayInfo.objects.select_for_update().get(pk=order_id)
     pay_info.response = str(data)
@@ -210,25 +223,25 @@ def handle_withdraw_result(data):
                     if pay_info.status != PayInfo.SUCCESS:
                         keeper.withdraw_ack(pay_info.amount)
                     pay_info.status = PayInfo.SUCCESS
-                    result = u'提款成功'
+                    result = PayResult.WITHDRAW_SUCCESS
                 elif transaction_status == 'I':
                     pay_info.status = PayInfo.ACCEPTED
-                    result = u'银行已受理'
+                    result = PayResult.WITHDRAW_SUCCESS
                 else:
                     pay_info.status = PayInfo.FAIL
-                    result = u'提款失败'
+                    result = PayResult.WITHDRAW_FAIL
                     keeper.withdraw_rollback(pay_info.amount)
             else:
                 pay_info.status = PayInfo.FAIL
-                result = u'提款失败'
+                result = PayResult.WITHDRAW_FAIL
                 keeper.withdraw_rollback(pay_info.amount)
         else:
             pay_info.status = PayInfo.EXCEPTION
             pay_info.error_message = 'Invalid signature'
-            result = u'系统内部错误,请联系客服人员'
+            result = PayResult.EXCEPTION
             logger.fatal('invalid signature. order id: %s', str(pay_info.pk))
     except(socket.error, SignException) as e:
-        result = u'系统内部错误,请联系客服人员'
+        result = PayResult.EXCEPTION
         pay_info.status = PayInfo.EXCEPTION
         pay_info.error_message = str(e)
         logger.fatal('unexpected error. order id: %s. exception: %s', str(pay_info.pk), str(e))
@@ -290,7 +303,7 @@ class WithdrawCompleteView(TemplateView):
             pay_info.status = PayInfo.FAIL
             pay_info.save()
         except (socket.error, SignException) as e:
-            result = u'系统内部错误,请重试'
+            result = PayResult.EXCEPTION
             pay_info.error_message = str(e)
             pay_info.status = PayInfo.FAIL
             pay_info.save()
@@ -310,14 +323,14 @@ class WithdrawCompleteView(TemplateView):
             for child in ret:
                 data[child.tag] = child.text
         except requests.exceptions.ConnectionError as e:
-            result = u'系统内部错误,请重试'
+            result = PayResult.WITHDRAW_FAIL
             pay_info.status = PayInfo.FAIL
             pay_info.error_message = str(e)
             pay_info.save()
             keeper.withdraw_rollback(amount)
             logger.error('connection error. order id: %s. exception: %s', str(pay_info.pk), str(e))
         except (requests.exceptions.HTTPError, requests.exceptions.Timeout, ET.ParseError) as e:
-            result = u'系统内部错误,请联系客服人员'
+            result = PayResult.EXCEPTION
             pay_info.status = PayInfo.EXCEPTION
             pay_info.error_message = str(e)
             pay_info.save()

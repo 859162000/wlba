@@ -37,6 +37,10 @@ $container-style: magic
   clear: both
   margin: 0 auto
 
+.white-container
+  @extend .container
+  background-color: white
+
 .container-hidden
   @extend .container
   display: none
@@ -90,12 +94,23 @@ $container-style: magic
 .pos-t-s
   top: $space-s
 
+.callback-container
+  @extend .white-container
+  margin: 10px auto
+
 .callback-content
   background: $white
   padding: $space-xxl 0
-  text-align: center
   line-height: $space-l
   font-size: $font-s
+  width: 600px
+  margin: 0 auto
+  +clearfix
+
+.callback-description
+  float: left
+  margin-left: 10px
+  margin-top: 5px
 
   h1
     font-size: $font-xl
@@ -108,13 +123,11 @@ $container-style: magic
   height: 84px
   display: inline-block
   overflow: hidden
+  float: left
 
 .error-icon
+  @extend .success-icon
   background: url("/static/images/success_failed.png") 0 -86px
-  width: 84px
-  height: 84px
-  display: inline-block
-  overflow: hidden
 
 .star
   +inline-block

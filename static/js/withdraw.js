@@ -2,12 +2,18 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'lib/jquery.min'
+      jquery: 'lib/jquery.min',
+      'jquery.modal': 'lib/jquery.modal.min',
+      'jquery.placeholder': 'lib/jquery.placeholder'
+    },
+    shim: {
+      'jquery.modal': ['jquery'],
+      'jquery.placeholder': ['jquery']
     }
   });
 
   require(['jquery'], function($) {
-    return $('#withdraw').click(function(e) {
+    $('#withdraw').click(function(e) {
       var amount;
       e.preventDefault();
       amount = $('#amount').val();
@@ -32,6 +38,9 @@
         $('#huifu-form').attr('action', json['form']['url']);
         return $('#huifu-form').submit();
       });
+    });
+    return $('#add-card-button').click(function() {
+      return $(this).modal();
     });
   });
 
