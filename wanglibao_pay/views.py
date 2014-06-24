@@ -6,6 +6,8 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
+from rest_framework.permissions import IsAdminUser
+from rest_framework.viewsets import ModelViewSet
 from order.utils import OrderHelper
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -15,6 +17,10 @@ from wanglibao_pay.models import PayInfo
 import requests
 import xml.etree.ElementTree as ET
 import decimal
+
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
+from wanglibao_pay.serializers import CardSerializer
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -188,10 +194,13 @@ class WithdrawView(TemplateView):
 
     def get_context_data(self, **kwargs):
         cards = Card.objects.filter(user=self.request.user).select_related()
+        banks = Bank.objects.all()
         return {
             'cards': cards,
+            'banks': banks,
             'user_profile': self.request.user.wanglibaouserprofile,
-            'margin': self.request.user.margin.margin
+            'margin': self.request.user.margin.margin,
+            'fee': HuifuPay.FEE
         }
 
 
@@ -356,4 +365,29 @@ class WithdrawCallback(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(WithdrawCallback, self).dispatch(request, *args, **kwargs)
+
+
+class CardViewSet(ModelViewSet):
+    model = Card
+    serializer = CardSerializer
+    throttle_classes = (UserRateThrottle,)
+    permission_classes = IsAdminUser,
+
+    @property
+    def allowed_methods(self):
+        return 'POST'
+
+    def create(self, request):
+        card = Card()
+        card.user = request.user
+        card.no = request.DATA.get('no', '')
+        bank_id = request.DATA.get('bank', '')
+        card.bank = Bank.objects.get(pk=bank_id)
+        card.save()
+
+        return Response({
+            'id': card.pk,
+            'no': card.no,
+            'bank_name': card.bank.name
+        })
 

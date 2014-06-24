@@ -26,6 +26,7 @@ class Card(models.Model):
     bank = models.ForeignKey(Bank)
     user = models.ForeignKey(get_user_model())
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
+    add_at = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return u'%s' % self.no
