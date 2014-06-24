@@ -32,6 +32,7 @@ class P2PProductManager(models.Manager):
 class P2PProductPayment(models.Model):
     name = models.CharField(max_length=255, verbose_name=u'付款方式')
     description = models.CharField(max_length=1000, verbose_name=u'描述', blank=u'', default=u'')
+    formula = models.TextField(verbose_name=u'计算公式')
 
     catalog_id = models.IntegerField(verbose_name=u'类别ID')
 
