@@ -32,16 +32,24 @@ body
             tr
               th 提现至银行卡
               td
-                select.card-select(name='card_id')
-                  for card in cards
-                    option(value='{{card.id}}') {{card.bank.name}}
+                if cards
+                  select.withdraw-select(name='card_id')
+                    for card in cards
+                      option(value='{{card.id}}') {{card.bank.name}}
+                  a#add-card-button.blue(href='#add-card-form')
+                   .add-icon
+                   添加提现银行卡
+                else
+                  a#add-card-button(href='#add-card-form')
+                    .add-icon
+                    添加提现银行卡
             tr
               th 可用余额
-              td {{margin}}
+              td.red-text {{margin}}
             tr
               th 提现金额(元)
               td
-                input.withdraw-text(type='text', name='amount', placeholder='金额', value='500.00')
+                input.withdraw-input(type='text', name='amount', placeholder='金额', value='500.00')
             tr
               th 手续费
               td
@@ -52,6 +60,25 @@ body
               td(colspan=2)
                 input#withdraw.button-red.button-l(type='submit', value='提现')
 
+  form#add-card-form(style="display:none")
+    .modal-title-bar
+      span.modal-title 添加银行卡
+    .padding-xl
+      .form-row-center
+        input#card-no.withdraw-input(type="text", placeholder="请输入银行卡号")
+      .form-row-center.margin-top-s
+        select#bank-select.withdraw-select
+          option 请选择银行
+          option 招商银行
+      .form-row-center.margin-top-s
+        .withdraw-checkbox
+          input(type='checkbox', name='default-checkbox')
+          设为默认银行
+      .form-row-center.margin-top-s
+        button#add-button.button.button-middle.button-red.withdraw-input(href="#", type="submit") 添加
+
+  script.
+    require(['/static/js/withdraw.js'])
   - with 1 as no_margin
   include include/footer
   - endwith

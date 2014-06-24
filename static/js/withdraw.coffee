@@ -1,6 +1,12 @@
 require.config(
   paths:
     jquery: 'lib/jquery.min'
+    'jquery.modal': 'lib/jquery.modal.min'
+    'jquery.placeholder': 'lib/jquery.placeholder'
+
+  shim:
+    'jquery.modal': ['jquery']
+    'jquery.placeholder': ['jquery']
 )
 
 require ['jquery'], ($)->
@@ -23,4 +29,7 @@ require ['jquery'], ($)->
           $('#huifu-form').append($(input))
         $('#huifu-form').attr('action', json['form']['url'])
         $('#huifu-form').submit()
+
+  $('#add-card-button').click ()->
+    $(this).modal()
 
