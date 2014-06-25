@@ -239,10 +239,11 @@ class AccountHome(TemplateView):
         message = ''
         user = self.request.user
 
-        try:
-            # TODO Remove this code before commit
-            raise FetchException()
+        mode = 'p2p'
+        if self.request.path.rstrip('/').split('/')[-1] == 'fund':
+            mode = 'fund'
 
+        try:
             fetcher = UserInfoFetcher(user)
             fetcher.fetch_user_fund_hold_info()
         except FetchException:
@@ -283,8 +284,6 @@ class AccountHome(TemplateView):
             if not amortization.product_id in p2p_product_amortization:
                 p2p_product_amortization[amortization.product_id] = amortization
 
-
-
         total_asset = fund_total_asset + p2p_total_asset
 
         return {
@@ -300,7 +299,9 @@ class AccountHome(TemplateView):
 
             'fund_total_asset': fund_total_asset,
             'p2p_total_asset': p2p_total_asset,
-            'total_asset': total_asset
+            'total_asset': total_asset,
+
+            'mode': mode
         }
 
 
