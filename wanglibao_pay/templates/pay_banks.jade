@@ -16,7 +16,7 @@ body
         .panel-title 账户充值
       .panel-content.padding-l-r-s
         .row
-          form#payform.payform(action="/pay/deposit/", method='post')
+          form#payform.payform(action="/pay/deposit/", method='post', target='_blank')
             - csrf_token
             .form-group
               .span1

@@ -44,7 +44,9 @@ class PayInfo(models.Model):
     WITHDRAW = 'W'
 
     type = models.CharField(verbose_name=u'类型', help_text=u'充值：D 取款：W', max_length=5)
-    amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'金额')
+    amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'实扣金额')
+    fee = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'手续费', default=0)
+    total_amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'总金额', default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     update_time = models.DateTimeField(verbose_name=u'更新时间', auto_now=True)
     request = models.TextField(verbose_name=u'请求数据', blank=True)

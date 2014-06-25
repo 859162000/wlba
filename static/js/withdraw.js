@@ -54,7 +54,7 @@
     $.validator.addMethod("money", function(value, element) {
       return backend.checkMoney(value, element);
     });
-    return $("#withdraw-form").validate({
+    $("#withdraw-form").validate({
       rules: {
         amount: {
           required: true,
@@ -76,6 +76,9 @@
         }
       }
     });
+    if ($('#id-is-valid').val() === 'False') {
+      return $('#id-validate').modal();
+    }
   });
 
 }).call(this);

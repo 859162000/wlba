@@ -246,8 +246,8 @@ def handle_withdraw_result(data):
                 keeper.withdraw_rollback(pay_info.amount)
         else:
             pay_info.status = PayInfo.EXCEPTION
-            pay_info.error_message = 'Invalid signature'
             result = PayResult.EXCEPTION
+            pay_info.error_message = 'Invalid signature'
             logger.fatal('invalid signature. order id: %s', str(pay_info.pk))
     except(socket.error, SignException) as e:
         result = PayResult.EXCEPTION
@@ -263,6 +263,11 @@ class WithdrawCompleteView(TemplateView):
     template_name = 'withdraw_complete.jade'
 
     def post(self, request, *args, **kwargs):
+        if not request.user.wanglibaouserprofile.id_is_valid:
+            return self.render_to_response({
+                'result': u'请先进行实名认证'
+            })
+
         result = u''
         try:
             amount_str = request.POST.get('amount', '')
@@ -272,13 +277,18 @@ class WithdrawCompleteView(TemplateView):
             if amount <= 0:
                 raise decimal.DecimalException
 
+            fee = (amount * HuifuPay.FEE).quantize(TWO_PLACES)
+            actual_amount = amount - fee
+
             card_id = request.POST.get('card_id', '')
             card = Card.objects.get(pk=card_id)
 
             order = OrderHelper.place_order(request.user)
             pay_info = PayInfo()
             pay_info.order = order
-            pay_info.amount = amount_str
+            pay_info.amount = actual_amount
+            pay_info.fee = fee
+            pay_info.total_amount = amount
             pay_info.type = PayInfo.WITHDRAW
             pay_info.user = request.user
             pay_info.status = PayInfo.INITIAL
@@ -289,7 +299,7 @@ class WithdrawCompleteView(TemplateView):
 
             post = dict()
             post['OrdId'] = str(pay_info.pk)
-            post['OrdAmt'] = amount_str
+            post['OrdAmt'] = actual_amount
             post['AcctName'] = request.user.wanglibaouserprofile.name
             post['BankId'] = card.bank.code
             post['AcctId'] = card.no
@@ -352,7 +362,8 @@ class WithdrawCompleteView(TemplateView):
 
         result = handle_withdraw_result(data)
         return self.render_to_response({
-            'result': result
+            'result': result,
+            'amount': amount
         })
 
 

@@ -68,3 +68,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
       card_id:
         required: '请选择银行卡'
 
+
+  if $('#id-is-valid').val() == 'False'
+    $('#id-validate').modal()
