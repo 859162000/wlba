@@ -6,6 +6,8 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
+from rest_framework.permissions import IsAdminUser
+from rest_framework.viewsets import ModelViewSet
 from order.utils import OrderHelper
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -15,6 +17,10 @@ from wanglibao_pay.models import PayInfo
 import requests
 import xml.etree.ElementTree as ET
 import decimal
+
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
+from wanglibao_pay.serializers import CardSerializer
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -188,10 +194,13 @@ class WithdrawView(TemplateView):
 
     def get_context_data(self, **kwargs):
         cards = Card.objects.filter(user=self.request.user).select_related()
+        banks = Bank.objects.all()
         return {
             'cards': cards,
+            'banks': banks,
             'user_profile': self.request.user.wanglibaouserprofile,
-            'margin': self.request.user.margin.margin
+            'margin': self.request.user.margin.margin,
+            'fee': HuifuPay.FEE
         }
 
 
@@ -237,8 +246,8 @@ def handle_withdraw_result(data):
                 keeper.withdraw_rollback(pay_info.amount)
         else:
             pay_info.status = PayInfo.EXCEPTION
-            pay_info.error_message = 'Invalid signature'
             result = PayResult.EXCEPTION
+            pay_info.error_message = 'Invalid signature'
             logger.fatal('invalid signature. order id: %s', str(pay_info.pk))
     except(socket.error, SignException) as e:
         result = PayResult.EXCEPTION
@@ -254,6 +263,11 @@ class WithdrawCompleteView(TemplateView):
     template_name = 'withdraw_complete.jade'
 
     def post(self, request, *args, **kwargs):
+        if not request.user.wanglibaouserprofile.id_is_valid:
+            return self.render_to_response({
+                'result': u'请先进行实名认证'
+            })
+
         result = u''
         try:
             amount_str = request.POST.get('amount', '')
@@ -263,13 +277,18 @@ class WithdrawCompleteView(TemplateView):
             if amount <= 0:
                 raise decimal.DecimalException
 
+            fee = (amount * HuifuPay.FEE).quantize(TWO_PLACES)
+            actual_amount = amount - fee
+
             card_id = request.POST.get('card_id', '')
             card = Card.objects.get(pk=card_id)
 
             order = OrderHelper.place_order(request.user)
             pay_info = PayInfo()
             pay_info.order = order
-            pay_info.amount = amount_str
+            pay_info.amount = actual_amount
+            pay_info.fee = fee
+            pay_info.total_amount = amount
             pay_info.type = PayInfo.WITHDRAW
             pay_info.user = request.user
             pay_info.status = PayInfo.INITIAL
@@ -280,7 +299,7 @@ class WithdrawCompleteView(TemplateView):
 
             post = dict()
             post['OrdId'] = str(pay_info.pk)
-            post['OrdAmt'] = amount_str
+            post['OrdAmt'] = actual_amount
             post['AcctName'] = request.user.wanglibaouserprofile.name
             post['BankId'] = card.bank.code
             post['AcctId'] = card.no
@@ -343,7 +362,8 @@ class WithdrawCompleteView(TemplateView):
 
         result = handle_withdraw_result(data)
         return self.render_to_response({
-            'result': result
+            'result': result,
+            'amount': amount
         })
 
 
@@ -356,4 +376,29 @@ class WithdrawCallback(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(WithdrawCallback, self).dispatch(request, *args, **kwargs)
+
+
+class CardViewSet(ModelViewSet):
+    model = Card
+    serializer = CardSerializer
+    throttle_classes = (UserRateThrottle,)
+    permission_classes = IsAdminUser,
+
+    @property
+    def allowed_methods(self):
+        return 'POST'
+
+    def create(self, request):
+        card = Card()
+        card.user = request.user
+        card.no = request.DATA.get('no', '')
+        bank_id = request.DATA.get('bank', '')
+        card.bank = Bank.objects.get(pk=bank_id)
+        card.save()
+
+        return Response({
+            'id': card.pk,
+            'no': card.no,
+            'bank_name': card.bank.name
+        })
 

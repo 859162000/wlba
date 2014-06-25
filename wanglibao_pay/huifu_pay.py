@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import decimal
 from wanglibao_pay.pay import Pay
 import socket
 
@@ -19,7 +20,7 @@ class HuifuPay(Pay):
     PAY_URL = 'http://test.chinapnr.com'
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
-    FEE = 0.0025
+    FEE = decimal.Decimal('0.0025')
 
     VERSION = '10'
     PAY_FIELDS = ['Version', 'CmdId', 'MerId', 'OrdId', 'OrdAmt', 'CurCode', 'Pid', 'RetUrl', 'MerPriv',

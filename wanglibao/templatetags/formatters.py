@@ -188,3 +188,7 @@ def timedelta_now(time):
     minutes, seconds = divmod(seconds, 60)
     hours += time_delta.days * 24
     return "%d:%02d:%02d" % (hours, minutes, seconds)
+
+@register.filter
+def card_info(card):
+    return u"%s(尾号%s)" % (card.bank.name, card.no[-4:])
