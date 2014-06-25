@@ -237,62 +237,70 @@ class AccountHome(TemplateView):
 
     def get_context_data(self, **kwargs):
         message = ''
+        user = self.request.user
 
         try:
-            fetcher = UserInfoFetcher(self.request.user)
+            # TODO Remove this code before commit
+            raise FetchException()
+
+            fetcher = UserInfoFetcher(user)
             fetcher.fetch_user_fund_hold_info()
         except FetchException:
             message = u'获取数据失败，请稍后重试'
         except AccessException:
             pass
 
-        hour = datetime.datetime.now().hour
-        if hour < 12:
-            greeting = u'早上好'
-        elif hour < 18:
-            greeting = u'下午好'
-        else:
-            greeting = u'晚上好'
+        fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
 
-        fund_hold_info = FundHoldInfo.objects.filter(user__exact=self.request.user)
-
-        total_asset = 0
+        fund_total_asset = 0
         income_rate = 0
 
         if fund_hold_info.exists():
             for hold_info in fund_hold_info:
-                total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+                fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
 
         today = timezone.datetime.today()
 
-        total_income = DailyIncome.objects.filter(user=self.request.user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=self.request.user, date__gt=today+datetime.timedelta(days=-7)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=self.request.user, date__gt=today+datetime.timedelta(days=-30)).aggregate(Sum('income'))['income__sum'] or 0
+        total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-7)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-30)).aggregate(Sum('income'))['income__sum'] or 0
 
-        if total_asset != 0:
-            income_rate = total_income / total_asset
+        if fund_total_asset != 0:
+            income_rate = total_income / fund_total_asset
 
         # Followings for p2p
-        p2p_equities = P2PEquity.objects.filter(user=self.request.user)
+        p2p_equities = P2PEquity.objects.filter(user=user)
         amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False)
+
+        unpayed_principle = 0
+        for equity in p2p_equities:
+            unpayed_principle += equity.equity - equity.paid_principal
+
+        p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
         p2p_product_amortization = {}
         for amortization in amortizations:
             if not amortization.product_id in p2p_product_amortization:
                 p2p_product_amortization[amortization.product_id] = amortization
 
+
+
+        total_asset = fund_total_asset + p2p_total_asset
+
         return {
             'fund_hold_info': fund_hold_info,
-            'total_asset': total_asset,
             'total_income': total_income,
             'income_rate': income_rate,
             'fund_income_week': fund_income_week,
             'fund_income_month': fund_income_month,
-            'greeting': greeting,
             'message': message,
 
             'p2p_equities': p2p_equities,
-            'p2p_product_amortization': p2p_product_amortization
+            'p2p_product_amortization': p2p_product_amortization,
+
+            'fund_total_asset': fund_total_asset,
+            'p2p_total_asset': p2p_total_asset,
+            'total_asset': total_asset
         }
 
 

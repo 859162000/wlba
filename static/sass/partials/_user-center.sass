@@ -1,24 +1,128 @@
+@import 'panel'
+
+// Use absolute px before designer switch to grid system, otherwise, there are too many
+// subtle flaws
+.account-home-aside
+  width: 230px
+  float: left
+  margin-right: 10px
+
+.account-home-main
+  float: left
+  width: 860px
+
+.money-card
+  @extend .span4
+  padding: 20px
+  font-size: $font-s
+  height: 70px
+
+.account-home-panel__no-padding
+  @extend .panel-padding
+  padding: 0
+
+.account-home-panel
+  @extend .account-home-panel__no-padding
+  padding: 20px
+
+.account-home-panel--title-bar
+  margin-top: 10px
+
+.account-home-panel--title-bar__product
+  border-bottom: 1px solid $color-text-d5
+  padding: 20px 20px 5px 20px
+  font-size: $font-m
+
+.account-home-panel--action-bar
+  @extend .row
+  @extend .align-right
+  padding-top: 10px
+  padding-bottom: 10px
+
+.total-asset-money-card
+  float: left
+  width: 180px
+  padding: 10px
+
+.sign-money-card
+  float: left
+  width: 30px
+  line-height: 70px
+  font-size: $font-xl
+  text-align: center
+
+%brief--basic
+  float: left
+  padding: 10px
+
+%brief--basic__border
+  border: 1px solid $color-text-d5
+  &:hover
+    border: 3px solid $color-text-d5
+
+.brief--p2p-total-asset
+  @extend %brief--basic
+  @extend %brief--basic__border
+  height: 70px
+  width: 276px
+
+.brief--fund-total-asset
+  @extend %brief--basic
+  @extend %brief--basic__border
+  height: 70px
+  width: 276px
+
+.account-home-panel
+  margin-top: 10px
+
+.title-bar--tabs
+  display: inline-block
+  list-style: none
+  line-height: 28px
+
+.title-bar--tab
+  display: inline-block
+  width: 105px
+  text-align: center
+
+  &.active
+    background: $color-primary
+
+    .title-bar--tab--anchor
+      +link-colors(white)
+
+  .title-bar--tab--anchor
+    +link-colors($color-text-d3)
+
+.p2p-asset--detail-container
+  float: left
+  background: #FAFAFA
+
+.p2p-asset--detail
+  float: left
+  width: 130px
+  text-align: center
+  padding: 10px 0
+
 .nickname
-  color: black
-  font-weight: bold
+  font-size: $font-m
   padding-right: 5px
 
 .phone
   margin-left: 1em
 
 .card-panel
-  background-color: $light-gray-background
-  border: 1px solid $light-gray-border
+  @extend .row
   border-left-width: 0
   width: 100%
   margin-top: 10px
-  +clearfix()
 
-.gray-card
-  padding: 25px 30px
-  float: left
-  font-size: $font-s
-  border-left: 1px solid $light-gray-border
+.card-panel-gray
+  background-color: $light-gray-background
+  @extend .card-panel
+
+.money-card--border
+  border: 1px solid $color-text-d5
 
 .gray-card3
   @extend .gray-card
@@ -29,9 +133,7 @@
   width: 25%
 
 .big_number
-  color: black
   font-size: $font-xl
-  font-weight: bold
 
 .card-category-bar
   @extend .info-bar

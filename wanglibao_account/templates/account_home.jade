@@ -9,149 +9,130 @@ body
   include include/navigation
 
   .row
-    .span3
+    .account-home-aside
       - with '账务总览' as activeItem
       include include/user_center_sidebar
       - endwith
 
-    .span9-omega
-      .panel-padding
-        .space-vertical-s
-        p.font-m
-          span.nickname {{ user.wanglibaouserprofile.nick_name }}
-          {{greeting}}
-          span.phone ({{user.wanglibaouserprofile.phone}})
+    .account-home-main
+      .account-home-panel
+        .account-home-panel--title-bar
+          span.nickname {{user | safe_phone}}
+          if user.wanglibaouserprofile.id_is_valid
+            span 已实名认证
+          else
+            span
+              a(href="/accounts/id_verify/") 还未进行实名认证
+
         .card-panel
-          .gray-card3
-            p 总资产
-            p
-              span.big_number {{total_asset|money_f_2}}
-              元
-          .gray-card3
-            p 累计收益
-            p
-              span.big_number {{total_income|money_f_2}}
-              元
-          .gray-card3
-            p 加权收益率
-            p
-              span.big_number {{income_rate|mul:100|floatformat:2}}
-              %
+          .total-asset-money-card
+            p.align-center
+              span.big_number {{total_asset|money_format}}
+            p.align-center 总资产(元)
+          .sign-money-card
+            =
+          .brief--p2p-total-asset
+            a(href="/accounts/home/")
+              p.align-center
+                span.big_number {{p2p_total_asset|money_format}}
+              p.align-center P2P资产(元)
+          .sign-money-card
+            +
+          .brief--fund-total-asset
+            a(href="/accounts/home/fund/")
+              p.align-center
+                span.big_number {{fund_total_asset|money_format}}
+              p.align-center 货币基金(元)
 
-      .panel-padding
-        .panel-product-title-red P2P
-          a.button-mini.pull-right(href='/accounts/transaction/p2p/') 交易记录
-        .card-panel
-          .gray-card4
-            p 总资产
-            p
-              span.big_number {{user.margin.margin|money_f_2}}
-              元
-          .gray-card4
-            p 余额
-            p
-              span.big_number {{user.margin.margin | money_f_2}}
-              元
-          .gray-card4
-            p 近一周收益
-            p
-              span.big_number {{fund_income_week|money_f_2}}
-              元
-          .gray-card4
-            p 近一月收益
-            p
-              span.big_number {{fund_income_month|money_f_2}}
-              元
+      .account-home-panel__no-padding
+        .account-home-panel--title-bar__product
+          ul.title-bar--tabs
+            li.title-bar--tab.active
+              a.title-bar--tab--anchor(href="javascript:void(0)") P2P
+            li.title-bar--tab
+              a.title-bar--tab--anchor(href="/accounts/home/fund/") 货币基金
+          a.button-mini.pull-right(href='/accounts/transaction/p2p/') 查看交易记录
+        .clamp-sm
+          .account-home-panel--action-bar
+            a.button-home-action(href="#") 充值
+            a.button-home-action.margin-left-m(href="#") 取现
 
-        .space-vertical-s
+          .row
+            .total-asset-money-card
+              p.align-center
+                span.big_number {{user.margin.margin|money_format}}
+              p.align-center P2P资产(元)
 
-        table.trust-table
-          thead
-            tr
-              th 投标时间
-              th 产品名称
-              th 投资金额
-              th 下次回款
-              th 下次回款时间
-              th 状态
-              th 已收益/预期收益
-          tbody
-            if p2p_equities
-              each equity in p2p_equities
-                tr
-                  if equity.product_id in p2p_product_amortization
-                    next_amortization = p2p_product_amortization[equity.product_id] or 'None'
-                    next_term_date = next_amortization.term_date
-                    next_income = next_amortization.total * equity.ratio
-                    term = next_amortization.term + 1
-                    total_income = float(equity.ratio) * equity.product.expected_earning_rate / 12 * equity.product.period * equity.equity
-                  else
-                    next_term_date = "-"
-                    next_income = 0
-                    term = "-"
-                    total_income = 0
+            .sign-money-card
+              =
 
-                  td {{equity.product.publish_time | date:"Y-m-d h:i:s"}}
-                  td {{equity.product.name}}
-                  td {{equity.equity | money_format}}
-                  td {{next_income | money_format | default:"--"}}
-                  td {{next_term_date | date:"Y-m-d" | default:"--"}}
-                  td 还款中{{term}}/{{equity.product.amortization_count}}
-                  td {{equity.paid_interest | money_format}} / {{total_income | money_format}}
-            else
+            .p2p-asset--detail-container
+              .p2p-asset--detail
+                p
+                  span.big_number {{user.margin.margin | money_format}}
+                p P2P余额
+              .sign-money-card
+                +
+              .p2p-asset--detail
+                p
+                  span.big_number {{fund_income_week|money_format}}
+                p 待收本金
+              .sign-money-card
+                +
+              .p2p-asset--detail
+                p
+                  span.big_number {{fund_income_week|money_format}}
+                p 投资中冻结金额
+              .sign-money-card
+                +
+              .p2p-asset--detail
+                p
+                  span.big_number {{fund_income_week|money_format}}
+                p 提现中冻结金额
+
+          .space-vertical-s
+
+          table.trust-table
+            thead
               tr
-                td(colspan='4') 无持仓记录
+                th 投标时间
+                th 产品名称
+                th 投资金额
+                th 下次回款
+                th 下次回款时间
+                th 状态
+                th 已收益/预期收益
+            tbody
+              if p2p_equities
+                each equity in p2p_equities
+                  tr
+                    if equity.product_id in p2p_product_amortization
+                      next_amortization = p2p_product_amortization[equity.product_id] or 'None'
+                      next_term_date = next_amortization.term_date
+                      next_income = next_amortization.total * equity.ratio
+                      term = next_amortization.term
+                      total_income = float(equity.ratio) * equity.product.expected_earning_rate / 12 * equity.product.period * equity.equity
+                    else
+                      next_term_date = "-"
+                      next_income = 0
+                      term = "-"
+                      total_income = 0
 
-      .panel-padding
-        .panel-product-title-red 货币基金
-          a.button-mini.pull-right(href='/accounts/transaction/fund/') 交易记录
-        .card-panel
-          .gray-card4
-            p 总资产
-            p
-              span.big_number {{total_asset|money_f_2}}
-              元
-          .gray-card4
-            p 累积收益
-            p
-              span.big_number {{total_income|money_f_2}}
-              元
-          .gray-card4
-            p 近一周收益
-            p
-              span.big_number {{fund_income_week|money_f_2}}
-              元
-          .gray-card4
-            p 近一月收益
-            p
-              span.big_number {{fund_income_month|money_f_2}}
-              元
-
-        .space-vertical-s
-
-        table.trust-table
-          thead
-            tr
-              th 产品名称
-              th 金额
-              th 收益
-              th 操作
-          tbody
-            if fund_hold_info
-              each fund in fund_hold_info
+                    td {{equity.product.publish_time | date:"Y-m-d h:i:s"}}
+                    td
+                      p <a href="/p2p/detail/{{equity.product.id}}/">{{equity.product.name}}</a>
+                      p 年化收益：{{equity.product.expected_earning_rate}}%
+                      p 期限：{{equity.product.period}}个月
+                    td {{equity.equity | money_format}}
+                    td {{next_income | money_format | default:"--"}}
+                    td {{next_term_date | date:"Y-m-d" | default:"--"}}
+                    td 还款中{{term}}/{{equity.product.amortization_count}}
+                    td <span class="highlight">{{equity.paid_interest | money_format}}</span> / {{total_income | money_format}}
+              else
                 tr
-                  td
-                    a(href="/fund/detail/{{fund.id}}/") {{fund.fund_name}}
-                  td {{fund.current_remain_share}}元
-                  td {{fund.unpaid_income}}元
-                  td
-                    a.button.button-mini.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=purchase" target="_blank") 继续购买
-                    &nbsp;
-                    a.button.button-mini.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=redeem" target="_blank") 赎回
-            else
-              tr
-                td(colspan='4') 无持仓记录
+                  td(colspan='4') 无持仓记录
 
+          .space-vertical-m
 
   include include/footer
   include include/templates
