@@ -9,7 +9,9 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
     '',
-    url(r'^home', login_required(AccountHome.as_view(),
+    url(r'^home/$', login_required(AccountHome.as_view(),
+                                 login_url='/accounts/register/')),
+    url(r'^home/fund/$', login_required(AccountHome.as_view(),
                                  login_url='/accounts/register/')),
     url(r'^transaction/fund/$', login_required(AccountTransaction.as_view(),
                                  login_url='/accounts/register/')),
