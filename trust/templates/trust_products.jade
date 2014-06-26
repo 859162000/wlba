@@ -16,7 +16,7 @@ body
         li.sub-navbar--list-item
           a.sub-navbar--anchor.active(href="{% url 'trust_product' %}") 信托产品
 
-  .panel-nopadding
+  .panel
     .panel-title-bar
       .panel-title 筛选条件
     .container(data-bind="foreach: {data: filters, afterRender: hookExpandButton}")
@@ -30,7 +30,7 @@ body
         a.button-mini.button-pink.absolute-pos.pos-r-s.pos-b-10px(href="#", data-role="expand", data-toggle="expand") 展开
         // /ko
 
-  .panel-nopadding
+  .panel
     .panel-title-bar
       .panel-title 筛选结果
 

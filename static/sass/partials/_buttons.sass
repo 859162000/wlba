@@ -54,24 +54,24 @@ $button-padding:         0.5em 0.5em  // Button padding
 
 // Colored buttons
 .button-red, a.button-red
-  background: $red
+  background: $color-pomegranate
   color: white
 
   &:hover, &:active
-    background: darken($red, 10%)
+    background: darken($color-pomegranate, 10%)
 
 .button-pink, a.button-pink
   background: #DC8883
-  color: $white
+  color: $color-white
   padding: .3em 1em
 
   &:hover
-    background: $red
+    background: $color-pomegranate
 
 .button-gray, a.button-gray
-  background: $gray
+  background: $color-gray
   padding: .3em 1em
-  color: $white
+  color: $color-white
 
 .button-white, a.button-white
   background: white
@@ -81,8 +81,8 @@ $button-padding:         0.5em 0.5em  // Button padding
   border-radius: 10px
 
   &:hover
-    color: $red
-    border-color: $red
+    color: $color-pomegranate
+    border-color: $color-pomegranate
 
 .button-no-border, a.button-no-border
   border: 0
@@ -93,7 +93,7 @@ $button-padding:         0.5em 0.5em  // Button padding
   @extend .button
   @extend .button-red
   padding: 8px 28px
-  background: $color-primary
+  background: $color-pomegranate
   font-size: $font-m
 
 .button-disabled

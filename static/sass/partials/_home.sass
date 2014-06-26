@@ -26,7 +26,7 @@ $home-banner-height: image-height('home0.jpg')
 .full-container-white
   @extend .full-container
   background-color: white
-  border-bottom: solid 1px $dark-ddd
+  border-bottom: solid 1px $color-alto
 
 .container-home
   @extend .container
@@ -49,7 +49,7 @@ $home-banner-height: image-height('home0.jpg')
     font-size: $font-xxxl
 
   a.login-button
-    +link-colors($color-text-d5, $color-primary)
+    +link-colors($color-text-d5, $color-pomegranate)
     text-decoration: underline
 
 .banner-form--title
@@ -75,7 +75,7 @@ $home-banner-height: image-height('home0.jpg')
     color: $color-text-d3
 
     &.highlight
-      color: $color-primary
+      color: $color-pomegranate
 
 .container-card-holder
   width: $content-width
@@ -83,7 +83,7 @@ $home-banner-height: image-height('home0.jpg')
   position: relative
   padding-left: 10px
   padding-bottom: 0
-  border-bottom: 1px solid $red
+  border-bottom: 1px solid $color-pomegranate
 
 .container-search
   width: 950px
@@ -97,7 +97,7 @@ $home-banner-height: image-height('home0.jpg')
 
 .hot-list
   height: $hot-list-height
-  background-color: $white
+  background-color: $color-white
 
 .hot-list-picture-title
   +float-left
@@ -108,16 +108,16 @@ $home-banner-height: image-height('home0.jpg')
   height: $hot-list-height
   width: $hot-list-width-content
   overflow: hidden
-  border: solid 1px $hot-list-border-color
+  border: solid 1px $color-mercury
   border-left: 0
 
 .hot-list-content
   height: $hot-list-height-content
-  border-bottom: solid 1px $hot-list-border-color
+  border-bottom: solid 1px $color-mercury
 
   >:nth-child(2)
-    border-right: solid 1px $hot-list-border-color
-    border-left: solid 1px $hot-list-border-color
+    border-right: solid 1px $color-mercury
+    border-left: solid 1px $color-mercury
 
 .hot-item-normal
   width: $hot-list-width-normal
@@ -129,14 +129,14 @@ $home-banner-height: image-height('home0.jpg')
 .hot-item-title
   font-size: $font-l
   font-weight: bold
-  color: $red
+  color: $color-pomegranate
   padding-left: $space-s
 
 .hot-item-list
   font-size: $font-s
   margin-top: $space-xs
   margin-left: $space-s
-  color: $gray-text
+  color: $color-dusty-gray
 
   dl
     +float-left
@@ -155,7 +155,7 @@ $home-banner-height: image-height('home0.jpg')
     width: 190px
 
     li
-      border-bottom: dotted 1px $hot-list-border-color
+      border-bottom: dotted 1px $color-mercury
       line-height: 33px
 
     li.no-border-bottom
@@ -166,10 +166,10 @@ $home-banner-height: image-height('home0.jpg')
   height: 170px
 
 .hot-item-comments
-  border-top: dotted 1px $hot-list-border-color
+  border-top: dotted 1px $color-mercury
   margin: $space-xs $space-s 0 $space-s
   padding-top: 7px
-  color: $gray-text
+  color: $color-dusty-gray
   font-size: $font-xs
   text-align: justify
   line-height: normal
@@ -208,7 +208,7 @@ $home-banner-height: image-height('home0.jpg')
   padding-top: 5px
 
 .dark-gray
-  color: $dark-gray
+  color: $color-emperor
 
 .button-m
   width: 85px
@@ -221,20 +221,20 @@ $home-banner-height: image-height('home0.jpg')
   font-size: $font-m
 
 .hot-list-num-m
-  color: $red
+  color: $color-pomegranate
   font-size: $font-xxxl
   font-family: Arial
   font-weight: bold
   line-height: 43px
 
 .hot-list-num-l
-  color: $red
+  color: $color-pomegranate
   font-size: $font-xxxxxl
   font-family: Arial
   font-weight: bold
 
 .hot-list-num-s
-  color: $red
+  color: $color-pomegranate
   font-size: $font-xxxxl
   font-family: Arial
   font-weight: bold
@@ -242,10 +242,10 @@ $home-banner-height: image-height('home0.jpg')
 a.hot-item-title-link
   +unstyled-link
   &:link, &:visited
-    color: $red
+    color: $color-pomegranate
   &:hover, &:active
-    background: $red
-    color: $white
+    background: $color-pomegranate
+    color: $color-white
 
 .hot-item-list-title
   position: relative
@@ -271,7 +271,7 @@ a.hot-item-title-link
       color: $color-text-d2
 
     .money-highlight
-      color: $color-money-highlight
+      color: $color-sea-green
 
     &:last-child
       border-bottom: 0

@@ -10,7 +10,7 @@ body
   include include/navigation
   - endwith
   .container
-    .span8.panel-nopadding.panel-header
+    .span8.panel.panel-header
       .panel-product-title-bar
         .panel-product-title
           .product-title.ispan11 {{ fund.name }} ({{fund.product_code}})
@@ -52,7 +52,7 @@ body
                   dt 当日涨幅
                   dd.highlight {{fund.rate_today | percentage}}
 
-    .span4-omega.panel-nopadding.panel-header
+    .span4-omega.panel.panel-header
       .panel-product-title-bar
         .panel-product-title 收益计算器
       form(data-period="50", data-rate="5")
@@ -70,7 +70,7 @@ body
           span#earning.highlight 0.0
           span 元
 
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 产品详情
     table.bordered-table.margin-top-m1
@@ -105,24 +105,24 @@ body
           td {{fund.rate_6_months | percentage}}
           th 近一年收益率
           td {{fund.rate_1_year | percentage}}
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 投资目标
 
     p.well {{fund.investment_target | linebreaksbr}}
 
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 投资范围
 
     p.well {{fund.investment_scope | linebreaksbr}}
 
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 投资策略
     p.well {{fund.investment_strategy | linebreaksbr}}
 
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 风险收益特征
     p.well {{fund.risk_character | linebreaksbr}}

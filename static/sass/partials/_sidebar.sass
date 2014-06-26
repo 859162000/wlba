@@ -23,11 +23,11 @@
     display: block
 
   &.active
-    border-left: 3px solid $color-primary
+    border-left: 3px solid $color-pomegranate
     background: #F9FAF9
 
     >a
-      +link-colors($red, $red)
+      +link-colors($color-pomegranate, $color-pomegranate)
       cursor: default
 
   a
@@ -55,11 +55,11 @@
   top: -1px
   width: 200px
   z-index: 999
-  background-color: $light-gray-background
+  background-color: $color-alabaster
   display: none
   border: 1px dotted lightgray
 
   a
     +unstyled-link
-    +link-colors(#666, $color-primary)
+    +link-colors(#666, $color-pomegranate)
 

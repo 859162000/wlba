@@ -10,7 +10,7 @@ body
   include include/navigation
   - endwith
   .container
-    .span8.panel-nopadding.fund-panel-header
+    .span8.panel.fund-panel-header
       .panel-product-title-bar
         .panel-product-title
             if is_favorited != 1
@@ -49,7 +49,7 @@ body
               a.button.button-round-large.button-red(href="/accounts/register/?next=/fund/detail/{{fund.id}}") 立即赚钱
             p 申请人数{{fund.bought_people_count}}人
 
-    .span4-omega.panel-nopadding.fund-panel-header
+    .span4-omega.panel.fund-panel-header
       .panel-product-title-bar
         .panel-product-title 收益计算器
       form(data-period="50", data-rate="5")
@@ -71,7 +71,7 @@ body
             span#earning-day.highlight 0.0
             span 元
 
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 产品详情
     table.bordered-table.margin-top-m1
@@ -101,24 +101,24 @@ body
           td {{fund.rate_6_months | percentage}}
           th 近一年收益率
           td {{fund.rate_1_year | percentage}}
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 投资目标
 
     p.well {{fund.investment_target | linebreaksbr}}
 
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 投资范围
 
     p.well {{fund.investment_scope | linebreaksbr}}
 
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 投资策略
     p.well {{fund.investment_strategy | linebreaksbr}}
 
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 风险收益特征
     p.well {{fund.risk_character | linebreaksbr}}

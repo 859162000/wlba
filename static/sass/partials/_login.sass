@@ -2,11 +2,11 @@
 
 .full-container-top-bar
   @extend  .full-container
-  background: $dark-gray
+  background: $color-emperor
   height: $top-bar-height
   line-height: $top-bar-height
   font-size: $font-s
-  color: $white
+  color: $color-white
 
 .full-container-login
   @extend .full-container
@@ -41,7 +41,7 @@
 
 .login-left-div
   @extend .register-left-div
-  border-top: 3px solid $red
+  border-top: 3px solid $color-pomegranate
   padding-top: 30px
 
 .login-right-div
@@ -49,7 +49,7 @@
   float: left
   padding: 35px 30px
   font-size: $font-s
-  color: $dark-gray
+  color: $color-emperor
   background-color: #f0f0f0
   border-top: 3px solid #DA736E
   position: relative
@@ -77,11 +77,11 @@
     position: relative
 
     &.end
-      background-color: $red
+      background-color: $color-pomegranate
       width: 34%
 
     &.active
-      background-color: $red
+      background-color: $color-pomegranate
 
     &:after
       position: absolute
@@ -94,10 +94,10 @@
       border-bottom: 17px solid transparent
 
     &.active:after
-      border-left-color: $red
+      border-left-color: $color-pomegranate
 
     &.end
-      background-color: $red
+      background-color: $color-pomegranate
       width: 34%
 
 .register
@@ -128,7 +128,7 @@
     color: #1771AE
 
 #register-now
-  +link-colors($red)
+  +link-colors($color-pomegranate)
 
 .slogan
   @extend .font-s

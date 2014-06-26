@@ -8,7 +8,7 @@
   float: right
 
   ul li a
-    +link-colors($dark-gray, $red)
+    +link-colors($color-emperor, $color-pomegranate)
 
 .container-navigation
   width: $content-width
@@ -28,7 +28,7 @@
   position: relative
 
   &.active .nav-item-anchor
-    +link-colors($color-primary)
+    +link-colors($color-pomegranate)
 
   &:first-child a.nav-item-anchor
     border-left: 0
@@ -38,4 +38,4 @@ a.nav-item-anchor
   padding: 0 2em
   border-left: 1px dotted gray
   +unstyled-link
-  +link-colors($color-text-d3, $color-primary)
+  +link-colors($color-text-d3, $color-pomegranate)

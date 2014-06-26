@@ -12,7 +12,7 @@
   padding-bottom: 1em
   box-shadow: inset 0 -1px 0 0 rgba(0,0,0,0.2),0 0 0 1px rgba(0,0,0,0.06),0 3px 2px -1px rgba(0,0,0,0.02)
 
-.panel-nopadding
+.panel
   @extend %panel-base
 
 .panel-padding
@@ -20,13 +20,13 @@
   padding-left: 18px
   padding-right: 18px
 
-.space-vertical-s+.panel-nopadding
+.space-vertical-s+.panel
   margin-top: 0
 
-.space-vertical-m+.panel-nopadding
+.space-vertical-m+.panel
   margin-top: 0
 
-.space-vertical-l+.panel-nopadding
+.space-vertical-l+.panel
   margin-top: 0
 
 $header-height: 150px
@@ -44,8 +44,8 @@ $header-height: 150px
 .panel-bar-s
   +container
   line-height: 33px
-  background: $panel-bar-background
-  color: $panel-bar-color
+  background: $color-gallery
+  color: $color-emperor
   padding-left: 15px
 
   dl
@@ -60,11 +60,11 @@ $header-height: 150px
 
 .panel-title-bar
   @extend .panel-bar
-  border-bottom: 2px solid $red
+  border-bottom: 2px solid $color-pomegranate
 
 .panel-title-bar-gray
   @extend .panel-title-bar
-  background-color: $background-color
+  background-color: $color-gallery
 
 .panel-title-bar__no-border
   @extend .panel-title-bar
@@ -78,7 +78,7 @@ $header-height: 150px
 .panel-product-title
   padding: 0 1.4em
   margin: 1em 0
-  border-left: 2px solid $red
+  border-left: 2px solid $color-pomegranate
   line-height: 1
   font-size: $font-l
 
@@ -95,7 +95,7 @@ $header-height: 150px
   margin-right: 1em
   +float-left
 
-.panel-nopadding .panel-title
+.panel .panel-title
   @extend .padding-l-r-s
 
 .panel-title-l
@@ -131,7 +131,7 @@ $header-height: 150px
   background-color: transparent
 
   &.active
-    background-color: $red
+    background-color: $color-pomegranate
     color: white
 
     a
@@ -139,7 +139,7 @@ $header-height: 150px
 
   a
     +unstyled-link()
-    +link-colors(black, $red)
+    +link-colors(black, $color-pomegranate)
 
 .panel-sub-tabs
   background: white
@@ -152,7 +152,7 @@ a.panel-sub-tab
   @extend .button-round-mini
 
   &.active
-    background: $red
+    background: $color-pomegranate
     +link-colors(white)
 
 .panel-text

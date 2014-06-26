@@ -7,7 +7,7 @@ body
   - with '基金产品' as activeItem
   include include/navigation
   - endwith
-  .panel-nopadding
+  .panel
     .panel-title-bar
       .panel-tabs(data-bind="foreach: tabTree")
         .panel-tab(data-bind="css:{active:$root.selectedTab() === $data}")

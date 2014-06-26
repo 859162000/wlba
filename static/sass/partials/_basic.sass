@@ -4,14 +4,13 @@
 @import compass/typography/links/unstyled-link
 
 // Basic
-$font-family: 'Microsoft Yahei', 'Hiragino Sans GB', '宋体'
 
 body
   font-family: $font-family
   font-size: $font-xs
   line-height: 1.5
   color: #666
-  background-color: $background-color
+  background-color: $color-gallery
 
   min-width: 1104px
 
@@ -22,9 +21,9 @@ button
 a
   +unstyled-link
   &:link, &:visited
-    color: $blue-gray
+    color: $color-shuttle-gray
   &:hover, &:active
-    color: $red
+    color: $color-pomegranate
 
 input
   padding: 5px
@@ -53,26 +52,10 @@ h5
 h6
   font-size: $font-xs
 
-.white-v-line
-  margin: 0 10px
-  min-width: 1px
-  height: 15px
-  line-height: 15px
-  background-color: $white
-  +inline-block()
-
 .seperator-gray-line
   width: 100%
   height: 1px
   border-top: 1px #d3d3d3 solid
-
-.dashed-line
-  height: 1px
-  border-top: 1px dashed gray
-
-.line
-  height: 1px
-  border-top: 1px solid gray
 
 .font-xs
   font-size: $font-xs
@@ -90,25 +73,22 @@ h6
   font-size: $font-xxxl
 
 .white-text, .white
-  color: $white
+  color: $color-white
 
   a
     &:link, &:visited
-      color: $white
+      color: $color-white
     &:hover, &:active
-      color: $red
+      color: $color-pomegranate
 
 .highlight
-  color: $color-primary
+  color: $color-pomegranate
 
 .txt-info
   color: #999999
 
 .white-background
-  background: $white
-
-.light-gray-text
-  color: #666666
+  background: $color-white
 
 .pull-left
   +float-left
@@ -126,7 +106,7 @@ h6
   display: none !important
 
 input
-  border-color: $border-color
+  border-color: $color-silver
 
 .space-xs
   +inline-block
@@ -228,7 +208,7 @@ input
 
 .sub-title
   font-size: $font-m
-  color: $red
+  color: $color-pomegranate
   padding: 1em 0
   margin-top: 1em
 
@@ -259,7 +239,7 @@ input
     +float-left
 
 .error
-  color: $red
+  color: $color-pomegranate
 
 .block-link
   width: 20%
@@ -267,10 +247,10 @@ input
   +inline-block()
 
   +unstyled-link
-  +link-colors(blue, $red)
+  +link-colors(blue, $color-pomegranate)
 
 a.red-link
-  +link-colors($red, black)
+  +link-colors($color-pomegranate, black)
 
 .align-right
   text-align: right !important
@@ -294,9 +274,6 @@ a.red-link
   white-space: -moz-pre-wrap
   word-wrap: break-word
 
-.vertical-middle
-  vertical-align: middle
-
 .hiring-list
   color: #739ABB
   line-height: 2em
@@ -309,42 +286,18 @@ a.red-link
     line-height: 14px
     margin-right: 3em
 
-.lh-xs
-  line-height: 1.2
-
 .lh-s
   line-height: 1.5
 
-.lh-m
-  line-height: 2
-
-.bold
-  font-weight: bold
-
 .blue,
 a.blue
-  +link-colors($blue)
+  +link-colors($color-denim)
 
 .border-all
-  border: solid 1px $dark-ddd
+  border: solid 1px $color-alto
 
 .border-left
-  border-left: solid 1px $dark-ddd
-
-.border-right
-  border-right: solid 1px $dark-ddd
-
-.border-top
-  border-top: solid 1px $dark-ddd
-
-.border-bottom
-  border-bottom: solid 1px $dark-ddd
-
-.border-none
-  border: 0
-
-.red-text
-  color: $red
+  border-left: solid 1px $color-alto
 
 .clamp-s
   padding-left: $space-s
@@ -371,5 +324,14 @@ a.blue
 .d4-text
   color: $color-text-d4
 
+.d3-text
+  color: $color-text-d3
+
+.red-text
+  color: $color-pomegranate
+
 .orange-text
-  color: $orange
+  color: $color-orange
+
+.color-primary
+  background: $color-pomegranate

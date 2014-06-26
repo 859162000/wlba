@@ -43,13 +43,13 @@ $value-bar-background: #75A8F0
   +background($color)
 
   &.active
-    +background($red)
+    +background($color-pomegranate)
 
   @if $hover
     &:hover
       +background(darken($color, $darken-by))
     &.active:hover
-      +background($red)
+      +background($color-pomegranate)
 
 .value-bar--selectable, a.value-bar--selectable
   @extend %value-bar-base

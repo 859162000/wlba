@@ -20,7 +20,7 @@ body
           a.sub-navbar--anchor(href="{% url 'trust_product' %}") 信托产品
 
   .container
-    .span8.panel-nopadding.panel-header
+    .span8.panel.panel-header
       .panel-product-title-bar
         #product_name.panel-product-title
           .product-title.ispan11 {{ trust.short_name }}
@@ -50,7 +50,7 @@ body
                   dt 投资期限
                   dd {{ trust.period | month}}
 
-    .span4-omega.panel-nopadding.panel-header.panel-preorder
+    .span4-omega.panel.panel-header.panel-preorder
       p.font-m 发售日期: {{ trust.issue_date | date:"Y年n月j日"}}
       a#order-button.button-round-large.button-red.padding-l-r-2em(href="#order-form") 立即预约
       .font-xs.well-s.lh-s
@@ -59,7 +59,7 @@ body
 
   .container
     .space-vertical-s
-    .panel-nopadding
+    .panel
       .panel-product-title-bar
         .panel-product-title 产品详情
       table.bordered-table.margin-top-m1

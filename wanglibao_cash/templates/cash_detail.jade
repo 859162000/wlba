@@ -9,7 +9,7 @@ body
   include include/navigation
   - endwith
   .container
-    .span8.panel-nopadding.panel-header
+    .span8.panel.panel-header
       .panel-product-title-bar
         .panel-product-title {{ cash.name }}
           if is_favorited != 1
@@ -50,7 +50,7 @@ body
                 else
                   dd 活期
 
-    .span4-omega.panel-nopadding.panel-header
+    .span4-omega.panel.panel-header
       .panel-product-title-bar
         .panel-product-title 收益计算器
       form
@@ -64,7 +64,7 @@ body
           span#earning.highlight 0.0
           span 元
 
-  .panel-nopadding
+  .panel
     .panel-product-title-bar
       .panel-product-title 产品信息
     table.bordered-table.margin-top-m1
