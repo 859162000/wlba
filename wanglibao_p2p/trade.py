@@ -48,8 +48,17 @@ class P2POperator(object):
             product.status = u'还款中'
             product.save()
 
-    def fail(self):
-        pass
+    def fail(self, product):
+        if product.status != u'流标':
+            raise P2PException('invalid status')
+
+        fake_order = 100
+        with transaction.atomic():
+            for equity in product.equities.all():
+                equity_keeper = EquityKeeper(equity.user, equity.product, fake_order)
+                equity_keeper.rollback(savepoint=False)
+            product.closed = True
+            product.save()
 
     def amortize(self, amortization):
         if not amortization.ready_for_settle:
