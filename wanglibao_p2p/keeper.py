@@ -53,7 +53,7 @@ class EquityKeeper(object):
         with transaction.atomic(savepoint=savepoint):
             self.equity, _ = P2PEquity.objects.get_or_create(user=self.user, product=self.product)
             self.equity = P2PEquity.objects.select_for_update().filter(pk=self.equity.pk).first()
-            if amount > self.equity.limit:
+            if amount > self.limit:
                 raise P2PException()
             self.equity.equity += amount
             self.equity.save()

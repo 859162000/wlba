@@ -53,9 +53,9 @@ class PurchaseP2P(APIView):
             amount = form.cleaned_data['amount']
 
             trader = P2PTrader(product=p2p, user=request.user)
-            trade_info = trader.purchase(amount)
+            product_info, margin_info, equity_info= trader.purchase(amount)
             return Response({
-                'data': trade_info.amount
+                'data': product_info.amount
             })
         else:
             return Response({

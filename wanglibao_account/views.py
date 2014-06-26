@@ -32,7 +32,7 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization
-from wanglibao_pay.models import Card, Bank
+from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
 
@@ -343,6 +343,36 @@ class AccountTransactionP2P(TemplateView):
         trade_records = pager.page(page)
         return {
             "trade_records": trade_records
+        }
+
+
+class AccountTransactionDeposit(TemplateView):
+    template_name = 'account_transaction_deposit.jade'
+
+    def get_context_data(self, **kwargs):
+        pay_records = PayInfo.objects.filter(user=self.request.user, type=PayInfo.DEPOSIT)
+        pager = Paginator(pay_records, 20)
+        page = self.request.GET.get('page')
+        if not page:
+            page = 1
+        pay_records = pager.page(page)
+        return {
+            "pay_records": pay_records
+        }
+
+
+class AccountTransactionWithdraw(TemplateView):
+    template_name = 'account_transaction_withdraw.jade'
+
+    def get_context_data(self, **kwargs):
+        pay_records = PayInfo.objects.filter(user=self.request.user, type=PayInfo.WITHDRAW)
+        pager = Paginator(pay_records, 20)
+        page = self.request.GET.get('page')
+        if not page:
+            page = 1
+        pay_records = pager.page(page)
+        return {
+            "pay_records": pay_records
         }
 
 
