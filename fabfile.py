@@ -227,8 +227,6 @@ def deploy():
                 run("git checkout %s" % env.branch)
                 run("git pull")
 
-        install_rabbit_mq()
-
         apt_get("gcc", "python-setuptools", "python-all-dev", "libpq-dev", "libjpeg-dev")
         print green("Install pip and virtualenv")
         sudo("easy_install pip")
