@@ -25,10 +25,11 @@ class P2PTrader(object):
     def purchase(self, amount):
         description = u'购买P2P产品 %s %s 份' %(self.product.short_name, amount)
         with transaction.atomic():
-            self.product_keeper.reserve(amount, self.user, savepoint=False)
-            self.margin_keeper.freeze(amount, description=description, savepoint=False)
-            self.equity_keeper.reserve(amount, description=description, savepoint=False)
+            product_record = self.product_keeper.reserve(amount, self.user, savepoint=False)
+            margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
+            equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
             # todo update order info
+            return product_record, margin_record, equity
 
 
 class P2POperator(object):
