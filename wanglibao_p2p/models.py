@@ -24,11 +24,22 @@ class WarrantCompany(models.Model):
         return u'%s' % self.name
 
 
-class P2PProductManager(models.Manager):
+class P2PSoldOutManager(models.Manager):
     def get_queryset(self):
-        return super(P2PProductManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
+        return super(P2PSoldOutManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
                                                                     status__exact=u'正在招标')
 
+
+class P2PReadyForSettleManager(models.Manager):
+    def get_queryset(self):
+        return super(P2PReadyForSettleManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
+                                                                           status__exact=u'已满标')
+
+
+class P2PReadyForFailManager(models.Manager):
+    def get_queryset(self):
+        return super(P2PReadyForFailManager, self).get_queryset().filter(end_time__lt=timezone.now(),
+                                                                         status__exact=u'正在招标')
 
 class P2PProduct(ProductBase):
     name = models.CharField(max_length=256, verbose_name=u'名字')
@@ -59,7 +70,9 @@ class P2PProduct(ProductBase):
     short_usage = models.TextField(blank=True, verbose_name=u'项目用途摘要')
 
     objects = models.Manager()
-    sold_out = P2PProductManager()
+    sold_out = P2PSoldOutManager()
+    ready_for_settle = P2PReadyForSettleManager()
+    ready_for_fail = P2PReadyForFailManager()
 
     class Meta:
         verbose_name_plural = u'P2P产品'
@@ -167,6 +180,7 @@ class P2PEquity(models.Model):
 class AmortizationRecord(models.Model):
     catalog = models.CharField(verbose_name=u'流水类型', max_length=100)
     amortization = models.ForeignKey(ProductAmortization, related_name=u'to_users')
+    order_id = models.IntegerField(verbose_name=u'关联订单编号', null=True)
 
     term = models.IntegerField(verbose_name=u'还款期数')
     principal = models.DecimalField(verbose_name=u'返还本金', max_digits=20, decimal_places=2)
@@ -191,7 +205,7 @@ class AmortizationRecord(models.Model):
 
 class P2PRecord(models.Model):
     catalog = models.CharField(verbose_name=u'流水类型', max_length=100)
-    order_id = models.IntegerField(verbose_name=u'关联订单编号')
+    order_id = models.IntegerField(verbose_name=u'关联订单编号', null=True)
     amount = models.DecimalField(verbose_name=u'发生数', max_digits=20, decimal_places=2)
 
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
@@ -216,7 +230,7 @@ class P2PRecord(models.Model):
 
 class EquityRecord(models.Model):
     catalog = models.CharField(verbose_name=u'流水类型', max_length=100)
-    order_id = models.IntegerField(verbose_name=u'相关流水号')
+    order_id = models.IntegerField(verbose_name=u'相关流水号', null=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(P2PProduct, verbose_name=u'产品', on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(verbose_name=u'发生数量', max_digits=20, decimal_places=2)
