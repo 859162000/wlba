@@ -143,7 +143,7 @@ class IdVerificationForm(forms.Form):
         id_number = cleaned_data.get('id_number')
         verify_record, error = verify_id(name, id_number)
 
-        if not verify_record.is_valid:
+        if error or not verify_record.is_valid:
             raise ValidationError(u'验证失败，拨打客服电话进行人工验证')
 
         return cleaned_data

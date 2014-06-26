@@ -370,3 +370,6 @@ BROKER_URL = 'amqp://guest:guest@localhost//'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+ID_VERIFY_USERNAME = 'wljr_admin'
+ID_VERIFY_PASSWORD = 'wljr888'

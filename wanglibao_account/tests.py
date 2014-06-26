@@ -1,3 +1,4 @@
+# coding=utf-8
 from urlparse import urlparse
 
 from django.conf import settings
@@ -5,7 +6,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from forms import EmailOrPhoneRegisterForm
-from utils import detect_identifier_type
+from utils import detect_identifier_type, verify_id, parse_id_verify_response
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_sms.utils import send_validation_code
 
@@ -207,3 +208,45 @@ class EndToEndTestCase(TestCase):
         })
 
         self.assertEqual(response.status_code, 200)
+
+
+class IdVerificationTestCase(TestCase):
+    def test_verify_id(self):
+        verification, error = verify_id(u'李硕', '130702198408260655')
+
+        self.assertIsNone(error)
+
+    def test_parse_response(self):
+        response = u"""
+            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+               <s:Body>
+                  <SimpleCheckResponse xmlns="http://www.nciic.com.cn">
+                     <SimpleCheckResult xmlns:a="http://schemas.datacontract.org/2004/07/Finance.EPM" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+                        <a:ResponseCode>100</a:ResponseCode>
+                        <a:ResponseText>成功</a:ResponseText>
+                        <a:Identifier>
+                           <a:Address i:nil="true"/>
+                           <a:BirthPlace i:nil="true"/>
+                           <a:Birthday>1984-08-26</a:Birthday>
+                           <a:Company i:nil="true"/>
+                           <a:Education i:nil="true"/>
+                           <a:FormerName i:nil="true"/>
+                           <a:IDNumber>130702198408260655</a:IDNumber>
+                           <a:IsQueryCitizen>false</a:IsQueryCitizen>
+                           <a:MaritalStatus i:nil="true"/>
+                           <a:Name>李硕</a:Name>
+                           <a:Nation i:nil="true"/>
+                           <a:NativePlace i:nil="true"/>
+                           <a:Photo/>
+                           <a:QueryTime i:nil="true"/>
+                           <a:Result>一致</a:Result>
+                           <a:Sex>男性</a:Sex>
+                        </a:Identifier>
+                        <a:RawXml i:nil="true"/>
+                     </SimpleCheckResult>
+                  </SimpleCheckResponse>
+               </s:Body>
+            </s:Envelope>"""
+
+        r = parse_id_verify_response(response)
+        self.assertEqual(r['response_code'], 100)
