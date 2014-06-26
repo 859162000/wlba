@@ -227,14 +227,24 @@ define ['jquery'], ($)->
           return false
 
   checkEmail = (identifier) ->
-    re = undefined
     re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     re.test identifier
 
   checkMobile = (identifier) ->
-    re = undefined
     re = /^1\d{10}$/
     re.test identifier
+
+  checkBalance = (amount, element)->
+    balance = $(element).attr('data-balance')
+    return (amount - balance).toFixed(2) <= 0
+
+  checkMoney = (amount, element)->
+    re = /^\d+(\.\d{0,2})?$/
+    re.test amount
+
+  checkCardNo = (card_no)->
+    re = /^\d{10,20}$/
+    return re.test card_no
 
   purchaseP2P = (data)->
     $.post '/api/p2p/purchase/', data
@@ -260,4 +270,7 @@ define ['jquery'], ($)->
     checkMobile: checkMobile
 
     purchaseP2P: purchaseP2P
+    checkBalance: checkBalance
+    checkMoney: checkMoney
+    checkCardNo: checkCardNo
   }

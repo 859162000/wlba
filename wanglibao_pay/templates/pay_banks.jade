@@ -10,55 +10,61 @@ body
   - with '首页' as activeItem
   include include/navigation
   - endwith
-  .panel-nopadding
-    .well
-      .panel-title-bar__no-border
-        .panel-title 账户充值
-      .panel-content.padding-l-r-s
-        .row
-          form#payform.payform(action="/pay/deposit/", method='post')
-            - csrf_token
-            .form-group
-              .span1
-                label 金额(元)
-              .span11-omega
-                input#amount(type='text', name='amount', placeholder='金额', value='100.00')
-            .form-group
-              input#gate_id(type='hidden', name='gate_id', placeholder='银行', value='09')
-              .span1
-                label 选择银行
-              .span11-omega
-                .banks
-                  count = len(banks)
-                  rows = range(0, count/4)
-                  cols = range(0, 4)
+  .row
+    .span3
+      - with '充值' as activeItem
+      include include/user_center_sidebar
+      - endwith
+    .span9-omega
+      .panel-nopadding
+        .well
+          .panel-title-bar__no-border
+            .panel-title 账户充值
+          .panel-content.padding-l-r-s
+            .row
+              form#payform.payform(action="/pay/deposit/", method='post', target='_blank')
+                - csrf_token
+                .form-group
+                  .span1
+                    label 金额(元)
+                  .span11-omega
+                    input#amount(type='text', name='amount', placeholder='金额', value='100.00')
+                .form-group
+                  input#gate_id(type='hidden', name='gate_id', placeholder='银行', value='09')
+                  .span1
+                    label 选择银行
+                  .span11-omega
+                    .banks
+                      count = len(banks)
+                      rows = range(0, count/4)
+                      cols = range(0, 4)
 
-                  for row_index in rows
-                    .row
-                      for col_index in cols
-                        bank = banks[row_index * 4 + col_index]
-                        if col_index != 3
-                          .span3
-                            a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                      for row_index in rows
+                        .row
+                          for col_index in cols
+                            bank = banks[row_index * 4 + col_index]
+                            if col_index != 3
+                              .span3
+                                a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                            else
+                              .span3-omega
+                                a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                    .row.bank-description
+                      for bank in banks
+                        if forloop.counter == 1
+                          div.bank-desc-container(id="bank-limit-{{bank.id}}")
+                            {{bank.limit | safe}}
                         else
-                          .span3-omega
-                            a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
-                .row.bank-description
-                  for bank in banks
-                    if forloop.counter == 1
-                      div.bank-desc-container(id="bank-limit-{{bank.id}}")
-                        {{bank.limit | safe}}
-                    else
-                      div.bank-desc-container(style="display:none", id="bank-limit-{{bank.id}}")
-                        {{bank.limit | safe}}
-                .row
-                  label
-                    input(type="checkbox", checked)
-                    span 我同意《<a href="#">网利宝投资咨询与管理服务协议</a>》与《<a href="#">网利宝资金管理规定</a>》
+                          div.bank-desc-container(style="display:none", id="bank-limit-{{bank.id}}")
+                            {{bank.limit | safe}}
+                    .row
+                      label
+                        input(type="checkbox", checked)
+                        span 我同意《<a href="#">网利宝投资咨询与管理服务协议</a>》与《<a href="#">网利宝资金管理规定</a>》
 
-                .space-vertical-m
-                .row
-                  input#pay.button-pay(type='submit', value='支 付')
+                    .space-vertical-m
+                    .row
+                      input#pay.button-pay(type='submit', value='支 付')
 
   script.
     require(["/static/js/pay.js"])

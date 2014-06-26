@@ -57,7 +57,6 @@ $container-style: magic
   .prefix#{$i}
     +pre($i)
 
-
 @for $i from 1 to $total-columns + 1
   .ispan#{$i}
     display: inline-block
@@ -109,13 +108,14 @@ $container-style: magic
 
 .callback-description
   float: left
-  margin-left: 10px
+  margin-left: 15px
   margin-top: 5px
 
   h1
     font-size: $font-xl
+    line-height: 35px
+    vertical-align: middle
     font-weight: bold
-    padding-bottom: $space-xs
 
 .success-icon
   background: url("/static/images/success_failed.png") 0 0
@@ -126,8 +126,13 @@ $container-style: magic
   float: left
 
 .error-icon
-  @extend .success-icon
-  background: url("/static/images/success_failed.png") 0 -86px
+  width: 35px
+  height: 35px
+  margin-top: 6px
+  display: inline-block
+  overflow: hidden
+  float: left
+  background: url("/static/images/notice.png") no-repeat
 
 .star
   +inline-block

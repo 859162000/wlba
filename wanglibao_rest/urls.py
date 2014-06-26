@@ -13,6 +13,7 @@ from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
 from wanglibao_hotlist.views import HotTrustViewSet, HotFinancingViewSet, HotFundViewSet, MobileHotTrustViewSet, \
     MobileHotFundViewSet, MobileMainPageViewSet
 from wanglibao_p2p.views import PurchaseP2P
+from wanglibao_pay.views import CardViewSet
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
@@ -54,6 +55,8 @@ router.register(r'banners', BannerViewSet)
 router.register(r'users', UserViewSet)
 
 router.register(r'daily_income', DailyIncomeViewSet)
+
+router.register(r'card', CardViewSet)
 
 urlpatterns = patterns(
     '',

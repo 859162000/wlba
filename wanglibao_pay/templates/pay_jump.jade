@@ -5,27 +5,31 @@ doctype html
 include include/head
 - endwith
 body
-  include include/header
-  - with '首页' as activeItem
-  include include/navigation
-  - endwith
-  .pay-container
-    .row
-      .pull-left {{message}}
+  if message
+    include include/header
+    - with '首页' as activeItem
+    include include/navigation
+    - endwith
 
-    if form
-      url = form['url']
-      form#huifu-pay(action='{{url}}', method='post')
-        post = form['post']
-        for name in post
-          value = post[name]
-          input(type='hidden', name='{{name}}', value='{{value}}')
+    .callback-container
+      .callback-content
+        if message
+          .error-icon
+          .callback-description
+            h1 抱歉，充值失败。
+            p {{message}}
 
-  script.
-    require(['/static/js/pay_jump.js'])
+    - with 1 as no_margin
+    include include/footer
+    - endwith
+    include include/tracking
 
-  - with 1 as no_margin
-  include include/footer
-  - endwith
-  include include/tracking
+  if form
+    url = form['url']
+    form#huifu-pay(action='{{url}}', method='post')
+      post = form['post']
+      for name in post
+        value = post[name]
+        input(type='hidden', name='{{name}}', value='{{value}}')
 
+    script(src='/static/js/pay_jump.js', data-main='/static/js/pay_jump')

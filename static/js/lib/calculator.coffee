@@ -9,6 +9,15 @@ define ['jquery'], ($)->
       period = periods[i]
       $(earning_element).text (rate / 100 * amount * 10000 / 365 * period).toFixed(1)
 
-    console.log 'rate: ' + rate + ' amount:' + amount
+  $('input[data-role=fee-calculator]').keyup (e)->
+    target = $(e.target)
+    rate = target.attr 'data-rate'
+    amount = target.val()
+    fee_element = target.attr 'data-target-fee'
+    actual_element = target.attr 'data-target-actual'
+    fee = (rate * amount).toFixed(2)
+    actual = (amount - fee).toFixed(2)
+    $(fee_element).text fee
+    $(actual_element).text actual
 
 

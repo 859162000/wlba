@@ -16,14 +16,14 @@ body
 
    .row
     .span3
-      - with '取现' as activeItem
+      - with '提现' as activeItem
       include include/user_center_sidebar
       - endwith
     .span9-omega
       .panel-padding
         .withdraw-title 提现
 
-        form(action="/pay/withdraw/complete/", method='post')
+        form#withdraw-form(action="/pay/withdraw/complete/", method='post')
           - csrf_token
           table.withdraw-table
             tr
@@ -32,33 +32,39 @@ body
             tr
               th 提现至银行卡
               td
-                if cards
-                  select.withdraw-select(name='card_id')
-                    for card in cards
-                      option(value='{{card.id}}') {{card.bank.name}}
-                  a#add-card-button.blue(href='#add-card-form')
-                   .add-icon
-                   添加提现银行卡
-                else
-                  a#add-card-button(href='#add-card-form')
-                    .add-icon
-                    添加提现银行卡
+                select#card-select.withdraw-select(name='card_id')
+                  option(value='') 请选择银行卡
+                  for card in cards
+                    option(value='{{card.id}}') {{card | card_info}}
+                a#add-card-button.blue(href='#add-card-form')
+                 .add-icon
+                 添加提现银行卡
             tr
-              th 可用余额
+              th 可用余额(元)
               td.red-text {{margin}}
             tr
               th 提现金额(元)
               td
-                input.withdraw-input(type='text', name='amount', placeholder='金额', value='500.00')
+                input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee}}', data-target-fee='#fee', data-target-actual='#actual-amount')
             tr
-              th 手续费
+              th 手续费(元)
               td
+                span#fee 0.00
             tr
-              th 实际到账金额
+              th 实际到账金额(元)
               td
+                span#actual-amount 0.00
             tr
               td(colspan=2)
-                input#withdraw.button-red.button-l(type='submit', value='提现')
+                .withdraw-td
+                  input#withdraw.button-red.button-xl(type='submit', value='提 现')
+                  p.d4-text 警告：禁止信用卡套现、虚假交易等行为，一经确认，将终止该账户的使用
+                  p.orange-text 您的资金的从合作银行监管账户转入提现银行卡
+
+        .space-vertical-xl
+        .withdraw-notice
+          p 温馨提示
+          p 1、在您申请提现前，请先在页面下方或“我的账户”页面绑定银行卡
 
   form#add-card-form(style="display:none")
     .modal-title-bar
@@ -68,14 +74,22 @@ body
         input#card-no.withdraw-input(type="text", placeholder="请输入银行卡号")
       .form-row-center.margin-top-s
         select#bank-select.withdraw-select
-          option 请选择银行
-          option 招商银行
+          option(value='') 请选择银行
+          for bank in banks
+            option(value='{{bank.id}}') {{bank.name}}
       .form-row-center.margin-top-s
         .withdraw-checkbox
-          input(type='checkbox', name='default-checkbox')
+          input#default-checkbox(type='checkbox', value='1')
           设为默认银行
       .form-row-center.margin-top-s
-        button#add-button.button.button-middle.button-red.withdraw-input(href="#", type="submit") 添加
+        button#add-card.button.button-middle.button-red.withdraw-input(href="#", type="submit") 添加
+
+  #id-validate(style='display: none')
+    input#id-is-valid(type='hidden', value='{{user_profile.id_is_valid}}')
+    .padding-xl.align-center
+      p 为保证您的资金安全，需要进行实名认证后，才能取现
+      .space-vertical-l
+      a.button.button-middle.button-l.button-red(href='/accounts/id_verify/') 去实名认证
 
   script.
     require(['/static/js/withdraw.js'])

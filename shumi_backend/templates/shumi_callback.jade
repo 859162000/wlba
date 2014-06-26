@@ -9,37 +9,40 @@ html
   body
     include include/header
     include include/navigation
-    .container
+    .callback-container
       .callback-content
         if record and record.pay_result != 101
           .success-icon
-          h1 {{action}}成功
-          p
-            您{{action}}的
-            amount = record.amount + record.shares
-            span.highlight {{amount}}
-            元 {{record.fund_name}}
-            ，将在2-3个交易日内完成确认
-        else
-          if record
-            .error-icon
-            h1 {{action}}失败
+          .callback-description
+            h1 {{action}}成功
             p
               您{{action}}的
               amount = record.amount + record.shares
               span.highlight {{amount}}
-              元 {{record.fund_name}}，交易失败，请尝试重新购买
+              元 {{record.fund_name}}
+              ，将在2-3个交易日内完成确认
+        else
+          if record
+            .error-icon
+            .callback-description
+              h1 {{action}}失败
+              p
+                您{{action}}的
+                amount = record.amount + record.shares
+                span.highlight {{amount}}
+                元 {{record.fund_name}}，交易失败，请尝试重新购买
           else
             .error-icon
-            h1 交易记录查询失败
+            .callback-description
+              h1 交易记录查询失败
 
-        p
-          您可以查看
-          a.blue(href="/accounts/transactions",title="全部交易记录") 全部交易记录
-          ，或者回到
-          a.blue(href="/",title="首页") 首页
+              p
+                您可以查看
+                a.blue(href="/accounts/transactions",title="全部交易记录") 全部交易记录
+                ，或者回到
+                a.blue(href="/",title="首页") 首页
 
-        p.txt-info 客服电话：4008-588-066
+              p.txt-info 客服电话：4008-588-066
 
     include include/footer
     include include/tracking
