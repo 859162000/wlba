@@ -11,23 +11,15 @@ body
   include include/navigation
   - endwith
 
-  .sub-navbar
-    .sub-navbar--list
-      ul
-        li.sub-navbar--list-item
-          a.sub-navbar--anchor.active(href="{% url 'trust_home' %}") 信托首页
-        li.sub-navbar--list-item
-          a.sub-navbar--anchor(href="{% url 'trust_product' %}") 信托产品
-
   .container
     .span8.panel.panel-header
       .panel-product-title-bar
         #product_name.panel-product-title
-          .product-title.ispan11 {{ trust.short_name }}
+          .product-title.ispan10 {{ trust.short_name }}
           if is_favorited != 1
             a#addToFavorite.button.button-white.button-mini.pull-right(href="#", data-id="{{trust.id}}", data-is-favorited="{{is_favorited}}") 收藏
           else
-            a#addToFavorite.button.button-white.button-mini.pull-right(href="#", data-id="{{trust.id}}", data-is-favorited="{{is_favorited}}") 取消
+            a#addToFavorite.button.button-white.button-mini.pull-right(href="#", data-id="{{trust.id}}", data-is-favorited="{{is_favorited}}") 取消收藏
 
       .panel-inner
         .row

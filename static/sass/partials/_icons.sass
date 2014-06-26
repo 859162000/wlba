@@ -2,26 +2,12 @@
 @import "font-icons"
 @include font-icon-family(entypo)
 
-.icon-mini
-  font-size: 12px
-
-.icon-large
-  font-size: 24px
-
 @mixin icon-base($family)
   @include font-icon-base($family, $font-size: 1em, $width: 1em, $margin: 0)
 
 .icon
   +inline-block()
   position: relative
-
-.icon-people
-  @include icon-base(entypo)
-  @extend %entypo-user
-
-.icon-search
-  @include icon-base(entypo)
-  @extend %entypo-search
 
 .icon-info
   @include icon-base(entypo)

@@ -122,7 +122,7 @@ define ['jquery'], ($)->
         item: id
       }
       .done ()->
-        $(target).html('取消')
+        $(target).html('取消收藏')
         $(target).addClass('button-no-border')
         $(target).attr('data-is-favorited', '1')
       .fail (xhr)->
@@ -140,7 +140,7 @@ define ['jquery'], ($)->
         type: 'DELETE'
       }
       .done ()->
-        $(target).html('<span class="star"></span>添加到我的收藏')
+        $(target).html('收藏')
         $(target).attr('data-is-favorited', '0')
         $(target).removeClass('button-no-border')
       .fail ()->

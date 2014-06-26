@@ -128,7 +128,7 @@
         return $.post(url, {
           item: id
         }).done(function() {
-          $(target).html('取消');
+          $(target).html('取消收藏');
           $(target).addClass('button-no-border');
           return $(target).attr('data-is-favorited', '1');
         }).fail(function(xhr) {
@@ -147,7 +147,7 @@
           url: url + id + '/',
           type: 'DELETE'
         }).done(function() {
-          $(target).html('<span class="star"></span>添加到我的收藏');
+          $(target).html('收藏');
           $(target).attr('data-is-favorited', '0');
           return $(target).removeClass('button-no-border');
         }).fail(function() {
