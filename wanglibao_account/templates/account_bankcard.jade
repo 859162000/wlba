@@ -14,25 +14,51 @@ body
       - endwith
     .span9-omega
       .panel-padding
-        .space-vertical-s
+        .space-vertical-m
+        .bar
+          .card-category-bar P2P专用账户
+        .row
+          if p2p_cards
+            each card in p2p_cards
+              .bank-card
+                .bank-card--title-bar.row
+                  .bank-card--bank-name.span6 {{card.bank.name}}
+                  .bank-card--icon.span3-omega
+                    img(src='/static/images/bank_card.png')
+                .row
+                  dl.bank-card--info-row
+                    dt.bank-card--info-title 账号
+                    dd.bank-card--info-value {{card.no | bank_card}}
+            a#add-card-button(href='#add-card-form')
+              .add-bank-card
+                .add-icon-large
+                p.add-card-text 添加一张银行卡
+          else
+            p.no-content 无绑定银行卡
+
+        .space-vertical-xl
         .bar
           .card-category-bar 基金专用账户
+        .row
+          if cards
+            each card in cards
+              .span4
+                .bank-card
+                  .bank-card--title-bar.row
+                    .bank-card--bank-name.span6 {{card.bank_name}}
+                    .bank-card--icon.span3-omega
+                      img(src='/static/images/bank_card.png')
+                  .row
+                    dl.bank-card--info-row
+                      dt.bank-card--info-title 账号
+                      dd.bank-card--info-value {{card.no | bank_card}}
+          else
+            p.no-content 无绑定银行卡
 
-        if cards
-          each card in cards
-            .bank-card.span6
-              .bank-card--title-bar.row
-                .bank-card--bank-name.span6 {{card.bank_name}}
-                .bank-card--icon.span3-omega
-                  img(src='/static/images/bank_card.png')
-              .row
-                dl.bank-card--info-row
-                  dt.bank-card--info-title 账号
-                  dd.bank-card--info-value {{card.no | bank_card}}
-        else
-          p.no-content 无绑定银行卡
+  include include/add_card
 
+  script.
+    require(['/static/js/add_card.js'])
   include include/footer
   include include/templates
-  script(src="/static/js/require.js", data-main="/static/js/account_home")
   include include/tracking

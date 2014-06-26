@@ -149,11 +149,18 @@
   @extend .info-bar
 
 .bank-card
-  width: 270px
+  width: 250px
   border: 1px solid #d3d3d3
   border-radius: 5px
   overflow: hidden
   margin-top: $space-m
+  float: left
+  margin-left: 10px
+
+.add-bank-card
+  @extend .bank-card
+  height: 146px
+  background: #F5F5F5
 
 .bank-card--title-bar
   background: #F5F5F5
@@ -190,7 +197,7 @@
   text-align: right
 
 .bank-card--info-value
-  @extend .span7
+  @extend .span8
   color: #666
   text-align: left
   padding-left: 1em
@@ -199,3 +206,32 @@
   text-align: center
   padding: 10px
   font-size: $font-m
+
+$add-icon-large-size: 54px
+$add-icon-large-width: 8px
+.add-icon-large
+  position: relative
+  width: $add-icon-large-size
+  height: $add-icon-large-size
+  margin: 35px auto 15px auto
+
+  &:before
+    position: absolute
+    left: ($add-icon-large-size - $add-icon-large-width)/2
+    content: " "
+    width: $add-icon-large-width
+    height: $add-icon-large-size
+    background-color: #D5D5D5
+
+  &:after
+    position: absolute
+    top: ($add-icon-large-size - $add-icon-large-width)/2
+    width: $add-icon-large-size
+    height: $add-icon-large-width
+    background-color: #D5D5D5
+    content: " "
+
+.add-card-text
+  text-align: center
+  font-size: $font-m
+  color: $blue

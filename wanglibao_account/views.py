@@ -32,6 +32,7 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization
+from wanglibao_pay.models import Card, Bank
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
 
@@ -359,8 +360,13 @@ class AccountBankCard(TemplateView):
             pass
 
         cards = BindBank.objects.filter(user__exact=self.request.user)
+        p2p_cards = Card.objects.filter(user__exact=self.request.user)
+        banks = Bank.objects.all()
         return {
-            "cards" : cards,
+            "cards": cards,
+            'p2p_cards': p2p_cards,
+            'banks': banks,
+            'user_profile': self.request.user.wanglibaouserprofile,
             "message": message
         }
 
