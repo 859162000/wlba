@@ -142,7 +142,8 @@ def handle_pay_result(request):
             else:
                 if code == '000000':
                     keeper = MarginKeeper(request.user, pay_info.order.pk)
-                    keeper.deposit(amount)
+                    margin_record = keeper.deposit(amount)
+                    pay_info.margin_record = margin_record
                     pay_info.status = PayInfo.SUCCESS
                     result = PayResult.DEPOSIT_SUCCESS
                 else:
@@ -294,10 +295,11 @@ class WithdrawCompleteView(TemplateView):
             pay_info.user = request.user
             pay_info.status = PayInfo.INITIAL
             pay_info.card = card
-            pay_info.save()
 
             keeper = MarginKeeper(request.user, pay_info.order.pk)
-            keeper.withdraw_pre_freeze(amount)
+            margin_record = keeper.withdraw_pre_freeze(amount)
+            pay_info.margin_record = margin_record
+            pay_info.save()
 
             post = dict()
             post['OrdId'] = str(pay_info.pk)

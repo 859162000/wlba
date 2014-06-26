@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.utils import timezone
 from order.models import Order
-from wanglibao_buy.models import BindBank
+from wanglibao_margin.models import MarginRecord
 
 
 class Bank(models.Model):
@@ -62,6 +61,7 @@ class PayInfo(models.Model):
     user = models.ForeignKey(get_user_model())
     card = models.ForeignKey(Card, blank=True, null=True)
     order = models.ForeignKey(Order, blank=True, null=True)
+    margin_record = models.ForeignKey(MarginRecord, blank=True, null=True)
     bank = models.ForeignKey(Bank, blank=True, null=True)
 
     def __unicode__(self):

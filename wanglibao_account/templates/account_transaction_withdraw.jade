@@ -36,7 +36,7 @@ body
                 td {{trade_record.id}}
                 td {{trade_record.create_time | date:"Y-m-d h:i:s"}}
                 td {{trade_record.total_amount}}
-                td {{trade_record.card.no}}
+                td {{trade_record.card.no | last_four_char}}
                 td {{trade_record.fee}}
                 td {{trade_record.status}}
 

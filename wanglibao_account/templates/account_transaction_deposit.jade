@@ -28,6 +28,7 @@ body
               th 时间
               th 金额(元)
               th 状态
+              th 余额(元)
           tbody
             each trade_record in pay_records
               tr
@@ -35,6 +36,7 @@ body
                 td {{trade_record.create_time | date:"Y-m-d h:i:s"}}
                 td {{trade_record.amount}}
                 td {{trade_record.status}}
+                td {{trade_record.margin_record.margin_current}}
       - with data=pay_records uri='/accounts/transaction/deposit/'
       include include/pager
       - endwith
