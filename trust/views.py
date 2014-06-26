@@ -20,10 +20,6 @@ class TrustHomeView(TemplateView):
         return context
 
 
-class TrustProductsView(TemplateView):
-    template_name = "trust_products.jade"
-
-
 class TrustDetailView(TemplateView):
     template_name = "trust_detail.jade"
 
