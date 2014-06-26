@@ -105,13 +105,14 @@ html
     .full-container-home.clearfix
       .p2p-container
         .span8.p2p-detail-container
-          r = p2p.extra_data.items()
-          for section_name, section_values in r
-            .p2p-detail-list.clearfix
-              h1 {{section_name}}
-              dl
-                for item_name, item_value in section_values
-                  dd {{item_name}}
+          if p2p.extra_data
+            r = p2p.extra_data.items()
+            for section_name, section_values in r
+              .p2p-detail-list.clearfix
+                h1 {{section_name}}
+                dl
+                  for item_name, item_value in section_values
+                    dd {{item_name}}
               if user.is_authenticated
                 ul
                   for item_name, item_value in section_values

@@ -8,7 +8,7 @@ from exceptions import ProductLack, ProductNotExist, P2PException
 
 class ProductKeeper(object):
 
-    def __init__(self, product, order):
+    def __init__(self, product, order=None):
         self.product = product
         self.order = order
 
@@ -24,6 +24,16 @@ class ProductKeeper(object):
             record = self.__tracer(catalog, amount, user, self.product.remain)
             return record
 
+    @classmethod
+    def get_ready_for_settle(cls):
+        products = P2PProduct.ready_for_settle.all()
+        return products
+
+    @classmethod
+    def get_ready_for_fail(cls):
+        products = P2PProduct.ready_for_fail.all()
+        return products
+
     def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
                           description=description, order_id=self.order, product=self.product)
@@ -33,7 +43,7 @@ class ProductKeeper(object):
 
 class EquityKeeper(object):
 
-    def __init__(self, user, product, order):
+    def __init__(self, user, product, order=None):
         self.user = user
         self.product = product
         self.order = order
@@ -109,7 +119,7 @@ class EquityKeeper(object):
 
 class AmortizationKeeper(object):
 
-    def __init__(self, amortization, order):
+    def __init__(self, amortization, order=None):
         self.amortization = amortization
         self.order = order
 

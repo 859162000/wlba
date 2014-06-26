@@ -142,6 +142,9 @@ def deploy():
     manage_py = '/var/wsgi/wanglibao/manage.py'
     log_file = '/var/log/wanglibao/scrawl.log'
 
+    p2p_watchdog = '/usr/bin/p2p'
+    p2p_log = '/var/log/wanglibao/p2p.log'
+
     sync_sm_info = '/usr/bin/sync_sm_info'
     sync_sm_income = '/usr/bin/sync_sm_income'
     sync_sm_log = '/var/log/wanglibao/sync_sm.log'
@@ -190,6 +193,7 @@ def deploy():
         sudo('echo "0 0 * * * %s" >> /tmp/tmp_tab' % scrawl_job_file)
         sudo('crontab /tmp/tmp_tab')
 
+        add_cron_tab(p2p_watchdog, p2p_log, env, '0 */10 * * *', manage_py, ['p2p_watchdog'])
         add_cron_tab(sync_sm_info, sync_sm_log, env, '0 */1 * * *', manage_py, ['syncsm -f', 'syncsm -m'])
         add_cron_tab(sync_sm_income, sync_sm_log, env, '0 18-23/1 * * *', manage_py, ['syncsm -i'], _end=True)
 
@@ -206,8 +210,6 @@ def deploy():
                 run('git remote set-url origin %s' % env.depot)
                 run("git checkout %s" % env.branch)
                 run("git pull")
-
-        install_rabbit_mq()
 
         apt_get("gcc", "python-setuptools", "python-all-dev", "libpq-dev", "libjpeg-dev")
         print green("Install pip and virtualenv")
