@@ -117,6 +117,7 @@ class MarginKeeper(object):
             margin.save()
             catalog = u'现金存入'
             record = self.__tracer(catalog, amount, margin.margin, description)
+            return record
 
     def __tracer(self, catalog, amount, margin_current, description=u''):
         trace = MarginRecord(catalog=catalog, amount=amount, margin_current=margin_current, description=description,
