@@ -7,12 +7,14 @@ include include/head
 body
   include include/header
   include include/navigation
+  .space-vertical-s
   .row
-    .span3
+    .aside
       - with '银行卡' as activeItem
       include include/user_center_sidebar
       - endwith
-    .span9-omega
+
+    .main
       .panel-padding
         .space-vertical-m
         .bar
