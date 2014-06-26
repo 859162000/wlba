@@ -2,7 +2,9 @@
 from django.db import transaction
 from order.utils import OrderHelper
 from wanglibao_margin.marginkeeper import MarginKeeper
-from keeper import ProductKeeper, EquityKeeper
+from order.utils import OrderHelper
+from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
+from exceptions import P2PException
 
 
 class P2PTrader(object):
@@ -30,14 +32,41 @@ class P2PTrader(object):
 
 class P2POperator(object):
 
-    def __init__(self, product):
-        self.product = product
+    def settle(self, product):
+        if product.ordered_amount != product.total_amount:
+            raise P2PException('product do not closed')
+        if product.status != u'已满标':
+            raise P2PException('product status not valid')
+        # place a order.
+        # fake id = 100
+        fake_order = 100
 
-    def settle(self):
-        pass
+        with transaction.atomic():
+            for equity in product.equities.all():
+                equity_keeper = EquityKeeper(equity.user, equity.product, fake_order)
+                equity_keeper.settle(savepoint=False)
+            product.status = u'还款中'
+            product.save()
 
-    def fail(self):
-        pass
+    def fail(self, product):
+        if product.status != u'流标':
+            raise P2PException('invalid status')
+
+        fake_order = 100
+        with transaction.atomic():
+            for equity in product.equities.all():
+                equity_keeper = EquityKeeper(equity.user, equity.product, fake_order)
+                equity_keeper.rollback(savepoint=False)
+            product.closed = True
+            product.save()
 
     def amortize(self, amortization):
-        pass
+        if not amortization.ready_for_settle:
+            raise P2PException('not ready for settle')
+        if amortization.product.status != u'还款中':
+            raise P2PException('not in pay status')
+
+        fake_order = 1000
+        amo_keeper = AmortizationKeeper(amortization, fake_order)
+        amo_keeper.amortize()
+

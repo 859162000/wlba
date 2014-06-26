@@ -15,39 +15,6 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], function($, modal, backend, placeholder, validate) {
-    $('input, textarea').placeholder();
-    $('#add-card-button').click(function(e) {
-      e.preventDefault();
-      return $(this).modal();
-    });
-    $('#add-card').click(function(e) {
-      var bank_id, card_no, is_default;
-      e.preventDefault();
-      card_no = $('#card-no').val();
-      if (!backend.checkCardNo(card_no)) {
-        alert('请输入有效的银行卡号');
-        return;
-      }
-      bank_id = $('#bank-select').val();
-      if (!bank_id) {
-        alert('请选择银行');
-        return;
-      }
-      is_default = $('#default-checkbox').prop('checked');
-      return $.ajax({
-        url: '/api/card/',
-        data: {
-          no: card_no,
-          bank: bank_id,
-          is_default: is_default
-        },
-        type: 'post'
-      }).done(function() {
-        return location.reload();
-      }).fail(function() {
-        return alert('添加银行卡失败');
-      });
-    });
     $.validator.addMethod("balance", function(value, element) {
       return backend.checkBalance(value, element);
     });

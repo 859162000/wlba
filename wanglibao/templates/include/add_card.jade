@@ -1,0 +1,24 @@
+form#add-card-form(style="display:none")
+  .modal-title-bar
+    span.modal-title 添加银行卡
+  .padding-xl
+    .form-row-center
+      input#card-no.withdraw-input(type="text", placeholder="请输入银行卡号")
+    .form-row-center.margin-top-s
+      select#bank-select.withdraw-select
+        option(value='') 请选择银行
+        for bank in banks
+          option(value='{{bank.id}}') {{bank.name}}
+    .form-row-center.margin-top-s
+      .withdraw-checkbox
+        input#default-checkbox(type='checkbox', value='1')
+        设为默认银行
+    .form-row-center.margin-top-s
+      button#add-card.button.button-middle.button-red.withdraw-input(href="#", type="submit") 添加
+
+#id-validate(style='display: none')
+  input#id-is-valid(type='hidden', value='{{user_profile.id_is_valid}}')
+  .padding-xl.align-center
+    p 为保证您的资金安全，请先进行实名认证
+    .space-vertical-l
+    a.button.button-middle.button-l.button-red(href='/accounts/id_verify/') 去实名认证

@@ -71,6 +71,12 @@ class P2PPeriod(object):
             'terms': terms
         }
 
+    @classmethod
+    def from_json(self, json_string):
+        data = json.dumps(json_string)
+        terms = data['terms']
+        return P2PPeriod(terms)
+
     def to_json(self):
         return json.dumps(self.serializer())
 
@@ -83,5 +89,12 @@ class AmoDateField(with_metaclass(models.SubfieldBase, models.Field)):
         return "TextField"
 
     def to_python(self, value):
-        pass
+        if isinstance(value, P2PPeriod):
+            return value
+        return P2PPeriod.from_json(value)
+
+    def get_prep_value(self, value):
+        return value.to_json()
+
+
 

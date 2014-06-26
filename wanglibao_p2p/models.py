@@ -29,6 +29,7 @@ class P2PProductManager(models.Manager):
         return super(P2PProductManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
                                                                     status__exact=u'正在招标')
 
+
 class P2PProduct(ProductBase):
     name = models.CharField(max_length=256, verbose_name=u'名字')
     short_name = models.CharField(max_length=64, verbose_name=u'短名字')
@@ -142,7 +143,7 @@ class P2PEquity(models.Model):
     penal_interest = models.DecimalField(verbose_name=u'已得罚息', max_digits=20, decimal_places=2, default=Decimal(0))
     term = models.IntegerField(verbose_name=u'已还期数', default=0)
     total_term = models.IntegerField(verbose_name=u'总期数', default=12)
-    next_term = models.CharField(verbose_name=u'下期时间', max_length=100, default='')
+    next_term = models.CharField(verbose_name=u'下期时间', max_length=100, default='', blank=True)
     next_amount = models.DecimalField(verbose_name=u'下期总数', max_digits=20, decimal_places=2, default=Decimal(0))
     total_interest = models.DecimalField(verbose_name=u'应付利息', max_digits=20, decimal_places=2, default=Decimal(0))
 

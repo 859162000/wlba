@@ -66,33 +66,11 @@ body
           p 温馨提示
           p 1、在您申请提现前，请先在页面下方或“我的账户”页面绑定银行卡
 
-  form#add-card-form(style="display:none")
-    .modal-title-bar
-      span.modal-title 添加银行卡
-    .padding-xl
-      .form-row-center
-        input#card-no.withdraw-input(type="text", placeholder="请输入银行卡号")
-      .form-row-center.margin-top-s
-        select#bank-select.withdraw-select
-          option(value='') 请选择银行
-          for bank in banks
-            option(value='{{bank.id}}') {{bank.name}}
-      .form-row-center.margin-top-s
-        .withdraw-checkbox
-          input#default-checkbox(type='checkbox', value='1')
-          设为默认银行
-      .form-row-center.margin-top-s
-        button#add-card.button.button-middle.button-red.withdraw-input(href="#", type="submit") 添加
+  include include/add_card
 
-  #id-validate(style='display: none')
-    input#id-is-valid(type='hidden', value='{{user_profile.id_is_valid}}')
-    .padding-xl.align-center
-      p 为保证您的资金安全，需要进行实名认证后，才能取现
-      .space-vertical-l
-      a.button.button-middle.button-l.button-red(href='/accounts/id_verify/') 去实名认证
 
   script.
-    require(['/static/js/withdraw.js'])
+    require(['/static/js/withdraw.js', '/static/js/add_card.js'])
   - with 1 as no_margin
   include include/footer
   - endwith

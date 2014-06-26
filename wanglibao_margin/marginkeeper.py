@@ -54,6 +54,19 @@ class MarginKeeper(object):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
+    def amortize(self, principal, interest, penal_interest, description=u'', savepoint=True):
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            catalog = u'还款入账'
+            margin.margin += principal
+            self.__tracer(catalog, principal, margin.margin, u'本金入账')
+            margin.margin += interest
+            self.__tracer(catalog, interest, margin.margin, u'利息入账')
+            if penal_interest > 0:
+                margin.margin += penal_interest
+                self.__tracer(catalog, penal_interest, margin.margin, u'罚息入账')
+            margin.save()
+
     def withdraw_pre_freeze(self, amount, description=u'', savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
