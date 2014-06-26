@@ -1,6 +1,6 @@
 -load formatters
 doctype html
-- with 'P2P交易记录' as title
+- with '充值记录' as title
 include include/head
 - endwith
 body
@@ -8,7 +8,7 @@ body
   include include/navigation
   .row
     .span3
-      - with '充值记录' as activeItem
+      - with '交易记录' as activeItem
       include include/user_center_sidebar
       - endwith
     .span9-omega.panel-padding
@@ -19,7 +19,7 @@ body
             a(href='/accounts/transaction/p2p/') 交易记录
           .panel-tab.active 充值记录
           .panel-tab
-            a(href='/accounts/transaction/withdraw/') 取现记录
+            a(href='/accounts/transaction/withdraw/') 提现记录
       .panel-container
         table.trust-table
           thead

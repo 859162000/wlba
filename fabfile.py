@@ -48,24 +48,6 @@ def production():
     env.create_ssl_cert = False  # Production's key is maintained differently
 
 
-def production_staging():
-    env.host_string = '192.168.1.150'
-    env.path = '/var/deploy/wanglibao'
-    env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
-    env.depot_name = 'wanglibao-backend'
-    env.branch = 'production'
-
-    env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
-    env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
-
-    env.debug = False
-    env.production = True
-
-    env.mysql = True
-    env.create_ssl_cert = True
-
-
 def staging():
     env.host_string = '192.168.0.12'
     env.path = '/var/deploy/wanglibao'
@@ -194,6 +176,8 @@ def deploy():
         create_user()
 
         apt_get('libmysqlclient-dev')
+
+        apt_get('libfreetype6-dev')
 
         print green('add crontab')
         sudo('echo "#!/bin/bash" > %s' % scrawl_job_file)

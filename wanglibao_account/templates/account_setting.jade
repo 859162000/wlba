@@ -6,13 +6,14 @@ body
   include include/header
   include include/navigation
 
+  .space-vertical-s
   .row
-    .span3
+    .aside
       - with '修改密码' as activeItem
       include include/user_center_sidebar
       - endwith
 
-    .span9-omega
+    .main
       .panel-padding
         .panel-title-bar
           .panel-title

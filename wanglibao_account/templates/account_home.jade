@@ -8,13 +8,14 @@ body
   include include/header
   include include/navigation
 
+  .space-vertical-s
   .row
-    .account-home-aside
+    .aside
       - with '账务总览' as activeItem
       include include/user_center_sidebar
       - endwith
 
-    .account-home-main
+    .main
       .account-home-panel
         .account-home-panel--title-bar
           span.nickname {{user | safe_phone}}
