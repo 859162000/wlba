@@ -1,6 +1,6 @@
 -load formatters
 doctype html
-- with 'P2P交易记录' as title
+- with '充值记录' as title
 include include/head
 - endwith
 body
@@ -15,9 +15,9 @@ body
       .space-vertical-s
       .panel-title-bar-gray
         .panel-tabs
-          .panel-tab.active 交易记录
           .panel-tab
-            a(href='/accounts/transaction/deposit/') 充值记录
+            a(href='/accounts/transaction/p2p/') 交易记录
+          .panel-tab.active 充值记录
           .panel-tab
             a(href='/accounts/transaction/withdraw/') 提现记录
       .panel-container
@@ -25,19 +25,19 @@ body
           thead
             tr
               th 流水号
-              th 产品
               th 时间
               th 金额(元)
-              th 交易类型
+              th 状态
+              th 余额(元)
           tbody
-            each trade_record in trade_records
+            each trade_record in pay_records
               tr
                 td {{trade_record.id}}
-                td {{trade_record.product.short_name}}
                 td {{trade_record.create_time | date:"Y-m-d h:i:s"}}
                 td {{trade_record.amount}}
-                td {{trade_record.catalog}}
-      - with data=trade_records uri='/accounts/transaction/p2p/'
+                td {{trade_record.status}}
+                td {{trade_record.margin_record.margin_current}}
+      - with data=pay_records uri='/accounts/transaction/deposit/'
       include include/pager
       - endwith
   include include/footer

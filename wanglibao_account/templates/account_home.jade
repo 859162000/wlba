@@ -8,13 +8,14 @@ body
   include include/header
   include include/navigation
 
+  .space-vertical-s
   .row
-    .account-home-aside
+    .aside
       - with '账务总览' as activeItem
       include include/user_center_sidebar
       - endwith
 
-    .account-home-main
+    .main
       .account-home-panel
         .account-home-panel--title-bar
           span.nickname {{user | safe_phone}}
@@ -121,7 +122,7 @@ body
 
                       td {{equity.product.publish_time | date:"Y-m-d h:i:s"}}
                       td
-                        p <a href="/p2p/detail/{{equity.product.id}}/">{{equity.product.name}}</a>
+                        p <a href="/p2p/detail/{{equity.product.id}}/">{{equity.product.short_name}}</a>
                         p 年化收益：{{equity.product.expected_earning_rate}}%
                         p 期限：{{equity.product.period}}个月
                       td {{equity.equity | money_format}}

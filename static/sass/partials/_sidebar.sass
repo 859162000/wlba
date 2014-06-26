@@ -1,6 +1,7 @@
 .sidebar
   background: white
   margin-top: $space-s
+  box-shadow: inset 0 -1px 0 0 rgba(0,0,0,0.2),0 0 0 1px rgba(0,0,0,0.06),0 3px 2px -1px rgba(0,0,0,0.02)
 
 .sidebar-title
   padding: 10px 20px
@@ -18,11 +19,14 @@
   &:first-child
     border-top: 0
 
+  &:hover ul
+    display: block
+
   &.active
     border-left: 3px solid $color-primary
     background: #F9FAF9
 
-    a
+    >a
       +link-colors($red, $red)
       cursor: default
 
@@ -51,6 +55,11 @@
   top: -1px
   width: 200px
   z-index: 999
-  background-color: white
+  background-color: $light-gray-background
   display: none
-  border-top: 1px solid lightgray
+  border: 1px dotted lightgray
+
+  a
+    +unstyled-link
+    +link-colors(#666, $color-primary)
+

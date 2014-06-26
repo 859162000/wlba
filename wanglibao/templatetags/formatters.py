@@ -192,3 +192,7 @@ def timedelta_now(time):
 @register.filter
 def card_info(card):
     return u"%s(尾号%s)" % (card.bank.name, card.no[-4:])
+
+@register.filter
+def last_four_char(str):
+    return str[-4:]
