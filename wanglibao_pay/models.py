@@ -43,6 +43,9 @@ class PayInfo(models.Model):
     DEPOSIT = 'D'
     WITHDRAW = 'W'
 
+    class Meta:
+        ordering = ['-create_time']
+
     type = models.CharField(verbose_name=u'类型', help_text=u'充值：D 取款：W', max_length=5)
     amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'实扣金额')
     fee = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'手续费', default=0)
@@ -59,6 +62,7 @@ class PayInfo(models.Model):
     user = models.ForeignKey(get_user_model())
     card = models.ForeignKey(Card, blank=True, null=True)
     order = models.ForeignKey(Order, blank=True, null=True)
+    bank = models.ForeignKey(Bank, blank=True, null=True)
 
     def __unicode__(self):
         return u'%s' % self.pk

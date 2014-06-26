@@ -68,7 +68,7 @@ class PayView(TemplateView):
                 raise decimal.DecimalException()
 
             gate_id = request.POST.get('gate_id', '')
-            Bank.objects.get(gate_id=gate_id)
+            bank = Bank.objects.get(gate_id=gate_id)
 
             order = OrderHelper().place_order(request.user)
             pay_info = PayInfo()
@@ -77,6 +77,7 @@ class PayView(TemplateView):
             pay_info.type = PayInfo.DEPOSIT
             pay_info.status = PayInfo.INITIAL
             pay_info.user = request.user
+            pay_info.bank = bank
             pay_info.save()
 
             post = {
@@ -292,6 +293,7 @@ class WithdrawCompleteView(TemplateView):
             pay_info.type = PayInfo.WITHDRAW
             pay_info.user = request.user
             pay_info.status = PayInfo.INITIAL
+            pay_info.card = card
             pay_info.save()
 
             keeper = MarginKeeper(request.user, pay_info.order.pk)

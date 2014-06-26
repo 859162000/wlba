@@ -4,7 +4,8 @@ from django.views.generic import TemplateView
 from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
 from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome, \
-    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView
+    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView, AccountTransactionDeposit, \
+    AccountTransactionWithdraw
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -16,6 +17,10 @@ urlpatterns = patterns(
     url(r'^transaction/fund/$', login_required(AccountTransaction.as_view(),
                                  login_url='/accounts/register/')),
     url(r'^transaction/p2p/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/register/')),
+    url(r'^transaction/deposit/$', login_required(AccountTransactionDeposit.as_view(),
+                                                  login_url='/accounts/register/')),
+    url(r'^transaction/withdraw/$', login_required(AccountTransactionWithdraw.as_view(),
+                                                   login_url='/accounts/register/')),
     url(r'^bankcard', login_required(AccountBankCard.as_view(),
                                  login_url='/accounts/register/')),
     url(r'^favorite/', login_required(TemplateView.as_view(template_name='account_favorite.jade'),
