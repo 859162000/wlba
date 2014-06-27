@@ -10,19 +10,30 @@ class PayMockGenerator(object):
             Bank.objects.all().delete()
 
         banks = [
-            (u'工商银行', '09', 'gsyh', 'ICBC'),
-            (u'中国农业银行', '01', 'nyyh', ''),
-            (u'招商银行', '01', 'zsyh', 'CMB'),
-            (u'交通银行', '01', 'jtyh', 'BOCOM'),
-            (u'中国邮政储蓄银行', '01', 'yzyh', ''),
-            (u'广发银行', '01', 'gfyh', ''),
-            (u'中国建设银行', '01', 'jsyh', 'CCB'),
-            (u'中国银行', '01', 'zgyh', ''),
-            (u'浦发银行', '01', 'pfyh', ''),
-            (u'中信银行', '01', 'zxyh', ''),
-            (u'华夏银行', '01', 'hxyh', ''),
-            (u'兴业银行', '01', 'xyyh', 'CIB'),
-            (u'平安银行', '01', 'payh', '')
+            (u'兴业银行', '09', 'xyyh', 'CIB'),
+            (u'民生银行', '12', 'msyh', 'CMBC'),
+            (u'华夏银行', '13', 'hxyh', 'HXB'),
+            (u'北京银行', '15', 'bjyh', 'BCCB'),
+            (u'浦发银行', '16', 'pfyh', 'SPDB'),
+            (u'广发银行', '19', 'gfyh', 'GDB'),
+            (u'交通银行', '21', 'jtyh', 'BOCOM'),
+            (u'工商银行', '25', 'gsyh', 'ICBC'),
+            (u'中国建设银行', '27', 'jsyh', 'CCB'),
+            (u'招商银行', '28', 'zsyh', 'CMB'),
+            (u'中国农业银行', '29', 'nyyh', 'ABC'),
+            (u'中信银行', '33', 'zxyh', 'CITIC'),
+            (u'光大银行', '36', 'gdyh', 'CEB'),
+            (u'北京农商银行', '40', 'bjnsyh', 'BJRCB'),
+            (u'中国银行', '45', 'zgyh', 'BOC'),
+            (u'中国邮政储蓄银行', '46', 'yzyh', 'PSBC'),
+            (u'南京银行', '49', 'njyh', 'NJCB'),
+            (u'平安银行', '50', 'payh', 'PINGAN'),
+            (u'杭州银行', '51', 'hzyh', 'HZCB'),
+            (u'浙商银行', '53', 'zsyh', 'CZB'),
+            (u'上海银行', '54', 'shyh', 'BOS'),
+            (u'渤海银行', '55', 'bhyh', 'CBHB'),
+            (u'东亚银行', '', 'dyyh', 'HKBEA'),
+            (u'深发银行', '', 'sfyh', 'SDB'),
         ]
 
         for name, gate_id, logo, code in banks:
