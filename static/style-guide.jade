@@ -222,6 +222,23 @@ body.font-m
 
     section
       .container
+        h1 容器/布局
+        p 比较普遍的容器是.panel，是一个白色背景，有阴影的容器，用来作为页面区域分割
+
+        .panel
+          .well
+            p .panel作为页面的顶级容器，可以被extend，比如.aside .main
+
+        .aside
+          .well
+            p .aside
+
+        .main
+          .well
+            p .main
+
+    section
+      .container
         h1 顶栏
       .topbar
         .container
