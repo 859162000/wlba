@@ -8,20 +8,12 @@ $row-height: 40px
   background: $color-white
   margin: 0 auto
 
-  input
-    height: 45px
-    font-size: $font-m
-
-  label
-    line-height: 30px
-
   button
     height: 45px
     font-size: $font-xl
 
 .form-title
-  color: $color-pomegranate
-  margin-top: 10px
+  font-size: $font-l
   margin-bottom: 10px
 
 .form-login-title
@@ -30,9 +22,10 @@ $row-height: 40px
   vertical-align: middle
 
 .form-row
-  overflow: visible
+  +pie-clearfix
   text-align: left
   position: relative
+  line-height: 40px
 
 .form-row-center
   text-align: center
@@ -41,9 +34,6 @@ $row-height: 40px
   @extend .form-row
   line-height: 40px
   margin-top: 20px
-
-  input
-    height: 40px
 
 .form-row-label
   line-height: $row-height
@@ -62,14 +52,9 @@ $row-height: 40px
     margin-top: $space-xs
     line-height: 30px
 
-  input
-    height: 30px
-
 .add-card-form
   width: 350px
 
-  input
-    height: 30px
 
 .search-form-row
   line-height: 40px

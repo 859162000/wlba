@@ -280,3 +280,43 @@ body.font-m
         .container
           p Top bar
 
+
+    section
+      .container
+        h1 表单
+        p 表单出现在多个地方，登陆注册，购买产品等。他们的风格都要保持一致。label以及input的宽度使用.span或者其他可以指定宽度的class来控制。
+        | 当前所有的input高度为30px form-row的line-height为40px
+
+        .panel
+          .well
+            form.form.span4
+              .form-title 有标题的文本框
+              .form-row
+                .span3
+                  label(for="first_input") 卡号
+                .span9-omega
+                  input#first_input(type="text", placeholder="请输入银行卡号")
+
+              .form-row
+                .span3
+                  label(for="banks-select") 银行
+                .span9-omega
+                  select#banks-select
+                    option 请选择银行
+                    option(value="40") 工商银行
+
+              .form-row
+                .span3
+                  label(for="captcha") 验证码
+                .span9-omega
+                  input#captcha(type="text")
+              .form-row
+                button.prefix3.span3.button-middle.button-red 提交
+
+        .panel
+          .well
+            form.form.span4
+              .form-title 无标题的文本框
+              .form-row
+                .prefix1.span11
+                  input#first_input(type="text", placeholder="输入框")
