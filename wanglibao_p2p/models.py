@@ -124,7 +124,7 @@ class ProductAmortization(models.Model):
     interest = models.DecimalField(verbose_name=u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(verbose_name=u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
 
-    settled = models.BooleanField(verbose_name=u'已结算给客户', default=False)
+    settled = models.BooleanField(verbose_name=u'已结算给客户', default=False, editable=False)
     settlement_time = models.DateTimeField(verbose_name=u'结算时间', auto_now=True)
 
     ready_for_settle = models.BooleanField(verbose_name=u'是否可以开始结算', default=False)
