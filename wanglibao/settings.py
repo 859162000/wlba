@@ -373,3 +373,25 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 ID_VERIFY_USERNAME = 'wljr_admin'
 ID_VERIFY_PASSWORD = 'wljr888'
+
+
+PAY_BACK_RETURN_URL = 'http://111.206.165.46:8000/pay/deposit/callback/'
+PAY_RET_URL = 'http://111.206.165.46:8000/pay/deposit/complete/'
+WITHDRAW_BACK_RETURN_URL = 'http://111.206.165.46:8000/pay/withdraw/callback/'
+MER_ID = '510672'
+CUSTOM_ID = '000010124821'
+SIGN_HOST = '192.168.0.12'
+SIGN_PORT = 8733
+PAY_URL = 'http://test.chinapnr.com'
+WITHDRAW_URL = 'http://test.chinapnr.com/buser'
+
+if not DEBUG:
+    PAY_BACK_RETURN_URL = 'http://111.206.165.46:8000/pay/deposit/callback/'
+    PAY_RET_URL = 'http://111.206.165.46:8000/pay/deposit/complete/'
+    WITHDRAW_BACK_RETURN_URL = 'http://111.206.165.46:8000/pay/withdraw/callback/'
+    MER_ID = '872724'
+    CUSTOM_ID = '000007522683'
+    SIGN_HOST = '192.168.0.12'
+    SIGN_PORT = 8733
+    PAY_URL = 'https://mas.chinapnr.com'
+    WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
