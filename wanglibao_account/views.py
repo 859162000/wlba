@@ -264,8 +264,8 @@ class AccountHome(TemplateView):
         today = timezone.datetime.today()
 
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-7)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-30)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
         if fund_total_asset != 0:
             income_rate = total_income / fund_total_asset
