@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import decimal
 from wanglibao_pay.pay import Pay
 import socket
+from django.conf import settings
 
 
 class SignException(Exception):
@@ -10,15 +11,15 @@ class SignException(Exception):
 
 
 class HuifuPay(Pay):
-    PAY_BACK_RETURN_URL = 'http://111.206.165.46:8000/pay/deposit/callback/'
-    PAY_RET_URL = 'http://111.206.165.46:8000/pay/deposit/complete/'
-    WITHDRAW_BACK_RETURN_URL = 'http://111.206.165.46:8000/pay/withdraw/callback/'
-    MER_ID = '510672'
-    CUSTOM_ID = '000010124821'
-    HOST = '192.168.0.12'
-    PORT = 8733
-    PAY_URL = 'http://test.chinapnr.com'
-    WITHDRAW_URL = 'http://test.chinapnr.com/buser'
+    PAY_BACK_RETURN_URL = settings.PAY_BACK_RETURN_URL
+    PAY_RET_URL = settings.PAY_RET_URL
+    WITHDRAW_BACK_RETURN_URL = settings.WITHDRAW_BACK_RETURN_URL
+    MER_ID = settings.MER_ID
+    CUSTOM_ID = settings.CUSTOM_ID
+    HOST = settings.SIGN_HOST
+    PORT = settings.SIGN_PORT
+    PAY_URL = settings.PAY_URL
+    WITHDRAW_URL = settings.WITHDRAW_URL
 
     FEE = decimal.Decimal('0.0025')
 
@@ -92,6 +93,7 @@ class HuifuPay(Pay):
         post['RetUrl'] = HuifuPay.PAY_RET_URL
         post['CmdId'] = 'Buy'
         post['MerId'] = HuifuPay.MER_ID
+        post['IsBalance'] = 'Y'
 
         post['ChkValue'] = self.sign_data(post, HuifuPay.PAY_FIELDS)
         return {
