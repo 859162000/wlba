@@ -73,6 +73,10 @@ body.font-m
             .color.color-pink
 
           .color-container
+            p.font-xs .color-cinderella
+            .color.color-cinderella
+
+          .color-container
             p.font-xs .color-red
             .color.color-red
 
@@ -199,6 +203,22 @@ body.font-m
               a.button-large-round.button-red(href="#") .button-large-round
               .space-m
               a.button-large-round.button-red(href="#") 大圆角
+
+        .space-vertical-s
+        .panel
+          .well
+            mixin buttons
+              .row
+                a.button-small.margin-right-s(class!=attributes.class, href="javascript:void(0)")=attributes.class
+                a.button-middle.margin-right-s(class!=attributes.class, href="javascript:void(0)")=attributes.class
+                a.button-large.margin-right-s(class!=attributes.class, href="javascript:void(0)")=attributes.class
+                a.button-large-round.margin-right-s(class!=attributes.class, href="javascript:void(0)")=attributes.class
+              .space-vertical-s
+
+            +buttons(class="button-red")
+            +buttons(class="button-pink")
+            +buttons(class="button-white")
+            +buttons(class="button-gray")
 
     section
       .container
