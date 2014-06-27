@@ -121,6 +121,13 @@ class Warrant(models.Model):
         return u'%s %s %s' % (self.product.name, self.name, str(self.warranted_at))
 
 
+class AmortizationReadyManger(models.Manager):
+    def get_queryset(self):
+        return super(AmortizationReadyManger, self).get_queryset().filter(term_date__lt=timezone.now(),
+                                                                          ready_for_settle=True,
+                                                                          settled=False)
+
+
 class ProductAmortization(models.Model):
     product = models.ForeignKey(P2PProduct, related_name='amortizations')
 
@@ -138,6 +145,9 @@ class ProductAmortization(models.Model):
     created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
     description = models.CharField(verbose_name=u'摘要', max_length=500, blank=True)
+
+    objects = models.Manager()
+    is_ready = AmortizationReadyManger()
 
     class Meta:
         verbose_name_plural = u'产品还款管理'
