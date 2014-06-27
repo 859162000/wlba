@@ -67,16 +67,16 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             colspan: 1
             text: (item)->
               if item.is_favorited == 1
-                '<a class="button button-mini button-white button-no-border" onclick="addToFavorite(event,' + "'trusts');" +
+                '<a class="button-small button-white button-no-border" onclick="addToFavorite(event,' + "'trusts');" +
                   '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">取消</a>'
               else
-                '<a class="button button-mini button-white" onclick="addToFavorite(event,' + "'trusts');" +
+                '<a class="button-small button-white" onclick="addToFavorite(event,' + "'trusts');" +
                   '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">收藏</a>'
           ,
             name: '详情'
             colspan: 1
             text: (item)->
-              '<a target="_blank" class="button button-mini button-pink" href="/trust/detail/' + item.id + '">详情</a>'
+              '<a target="_blank" class="button-small button-pink" href="/trust/detail/' + item.id + '">详情</a>'
           ]
 
       _.extend(context, defaultContext)

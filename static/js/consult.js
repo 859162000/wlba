@@ -15,7 +15,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/chart', 'lib/modal', 'purl', 'model/trustTable', 'model/financingTable', 'model/cashTable', 'model/fundTable', 'model/fund', 'model/emptyTable'], function($, _, ko, backend, chart, modal, purl, trustTable, financingTable, cashTable, fundTable, fund, emptyTable) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/chart', 'lib/modal', 'purl', 'model/trustTable', 'model/fundTable', 'model/fund', 'model/emptyTable'], function($, _, ko, backend, chart, modal, purl, trustTable, fundTable, fund, emptyTable) {
     var ViewModel, asset_param, model, period_param;
     ViewModel = (function() {
       function ViewModel(asset_param, period_param) {
@@ -146,12 +146,6 @@
         self.trustTable = new trustTable.viewModel({
           fields: ['名称', '状态', '资金门槛', '产品期限', '预期收益', '收藏', '详情']
         });
-        self.financingTable = new financingTable.viewModel({
-          fields: ['名称', '起购金额', '管理期限', '预期收益', '收藏', '详情']
-        });
-        self.cashTable = new cashTable.viewModel({
-          fields: ['名称', '发行机构', '期限', '七日年化利率', '收藏', '详情']
-        });
         self.fundTable = new fundTable.viewModel({
           fields: ['名称', '七日年化利率', '近一月收益率', '起购金额(元)', '购买', '收藏']
         });
@@ -176,12 +170,6 @@
                   case 'trusts':
                     backend.joinFavorites(data, "trusts", self.trustTable);
                     return self.dataTable(self.trustTable);
-                  case 'bank_financings':
-                    backend.joinFavorites(data, 'financings', self.financingTable);
-                    return self.dataTable(self.financingTable);
-                  case 'cashes':
-                    backend.joinFavorites(data, 'cashes', self.cashTable);
-                    return self.dataTable(self.cashTable);
                   case 'funds':
                     backend.joinFavorites(data, 'funds', self.fundTable, function(data) {
                       return _.map(data.results, function(item) {

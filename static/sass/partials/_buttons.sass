@@ -1,38 +1,27 @@
 @import compass/typography/links
 @import "variables"
 
-$button-border-radius:   3px         // Button border radius
-$button-padding:         0.5em 0.5em  // Button padding
+$button-padding:         0.5em 0.5em
 
 .button
-  +unstyled-link()
   line-height: 1 //Work around the line-height make it 1 to have precious control on button size
   border: 0
   text-align: center
-  +border-radius($button-border-radius)
+  +border-radius(3px)
   display: inline-block
 
   &:focus
     outline: 0
 
-.button-square
-  +border-radius(0)
-
-.button-round-mini
-  @extend .button
-  line-height: 20px
-  +border-radius(10px)
-  padding: 0 1em
-
-.button-mini, a.button-mini
-  @extend .button
-  font-size: 12px
-  padding: $button-padding
-
 .button-small, a.button-small
   @extend .button
+  line-height: 20px
   font-size: $font-xs
-  padding: $button-padding
+  padding: 0 1em
+
+.button-small-round, a.button-small-round
+  @extend .button-small
+  +border-radius(10px)
 
 .button-middle, a.button-middle
   @extend .button
@@ -42,17 +31,13 @@ $button-padding:         0.5em 0.5em  // Button padding
 .button-large, a.button-large
   @extend .button
   font-size: $font-m
-  padding: ((50- $font-m)/2/$font-m)+em 1em
-  line-height: .3
-
-.button-round-large, a.button-round-large
-  @extend .button
-  font-size: $font-m
   line-height: 40px
-  +border-radius(20px)
   padding: 0 1em
 
-// Colored buttons
+.button-large-round, a.button-large-round
+  @extend .button-large
+  +border-radius(20px)
+
 .button-red, a.button-red
   background: $color-pomegranate
   color: white
@@ -61,9 +46,8 @@ $button-padding:         0.5em 0.5em  // Button padding
     background: darken($color-pomegranate, 10%)
 
 .button-pink, a.button-pink
-  background: #DC8883
+  background: $color-pink
   color: $color-white
-  padding: .3em 1em
 
   &:hover
     background: $color-pomegranate
@@ -76,7 +60,6 @@ $button-padding:         0.5em 0.5em  // Button padding
 .button-white, a.button-white
   background: white
   color: #DC8883
-  padding: 3px 1em
   border: 1px solid #DC8883
   border-radius: 10px
 
@@ -93,7 +76,6 @@ $button-padding:         0.5em 0.5em  // Button padding
   @extend .button
   @extend .button-red
   padding: 8px 28px
-  background: $color-pomegranate
   font-size: $font-m
 
 .button-disabled

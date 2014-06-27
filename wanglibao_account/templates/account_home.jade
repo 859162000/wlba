@@ -53,7 +53,7 @@ body
                 a.title-bar--tab--anchor(href="javascript:void(0)") P2P
               li.title-bar--tab
                 a.title-bar--tab--anchor(href="/accounts/home/fund/") 货币基金
-            a.button-mini.pull-right(href='/accounts/transaction/p2p/') 查看交易记录
+            a.button-small.pull-right(href='/accounts/transaction/p2p/') 查看交易记录
           .clamp-sm
             .account-home-panel--action-bar
               a.button-home-action(href="#") 充值
@@ -144,7 +144,7 @@ body
                 a.title-bar--tab--anchor(href="javascript:void(0)") P2P
               li.title-bar--tab.active
                 a.title-bar--tab--anchor(href="javascript:void(0)") 货币基金
-            a.button-mini.pull-right(href='/accounts/transaction/fund/') 查看交易记录
+            a.button-small.pull-right(href='/accounts/transaction/fund/') 查看交易记录
           .clamp-sm
             .space-vertical-s
             .row
@@ -182,9 +182,9 @@ body
                       td {{fund.current_remain_share}}
                       td {{fund.unpaid_income}}
                       td
-                        a.button.button-mini.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=purchase" target="_blank") 继续购买
+                        a.button.button-small.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=purchase" target="_blank") 继续购买
                         &nbsp;
-                        a.button.button-mini.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=redeem" target="_blank") 赎回
+                        a.button.button-small.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=redeem" target="_blank") 赎回
                 else
                   tr
                     td(colspan='4') 无持仓记录

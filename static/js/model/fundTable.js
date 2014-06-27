@@ -64,9 +64,9 @@
               colspan: 1,
               text: function(item) {
                 if (item.availablefund) {
-                  return '<a class="button button-mini button-pink" href="/shumi/oauth/check_oauth_status/?fund_code=' + item.product_code + '&action=purchase" target="_blank"> 购买 </a>';
+                  return '<a class="button-small button-pink" href="/shumi/oauth/check_oauth_status/?fund_code=' + item.product_code + '&action=purchase" target="_blank"> 购买 </a>';
                 } else {
-                  return '<a class="button button-mini button-gray" href="javascript:void(0)"> 购买 </a>';
+                  return '<a class="button-small button-gray" href="javascript:void(0)"> 购买 </a>';
                 }
               }
             }, {
@@ -74,9 +74,9 @@
               colspan: 1,
               text: function(item) {
                 if (item.is_favorited === 1) {
-                  return '<a class="button button-mini button-white button-no-border" onclick="addToFavorite(event,' + "'funds');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">取消</a>';
+                  return '<a class="button-small button-white button-no-border" onclick="addToFavorite(event,' + "'funds');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">取消</a>';
                 } else {
-                  return '<a class="button button-mini button-white" onclick="addToFavorite(event,' + "'funds');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">收藏</a>';
+                  return '<a class="button-small button-white" onclick="addToFavorite(event,' + "'funds');" + '" href="#" data-is-favorited=' + item.is_favorited + ' data-id="' + item.id + '">收藏</a>';
                 }
               }
             }

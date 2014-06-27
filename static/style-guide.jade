@@ -69,6 +69,10 @@ body.font-m
             .color.color-denim
 
           .color-container
+            p.font-xs .color-pink
+            .color.color-pink
+
+          .color-container
             p.font-xs .color-red
             .color.color-red
 
@@ -160,8 +164,41 @@ body.font-m
             p.font-xs .color-text-d6
             .color.color-text-d6
 
+    section
+      .container
+        h1 按钮
+        p button由两个class共同控制，大小形状 + 颜色风格，例如，.button-small.button-primary就会创建一个颜色为主色调的小按钮
+          a.button-small.button-red.margin-left-s(href="#") 这样
+        p 如果需要调整按钮的padding，可以在sass中extend .button-small，再设置padding: 1em
+          a.button-primary.margin-left-s.margin-right-s(href="#") 这样
+          | .button-primary 扩展自 .button .button-red
+        .panel
+          .well
+            .row.margin-top-m
+              a.button-small-round.button-red(href="#") .button-small-round
+              .space-m
+              a.button-small-round.button-red(href="#") 小圆角
+              .space-l
+              a.button-small.button-red(href="#") .button-small
+              .space-m
+              a.button-small.button-red(href="#") 小按钮
+              .space-l
+              a.button-small.button-red(href="#") .button-small
+              .space-m
+              a.button-small.button-red(href="#") 小按钮
+              .space-l
+              a.button-middle.button-red(href="#") .button-middle
+              .space-m
+              a.button-middle.button-red(href="#") 中按钮
+              .space-l
+              a.button-large.button-red(href="#") .button-large
+              .space-m
+              a.button-large.button-red(href="#") 大按钮
+              .space-l
 
-
+              a.button-large-round.button-red(href="#") .button-large-round
+              .space-m
+              a.button-large-round.button-red(href="#") 大圆角
 
     section
       .container

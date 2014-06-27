@@ -19,11 +19,9 @@ require ['jquery',
          'lib/modal',
          'purl',
          'model/trustTable',
-         'model/financingTable',
-         'model/cashTable',
          'model/fundTable',
          'model/fund',
-         'model/emptyTable'], ($, _, ko, backend, chart, modal, purl, trustTable, financingTable, cashTable, fundTable, fund, emptyTable)->
+         'model/emptyTable'], ($, _, ko, backend, chart, modal, purl, trustTable, fundTable, fund, emptyTable)->
 
   class ViewModel
     constructor: (asset_param, period_param)->
@@ -156,26 +154,6 @@ require ['jquery',
           '详情'
         ]
       }
-      self.financingTable = new financingTable.viewModel {
-        fields:[
-          '名称'
-          '起购金额'
-          '管理期限'
-          '预期收益'
-          '收藏'
-          '详情'
-        ]
-      }
-      self.cashTable = new cashTable.viewModel {
-        fields: [
-          '名称'
-          '发行机构'
-          '期限'
-          '七日年化利率'
-          '收藏'
-          '详情'
-        ]
-      }
       self.fundTable = new fundTable.viewModel {
         fields: [
           '名称'
@@ -209,12 +187,6 @@ require ['jquery',
                 when 'trusts'
                   backend.joinFavorites(data, "trusts", self.trustTable)
                   self.dataTable self.trustTable
-                when 'bank_financings'
-                  backend.joinFavorites(data, 'financings', self.financingTable)
-                  self.dataTable self.financingTable
-                when 'cashes'
-                  backend.joinFavorites(data, 'cashes', self.cashTable)
-                  self.dataTable self.cashTable
                 when 'funds'
                   backend.joinFavorites(data, 'funds', self.fundTable, (data)->
                     return _.map(data.results, (item)->
