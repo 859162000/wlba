@@ -290,12 +290,14 @@ body.font-m
         .panel
           .well
             form.form.span4
-              .form-title 有标题的文本框
+              .form-title 普通表单
               .form-row
                 .span3
                   label(for="first_input") 卡号
                 .span9-omega
                   input#first_input(type="text", placeholder="请输入银行卡号")
+              .form-row-error
+                .error.prefix3.span9-omega 卡号错误
 
               .form-row
                 .span3
@@ -308,15 +310,23 @@ body.font-m
               .form-row
                 .span3
                   label(for="captcha") 验证码
-                .span9-omega
+                .span6
                   input#captcha(type="text")
+                .span3-omega
+                  span 8826
+              .form-row-error
+                .error.prefix3.span9-omega 验证码错误
+              .form-row
+                .prefix3.span9-omega
+                  input#default_card(type="checkbox", name="default_card", value="1")
+                  label(for="default_card") 设为默认银行卡
               .form-row
                 button.prefix3.span3.button-middle.button-red 提交
 
         .panel
           .well
             form.form.span4
-              .form-title 无标题的文本框
+              .form-title 无标题的表单
               .form-row
                 .prefix1.span11
                   input#first_input(type="text", placeholder="输入框")

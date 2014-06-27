@@ -57,9 +57,14 @@
   padding: 8px 10px 5px 10px
   line-height: normal
 
-  .error
-    line-height: normal
-    padding: 0
+.error
+  line-height: normal
+  padding: 0
+  font-size: $font-s
+
+  &:before
+    content: '* '
+
 
 #login-modal
   width: 520px
