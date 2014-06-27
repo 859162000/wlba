@@ -42,10 +42,17 @@ class P2PReadyForFailManager(models.Manager):
                                                                          status__exact=u'正在招标')
 
 class P2PProduct(ProductBase):
+    STATUS_CHOICES = (
+        (u'正在招标', u'正在招标'),
+        (u'已满标', u'已满标'),
+        (u'还款中', u'还款中')
+    )
     name = models.CharField(max_length=256, verbose_name=u'名字')
     short_name = models.CharField(max_length=64, verbose_name=u'短名字')
 
-    status = models.CharField(max_length=16, default=u'正在招标', verbose_name=u'产品装态(正在招标，已满标，还款中)')
+    status = models.CharField(max_length=16, default=u'正在招标',
+                              choices=STATUS_CHOICES,
+                              verbose_name=u'产品装态(正在招标，已满标，还款中)')
 
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)')
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
@@ -78,8 +85,7 @@ class P2PProduct(ProductBase):
         verbose_name_plural = u'P2P产品'
 
     def __unicode__(self):
-        return u'<%s %f, 总量: %s, 已募集: %s, 完成率: %.2f %%>' % (self.name, self.expected_earning_rate, self.total_amount,
-                                            self.ordered_amount, self.completion_rate)
+        return u'<%s>' % (self.name)
 
     @property
     def remain(self):

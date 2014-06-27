@@ -16,6 +16,7 @@ class P2PProductAdmin(admin.ModelAdmin):
     inlines = [
         AmortizationInline
     ]
+    list_display = ('name', 'short_name', 'status', 'pay_method', 'end_time', 'closed')
 
 admin.site.register(P2PProduct, P2PProductAdmin)
 admin.site.register(Warrant)
