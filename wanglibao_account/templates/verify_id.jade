@@ -40,14 +40,18 @@ block main
           - csrf_token
           .error
             {{form.non_field_errors}}
-          .form-row-m.row
+          .form-row
             {{form.name.errors}}
-            label.span3.font-s 真实姓名
-            - render_field form.name class+="font-l span9-omega"
-          .form-row-m.row
+            .span3
+              label 真实姓名
+            .span9-omega
+              - render_field form.name
+          .form-row
             {{form.id_number.errors}}
-            label.span3.font-s 身份证号
-            - render_field form.id_number class+="font-l span9-omega"
-          .form-row-m.row
+            .span3
+              label 身份证号
+            .span9-omega
+              - render_field form.id_number
+          .form-row
             button.button-primary.prefix3.span9-omega(type="submit") 提交
     .space-vertical-xl
