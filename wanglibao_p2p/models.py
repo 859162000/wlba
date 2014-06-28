@@ -41,6 +41,7 @@ class P2PReadyForFailManager(models.Manager):
         return super(P2PReadyForFailManager, self).get_queryset().filter(end_time__lt=timezone.now(),
                                                                          status__exact=u'正在招标')
 
+
 class P2PProduct(ProductBase):
     STATUS_CHOICES = (
         (u'正在招标', u'正在招标'),
@@ -119,6 +120,19 @@ class Warrant(models.Model):
 
     def __unicode__(self):
         return u'%s %s %s' % (self.product.name, self.name, str(self.warranted_at))
+
+
+class Attachment(models.Model):
+    product = models.ForeignKey(P2PProduct)
+    name = models.CharField(u'名字', max_length=128)
+    description = models.TextField(u'描述')
+    type = models.CharField(u'类型', max_length=32)
+    file = models.FileField(upload_to='attachment')
+    created_at = models.DateTimeField(auto_now_add=True)
+    extra_data = JSONField()
+
+    def __unicode__(self):
+        return u'%s' % self.name
 
 
 class AmortizationReadyManger(models.Manager):
