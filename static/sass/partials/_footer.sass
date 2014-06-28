@@ -5,8 +5,6 @@
   color: #BBBBBB
   margin-top: $space-s
 
-  a
-    +link-colors(darken(white, 40%), white)
 
 .footer-no-margin
   @extend .footer
@@ -17,6 +15,10 @@
   padding: 25px 0
   height: 220px
   overflow: visible
+
+  a
+    +link-colors(darken(white, 40%), white)
+
 
 .footer-section
   +float-left

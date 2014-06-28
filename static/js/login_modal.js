@@ -51,11 +51,7 @@
         }
       },
       errorPlacement: function(error, element) {
-        if (element.is("#id_captcha_1")) {
-          return error.appendTo(element.next().next().next('.errMessage'));
-        } else {
-          return error.appendTo(element.next('.errMessage'));
-        }
+        return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
       },
       submitHandler: function(form) {
         return $.ajax({
@@ -112,7 +108,7 @@
         }
       },
       errorPlacement: function(error, element) {
-        return error.appendTo(element.next('.errMessage'));
+        return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
       },
       submitHandler: function(form) {
         return form.submit();
@@ -154,14 +150,16 @@
         intervalId;
         count = 60;
         $(element).attr('disabled', 'disabled');
+        $(element).removeClass('button-red').addClass('button-gray');
         timerFunction = function() {
           if (count >= 1) {
             count--;
-            return $(element).text('重新获取(' + count + ')');
+            return $(element).text('已经发送(' + count + ')');
           } else {
             clearInterval(intervalId);
             $(element).text('重新获取');
-            return $(element).removeAttr('disabled');
+            $(element).removeAttr('disabled');
+            return $(element).removeClass('button-gray').addClass('button-red');
           }
         };
         timerFunction();
