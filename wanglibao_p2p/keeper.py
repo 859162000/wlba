@@ -2,7 +2,7 @@
 from decimal import Decimal
 from django.db import transaction
 from wanglibao_margin.marginkeeper import MarginKeeper
-from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord
+from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization
 from exceptions import ProductLack, ProductNotExist, P2PException
 
 
@@ -125,6 +125,7 @@ class AmortizationKeeper(object):
 
     def amortize(self, description=u'', savepoint=True):
         with transaction.atomic(savepoint=savepoint):
+            self.amortization = ProductAmortization.objects.select_for_update().filter(pk=self.amortization.pk).first()
             equities = self.amortization.product.equities.all()
             for equity in equities:
                 user_amo = equity
@@ -145,6 +146,11 @@ class AmortizationKeeper(object):
                 user_margin_keeper.amortize(user_principal, user_interest, user_penal_interest, savepoint=False)
             self.amortization.settled = True
             self.amortization.save()
+
+    @classmethod
+    def get_ready_for_settle(self):
+        amos = ProductAmortization.is_ready.all()
+        return amos
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, description=u''):
         trace = AmortizationRecord(

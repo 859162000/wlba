@@ -48,6 +48,12 @@ class P2POperator(object):
                 cls().fail(product)
             except Exception, e:
                 cls.logger.error('%s, %s' % (product.id, e))
+        for amortization in AmortizationKeeper.get_ready_for_settle():
+            try:
+                cls().amortize(amortization)
+            except Exception, e:
+                cls.logger.error('%s, %s' % (amortization.id, e))
+                print(e)
 
     def settle(self, product):
         if product.ordered_amount != product.total_amount:
