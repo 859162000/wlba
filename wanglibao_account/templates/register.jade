@@ -17,14 +17,14 @@ html
               img.user-icon(src='/static/images/user.png')
               label.font-l 用户注册
             .form-row
-              - render_field form.nickname class+="input-large" placeholder="* 昵称" title="* 昵称"
-              #{ form.nickname.errors }
-            .form-row
-              - render_field form.identifier class+="input-large" placeholder="* 请输入手机号码" title="* 请输入邮箱或手机"
-              #{ form.identifier.errors }
+              .span7
+                - render_field form.identifier class+="input-large" placeholder="* 请输入手机号码" title="* 请输入邮箱或手机"
+              .span5-omega
+                button.ispan4-omega#button-get-validate-code.button-red.button-large(type='button') 获取验证码
+              .form-row-error
+                #{ form.identifier.errors }
             #validate-code-container.form-row
               - render_field form.validate_code class+="ispan6 clear-margin" placeholder="* 请输入验证码" autocomplete='off' title="* 请输入验证码"
-              button.ispan4-omega#button-get-validate-code.button.button-red.button-small(type='button') 获取
             .form-row
               - render_field form.password class+="input-large" placeholder="* 请输入密码" autocomplete='off' title="* 请输入密码"
               .password-strength-container
@@ -48,6 +48,7 @@ html
     include include/footer
     - endwith
 
-    script(src="/static/js/require.js", data-main="/static/js/register")
+    script.
+      require(["/static/js/register.js"])
 
     include include/tracking
