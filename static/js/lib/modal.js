@@ -12,7 +12,7 @@
       modalClass: "modal",
       spinnerHtml: null,
       showSpinner: true,
-      showClose: true,
+      showClose: false,
       fadeDuration: null,
       fadeDelay: 1.0
     };

@@ -92,17 +92,20 @@ body
       a.icon-cancel.pull-right(rel="modal:close")
     .padding-s
       //ko foreach: questions
-      div.maring-top-s
-        label.ispan3.align-right(data-bind="text:$data.question + '：'")
-        //ko if: _.has($data, 'options')
-        select.ispan7(data-bind="options: $data.options, optionsText: 'title', optionsValue: 'value', value: $data.answer")
-        // /ko
+      .form-row
+        .ispan3
+          label.align-right(data-bind="text:$data.question + '：'")
 
-        //ko if: _.has($data, 'input')
-        span(style="position:relative")
-          input.ispan7(type='text', data-bind="value: answer")
-          span(style="position:absolute; right: 5px", data-bind="text: $data.input.suffix")
-        // /ko
+        .ispan7
+          //ko if: _.has($data, 'options')
+          select.ispan7(data-bind="options: $data.options, optionsText: 'title', optionsValue: 'value', value: $data.answer")
+          // /ko
+
+          //ko if: _.has($data, 'input')
+          span(style="position:relative")
+            input(type='text', data-bind="value: answer")
+            span(style="position:absolute; right: 5px; line-height: 40px", data-bind="text: $data.input.suffix")
+          // /ko
       // /ko
 
       div.margin-top-s.clearfix
