@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from order.utils import OrderHelper
 from wanglibao_margin.exceptions import MarginLack
@@ -74,6 +74,7 @@ class PayView(TemplateView):
             pay_info = PayInfo()
             pay_info.order = order
             pay_info.amount = amount
+            pay_info.total_amount = amount
             pay_info.type = PayInfo.DEPOSIT
             pay_info.status = PayInfo.INITIAL
             pay_info.user = request.user
@@ -238,7 +239,7 @@ def handle_withdraw_result(data):
                 elif transaction_status == 'I':
                     pay_info.status = PayInfo.ACCEPTED
                     result = PayResult.WITHDRAW_SUCCESS
-                else:
+                elif transaction_status == 'F':
                     pay_info.status = PayInfo.FAIL
                     result = PayResult.WITHDRAW_FAIL
                     keeper.withdraw_rollback(pay_info.amount)
@@ -386,7 +387,7 @@ class CardViewSet(ModelViewSet):
     model = Card
     serializer = CardSerializer
     throttle_classes = (UserRateThrottle,)
-    permission_classes = IsAdminUser,
+    permission_classes = IsAuthenticated,
 
     @property
     def allowed_methods(self):
