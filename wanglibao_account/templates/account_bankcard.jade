@@ -36,7 +36,10 @@ body
                 .add-icon-large
                 p.add-card-text 添加一张银行卡
           else
-            p.no-content 无绑定银行卡
+            a#add-card-button(href='#add-card-form')
+              .add-bank-card
+                .add-icon-large
+                p.add-card-text 添加一张银行卡
 
         .space-vertical-xl
         .bar
