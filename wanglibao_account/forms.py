@@ -23,9 +23,9 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     account is not activated. When the user clicked the activation link, the account
     will be activated.
     """
-    nickname = forms.CharField(label="Nick name", required=True)
+    nickname = forms.CharField(label="Nick name", required=False)
     identifier = forms.CharField(label="Email/Phone")
-    validate_code = forms.CharField(label="Validate code for phone", required=False)
+    validate_code = forms.CharField(label="Validate code for phone", required=True)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
     error_messages = {
