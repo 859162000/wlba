@@ -50,7 +50,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
       .done (data,textStatus) ->
         location.reload()
       .fail (xhr)->
-        alert('登录失败，请重新登录')
+        result = JSON.parse xhr.responseText
+        message = result.message
+        error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
+        alert error_message
 
   $('#register-modal-form').validate
     rules:
@@ -88,7 +91,17 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
       error.appendTo $(element).parents('.form-row').children('.form-row-error')
 
     submitHandler: (form) ->
-      form.submit()
+      $.ajax
+        url: $(form).attr('action')
+        type: "POST"
+        data: $(form).serialize()
+      .done (data,textStatus) ->
+        location.reload()
+      .fail (xhr)->
+        result = JSON.parse xhr.responseText
+        message = result.message
+        error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
+        alert error_message
 
   $('input, textarea').placeholder()
 

@@ -1,4 +1,5 @@
-form#register-modal-form.login-form(method='post', action='/accounts/register?next={{ next }}')
+form#register-modal-form.login-form(method='post', action='/accounts/register/ajax/')
+  - csrf_token
   .form-row
     .span7
       input#reg_identifier(type="text", name="identifier", placeholder="请输入手机号")

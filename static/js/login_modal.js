@@ -61,7 +61,13 @@
         }).done(function(data, textStatus) {
           return location.reload();
         }).fail(function(xhr) {
-          return alert('登录失败，请重新登录');
+          var error_message, message, result;
+          result = JSON.parse(xhr.responseText);
+          message = result.message;
+          error_message = _.chain(message).pairs().map(function(e) {
+            return e[1];
+          }).flatten().value();
+          return alert(error_message);
         });
       }
     });
@@ -111,7 +117,21 @@
         return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
       },
       submitHandler: function(form) {
-        return form.submit();
+        return $.ajax({
+          url: $(form).attr('action'),
+          type: "POST",
+          data: $(form).serialize()
+        }).done(function(data, textStatus) {
+          return location.reload();
+        }).fail(function(xhr) {
+          var error_message, message, result;
+          result = JSON.parse(xhr.responseText);
+          message = result.message;
+          error_message = _.chain(message).pairs().map(function(e) {
+            return e[1];
+          }).flatten().value();
+          return alert(error_message);
+        });
       }
     });
     $('input, textarea').placeholder();

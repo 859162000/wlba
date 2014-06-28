@@ -36,6 +36,7 @@ urlpatterns = patterns(
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
+    url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
     url(r'^email/sent/$', EmailSentView.as_view(), name='email_sent'),
 
     url(r'^password/change/$', "wanglibao_account.views.password_change", name='password_change'),

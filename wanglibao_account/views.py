@@ -473,6 +473,37 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
         return HttpResponseNotAllowed()
 
 
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def ajax_register(request):
+    def messenger(message, user=None):
+        res = dict()
+        if user:
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
+        res['message'] = message
+        return json.dumps(res)
+
+    if request.method == "POST":
+        if request.is_ajax():
+            form = EmailOrPhoneRegisterForm(request.POST)
+            if form.is_valid():
+                nickname = form.cleaned_data['nickname']
+                password = form.cleaned_data['password']
+                identifier = form.cleaned_data['identifier']
+
+                user = create_user(identifier, password, nickname)
+                auth_user = authenticate(identifier=identifier, password=password)
+                auth.login(request, auth_user)
+                return HttpResponse(messenger('done', user=request.user))
+            else:
+                return HttpResponseForbidden(messenger(form.errors))
+        else:
+            return HttpResponseForbidden('not valid ajax request')
+    else:
+        return HttpResponseNotAllowed()
+
+
 class IdVerificationView(FormView):
     template_name = 'verify_id.jade'
     form_class = IdVerificationForm
