@@ -1,3 +1,4 @@
+- load formatters
 .full-container
   .topbar
     .container
@@ -12,7 +13,7 @@
       .user-info.white#user-info-ajax
         if user.is_authenticated
           span
-            a(href="/accounts/home") {{ user.wanglibaouserprofile.nick_name }} 的个人中心
+            a(href="/accounts/home") {{user | display_name}} 的个人中心
           a.logout(href="/accounts/logout?next={{ request.path }}") 退出
         else
           a.login-modal.user-info--login(href="#login-modal") 登录
