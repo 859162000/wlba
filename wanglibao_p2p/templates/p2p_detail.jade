@@ -71,11 +71,12 @@ html
               .row
                 span.span4 投资金额
                 span.span8-omega
-                  -render_field form.amount class+="span12" placeholder="请输入50-42400的整数"
+                  period = p2p.period * 30
+                  -render_field form.amount class+="span12" placeholder="请输入50-10000的整数" data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1"
               .row
                 span.span4 预期收益
                 span.span8-omega
-                  span.highlight.font-m 00.00
+                  span.highlight.font-m#expected_income 00.00
                   | 元
               .row
                 span.span4 输入验证码
