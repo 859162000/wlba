@@ -10,6 +10,10 @@ require ['jquery'], ->
         target = $(e.target).attr('data-target')
         $(target).show()
 
+        $(target).mouseleave (e)->
+          e.preventDefault()
+          $(e.target).hide()
+
       $(elem).mouseleave (e)->
         e.preventDefault()
         target = $(e.target).attr('data-target')

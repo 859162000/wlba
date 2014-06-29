@@ -7,8 +7,9 @@
       span 4008-588-066
 
       span.margin-left-m 关注我们：
-      a.topbar-anchor.icon.icon-weibo(href="javascript:void(0)")
-      a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)")
+      a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank")
+      a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", style="position:relative", data-role="hover", data-target="#qrcode-top")
+        img#qrcode-top(src="/static/images/weixin-qr.png", style="display:none; position:absolute; z-index:2")
 
       .user-info.white#user-info-ajax
         if user.is_authenticated
