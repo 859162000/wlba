@@ -72,7 +72,8 @@ html
                 span.span4 投资金额
                 span.span8-omega
                   period = p2p.period * 30
-                  -render_field form.amount class+="span12" placeholder="请输入50-10000的整数" data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1"
+                  user_limit = u"请输入50-%d的整数" % p2p.current_limit
+                  -render_field form.amount class+="span12" placeholder=user_limit data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1"
               .row
                 span.span4 预期收益
                 span.span8-omega

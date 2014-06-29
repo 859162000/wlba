@@ -102,6 +102,10 @@ class P2PProduct(ProductBase):
     def limit_amount_per_user(self):
         return int(self.limit_per_user * self.total_amount)
 
+    @property
+    def current_limit(self):
+        return min(self.remain, self.limit_amount_per_user)
+
     def has_amount(self, amount):
         if amount <= self.remain:
             return True
