@@ -2,6 +2,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from import_export import resources, fields
+from import_export.admin import ImportExportModelAdmin
+from import_export.widgets import DecimalWidget
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -19,11 +22,18 @@ class P2PEquityInline(admin.StackedInline):
     model = P2PEquity
 
 
-class UserProfileAdmin(UserAdmin):
+class UserResource(resources.ModelResource):
+    margin = fields.Field(attribute="margin__margin", widget=DecimalWidget())
+
+    class Meta:
+        model = User
+
+
+class UserProfileAdmin(UserAdmin, ImportExportModelAdmin):
     inlines = [ProfileInline, MarginInline, P2PEquityInline]
     list_display = ('phone', 'name', 'id_num', 'is_active', 'date_joined', 'is_staff')
-
     search_fields = ['wanglibaouserprofile__phone', 'wanglibaouserprofile__id_number', 'wanglibaouserprofile__name']
+    resource_class = UserResource
 
     def phone(self, obj):
         return "%s" % obj.wanglibaouserprofile.phone
