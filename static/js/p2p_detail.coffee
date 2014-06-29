@@ -3,7 +3,7 @@ require.config
     jquery: 'lib/jquery.min'
     underscore: 'lib/underscore-min'
 
-require ['jquery', 'underscore', 'lib/backend', 'lib/calculator'], ($, _, backend, calculator)->
+require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown'], ($, _, backend, calculator, countdown)->
   $('#purchase-form .submit-button').click (e)->
     e.preventDefault()
 

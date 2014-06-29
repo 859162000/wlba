@@ -90,7 +90,8 @@ html
                         a.button-primary(href="/p2p/detail/{{product.id}}/") 正在招标
                       else
                         a.button-disabled(href="javascript:void(0)", disabled) {{product.status}}
-                    p 剩余时间：{{product.end_time | timedelta_now }}
+                    p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余时间：
+                      span(id="counter_{{product.id}}") {{product.end_time | timedelta_now }}
               .panel-p2p--footer
                 .row
                   .span4

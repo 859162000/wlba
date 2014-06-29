@@ -7,7 +7,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator'], function($, _, backend, calculator) {
+  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown'], function($, _, backend, calculator, countdown) {
     return $('#purchase-form .submit-button').click(function(e) {
       var amount, captcha_0, captcha_1, product;
       e.preventDefault();

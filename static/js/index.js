@@ -11,7 +11,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'lib/backend', 'lib/modal'], function($, _, backend, modal) {
+  require(['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], function($, _, backend, modal, countdown) {
     var anchors, bannerCount, banners, currentBanner, trustId, trustName;
     $('.portfolio-submit').click(function() {
       var asset, period;
