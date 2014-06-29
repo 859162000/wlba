@@ -103,6 +103,10 @@ html
             .panel-title-bar__no-border
               .panel-title 媒体报道
             .panel-content-container.padding-l-r-s
+              ul
+                for news in news_and_reports
+                  li
+                    a(href="{{news.link}}") {{news.name}}
 
           .panel
             .panel-title-bar__no-border

@@ -80,6 +80,8 @@ INSTALLED_APPS = (
     'order',
     'wanglibao_margin',
 
+    'marketing',
+
     'provider',
     'provider.oauth2',
 
