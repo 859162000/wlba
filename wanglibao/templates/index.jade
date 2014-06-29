@@ -26,12 +26,22 @@ html
           a.background-anchor(href="#") x
       .container-home
         .banner-form
-          h1.banner-form--title 网利宝年化收益率
-          p.banner-form--row 最高 <em class="highlight">13.24%</em>
-          p.banner-form--row <span class="highlight">30</span>倍活期存款收益<span class="highlight">24</span>倍定期存款收益
-          a.banner-form--button.full-width.register-modal(href="#login-modal") 免费注册
-          p.align-right
-            span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
+          if user.is_authenticated
+            .space-vertical-m
+            h1.banner-form--title 欢迎来网利宝投资理财
+            .space-vertical-s
+            p.banner-form-row.font-m 您的登录账户:
+              span.highlight {{user|display_name}}
+            .space-vertical-m
+            .banner-form--row.align-center
+              a.banner-form--button(href="/accounts/home") 进入我的账户
+          else
+            h1.banner-form--title 网利宝年化收益率
+            p.banner-form--row 最高 <em class="highlight">13.24%</em>
+            p.banner-form--row <span class="highlight">30</span>倍活期存款收益<span class="highlight">24</span>倍定期存款收益
+            a.banner-form--button.full-width.register-modal(href="#login-modal") 免费注册
+            p.align-right
+              span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
 
     .full-container-white
       .sales-data-container
@@ -95,8 +105,6 @@ html
                   .span4-omega.align-right
                     span 还款方式: &nbsp;&nbsp;
                     span {{product.pay_method}}
-
-          a(href="#") 点击查看更多 >>
 
         .span4-omega
           .panel
