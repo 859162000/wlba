@@ -52,12 +52,17 @@ class PurchaseP2P(APIView):
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
 
-            trader = P2PTrader(product=p2p, user=request.user)
-            product_info, margin_info, equity_info= trader.purchase(amount)
-            return Response({
-                'data': product_info.amount
-            })
+            try:
+                trader = P2PTrader(product=p2p, user=request.user)
+                product_info, margin_info, equity_info = trader.purchase(amount)
+                return Response({
+                    'data': product_info.amount
+                })
+            except Exception, e:
+                return Response({
+                    'message': e.message
+                }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({
-                "errors": form.errors
+                "message": form.errors
             }, status=status.HTTP_400_BAD_REQUEST)

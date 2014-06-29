@@ -20,7 +20,6 @@ html
           .p2p-detail-bar.clearfix
             .row
               .span8
-                span.icon 担 &nbsp;
                 span.p2p-detail-title {{p2p.short_name}}
                 span.p2p-warrant-way
                   span.icon-check-shield
@@ -111,17 +110,17 @@ html
                 dl
                   for item_name, item_value in section_values
                     dd {{item_name}}
-              if user.is_authenticated
-                ul
-                  for item_name, item_value in section_values
-                    li {{item_value}}
-              else
-                ul.p2p-no-login
-                  li
-                    | 只有
-                    span.blue 注册用户
-                    |才能看到，现在
-                    a.login-modal.blue(href="#login-modal") 登陆
+                if user.is_authenticated
+                  ul
+                    for item_name, item_value in section_values
+                      li {{item_value}}
+                else
+                  ul.p2p-no-login
+                    li
+                      | 只有
+                      span.blue 注册用户
+                      |才能看到，现在
+                      a.login-modal.blue(href="#login-modal") 登陆
         .span4-omega.border-left.clearfix
           .p2p-detail-container.guarantee-company
             h1 担保机构
@@ -172,9 +171,6 @@ html
                       td
                         span.money-highlight {{trade.amount}}
                         span 元
-
-              p.check-more
-                a.blue.font-s(href="#") 显示更多
 
     script.
       require(['/static/js/p2p_detail.js'])
