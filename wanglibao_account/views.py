@@ -518,3 +518,18 @@ class IdVerificationView(FormView):
         user.wanglibaouserprofile.save()
 
         return super(IdVerificationView, self).form_valid(form)
+
+
+class P2PAmortizationView(TemplateView):
+    template_name = 'p2p_amortization_plan.jade'
+
+    def get_context_data(self, **kwargs):
+        product_id = kwargs['product_id']
+
+        equity = P2PEquity.objects.filter(user=self.request.user, product_id=product_id).prefetch_related('product').first()
+        amortizations = equity.product.amortizations.all()
+
+        return {
+            'equity': equity,
+            'amortizations': amortizations
+        }

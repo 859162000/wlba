@@ -5,7 +5,7 @@ from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
 from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome, \
     AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView, AccountTransactionDeposit, \
-    AccountTransactionWithdraw
+    AccountTransactionWithdraw, P2PAmortizationView
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -14,6 +14,8 @@ urlpatterns = patterns(
                                  login_url='/accounts/register/')),
     url(r'^home/fund/$', login_required(AccountHome.as_view(),
                                  login_url='/accounts/register/')),
+    url(r'^p2p/amortization/(?P<product_id>\d+)', P2PAmortizationView.as_view()),
+
     url(r'^transaction/fund/$', login_required(AccountTransaction.as_view(),
                                  login_url='/accounts/register/')),
     url(r'^transaction/p2p/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/register/')),
