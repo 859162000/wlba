@@ -1,0 +1,70 @@
+extends account_home_base
+
+- load formatters
+- load mathfilters
+
+block head
+  - with '充值' as title
+  include include/head
+  - endwith
+
+block sidebar
+  - with '充值' as activeItem
+  include include/user_center_sidebar
+  - endwith
+
+block main
+  .panel
+    .well
+      .panel-title-bar__no-border
+        .panel-title 账户充值
+      .panel-content.padding-l-r-s
+        .row
+          form#payform.payform(action="/pay/deposit/", method='post', target='_blank')
+            - csrf_token
+            .form-group
+              .span2
+                label 金额(元)
+              .span2
+                input#amount(type='text', name='amount', placeholder='金额', value='100.00')
+            .form-group
+              input#gate_id(type='hidden', name='gate_id', placeholder='银行', value='09')
+              .span2
+                label 选择银行
+              .span10-omega
+                .banks
+                  col_num = 3
+                  count = len(banks)
+                  rows = range(0, count/col_num)
+                  cols = range(0, col_num)
+
+                  for row_index in rows
+                    .row
+                      for col_index in cols
+                        bank = banks[row_index * col_num + col_index]
+                        if col_index != 2
+                          .span4
+                            a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                        else
+                          .span4-omega
+                            a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                .row.bank-description
+                  for bank in banks
+                    if forloop.counter == 1
+                      div.bank-desc-container(id="bank-limit-{{bank.id}}")
+                        {{bank.limit | safe}}
+                    else
+                      div.bank-desc-container(style="display:none", id="bank-limit-{{bank.id}}")
+                        {{bank.limit | safe}}
+                .row
+                  label
+                    input(type="checkbox", checked)
+                    span 我同意《<a href="#">网利宝投资咨询与管理服务协议</a>》与《<a href="#">网利宝资金管理规定</a>》
+
+                .space-vertical-m
+                .row
+                  input#pay.button-pay(type='submit', value='支 付')
+
+block script
+  script.
+    require(["/static/js/pay.js"])

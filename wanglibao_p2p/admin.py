@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity
+from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment
 from models import AmortizationRecord, ProductAmortization, EquityRecord
 
 
@@ -12,11 +12,20 @@ class AmortizationInline(admin.TabularInline):
     model = ProductAmortization
 
 
+class WarrantInline(admin.TabularInline):
+    model = Warrant
+
+
+class AttachementInline(admin.TabularInline):
+    model = Attachment
+
+
 class P2PProductAdmin(admin.ModelAdmin):
     inlines = [
-        AmortizationInline
+        WarrantInline, AttachementInline, AmortizationInline
     ]
     list_display = ('name', 'short_name', 'status', 'pay_method', 'end_time', 'closed')
+
 
 admin.site.register(P2PProduct, P2PProductAdmin)
 admin.site.register(Warrant)

@@ -2,17 +2,23 @@
 (function() {
   define(['jquery'], function($) {
     $('input[data-role=earning-calculator]').keyup(function(e) {
-      var amount, earning_element, earning_elements, i, period, periods, rate, target, _i, _len, _results;
+      var amount, earning_element, earning_elements, i, period, periods, rate, target, unit, _i, _len, _results;
       target = $(e.target);
       rate = target.attr('data-rate');
       periods = (target.attr('data-period')).split(',');
       amount = target.val();
+      unit = target.attr('data-unit');
+      if (unit) {
+        amount = amount * unit;
+      } else {
+        amount = amount * 10000;
+      }
       earning_elements = (target.attr('data-target')).split(',');
       _results = [];
       for (i = _i = 0, _len = earning_elements.length; _i < _len; i = ++_i) {
         earning_element = earning_elements[i];
         period = periods[i];
-        _results.push($(earning_element).text((rate / 100 * amount * 10000 / 365 * period).toFixed(1)));
+        _results.push($(earning_element).text((rate / 100 * amount / 365 * period).toFixed(1)));
       }
       return _results;
     });

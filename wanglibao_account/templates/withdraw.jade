@@ -1,0 +1,68 @@
+extends account_home_base
+
+- load formatters
+- load mathfilters
+- load widget_tweaks
+
+block head
+  - with '提现' as title
+  include include/common_head
+  - endwith
+
+block sidebar
+  - with '提现' as activeItem
+  include include/user_center_sidebar
+  - endwith
+
+block main
+  .panel
+    .well
+      .withdraw-title 提现
+
+      form#withdraw-form(action="/pay/withdraw/complete/", method='post')
+        - csrf_token
+        table.withdraw-table
+          tr
+            th 持卡人
+            td {{user_profile.name}}
+          tr
+            th 提现至银行卡
+            td
+              select#card-select.withdraw-select(name='card_id')
+                option(value='') 请选择银行卡
+                for card in cards
+                  option(value='{{card.id}}') {{card | card_info}}
+              a#add-card-button.blue(href='#add-card-form')
+               .add-icon
+               添加提现银行卡
+          tr
+            th 可用余额(元)
+            td.red-text {{margin}}
+          tr
+            th 提现金额(元)
+            td
+              input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee}}', data-target-fee='#fee', data-target-actual='#actual-amount')
+          tr
+            th 手续费(元)
+            td
+              span#fee 0.00
+          tr
+            th 实际到账金额(元)
+            td
+              span#actual-amount 0.00
+          tr
+            td(colspan=2)
+              .withdraw-td
+                input#withdraw.button-red.button-xl(type='submit', value='提 现')
+                p.d4-text 警告：禁止信用卡套现、虚假交易等行为，一经确认，将终止该账户的使用
+                p.orange-text 您的资金的从合作银行监管账户转入提现银行卡
+
+      .space-vertical-xl
+      .withdraw-notice
+        p 温馨提示
+        p 1、在您申请提现前，请先在页面下方或“我的账户”页面绑定银行卡
+
+block script
+  include include/add_card
+  script.
+    require(['/static/js/withdraw.js', '/static/js/add_card.js'])

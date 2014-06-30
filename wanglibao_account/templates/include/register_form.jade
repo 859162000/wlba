@@ -1,0 +1,28 @@
+form#register-modal-form.login-form(method='post', action='/accounts/register/ajax/')
+  - csrf_token
+  .form-row
+    .span7
+      input#reg_identifier(type="text", name="identifier", placeholder="请输入手机号")
+    .span5-omega
+      button#button-get-validate-code.button-red.button-large(type='button') 获取验证码
+    .form-row-error
+  #validate-code-container.form-row
+    input#id_validate_code(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+    .form-row-error
+  .form-row
+    input#reg_password.full-width(type="password", name="password", placeholder="请输入密码")
+    .password-strength-container
+      span.password-strength-1 低
+      span.password-strength-2 中
+      span.password-strength-3 高
+    .form-row-error
+  .form-row
+    input#reg_password2(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码")
+    .form-row-error
+  .form-row.form-bottom-bar
+    button#register_submit.span12.button-primary(type='submit') 注 册
+    .agreement
+      label(for="agreement")
+        input(type="checkbox", name="agreement", checked="checked", id="agreement")
+      | 我同意《网利宝注册协议》
+  .space-vertical-s

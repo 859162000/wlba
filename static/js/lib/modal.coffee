@@ -10,6 +10,6 @@ define ['jquery', 'jquery.modal'], ($, modal)->
     modalClass: "modal",
     spinnerHtml: null,
     showSpinner: true,
-    showClose: true,
+    showClose: false,
     fadeDuration: null,   # Number of milliseconds the fade animation takes.
     fadeDelay: 1.0

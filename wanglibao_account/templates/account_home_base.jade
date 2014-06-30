@@ -1,0 +1,20 @@
+-load formatters
+
+doctype html
+block head
+
+body
+  include include/header
+  include include/navigation
+  .space-vertical-s
+  .row
+    .aside
+      block sidebar
+
+    .main
+      block main
+
+  block script
+  include include/footer
+  include include/templates
+  include include/tracking

@@ -41,6 +41,7 @@ class P2PReadyForFailManager(models.Manager):
         return super(P2PReadyForFailManager, self).get_queryset().filter(end_time__lt=timezone.now(),
                                                                          status__exact=u'正在招标')
 
+
 class P2PProduct(ProductBase):
     STATUS_CHOICES = (
         (u'正在招标', u'正在招标'),
@@ -101,6 +102,10 @@ class P2PProduct(ProductBase):
     def limit_amount_per_user(self):
         return int(self.limit_per_user * self.total_amount)
 
+    @property
+    def current_limit(self):
+        return min(self.remain, self.limit_amount_per_user)
+
     def has_amount(self, amount):
         if amount <= self.remain:
             return True
@@ -119,6 +124,19 @@ class Warrant(models.Model):
 
     def __unicode__(self):
         return u'%s %s %s' % (self.product.name, self.name, str(self.warranted_at))
+
+
+class Attachment(models.Model):
+    product = models.ForeignKey(P2PProduct)
+    name = models.CharField(u'名字', max_length=128)
+    description = models.TextField(u'描述')
+    type = models.CharField(u'类型', max_length=32)
+    file = models.FileField(upload_to='attachment')
+    created_at = models.DateTimeField(auto_now_add=True)
+    extra_data = JSONField()
+
+    def __unicode__(self):
+        return u'%s' % self.name
 
 
 class AmortizationReadyManager(models.Manager):
@@ -162,7 +180,7 @@ class ProductAmortization(models.Model):
 
 
 class UserAmortization(models.Model):
-    product_amortization = models.ForeignKey(ProductAmortization, related_name='to_users')
+    product_amortization = models.ForeignKey(ProductAmortization, related_name='subs')
     user = models.ForeignKey(get_user_model())
     term = models.IntegerField(verbose_name=u'还款期数')
     term_date = models.DateTimeField(verbose_name=u'还款时间')

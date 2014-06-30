@@ -5,7 +5,7 @@ from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
 from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome, \
     AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView, AccountTransactionDeposit, \
-    AccountTransactionWithdraw
+    AccountTransactionWithdraw, P2PAmortizationView
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -14,6 +14,8 @@ urlpatterns = patterns(
                                  login_url='/accounts/register/')),
     url(r'^home/fund/$', login_required(AccountHome.as_view(),
                                  login_url='/accounts/register/')),
+    url(r'^p2p/amortization/(?P<product_id>\d+)', P2PAmortizationView.as_view()),
+
     url(r'^transaction/fund/$', login_required(AccountTransaction.as_view(),
                                  login_url='/accounts/register/')),
     url(r'^transaction/p2p/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/register/')),
@@ -21,13 +23,13 @@ urlpatterns = patterns(
                                                   login_url='/accounts/register/')),
     url(r'^transaction/withdraw/$', login_required(AccountTransactionWithdraw.as_view(),
                                                    login_url='/accounts/register/')),
-    url(r'^bankcard', login_required(AccountBankCard.as_view(),
+    url(r'^bankcard/$', login_required(AccountBankCard.as_view(),
                                  login_url='/accounts/register/')),
-    url(r'^favorite/', login_required(TemplateView.as_view(template_name='account_favorite.jade'),
+    url(r'^favorite/$', login_required(TemplateView.as_view(template_name='account_favorite.jade'),
                                       login_url='/accounts/register/')),
-    url(r'^setting/', login_required(TemplateView.as_view(template_name='account_setting.jade'),
+    url(r'^setting/$', login_required(TemplateView.as_view(template_name='account_setting.jade'),
                                      login_url='/accounts/register/')),
-    url(r'^id_verify/', login_required(IdVerificationView.as_view(), login_url='/accounts/register/')),
+    url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/register/')),
 
     url(r'^login/ajax/', 'wanglibao_account.views.ajax_login'),
     url(r'^login/', 'django.contrib.auth.views.login',
@@ -36,6 +38,7 @@ urlpatterns = patterns(
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
+    url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
     url(r'^email/sent/$', EmailSentView.as_view(), name='email_sent'),
 
     url(r'^password/change/$', "wanglibao_account.views.password_change", name='password_change'),

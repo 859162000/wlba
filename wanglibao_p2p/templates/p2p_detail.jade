@@ -12,9 +12,7 @@ html
 
   body
     include include/header
-    - with '首页' as activeItem
     include include/navigation
-    - endwith
     .space-m
     .full-container-home.clearfix
       .p2p-container.dark-gray.border-all
@@ -22,12 +20,12 @@ html
           .p2p-detail-bar.clearfix
             .row
               .span8
-                span.icon 担 &nbsp;
                 span.p2p-detail-title {{p2p.short_name}}
                 span.p2p-warrant-way
                   span.icon-check-shield
                   | 100%本息担保
-              .span4-omega.p2p-detail-endtime.align-right 剩余时间：{{p2p.end_time | timedelta_now }}
+              .span4-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余时间：
+                span#countdown{{p2p.end_time | timedelta_now }}
           .p2p-detail-content.clearfix
             .row
               .span4
@@ -74,11 +72,13 @@ html
               .row
                 span.span4 投资金额
                 span.span8-omega
-                  -render_field form.amount class+="span12" placeholder="请输入50-42400的整数"
+                  period = p2p.period * 30
+                  user_limit = u"请输入50-%d的整数" % p2p.current_limit
+                  -render_field form.amount class+="span12" placeholder=user_limit data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1"
               .row
                 span.span4 预期收益
                 span.span8-omega
-                  span.highlight.font-m 00.00
+                  span.highlight.font-m#expected_income 00.00
                   | 元
               .row
                 span.span4 输入验证码
@@ -113,17 +113,17 @@ html
                 dl
                   for item_name, item_value in section_values
                     dd {{item_name}}
-              if user.is_authenticated
-                ul
-                  for item_name, item_value in section_values
-                    li {{item_value}}
-              else
-                ul.p2p-no-login
-                  li
-                    | 只有
-                    span.blue 注册用户
-                    |才能看到，现在
-                    a.login-modal.blue(href="#login-modal") 登陆
+                if user.is_authenticated
+                  ul
+                    for item_name, item_value in section_values
+                      li {{item_value}}
+                else
+                  ul.p2p-no-login
+                    li
+                      | 只有
+                      span.blue 注册用户
+                      |才能看到，现在
+                      a.login-modal.blue(href="#login-modal") 登陆
         .span4-omega.border-left.clearfix
           .p2p-detail-container.guarantee-company
             h1 担保机构
@@ -174,9 +174,6 @@ html
                       td
                         span.money-highlight {{trade.amount}}
                         span 元
-
-              p.check-more
-                a.blue.font-s(href="#") 显示更多
 
     script.
       require(['/static/js/p2p_detail.js'])

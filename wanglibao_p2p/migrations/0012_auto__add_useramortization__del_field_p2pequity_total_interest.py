@@ -8,11 +8,31 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'UserAmortization'
+        db.create_table(u'wanglibao_p2p_useramortization', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('product_amortization', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subs', to=orm['wanglibao_p2p.ProductAmortization'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('term', self.gf('django.db.models.fields.IntegerField')()),
+            ('term_date', self.gf('django.db.models.fields.DateTimeField')()),
+            ('principal', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
+            ('interest', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
+            ('penal_interest', self.gf('django.db.models.fields.DecimalField')(default='0.00', max_digits=20, decimal_places=2)),
+            ('settled', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('settlement_time', self.gf('django.db.models.fields.DateTimeField')()),
+            ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('description', self.gf('django.db.models.fields.CharField')(max_length=500, blank=True)),
+        ))
+        db.send_create_signal(u'wanglibao_p2p', ['UserAmortization'])
+
         # Deleting field 'P2PEquity.total_interest'
         db.delete_column(u'wanglibao_p2p_p2pequity', 'total_interest')
 
 
     def backwards(self, orm):
+        # Deleting model 'UserAmortization'
+        db.delete_table(u'wanglibao_p2p_useramortization')
+
         # Adding field 'P2PEquity.total_interest'
         db.add_column(u'wanglibao_p2p_p2pequity', 'total_interest',
                       self.gf('django.db.models.fields.DecimalField')(default='0', max_digits=20, decimal_places=2),
@@ -69,6 +89,17 @@ class Migration(SchemaMigration):
             'principal': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
             'term': ('django.db.models.fields.IntegerField', [], {}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+        },
+        u'wanglibao_p2p.attachment': {
+            'Meta': {'object_name': 'Attachment'},
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {}),
+            'extra_data': ('jsonfield.fields.JSONField', [], {}),
+            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']"}),
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
         },
         u'wanglibao_p2p.equityrecord': {
             'Meta': {'object_name': 'EquityRecord'},
@@ -149,6 +180,21 @@ class Migration(SchemaMigration):
             'settlement_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'term': ('django.db.models.fields.IntegerField', [], {}),
             'term_date': ('django.db.models.fields.DateTimeField', [], {})
+        },
+        u'wanglibao_p2p.useramortization': {
+            'Meta': {'ordering': "['term']", 'object_name': 'UserAmortization'},
+            'created_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '500', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'interest': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
+            'penal_interest': ('django.db.models.fields.DecimalField', [], {'default': "'0.00'", 'max_digits': '20', 'decimal_places': '2'}),
+            'principal': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
+            'product_amortization': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subs'", 'to': u"orm['wanglibao_p2p.ProductAmortization']"}),
+            'settled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'settlement_time': ('django.db.models.fields.DateTimeField', [], {}),
+            'term': ('django.db.models.fields.IntegerField', [], {}),
+            'term_date': ('django.db.models.fields.DateTimeField', [], {}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'wanglibao_p2p.warrant': {
             'Meta': {'object_name': 'Warrant'},

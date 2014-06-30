@@ -1,66 +1,62 @@
+extends account_home_base
+
 -load formatters
 
-doctype html
-- with '我的银行卡' as title
-include include/head
-- endwith
-body
-  include include/header
-  include include/navigation
-  .space-vertical-s
-  .row
-    .aside
-      - with '银行卡' as activeItem
-      include include/user_center_sidebar
-      - endwith
+block head
+  - with '我的银行卡' as title
+    include include/head
 
-    .main
-      .panel-padding
-        .space-vertical-m
-        .bar
-          .card-category-bar P2P专用账户
-        .row
-          if p2p_cards
-            each card in p2p_cards
-              .bank-card
-                .bank-card--title-bar.row
-                  .bank-card--bank-name.span6 {{card.bank.name}}
-                  .bank-card--icon.span3-omega
-                    img(src='/static/images/bank_card.png')
-                .row
-                  dl.bank-card--info-row
-                    dt.bank-card--info-title 账号
-                    dd.bank-card--info-value {{card.no | bank_card}}
-            a#add-card-button(href='#add-card-form')
-              .add-bank-card
-                .add-icon-large
-                p.add-card-text 添加一张银行卡
-          else
-            p.no-content 无绑定银行卡
+block sidebar
+  - with '银行卡' as activeItem
+    include include/user_center_sidebar
 
-        .space-vertical-xl
-        .bar
-          .card-category-bar 基金专用账户
-        .row
-          if cards
-            each card in cards
-              .span4
-                .bank-card
-                  .bank-card--title-bar.row
-                    .bank-card--bank-name.span6 {{card.bank_name}}
-                    .bank-card--icon.span3-omega
-                      img(src='/static/images/bank_card.png')
-                  .row
-                    dl.bank-card--info-row
-                      dt.bank-card--info-title 账号
-                      dd.bank-card--info-value {{card.no | bank_card}}
-          else
-            p.no-content 无绑定银行卡
+block main
+  .panel-padding
+    .space-vertical-m
+    .bar
+      .card-category-bar P2P专用账户
+    .row
+      if p2p_cards
+        each card in p2p_cards
+          .bank-card
+            .bank-card--title-bar.row
+              .bank-card--bank-name.span6 {{card.bank.name}}
+              .bank-card--icon.span3-omega
+                img(src='/static/images/bank_card.png')
+            .row
+              dl.bank-card--info-row
+                dt.bank-card--info-title 账号
+                dd.bank-card--info-value {{card.no | bank_card}}
+        a#add-card-button(href='#add-card-form')
+          .add-bank-card
+            .add-icon-large
+            p.add-card-text 添加一张银行卡
+      else
+        a#add-card-button(href='#add-card-form')
+          .add-bank-card
+            .add-icon-large
+            p.add-card-text 添加一张银行卡
 
+    .space-vertical-xl
+    .bar
+      .card-category-bar 基金专用账户
+    .row
+      if cards
+        each card in cards
+          .span4
+            .bank-card
+              .bank-card--title-bar.row
+                .bank-card--bank-name.span6 {{card.bank_name}}
+                .bank-card--icon.span3-omega
+                  img(src='/static/images/bank_card.png')
+              .row
+                dl.bank-card--info-row
+                  dt.bank-card--info-title 账号
+                  dd.bank-card--info-value {{card.no | bank_card}}
+      else
+        p.no-content 无绑定银行卡
+
+block script
   include include/add_card
-
   script.
     require(['/static/js/add_card.js'])
-  include include/footer
-  include include/templates
-  include include/tracking

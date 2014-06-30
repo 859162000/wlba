@@ -131,6 +131,12 @@ def safe_name(name):
     result = "*" + name[1:]
     return result
 
+@register.filter
+def display_name(user):
+    if user.wanglibaouserprofile.nick_name:
+        return user.wanglibaouserprofile.nick_name
+
+    return safe_phone(user)
 
 @register.filter
 def not_bool_to_display(flag):

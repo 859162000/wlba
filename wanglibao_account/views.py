@@ -264,8 +264,8 @@ class AccountHome(TemplateView):
         today = timezone.datetime.today()
 
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-7)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-30)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
         if fund_total_asset != 0:
             income_rate = total_income / fund_total_asset
@@ -473,6 +473,37 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
         return HttpResponseNotAllowed()
 
 
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def ajax_register(request):
+    def messenger(message, user=None):
+        res = dict()
+        if user:
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
+        res['message'] = message
+        return json.dumps(res)
+
+    if request.method == "POST":
+        if request.is_ajax():
+            form = EmailOrPhoneRegisterForm(request.POST)
+            if form.is_valid():
+                nickname = form.cleaned_data['nickname']
+                password = form.cleaned_data['password']
+                identifier = form.cleaned_data['identifier']
+
+                user = create_user(identifier, password, nickname)
+                auth_user = authenticate(identifier=identifier, password=password)
+                auth.login(request, auth_user)
+                return HttpResponse(messenger('done', user=request.user))
+            else:
+                return HttpResponseForbidden(messenger(form.errors))
+        else:
+            return HttpResponseForbidden('not valid ajax request')
+    else:
+        return HttpResponseNotAllowed()
+
+
 class IdVerificationView(FormView):
     template_name = 'verify_id.jade'
     form_class = IdVerificationForm
@@ -487,3 +518,18 @@ class IdVerificationView(FormView):
         user.wanglibaouserprofile.save()
 
         return super(IdVerificationView, self).form_valid(form)
+
+
+class P2PAmortizationView(TemplateView):
+    template_name = 'p2p_amortization_plan.jade'
+
+    def get_context_data(self, **kwargs):
+        product_id = kwargs['product_id']
+
+        equity = P2PEquity.objects.filter(user=self.request.user, product_id=product_id).prefetch_related('product').first()
+        amortizations = equity.product.amortizations.all()
+
+        return {
+            'equity': equity,
+            'amortizations': amortizations
+        }

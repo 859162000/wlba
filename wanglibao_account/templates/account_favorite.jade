@@ -1,30 +1,23 @@
-doctype html
-- with '收藏产品' as title
-include include/head
-- endwith
-body
-  include include/header
-  include include/navigation
-  .space-vertical-s
-  .row
-    .aside
-      - with '我的收藏' as activeItem
-      include include/user_center_sidebar
-      - endwith
+extends account_home_base
 
-    .main
-      .panel-padding
-        .panel-product-title-no-border 我的产品收藏
-        .panel-title-bar-gray
-          // ko template: {name: 'tabs', data: tab}
-          // /ko
-        .panel-container
-          //ko template: {name: 'data-table', data: dataTable}
-          // /ko
+block head
+  - with '收藏产品' as title
+    include include/head
 
-  include include/footer
-  include include/templates
+block sidebar
+  - with '我的收藏' as activeItem
+    include include/user_center_sidebar
+
+block main
+  .panel-padding
+    .panel-product-title-no-border 我的产品收藏
+    .panel-title-bar-gray
+      // ko template: {name: 'tabs', data: tab}
+      // /ko
+    .panel-container
+      //ko template: {name: 'data-table', data: dataTable}
+      // /ko
+
+block script
   script.
     require(['/static/js/account_favorite.js'])
-
-  include include/tracking

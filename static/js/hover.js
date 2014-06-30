@@ -13,7 +13,11 @@
           var target;
           e.preventDefault();
           target = $(e.target).attr('data-target');
-          return $(target).show();
+          $(target).show();
+          return $(target).mouseleave(function(e) {
+            e.preventDefault();
+            return $(e.target).hide();
+          });
         });
         return $(elem).mouseleave(function(e) {
           var target;

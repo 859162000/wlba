@@ -40,10 +40,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
         minlength: $.format("验证码要输入4位")
 
     errorPlacement: (error, element) ->
-      if  ( element.is("#id_captcha_1") )
-        error.appendTo(element.next().next().next('.errMessage'))
-      else
-        error.appendTo(element.next('.errMessage'))
+        error.appendTo $(element).parents('.form-row').children('.form-row-error')
 
     submitHandler: (form) ->
       $.ajax
@@ -53,7 +50,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
       .done (data,textStatus) ->
         location.reload()
       .fail (xhr)->
-        alert('登录失败，请重新登录')
+        result = JSON.parse xhr.responseText
+        message = result.message
+        error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
+        alert error_message
 
   $('#register-modal-form').validate
     rules:
@@ -88,10 +88,20 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
 
 
     errorPlacement: (error, element) ->
-      error.appendTo(element.next('.errMessage'))
+      error.appendTo $(element).parents('.form-row').children('.form-row-error')
 
     submitHandler: (form) ->
-      form.submit()
+      $.ajax
+        url: $(form).attr('action')
+        type: "POST"
+        data: $(form).serialize()
+      .done (data,textStatus) ->
+        location.reload()
+      .fail (xhr)->
+        result = JSON.parse xhr.responseText
+        message = result.message
+        error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
+        alert error_message
 
   $('input, textarea').placeholder()
 
@@ -128,14 +138,17 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
         count = 60
 
         $(element).attr 'disabled', 'disabled'
+        $(element).removeClass('button-red').addClass('button-gray')
+
         timerFunction = ()->
           if count >= 1
             count--
-            $(element).text('重新获取(' + count + ')')
+            $(element).text('已经发送(' + count + ')')
           else
             clearInterval(intervalId)
             $(element).text('重新获取')
             $(element).removeAttr 'disabled'
+            $(element).removeClass('button-gray').addClass('button-red')
 
         # Fire now and future
         timerFunction()

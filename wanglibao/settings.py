@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     'rest_framework_swagger',
     'drf_wrapper',
+    'import_export',
 
     'south',
     'registration',
@@ -78,6 +79,8 @@ INSTALLED_APPS = (
     'wanglibao_pay',
     'order',
     'wanglibao_margin',
+
+    'marketing',
 
     'provider',
     'provider.oauth2',

@@ -1,47 +1,39 @@
-doctype html
-- with '修改密码' as title
-include include/head
-- endwith
-body
-  include include/header
-  include include/navigation
+extends account_home_base
 
-  .space-vertical-s
-  .row
-    .aside
-      - with '修改密码' as activeItem
-      include include/user_center_sidebar
-      - endwith
+block head
+  - with '修改密码' as title
+    include include/head
 
-    .main
-      .panel-padding
-        .panel-title-bar
-          .panel-title
-            span 修改密码
+block sidebar
+  - with '修改密码' as activeItem
+    include include/user_center_sidebar
 
-        .panel-inner
-          form#passwordChangeForm.well-s(method="POST")
-            table
-              tr
-                td 原始密码
-                td
-                  input#old-password(type="password", name="old-password")
-              tr
-                td 新密码
-                td
-                  input#new-password1(type="password", name="new-password1")
-              tr
-                td 再次输入
-                td
-                  input#new-password2(type="password", name="new-password2")
-              tr
-                td
-                td
-                  button#passwordChangeButton(type="submit") 提交
+block main
+  .panel
+    .panel-title-bar
+      .panel-title
+        span 修改密码
 
-  include include/footer
+    .panel-inner
+      form#passwordChangeForm.well-s(method="POST")
+        table
+          tr
+            td 原始密码
+            td
+              input#old-password(type="password", name="old-password")
+          tr
+            td 新密码
+            td
+              input#new-password1(type="password", name="new-password1")
+          tr
+            td 再次输入
+            td
+              input#new-password2(type="password", name="new-password2")
+          tr
+            td
+            td
+              button#passwordChangeButton.button-primary(type="submit") 提交
 
+block script
   script.
     require(['/static/js/account_setting.js'])
-
-  include include/tracking

@@ -51,11 +51,7 @@
         }
       },
       errorPlacement: function(error, element) {
-        if (element.is("#id_captcha_1")) {
-          return error.appendTo(element.next().next().next('.errMessage'));
-        } else {
-          return error.appendTo(element.next('.errMessage'));
-        }
+        return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
       },
       submitHandler: function(form) {
         return $.ajax({
@@ -65,7 +61,13 @@
         }).done(function(data, textStatus) {
           return location.reload();
         }).fail(function(xhr) {
-          return alert('登录失败，请重新登录');
+          var error_message, message, result;
+          result = JSON.parse(xhr.responseText);
+          message = result.message;
+          error_message = _.chain(message).pairs().map(function(e) {
+            return e[1];
+          }).flatten().value();
+          return alert(error_message);
         });
       }
     });
@@ -112,10 +114,24 @@
         }
       },
       errorPlacement: function(error, element) {
-        return error.appendTo(element.next('.errMessage'));
+        return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
       },
       submitHandler: function(form) {
-        return form.submit();
+        return $.ajax({
+          url: $(form).attr('action'),
+          type: "POST",
+          data: $(form).serialize()
+        }).done(function(data, textStatus) {
+          return location.reload();
+        }).fail(function(xhr) {
+          var error_message, message, result;
+          result = JSON.parse(xhr.responseText);
+          message = result.message;
+          error_message = _.chain(message).pairs().map(function(e) {
+            return e[1];
+          }).flatten().value();
+          return alert(error_message);
+        });
       }
     });
     $('input, textarea').placeholder();
@@ -154,14 +170,16 @@
         intervalId;
         count = 60;
         $(element).attr('disabled', 'disabled');
+        $(element).removeClass('button-red').addClass('button-gray');
         timerFunction = function() {
           if (count >= 1) {
             count--;
-            return $(element).text('重新获取(' + count + ')');
+            return $(element).text('已经发送(' + count + ')');
           } else {
             clearInterval(intervalId);
             $(element).text('重新获取');
-            return $(element).removeAttr('disabled');
+            $(element).removeAttr('disabled');
+            return $(element).removeClass('button-gray').addClass('button-red');
           }
         };
         timerFunction();

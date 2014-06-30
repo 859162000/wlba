@@ -25,14 +25,26 @@ a
   &:hover, &:active
     color: $color-pomegranate
 
-input
+label
+  font-size: $font-s
+
+.input-base
   padding: 5px
-  +border-radius(3px)
-  border: 1px solid darkgray
   font-family: $font-family
+  height: 40px
+  width: 100%
+  font-size: $font-m
+
+input[type=text], input[type=password], input[type=number]
+  @extend .input-base
+  border: 1px solid darkgray
+
+button
+  padding: 0
 
 select
-  font-family: $font-family
+  @extend .input-base
+  +border-radius(0)
 
 h1
   font-size: $font-xxl

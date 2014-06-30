@@ -1,0 +1,31 @@
+extends account_home_base
+- load formatters
+- load mathfilters
+block head
+  - with '我的账户' as title
+    include include/head
+block sidebar
+  - with '账务总览' as activeItem
+    include include/user_center_sidebar
+block main
+  .account-home-panel
+    .account-home-panel--title-bar
+      h3 {{equity.product.short_name}} 还款计划表
+    .space-vertical-m
+
+    table.table
+      tr
+        th 还款时间
+        th 本金
+        th 利息
+        th 总记
+
+      for amortization in amortizations
+        tr
+          td {{amortization.term_date | date:"y-m-d"}}
+          amount_principal = amortization.principal * equity.ratio
+          td {{amount_principal | money_format}}
+          amount_interest = amortization.interest * equity.ratio
+          td {{amount_interest | money_format}}
+          amount = amount_principal + amount_interest
+          td {{amount | money_format}}

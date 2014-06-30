@@ -7,7 +7,7 @@ require.config
   shim:
     'jquery.modal': ['jquery']
 
-require ['jquery', 'underscore', 'lib/backend', 'lib/modal'], ($, _, backend, modal)->
+require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], ($, _, backend, modal, countdown)->
   $('.portfolio-submit').click ()->
     asset = $('#portfolio-asset')[0].value
     period = $('#portfolio-period')[0].value

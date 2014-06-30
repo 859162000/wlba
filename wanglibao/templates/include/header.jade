@@ -1,3 +1,4 @@
+- load formatters
 .full-container
   .topbar
     .container
@@ -6,13 +7,14 @@
       span 4008-588-066
 
       span.margin-left-m 关注我们：
-      a.topbar-anchor.icon.icon-weibo(href="javascript:void(0)")
-      a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)")
+      a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank")
+      a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", style="position:relative", data-role="hover", data-target="#qrcode-top")
+        img#qrcode-top(src="/static/images/weixin-qr.png", style="display:none; position:absolute; z-index:2")
 
       .user-info.white#user-info-ajax
         if user.is_authenticated
           span
-            a(href="/accounts/home") {{ user.wanglibaouserprofile.nick_name }} 的个人中心
+            a(href="/accounts/home") {{user | display_name}} 的个人中心
           a.logout(href="/accounts/logout?next={{ request.path }}") 退出
         else
           a.login-modal.user-info--login(href="#login-modal") 登录

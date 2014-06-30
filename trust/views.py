@@ -6,6 +6,7 @@ from serializers import TrustSerializer
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_favorite.models import FavoriteTrust
+from wanglibao_hotlist.models import HotTrust
 
 
 class TrustHomeView(TemplateView):
@@ -13,11 +14,10 @@ class TrustHomeView(TemplateView):
     template_name = "trust_home.jade"
 
     def get_context_data(self, **kwargs):
-        context = super(TrustHomeView, self).get_context_data(**kwargs)
-
-        latest_trusts = Trust.objects.order_by('-issue_date')[0:10] # TODO make this value configurable
-        context['latest_trusts'] = latest_trusts
-        return context
+        hot_trusts = HotTrust.objects.all().prefetch_related('trust').prefetch_related('trust__issuer')[:3]
+        return {
+            'hot_trusts': hot_trusts
+        }
 
 
 class TrustDetailView(TemplateView):
