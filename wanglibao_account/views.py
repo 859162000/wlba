@@ -299,9 +299,10 @@ class AccountHome(TemplateView):
             'p2p_product_amortization': p2p_product_amortization,
             'p2p_unpay_principle': unpayed_principle,
             'p2p_total_asset': p2p_total_asset,
+            'margin_withdrawing': user.margin.withdrawing,
+            'margin_freeze': user.margin.freeze,
 
             'fund_total_asset': fund_total_asset,
-            'p2p_total_asset': p2p_total_asset,
             'total_asset': total_asset,
 
             'mode': mode
