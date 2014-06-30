@@ -2,7 +2,7 @@
 import collections
 from decimal import Decimal
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Sum
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from jsonfield import JSONField
@@ -121,9 +121,9 @@ class Warrant(models.Model):
         return u'%s %s %s' % (self.product.name, self.name, str(self.warranted_at))
 
 
-class AmortizationReadyManger(models.Manager):
+class AmortizationReadyManager(models.Manager):
     def get_queryset(self):
-        return super(AmortizationReadyManger, self).get_queryset().filter(term_date__lt=timezone.now(),
+        return super(AmortizationReadyManager, self).get_queryset().filter(term_date__lt=timezone.now(),
                                                                           ready_for_settle=True,
                                                                           settled=False)
 
@@ -147,10 +147,10 @@ class ProductAmortization(models.Model):
     description = models.CharField(verbose_name=u'摘要', max_length=500, blank=True)
 
     objects = models.Manager()
-    is_ready = AmortizationReadyManger()
+    is_ready = AmortizationReadyManager()
 
     class Meta:
-        verbose_name_plural = u'产品还款管理'
+        verbose_name_plural = u'产品还款计划'
         ordering = ['term']
 
     @property
@@ -159,6 +159,26 @@ class ProductAmortization(models.Model):
 
     def __unicode__(self):
         return u'产品<%s>: 第 %s 期，总额 %s 元' % (self.product.short_name, self.term, self.total)
+
+
+class UserAmortization(models.Model):
+    product_amortization = models.ForeignKey(ProductAmortization, related_name='to_users')
+    user = models.ForeignKey(get_user_model())
+    term = models.IntegerField(verbose_name=u'还款期数')
+    term_date = models.DateTimeField(verbose_name=u'还款时间')
+    principal = models.DecimalField(verbose_name=u'本金', max_digits=20, decimal_places=2)
+    interest = models.DecimalField(verbose_name=u'利息', max_digits=20, decimal_places=2)
+    penal_interest = models.DecimalField(verbose_name=u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+
+    settled = models.BooleanField(verbose_name=u'已结算', default=False)
+    settlement_time = models.DateTimeField(verbose_name=u'结算时间')
+
+    created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    description = models.CharField(verbose_name=u'摘要', max_length=500, blank=True)
+
+    class Meta:
+        verbose_name_plural = u'用户还款计划'
+        ordering = ['term']
 
 
 class P2PEquity(models.Model):
@@ -174,7 +194,6 @@ class P2PEquity(models.Model):
     total_term = models.IntegerField(verbose_name=u'总期数', default=12)
     next_term = models.CharField(verbose_name=u'下期时间', max_length=100, default='', blank=True)
     next_amount = models.DecimalField(verbose_name=u'下期总数', max_digits=20, decimal_places=2, default=Decimal(0))
-    total_interest = models.DecimalField(verbose_name=u'应付利息', max_digits=20, decimal_places=2, default=Decimal(0))
 
     class Meta:
         unique_together = (('user', 'product'),)
@@ -191,6 +210,19 @@ class P2PEquity(models.Model):
     @property
     def ratio(self):
         return Decimal(self.equity) / Decimal(self.product.total_amount)
+
+    @property
+    def total_interest(self):
+        total = Decimal('0')
+        for amos in self.product.amortizations.all():
+            interest = amos.interest * self.ratio
+            total += interest.quantize(Decimal('0.01'))
+        return total
+
+    def get_next_term(self):
+        len_all = self.product.amortizations.count()
+        next = self.product.amortizations.filter(settled=False).first()
+        return len_all, next
 
 
 class AmortizationRecord(models.Model):

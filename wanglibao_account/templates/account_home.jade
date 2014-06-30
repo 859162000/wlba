@@ -112,13 +112,12 @@ body
                         next_amortization = p2p_product_amortization[equity.product_id] or 'None'
                         next_term_date = next_amortization.term_date
                         next_income = next_amortization.total * equity.ratio
-                        term = next_amortization.term
-                        total_income = float(equity.ratio) * equity.product.expected_earning_rate / 12 * equity.product.period * equity.equity
                       else
                         next_term_date = "-"
                         next_income = 0
-                        term = "-"
-                        total_income = 0
+
+                      term = equity.term
+                      total_income = equity.total_interest
 
                       td {{equity.product.publish_time | date:"Y-m-d h:i:s"}}
                       td
@@ -128,7 +127,7 @@ body
                       td {{equity.equity | money_format}}
                       td {{next_income | money_format | default:"--"}}
                       td {{next_term_date | date:"Y-m-d" | default:"--"}}
-                      td 还款中{{term}}/{{equity.product.amortization_count}}
+                      td {{term}}/{{equity.product.amortization_count}}
                       td <span class="highlight">{{equity.paid_interest | money_format}}</span> / {{total_income | money_format}}
                 else
                   tr

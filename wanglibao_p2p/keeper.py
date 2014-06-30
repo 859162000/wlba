@@ -1,8 +1,10 @@
 # encoding: utf-8
 from decimal import Decimal
 from django.db import transaction
+from django.db.models import Sum
 from wanglibao_margin.marginkeeper import MarginKeeper
-from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization
+from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
+    UserAmortization
 from exceptions import ProductLack, ProductNotExist, P2PException
 
 
@@ -23,6 +25,18 @@ class ProductKeeper(object):
             catalog = u'申购'
             record = self.__tracer(catalog, amount, user, self.product.remain)
             return record
+
+    def settle(self, savepoint=True):
+        """
+        call after product startup.
+        """
+        # todo: check product status and so..
+        with transaction.atomic(savepoint=savepoint):
+            amo_keeper = AmortizationKeeper(self.product)
+            amo_keeper.clearing(savepoint=False)
+            self.product.status = u'还款中'
+            self.product.save()
+
 
     @classmethod
     def get_ready_for_settle(cls):
@@ -87,8 +101,6 @@ class EquityKeeper(object):
             if next_term:
                 self.equity.next_term = next_term.term_date.strftime('%Y-%m-%d')
                 self.equity.next_amount = next_term.total * self.equity.ratio
-                self.equity.total_interest = Decimal(self.product.expected_earning_rate / 100) * self.equity.ratio\
-                                             * Decimal(self.equity.equity)
             self.equity.save()
             catalog = u'申购确认'
             description = u''
@@ -119,33 +131,43 @@ class EquityKeeper(object):
 
 class AmortizationKeeper(object):
 
-    def __init__(self, amortization, order=None):
-        self.amortization = amortization
+    def __init__(self, product, order=None):
+        self.product = product
+        self.amortizations = product.amortizations.all()
+        self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
+        self.equities = self.product.equities.all()
         self.order = order
 
-    def amortize(self, description=u'', savepoint=True):
-        with transaction.atomic(savepoint=savepoint):
-            self.amortization = ProductAmortization.objects.select_for_update().filter(pk=self.amortization.pk).first()
-            equities = self.amortization.product.equities.all()
-            for equity in equities:
-                user_amo = equity
-                user_principal = self.amortization.principal * equity.ratio
-                user_interest = self.amortization.interest * equity.ratio
-                user_penal_interest = self.amortization.penal_interest * equity.ratio
 
-                user_amo.paid_interest += user_interest
-                user_amo.paid_principal += user_principal
-                user_amo.penal_interest += user_penal_interest
-                user_amo.term = self.amortization.term
-                user_amo.total_term = self.amortization.product.period
-                user_amo.save()
-                catalog = u'P2P还款'
-                record = self.__tracer(catalog, equity.user, user_principal, user_interest, user_penal_interest,
-                                       description)
-                user_margin_keeper = MarginKeeper(equity.user, self.order)
-                user_margin_keeper.amortize(user_principal, user_interest, user_penal_interest, savepoint=False)
-            self.amortization.settled = True
-            self.amortization.save()
+    def clearing(self, savepoint=True):
+        if self.product.status != u'已满标':
+            raise P2PException('invalid product status.')
+        for equity in self.equities:
+            with transaction.atomic(savepoint=savepoint):
+                ProductAmortization.objects.select_for_update().filter(product=self.product)
+                self.__dispatch(equity)
+
+    def __dispatch(self, equity):
+        total_principal = equity.equity
+        total_interest = self.product_interest * equity.ratio
+        paid_principal = Decimal('0')
+        paid_interest = Decimal('0')
+        count = len(self.amortizations)
+        for i, amo in enumerate(self.amortizations):
+            if i+1 != count:
+                principal = equity.ratio * amo.principal
+                interest = equity.ratio * amo.principal
+                paid_interest += interest
+                paid_principal += principal
+            else:
+                principal = total_principal - paid_principal
+                interest = total_interest - paid_interest
+
+            user_amo = UserAmortization(
+                product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
+                principal=principal, interest=interest
+            )
+            user_amo.save()
 
     @classmethod
     def get_ready_for_settle(self):
