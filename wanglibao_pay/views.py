@@ -233,7 +233,7 @@ def handle_withdraw_result(data):
             if data['RespCode'] == '000':
                 if transaction_status == 'S':
                     if pay_info.status != PayInfo.SUCCESS:
-                        keeper.withdraw_ack(pay_info.amount)
+                        keeper.withdraw_ack(pay_info.total_amount)
                     pay_info.status = PayInfo.SUCCESS
                     result = PayResult.WITHDRAW_SUCCESS
                 elif transaction_status == 'I':
@@ -242,11 +242,11 @@ def handle_withdraw_result(data):
                 elif transaction_status == 'F':
                     pay_info.status = PayInfo.FAIL
                     result = PayResult.WITHDRAW_FAIL
-                    keeper.withdraw_rollback(pay_info.amount)
+                    keeper.withdraw_rollback(pay_info.total_amount)
             else:
                 pay_info.status = PayInfo.FAIL
                 result = PayResult.WITHDRAW_FAIL
-                keeper.withdraw_rollback(pay_info.amount)
+                keeper.withdraw_rollback(pay_info.total_amount)
         else:
             pay_info.status = PayInfo.EXCEPTION
             result = PayResult.EXCEPTION
