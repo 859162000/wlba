@@ -1,4 +1,5 @@
 # encoding: utf-8
+import decimal
 from decimal import Decimal
 from django.db import transaction
 from django.db.models import Sum
@@ -93,7 +94,7 @@ class EquityKeeper(object):
         with transaction.atomic(savepoint=savepoint):
             equity_query =  P2PEquity.objects.filter(user=self.user, product=self.product)
             if (not equity_query.exists()) or (len(equity_query) != 1):
-                raise P2PException('')
+                raise P2PException('can not get equity info.')
             self.equity = equity_query.first()
             self.equity.confirm = True
             self.equity.total_term = self.product.period
@@ -105,8 +106,8 @@ class EquityKeeper(object):
             catalog = u'申购确认'
             description = u''
             self.__tracer(catalog, self.equity.equity, description)
-            user_margin_keeper = MarginKeeper(self.equity, savepoint=False)
-            user_margin_keeper.settle(self.equity.equity)
+            user_margin_keeper = MarginKeeper(self.equity.user)
+            user_margin_keeper.settle(self.equity.equity, savepoint=False)
 
     def __tracer(self, catalog, amount, description=u''):
         trace = EquityRecord(catalog=catalog, amount=amount, description=description, user=self.user,
@@ -156,12 +157,16 @@ class AmortizationKeeper(object):
         for i, amo in enumerate(self.amortizations):
             if i+1 != count:
                 principal = equity.ratio * amo.principal
-                interest = equity.ratio * amo.principal
+                interest = equity.ratio * amo.interest
+                principal = principal.quantize(Decimal('.01'))
+                interest = interest.quantize(Decimal('.01'))
                 paid_interest += interest
                 paid_principal += principal
+                # print 'the %s term, principal %s , interest %s' %(i+1, principal, interest)
             else:
                 principal = total_principal - paid_principal
                 interest = total_interest - paid_interest
+                #print 'total %s - paid %s = %s' % (total_principal, paid_interest, interest)
 
             user_amo = UserAmortization(
                 product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,

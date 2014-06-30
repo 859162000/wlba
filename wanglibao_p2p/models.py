@@ -188,14 +188,17 @@ class UserAmortization(models.Model):
     penal_interest = models.DecimalField(verbose_name=u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
 
     settled = models.BooleanField(verbose_name=u'已结算', default=False)
-    settlement_time = models.DateTimeField(verbose_name=u'结算时间')
+    settlement_time = models.DateTimeField(verbose_name=u'结算时间', auto_now=True)
 
     created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     description = models.CharField(verbose_name=u'摘要', max_length=500, blank=True)
 
     class Meta:
         verbose_name_plural = u'用户还款计划'
-        ordering = ['term']
+        ordering = ['user', 'term']
+
+    def __unicode__(self):
+        return u'分期%s 用户%s 本金%s 利息%s' % (self.product_amortization, self.user, self.principal, self.interest)
 
 
 class P2PEquity(models.Model):

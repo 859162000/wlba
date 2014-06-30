@@ -38,16 +38,21 @@ class P2POperator(object):
 
     @classmethod
     def watchdog(cls):
+        print('watching for settle.')
         for product in ProductKeeper.get_ready_for_settle():
             try:
                 cls().settle(product)
             except Exception, e:
                 cls.logger.error('%s, %s' % (product.id, e))
+                print(e)
+        print('watching for fail.')
         for product in ProductKeeper.get_ready_for_fail():
             try:
                 cls().fail(product)
             except Exception, e:
                 cls.logger.error('%s, %s' % (product.id, e))
+                print(e)
+        print('watching for amortize.')
         for amortization in AmortizationKeeper.get_ready_for_settle():
             try:
                 cls().amortize(amortization)
@@ -64,6 +69,8 @@ class P2POperator(object):
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
                 equity_keeper.settle(savepoint=False)
+            amo_keeper = AmortizationKeeper(product)
+            amo_keeper.clearing(savepoint=False)
             product.status = u'还款中'
             product.save()
 

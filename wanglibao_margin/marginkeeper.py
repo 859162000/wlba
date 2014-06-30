@@ -7,7 +7,7 @@ from exceptions import MarginLack, MarginNotExist
 
 class MarginKeeper(object):
 
-    def __init__(self, user, order):
+    def __init__(self, user, order=None):
         if not Margin.objects.filter(user=user).exists():
             raise MarginNotExist(u'100')
         self.user = user
