@@ -383,7 +383,7 @@ ID_VERIFY_PASSWORD = 'wljr888'
 
 if DEBUG:
     PAY_BACK_RETURN_URL = 'http://111.206.165.46/pay/deposit/callback/'
-    PAY_RET_URL = 'http://111.206.165.46:8000/pay/deposit/complete/'
+    PAY_RET_URL = 'http://111.206.165.46/pay/deposit/complete/'
     WITHDRAW_BACK_RETURN_URL = 'http://111.206.165.46/pay/withdraw/callback/'
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
@@ -393,7 +393,7 @@ if DEBUG:
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 else:
     PAY_BACK_RETURN_URL = 'http://111.206.165.46/pay/deposit/callback/'
-    PAY_RET_URL = 'http://111.206.165.46:8000/pay/deposit/complete/'
+    PAY_RET_URL = 'http://111.206.165.46/pay/deposit/complete/'
     WITHDRAW_BACK_RETURN_URL = 'http://111.206.165.46/pay/withdraw/callback/'
     MER_ID = '510672'
     CUSTOM_ID = '000010124821'

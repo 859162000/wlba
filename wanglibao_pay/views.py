@@ -240,9 +240,12 @@ def handle_withdraw_result(data):
                     pay_info.status = PayInfo.ACCEPTED
                     result = PayResult.WITHDRAW_SUCCESS
                 elif transaction_status == 'F':
+                    is_already_successful = False
+                    if pay_info.status == 'S':
+                        is_already_successful = True
                     pay_info.status = PayInfo.FAIL
                     result = PayResult.WITHDRAW_FAIL
-                    keeper.withdraw_rollback(pay_info.total_amount)
+                    keeper.withdraw_rollback(pay_info.total_amount, u'', is_already_successful)
             else:
                 pay_info.status = PayInfo.FAIL
                 result = PayResult.WITHDRAW_FAIL
