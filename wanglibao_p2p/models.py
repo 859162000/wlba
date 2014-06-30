@@ -133,7 +133,6 @@ class Attachment(models.Model):
     type = models.CharField(u'类型', max_length=32)
     file = models.FileField(upload_to='attachment')
     created_at = models.DateTimeField(auto_now_add=True)
-    extra_data = JSONField()
 
     def __unicode__(self):
         return u'%s' % self.name
