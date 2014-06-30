@@ -381,7 +381,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 ID_VERIFY_USERNAME = 'wljr_admin'
 ID_VERIFY_PASSWORD = 'wljr888'
 
-if PRODUCTION:
+if DEBUG:
     PAY_BACK_RETURN_URL = 'http://111.206.165.46/pay/deposit/callback/'
     PAY_RET_URL = 'http://111.206.165.46:8000/pay/deposit/complete/'
     WITHDRAW_BACK_RETURN_URL = 'http://111.206.165.46/pay/withdraw/callback/'
