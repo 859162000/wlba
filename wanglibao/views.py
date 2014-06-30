@@ -15,7 +15,7 @@ class IndexView(TemplateView):
         p2p_products = P2PProduct.objects.all()[:20]
         trade_records = P2PRecord.objects.all()[:40]
 
-        news_and_reports = NewsAndReport.objects.all()[:20]
+        news_and_reports = NewsAndReport.objects.all()[:5]
         return {
             "p2p_products": p2p_products,
             "trade_records": trade_records,

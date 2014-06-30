@@ -114,7 +114,12 @@ html
             .panel-content-container.padding-l-r-s
               ul
                 for news in news_and_reports
-                  li
+                  li.media-item
+                    if forloop.counter <= 3
+                      i.media-caption.highlight {{forloop.counter | stringformat:"02d"}}
+                    else
+                      i.media-caption {{forloop.counter | stringformat:"02d"}}
+
                     a(href="{{news.link}}") {{news.name}}
 
           .panel
