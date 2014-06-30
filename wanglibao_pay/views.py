@@ -142,7 +142,7 @@ def handle_pay_result(request):
                 result = PayResult.EXCEPTION
             else:
                 if code == '000000':
-                    keeper = MarginKeeper(request.user, pay_info.order.pk)
+                    keeper = MarginKeeper(pay_info.user, pay_info.order.pk)
                     margin_record = keeper.deposit(amount)
                     pay_info.margin_record = margin_record
                     pay_info.status = PayInfo.SUCCESS
