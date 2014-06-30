@@ -22,7 +22,7 @@
       }
       return _results;
     });
-    return $('input[data-role=fee-calculator]').keyup(function(e) {
+    $('input[data-role=fee-calculator]').keyup(function(e) {
       var actual, actual_element, amount, fee, fee_element, rate, target;
       target = $(e.target);
       rate = target.attr('data-rate');
@@ -34,6 +34,7 @@
       $(fee_element).text(fee);
       return $(actual_element).text(actual);
     });
+    return $('input[data-role=fee-calculator]').keyup();
   });
 
 }).call(this);

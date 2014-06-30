@@ -28,20 +28,23 @@ block main
           tr
             th 提现至银行卡
             td
-              select#card-select.withdraw-select(name='card_id')
-                option(value='') 请选择银行卡
-                for card in cards
-                  option(value='{{card.id}}') {{card | card_info}}
-              a#add-card-button.blue(href='#add-card-form')
-               .add-icon
-               添加提现银行卡
+              .span5
+                select#card-select.withdraw-select(name='card_id')
+                  option(value='') 请选择银行卡
+                  for card in cards
+                    option(value='{{card.id}}') {{card | card_info}}
+                .space-vertical-s
+                a#add-card-button.blue.margin-top-m(href='#add-card-form')
+                 .add-icon
+                 添加提现银行卡
           tr
             th 可用余额(元)
             td.red-text {{margin}}
           tr
             th 提现金额(元)
             td
-              input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee}}', data-target-fee='#fee', data-target-actual='#actual-amount')
+              .span5
+                input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee}}', data-target-fee='#fee', data-target-actual='#actual-amount')
           tr
             th 手续费(元)
             td
@@ -53,7 +56,7 @@ block main
           tr
             td(colspan=2)
               .withdraw-td
-                input#withdraw.button-red.button-xl(type='submit', value='提 现')
+                input#withdraw.withdraw-button(type='submit', value='提 现')
                 p.d4-text 警告：禁止信用卡套现、虚假交易等行为，一经确认，将终止该账户的使用
                 p.orange-text 您的资金的从合作银行监管账户转入提现银行卡
 
