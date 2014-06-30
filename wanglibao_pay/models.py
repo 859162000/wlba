@@ -19,6 +19,14 @@ class Bank(models.Model):
     def __unicode__(self):
         return u'%s' % self.name
 
+    @classmethod
+    def get_deposit_banks(cls):
+        return Bank.objects.all().exclude(gate_id='').exclude(gate_id__isnull=True).select_related()
+
+    @classmethod
+    def get_withdraw_banks(cls):
+        return Bank.objects.all().exclude(code='').exclude(code__isnull=True).select_related()
+
 
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号')
