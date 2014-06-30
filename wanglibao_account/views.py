@@ -276,7 +276,7 @@ class AccountHome(TemplateView):
 
         unpayed_principle = 0
         for equity in p2p_equities:
-            unpayed_principle += equity.equity - equity.paid_principal
+            unpayed_principle += equity.unpaid_interest
 
         p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
@@ -527,7 +527,6 @@ class P2PAmortizationView(TemplateView):
         product_id = kwargs['product_id']
 
         equity = P2PEquity.objects.filter(user=self.request.user, product_id=product_id).prefetch_related('product').first()
-        amortizations = equity.product.amortizations.all()
 
         amortizations = UserAmortization.objects.filter(user=self.request.user, product_amortization__product_id=product_id)
         return {

@@ -210,14 +210,6 @@ class P2PEquity(models.Model):
     equity = models.BigIntegerField(verbose_name=u'用户所持份额', default=0)
     confirm = models.BooleanField(verbose_name=u'确认成功', default=False)
 
-    paid_principal = models.DecimalField(verbose_name=u'已付本金', max_digits=20, decimal_places=2, default=Decimal(0))
-    paid_interest = models.DecimalField(verbose_name=u'已付利息', max_digits=20, decimal_places=2, default=Decimal(0))
-    penal_interest = models.DecimalField(verbose_name=u'已得罚息', max_digits=20, decimal_places=2, default=Decimal(0))
-    term = models.IntegerField(verbose_name=u'已还期数', default=0)
-    total_term = models.IntegerField(verbose_name=u'总期数', default=12)
-    next_term = models.CharField(verbose_name=u'下期时间', max_length=100, default='', blank=True)
-    next_amount = models.DecimalField(verbose_name=u'下期总数', max_digits=20, decimal_places=2, default=Decimal(0))
-
     class Meta:
         unique_together = (('user', 'product'),)
         verbose_name_plural = u'用户持仓'
@@ -235,12 +227,69 @@ class P2PEquity(models.Model):
         return Decimal(self.equity) / Decimal(self.product.total_amount)
 
     @property
+    def term(self):
+        amos = self.__get_amortizations(settled=True)
+        return len(amos)
+
+    @property
+    def total_term(self):
+        return self.product.amortization_count
+
+    @property
     def total_interest(self):
-        total = Decimal('0')
-        for amos in self.product.amortizations.all():
-            interest = amos.interest * self.ratio
-            total += interest.quantize(Decimal('0.01'))
-        return total
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        interest = amortizations.aggregate(Sum('interest'))['interest__sum']
+        return interest
+
+    @property
+    def paid_interest(self):
+        if not self.confirm:
+            return Decimal('0')
+        paid_amos = self.__get_amortizations(settled=True)
+        if not paid_amos:
+            return Decimal('0')
+        paid_interest = paid_amos.aggregate(Sum('interest'))['interest__sum']
+        return paid_interest
+
+    @property
+    def penal_interest(self):
+        if not self.confirm:
+            return Decimal('0')
+        paid_amos = self.__get_amortizations(settled=True)
+        if not paid_amos:
+            return Decimal('0')
+        penal_interest = paid_amos.aggregate(Sum('penal_interest'))['penal_interest__sum']
+        return penal_interest
+
+    @property
+    def unpaid_interest(self):
+        return self.total_interest - self.paid_interest
+
+    @property
+    def paid_principal(self):
+        if not self.confirm:
+            return Decimal('0')
+        paid_amos = self.__get_amortizations(settled=True)
+        if not paid_amos:
+            return Decimal('0')
+        paid_principal = paid_amos.aggregate(Sum('principal'))['principal__sum']
+        return paid_principal
+
+    @property
+    def unpaid_principal(self):
+        return self.equity - self.paid_principal
+
+    def __get_amortizations(self, settled=False):
+        if settled:
+            amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product,
+                                                            settled=True)
+        else:
+            amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product)
+        return amortizations
 
     def get_next_term(self):
         len_all = self.product.amortizations.count()
