@@ -276,7 +276,7 @@ class AccountHome(TemplateView):
 
         unpayed_principle = 0
         for equity in p2p_equities:
-            unpayed_principle += equity.unpaid_interest
+            unpayed_principle += equity.unpaid_principal
 
         p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
@@ -297,6 +297,8 @@ class AccountHome(TemplateView):
 
             'p2p_equities': p2p_equities,
             'p2p_product_amortization': p2p_product_amortization,
+            'p2p_unpay_principle': unpayed_principle,
+            'p2p_total_asset': p2p_total_asset,
 
             'fund_total_asset': fund_total_asset,
             'p2p_total_asset': p2p_total_asset,

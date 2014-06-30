@@ -58,7 +58,7 @@ block main
         .row
           .total-asset-money-card
             p.align-center
-              span.big_number {{user.margin.margin|money_format}}
+              span.big_number {{p2p_total_asset|money_format}}
             p.align-center P2P资产(元)
 
           .sign-money-card
@@ -74,7 +74,7 @@ block main
               +
             .p2p-asset--detail
               p
-                span.big_number {{fund_income_week|money_format}}
+                span.big_number {{p2p_unpay_principle|money_format}}
               p 待收本金
             .sign-money-card
               +
