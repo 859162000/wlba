@@ -81,17 +81,19 @@ class MarginKeeper(object):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def withdraw_rollback(self, amount, description=u'', savepoint=True):
+    def withdraw_rollback(self, amount, description=u'', is_already_successful=False ,savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
-            if amount > margin.withdrawing:
-                raise MarginLack(u'203')
+            catalog = u'取款渠道失败解冻'
+            if not is_already_successful:
+                if amount > margin.withdrawing:
+                    raise MarginLack(u'203')
+                margin.withdrawing -= amount
+                catalog = u'取款失败解冻'
             margin.margin += amount
-            margin.withdrawing -= amount
             margin.save()
-            catalog = u'取款失败解冻'
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
