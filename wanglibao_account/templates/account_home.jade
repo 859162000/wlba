@@ -97,8 +97,6 @@ block main
               th 投标时间
               th 产品名称
               th 投资金额
-              th 下次回款
-              th 下次回款时间
               th 状态
               th 已收益/预期收益
               th
@@ -107,14 +105,6 @@ block main
             if p2p_equities
               each equity in p2p_equities
                 tr
-                if equity.product_id in p2p_product_amortization
-                  next_amortization = p2p_product_amortization[equity.product_id] or 'None'
-                  next_term_date = next_amortization.term_date
-                  next_income = next_amortization.total * equity.ratio
-                else
-                  next_term_date = "-"
-                  next_income = 0
-
                   term = equity.term
                   total_income = equity.total_interest
 
@@ -124,8 +114,6 @@ block main
                     p 年化收益：{{equity.product.expected_earning_rate}}%
                     p 期限：{{equity.product.period}}个月
                   td {{equity.equity | money_format}}
-                  td {{next_income | money_format | default:"--"}}
-                  td {{next_term_date | date:"Y-m-d" | default:"--"}}
                   td 还款中{{term}}/{{equity.product.amortization_count}}
                   td <span class="highlight">{{equity.paid_interest | money_format}}</span> / {{total_income | money_format}}
                   td
