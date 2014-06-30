@@ -9,7 +9,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
     product = $('input[name=product]').val()
     amount = $('input[name=amount]').val()
-    captcha_0 = $('input[name=captcha_0').val()
+    captcha_0 = $('input[name=captcha_0]').val()
     captcha_1 = $('input[name=captcha_1]').val()
 
     backend.purchaseP2P {

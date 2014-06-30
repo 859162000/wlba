@@ -13,7 +13,7 @@
       e.preventDefault();
       product = $('input[name=product]').val();
       amount = $('input[name=amount]').val();
-      captcha_0 = $('input[name=captcha_0').val();
+      captcha_0 = $('input[name=captcha_0]').val();
       captcha_1 = $('input[name=captcha_1]').val();
       return backend.purchaseP2P({
         product: product,
