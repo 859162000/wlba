@@ -312,6 +312,10 @@ LOGGING = {
         'wanglibao_pay': {
             'handlers': ['file'],
             'level': 'DEBUG',
+        },
+        'p2p': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
         }
     }
 }
