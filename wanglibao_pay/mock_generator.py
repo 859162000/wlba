@@ -29,7 +29,7 @@ class PayMockGenerator(object):
             (u'南京银行', '49', 'njyh', 'NJCB'),
             (u'平安银行', '50', 'payh', 'PINGAN'),
             (u'杭州银行', '51', 'hzyh', 'HZCB'),
-            (u'浙商银行', '53', 'zsyh', 'CZB'),
+            (u'浙商银行', '53', 'zhesyh', 'CZB'),
             (u'上海银行', '54', 'shyh', 'BOS'),
             (u'渤海银行', '55', 'bhyh', 'CBHB'),
             (u'东亚银行', '', 'dyyh', 'HKBEA'),

@@ -40,7 +40,7 @@ class BankListView(TemplateView):
 
     def get_context_data(self, **kwargs):
         return {
-            'banks': Bank.objects.all(),
+            'banks': Bank.get_deposit_banks()
         }
 
 
@@ -197,7 +197,7 @@ class WithdrawView(TemplateView):
 
     def get_context_data(self, **kwargs):
         cards = Card.objects.filter(user=self.request.user).select_related()
-        banks = Bank.objects.all()
+        banks = Bank.get_withdraw_banks()
         return {
             'cards': cards,
             'banks': banks,
