@@ -1,13 +1,13 @@
 # encoding: utf-8
 import collections
 from decimal import Decimal
+from ckeditor.fields import RichTextField
 from django.db import models
-from django.db.models import F, Sum
+from django.db.models import F, Sum, SET_NULL
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from jsonfield import JSONField
 from wanglibao.models import ProductBase
-from order.models import Order
 from utility import gen_hash_list
 
 user_model = get_user_model()
@@ -40,6 +40,17 @@ class P2PReadyForFailManager(models.Manager):
     def get_queryset(self):
         return super(P2PReadyForFailManager, self).get_queryset().filter(end_time__lt=timezone.now(),
                                                                          status__exact=u'正在招标')
+
+
+class ContractTemplate(models.Model):
+    name = models.CharField(u'名字', max_length=32)
+    content = models.TextField(u'模板内容', default='')
+
+    class Meta:
+        verbose_name_plural = u'借款合同'
+
+    def __unicode__(self):
+        return self.name
 
 
 class P2PProduct(ProductBase):
@@ -77,6 +88,8 @@ class P2PProduct(ProductBase):
     usage = models.TextField(blank=True, verbose_name=u'项目用途')
     short_usage = models.TextField(blank=True, verbose_name=u'项目用途摘要')
 
+    contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True)
+
     objects = models.Manager()
     sold_out = P2PSoldOutManager()
     ready_for_settle = P2PReadyForSettleManager()
@@ -86,7 +99,7 @@ class P2PProduct(ProductBase):
         verbose_name_plural = u'P2P产品'
 
     def __unicode__(self):
-        return u'<%s>' % (self.name)
+        return u'<%s>' % self.name
 
     @property
     def remain(self):
@@ -214,6 +227,8 @@ class P2PEquity(models.Model):
     total_term = models.IntegerField(verbose_name=u'总期数', default=12)
     next_term = models.CharField(verbose_name=u'下期时间', max_length=100, default='', blank=True)
     next_amount = models.DecimalField(verbose_name=u'下期总数', max_digits=20, decimal_places=2, default=Decimal(0))
+
+    contract = models.FileField(u'合同文件', null=True, upload_to='contracts')
 
     class Meta:
         unique_together = (('user', 'product'),)

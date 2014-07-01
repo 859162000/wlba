@@ -12,12 +12,13 @@ from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
-from django.shortcuts import resolve_url
+from django.shortcuts import resolve_url, render
+from django.template import Template
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView, FormView, View
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -533,3 +534,19 @@ class P2PAmortizationView(TemplateView):
             'equity': equity,
             'amortizations': amortizations
         }
+
+@login_required
+def user_product_contract(request, product_id):
+    equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
+
+    context = {
+        'equity': equity
+    }
+
+    if equity.product.contract_template is None:
+        return render(request, 'renrenjucai.jade', context)
+
+    else:
+        # Load the template from database
+        template = Template(equity.product.contract_template.content)
+        return HttpResponse(template.render(context))

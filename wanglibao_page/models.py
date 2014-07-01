@@ -14,6 +14,7 @@ class Catalog(models.Model):
     def __unicode__(self):
         return '<Catalog %s>' % self.catalog
 
+
 class Page(models.Model):
     title = models.CharField(max_length=100, verbose_name='标题', help_text='显示在浏览器标题栏和文章标题处')
     content = RichTextField()

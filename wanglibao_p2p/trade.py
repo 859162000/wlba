@@ -69,6 +69,9 @@ class P2POperator(object):
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
                 equity_keeper.settle(savepoint=False)
+
+                # Generate contract for each equity
+
             amo_keeper = AmortizationKeeper(product)
             amo_keeper.clearing(savepoint=False)
             product.status = u'还款中'
