@@ -97,11 +97,6 @@ class EquityKeeper(object):
                 raise P2PException('can not get equity info.')
             self.equity = equity_query.first()
             self.equity.confirm = True
-            self.equity.total_term = self.product.period
-            next_term = self.product.amortizations.all().first()
-            if next_term:
-                self.equity.next_term = next_term.term_date.strftime('%Y-%m-%d')
-                self.equity.next_amount = next_term.total * self.equity.ratio
             self.equity.save()
             catalog = u'申购确认'
             description = u''
@@ -186,7 +181,6 @@ class AmortizationKeeper(object):
         )
         trace.save()
         return trace
-
 
 def check_amount(amount):
     pass

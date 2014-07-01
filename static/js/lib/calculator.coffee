@@ -26,3 +26,4 @@ define ['jquery'], ($)->
     $(actual_element).text actual
 
 
+  $('input[data-role=fee-calculator]').keyup()

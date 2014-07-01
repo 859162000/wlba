@@ -40,7 +40,7 @@ class BankListView(TemplateView):
 
     def get_context_data(self, **kwargs):
         return {
-            'banks': Bank.objects.all(),
+            'banks': Bank.get_deposit_banks()
         }
 
 
@@ -142,7 +142,7 @@ def handle_pay_result(request):
                 result = PayResult.EXCEPTION
             else:
                 if code == '000000':
-                    keeper = MarginKeeper(request.user, pay_info.order.pk)
+                    keeper = MarginKeeper(pay_info.user, pay_info.order.pk)
                     margin_record = keeper.deposit(amount)
                     pay_info.margin_record = margin_record
                     pay_info.status = PayInfo.SUCCESS
@@ -197,7 +197,7 @@ class WithdrawView(TemplateView):
 
     def get_context_data(self, **kwargs):
         cards = Card.objects.filter(user=self.request.user).select_related()
-        banks = Bank.objects.all()
+        banks = Bank.get_withdraw_banks()
         return {
             'cards': cards,
             'banks': banks,
@@ -233,20 +233,23 @@ def handle_withdraw_result(data):
             if data['RespCode'] == '000':
                 if transaction_status == 'S':
                     if pay_info.status != PayInfo.SUCCESS:
-                        keeper.withdraw_ack(pay_info.amount)
+                        keeper.withdraw_ack(pay_info.total_amount)
                     pay_info.status = PayInfo.SUCCESS
                     result = PayResult.WITHDRAW_SUCCESS
                 elif transaction_status == 'I':
                     pay_info.status = PayInfo.ACCEPTED
                     result = PayResult.WITHDRAW_SUCCESS
                 elif transaction_status == 'F':
+                    is_already_successful = False
+                    if pay_info.status == 'S':
+                        is_already_successful = True
                     pay_info.status = PayInfo.FAIL
                     result = PayResult.WITHDRAW_FAIL
-                    keeper.withdraw_rollback(pay_info.amount)
+                    keeper.withdraw_rollback(pay_info.total_amount, u'', is_already_successful)
             else:
                 pay_info.status = PayInfo.FAIL
                 result = PayResult.WITHDRAW_FAIL
-                keeper.withdraw_rollback(pay_info.amount)
+                keeper.withdraw_rollback(pay_info.total_amount)
         else:
             pay_info.status = PayInfo.EXCEPTION
             result = PayResult.EXCEPTION

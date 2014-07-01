@@ -25,6 +25,7 @@ class P2PProductAdmin(admin.ModelAdmin):
         WarrantInline, AttachementInline, AmortizationInline
     ]
     list_display = ('name', 'short_name', 'status', 'pay_method', 'end_time', 'closed')
+    list_filter = ('status', 'closed',)
 
 
 class UserAmortizationAdmin(admin.ModelAdmin):

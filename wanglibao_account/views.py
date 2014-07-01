@@ -32,7 +32,7 @@ from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
-from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization
+from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 
@@ -277,7 +277,7 @@ class AccountHome(TemplateView):
 
         unpayed_principle = 0
         for equity in p2p_equities:
-            unpayed_principle += equity.equity - equity.paid_principal
+            unpayed_principle += equity.unpaid_principal
 
         p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
@@ -298,9 +298,12 @@ class AccountHome(TemplateView):
 
             'p2p_equities': p2p_equities,
             'p2p_product_amortization': p2p_product_amortization,
+            'p2p_unpay_principle': unpayed_principle,
+            'p2p_total_asset': p2p_total_asset,
+            'margin_withdrawing': user.margin.withdrawing,
+            'margin_freeze': user.margin.freeze,
 
             'fund_total_asset': fund_total_asset,
-            'p2p_total_asset': p2p_total_asset,
             'total_asset': total_asset,
 
             'mode': mode
@@ -392,7 +395,7 @@ class AccountBankCard(TemplateView):
 
         cards = BindBank.objects.filter(user__exact=self.request.user)
         p2p_cards = Card.objects.filter(user__exact=self.request.user)
-        banks = Bank.objects.all()
+        banks = Bank.get_withdraw_banks()
         return {
             "cards": cards,
             'p2p_cards': p2p_cards,
@@ -528,8 +531,8 @@ class P2PAmortizationView(TemplateView):
         product_id = kwargs['product_id']
 
         equity = P2PEquity.objects.filter(user=self.request.user, product_id=product_id).prefetch_related('product').first()
-        amortizations = equity.product.amortizations.all()
 
+        amortizations = UserAmortization.objects.filter(user=self.request.user, product_amortization__product_id=product_id)
         return {
             'equity': equity,
             'amortizations': amortizations
