@@ -61,6 +61,7 @@ def staging():
 
     env.debug = False
     env.production = True
+    env.staging = True
 
     env.mysql = True
     env.create_ssl_cert = True
@@ -271,6 +272,8 @@ def deploy():
                 print green("Copy apache config file")
                 sudo('cp wanglibao.conf /etc/apache2/sites-available')
                 sudo('a2ensite wanglibao.conf')
+                if env.staging:
+                    sudo('cp staging.conf /etc/apache2/sites-available')
 
                 print green('apache server configured, restart it')
                 sudo('service apache2 reload')
