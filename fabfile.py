@@ -49,7 +49,7 @@ def production():
 
 
 def staging():
-    env.host_string = '192.168.0.12'
+    env.host_string = 'staging.wanglibao.com'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
