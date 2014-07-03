@@ -16,10 +16,12 @@ define ['jquery', 'underscore'], ($, _)->
       left = $(e).attr 'data-left'
       components = left.split(":")
       seconds = parseInt(components[0]) * 3600 + parseInt(components[1]) * 60 + parseInt(components[2])
-      left = seconds - diffInSeconds
 
-      timeString = Math.floor(left / 3600) + ":" + twoDigit(Math.floor(left % 3600 / 60)) + ":" + twoDigit(Math.floor(left % 60))
+      if seconds > 0
+        left = seconds - diffInSeconds
 
-      $($(e).attr 'data-target').text timeString
+        timeString = Math.floor(left / 3600) + ":" + twoDigit(Math.floor(left % 3600 / 60)) + ":" + twoDigit(Math.floor(left % 60))
+
+        $($(e).attr 'data-target').text timeString
 
   setInterval(countdown, 1000)
