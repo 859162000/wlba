@@ -95,7 +95,7 @@ html
                       p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余时间：
                         span(id="counter_{{product.id}}") {{product.end_time | timedelta_now }}
                     else
-                      p(data-role="countdown") 剩余时间：
+                      p 剩余时间：
                         span 00:00:00
 
               .panel-p2p--footer
