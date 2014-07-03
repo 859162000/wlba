@@ -21,17 +21,15 @@ $row-height: 40px
   @extend .row
   text-align: left
   position: relative
-  line-height: 50px
+  line-height: 63px
 
 .form-row-error
   @extend .row
   line-height: 1.3
 
-input.error
-  box-shadow: 0 0 3px $color-pomegranate
-
 label.error
   font-size: $font-s
+  color: $color-pomegranate
 
   &:before
     content: '* '
@@ -165,7 +163,7 @@ a.captcha-refresh
 .remember-me,
 .agreement
   font-size: $font-s
-  color: $color-emperor
+  color: $color-dusty-gray
   text-align: center
   line-height: normal
   clear: both
@@ -174,3 +172,6 @@ a.captcha-refresh
 
   input
     height: 16px
+
+  a
+    +link-colors($color-denim)

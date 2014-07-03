@@ -190,10 +190,13 @@ def buy_fund_url(code):
 @register.filter
 def timedelta_now(time):
     time_delta = time - timezone.now()
-    hours, seconds = divmod(time_delta.seconds, 3600)
-    minutes, seconds = divmod(seconds, 60)
-    hours += time_delta.days * 24
-    return "%d:%02d:%02d" % (hours, minutes, seconds)
+    if time_delta.days >= 0:
+        hours, seconds = divmod(time_delta.seconds, 3600)
+        minutes, seconds = divmod(seconds, 60)
+        hours += time_delta.days * 24
+        return "%d:%02d:%02d" % (hours, minutes, seconds)
+    else:
+        return "00:00:00"
 
 @register.filter
 def card_info(card):
