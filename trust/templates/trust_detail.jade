@@ -49,62 +49,60 @@ body
         p 预约成功后，我们将在第一时间联系您
         p 或直接拨打400-8588-066
 
-  .container
-    .space-vertical-s
-    .panel
-      .panel-product-title-bar
-        .panel-product-title 产品详情
-      table.bordered-table.margin-top-m1
-        tbody
-          tr
-            th(colspan="1") 信托名称
-            td(colspan="2") {{ trust.name }}
-            th(colspan="1") 预计发行规模
-            td(colspan="1") {{ trust.scale | money_to_10k }}
-          tr
-            th(colspan="1") 信托公司
-            td(colspan="2") {{ trust.issuer.name }}
-            th(colspan="1") 预计年收益
-            td(colspan="1") {{ trust.expected_earning_rate | percentage }}
-          tr
-            th(colspan="1") 存续期
-            td(colspan="2") {{ trust.period | month}}
-            th(colspan="1") 利息分配
-            td(colspan="1") {{ trust.payment | linebreaksbr }}
+  .panel
+    .panel-product-title-bar
+      .panel-product-title 产品详情
+    table.bordered-table.margin-top-m1
+      tbody
+        tr
+          th(colspan="1") 信托名称
+          td(colspan="2") {{ trust.name }}
+          th(colspan="1") 预计发行规模
+          td(colspan="1") {{ trust.scale | money_to_10k }}
+        tr
+          th(colspan="1") 信托公司
+          td(colspan="2") {{ trust.issuer.name }}
+          th(colspan="1") 预计年收益
+          td(colspan="1") {{ trust.expected_earning_rate | percentage }}
+        tr
+          th(colspan="1") 存续期
+          td(colspan="2") {{ trust.period | month}}
+          th(colspan="1") 利息分配
+          td(colspan="1") {{ trust.payment | linebreaksbr }}
 
-          tr
-            th(colspan="1") 最低认购金额
-            td(colspan="2") {{ trust.investment_threshold | money_to_10k }}
-            th(colspan="1") 信托类型
-            td(colspan="1") {{ trust.type }}
+        tr
+          th(colspan="1") 最低认购金额
+          td(colspan="2") {{ trust.investment_threshold | money_to_10k }}
+          th(colspan="1") 信托类型
+          td(colspan="1") {{ trust.type }}
 
-          tr
-            th(colspan="1") 投资行业
-            td(colspan="2") {{ trust.usage | linebreaksbr }}
-            th(colspan="1") 年化收益率
-            td(colspan="1") {{ trust.expected_earning_rate | percentage}}
+        tr
+          th(colspan="1") 投资行业
+          td(colspan="2") {{ trust.usage | linebreaksbr }}
+          th(colspan="1") 年化收益率
+          td(colspan="1") {{ trust.expected_earning_rate | percentage}}
 
-          tr
-            th(colspan="1") 收益说明
-            td(colspan="2") {{ trust.earning_description | linebreaksbr }}
-            th(colspan="1") 抵押率
-            td(colspan="1") {{ trust.mortgage_rate | percentage }}
+        tr
+          th(colspan="1") 收益说明
+          td(colspan="2") {{ trust.earning_description | linebreaksbr }}
+          th(colspan="1") 抵押率
+          td(colspan="1") {{ trust.mortgage_rate | percentage }}
 
-          tr
-            th(colspan="1") 抵押物
-            td(colspan="4") {{ trust.mortgage | linebreaksbr }}
+        tr
+          th(colspan="1") 抵押物
+          td(colspan="4") {{ trust.mortgage | linebreaksbr }}
 
-          tr
-            th(colspan="1") 产品说明
-            td(colspan="4") {{ trust.product_description | linebreaksbr }}
+        tr
+          th(colspan="1") 产品说明
+          td(colspan="4") {{ trust.product_description | linebreaksbr }}
 
-          tr
-            th(colspan="1") 风险控制
-            td(colspan="4") {{ trust.risk_management | linebreaksbr }}
+        tr
+          th(colspan="1") 风险控制
+          td(colspan="4") {{ trust.risk_management | linebreaksbr }}
 
-          tr
-            th(colspan="1") 受托人
-            td(colspan="4") {{ trust.consignee | linebreaksbr }}
+        tr
+          th(colspan="1") 受托人
+          td(colspan="4") {{ trust.consignee | linebreaksbr }}
 
   include include/footer
 

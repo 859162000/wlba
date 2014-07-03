@@ -27,15 +27,15 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
               item.investment_threshold + '万'
             field: 'investment_threshold'
           ,
-            name: '产品期限'
-            colspan: 2
+            name: '期限'
+            colspan: 1
             sortable: true
             text: (item)->
               item.period + '个月'
             field: 'period'
           ,
             name: '预期收益'
-            colspan: 2
+            colspan: 1
             sortable: true
             text: (item)->
               item.expected_earning_rate.toFixed(2) + '%'
