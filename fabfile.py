@@ -270,10 +270,12 @@ def deploy():
                     run("python manage.py migrate")
 
                 print green("Copy apache config file")
-                sudo('cp wanglibao.conf /etc/apache2/sites-available')
-                sudo('a2ensite wanglibao.conf')
+                if env.production and not env.staging:
+                    sudo('cp wanglibao.conf /etc/apache2/sites-available')
+                    sudo('a2ensite wanglibao.conf')
                 if env.staging:
                     sudo('cp staging.conf /etc/apache2/sites-available')
+                    sudo('a2ensite staging.conf')
 
                 print green('apache server configured, restart it')
                 sudo('service apache2 reload')
