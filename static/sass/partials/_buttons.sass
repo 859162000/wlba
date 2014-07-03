@@ -5,7 +5,6 @@
   line-height: 1 //Work around the line-height make it 1 to have precious control on button size
   border: 0
   text-align: center
-  +border-radius(3px)
   display: inline-block
 
   &:focus
@@ -51,8 +50,8 @@
     background: $color-pomegranate
 
 .button-gray, a.button-gray
-  background: $color-gray
-  color: $color-white
+  background: $color-alto
+  color: $color-text-d2
 
 .button-white, a.button-white
   background: white
@@ -88,3 +87,8 @@
   background: $color-cinderella
   font-size: $font-m
   padding: 8px 30px
+
+.button-account
+  @extend .button-primary
+  font-size: $font-xl
+  padding: 10px

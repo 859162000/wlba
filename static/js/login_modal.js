@@ -170,7 +170,6 @@
         intervalId;
         count = 60;
         $(element).attr('disabled', 'disabled');
-        $(element).removeClass('button-red').addClass('button-gray');
         timerFunction = function() {
           if (count >= 1) {
             count--;
@@ -178,8 +177,7 @@
           } else {
             clearInterval(intervalId);
             $(element).text('重新获取');
-            $(element).removeAttr('disabled');
-            return $(element).removeClass('button-gray').addClass('button-red');
+            return $(element).removeAttr('disabled');
           }
         };
         timerFunction();
