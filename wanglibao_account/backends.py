@@ -1,3 +1,4 @@
+# coding=utf-8
 import logging
 from django.conf import settings
 import requests
@@ -79,7 +80,12 @@ class ProductionIDVerifyBackEnd(object):
         if not result:
             logger.error("Failed to validate: %s" % response.text)
 
-        record = IdVerification(id_number=id_number, name=name, is_valid=result)
+        verify_result = True
+        if parsed_response['result'] != u'一致':
+            verify_result = False
+            logger.info("Identity not consistent %s" % response.text)
+
+        record = IdVerification(id_number=id_number, name=name, is_valid=verify_result)
         record.save()
 
         return record, None
@@ -90,7 +96,9 @@ def parse_id_verify_response(text):
 
     root = ETree.fromstring(text.encode('utf-8'))
     response_code = int(next(root.iter('{http://schemas.datacontract.org/2004/07/Finance.EPM}ResponseCode')).text)
+    result_text = next(root.iter('{http://schemas.datacontract.org/2004/07/Finance.EPM}Result')).text
 
     return {
         'response_code': response_code,
+        'result': result_text,
     }

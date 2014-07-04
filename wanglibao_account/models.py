@@ -14,6 +14,9 @@ class IdVerification(models.Model):
     is_valid = models.BooleanField(u"验证结果", default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __unicode__(self):
+        return u'%s %s %d' % (self.id_number, self.name, self.is_valid)
+
 
 class VerifyCounter(models.Model):
     """

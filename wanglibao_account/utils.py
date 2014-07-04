@@ -95,7 +95,7 @@ def create_user(identifier, password, nickname):
 
 
 def verify_id(name, id_number):
-    backend = settings.ID_VEIRIFY_BACKEND
+    backend = settings.ID_VERIFY_BACKEND
     class_name = backend.split('.')[-1]
 
     if class_name == 'TestIDVerifyBackEnd':

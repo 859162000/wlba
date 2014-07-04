@@ -402,6 +402,6 @@ else:
     PAY_URL = 'http://test.chinapnr.com'
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
-ID_VEIRIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
-if PRODUCTION:
-    ID_VEIRIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+#ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+#if PRODUCTION:
+ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
