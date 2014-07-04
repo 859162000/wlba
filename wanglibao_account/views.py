@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import resolve_url, render
 from django.template import Template
@@ -30,6 +30,7 @@ from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
+from wanglibao_account.models import VerifyCounter
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization
@@ -512,6 +513,9 @@ class IdVerificationView(FormView):
     template_name = 'verify_id.jade'
     form_class = IdVerificationForm
     success_url = '/accounts/id_verify/'
+
+    def get_form(self, form_class):
+        return form_class(user=self.request.user, **self.get_form_kwargs())
 
     def form_valid(self, form):
         user = self.request.user
