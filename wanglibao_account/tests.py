@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from forms import EmailOrPhoneRegisterForm
-from utils import detect_identifier_type, verify_id, parse_id_verify_response
+from utils import detect_identifier_type, verify_id, create_user
+from wanglibao_account.backends import parse_id_verify_response
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_sms.utils import send_validation_code
 
@@ -250,3 +251,32 @@ class IdVerificationTestCase(TestCase):
 
         r = parse_id_verify_response(response)
         self.assertEqual(r['response_code'], 100)
+
+    def test_one_user_only_verify_2_times(self):
+        identifier = '13800000000'
+        password = 'testpass'
+
+        create_user(identifier=identifier, password=password, nickname=identifier)
+
+        self.client.login(identifier=identifier, password=password)
+
+        response = self.client.post("/accounts/id_verify/", {
+            'name': 'testName',
+            'id_number': '12386718523671243574'
+        })
+
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.post("/accounts/id_verify/", {
+            'name': 'testName',
+            'id_number': '12386718523671243574'
+        })
+
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.post("/accounts/id_verify/", {
+            'name': 'testName',
+            'id_number': '12386718523671243574'
+        })
+
+        self.assertEqual(response.status_code, 200)

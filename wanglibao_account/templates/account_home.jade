@@ -58,7 +58,7 @@ block main
         .row
           .total-asset-money-card
             p.align-center
-              span.big_number {{user.margin.margin|money_format}}
+              span.big_number {{p2p_total_asset|money_format}}
             p.align-center P2P资产(元)
 
           .sign-money-card
@@ -74,19 +74,19 @@ block main
               +
             .p2p-asset--detail
               p
-                span.big_number {{fund_income_week|money_format}}
+                span.big_number {{p2p_unpay_principle|money_format}}
               p 待收本金
             .sign-money-card
               +
             .p2p-asset--detail
               p
-                span.big_number {{fund_income_week|money_format}}
+                span.big_number {{margin_freeze|money_format}}
               p 投资中冻结金额
             .sign-money-card
               +
             .p2p-asset--detail
               p
-                span.big_number {{fund_income_week|money_format}}
+                span.big_number {{margin_withdrawing|money_format}}
               p 提现中冻结金额
 
         .space-vertical-s
@@ -119,7 +119,7 @@ block main
                   td
                     a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{equity.product.id}}/") 还款计划
                   td
-                    a.button.button-small.button-pink(href="#" target="_blank") 合同
+                    a.button.button-small.button-pink(href="/accounts/p2p/contract/{{equity.product.id}}/" target="_blank") 合同
             else
               tr
                 td(colspan='8') 无持仓记录

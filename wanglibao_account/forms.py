@@ -4,8 +4,10 @@ from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
 from django.core.exceptions import ValidationError
+from django.db.models import F
 
 from utils import detect_identifier_type, verify_id
+from wanglibao_account.models import VerifyCounter
 from wanglibao_sms.utils import validate_validation_code
 
 User = get_user_model()
@@ -66,12 +68,12 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             code='duplicate_username', )
 
     def clean(self):
-        validate_code = self.cleaned_data["validate_code"]
         if 'identifier' in self.cleaned_data:
             identifier = self.cleaned_data["identifier"]
             identifier_type = detect_identifier_type(identifier)
             if identifier_type == 'phone':
                 phone = identifier
+                validate_code = self.cleaned_data["validate_code"]
                 status, message = validate_validation_code(phone, validate_code)
                 if status != 200:
                     raise forms.ValidationError(
@@ -136,12 +138,25 @@ class IdVerificationForm(forms.Form):
     name = forms.CharField(max_length=32, label=u'姓名')
     id_number = forms.CharField(max_length=128, label=u'身份证号')
 
+    def __init__(self, user=None, *args, **kwargs):
+        super(IdVerificationForm, self).__init__(*args, **kwargs)
+        self._user = user
+
     def clean(self):
         cleaned_data = super(IdVerificationForm, self).clean()
+
+        user = self._user
+        verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
+
+        if verify_counter.count >= 2:
+            raise ValidationError(u'验证次数超过两次，请联系客服进行人工验证')
 
         name = cleaned_data.get('name')
         id_number = cleaned_data.get('id_number')
         verify_record, error = verify_id(name, id_number)
+
+        verify_counter.count = F('count') + 1
+        verify_counter.save()
 
         if error or not verify_record.is_valid:
             raise ValidationError(u'验证失败，拨打客服电话进行人工验证')

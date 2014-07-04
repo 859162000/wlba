@@ -10,14 +10,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
-from django.shortcuts import resolve_url
+from django.shortcuts import resolve_url, render
+from django.template import Template
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView, FormView, View
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -29,6 +30,7 @@ from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
+from wanglibao_account.models import VerifyCounter
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization
@@ -276,7 +278,7 @@ class AccountHome(TemplateView):
 
         unpayed_principle = 0
         for equity in p2p_equities:
-            unpayed_principle += equity.equity - equity.paid_principal
+            unpayed_principle += equity.unpaid_principal
 
         p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
@@ -297,9 +299,12 @@ class AccountHome(TemplateView):
 
             'p2p_equities': p2p_equities,
             'p2p_product_amortization': p2p_product_amortization,
+            'p2p_unpay_principle': unpayed_principle,
+            'p2p_total_asset': p2p_total_asset,
+            'margin_withdrawing': user.margin.withdrawing,
+            'margin_freeze': user.margin.freeze,
 
             'fund_total_asset': fund_total_asset,
-            'p2p_total_asset': p2p_total_asset,
             'total_asset': total_asset,
 
             'mode': mode
@@ -509,6 +514,9 @@ class IdVerificationView(FormView):
     form_class = IdVerificationForm
     success_url = '/accounts/id_verify/'
 
+    def get_form(self, form_class):
+        return form_class(user=self.request.user, **self.get_form_kwargs())
+
     def form_valid(self, form):
         user = self.request.user
 
@@ -527,10 +535,25 @@ class P2PAmortizationView(TemplateView):
         product_id = kwargs['product_id']
 
         equity = P2PEquity.objects.filter(user=self.request.user, product_id=product_id).prefetch_related('product').first()
-        amortizations = equity.product.amortizations.all()
 
         amortizations = UserAmortization.objects.filter(user=self.request.user, product_amortization__product_id=product_id)
         return {
             'equity': equity,
             'amortizations': amortizations
         }
+
+@login_required
+def user_product_contract(request, product_id):
+    equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
+
+    context = {
+        'equity': equity
+    }
+
+    if equity.product.contract_template is None:
+        return render(request, 'renrenjucai.jade', context)
+
+    else:
+        # Load the template from database
+        template = Template(equity.product.contract_template.content)
+        return HttpResponse(template.render(context))

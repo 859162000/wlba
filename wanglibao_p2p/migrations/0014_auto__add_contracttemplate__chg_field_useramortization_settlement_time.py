@@ -8,21 +8,40 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'ContractTemplate'
+        db.create_table(u'wanglibao_p2p_contracttemplate', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=32)),
+            ('content', self.gf('django.db.models.fields.TextField')(default='')),
+        ))
+        db.send_create_signal(u'wanglibao_p2p', ['ContractTemplate'])
+
 
         # Changing field 'UserAmortization.settlement_time'
         db.alter_column(u'wanglibao_p2p_useramortization', 'settlement_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True))
-        # Adding field 'P2PProduct.serial_number'
-        db.add_column(u'wanglibao_p2p_p2pproduct', 'serial_number',
-                      self.gf('django.db.models.fields.CharField')(max_length=100, unique=True, null=True),
+        # Adding field 'P2PProduct.contract_template'
+        db.add_column(u'wanglibao_p2p_p2pproduct', 'contract_template',
+                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.ContractTemplate'], null=True, on_delete=models.SET_NULL),
+                      keep_default=False)
+
+        # Adding field 'P2PEquity.contract'
+        db.add_column(u'wanglibao_p2p_p2pequity', 'contract',
+                      self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
+        # Deleting model 'ContractTemplate'
+        db.delete_table(u'wanglibao_p2p_contracttemplate')
+
 
         # Changing field 'UserAmortization.settlement_time'
         db.alter_column(u'wanglibao_p2p_useramortization', 'settlement_time', self.gf('django.db.models.fields.DateTimeField')())
-        # Deleting field 'P2PProduct.serial_number'
-        db.delete_column(u'wanglibao_p2p_p2pproduct', 'serial_number')
+        # Deleting field 'P2PProduct.contract_template'
+        db.delete_column(u'wanglibao_p2p_p2pproduct', 'contract_template_id')
+
+        # Deleting field 'P2PEquity.contract'
+        db.delete_column(u'wanglibao_p2p_p2pequity', 'contract')
 
 
     models = {
@@ -86,6 +105,12 @@ class Migration(SchemaMigration):
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']"}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
         },
+        u'wanglibao_p2p.contracttemplate': {
+            'Meta': {'object_name': 'ContractTemplate'},
+            'content': ('django.db.models.fields.TextField', [], {'default': "''"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+        },
         u'wanglibao_p2p.equityrecord': {
             'Meta': {'object_name': 'EquityRecord'},
             'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
@@ -100,6 +125,7 @@ class Migration(SchemaMigration):
         u'wanglibao_p2p.p2pequity': {
             'Meta': {'unique_together': "(('user', 'product'),)", 'object_name': 'P2PEquity'},
             'confirm': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'contract': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True'}),
             'equity': ('django.db.models.fields.BigIntegerField', [], {'default': '0'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'next_amount': ('django.db.models.fields.DecimalField', [], {'default': "'0'", 'max_digits': '20', 'decimal_places': '2'}),
@@ -122,6 +148,7 @@ class Migration(SchemaMigration):
             'bought_people_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'brief': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'closed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'contract_template': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.ContractTemplate']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
             'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'expected_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'extra_data': ('jsonfield.fields.JSONField', [], {'blank': 'True'}),
@@ -132,7 +159,6 @@ class Migration(SchemaMigration):
             'pay_method': ('django.db.models.fields.CharField', [], {'default': "u'\\u7b49\\u989d\\u672c\\u606f'", 'max_length': '32', 'blank': 'True'}),
             'period': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'publish_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'serial_number': ('django.db.models.fields.CharField', [], {'max_length': '100', 'unique': 'True', 'null': 'True'}),
             'short_name': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
             'short_usage': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "u'\\u6b63\\u5728\\u62db\\u6807'", 'max_length': '16'}),

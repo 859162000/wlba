@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment
+from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 
 
@@ -39,3 +39,4 @@ admin.site.register(P2PRecord)
 admin.site.register(AmortizationRecord)
 admin.site.register(EquityRecord)
 admin.site.register(UserAmortization, UserAmortizationAdmin)
+admin.site.register(ContractTemplate)

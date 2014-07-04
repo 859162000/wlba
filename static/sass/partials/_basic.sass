@@ -37,7 +37,7 @@ label
 
 input[type=text], input[type=password], input[type=number]
   @extend .input-base
-  border: 1px solid darkgray
+  border: 1px solid $color-alto
 
 button
   padding: 0
@@ -202,6 +202,10 @@ input
   padding-left: $space-s !important
   padding-right: $space-s !important
 
+.padding-l-r-sm
+  padding-left: $space-sm !important
+  padding-right: $space-sm !important
+
 .padding-l-r-m
   padding-left: $space-m !important
   padding-right: $space-m !important
@@ -249,9 +253,6 @@ input
 
   dd
     +float-left
-
-.error
-  color: $color-pomegranate
 
 .block-link
   width: 20%

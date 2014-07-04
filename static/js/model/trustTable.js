@@ -41,8 +41,8 @@
               },
               field: 'investment_threshold'
             }, {
-              name: '产品期限',
-              colspan: 2,
+              name: '期限',
+              colspan: 1,
               sortable: true,
               text: function(item) {
                 return item.period + '个月';
@@ -50,7 +50,7 @@
               field: 'period'
             }, {
               name: '预期收益',
-              colspan: 2,
+              colspan: 1,
               sortable: true,
               text: function(item) {
                 return item.expected_earning_rate.toFixed(2) + '%';

@@ -190,10 +190,13 @@ def buy_fund_url(code):
 @register.filter
 def timedelta_now(time):
     time_delta = time - timezone.now()
-    hours, seconds = divmod(time_delta.seconds, 3600)
-    minutes, seconds = divmod(seconds, 60)
-    hours += time_delta.days * 24
-    return "%d:%02d:%02d" % (hours, minutes, seconds)
+    if time_delta.days >= 0:
+        hours, seconds = divmod(time_delta.seconds, 3600)
+        minutes, seconds = divmod(seconds, 60)
+        hours += time_delta.days * 24
+        return "%d:%02d:%02d" % (hours, minutes, seconds)
+    else:
+        return "00:00:00"
 
 @register.filter
 def card_info(card):
@@ -202,3 +205,51 @@ def card_info(card):
 @register.filter
 def last_four_char(str):
     return str[-4:]
+
+
+@register.filter
+def number_to_chinese(value):
+    nums = "%.2f" % value
+
+    left, right = nums.split('.')
+
+    number_charactors = list(u'零壹贰叁肆伍陆柒捌玖')
+    unit_charactors = list(u'万仟佰拾 仟佰拾 仟佰拾 ')[-len(left):]
+    units = list(u'                   亿   万   元')[-len(left):]
+
+    nums = [int(d) for d in left]
+
+    result = u''
+
+    zero = False
+
+    for i in range(0, len(nums)):
+        if zero and nums[i] != 0:
+            result += number_charactors[0]
+
+        if nums[i] != 0:
+            result += number_charactors[nums[i]]
+            if unit_charactors[i] != ' ':
+                result += unit_charactors[i]
+
+        if units[i] != ' ':
+            result += units[i]
+
+        if nums[i] == 0:
+            zero = True
+        else:
+            zero = False
+
+    result = result.replace(u'亿万', u'亿')
+
+    if right == '00':
+        result += u'整'
+    else:
+        jiao, fen = [int(d) for d in right]
+
+        if jiao:
+            result += number_charactors[jiao] + u'角'
+        if fen:
+            result += number_charactors[fen] + u'分'
+
+    return result

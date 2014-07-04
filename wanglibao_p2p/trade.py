@@ -52,13 +52,7 @@ class P2POperator(object):
             except Exception, e:
                 cls.logger.error('%s, %s' % (product.id, e))
                 print(e)
-        print('watching for amortize.')
-        for amortization in AmortizationKeeper.get_ready_for_settle():
-            try:
-                cls().amortize(amortization)
-            except Exception, e:
-                cls.logger.error('%s, %s' % (amortization.id, e))
-                print(e)
+        # todo rebuild amortize logic.
 
     def settle(self, product):
         if product.ordered_amount != product.total_amount:
@@ -69,6 +63,9 @@ class P2POperator(object):
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
                 equity_keeper.settle(savepoint=False)
+
+                # Generate contract for each equity
+
             amo_keeper = AmortizationKeeper(product)
             amo_keeper.clearing(savepoint=False)
             product.status = u'还款中'
