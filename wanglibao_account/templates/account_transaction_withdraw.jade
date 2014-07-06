@@ -14,13 +14,14 @@ block sidebar
 
 block main
   .panel
-    .panel-title-bar-gray
-      .panel-tabs
-        .panel-tab
-          a(href='/accounts/transaction/p2p/') 交易记录
-        .panel-tab
-          a(href='/accounts/transaction/deposit/') 充值记录
-        .panel-tab.active 提现记录
+    .account-home-panel--title-bar__product
+      ul.title-bar--tabs
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href="/accounts/transaction/p2p/") 交易记录
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href='/accounts/transaction/deposit/') 充值记录
+        li.title-bar--tab.active
+          a.title-bar--tab--anchor(href='javascript:void(0)') 提现记录
     .panel-container
       table.table
         thead
