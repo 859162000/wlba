@@ -9,7 +9,7 @@ from wanglibao_robot.fund import FundRobot
 # Create your tests here.
 
 
-user = get_user_model().objects.filter(pk__exact=2).first()
+user = get_user_model().objects.filter(pk__exact=1).first()
 fetcher = UserInfoFetcher(user)
 app = AppInfoFetcher()
 robot = FundRobot()

@@ -3,6 +3,7 @@ from decimal import Decimal
 from collections import OrderedDict
 import random
 import datetime
+import uuid
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, ProductAmortization
@@ -81,6 +82,26 @@ class MockGenerator(object):
                     w.name = name
                     w.product = p2p
                     w.save()
+
+    @classmethod
+    def generate_staging_p2p(cls, name, amount=10000, terms=3, term_delta_minute=10, end_delta_minute=10, per_user=0.5):
+        short_name = name[:4]
+        warrant_company, _ = WarrantCompany.objects.get_or_create(name=u'担保公司1')
+        product = P2PProduct.objects.create(
+            name=name, short_name=short_name, serial_number=uuid.uuid1(), status=u'正在招标', period=terms,
+            expected_earning_rate=10, pay_method=u'等额本息', amortization_count=terms, total_amount=amount,
+            end_time=timezone.now()+datetime.timedelta(minutes=end_delta_minute), limit_per_user=per_user,
+            warrant_company=warrant_company
+        )
+        now = timezone.now()
+        delta = datetime.timedelta(minutes=term_delta_minute)
+        principal = amount
+        interest = amount * 0.1
+        for i in xrange(1, terms+1):
+            ProductAmortization.objects.create(
+                product=product, term=terms, term_date=now+delta*i, principal=principal/terms, interest=interest/terms,
+            )
+        return product
 
     @classmethod
     def generate_trade(cls, clean=False):

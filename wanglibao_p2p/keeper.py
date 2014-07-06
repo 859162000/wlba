@@ -38,6 +38,17 @@ class ProductKeeper(object):
             self.product.status = u'还款中'
             self.product.save()
 
+    def over(self, savepoint=True):
+        with transaction.atomic(savepoint=savepoint):
+            if self.product.ordered_amount != self.product.total_amount:
+                raise P2PException('product status not valid.')
+            self.product.status = u'已满标'
+            self.product.save()
+
+    @classmethod
+    def get_sold_out(cls):
+        products = P2PProduct.sold_out.all()
+        return products
 
     @classmethod
     def get_ready_for_settle(cls):
@@ -48,6 +59,7 @@ class ProductKeeper(object):
     def get_ready_for_fail(cls):
         products = P2PProduct.ready_for_fail.all()
         return products
+
 
     def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
@@ -92,17 +104,17 @@ class EquityKeeper(object):
 
     def settle(self, description=u'', savepoint=True):
         with transaction.atomic(savepoint=savepoint):
-            equity_query =  P2PEquity.objects.filter(user=self.user, product=self.product)
+            equity_query = P2PEquity.objects.filter(user=self.user, product=self.product)
             if (not equity_query.exists()) or (len(equity_query) != 1):
                 raise P2PException('can not get equity info.')
-            self.equity = equity_query.first()
-            self.equity.confirm = True
-            self.equity.save()
+            equity = equity_query.first()
+            equity.confirm = True
+            equity.save()
             catalog = u'申购确认'
             description = u''
-            self.__tracer(catalog, self.equity.equity, description)
-            user_margin_keeper = MarginKeeper(self.equity.user)
-            user_margin_keeper.settle(self.equity.equity, savepoint=False)
+            self.__tracer(catalog, equity.equity, description)
+            user_margin_keeper = MarginKeeper(self.user)
+            user_margin_keeper.settle(equity.equity, savepoint=False)
 
     def __tracer(self, catalog, amount, description=u''):
         trace = EquityRecord(catalog=catalog, amount=amount, description=description, user=self.user,
@@ -129,15 +141,16 @@ class AmortizationKeeper(object):
 
     def __init__(self, product, order=None):
         self.product = product
-        self.amortizations = product.amortizations.all()
-        self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
-        self.equities = self.product.equities.all()
         self.order = order
 
 
     def clearing(self, savepoint=True):
         if self.product.status != u'已满标':
             raise P2PException('invalid product status.')
+        self.amortizations = self.product.amortizations.all()
+        self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
+        self.equities = self.product.equities.all()
+
         for equity in self.equities:
             with transaction.atomic(savepoint=savepoint):
                 ProductAmortization.objects.select_for_update().filter(product=self.product)
@@ -174,9 +187,26 @@ class AmortizationKeeper(object):
         amos = ProductAmortization.is_ready.all()
         return amos
 
-    def __tracer(self, catalog, user, principal, interest, penal_interest, description=u''):
+    def amortize(self, amortization, savepoint=True):
+        with transaction.atomic(savepoint=savepoint):
+            if amortization.settled == True:
+                raise P2PException('amortization %s already settled.' % amortization)
+            sub_amortizations = amortization.subs.all()
+            description = unicode(amortization)
+            catalog = u'分期还款'
+            for sub_amo in sub_amortizations:
+                user_margin_keeper = MarginKeeper(sub_amo.user)
+                user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest,
+                                            sub_amo.penal_interest, savepoint=False, description=description)
+                self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
+                              description, amortization)
+            amortization.settled = True
+            amortization.save()
+            catalog = u'还款入账'
+
+    def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u''):
         trace = AmortizationRecord(
-            amortization=self.amortization, term=self.amortization.term, principal=principal, interest=interest,
+            amortization=amortization, term=amortization.term, principal=principal, interest=interest,
             penal_interest=penal_interest, description=description, user=user, catalog=catalog
         )
         trace.save()

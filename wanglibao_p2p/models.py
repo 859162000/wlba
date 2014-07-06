@@ -59,13 +59,19 @@ class P2PProduct(ProductBase):
         (u'还款中', u'还款中'),
         (u'已完成', u'已完成')
     )
+
+    PAY_METHOD_CHOICES = (
+        (u'等额本息', u'等额本息'),
+        (u'先息后本', u'先息后本')
+    )
+
     name = models.CharField(max_length=256, verbose_name=u'名字')
     short_name = models.CharField(max_length=64, verbose_name=u'短名字')
     serial_number = models.CharField(max_length=100, verbose_name=u'产品编号', unique=True, null=True)
 
     status = models.CharField(max_length=16, default=u'正在招标',
                               choices=STATUS_CHOICES,
-                              verbose_name=u'产品装态',
+                              verbose_name=u'产品状态',
                               help_text=u'(正在招标，已满标，还款中, 已完成)')
 
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)')
@@ -73,7 +79,7 @@ class P2PProduct(ProductBase):
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)')
     closed = models.BooleanField(u'是否完结', default=False)
 
-    pay_method = models.CharField(u'支付方式', max_length=32, blank=True, default=u'等额本息')
+    pay_method = models.CharField(u'支付方式', max_length=32, blank=True, default=u'等额本息', choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)
 
     total_amount = models.BigIntegerField(default=0, verbose_name=u'借款总额')
@@ -125,6 +131,12 @@ class P2PProduct(ProductBase):
         if amount <= self.remain:
             return True
         return False
+
+
+class ProductProxy(P2PProduct):
+    class Meta:
+        proxy = True
+        verbose_name_plural =u'产品特殊权限'
 
 
 class Warrant(models.Model):
@@ -190,7 +202,7 @@ class ProductAmortization(models.Model):
         return self.principal + self.interest + self.penal_interest
 
     def __unicode__(self):
-        return u'产品<%s>: 第 %s 期，总额 %s 元' % (self.product.short_name, self.term, self.total)
+        return u'产品<%s>: 第 %s 期' % (self.product.short_name, self.term)
 
 
 class UserAmortization(models.Model):
@@ -303,11 +315,6 @@ class P2PEquity(models.Model):
         else:
             amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product)
         return amortizations
-
-    def get_next_term(self):
-        len_all = self.product.amortizations.count()
-        next = self.product.amortizations.filter(settled=False).first()
-        return len_all, next
 
 
 class AmortizationRecord(models.Model):
