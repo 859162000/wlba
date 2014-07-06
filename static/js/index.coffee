@@ -38,8 +38,3 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
       $(banners[index]).fadeIn()
       $(anchors[index]).toggleClass('active')
       currentBanner = index
-
-  $('.home-banner-2').click ()->
-    window.location.href='/trust/detail/8526'
-
-
