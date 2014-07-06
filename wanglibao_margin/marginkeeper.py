@@ -55,6 +55,12 @@ class MarginKeeper(object):
             return record
 
     def amortize(self, principal, interest, penal_interest, description=u'', savepoint=True):
+        check_amount(principal)
+        check_amount(interest)
+        check_amount(penal_interest, allow_zero=True)
+        principal = Decimal(principal)
+        interest = Decimal(interest)
+        penal_interest = Decimal(penal_interest)
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             catalog = u'还款入账'
@@ -128,7 +134,11 @@ class MarginKeeper(object):
         return trace
 
 
-def check_amount(amount):
-    if amount <= 0:
-        raise ValueError(u'amount must be positive')
+def check_amount(amount, allow_zero=False):
+    if not allow_zero:
+        if amount <= 0:
+            raise ValueError(u'amount must be positive.')
+    if amount < 0:
+        raise ValueError(u'amount must positive or zero.')
+    # todo add decimal len check
 
