@@ -13,7 +13,7 @@ block sidebar
 
 block main
   .account-home-panel
-    .account-home-panel--title-bar
+    .account-home-panel--title-bar.clamp-xl
       span.nickname {{user | safe_phone}}
       if user.wanglibaouserprofile.id_is_valid
         span 已实名认证
@@ -43,14 +43,14 @@ block main
 
   if mode == 'p2p'
     .account-home-panel__no-padding
-      .account-home-panel--title-bar__product
+      .account-home-panel--title-bar__product.clamp-xl
         ul.title-bar--tabs
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") P2P
           li.title-bar--tab
             a.title-bar--tab--anchor(href="/accounts/home/fund/") 货币基金
-        a.button-small.pull-right(href='/accounts/transaction/p2p/') 查看交易记录
-      .clamp-sm
+        a.pull-right.align-right(href='/accounts/transaction/p2p/') 查看交易记录
+      .clamp-xl
         .account-home-panel--action-bar
           a.button-home-action(href="/pay/banks/") 充值
           a.button-home-action.margin-left-m(href="/pay/withdraw/") 取现
