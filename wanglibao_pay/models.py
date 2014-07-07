@@ -75,3 +75,11 @@ class PayInfo(models.Model):
     def __unicode__(self):
         return u'%s' % self.pk
 
+
+class PayResult(object):
+    DEPOSIT_SUCCESS = u'充值成功'
+    DEPOSIT_FAIL = u'充值失败'
+    WITHDRAW_SUCCESS = u'提现成功'
+    WITHDRAW_FAIL = u'提现失败'
+    RETRY = u'系统内部错误，请重试'
+    EXCEPTION = u'系统内部错误，请联系客服'

@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 import logging
 import socket
-from django.db import transaction
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from order.utils import OrderHelper
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_pay.models import Bank, Card
+from wanglibao_pay.models import Bank, Card, PayResult
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay.models import PayInfo
 import requests
 import xml.etree.ElementTree as ET
 import decimal
-
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from wanglibao_pay.serializers import CardSerializer
@@ -42,15 +40,6 @@ class BankListView(TemplateView):
         return {
             'banks': Bank.get_deposit_banks()
         }
-
-
-class PayResult(object):
-    DEPOSIT_SUCCESS = u'充值成功'
-    DEPOSIT_FAIL = u'充值失败'
-    WITHDRAW_SUCCESS = u'提现成功'
-    WITHDRAW_FAIL = u'提现失败'
-    RETRY = u'系统内部错误，请重试'
-    EXCEPTION = u'系统内部错误，请联系客服'
 
 
 class PayView(TemplateView):
@@ -110,66 +99,11 @@ class PayView(TemplateView):
         return self.render_to_response(context)
 
 
-@transaction.atomic
-def handle_pay_result(request):
-    order_id = request.POST.get('OrdId', '')
-    try:
-        pay_info = PayInfo.objects.select_for_update().get(pk=order_id)
-    except PayInfo.DoesNotExist:
-        logger.warning('Order not found, order id: ' + order_id + ', response: ' + request.body)
-        return PayResult.EXCEPTION
-
-    if pay_info.status == PayInfo.SUCCESS:
-        return PayResult.DEPOSIT_SUCCESS
-
-    amount = request.POST.get('OrdAmt', '')
-    code = request.POST.get('RespCode', '')
-    message = request.POST.get('ErrMsg', '')
-    pay_info.error_code = code
-    pay_info.error_message = message
-    pay_info.response = request.body
-    pay_info.response_ip = get_client_ip(request)
-
-    result = u''
-    try:
-        pay = HuifuPay()
-        if pay.verify_sign(request.POST.dict(), HuifuPay.PAY_FIELDS):
-            if pay_info.amount != decimal.Decimal(amount):
-                pay_info.status = PayInfo.FAIL
-                pay_info.error_message += u' 金额不匹配'
-                logger.error('Amount mismatch, order id: %s request amount: %f response amount: %s',
-                             order_id, float(pay_info.amount), amount)
-                result = PayResult.EXCEPTION
-            else:
-                if code == '000000':
-                    keeper = MarginKeeper(pay_info.user, pay_info.order.pk)
-                    margin_record = keeper.deposit(amount)
-                    pay_info.margin_record = margin_record
-                    pay_info.status = PayInfo.SUCCESS
-                    result = PayResult.DEPOSIT_SUCCESS
-                else:
-                    pay_info.status = PayInfo.FAIL
-                    result = PayResult.DEPOSIT_FAIL
-        else:
-            pay_info.error_message = 'Invalid signature. Order id: ' + order_id
-            logger.error(pay_info.error_message)
-            pay_info.status = PayInfo.EXCEPTION
-            result = PayResult.EXCEPTION
-    except (socket.error, SignException) as e:
-        pay_info.error_message = str(e)
-        pay_info.status = PayInfo.EXCEPTION
-        logger.fatal('sign error! order id: ' + order_id + ' ' + str(e))
-        result = PayResult.EXCEPTION
-
-    pay_info.save()
-    return result
-
-
 class PayCompleteView(TemplateView):
     template_name = 'pay_complete.jade'
 
     def post(self, request, *args, **kwargs):
-        result = handle_pay_result(request)
+        result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
         return self.render_to_response({
             'result': result,
@@ -183,7 +117,7 @@ class PayCompleteView(TemplateView):
 
 class PayCallback(View):
     def post(self, request, *args, **kwargs):
-        handle_pay_result(request)
+        HuifuPay.handle_pay_result(request)
         order_id = request.POST.get('OrdId', '')
         return HttpResponse('RECV_ORD_ID_' + order_id)
 
@@ -207,64 +141,6 @@ class WithdrawView(TemplateView):
         }
 
 
-@transaction.atomic
-def handle_withdraw_result(data):
-    order_id = data.get('OrdId', '')
-    try:
-        pay_info = PayInfo.objects.select_for_update().get(pk=order_id)
-    except PayInfo.DoesNotExist:
-        logger.warning('Order not found, order id: ' + order_id + ', response: ' + str(data))
-        return PayResult.EXCEPTION
-
-    if pay_info.status == PayInfo.FAIL:
-        return PayResult.WITHDRAW_FAIL
-
-    pay_info = PayInfo.objects.select_for_update().get(pk=order_id)
-    pay_info.response = str(data)
-    pay_info.error_code = data.get('RespCode', '')
-    pay_info.error_message = data.get('RespDesc', '')
-    transaction_status = data.get('TransStat', '')
-
-    keeper = MarginKeeper(pay_info.user, pay_info.order.pk)
-
-    try:
-        pay = HuifuPay()
-        if pay.verify_sign(data, HuifuPay.WITHDRAW_FIELDS):
-            if data['RespCode'] == '000':
-                if transaction_status == 'S':
-                    if pay_info.status != PayInfo.SUCCESS:
-                        keeper.withdraw_ack(pay_info.total_amount)
-                    pay_info.status = PayInfo.SUCCESS
-                    result = PayResult.WITHDRAW_SUCCESS
-                elif transaction_status == 'I':
-                    pay_info.status = PayInfo.ACCEPTED
-                    result = PayResult.WITHDRAW_SUCCESS
-                elif transaction_status == 'F':
-                    is_already_successful = False
-                    if pay_info.status == 'S':
-                        is_already_successful = True
-                    pay_info.status = PayInfo.FAIL
-                    result = PayResult.WITHDRAW_FAIL
-                    keeper.withdraw_rollback(pay_info.total_amount, u'', is_already_successful)
-            else:
-                pay_info.status = PayInfo.FAIL
-                result = PayResult.WITHDRAW_FAIL
-                keeper.withdraw_rollback(pay_info.total_amount)
-        else:
-            pay_info.status = PayInfo.EXCEPTION
-            result = PayResult.EXCEPTION
-            pay_info.error_message = 'Invalid signature'
-            logger.fatal('invalid signature. order id: %s', str(pay_info.pk))
-    except(socket.error, SignException) as e:
-        result = PayResult.EXCEPTION
-        pay_info.status = PayInfo.EXCEPTION
-        pay_info.error_message = str(e)
-        logger.fatal('unexpected error. order id: %s. exception: %s', str(pay_info.pk), str(e))
-
-    pay_info.save()
-    return result
-
-
 class WithdrawCompleteView(TemplateView):
     template_name = 'withdraw_complete.jade'
 
@@ -279,7 +155,6 @@ class WithdrawCompleteView(TemplateView):
             amount_str = request.POST.get('amount', '')
             amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
-            amount_str = str(amount)
             if amount <= 0:
                 raise decimal.DecimalException
 
@@ -368,7 +243,7 @@ class WithdrawCompleteView(TemplateView):
                 'result': result
             })
 
-        result = handle_withdraw_result(data)
+        result = HuifuPay.handle_withdraw_result(data)
         return self.render_to_response({
             'result': result,
             'amount': amount
@@ -377,7 +252,7 @@ class WithdrawCompleteView(TemplateView):
 
 class WithdrawCallback(View):
     def post(self, request, *args, **kwargs):
-        handle_withdraw_result(request.POST.dict())
+        HuifuPay.handle_withdraw_result(request.POST.dict())
         order_id = request.POST.get('OrdId', '')
         return HttpResponse('RECV_ORD_ID_' + order_id)
 

@@ -27,6 +27,8 @@ def testserver():
 
     env.debug = True
     env.production = False
+    env.staging = False
+
     env.mysql = True
 
 
@@ -43,6 +45,7 @@ def production():
 
     env.debug = False
     env.production = True
+    env.staging = False
 
     env.mysql = False  # Use RDS, so we no need to install mysql
     env.create_ssl_cert = False  # Production's key is maintained differently
@@ -229,6 +232,9 @@ def deploy():
                 if not env.debug:
                     print yellow('Replacing wanglibao/settings.py DEBUG')
                     run("fab config:'wanglibao/settings.py','DEBUG \= True','DEBUG \= False'")
+                if env.staging:
+                    print yellow('Replacing wanglibao/settings.py STAGING')
+                    run("fab config:'wanglibao/settings.py','STAGING \= False','STAGING \= True'")
                 if env.mysql:
                     print red('Overwriting setting file to use local MYSQL')
                     run("fab config:'wanglibao/settings.py','LOCAL_MYSQL \= not PRODUCTION','LOCAL_MYSQL \= True'")
