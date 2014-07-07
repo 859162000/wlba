@@ -42,32 +42,4 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
   $('.home-banner-2').click ()->
     window.location.href='/trust/detail/8526'
 
-  trustId = 0
-  trustName = ''
-  $('.order-button').click (e)->
-    e.preventDefault()
-    trustId = $(e.target).attr('data-trust-id')
-    trustName = $(e.target).attr('data-trust-name')
-    $(this).modal()
 
-  $('#preorder_submit').click (event)->
-    event.preventDefault()
-
-    name = $('#name_input').val()
-    phone = $('#phone_input').val()
-
-    if name and phone
-      backend.createPreOrder
-        product_url: trustId
-        product_type: 'trust'
-        product_name: trustName
-        user_name: name
-        phone: phone
-      .done ->
-          alert '预约成功，稍后我们的客户经理会联系您'
-          $('#name_input').val ''
-          $('#phone_input').val ''
-          $.modal.close()
-
-      .fail ()->
-          alert '预约失败，请稍后再试或者拨打400-9999999'

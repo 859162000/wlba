@@ -81,6 +81,21 @@ body
   include include/footer
   include include/templates
 
+  form#order-form.order-form(style="display:none")
+      .modal-title-bar
+          span.modal-title 填写个人信息
+          a.icon-cancel.pull-right(rel="modal:close")
+      .padding-xl
+          div
+            input#name_input.full-width(type="text", placeholder="姓名")
+          div.margin-top-s
+            input#phone_input.full-width(type="text", placeholder="电话")
+          div.margin-top-s
+            button#preorder_submit.button.button-middle.button-red.full-width(href="#", type="submit") 立即预约
+          div.margin-top-s.d3-text.align-center
+            预约成功后，我们将在第一时间联系您<br/>或直接拨打
+            span.highlight 400-8588-066
+
   script.
     require(['/static/js/trust_home.js'])
 

@@ -38,21 +38,33 @@ class P2POperator(object):
 
     @classmethod
     def watchdog(cls):
+        print('watching for sold out.')
+        for product in ProductKeeper.get_sold_out():
+            try:
+                cls().over(product)
+            except P2PException, e:
+                cls.logger.error('%s %s.' % (product.id, e))
         print('watching for settle.')
         for product in ProductKeeper.get_ready_for_settle():
             try:
                 cls().settle(product)
-            except Exception, e:
+            except P2PException, e:
                 cls.logger.error('%s, %s' % (product.id, e))
                 print(e)
         print('watching for fail.')
         for product in ProductKeeper.get_ready_for_fail():
             try:
                 cls().fail(product)
-            except Exception, e:
+            except P2PException, e:
                 cls.logger.error('%s, %s' % (product.id, e))
                 print(e)
-        # todo rebuild amortize logic.
+        print('watching for amortize.')
+        for amortization in AmortizationKeeper.get_ready_for_settle():
+            try:
+                cls().amortize(amortization)
+            except P2PException, e:
+                cls.logger.error('%s, %s' % (amortization, e))
+                print(e)
 
     def settle(self, product):
         if product.ordered_amount != product.total_amount:
@@ -63,9 +75,7 @@ class P2POperator(object):
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
                 equity_keeper.settle(savepoint=False)
-
                 # Generate contract for each equity
-
             amo_keeper = AmortizationKeeper(product)
             amo_keeper.clearing(savepoint=False)
             product.status = u'还款中'
@@ -87,6 +97,13 @@ class P2POperator(object):
             raise P2PException('not ready for settle')
         if amortization.product.status != u'还款中':
             raise P2PException('not in pay status')
-        amo_keeper = AmortizationKeeper(amortization)
-        amo_keeper.amortize()
+        amo_keeper = AmortizationKeeper(amortization.product)
+        amo_keeper.amortize(amortization)
+
+    def over(self, product):
+        if product.total_amount != product.ordered_amount:
+            raise P2PException('product do not done yet')
+        product_keeper = ProductKeeper(product)
+        product_keeper.over()
+
 

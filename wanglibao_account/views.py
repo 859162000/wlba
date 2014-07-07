@@ -291,7 +291,6 @@ class AccountHome(TemplateView):
 
         return {
             'fund_hold_info': fund_hold_info,
-            'total_income': total_income,
             'income_rate': income_rate,
             'fund_income_week': fund_income_week,
             'fund_income_month': fund_income_month,
@@ -300,13 +299,14 @@ class AccountHome(TemplateView):
             'p2p_equities': p2p_equities,
             'p2p_product_amortization': p2p_product_amortization,
             'p2p_unpay_principle': unpayed_principle,
-            'p2p_total_asset': p2p_total_asset,
             'margin_withdrawing': user.margin.withdrawing,
             'margin_freeze': user.margin.freeze,
 
+            'p2p_total_asset': p2p_total_asset,
             'fund_total_asset': fund_total_asset,
             'total_asset': total_asset,
 
+            'total_income': total_income,
             'mode': mode
         }
 

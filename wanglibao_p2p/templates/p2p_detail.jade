@@ -111,11 +111,13 @@ html
               .p2p-detail-list.clearfix
                 h1 {{section_name}}
                 dl
-                  for item_name, item_value in section_values
+                  for item_name in section_values
                     dd {{item_name}}
+
                 if user.is_authenticated
                   ul
-                    for item_name, item_value in section_values
+                    for item_name in section_values
+                      item_value = section_values[item_name]
                       li {{item_value}}
                 else
                   ul.p2p-no-login

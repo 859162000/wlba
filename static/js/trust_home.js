@@ -9,7 +9,7 @@
   });
 
   require(['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/trustTable'], function($, _, ko, backend, tab, table) {
-    var DataViewModel, model;
+    var DataViewModel, model, trustId, trustName;
     DataViewModel = (function() {
       function DataViewModel() {
         var self;
@@ -137,12 +137,42 @@
     })();
     model = new DataViewModel();
     ko.applyBindings(model);
-    return backend.loadData('trust', {
+    backend.loadData('trust', {
       count: 10,
       ordering: '-issue_date',
       status: '在售'
     }).done(function(trusts) {
       return backend.joinFavorites(trusts, "trusts", model.trustTable);
+    });
+    trustId = 0;
+    trustName = '';
+    $('.order-button').click(function(e) {
+      e.preventDefault();
+      trustId = $(e.target).attr('data-trust-id');
+      trustName = $(e.target).attr('data-trust-name');
+      return $(this).modal();
+    });
+    return $('#preorder_submit').click(function(event) {
+      var name, phone;
+      event.preventDefault();
+      name = $('#name_input').val();
+      phone = $('#phone_input').val();
+      if (name && phone) {
+        return backend.createPreOrder({
+          product_url: trustId,
+          product_type: 'trust',
+          product_name: trustName,
+          user_name: name,
+          phone: phone
+        }).done(function() {
+          alert('预约成功，稍后我们的客户经理会联系您');
+          $('#name_input').val('');
+          $('#phone_input').val('');
+          return $.modal.close();
+        }).fail(function() {
+          return alert('预约失败，请稍后再试或者拨打4008-588-066');
+        });
+      }
     });
   });
 

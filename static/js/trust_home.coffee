@@ -114,3 +114,33 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/
   .done (trusts)->
       backend.joinFavorites(trusts, "trusts", model.trustTable)
 
+
+  trustId = 0
+  trustName = ''
+  $('.order-button').click (e)->
+    e.preventDefault()
+    trustId = $(e.target).attr('data-trust-id')
+    trustName = $(e.target).attr('data-trust-name')
+    $(this).modal()
+
+  $('#preorder_submit').click (event)->
+    event.preventDefault()
+
+    name = $('#name_input').val()
+    phone = $('#phone_input').val()
+
+    if name and phone
+      backend.createPreOrder
+        product_url: trustId
+        product_type: 'trust'
+        product_name: trustName
+        user_name: name
+        phone: phone
+      .done ->
+          alert '预约成功，稍后我们的客户经理会联系您'
+          $('#name_input').val ''
+          $('#phone_input').val ''
+          $.modal.close()
+
+      .fail ()->
+          alert '预约失败，请稍后再试或者拨打4008-588-066'

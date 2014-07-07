@@ -37,6 +37,9 @@ class MarginRecord(models.Model):
     def __unicode__(self):
         return u'%s , %s' % (self.catalog, self.user)
 
+    class Meta:
+        ordering = ['-create_time']
+
 
 def create_user_margin(sender, **kwargs):
     """
