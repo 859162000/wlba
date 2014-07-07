@@ -26,13 +26,15 @@
     border-left: 3px solid $color-pomegranate
     background: #F9FAF9
 
-    >a
+    a
       +link-colors($color-pomegranate, $color-pomegranate)
       cursor: default
 
   a
     +unstyled-link
     +link-colors(#666, #333)
+    display: block
+    text-align: center
 
 .sidebar-anchor
   +unstyled-link
