@@ -35,7 +35,7 @@
       $(banners[currentBanner]).fadeIn();
       return $(anchors[currentBanner]).toggleClass('active');
     }, 6000);
-    $('.background-anchor').click(function(e) {
+    return $('.background-anchor').click(function(e) {
       var index;
       e.preventDefault();
       index = $(e.target).parent().index();
@@ -46,9 +46,6 @@
         $(anchors[index]).toggleClass('active');
         return currentBanner = index;
       }
-    });
-    return $('.home-banner-2').click(function() {
-      return window.location.href = '/trust/detail/8526';
     });
   });
 

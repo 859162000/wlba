@@ -23,17 +23,18 @@ block main
           form#payform.payform(action="/pay/deposit/", method='post', target='_blank')
             - csrf_token
             .form-group
-              .span2
+              .row
                 label 金额(元)
-              .span2
-                input#amount(type='text', name='amount', placeholder='金额', value='100.00')
+              .row
+                .span2
+                  input#amount(type='text', name='amount', placeholder='金额', value='100.00')
             .form-group
               input#gate_id(type='hidden', name='gate_id', placeholder='银行', value='09')
-              .span2
+              .row
                 label 选择银行
-              .span10-omega
+              .row
                 .banks
-                  col_num = 3
+                  col_num = 4
                   count = len(banks)
                   rows = range(0, count/col_num)
                   cols = range(0, col_num)
@@ -43,10 +44,10 @@ block main
                       for col_index in cols
                         bank = banks[row_index * col_num + col_index]
                         if col_index != 2
-                          .span4
+                          .span3
                             a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
                         else
-                          .span4-omega
+                          .span3-omega
                             a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
                 .row.bank-description
                   for bank in banks
