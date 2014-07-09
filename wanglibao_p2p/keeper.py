@@ -101,7 +101,7 @@ class EquityKeeper(KeeperBaseMixin):
             user_margin_keeper.unfreeze(amount, savepoint=False)
             return record
 
-    def settle(self, description=u'', savepoint=True):
+    def settle(self, savepoint=True):
         with transaction.atomic(savepoint=savepoint):
             equity_query = P2PEquity.objects.filter(user=self.user, product=self.product)
             if (not equity_query.exists()) or (len(equity_query) != 1):
@@ -110,7 +110,7 @@ class EquityKeeper(KeeperBaseMixin):
             equity.confirm = True
             equity.save()
             catalog = u'申购确认'
-            description = u''
+            description = u'用户份额确认(%d)' % equity.equity
             self.__tracer(catalog, equity.equity, description)
             user_margin_keeper = MarginKeeper(self.user)
             user_margin_keeper.settle(equity.equity, savepoint=False)

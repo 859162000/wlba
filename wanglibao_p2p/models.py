@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import F, Sum, SET_NULL
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from jsonfield import JSONField
+from wanglibao.fields import JSONFieldUtf8
 from wanglibao.models import ProductBase
 from utility import gen_hash_list
 
@@ -87,7 +87,7 @@ class P2PProduct(ProductBase):
     total_amount = models.BigIntegerField(default=0, verbose_name=u'借款总额')
     ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
 
-    extra_data = JSONField(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
+    extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
     publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间')
     end_time = models.DateTimeField(default=timezone.now, verbose_name=u'终止时间')
