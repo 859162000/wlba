@@ -56,6 +56,7 @@ class Fund(ProductBase):
     profit_month = models.FloatField(default=0, help_text=u"当月收益")
 
     added = models.DateTimeField(default=timezone.now, help_text=u'加入系统时间')
+    rapid_redeem = models.BooleanField(help_text=u'是否支持快速赎回', default=False)
 
     def __unicode__(self):
         return u'%s' % (self.name, )
