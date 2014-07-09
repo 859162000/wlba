@@ -92,7 +92,7 @@ class P2PProduct(ProductBase):
     publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间')
     end_time = models.DateTimeField(default=timezone.now, verbose_name=u'终止时间')
 
-    limit_per_user = models.FloatField(verbose_name=u'单用户购买限额', default=0.2)
+    limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)', default=0.2)
 
     warrant_company = models.ForeignKey(WarrantCompany)
     usage = models.TextField(blank=True, verbose_name=u'项目用途')
@@ -164,8 +164,8 @@ class Attachment(models.Model):
 class AmortizationReadyManager(models.Manager):
     def get_queryset(self):
         return super(AmortizationReadyManager, self).get_queryset().filter(term_date__lt=timezone.now(),
-                                                                          ready_for_settle=True,
-                                                                          settled=False)
+                                                                           ready_for_settle=True,
+                                                                           settled=False)
 
 
 class ProductAmortization(models.Model):
@@ -358,7 +358,7 @@ class P2PRecord(models.Model):
         verbose_name_plural = u'产品流水'
 
     def __unicode__(self):
-        return u'流水号%s %s 发生金额%s' %(self.id, self.catalog, self.amount)
+        return u'流水号%s %s 发生金额%s' % (self.id, self.catalog, self.amount)
 
     def get_hash_list(self):
         return gen_hash_list(self.catalog, self.order_id, self.user.id, self.product.id, self.amount, self.create_time)
@@ -378,4 +378,4 @@ class EquityRecord(models.Model):
         verbose_name_plural = u'持仓流水'
 
     def __unicode__(self):
-        return u'%s %s %s %s' %(self.catalog, self.user, self.product, self.amount)
+        return u'%s %s %s %s' % (self.catalog, self.user, self.product, self.amount)

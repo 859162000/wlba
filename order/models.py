@@ -2,7 +2,7 @@
 import json
 from django.contrib.auth import get_user_model
 from django.db import models
-from jsonfield import JSONField
+from wanglibao.fields import JSONFieldUtf8
 
 
 class Order(models.Model):
@@ -15,11 +15,10 @@ class Order(models.Model):
 
     # Parent Order
     parent = models.ForeignKey("self", null=True, related_name='children')
-
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'订单创建时间')
 
     # Field for storing extra data
-    extra_data = JSONField(blank=True)
+    extra_data = JSONFieldUtf8(blank=True)
 
     def __unicode__(self):
         return u"%s %s %s" % (str(self.id), self.type, unicode(json.dumps(self.extra_data)))
@@ -36,7 +35,7 @@ class OrderNote(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    extra_data = JSONField(blank=True)
+    extra_data = JSONFieldUtf8(blank=True)
 
     class Meta:
         ordering=['-created_at']
