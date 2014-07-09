@@ -326,22 +326,6 @@ class AppInfoFetcher(AppLevel):
                 except IntegrityError, e:
                     pass
 
-        HotFund.objects.all().delete()
-        MobileHotFund.objects.all().delete()
-        hot_list = Fund.objects.filter(availablefund__isnull=False).order_by('-rate_7_days')[:20]
-
-        for index, item in enumerate(hot_list):
-            if index < 4:
-                hf = HotFund()
-                hf.fund = item
-                hf.hot_score = len(hot_list) - index
-                hf.save()
-
-            mhf = MobileHotFund()
-            mhf.fund = item
-            mhf.hot_score = len(hot_list) - index
-            mhf.save()
-
     def compute_user_daily_income(self):
         # get user list who had shumi access token
         users = get_user_model().objects.exclude(wanglibaouserprofile__shumi_access_token='')

@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 import decimal
 import logging
+from django.utils.decorators import method_decorator
 import requests
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import PayInfo
@@ -9,6 +10,7 @@ from wanglibao_pay.pay import Pay
 import socket
 from django.conf import settings
 from django.db import transaction
+from wanglibao_pay.util import get_client_ip
 from wanglibao_pay.views import PayResult
 import xml.etree.ElementTree as ET
 
@@ -144,9 +146,9 @@ class HuifuPay(Pay):
             for child in result:
                 data[child.tag] = child.text
 
-
-    @transaction.atomic
-    def handle_withdraw_result(data):
+    @classmethod
+    @method_decorator(transaction.atomic)
+    def handle_withdraw_result(cls, data):
         order_id = data.get('OrdId', '')
         try:
             pay_info = PayInfo.objects.select_for_update().get(pk=order_id)
@@ -202,8 +204,9 @@ class HuifuPay(Pay):
         pay_info.save()
         return result
 
-    @transaction.atomic
-    def handle_pay_result(request):
+    @classmethod
+    @method_decorator(transaction.atomic)
+    def handle_pay_result(cls, request):
         order_id = request.POST.get('OrdId', '')
         try:
             pay_info = PayInfo.objects.select_for_update().get(pk=order_id)

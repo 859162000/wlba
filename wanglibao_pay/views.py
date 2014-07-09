@@ -19,18 +19,10 @@ import decimal
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from wanglibao_pay.serializers import CardSerializer
+from wanglibao_pay.util import get_client_ip
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
-
-
-def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        return x_forwarded_for
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
 
 
 class BankListView(TemplateView):
