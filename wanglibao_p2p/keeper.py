@@ -1,26 +1,26 @@
 # encoding: utf-8
-import decimal
 from decimal import Decimal
 from django.db import transaction
 from django.db.models import Sum
+from order.mixins import KeeperBaseMixin
 from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
     UserAmortization
-from exceptions import ProductLack, ProductNotExist, P2PException
+from exceptions import ProductLack, P2PException
 
 
-class ProductKeeper(object):
+class ProductKeeper(KeeperBaseMixin):
 
-    def __init__(self, product, order=None):
+    def __init__(self, product, order_id=None):
+        super(ProductKeeper, self).__init__(product=product, order_id=order_id)
         self.product = product
-        self.order = order
 
     def reserve(self, amount, user, savepoint=True):
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
             self.product = P2PProduct.objects.select_for_update().filter(pk=self.product.pk).first()
             if amount > self.product.remain:
-                raise ProductLack('500')
+                raise ProductLack()
             self.product.ordered_amount += amount
             self.product.save()
             catalog = u'申购'
@@ -41,7 +41,7 @@ class ProductKeeper(object):
     def over(self, savepoint=True):
         with transaction.atomic(savepoint=savepoint):
             if self.product.ordered_amount != self.product.total_amount:
-                raise P2PException('product status not valid.')
+                raise P2PException(u'产品预约金额不等于产品总金额')
             self.product.status = u'已满标'
             self.product.save()
 
@@ -60,20 +60,18 @@ class ProductKeeper(object):
         products = P2PProduct.ready_for_fail.all()
         return products
 
-
     def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
-                          description=description, order_id=self.order, product=self.product)
+                          description=description, order_id=self.order_id, product=self.product)
         trace.save()
         return trace
 
 
-class EquityKeeper(object):
+class EquityKeeper(KeeperBaseMixin):
 
-    def __init__(self, user, product, order=None):
-        self.user = user
+    def __init__(self, user, product, order_id=None):
+        super(EquityKeeper, self).__init__(user=user, product=product, order_id=order_id)
         self.product = product
-        self.order = order
 
     def reserve(self, amount, description=u'', savepoint=True):
         check_amount(amount)
@@ -99,8 +97,9 @@ class EquityKeeper(object):
             equity.delete()
             catalog = u'流标取消'
             record = self.__tracer(catalog, amount)
-            user_margin_keeper = MarginKeeper(self.user, self.order)
+            user_margin_keeper = MarginKeeper(self.user, self.order_id)
             user_margin_keeper.unfreeze(amount, savepoint=False)
+            return record
 
     def settle(self, description=u'', savepoint=True):
         with transaction.atomic(savepoint=savepoint):
@@ -118,7 +117,7 @@ class EquityKeeper(object):
 
     def __tracer(self, catalog, amount, description=u''):
         trace = EquityRecord(catalog=catalog, amount=amount, description=description, user=self.user,
-                             product=self.product, order_id=self.order)
+                             product=self.product, order_id=self.order_id)
         trace.save()
         return trace
 
@@ -137,12 +136,11 @@ class EquityKeeper(object):
         return 0
 
 
-class AmortizationKeeper(object):
+class AmortizationKeeper(KeeperBaseMixin):
 
     def __init__(self, product, order=None):
+        super(AmortizationKeeper, self).__init__(product=product, order_id=order)
         self.product = product
-        self.order = order
-
 
     def clearing(self, savepoint=True):
         if self.product.status != u'已满标':
@@ -170,11 +168,9 @@ class AmortizationKeeper(object):
                 interest = interest.quantize(Decimal('.01'))
                 paid_interest += interest
                 paid_principal += principal
-                # print 'the %s term, principal %s , interest %s' %(i+1, principal, interest)
             else:
                 principal = total_principal - paid_principal
                 interest = total_interest - paid_interest
-                #print 'total %s - paid %s = %s' % (total_principal, paid_interest, interest)
 
             user_amo = UserAmortization(
                 product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
@@ -207,7 +203,7 @@ class AmortizationKeeper(object):
     def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u''):
         trace = AmortizationRecord(
             amortization=amortization, term=amortization.term, principal=principal, interest=interest,
-            penal_interest=penal_interest, description=description, user=user, catalog=catalog
+            penal_interest=penal_interest, description=description, user=user, catalog=catalog, order_id=self.order_id
         )
         trace.save()
         return trace

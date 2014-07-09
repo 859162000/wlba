@@ -3,15 +3,12 @@ from decimal import Decimal
 from django.db import transaction
 from models import Margin, MarginRecord
 from exceptions import MarginLack, MarginNotExist
+from order.mixins import KeeperBaseMixin
 
 
-class MarginKeeper(object):
-
-    def __init__(self, user, order=None):
-        if not Margin.objects.filter(user=user).exists():
-            raise MarginNotExist(u'100')
-        self.user = user
-        self.order = order
+class MarginKeeper(KeeperBaseMixin):
+    def __init__(self, user, order_id=None):
+        super(MarginKeeper, self).__init__(user=user, order_id=order_id)
 
     def freeze(self, amount, description=u'', savepoint=True):
         amount = Decimal(amount)
@@ -19,6 +16,7 @@ class MarginKeeper(object):
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.margin:
+                # TODO, check why 201? Magic number sucks, unless its famous, like 404 or 500
                 raise MarginLack(u'201')
             margin.margin -= amount
             margin.freeze += amount
@@ -87,7 +85,7 @@ class MarginKeeper(object):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def withdraw_rollback(self, amount, description=u'', is_already_successful=False ,savepoint=True):
+    def withdraw_rollback(self, amount, description=u'', is_already_successful=False, savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
@@ -129,7 +127,7 @@ class MarginKeeper(object):
 
     def __tracer(self, catalog, amount, margin_current, description=u''):
         trace = MarginRecord(catalog=catalog, amount=amount, margin_current=margin_current, description=description,
-                             order_id=self.order, user=self.user)
+                             order_id=self.order_id, user=self.user)
         trace.save()
         return trace
 

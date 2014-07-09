@@ -54,9 +54,11 @@ class ContractTemplate(models.Model):
 
 class P2PProduct(ProductBase):
     STATUS_CHOICES = (
+        (u'待审核', u'待审核'),
         (u'正在招标', u'正在招标'),
         (u'已满标', u'已满标'),
         (u'还款中', u'还款中'),
+        (u'流标', u'流标'),
         (u'已完成', u'已完成')
     )
 
@@ -69,10 +71,10 @@ class P2PProduct(ProductBase):
     short_name = models.CharField(max_length=64, verbose_name=u'短名字')
     serial_number = models.CharField(max_length=100, verbose_name=u'产品编号', unique=True, null=True)
 
-    status = models.CharField(max_length=16, default=u'正在招标',
+    status = models.CharField(max_length=16, default=u'待审核',
                               choices=STATUS_CHOICES,
                               verbose_name=u'产品状态',
-                              help_text=u'(正在招标，已满标，还款中, 已完成)')
+                              help_text=u'(待审核，正在招标，已满标，还款中，流标，已完成)')
 
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)')
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
@@ -131,12 +133,6 @@ class P2PProduct(ProductBase):
         if amount <= self.remain:
             return True
         return False
-
-
-class ProductProxy(P2PProduct):
-    class Meta:
-        proxy = True
-        verbose_name_plural =u'产品特殊权限'
 
 
 class Warrant(models.Model):

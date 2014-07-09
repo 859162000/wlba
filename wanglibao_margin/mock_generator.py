@@ -18,6 +18,6 @@ class MockGenerator(object):
 
         for u in users:
             order = OrderHelper.place_order()
-            keeper = MarginKeeper(order=order.id, user=u)
+            keeper = MarginKeeper(order_id=order.id, user=u)
             keeper.deposit(100000000)
 

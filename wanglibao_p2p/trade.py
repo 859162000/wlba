@@ -1,7 +1,7 @@
 # encoding: utf-8
 import logging
 from django.db import transaction
-from order.utils import OrderHelper
+from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
@@ -10,25 +10,29 @@ from exceptions import P2PException
 
 class P2PTrader(object):
 
-    def __init__(self, product, user, order=None, request=None):
+    def __init__(self, product, user, order_id=None, request=None):
         self.user = user
         self.product = product
         self.request = request
-        if order is None:
-            self.order = OrderHelper.place_order(user).id
+        if order_id is None:
+            self.order_id = OrderHelper.place_order(user, order_type=u'产品申购', product_id=product.id, status=u'新建').id
         else:
-            self.order = order
-        self.margin_keeper = MarginKeeper(user, self.order)
-        self.product_keeper = ProductKeeper(product, self.order)
-        self.equity_keeper = EquityKeeper(user, product, self.order)
+            self.order_id = order_id
+        self.margin_keeper = MarginKeeper(user=user, order_id=self.order_id)
+        self.product_keeper = ProductKeeper(product, order_id=self.order_id)
+        self.equity_keeper = EquityKeeper(user=user, product=product, order_id=self.order_id)
 
     def purchase(self, amount):
         description = u'购买P2P产品 %s %s 份' %(self.product.short_name, amount)
+        if self.user.wanglibaouserprofile.frozen:
+            raise P2PException('User account is frozen')
         with transaction.atomic():
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False)
             margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
             equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
-            # todo update order info
+
+            OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
+
             return product_record, margin_record, equity
 
 

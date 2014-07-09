@@ -24,7 +24,7 @@ class MockGenerator(object):
             for warrant_company in WarrantCompany.objects.all():
                 warrant_company.delete()
 
-        for index in range(0, 20):
+        for index in range(0, 5):
             # generate warrant company
             warrant_company = WarrantCompany()
             warrant_company.name = u'担保公司 %d' % index
@@ -34,6 +34,7 @@ class MockGenerator(object):
             for index in range(0, 3):
                 p2p = P2PProduct()
 
+                p2p.status = P2PProduct.STATUS_CHOICES[random.randrange(0, 4)][0]
                 p2p.name = u'P2P产品' + str(index + 1)
                 p2p.short_name = u'P2P 短名'
                 p2p.pay_method = u'按月还款 等额本息'

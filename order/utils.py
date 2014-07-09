@@ -1,3 +1,4 @@
+# coding=utf-8
 from order.models import Order, OrderNote
 
 
@@ -6,10 +7,10 @@ class OrderHelper(object):
     Places the order
     """
     @classmethod
-    def place_order(cls, user=None, **fields):
+    def place_order(cls, user=None, order_type=u'默认订单类型', status=u'新建', **fields):
         order_data = {
-            "type": "DEFAULT",
-            "status": "New",
+            "type": order_type,
+            "status": status,
         }
 
         order = Order(**order_data)
@@ -22,10 +23,9 @@ class OrderHelper(object):
     @classmethod
     def update_order(cls, order, user=None, **fields):
         order.extra_data = fields
-        if 'type' in fields:
-            order.type = fields['type']
-        if 'status' in fields:
-            order.status = fields['status']
+        order.type = fields.get('type', order.type)
+        order.type = fields.get('order_type', order.type)
+        order.status = fields.get('status', order.status)
 
         order.save()
 

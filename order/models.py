@@ -13,6 +13,9 @@ class Order(models.Model):
     type = models.CharField(max_length=64, verbose_name=u'订单类型')
     status = models.CharField(max_length=64, verbose_name=u'订单状态')
 
+    # Parent Order
+    parent = models.ForeignKey("self", null=True, related_name='children')
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'订单创建时间')
 
     # Field for storing extra data
@@ -34,6 +37,9 @@ class OrderNote(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     extra_data = JSONField(blank=True)
+
+    class Meta:
+        ordering=['-created_at']
 
     def __unicode__(self):
         return u'%s (%s)' % (self.message[:50], self.user)
