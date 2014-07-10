@@ -208,6 +208,7 @@ def deploy():
                 run('git reset --hard HEAD')
                 run('git remote set-url origin %s' % env.depot)
                 run("git checkout %s" % env.branch)
+                run("git branch --set-upstream %s origin/%s" % (env.branch, env.branch))
                 run("git pull")
 
         apt_get("gcc", "python-setuptools", "python-all-dev", "libpq-dev", "libjpeg-dev")
