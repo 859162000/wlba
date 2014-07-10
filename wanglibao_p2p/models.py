@@ -57,6 +57,9 @@ class P2PProduct(ProductBase):
         (u'待审核', u'待审核'),
         (u'正在招标', u'正在招标'),
         (u'已满标', u'已满标'),
+        (u'满标待处理', u'满标待处理'),
+        (u'满标待审核', u'满标待审核'),
+        (u'满标已审核', u'满标已审核'),
         (u'还款中', u'还款中'),
         (u'流标', u'流标'),
         (u'已完成', u'已完成')
@@ -73,8 +76,7 @@ class P2PProduct(ProductBase):
 
     status = models.CharField(max_length=16, default=u'待审核',
                               choices=STATUS_CHOICES,
-                              verbose_name=u'产品状态',
-                              help_text=u'(待审核，正在招标，已满标，还款中，流标，已完成)')
+                              verbose_name=u'产品状态')
 
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)')
     brief = models.TextField(blank=True, verbose_name=u'产品点评')

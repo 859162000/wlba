@@ -11,9 +11,11 @@ from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db.models import Sum, F
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, \
+    HttpResponseNotFound, Http404
 from django.shortcuts import resolve_url, render
-from django.template import Template
+from django.template import Template, Context
+from django.template.loader import get_template
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -23,14 +25,12 @@ from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
-from utils import detect_identifier_type, create_user
+from utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
-from wanglibao_account.models import VerifyCounter
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization
@@ -542,18 +542,14 @@ class P2PAmortizationView(TemplateView):
             'amortizations': amortizations
         }
 
+
 @login_required
 def user_product_contract(request, product_id):
     equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
 
-    context = {
-        'equity': equity
-    }
-
-    if equity.product.contract_template is None:
-        return render(request, 'renrenjucai.jade', context)
-
-    else:
-        # Load the template from database
-        template = Template(equity.product.contract_template.content)
-        return HttpResponse(template.render(context))
+    try:
+        with equity.contract.open(mode='rb') as f:
+            lines = f.readlines()
+            return HttpResponse("\n".join(lines))
+    except ValueError, e:
+        raise Http404

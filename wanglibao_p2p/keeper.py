@@ -1,8 +1,12 @@
 # encoding: utf-8
 from decimal import Decimal
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db import transaction
 from django.db.models import Sum
 from order.mixins import KeeperBaseMixin
+from wanglibao_account.utils import generate_contract
 from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
     UserAmortization
@@ -22,6 +26,10 @@ class ProductKeeper(KeeperBaseMixin):
             if amount > self.product.remain:
                 raise ProductLack()
             self.product.ordered_amount += amount
+
+            if self.product.ordered_amount == self.product.total_amount:
+                self.product.status = u'满标待处理'
+
             self.product.save()
             catalog = u'申购'
             record = self.__tracer(catalog, amount, user, self.product.remain)
@@ -31,10 +39,9 @@ class ProductKeeper(KeeperBaseMixin):
         """
         call after product startup.
         """
-        # todo: check product status and so..
         with transaction.atomic(savepoint=savepoint):
             amo_keeper = AmortizationKeeper(self.product)
-            amo_keeper.clearing(savepoint=False)
+            amo_keeper.generate_amortization_plan(savepoint=False)
             self.product.status = u'还款中'
             self.product.save()
 
@@ -115,6 +122,18 @@ class EquityKeeper(KeeperBaseMixin):
             user_margin_keeper = MarginKeeper(self.user)
             user_margin_keeper.settle(equity.equity, savepoint=False)
 
+    def generate_contract(self, savepoint=True):
+        with transaction.atomic(savepoint=savepoint):
+            product = self.product
+            user = self.user
+            equity_query = P2PEquity.objects.filter(user=user, product=product)
+            if (not equity_query.exists()) or (len(equity_query) != 1):
+                raise P2PException('can not get equity info.')
+            equity = equity_query.first()
+            contract_string = generate_contract(equity)
+            equity.contract.save(str(equity.id)+'.html', ContentFile(contract_string))
+            equity.save()
+
     def __tracer(self, catalog, amount, description=u''):
         trace = EquityRecord(catalog=catalog, amount=amount, description=description, user=self.user,
                              product=self.product, order_id=self.order_id)
@@ -138,18 +157,18 @@ class EquityKeeper(KeeperBaseMixin):
 
 class AmortizationKeeper(KeeperBaseMixin):
 
-    def __init__(self, product, order=None):
-        super(AmortizationKeeper, self).__init__(product=product, order_id=order)
+    def __init__(self, product, order_id=None):
+        super(AmortizationKeeper, self).__init__(product=product, order_id=order_id)
         self.product = product
 
-    def clearing(self, savepoint=True):
-        if self.product.status != u'已满标':
+    def generate_amortization_plan(self, savepoint=True):
+        if self.product.status != u'满标待处理':
             raise P2PException('invalid product status.')
         self.amortizations = self.product.amortizations.all()
         self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
-        self.equities = self.product.equities.all()
+        equities = self.product.equities.all()
 
-        for equity in self.equities:
+        for equity in equities:
             with transaction.atomic(savepoint=savepoint):
                 ProductAmortization.objects.select_for_update().filter(product=self.product)
                 self.__dispatch(equity)
@@ -207,6 +226,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         )
         trace.save()
         return trace
+
 
 def check_amount(amount):
     pass

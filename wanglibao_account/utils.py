@@ -5,11 +5,10 @@ import re
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
+from django.template import Context, Template
+from django.template.loader import render_to_string, get_template
 from registration.models import RegistrationProfile
-import requests
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd
-from wanglibao_account.models import IdVerification
 import logging
 
 logger = logging.getLogger(__name__)
@@ -104,3 +103,23 @@ def verify_id(name, id_number):
         return ProductionIDVerifyBackEnd.verify(name, id_number)
     else:
         raise NameError("The specific backend not implemented")
+
+
+def generate_contract(equity):
+    """
+    Generate the contract file for the equity.
+
+    :param equity: Equity param, which links the product and user
+    :return: The string representation of the contract
+    """
+    context = Context({
+        'equity': equity
+    })
+
+    if equity.product.contract_template is None:
+        template = get_template('renrenjucai.jade')
+    else:
+        # Load the template from database
+        template = Template(equity.product.contract_template.content)
+
+    return template.render(context)
