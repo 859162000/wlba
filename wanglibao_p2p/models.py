@@ -23,24 +23,6 @@ class WarrantCompany(models.Model):
         return u'%s' % self.name
 
 
-class P2PSoldOutManager(models.Manager):
-    def get_queryset(self):
-        return super(P2PSoldOutManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
-                                                                    status__exact=u'正在招标')
-
-
-class P2PReadyForSettleManager(models.Manager):
-    def get_queryset(self):
-        return super(P2PReadyForSettleManager, self).get_queryset().filter(total_amount__exact=F('ordered_amount'),
-                                                                           status__exact=u'已满标')
-
-
-class P2PReadyForFailManager(models.Manager):
-    def get_queryset(self):
-        return super(P2PReadyForFailManager, self).get_queryset().filter(end_time__lt=timezone.now(),
-                                                                         status__exact=u'正在招标')
-
-
 class ContractTemplate(models.Model):
     name = models.CharField(u'名字', max_length=32)
     content = models.TextField(u'模板内容', default='')
@@ -102,11 +84,6 @@ class P2PProduct(ProductBase):
 
     contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True)
 
-    objects = models.Manager()
-    sold_out = P2PSoldOutManager()
-    ready_for_settle = P2PReadyForSettleManager()
-    ready_for_fail = P2PReadyForFailManager()
-
     class Meta:
         verbose_name_plural = u'P2P产品'
 
@@ -165,7 +142,7 @@ class Attachment(models.Model):
 
 class AmortizationReadyManager(models.Manager):
     def get_queryset(self):
-        return super(AmortizationReadyManager, self).get_queryset().filter(term_date__lt=timezone.now(),
+        return super(AmortizationReadyManager, self).get_queryset().filter(term_date__lte=timezone.now(),
                                                                            ready_for_settle=True,
                                                                            settled=False)
 
@@ -185,7 +162,6 @@ class ProductAmortization(models.Model):
     ready_for_settle = models.BooleanField(verbose_name=u'是否可以开始结算', default=False)
 
     created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
-
     description = models.CharField(verbose_name=u'摘要', max_length=500, blank=True)
 
     objects = models.Manager()
@@ -325,7 +301,7 @@ class AmortizationRecord(models.Model):
     interest = models.DecimalField(verbose_name=u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(verbose_name=u'额外罚息', max_digits=20, decimal_places=2)
 
-    user = models.ForeignKey(get_user_model())
+    user = models.ForeignKey(get_user_model(), null=True)
     created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
     description = models.CharField(verbose_name=u'摘要', max_length=1000)

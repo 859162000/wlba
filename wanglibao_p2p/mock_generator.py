@@ -95,12 +95,11 @@ class MockGenerator(object):
             warrant_company=warrant_company
         )
         now = timezone.now()
-        delta = datetime.timedelta(minutes=term_delta_minute)
         principal = amount
         interest = amount * 0.1
         for i in xrange(1, terms+1):
             ProductAmortization.objects.create(
-                product=product, term=terms, term_date=now+delta*i, principal=principal/terms, interest=interest/terms,
+                product=product, term=terms, term_date=now, principal=principal/terms, interest=interest/terms,
             )
         return product
 

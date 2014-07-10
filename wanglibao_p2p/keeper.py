@@ -1,8 +1,6 @@
 # encoding: utf-8
 from decimal import Decimal
-from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.db import transaction
 from django.db.models import Sum
 from order.mixins import KeeperBaseMixin
@@ -51,21 +49,6 @@ class ProductKeeper(KeeperBaseMixin):
                 raise P2PException(u'产品预约金额不等于产品总金额')
             self.product.status = u'已满标'
             self.product.save()
-
-    @classmethod
-    def get_sold_out(cls):
-        products = P2PProduct.sold_out.all()
-        return products
-
-    @classmethod
-    def get_ready_for_settle(cls):
-        products = P2PProduct.ready_for_settle.all()
-        return products
-
-    @classmethod
-    def get_ready_for_fail(cls):
-        products = P2PProduct.ready_for_fail.all()
-        return products
 
     def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
@@ -214,10 +197,11 @@ class AmortizationKeeper(KeeperBaseMixin):
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest,
                                             sub_amo.penal_interest, savepoint=False, description=description)
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                              description, amortization)
+                              amortization, description)
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'
+            self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u''):
         trace = AmortizationRecord(

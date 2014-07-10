@@ -1,6 +1,7 @@
 # encoding: utf-8
 import logging
 from django.db import transaction
+from django.utils import timezone
 from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
@@ -43,22 +44,34 @@ class P2POperator(object):
 
     @classmethod
     def watchdog(cls):
-        print('watching for settle.')
-        for product in ProductKeeper.get_ready_for_settle():
+        print('Getting products with status 满标待处理')
+        for product in P2PProduct.objects.filter(status=u'满标待处理'):
+            try:
+                cls().preprocess_for_settle(product)
+            except P2PException, e:
+                cls.logger.error('%s, %s' % (product.id, e))
+                print(e)
+
+        print('Getting products with status 满标已审核')
+        for product in P2PProduct.objects.filter(status=u'满标已审核'):
             try:
                 cls().settle(product)
             except P2PException, e:
                 cls.logger.error('%s, %s' % (product.id, e))
                 print(e)
-        print('watching for fail.')
-        for product in ProductKeeper.get_ready_for_fail():
+
+        print('Getting products with status 正在招标 and end time earlier than now')
+        for product in P2PProduct.objects.filter(status=u'正在招标', end_time__lte=timezone.now()):
             try:
                 cls().fail(product)
             except P2PException, e:
                 cls.logger.error('%s, %s' % (product.id, e))
                 print(e)
-        print('watching for amortize.')
-        for amortization in AmortizationKeeper.get_ready_for_settle():
+
+        print('Getting amortization needs handle')
+        amortizations_to_settle = AmortizationKeeper.get_ready_for_settle()
+        print 'Get %d amortizations' % len(amortizations_to_settle)
+        for amortization in amortizations_to_settle:
             try:
                 cls().amortize(amortization)
             except P2PException, e:
@@ -93,7 +106,8 @@ class P2POperator(object):
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
                 equity_keeper.settle(savepoint=False)
-                # Generate contract for each equity
+            product.status = u'还款中'
+            product.save()
 
     def fail(self, product):
         if product.status == u'流标':
@@ -111,5 +125,13 @@ class P2POperator(object):
             raise P2PException('not ready for settle')
         if amortization.product.status != u'还款中':
             raise P2PException('not in pay status')
-        amo_keeper = AmortizationKeeper(amortization.product)
-        amo_keeper.amortize(amortization)
+        with transaction.atomic():
+            amo_keeper = AmortizationKeeper(amortization.product)
+            amo_keeper.amortize(amortization)
+
+            product = amortization.product
+            all_settled = reduce(lambda flag, a: flag & a.settled, product.amortizations.all(), True)
+            if all_settled:
+                self.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
+                product.status = u'已完成'
+                product.save()
