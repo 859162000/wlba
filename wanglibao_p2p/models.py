@@ -113,6 +113,15 @@ class P2PProduct(ProductBase):
             return True
         return False
 
+    def audit_link(self):
+        if self.status == u'满标待审核':
+            return u'<a href="/p2p/audit/%d/" class="link">审核</a>' % self.id
+        else:
+            return u'-'
+
+    audit_link.short_description = u'审核'
+    audit_link.allow_tags = True
+
 
 class Warrant(models.Model):
     name = models.CharField(max_length=16, verbose_name=u'名字')

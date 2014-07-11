@@ -1,0 +1,55 @@
+doctype html
+
+html
+  head
+    title p2p 产品审核页面
+    include include/common_head
+
+  body
+    .container
+      h2 产品详情
+
+      table.table
+        thead
+          tr
+            th 名字
+            th 产品总金额
+            th 产品以募集金额
+
+        tbody
+          tr
+            td {{p2p.name}}
+            td {{p2p.total_amount}}
+            td {{p2p.ordered_amount}}
+
+      h2 用户持仓情况
+
+      equities = p2p.equities.all()
+      table.table
+        thead
+          tr
+            th 用户id
+            th 用户手机号
+            th 用户姓名
+            th 身份证
+            th 认购份额
+            th 合同
+
+        tbody
+          for equity in equities
+            tr
+              td {{equity.user.id}}
+              td {{equity.user.wanglibaouserprofile.phone}}
+              td {{equity.user.wanglibaouserprofile.name}}
+              td {{equity.user.wanglibaouserprofile.id_number}}
+              td {{equity.equity}}
+              if equity.contract
+                td {{equity.contract}}
+              else
+                td 合同未生成
+
+      form(method="POST", action="{{request.url}}").pull-left
+        -csrf_token
+        button.button-primary(type="submit") 审核通过
+
+      a.button-primary.margin-left-m(href="/admin/wanglibao_p2p/p2pproduct/") 返回

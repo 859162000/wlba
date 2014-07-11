@@ -1,4 +1,7 @@
+from django.conf.urls import patterns, url
 from django.contrib import admin
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 
@@ -24,7 +27,8 @@ class P2PProductAdmin(admin.ModelAdmin):
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline
     ]
-    list_display = ('name', 'short_name', 'status', 'pay_method', 'end_time', 'closed')
+    list_display = ('name', 'short_name', 'status', 'pay_method', 'end_time', 'closed', 'audit_link')
+    list_editable = ('status',)
     list_filter = ('status', 'closed',)
 
 

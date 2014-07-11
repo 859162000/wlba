@@ -1,8 +1,9 @@
 # encoding: utf8
+from django.contrib.admin.views.decorators import staff_member_required
 
 from django.http import Http404
 from django.utils import timezone
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -66,3 +67,17 @@ class PurchaseP2P(APIView):
             return Response({
                 "message": form.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AuditProductView(TemplateView):
+    template_name = 'audit_p2p.jade'
+
+    def get_context_data(self, **kwargs):
+        pk = kwargs['id']
+        p2p = P2PProduct.objects.get(pk=pk)
+        return {
+            "p2p": p2p
+        }
+
+
+audit_product_view = staff_member_required(AuditProductView.as_view())
