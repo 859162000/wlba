@@ -1,16 +1,13 @@
 # encoding: utf-8
-from datetime import date, datetime
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from django.contrib.auth.models import User
+
 from order.models import Order
-from order.utils import OrderHelper
-
 from wanglibao_margin.marginkeeper import MarginKeeper
-
 from mock_generator import MockGenerator
-from models import P2PProduct, WarrantCompany, ProductAmortization, P2PEquity, UserAmortization, P2PRecord, EquityRecord
+from models import P2PProduct, WarrantCompany, P2PEquity
 from trade import P2PTrader, P2POperator
-from exceptions import P2PException
+
 # Create your tests here.
 from wanglibao_margin.models import MarginRecord
 
