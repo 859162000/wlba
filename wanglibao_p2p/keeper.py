@@ -33,6 +33,12 @@ class ProductKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, user, self.product.remain)
             return record
 
+    def audit(self, user):
+        if self.product.status == u'满标待审核':
+            self.product.status = u'满标已审核'
+            self.product.save()
+            self.__tracer(u'状态变化', 0, user, self.product.remain, u'产品状态由[满标待审核]转为[满标已审核]')
+
     def settle(self, savepoint=True):
         """
         call after product startup.

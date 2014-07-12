@@ -10,6 +10,7 @@ from trade import P2PTrader, P2POperator
 
 # Create your tests here.
 from wanglibao_margin.models import MarginRecord
+from wanglibao_p2p.keeper import ProductKeeper
 
 
 class TraderTestCase(TransactionTestCase):
@@ -121,11 +122,9 @@ class TraderTestCase(TransactionTestCase):
         # Run the operator and check status -> 满标待审核
         operator.watchdog()
 
+        # 满标待审核 -> 满标已审核
         product = P2PProduct.objects.first()
-        self.assertEqual(product.status, u'满标待审核')
-
-        product.status = u'满标已审核'
-        product.save()
+        ProductKeeper(product).audit(self.user1)
 
         # status -> 还款中
         operator.watchdog()

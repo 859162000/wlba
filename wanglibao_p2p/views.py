@@ -1,7 +1,7 @@
 # encoding: utf8
 from django.contrib.admin.views.decorators import staff_member_required
 
-from django.http import Http404
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.views.generic import TemplateView, View
 from rest_framework import status
@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from wanglibao_p2p.forms import PurchaseForm
+from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct
 from wanglibao_p2p.trade import P2PTrader
 
@@ -75,9 +76,19 @@ class AuditProductView(TemplateView):
     def get_context_data(self, **kwargs):
         pk = kwargs['id']
         p2p = P2PProduct.objects.get(pk=pk)
+
+        if p2p.status != u'满标待审核':
+            return HttpResponse(u'产品状态不是满标待审核')
+
         return {
             "p2p": p2p
         }
+
+    def post(self, request, **kwargs):
+        pk = kwargs['id']
+        p2p = P2PProduct.objects.get(pk=pk)
+        ProductKeeper(p2p).audit(request.user)
+        return HttpResponseRedirect('/admin/wanglibao_p2p/p2pproduct/')
 
 
 audit_product_view = staff_member_required(AuditProductView.as_view())
