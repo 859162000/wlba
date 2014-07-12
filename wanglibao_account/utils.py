@@ -5,7 +5,7 @@ import re
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
-from django.template import Context, Template
+from django.template import Context, Template, add_to_builtins
 from django.template.loader import render_to_string, get_template
 from registration.models import RegistrationProfile
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd
@@ -18,6 +18,9 @@ ALPHABET = string.ascii_uppercase + string.ascii_lowercase + \
 ALPHABET_REVERSE = dict((c, i) for (i, c) in enumerate(ALPHABET))
 BASE = len(ALPHABET)
 SIGN_CHARACTER = '$'
+
+# Try to load pyjade tags
+add_to_builtins('pyjade.ext.django.templatetags')
 
 
 def num_encode(n):
