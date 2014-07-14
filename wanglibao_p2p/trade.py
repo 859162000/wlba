@@ -48,7 +48,7 @@ class P2POperator(object):
     @classmethod
     def watchdog(cls):
         print('Getting products with status 满标待处理')
-        for product in P2PProduct.objects.filter(status=u'满标待处理'):
+        for product in P2PProduct.objects.filter(status=u'满标已打款'):
             try:
                 cls().preprocess_for_settle(product)
             except P2PException, e:
@@ -87,8 +87,8 @@ class P2POperator(object):
         # Create an order to link all changes
         order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
 
-        if product.status != u'满标待处理':
-            raise P2PException(u'产品状态(%s)不是(满标待处理)' % product.status)
+        if product.status != u'满标已打款':
+            raise P2PException(u'产品状态(%s)不是(满标已打款)' % product.status)
         with transaction.atomic():
             # Generate the amotization plan and contract for each equity(user)
             amo_keeper = AmortizationKeeper(product, order_id=order.id)

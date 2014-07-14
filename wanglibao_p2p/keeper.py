@@ -27,7 +27,7 @@ class ProductKeeper(KeeperBaseMixin):
             self.product.ordered_amount += amount
 
             if self.product.ordered_amount == self.product.total_amount:
-                self.product.status = u'满标待处理'
+                self.product.status = u'满标待打款'
                 self.product.soldout_time = timezone.now()
 
             self.product.save()
@@ -40,16 +40,6 @@ class ProductKeeper(KeeperBaseMixin):
             self.product.status = u'满标已审核'
             self.product.save()
             self.__tracer(u'状态变化', 0, user, self.product.remain, u'产品状态由[满标待审核]转为[满标已审核]')
-
-    def settle(self, savepoint=True):
-        """
-        call after product startup.
-        """
-        with transaction.atomic(savepoint=savepoint):
-            amo_keeper = AmortizationKeeper(self.product)
-            amo_keeper.generate_amortization_plan(savepoint=False)
-            self.product.status = u'还款中'
-            self.product.save()
 
     def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
@@ -146,7 +136,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         self.product = product
 
     def generate_amortization_plan(self, savepoint=True):
-        if self.product.status != u'满标待处理':
+        if self.product.status != u'满标已打款':
             raise P2PException('invalid product status.')
         self.amortizations = self.product.amortizations.all()
         self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']

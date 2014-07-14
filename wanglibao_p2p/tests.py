@@ -54,7 +54,10 @@ class TraderTestCase(TransactionTestCase):
         # Now The product status should be pre settle, which means some one should do the final check,
         # Do money transfer, and if everything works, then he or she should change status to 还款中
         product = P2PProduct.objects.get(pk=product.id)
-        self.assertEqual(product.status, u'满标待处理')
+        self.assertEqual(product.status, u'满标待打款')
+
+        product.status = u'满标已打款'
+        product.save()
 
         operator = P2POperator()
         operator.preprocess_for_settle(product=product)
@@ -83,7 +86,10 @@ class TraderTestCase(TransactionTestCase):
         # Now The product status should be pre settle, which means some one should do the final check,
         # Do money transfer, and if everything works, then he or she should change status to 还款中
         product = P2PProduct.objects.get(pk=product.id)
-        self.assertEqual(product.status, u'满标待处理')
+        self.assertEqual(product.status, u'满标待打款')
+
+        product.status = u'满标已打款'
+        product.save()
 
         operator = P2POperator()
         operator.preprocess_for_settle(product=product)
@@ -172,19 +178,23 @@ class TraderTestCase(TransactionTestCase):
         P2PTrader(product, self.user1).purchase(100000)
 
         product = P2PProduct.objects.first()
-        self.assertEqual(product.status, u'满标待处理')
+        self.assertEqual(product.status, u'满标待打款')
 
-        # Run the operator and check status -> 满标待审核
+        # Stimulate that the money already paid
+        product.status = u'满标已打款'
+        product.save()
+
+        # status -> 满标待审核
         operator.watchdog()
         product = P2PProduct.objects.first()
         user_amortizations = UserAmortization.objects.filter(product_amortization__in=product.amortizations.all())
 
         user_amortizations_count = len(user_amortizations)
 
-        # Some body may manually set status to 满标待处理 in case some error detected, system should
+        # Some body may manually set status to 满标已打款 in case some error detected, system should
         # support this case
         product = P2PProduct.objects.get(pk=product.id)
-        product.status = u'满标待处理'
+        product.status = u'满标已打款'
 
         # Regenerate user amortization plan
         operator.watchdog()
