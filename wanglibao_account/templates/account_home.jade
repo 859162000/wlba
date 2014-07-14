@@ -98,8 +98,8 @@ block main
               th 投资金额
               th 状态
               th 已收益/预期收益
-              th
-              th
+              th 还款计划
+              th 借款合同
           tbody
             if p2p_equities
               each equity in p2p_equities
@@ -113,12 +113,22 @@ block main
                     p 年化收益：{{equity.product.expected_earning_rate}}%
                     p 期限：{{equity.product.period}}个月
                   td {{equity.equity | money_format}}
-                  td 还款中{{term}}/{{equity.product.amortization_count}}
+
+                  if equity.product.status != '还款中'
+                    td {{equity.product.status}}
+                  else
+                    td {{equity.product.status}}{{term}}/{{equity.product.amortization_count}}
+
                   td <span class="highlight">{{equity.paid_interest | money_format}}</span> / {{total_income | money_format}}
-                  td
-                    a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{equity.product.id}}/") 还款计划
-                  td
-                    a.button.button-small.button-pink(href="/accounts/p2p/contract/{{equity.product.id}}/" target="_blank") 合同
+
+                  if equity.product.status == '还款中' or equity.product.status == '已完成'
+                    td
+                      a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{equity.product.id}}/") 还款计划
+                    td
+                      a.button.button-small.button-pink(href="/accounts/p2p/contract/{{equity.product.id}}/" target="_blank") 合同
+                  else
+                    td -
+                    td -
             else
               tr
                 td(colspan='7') 无持仓记录

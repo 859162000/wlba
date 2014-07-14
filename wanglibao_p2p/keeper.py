@@ -51,13 +51,6 @@ class ProductKeeper(KeeperBaseMixin):
             self.product.status = u'还款中'
             self.product.save()
 
-    def over(self, savepoint=True):
-        with transaction.atomic(savepoint=savepoint):
-            if self.product.ordered_amount != self.product.total_amount:
-                raise P2PException(u'产品预约金额不等于产品总金额')
-            self.product.status = u'已满标'
-            self.product.save()
-
     def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
                           description=description, order_id=self.order_id, product=self.product)
