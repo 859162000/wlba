@@ -1,5 +1,6 @@
 # encoding: utf-8
 from decimal import Decimal
+from dateutil.relativedelta import relativedelta
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import Sum
@@ -142,11 +143,18 @@ class AmortizationKeeper(KeeperBaseMixin):
         self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
         equities = self.product.equities.all()
 
+        today = timezone.now()
+        for index, amortization in enumerate(self.amortizations):
+            if amortization.term_date is None:
+                amortization.term_date = today + relativedelta(months=index+1)
+                amortization.save()
+
         # Delete all old user amortizations
         with transaction.atomic(savepoint=savepoint):
             UserAmortization.objects.filter(product_amortization__in=self.amortizations).delete()
+
+            ProductAmortization.objects.select_for_update().filter(product=self.product)
             for equity in equities:
-                ProductAmortization.objects.select_for_update().filter(product=self.product)
                 self.__dispatch(equity)
 
     def __dispatch(self, equity):

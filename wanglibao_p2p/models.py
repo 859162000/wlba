@@ -95,8 +95,6 @@ class P2PProduct(ProductBase):
 
     contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True)
 
-
-
     class Meta:
         verbose_name_plural = u'P2P产品'
 
@@ -172,19 +170,19 @@ class AmortizationReadyManager(models.Manager):
 class ProductAmortization(models.Model):
     product = models.ForeignKey(P2PProduct, related_name='amortizations')
 
-    term = models.IntegerField(verbose_name=u'还款期数')
-    term_date = models.DateTimeField(verbose_name=u'还款时间')
-    principal = models.DecimalField(verbose_name=u'返还本金', max_digits=20, decimal_places=2)
-    interest = models.DecimalField(verbose_name=u'返还利息', max_digits=20, decimal_places=2)
-    penal_interest = models.DecimalField(verbose_name=u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
+    term = models.IntegerField(u'还款期数')
+    term_date = models.DateTimeField(u'还款时间', null=True)
+    principal = models.DecimalField(u'返还本金', max_digits=20, decimal_places=2)
+    interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
+    penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
 
-    settled = models.BooleanField(verbose_name=u'已结算给客户', default=False, editable=False)
-    settlement_time = models.DateTimeField(verbose_name=u'结算时间', auto_now=True)
+    settled = models.BooleanField(u'已结算给客户', default=False, editable=False)
+    settlement_time = models.DateTimeField(u'结算时间', auto_now=True)
 
-    ready_for_settle = models.BooleanField(verbose_name=u'是否可以开始结算', default=False)
+    ready_for_settle = models.BooleanField(u'是否可以开始结算', default=False)
 
-    created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
-    description = models.CharField(verbose_name=u'摘要', max_length=500, blank=True)
+    created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    description = models.CharField(u'摘要', max_length=500, blank=True)
 
     objects = models.Manager()
     is_ready = AmortizationReadyManager()
@@ -204,17 +202,17 @@ class ProductAmortization(models.Model):
 class UserAmortization(models.Model):
     product_amortization = models.ForeignKey(ProductAmortization, related_name='subs')
     user = models.ForeignKey(get_user_model())
-    term = models.IntegerField(verbose_name=u'还款期数')
-    term_date = models.DateTimeField(verbose_name=u'还款时间')
-    principal = models.DecimalField(verbose_name=u'本金', max_digits=20, decimal_places=2)
-    interest = models.DecimalField(verbose_name=u'利息', max_digits=20, decimal_places=2)
-    penal_interest = models.DecimalField(verbose_name=u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    term = models.IntegerField(u'还款期数')
+    term_date = models.DateTimeField(u'还款时间')
+    principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
+    interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
+    penal_interest = models.DecimalField(u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
 
-    settled = models.BooleanField(verbose_name=u'已结算', default=False)
-    settlement_time = models.DateTimeField(verbose_name=u'结算时间', auto_now=True)
+    settled = models.BooleanField(u'已结算', default=False)
+    settlement_time = models.DateTimeField(u'结算时间', auto_now=True)
 
-    created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
-    description = models.CharField(verbose_name=u'摘要', max_length=500, blank=True)
+    created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    description = models.CharField(u'摘要', max_length=500, blank=True)
 
     class Meta:
         verbose_name_plural = u'用户还款计划'
@@ -227,8 +225,8 @@ class UserAmortization(models.Model):
 class P2PEquity(models.Model):
     user = models.ForeignKey(get_user_model(), related_name='equities')
     product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
-    equity = models.BigIntegerField(verbose_name=u'用户所持份额', default=0)
-    confirm = models.BooleanField(verbose_name=u'确认成功', default=False)
+    equity = models.BigIntegerField(u'用户所持份额', default=0)
+    confirm = models.BooleanField(u'确认成功', default=False)
     contract = models.FileField(u'合同文件', null=True, upload_to='contracts')
 
     class Meta:
@@ -318,19 +316,19 @@ class P2PEquity(models.Model):
 
 
 class AmortizationRecord(models.Model):
-    catalog = models.CharField(verbose_name=u'流水类型', max_length=100)
+    catalog = models.CharField(u'流水类型', max_length=100)
     amortization = models.ForeignKey(ProductAmortization, related_name=u'to_users')
-    order_id = models.IntegerField(verbose_name=u'关联订单编号', null=True)
+    order_id = models.IntegerField(u'关联订单编号', null=True)
 
-    term = models.IntegerField(verbose_name=u'还款期数')
-    principal = models.DecimalField(verbose_name=u'返还本金', max_digits=20, decimal_places=2)
-    interest = models.DecimalField(verbose_name=u'返还利息', max_digits=20, decimal_places=2)
-    penal_interest = models.DecimalField(verbose_name=u'额外罚息', max_digits=20, decimal_places=2)
+    term = models.IntegerField(u'还款期数')
+    principal = models.DecimalField(u'返还本金', max_digits=20, decimal_places=2)
+    interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
+    penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2)
 
     user = models.ForeignKey(get_user_model(), null=True)
-    created_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
-    description = models.CharField(verbose_name=u'摘要', max_length=1000)
+    description = models.CharField(u'摘要', max_length=1000)
 
     class Meta:
         verbose_name_plural = u'还款流水'
@@ -344,18 +342,18 @@ class AmortizationRecord(models.Model):
 
 
 class P2PRecord(models.Model):
-    catalog = models.CharField(verbose_name=u'流水类型', max_length=100)
-    order_id = models.IntegerField(verbose_name=u'关联订单编号', null=True)
-    amount = models.DecimalField(verbose_name=u'发生数', max_digits=20, decimal_places=2)
+    catalog = models.CharField(u'流水类型', max_length=100)
+    order_id = models.IntegerField(u'关联订单编号', null=True)
+    amount = models.DecimalField(u'发生数', max_digits=20, decimal_places=2)
 
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
-    product_balance_after = models.IntegerField(verbose_name=u'标的后余额', help_text=u'该笔流水发生后标的剩余量', null=True)
+    product_balance_after = models.IntegerField(u'标的后余额', help_text=u'该笔流水发生后标的剩余量', null=True)
 
     user = models.ForeignKey(get_user_model(), null=True, on_delete=models.SET_NULL)
 
-    create_time = models.DateTimeField(verbose_name=u'发生时间', auto_now_add=True)
+    create_time = models.DateTimeField(u'发生时间', auto_now_add=True)
 
-    description = models.CharField(verbose_name=u'摘要', default='', max_length=1000)
+    description = models.CharField(u'摘要', default='', max_length=1000)
 
     class Meta:
         ordering = ['-create_time']
@@ -369,14 +367,14 @@ class P2PRecord(models.Model):
 
 
 class EquityRecord(models.Model):
-    catalog = models.CharField(verbose_name=u'流水类型', max_length=100)
-    order_id = models.IntegerField(verbose_name=u'相关流水号', null=True)
+    catalog = models.CharField(u'流水类型', max_length=100)
+    order_id = models.IntegerField(u'相关流水号', null=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(P2PProduct, verbose_name=u'产品', on_delete=models.SET_NULL, null=True)
-    amount = models.DecimalField(verbose_name=u'发生数量', max_digits=20, decimal_places=2)
-    description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
+    amount = models.DecimalField(u'发生数量', max_digits=20, decimal_places=2)
+    description = models.CharField(u'摘要', max_length=1000, default=u'')
 
-    create_time = models.DateTimeField(verbose_name=u'流水时间', auto_now_add=True)
+    create_time = models.DateTimeField(u'流水时间', auto_now_add=True)
 
     class Meta:
         verbose_name_plural = u'持仓流水'
