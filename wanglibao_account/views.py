@@ -548,8 +548,9 @@ def user_product_contract(request, product_id):
     equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
 
     try:
-        with equity.contract.open(mode='rb') as f:
-            lines = f.readlines()
-            return HttpResponse("\n".join(lines))
+        f = equity.contract
+        lines = f.readlines()
+        f.close()
+        return HttpResponse("\n".join(lines))
     except ValueError, e:
         raise Http404
