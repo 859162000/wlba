@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import Sum
+from django.utils import timezone
 from order.mixins import KeeperBaseMixin
 from wanglibao_account.utils import generate_contract
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -204,8 +205,15 @@ class AmortizationKeeper(KeeperBaseMixin):
                 user_margin_keeper = MarginKeeper(sub_amo.user)
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest,
                                             sub_amo.penal_interest, savepoint=False, description=description)
+
+                sub_amo.settled = True
+                sub_amo.settlement_time = timezone.now()
+                sub_amo.save()
+
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
                               amortization, description)
+
+
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'

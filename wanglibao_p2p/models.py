@@ -236,7 +236,7 @@ class P2PEquity(models.Model):
 
     @property
     def term(self):
-        amos = self.__get_amortizations(settled=True)
+        amos = self.__get_amortizations(settled_only=True)
         return len(amos)
 
     @property
@@ -257,7 +257,7 @@ class P2PEquity(models.Model):
     def paid_interest(self):
         if not self.confirm:
             return Decimal('0')
-        paid_amos = self.__get_amortizations(settled=True)
+        paid_amos = self.__get_amortizations(settled_only=True)
         if not paid_amos:
             return Decimal('0')
         paid_interest = paid_amos.aggregate(Sum('interest'))['interest__sum']
@@ -267,7 +267,7 @@ class P2PEquity(models.Model):
     def penal_interest(self):
         if not self.confirm:
             return Decimal('0')
-        paid_amos = self.__get_amortizations(settled=True)
+        paid_amos = self.__get_amortizations(settled_only=True)
         if not paid_amos:
             return Decimal('0')
         penal_interest = paid_amos.aggregate(Sum('penal_interest'))['penal_interest__sum']
@@ -281,7 +281,7 @@ class P2PEquity(models.Model):
     def paid_principal(self):
         if not self.confirm:
             return Decimal('0')
-        paid_amos = self.__get_amortizations(settled=True)
+        paid_amos = self.__get_amortizations(settled_only=True)
         if not paid_amos:
             return Decimal('0')
         paid_principal = paid_amos.aggregate(Sum('principal'))['principal__sum']
@@ -291,8 +291,12 @@ class P2PEquity(models.Model):
     def unpaid_principal(self):
         return self.equity - self.paid_principal
 
-    def __get_amortizations(self, settled=False):
-        if settled:
+    @property
+    def amortizations(self):
+        return self.__get_amortizations()
+
+    def __get_amortizations(self, settled_only=False):
+        if settled_only:
             amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product,
                                                             settled=True)
         else:
