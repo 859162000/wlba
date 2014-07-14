@@ -23,7 +23,13 @@ class P2PDetailView(TemplateView):
         try:
             p2p = P2PProduct.objects.get(pk=id)
             form = PurchaseForm(initial={'product': p2p})
-            if p2p.remain == 0:
+
+            if p2p.soldout_time:
+                end_time = p2p.soldout_time
+            else:
+                end_time = p2p.end_time
+
+            if p2p.status != u'正在招标':
                 status = 'finished'
             else:
                 if p2p.publish_time <= timezone.now() < p2p.end_time:
@@ -37,7 +43,8 @@ class P2PDetailView(TemplateView):
         return {
             'p2p': p2p,
             'form': form,
-            'status': status
+            'status': status,
+            'end_time': end_time
         }
 
 

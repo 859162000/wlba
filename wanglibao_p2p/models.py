@@ -68,6 +68,16 @@ class P2PProduct(ProductBase):
     pay_method = models.CharField(u'支付方式', max_length=32, blank=True, default=u'等额本息', choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)
 
+    # pay info for the borrower
+    borrower_name = models.CharField(u'借债人姓名', max_length=32, blank=True)
+    borrower_phone = models.CharField(u'借债人手机号', max_length=32, blank=True)
+    borrower_id_number = models.CharField(u'借债人身份证号', max_length=32, blank=True)
+    borrower_bankcard = models.CharField(u'借债人银行卡号', max_length=64, blank=True)
+    borrower_bankcard_bank_code = models.CharField(u'借债人银行(汇付表格专用)', max_length=64, blank=True)
+    borrower_bankcard_bank_province = models.CharField(u'借债人银行省份', max_length=64, blank=True)
+    borrower_bankcard_bank_city = models.CharField(u'借债人地区', max_length=64, blank=True)
+    borrower_bankcard_bank_branch = models.CharField(u'借债人支行', max_length=64, blank=True)
+
     total_amount = models.BigIntegerField(default=0, verbose_name=u'借款总额')
     ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
 
@@ -75,6 +85,7 @@ class P2PProduct(ProductBase):
 
     publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间')
     end_time = models.DateTimeField(default=timezone.now, verbose_name=u'终止时间')
+    soldout_time = models.DateTimeField(u'售完时间', null=True)
 
     limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)', default=0.2)
 
@@ -83,6 +94,8 @@ class P2PProduct(ProductBase):
     short_usage = models.TextField(blank=True, verbose_name=u'项目用途摘要')
 
     contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True)
+
+
 
     class Meta:
         verbose_name_plural = u'P2P产品'

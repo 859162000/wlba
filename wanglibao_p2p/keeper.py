@@ -28,6 +28,7 @@ class ProductKeeper(KeeperBaseMixin):
 
             if self.product.ordered_amount == self.product.total_amount:
                 self.product.status = u'满标待处理'
+                self.product.soldout_time = timezone.now()
 
             self.product.save()
             catalog = u'申购'
