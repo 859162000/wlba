@@ -11,7 +11,7 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         p2p_products = P2PProduct.objects.filter(Q(publish_time__lte=timezone.now())).filter(Q(status=u'正在招标') | Q(status=u'已完成'))[:20]
-        trade_records = P2PRecord.objects.filter(catalog=u'申购')[:40]
+        trade_records = P2PRecord.objects.filter(catalog=u'申购').prefetch_related('user').prefetch_related('user__wanglibaouserprofile')[:40]
 
         news_and_reports = NewsAndReport.objects.all()[:5]
         return {

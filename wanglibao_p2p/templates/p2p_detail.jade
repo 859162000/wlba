@@ -19,12 +19,12 @@ html
         .span8.p2p-detail-container
           .p2p-detail-bar.clearfix
             .row
-              .span8
+              .span7
                 span.p2p-detail-title {{p2p.short_name}}
                 span.p2p-warrant-way
                   span.icon-check-shield
                   | 100%本息担保
-              .span4-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余时间：
+              .span5-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余时间：
                 span#countdown{{p2p.end_time | timedelta_now }}
           .p2p-detail-content.clearfix
             .row
@@ -43,10 +43,10 @@ html
                 p 年化收益
           .p2p-detail-footer
             .row
-              .span8
+              .span7
                 |还款方式：
                 span.dark-gray {{p2p.pay_method}}
-              .span4-omega
+              .span5-omega
                 span 进度：
                   .progress-container
                     percent = float(p2p.ordered_amount) / p2p.total_amount * 100
@@ -152,7 +152,7 @@ html
                     th 投资人
                     th 金额
                 tbody
-                  trade_records = p2p.p2precord_set.all()[:40]
+                  trade_records = p2p.p2precord_set.filter(catalog=u'申购')[:40]
                   top = trade_records[:15]
                   rest = trade_records[15:]
                   for trade in top
