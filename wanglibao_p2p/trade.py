@@ -39,6 +39,9 @@ class P2PTrader(object):
 
 
 class P2POperator(object):
+    """
+    When generate new entries, pls note that old entries may still exists, so remove them first
+    """
 
     logger = logging.getLogger('p2p')
 
@@ -88,9 +91,10 @@ class P2POperator(object):
             raise P2PException(u'产品状态(%s)不是(满标待处理)' % product.status)
         with transaction.atomic():
             # Generate the amotization plan and contract for each equity(user)
+            amo_keeper = AmortizationKeeper(product, order_id=order.id)
+            amo_keeper.generate_amortization_plan(savepoint=False)
+
             for equity in product.equities.all():
-                amo_keeper = AmortizationKeeper(product, order_id=order.id)
-                amo_keeper.generate_amortization_plan(savepoint=False)
                 EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
 
             product = P2PProduct.objects.get(pk=product.id)

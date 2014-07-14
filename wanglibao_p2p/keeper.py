@@ -157,8 +157,10 @@ class AmortizationKeeper(KeeperBaseMixin):
         self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
         equities = self.product.equities.all()
 
-        for equity in equities:
-            with transaction.atomic(savepoint=savepoint):
+        # Delete all old user amortizations
+        with transaction.atomic(savepoint=savepoint):
+            UserAmortization.objects.filter(product_amortization__in=self.amortizations).delete()
+            for equity in equities:
                 ProductAmortization.objects.select_for_update().filter(product=self.product)
                 self.__dispatch(equity)
 

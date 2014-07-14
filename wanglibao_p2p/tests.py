@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
 from mock_generator import MockGenerator
-from models import P2PProduct, WarrantCompany, P2PEquity
+from models import P2PProduct, WarrantCompany, P2PEquity, UserAmortization
 from trade import P2PTrader, P2POperator
 
 # Create your tests here.
@@ -121,6 +121,25 @@ class TraderTestCase(TransactionTestCase):
 
         # Run the operator and check status -> 满标待审核
         operator.watchdog()
+        product = P2PProduct.objects.first()
+        user_amortizations = UserAmortization.objects.filter(product_amortization__in=product.amortizations.all())
+
+        user_amortizations_count = len(user_amortizations)
+
+        # Some body may manually set status to 满标待处理 in case some error detected, system should
+        # support this case
+        product = P2PProduct.objects.get(pk=product.id)
+        product.status = u'满标待处理'
+
+        # Regenerate user amortization plan
+        operator.watchdog()
+
+        product = P2PProduct.objects.first()
+        user_amortizations = UserAmortization.objects.filter(product_amortization__in=product.amortizations.all())
+
+        # Even we regenerate everything, the user_amortization account should be the same
+        self.assertEqual(len(user_amortizations), user_amortizations_count)
+
 
         # 满标待审核 -> 满标已审核
         product = P2PProduct.objects.first()
