@@ -28,7 +28,6 @@ djangorestframework==2.3.13
 drf-wrapper==0.1
 ecdsa==0.11
 fabric-components==0.1.1
-gnureadline==6.3.3
 ipython==2.1.0
 jsonfield==0.9.20
 kombu==3.0.19
