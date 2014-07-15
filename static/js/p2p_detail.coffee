@@ -29,4 +29,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
       else
         error_message = message
+
       alert error_message
+      location.reload()

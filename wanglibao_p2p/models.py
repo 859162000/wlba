@@ -85,7 +85,7 @@ class P2PProduct(ProductBase):
 
     publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间')
     end_time = models.DateTimeField(default=timezone.now, verbose_name=u'终止时间')
-    soldout_time = models.DateTimeField(u'售完时间', null=True)
+    soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True)
 
     limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)', default=0.2)
 
@@ -171,7 +171,7 @@ class ProductAmortization(models.Model):
     product = models.ForeignKey(P2PProduct, related_name='amortizations')
 
     term = models.IntegerField(u'还款期数')
-    term_date = models.DateTimeField(u'还款时间', null=True)
+    term_date = models.DateTimeField(u'还款时间', null=True, blank=True)
     principal = models.DecimalField(u'返还本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))

@@ -35,7 +35,8 @@
         } else {
           error_message = message;
         }
-        return alert(error_message);
+        alert(error_message);
+        return location.reload();
       });
     });
   });
