@@ -60,6 +60,7 @@ class PayView(TemplateView):
             pay_info.status = PayInfo.INITIAL
             pay_info.user = request.user
             pay_info.bank = bank
+            pay_info.request_ip = get_client_ip(request)
             pay_info.save()
 
             post = {
@@ -70,7 +71,6 @@ class PayView(TemplateView):
             pay = HuifuPay()
             form = pay.pay(post)
             pay_info.request = str(form)
-            pay_info.request_ip = get_client_ip(request)
             pay_info.status = PayInfo.PROCESSING
             pay_info.save()
         except decimal.DecimalException:

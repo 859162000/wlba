@@ -83,6 +83,7 @@ INSTALLED_APPS = (
     'wanglibao_margin',
 
     'marketing',
+    'report',
 
     'provider',
     'provider.oauth2',
