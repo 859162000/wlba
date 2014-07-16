@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>限量预约10%保本保息理财产品 - 网利宝</title>
+        <style type="text/css">
+            *{margin:0; padding: 0}
+            body{margin:0;padding:0; background:url(/static/images/active_bg.jpg) no-repeat center top; min-height:1350px; min-width: 1000px;}
+            del {display: none}
+            .container {width: 1000px; height: 100%; overflow: hidden; margin: 0 auto;}
+            .container .home-link {margin-top: 80px; }
+            .container .home-link a {position: relative; left:895px; display: block; width: 105px; height: 40px;}
+            .order-form {margin-top: 393px; margin-left: 511px;}
+            .order-form form {background: url(/static/images/form_bg.png) no-repeat;width: 445px; height: 216px;overflow: hidden; text-align: right}
+            .order-form input {background: transparent; width:333px; text-indent:10px; height:40px; border:0; font-size:16px; color:#ffffff;} 
+            .order-form input.order_submit{width:445px; height: 51px; margin-top: 18px;} 
+            .order-form .input_name {padding-top: 7px;}
+            .order-form .input_phone {padding-top: 10px;}
+            .order-form .input_amount {padding-top: 10px;}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="home-link">
+                <a href="http://www.wanglibao.com" title="网利宝首页"><del>返回首页</del></a>
+            </div>
+            <div class="order-form">
+                <form id="form" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_name" id="product_name" value="百分之10" />
+                    <p class="input_name"><input type="text" name="name" id="name" /></p>
+                    <p class="input_phone"><input type="text" name="phone" id="phone" /></p>
+                    <p class="input_amount"><input type="text" name="amount" id="amount" /></p>
+                    <p><input type="image" name="submit" src="/static/images/submit_bg.png" class="order_submit" /></p>
+                </form>
+            </div>
+        </div>
+    </body>
+<script src="/static/js/lib/jquery.min.js"></script>
+<script type="text/javascript">
+function check() {
+	var name = $.trim($("#name").val());
+	var phone = $("#phone").val();
+	var amount = $("#amount").val();
+	var reg_amount = /^[1-9]\d+$/;
+	var reg_phone = /^[1][34578]\d{9}$/;
+	if(name == "") {
+		alert("名称不能为空");
+		return false;	
+	}
+	if(!reg_phone.test(phone)){
+		alert("电话号码不正确");
+		return false;
+	}
+	if(!reg_amount.test(amount)){
+		alert("预约额度只能为数字");
+		return false;	
+	}
+	if(amount < 100){
+		alert("预约额度至少为100元");
+		$("#amount").val(100);
+		return false;	
+	}
+	return true;
+}
+
+// this is the id of the form
+$("#form").submit(function() {
+
+  if(!check()){
+    return false;
+  }
+
+  var url = document.URL;
+
+  $.ajax({
+         type: "POST",
+         url: url,
+         data: $("#form").serialize(), // serializes the form's elements.
+         success: function(data) {
+             alert(data); // show response from the php script.
+         }
+       });
+
+  return false; // avoid to execute the actual submit of the form.
+});
+
+</script>
+</html>
