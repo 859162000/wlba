@@ -29,8 +29,8 @@ block main
             th 流水号
             th 时间
             th 总金额(元)
-            th 卡号尾号
             th 手续费(元)
+            th 卡号尾号
             th 状态
         tbody
           each trade_record in pay_records
@@ -38,8 +38,8 @@ block main
               td {{trade_record.id}}
               td {{trade_record.create_time | date:"Y-m-d h:i:s"}}
               td {{trade_record.total_amount}}
-              td {{trade_record.card.no | last_four_char}}
               td {{trade_record.fee}}
+              td {{trade_record.card_no | last_four_char}}
               td {{trade_record.status}}
 
     - with data=pay_records uri='/accounts/transaction/withdraw/'

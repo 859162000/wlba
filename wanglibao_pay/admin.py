@@ -6,7 +6,7 @@ from wanglibao_pay.models import Bank, PayInfo, Card
 
 
 class PayInfoAdmin(admin.ModelAdmin):
-    list_display = ('get_phone', 'type', 'total_amount', 'fee', 'bank', 'card', 'status', 'create_time')
+    list_display = ('get_phone', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time')
     search_fields = ['user__wanglibaouserprofile__phone', 'card__no']
 
     def get_phone(self, obj):

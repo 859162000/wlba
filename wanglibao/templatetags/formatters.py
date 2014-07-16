@@ -204,7 +204,10 @@ def card_info(card):
 
 @register.filter
 def last_four_char(str):
-    return str[-4:]
+    if str:
+        return str[-4:]
+    else:
+        return ""
 
 
 @register.filter

@@ -9,6 +9,8 @@ class Order(models.Model):
     """
     The main order model
     """
+    PAY_ORDER = 'pay'
+    WITHDRAW_ORDER = 'withdraw'
 
     type = models.CharField(max_length=64, verbose_name=u'订单类型')
     status = models.CharField(max_length=64, verbose_name=u'订单状态')

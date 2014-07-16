@@ -2,8 +2,10 @@
 from __future__ import unicode_literals
 import decimal
 import logging
+from django.forms import model_to_dict
 from django.utils.decorators import method_decorator
 import requests
+from order.utils import OrderHelper
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import PayInfo
 from wanglibao_pay.pay import Pay
@@ -202,6 +204,7 @@ class HuifuPay(Pay):
             logger.fatal('unexpected error. order id: %s. exception: %s', str(pay_info.pk), str(e))
 
         pay_info.save()
+        OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return result
 
     @classmethod
@@ -259,4 +262,5 @@ class HuifuPay(Pay):
             result = PayResult.EXCEPTION
 
         pay_info.save()
+        OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return result

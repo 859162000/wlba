@@ -17,8 +17,9 @@ body
       if result == '提现成功'
         .success-icon
         .callback-description
-          h1 恭喜，您已经成功提现<span class='red-text'>{{amount}}</span>元。
-          p 您可以点击<a class='blue' href='/accounts/home'>查看余额</a>，或者<a class='blue' href='/'>立即投资</a>
+          h1 提现申请已成功提交！
+          p 若审核通过，则预计到账时间在2~3个工作日之后
+          p 您可以<a class='blue' href='/accounts/transaction/withdraw/'>查看交易记录</a>，或者<a class='blue' href='/accounts/home/'>返回我的账户</a>
       elif result == '提现失败'
         .error-icon
         .callback-description
@@ -29,7 +30,7 @@ body
         .callback-description
           h1 提现申请异常
           p {{result}}
-          p 请先查看<a class='blue' href='/accounts/transaction/p2p/'>提现记录</a>,如果没有申请成功，请拨打客服电话咨询：400-588-066
+          p 请先查看<a class='blue' href='/accounts/transaction/withdraw/'>提现记录</a>,如果没有申请成功，请拨打客服电话咨询：400-588-066
 
   - with 1 as no_margin
   include include/footer
