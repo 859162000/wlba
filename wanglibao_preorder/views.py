@@ -39,7 +39,6 @@ class PreOrderViewSet(PaginatedModelViewSet):
 
 
 class PreOrderP2PView(TemplateView):
-
     template_name = 'preorder_p2p.html'
 
     def post(self, request):
@@ -48,8 +47,14 @@ class PreOrderP2PView(TemplateView):
             name = form.cleaned_data.get('name')
             phone = form.cleaned_data.get('phone')
             amount = form.cleaned_data.get('amount')
-            preorder = PreOrder(user_name=name, phone=phone, amount=amount, product_type='p2p')
+            product_name = form.cleaned_data.get('product_name', '')
+            preorder = PreOrder(user_name=name, phone=phone, amount=amount, product_type='p2p', product_name=product_name)
+
             preorder.save()
-            return HttpResponse(u'您的预约请求已经收到')
+            return HttpResponse(u'恭喜您成功预约')
         else:
-            return HttpResponse(u'您的预约请求数据格式不对')
+            return HttpResponse(u'您的预约请求数据格式不对', status=400)
+
+
+class PreOrderP2PPhoneView(PreOrderP2PView):
+    template_name = 'preorder_p2p_phone.html'

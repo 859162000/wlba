@@ -25,8 +25,9 @@
                 <a href="http://www.wanglibao.com" title="网利宝首页"><del>返回首页</del></a>
             </div>
             <div class="order-form">
-                <form  action="" onsubmit="return check()" method="post">
+                <form id="form" method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="product_name" id="product_name" value="百分之10" />
                     <p class="input_name"><input type="text" name="name" id="name" /></p>
                     <p class="input_phone"><input type="text" name="phone" id="phone" /></p>
                     <p class="input_amount"><input type="text" name="amount" id="amount" /></p>
@@ -35,7 +36,7 @@
             </div>
         </div>
     </body>
-<script src="static/jquery.js"></script>
+<script src="/static/js/lib/jquery.min.js"></script>
 <script type="text/javascript">
 function check() {
 	var name = $.trim($("#name").val());
@@ -49,7 +50,7 @@ function check() {
 	}
 	if(!reg_phone.test(phone)){
 		alert("电话号码不正确");
-		return false;	
+		return false;
 	}
 	if(!reg_amount.test(amount)){
 		alert("预约额度只能为数字");
@@ -60,7 +61,29 @@ function check() {
 		$("#amount").val(100);
 		return false;	
 	}
-	return false;
+	return true;
 }
+
+// this is the id of the form
+$("#form").submit(function() {
+
+  if(!check()){
+    return false;
+  }
+
+  var url = document.URL;
+
+  $.ajax({
+         type: "POST",
+         url: url,
+         data: $("#form").serialize(), // serializes the form's elements.
+         success: function(data) {
+             alert(data); // show response from the php script.
+         }
+       });
+
+  return false; // avoid to execute the actual submit of the form.
+});
+
 </script>
 </html>
