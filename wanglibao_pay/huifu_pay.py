@@ -207,6 +207,8 @@ class HuifuPay(Pay):
     @classmethod
     @method_decorator(transaction.atomic)
     def handle_pay_result(cls, request):
+        # TODO Add a log
+
         order_id = request.POST.get('OrdId', '')
         try:
             pay_info = PayInfo.objects.select_for_update().get(pk=order_id)
