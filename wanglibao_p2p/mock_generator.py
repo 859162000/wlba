@@ -85,7 +85,7 @@ class MockGenerator(object):
                     w.save()
 
     @classmethod
-    def generate_staging_p2p(cls, name, amount=10000, terms=3, term_delta_minute=10, end_delta_minute=10, per_user=0.5):
+    def generate_staging_p2p(cls, name, amount=10000, terms=3, interests=(1000, 1000, 1000), term_delta_minute=10, end_delta_minute=10, per_user=0.5):
         short_name = name[:4]
         warrant_company, _ = WarrantCompany.objects.get_or_create(name=u'担保公司1')
         product = P2PProduct.objects.create(
@@ -95,12 +95,10 @@ class MockGenerator(object):
             warrant_company=warrant_company
         )
         now = timezone.now()
-        delta = datetime.timedelta(minutes=term_delta_minute)
         principal = amount
-        interest = amount * 0.1
         for i in xrange(1, terms+1):
             ProductAmortization.objects.create(
-                product=product, term=terms, term_date=now+delta*i, principal=principal/terms, interest=interest/terms,
+                product=product, term=terms, term_date=now, principal=principal/terms, interest=interests[i-1],
             )
         return product
 

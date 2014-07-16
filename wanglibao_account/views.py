@@ -274,7 +274,7 @@ class AccountHome(TemplateView):
 
         # Followings for p2p
         p2p_equities = P2PEquity.objects.filter(user=user)
-        amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False)
+        amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False).prefetch_related("subs")
 
         unpayed_principle = 0
         for equity in p2p_equities:
@@ -297,6 +297,7 @@ class AccountHome(TemplateView):
             'message': message,
 
             'p2p_equities': p2p_equities,
+            'amortizations': amortizations,
             'p2p_product_amortization': p2p_product_amortization,
             'p2p_unpay_principle': unpayed_principle,
             'margin_withdrawing': user.margin.withdrawing,
@@ -548,8 +549,9 @@ def user_product_contract(request, product_id):
     equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
 
     try:
-        with equity.contract.open(mode='rb') as f:
-            lines = f.readlines()
-            return HttpResponse("\n".join(lines))
+        f = equity.contract
+        lines = f.readlines()
+        f.close()
+        return HttpResponse("\n".join(lines))
     except ValueError, e:
         raise Http404

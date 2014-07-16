@@ -1,13 +1,15 @@
 # encoding: utf8
+from django.contrib.admin.views.decorators import staff_member_required
 
-from django.http import Http404
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from wanglibao_p2p.forms import PurchaseForm
+from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct
 from wanglibao_p2p.trade import P2PTrader
 
@@ -21,7 +23,13 @@ class P2PDetailView(TemplateView):
         try:
             p2p = P2PProduct.objects.get(pk=id)
             form = PurchaseForm(initial={'product': p2p})
-            if p2p.remain == 0:
+
+            if p2p.soldout_time:
+                end_time = p2p.soldout_time
+            else:
+                end_time = p2p.end_time
+
+            if p2p.status != u'正在招标':
                 status = 'finished'
             else:
                 if p2p.publish_time <= timezone.now() < p2p.end_time:
@@ -35,7 +43,8 @@ class P2PDetailView(TemplateView):
         return {
             'p2p': p2p,
             'form': form,
-            'status': status
+            'status': status,
+            'end_time': end_time
         }
 
 
@@ -66,3 +75,27 @@ class PurchaseP2P(APIView):
             return Response({
                 "message": form.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AuditProductView(TemplateView):
+    template_name = 'audit_p2p.jade'
+
+    def get_context_data(self, **kwargs):
+        pk = kwargs['id']
+        p2p = P2PProduct.objects.get(pk=pk)
+
+        if p2p.status != u'满标待审核':
+            return HttpResponse(u'产品状态不是满标待审核')
+
+        return {
+            "p2p": p2p
+        }
+
+    def post(self, request, **kwargs):
+        pk = kwargs['id']
+        p2p = P2PProduct.objects.get(pk=pk)
+        ProductKeeper(p2p).audit(request.user)
+        return HttpResponseRedirect('/admin/wanglibao_p2p/p2pproduct/')
+
+
+audit_product_view = staff_member_required(AuditProductView.as_view())

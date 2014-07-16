@@ -1,10 +1,10 @@
 # encoding: utf-8
 from decimal import Decimal
-from django.conf import settings
+from dateutil.relativedelta import relativedelta
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.db import transaction
 from django.db.models import Sum
+from django.utils import timezone
 from order.mixins import KeeperBaseMixin
 from wanglibao_account.utils import generate_contract
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -28,44 +28,19 @@ class ProductKeeper(KeeperBaseMixin):
             self.product.ordered_amount += amount
 
             if self.product.ordered_amount == self.product.total_amount:
-                self.product.status = u'满标待处理'
+                self.product.status = u'满标待打款'
+                self.product.soldout_time = timezone.now()
 
             self.product.save()
             catalog = u'申购'
             record = self.__tracer(catalog, amount, user, self.product.remain)
             return record
 
-    def settle(self, savepoint=True):
-        """
-        call after product startup.
-        """
-        with transaction.atomic(savepoint=savepoint):
-            amo_keeper = AmortizationKeeper(self.product)
-            amo_keeper.generate_amortization_plan(savepoint=False)
-            self.product.status = u'还款中'
+    def audit(self, user):
+        if self.product.status == u'满标待审核':
+            self.product.status = u'满标已审核'
             self.product.save()
-
-    def over(self, savepoint=True):
-        with transaction.atomic(savepoint=savepoint):
-            if self.product.ordered_amount != self.product.total_amount:
-                raise P2PException(u'产品预约金额不等于产品总金额')
-            self.product.status = u'已满标'
-            self.product.save()
-
-    @classmethod
-    def get_sold_out(cls):
-        products = P2PProduct.sold_out.all()
-        return products
-
-    @classmethod
-    def get_ready_for_settle(cls):
-        products = P2PProduct.ready_for_settle.all()
-        return products
-
-    @classmethod
-    def get_ready_for_fail(cls):
-        products = P2PProduct.ready_for_fail.all()
-        return products
+            self.__tracer(u'状态变化', 0, user, self.product.remain, u'产品状态由[满标待审核]转为[满标已审核]')
 
     def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
@@ -162,15 +137,24 @@ class AmortizationKeeper(KeeperBaseMixin):
         self.product = product
 
     def generate_amortization_plan(self, savepoint=True):
-        if self.product.status != u'满标待处理':
+        if self.product.status != u'满标已打款':
             raise P2PException('invalid product status.')
         self.amortizations = self.product.amortizations.all()
         self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
         equities = self.product.equities.all()
 
-        for equity in equities:
-            with transaction.atomic(savepoint=savepoint):
-                ProductAmortization.objects.select_for_update().filter(product=self.product)
+        today = timezone.now()
+        for index, amortization in enumerate(self.amortizations):
+            if amortization.term_date is None:
+                amortization.term_date = today + relativedelta(months=index+1)
+                amortization.save()
+
+        # Delete all old user amortizations
+        with transaction.atomic(savepoint=savepoint):
+            UserAmortization.objects.filter(product_amortization__in=self.amortizations).delete()
+
+            ProductAmortization.objects.select_for_update().filter(product=self.product)
+            for equity in equities:
                 self.__dispatch(equity)
 
     def __dispatch(self, equity):
@@ -213,11 +197,19 @@ class AmortizationKeeper(KeeperBaseMixin):
                 user_margin_keeper = MarginKeeper(sub_amo.user)
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest,
                                             sub_amo.penal_interest, savepoint=False, description=description)
+
+                sub_amo.settled = True
+                sub_amo.settlement_time = timezone.now()
+                sub_amo.save()
+
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                              description, amortization)
+                              amortization, description)
+
+
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'
+            self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u''):
         trace = AmortizationRecord(

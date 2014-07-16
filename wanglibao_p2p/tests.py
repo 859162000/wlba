@@ -1,18 +1,16 @@
 # encoding: utf-8
-from datetime import date, datetime
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from django.contrib.auth.models import User
+
 from order.models import Order
-from order.utils import OrderHelper
-
 from wanglibao_margin.marginkeeper import MarginKeeper
-
 from mock_generator import MockGenerator
-from models import P2PProduct, WarrantCompany, ProductAmortization, P2PEquity, UserAmortization, P2PRecord, EquityRecord
+from models import P2PProduct, WarrantCompany, P2PEquity, UserAmortization
 from trade import P2PTrader, P2POperator
-from exceptions import P2PException
+
 # Create your tests here.
-from wanglibao_margin.models import MarginRecord
+from wanglibao_margin.models import MarginRecord, Margin
+from wanglibao_p2p.keeper import ProductKeeper
 
 
 class TraderTestCase(TransactionTestCase):
@@ -22,7 +20,7 @@ class TraderTestCase(TransactionTestCase):
         self.user2 = User.objects.create(username='user2')
         self.warrant_company = WarrantCompany.objects.create(name=u'肯定会还钱的担保公司')
 
-    def testPurchase(self):
+    def test_purchase(self):
         user1_margin_keeper = MarginKeeper(self.user1)
         user1_margin_keeper.deposit(100000)
 
@@ -43,7 +41,7 @@ class TraderTestCase(TransactionTestCase):
 
         self.assertEqual(notes[0].extra_data['status'], u'份额确认')
 
-    def testPreProcess(self):
+    def test_pre_process(self):
         user1_margin_keeper = MarginKeeper(self.user1)
         user1_margin_keeper.deposit(100000)
 
@@ -56,7 +54,10 @@ class TraderTestCase(TransactionTestCase):
         # Now The product status should be pre settle, which means some one should do the final check,
         # Do money transfer, and if everything works, then he or she should change status to 还款中
         product = P2PProduct.objects.get(pk=product.id)
-        self.assertEqual(product.status, u'满标待处理')
+        self.assertEqual(product.status, u'满标待打款')
+
+        product.status = u'满标已打款'
+        product.save()
 
         operator = P2POperator()
         operator.preprocess_for_settle(product=product)
@@ -72,7 +73,7 @@ class TraderTestCase(TransactionTestCase):
         except ValueError, e:
             self.fail("The contract not generated as expected")
 
-    def testSettle(self):
+    def test_settle(self):
         user1_margin_keeper = MarginKeeper(self.user1)
         user1_margin_keeper.deposit(100000)
 
@@ -85,7 +86,10 @@ class TraderTestCase(TransactionTestCase):
         # Now The product status should be pre settle, which means some one should do the final check,
         # Do money transfer, and if everything works, then he or she should change status to 还款中
         product = P2PProduct.objects.get(pk=product.id)
-        self.assertEqual(product.status, u'满标待处理')
+        self.assertEqual(product.status, u'满标待打款')
+
+        product.status = u'满标已打款'
+        product.save()
 
         operator = P2POperator()
         operator.preprocess_for_settle(product=product)
@@ -107,62 +111,114 @@ class TraderTestCase(TransactionTestCase):
 
         operator.settle(product)
 
-    def testFullProcess(self):
+    def test_equity_properties(self):
         user1_margin_keeper = MarginKeeper(self.user1)
-        user2_margin_keeper = MarginKeeper(self.user2)
         user1_margin_keeper.deposit(100000)
-        user2_margin_keeper.deposit(10000)
         operator = P2POperator()
 
-        product = MockGenerator.generate_staging_p2p(u'测试用P2P产品第一号', 10000, per_user=0.5)
-        user1_trader = P2PTrader(product, self.user1)
-        # test purchase
-        user1_trader.purchase(5000)
-        # test per_user_limit restriction
-        self.assertRaises(P2PException, user1_trader.purchase, 1)
+        product = MockGenerator.generate_staging_p2p(u'测试用P2P产品第一号', 100000, per_user=1, terms=3, interests=(1000, 1000, 1000))
+
+        # Run the operator and check nothing happened
+
+        P2PTrader(product, self.user1).purchase(100000)
+
+        equity = P2PEquity.objects.filter(user=self.user1).first()
+        margin = Margin.objects.get(user=self.user1)
+        self.assertEqual(margin.freeze, 100000)
+
         product = P2PProduct.objects.first()
-        self.assertEqual(product.ordered_amount, 5000)
-        self.assertEqual(product.remain, 5000)
-        self.assertEqual(product.completion_rate, 50)
-        # test user equity
-        user1_equity = P2PEquity.objects.get(user=self.user1, product=product)
-        self.assertEqual(user1_equity.equity, 5000)
-        self.assertFalse(user1_equity.confirm)
-        self.assertEqual(user1_equity.ratio, 0.5)
-        # complete the product
-        self.assertRaises(P2PException, operator.over, product)
-        user2_trader = P2PTrader(product, self.user2)
-        user2_trader.purchase(5000)
+        self.assertEqual(product.status, u'满标待处理')
+
+        # Run the operator and check status -> 满标待审核
+        operator.watchdog()
+
+        # 满标待审核 -> 满标已审核
         product = P2PProduct.objects.first()
-        operator.over(product)
-        product = P2PProduct.objects.first()
-        self.assertEqual(product.status, u'已满标')
-        operator.settle(product)
-        product = P2PProduct.objects.first()
+        ProductKeeper(product).audit(self.user1)
+
+        # status -> 还款中
+        operator.watchdog()
+
+        # Equity should be confirmed
+        equity = P2PEquity.objects.filter(user=self.user1).first()
+        self.assertTrue(equity.confirm)
+
+        margin = Margin.objects.get(user=self.user1)
+        self.assertEqual(margin.freeze, 0)
+
+        product = P2PProduct.objects.get(pk=product.id)
         self.assertEqual(product.status, u'还款中')
-        user2_equity = P2PEquity.objects.get(product=product, user=self.user2)
-        user1_equity = P2PEquity.objects.get(product=product, user=self.user1)
-        self.assertEqual(user2_equity.equity, 5000)
-        self.assertTrue(user2_equity.confirm)
-        self.assertEqual(user1_equity.equity, 5000)
-        self.assertTrue(user1_equity.confirm)
-        # test user amortizations
-        user1_amortizations = UserAmortization.objects.filter(user=self.user1)
-        user2_amortizations = UserAmortization.objects.filter(user=self.user2)
-        self.assertEqual(user1_amortizations.count(), 3)
-        self.assertEqual(user2_amortizations.count(), 3)
 
-        # Check records, we need to make sure that all changes are recorded
-        records = P2PRecord.objects.all().filter(product=product)
-        self.assertEqual(len(records), 2)
+        for a in product.amortizations.all():
+            a.ready_for_settle = True
+            a.save()
+            operator.watchdog()
 
-        margin_records = MarginRecord.objects.all().filter(user=self.user1)
-        self.assertEqual(len(margin_records), 3)
+        product = P2PProduct.objects.get(pk=product.id)
+        self.assertEqual(product.status, u'已完成')
 
-        for margin_record in margin_records:
-            self.assertIsNotNone(margin_record.order_id)
+        equity = P2PEquity.objects.filter(user=self.user1).first()
+        self.assertTrue(equity.confirm)
+        amortizations = equity.amortizations
+        self.assertTrue(reduce(lambda x, y: x & y, [a.settled for a in amortizations], True))
 
-        equity_records = EquityRecord.objects.all().filter(user=self.user1)
-        self.assertEqual(len(equity_records), 2)
+        margin = Margin.objects.get(user=self.user1)
+        self.assertEqual(margin.margin, 103000)
 
 
+    def test_full_process(self):
+        user1_margin_keeper = MarginKeeper(self.user1)
+        user1_margin_keeper.deposit(100000)
+        operator = P2POperator()
+
+        product = MockGenerator.generate_staging_p2p(u'测试用P2P产品第一号', 100000, per_user=1)
+
+        # Run the operator and check nothing happened
+
+        P2PTrader(product, self.user1).purchase(100000)
+
+        product = P2PProduct.objects.first()
+        self.assertEqual(product.status, u'满标待打款')
+
+        # Stimulate that the money already paid
+        product.status = u'满标已打款'
+        product.save()
+
+        # status -> 满标待审核
+        operator.watchdog()
+        product = P2PProduct.objects.first()
+        user_amortizations = UserAmortization.objects.filter(product_amortization__in=product.amortizations.all())
+
+        user_amortizations_count = len(user_amortizations)
+
+        # Some body may manually set status to 满标已打款 in case some error detected, system should
+        # support this case
+        product = P2PProduct.objects.get(pk=product.id)
+        product.status = u'满标已打款'
+
+        # Regenerate user amortization plan
+        operator.watchdog()
+
+        product = P2PProduct.objects.first()
+        user_amortizations = UserAmortization.objects.filter(product_amortization__in=product.amortizations.all())
+
+        # Even we regenerate everything, the user_amortization account should be the same
+        self.assertEqual(len(user_amortizations), user_amortizations_count)
+
+
+        # 满标待审核 -> 满标已审核
+        product = P2PProduct.objects.first()
+        ProductKeeper(product).audit(self.user1)
+
+        # status -> 还款中
+        operator.watchdog()
+        product = P2PProduct.objects.get(pk=product.id)
+        self.assertEqual(product.status, u'还款中')
+
+        for a in product.amortizations.all():
+            a.ready_for_settle = True
+            a.save()
+            operator.watchdog()
+
+        product = P2PProduct.objects.get(pk=product.id)
+        self.assertEqual(product.status, u'已完成')

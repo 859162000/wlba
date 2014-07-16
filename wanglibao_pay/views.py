@@ -236,7 +236,7 @@ class CardViewSet(ModelViewSet):
 
 class WithdrawTransactions(TemplateView):
     template_name = 'withdraw_transactions.jade'
-    COB_HOUR = 14
+    COB_HOUR = 15
 
     def get_context_data(self, **kwargs):
         now = datetime.datetime.now()

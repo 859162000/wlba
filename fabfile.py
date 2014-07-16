@@ -197,7 +197,7 @@ def deploy():
         sudo('echo "0 0 * * * %s" >> /tmp/tmp_tab' % scrawl_job_file)
         sudo('crontab /tmp/tmp_tab')
 
-        add_cron_tab(p2p_watchdog, p2p_log, env, '*/10 * * * *', manage_py, ['p2p_watchdog'])
+        add_cron_tab(p2p_watchdog, p2p_log, env, '*/1 * * * *', manage_py, ['p2p_watchdog'])
         add_cron_tab(sync_sm_info, sync_sm_log, env, '0 */1 * * *', manage_py, ['syncsm -f', 'syncsm -m'])
         add_cron_tab(sync_sm_income, sync_sm_log, env, '0 18-23/1 * * *', manage_py, ['syncsm -i'], _end=True)
 
