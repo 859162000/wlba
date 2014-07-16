@@ -86,3 +86,53 @@ class ReportGenerator(object):
             report.save()
 
             return report
+
+    @classmethod
+    def generate_withdraw_report(self, start_time, end_time=None):
+        if end_time is None:
+            end_time = start_time + timedelta(days=1)
+
+        assert(isinstance(start_time, datetime))
+        assert(isinstance(start_time, datetime) or end_time is None)
+
+        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W').prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
+
+        filename = 'txjl-%s.tsv' % start_time.strftime('%Y-%m-%d')
+        folder = join(settings.MEDIA_ROOT, 'reports', 'txjl')
+        path = join(folder, filename)
+
+        try:
+            makedirs(folder)
+        except OSError, e:
+            if e.errno != 17:
+                raise
+
+        with open(path, 'w+b') as tsv_file:
+            writer = UnicodeWriter(tsv_file, delimiter='\t')
+
+            writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号', u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态'])
+
+            for payinfo in payinfos:
+                writer.writerow([
+                    str(payinfo.id),
+                    payinfo.user.wanglibaouserprofile.phone,
+                    payinfo.account_name,
+                    payinfo.user.wanglibaouserprofile.id_number,
+                    payinfo.user.wanglibaouserprofile.phone,
+                    payinfo.bank.name,
+                    '-',
+                    '-',
+                    payinfo.card_no,
+                    payinfo.total_amount,
+                    payinfo.amount,
+                    payinfo.fee,
+                    payinfo.create_time.strftime("%Y-%m-%d %H-%M"),
+                    str(payinfo.request_ip),
+                    u'申请'
+                ])
+
+            report = Report(name=u'充值记录 %s' % start_time.strftime('%Y-%m-%d %H-%M-%S'))
+            report.file = join('reports', 'txjl', filename)
+            report.save()
+
+            return report
