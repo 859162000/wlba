@@ -30,7 +30,7 @@ class Bank(models.Model):
 
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号')
-    bank = models.ForeignKey(Bank)
+    bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
     user = models.ForeignKey(get_user_model())
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
     add_at = models.DateTimeField(auto_now=True)
@@ -66,14 +66,19 @@ class PayInfo(models.Model):
     error_message = models.CharField(max_length=100, verbose_name=u'错误原因', blank=True)
     request_ip = models.CharField(max_length=50, verbose_name=u'请求地址', blank=True, null=True)
     response_ip = models.CharField(max_length=50, verbose_name=u'响应地址', blank=True, null=True)
-    user = models.ForeignKey(get_user_model())
-    card = models.ForeignKey(Card, blank=True, null=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     order = models.ForeignKey(Order, blank=True, null=True)
     margin_record = models.ForeignKey(MarginRecord, blank=True, null=True)
-    bank = models.ForeignKey(Bank, blank=True, null=True)
+    bank = models.ForeignKey(Bank, blank=True, null=True, on_delete=models.PROTECT)
+    account_name = models.CharField(max_length=12, verbose_name=u'姓名', blank=True, null=True)
+    card_no = models.CharField(max_length=25, verbose_name=u'卡号', blank=True, null=True)
 
     def __unicode__(self):
         return u'%s' % self.pk
+
+    def toJSON(self):
+        import simplejson
+        return simplejson.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
 
 
 class PayResult(object):
