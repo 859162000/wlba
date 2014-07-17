@@ -17,13 +17,28 @@ html
     - endwith
 
     .full-container-home.clearfix
-      .home-banner-1
-      .home-banner-2
+      banners_ = enumerate(banners)
+      for index, banner in banners_
+        if index == 0
+          if banner.type == 'ad'
+            a(href="{{banner.link}}")
+              .home-banner(style="display:block; background-image:url('/media/{{banner.image}}')")
+          else
+            .home-banner(style="display:block; background-image:url('/media/{{banner.image}}')")
+        else
+          if banner.type == 'ad'
+            a(href="{{banner.link}}")
+              .home-banner(style="background-image:url('/media/{{banner.image}}')")
+          else
+            .home-banner(style="background-image:url('/media/{{banner.image}}')")
       ul.background-anchors
-        li
-          a.background-anchor.active(href="#") x
-        li
-          a.background-anchor(href="#") x
+        banners_ = enumerate(banners)
+        for index, banner in banners_
+          li
+            if index == 0
+              a.background-anchor.active(href="#") x
+            else
+              a.background-anchor(href="#") x
       .container-home
         .banner-form
           if user.is_authenticated
