@@ -14,24 +14,6 @@ def prepare():
     local("git push")
 
 
-def testserver():
-    env.host_string = '192.168.1.161'
-    env.path = '/var/deploy/wanglibao'
-    env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'ssh://192.168.1.100/~/developer/django/wanglibao-back'
-    env.depot_name = 'wanglibao'
-    env.branch = "master"
-
-    env.pip_install = "pip install --index-url http://pypi.douban.com/simple/ -r requirements.txt"
-    env.pip_install_command = "pip install --index-url http://pypi.douban.com/simple/"
-
-    env.debug = True
-    env.production = False
-    env.staging = False
-
-    env.mysql = True
-
-
 def production():
     env.host_string = '115.28.151.49'
     env.path = '/var/deploy/wanglibao'
@@ -108,6 +90,7 @@ def publish():
 
     for file in files:
         local('osscmd.py put static/images/%s oss://wanglibao/images/%s' % (file, file))
+
 
 def add_cron_tab(job_file, job_log_file, env, period_string, manage_py, manage_actions, _start=False, _end=False):
 
@@ -197,6 +180,7 @@ def deploy():
         sudo('echo "0 0 * * * %s" >> /tmp/tmp_tab' % scrawl_job_file)
         sudo('crontab /tmp/tmp_tab')
 
+        add_cron_tab('/var/bin/generate_report', '/var/log/wanglibao/report.log', env, '0 17 * * *', manage_py, ['generate_report'])
         add_cron_tab(p2p_watchdog, p2p_log, env, '*/1 * * * *', manage_py, ['p2p_watchdog'])
         add_cron_tab(sync_sm_info, sync_sm_log, env, '0 */1 * * *', manage_py, ['syncsm -f', 'syncsm -m'])
         add_cron_tab(sync_sm_income, sync_sm_log, env, '0 18-23/1 * * *', manage_py, ['syncsm -i'], _end=True)
