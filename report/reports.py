@@ -93,11 +93,11 @@ class ReportGenerator(object):
                     str(payinfo.fee),
                     str(payinfo.amount - payinfo.fee),
                     u'待审核',
-                    payinfo.create_time.strftime("%Y-%m-%d %H-%M"),
+                    payinfo.create_time.strftime("%Y-%m-%d %H:%M"),
                     str(payinfo.request_ip),
                 ])
 
-            report = Report(name=u'充值记录 %s' % start_time.strftime('%Y-%m-%d %H-%M-%S'))
+            report = Report(name=u'充值记录 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
             report.file = join('reports', 'czjl', filename)
             report.save()
 
@@ -142,12 +142,12 @@ class ReportGenerator(object):
                     payinfo.total_amount,
                     payinfo.amount,
                     payinfo.fee,
-                    payinfo.create_time.strftime("%Y-%m-%d %H-%M"),
+                    payinfo.create_time.strftime("%Y-%m-%d %H:%M"),
                     str(payinfo.request_ip),
                     u'申请'
                 ])
 
-            report = Report(name=u'提现记录 %s' % start_time.strftime('%Y-%m-%d %H-%M-%S'))
+            report = Report(name=u'提现记录 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
             report.file = join('reports', 'txjl', filename)
             report.save()
 
@@ -199,7 +199,7 @@ class ReportGenerator(object):
                     amortization.term_date.strftime("%Y-%m-%d")
                 ])
 
-            report = Report(name=u'还款列表 %s' % start_time.strftime('%Y-%m-%d %H-%M-%S'))
+            report = Report(name=u'还款列表 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
             report.file = join('reports', fileprefix, filename)
             report.save()
 
@@ -250,7 +250,7 @@ class ReportGenerator(object):
                     '抵押标', # Hard code this since it is not used anywhere except this table
                     str(len(product.equities.all())),
                     product.status,
-                    product.soldout_time.strftime("%Y-%m-%d %H-%M-%S"),
+                    product.soldout_time.strftime("%Y-%m-%d %H:%M:%S"),
                     product.borrower_name,
                     product.borrower_phone,
                     product.borrower_id_number,
@@ -261,7 +261,7 @@ class ReportGenerator(object):
                     product.borrower_bankcard_branch
                 ])
 
-            report = Report(name=u'满标复审 %s' % start_time.strftime('%Y-%m-%d %H-%M-%S'))
+            report = Report(name=u'满标复审 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
             report.file = join('reports', fileprefix, filename)
             report.save()
 
