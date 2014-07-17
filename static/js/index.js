@@ -47,9 +47,6 @@
         return currentBanner = index;
       }
     });
-    $('.home-banner-2').click(function() {
-      return window.location.href = '/trust/detail/8526';
-    });
     trustId = 0;
     trustName = '';
     $('.order-button').click(function(e) {

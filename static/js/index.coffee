@@ -39,9 +39,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal'], ($, _, backend, mo
       $(anchors[index]).toggleClass('active')
       currentBanner = index
 
-  $('.home-banner-2').click ()->
-    window.location.href='/trust/detail/8526'
-
   trustId = 0
   trustName = ''
   $('.order-button').click (e)->

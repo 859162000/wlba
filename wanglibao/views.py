@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView
+from wanglibao_banner.models import Banner
 from wanglibao_hotlist.models import HotTrust, HotFund, HotFinancing
 
 
@@ -15,9 +16,12 @@ class IndexView(TemplateView):
         hot_financings = HotFinancing.objects.all().prefetch_related('bank_financing').\
                              prefetch_related('bank_financing__bank')[:count]
 
+        banners = Banner.objects.filter(device=Banner.PC)
+
         return {
             'hot_trusts': hot_trusts,
             'hot_funds': hot_funds,
-            'hot_financings': hot_financings
+            'hot_financings': hot_financings,
+            'banners': banners
             }
 
