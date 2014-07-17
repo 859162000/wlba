@@ -18,8 +18,8 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        today = timezone.now().date() + timezone.timedelta(days=-1)
-        timestamp_str = today.strftime('%Y %m %d 16 00 00')
+        today = timezone.now().date() + timezone.timedelta(days=-2)
+        timestamp_str = today.strftime('%Y %m %d 00 00 00')
         start_time = timezone.datetime.strptime(timestamp_str, '%Y %m %d %H %M %S')
         logger.info('Start generating reports for start time: %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
         print 'Start generating reports for start time: %s' % start_time.strftime('%Y-%m-%d %H:%M:%S')
