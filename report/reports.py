@@ -1,12 +1,20 @@
 # coding=utf-8
 from datetime import timedelta, datetime
-from django.conf import settings
 from os.path import join
 from os import makedirs
-from report.models import Report
-from wanglibao_pay.models import PayInfo
 import csv
-import codecs, cStringIO
+import codecs
+import cStringIO
+import logging
+
+from django.conf import settings
+
+from report.models import Report
+from wanglibao_p2p.models import UserAmortization, P2PProduct
+from wanglibao_pay.models import PayInfo
+
+
+logger = logging.getLogger(__name__)
 
 
 class UnicodeWriter:
@@ -42,7 +50,15 @@ class UnicodeWriter:
 class ReportGenerator(object):
 
     @classmethod
-    def generate_deposit_report(self, start_time, end_time=None):
+    def generate_reports(cls, start_time, end_time=None):
+        cls.generate_deposit_report(start_time=start_time, end_time=end_time)
+        cls.generate_withdraw_report(start_time=start_time, end_time=end_time)
+        cls.generate_payback_report(start_time=start_time, end_time=end_time)
+        cls.generate_p2p_audit_report(start_time=start_time, end_time=end_time)
+
+
+    @classmethod
+    def generate_deposit_report(cls, start_time, end_time=None):
         if end_time is None:
             end_time = start_time + timedelta(days=1)
 
@@ -88,7 +104,7 @@ class ReportGenerator(object):
             return report
 
     @classmethod
-    def generate_withdraw_report(self, start_time, end_time=None):
+    def generate_withdraw_report(cls, start_time, end_time=None):
         if end_time is None:
             end_time = start_time + timedelta(days=1)
 
@@ -131,8 +147,122 @@ class ReportGenerator(object):
                     u'申请'
                 ])
 
-            report = Report(name=u'充值记录 %s' % start_time.strftime('%Y-%m-%d %H-%M-%S'))
+            report = Report(name=u'提现记录 %s' % start_time.strftime('%Y-%m-%d %H-%M-%S'))
             report.file = join('reports', 'txjl', filename)
+            report.save()
+
+            return report
+
+    @classmethod
+    def generate_payback_report(cls, start_time, end_time=None):
+        if end_time is None:
+            end_time = start_time + timedelta(days=1)
+
+        assert(isinstance(start_time, datetime))
+        assert(isinstance(start_time, datetime) or end_time is None)
+
+        fileprefix = 'pay'
+
+        filename = '%s-%s.tsv' % (fileprefix, start_time.strftime('%Y-%m-%d'))
+        folder = join(settings.MEDIA_ROOT, 'reports', fileprefix)
+        path = join(folder, filename)
+
+        try:
+            makedirs(folder)
+        except OSError, e:
+            if e.errno != 17:
+                raise
+
+        with open(path, 'w+b') as tsv_file:
+            writer = UnicodeWriter(tsv_file, delimiter='\t')
+
+            writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
+                             u'应还本息', u'应还本金', u'应还利息', u'状态'])
+
+            amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time, settled=False)\
+                .prefetch_related('product_amortization').prefetch_related('product_amortization__product')\
+                .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+
+            for index, amortization in enumerate(amortizations):
+                writer.writerow([
+                    str(index + 1),
+                    amortization.product_amortization.product.serial_number,
+                    amortization.product_amortization.product.serial_number + '_JK',
+                    amortization.product_amortization.product.name,
+                    u'第%d期' % amortization.term,
+                    u'抵押标',
+                    amortization.term_date.strftime("%Y-%m-%d"),
+                    str(amortization.principal + amortization.interest),
+                    str(amortization.principal),
+                    str(amortization.interest),
+                    u'待还',
+                    amortization.term_date.strftime("%Y-%m-%d")
+                ])
+
+            report = Report(name=u'还款列表 %s' % start_time.strftime('%Y-%m-%d %H-%M-%S'))
+            report.file = join('reports', fileprefix, filename)
+            report.save()
+
+            return report
+
+
+    @classmethod
+    def generate_p2p_audit_report(cls, start_time, end_time=None):
+        if end_time is None:
+            end_time = start_time + timedelta(days=1)
+
+        assert(isinstance(start_time, datetime))
+        assert(isinstance(start_time, datetime) or end_time is None)
+
+        fileprefix = 'p2p_audit'
+
+        filename = '%s-%s.tsv' % (fileprefix, start_time.strftime('%Y-%m-%d'))
+        folder = join(settings.MEDIA_ROOT, 'reports', fileprefix)
+        path = join(folder, filename)
+
+        try:
+            makedirs(folder)
+        except OSError, e:
+            if e.errno != 17:
+                raise
+
+        with open(path, 'w+b') as tsv_file:
+            writer = UnicodeWriter(tsv_file, delimiter='\t')
+
+            writer.writerow([u'序号', u'贷款号', u'用户名称', u'借款标题', u'借款金额', u'已借金额', u'利率', u'借款期限', u'还款方式',
+                             u'借款类型', u'投资次数', u'状态', u'满标时间', u'真实姓名', u'手机号', u'身份证', u'银行名', u'银行账号',
+                             u'省份', u'地区', u'支行'])
+
+            # Get all products with status 满标待打款
+            products = P2PProduct.objects.filter(status=u'满标待打款')
+
+            for index, product in enumerate(products):
+                writer.writerow([
+                    str(index + 1),
+                    product.serial_number,
+                    '-',
+                    product.name,
+                    str(product.total_amount),
+                    str(product.ordered_amount),
+                    str(product.expected_earning_rate),
+                    str(product.period),
+                    product.pay_method,
+                    '抵押标', # Hard code this since it is not used anywhere except this table
+                    str(len(product.equities.all())),
+                    product.status,
+                    product.soldout_time.strftime("%Y-%m-%d %H-%M-%S"),
+                    product.borrower_name,
+                    product.borrower_phone,
+                    product.borrower_id_number,
+                    product.borrower_bankcard_bank_code,
+                    product.borrower_bankcard,
+                    product.borrower_bankcard_province,
+                    product.borrower_bankcard_city,
+                    product.borrower_bankcard_branch
+                ])
+
+            report = Report(name=u'满标复审 %s' % start_time.strftime('%Y-%m-%d %H-%M-%S'))
+            report.file = join('reports', fileprefix, filename)
             report.save()
 
             return report
