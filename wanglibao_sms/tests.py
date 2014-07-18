@@ -3,7 +3,7 @@ import datetime
 
 from django.test import TestCase
 from django.utils import timezone
-from wanglibao_sms.backends import TestBackEnd, UrlBasedSMSBackEnd
+from wanglibao_sms.backends import TestBackEnd, UrlBasedSMSBackEnd, ManDaoSMSBackEnd
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_sms.utils import send_validation_code, validate_validation_code
 
@@ -35,3 +35,6 @@ class BackEndTestCase(TestCase):
 
         self.assertEqual(status, 410)
 
+    def test_mandao_backend(self):
+        status, message = ManDaoSMSBackEnd.send('13810652323', u'手机尾号[2323]的验证码是[1234]，欢迎使用网利宝，您的贴心理财专家！回复TD退订 400-855-9600【网利宝】')
+        self.assertEqual(status, 200)
