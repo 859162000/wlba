@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from order.models import Order
 from wanglibao_margin.models import MarginRecord
+from wanglibao_pay.util import get_a_uuid
 
 
 class Bank(models.Model):
@@ -54,6 +55,7 @@ class PayInfo(models.Model):
         ordering = ['-create_time']
 
     type = models.CharField(verbose_name=u'类型', help_text=u'充值：D 取款：W', max_length=5)
+    uuid = models.CharField(u'唯一标示', max_length=32, unique=True, db_index=True, default=get_a_uuid)
     amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'实扣金额')
     fee = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'手续费', default=0)
     total_amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'总金额', default=0)
