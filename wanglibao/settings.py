@@ -95,6 +95,8 @@ INSTALLED_APPS = (
 
     'ckeditor',
     'captcha',
+    'djcelery', # Use django orm as the backend
+    'djsupervisor',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -380,11 +382,23 @@ SWAGGER_SETTINGS = {
 CAPTCHA_IMAGE_BEFORE_FIELD = False
 
 # Celery configuration
+
+# Now since the rabbitmq installed in localhost, we use guest
 BROKER_URL = 'amqp://guest:guest@localhost//'
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
+from datetime import timedelta
+
+CELERYBEAT_SCHEDULE = {
+    'p2p-watchdog-1-minutes': {
+        'task': 'wanglibao_p2p.tasks.p2p_watchdog',
+        'schedule': timedelta(minutes=1),
+    },
+}
 
 ID_VERIFY_USERNAME = 'wljr_admin'
 ID_VERIFY_PASSWORD = 'wljr888'

@@ -129,9 +129,6 @@ def deploy():
     manage_py = '/var/wsgi/wanglibao/manage.py'
     log_file = '/var/log/wanglibao/scrawl.log'
 
-    p2p_watchdog = '/usr/bin/p2p'
-    p2p_log = '/var/log/wanglibao/p2p.log'
-
     sync_sm_info = '/usr/bin/sync_sm_info'
     sync_sm_income = '/usr/bin/sync_sm_income'
     sync_sm_log = '/var/log/wanglibao/sync_sm.log'
@@ -145,12 +142,11 @@ def deploy():
     sudo('adduser `whoami` www-data')
 
     with cd(path):
-        print green("check out the build")
 
-        print green("Install git")
+        #########################################################################################
+        # Install pre-requisition
+        #########################################################################################
         apt_get("git")
-
-        print green("Install lxml dependency")
         apt_get('libxml2-dev', 'libxslt1-dev')
 
         print green("Install apache2 and wsgi mod")
@@ -163,8 +159,8 @@ def deploy():
         create_user()
 
         apt_get('libmysqlclient-dev')
-
         apt_get('libfreetype6-dev')
+        apt_get('supervisor')
 
         print green('add crontab')
         sudo('echo "#!/bin/bash" > %s' % scrawl_job_file)
@@ -181,9 +177,13 @@ def deploy():
         sudo('crontab /tmp/tmp_tab')
 
         add_cron_tab('/usr/bin/generate_report', '/var/log/wanglibao/report.log', env, '15 0 * * *', manage_py, ['generate_report'])
-        add_cron_tab(p2p_watchdog, p2p_log, env, '*/1 * * * *', manage_py, ['p2p_watchdog'])
         add_cron_tab(sync_sm_info, sync_sm_log, env, '0 */1 * * *', manage_py, ['syncsm -f', 'syncsm -m'])
         add_cron_tab(sync_sm_income, sync_sm_log, env, '0 18-23/1 * * *', manage_py, ['syncsm -i'], _end=True)
+
+        ##############################################################################
+        # Check out build from github
+        ##############################################################################
+        print green("check out the build")
 
         if not exists(os.path.join(path, env.depot_name)):
             print green('Git folder not there, create it')
