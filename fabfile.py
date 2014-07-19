@@ -112,7 +112,7 @@ def add_cron_tab(job_file, job_log_file, env, period_string, manage_py, manage_a
 
 
 def install_rabbit_mq():
-    apt_get("software-properties-common")
+    apt_get('software-properties-common', 'python-software-properties')
 
     if not contains('/etc/apt/sources.list', 'rabbitmq'):
         sudo("add-apt-repository \"deb http://www.rabbitmq.com/debian/ testing main\"")
@@ -134,12 +134,15 @@ def deploy():
     sync_sm_log = '/var/log/wanglibao/sync_sm.log'
 
     print red("Begin deploy: ")
-    create_folder(path, mod="777")
 
-    print green("Create log folder")
+    create_folder(path, mod="777")
+    create_folder('/var/run/wanglibao/', owner='www-data', group='www-data', mod='770')
     create_folder('/var/log/wanglibao/', owner='www-data', group='www-data', mod='770')
+
     # Add deploy account to www-data to inherit the permission on log folder, prevent permission issue
     sudo('adduser `whoami` www-data')
+
+    install_rabbit_mq()
 
     with cd(path):
 
@@ -268,8 +271,18 @@ def deploy():
                     sudo('cp staging.conf /etc/apache2/sites-available')
                     sudo('a2ensite staging.conf')
 
-                print green('apache server configured, restart it')
                 sudo('service apache2 reload')
+
+                print green('Start the supervisor in daemon mode')
+
+                with cd('/var/wsgi/wanglibao'):
+                    if exists('/var/run/wanglibao/supervisor.pid'):
+                        run("python manage.py supervisor stop all")
+                        run("kill `cat /var/run/wanglibao/supervisor.pid`")
+                    run("python manage.py supervisor --daemonize --logfile=/var/log/wanglibao/supervisord.log --pidfile=/var/run/wanglibao/supervisor.pid")
+                    run("python manage.py supervisor update")
+                    run("python manage.py supervisor restart all")
+
                 print green('deploy finished')
 
 
