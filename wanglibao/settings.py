@@ -400,6 +400,8 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
+CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
+
 ID_VERIFY_USERNAME = 'wljr_admin'
 ID_VERIFY_PASSWORD = 'wljr888'
 
