@@ -3,6 +3,7 @@ from django.contrib import admin
 
 # Register your models here.
 from wanglibao_pay.models import Bank, PayInfo, Card
+from wanglibao_pay.views import WithdrawTransactions
 
 
 class PayInfoAdmin(admin.ModelAdmin):
@@ -31,3 +32,6 @@ class CardAdmin(admin.ModelAdmin):
 admin.site.register(Bank, BankAdmin)
 admin.site.register(Card, CardAdmin)
 admin.site.register(PayInfo, PayInfoAdmin)
+
+
+admin.site.register_view('pay/withdraw/audit', view=WithdrawTransactions.as_view(), name=u'提现申请审核页面')

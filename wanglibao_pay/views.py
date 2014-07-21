@@ -259,7 +259,7 @@ class WithdrawTransactions(TemplateView):
             for payinfo in payinfos:
                 with transaction.atomic():
                     if payinfo.status != PayInfo.ACCEPTED or payinfo.status != PayInfo.PROCESSING:
-                        logger.Info("The withdraw status [%s] not in %s or %s, ignore it" % (payinfo.status, PayInfo.ACCEPTED, PayInfo.PROCESSING))
+                        logger.info("The withdraw status [%s] not in %s or %s, ignore it" % (payinfo.status, PayInfo.ACCEPTED, PayInfo.PROCESSING))
                         continue
 
                     marginKeeper = MarginKeeper(payinfo.user)
@@ -276,4 +276,4 @@ class WithdrawTransactions(TemplateView):
         """
         Only user with change payinfo permission can call this view
         """
-        super(WithdrawTransactions, self).dispatch(*args, **kwargs)
+        return super(WithdrawTransactions, self).dispatch(request, *args, **kwargs)

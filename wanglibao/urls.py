@@ -1,3 +1,4 @@
+from adminplus.sites import AdminSitePlus
 from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
@@ -9,6 +10,7 @@ from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 
+admin.site = AdminSitePlus()
 admin.autodiscover()
 
 urlpatterns = patterns(

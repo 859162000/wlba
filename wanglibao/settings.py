@@ -97,6 +97,7 @@ INSTALLED_APPS = (
     'captcha',
     'djcelery', # Use django orm as the backend
     'djsupervisor',
+    'adminplus',
 )
 
 MIDDLEWARE_CLASSES = (

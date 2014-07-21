@@ -11,6 +11,7 @@ billiard==3.3.0.17
 celery==3.1.12
 cssselect==0.9.1
 diff-match-patch==20110725.1
+django-adminplus==0.3
 django-appconf==0.6
 django-celery==3.1.10
 django-ckeditor-updated==4.2.8
