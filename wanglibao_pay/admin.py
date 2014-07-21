@@ -9,6 +9,7 @@ from wanglibao_pay.views import WithdrawTransactions
 class PayInfoAdmin(admin.ModelAdmin):
     list_display = ('get_phone', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time')
     search_fields = ['user__wanglibaouserprofile__phone', 'card__no']
+    raw_id_fields = ('order', 'margin_record')
 
     def get_phone(self, obj):
         return obj.user.wanglibaouserprofile.phone
