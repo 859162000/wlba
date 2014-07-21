@@ -111,7 +111,7 @@ class ReportGenerator(object):
         assert(isinstance(start_time, datetime))
         assert(isinstance(start_time, datetime) or end_time is None)
 
-        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W').prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
+        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W', status=PayInfo.ACCEPTED).prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
 
         filename = 'txjl-%s.tsv' % start_time.strftime('%Y-%m-%d')
         folder = join(settings.MEDIA_ROOT, 'reports', 'txjl')
@@ -139,12 +139,12 @@ class ReportGenerator(object):
                     '-',
                     '-',
                     payinfo.card_no,
-                    payinfo.total_amount,
-                    payinfo.amount,
-                    payinfo.fee,
+                    str(payinfo.total_amount),
+                    str(payinfo.amount),
+                    str(payinfo.fee),
                     payinfo.create_time.strftime("%Y-%m-%d %H:%M"),
                     str(payinfo.request_ip),
-                    u'申请'
+                    unicode(payinfo.status)
                 ])
 
             report = Report(name=u'提现记录 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))

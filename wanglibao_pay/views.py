@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
+import re
 import socket
 import datetime
+from django.contrib.auth.decorators import permission_required
 from django.db import transaction
 from django.forms import model_to_dict
 from django.http import HttpResponse
@@ -236,18 +238,42 @@ class CardViewSet(ModelViewSet):
 
 class WithdrawTransactions(TemplateView):
     template_name = 'withdraw_transactions.jade'
-    COB_HOUR = 15
 
-    def get_context_data(self, **kwargs):
-        now = datetime.datetime.now()
-        end = datetime.datetime(now.year, now.month, now.day, WithdrawTransactions.COB_HOUR)
-        if now.hour < WithdrawTransactions.COB_HOUR:
-            end = end - datetime.timedelta(days=1)
-        start = end - datetime.timedelta(days=1)
+    def post(self, request):
+        action = request.POST.get('action')
+        uuids_param = request.POST.get('transaction_uuids', '')
+        uuids = re.findall(r'[\w]+', uuids_param)
+        payinfos = PayInfo.objects.filter(uuid__in=uuids, type='W')
 
-        trade_records = PayInfo.objects.filter(update_time__gte=start, update_time__lt=end, status=PayInfo.ACCEPTED,
-                                               type=PayInfo.WITHDRAW)
-        return {
-            "trade_records": trade_records
-        }
+        # These are the uuids exists in db for real
+        uuids_param = ",".join([payinfo.uuid for payinfo in payinfos])
 
+        if action == 'preview' or action is None:
+            return self.render_to_response(
+                {
+                    'payinfos': payinfos,
+                    'transaction_uuids': uuids_param
+                }
+            )
+        elif action == 'confirm':
+            for payinfo in payinfos:
+                with transaction.atomic():
+                    if payinfo.status != PayInfo.ACCEPTED or payinfo.status != PayInfo.PROCESSING:
+                        logger.Info("The withdraw status [%s] not in %s or %s, ignore it" % (payinfo.status, PayInfo.ACCEPTED, PayInfo.PROCESSING))
+                        continue
+
+                    marginKeeper = MarginKeeper(payinfo.user)
+                    marginKeeper.withdraw_ack(payinfo.amount)
+                    payinfo.status = PayInfo.SUCCESS
+                    payinfo.save()
+
+            return HttpResponse({
+                u"所有的取款请求已经处理完毕 %s" % uuids_param
+            })
+
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        super(WithdrawTransactions, self).dispatch(*args, **kwargs)
