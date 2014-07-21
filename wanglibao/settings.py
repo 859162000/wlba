@@ -427,6 +427,6 @@ PAY_BACK_RETURN_URL = CALLBACK_HOST + '/pay/deposit/callback/'
 PAY_RET_URL = CALLBACK_HOST + '/pay/deposit/complete/'
 WITHDRAW_BACK_RETURN_URL = CALLBACK_HOST + '/pay/withdraw/callback/'
 
-#ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
-#if PRODUCTION:
-ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+if PRODUCTION:
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
