@@ -1,21 +1,25 @@
 # -*- coding: utf-8 -*-
+from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
+from django.db import models
+from wanglibao_pay.models import PayInfo
+from wanglibao_pay.util import get_a_uuid
 
 
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        # Adding field 'PayInfo.uuid'
-        db.add_column(u'wanglibao_pay_payinfo', 'uuid',
-                      self.gf('django.db.models.fields.CharField')(max_length=32, db_index=True),
-                      keep_default=False)
-
+        "Write your forwards methods here."
+        # Note: Don't use "from appname.models import ModelName". 
+        # Use orm.ModelName to refer to models in this application,
+        # and orm['appname.ModelName'] for models in other applications.
+        for pay_info in PayInfo.objects.all():
+            pay_info.uuid = get_a_uuid()
+            pay_info.save()
 
     def backwards(self, orm):
-        # Deleting field 'PayInfo.uuid'
-        db.delete_column(u'wanglibao_pay_payinfo', 'uuid')
-
+        "Write your backwards methods here."
 
     models = {
         u'auth.group': {
@@ -115,8 +119,9 @@ class Migration(SchemaMigration):
             'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
             'update_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'on_delete': 'models.PROTECT'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'5Lo_EwMgQKaKeOOlhdzUhg'", 'max_length': '32', 'db_index': 'True'})
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'OAxWScsiRl2Y9bnMo1uF2Q'", 'max_length': '32', 'db_index': 'True'})
         }
     }
 
     complete_apps = ['wanglibao_pay']
+    symmetrical = True

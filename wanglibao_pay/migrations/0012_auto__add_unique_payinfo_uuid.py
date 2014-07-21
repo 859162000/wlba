@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
+from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
+from django.db import models
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'PayInfo.uuid'
-        db.add_column(u'wanglibao_pay_payinfo', 'uuid',
-                      self.gf('django.db.models.fields.CharField')(max_length=32, db_index=True),
-                      keep_default=False)
+        # Adding unique constraint on 'PayInfo', fields ['uuid']
+        db.create_unique(u'wanglibao_pay_payinfo', ['uuid'])
 
 
     def backwards(self, orm):
-        # Deleting field 'PayInfo.uuid'
-        db.delete_column(u'wanglibao_pay_payinfo', 'uuid')
+        # Removing unique constraint on 'PayInfo', fields ['uuid']
+        db.delete_unique(u'wanglibao_pay_payinfo', ['uuid'])
 
 
     models = {
@@ -115,7 +115,7 @@ class Migration(SchemaMigration):
             'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
             'update_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'on_delete': 'models.PROTECT'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'5Lo_EwMgQKaKeOOlhdzUhg'", 'max_length': '32', 'db_index': 'True'})
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'dzhlzGKoTdarCjbTPm4rqw'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'})
         }
     }
 
