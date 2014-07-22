@@ -24,10 +24,12 @@ block main
             - csrf_token
             .form-group
               .row
-                label 金额(元)
+                label 充值金额
               .row
-                .span2
+                .span4
                   input#amount(type='text', name='amount', placeholder='金额', value='100.00')
+                .span2
+                  元
             .form-group
               input#gate_id(type='hidden', name='gate_id', placeholder='银行', value='09')
               .row
