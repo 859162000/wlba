@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -7,6 +8,7 @@
             *{margin:0; padding: 0}
             body{margin:0;padding:0; background:url(/static/images/active_bg.jpg) no-repeat center top; min-height:1350px; min-width: 1000px;}
             del {display: none}
+            ul, li {list-style: none}
             .container {width: 1000px; height: 100%; overflow: hidden; margin: 0 auto;}
             .container .home-link {margin-top: 80px; }
             .container .home-link a {position: relative; left:895px; display: block; width: 105px; height: 40px;}
@@ -17,6 +19,10 @@
             .order-form .input_name {padding-top: 7px;}
             .order-form .input_phone {padding-top: 10px;}
             .order-form .input_amount {padding-top: 10px;}
+            .share {margin: 460px auto 0 auto; width: 380px; height: 50px;}
+            .share div {width: 380px; height: 50px; margin-left: 28px;}
+            .share a {float: left; overflow: hidden;}
+            .share a.bds_tsina,.share a.bds_tqq,.share a.bds_qzone,.share a.bds_renren,.share a.mailto  {width: 70px; height: 50px; padding:0; margin: 0; background: url("")}
         </style>
     </head>
     <body>
@@ -34,56 +40,101 @@
                     <p><input type="image" name="submit" src="/static/images/submit_bg.png" class="order_submit" /></p>
                 </form>
             </div>
+            <div class="share bdsharebuttonbox" data-tag="share_1">
+                <div>
+                    <a class="bds_tsina" data-cmd="tsina" title="新浪微博"></a>
+                    <a class="bds_tqq" data-cmd="tqq" title="腾讯微博"></a>
+                    <a class="bds_qzone" data-cmd="qzone" href="#" title="QQ空间"></a>
+                    <a class="bds_renren" data-cmd="renren" title="人人"></a>
+                    <a class="mailto" href="mailto:" title="邮件"></a>
+                </div>
+            </div>
         </div>
     </body>
-<script src="/static/js/lib/jquery.min.js"></script>
-<script type="text/javascript">
-function check() {
-	var name = $.trim($("#name").val());
-	var phone = $("#phone").val();
-	var amount = $("#amount").val();
-	var reg_amount = /^[1-9]\d+$/;
-	var reg_phone = /^[1][34578]\d{9}$/;
-	if(name == "") {
-		alert("名称不能为空");
-		return false;	
-	}
-	if(!reg_phone.test(phone)){
-		alert("电话号码不正确");
-		return false;
-	}
-	if(!reg_amount.test(amount)){
-		alert("预约额度只能为数字");
-		return false;	
-	}
-	if(amount < 100){
-		alert("预约额度至少为100元");
-		$("#amount").val(100);
-		return false;	
-	}
-	return true;
-}
+    <script src="/static/js/lib/jquery.min.js"></script>
+    <script type="text/javascript">
+      function check() {
+        var name = $.trim($("#name").val());
+        var phone = $("#phone").val();
+        var amount = $("#amount").val();
+        var reg_amount = /^[1-9]\d+$/;
+        var reg_phone = /^[1][34578]\d{9}$/;
+        if(name == "") {
+          alert("名称不能为空");
+          return false;
+        }
+        if(!reg_phone.test(phone)){
+          alert("电话号码不正确");
+          return false;
+        }
+        if(!reg_amount.test(amount)){
+          alert("预约额度只能为数字");
+          return false;
+        }
+        if(amount < 100){
+          alert("预约额度至少为100元");
+          $("#amount").val(100);
+          return false;
+        }
+        return true;
+      }
 
-// this is the id of the form
-$("#form").submit(function() {
+      // this is the id of the form
+      $("#form").submit(function() {
 
-  if(!check()){
-    return false;
-  }
+        if(!check()){
+          return false;
+        }
 
-  var url = document.URL;
+        var url = document.URL;
 
-  $.ajax({
-         type: "POST",
-         url: url,
-         data: $("#form").serialize(), // serializes the form's elements.
-         success: function(data) {
-             alert(data); // show response from the php script.
-         }
-       });
+        $.ajax({
+               type: "POST",
+               url: url,
+               data: $("#form").serialize(), // serializes the form's elements.
+               success: function(data) {
+                   alert(data); // show response from the php script.
+               }
+             });
 
-  return false; // avoid to execute the actual submit of the form.
-});
+        return false; // avoid to execute the actual submit of the form.
+      });
 
-</script>
+      window._bd_share_config = {
+          common: {
+              bdText: '【网利宝】限量预约10%保本保息理财产品！土豪，从这里雄起！',
+              bdDesc: '【网利宝】限量预约10%本息保障理财产品，民生银行全程监管',
+              bdUrl: 'https://www.wanglibao.com/preorder/p2p/',
+              bdPic: 'https://www.wanglibao.com/static/images/order_logo.jpg'
+          },
+          share: [
+            {
+              "bdSize": 16
+            }
+          ],
+          slide: [
+            {
+              bdImg: 0,
+              bdPos: "right",
+              bdTop: 100
+            }
+          ],
+          image: [
+            {
+              viewType: 'list',
+              viewPos: 'top',
+              viewColor: 'black',
+              viewSize: '16',
+              viewList: ['qzone', 'tsina', 'huaban', 'tqq', 'renren']
+            }
+          ],
+          selectShare: [
+            {
+              "bdselectMiniList": ['qzone', 'tqq', 'kaixin001', 'bdxc', 'tqf']
+            }
+          ]
+      }
+
+      with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+    </script>
 </html>

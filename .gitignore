@@ -10,3 +10,4 @@ static/sass/*.css
 .DS_Store
 *.pid
 celerybeat-schedule
+gems
