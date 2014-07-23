@@ -24,4 +24,3 @@ class IndexView(TemplateView):
             'banners': banners,
             'site_data': site_data
         }
-

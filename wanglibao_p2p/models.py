@@ -3,6 +3,7 @@ import collections
 from decimal import Decimal
 from django.db import models
 from django.db.models import F, Sum, SET_NULL
+from django.db.models.signals import post_save, pre_save
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from wanglibao.fields import JSONFieldUtf8
@@ -36,6 +37,8 @@ class ContractTemplate(models.Model):
 
 class P2PProduct(ProductBase):
     STATUS_CHOICES = (
+        (u'录标', u'录标'),
+        (u'录标完成', u'录标完成'),
         (u'待审核', u'待审核'),
         (u'正在招标', u'正在招标'),
         (u'满标待打款', u'满标待打款'),
@@ -49,14 +52,15 @@ class P2PProduct(ProductBase):
 
     PAY_METHOD_CHOICES = (
         (u'等额本息', u'等额本息'),
-        (u'先息后本', u'先息后本')
+        (u'先息后本', u'先息后本'),
+        (u'按月付息', u'按月付息'),
     )
 
     name = models.CharField(max_length=256, verbose_name=u'名字')
     short_name = models.CharField(max_length=64, verbose_name=u'短名字')
     serial_number = models.CharField(max_length=100, verbose_name=u'产品编号', unique=True, null=True)
 
-    status = models.CharField(max_length=16, default=u'待审核',
+    status = models.CharField(max_length=16, default=u'录标',
                               choices=STATUS_CHOICES,
                               verbose_name=u'产品状态')
 
