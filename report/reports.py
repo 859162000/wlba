@@ -241,24 +241,24 @@ class ReportGenerator(object):
                     str(index + 1),
                     product.serial_number,
                     '-',
-                    product.name,
+                    unicode(product.name),
                     str(product.total_amount),
                     str(product.ordered_amount),
                     str(product.expected_earning_rate),
                     str(product.period),
-                    product.pay_method,
-                    '抵押标', # Hard code this since it is not used anywhere except this table
+                    unicode(product.pay_method),
+                    u'抵押标', # Hard code this since it is not used anywhere except this table
                     str(len(product.equities.all())),
-                    product.status,
+                    unicode(product.status),
                     product.soldout_time.strftime("%Y-%m-%d %H:%M:%S"),
-                    product.borrower_name,
-                    product.borrower_phone,
-                    product.borrower_id_number,
-                    product.borrower_bankcard_bank_code,
-                    product.borrower_bankcard,
-                    product.borrower_bankcard_bank_province,
-                    product.borrower_bankcard_bank_city,
-                    product.borrower_bankcard_bank_branch
+                    unicode(product.borrower_name),
+                    unicode(product.borrower_phone),
+                    unicode(product.borrower_id_number),
+                    unicode(product.borrower_bankcard_bank_code),
+                    unicode(product.borrower_bankcard),
+                    unicode(product.borrower_bankcard_bank_province),
+                    unicode(product.borrower_bankcard_bank_city),
+                    unicode(product.borrower_bankcard_bank_branch)
                 ])
 
             report = Report(name=u'满标复审 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
