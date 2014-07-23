@@ -256,9 +256,9 @@ class ReportGenerator(object):
                     product.borrower_id_number,
                     product.borrower_bankcard_bank_code,
                     product.borrower_bankcard,
-                    product.borrower_bankcard_province,
-                    product.borrower_bankcard_city,
-                    product.borrower_bankcard_branch
+                    product.borrower_bankcard_bank_province,
+                    product.borrower_bankcard_bank_city,
+                    product.borrower_bankcard_bank_branch
                 ])
 
             report = Report(name=u'满标复审 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
