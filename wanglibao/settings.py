@@ -7,10 +7,11 @@ https://docs.djangoproject.com/en/1.6/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
+from __future__ import absolute_import
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from django.core.exceptions import ImproperlyConfigured
+from celery.schedules import crontab
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -399,6 +400,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_p2p.tasks.p2p_watchdog',
         'schedule': timedelta(minutes=1),
     },
+    'report-generate': {
+        'task': 'report.tasks.generate_report',
+        'schedule': crontab(minute=5, hour=0),
+    }
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
