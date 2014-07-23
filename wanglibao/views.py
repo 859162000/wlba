@@ -11,7 +11,7 @@ class IndexView(TemplateView):
     template_name = 'index.jade'
 
     def get_context_data(self, **kwargs):
-        p2p_products = P2PProduct.objects.filter(Q(publish_time__lte=timezone.now())).filter(Q(status=u'正在招标') | Q(status=u'已完成'))[:20]
+        p2p_products = P2PProduct.objects.filter(Q(publish_time__lte=timezone.now())).filter(Q(status=u'正在招标') | Q(status=u'已完成')).order_by('-end_time')[:20]
         trade_records = P2PRecord.objects.filter(catalog=u'申购').prefetch_related('user').prefetch_related('user__wanglibaouserprofile')[:40]
         banners = Banner.objects.filter(device=Banner.PC)
         news_and_reports = NewsAndReport.objects.all()[:5]
@@ -24,4 +24,3 @@ class IndexView(TemplateView):
             'banners': banners,
             'site_data': site_data
         }
-
