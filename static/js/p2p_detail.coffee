@@ -29,6 +29,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       if result.error_number == 1
         $('.login-modal').trigger('click')
         return
+      else if result.error_number == 2
+        $('#id-validate').modal()
+        return
 
       message = result.message
       error_message = ''
