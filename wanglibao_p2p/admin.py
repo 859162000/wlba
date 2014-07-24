@@ -26,9 +26,9 @@ class P2PProductAdmin(ConcurrentModelAdmin, VersionAdmin):
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline
     ]
-    list_display = ('name', 'short_name', 'status', 'pay_method', 'end_time', 'closed', 'audit_link')
+    list_display = ('name', 'short_name', 'status', 'pay_method', 'end_time', 'audit_link')
     list_editable = ('status',)
-    list_filter = ('status', 'closed',)
+    list_filter = ('status',)
 
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):

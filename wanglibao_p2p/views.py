@@ -8,9 +8,13 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 
 
@@ -99,3 +103,9 @@ class AuditProductView(TemplateView):
 
 
 audit_product_view = staff_member_required(AuditProductView.as_view())
+
+
+class P2PProductViewSet(PaginatedModelViewSet):
+    model = P2PProduct
+    permission_classes = IsAdminUserOrReadOnly,
+    serializer_class = P2PProductSerializer

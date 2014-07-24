@@ -120,7 +120,6 @@ class P2POperator(object):
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
                 equity_keeper.rollback(savepoint=False)
-            product.closed = True
             product.status = u'流标'
             product.save()
 
