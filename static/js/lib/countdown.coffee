@@ -1,5 +1,6 @@
 define ['jquery', 'underscore'], ($, _)->
-  loadTime = Date.now()
+
+  loadTime = new Date().getTime()
 
   counters = $('*[data-role=countdown]')
 
@@ -9,7 +10,7 @@ define ['jquery', 'underscore'], ($, _)->
     return '' + n
 
   countdown = ()->
-    now = Date.now()
+    now = new Date().getTime()
 
     diffInSeconds = (now - loadTime)/ 1000
     _.each counters, (e)->

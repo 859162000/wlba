@@ -2,7 +2,7 @@
 (function() {
   define(['jquery', 'underscore'], function($, _) {
     var countdown, counters, loadTime, twoDigit;
-    loadTime = Date.now();
+    loadTime = new Date().getTime();
     counters = $('*[data-role=countdown]');
     twoDigit = function(n) {
       if (n < 10) {
@@ -12,7 +12,7 @@
     };
     countdown = function() {
       var diffInSeconds, now;
-      now = Date.now();
+      now = new Date().getTime();
       diffInSeconds = (now - loadTime) / 1000;
       return _.each(counters, function(e) {
         var components, left, seconds, timeString;
