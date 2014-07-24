@@ -133,15 +133,13 @@ html
               caption {{p2p.warrant_company.name}}
               tbody
                 warrants = p2p.warrant_set.all()
-                tr
-                  for warrant in warrants
+                for warrant in warrants
+                  tr
                     td {{warrant.name}}
-                tr
-                  for warrant in warrants
                     td
                       span
-                        span.icon.icon-approve
-                        | 已认证
+                      span.icon.icon-approve
+                      | 已认证
           .clearfix
             .p2p-detail-container
               h1 投资记录
