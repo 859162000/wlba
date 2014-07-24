@@ -5,7 +5,7 @@ from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, At
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 
 
-class UserEquityAdmin(admin.ModelAdmin, VersionAdmin):
+class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('user', 'product', 'equity', 'confirm', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
     list_filter = ('confirm',)
 
@@ -31,7 +31,7 @@ class P2PProductAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_filter = ('status', 'closed',)
 
 
-class UserAmortizationAdmin(admin.ModelAdmin, VersionAdmin):
+class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
 
 
