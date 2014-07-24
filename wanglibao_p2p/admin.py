@@ -1,12 +1,11 @@
-from django.conf.urls import patterns, url
+from concurrency.admin import ConcurrentModelAdmin
 from django.contrib import admin
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 
 
-class UserEquityAdmin(admin.ModelAdmin):
+class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('user', 'product', 'equity', 'confirm', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
     list_filter = ('confirm',)
 
@@ -23,7 +22,7 @@ class AttachementInline(admin.TabularInline):
     model = Attachment
 
 
-class P2PProductAdmin(admin.ModelAdmin):
+class P2PProductAdmin(ConcurrentModelAdmin, VersionAdmin):
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline
     ]
@@ -32,7 +31,7 @@ class P2PProductAdmin(admin.ModelAdmin):
     list_filter = ('status', 'closed',)
 
 
-class UserAmortizationAdmin(admin.ModelAdmin):
+class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
 
 

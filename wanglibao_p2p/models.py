@@ -1,11 +1,13 @@
 # encoding: utf-8
 import collections
 from decimal import Decimal
+from concurrency.fields import IntegerVersionField
 from django.db import models
 from django.db.models import F, Sum, SET_NULL
 from django.db.models.signals import post_save, pre_save
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+import reversion
 from wanglibao.fields import JSONFieldUtf8
 from wanglibao.models import ProductBase
 from utility import gen_hash_list
@@ -55,6 +57,8 @@ class P2PProduct(ProductBase):
         (u'先息后本', u'先息后本'),
         (u'按月付息', u'按月付息'),
     )
+
+    version = IntegerVersionField()
 
     name = models.CharField(max_length=256, verbose_name=u'名字')
     short_name = models.CharField(max_length=64, verbose_name=u'短名字')
@@ -137,6 +141,8 @@ class P2PProduct(ProductBase):
     audit_link.short_description = u'审核'
     audit_link.allow_tags = True
 
+reversion.register(P2PProduct)
+
 
 class Warrant(models.Model):
     name = models.CharField(max_length=16, verbose_name=u'名字')
@@ -172,6 +178,8 @@ class AmortizationReadyManager(models.Manager):
 
 
 class ProductAmortization(models.Model):
+    version = IntegerVersionField()
+
     product = models.ForeignKey(P2PProduct, related_name='amortizations')
 
     term = models.IntegerField(u'还款期数')
@@ -204,6 +212,8 @@ class ProductAmortization(models.Model):
 
 
 class UserAmortization(models.Model):
+    version = IntegerVersionField()
+
     product_amortization = models.ForeignKey(ProductAmortization, related_name='subs')
     user = models.ForeignKey(get_user_model())
     term = models.IntegerField(u'还款期数')
@@ -227,6 +237,8 @@ class UserAmortization(models.Model):
 
 
 class P2PEquity(models.Model):
+    version = IntegerVersionField()
+
     user = models.ForeignKey(get_user_model(), related_name='equities')
     product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
     equity = models.BigIntegerField(u'用户所持份额', default=0)
