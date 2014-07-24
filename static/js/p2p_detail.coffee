@@ -3,7 +3,7 @@ require.config
     jquery: 'lib/jquery.min'
     underscore: 'lib/underscore-min'
 
-require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown'], ($, _, backend, calculator, countdown)->
+require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'lib/backend'], ($, _, backend, calculator, countdown)->
   $('#purchase-form .submit-button').click (e)->
     e.preventDefault()
 
@@ -26,6 +26,10 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       location.reload()
     .fail (xhr)->
       result = JSON.parse xhr.responseText
+      if result.error_number == 1
+        $('.login-modal').trigger('click')
+        return
+
       message = result.message
       error_message = ''
       if $.type(message) == 'object'
@@ -34,4 +38,4 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         error_message = message
 
       alert error_message
-      location.reload()
+      #location.reload()

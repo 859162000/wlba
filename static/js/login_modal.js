@@ -67,6 +67,7 @@
           error_message = _.chain(message).pairs().map(function(e) {
             return e[1];
           }).flatten().value();
+          $('.captcha-refresh', '#login-modal-form').trigger('click');
           return alert(error_message);
         });
       }
