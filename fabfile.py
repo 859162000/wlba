@@ -171,7 +171,6 @@ def deploy():
         sudo('echo "date > %s" >> %s' % (log_file, scrawl_job_file))
         sudo('echo "cd /var/wsgi/wanglibao/" >> %s' % scrawl_job_file)
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'run_robot', log_file, scrawl_job_file))
-        sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'load_cash', log_file, scrawl_job_file))
         sudo('echo "python %s %s &>> %s">> %s' % (manage_py, 'scrawl_fund', log_file, scrawl_job_file))
         sudo('echo "date >> %s" >> %s' % (log_file, scrawl_job_file))
         sudo('chmod +x %s' % scrawl_job_file)
@@ -179,7 +178,6 @@ def deploy():
         sudo('echo "0 0 * * * %s" >> /tmp/tmp_tab' % scrawl_job_file)
         sudo('crontab /tmp/tmp_tab')
 
-        add_cron_tab('/usr/bin/generate_report', '/var/log/wanglibao/report.log', env, '15 0 * * *', manage_py, ['generate_report'])
         add_cron_tab(sync_sm_info, sync_sm_log, env, '0 */1 * * *', manage_py, ['syncsm -f', 'syncsm -m'])
         add_cron_tab(sync_sm_income, sync_sm_log, env, '0 18-23/1 * * *', manage_py, ['syncsm -i'], _end=True)
 

@@ -104,7 +104,11 @@ html
                       if product.status == '正在招标'
                         a.button-primary(href="/p2p/detail/{{product.id}}/") 正在招标
                       else
-                        a.button-disabled(href="javascript:void(0)", disabled) {{product.status}}
+                        status = product.status
+                        full = status.startswith(u'满标')
+                        if full
+                          status = '已满标'
+                        a.button-disabled(href="javascript:void(0)", disabled) {{status}}
 
                     if product.status == '正在招标'
                       p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余时间：
