@@ -3,9 +3,14 @@ from rest_framework import serializers
 
 class ModelSerializerExtended(serializers.ModelSerializer):
 
+    def __init__(self, *args, **kwargs):
+        self.request = None
+        super(ModelSerializerExtended, self).__init__(*args, **kwargs)
+
     def get_default_fields(self):
         fields = super(ModelSerializerExtended, self).get_default_fields()
         request = self.context['request']
+        self.request = request
         fields_param = request.QUERY_PARAMS.get('fields', None)
 
         if fields_param:
@@ -18,6 +23,5 @@ class ModelSerializerExtended(serializers.ModelSerializer):
         for field in fields_to_remove:
             if field in fields:
                 fields.pop(field)
-
 
         return fields
