@@ -85,14 +85,14 @@ class ReportGenerator(object):
             for payinfo in payinfos:
                 writer.writerow([
                     str(payinfo.id),
-                    payinfo.user.wanglibaouserprofile.name,
+                    payinfo.user.wanglibaouserprofile.phone,
                     str(payinfo.order.id),
                     u'线上充值',
-                    payinfo.bank.name,
+                    unicode(payinfo.bank.name),
                     str(payinfo.amount),
                     str(payinfo.fee),
                     str(payinfo.amount - payinfo.fee),
-                    u'待审核',
+                    unicode(payinfo.status),
                     payinfo.create_time.strftime("%Y-%m-%d %H:%M"),
                     str(payinfo.request_ip),
                 ])
