@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 class ErrorNumber():
-    unauthorized = 1,
-    need_authentication = 2,
-    form_error = 3,
+    unauthorized = 1
+    need_authentication = 2
+    form_error = 3
     unknown_error = 4
