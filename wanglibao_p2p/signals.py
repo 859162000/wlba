@@ -1,5 +1,5 @@
 # coding=utf-8
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.models import P2PProduct, ProductAmortization
 import logging
@@ -27,4 +27,4 @@ def generate_amortization_plan(sender, instance, **kwargs):
         instance.save()
 
 
-pre_save.connect(generate_amortization_plan, sender=P2PProduct, dispatch_uid="generate_amortization_plan")
+post_save.connect(generate_amortization_plan, sender=P2PProduct, dispatch_uid="generate_amortization_plan")

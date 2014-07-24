@@ -1,12 +1,11 @@
-from django.conf.urls import patterns, url
+from concurrency.admin import ConcurrentModelAdmin
 from django.contrib import admin
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 
 
-class UserEquityAdmin(admin.ModelAdmin):
+class UserEquityAdmin(admin.ModelAdmin, VersionAdmin):
     list_display = ('user', 'product', 'equity', 'confirm', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
     list_filter = ('confirm',)
 
@@ -23,7 +22,7 @@ class AttachementInline(admin.TabularInline):
     model = Attachment
 
 
-class P2PProductAdmin(admin.ModelAdmin):
+class P2PProductAdmin(ConcurrentModelAdmin, VersionAdmin):
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline
     ]
@@ -32,15 +31,32 @@ class P2PProductAdmin(admin.ModelAdmin):
     list_filter = ('status', 'closed',)
 
 
-class UserAmortizationAdmin(admin.ModelAdmin):
+class UserAmortizationAdmin(admin.ModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
 
+
+class P2PRecordAdmin(admin.ModelAdmin):
+    list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
+
+
+class WarrantAdmin(admin.ModelAdmin):
+    list_display = ('product', 'name')
+
+
+class AmortizationRecordAdmin(admin.ModelAdmin):
+    list_display = ('catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
+
+
+class EquityRecordAdmin(admin.ModelAdmin):
+    list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
+
+
 admin.site.register(P2PProduct, P2PProductAdmin)
-admin.site.register(Warrant)
+admin.site.register(Warrant, WarrantAdmin)
 admin.site.register(P2PEquity, UserEquityAdmin)
 admin.site.register(WarrantCompany)
-admin.site.register(P2PRecord)
-admin.site.register(AmortizationRecord)
-admin.site.register(EquityRecord)
 admin.site.register(UserAmortization, UserAmortizationAdmin)
 admin.site.register(ContractTemplate)
+admin.site.register(P2PRecord, P2PRecordAdmin)
+admin.site.register(EquityRecord, EquityRecordAdmin)
+admin.site.register(AmortizationRecord, AmortizationRecordAdmin)

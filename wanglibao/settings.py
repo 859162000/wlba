@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'registration_defaults',
     'django.contrib.admin',
     'django_extensions',
+    'reversion',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -103,6 +104,8 @@ INSTALLED_APPS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
+    'concurrency.middleware.ConcurrencyMiddleware',
+    'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -110,6 +113,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+CONCURRENCY_POLICY = 2
 
 ROOT_URLCONF = 'wanglibao.urls'
 
