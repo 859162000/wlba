@@ -35,12 +35,29 @@ class P2PProductAdmin(admin.ModelAdmin):
 class UserAmortizationAdmin(admin.ModelAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
 
+
+class P2PRecordAdmin(admin.ModelAdmin):
+    list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
+
+
+class WarrantAdmin(admin.ModelAdmin):
+    list_display = ('product', 'name')
+
+
+class AmortizationRecordAdmin(admin.ModelAdmin):
+    list_display = ('catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
+
+
+class EquityRecordAdmin(admin.ModelAdmin):
+    list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
+
+
 admin.site.register(P2PProduct, P2PProductAdmin)
-admin.site.register(Warrant)
+admin.site.register(Warrant, WarrantAdmin)
 admin.site.register(P2PEquity, UserEquityAdmin)
 admin.site.register(WarrantCompany)
-admin.site.register(P2PRecord)
-admin.site.register(AmortizationRecord)
-admin.site.register(EquityRecord)
 admin.site.register(UserAmortization, UserAmortizationAdmin)
 admin.site.register(ContractTemplate)
+admin.site.register(P2PRecord, P2PRecordAdmin)
+admin.site.register(EquityRecord, EquityRecordAdmin)
+admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
