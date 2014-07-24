@@ -1,12 +1,8 @@
-from rest_framework import serializers
-from wanglibao_p2p.models import P2PProduct, WarrantCompany
+from wanglibao.serializers import ModelSerializerExtended
+from wanglibao_p2p.models import P2PProduct
 
 
-class P2PProductSerializer(serializers.ModelSerializer):
-
-    def __init__(self, request=None, *args, **kwargs):
-        super(P2PProductSerializer, self).__init__(*args, **kwargs)
-        self.request = request
+class P2PProductSerializer(ModelSerializerExtended):
 
     class Meta:
         model = P2PProduct
