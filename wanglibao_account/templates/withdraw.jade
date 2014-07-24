@@ -17,9 +17,9 @@ block sidebar
 block main
   .panel
     .well
-      .withdraw-title 提现
+      .withdraw-title.padding-l-r-m 提现
 
-      form#withdraw-form(action="/pay/withdraw/complete/", method='post')
+      form#withdraw-form.padding-l-r-m(action="/pay/withdraw/complete/", method='post')
         - csrf_token
         table.withdraw-table
           tr
@@ -61,7 +61,7 @@ block main
                 p.orange-text 您的资金的从合作银行监管账户转入提现银行卡
 
       .space-vertical-xl
-      .withdraw-notice
+      .withdraw-notice.margin-left-m.margin-right-m
         p 温馨提示
         p 1、在您申请提现前，请先在页面下方或“我的账户”页面绑定银行卡
 

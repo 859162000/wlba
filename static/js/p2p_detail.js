@@ -7,10 +7,13 @@
     }
   });
 
-  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown'], function($, _, backend, calculator, countdown) {
+  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'lib/backend'], function($, _, backend, calculator, countdown) {
     return $('#purchase-form .submit-button').click(function(e) {
       var amount, captcha_0, captcha_1, product;
       e.preventDefault();
+      if (!confirm('您的投资金额为:' + $('input[name=amount]').val())) {
+        return;
+      }
       product = $('input[name=product]').val();
       amount = $('input[name=amount]').val();
       captcha_0 = $('input[name=captcha_0]').val();
@@ -26,6 +29,13 @@
       }).fail(function(xhr) {
         var error_message, message, result;
         result = JSON.parse(xhr.responseText);
+        if (result.error_number === 1) {
+          $('.login-modal').trigger('click');
+          return;
+        } else if (result.error_number === 2) {
+          $('#id-validate').modal();
+          return;
+        }
         message = result.message;
         error_message = '';
         if ($.type(message) === 'object') {
@@ -35,8 +45,7 @@
         } else {
           error_message = message;
         }
-        alert(error_message);
-        return location.reload();
+        return alert(error_message);
       });
     });
   });

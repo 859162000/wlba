@@ -81,10 +81,6 @@ html
                   span.highlight.font-m#expected_income 00.00
                   | 元
               .row
-                span.span4 输入验证码
-                span.span8-omega
-                  -render_field form.captcha
-              .row
                 span.span4
                 span.span8-omega
                   a.submit-button.span12.button-primary.button-middle(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
@@ -133,15 +129,13 @@ html
               caption {{p2p.warrant_company.name}}
               tbody
                 warrants = p2p.warrant_set.all()
-                tr
-                  for warrant in warrants
+                for warrant in warrants
+                  tr
                     td {{warrant.name}}
-                tr
-                  for warrant in warrants
                     td
                       span
-                        span.icon.icon-approve
-                        | 已认证
+                      span.icon.icon-approve
+                      | 已认证
           .clearfix
             .p2p-detail-container
               h1 投资记录
@@ -181,3 +175,4 @@ html
       require(['/static/js/p2p_detail.js'])
     include include/footer
     include include/tracking
+    include include/verify

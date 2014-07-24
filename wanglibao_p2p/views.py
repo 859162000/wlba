@@ -16,6 +16,7 @@ from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
+from wanglibao.const import ErrorNumber
 
 
 class P2PDetailView(TemplateView):
@@ -53,13 +54,23 @@ class P2PDetailView(TemplateView):
 
 
 class PurchaseP2P(APIView):
-    permission_classes = IsAuthenticated,
+    permission_classes = ()
 
     @property
     def allowed_methods(self):
         return ['POST']
 
     def post(self, request):
+        if not request.user.is_authenticated():
+            return Response({
+                'message':u'请登录',
+                'error_number':ErrorNumber.unauthorized
+            }, status=status.HTTP_403_FORBIDDEN)
+        if not request.user.wanglibaouserprofile.id_is_valid:
+            return Response({
+                'message': u'请先进行实名认证',
+                'error_number':ErrorNumber.need_authentication
+            }, status=status.HTTP_400_BAD_REQUEST)
         form = PurchaseForm(request.DATA)
         if form.is_valid():
             p2p = form.cleaned_data['product']
@@ -73,11 +84,13 @@ class PurchaseP2P(APIView):
                 })
             except Exception, e:
                 return Response({
-                    'message': e.message
+                    'message': e.message,
+                    'error_number':ErrorNumber.unknown_error
                 }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({
-                "message": form.errors
+                "message": form.errors,
+                'error_number':ErrorNumber.form_error
             }, status=status.HTTP_400_BAD_REQUEST)
 
 

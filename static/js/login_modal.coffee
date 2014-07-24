@@ -53,6 +53,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
         result = JSON.parse xhr.responseText
         message = result.message
         error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
+        $('.captcha-refresh', '#login-modal-form').trigger('click')
         alert error_message
 
   $('#register-modal-form').validate
