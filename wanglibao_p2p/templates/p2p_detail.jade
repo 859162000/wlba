@@ -19,12 +19,12 @@ html
         .span8.p2p-detail-container
           .p2p-detail-bar.clearfix
             .row
-              .span9
+              .span7
                 span.p2p-detail-title {{p2p.short_name}}
                 span.p2p-warrant-way
                   span.icon-check-shield
                   | 100%本息担保
-              .span3-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余时间：
+              .span5-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余时间：
                 span#countdown{{p2p.end_time | timedelta_now }}
           .p2p-detail-content.clearfix
             .row
@@ -80,10 +80,6 @@ html
                 span.span8-omega
                   span.highlight.font-m#expected_income 00.00
                   | 元
-              .row
-                span.span4 输入验证码
-                span.span8-omega
-                  -render_field form.captcha
               .row
                 span.span4
                 span.span8-omega

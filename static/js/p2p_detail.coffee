@@ -7,6 +7,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $('#purchase-form .submit-button').click (e)->
     e.preventDefault()
 
+    if !confirm('您的投资金额为:' + $('input[name=amount]').val())
+      return
+
     product = $('input[name=product]').val()
     amount = $('input[name=amount]').val()
     captcha_0 = $('input[name=captcha_0]').val()
