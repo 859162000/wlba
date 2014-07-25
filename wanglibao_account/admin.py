@@ -33,7 +33,8 @@ class UserResource(resources.ModelResource):
 
 class UserProfileAdmin(UserAdmin, ImportExportModelAdmin):
     inlines = [ProfileInline, MarginInline, P2PEquityInline]
-    list_display = ('phone', 'name', 'id_num', 'is_active', 'date_joined', 'is_staff')
+    list_display = ('id', 'username', 'phone', 'name', 'id_num', 'is_active', 'date_joined', 'is_staff')
+    list_display_links = ('id', 'username', 'phone')
     search_fields = ['wanglibaouserprofile__phone', 'wanglibaouserprofile__id_number', 'wanglibaouserprofile__name']
     resource_class = UserResource
 
