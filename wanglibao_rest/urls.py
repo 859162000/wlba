@@ -12,7 +12,7 @@ from wanglibao_feedback.views import FeedbackViewSet
 from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
 from wanglibao_hotlist.views import HotTrustViewSet, HotFinancingViewSet, HotFundViewSet, MobileHotTrustViewSet, \
     MobileHotFundViewSet, MobileMainPageViewSet
-from wanglibao_p2p.views import PurchaseP2P, P2PProductViewSet
+from wanglibao_p2p.views import PurchaseP2P, P2PProductViewSet, RecordView
 from wanglibao_pay.views import CardViewSet
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -71,6 +71,7 @@ urlpatterns = patterns(
     url(r'^profile/', ProfileView.as_view()),
     url(r'^total_income', TotalIncome.as_view()),
     url(r'^p2p/purchase/', PurchaseP2P.as_view()),
+    url(r'^p2ps/(?P<product_id>\d+)/records/', RecordView.as_view()),
     url(r'', include(router.urls)),
 )
 

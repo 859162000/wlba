@@ -3,18 +3,16 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
-from django.views.generic import TemplateView, View
+from django.views.generic import TemplateView
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct
-from wanglibao_p2p.serializers import P2PProductSerializer
+from wanglibao_p2p.serializers import P2PProductSerializer, P2PRecordSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
 
@@ -122,3 +120,21 @@ class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = IsAdminUserOrReadOnly,
     serializer_class = P2PProductSerializer
+
+
+class RecordView(APIView):
+    permission_classes = ()
+
+    def get(self, request, product_id):
+        try:
+            product = P2PProduct.objects.get(pk=product_id)
+        except P2PProduct.DoesNotExist:
+            return Response(
+                status=404
+            )
+
+        equities = product.p2precord_set.filter(catalog=u'申购').prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+
+        serializer = P2PRecordSerializer(equities, many=True, context={"request": request})
+
+        return Response(data=serializer.data)
