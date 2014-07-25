@@ -21,6 +21,7 @@ class MarginInline(admin.StackedInline):
 
 class P2PEquityInline(admin.StackedInline):
     model = P2PEquity
+    extra = 0
 
 
 class UserResource(resources.ModelResource):
