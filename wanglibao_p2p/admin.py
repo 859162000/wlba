@@ -12,6 +12,7 @@ class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
 
 class AmortizationInline(admin.TabularInline):
     model = ProductAmortization
+    extra = 0
 
 
 class WarrantInline(admin.TabularInline):

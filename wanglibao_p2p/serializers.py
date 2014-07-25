@@ -27,6 +27,9 @@ class P2PProductSerializer(ModelSerializerExtended):
         exclude = ('contract_template', 'bought_people_count', 'bought_count', 'bought_amount', 'bought_count_random', 'bought_amount_random', 'version')
 
     def transform_extra_data(self, obj, value):
+        if value is None:
+            return value
+
         extra_data = json.loads(value)
 
         if not self.request.user.is_authenticated():
