@@ -71,7 +71,6 @@ class P2PProduct(ProductBase):
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)')
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)')
-    closed = models.BooleanField(u'是否完结', default=False)
 
     pay_method = models.CharField(u'支付方式', max_length=32, blank=True, default=u'等额本息', choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)
