@@ -3,32 +3,29 @@ require.config
     jquery: 'lib/jquery.min'
 
 require ['jquery', 'lib/backend'], ($, backend)->
-  $('#validate_method').change (e)->
-    selected = $(e.target).children('option:selected')[0]
-    value = $(selected).val()
-    console.log value
-
-    if value == '手机'
-      $('#email-form').hide()
-      $('#phone-form').show()
-    else if value == '邮箱'
-      $('#email-form').show()
-      $('#phone-form').hide()
-
-  $('#sendMailButton').click (e)->
-    target = $(e.target).attr('data-url')
-    $.post target
-    .done ->
-      $('#sendMail').hide()
-      $('#sendMailDone').show()
-    .fail ->
-      console.log 'Mail send failed'
-
-  $('#sendValidateCodeButton').click (e)->
-    target = $(e.target).attr('data-url')
+  $('#sendValidateCodeButton').click (event)->
+    target = $(event.target).attr('data-url')
+    element = event.target
     $.post target
     .done ->
       $('#nextStep').prop('disabled', false)
+
+    count = 60
+
+    $(element).prop 'disabled', true
+
+    timerFunction = ()->
+      if count >= 1
+        count--
+        $(element).html('已经发送(' + count + ')')
+      else
+        clearInterval(intervalId)
+        $(element).html('重新获取')
+        $(element).prop 'disabled', false
+
+    # Fire now and future
+    timerFunction()
+    intervalId = setInterval timerFunction, 1000
 
   $('#nextStep').click (e)->
     # Check the validate code first

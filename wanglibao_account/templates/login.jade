@@ -50,5 +50,7 @@ html
     include include/footer
     -endwith
 
-    script(src="/static/js/require.js", data-main="/static/js/login")
+    script.
+      require(["/static/js/login.js"])
+
     include include/tracking

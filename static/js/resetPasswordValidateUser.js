@@ -7,35 +7,27 @@
   });
 
   require(['jquery', 'lib/backend'], function($, backend) {
-    $('#validate_method').change(function(e) {
-      var selected, value;
-      selected = $(e.target).children('option:selected')[0];
-      value = $(selected).val();
-      console.log(value);
-      if (value === '手机') {
-        $('#email-form').hide();
-        return $('#phone-form').show();
-      } else if (value === '邮箱') {
-        $('#email-form').show();
-        return $('#phone-form').hide();
-      }
-    });
-    $('#sendMailButton').click(function(e) {
-      var target;
-      target = $(e.target).attr('data-url');
-      return $.post(target).done(function() {
-        $('#sendMail').hide();
-        return $('#sendMailDone').show();
-      }).fail(function() {
-        return console.log('Mail send failed');
-      });
-    });
-    $('#sendValidateCodeButton').click(function(e) {
-      var target;
-      target = $(e.target).attr('data-url');
-      return $.post(target).done(function() {
+    $('#sendValidateCodeButton').click(function(event) {
+      var count, element, intervalId, target, timerFunction;
+      target = $(event.target).attr('data-url');
+      element = event.target;
+      $.post(target).done(function() {
         return $('#nextStep').prop('disabled', false);
       });
+      count = 60;
+      $(element).prop('disabled', true);
+      timerFunction = function() {
+        if (count >= 1) {
+          count--;
+          return $(element).html('已经发送(' + count + ')');
+        } else {
+          clearInterval(intervalId);
+          $(element).html('重新获取');
+          return $(element).prop('disabled', false);
+        }
+      };
+      timerFunction();
+      return intervalId = setInterval(timerFunction, 1000);
     });
     return $('#nextStep').click(function(e) {
       var target, validate_code;

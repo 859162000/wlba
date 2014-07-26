@@ -191,4 +191,5 @@ block main
         .space-vertical-m
 
 block script
-  script(src="/static/js/require.js", data-main="/static/js/account_home")
+  script.
+    require(["/static/js/account_home.js"])
