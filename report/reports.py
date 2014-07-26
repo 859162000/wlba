@@ -12,6 +12,7 @@ from django.conf import settings
 from report.models import Report
 from wanglibao_p2p.models import UserAmortization, P2PProduct
 from wanglibao_pay.models import PayInfo
+from M2Crypto import RSA,BIO
 
 
 logger = logging.getLogger(__name__)
@@ -79,7 +80,6 @@ class ReportGenerator(object):
 
         with open(path, 'w+b') as tsv_file:
             writer = UnicodeWriter(tsv_file, delimiter='\t')
-
             writer.writerow(['Id', u'用户名', u'交易号', u'类型', u'充值银行', u'充值金额', u'充值手续费', u'实际到账金额', u'状态', u'操作时间', u'操作ip'])
 
             for payinfo in payinfos:
@@ -102,6 +102,7 @@ class ReportGenerator(object):
             report.save()
 
             return report
+        cls.encryptFile(path)
 
     @classmethod
     def generate_withdraw_report(cls, start_time, end_time=None):
@@ -152,6 +153,7 @@ class ReportGenerator(object):
             report.save()
 
             return report
+        cls.encryptFile()
 
     @classmethod
     def generate_payback_report(cls, start_time, end_time=None):
@@ -175,7 +177,6 @@ class ReportGenerator(object):
 
         with open(path, 'w+b') as tsv_file:
             writer = UnicodeWriter(tsv_file, delimiter='\t')
-
             writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
                              u'应还本息', u'应还本金', u'应还利息', u'状态'])
 
@@ -202,9 +203,8 @@ class ReportGenerator(object):
             report = Report(name=u'还款列表 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
             report.file = join('reports', fileprefix, filename)
             report.save()
-
             return report
-
+        cls.encryptFile(path)
 
     @classmethod
     def generate_p2p_audit_report(cls, start_time, end_time=None):
@@ -266,3 +266,44 @@ class ReportGenerator(object):
             report.save()
 
             return report
+        cls.encryptFile(path)
+
+    @classmethod
+    def encryptFile(cls,path):
+        file = open(path,"r+")
+        rsa = Rsa()
+        all_text = file.read()
+        print(all_text)
+        encrypt_text = rsa.encrypt(all_text)
+        print(encrypt_text)
+        file.seek(0)
+        file.write(encrypt_text)
+        file.close()
+
+class Rsa:
+    def genRsaKeyPair(self,rsalen=1024):
+        try:
+            rsa_key = RSA.gen_key(rsalen,3,lambda *args:None)
+            rsa_key.save_key("pri_key.pem",None)
+            rsa_key.save_pub_key("pub_key.pem")
+        except OSError,e:
+            if e.errno != 17:
+                raise
+
+    def encrypt(self,data):
+        try:
+            pub_key = RSA.load_pub_key("pub_key.pem")
+        except OSError,e:
+            if e.errno != 17:
+                raise
+        return pub_key.public_encrypt(data,RSA.pkcs1_oaep_padding)
+
+    def decrypt(self,data):
+        try:
+            string = open("pri_key.pem","rb").read()
+        except OSError,e:
+            if e.errno != 17:
+                raise
+        bio = BIO.MemoryBuffer(string)
+        pri_key = RSA.load_key_bio(bio)
+        return pri_key.private_decrypt(data,RSA.pkcs1_oaep_padding)

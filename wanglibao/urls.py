@@ -57,6 +57,7 @@ urlpatterns = patterns(
     url(r'^ckeditor/', include('ckeditor.urls')),
 
     url(r'^preorder/', include('wanglibao_preorder.urls')),
+    url(r'^weixin/', include('weixin.urls')),
 )
 
 urlpatterns += patterns('',
