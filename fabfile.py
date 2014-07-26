@@ -151,7 +151,7 @@ def deploy():
         #########################################################################################
         apt_get("git")
         apt_get('libxml2-dev', 'libxslt1-dev')
-
+        apt_get('swig')
         print green("Install apache2 and wsgi mod")
         install_apache(mods=['ssl', 'headers', 'rewrite'], disable_sites=['default'])
 
