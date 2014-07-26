@@ -1,5 +1,6 @@
 from django.contrib import admin
-from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund, MobileHotFund, MobileHotTrust, MobileMainPage
+from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund, MobileHotFund, MobileHotTrust, MobileMainPage, \
+    MobileMainPageP2P
 
 
 class HotTrustAdmin(admin.ModelAdmin):
@@ -25,9 +26,10 @@ class MobileHotFundAdmin(admin.ModelAdmin):
 class MobileMainPageAdmin(admin.ModelAdmin):
     raw_id_fields = 'item',
 
+
 admin.site.register(HotTrust, HotTrustAdmin)
-admin.site.register(HotFinancing, HotFinancingAdmin)
 admin.site.register(HotFund, HotFundAdmin)
 admin.site.register(MobileHotFund, MobileHotFundAdmin)
 admin.site.register(MobileHotTrust, MobileHotTrustAdmin)
 admin.site.register(MobileMainPage, MobileMainPageAdmin)
+admin.site.register(MobileMainPageP2P, MobileMainPageAdmin)

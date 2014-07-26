@@ -1,5 +1,4 @@
 # encoding:utf-8
-from random import randrange
 from django.db import models
 
 

@@ -5,6 +5,7 @@ from django.utils import timezone
 from trust.models import Trust
 from wanglibao_bank_financing.models import BankFinancing
 from wanglibao_fund.models import Fund
+from wanglibao_p2p.models import P2PProduct
 
 
 class HotItemBase(models.Model):
@@ -63,6 +64,13 @@ class MobileMainPage(HotItemBase):
     TODO Figure out a better way to fullfil the hot list requirements
     """
     item = models.OneToOneField(Fund)
+
+    def __unicode__(self):
+        return u'%s score: %d' % (self.item.name, self.hot_score)
+
+
+class MobileMainPageP2P(HotItemBase):
+    item = models.OneToOneField(P2PProduct)
 
     def __unicode__(self):
         return u'%s score: %d' % (self.item.name, self.hot_score)

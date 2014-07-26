@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund, MobileMainPage
+from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund, MobileMainPage, MobileMainPageP2P
+from wanglibao_p2p.serializers import P2PProductSerializer
 
 
 class HotTrustSerializer(serializers.HyperlinkedModelSerializer):
@@ -32,3 +33,16 @@ class MobileMainPageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MobileMainPage
         depth = 3
+
+
+class MobileMainPageP2PSerializer(serializers.HyperlinkedModelSerializer):
+    item = serializers.SerializerMethodField('get_item')
+
+    class Meta:
+        model = MobileMainPageP2P
+        depth = 2
+
+    def get_item(self, obj):
+        serializer = P2PProductSerializer(obj.item, context=self.context)
+        return serializer.data
+

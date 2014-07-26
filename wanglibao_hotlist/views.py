@@ -4,9 +4,11 @@ from rest_framework import viewsets
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_fund.models import Fund
-from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund, MobileHotFund, MobileHotTrust, MobileMainPage
+from wanglibao_hotlist.models import HotTrust, HotFinancing, HotFund, MobileHotFund, MobileHotTrust, MobileMainPage, \
+    MobileMainPageP2P
 from wanglibao_hotlist.serializers import HotFundSerializer, MobileHotFundSerializer, MobileHotTrustSerializer, \
-    MobileMainPageSerializer
+    MobileMainPageSerializer, MobileMainPageP2PSerializer
+from wanglibao_p2p.models import P2PProduct
 
 
 class HotViewSetBase(viewsets.ModelViewSet):
@@ -49,3 +51,19 @@ class MobileMainPageViewSet(PaginatedModelViewSet):
             return [h]
 
         return super(MobileMainPageViewSet, self).get_queryset()
+
+
+class MobileMainPageP2PViewSet(PaginatedModelViewSet):
+    model = MobileMainPageP2P
+    serializer_class = MobileMainPageP2PSerializer
+
+    def get_queryset(self):
+        if not self.model.objects.all().exists():
+            h = MobileMainPageP2P()
+            h.item = P2PProduct.objects.filter(end_time__gt=timezone.now()).order_by('end_time').first()
+            h.added = timezone.now()
+            h.hot_score = 1
+
+            return [h]
+
+        return super(MobileMainPageP2PViewSet, self).get_queryset()

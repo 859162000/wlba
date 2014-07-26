@@ -1,17 +1,20 @@
 # encoding: utf-8
 import collections
+import logging
 from decimal import Decimal
 from concurrency.fields import IntegerVersionField
 from django.db import models
 from django.db.models import F, Sum, SET_NULL
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 import reversion
 from wanglibao.fields import JSONFieldUtf8
 from wanglibao.models import ProductBase
 from utility import gen_hash_list
+from wanglibao_p2p.amortization_plan import get_amortization_plan
 
+logger = logging.getLogger(__name__)
 user_model = get_user_model()
 
 
@@ -396,3 +399,26 @@ class EquityRecord(models.Model):
 
     def __unicode__(self):
         return u'%s %s %s %s' % (self.catalog, self.user, self.product, self.amount)
+
+
+def generate_amortization_plan(sender, instance, **kwargs):
+    if instance.status == u'录标完成':
+        logger.info('The product status is 录标完成, start to generate amortization plan')
+
+        term_count = instance.amortization_count
+        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, term_count)
+
+        for index, term in enumerate(terms['terms']):
+            amortization = ProductAmortization()
+            amortization.description = u'第%d期' % (index + 1)
+            amortization.principal = term[1]
+            amortization.interest = term[2]
+            amortization.term = index + 1
+            instance.amortizations.add(amortization)
+            amortization.save()
+
+        instance.status = u'待审核'
+        instance.save()
+
+
+post_save.connect(generate_amortization_plan, sender=P2PProduct, dispatch_uid="generate_amortization_plan")
