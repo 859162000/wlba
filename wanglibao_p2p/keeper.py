@@ -54,14 +54,19 @@ class EquityKeeper(KeeperBaseMixin):
     def __init__(self, user, product, order_id=None):
         super(EquityKeeper, self).__init__(user=user, product=product, order_id=order_id)
         self.product = product
+        self.equity = None
 
     def reserve(self, amount, description=u'', savepoint=True):
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
-            self.equity, _ = P2PEquity.objects.get_or_create(user=self.user, product=self.product)
+            P2PEquity.objects.get_or_create(user=self.user, product=self.product)
             self.equity = P2PEquity.objects.select_for_update().filter(pk=self.equity.pk).first()
-            if amount > self.limit:
-                raise P2PException()
+
+            limit = self.limit
+
+            if amount > limit:
+                raise P2PException(u'已超过可认购份额限制，该产品每个客户最大投资金额为%s元' % str(limit))
+
             self.equity.equity += amount
             self.equity.save()
             catalog = u'申购'

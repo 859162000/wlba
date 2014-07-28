@@ -26,6 +26,9 @@ class TraderTestCase(TransactionTestCase):
 
         product = MockGenerator.generate_staging_p2p(u'test', 100000, per_user=0.1)
         user1_trader = P2PTrader(product, self.user1)
+
+        # user1_trader.purchase(2000)
+
         user1_trader.purchase(1000)
 
         margin_records = MarginRecord.objects.all()
@@ -110,61 +113,6 @@ class TraderTestCase(TransactionTestCase):
         product.save()
 
         operator.settle(product)
-
-    def test_equity_properties(self):
-        user1_margin_keeper = MarginKeeper(self.user1)
-        user1_margin_keeper.deposit(100000)
-        operator = P2POperator()
-
-        product = MockGenerator.generate_staging_p2p(u'测试用P2P产品第一号', 100000, per_user=1, terms=3, interests=(1000, 1000, 1000))
-
-        # Run the operator and check nothing happened
-
-        P2PTrader(product, self.user1).purchase(100000)
-
-        equity = P2PEquity.objects.filter(user=self.user1).first()
-        margin = Margin.objects.get(user=self.user1)
-        self.assertEqual(margin.freeze, 100000)
-
-        product = P2PProduct.objects.first()
-        self.assertEqual(product.status, u'满标待处理')
-
-        # Run the operator and check status -> 满标待审核
-        operator.watchdog()
-
-        # 满标待审核 -> 满标已审核
-        product = P2PProduct.objects.first()
-        ProductKeeper(product).audit(self.user1)
-
-        # status -> 还款中
-        operator.watchdog()
-
-        # Equity should be confirmed
-        equity = P2PEquity.objects.filter(user=self.user1).first()
-        self.assertTrue(equity.confirm)
-
-        margin = Margin.objects.get(user=self.user1)
-        self.assertEqual(margin.freeze, 0)
-
-        product = P2PProduct.objects.get(pk=product.id)
-        self.assertEqual(product.status, u'还款中')
-
-        for a in product.amortizations.all():
-            a.ready_for_settle = True
-            a.save()
-            operator.watchdog()
-
-        product = P2PProduct.objects.get(pk=product.id)
-        self.assertEqual(product.status, u'已完成')
-
-        equity = P2PEquity.objects.filter(user=self.user1).first()
-        self.assertTrue(equity.confirm)
-        amortizations = equity.amortizations
-        self.assertTrue(reduce(lambda x, y: x & y, [a.settled for a in amortizations], True))
-
-        margin = Margin.objects.get(user=self.user1)
-        self.assertEqual(margin.margin, 103000)
-
 
     def test_full_process(self):
         user1_margin_keeper = MarginKeeper(self.user1)

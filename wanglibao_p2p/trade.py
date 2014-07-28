@@ -27,7 +27,7 @@ class P2PTrader(object):
     def purchase(self, amount):
         description = u'购买P2P产品 %s %s 份' %(self.product.short_name, amount)
         if self.user.wanglibaouserprofile.frozen:
-            raise P2PException('User account is frozen')
+            raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False)
             margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
