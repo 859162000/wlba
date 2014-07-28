@@ -59,8 +59,8 @@ class EquityKeeper(KeeperBaseMixin):
     def reserve(self, amount, description=u'', savepoint=True):
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
-            P2PEquity.objects.get_or_create(user=self.user, product=self.product)
-            self.equity = P2PEquity.objects.select_for_update().filter(pk=self.equity.pk).first()
+            self.equity, _ = P2PEquity.objects.get_or_create(user=self.user, product=self.product)
+            self.equity = P2PEquity.objects.select_for_update().filter(pk=self.equity.id).first()
 
             limit = self.limit
 

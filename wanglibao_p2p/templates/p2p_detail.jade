@@ -64,26 +64,32 @@ html
           if status == 'open'
             form#purchase-form
               {{form.product}}
+              if current_equity > 0
+                .row
+                  span.span4 已投资金额
+                  span.span8-omega
+                    span.dark-gray.font-m {{current_equity}}元
+
               .row
                 span.span4 可投资金额
                 span.span8-omega
-                  span.dark-gray.font-m {{p2p.remain | money_format}}
-                  | 元
-              .row
-                span.span4 投资金额
-                span.span8-omega
-                  period = p2p.period * 30
-                  user_limit = u"请输入50-%d的整数" % p2p.current_limit
-                  -render_field form.amount class+="span12" placeholder=user_limit data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1"
-              .row
-                span.span4 预期收益
-                span.span8-omega
-                  span.highlight.font-m#expected_income 00.00
-                  | 元
-              .row
-                span.span4
-                span.span8-omega
-                  a.submit-button.span12.button-primary.button-middle(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                  span.dark-gray.font-m {{orderable_amount}}元
+              if orderable_amount > 0
+                .row
+                  span.span4 投资金额
+                  span.span8-omega
+                    period = p2p.period * 30
+                    user_limit = u"请输入小于%d的整数" % orderable_amount
+                    -render_field form.amount class+="span12" placeholder=user_limit data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1"
+                .row
+                  span.span4 预期收益
+                  span.span8-omega
+                    span.highlight.font-m#expected_income 00.00
+                    | 元
+                .row
+                  span.span4
+                  span.span8-omega
+                    a.submit-button.span12.button-primary.button-middle(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
           if status == 'finished'
             .sold-out
               p.align-center

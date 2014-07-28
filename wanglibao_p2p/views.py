@@ -43,11 +43,23 @@ class P2PDetailView(TemplateView):
         except P2PProduct.DoesNotExist:
             raise Http404(u'您查找的产品不存在')
 
+        user = self.request.user
+        current_equity = 0
+
+        if user.is_authenticated():
+            equity_record = p2p.equities.filter(user=user).first()
+            if equity_record is not None:
+                current_equity = equity_record.equity
+
+        orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
+
         return {
             'p2p': p2p,
             'form': form,
             'status': status,
-            'end_time': end_time
+            'end_time': end_time,
+            'orderable_amount': orderable_amount,
+            'current_equity': current_equity
         }
 
 
