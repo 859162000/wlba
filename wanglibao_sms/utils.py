@@ -31,9 +31,11 @@ def send_messages(phones, messages):
     short_message.context = json.dumps(context)
     short_message.save()
 
+    return status, context
+
 
 def send_sms(phone, message):
-    send_messages([phone], [message])
+    return send_messages([phone], [message])
 
 
 def send_validation_code(phone, validate_code=None):
