@@ -6,7 +6,8 @@ import csv
 import codecs
 import cStringIO
 import logging
-import binascii,os
+import binascii
+import os
 import base64
 from django.conf import settings
 
@@ -103,7 +104,7 @@ class ReportGenerator(object):
             report.file = join('reports', 'czjl', filename)
             report.save()
             tsv_file.close()
-            #cls.encryptFile(path)
+            cls.encrypt_file(path)
             return report
 
     @classmethod
@@ -154,7 +155,7 @@ class ReportGenerator(object):
             report.file = join('reports', 'txjl', filename)
             report.save()
             tsv_file.close()
-            cls.encryptFile(path)
+            cls.encrypt_file(path)
             return report
 
 
@@ -207,7 +208,7 @@ class ReportGenerator(object):
             report.file = join('reports', fileprefix, filename)
             report.save()
             tsv_file.close()
-            cls.encryptFile(path)
+            cls.encrypt_file(path)
             return report
 
     @classmethod
@@ -269,31 +270,30 @@ class ReportGenerator(object):
             report.file = join('reports', fileprefix, filename)
             report.save()
             tsv_file.close()
-            cls.encryptFile(path)
+            cls.encrypt_file(path)
             return report
 
-
-
     @classmethod
-    def encryptFile(cls, path):
-        file = open(path,"r+")
+    def encrypt_file(cls, path):
+        file_object = open(path, "r+")
         rsa = Rsa()
         ase = Aes()
-        all_text = file.read()
+        all_text = file_object.read()
         crypt_key = binascii.b2a_hex(os.urandom(15))
         encrypt_text = ase.encrypt(crypt_key, all_text)
         encrypt_key = base64.b64encode(rsa.encrypt(crypt_key))
-        file.seek(0)
-        file.write(encrypt_key)
-        file.write('\n')
-        file.write(encrypt_text)
-        file.close()
+        file_object.seek(0)
+        file_object.write(encrypt_key)
+        file_object.write('\n')
+        file_object.write(encrypt_text)
+        file_object.close()
+
     @classmethod
-    def decryptFile(cls, path):
-        file = open(path, 'r')
+    def decrypt_file(cls, path):
+        file_object = open(path, 'r')
         rsa = Rsa()
         ase = Aes()
-        all_line = file.readlines()
+        all_line = file_object.readlines()
         all_key = base64.decodestring(all_line[0].strip('\n'))
         all_text = all_line[1].strip('\n')
         print(all_text)
@@ -302,51 +302,49 @@ class ReportGenerator(object):
         decrypt_text = ase.decrypt(decrypt_key, all_text)
         print(decrypt_text)
 
-class Rsa:
-    def genRsaKeyPair(self, rsalen=1024):
-        try:
-            rsa_key = RSA.gen_key(rsalen, 3, lambda *args:None)
-            rsa_key.save_key("pri_key.pem", None)
-            rsa_key.save_pub_key("pub_key.pem")
-        except OSError, e:
-            if e.errno != 17:
-                raise
 
-    def encrypt(self, data):
-        try:
-            pub_key = RSA.load_pub_key("pub_key.pem")
-        except OSError, e:
-            if e.errno != 17:
-                raise
+class Rsa(object):
+
+    @classmethod
+    def gen_rsa_key_pair(cls, rsalen=1024):
+        rsa_key = RSA.gen_key(rsalen, 3, lambda *args: None)
+        rsa_key.save_key("pri_key.pem", None)
+        rsa_key.save_pub_key("pub_key.pem")
+
+    @classmethod
+    def encrypt(cls, data):
+        pub_key = RSA.load_pub_key("pub_key.pem")
         return pub_key.public_encrypt(data, RSA.pkcs1_oaep_padding)
 
-    def decrypt(self, data):
-        try:
-            string = open("pri_key.pem", "rb").read()
-        except OSError, e:
-            if e.errno != 17:
-                raise
+    @classmethod
+    def decrypt(cls, data):
+        string = open("pri_key.pem", "rb").read()
         bio = BIO.MemoryBuffer(string)
         pri_key = RSA.load_key_bio(bio)
         return pri_key.private_decrypt(data, RSA.pkcs1_oaep_padding)
 
-class Aes:
-    def get_cryptor(self, op, key, alg='aes_128_ecb', iv=None):
-        if iv == None:
+
+class Aes(object):
+
+    @classmethod
+    def get_cryptor(cls, op, key, alg='aes_128_ecb', iv=None):
+        if iv is None:
             iv = '\0' * 16
         cryptor = EVP.Cipher(alg=alg, key=key, iv=iv, op=op)
         return cryptor
 
-    def encrypt(self, key, plaintext):
-        cryptor = self.get_cryptor(1, key)
+    @classmethod
+    def encrypt(cls, key, plaintext):
+        cryptor = cls.get_cryptor(1, key)
         ret = cryptor.update(plaintext)
         ret = ret + cryptor.final()
         ret = binascii.hexlify(ret)
         return ret
 
-    def decrypt(self, key, ciphertext):
-        cryptor = self.get_cryptor(0, key)
-        ciphertext = binascii.unhexlify(ciphertext)
-        ret = cryptor.update(ciphertext)
+    @classmethod
+    def decrypt(cls, key, cipher_text):
+        cryptor = cls.get_cryptor(0, key)
+        cipher_text = binascii.unhexlify(cipher_text)
+        ret = cryptor.update(cipher_text)
         ret = ret + cryptor.final()
         return ret
