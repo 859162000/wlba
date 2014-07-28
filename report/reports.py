@@ -103,7 +103,7 @@ class ReportGenerator(object):
             report.file = join('reports', 'czjl', filename)
             report.save()
             tsv_file.close()
-            #cls.encryptFile(path)
+            cls.encryptFile(path)
             return report
 
     @classmethod
@@ -301,6 +301,7 @@ class ReportGenerator(object):
         print(decrypt_key)
         decrypt_text = ase.decrypt(decrypt_key, all_text)
         print(decrypt_text)
+
 
 class Rsa:
     def genRsaKeyPair(self, rsalen=1024):
