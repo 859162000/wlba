@@ -19,12 +19,12 @@ html
         .span8.p2p-detail-container
           .p2p-detail-bar.clearfix
             .row
-              .span7
+              .span9
                 span.p2p-detail-title {{p2p.short_name}}
                 span.p2p-warrant-way
                   span.icon-check-shield
                   | 100%本息担保
-              .span5-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余时间：
+              .span3-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余时间：
                 span#countdown{{p2p.end_time | timedelta_now }}
           .p2p-detail-content.clearfix
             .row
