@@ -193,7 +193,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
     def amortize(self, amortization, savepoint=True):
         with transaction.atomic(savepoint=savepoint):
-            if amortization.settled == True:
+            if amortization.settled:
                 raise P2PException('amortization %s already settled.' % amortization)
             sub_amortizations = amortization.subs.all()
             description = unicode(amortization)
