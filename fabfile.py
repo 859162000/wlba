@@ -276,7 +276,7 @@ def deploy():
                 with cd('/var/wsgi/wanglibao'):
                     if exists('/var/run/wanglibao/supervisor.pid'):
                         run("python manage.py supervisor stop all")
-                        run("kill `cat /var/run/wanglibao/supervisor.pid`")
+                        sudo("kill `cat /var/run/wanglibao/supervisor.pid`")
                     run("python manage.py supervisor --daemonize --logfile=/var/log/wanglibao/supervisord.log --pidfile=/var/run/wanglibao/supervisor.pid")
                     run("python manage.py supervisor update")
                     run("python manage.py supervisor restart all")

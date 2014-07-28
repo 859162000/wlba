@@ -6,13 +6,15 @@ import csv
 import codecs
 import cStringIO
 import logging
-
+import binascii,os
+import base64
 from django.conf import settings
 
 from report.models import Report
 from wanglibao_p2p.models import UserAmortization, P2PProduct
 from wanglibao_pay.models import PayInfo
-from M2Crypto import RSA,BIO
+from M2Crypto import RSA,BIO,EVP
+
 
 
 logger = logging.getLogger(__name__)
@@ -100,9 +102,9 @@ class ReportGenerator(object):
             report = Report(name=u'充值记录 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
             report.file = join('reports', 'czjl', filename)
             report.save()
-
+            tsv_file.close()
+            #cls.encryptFile(path)
             return report
-        cls.encryptFile(path)
 
     @classmethod
     def generate_withdraw_report(cls, start_time, end_time=None):
@@ -151,9 +153,10 @@ class ReportGenerator(object):
             report = Report(name=u'提现记录 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
             report.file = join('reports', 'txjl', filename)
             report.save()
-
+            tsv_file.close()
+            cls.encryptFile(path)
             return report
-        cls.encryptFile()
+
 
     @classmethod
     def generate_payback_report(cls, start_time, end_time=None):
@@ -203,8 +206,9 @@ class ReportGenerator(object):
             report = Report(name=u'还款列表 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
             report.file = join('reports', fileprefix, filename)
             report.save()
+            tsv_file.close()
+            cls.encryptFile(path)
             return report
-        cls.encryptFile(path)
 
     @classmethod
     def generate_p2p_audit_report(cls, start_time, end_time=None):
@@ -264,46 +268,85 @@ class ReportGenerator(object):
             report = Report(name=u'满标复审 %s' % start_time.strftime('%Y-%m-%d %H:%M:%S'))
             report.file = join('reports', fileprefix, filename)
             report.save()
-
+            tsv_file.close()
+            cls.encryptFile(path)
             return report
-        cls.encryptFile(path)
+
+
 
     @classmethod
-    def encryptFile(cls,path):
+    def encryptFile(cls, path):
         file = open(path,"r+")
         rsa = Rsa()
+        ase = Aes()
         all_text = file.read()
-        print(all_text)
-        encrypt_text = rsa.encrypt(all_text)
-        print(encrypt_text)
+        crypt_key = binascii.b2a_hex(os.urandom(15))
+        encrypt_text = ase.encrypt(crypt_key, all_text)
+        encrypt_key = base64.b64encode(rsa.encrypt(crypt_key))
         file.seek(0)
+        file.write(encrypt_key)
+        file.write('\n')
         file.write(encrypt_text)
         file.close()
+    @classmethod
+    def decryptFile(cls, path):
+        file = open(path, 'r')
+        rsa = Rsa()
+        ase = Aes()
+        all_line = file.readlines()
+        all_key = base64.decodestring(all_line[0].strip('\n'))
+        all_text = all_line[1].strip('\n')
+        print(all_text)
+        decrypt_key = rsa.decrypt(all_key)
+        print(decrypt_key)
+        decrypt_text = ase.decrypt(decrypt_key, all_text)
+        print(decrypt_text)
 
 class Rsa:
-    def genRsaKeyPair(self,rsalen=1024):
+    def genRsaKeyPair(self, rsalen=1024):
         try:
-            rsa_key = RSA.gen_key(rsalen,3,lambda *args:None)
-            rsa_key.save_key("pri_key.pem",None)
+            rsa_key = RSA.gen_key(rsalen, 3, lambda *args:None)
+            rsa_key.save_key("pri_key.pem", None)
             rsa_key.save_pub_key("pub_key.pem")
-        except OSError,e:
+        except OSError, e:
             if e.errno != 17:
                 raise
 
-    def encrypt(self,data):
+    def encrypt(self, data):
         try:
             pub_key = RSA.load_pub_key("pub_key.pem")
-        except OSError,e:
+        except OSError, e:
             if e.errno != 17:
                 raise
-        return pub_key.public_encrypt(data,RSA.pkcs1_oaep_padding)
+        return pub_key.public_encrypt(data, RSA.pkcs1_oaep_padding)
 
-    def decrypt(self,data):
+    def decrypt(self, data):
         try:
-            string = open("pri_key.pem","rb").read()
-        except OSError,e:
+            string = open("pri_key.pem", "rb").read()
+        except OSError, e:
             if e.errno != 17:
                 raise
         bio = BIO.MemoryBuffer(string)
         pri_key = RSA.load_key_bio(bio)
-        return pri_key.private_decrypt(data,RSA.pkcs1_oaep_padding)
+        return pri_key.private_decrypt(data, RSA.pkcs1_oaep_padding)
+
+class Aes:
+    def get_cryptor(self, op, key, alg='aes_128_ecb', iv=None):
+        if iv == None:
+            iv = '\0' * 16
+        cryptor = EVP.Cipher(alg=alg, key=key, iv=iv, op=op)
+        return cryptor
+
+    def encrypt(self, key, plaintext):
+        cryptor = self.get_cryptor(1, key)
+        ret = cryptor.update(plaintext)
+        ret = ret + cryptor.final()
+        ret = binascii.hexlify(ret)
+        return ret
+
+    def decrypt(self, key, ciphertext):
+        cryptor = self.get_cryptor(0, key)
+        ciphertext = binascii.unhexlify(ciphertext)
+        ret = cryptor.update(ciphertext)
+        ret = ret + cryptor.final()
+        return ret
