@@ -23,6 +23,7 @@ class SiteData(models.Model):
     highest_earning_rate = models.FloatField(u'最高年化收益率(%)', default=15)
     demand_deposit_interest_rate = models.FloatField(u'活期存款利率(%)', default=0.35)
     one_year_interest_rate = models.FloatField(u'一年期存款利率(%)', default=3)
+    product_release_time = models.CharField(u'产品发布时间', max_length=128, default=u'17:30')
     updated_at = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):

@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from marketing.models import SiteData
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.forms import PurchaseForm
@@ -53,13 +54,16 @@ class P2PDetailView(TemplateView):
 
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
 
+        site_data = SiteData.objects.all()[0]
+
         return {
             'p2p': p2p,
             'form': form,
             'status': status,
             'end_time': end_time,
             'orderable_amount': orderable_amount,
-            'current_equity': current_equity
+            'current_equity': current_equity,
+            'site_data': site_data
         }
 
 

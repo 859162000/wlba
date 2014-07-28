@@ -24,8 +24,9 @@ html
                 span.p2p-warrant-way
                   span.icon-check-shield
                   | 100%本息担保
-              .span3-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余时间：
-                span#countdown{{p2p.end_time | timedelta_now }}
+              if status != 'finished'
+                .span3-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余时间：
+                  span#countdown{{p2p.end_time | timedelta_now }}
           .p2p-detail-content.clearfix
             .row
               .span4
@@ -55,9 +56,7 @@ html
 
           dl.p2p-detail-intro.clearfix
             dt 项目用途：
-            dd
-              | {{p2p.short_usage}}
-              a.blue(href="") [详情]
+            dd {{p2p.short_usage}}
 
         .span4-omega.invest-form.border-left
           h1 我要投资
@@ -98,7 +97,7 @@ html
               p.align-center.padding-s {{end_time|date:"m-d H:i:s"}} 售完
               p
                 | 新的投资产品将在工作日
-                span.highlight 17:30
+                span.highlight {{site_data.product_release_time}}
                 | 固定时间发布，请查看网站<a href="/">首页</a>。
           if status == 'not_started'
             p 还没有开始
