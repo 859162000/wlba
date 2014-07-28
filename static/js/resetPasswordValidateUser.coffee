@@ -31,11 +31,21 @@ require ['jquery', 'lib/backend'], ($, backend)->
     # Check the validate code first
     target = $(e.target).attr('data-url')
     validate_code = $('input[name="validate_code"]').val()
+
+    if validate_code == ''
+      alert '验证码不能为空'
+      return
+
     $.post target, {
-      "validate_code": validate_code
-    }
-    .done ->
-      # If succeeded, then go to password setting page
-      window.location = '/accounts/password/reset/set_password/'
-    .fail ->
-      console.log '验证失败!'
+        "validate_code": validate_code
+      }
+      .done ->
+        # If succeeded, then go to password setting page
+        window.location = '/accounts/password/reset/set_password/'
+      .fail ->
+        alert '验证失败!'
+
+  $('#validate_form').on 'submit', (e) ->
+    e.preventDefault()
+    $('#nextStep').click()
+

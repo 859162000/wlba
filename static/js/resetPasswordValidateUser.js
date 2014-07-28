@@ -29,17 +29,25 @@
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
     });
-    return $('#nextStep').click(function(e) {
+    $('#nextStep').click(function(e) {
       var target, validate_code;
       target = $(e.target).attr('data-url');
       validate_code = $('input[name="validate_code"]').val();
+      if (validate_code === '') {
+        alert('验证码不能为空');
+        return;
+      }
       return $.post(target, {
         "validate_code": validate_code
       }).done(function() {
         return window.location = '/accounts/password/reset/set_password/';
       }).fail(function() {
-        return console.log('验证失败!');
+        return alert('验证失败!');
       });
+    });
+    return $('#validate_form').on('submit', function(e) {
+      e.preventDefault();
+      return $('#nextStep').click();
     });
   });
 
