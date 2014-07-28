@@ -254,19 +254,12 @@ EMAIL_HOST_USER = 'postmaster@sandbox57322.mailgun.org'
 EMAIL_HOST_PASSWORD = '83x1ln8w5p64'
 DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 
-# sms service configuration
-SMS_ACCOUNT = 'cf_zkrx'
-SMS_PASSWORD = 'S8o-mHH-fcc-x8g'
-SMS_URL = 'http://121.199.16.178/webservice/sms.php?method=Submit'
-
 # ManDao sms service
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/mdgxsend.ashx'
 SMS_MANDAO_SN = 'SDK-BBX-010-20599'
 SMS_MANDAO_MD5_PWD = '4A4080BB5FCCC3422E14EA8247D1062C'
 
-SMS_BACKEND = 'wanglibao_sms.backends.TestBackEnd'
-if PRODUCTION:
-    SMS_BACKEND = 'wanglibao_sms.backends.UrlBasedSMSBackEnd'
+SMS_BACKEND = 'wanglibao_sms.backends.ManDaoSMSBackEnd'
 
 # Default login redirect url
 LOGIN_REDIRECT_URL = '/'

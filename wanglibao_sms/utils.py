@@ -1,10 +1,12 @@
+# coding=utf-8
+import json
 import random
 from django.conf import settings
 from django.template.loader import render_to_string
 import datetime
 from django.utils import timezone
-from wanglibao_sms.backends import UrlBasedSMSBackEnd, TestBackEnd
-from wanglibao_sms.models import PhoneValidateCode
+from django.utils.module_loading import import_by_path
+from wanglibao_sms.models import PhoneValidateCode, ShortMessage
 import logging
 logger = logging.getLogger(__name__)
 
@@ -13,17 +15,25 @@ def generate_validate_code():
     return "%d" % (random.randrange(100000, 1000000))
 
 
-def send_sms(phone, message):
-    logger.debug('Send short messages')
-    backend = settings.SMS_BACKEND
-    class_name = backend.split('.')[-1]
+def send_messages(phones, messages):
+    short_message = ShortMessage()
+    short_message.phones = " ".join(phones)
+    short_message.contents = " ".join([":".join(pair) for pair in zip(phones, messages)])
+    short_message.save()
+    backend = import_by_path(settings.SMS_BACKEND)
+    status, context = backend.send_messages(phones, messages)
 
-    if class_name == 'TestBackEnd':
-        return TestBackEnd.send(phone, message)
-    elif class_name == 'UrlBasedSMSBackEnd':
-        return UrlBasedSMSBackEnd.send(phone, message)
+    if status != 200:
+        short_message.status = u'失败'
     else:
-        raise NameError("The specific backend not implemented")
+        short_message.status = u'成功'
+
+    short_message.context = json.dumps(context)
+    short_message.save()
+
+
+def send_sms(phone, message):
+    send_messages([phone], [message])
 
 
 def send_validation_code(phone, validate_code=None):
