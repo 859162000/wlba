@@ -52,7 +52,7 @@ class P2POperator(object):
             try:
                 cls().preprocess_for_settle(product)
             except P2PException, e:
-                cls.logger.error('%s, %s' % (product.id, e))
+                cls.logger.error('%s, %s' % (product.id, e.message))
                 print(e)
 
         print('Getting products with status 满标已审核')
@@ -60,7 +60,7 @@ class P2POperator(object):
             try:
                 cls().settle(product)
             except P2PException, e:
-                cls.logger.error('%s, %s' % (product.id, e))
+                cls.logger.error('%s, %s' % (product.id, e.message))
                 print(e)
 
         print('Getting products with status 正在招标 and end time earlier than now')
@@ -68,7 +68,7 @@ class P2POperator(object):
             try:
                 cls().fail(product)
             except P2PException, e:
-                cls.logger.error('%s, %s' % (product.id, e))
+                cls.logger.error('%s, %s' % (product.id, e.message))
                 print(e)
 
         print('Getting amortization needs handle')
@@ -78,7 +78,7 @@ class P2POperator(object):
             try:
                 cls().amortize(amortization)
             except P2PException, e:
-                cls.logger.error('%s, %s' % (amortization, e))
+                cls.logger.error('%s, %s' % (amortization, e.message))
                 print(e)
 
     def preprocess_for_settle(self, product):
