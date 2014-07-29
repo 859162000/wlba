@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 import datetime
 from django.utils import timezone
 from django.utils.module_loading import import_by_path
+from wanglibao_sms import messages
 from wanglibao_sms.models import PhoneValidateCode, ShortMessage
 import logging
 logger = logging.getLogger(__name__)
@@ -63,8 +64,7 @@ def send_validation_code(phone, validate_code=None):
             last_send_time=now,
             code_send_count=1)
 
-    content = render_to_string('html/activation-sms.html', {'validation_code': validate_code})
-    status, message = send_sms(phone, content)
+    status, message = send_sms(phone, messages.validate_code)
 
     if status != 200:
         return status, message

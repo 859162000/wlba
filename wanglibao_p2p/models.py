@@ -403,7 +403,7 @@ class EquityRecord(models.Model):
 
 def generate_amortization_plan(sender, instance, **kwargs):
     if instance.status == u'录标完成':
-        logger.info('The product status is 录标完成, start to generate amortization plan')
+        logger.info(u'The product status is 录标完成, start to generate amortization plan')
 
         term_count = instance.amortization_count
         terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, term_count)

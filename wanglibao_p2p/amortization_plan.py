@@ -1,6 +1,7 @@
 # coding=utf-8
 from decimal import *
 
+
 class AmortizationPlan(object):
     @classmethod
     def generate(cls, amount, year_rate, term):
