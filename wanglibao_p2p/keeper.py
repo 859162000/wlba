@@ -11,6 +11,8 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
     UserAmortization
 from exceptions import ProductLack, P2PException
+from wanglibao_sms import messages
+from wanglibao_sms.tasks import send_messages
 
 
 class ProductKeeper(KeeperBaseMixin):
@@ -207,9 +209,13 @@ class AmortizationKeeper(KeeperBaseMixin):
                 sub_amo.settlement_time = timezone.now()
                 sub_amo.save()
 
+                send_messages.apply_async(kwargs={
+                    "phones": [sub_amo.user.wanglibaouserprofile.phone],
+                    "messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, sub_amo.principal + sub_amo.interest + sub_amo.penal_interest)]
+                })
+
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
                               amortization, description)
-
 
             amortization.settled = True
             amortization.save()

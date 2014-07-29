@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import permission_required
 from django.db import transaction
 from django.forms import model_to_dict
 from django.http import HttpResponse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
@@ -24,6 +25,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip
+from wanglibao_sms import messages
+from wanglibao_sms.tasks import send_messages
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -105,6 +108,13 @@ class PayCompleteView(TemplateView):
     def post(self, request, *args, **kwargs):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
+
+        phone = request.user.wanglibaouserprofile.phone
+        send_messages.apply_async(kwargs={
+            "phones": [phone],
+            "messages": [messages.deposit_succeed(amount)]
+        })
+
         return self.render_to_response({
             'result': result,
             'amount': amount
@@ -185,6 +195,11 @@ class WithdrawCompleteView(TemplateView):
             pay_info.margin_record = margin_record
 
             pay_info.save()
+
+            send_messages.apply_async(kwargs={
+                'phones': [request.user.wanglibaouserprofile.phone],
+                'messages': [messages.withdraw_submitted(amount, timezone.now())]
+            })
         except decimal.DecimalException:
             result = u'金额格式错误'
         except Card.DoesNotExist:

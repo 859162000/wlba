@@ -13,7 +13,7 @@
     };
     initConfirm = function() {
       var html;
-      html = ['<div id= "', confirm_container_id, '" class="', modal_container, '" style="display:none">', '<div class="modal-header"><span class="icon-cancel"></span></div>', '<div class="modal-content"><h2></h2><div class="modal-content-inner">同志确认吗?</div></div>', '<div class="modal-footer"><a href="#" class="ok button-confirm-ok">确认</a><a href="#" class="cancel button-confirm-cancel">取消</a></div>', '</div>'];
+      html = ['<div id= "', confirm_container_id, '" class="', modal_container, '" style="display:none">', '<div class="modal-header"><span class="icon-cancel"></span></div>', '<div class="modal-content"><h2></h2><div class="modal-content-inner">确认吗?</div></div>', '<div class="modal-footer"><a href="#" class="ok button-confirm-ok">确认</a><a href="#" class="cancel button-confirm-cancel">取消</a></div>', '</div>'];
       $(html.join('')).appendTo($(document.body));
       return $('#' + alert_container_id).on(modal.CLOSE, beforeClose);
     };

@@ -8,6 +8,8 @@ from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
 from exceptions import P2PException
 from wanglibao_p2p.models import P2PProduct
+from wanglibao_sms import messages
+from wanglibao_sms.tasks import send_messages
 
 
 class P2PTrader(object):
@@ -52,7 +54,7 @@ class P2POperator(object):
             try:
                 cls().preprocess_for_settle(product)
             except P2PException, e:
-                cls.logger.error('%s, %s' % (product.id, e))
+                cls.logger.error('%s, %s' % (product.id, e.message))
                 print(e)
 
         print('Getting products with status 满标已审核')
@@ -60,15 +62,15 @@ class P2POperator(object):
             try:
                 cls().settle(product)
             except P2PException, e:
-                cls.logger.error('%s, %s' % (product.id, e))
+                cls.logger.error('%s, %s' % (product.id, e.message))
                 print(e)
 
         print('Getting products with status 正在招标 and end time earlier than now')
         for product in P2PProduct.objects.filter(status=u'正在招标', end_time__lte=timezone.now()):
             try:
-                cls().fail(product)
+                cls.fail(product)
             except P2PException, e:
-                cls.logger.error('%s, %s' % (product.id, e))
+                cls.logger.error('%s, %s' % (product.id, e.message))
                 print(e)
 
         print('Getting amortization needs handle')
@@ -78,11 +80,12 @@ class P2POperator(object):
             try:
                 cls().amortize(amortization)
             except P2PException, e:
-                cls.logger.error('%s, %s' % (amortization, e))
+                cls.logger.error('%s, %s' % (amortization, e.message))
                 print(e)
 
-    def preprocess_for_settle(self, product):
-        self.logger.info('Enter pre process for settle for product: %d: %s', product.id, product.name)
+    @classmethod
+    def preprocess_for_settle(cls, product):
+        cls.logger.info('Enter pre process for settle for product: %d: %s', product.id, product.name)
 
         # Create an order to link all changes
         order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
@@ -101,7 +104,8 @@ class P2POperator(object):
             product.status = u'满标待审核'
             product.save()
 
-    def settle(self, product):
+    @classmethod
+    def settle(cls, product):
         if product.ordered_amount != product.total_amount:
             raise P2PException(u'产品已申购额度(%s)不等于总额度(%s)' % (str(product.ordered_amount), str(product.total_amount)))
         if product.status != u'满标已审核':
@@ -113,9 +117,19 @@ class P2POperator(object):
             product.status = u'还款中'
             product.save()
 
-    def fail(self, product):
+        product = P2PProduct.objects.get(id=product.id)
+        phones = [u.wanglibaouserprofile.phone for u in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        send_messages.apply_async(kwargs={
+            "phones": phones,
+            "messages": [messages.product_settled(product, timezone.now())]
+        })
+
+    @classmethod
+    def fail(cls, product):
         if product.status == u'流标':
             raise P2PException('Product already failed')
+
+        cls.logger.info("Product [%d] [%s] not able to reach 100%")
         with transaction.atomic():
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
@@ -123,7 +137,15 @@ class P2POperator(object):
             product.status = u'流标'
             product.save()
 
-    def amortize(self, amortization):
+        product = P2PProduct.objects.get(id=product.id)
+        phones = [u.wanglibaouserprofile.phone for u in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        send_messages.apply_async(kwargs={
+            "phones": phones,
+            "messages": [messages.product_failed(product)]
+        })
+
+    @classmethod
+    def amortize(cls, amortization):
         if not amortization.ready_for_settle:
             raise P2PException('not ready for settle')
         if amortization.product.status != u'还款中':
@@ -135,6 +157,6 @@ class P2POperator(object):
             product = amortization.product
             all_settled = reduce(lambda flag, a: flag & a.settled, product.amortizations.all(), True)
             if all_settled:
-                self.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
+                cls.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
                 product.status = u'已完成'
                 product.save()
