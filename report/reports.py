@@ -2,6 +2,7 @@
 from datetime import timedelta, datetime
 from os.path import join
 from os import makedirs
+from Crypto.Cipher import AES
 import csv
 import codecs
 import cStringIO
@@ -279,7 +280,7 @@ class ReportGenerator(object):
         rsa = Rsa()
         ase = Aes()
         all_text = file_object.read()
-        crypt_key = binascii.b2a_hex(os.urandom(15))
+        crypt_key = binascii.b2a_hex(os.urandom(16))
         encrypt_text = ase.encrypt(crypt_key, all_text)
         encrypt_key = base64.b64encode(rsa.encrypt(crypt_key))
         file_object.seek(0)
@@ -327,24 +328,25 @@ class Rsa(object):
 class Aes(object):
 
     @classmethod
-    def get_cryptor(cls, op, key, alg='aes_128_ecb', iv=None):
-        if iv is None:
-            iv = '\0' * 16
-        cryptor = EVP.Cipher(alg=alg, key=key, iv=iv, op=op)
-        return cryptor
+    def encrypt(cls, key, plain_text):
+        iv = '\0' * 16
+        cryptor = AES.new(key=key, mode=AES.MODE_CBC, IV=iv)
+        padding = '\0'
+        length = 16
+        count = plain_text.count('')
+        if count < length:
+            add = (length - count) + 1
+            plain_text += (padding * add)
+        elif count > length:
+            add = (length - (count % length)) + 1
+            plain_text += (padding * add)
+        cipher_text = cryptor.encrypt(plain_text)
+        return base64.b64encode(cipher_text)
 
     @classmethod
-    def encrypt(cls, key, plaintext):
-        cryptor = cls.get_cryptor(1, key)
-        ret = cryptor.update(plaintext)
-        ret = ret + cryptor.final()
-        ret = binascii.hexlify(ret)
-        return ret
-
-    @classmethod
-    def decrypt(cls, key, cipher_text):
-        cryptor = cls.get_cryptor(0, key)
-        cipher_text = binascii.unhexlify(cipher_text)
-        ret = cryptor.update(cipher_text)
-        ret = ret + cryptor.final()
-        return ret
+    def decrypt(cls, key, text):
+        iv = '\0' * 16
+        cryptor = AES.new(key=key, mode=AES.MODE_CBC, IV=iv)
+        text = base64.b64decode(text)
+        plain_text = cryptor.decrypt(text)
+        return plain_text.rstrip("\0")

@@ -96,6 +96,14 @@ class InterestFirstThenPrincipal(AmortizationPlan):
         }
 
 
+class DisposablePayOff(AmortizationPlan):
+    name = u'一次性还清'
+
+    @classmethod
+    def generate(cls, amount, year_rate, term=1):
+        return
+
+
 def get_amortization_plan(amortization_type):
     for plan in (MatchingPrincipalAndInterest, MonthlyInterest, InterestFirstThenPrincipal):
         if plan.name == amortization_type:
