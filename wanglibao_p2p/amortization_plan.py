@@ -101,11 +101,23 @@ class DisposablePayOff(AmortizationPlan):
     name = u'一次性还清'
 
     @classmethod
-    def generate(cls, amount, year_rate, term=1):
-        return
+    def generate(cls, amount, year_rate, months):
+        amount = Decimal(amount)
+        year_rate = Decimal(year_rate)
+
+        month_rate = year_rate / 12
+        month_interest = amount * month_rate
+        month_interest = month_interest.quantize(Decimal('.01'), ROUND_UP)
+
+        total = amount + month_interest * months
+        result = [(total, Decimal(0), total - amount, Decimal(0), Decimal(0))]
+        return {
+            "terms": result,
+            "total": total
+        }
 
 
 def get_amortization_plan(amortization_type):
-    for plan in (MatchingPrincipalAndInterest, MonthlyInterest, InterestFirstThenPrincipal):
+    for plan in (MatchingPrincipalAndInterest, MonthlyInterest, InterestFirstThenPrincipal, DisposablePayOff):
         if plan.name == amortization_type:
             return plan
