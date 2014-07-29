@@ -64,8 +64,9 @@ class P2PProduct(ProductBase):
     version = IntegerVersionField()
 
     name = models.CharField(max_length=256, verbose_name=u'名字')
-    short_name = models.CharField(max_length=64, verbose_name=u'短名字')
-    serial_number = models.CharField(max_length=100, verbose_name=u'产品编号', unique=True, null=True)
+    short_name = models.CharField(u'短名字', max_length=64)
+    serial_number = models.CharField(u'产品编号', max_length=100, unique=True, null=True)
+    contract_serial_number = models.CharField(u'合同编号', max_length=100, blank=True, null=True)
 
     status = models.CharField(max_length=16, default=u'录标',
                               choices=STATUS_CHOICES,
