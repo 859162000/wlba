@@ -18,7 +18,10 @@ def generate_validate_code():
 def send_messages(phones, messages):
     short_message = ShortMessage()
     short_message.phones = " ".join(phones)
-    short_message.contents = " ".join([":".join(pair) for pair in zip(phones, messages)])
+    if len(phones) == len(messages):
+        short_message.contents = " ".join([":".join(pair) for pair in zip(phones, messages)])
+    else:
+        short_message.contents = u"%s: %s" % (",".join(phones), "|".join(messages))
     short_message.save()
     backend = import_by_path(settings.SMS_BACKEND)
     status, context = backend.send_messages(phones, messages)

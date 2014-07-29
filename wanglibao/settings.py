@@ -256,6 +256,7 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 
 # ManDao sms service
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/mdgxsend.ashx'
+SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/mdsmssend.ashx'
 SMS_MANDAO_SN = 'SDK-BBX-010-20599'
 SMS_MANDAO_MD5_PWD = '4A4080BB5FCCC3422E14EA8247D1062C'
 
