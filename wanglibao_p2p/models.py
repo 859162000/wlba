@@ -427,4 +427,16 @@ def generate_amortization_plan(sender, instance, **kwargs):
         instance.save()
 
 
-post_save.connect(generate_amortization_plan, sender=P2PProduct, dispatch_uid="generate_amortization_plan")
+def process_after_money_paied(product):
+    if product.status == u'满标已打款':
+        from celery.execute import send_task
+        send_task("wanglibao_p2p.tasks.process_paid_product", kwargs={
+            'product_id': product.id
+        })
+
+
+def post_save_process(sender, instance, **kwargs):
+    generate_amortization_plan(sender, instance, **kwargs)
+    process_after_money_paied(instance)
+
+post_save.connect(post_save_process, sender=P2PProduct, dispatch_uid="generate_amortization_plan")
