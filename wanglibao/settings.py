@@ -435,4 +435,4 @@ ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
 if PRODUCTION:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 
-WEIXIN_TOKEN = 'weixin_wanglibao'
+#WEIXIN_TOKEN = 'weixin_wanglibao'
