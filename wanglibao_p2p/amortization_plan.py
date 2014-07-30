@@ -1,11 +1,22 @@
 # coding=utf-8
 from decimal import *
+from dateutil.relativedelta import relativedelta
+from django.utils import timezone
 
 
 class AmortizationPlan(object):
     @classmethod
     def generate(cls, amount, year_rate, term, period=None):
         raise NotImplemented('Not implemented')
+
+    @classmethod
+    def calculate_term_date(cls, product):
+        amortizations = product.amortizations.all()
+        today = timezone.now()
+        for index, amortization in enumerate(amortizations):
+            if amortization.term_date is None:
+                amortization.term_date = today + relativedelta(months=index + 1)
+                amortization.save()
 
 
 class MatchingPrincipalAndInterest(AmortizationPlan):
@@ -115,11 +126,18 @@ class DisposablePayOff(AmortizationPlan):
         month_interest = month_interest.quantize(Decimal('.01'), ROUND_UP)
 
         total = amount + month_interest * period
-        result = [(total, Decimal(0), total - amount, Decimal(0), Decimal(0))]
+        result = [(total, amount, total - amount, Decimal(0), Decimal(0))]
         return {
             "terms": result,
             "total": total
         }
+
+    @classmethod
+    def calculate_term_date(cls, product):
+        amortization = product.amortizations.all()[0]
+        today = timezone.now()
+        amortization.term_date = today + relativedelta(months=product.period)
+        amortization.save()
 
 
 def get_amortization_plan(amortization_type):

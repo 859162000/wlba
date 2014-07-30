@@ -11,6 +11,7 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
     UserAmortization
 from exceptions import ProductLack, P2PException
+from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 
@@ -151,12 +152,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
         equities = self.product.equities.all()
 
-        today = timezone.now()
-        for index, amortization in enumerate(self.amortizations):
-            if amortization.term_date is None:
-                amortization.term_date = today + relativedelta(months=index+1)
-                amortization.save()
-
+        get_amortization_plan(self.product.pay_method).calculate_term_date(self.product)
         # Delete all old user amortizations
         with transaction.atomic(savepoint=savepoint):
             UserAmortization.objects.filter(product_amortization__in=self.amortizations).delete()
