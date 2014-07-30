@@ -78,12 +78,15 @@ class P2PProduct(ProductBase):
 
     pay_method = models.CharField(u'支付方式', max_length=32, blank=True, default=u'等额本息', choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)
+    repaying_source = models.CharField(u'还款资金来源', max_length=256, blank=True)
 
     # pay info for the borrower
     borrower_name = models.CharField(u'借债人姓名', max_length=32, blank=True)
     borrower_phone = models.CharField(u'借债人手机号', max_length=32, blank=True)
+    borrower_address = models.CharField(u'借债人地址', max_length=128, blank=True)
     borrower_id_number = models.CharField(u'借债人身份证号', max_length=32, blank=True)
     borrower_bankcard = models.CharField(u'借债人银行卡号', max_length=64, blank=True)
+    borrower_bankcard_bank_name = models.CharField(u'开户行', max_length=64, blank=True)
     borrower_bankcard_bank_code = models.CharField(u'借债人银行(汇付表格专用)', max_length=64, blank=True)
     borrower_bankcard_bank_province = models.CharField(u'借债人银行省份', max_length=64, blank=True)
     borrower_bankcard_bank_city = models.CharField(u'借债人地区', max_length=64, blank=True)
@@ -246,6 +249,7 @@ class P2PEquity(models.Model):
     product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
     equity = models.BigIntegerField(u'用户所持份额', default=0)
     confirm = models.BooleanField(u'确认成功', default=False)
+    confirm_at = models.DateTimeField(u'份额确认时间', null=True)
     contract = models.FileField(u'合同文件', null=True, upload_to='contracts')
 
     class Meta:

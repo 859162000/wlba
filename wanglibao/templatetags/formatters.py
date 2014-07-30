@@ -1,4 +1,5 @@
 # coding=UTF-8
+from dateutil.relativedelta import relativedelta
 
 from django import template
 from django.utils import timezone
@@ -256,3 +257,8 @@ def number_to_chinese(value):
             result += number_charactors[fen] + u'分'
 
     return result
+
+
+@register.filter
+def add_months(value, months):
+    return value + relativedelta(months=months)

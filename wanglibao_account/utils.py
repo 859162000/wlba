@@ -108,7 +108,7 @@ def verify_id(name, id_number):
         raise NameError("The specific backend not implemented")
 
 
-def generate_contract(equity):
+def generate_contract(equity, template_name=None):
     """
     Generate the contract file for the equity.
 
@@ -119,8 +119,10 @@ def generate_contract(equity):
         'equity': equity
     })
 
-    if equity.product.contract_template is None:
-        template = get_template('renrenjucai.jade')
+    if template_name is not None:
+        template = get_template(template_name)
+    elif equity.product.contract_template is None:
+        template = get_template('contract_template.jade')
     else:
         # Load the template from database
         template = Template(equity.product.contract_template.content)

@@ -97,6 +97,7 @@ class EquityKeeper(KeeperBaseMixin):
                 raise P2PException('can not get equity info.')
             equity = equity_query.first()
             equity.confirm = True
+            equity.confirm_at = timezone.now()
             equity.save()
             catalog = u'申购确认'
             description = u'用户份额确认(%d)' % equity.equity

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
@@ -5,7 +6,7 @@ from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
 from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome, \
     AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView, AccountTransactionDeposit, \
-    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract
+    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -67,3 +68,9 @@ urlpatterns = patterns(
         name='auth_password_reset_confirm'),
     url(r'', include('registration.backends.default.urls')),
 )
+
+if settings.DEBUG:
+    urlpatterns += patterns(
+        '',
+        url(r'^contract/test/(?P<equity_id>\w+)/', test_contract)
+    )
