@@ -4,7 +4,7 @@ from decimal import *
 
 class AmortizationPlan(object):
     @classmethod
-    def generate(cls, amount, year_rate, term):
+    def generate(cls, amount, year_rate, term, period=None):
         raise NotImplemented('Not implemented')
 
 
@@ -12,7 +12,7 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
     name = u'等额本息'
 
     @classmethod
-    def generate(cls, amount, year_rate, term):
+    def generate(cls, amount, year_rate, term, period=None):
         amount = Decimal(amount)
         year_rate = Decimal(year_rate)
 
@@ -47,7 +47,7 @@ class MonthlyInterest(AmortizationPlan):
     name = u'按月付息'
 
     @classmethod
-    def generate(cls, amount, year_rate, term):
+    def generate(cls, amount, year_rate, term, period=None):
         amount = Decimal(amount)
         year_rate = Decimal(year_rate)
 
@@ -74,7 +74,7 @@ class InterestFirstThenPrincipal(AmortizationPlan):
     name = u'先息后本'
 
     @classmethod
-    def generate(cls, amount, year_rate, term):
+    def generate(cls, amount, year_rate, term, period=None):
         amount = Decimal(amount)
         year_rate = Decimal(year_rate)
 
@@ -98,10 +98,15 @@ class InterestFirstThenPrincipal(AmortizationPlan):
 
 
 class DisposablePayOff(AmortizationPlan):
-    name = u'一次性还清'
+    name = u'到期还本付息'
 
     @classmethod
-    def generate(cls, amount, year_rate, months):
+    def generate(cls, amount, year_rate, term, period=None):
+        if period is None:
+            return {
+                "terms": [],
+                "total": 0
+            }
         amount = Decimal(amount)
         year_rate = Decimal(year_rate)
 
@@ -109,7 +114,7 @@ class DisposablePayOff(AmortizationPlan):
         month_interest = amount * month_rate
         month_interest = month_interest.quantize(Decimal('.01'), ROUND_UP)
 
-        total = amount + month_interest * months
+        total = amount + month_interest * period
         result = [(total, Decimal(0), total - amount, Decimal(0), Decimal(0))]
         return {
             "terms": result,

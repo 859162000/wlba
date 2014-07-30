@@ -59,7 +59,7 @@ class P2PProduct(ProductBase):
         (u'等额本息', u'等额本息'),
         (u'先息后本', u'先息后本'),
         (u'按月付息', u'按月付息'),
-        (u'一次性还清', u'一次性还清'),
+        (u'到期还本付息', u'到期还本付息'),
     )
 
     version = IntegerVersionField()
@@ -408,9 +408,7 @@ def generate_amortization_plan(sender, instance, **kwargs):
         logger.info(u'The product status is 录标完成, start to generate amortization plan')
 
         term_count = instance.amortization_count
-        if instance.pay_method == u'一次性还清':
-            term_count = instance.period
-        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, term_count)
+        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, term_count, instance.period)
 
         for index, term in enumerate(terms['terms']):
             amortization = ProductAmortization()
