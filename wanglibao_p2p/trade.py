@@ -114,7 +114,7 @@ class P2POperator(object):
             product.save()
 
         product = P2PProduct.objects.get(id=product.id)
-        phones = [u.wanglibaouserprofile.phone for u in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        phones = [e.user.wanglibaouserprofile.phone for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
         send_messages.apply_async(kwargs={
             "phones": phones,
             "messages": [messages.product_settled(product, timezone.now())]
