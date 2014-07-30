@@ -19,8 +19,9 @@ html
         .span8.p2p-detail-container
           .p2p-detail-bar.clearfix
             .row
-              .span9
-                span.p2p-detail-title {{p2p.short_name}}
+              .span6.text-overflow-hidden
+                span.p2p-detail-title(title="{{p2p.short_name}}") {{p2p.short_name}}
+              .span3.p2p-detail-endtime
                 span.p2p-warrant-way
                   span.icon-check-shield
                   | 100%本息担保
@@ -30,7 +31,7 @@ html
           .p2p-detail-content.clearfix
             .row
               .span4
-                p.dark-gray.font-xxl {{p2p.total_amount | money_format}}
+                p.dark-gray.font-xxl {{p2p.total_amount | money_format_int}}
                 p 投资金额（元）
               .span5
                 p.dark-gray
@@ -48,7 +49,7 @@ html
                 |还款方式：
                 span.dark-gray {{p2p.pay_method}}
               .span5-omega
-                span 进度：
+                span.pull-right 进度：
                   .progress-container
                     percent = float(p2p.ordered_amount) / p2p.total_amount * 100
                     .progress-indicator(style="width:{{percent | percentage}}")
@@ -72,14 +73,14 @@ html
               .row
                 span.span4 可投资金额
                 span.span8-omega
-                  span.dark-gray.font-m {{orderable_amount}}元
+                  span.dark-gray.font-m {{orderable_amount|money_format_int}}元
               if orderable_amount > 0
                 .row
                   span.span4 投资金额
                   span.span8-omega
                     period = p2p.period * 30
                     user_limit = u"请输入小于%d的整数" % orderable_amount
-                    -render_field form.amount class+="span12" placeholder=user_limit data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1"
+                    -render_field form.amount class+="span12" type="text" placeholder=user_limit data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1"
                 .row
                   span.span4 预期收益
                   span.span8-omega
@@ -95,7 +96,7 @@ html
                 button.button-large.disabled(type="button")
                   span.font-xl 已售完
               p.align-center.padding-s {{end_time|date:"m-d H:i:s"}} 售完
-              p
+              p.font-s
                 | 新的投资产品将在工作日
                 span.highlight {{site_data.product_release_time}}
                 | 固定时间发布，请查看网站<a href="/">首页</a>。
