@@ -37,6 +37,15 @@ def money_f_2(value):
 @register.filter
 def money_format(value):
     value = "%.2f" % value
+    return _money_format(value)
+
+@register.filter
+def money_format_int(value):
+    value = "%.0f" % value
+    return _money_format(value)
+
+
+def _money_format(value):
     components = str(value).split('.')
     if len(components) > 1:
         left, right = components

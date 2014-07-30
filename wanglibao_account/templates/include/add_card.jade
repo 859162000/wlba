@@ -1,14 +1,14 @@
 form#add-card-form(style="display:none")
   .modal-title-bar
     span.modal-title 添加银行卡
-  .padding-xl
-    .form-row
-      input#card-no(type="text", placeholder="请输入银行卡号")
+  .modal-content-padding
     .form-row
       select#bank-select
         option(value='') 请选择银行
         for bank in banks
           option(value='{{bank.id}}') {{bank.name}}
+    .form-row
+      input#card-no(type="text", placeholder="请输入银行卡号")
     .form-row
       .withdraw-checkbox
         input#default-checkbox(type='checkbox', value='1')
