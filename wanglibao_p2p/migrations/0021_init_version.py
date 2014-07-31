@@ -10,16 +10,16 @@ class Migration(DataMigration):
         # Note: Don't use "from appname.models import ModelName". 
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
-        for p2p in P2PProduct.objects.all():
+        for p2p in orm.P2PProduct.objects.all():
             p2p.save()
 
-        for product_amortization in ProductAmortization.objects.all():
+        for product_amortization in orm.ProductAmortization.objects.all():
             product_amortization.save()
 
-        for user_amortization in UserAmortization.objects.all():
+        for user_amortization in orm.UserAmortization.objects.all():
             user_amortization.save()
 
-        for equity in P2PEquity.objects.all():
+        for equity in orm.P2PEquity.objects.all():
             equity.save()
 
     def backwards(self, orm):
