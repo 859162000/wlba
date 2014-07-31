@@ -13,6 +13,7 @@ class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
 class AmortizationInline(admin.TabularInline):
     model = ProductAmortization
     extra = 0
+    exclude = ('version',)
 
 
 class WarrantInline(admin.TabularInline):
@@ -23,13 +24,26 @@ class AttachementInline(admin.TabularInline):
     model = Attachment
 
 
+class P2PEquityInline(admin.TabularInline):
+    model = P2PEquity
+    raw_id_fields = ('user',)
+    readonly_fields = ('user', 'confirm', 'contract', 'equity', 'confirm_at')
+    exclude = ('version',)
+    extra = 0
+    can_delete = False
+
+    def get_queryset(self, request):
+        return super(P2PEquityInline, self).get_queryset(request).select_related('user').select_related('user__wanglibaouserprofile')
+
+
 class P2PProductAdmin(ConcurrentModelAdmin, VersionAdmin):
     inlines = [
-        WarrantInline, AttachementInline, AmortizationInline
+        WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
     ]
     list_display = ('name', 'short_name', 'status', 'pay_method', 'end_time', 'audit_link')
     list_editable = ('status',)
     list_filter = ('status',)
+    search_fields = ('name',)
 
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):

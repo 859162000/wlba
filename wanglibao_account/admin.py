@@ -50,6 +50,12 @@ class UserProfileAdmin(UserAdmin, ImportExportModelAdmin):
         return obj.wanglibaouserprofile.id_number
     id_num.short_description = u'身份证'
 
+
+def user_unicode(self):
+    return u'[%s] %s %s ' % (str(self.id), self.wanglibaouserprofile.name, self.wanglibaouserprofile.phone)
+
+User.__unicode__ = user_unicode
+
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(IdVerification)

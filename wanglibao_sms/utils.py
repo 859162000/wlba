@@ -64,7 +64,7 @@ def send_validation_code(phone, validate_code=None):
             last_send_time=now,
             code_send_count=1)
 
-    status, message = send_sms(phone, messages.validate_code)
+    status, message = send_sms(phone, messages.validate_code(validate_code))
 
     if status != 200:
         return status, message

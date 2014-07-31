@@ -162,7 +162,7 @@ class Warrant(models.Model):
         verbose_name_plural = u'产品担保'
 
     def __unicode__(self):
-        return u'%s %s %s' % (self.product.name, self.name, str(self.warranted_at))
+        return u'%s %s %s' % (str(self.product_id), self.name, str(self.warranted_at))
 
 
 class Attachment(models.Model):
@@ -215,7 +215,7 @@ class ProductAmortization(models.Model):
         return self.principal + self.interest + self.penal_interest
 
     def __unicode__(self):
-        return u'产品<%s>: 第 %s 期' % (self.product.short_name, self.term)
+        return u'产品%s: 第 %s 期' % (str(self.product_id), self.term)
 
 
 class UserAmortization(models.Model):
@@ -256,9 +256,6 @@ class P2PEquity(models.Model):
     class Meta:
         unique_together = (('user', 'product'),)
         verbose_name_plural = u'用户持仓'
-
-    def __unicode__(self):
-        return u'%s 持有 %s 数量:%s' % (self.user, self.product, self.equity)
 
     @property
     def related_orders(self):
