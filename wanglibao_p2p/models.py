@@ -15,7 +15,6 @@ from utility import gen_hash_list
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 
 logger = logging.getLogger(__name__)
-user_model = get_user_model()
 
 
 class WarrantCompany(models.Model):
