@@ -82,6 +82,10 @@ def percentage(value):
     return u'%.1f%%' % (value, )
 
 @register.filter
+def percentage_number(value):
+    return u'%.1f' % (value, )
+
+@register.filter
 def yes_no(value):
     if value:
         return u'是'

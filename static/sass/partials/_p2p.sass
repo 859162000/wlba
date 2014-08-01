@@ -2,6 +2,7 @@
   @extend .panel
   overflow: visible
   padding-bottom: 0
+  position: relative
 
   .panel-title-bar
     line-height: 55px
@@ -22,9 +23,12 @@
   em
     color: $color-text-d3
     font-size: $font-xl
+    font-weight: bold
 
     &.highlight
       color: $color-pomegranate
+    &.font-xxl
+      font-size: $font-xxl
 
   .panel-p2p--footer
     @extend .panel-content
@@ -39,6 +43,8 @@
   width: 110px
   padding: 1px
   display: inline-block
+  position: relative
+  top: 1px
 
   .progress-indicator
     background: $color-pomegranate
@@ -202,3 +208,27 @@
     background: url("/static/images/icon-top-bar.png") no-repeat left -85px
     margin-right: 5px
     top: -2px
+
+.warrant-icon
+  width: 16px
+  height: 16px
+  color: #fff
+  font-size: $font-s
+  line-height: 16px
+  padding-left: 1px
+  display: inline-block
+  margin-right: 10px
+  position: relative
+  top: -1px
+  &.odd
+    background-color: #f86149
+  &.even
+    background-color: #37b5ea
+
+.panel-p2p-stamp
+  background: url("/static/images/stamp.png") no-repeat
+  width: 110px
+  height: 110px
+  position: absolute
+  right: 85px
+  top: 50px

@@ -45,32 +45,32 @@ html
             .space-vertical-m
             h1.banner-form--title 欢迎来网利宝投资理财
             .space-vertical-s
-            p.banner-form--row.font-m 您的登录账户:
+            p.banner-form--row.font-s 您的登录账户:
               span.highlight {{user|display_name}}
             .space-vertical-m
             .banner-form--row.align-center
               a.banner-form--button(href="/accounts/home") 进入我的账户
           else
             h1.banner-form--title 网利宝年化收益率
-            p.banner-form--row 最高 <em class="highlight">{{site_data.highest_earning_rate | percentage}}</em>
-            p.banner-form--row <span class="highlight">{{site_data.demand_rate_times}}</span>倍活期存款收益<span class="highlight">{{site_data.one_year_times}}</span>倍定期存款收益
+            p.banner-form--row.font-s 最高 <em class="highlight">{{site_data.highest_earning_rate | percentage}}</em>
+            p.banner-form--row.font-s <span class="highlight">{{site_data.demand_rate_times}}</span>倍活期存款收益<span class="highlight">{{site_data.one_year_times}}</span>倍定期存款收益
             a.banner-form--button.full-width.register-modal(href="#login-modal") 免费注册
-            p.align-right
+            p.align-right.font-s
               span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
 
     .full-container-white
       .sales-data-container
-        .row.align-center
+        .row.align-center.font-m
           span 第三方担保，<em class="highlight">{{site_data.invest_threshold}}元</em>起投，投标次日计息。
           span 每工作日 <em>10:30、14:30、20:00</em> 更新总额度。
-        .row
-          .span4
+        .row.sales-data-info
+          .span4.font-m
             span 投资人总收益：
             em {{site_data.p2p_total_earning}}
-          .span4
+          .span4.font-m
             span 累计交易额：
             em {{site_data.p2p_total_trade}}
-          .span4-omega
+          .span4-omega.font-m
             span 年化收益率：
             em.highlight {{site_data.earning_rate}}
     .container
@@ -79,6 +79,8 @@ html
           for product in p2p_products
             .panel-p2p-product
               .panel-title-bar
+                if product.warrant_company
+                  .warrant-icon(class="{% cycle 'odd' 'even' %}") 担
                 a(href="/p2p/detail/{{product.id}}") {{product.name}}
               .panel-content
                 .row
@@ -88,11 +90,13 @@ html
                     p 融资金额(元)
                   .span2
                     p
-                      em {{product.period}}个月
+                      em {{product.period}}
+                      span.font-s 个月
                     p 还款期限
                   .span2
                     p
-                      em.highlight {{product.expected_earning_rate | percentage}}
+                      em.highlight.font-xxl {{product.expected_earning_rate | percentage_number}}
+                      span.highlight.font-m %
                     p 年化收益
                   .span2
                     p
@@ -127,10 +131,12 @@ html
                     span.highlight &nbsp;&nbsp; {{percent | percentage}}
                   .span4.align-right
                     span 担保机构: &nbsp;&nbsp;
-                    span {{product.warrant_company.name}}
+                    span.d3-text {{product.warrant_company.name}}
                   .span4-omega.align-right
                     span 还款方式: &nbsp;&nbsp;
-                    span {{product.pay_method}}
+                    span.d3-text {{product.pay_method}}
+              if product.status == '还款中'
+                .panel-p2p-stamp
 
         .span4-omega
           .panel
