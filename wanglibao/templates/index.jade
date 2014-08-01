@@ -80,7 +80,7 @@ html
             .panel-p2p-product
               .panel-title-bar
                 if product.warrant_company
-                  .warrant-icon(class="{% cycle 'odd' 'even' %}") 担
+                  .warrant-icon 担
                 a(href="/p2p/detail/{{product.id}}") {{product.name}}
               .panel-content
                 .row
@@ -91,12 +91,12 @@ html
                   .span2
                     p
                       em {{product.period}}
-                      span.font-s 个月
+                      span.font-l 个月
                     p 还款期限
                   .span2
                     p
-                      em.highlight.font-xxl {{product.expected_earning_rate | percentage_number}}
-                      span.highlight.font-m %
+                      em.highlight.font-xxll {{product.expected_earning_rate | percentage_number}}
+                      span.highlight.font-xll %
                     p 年化收益
                   .span2
                     p
@@ -135,23 +135,23 @@ html
                   .span4-omega.align-right
                     span 还款方式: &nbsp;&nbsp;
                     span.d3-text {{product.pay_method}}
-              if product.status == '还款中'
+              if product.status == '还款中' or product.status == '已完成'
                 .panel-p2p-stamp
 
         .span4-omega
           .panel
-            .panel-title-bar__no-border
+            .panel-title-bar__border-gray
               .panel-title 媒体报道
             .panel-content-container.padding-l-r-s
-              ul
+              ul.margin-top-s
                 for news in news_and_reports
                   li.media-item
                     if forloop.counter <= 3
                       i.media-caption.highlight {{forloop.counter | stringformat:"02d"}}
                     else
-                      i.media-caption {{forloop.counter | stringformat:"02d"}}
-
-                    a(href="{{news.link}}") {{news.name}}
+                      i.media-caption.gloomy {{forloop.counter | stringformat:"02d"}}
+                    div.media-title.text-overflow-hidden
+                      a.font-s(href="{{news.link}}" title="{{news.name}}") {{news.name}}
 
           .panel
             .panel-title-bar__no-border
