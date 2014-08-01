@@ -139,46 +139,36 @@ html
                 .panel-p2p-stamp
 
         .span4-omega
-          .panel
-            .panel-title-bar__border-gray
-              .panel-title 媒体报道
-            .panel-content-container.padding-l-r-s
-              ul.margin-top-s
-                for news in news_and_reports
-                  li.media-item
-                    if forloop.counter <= 3
-                      i.media-caption.highlight {{forloop.counter | stringformat:"02d"}}
-                    else
-                      i.media-caption.gloomy {{forloop.counter | stringformat:"02d"}}
-                    div.media-title.text-overflow-hidden
-                      a.font-s(href="{{news.link}}" title="{{news.name}}") {{news.name}}
+          div(data-role = "float")
+            .panel
+              .panel-title-bar__border-gray
+                .panel-title 媒体报道
+              .panel-content-container.padding-l-r-s
+                ul.margin-top-s
+                  for news in news_and_reports
+                    li.media-item
+                      if forloop.counter <= 3
+                        i.media-caption.highlight {{forloop.counter | stringformat:"02d"}}
+                      else
+                        i.media-caption.gloomy {{forloop.counter | stringformat:"02d"}}
+                      div.media-title.text-overflow-hidden
+                        a.font-s(href="{{news.link}}" title="{{news.name}}") {{news.name}}
 
-          .panel
-            .panel-title-bar__no-border
-              .panel-title 投资记录
-            .panel-content-container.padding-l-r-sm
-              table.invest-history-table
-                thead
-                  tr
-                    th 申购时间
-                    th 投资人
-                    th 金额
-                tbody
-                  trade_records = trade_records
-                  top = trade_records[:15]
-                  rest = trade_records[15:]
-                  for trade in top
+            .panel
+              .panel-title-bar__no-border
+                .panel-title 投资记录
+              .panel-content-container.padding-l-r-sm
+                table.invest-history-table
+                  thead
                     tr
-                      td
-                        p {{trade.create_time | date:"Y-m-d"}}
-                        p {{trade.create_time | date:"H:i:s"}}
-                      td
-                        em {{trade.user | safe_phone}}
-                      td
-                        span.money-highlight {{trade.amount}}
-                        span 元
-                  tbody(style="display:none")
-                    for trade in rest
+                      th 申购时间
+                      th 投资人
+                      th 金额
+                  tbody
+                    trade_records = trade_records
+                    top = trade_records[:15]
+                    rest = trade_records[15:]
+                    for trade in top
                       tr
                         td
                           p {{trade.create_time | date:"Y-m-d"}}
@@ -187,7 +177,18 @@ html
                           em {{trade.user | safe_phone}}
                         td
                           span.money-highlight {{trade.amount}}
-                            span 元
+                          span 元
+                    tbody(style="display:none")
+                      for trade in rest
+                        tr
+                          td
+                            p {{trade.create_time | date:"Y-m-d"}}
+                            p {{trade.create_time | date:"H:i:s"}}
+                          td
+                            em {{trade.user | safe_phone}}
+                          td
+                            span.money-highlight {{trade.amount}}
+                              span 元
 
     script.
       require(["/static/js/index.js"])

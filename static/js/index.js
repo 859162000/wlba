@@ -11,7 +11,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], function($, _, backend, modal, countdown) {
+  require(['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown', 'lib/autofloat'], function($, _, backend, modal, countdown, autofloat) {
     var anchors, bannerCount, banners, currentBanner;
     $('.portfolio-submit').click(function() {
       var asset, period;
