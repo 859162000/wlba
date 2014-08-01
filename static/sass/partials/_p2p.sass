@@ -6,13 +6,16 @@
 
   .panel-title-bar
     line-height: 55px
-    border-bottom: 1px dotted $color-text-d4
+    border-bottom: 1px dashed $color-gainsboro
     font-size: $font-m
     color: $color-text-d2
     padding: 0 24px
+    a
+      font-size: $font-l
+      font-weight: bold
 
   .panel-content
-    border-bottom: 1px dotted $color-text-d4
+    border-bottom: 1px dashed $color-gainsboro
     color: $color-text-d4
     padding: 15px 24px
     line-height: 30px
@@ -22,17 +25,17 @@
 
   em
     color: $color-text-d3
-    font-size: $font-xl
+    font-size: $font-xll
     font-weight: bold
 
     &.highlight
       color: $color-pomegranate
-    &.font-xxl
-      font-size: $font-xxl
+    &.font-xxll
+      font-size: $font-xxll
 
   .panel-p2p--footer
     @extend .panel-content
-
+    border-bottom: none
     padding-top: 0
     padding-bottom: 0
     line-height: 55px
@@ -210,20 +213,18 @@
     top: -2px
 
 .warrant-icon
-  width: 16px
-  height: 16px
-  color: #fff
-  font-size: $font-s
-  line-height: 16px
-  padding-left: 1px
+  width: 18px
+  height: 18px
+  color: $color-white
+  font-size: $font-xs
+  line-height: 18px
+  padding-left: 3px
   display: inline-block
   margin-right: 10px
   position: relative
-  top: -1px
-  &.odd
-    background-color: #f86149
-  &.even
-    background-color: #37b5ea
+  top: -2px
+  background-color: $color-red
+
 
 .panel-p2p-stamp
   background: url("/static/images/stamp.png") no-repeat
