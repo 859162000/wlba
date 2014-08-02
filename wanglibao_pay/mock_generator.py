@@ -1,6 +1,8 @@
 #encoding: utf8
+import random
 from django.contrib.auth import get_user_model
-from wanglibao_pay.models import Bank, Card
+from order.utils import OrderHelper
+from wanglibao_pay.models import Bank, Card, PayInfo
 
 
 class PayMockGenerator(object):
@@ -89,3 +91,32 @@ class PayMockGenerator(object):
                 card.user = user
                 card.no = '6228480402564890018'
                 card.save()
+
+    @classmethod
+    def generate_payinfo(cls, clean=False):
+        if clean:
+            PayInfo.objects.all().delete()
+
+        banks = Bank.objects.all()
+
+        # generate 5 payinfo per user
+        for user in get_user_model().objects.all():
+
+            for i in range(0, 6):
+                pay = PayInfo()
+                pay.user = user
+                pay.type = 'D'
+                pay.amount = random.randrange(1000, 10000)
+                pay.total_amount = pay.amount
+                pay.order = OrderHelper.place_order()
+                pay.bank = banks[random.randrange(0, len(banks))]
+
+                pay.status = (PayInfo.INITIAL,
+                              PayInfo.PROCESSING,
+                              PayInfo.SUCCESS,
+                              PayInfo.FAIL,
+                              PayInfo.EXCEPTION,
+                              PayInfo.ACCEPTED)[random.randrange(0, 6)]
+
+                pay.request_ip = '127.0.0.1'
+                pay.save()

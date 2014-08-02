@@ -16,6 +16,7 @@ class Report(models.Model):
     name = models.CharField(u'表格名称', max_length=128, blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     file = models.FileField(u'文件', null=True, upload_to='reports', storage=mfs)
+    content = models.TextField(u'表格内容', blank=True)
 
     class Meta:
         verbose_name_plural = u'导出表格'

@@ -53,27 +53,28 @@ class PayInfo(models.Model):
 
     class Meta:
         ordering = ['-create_time']
+        verbose_name_plural = u'支付记录'
 
-    type = models.CharField(verbose_name=u'类型', help_text=u'充值：D 取款：W', max_length=5)
+    type = models.CharField(u'类型', help_text=u'充值：D 取款：W', max_length=5)
     uuid = models.CharField(u'唯一标示', max_length=32, unique=True, db_index=True, default=get_a_uuid)
-    amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'实扣金额')
-    fee = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'手续费', default=0)
-    total_amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name=u'总金额', default=0)
-    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
-    update_time = models.DateTimeField(verbose_name=u'更新时间', auto_now=True)
-    request = models.TextField(verbose_name=u'请求数据', blank=True)
-    response = models.TextField(verbose_name=u'返回数据', blank=True)
-    status = models.CharField(max_length=15, verbose_name=u'状态')
-    error_code = models.CharField(max_length=10, verbose_name=u'错误码', blank=True)
-    error_message = models.CharField(max_length=100, verbose_name=u'错误原因', blank=True)
-    request_ip = models.CharField(max_length=50, verbose_name=u'请求地址', blank=True, null=True)
-    response_ip = models.CharField(max_length=50, verbose_name=u'响应地址', blank=True, null=True)
+    amount = models.DecimalField(u'实扣金额', max_digits=20, decimal_places=2)
+    fee = models.DecimalField(u'手续费', max_digits=20, decimal_places=2, default=0)
+    total_amount = models.DecimalField(u'总金额', max_digits=20, decimal_places=2, default=0)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    update_time = models.DateTimeField(u'更新时间', auto_now=True)
+    request = models.TextField(u'请求数据', blank=True)
+    response = models.TextField(u'返回数据', blank=True)
+    status = models.CharField(u'状态', max_length=15)
+    error_code = models.CharField(u'错误码', max_length=10, blank=True)
+    error_message = models.CharField(u'错误原因', max_length=100, blank=True)
+    request_ip = models.CharField(u'请求地址', max_length=50, blank=True, null=True)
+    response_ip = models.CharField(u'响应地址', max_length=50, blank=True, null=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     order = models.ForeignKey(Order, blank=True, null=True)
     margin_record = models.ForeignKey(MarginRecord, blank=True, null=True)
     bank = models.ForeignKey(Bank, blank=True, null=True, on_delete=models.PROTECT)
-    account_name = models.CharField(max_length=12, verbose_name=u'姓名', blank=True, null=True)
-    card_no = models.CharField(max_length=25, verbose_name=u'卡号', blank=True, null=True)
+    account_name = models.CharField(u'姓名', max_length=12, blank=True, null=True)
+    card_no = models.CharField(u'卡号', max_length=25, blank=True, null=True)
 
     def __unicode__(self):
         return u'%s' % self.pk
