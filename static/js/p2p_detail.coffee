@@ -5,13 +5,8 @@ require.config
     tools: 'lib/modal.tools'
 
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools'], ($, _, backend, calculator, countdown, tool)->
-  $('#purchase-form .submit-button').click (e)->
-    e.preventDefault()
 
-    #if !confirm('您的投资金额为:' + $('input[name=amount]').val())
-    #  return
-
-    handler = () ->
+  handler = () ->
       product = $('input[name=product]').val()
       amount = $('input[name=amount]').val()
       captcha_0 = $('input[name=captcha_0]').val()
@@ -44,8 +39,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
         #alert error_message
         tool.modalAlert({title: '温馨提示', msg: error_message})
-        #location.reload()
+
+  $('#purchase-form .submit-button').click (e)->
+    e.preventDefault()
 
     tip = '您的投资金额为:' + $('input[name=amount]').val() + '元'
-
     tool.modalConfirm({title: '温馨提示', msg: tip, callback_ok: handler})
