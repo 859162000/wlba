@@ -12,7 +12,12 @@ define ['jquery'], ($)->
     earning_elements = (target.attr 'data-target').split(',')
     for earning_element, i in earning_elements
       period = periods[i]
-      $(earning_element).text (rate / 100 * amount / 365 * period).toFixed(1)
+      earning = (rate / 100 * amount / 365 * period).toFixed(1)
+      if earning and earning != 'NaN'
+        $(earning_element).text earning
+      else
+        $(earning_element).text "0.0"
+
 
   $('input[data-role=fee-calculator]').keyup (e)->
     target = $(e.target)
