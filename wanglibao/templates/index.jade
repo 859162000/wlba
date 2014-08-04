@@ -12,7 +12,7 @@ html
 
   body
     include include/header
-    - with '首页' as activeItem
+    - with 'P2P' as activeItem
     include include/navigation
     - endwith
 
@@ -60,19 +60,54 @@ html
 
     .full-container-white
       .sales-data-container
-        .row.align-center.font-m
-          span 第三方担保，<em class="highlight">{{site_data.invest_threshold}}元</em>起投，投标次日计息。
-          span 每工作日 <em>10:30、14:30、20:00</em> 更新总额度。
         .row.sales-data-info
-          .span4.font-m
-            span 投资人总收益：
-            em {{site_data.p2p_total_earning}}
-          .span4.font-m
-            span 累计交易额：
-            em {{site_data.p2p_total_trade}}
-          .span4-omega.font-m
-            span 年化收益率：
-            em.highlight {{site_data.earning_rate}}
+          .span6
+            p 第三方担保，
+              span.highlight{{site_data.invest_threshold}}
+              元起投，投标次日计息。</br>每工作日&nbsp;10:30、14:30、20:00更新总额度。
+          .span2
+            .sales-data-box
+              .sales-data-title 投资人总收益
+              .sales-data-number-blue {{site_data.p2p_total_earning}}
+          .span2
+            .sales-data-box
+              .sales-data-title 累计交易额
+              .sales-data-number-blue {{site_data.p2p_total_trade}}
+          .span2-omega
+            .sales-data-box
+              .sales-data-title 年化收益率
+              .sales-data-number-red {{site_data.earning_rate}}
+    .full-container-white-no-border
+      .product-ad-container
+        .row
+          .span3
+            .big-icon-container.income-high
+            p.title 短期理财&nbsp;&nbsp;高收益
+            p.content 年化收益是活期存款的
+              span.highlight 50
+              倍，</br>银行理财的
+              span.highlight 2
+              倍
+          .span3
+            .big-icon-container.sill-low
+            p.title 灵活投资&nbsp;&nbsp;低门槛
+            p.content
+              span.highlight 100
+              元起投，门槛低至银行理财的</br>千分之一，
+              span.highlight 0
+              手续费
+          .span3
+            .big-icon-container.security-more
+            p.title 四层保障&nbsp;&nbsp;最安全
+            p.content 担保机构担保，银行级风险防范，保障</br>
+              span.highlight 本息安全
+              ，联合信用评级
+          .span3-omega
+            .big-icon-container.wealth-share
+            p.title 随时随地&nbsp;&nbsp;享财富
+            p.content
+              span.highlight 移动端
+              支持随时随地乐享理财乐趣
     .container
       .row
         .span8
@@ -194,8 +229,36 @@ html
       require(["/static/js/index.js"])
 
     .space-vertical-m
+    .full-container-border
+      .investment-process-container
+        .row
+          .span6.title 投资流程
+          .span6-omega.info 选择网利宝，让您放心！跟随我们，开启您的互联网金融之旅
+        .row
+          .span1 &nbsp;
+          .span2
+            .middle-icon-container.first-step
+            .process-title 第一步&nbsp;免费注册
+            .process-content 30秒轻松免费注册成为会员
+          .span2
+            .middle-icon-container.second-step
+            .process-title 第二步&nbsp;进行认证
+            .process-content 完成实名认证
+          .span2
+            .middle-icon-container.third-step
+            .process-title 第三步&nbsp;充值账户
+            .process-content 在线充值，免收手续费
+          .span2
+            .middle-icon-container.fourth-step
+            .process-title 第四步&nbsp;成功投标
+            .process-content 按需筛选借款标并进行投标
+          .span2
+            .middle-icon-container.fifth-step
+            .process-title 第五步&nbsp;自动收款
+            .process-content 借款期满后自助回款
+          .span1-omega &nbsp;
     .full-container
-      div(style="background:url('/static/images/footer-banner.jpg') no-repeat center; height:240px")
+      div(style="background:url('/static/images/partner.png') no-repeat center; height:379px")
     - with 1 as no_margin
     include include/footer
     - endwith

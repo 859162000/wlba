@@ -27,3 +27,10 @@ class IndexView(TemplateView):
             'banners': banners,
             'site_data': site_data
         }
+
+class SecurityView(TemplateView):
+    template_name = 'security.jade'
+
+    def get_context_data(self, **kwargs):
+
+        return {}
