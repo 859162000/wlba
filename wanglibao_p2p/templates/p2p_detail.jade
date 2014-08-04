@@ -62,13 +62,13 @@ html
         .span4-omega.invest-form.border-left
           h1 我要投资
           if status == 'open'
-            form#purchase-form
+            form#purchase-form(action="javascript:void(0)")
               {{form.product}}
               if current_equity > 0
                 .row
                   span.span4 已投资金额
                   span.span8-omega
-                    span.dark-gray.font-m {{current_equity}}元
+                    span.dark-gray.font-m {{current_equity|money_format_int}}元
 
               .row
                 span.span4 可投资金额
@@ -79,12 +79,12 @@ html
                   span.span4 投资金额
                   span.span8-omega
                     period = p2p.period * 30
-                    user_limit = u"请输入小于%d的整数" % orderable_amount
+                    user_limit = u"100的整数倍"
                     -render_field form.amount class+="span12" type="text" placeholder=user_limit data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1"
                 .row
                   span.span4 预期收益
                   span.span8-omega
-                    span.highlight.font-m#expected_income 00.00
+                    span.highlight.font-m#expected_income 0.0
                     | 元
                 .row
                   span.span4

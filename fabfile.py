@@ -30,7 +30,26 @@ def production():
     env.staging = False
 
     env.mysql = False  # Use RDS, so we no need to install mysql
-    env.create_ssl_cert = False  # Production's key is maintained differently
+    env.apache_conf = 'wanglibao.conf'
+
+
+def dev():
+    env.host_string = '192.168.1.154'
+    env.path = '/var/deploy/wanglibao'
+    env.activate = 'source ' + env.path + '/virt-python/bin/activate'
+    env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
+    env.depot_name = 'wanglibao-backend'
+    env.branch = 'master'
+
+    env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
+    env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
+
+    env.debug = False
+    env.production = True
+    env.staging = True
+
+    env.mysql = True
+    env.apache_conf = 'dev.conf'
 
 
 def staging():
@@ -49,7 +68,7 @@ def staging():
     env.staging = True
 
     env.mysql = True
-    env.create_ssl_cert = True
+    env.apache_conf = 'staging.conf'
 
 
 def new_virtualenv():
@@ -262,12 +281,9 @@ def deploy():
                     run("python manage.py migrate")
 
                 print green("Copy apache config file")
-                if env.production and not env.staging:
-                    sudo('cp wanglibao.conf /etc/apache2/sites-available')
-                    sudo('a2ensite wanglibao.conf')
-                if env.staging:
-                    sudo('cp staging.conf /etc/apache2/sites-available')
-                    sudo('a2ensite staging.conf')
+
+                sudo('cp %s /etc/apache2/sites-available/' % env.apache_conf)
+                sudo('a2ensite %s' % env.apache_conf)
 
                 sudo('service apache2 reload')
 

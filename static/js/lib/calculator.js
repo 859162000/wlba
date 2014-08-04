@@ -2,7 +2,7 @@
 (function() {
   define(['jquery'], function($) {
     $('input[data-role=earning-calculator]').keyup(function(e) {
-      var amount, earning_element, earning_elements, i, period, periods, rate, target, unit, _i, _len, _results;
+      var amount, earning, earning_element, earning_elements, i, period, periods, rate, target, unit, _i, _len, _results;
       target = $(e.target);
       rate = target.attr('data-rate');
       periods = (target.attr('data-period')).split(',');
@@ -18,7 +18,12 @@
       for (i = _i = 0, _len = earning_elements.length; _i < _len; i = ++_i) {
         earning_element = earning_elements[i];
         period = periods[i];
-        _results.push($(earning_element).text((rate / 100 * amount / 365 * period).toFixed(1)));
+        earning = (rate / 100 * amount / 365 * period).toFixed(1);
+        if (earning && earning !== 'NaN') {
+          _results.push($(earning_element).text(earning));
+        } else {
+          _results.push($(earning_element).text("0.0"));
+        }
       }
       return _results;
     });
