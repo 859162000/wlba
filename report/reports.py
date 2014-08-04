@@ -108,7 +108,8 @@ class DepositReportGenerator(ReportGeneratorBase):
         output = cStringIO.StringIO()
         pay_infos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='D').select_related('user').select_related('user__wanglibaouserprofile').select_related('order')
         writer = UnicodeWriter(output, delimiter='\t')
-        writer.writerow(['Id', u'用户名', u'交易号', u'类型', u'充值银行', u'充值金额', u'充值手续费', u'实际到账金额', u'状态', u'操作时间', u'操作ip'])
+        writer.writerow(['Id', u'用户名', u'交易号', u'类型', u'充值银行', u'充值金额', u'充值手续费', u'实际到账金额',
+                         u'状态', u'操作时间', u'操作ip', u'编号'])
 
         for pay_info in pay_infos:
             writer.writerow([
@@ -122,7 +123,8 @@ class DepositReportGenerator(ReportGeneratorBase):
                 str(pay_info.amount - pay_info.fee),
                 unicode(pay_info.status),
                 pay_info.create_time.strftime("%Y-%m-%d %H:%M"),
-                str(pay_info.request_ip),
+                unicode(pay_info.request_ip),
+                unicode(pay_info.uuid)
             ])
 
         return output.getvalue()
@@ -139,7 +141,8 @@ class WithDrawReportGenerator(ReportGeneratorBase):
         output = cStringIO.StringIO()
 
         writer = UnicodeWriter(output, delimiter='\t')
-        writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号', u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态'])
+        writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号',
+                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'编号'])
 
         for payinfo in payinfos:
             writer.writerow([
@@ -157,7 +160,8 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 str(payinfo.fee),
                 payinfo.create_time.strftime("%Y-%m-%d %H:%M"),
                 str(payinfo.request_ip),
-                unicode(payinfo.status)
+                unicode(payinfo.status),
+                unicode(payinfo.uuid)
             ])
         return output.getvalue()
 
