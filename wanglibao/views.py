@@ -12,7 +12,6 @@ class IndexView(TemplateView):
     template_name = 'index.jade'
 
     def get_context_data(self, **kwargs):
-        statsd.increment('index.render')
         p2p_products = P2PProduct.objects.filter(Q(publish_time__lte=timezone.now())).filter(
             status__in=[u'正在招标', u'已完成', u'满标待打款', u'满标待审核', u'还款中']).order_by('-end_time')[:20]
         trade_records = P2PRecord.objects.filter(catalog=u'申购').prefetch_related('user').prefetch_related('user__wanglibaouserprofile')[:40]
