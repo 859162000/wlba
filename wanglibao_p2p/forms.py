@@ -6,7 +6,10 @@ from wanglibao_p2p.models import P2PProduct
 
 class PurchaseForm(forms.Form):
     product = forms.ModelChoiceField(queryset=P2PProduct.objects.all(), widget=forms.HiddenInput())
-    amount = forms.IntegerField()
+    amount = forms.IntegerField(error_messages={
+        'required': u'购买金额不能为空',
+        'invalid': u'请输入整数'
+    })
 
     def clean_amount(self):
         amount = self.cleaned_data['amount']
