@@ -1,14 +1,15 @@
 .nav-items
   ul
-    mixin nav-item(name, link)
+    mixin nav-item(name, link, new_class)
       if activeItem == name
         li.nav-item.active
-          a.nav-item-anchor(href=link)= name
+          a.nav-item-anchor(href=link, class=new_class)= name
       else
         li.nav-item
-          a.nav-item-anchor(href=link)= name
+          a.nav-item-anchor(href=link, class=new_class)= name
 
-    +nav-item('首页', '/')
-    +nav-item('信托', '/trust/home')
-    +nav-item('基金', '/fund/products')
-    +nav-item('免费定制个人方案', '/portfolio')
+    +nav-item('P2P', '/', '')
+    +nav-item('信托', '/trust/home', '')
+    +nav-item('基金', '/fund/products', '')
+    +nav-item('免费定制个人方案', '/portfolio', '')
+    +nav-item('安全保障', '/security', 'security-nav')

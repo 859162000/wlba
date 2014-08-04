@@ -19,6 +19,14 @@ $home-banner-height: image-height('home0.jpg')
   background-color: white
   border-bottom: solid 1px $color-alto
 
+.full-container-white-no-border
+  @extend .full-container
+  background-color: white
+
+.full-container-border
+  @extend .full-container-white
+  border-top: solid 1px $color-alto
+
 .container-home
   @extend .container
   height: $home-banner-height
@@ -74,6 +82,101 @@ $home-banner-height: image-height('home0.jpg')
 
   em
     font-size: $font-xxl
+
+.sales-data-box
+  text-align: right
+  border-right: 5px solid $color-gainsboro
+  padding-right: 10px
+  .sales-data-title
+    font-size: $font-s
+  .sales-data-number-blue
+    font-size: $font-xll
+    color: $color-denim
+  .sales-data-number-red
+    font-size: $font-xll
+    color: $color-red
+
+.product-ad-container
+  @extend .container
+  padding-top: 30px
+  padding-bottom: 30px
+
+  .title
+    font-weight: bold
+  .content
+    text-align: center
+  .highlight
+    font-size: $font-m
+    font-weight: bold
+
+.big-icon-container
+  width: 100px
+  height: 100px
+  cursor: pointer
+  text-align: center
+  margin: 0 auto 15px auto
+  &.income-high
+    background: url("/static/images/income-high.png") no-repeat
+    &:hover
+      background: url("/static/images/income-high.gif") no-repeat
+  &.sill-low
+    background: url("/static/images/sill-low.png") no-repeat
+    &:hover
+      background: url("/static/images/sill-low.gif") no-repeat
+  &.security-more
+    background: url("/static/images/security-more.png") no-repeat
+    &:hover
+      background: url("/static/images/security-more.gif") no-repeat
+  &.wealth-share
+    background: url("/static/images/wealth-share.png") no-repeat
+    &:hover
+      background: url("/static/images/wealth-share.gif") no-repeat
+  &.first-step
+    background: url("/static/images/first-step.png") no-repeat
+  &.second-step
+    background: url("/static/images/second-step.png") no-repeat
+  &.third-step
+    background: url("/static/images/third-step.png") no-repeat
+  &.fourth-step
+    background: url("/static/images/fourth-step.png") no-repeat
+  &.fifth-step
+    background: url("/static/images/fifth-step.png") no-repeat
+
+.middle-icon-container
+  width: 75px
+  height: 75px
+  text-align: center
+  margin: 0 auto 10px auto
+  &.first-step
+    background: url("/static/images/first-step.png") no-repeat
+  &.second-step
+    background: url("/static/images/second-step.png") no-repeat
+  &.third-step
+    background: url("/static/images/third-step.png") no-repeat
+  &.fourth-step
+    background: url("/static/images/fourth-step.png") no-repeat
+  &.fifth-step
+    background: url("/static/images/fifth-step.png") no-repeat
+
+.investment-process-container
+  @extend .container
+  padding-top: 30px
+  padding-bottom: 30px
+  .title
+    text-align: left
+    font-size: $font-xll
+    color: $color-text-d2
+    padding-left: 14px
+  .info
+    text-align: right
+    height: 36px
+    line-height: 36px
+  .process-title
+    text-align: center
+    color: $color-text-d2
+  .process-content
+    text-align: center
+    margin-top: 5px
 
 .container-card-holder
   width: $content-width

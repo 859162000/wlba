@@ -1,0 +1,31 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    - with '安全保障' as title
+    include include/common_head
+    - endwith
+    meta(name="keywords", content="安全保障")
+    meta(name="description", content="没有最安全，只有更安全")
+
+  body
+    include include/header
+    - with '安全保障' as activeItem
+    include include/navigation
+    - endwith
+
+      .security-container-gallery binner
+      .security-container-white b
+    script.
+      require(["/static/js/index.js"])
+
+    .space-vertical-m
+    .full-container
+      div(style="background:url('/static/images/footer-banner.jpg') no-repeat center; height:240px")
+    - with 1 as no_margin
+    include include/footer
+    - endwith
+
+    include include/tracking
