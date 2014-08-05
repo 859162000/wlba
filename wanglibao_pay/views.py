@@ -241,6 +241,7 @@ class CardViewSet(ModelViewSet):
         card.user = request.user
         card.no = request.DATA.get('no', '')
         bank_id = request.DATA.get('bank', '')
+        #exist_cards = Card.objects.filter(no=card.no and bank__id=bank_id and user__id=card.user.id)
         card.bank = Bank.objects.get(pk=bank_id)
         card.save()
 
