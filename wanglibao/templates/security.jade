@@ -101,6 +101,7 @@ html
 
         .row
           if user.is_authenticated
+            a.register-modal(href='/') 立即赚钱，马上注册
             else
               a.register-modal(href='#login-modal') 立即赚钱，马上注册
 
