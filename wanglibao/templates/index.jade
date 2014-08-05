@@ -228,7 +228,7 @@ html
     script.
       require(["/static/js/index.js"])
 
-    .space-vertical-m
+    .space-vertical-ssm
     .full-container-border
       .investment-process-container
         .row
@@ -257,8 +257,10 @@ html
             .process-title 第五步&nbsp;自动收款
             .process-content 借款期满后自助回款
           .span1-omega &nbsp;
-    .full-container
-      div(style="background:url('/static/images/partner.png') no-repeat center; height:379px")
+    .full-container-white-no-border
+      .investment-process-container
+        .title 合作伙伴
+        div(style="background:url('/static/images/partner.png') no-repeat center; height:250px")
     - with 1 as no_margin
     include include/footer
     - endwith

@@ -104,7 +104,7 @@ class PurchaseP2P(APIView):
         else:
             return Response({
                 "message": form.errors,
-                'error_number':ErrorNumber.form_error
+                'error_number': ErrorNumber.form_error
             }, status=status.HTTP_400_BAD_REQUEST)
 
 

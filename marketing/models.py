@@ -7,7 +7,7 @@ class NewsAndReport(models.Model):
     link = models.URLField(u'链接', null=True)
     score = models.IntegerField(u'排名权重', default=0)
     created_at = models.DateTimeField(u'添加时间', auto_now_add=True)
-    image = models.ImageField(u'图片', null=True, upload_to='news')
+    image = models.ImageField(u'图片', null=True, upload_to='news', blank=True)
 
     class Meta:
         ordering = ['-score']
