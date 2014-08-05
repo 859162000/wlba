@@ -159,7 +159,8 @@ def deploy():
     create_folder('/var/log/wanglibao/', owner='www-data', group='www-data', mod='770')
 
     # Add deploy account to www-data to inherit the permission on log folder, prevent permission issue
-    sudo('adduser `whoami` www-data')
+    me = run('whoami')
+    sudo('adduser %s www-data' % me)
 
     install_rabbit_mq()
 
