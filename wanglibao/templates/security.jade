@@ -16,14 +16,98 @@ html
     include include/navigation
     - endwith
 
-      .security-container-gallery binner
-      .security-container-white b
+      .security-container-banner
+      .security-container-gallery
+        .row.security-guarantee
+          h1 银行级网站安全保障, 全方位保障数据安全
+        .row
+          .security-column
+            .security-box.cash
+              .header
+              .content
+                p 平安银行为每一位投资人的账户资金进行全额担保，如出现被盗平安银行进行全额赔付。
+                p 委托银行和专业第三方支付smsqcf投资者账户进行资金托管，用户账户资金与网利宝运营资金严格分离；
+          .security-column
+              .security-box.data
+                .header
+                .content
+                  p 网利宝通过国际标准的SSL安全加密技术保障数据信息安全，三层防火墙隔离系统的访问层、应用层和数据集群；有效的入侵防范及容灾备份，确保交易数据安全无虞；
+          .security-column-last
+              .security-box.privacy
+                .header
+                .content
+                  p 网利宝上所有的隐私信息都经过128位加密处理，防止任何人包括公司员工获取用户信息。网利宝在任何情况下都绝不会出售、出租或以任何其他形式泄漏您的信息。您的信息将按照《网利宝用户注册协议》中的规定被严格保护
+
+      .security-container-white.partners-container
+        .row
+          h1 合作伙伴
+          ul.items
+            li
+              span.icon-right-dir
+              span.content 安全、合规、稳健的可持续战略规划，保障与合作伙伴的长期稳定、携手共赢；
+            li
+              span.icon-right-dir
+              span.content 百度、腾讯、阿里巴巴、360等一线互联网流量入口资源
+            li
+              span.icon-right-dir
+              span.content P2P行业巨头陆金所、宜信等战略合作；全国各地拥有多个分支机构，全面控制源头风险
+          .partners
+
+
+      .patterns-container
+        .row
+          h1 P2P业务运作模式图
+          .patterns-image
+
+      .law-container
+        .row
+          h1 政策法规保障
+          .security-column
+            .security-box.law1
+              .header
+              .content 法律顾问从服务合规性、政策走向等多方面提供法律意见，保障融资方式、平台和项目的合法性。
+          .security-column
+            .security-box.law2
+              .header
+              .content 一切合同和规章制度将由我们的法律顾问和专业的金融机构一同起草，保证投资人在平台上的所有操作都合法有效。
+          .security-column-last
+            .security-box.law3
+              .header
+              .content 法律顾问将会为投资者的合法权益提供法律担保。当项目或者投资人利益受损时，均能快速找到我们的法律顾问并得到法律援助。
+
+      .security-risk-container
+        .row.risk-row
+          h1 权威风控体系
+          .item-row
+            span.icon-right-dir
+            span.content 联合信用权威评级
+          .item-row.non-icon
+            p.content P2P贷款的最大风险来源于非标项目的安全风险。因此，联合信用权威评级制度。与别的P2P网站自行评级不同，我们的项目由联合信用管理有限公司（联合信用http://www.lhcis.com/）进行权威风险评级，帮助客户避免风险。联合信用是目前我国最大的信用信息服务机构，网利宝与其战略合作之后，成为国内唯一一家引入第三方机构独立权威评级的P2P平台。
+          .item-row
+            span.icon-right-dir
+            span.content   严格机构审核和内部审核机制，第三方担保及第三方权威评级的优秀债权项目
+          .item-row
+            span.icon-right-dir
+            span.content 多元化投资，使投资资金分散，风险最小化
+          .item-row
+            span.icon-right-dir
+            span.content 网利宝投资理财用户账户安全由国内领先的保险公司全额承保
+          .item-row
+            span.icon-right-dir
+            span.content 网利宝拥有自己专业且严格的风控团队，对合作金融机构进行严格筛选并对投资项目进行双重审核。
+          .item-row
+            span.icon-right-dir
+            span.content 完善的贷后跟踪控制机制
+
+        .row
+          if user.is_authenticated
+            else
+              a.register-modal(href='#login-modal') 立即赚钱，马上注册
+
+
     script.
       require(["/static/js/index.js"])
 
-    .space-vertical-m
-    .full-container
-      div(style="background:url('/static/images/footer-banner.jpg') no-repeat center; height:240px")
     - with 1 as no_margin
     include include/footer
     - endwith

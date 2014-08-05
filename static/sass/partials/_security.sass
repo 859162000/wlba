@@ -1,9 +1,110 @@
+.security-container-banner
+  @extend .full-container
+  background: url(/static/images/security/banner.jpg) center top
+  height: 425px
+
 .security-container-gallery
   @extend .full-container
-  background-color: $color-gallery
+  background-color: #f9f9f9
+  border-bottom: solid 1px $color-alto
+  padding-bottom: 50px
 
 .security-container-white
-  @extend .full-container
-  background-color: white
-  border-top: solid 1px $color-alto
-  border-bottom: solid 1px $color-alto
+  background-color: #fff
+  padding: 40px 0px
+
+.security-guarantee
+  padding-top: 20px
+
+.security-container-white h1, .security-container-gallery h1
+  margin-bottom: 20px
+  color: #333
+
+.security-column
+  @include span-columns(3, 9)
+
+.security-column-last
+  @include span-columns(3 omega, 9)
+
+.security-column .header, .security-column-last .header
+  height: 100px
+  width: 335px
+
+.security-column .content, .security-column-last .content
+  width: 335px
+  height: 125px
+  padding: 20px 10px
+  border: 1px solid $color-gallery
+  background-color: #fff
+
+.security-column .content p, .security-column-last .content p
+  line-height: 20px
+
+.cash .header
+  background: url(/static/images/security/box_header_cash.png) left top no-repeat
+
+.data .header
+  background: url(/static/images/security/box_header_data.png) left top no-repeat
+
+.privacy .header
+  background: url(/static/images/security/box_header_privacy.png) left top no-repeat
+
+.law1 .header
+  background: url(/static/images/security/box_header_law1.png) left top no-repeat
+
+.law2 .header
+  background: url(/static/images/security/box_header_law2.png) left top no-repeat
+
+.law3 .header
+  background: url(/static/images/security/box_header_law3.png) left top no-repeat
+
+.security-container-white .partners
+  background: url(/static/images/security/partners.png) left top no-repeat
+  height: 170px
+
+.patterns-container
+  @extend .security-container-gallery
+  padding-top: 30px
+
+
+ul.items
+  margin-bottom: 20px
+
+ul.items li
+  color: #333
+  line-height: 25px
+  .content
+    margin-left: 10px
+
+.patterns-image
+  background: url(/static/images/security/patterns.png) left top no-repeat
+  height: 520px
+
+.law-container
+  @extend .security-container-white
+
+.security-risk-container
+  @extend .security-container-gallery
+  padding-top: 30px
+  margin-bottom: 30px
+  .risk-row
+    margin-bottom: 50px
+
+    .item-row
+      .content
+        line-height: 35px
+        margin-left: 10px
+    .non-icon
+      .content
+        margin-left: 20px
+
+  .register-modal
+    width: 320px
+    height: 54px
+    line-height: 45px
+    text-align: center
+    font-size: 17px
+    color: #fff !important
+    background: url(/static/images/security/register.png)
+    display: block
+    margin: 0px auto
