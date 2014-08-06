@@ -16,10 +16,14 @@
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0;
     }, '请输入100的整数倍');
+    $.validator.addMethod('isNumber', function(value, element) {
+      return /^\d+$/ig.test(value) && $.isNumeric(value) && value <= $(element).attr('data-max');
+    }, '请输入有效金额');
     $('#purchase-form').validate({
       rules: {
         amount: {
           required: true,
+          isNumber: true,
           dividableBy100: true
         }
       },
