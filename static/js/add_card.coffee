@@ -4,6 +4,7 @@ require.config(
     'jquery.modal': 'lib/jquery.modal.min'
     'jquery.placeholder': 'lib/jquery.placeholder'
     'jquery.validate': 'lib/jquery.validate.min'
+    tools: 'lib/modal.tools'
 
   shim:
     'jquery.modal': ['jquery']
@@ -11,7 +12,7 @@ require.config(
     'jquery.validate': ['jquery']
 )
 
-require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], ($, modal, backend, placeholder, validate)->
+require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.validate', 'tools'], ($, modal, backend, placeholder, validate, tool)->
   $('input, textarea').placeholder()
 
   $('#add-card-button').click (e)->
@@ -21,17 +22,19 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
     e.preventDefault()
     $(this).modal()
 
+  _showModal = ()->
+    $('#add-card-button').modal()
 
   $('#add-card').click (e)->
     e.preventDefault()
     card_no = $('#card-no').val()
     if !backend.checkCardNo(card_no)
-      alert('请输入有效的银行卡号')
+      tool.modalAlert({title: '温馨提示', msg: '请输入有效的银行卡号', callback_ok: _showModal})
       return
 
     bank_id = $('#bank-select').val()
     if !bank_id
-      alert('请选择银行')
+      tool.modalAlert({title: '温馨提示', msg: '请选择银行', callback_ok: _showModal})
       return
 
     is_default = $('#default-checkbox').prop('checked')
@@ -46,6 +49,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
     }
     .done ()->
       location.reload()
-    .fail ()->
-      alert('添加银行卡失败')
+    .fail (xhr)->
+      $.modal.close()
+      result = JSON.parse xhr.responseText
+      if result.error_number == 5
+        tool.modalAlert({title: '温馨提示', msg: result.message})
+        return
+      tool.modalAlert({title: '温馨提示', msg: '添加银行卡失败'})
 

@@ -5,3 +5,4 @@ class ErrorNumber():
     need_authentication = 2
     form_error = 3
     unknown_error = 4
+    duplicate = 5
