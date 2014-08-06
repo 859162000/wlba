@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
+from rest_framework import status
 from order.models import Order
 from order.utils import OrderHelper
 from wanglibao_margin.exceptions import MarginLack
@@ -27,6 +28,7 @@ from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
+from wanglibao.const import ErrorNumber
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -241,7 +243,12 @@ class CardViewSet(ModelViewSet):
         card.user = request.user
         card.no = request.DATA.get('no', '')
         bank_id = request.DATA.get('bank', '')
-        #exist_cards = Card.objects.filter(no=card.no and bank__id=bank_id and user__id=card.user.id)
+        exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
+        if exist_cards:
+            return Response({
+                "message": u"该银行卡已经存在",
+                'error_number': ErrorNumber.duplicate
+            }, status=status.HTTP_400_BAD_REQUEST)
         card.bank = Bank.objects.get(pk=bank_id)
         card.save()
 

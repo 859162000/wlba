@@ -68,11 +68,11 @@ html
           .span2
             .sales-data-box
               .sales-data-title 投资人总收益
-              .sales-data-number-blue {{site_data.p2p_total_earning}}
+              .sales-data-number-blue {{site_data.p2p_total_earning | money_format}}
           .span2
             .sales-data-box
               .sales-data-title 累计交易额
-              .sales-data-number-blue {{site_data.p2p_total_trade}}
+              .sales-data-number-blue {{site_data.p2p_total_trade | money_format}}
           .span2-omega
             .sales-data-box
               .sales-data-title 年化收益率
