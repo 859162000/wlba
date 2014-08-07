@@ -50,7 +50,7 @@
               field: 'period'
             }, {
               name: '预期收益',
-              colspan: 1,
+              colspan: 2,
               sortable: true,
               text: function(item) {
                 return item.expected_earning_rate.toFixed(2) + '%';
