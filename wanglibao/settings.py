@@ -438,3 +438,5 @@ if PRODUCTION:
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
+
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
