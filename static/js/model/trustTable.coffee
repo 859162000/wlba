@@ -35,7 +35,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             field: 'period'
           ,
             name: '预期收益'
-            colspan: 1
+            colspan: 2
             sortable: true
             text: (item)->
               item.expected_earning_rate.toFixed(2) + '%'

@@ -2,7 +2,7 @@
   @extend .full-container
   position: relative
 
-$home-banner-height: 360px
+$home-banner-height: image-height('home0.jpg')
 
 .home-banner
   $file: 'home0.jpg'
@@ -62,38 +62,6 @@ $home-banner-height: 360px
   width: 240px
   height: 38px
   padding-top: 10px
-
-.sales-data-container
-  @extend .container
-  padding-top: 30px
-  padding-bottom: 30px
-  line-height: 30px
-  font-size: $font-m
-  color: $color-text-d4
-
-  em
-    color: $color-text-d3
-
-    &.highlight
-      color: $color-pomegranate
-
-.sales-data-info
-  margin-top: 5px
-  p
-    font-size: $font-s
-  em
-    font-size: $font-xxl
-
-.sales-data-box
-  text-align: right
-  .sales-data-title
-    font-size: $font-s
-  .sales-data-number-blue
-    font-size: $font-xll
-    color: $color-denim
-  .sales-data-number-red
-    font-size: $font-xll
-    color: $color-red
 
 .product-ad-container
   @extend .container
@@ -327,6 +295,7 @@ $home-banner-height: 360px
   font-weight: bold
   line-height: 43px
 
+
 .hot-list-num-l
   color: $color-pomegranate
   font-size: $font-xxxxxl
@@ -341,6 +310,7 @@ $home-banner-height: 360px
 
 a.hot-item-title-link
   +unstyled-link
+  cursor: pointer
   &:link, &:visited
     color: $color-pomegranate
   &:hover, &:active
@@ -380,25 +350,11 @@ a.hot-item-title-link
   padding: 5px 0
   font-size: $font-m
 
-.media-caption
-  display: inline-block
-  width: 16px
-  height: 16px
-  text-align: center
-  margin-left: 10px
-  margin-right: 20px
-  font-size: $font-xs
-  color: white
-  padding-left: 1px
-
-  &.highlight
-    background: $color-red
-  &.gloomy
-    background: $color-alto
 
 .media-title
   display: inline-block
-  max-width: 280px
+  max-width: 332px
   height: 16px
   line-height: 16px
   padding-top: 1px
+  padding-left: 10px

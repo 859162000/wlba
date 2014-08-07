@@ -57,26 +57,6 @@ html
             a.banner-form--button.full-width.register-modal(href="#login-modal") 免费注册
             p.align-right.font-s
               span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
-
-    .full-container-white
-      .sales-data-container
-        .row.sales-data-info
-          .span4
-            p 第三方担保，
-              span.highlight{{site_data.invest_threshold}}
-              元起投，投标次日计息。</br>每工作日&nbsp;10:30、14:30、20:00更新总额度。
-          .span3
-            .sales-data-box
-              .sales-data-title 投资人总收益
-              .sales-data-number-blue {{site_data.p2p_total_earning | money_format}}
-          .span3
-            .sales-data-box
-              .sales-data-title 累计交易额
-              .sales-data-number-blue {{site_data.p2p_total_trade | money_format}}
-          .span2-omega
-            .sales-data-box
-              .sales-data-title 年化收益率
-              .sales-data-number-red {{site_data.earning_rate}}
     .full-container-white-no-border
       .product-ad-container
         .row
@@ -182,12 +162,8 @@ html
                 ul.margin-top-s
                   for news in news_and_reports
                     li.media-item
-                      if forloop.counter <= 3
-                        i.media-caption.highlight {{forloop.counter | stringformat:"02d"}}
-                      else
-                        i.media-caption.gloomy {{forloop.counter | stringformat:"02d"}}
                       div.media-title.text-overflow-hidden
-                        a.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') {{news.name}}
+                        a.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') ·&nbsp;&nbsp;{{news.name}}
 
             .panel
               .panel-title-bar__no-border
@@ -207,7 +183,6 @@ html
                       tr
                         td
                           p {{trade.create_time | date:"Y-m-d"}}
-                          p {{trade.create_time | date:"H:i:s"}}
                         td
                           em {{trade.user | safe_phone}}
                         td

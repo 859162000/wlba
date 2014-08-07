@@ -16,7 +16,7 @@ block main
     .account-home-panel--title-bar.clamp-xl
       span.nickname {{user | safe_phone}}
       if user.wanglibaouserprofile.id_is_valid
-        span 已实名认证
+        span.verified 已实名认证
       else
         span
           a(href="/accounts/id_verify/") 还未进行实名认证
@@ -143,7 +143,7 @@ block main
             a.title-bar--tab--anchor(href="/accounts/home/") P2P
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") 货币基金
-        a.button-small.pull-right(href='/accounts/transaction/fund/') 查看交易记录
+        a.pull-right.align-right(href='/accounts/transaction/fund/') 查看交易记录
       .clamp-sm
         .space-vertical-s
         .row
