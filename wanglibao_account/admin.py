@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import DecimalWidget
+from marketing.models import PromotionToken, IntroducedBy
 from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
@@ -24,6 +25,10 @@ class P2PEquityInline(admin.StackedInline):
     extra = 0
 
 
+class PromotionTokenInline(admin.StackedInline):
+    model = PromotionToken
+
+
 class UserResource(resources.ModelResource):
     margin = fields.Field(attribute="margin__margin", widget=DecimalWidget())
 
@@ -32,7 +37,7 @@ class UserResource(resources.ModelResource):
 
 
 class UserProfileAdmin(UserAdmin, ImportExportModelAdmin):
-    inlines = [ProfileInline, MarginInline, P2PEquityInline]
+    inlines = [ProfileInline, MarginInline, PromotionTokenInline, P2PEquityInline]
     list_display = ('id', 'username', 'phone', 'name', 'id_num', 'is_active', 'date_joined', 'is_staff')
     list_display_links = ('id', 'username', 'phone')
     search_fields = ['wanglibaouserprofile__phone', 'wanglibaouserprofile__id_number', 'wanglibaouserprofile__name']

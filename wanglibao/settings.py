@@ -112,6 +112,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'marketing.middlewares.PromotionTokenMiddleWare'
 )
 
 CONCURRENCY_POLICY = 2
@@ -435,4 +436,5 @@ ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
 if PRODUCTION:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 
-#WEIXIN_TOKEN = 'weixin_wanglibao'
+PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
+PROMO_TOKEN_QUERY_STRING = 'promo_token'
