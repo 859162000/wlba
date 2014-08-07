@@ -123,7 +123,7 @@ def safe_phone(user):
     result = u''
     if user.wanglibaouserprofile.phone:
         phone = user.wanglibaouserprofile.phone
-        result = phone[:3] + '*' * (len(phone) - 4 - 3) + phone[-4:]
+        result = phone[:3] + '*' * (len(phone) - 2 - 3) + phone[-2:]
 
     return result
 
