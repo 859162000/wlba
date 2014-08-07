@@ -21,13 +21,21 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
   banners = $('*[class^="home-banner"]')
   bannerCount = banners.length
   anchors = $('.background-anchor')
-  setInterval(()->
-      $(banners[currentBanner]).hide()
-      $(anchors[currentBanner]).toggleClass('active')
-      currentBanner = (currentBanner + 1) % bannerCount
-      $(banners[currentBanner]).fadeIn()
-      $(anchors[currentBanner]).toggleClass('active')
-    , 6000)
+
+  switchBanner = ()->
+    $(banners[currentBanner]).hide()
+    $(anchors[currentBanner]).toggleClass('active')
+    currentBanner = (currentBanner + 1) % bannerCount
+    $(banners[currentBanner]).fadeIn()
+    $(anchors[currentBanner]).toggleClass('active')
+
+  timer = setInterval(switchBanner, 6000)
+
+  $('.background-anchor').mouseover (e)->
+    clearInterval(timer)
+
+  $('.background-anchor').mouseout (e)->
+    timer = setInterval(switchBanner, 6000)
 
   $('.background-anchor').click (e)->
     e.preventDefault()

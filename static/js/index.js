@@ -11,8 +11,8 @@
     }
   });
 
-  require(['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown', 'lib/autofloat'], function($, _, backend, modal, countdown, autofloat) {
-    var anchors, bannerCount, banners, currentBanner;
+  require(['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], function($, _, backend, modal, countdown) {
+    var anchors, bannerCount, banners, currentBanner, switchBanner, timer;
     $('.portfolio-submit').click(function() {
       var asset, period;
       asset = $('#portfolio-asset')[0].value;
@@ -28,13 +28,20 @@
     banners = $('*[class^="home-banner"]');
     bannerCount = banners.length;
     anchors = $('.background-anchor');
-    setInterval(function() {
+    switchBanner = function() {
       $(banners[currentBanner]).hide();
       $(anchors[currentBanner]).toggleClass('active');
       currentBanner = (currentBanner + 1) % bannerCount;
       $(banners[currentBanner]).fadeIn();
       return $(anchors[currentBanner]).toggleClass('active');
-    }, 6000);
+    };
+    timer = setInterval(switchBanner, 6000);
+    $('.background-anchor').mouseover(function(e) {
+      return clearInterval(timer);
+    });
+    $('.background-anchor').mouseout(function(e) {
+      return timer = setInterval(switchBanner, 6000);
+    });
     return $('.background-anchor').click(function(e) {
       var index;
       e.preventDefault();

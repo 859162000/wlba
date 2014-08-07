@@ -139,6 +139,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
         count = 60
 
         $(element).attr 'disabled', 'disabled'
+        $(element).removeClass 'button-red'
+        $(element).addClass 'button-gray'
 
         timerFunction = ()->
           if count >= 1
@@ -148,6 +150,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
             clearInterval(intervalId)
             $(element).text('重新获取')
             $(element).removeAttr 'disabled'
+            $(element).addClass 'button-red'
+            $(element).removeClass 'button-gray'
 
         # Fire now and future
         timerFunction()
