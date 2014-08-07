@@ -154,21 +154,8 @@ html
                     th 投资人
                     th 金额
                 tbody
-                  trade_records = p2p.p2precord_set.filter(catalog=u'申购')[:40]
-                  top = trade_records[:15]
-                  rest = trade_records[15:]
-                  for trade in top
-                    tr
-                      td
-                        p {{trade.create_time | date:"Y-m-d"}}
-                        p {{trade.create_time | date:"H:i:s"}}
-                      td
-                        em {{trade.user | safe_phone}}
-                      td
-                        span.money-highlight {{trade.amount}}
-                        span 元
-                tbody(style="display:none")
-                  for trade in rest
+                  trade_records = p2p.p2precord_set.filter(catalog=u'申购')[:20]
+                  for trade in trade_records
                     tr
                       td
                         p {{trade.create_time | date:"Y-m-d"}}
