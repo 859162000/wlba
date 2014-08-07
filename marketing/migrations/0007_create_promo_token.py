@@ -3,6 +3,8 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
+from wanglibao_pay.util import get_a_uuid
+
 
 class Migration(DataMigration):
 
@@ -14,6 +16,7 @@ class Migration(DataMigration):
         for u in orm['auth.User'].objects.all():
             token = orm.PromotionToken()
             token.user = u
+            token.token = get_a_uuid()
             token.save()
 
     def backwards(self, orm):
