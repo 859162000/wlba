@@ -6,3 +6,4 @@ class ErrorNumber():
     form_error = 3
     unknown_error = 4
     duplicate = 5
+    not_find = 6

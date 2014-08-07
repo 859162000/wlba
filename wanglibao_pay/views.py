@@ -242,6 +242,11 @@ class CardViewSet(ModelViewSet):
         card = Card()
         card.user = request.user
         card.no = request.DATA.get('no', '')
+        if len(card.no) > 25:
+            return Response({
+                "message": u"银行账号超过长度",
+                'error_number': ErrorNumber.form_error
+            }, status=status.HTTP_400_BAD_REQUEST)
         bank_id = request.DATA.get('bank', '')
         exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
         if exist_cards:
@@ -250,6 +255,11 @@ class CardViewSet(ModelViewSet):
                 'error_number': ErrorNumber.duplicate
             }, status=status.HTTP_400_BAD_REQUEST)
         card.bank = Bank.objects.get(pk=bank_id)
+        if not card.bank:
+            return Response({
+                "message": u"没有找到该银行",
+                'error_number': ErrorNumber.not_find
+            }, status=status.HTTP_400_BAD_REQUEST)
         card.save()
 
         return Response({
