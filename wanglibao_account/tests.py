@@ -40,14 +40,8 @@ class EmailOrPhoneRegisterFormTestCase(TestCase):
 
 class RegisterViewTestCase(TestCase):
 
-    def test_phone_duplicate(self):
+    def test_register(self):
         phone = '12345678901'
-
-        # fake user is validated by mail, but he has an unverified phone number
-        fake_user = User.objects.create(username='fake')
-        fake_user.wanglibaouserprofile.phone = phone
-        fake_user.wanglibaouserprofile.phone_verified = False
-        fake_user.wanglibaouserprofile.save()
 
         # The real user not registered, but holds the true phone
         validate_code = '123456'

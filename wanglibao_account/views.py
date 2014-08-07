@@ -26,6 +26,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
+from marketing.utils import set_promo_user
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user, generate_contract
@@ -53,6 +54,9 @@ class RegisterView (RegistrationView):
         identifier = cleaned_data['identifier']
 
         user = create_user(identifier, password, nickname)
+
+        set_promo_user(request, user)
+
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
         return user
