@@ -81,7 +81,7 @@ html
                     .row
                       period = p2p.period * 30
                       user_limit = u"100的整数倍"
-                      -render_field form.amount class+="span12" type="text" placeholder=user_limit data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1" max=orderable_amount
+                      -render_field form.amount class+="span12" type="text" placeholder=user_limit data-role="earning-calculator" data-rate=p2p.expected_earning_rate data-period=period data-target="#expected_income" data-unit="1" data-max=orderable_amount
                     .form-row-error
                 .row
                   span.span4 预期收益

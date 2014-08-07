@@ -61,18 +61,18 @@ html
     .full-container-white
       .sales-data-container
         .row.sales-data-info
-          .span6
+          .span4
             p 第三方担保，
               span.highlight{{site_data.invest_threshold}}
               元起投，投标次日计息。</br>每工作日&nbsp;10:30、14:30、20:00更新总额度。
-          .span2
+          .span3
             .sales-data-box
               .sales-data-title 投资人总收益
-              .sales-data-number-blue {{site_data.p2p_total_earning}}
-          .span2
+              .sales-data-number-blue {{site_data.p2p_total_earning | money_format}}
+          .span3
             .sales-data-box
               .sales-data-title 累计交易额
-              .sales-data-number-blue {{site_data.p2p_total_trade}}
+              .sales-data-number-blue {{site_data.p2p_total_trade | money_format}}
           .span2-omega
             .sales-data-box
               .sales-data-title 年化收益率
@@ -187,7 +187,7 @@ html
                       else
                         i.media-caption.gloomy {{forloop.counter | stringformat:"02d"}}
                       div.media-title.text-overflow-hidden
-                        a.font-s(href="{{news.link}}" title="{{news.name}}") {{news.name}}
+                        a.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') {{news.name}}
 
             .panel
               .panel-title-bar__no-border

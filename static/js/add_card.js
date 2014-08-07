@@ -5,7 +5,8 @@
       jquery: 'lib/jquery.min',
       'jquery.modal': 'lib/jquery.modal.min',
       'jquery.placeholder': 'lib/jquery.placeholder',
-      'jquery.validate': 'lib/jquery.validate.min'
+      'jquery.validate': 'lib/jquery.validate.min',
+      tools: 'lib/modal.tools'
     },
     shim: {
       'jquery.modal': ['jquery'],
@@ -14,7 +15,8 @@
     }
   });
 
-  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], function($, modal, backend, placeholder, validate) {
+  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.validate', 'tools'], function($, modal, backend, placeholder, validate, tool) {
+    var _showModal;
     $('input, textarea').placeholder();
     $('#add-card-button').click(function(e) {
       if ($('#id-is-valid').val() === 'False') {
@@ -24,17 +26,28 @@
       e.preventDefault();
       return $(this).modal();
     });
+    _showModal = function() {
+      return $('#add-card-button').modal();
+    };
     return $('#add-card').click(function(e) {
       var bank_id, card_no, is_default;
       e.preventDefault();
       card_no = $('#card-no').val();
       if (!backend.checkCardNo(card_no)) {
-        alert('请输入有效的银行卡号');
+        tool.modalAlert({
+          title: '温馨提示',
+          msg: '请输入有效的银行卡号',
+          callback_ok: _showModal
+        });
         return;
       }
       bank_id = $('#bank-select').val();
       if (!bank_id) {
-        alert('请选择银行');
+        tool.modalAlert({
+          title: '温馨提示',
+          msg: '请选择银行',
+          callback_ok: _showModal
+        });
         return;
       }
       is_default = $('#default-checkbox').prop('checked');
@@ -48,8 +61,21 @@
         type: 'post'
       }).done(function() {
         return location.reload();
-      }).fail(function() {
-        return alert('添加银行卡失败');
+      }).fail(function(xhr) {
+        var result;
+        $.modal.close();
+        result = JSON.parse(xhr.responseText);
+        if (result.error_number === 5) {
+          tool.modalAlert({
+            title: '温馨提示',
+            msg: result.message
+          });
+          return;
+        }
+        return tool.modalAlert({
+          title: '温馨提示',
+          msg: '添加银行卡失败'
+        });
       });
     });
   });
