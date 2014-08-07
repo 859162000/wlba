@@ -162,12 +162,8 @@ html
                 ul.margin-top-s
                   for news in news_and_reports
                     li.media-item
-                      if forloop.counter <= 3
-                        i.media-caption.highlight {{forloop.counter | stringformat:"02d"}}
-                      else
-                        i.media-caption.gloomy {{forloop.counter | stringformat:"02d"}}
                       div.media-title.text-overflow-hidden
-                        a.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') {{news.name}}
+                        a.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') ·&nbsp;&nbsp;{{news.name}}
 
             .panel
               .panel-title-bar__no-border
