@@ -101,7 +101,7 @@ html
                 .row
                   .span3
                     p
-                      em {{product.total_amount | money_format}}
+                      em {{product.total_amount | money_format_int}}
                     p 融资金额(元)
                   .span2
                     p
@@ -116,7 +116,7 @@ html
                   .span2
                     p
                       amount = product.total_amount - product.ordered_amount
-                      em {{amount | money_format}}
+                      em {{amount | money_format_int}}
                     p 可投资金额(元)
                   .span3-omega.align-right
                     p
@@ -154,7 +154,7 @@ html
                 .panel-p2p-stamp
 
         .span4-omega
-          div(data-role = "float")
+          div
             .panel
               .panel-title-bar__border-gray
                 .panel-title 媒体报道
