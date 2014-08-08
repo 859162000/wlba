@@ -94,16 +94,17 @@ INSTALLED_APPS = (
     'mathfilters',
 
     'raven.contrib.django.raven_compat',
-
     'ckeditor',
     'captcha',
     'djcelery', # Use django orm as the backend
     'djsupervisor',
     'adminplus',
+    'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'concurrency.middleware.ConcurrencyMiddleware',
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -440,3 +441,9 @@ PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
 
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
+
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+INTERNAL_IPS = ('127.0.0.1',)
+DEBUG_TOOLBAR_CONFIG = {
+    'JQUERY_URL': '/static/js/lib/jquery.min.js'
+}

@@ -1,6 +1,7 @@
 # encoding: utf-8
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models.signals import post_save
 
 
 class WanglibaoUserProfile(models.Model):
@@ -27,3 +28,15 @@ class WanglibaoUserProfile(models.Model):
 
     def __unicode__(self):
         return "phone: %s nickname: %s  %s" % (self.phone, self.nick_name, self.user.username)
+
+
+def create_profile(sender, **kw):
+    """
+    Create the user profile when a user object is created
+    """
+    user = kw["instance"]
+    if kw["created"]:
+        profile = WanglibaoUserProfile(user=user)
+        profile.save()
+
+post_save.connect(create_profile, sender=get_user_model(), dispatch_uid="users-profile-creation-signal")
