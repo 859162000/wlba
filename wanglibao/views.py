@@ -13,7 +13,9 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         p2p_products = P2PProduct.objects.filter(Q(publish_time__lte=timezone.now())).filter(
-            status__in=[u'正在招标', u'已完成', u'满标待打款',u'满标已打款', u'满标待审核',u'满标已审核', u'还款中']).order_by('-end_time')[:20]
+            status__in=[
+                u'正在招标', u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+            ]).order_by('-end_time').select_related('warrant_company')[:20]
 
         trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:5]
         banners = Banner.objects.filter(device=Banner.PC)

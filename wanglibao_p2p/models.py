@@ -362,7 +362,7 @@ class AmortizationRecord(models.Model):
 
 
 class P2PRecord(models.Model):
-    catalog = models.CharField(u'流水类型', max_length=100)
+    catalog = models.CharField(u'流水类型', max_length=100, db_index=True)
     order_id = models.IntegerField(u'关联订单编号', null=True)
     amount = models.DecimalField(u'发生数', max_digits=20, decimal_places=2)
 
