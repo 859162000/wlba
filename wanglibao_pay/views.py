@@ -242,7 +242,8 @@ class CardViewSet(ModelViewSet):
         card = Card()
         card.user = request.user
         card.no = request.DATA.get('no', '')
-        if len(card.no) > 25:
+        print(card.no)
+        if not re.match('^[\d]{0,25}$',card.no):
             return Response({
                 "message": u"银行账号超过长度",
                 'error_number': ErrorNumber.form_error
