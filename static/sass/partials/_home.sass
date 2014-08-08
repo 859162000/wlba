@@ -100,52 +100,57 @@ $home-banner-height: 360px
     background: url("/static/images/wealth-share.png") no-repeat
     &:hover
       background: url("/static/images/wealth-share.gif") no-repeat
-  &.first-step
-    background: url("/static/images/first-step.png") no-repeat
-  &.second-step
-    background: url("/static/images/second-step.png") no-repeat
-  &.third-step
-    background: url("/static/images/third-step.png") no-repeat
-  &.fourth-step
-    background: url("/static/images/fourth-step.png") no-repeat
-  &.fifth-step
-    background: url("/static/images/fifth-step.png") no-repeat
-
-.middle-icon-container
-  width: 75px
-  height: 75px
-  text-align: center
-  margin: 0 auto 10px auto
-  &.first-step
-    background: url("/static/images/first-step.png") no-repeat
-  &.second-step
-    background: url("/static/images/second-step.png") no-repeat
-  &.third-step
-    background: url("/static/images/third-step.png") no-repeat
-  &.fourth-step
-    background: url("/static/images/fourth-step.png") no-repeat
-  &.fifth-step
-    background: url("/static/images/fifth-step.png") no-repeat
 
 .investment-process-container
   @extend .container
-  padding-top: 30px
+  padding-top: 15px
   padding-bottom: 30px
+  background-color: $color-white
   .title
     text-align: left
     font-size: $font-xll
     color: $color-text-d2
+    background-color: $color-white
     padding-left: 14px
   .info
     text-align: right
     height: 36px
     line-height: 36px
+    background-color: $color-white
+    padding-right: 16px
   .process-title
     text-align: center
     color: $color-text-d2
   .process-content
     text-align: center
     margin-top: 5px
+  .process-container
+    background: url("/static/images/process.png") no-repeat
+    height: 110px
+  .step
+    display: inline
+    float: left
+    width: 220px
+    background-color: $color-white
+
+.partner-container
+  @extend .container
+  margin-top: 15px
+  margin-bottom: 15px
+  padding-bottom: 45px
+  background-color: $color-white
+  .title
+    padding-top: 20px
+    padding-bottom: 20px
+    text-align: left
+    font-size: $font-xll
+    color: $color-text-d2
+    background-color: $color-white
+    padding-left: 14px
+  .logo-container
+    background: url('/static/images/partner.png') no-repeat top center
+    height: 286px
+
 
 .container-card-holder
   width: $content-width
