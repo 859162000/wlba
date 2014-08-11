@@ -1,0 +1,22 @@
+doctype html
+- with '网利宝大事记' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .container
+    .siderbar-div
+      - with '网利宝大事记' as title
+      include include/about_sidebar
+      - endwith
+    .panel-padding.span9-omega
+      .well-s
+        h1.about-title 网利宝大事记
+        p.para 2014年2月获IDG资本千万美金A轮投资
+        p.para 2014年5月”网利金融“成为中国互联网金融行业协会会员
+        p.para 2014年6月”网利金融“荣获2014第三届中国财经峰会”年度创新企业“
+        p.para 2014年6月”网利金融“CEO赵润龙“荣获2014第三届财经峰会”
+        p.para 截止2014年6月底，网利宝平台交易额突破13亿元。
+  include include/footer
+  include include/tracking

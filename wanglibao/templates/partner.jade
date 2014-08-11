@@ -1,0 +1,19 @@
+doctype html
+- with '战略合作伙伴' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .container
+    .siderbar-div
+      - with '战略合作伙伴' as title
+      include include/about_sidebar
+      - endwith
+    .panel-padding.span9-omega
+      .well-s
+        h1.about-title 战略合作伙伴
+
+
+  include include/footer
+  include include/tracking
