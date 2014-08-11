@@ -4,6 +4,30 @@
     <meta charset="UTF-8">
     <title></title>
 </head>
-<body>
+<body style="background-color: #f0f0f0">
+    <div style="text-align: center;margin-top: 300px">
+        <div style="font-size: 39px;color: #999">
+            亲，休息一下
+        </div>
+        <div style="font-size: 22px;color: #999;margin-top: 10px">
+             页面好像出现了错误，<span id = "span_timer" style="color: #00649d">5</span>秒后自动<a style="color: #00649d" href="https://www.wanglibao.com">跳回首页</a>
+        </div>
+        <div style="background: url('../../../static/images/500.gif') no-repeat center; height: 300px">
+
+        </div>
+    </div>
+    <script type="application/javascript">
+        var t = 5;
+        function countDown(){
+            var timeSpan = document.getElementById("span_timer");
+            t-- ;
+            timeSpan.innerHTML = t;
+            if(t <= 0){
+                location.href = "https://www.wanglibao.com";
+                clearInterval(inter);
+            }
+        };
+        var inter = setInterval(countDown,1000);
+    </script>
 </body>
 </html>
