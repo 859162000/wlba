@@ -97,21 +97,24 @@ html
                 a(href="/p2p/detail/{{product.id}}") {{product.name}}
               .panel-content
                 .row
-                  .span3
+                  .span2.align-center
                     p
                       em {{product.total_amount | money_format_int}}
                     p 融资金额(元)
-                  .span2
+                  .span2.align-center
                     p
                       em {{product.period}}
                       span.font-l 个月
                     p 还款期限
-                  .span2
+                  .span3.align-center
                     p
-                      em.highlight.font-xxll {{product.expected_earning_rate | percentage_number}}
-                      span.highlight.font-xll %
+                      earning_rate = str(product.expected_earning_rate)
+                      if product.excess_earning_rate > 0
+                        earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
+                      em.highlight {{earning_rate}}
+                      span.highlight.font-m %
                     p 年化收益
-                  .span2
+                  .span2.align-center
                     p
                       amount = product.total_amount - product.ordered_amount
                       em {{amount | money_format_int}}
