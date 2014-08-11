@@ -5,13 +5,14 @@ require.config
     'jquery.validate': 'lib/jquery.validate.min'
     'jquery.complexify': 'lib/jquery.complexify.min'
     'jquery.placeholder': 'lib/jquery.placeholder'
+    tools: 'lib/modal.tools'
   shim:
     'jquery.modal': ['jquery']
     'jquery.validate': ['jquery']
     'jquery.complexify': ['jquery']
     'jquery.placeholder': ['jquery']
 
-require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.complexify', 'jquery.placeholder'], ($, modal, backend, validate, complexify, placeholder)->
+require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder'], ($, modal, backend, validate,tool,  complexify, placeholder)->
 
   $.validator.addMethod "emailOrPhone", (value, element)->
       return backend.checkEmail(value) or backend.checkMobile(value)
@@ -121,6 +122,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
         $("#validate-code-container").show()
 
   $("#reg_identifier").keyup()
+
+  _showModal = ()->
+    $('#login-modal').modal()
+
   $("#button-get-validate-code").click (e) ->
       e.preventDefault()
       element = this
@@ -130,10 +135,19 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.comple
         if console?
           console.log "Phone number checked, now send the valdiation code"
 
-        $.ajax(
+        $.ajax
           url: "/api/phone_validation_code/register/" + phoneNumber + "/"
           type: "POST"
-        )
+        .fail (xhr)->
+          console.log("eoorsss")
+          $.modal.close()
+          clearInterval(intervalId)
+          $(element).text('重新获取')
+          $(element).removeAttr 'disabled'
+          $(element).addClass 'button-red'
+          $(element).removeClass 'button-gray'
+          result = JSON.parse xhr.responseText
+          tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
 
         intervalId
         count = 60

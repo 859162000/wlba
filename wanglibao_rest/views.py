@@ -16,6 +16,8 @@ from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer, RegisterUserSerializer
 from wanglibao_sms.utils import send_validation_code
+from wanglibao.const import ErrorNumber
+from wanglibao_profile.models import WanglibaoUserProfile
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -36,6 +38,13 @@ class SendValidationCodeView(APIView):
 
     def post(self, request, phone, format=None):
         phone_number = phone.strip()
+        phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number,phone_verified=True)
+        print(phone_check)
+        if phone_check is not None:
+            return Response({
+                                "message": u"该手机号已经被注册，不能重复注册",
+                                "error_number": ErrorNumber.duplicate
+                            }, status= 400)
         status, message = send_validation_code(phone_number)
         return Response({
                             'message': message

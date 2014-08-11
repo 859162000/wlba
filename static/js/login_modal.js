@@ -6,7 +6,8 @@
       'jquery.modal': 'lib/jquery.modal.min',
       'jquery.validate': 'lib/jquery.validate.min',
       'jquery.complexify': 'lib/jquery.complexify.min',
-      'jquery.placeholder': 'lib/jquery.placeholder'
+      'jquery.placeholder': 'lib/jquery.placeholder',
+      tools: 'lib/modal.tools'
     },
     shim: {
       'jquery.modal': ['jquery'],
@@ -16,8 +17,8 @@
     }
   });
 
-  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'jquery.complexify', 'jquery.placeholder'], function($, modal, backend, validate, complexify, placeholder) {
-    var checkMobile, container;
+  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder'], function($, modal, backend, validate, tool, complexify, placeholder) {
+    var checkMobile, container, _showModal;
     $.validator.addMethod("emailOrPhone", function(value, element) {
       return backend.checkEmail(value) || backend.checkMobile(value);
     });
@@ -154,6 +155,9 @@
       }
     });
     $("#reg_identifier").keyup();
+    _showModal = function() {
+      return $('#login-modal').modal();
+    };
     $("#button-get-validate-code").click(function(e) {
       var count, element, intervalId, phoneNumber, timerFunction;
       e.preventDefault();
@@ -167,6 +171,21 @@
         $.ajax({
           url: "/api/phone_validation_code/register/" + phoneNumber + "/",
           type: "POST"
+        }).fail(function(xhr) {
+          var result;
+          console.log("eoorsss");
+          $.modal.close();
+          clearInterval(intervalId);
+          $(element).text('重新获取');
+          $(element).removeAttr('disabled');
+          $(element).addClass('button-red');
+          $(element).removeClass('button-gray');
+          result = JSON.parse(xhr.responseText);
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: result.message,
+            callback_ok: _showModal
+          });
         });
         intervalId;
         count = 60;
