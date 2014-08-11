@@ -39,7 +39,10 @@ html
                 p 还款期限
               .span3-omega
                 p.highlight
-                  span.font-xxl {{p2p.expected_earning_rate}}
+                  earning_rate = str(p2p.expected_earning_rate)
+                  if p2p.excess_earning_rate > 0
+                    earning_rate = str(p2p.expected_earning_rate - p2p.excess_earning_rate) + '+' + str(p2p.excess_earning_rate)
+                  span.font-xxl {{earning_rate}}
                   span.font-xl %
                 p 年化收益
           .p2p-detail-footer
