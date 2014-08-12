@@ -64,5 +64,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=modal.tools.map
