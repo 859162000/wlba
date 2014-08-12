@@ -8,13 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding index on 'P2PRecord', fields ['catalog']
-        db.create_index(u'wanglibao_p2p_p2precord', ['catalog'])
+        # Adding field 'P2PProduct.excess_earning_rate'
+        db.add_column(u'wanglibao_p2p_p2pproduct', 'excess_earning_rate',
+                      self.gf('django.db.models.fields.FloatField')(default=0),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Removing index on 'P2PRecord', fields ['catalog']
-        db.delete_index(u'wanglibao_p2p_p2precord', ['catalog'])
+        # Deleting field 'P2PProduct.excess_earning_rate'
+        db.delete_column(u'wanglibao_p2p_p2pproduct', 'excess_earning_rate')
 
 
     models = {
@@ -128,6 +130,7 @@ class Migration(SchemaMigration):
             'contract_serial_number': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'contract_template': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.ContractTemplate']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
             'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'excess_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'expected_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'extra_data': ('wanglibao.fields.JSONFieldUtf8', [], {'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

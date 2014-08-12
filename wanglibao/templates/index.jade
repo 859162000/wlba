@@ -131,11 +131,11 @@ html
                         a.button-disabled(href="javascript:void(0)", disabled) {{status}}
 
                     if product.status == '正在招标'
-                      p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余时间：
-                        span(id="counter_{{product.id}}") {{product.end_time | timedelta_now }}
+                      p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
+                        span(id="counter_{{product.id}}") {{product.end_time | timedelta_now_day }}
                     else
-                      p 剩余时间：
-                        span 00:00:00
+                      p
+
 
               .panel-p2p--footer
                 .row

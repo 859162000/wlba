@@ -7,7 +7,6 @@ mixin sidebar-item(name, link, expected_title)
       a(href=link)= name
 
 ul.sidebar
-  p.sidebar-title 关于网利宝
   div
     +sidebar-item('关于我们', '/about', '关于我们')
     +sidebar-item('管理团队', '/team', '管理团队')
