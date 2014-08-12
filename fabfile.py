@@ -9,6 +9,8 @@ from fabric_components.apache import install_apache
 from fabric_components.mysql import install_mysql, db_env, create_database, create_user, apt_get
 from config.nginx_conf import generate_conf
 
+env.apache_conf = 'config/apache.conf'
+
 
 def production():
     env.host_string = 'www.wanglibao.com'
@@ -26,7 +28,6 @@ def production():
     env.staging = False
 
     env.mysql = False  # Use RDS, so we no need to install mysql
-    env.apache_conf = 'wanglibao.conf'
 
 
 def pre_production():
@@ -44,7 +45,6 @@ def pre_production():
     env.staging = False
 
     env.mysql = False  # Use RDS, so we no need to install mysql
-    env.apache_conf = 'dev.conf'
 
 
 def dev():
@@ -62,7 +62,6 @@ def dev():
     env.staging = True
 
     env.mysql = True
-    env.apache_conf = 'dev.conf'
 
 
 def staging():
@@ -82,7 +81,6 @@ def staging():
     env.staging = True
 
     env.mysql = True
-    env.apache_conf = 'staging.conf'
 
 
 if env.get('group') == 'staging':
@@ -105,7 +103,10 @@ elif env.get('group') == 'production':
 elif env.get('group') == 'dev':
     env.roledefs = {
         'lb': ['192.168.1.162'],
-        'web': ['192.168.1.184', '192.168.1.160'],
+        'web': [
+            '192.168.1.184',
+            #'192.168.1.160',
+        ],
         'cron_tab': ['192.168.1.184'],
         'db': ['192.168.1.161'],
     }
@@ -174,6 +175,7 @@ def install_rabbit_mq():
     apt_get("rabbitmq-server")
 
 
+@task
 def init():
     """
     Setup the server for the first time
@@ -369,6 +371,7 @@ def deploy():
 """)
 
 
+@task
 def execute(command):
     with virtualenv():
         with cd('/var/wsgi/wanglibao'):
