@@ -15,13 +15,19 @@
       now = new Date().getTime();
       diffInSeconds = (now - loadTime) / 1000;
       return _.each(counters, function(e) {
-        var components, left, seconds, timeString;
+        var components, day, left, seconds, timeString;
         left = $(e).attr('data-left');
         components = left.split(":");
         seconds = parseInt(components[0]) * 3600 + parseInt(components[1]) * 60 + parseInt(components[2]);
         if (seconds > 0) {
           left = seconds - diffInSeconds;
-          timeString = Math.floor(left / 3600) + ":" + twoDigit(Math.floor(left % 3600 / 60)) + ":" + twoDigit(Math.floor(left % 60));
+          timeString = "";
+          day = Math.floor(left / 86400);
+          if (day > 0) {
+            timeString += day + "天";
+            left = Math.floor(left % 86400);
+          }
+          timeString += Math.floor(left / 3600) + "小时" + twoDigit(Math.floor(left % 3600 / 60)) + "分" + twoDigit(Math.floor(left % 60)) + "秒";
           return $($(e).attr('data-target')).text(timeString);
         }
       });

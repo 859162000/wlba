@@ -213,6 +213,22 @@ def timedelta_now(time):
         return "00:00:00"
 
 @register.filter
+def timedelta_now_day(time):
+    time_delta = time - timezone.now()
+    days = time_delta.days
+    if days >= 0:
+        hours, seconds = divmod(time_delta.seconds, 3600)
+        minutes, seconds = divmod(seconds, 60)
+
+        if days > 0:
+            return "%d天%d小时%02d分%02d秒" % (days, hours, minutes, seconds)
+        else:
+            return "%d小时%02d分%02d秒" % (hours, minutes, seconds)
+    else:
+        return ""
+
+
+@register.filter
 def card_info(card):
     return u"%s(尾号%s)" % (card.bank.name, card.no[-4:])
 

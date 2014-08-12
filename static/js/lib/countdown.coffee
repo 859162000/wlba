@@ -20,8 +20,12 @@ define ['jquery', 'underscore'], ($, _)->
 
       if seconds > 0
         left = seconds - diffInSeconds
-
-        timeString = Math.floor(left / 3600) + ":" + twoDigit(Math.floor(left % 3600 / 60)) + ":" + twoDigit(Math.floor(left % 60))
+        timeString = ""
+        day = Math.floor(left / 86400)
+        if day > 0
+          timeString += day + "天"
+          left = Math.floor(left % 86400)
+        timeString += Math.floor(left / 3600) + "小时" + twoDigit(Math.floor(left % 3600 / 60)) + "分" + twoDigit(Math.floor(left % 60)) + "秒"
 
         $($(e).attr 'data-target').text timeString
 
