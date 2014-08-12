@@ -39,8 +39,7 @@ class SendValidationCodeView(APIView):
     def post(self, request, phone, format=None):
         phone_number = phone.strip()
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number,phone_verified=True)
-        print(phone_check)
-        if phone_check is not None:
+        if phone_check:
             return Response({
                                 "message": u"该手机号已经被注册，不能重复注册",
                                 "error_number": ErrorNumber.duplicate
