@@ -65,6 +65,17 @@
               } else if (result.error_number === 2) {
                 $('#id-validate').modal();
                 return;
+              } else if (result.error_number === 4 && result.message === "余额不足") {
+                console.log("dfsd");
+                tool.modalAlert({
+                  btnText: "去充值",
+                  title: '温馨提示',
+                  msg: result.message,
+                  callback_ok: function() {
+                    return window.location.href = '/pay/banks/';
+                  }
+                });
+                return;
               }
               message = result.message;
               error_message = '';

@@ -42,12 +42,18 @@
       alertOption = option;
       $('.modal-content-inner', $('#' + alert_container_id)).html(option.msg);
       $('h2', $('#' + alert_container_id)).html(option.title);
+      if (option.btnText) {
+        $('.button-alert-ok', $('#' + alert_container_id)).html(option.btnText);
+      }
       return $('#' + alert_container_id).modal();
     };
     modalConfirm = function(option) {
       confirmOption = option;
       $('.modal-content-inner', $('#' + confirm_container_id)).html(option.msg);
       $('h2', $('#' + confirm_container_id)).html(option.title);
+      if (option.btnText) {
+        $('.button-confirm-ok', $('#' + confirm_container_id)).html(option.btnText);
+      }
       return $('#' + confirm_container_id).modal();
     };
     init();
