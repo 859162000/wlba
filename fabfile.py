@@ -34,7 +34,7 @@ def pre_production():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'nginx'
+    env.branch = 'master'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -52,7 +52,7 @@ def dev():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'master'
+    env.branch = 'nginx'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -126,6 +126,7 @@ def virtualenv():
             yield
 
 
+@task
 def config(filename, key, value):
     """
     This method generate the files by replace key with value
@@ -222,6 +223,9 @@ def generate_nginx_conf():
     print green('Generate the nginx conf file')
     conf_content = generate_conf(apps=env.roledefs['web'])
     put(StringIO(conf_content), "/etc/nginx/sites-available/wanglibao-proxy.conf", use_sudo=True)
+    with settings(warn_only=True):
+        sudo('nginx_dissite default')
+    sudo('nginx_ensite wanglibao-proxy.conf')
 
 
 @task
@@ -235,21 +239,27 @@ def check_out():
             with cd(env.depot_name):
                 run("git checkout %s" % env.branch)
         else:
-            print green('Found depot, pull changes')
             with cd(env.depot_name):
-                run('git reset --hard HEAD')
-                run('git remote set-url origin %s' % env.depot)
-                run("git checkout %s" % env.branch)
-                run("git branch --set-upstream %s origin/%s" % (env.branch, env.branch))
-                run("git pull")
+                with settings(warn_only=True):
+                    run('git reset --hard HEAD')
+                    run('git remote set-url origin %s' % env.depot)
 
-        sudo("cp vender/nginx_util/* /usr/bin/")
+                    result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
+                    if result.return_code > 0:
+                        run('git fetch origin %s:%s' % (env.branch, env.branch))
+                    else:
+                        run('git checkout %s' % env.branch)
+                        run('git pull')
+
+                    run("git checkout %s" % env.branch)
 
 
 @task
 @roles('lb', 'web', 'db')
 def deploy():
     with cd(env.path):
+        sudo("cp %s/vender/nginx_util/* /usr/bin/" % env.depot_name)
+
         if env.host_string in env.roledefs['cron_tab']:
             print green('add crontab')
             scrawl_job_file = '/usr/bin/scrawl_job'
@@ -350,7 +360,7 @@ def deploy():
                 run("python manage.py supervisor restart all")
 
         if env.host_string in env.roledefs['lb']:
-            execute(generate_nginx_conf)
+            generate_nginx_conf()
             sudo('service nginx reload')
         print green("""
         #########################################################################
