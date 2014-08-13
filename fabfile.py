@@ -34,7 +34,7 @@ def production():
 def pre_production():
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'nginx'
 
@@ -45,7 +45,7 @@ def pre_production():
     env.production = True
     env.staging = False
 
-    env.mysql = True
+    env.mysql = False
 
 
 def dev():
@@ -162,7 +162,7 @@ elif env.get('group') == 'pre':
 
         # DB is the db servers
         'db': [
-            '115.28.240.194'
+            # '115.28.240.194'
         ],
 
         # Task queue server is the server running rabbitmq or redis.
@@ -243,7 +243,8 @@ def init():
 
     banner("init")
     with hide("output"):
-        sudo('apt-get update')
+        if not env.get('no-apt-update'):
+            sudo('apt-get update')
 
         create_folder(env.path, mod="777")
         create_folder('/var/run/wanglibao/', owner='www-data', group='www-data', mod='770')
@@ -299,8 +300,7 @@ def generate_nginx_conf():
     print green('Generate the nginx conf file for new lb')
     conf_content = generate_conf(apps=env.roledefs['web'])
     put(StringIO(conf_content), "/etc/nginx/sites-available/wanglibao-proxy.conf", use_sudo=True)
-    with settings(warn_only=True):
-        sudo('nginx_dissite default')
+    sudo('rm -f /etc/nginx/sites-enabled/*')
     sudo('nginx_ensite wanglibao-proxy.conf')
 
 
@@ -445,7 +445,7 @@ def config_apache():
 
             sudo('cp %s /etc/apache2/sites-available/' % env.apache_conf)
             # Disable all other sites
-            sudo('rm /etc/apache2/sites-enabled/*')
+            sudo('rm -f /etc/apache2/sites-enabled/*')
             sudo('a2ensite %s' % os.path.split(env.apache_conf)[-1])
 
             sudo('service apache2 reload')
@@ -464,12 +464,15 @@ def deploy():
 
     execute(check_out)
 
-    execute(take_out_of_rotation)
+    if env.roledefs['old_lb']:
+        execute(take_out_of_rotation)
+
     execute(config_apache)
     execute(setup_cron_tab)
 
     # Now ready to update lb config
-    execute(config_loadbalancer)
+    if env.roledefs['lb']:
+        execute(config_loadbalancer)
 
     print green(reindent("""
     #########################################################################
