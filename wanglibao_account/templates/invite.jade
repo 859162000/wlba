@@ -1,0 +1,72 @@
+extends account_home_base
+- load formatters
+- load mathfilters
+block head
+  - with '邀请奖励' as title
+    include include/head
+block sidebar
+  - with '邀请奖励' as activeItem
+    include include/user_center_sidebar
+block main
+  .account-home-panel
+    .well-s.lh-m
+      .font-s.d4-text 网利宝P2P理财，3个月期，年化收益最高达12%（11%年化收益+网利宝独家补贴1%）.第三方本息担保，限量发售，先到先得，平安保险对用户资金全额承保，让您投资更安心。现在就买，还能跟好友一起共享60元花费。
+      .space-vertical-l
+      dl.font-s
+        dt.font-xl.dark-text “邀请好友送话费”活动：
+        dd 通过以下任意一种方式邀请好友购买网利宝P2P理财
+        dd 好友接受邀请注册并首次购买成功
+        dd 你和你的小伙伴就都能各自拿到网利宝派发的30元花费哦
+        dd.d4-text （确认信息将由网利宝系统发出，请务必保证你注册手机号畅通）
+      .space-vertical-l
+      .invite-container.clearfix
+        .pull-left.invite-num-circle
+          span 1
+          h3 专属链接
+        .pull-right.invite-content
+          .invite-title-bgcolor 这是您的专用邀请链接，您可点击【复制】按钮，将本文粘贴并发送给您的好友：
+          p
+            textarea.invite-textarea(name="invite_text")
+              |我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～
+              |戳这里>>https://www.wanglibao.com/ref=#######
+          input.pull-right.button.button-red(type="button",value="复制")
+      .space-vertical-l
+      .invite-container.clearfix
+        .pull-left.invite-num-circle
+          span 2
+          h3 分享社区
+        .pull-right.invite-content
+          .invite-title-bgcolor 快速分享到社区
+          .invite-share.bdsharebuttonbox(data-tag="share_1")
+            a.bds_tsina(href="#",data-cmd="tsina",title="分享到新浪微博")
+              span.icon.icon-invite-tsina
+              i 新浪微博
+            a.bds_tqq(href="#",data-cmd="tqq",title="分享到腾讯微博")
+              span.icon.icon-invite-tqq
+              i 腾讯微博
+            a.bds_kaixin001(href="#",data-cmd="kaixin001",title="分享到开心网")
+              span.icon.icon-invite-kaixin
+              i 开心
+            a.bds_douban(href="#",data-cmd="douban",title="分享到豆瓣网")
+              span.icon.icon-invite-douban
+              i 豆瓣网
+            a.bds_renren(href="#",data-cmd="renren",title="分享到人人网")
+              span.icon.icon-invite-renren
+              i 人人网
+            a.bds_qzone(href="#",data-cmd="qzone",title="分享到QQ空间")
+              span.icon.icon-invite-qzone
+              i QQ空间
+            script.
+              window._bd_share_config = {
+                common : {
+                  bdText : '我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～戳这里>>https://www.wanglibao.com/ref=#######',
+                  bdDesc : '我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～戳这里>>https://www.wanglibao.com/ref=#######',
+                  bdUrl : 'https://www.wanglibao.com',
+                  bdPic : ''
+                },
+                share : [{
+                  "bdSize" : 32,
+                  "bdCustomStyle" : 50
+                }]
+              }
+              with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];

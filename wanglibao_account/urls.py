@@ -32,6 +32,8 @@ urlpatterns = patterns(
                                      login_url='/accounts/register/')),
     url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/register/')),
 
+    url(r'^invite/$', login_required(TemplateView.as_view(template_name='invite.jade'), login_url='/accounts/login/')),
+
     url(r'^login/ajax/', 'wanglibao_account.views.ajax_login'),
     url(r'^login/', 'django.contrib.auth.views.login',
         {
