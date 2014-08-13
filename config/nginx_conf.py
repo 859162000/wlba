@@ -1,7 +1,7 @@
 from vender.nginxparser import dumps
 
 
-def generate_conf(apps, port='8080'):
+def generate_conf(apps, port='80'):
     conf = [
         ['proxy_cache_path', '/var/cache/nginx levels=1:2 keys_zone=static-cache:8m max_size=1000m inactive=600m'],
         ['proxy_temp_path', '/var/cache/tmp'],
