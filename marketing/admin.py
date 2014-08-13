@@ -18,3 +18,4 @@ class PromotionTokenAdmin(admin.ModelAdmin):
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
+admin.site.register(PromotionToken, PromotionTokenAdmin)
