@@ -141,7 +141,8 @@ class PasswordResetGetIdentifierView(TemplateView):
             else:
                 view = PasswordResetValidateView()
                 view.request = request
-
+                if identifier_type == 'phone':
+                    send_validation_code(identifier)
                 request.session['user_to_reset'] = users[0].id
                 return view.render_to_response({
                     'user_to_reset': users[0]
@@ -208,8 +209,8 @@ class ResetPassword(TemplateView):
     template_name = "password_reset_set_password.jade"
 
     def post(self, request):
-        password1 = request.POST['new_password1'].strip()
-        password2 = request.POST['new_password2'].strip()
+        password1 = request.POST['password1'].strip()
+        password2 = request.POST['password2'].strip()
 
         if password1 != password2:
             return HttpResponse(u'两次密码不匹配', status=400)
@@ -227,6 +228,7 @@ class ResetPassword(TemplateView):
         if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 30 * 60:
             user.set_password(password1)
             user.save()
+            #auth.login(request, user)
             return HttpResponseRedirect(redirect_to='/accounts/password/reset/done/')
 
         else:
