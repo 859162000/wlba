@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from marketing.models import SiteData
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
+from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct
@@ -44,6 +45,12 @@ class P2PDetailView(TemplateView):
         except P2PProduct.DoesNotExist:
             raise Http404(u'您查找的产品不存在')
 
+        terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
+                                                               p2p.expected_earning_rate/100,
+                                                               p2p.amortization_count,
+                                                               p2p.period)
+        total_earning = terms.get("total") - p2p.total_amount
+
         user = self.request.user
         current_equity = 0
 
@@ -62,8 +69,9 @@ class P2PDetailView(TemplateView):
             'status': status,
             'end_time': end_time,
             'orderable_amount': orderable_amount,
+            'total_earning': total_earning,
             'current_equity': current_equity,
-            'site_data': site_data
+            'site_data': site_data,
         }
 
 

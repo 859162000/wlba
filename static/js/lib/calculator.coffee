@@ -32,3 +32,27 @@ define ['jquery'], ($)->
 
 
   $('input[data-role=fee-calculator]').keyup()
+
+  $('input[data-role=p2p-calculator]').keyup (e)->
+    target = $(e.target)
+    total_amount = parseFloat(target.attr 'data-total-amount')
+    total_earning = parseFloat(target.attr 'data-total-earning')
+    existing = parseFloat(target.attr 'data-existing')
+    amount = parseFloat(target.val()) || 0
+
+    if amount > target.attr 'data-max'
+      amount = target.attr 'data-max'
+      target.val amount
+
+    amount = parseFloat(existing) + parseFloat(amount)
+
+    earning = ((amount / total_amount) * total_earning).toFixed(1)
+
+    earning_elements = (target.attr 'data-target').split(',')
+    for earning_element, i in earning_elements
+      if earning and $.isNumeric(earning)
+        $(earning_element).text earning
+      else
+        $(earning_element).text "0.0"
+
+  $('input[data-role=p2p-calculator]').keyup()
