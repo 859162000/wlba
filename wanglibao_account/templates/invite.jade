@@ -37,36 +37,13 @@ block main
           h3 分享社区
         .pull-right.invite-content
           .invite-title-bgcolor 快速分享到社区
-          .invite-share.bdsharebuttonbox(data-tag="share_1")
-            a.bds_tsina(href="#",data-cmd="tsina",title="分享到新浪微博")
-              span.icon.icon-invite-tsina
-              i 新浪微博
-            a.bds_tqq(href="#",data-cmd="tqq",title="分享到腾讯微博")
-              span.icon.icon-invite-tqq
-              i 腾讯微博
-            a.bds_kaixin001(href="#",data-cmd="kaixin001",title="分享到开心网")
-              span.icon.icon-invite-kaixin
-              i 开心
-            a.bds_douban(href="#",data-cmd="douban",title="分享到豆瓣网")
-              span.icon.icon-invite-douban
-              i 豆瓣网
-            a.bds_renren(href="#",data-cmd="renren",title="分享到人人网")
-              span.icon.icon-invite-renren
-              i 人人网
-            a.bds_qzone(href="#",data-cmd="qzone",title="分享到QQ空间")
-              span.icon.icon-invite-qzone
-              i QQ空间
+          .bdsharebuttonbox.padding-top-xs(data-tag="share_1")
+            a.bds_tsina(href="#",data-cmd="tsina",title="分享到新浪微博") 新浪微博
+            a.bds_tqq(href="#",data-cmd="tqq",title="分享到腾讯微博") 腾讯微博
+            a.bds_kaixin001(href="#",data-cmd="kaixin001",title="分享到开心网") 开心网
+            a.bds_douban(href="#",data-cmd="douban",title="分享到豆瓣网") 豆瓣网
+            a.bds_renren(href="#",data-cmd="renren",title="分享到人人网") 人人网
+            a.bds_qzone(href="#",data-cmd="qzone",title="分享到QQ空间") QQ空间
+            a.bds_more(href="#",data-cmd="more",title="分享到")
             script.
-              window._bd_share_config = {
-                common : {
-                  bdText : '我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～戳这里>>https://www.wanglibao.com/ref=#######',
-                  bdDesc : '我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～戳这里>>https://www.wanglibao.com/ref=#######',
-                  bdUrl : 'https://www.wanglibao.com',
-                  bdPic : ''
-                },
-                share : [{
-                  "bdSize" : 32,
-                  "bdCustomStyle" : 50
-                }]
-              }
-              with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+              window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～ 戳这里>>https://www.wanglibao.com/ref=#######","bdMini":"3","bdMiniList":["mshare","tsina","tqq","kaixin001","douban","renren","qzone","tsohu","bdhome","sqq","thx","qq","ibaidu","taobao","hi","baidu","sohu","t163","qy"],"bdPic":"","bdStyle":"1","bdSize":"32"},"share":{"bdSize":24}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
