@@ -48,6 +48,10 @@ class PayView(TemplateView):
     template_name = 'pay_jump.jade'
 
     def post(self, request):
+        if not request.user.wanglibaouserprofile.id_is_valid:
+            return self.render_to_response({
+                'message': u'请先进行实名认证'
+            })
         form = dict()
         message = ''
         try:

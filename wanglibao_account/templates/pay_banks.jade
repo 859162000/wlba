@@ -67,6 +67,13 @@ block main
                 .space-vertical-m
                 .row
                   input#pay.button-pay(type='submit', value='支 付')
+  #id-validate(style='display: none')
+    input#id-is-valid(type='hidden', value='{{user.wanglibaouserprofile.id_is_valid}}')
+    .padding-xl.align-center
+      p 为保证您的资金安全，请先进行实名认证
+      .space-vertical-l
+      a.button.button-middle.button-l.button-red(href='/accounts/id_verify/') 去实名认证
+
 
 block script
   script.
