@@ -27,3 +27,11 @@ Install compass
 Languages or skills required
 -----------------
 Programming language: Python, Sass + Compass, jade (pyjade)
+
+
+Deploy
+-----------------
+dev: fab deploy --set group=dev
+staging: fab deploy --set group=staging
+pre: fab deploy --set group=pre
+production: fab deploy --set group=production
