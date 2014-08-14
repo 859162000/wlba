@@ -505,6 +505,7 @@ def ajax_register(request):
                 identifier = form.cleaned_data['identifier']
 
                 user = create_user(identifier, password, nickname)
+                set_promo_user(request, user)
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
                 return HttpResponse(messenger('done', user=request.user))

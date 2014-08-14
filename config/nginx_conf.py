@@ -1,15 +1,21 @@
 from vender.nginxparser import dumps
 
 
-def generate_conf(apps, port='80'):
+def generate_conf(apps, upstream_port='80', listen_on_80=True):
     conf = [
         ['proxy_cache_path', '/var/cache/nginx levels=1:2 keys_zone=static-cache:8m max_size=1000m inactive=600m'],
         ['proxy_temp_path', '/var/cache/tmp'],
+    ]
 
-        [['server'], [
-            ['listen', '80'],
-            ['return', '301 https://$host$request_uri'],
-        ]],
+    if listen_on_80:
+        conf += [
+            [['server'], [
+                    ['listen', '80'],
+                    ['return', '301 https://$host$request_uri'],
+            ]]
+        ]
+
+    conf += [
         [['server'], [
             ['listen', '443 ssl'],
             ['server_name', 'localhost'],
@@ -36,7 +42,7 @@ def generate_conf(apps, port='80'):
                 ['proxy_cache_valid', '404 1m'],
             ]],
         ]],
-        [['upstream apps'], [('server', name + ':' + port) for name in apps]]
+        [['upstream apps'], [('server', name + ':' + upstream_port) for name in apps]]
     ]
 
     return dumps(conf)

@@ -11,13 +11,13 @@ from fabric_components.mysql import install_mysql, db_env, create_database, crea
 from config.nginx_conf import generate_conf
 
 env.apache_conf = 'config/apache.conf'
-
+env.nginx_listen_on_80 = True
 
 def production():
     env.host_string = 'www.wanglibao.com'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'production2.0'
 
@@ -36,7 +36,7 @@ def pre_production():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'nginx'
+    env.branch = 'master'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -53,7 +53,7 @@ def dev():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'nginx'
+    env.branch = 'master'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -70,7 +70,7 @@ def staging():
     env.password = 'wanglibank'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'https://github.com/shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'master'
 
@@ -82,18 +82,18 @@ def staging():
     env.staging = True
 
     env.mysql = True
+    env.nginx_listen_on_80 = False
 
 
 if env.get('group') == 'staging':
     env.roledefs = {
-        'lb': [
-            #'staging.wanglibao.com'
-        ],
+        'lb': ['staging.wanglibao.com'],
         'web': ['staging.wanglibao.com'],
         'task_queue': ['staging.wanglibao.com'],
         'db': ['staging.wanglibao.com'],
         'old_lb': [],
         'old_web': [],
+        'cron_tab': ['staging.wanglibao.com'],
     }
     staging()
 
@@ -265,7 +265,7 @@ def init():
         new_virtualenv()
 
         if env.host_string in env.roledefs['web'] or env.host_string in env.roledefs['old_web']:
-            install_apache(mods=['ssl', 'headers', 'rewrite'], disable_sites=['default'])
+            install_apache(mods=['headers', 'rewrite'], disable_mods=['ssl'], disable_sites=['default'])
 
             me = run('whoami')
             sudo('adduser %s www-data' % me)
@@ -302,7 +302,7 @@ def init():
 @roles('lb')
 def generate_nginx_conf():
     print green('Generate the nginx conf file for new lb')
-    conf_content = generate_conf(apps=env.roledefs['web'])
+    conf_content = generate_conf(apps=env.roledefs['web'], listen_on_80=env.nginx_listen_on_80)
     put(StringIO(conf_content), "/etc/nginx/sites-available/wanglibao-proxy.conf", use_sudo=True)
     sudo('rm -f /etc/nginx/sites-enabled/*')
     sudo('nginx_ensite wanglibao-proxy.conf')
