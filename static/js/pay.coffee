@@ -2,11 +2,12 @@ require.config(
   paths:
     jquery: 'lib/jquery.min'
     'jquery.validate': 'lib/jquery.validate.min'
+    'jquery.modal': 'lib/jquery.modal.min'
   shim:
     'jquery.validate': ['jquery']
 )
 
-require ['jquery', 'jquery.validate'], ($, validate)->
+require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
   $('.banks a').click (e)->
     e.preventDefault()
 
@@ -31,3 +32,6 @@ require ['jquery', 'jquery.validate'], ($, validate)->
     value = $(this).val()
     if value
       $(this).val parseFloat(value).toFixed(2)
+
+  if $('#id-is-valid').val() == 'False'
+    $('#id-validate').modal()
