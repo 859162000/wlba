@@ -7,8 +7,10 @@ require.config
 require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
 
   $("#invite_top_bar").click () ->
-    backend.userProfile {}
-    .done (data)->
+    backend.userProfile {
+
+    }
+    .done ->
       window.location.href = '/accounts/invite/'
     .fail (xhr)->
       if xhr.status == 403
