@@ -452,6 +452,9 @@ def config_apache():
             sudo('rm -f /etc/apache2/sites-enabled/*')
             sudo('a2ensite %s' % os.path.split(env.apache_conf)[-1])
 
+            if env.get('group') == 'staging':
+                sudo('a2ensite chandao.conf')
+
             sudo('service apache2 reload')
 
 
@@ -477,10 +480,6 @@ def deploy():
     # Now ready to update lb config
     if env.roledefs['lb']:
         execute(config_loadbalancer)
-
-    if env.get('group') == 'staging':
-        sudo('a2ensite chandao.conf')
-        sudo('service apache2 reload')
 
     banner('Deploy Succeeded. Go Home!')
 
