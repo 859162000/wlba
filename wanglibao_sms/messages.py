@@ -41,7 +41,7 @@ def product_amortize(product, amortize_time, amount):
 
 @suffix
 def validate_code(code):
-    return u'验证码%s，如非本人操作，请忽略。工作人员不会索取，请勿泄露。' % code
+    return u'您的验证码%s' % code
 
 
 @suffix
