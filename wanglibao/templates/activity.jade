@@ -13,16 +13,17 @@ html
     .full-container
       .container.activity-header.clearfix
         .pull-left
-          img(src="/static/images/activity/logo.png")
+          a(href="/")
+            img(src="/static/images/activity/logo.png")
         .pull-right.back-home
-          a(href="http://www.wanglibao.com")
+          a(href="/")
             span.icon.icon-home
             | 返回首页
 
     .full-container.activity-container
       .activity-banner
         p.container
-          a.buying(href="http://www.wanglibao.com",title="立即抢购")
+          a.buying(href="/",title="立即抢购")
 
     .container.activity-text
       .activity-line
@@ -73,7 +74,7 @@ html
           img(src="/static/images/activity/text_2.png",alt="有钱一起赚，邀请好友就赚钱")
 
     .container
-      a.invite-friend(href="#",title="邀请好友")
+      a.invite-friend(href="/accounts/invite/",title="邀请好友")
         img(src="/static/images/activity/invite_friends.png",alt="邀请好友")
       p.invite-text
         |邀请好友，多邀多送，上不封顶，有钱一起赚！
