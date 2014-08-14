@@ -56,12 +56,13 @@ block main
               span.icon.icon-invite-qzone
               i QQ空间
   script(src="/static/js/lib/jquery.min.js")
+  script(src="/static/js/lib/jquery.zclip.min.js")
   script(src="/static/js/lib/jquery.modal.min.js")
   script.
     var _share_title = encodeURI('我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～ 戳这里 https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
     var _share_content = encodeURI('我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～ 戳这里  https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
     var _share_url = encodeURIComponent('https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
-    var _share_pic = '';
+    var _share_pic = '/static/images/share_pic.jpg';
     var _share_site = '';
     $(document).ready(function(){
       $(".wlb_tsina").click(function(){
@@ -82,16 +83,23 @@ block main
       $(".wlb_qzone").click(function(){
         window.open("http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url="+_share_url+"&title="+_share_title+"&desc="+_share_title);
       });
-      $("#inviteCopyButton").click(function(){
-        window.clipboardData.clearData();
-        window.clipboardData.setData("Text", $(".invite-textarea").htm());
-        $('#alert_modal').modal();
+      $("#inviteCopyButton").zclip({
+        path: "/static/images/ZeroClipboard.swf",
+        copy: $('.invite-textarea').text(),
+        afterCopy:function(){
+          $('#copyed_modal').modal();
+        }
       });
+      //$("#inviteCopyButton").click(function(){
+      //  window.clipboardData.setData("Text", $(".invite-textarea").htm());
+      //  $('#copyed_modal').modal();
+      //});
     });
 
   #copyed_modal(style="display:none").modal
     .modal-title-bar
-      span.modal-title 复制成功!
+      span.modal-title &nbsp;
       a.icon-cancel.pull-right(rel="modal:close")
     .copyed-ok
+      p 复制成功！
       p 你可以粘贴到QQ或论坛中发送给好友
