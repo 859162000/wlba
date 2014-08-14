@@ -115,7 +115,10 @@ block main
                   td {{equity.equity | money_format}}
 
                   if equity.product.status != '还款中'
-                    td {{equity.product.status}}
+                    if equity.product.status != '流标'
+                      td 募集中
+                    else
+                      td {{equity.product.status}}
                   else
                     td {{equity.product.status}}{{term}}/{{equity.product.amortization_count}}
 

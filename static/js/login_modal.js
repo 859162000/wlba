@@ -273,7 +273,7 @@
         return $form.find('img.captcha').attr('src', json.image_url);
       });
     });
-    return $('.login-modal-tab>li').click(function(e) {
+    $('.login-modal-tab>li').click(function(e) {
       $('.login-modal-tab>li').removeClass('active');
       $(this).addClass('active');
       if ($("#tab-login").attr('class') === 'active') {
@@ -284,8 +284,15 @@
         return $("#register-modal-form").show();
       }
     });
+    return $("#invite_top_bar").click(function() {
+      return backend.userProfile({}).done(function() {
+        return window.location.href = $("#invite_top_bar").attr("data-url");
+      }).fail(function(xhr) {
+        if (xhr.status === 403) {
+          $('.login-modal').trigger('click');
+        }
+      });
+    });
   });
 
 }).call(this);
-
-//# sourceMappingURL=login_modal.map
