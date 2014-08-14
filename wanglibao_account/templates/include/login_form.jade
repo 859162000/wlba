@@ -14,6 +14,10 @@ form.form#login-modal-form.login-form(method='POST', action='/accounts/login/aja
     a.captcha-refresh.icon-refresh(type="button", title="点击刷新验证码")
     .form-row-error
 
+  .form-row
+    input(type="checkbox", name="remember_me")
+    span.font-m.d3-text 记住我，一周内自动登录
+
   .form-row.form-bottom-bar
     button#login_submit.span12.button-account(type='submit') 登 录
     .remember-me
