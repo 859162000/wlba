@@ -11,4 +11,3 @@ static/sass/*.css
 *.pid
 celerybeat-schedule
 gems
-screen.cssgit
