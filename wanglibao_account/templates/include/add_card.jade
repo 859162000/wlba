@@ -10,6 +10,11 @@ form#add-card-form(style="display:none")
     .form-row
       input#card-no(type="text", placeholder="请输入银行卡号")
     .form-row
+      注意：此银行卡开户人必须和您实名认证名字
+      if user_profile.id_is_valid
+        （{{user_profile.name}}）
+      一致，否则提现无法成功到账
+    .form-row
       .withdraw-checkbox
         input#default-checkbox(type='checkbox', value='1')
         设为默认银行
