@@ -41,7 +41,7 @@ html
 
   body
     h1 借款协议({{product.contract_serial_number}})
-    p 本协议由以下各方于{{equity.confirm_at|date:"[Y]年[m]月[d]日"}}签订：
+    p 本协议由以下各方于{{now|date:"[Y]年[m]月[d]日"}}签订：
     p 甲方（出借方）：
     table
       tbody
@@ -144,7 +144,7 @@ html
           td 【{{product.period}}个月】
         tr
           td 借款起止日期
-          td {{equity.confirm_at|date:"【Y】年【m】月【d】日"}}至{{equity.confirm_at|add_months:product.period|date:"【Y】年【m】月【d】日"}}
+          td {{now|date:"【Y】年【m】月【d】日"}}至{{now|add_months:product.period|date:"【Y】年【m】月【d】日"}}
         tr
           td 总还款本息
           total = reduce(lambda v, i: v + i, [amort.principal + amort.interest for amort in product.amortizations.all()])
