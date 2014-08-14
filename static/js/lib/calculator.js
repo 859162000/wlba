@@ -39,7 +39,33 @@
       $(fee_element).text(fee);
       return $(actual_element).text(actual);
     });
-    return $('input[data-role=fee-calculator]').keyup();
+    $('input[data-role=fee-calculator]').keyup();
+    $('input[data-role=p2p-calculator]').keyup(function(e) {
+      var amount, earning, earning_element, earning_elements, existing, i, target, total_amount, total_earning, _i, _len, _results;
+      target = $(e.target);
+      total_amount = parseFloat(target.attr('data-total-amount'));
+      total_earning = parseFloat(target.attr('data-total-earning'));
+      existing = parseFloat(target.attr('data-existing'));
+      amount = parseFloat(target.val()) || 0;
+      if (amount > target.attr('data-max')) {
+        amount = target.attr('data-max');
+        target.val(amount);
+      }
+      amount = parseFloat(existing) + parseFloat(amount);
+      earning = ((amount / total_amount) * total_earning).toFixed(1);
+      earning_elements = (target.attr('data-target')).split(',');
+      _results = [];
+      for (i = _i = 0, _len = earning_elements.length; _i < _len; i = ++_i) {
+        earning_element = earning_elements[i];
+        if (earning && $.isNumeric(earning)) {
+          _results.push($(earning_element).text(earning));
+        } else {
+          _results.push($(earning_element).text("0.0"));
+        }
+      }
+      return _results;
+    });
+    return $('input[data-role=p2p-calculator]').keyup();
   });
 
 }).call(this);

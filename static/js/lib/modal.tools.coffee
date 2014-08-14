@@ -7,7 +7,7 @@ define ['jquery', 'lib/modal'], ($, modal)->
 
   initAlert = () ->
     html = ['<div id= "', alert_container_id, '" class="', modal_container, '" style="display:none">',
-            '<div class="modal-header"><span class="icon-cancel"></span></div>',
+            '<div class="modal-header"></div>',
             '<div class="modal-content"><h2>购买成功</h2><p class="modal-content-inner">同志确认吗?</p></div>',
            '<div class="modal-footer"><a href="#" class="ok button-alert-ok">确认</a>',
             '</div>']
@@ -23,7 +23,7 @@ define ['jquery', 'lib/modal'], ($, modal)->
 
   initConfirm = () ->
     html = ['<div id= "', confirm_container_id, '" class="', modal_container, '" style="display:none">',
-            '<div class="modal-header"><span class="icon-cancel"></span></div>',
+            '<div class="modal-header"></div>',
             '<div class="modal-content"><h2></h2><div class="modal-content-inner">确认吗?</div></div>',
            '<div class="modal-footer"><a href="#" class="ok button-confirm-ok">确认</a><a href="#" class="cancel button-confirm-cancel">取消</a></div>',
             '</div>']

@@ -6,13 +6,13 @@
       opacity: 0.6,
       zIndex: 99,
       escapeClose: true,
-      clickClose: true,
-      closeText: 'Close',
+      clickClose: false,
+      closeText: 'x',
       closeClass: '',
       modalClass: "modal",
-      spinnerHtml: null,
+      spinnerHtml: "",
       showSpinner: true,
-      showClose: false,
+      showClose: true,
       fadeDuration: null,
       fadeDelay: 1.0
     };
