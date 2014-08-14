@@ -99,12 +99,12 @@ INSTALLED_APPS = (
     'djcelery', # Use django orm as the backend
     'djsupervisor',
     'adminplus',
-    'debug_toolbar',
+  #  'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+   # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'concurrency.middleware.ConcurrencyMiddleware',
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
