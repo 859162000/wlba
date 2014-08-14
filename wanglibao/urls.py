@@ -78,3 +78,6 @@ if settings.DEBUG:
     urlpatterns += patterns('',
         url(r'^__debug__/', include(debug_toolbar.urls)),
     )
+
+handler404 = 'wanglibao.views.page_not_found'
+handler500 = 'wanglibao.views.server_error'

@@ -1,5 +1,7 @@
 # encoding: utf8
 from django.db.models import Q
+from django.http import HttpResponse
+from django.template import loader, Context
 from django.utils import timezone
 from django.views.generic import TemplateView
 from marketing.models import NewsAndReport, SiteData
@@ -36,3 +38,14 @@ class SecurityView(TemplateView):
     def get_context_data(self, **kwargs):
 
         return {}
+
+
+def page_not_found(request):
+    template = loader.get_template('html/404.html')
+    return HttpResponse(content=template.render(Context()), content_type='text/html; charset=utf-8', status=404)
+
+
+def server_error(request):
+    template = loader.get_template('html/500.html')
+    return HttpResponse(content=template.render(Context()), content_type='text/html; charset=utf-8', status=500)
+
