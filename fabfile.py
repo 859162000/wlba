@@ -478,16 +478,18 @@ def deploy():
     if env.roledefs['lb']:
         execute(config_loadbalancer)
 
-    print green(reindent("""
-    #########################################################################
-    ##         Deploy Succeeded. Go Home!           #########################
-    #########################################################################
-    """, 0))
+    if env.get('group') == 'staging':
+        sudo('a2ensite chandao.conf')
+        sudo('service apache2 reload')
+
+    banner('Deploy Succeeded. Go Home!')
 
 
 def banner(message):
+    host_string = "%s (%s)" % (message, env.host_string)
+
     print green(reindent("""
     #########################################################################
-    ## %s (%s)
+    ## %s
     #########################################################################
-    """ % (message, env.host_string), 0))
+    """ % host_string, 0))
