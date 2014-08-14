@@ -163,14 +163,17 @@ class WithdrawCompleteView(TemplateView):
             return self.render_to_response({
                 'result': u'请先进行实名认证'
             })
-
-        if not validate_validation_code(request.user.wanglibaouserprofile.phone,request.POST.get('validate_code', '')):
+        phone = request.user.wanglibaouserprofile.phone
+        code = request.POST.get('validate_code', '')
+        status, message = validate_validation_code(phone, code)
+        if status != 200:
             return self.render_to_response({
                 'result': u'验证码输入错误'
             })
 
         result = PayResult.WITHDRAW_SUCCESS
         try:
+
             amount_str = request.POST.get('amount', '')
             amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
