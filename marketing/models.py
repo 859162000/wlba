@@ -54,6 +54,8 @@ class IntroducedBy(models.Model):
     user = models.ForeignKey(get_user_model())
     introduced_by = models.ForeignKey(get_user_model(), related_name='introduces')
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+    bought_at = models.DateTimeField(u'第一次购买时间', null=True)
+    gift_send_at = models.DateTimeField(u'奖品发放时间', null=True)
 
 
 def generate_user_promo_token(sender, instance, **kwargs):

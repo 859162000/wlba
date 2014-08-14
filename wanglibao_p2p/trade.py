@@ -2,7 +2,9 @@
 import logging
 from django.db import transaction
 from django.utils import timezone
+from marketing.models import IntroducedBy
 from order.models import Order
+from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
@@ -37,7 +39,21 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-            return product_record, margin_record, equity
+        introduced_by = IntroducedBy.objects.filter(user=self.user).first()
+        if introduced_by and introduced_by.bought_at is None:
+            introduced_by.bought_at = timezone.now()
+            introduced_by.save()
+
+            inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
+            invited_phone = introduced_by.user.wanglibaouserprofile.phone
+
+            send_messages.apply_async(kwargs={
+                "phones": [inviter_phone, invited_phone],
+                "messages": [messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
+                             messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)]
+            })
+
+        return product_record, margin_record, equity
 
 
 class P2POperator(object):

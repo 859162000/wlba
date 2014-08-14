@@ -42,3 +42,14 @@ def product_amortize(product, amortize_time, amount):
 @suffix
 def validate_code(code):
     return u'验证码%s，如非本人操作，请忽略。工作人员不会索取，请勿泄露。' % code
+
+
+@suffix
+def gift_inviter(invited_phone, money):
+    return u'用户%s已接受你的邀请注册网利宝并购买成功！网利宝将奖励你%s元手机话费，5个工作日内将直接充值到你的注册手机号。' \
+           % (invited_phone, str(money))
+
+@suffix
+def gift_invited(inviter_phone, money):
+    return u'感谢你接受用户%s的邀请注册网利宝并成功购买理财产品！网利宝将奖励你%s元手机话费，5个工作日内将直接充值到你的注册手机号。' \
+           % (inviter_phone, str(money))
