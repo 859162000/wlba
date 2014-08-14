@@ -86,10 +86,14 @@ def staging():
 
 if env.get('group') == 'staging':
     env.roledefs = {
-        'lb': ['staging.wanglibao.com'],
+        'lb': [
+            #'staging.wanglibao.com'
+        ],
         'web': ['staging.wanglibao.com'],
         'task_queue': ['staging.wanglibao.com'],
         'db': ['staging.wanglibao.com'],
+        'old_lb': [],
+        'old_web': [],
     }
     staging()
 
