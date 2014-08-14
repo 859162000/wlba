@@ -4,6 +4,7 @@ import logging
 import json
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
+from django.db.models import Q
 
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
@@ -279,7 +280,7 @@ class AccountHome(TemplateView):
             income_rate = total_income / fund_total_asset
 
         # Followings for p2p
-        p2p_equities = P2PEquity.objects.filter(user=user, confirm=True)
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成"))
         amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False).prefetch_related("subs")
 
         unpayed_principle = 0

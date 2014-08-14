@@ -99,12 +99,12 @@ INSTALLED_APPS = (
     'djcelery', # Use django orm as the backend
     'djsupervisor',
     'adminplus',
-  #  'debug_toolbar',
+    'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
-   # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'concurrency.middleware.ConcurrencyMiddleware',
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -442,8 +442,8 @@ PROMO_TOKEN_QUERY_STRING = 'promo_token'
 
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 
-#DEBUG_TOOLBAR_PATCH_SETTINGS = False
-#INTERNAL_IPS = ('127.0.0.1',)
-#DEBUG_TOOLBAR_CONFIG = {
-#    'JQUERY_URL': '/static/js/lib/jquery.min.js'
-#}
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+INTERNAL_IPS = ('127.0.0.1',)
+DEBUG_TOOLBAR_CONFIG = {
+    'JQUERY_URL': '/static/js/lib/jquery.min.js'
+}
