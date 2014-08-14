@@ -242,3 +242,14 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
     else
       $("#login-modal-form").hide()
       $("#register-modal-form").show()
+
+  $("#invite_top_bar").click () ->
+    backend.userProfile {
+
+    }
+    .done ->
+      window.location.href = $("#invite_top_bar").attr("data-url")
+    .fail (xhr)->
+      if xhr.status == 403
+        $('.login-modal').trigger('click')
+        return
