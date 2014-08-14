@@ -15,7 +15,7 @@ class Margin(models.Model):
                                         default=Decimal('0.00'))
 
     def __unicode__(self):
-        return '%s margin: %s, freeze: %s' % (self.user, self.margin, self.freeze)
+        return u'%s margin: %s, freeze: %s' % (self.user, self.margin, self.freeze)
 
     def has_margin(self, amount):
         amount = Decimal(amount)

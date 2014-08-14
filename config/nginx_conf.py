@@ -10,8 +10,8 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
     if listen_on_80:
         conf += [
             [['server'], [
-                    ['listen', '80'],
-                    ['return', '301 https://$host$request_uri'],
+                ['listen', '80'],
+                ['return', '301 https://$host$request_uri'],
             ]]
         ]
 
@@ -37,6 +37,13 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
 
             [['location', '/static'], [
                 ['proxy_pass', 'http://apps/static'],
+                ['proxy_cache', 'static-cache'],
+                ['proxy_cache_valid', '200 302 60m'],
+                ['proxy_cache_valid', '404 1m'],
+            ]],
+
+            [['location', '/media'], [
+                ['proxy_pass', 'http://apps/media'],
                 ['proxy_cache', 'static-cache'],
                 ['proxy_cache_valid', '200 302 60m'],
                 ['proxy_cache_valid', '404 1m'],

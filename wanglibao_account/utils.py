@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
 from django.template import Context, Template, add_to_builtins
 from django.template.loader import render_to_string, get_template
+from django.utils import timezone
 from registration.models import RegistrationProfile
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd
 import logging
@@ -116,7 +117,8 @@ def generate_contract(equity, template_name=None):
     :return: The string representation of the contract
     """
     context = Context({
-        'equity': equity
+        'equity': equity,
+        'now': timezone.now()
     })
 
     if template_name is not None:

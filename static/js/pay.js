@@ -3,14 +3,15 @@
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      'jquery.validate': 'lib/jquery.validate.min'
+      'jquery.validate': 'lib/jquery.validate.min',
+      'jquery.modal': 'lib/jquery.modal.min'
     },
     shim: {
       'jquery.validate': ['jquery']
     }
   });
 
-  require(['jquery', 'jquery.validate'], function($, validate) {
+  require(['jquery', 'jquery.validate', 'lib/modal'], function($, validate, modal) {
     $('.banks a').click(function(e) {
       e.preventDefault();
       $('.banks a').removeClass('active');
@@ -34,13 +35,16 @@
         }
       }
     });
-    return $("#amount").blur(function() {
+    $("#amount").blur(function() {
       var value;
       value = $(this).val();
       if (value) {
         return $(this).val(parseFloat(value).toFixed(2));
       }
     });
+    if ($('#id-is-valid').val() === 'False') {
+      return $('#id-validate').modal();
+    }
   });
 
 }).call(this);
