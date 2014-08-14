@@ -29,6 +29,7 @@ from wanglibao_pay.util import get_client_ip
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao.const import ErrorNumber
+from wanglibao_sms.utils import validate_validation_code
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -161,6 +162,11 @@ class WithdrawCompleteView(TemplateView):
         if not request.user.wanglibaouserprofile.id_is_valid:
             return self.render_to_response({
                 'result': u'请先进行实名认证'
+            })
+
+        if not validate_validation_code(request.user.wanglibaouserprofile.phone,request.POST.get('validate_code', '')):
+            return self.render_to_response({
+                'result': u'验证码输入错误'
             })
 
         result = PayResult.WITHDRAW_SUCCESS

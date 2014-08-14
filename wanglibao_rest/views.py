@@ -38,6 +38,21 @@ class SendValidationCodeView(APIView):
 
     def post(self, request, phone, format=None):
         phone_number = phone.strip()
+        status, message = send_validation_code(phone_number)
+        return Response({
+                            'message': message
+                        }, status=status)
+
+
+class SendRegisterValidationCodeView(APIView):
+    """
+    The phone validate view which accept a post request and send a validate code to the phone
+    """
+    permission_classes = ()
+    throttle_classes = (UserRateThrottle,)
+
+    def post(self, request, phone, format=None):
+        phone_number = phone.strip()
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number,phone_verified=True)
         if phone_check:
             return Response({

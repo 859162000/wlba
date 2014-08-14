@@ -54,6 +54,13 @@ block main
             td
               span#actual-amount 0.00
           tr
+            th 手机验证码
+            td
+              .span5
+                input.withdraw-input(type='text', name='validate_code', placeholder='请输入验证码')
+              .span4
+                button.ispan4-omega#button-get-validate-code.button-red.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+          tr
             td(colspan=2)
               .withdraw-td
                 input#withdraw.withdraw-button(type='submit', value='提 现')
