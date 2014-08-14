@@ -14,21 +14,17 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     return value % 100 == 0
   , '请输入100的整数倍'
 
-  $.validator.addMethod 'isNumber', (value, element)->
-    return /^\d+$/ig.test(value) && $.isNumeric(value) && value <= $(element).attr('data-max')
-  , '请输入有效金额'
-
   $('#purchase-form').validate
     rules:
       amount:
         required: true
-        isNumber: true
+        number: true
         dividableBy100: true
 
     messages:
       amount:
         required: '请输入投资金额'
-        max: '不能大于可投资金额'
+        number: '请输入有效金额'
 
     errorPlacement: (error, element) ->
       error.appendTo $(element).closest('.form-row').find('.form-row-error')
