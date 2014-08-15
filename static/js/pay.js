@@ -20,6 +20,12 @@
       $('.bank-description .bank-desc-container').hide();
       return $('#' + $(e.target).attr('data-desc-id')).show();
     });
+    $('#pay').click(function(e) {
+      e.preventDefault();
+      if ($('#id-is-valid').val() === 'False') {
+        $('#id-validate').modal();
+      }
+    });
     $("#payform").validate({
       rules: {
         amount: {
