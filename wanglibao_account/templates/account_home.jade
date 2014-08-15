@@ -13,7 +13,7 @@ block sidebar
 
 block main
   .account-home-panel
-    .account-home-panel--title-bar.clamp-xl
+    .account-home-panel--title-bar
       span.nickname {{user | safe_phone}}
       if user.wanglibaouserprofile.id_is_valid
         span.verified 已实名认证
@@ -140,7 +140,7 @@ block main
 
   else
     .account-home-panel__no-padding
-      .account-home-panel--title-bar__product
+      .account-home-panel--title-bar__product.clamp-xl
         ul.title-bar--tabs
           li.title-bar--tab
             a.title-bar--tab--anchor(href="/accounts/home/") P2P
@@ -149,23 +149,23 @@ block main
         a.pull-right.align-right(href='/accounts/transaction/fund/') 查看交易记录
       .clamp-sm
         .space-vertical-s
-        .row
+        .row.total-money
           .gray-card4
-            p 总资产(元)
             p
               span.big_number {{fund_total_asset|money_f_2}}
+            p 总资产(元)
           .gray-card4
-            p 累积收益(元)
             p
               span.big_number {{total_income|money_f_2}}
+            p 累积收益(元)
           .gray-card4
-            p 近一周收益(元)
             p
               span.big_number {{fund_income_week|money_f_2}}
+            p 近一周收益(元)
           .gray-card4
-            p 近一月收益(元)
             p
               span.big_number {{fund_income_month|money_f_2}}
+            p 近一月收益(元)
         .space-vertical-s
 
         table.table

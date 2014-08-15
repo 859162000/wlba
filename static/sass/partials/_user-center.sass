@@ -30,6 +30,7 @@
 
 .account-home-panel--title-bar
   margin-top: 10px
+  font-size: $font-s
 
 .account-home-panel--title-bar__product
   border-bottom: 1px solid $color-text-d5
@@ -78,7 +79,7 @@
   width: 276px
 
 .account-home-panel
-  margin-top: 10px
+  margin-top: 15px
 
 .title-bar--tabs
   display: inline-block
@@ -110,7 +111,6 @@
   padding: 10px 0
 
 .nickname
-  font-size: $font-m
   padding-right: 5px
 
 .verified
@@ -151,6 +151,16 @@
   @extend .gray-card
   width: 25%
 
+.total-money
+  border: solid 1px #f0f0f0
+
+  .gray-card4
+    text-align: center
+
+    &:first-child
+      border-left: 0
+      background: #fbfbfb
+
 .big_number
   font-size: $font-xl
 
@@ -161,12 +171,12 @@
   padding: 5px
 
 .bank-card
-  width: 250px
+  width: 239px
   border: 1px solid #d3d3d3
   border-radius: 5px
   overflow: hidden
   margin-top: $space-m
-  margin-left: 10px
+  margin-left: $space-m
   display: inline-block
 
 .add-bank-card
