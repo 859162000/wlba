@@ -154,6 +154,11 @@ class P2PProduct(ProductBase):
     audit_link.short_description = u'审核'
     audit_link.allow_tags = True
 
+    def preview_link(self):
+        return u'<a href="/p2p/detail/%s" target="_blank">预览</a>' % str(self.id)
+    preview_link.short_description = u'预览'
+    preview_link.allow_tags = True
+
 reversion.register(P2PProduct)
 
 
