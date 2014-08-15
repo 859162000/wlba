@@ -27,7 +27,8 @@ block main
           .invite-title-bgcolor 这是您的专用邀请链接，您可点击【复制】按钮，将本文粘贴并发送给您的好友：
           .invite-textarea
             |我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～
-            |戳这里>>https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}
+            |戳这里>>
+            span.blue https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}
           input.pull-right.button.button-red#inviteCopyButton(type="button",value="复制")
       .space-vertical-l
       .invite-container.clearfix
@@ -98,7 +99,7 @@ block main
 
   #copyed_modal(style="display:none").modal
     .modal-title-bar
-      span.modal-title &nbsp;
+      span.modal-title 邀请好友送话费
       a.icon-cancel.pull-right(rel="modal:close")
     .copyed-ok
       p 复制成功！
