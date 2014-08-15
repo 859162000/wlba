@@ -17,11 +17,8 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
     $('#' + $(e.target).attr('data-desc-id')).show()
 
   $('#pay').click (e)->
-    e.preventDefault()
     if $('#id-is-valid').val() == 'False'
       $('#id-validate').modal()
-      return
-    if $(this).hasClass "disabled"
       return
 
   $("#payform").validate

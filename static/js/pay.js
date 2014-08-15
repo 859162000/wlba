@@ -21,13 +21,8 @@
       return $('#' + $(e.target).attr('data-desc-id')).show();
     });
     $('#pay').click(function(e) {
-      e.preventDefault();
       if ($('#id-is-valid').val() === 'False') {
         $('#id-validate').modal();
-        return;
-      }
-      if ($(this).hasClass("disabled")) {
-
       }
     });
     $("#payform").validate({
