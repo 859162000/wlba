@@ -127,24 +127,48 @@ html
             table
               thead
                 tr
-                  td 投资人网利宝用户名
-                  td 每月（除最后一个月）应收收益
-                  td 最后一个月应收转让价款及收益
+                  td 借款期数
+                  td 还款日期
+                  td 还款本息
+                  td 还款本金
+                  td 还款利息
               tbody
-                tr
-                  td(colspan=3)
+                if product.pay_method == '按月付息'
+                  amortizations = equity.amortizations.all()
+                  for amortization in amortizations
+                    tr
+                      td 第{{amortization.term}}期
+                      td {{amortization.term_date|date:"Y年m月d日"}}
+                      total = amortization.principal + amortization.interest
+                      td ￥{{total}}元
+                      td ￥{{amortization.principal}}元
+                      td ￥{{amortization.interest}}元
+                else
+                  td(colspan=5)
           li （2）按季度付息，应收账款转让到期一次性支付转让价款。
             p ①乙方每季度应还收益=转让价款×月收益率×3。
             p ②回购分期次数为[{{product.amortization_count}}]次，当期回购日为自{{now|date:"【Y】年【m】月【d】日"}}起，每三个月的最后一个月的{{now|date:"【d】日"}}（若当月没有该日，则当期回购日为当月最后一天；若当期回购日遇法定节假日的，顺延至节后第一个工作日）。
             table
               thead
                 tr
-                  td 投资人网利宝用户名
-                  td 每季度（除最后一季度）应收收益
-                  td 最后一季度应收转让价款及收益
+                  td 借款期数
+                  td 还款日期
+                  td 还款本息
+                  td 还款本金
+                  td 还款利息
               tbody
-                tr
-                  td(colspan=3)
+                if product.pay_method == '按季度付息'
+                  amortizations = equity.amortizations.all()
+                  for amortization in amortizations
+                    tr
+                      td 第{{amortization.term}}期
+                      td {{amortization.term_date|date:"Y年m月d日"}}
+                      total = amortization.principal + amortization.interest
+                      td ￥{{total}}元
+                      td ￥{{amortization.principal}}元
+                      td ￥{{amortization.interest}}元
+                else
+                  td(colspan=5)
           li （3）应收账款转让到期一次性支付转让价款及收益。
             p ①乙方到期时应付转让价款及收益=转让价款+转让价款×月收益率×应收账款转让月数
             p ②当期回购日为{{now|add_months:product.period|date:"【Y】年【m】月【d】日"}}。
@@ -152,11 +176,24 @@ html
             table
               thead
                 tr
-                  td 投资人网利宝用户名
-                  td 回购日应收转让价款及收益
+                  td 借款期数
+                  td 还款日期
+                  td 还款本息
+                  td 还款本金
+                  td 还款利息
               tbody
-                tr
-                  td(colspan=2)
+                if product.pay_method == '到期还本付息'
+                  amortizations = equity.amortizations.all()
+                  for amortization in amortizations
+                    tr
+                      td 第{{amortization.term}}期
+                      td {{amortization.term_date|date:"Y年m月d日"}}
+                      total = amortization.principal + amortization.interest
+                      td ￥{{total}}元
+                      td ￥{{amortization.principal}}元
+                      td ￥{{amortization.interest}}元
+                else
+                  td(colspan=5)
       li 乙方授权并委托丙方通过第三方支付平台下发支付指令，从乙方账户向甲方账户按时足额的划转当期应付收益和/或其他各项费用给甲方和/或丙方。
       li 乙方支付的各项费用（如有）均应按照如下顺序清偿：
         ul

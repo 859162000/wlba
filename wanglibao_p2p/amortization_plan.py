@@ -177,11 +177,17 @@ class QuarterlyInterest(AmortizationPlan):
     @classmethod
     def calculate_term_date(cls, product):
         amortizations = product.amortizations.all()
+        count = len(amortizations)
+        period = product.period
         today = timezone.now()
 
-        for index, amortization in enumerate(amortizations):
+        for index, amortization in enumerate(amortizations[0:count-1]):
             amortization.term_date = today + relativedelta(months=(1 + index)*3)
             amortization.save()
+
+        amortization = amortizations[count-1]
+        amortization.term_date = today + relativedelta(months=period)
+        amortization.save()
 
 
 def get_amortization_plan(amortization_type):
