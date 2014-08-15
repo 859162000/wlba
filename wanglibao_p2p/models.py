@@ -59,6 +59,7 @@ class P2PProduct(ProductBase):
         (u'先息后本', u'先息后本'),
         (u'按月付息', u'按月付息'),
         (u'到期还本付息', u'到期还本付息'),
+        (u'按季度付息', u'按季度付息'),
     )
 
     version = IntegerVersionField()
@@ -80,6 +81,11 @@ class P2PProduct(ProductBase):
     pay_method = models.CharField(u'支付方式', max_length=32, blank=True, default=u'等额本息', choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)
     repaying_source = models.CharField(u'还款资金来源', max_length=256, blank=True)
+
+    # Bao li related
+    baoli_original_contract_number = models.CharField(u'(保理)原合同编号', max_length=64, blank=True)
+    baoli_original_contract_name = models.CharField(u'(保理)原合同名字', max_length=128, blank=True)
+    baoli_trade_relation = models.CharField(u'(保理)交易关系', max_length=128, blank=True)
 
     # pay info for the borrower
     borrower_name = models.CharField(u'借债人姓名', max_length=32, blank=True)
@@ -250,8 +256,8 @@ class P2PEquity(models.Model):
     product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
     equity = models.BigIntegerField(u'用户所持份额', default=0)
     confirm = models.BooleanField(u'确认成功', default=False)
-    confirm_at = models.DateTimeField(u'份额确认时间', null=True)
-    contract = models.FileField(u'合同文件', null=True, upload_to='contracts')
+    confirm_at = models.DateTimeField(u'份额确认时间', null=True, blank=True)
+    contract = models.FileField(u'合同文件', null=True, blank=True, upload_to='contracts')
 
     class Meta:
         unique_together = (('user', 'product'),)
@@ -408,8 +414,7 @@ def generate_amortization_plan(sender, instance, **kwargs):
     if instance.status == u'录标完成':
         logger.info(u'The product status is 录标完成, start to generate amortization plan')
 
-        term_count = instance.amortization_count
-        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, term_count, instance.period)
+        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, None, instance.period)
 
         for index, term in enumerate(terms['terms']):
             amortization = ProductAmortization()
@@ -424,7 +429,7 @@ def generate_amortization_plan(sender, instance, **kwargs):
         instance.save()
 
 
-def process_after_money_paied(product):
+def process_after_money_paided(product):
     if product.status == u'满标已打款':
         from celery.execute import send_task
         send_task("wanglibao_p2p.tasks.process_paid_product", kwargs={
@@ -434,6 +439,6 @@ def process_after_money_paied(product):
 
 def post_save_process(sender, instance, **kwargs):
     generate_amortization_plan(sender, instance, **kwargs)
-    process_after_money_paied(instance)
+    process_after_money_paided(instance)
 
 post_save.connect(post_save_process, sender=P2PProduct, dispatch_uid="generate_amortization_plan")

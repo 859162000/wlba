@@ -60,47 +60,60 @@ block main
   script(src="/static/js/lib/jquery.zclip.min.js")
   script(src="/static/js/lib/jquery.modal.min.js")
   script.
-    var _share_title = encodeURI('我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～ 戳这里 https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
+    var _share_title = encodeURI('“邀请好友送话费”活动');
     var _share_content = encodeURI('我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～ 戳这里  https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
+    var _activity_url = encodeURIComponent('https://www.wanglibao.com/activity/');
     var _share_url = encodeURIComponent('https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
     var _share_pic = 'https://staging.wanglibao.com/static/images/share_pic.jpg';
     var _share_site = '';
     $(document).ready(function(){
       $(".wlb_tsina").click(function(){
-        window.open("http://v.t.sina.com.cn/share/share.php?url="+_share_url+"&title="+_share_title);
+        window.open("http://v.t.sina.com.cn/share/share.php?url=&title="+_share_content);
       });
       $(".wlb_tqq").click(function(){
-        window.open("http://v.t.qq.com/share/share.php?url="+_share_url+"&pic="+_share_pic+"&title="+_share_title);
+        window.open("http://v.t.qq.com/share/share.php?url=&pic="+_share_pic+"&title="+_share_content);
       });
       $(".wlb_kaixin001").click(function(){
-        window.open("http://www.kaixin001.com/repaste/share.php?rurl="+_share_url+"&rcontent="+_share_content+"&rtitle="+_share_title);
+        window.open("http://www.kaixin001.com/repaste/share.php?rurl="+_share_url+"&rcontent="+_share_content);
       });
       $(".wlb_douban").click(function(){
-        window.open("http://www.douban.com/recommend/?url="+_share_url+"&title="+_share_title);
+        window.open("http://www.douban.com/recommend/?url="+_share_url+"&title="+_share_content);
       });
       $(".wlb_renren").click(function(){
-        window.open("http://share.renren.com/share/buttonshare.do?link="+_share_url+"&title="+_share_title);
+        window.open("http://share.renren.com/share/buttonshare.do?link="+_share_url+"&title="+_share_content);
       });
       $(".wlb_qzone").click(function(){
-        window.open("http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url="+_share_url+"&title="+_share_title+"&pics="+_share_pic+"&desc="+_share_title);
+        window.open("http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url="+_activity_url+"&title="+_share_title+"&pics="+_share_pic+"&desc="+_share_content);
       });
-      $("#inviteCopyButton").zclip({
-        path: "/static/images/ZeroClipboard.swf",
-        copy: $('.invite-textarea').text(),
-        afterCopy:function(){
-          $('#copyed_modal').modal();
+      if(navigator.plugins){
+        var isFlashPlugin = 0;
+        $.each(navigator.plugins, function(x,y){
+          if(navigator.plugins[x].name == "Shockwave Flash") {
+            isFlashPlugin = 1;
+          }
+        });
+        if(isFlashPlugin == 1){
+          $("#inviteCopyButton").zclip({
+            path: "/static/images/ZeroClipboard.swf",
+            copy: $('.invite-textarea').text(),
+            afterCopy:function(){
+              $('#copyed_modal').modal();
+            }
+          });
+        } else {
+          $("#inviteCopyButton").click(function(){
+            $('#no_copyed_modal').modal();
+          });
         }
-      });
-      //$("#inviteCopyButton").click(function(){
-      //  window.clipboardData.setData("Text", $(".invite-textarea").htm());
-      //  $('#copyed_modal').modal();
-      //});
+      }
     });
 
   #copyed_modal(style="display:none").modal
-    .modal-title-bar
-      span.modal-title 邀请好友送话费
-      a.icon-cancel.pull-right(rel="modal:close")
     .copyed-ok
       p 复制成功！
       p 你可以粘贴到QQ或论坛中发送给好友
+
+  #no_copyed_modal(style="display:none").modal
+    .copyed-ok
+      p 你的浏览器不支持直接复制。
+      p 请选中文案后点击鼠标右键复制。
