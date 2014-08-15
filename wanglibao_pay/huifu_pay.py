@@ -34,7 +34,7 @@ class HuifuPay(Pay):
     PAY_URL = settings.PAY_URL
     WITHDRAW_URL = settings.WITHDRAW_URL
 
-    FEE = decimal.Decimal('0.0025')
+    FEE = decimal.Decimal(0)
 
     VERSION = '10'
     PAY_FIELDS = ['Version', 'CmdId', 'MerId', 'OrdId', 'OrdAmt', 'CurCode', 'Pid', 'RetUrl', 'MerPriv',
