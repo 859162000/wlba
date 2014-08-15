@@ -85,33 +85,35 @@ block main
       $(".wlb_qzone").click(function(){
         window.open("http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url="+_activity_url+"&title="+_share_title+"&pics="+_share_pic+"&desc="+_share_content);
       });
-      var swf = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
-      if(swf){
-        $("#inviteCopyButton").zclip({
-          path: "/static/images/ZeroClipboard.swf",
-          copy: $('.invite-textarea').text(),
-          afterCopy:function(){
-            $('#copyed_modal').modal();
+      if(navigator.plugins){
+        var isFlashPlugin = 0;
+        $.each(navigator.plugins, function(x,y){
+          if(navigator.plugins[x].name == "Shockwave Flash") {
+            isFlashPlugin = 1;
           }
         });
-      } else {
-        $("#inviteCopyButton").click(function(){
-          $('#no_copyed_modal').modal();
-        });
+        if(isFlashPlugin == 1){
+          $("#inviteCopyButton").zclip({
+            path: "/static/images/ZeroClipboard.swf",
+            copy: $('.invite-textarea').text(),
+            afterCopy:function(){
+              $('#copyed_modal').modal();
+            }
+          });
+        } else {
+          $("#inviteCopyButton").click(function(){
+            $('#no_copyed_modal').modal();
+          });
+        }
       }
     });
 
   #copyed_modal(style="display:none").modal
     .copyed-ok
-      p
-        a.icon-cancel.pull-right(rel="modal:close")
       p 复制成功！
       p 你可以粘贴到QQ或论坛中发送给好友
 
   #no_copyed_modal(style="display:none").modal
-    .modal-title-bar
-      span.modal-title 邀请好友送话费
-      a.icon-cancel.pull-right(rel="modal:close")
     .copyed-ok
       p 你的浏览器不支持直接复制。
       p 请选中文案后点击鼠标右键复制。
