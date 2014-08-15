@@ -2,6 +2,7 @@
 from decimal import *
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+import math
 
 
 class AmortizationPlan(object):
@@ -140,7 +141,54 @@ class DisposablePayOff(AmortizationPlan):
         amortization.save()
 
 
+class QuarterlyInterest(AmortizationPlan):
+    name = u'按季度付息'
+
+    @classmethod
+    def generate(cls, amount, year_rate, term, period=None):
+        assert(period is not None)
+
+        amount = Decimal(amount)
+        year_rate = Decimal(year_rate)
+        quarter_rate = year_rate / 4
+
+        quarter_interest = amount * quarter_rate
+        quarter_interest = quarter_interest.quantize(Decimal('.01'), ROUND_UP)
+
+        term_count = int(math.ceil(period / 3.0))
+
+        total_interest = year_rate / 12 * period * amount
+        total = amount + total_interest
+
+        result = []
+        paid_interest = Decimal(0)
+        for i in xrange(0, term_count - 1):
+            result.append((quarter_interest, Decimal(0), quarter_interest, amount, total - quarter_interest * (i + 1)))
+            paid_interest = paid_interest + quarter_interest
+
+        result.append((total - quarter_interest * (term_count - 1), amount, total_interest - paid_interest, Decimal(0), Decimal(0)))
+
+        return {
+            "terms": result,
+            "total": total
+        }
+
+
+    @classmethod
+    def calculate_term_date(cls, product):
+        amortizations = product.amortizations.all()
+        today = timezone.now()
+
+        for index, amortization in enumerate(amortizations):
+            amortization.term_date = today + relativedelta(months=(1 + index)*3)
+            amortization.save()
+
+
 def get_amortization_plan(amortization_type):
-    for plan in (MatchingPrincipalAndInterest, MonthlyInterest, InterestFirstThenPrincipal, DisposablePayOff):
+    for plan in (MatchingPrincipalAndInterest,
+                 MonthlyInterest,
+                 InterestFirstThenPrincipal,
+                 DisposablePayOff,
+                 QuarterlyInterest):
         if plan.name == amortization_type:
             return plan

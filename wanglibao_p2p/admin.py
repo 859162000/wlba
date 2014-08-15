@@ -1,3 +1,4 @@
+# coding=utf-8
 from concurrency.admin import ConcurrentModelAdmin
 from django.contrib import admin
 from reversion.admin import VersionAdmin
