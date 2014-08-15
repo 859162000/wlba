@@ -64,6 +64,8 @@ class P2PProduct(ProductBase):
 
     version = IntegerVersionField()
 
+    hide = models.BooleanField(u'隐藏', default=False)
+
     name = models.CharField(max_length=256, verbose_name=u'名字')
     short_name = models.CharField(u'短名字', max_length=64)
     serial_number = models.CharField(u'产品编号', max_length=100, unique=True, null=True)

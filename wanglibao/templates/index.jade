@@ -128,7 +128,7 @@ html
                         status = product.status
                         full = status.startswith(u'满标')
                         if full
-                          status = '已满标'
+                          status = '满标审核中'
                         a.button-disabled(href="javascript:void(0)", disabled) {{status}}
 
                     if product.status == '正在招标'

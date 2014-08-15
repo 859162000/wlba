@@ -14,7 +14,7 @@ class IndexView(TemplateView):
     template_name = 'index.jade'
 
     def get_context_data(self, **kwargs):
-        p2p_products = P2PProduct.objects.filter(Q(publish_time__lte=timezone.now())).filter(
+        p2p_products = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
             status__in=[
                 u'正在招标', u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
             ]).order_by('-end_time').select_related('warrant_company')[:20]
@@ -31,6 +31,7 @@ class IndexView(TemplateView):
             'banners': banners,
             'site_data': site_data
         }
+
 
 class SecurityView(TemplateView):
     template_name = 'security.jade'
