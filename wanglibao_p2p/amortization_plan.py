@@ -2,6 +2,7 @@
 from decimal import *
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+import math
 
 
 class AmortizationPlan(object):
@@ -28,14 +29,14 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
         year_rate = Decimal(year_rate)
 
         month_rate = year_rate / 12
-        term_amount = amount * (month_rate * pow(1 + month_rate, term)) / (pow(1 + month_rate, term) - 1)
+        term_amount = amount * (month_rate * pow(1 + month_rate, period)) / (pow(1 + month_rate, period) - 1)
         term_amount = term_amount.quantize(Decimal('.01'), rounding=ROUND_UP)
 
-        total = term * term_amount
+        total = period * term_amount
 
         result = []
         principal_left = amount
-        for i in xrange(0, term - 1):
+        for i in xrange(0, period - 1):
             interest = principal_left * month_rate
             interest = interest.quantize(Decimal('.01'), rounding=ROUND_UP)
 
@@ -44,7 +45,7 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
 
             principal_left -= principal
 
-            result.append((term_amount, principal, interest, principal_left, term_amount * (term - i - 1)))
+            result.append((term_amount, principal, interest, principal_left, term_amount * (period - i - 1)))
 
         result.append((term_amount, principal_left, term_amount - principal_left, Decimal(0), Decimal(0)))
 
@@ -66,11 +67,11 @@ class MonthlyInterest(AmortizationPlan):
         month_interest = amount * month_rate
         month_interest = month_interest.quantize(Decimal('.01'), ROUND_UP)
 
-        total = month_interest * term + amount
+        total = month_interest * period + amount
 
         result = []
 
-        for i in xrange(0, term - 1):
+        for i in xrange(0, period - 1):
             result.append((month_interest, Decimal(0), month_interest, amount, total - month_interest * (i + 1)))
 
         result.append((month_interest + amount, amount, month_interest, Decimal(0), Decimal(0)))
@@ -93,11 +94,11 @@ class InterestFirstThenPrincipal(AmortizationPlan):
         month_interest = amount * month_rate
         month_interest = month_interest.quantize(Decimal('.01'), ROUND_UP)
 
-        total = month_interest * term + amount
+        total = month_interest * period + amount
 
         result = []
 
-        for i in xrange(0, term):
+        for i in xrange(0, period):
             result.append((month_interest, Decimal(0), month_interest, amount, total - month_interest * (i + 1)))
 
         result.append((amount, amount, Decimal(0), Decimal(0), Decimal(0)))
@@ -140,7 +141,60 @@ class DisposablePayOff(AmortizationPlan):
         amortization.save()
 
 
+class QuarterlyInterest(AmortizationPlan):
+    name = u'按季度付息'
+
+    @classmethod
+    def generate(cls, amount, year_rate, term, period=None):
+        assert(period is not None)
+
+        amount = Decimal(amount)
+        year_rate = Decimal(year_rate)
+        quarter_rate = year_rate / 4
+
+        quarter_interest = amount * quarter_rate
+        quarter_interest = quarter_interest.quantize(Decimal('.01'), ROUND_UP)
+
+        term_count = int(math.ceil(period / 3.0))
+
+        total_interest = year_rate / 12 * period * amount
+        total = amount + total_interest
+
+        result = []
+        paid_interest = Decimal(0)
+        for i in xrange(0, term_count - 1):
+            result.append((quarter_interest, Decimal(0), quarter_interest, amount, total - quarter_interest * (i + 1)))
+            paid_interest = paid_interest + quarter_interest
+
+        result.append((total - quarter_interest * (term_count - 1), amount, total_interest - paid_interest, Decimal(0), Decimal(0)))
+
+        return {
+            "terms": result,
+            "total": total
+        }
+
+
+    @classmethod
+    def calculate_term_date(cls, product):
+        amortizations = product.amortizations.all()
+        count = len(amortizations)
+        period = product.period
+        today = timezone.now()
+
+        for index, amortization in enumerate(amortizations[0:count-1]):
+            amortization.term_date = today + relativedelta(months=(1 + index)*3)
+            amortization.save()
+
+        amortization = amortizations[count-1]
+        amortization.term_date = today + relativedelta(months=period)
+        amortization.save()
+
+
 def get_amortization_plan(amortization_type):
-    for plan in (MatchingPrincipalAndInterest, MonthlyInterest, InterestFirstThenPrincipal, DisposablePayOff):
+    for plan in (MatchingPrincipalAndInterest,
+                 MonthlyInterest,
+                 InterestFirstThenPrincipal,
+                 DisposablePayOff,
+                 QuarterlyInterest):
         if plan.name == amortization_type:
             return plan
