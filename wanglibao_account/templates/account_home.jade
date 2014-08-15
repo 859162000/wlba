@@ -121,9 +121,10 @@ block main
                       td {{equity.product.status}}
                   else
                     td {{equity.product.status}}{{term}}/{{equity.product.amortization_count}}
-
-                  td <span class="highlight">{{equity.paid_interest | money_format}}</span> / {{total_income | money_format}}
-
+                  if equity.product.status == '还款中'
+                    td <span class="highlight">{{equity.paid_interest | money_format}}</span> / {{total_income | money_format}}
+                  else
+                    td -
                   if equity.product.status == '还款中' or equity.product.status == '已完成'
                     td
                       a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{equity.product.id}}/") 还款计划

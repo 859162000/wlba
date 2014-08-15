@@ -4,13 +4,14 @@ require.config
     'jquery.validate': 'lib/jquery.validate.min'
     'jquery.complexify': 'lib/jquery.complexify.min'
     'jquery.placeholder': 'lib/jquery.placeholder'
+    tools: 'lib/modal.tools'
 
   shim:
     'jquery.validate': ['jquery']
     'jquery.complexify': ['jquery']
     'jquery.placeholder': ['jquery']
 
-require ['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquery.placeholder'], ($, validate, complexify, backend, placeholder)->
+require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend', 'jquery.placeholder'], ($, validate, tool, complexify, backend, placeholder)->
 
   $('input, textarea').placeholder()
 
@@ -41,10 +42,19 @@ require ['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquer
       if console?
         console.log "Phone number checked, now send the valdiation code"
 
-      $.ajax(
-        url: "/api/phone_validation_code/register/" + phoneNumber + "/"
-        type: "POST"
-      )
+      $.ajax
+          url: "/api/phone_validation_code/register/" + phoneNumber + "/"
+          type: "POST"
+        .fail (xhr)->
+          console.log("eoorsss")
+          $.modal.close()
+          clearInterval(intervalId)
+          $(element).text('重新获取')
+          $(element).removeAttr 'disabled'
+          $(element).addClass 'button-red'
+          $(element).removeClass 'button-gray'
+          result = JSON.parse xhr.responseText
+          tool.modalAlert({title: '温馨提示', msg: result.message})
 
       intervalId
       count = 60
@@ -98,7 +108,6 @@ require ['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquer
 
   container = $('.password-strength-container')
   $('#id_password').complexify {minimumChars:6, strengthScaleFactor:1}, (valid, complexity)->
-    console.log 'complexity: ' + complexity
     if complexity == 0
       container.removeClass 'low'
       container.removeClass 'soso'
@@ -115,3 +124,18 @@ require ['jquery', 'jquery.validate', 'jquery.complexify', 'lib/backend', 'jquer
       container.removeClass 'low'
       container.removeClass 'soso'
       container.addClass 'strong'
+
+
+  $("#agreement").change (value)->
+    if $(this).attr("data-value") == "agree"
+      $("#register_submit").addClass("disabled")
+      $(this).attr("data-value","disagree")
+    else
+      $(this).attr("data-value","agree")
+      $("#register_submit").removeClass("disabled")
+
+
+  $("#register_submit").click (e)->
+    if $(this).hasClass("disabled")
+      e.preventDefault()
+      return

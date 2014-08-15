@@ -173,7 +173,6 @@
           type: "POST"
         }).fail(function(xhr) {
           var result;
-          console.log("eoorsss");
           $.modal.close();
           clearInterval(intervalId);
           $(element).text('重新获取');
@@ -294,12 +293,10 @@
       });
     });
     $("#agreement").change(function(value) {
-      if ($(this).attr("data-value") === "agree") {
+      if ($(this).attr("checked")) {
         $("#register_submit").addClass("disabled");
-        $(this).attr("data-value", "disagree");
-        return $(this).removeAttr(checked);
+        return $(this).removeAttr("checked");
       } else {
-        $(this).attr("data-value", "agree");
         $("#register_submit").removeClass("disabled");
         return $(this).attr("checked", "checked");
       }

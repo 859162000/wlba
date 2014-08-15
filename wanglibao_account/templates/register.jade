@@ -35,7 +35,12 @@ html
             .form-row
               input.input-large(type="password", name="password2", placeholder="* 请确认密码", autocomplete='off', title="* 请确认密码")
             .form-row.form-bottom-bar
-              button#button-submit.button-red.button-middle.span12(type='submit') 注 册
+              button#register_submit.button-red.button-middle.span12(type='submit') 注 册
+              .agreement
+                label(for="agreement")
+                input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
+                | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                .form-row-error
         .register-right-div
           p 已有网利宝账号&nbsp;
             a#register-now(href='/accounts/login/?next={{next}}') 直接登录>>

@@ -99,7 +99,7 @@ INSTALLED_APPS = (
     'djcelery', # Use django orm as the backend
     'djsupervisor',
     'adminplus',
-    'debug_toolbar',
+    #'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (

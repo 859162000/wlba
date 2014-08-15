@@ -139,7 +139,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
           url: "/api/phone_validation_code/register/" + phoneNumber + "/"
           type: "POST"
         .fail (xhr)->
-          console.log("eoorsss")
           $.modal.close()
           clearInterval(intervalId)
           $(element).text('重新获取')
@@ -255,14 +254,12 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         return
 
   $("#agreement").change (value)->
-    if $(this).attr("data-value") == "agree"
+    if $(this).attr "checked"
       $("#register_submit").addClass("disabled")
-      $(this).attr("data-value","disagree")
-      $(this).removeAttr checked
+      $(this).removeAttr "checked"
     else
-      $(this).attr("data-value","agree")
       $("#register_submit").removeClass("disabled")
-      $(this).attr("checked","checked")
+      $(this).attr "checked", "checked"
 
   $("#register_submit").click (e)->
     if $(this).hasClass("disabled")
