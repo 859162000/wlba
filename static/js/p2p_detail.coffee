@@ -14,11 +14,16 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     return value % 100 == 0
   , '请输入100的整数倍'
 
+  $.validator.addMethod 'positiveNumber', (value, element)->
+    return Number(value) > 0
+  , '请输入有效金额'
+
   $('#purchase-form').validate
     rules:
       amount:
         required: true
         number: true
+        positiveNumber: true
         dividableBy100: true
 
     messages:

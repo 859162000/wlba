@@ -48,6 +48,9 @@ define ['jquery'], ($)->
 
     earning = ((amount / total_amount) * total_earning).toFixed(1)
 
+    if earning < 0
+      earning = 0
+
     earning_elements = (target.attr 'data-target').split(',')
     for earning_element, i in earning_elements
       if earning and $.isNumeric(earning)

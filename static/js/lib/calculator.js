@@ -53,6 +53,9 @@
       }
       amount = parseFloat(existing) + parseFloat(amount);
       earning = ((amount / total_amount) * total_earning).toFixed(1);
+      if (earning < 0) {
+        earning = 0;
+      }
       earning_elements = (target.attr('data-target')).split(',');
       _results = [];
       for (i = _i = 0, _len = earning_elements.length; _i < _len; i = ++_i) {

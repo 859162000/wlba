@@ -16,11 +16,15 @@
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0;
     }, '请输入100的整数倍');
+    $.validator.addMethod('positiveNumber', function(value, element) {
+      return Number(value) > 0;
+    }, '请输入有效金额');
     $('#purchase-form').validate({
       rules: {
         amount: {
           required: true,
           number: true,
+          positiveNumber: true,
           dividableBy100: true
         }
       },
@@ -98,3 +102,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=p2p_detail.map
