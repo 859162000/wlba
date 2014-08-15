@@ -4,10 +4,10 @@
 doctype html
 html
   head
-    title 11%年化收益 再贴1%
+    - with '购买P2P，送钱还送礼' as title
       include include/common_head
-      meta(name="keywords", content="11%年化收益")
-      meta(name="description", content="11%年化收益 再贴1%，活动期间内，达到累计购买金额，即送“真爱大礼”")
+      meta(name="keywords", content="购买P2P,送钱还送礼,网利宝")
+      meta(name="description", content="购买P2P，送钱还送礼，11%年化收益 再贴1%，活动期间内，达到累计购买金额，即送“真爱大礼”")
 
   body.white-background
     .full-container
@@ -74,7 +74,7 @@ html
           img(src="/static/images/activity/text_2.png",alt="有钱一起赚，邀请好友就赚钱")
 
     .container
-      a.invite-friend(href="/accounts/invite/",title="邀请好友")
+      a.invite-friend(href="/accounts/invite/",title="邀请好友",target="_blank")
         img(src="/static/images/activity/invite_friends.png",alt="邀请好友")
       p.invite-text
         |邀请好友，多邀多送，上不封顶，有钱一起赚！
