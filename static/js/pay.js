@@ -22,8 +22,23 @@
     });
     $('#pay').click(function(e) {
       e.preventDefault();
+      console.log($("#agreement").removeAttr("checked"));
+      return;
       if ($('#id-is-valid').val() === 'False') {
         $('#id-validate').modal();
+        return;
+      }
+      if ($(this).hasClass("disabled")) {
+
+      }
+    });
+    $("#agreement").change(function(e) {
+      if ($(this).attr("checked")) {
+        $(this).removeAttr("checked");
+        return $("#pay").addClass("disabled");
+      } else {
+        $(this).attr("checked", "checked");
+        return $("#pay").removeClass("disabled");
       }
     });
     $("#payform").validate({
