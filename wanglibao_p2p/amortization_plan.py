@@ -29,14 +29,14 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
         year_rate = Decimal(year_rate)
 
         month_rate = year_rate / 12
-        term_amount = amount * (month_rate * pow(1 + month_rate, term)) / (pow(1 + month_rate, term) - 1)
+        term_amount = amount * (month_rate * pow(1 + month_rate, period)) / (pow(1 + month_rate, period) - 1)
         term_amount = term_amount.quantize(Decimal('.01'), rounding=ROUND_UP)
 
-        total = term * term_amount
+        total = period * term_amount
 
         result = []
         principal_left = amount
-        for i in xrange(0, term - 1):
+        for i in xrange(0, period - 1):
             interest = principal_left * month_rate
             interest = interest.quantize(Decimal('.01'), rounding=ROUND_UP)
 
@@ -45,7 +45,7 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
 
             principal_left -= principal
 
-            result.append((term_amount, principal, interest, principal_left, term_amount * (term - i - 1)))
+            result.append((term_amount, principal, interest, principal_left, term_amount * (period - i - 1)))
 
         result.append((term_amount, principal_left, term_amount - principal_left, Decimal(0), Decimal(0)))
 
@@ -67,11 +67,11 @@ class MonthlyInterest(AmortizationPlan):
         month_interest = amount * month_rate
         month_interest = month_interest.quantize(Decimal('.01'), ROUND_UP)
 
-        total = month_interest * term + amount
+        total = month_interest * period + amount
 
         result = []
 
-        for i in xrange(0, term - 1):
+        for i in xrange(0, period - 1):
             result.append((month_interest, Decimal(0), month_interest, amount, total - month_interest * (i + 1)))
 
         result.append((month_interest + amount, amount, month_interest, Decimal(0), Decimal(0)))
@@ -94,11 +94,11 @@ class InterestFirstThenPrincipal(AmortizationPlan):
         month_interest = amount * month_rate
         month_interest = month_interest.quantize(Decimal('.01'), ROUND_UP)
 
-        total = month_interest * term + amount
+        total = month_interest * period + amount
 
         result = []
 
-        for i in xrange(0, term):
+        for i in xrange(0, period):
             result.append((month_interest, Decimal(0), month_interest, amount, total - month_interest * (i + 1)))
 
         result.append((amount, amount, Decimal(0), Decimal(0), Decimal(0)))

@@ -414,8 +414,7 @@ def generate_amortization_plan(sender, instance, **kwargs):
     if instance.status == u'录标完成':
         logger.info(u'The product status is 录标完成, start to generate amortization plan')
 
-        term_count = instance.amortization_count
-        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, term_count, instance.period)
+        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, None, instance.period)
 
         for index, term in enumerate(terms['terms']):
             amortization = ProductAmortization()
@@ -430,7 +429,7 @@ def generate_amortization_plan(sender, instance, **kwargs):
         instance.save()
 
 
-def process_after_money_paied(product):
+def process_after_money_paided(product):
     if product.status == u'满标已打款':
         from celery.execute import send_task
         send_task("wanglibao_p2p.tasks.process_paid_product", kwargs={
@@ -440,6 +439,6 @@ def process_after_money_paied(product):
 
 def post_save_process(sender, instance, **kwargs):
     generate_amortization_plan(sender, instance, **kwargs)
-    process_after_money_paied(instance)
+    process_after_money_paided(instance)
 
 post_save.connect(post_save_process, sender=P2PProduct, dispatch_uid="generate_amortization_plan")
