@@ -45,6 +45,7 @@ class P2PProductAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_editable = ('status',)
     list_filter = ('status',)
     search_fields = ('name',)
+    readonly_fields = ('amortization_count',)
 
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):

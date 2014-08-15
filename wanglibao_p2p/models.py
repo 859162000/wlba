@@ -425,6 +425,8 @@ def generate_amortization_plan(sender, instance, **kwargs):
             instance.amortizations.add(amortization)
             amortization.save()
 
+        instance.amortization_count = len(terms['terms'])
+
         instance.status = u'待审核'
         instance.save()
 
