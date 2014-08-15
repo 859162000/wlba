@@ -10,12 +10,17 @@ require.config(
 require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
   $('.banks a').click (e)->
     e.preventDefault()
-
     $('.banks a').removeClass 'active'
     $(e.target).addClass 'active'
     $('#gate_id').val $(e.target).attr('data-gate-id')
     $('.bank-description .bank-desc-container').hide()
     $('#' + $(e.target).attr('data-desc-id')).show()
+
+  $('#pay').click (e)->
+    e.preventDefault()
+    if $('#id-is-valid').val() == 'False'
+      $('#id-validate').modal()
+      return
 
   $("#payform").validate
     rules:
