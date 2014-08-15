@@ -16,7 +16,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
   $.validator.addMethod "balance", (value, element)->
     return backend.checkBalance(value, element)
   $.validator.addMethod "money", (value, element)->
-    return backend.checkMoney(value, element)
+    return backend.checkMoney(value, element) && value < 50000
 
   $("#withdraw-form").validate
     rules:
@@ -32,7 +32,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
     messages:
       amount:
         required: '不能为空'
-        money: '金额必须为正的两位小数'
+        money: '金额必须在0～50000之间'
         balance: '余额不足'
       card_id:
         required: '请选择银行卡'

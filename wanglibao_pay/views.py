@@ -59,7 +59,7 @@ class PayView(TemplateView):
             amount = decimal.Decimal(amount_str).\
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             amount_str = str(amount)
-            if amount <= 0:
+            if amount <= 0 or amount > 50000:
                 raise decimal.DecimalException()
 
             gate_id = request.POST.get('gate_id', '')
@@ -91,7 +91,7 @@ class PayView(TemplateView):
             pay_info.save()
             OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         except decimal.DecimalException:
-            message = u'金额格式错误'
+            message = u'提款金额在0～50000之间'
         except Bank.DoesNotExist:
             message = u'请选择有效的银行'
         except (socket.error, SignException) as e:

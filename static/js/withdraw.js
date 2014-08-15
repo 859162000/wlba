@@ -19,7 +19,7 @@
       return backend.checkBalance(value, element);
     });
     $.validator.addMethod("money", function(value, element) {
-      return backend.checkMoney(value, element);
+      return backend.checkMoney(value, element) && value < 50000;
     });
     $("#withdraw-form").validate({
       rules: {
@@ -38,7 +38,7 @@
       messages: {
         amount: {
           required: '不能为空',
-          money: '金额必须为正的两位小数',
+          money: '金额必须在0～50000之间',
           balance: '余额不足'
         },
         card_id: {
