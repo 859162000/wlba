@@ -18,21 +18,11 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
 
   $('#pay').click (e)->
     e.preventDefault()
-    console.log($("#agreement").removeAttr("checked"))
-    return
     if $('#id-is-valid').val() == 'False'
       $('#id-validate').modal()
       return
     if $(this).hasClass "disabled"
       return
-
-  $("#agreement").change (e) ->
-    if $(this).attr("checked")
-      $(this).removeAttr "checked"
-      $("#pay").addClass "disabled"
-    else
-      $(this).attr "checked","checked"
-      $("#pay").removeClass "disabled"
 
   $("#payform").validate
     rules:
@@ -48,7 +38,10 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
   $("#amount").blur ->
     value = $(this).val()
     if value
-      $(this).val parseFloat(value).toFixed(2)
+      if parseFloat(value).toFixed(2) == "NaN"
+        $(this).val ""
+      else
+        $(this).val parseFloat(value).toFixed(2)
 
   if $('#id-is-valid').val() == 'False'
     $('#id-validate').modal()

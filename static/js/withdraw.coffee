@@ -52,8 +52,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
       return;
 
     phoneNumber = $(element).attr("data-phone")
-
-    console.log(phoneNumber)
     $.ajax(
       url: "/api/phone_validation_code/" + phoneNumber + "/"
       type: "POST"

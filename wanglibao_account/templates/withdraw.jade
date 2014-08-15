@@ -48,7 +48,7 @@ block main
           tr
             th 手续费(元)
             td
-              span#fee 0.00
+              span.orange-text 优惠期内，暂时不收取手续费
           tr
             th 实际到账金额(元)
             td
@@ -64,13 +64,14 @@ block main
             td(colspan=2)
               .withdraw-td
                 input#withdraw.withdraw-button(type='submit', value='提 现')
-                p.d4-text 警告：禁止信用卡套现、虚假交易等行为，一经确认，将终止该账户的使用
-                p.orange-text 您的资金从合作银行监管账户转入提现银行卡
+                p.d4-text 申请通过后 3 个工作日内（此为预估时间，具体实际到账为准）
 
       .space-vertical-xl
       .withdraw-notice.margin-left-m.margin-right-m
         p 温馨提示
-        p 1、在您申请提现前，请先在页面下方或“我的账户”页面绑定银行卡
+        p 1. 提款申请提交后，您的提现金额将从可用金额中扣除，无法再进行出借。
+        p 2. 为防止信用卡套现、洗钱等违法行为，网站将针对异常提款（包括提取无消费充值资金）进行严格审核，审核时间在 15 个工作日之后。
+        p 3. 提现银行账号的开户名必须与银行卡名一致， 否则提现失败。
 
 block script
   include include/add_card

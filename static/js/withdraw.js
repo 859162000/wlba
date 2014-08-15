@@ -61,7 +61,6 @@
         return;
       }
       phoneNumber = $(element).attr("data-phone");
-      console.log(phoneNumber);
       $.ajax({
         url: "/api/phone_validation_code/" + phoneNumber + "/",
         type: "POST"
