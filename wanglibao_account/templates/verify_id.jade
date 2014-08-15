@@ -16,42 +16,44 @@ block sidebar
 
 
 block main
-  .account-home-panel
-    .account-home-panel--title-bar
-      span.nickname 实名认证
+  .panel
+    .well
+      .panel-title-bar__no-border
+        .panel-title 实名认证
 
-    .space-vertical-m
-
-    if user.wanglibaouserprofile.id_is_valid
-      .form-row
-        label.span2.font-s 真实姓名
-        span {{user.wanglibaouserprofile.name | safe_name}}
-      .form-row
-        label.span2.font-s 身份证号
-        span {{user.wanglibaouserprofile.id_number | safe_id}}
-
-    else
-      .panel-annotation
-        p 根据法律，网上投资必须进行实名认证。
-        p 请花15秒钟完成免费的实名认证，以方便日后投资理财。
-
-      .row
-        form.form.span5(method="POST")
-          - csrf_token
-          .error
-            {{form.non_field_errors}}
+      .space-vertical-s
+      .panel-content.padding-l-r-sm
+        if user.wanglibaouserprofile.id_is_valid
           .form-row
-            {{form.name.errors}}
-            .span3
-              label 真实姓名
-            .span9-omega
-              - render_field form.name
+            label.span2.font-s 真实姓名
+            span {{user.wanglibaouserprofile.name | safe_name}}
           .form-row
-            {{form.id_number.errors}}
-            .span3
-              label 身份证号
-            .span9-omega
-              - render_field form.id_number
-          .form-row
-            button.button-primary.prefix3.span9-omega(type="submit") 提交
-    .space-vertical-xl
+            label.span2.font-s 身份证号
+            span {{user.wanglibaouserprofile.id_number | safe_id}}
+
+        else
+          .panel-annotation
+            p 根据法律，网上投资必须进行实名认证。
+            p 请花15秒钟完成免费的实名认证，以方便日后投资理财。
+
+          .space-vertical-l
+          .row
+            form.form.span5(method="POST")
+              - csrf_token
+              .error
+                {{form.non_field_errors}}
+              .form-row
+                {{form.name.errors}}
+                .span3
+                  label 真实姓名
+                .span9-omega
+                  - render_field form.name
+              .form-row
+                {{form.id_number.errors}}
+                .span3
+                  label 身份证号
+                .span9-omega
+                  - render_field form.id_number
+              .form-row
+                button.button-primary.prefix3.span9-omega(type="submit") 提交
+        .space-vertical-xl

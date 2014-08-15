@@ -10,29 +10,29 @@ block sidebar
 
 block main
   .panel
-    .panel-title-bar
-      .panel-title
-        span 修改密码
+    .well
+      .panel-title-bar__no-border
+        .panel-title 修改密码
 
-    .panel-inner
-      form#passwordChangeForm.well-s(method="POST")
-        table
-          tr
-            td 原始密码
-            td
-              input#old-password(type="password", name="old-password")
-          tr
-            td 新密码
-            td
-              input#new-password1(type="password", name="new-password1")
-          tr
-            td 再次输入
-            td
-              input#new-password2(type="password", name="new-password2")
-          tr
-            td
-            td
-              button#passwordChangeButton.button-primary(type="submit") 提交
+      .panel-inner.font-s
+        form#passwordChangeForm.well-s(method="POST")
+          table
+            tr
+              td 原始密码
+              td
+                input#old-password(type="password", name="old-password")
+            tr
+              td 新密码
+              td
+                input#new-password1(type="password", name="new-password1")
+            tr
+              td 再次输入
+              td
+                input#new-password2(type="password", name="new-password2")
+            tr
+              td
+              td
+                button#passwordChangeButton.button-primary(type="submit") 提交
 
 block script
   script.

@@ -9,14 +9,16 @@ block sidebar
     include include/user_center_sidebar
 
 block main
-  .panel-standard
-    .panel-product-title-no-border 我的产品收藏
-    .panel-title-bar-gray
-      // ko template: {name: 'tabs', data: tab}
-      // /ko
-    .panel-container
-      //ko template: {name: 'data-table', data: dataTable}
-      // /ko
+  .panel
+    .well
+      .panel-title-bar__no-border
+        .panel-title 我的产品收藏
+      .panel-container
+        // ko template: {name: 'tabs', data: tab}
+        // /ko
+      .panel-container
+        //ko template: {name: 'data-table', data: dataTable}
+        // /ko
 
 block script
   script.
