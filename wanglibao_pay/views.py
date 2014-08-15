@@ -147,7 +147,7 @@ class WithdrawView(TemplateView):
     template_name = 'withdraw.jade'
 
     def get_context_data(self, **kwargs):
-        cards = Card.objects.filter(user=self.request.user).select_related()
+        cards = Card.objects.filter(user=self.request.user).order_by("-is_default").select_related()
         banks = Bank.get_withdraw_banks()
         return {
             'cards': cards,
@@ -255,7 +255,8 @@ class CardViewSet(ModelViewSet):
         card = Card()
         card.user = request.user
         card.no = request.DATA.get('no', '')
-        print(card.no)
+        if request.DATA.get('is_default') == "true":
+            card.is_default = True
         if not re.match('^[\d]{0,25}$',card.no):
             return Response({
                 "message": u"银行账号超过长度",
