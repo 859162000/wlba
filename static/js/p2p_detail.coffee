@@ -55,7 +55,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             $('#id-validate').modal()
             return
           else if result.error_number == 4 && result.message == "余额不足"
-            console.log("dfsd")
             tool.modalAlert({btnText:"去充值", title: '温馨提示', msg: result.message, callback_ok: ()->
               window.location.href = '/pay/banks/'
             })

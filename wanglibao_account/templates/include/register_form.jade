@@ -24,6 +24,7 @@ form#register-modal-form.login-form(method='post', action='/accounts/register/aj
     button#register_submit.button-account.span12(type='submit') 注 册
     .agreement
       label(for="agreement")
-        input(type="checkbox", name="agreement", checked="checked", id="agreement")
+        input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
       | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+      .form-row-error
   .space-vertical-s

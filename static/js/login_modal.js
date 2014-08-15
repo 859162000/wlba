@@ -284,7 +284,7 @@
         return $("#register-modal-form").show();
       }
     });
-    return $("#invite_top_bar").click(function() {
+    $("#invite_top_bar").click(function() {
       return backend.userProfile({}).done(function() {
         return window.location.href = $("#invite_top_bar").attr("data-url");
       }).fail(function(xhr) {
@@ -292,6 +292,22 @@
           $('.login-modal').trigger('click');
         }
       });
+    });
+    $("#agreement").change(function(value) {
+      if ($(this).attr("data-value") === "agree") {
+        $("#register_submit").addClass("disabled");
+        $(this).attr("data-value", "disagree");
+        return $(this).removeAttr(checked);
+      } else {
+        $(this).attr("data-value", "agree");
+        $("#register_submit").removeClass("disabled");
+        return $(this).attr("checked", "checked");
+      }
+    });
+    return $("#register_submit").click(function(e) {
+      if ($(this).hasClass("disabled")) {
+        e.preventDefault();
+      }
     });
   });
 

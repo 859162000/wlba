@@ -253,3 +253,18 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       if xhr.status == 403
         $('.login-modal').trigger('click')
         return
+
+  $("#agreement").change (value)->
+    if $(this).attr("data-value") == "agree"
+      $("#register_submit").addClass("disabled")
+      $(this).attr("data-value","disagree")
+      $(this).removeAttr checked
+    else
+      $(this).attr("data-value","agree")
+      $("#register_submit").removeClass("disabled")
+      $(this).attr("checked","checked")
+
+  $("#register_submit").click (e)->
+    if $(this).hasClass("disabled")
+      e.preventDefault()
+      return

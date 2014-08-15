@@ -63,7 +63,6 @@
                 $('#id-validate').modal();
                 return;
               } else if (result.error_number === 4 && result.message === "余额不足") {
-                console.log("dfsd");
                 tool.modalAlert({
                   btnText: "去充值",
                   title: '温馨提示',
