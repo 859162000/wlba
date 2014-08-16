@@ -39,9 +39,15 @@ class BankListView(TemplateView):
     template_name = 'pay_banks.jade'
 
     def get_context_data(self, **kwargs):
-        return {
+        context = super(BankListView, self).get_context_data(**kwargs)
+
+        default_bank = Bank.get_deposit_banks().filter(name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
+
+        context.update({
+            'default_bank': default_bank,
             'banks': Bank.get_deposit_banks()
-        }
+        })
+        return context
 
 
 class PayView(TemplateView):
@@ -59,11 +65,15 @@ class PayView(TemplateView):
             amount = decimal.Decimal(amount_str).\
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             amount_str = str(amount)
-            if amount <= 0 or amount > 50000:
+            if amount <= 0:
                 raise decimal.DecimalException()
 
             gate_id = request.POST.get('gate_id', '')
             bank = Bank.objects.get(gate_id=gate_id)
+
+            # Store this as the default bank
+            request.user.wanglibaouserprofile.deposit_default_bank_name = bank.name
+            request.user.wanglibaouserprofile.save()
 
             pay_info = PayInfo()
             pay_info.amount = amount
@@ -91,7 +101,7 @@ class PayView(TemplateView):
             pay_info.save()
             OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         except decimal.DecimalException:
-            message = u'提款金额在0～50000之间'
+            message = u'金额格式错误'
         except Bank.DoesNotExist:
             message = u'请选择有效的银行'
         except (socket.error, SignException) as e:

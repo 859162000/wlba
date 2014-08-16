@@ -31,6 +31,8 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
     messages:
       amount:
         required: '不能为空'
+      gate_id:
+        required: '请选择银行'
 
   $("#amount").blur ->
     value = $(this).val()

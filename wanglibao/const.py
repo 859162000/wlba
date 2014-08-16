@@ -7,3 +7,4 @@ class ErrorNumber():
     unknown_error = 4
     duplicate = 5
     not_find = 6
+    validate_code_wrong = 7
