@@ -1,7 +1,7 @@
 mixin sidebar-item(name, link, target)
   unless target
     target = '_self'
-  if activeItem == name
+  if activeItem == name or activeSubItem == name
     li.sidebar-item.active
       a(href=link, target=target)= name
   else
@@ -21,10 +21,6 @@ ul.sidebar
     ul.sidebar-secondary
       +sidebar-item('P2P交易记录', '/accounts/transaction/p2p/')
       +sidebar-item('货基交易记录', '/accounts/transaction/fund/')
-      //li.sidebar-item
-        a(href='/accounts/transaction/p2p/') P2P交易记录
-      //li.sidebar-item
-        a(href='/accounts/transaction/fund/') 货基交易记录
 
   +sidebar-item('银行卡', '/accounts/bankcard/')
 

@@ -7,7 +7,8 @@ block head
 
 block sidebar
   - with '交易记录' as activeItem
-    include include/user_center_sidebar
+    - with 'P2P交易记录' as activeSubItem
+      include include/user_center_sidebar
 
 block main
   .panel

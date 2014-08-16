@@ -1,8 +1,10 @@
 extends account_home_base
 - load formatters
 - load mathfilters
+
 block head
-  - with '我的账户' as title
+  title_str = equity.product.short_name + '(' + equity.product.serial_number + ')'
+  - with title_str as title
     include include/head
 block sidebar
   - with '账务总览' as activeItem
@@ -10,7 +12,8 @@ block sidebar
 block main
   .account-home-panel
     .account-home-panel--title-bar
-      h3 {{equity.product.short_name}} 还款计划表
+      title_str = equity.product.short_name + '(' + equity.product.serial_number + ')'
+      h3 {{title_str}}
     .space-vertical-m
 
     table.table
