@@ -280,7 +280,7 @@ class AccountHome(TemplateView):
             income_rate = total_income / fund_total_asset
 
         # Followings for p2p
-        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成"))
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status=u"已完成")
         amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False).prefetch_related("subs")
 
         unpayed_principle = 0
