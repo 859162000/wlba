@@ -265,10 +265,12 @@ class P2PEquity(models.Model):
     confirm = models.BooleanField(u'确认成功', default=False)
     confirm_at = models.DateTimeField(u'份额确认时间', null=True, blank=True)
     contract = models.FileField(u'合同文件', null=True, blank=True, upload_to='contracts')
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True, null=True)
 
     class Meta:
         unique_together = (('user', 'product'),)
         verbose_name_plural = u'用户持仓'
+        ordering = ('-created_at',)
 
     @property
     def related_orders(self):
