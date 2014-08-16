@@ -3,7 +3,7 @@ extends account_home_base
 - load mathfilters
 
 block head
-  title_str = equity.product.short_name + '(' + equity.product.serial_number + ')'
+  title_str = equity.product.short_name + '(' + equity.product.serial_number + ')' + '还款计划表'
   - with title_str as title
     include include/head
 block sidebar
@@ -12,7 +12,7 @@ block sidebar
 block main
   .account-home-panel
     .account-home-panel--title-bar
-      title_str = equity.product.short_name + '(' + equity.product.serial_number + ')'
+      title_str = equity.product.short_name + '(' + equity.product.serial_number + ')' + '还款计划表'
       h3 {{title_str}}
     .space-vertical-m
 
