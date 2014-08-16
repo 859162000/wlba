@@ -146,8 +146,7 @@ class P2POperator(object):
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
                 equity_keeper.rollback(savepoint=False)
-            product.status = u'流标'
-            product.save()
+            ProductKeeper(product).fail()
 
         product = P2PProduct.objects.get(id=product.id)
         phones = [u.wanglibaouserprofile.phone for u in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
@@ -170,5 +169,4 @@ class P2POperator(object):
             all_settled = reduce(lambda flag, a: flag & a.settled, product.amortizations.all(), True)
             if all_settled:
                 cls.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
-                product.status = u'已完成'
-                product.save()
+                ProductKeeper(product).finish(None)

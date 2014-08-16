@@ -43,7 +43,20 @@ class ProductKeeper(KeeperBaseMixin):
         if self.product.status == u'满标待审核':
             self.product.status = u'满标已审核'
             self.product.save()
-            self.__tracer(u'状态变化', 0, user, self.product.remain, u'产品状态由[满标待审核]转为[满标已审核]')
+            self.__tracer(u'状态变化', 0, user, self.product.remain, u'满标待审核 -> 满标已审核')
+
+    def finish(self, user):
+        if self.product.status == u'还款中':
+            self.product.status = u'已完成'
+            self.product.save()
+            self.__tracer(u'状态变化', 0, user, self.product.remain, u'还款中 -> 已完成')
+
+    def fail(self):
+        prev_status = self.product.status
+
+        self.product.status = u'流标'
+        self.product.save()
+        self.__tracer(u'状态变化', 0, None, self.product.remain, u'%s -> 流标' % prev_status)
 
     def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
