@@ -21,13 +21,15 @@ require ['jquery',
          'model/trustTable',
          'model/fundTable',
          'model/fund',
-         'model/emptyTable'], ($, _, ko, backend, chart, modal, purl, trustTable, fundTable, fund, emptyTable)->
+         'model/emptyTable',
+         'model/p2pTable'], ($, _, ko, backend, chart, modal, purl, trustTable, fundTable, fund, emptyTable, p2pTable)->
 
   class ViewModel
-    constructor: (asset_param, period_param)->
+    constructor: (asset_param, period_param, flexibility_param)->
       self = this
       self.asset = ko.observable(asset_param)
       self.period = ko.observable(period_param)
+      self.risk = ko.observable(flexibility_param)
 
       self.portfolioName = ko.observable()
       self.portfolioEarningRate = ko.observable(0)
@@ -42,6 +44,10 @@ require ['jquery',
         period = self.questions[1].answer()
         if period and parseInt(period) > 0
           self.period(period)
+
+        risk = self.questions[2].answer()
+        if risk and parseInt(risk) > 0
+          self.risk(risk)
 
         $.modal.close()
 
@@ -58,12 +64,32 @@ require ['jquery',
           input:
             suffix: '个月'
         }
+        {
+          question: '流动性要求'
+          answer: ko.observable(self.risk())
+          options:
+            [
+              {
+                title: '投资期间不需要赎回'
+                value: 1
+              },
+              {
+                title: '可能需要提前赎回'
+                value: 2
+              },
+              {
+                title: '随时能赎回'
+                value: 3
+              }
+            ]
+        }
       ]
 
       self.savePortfolio = ->
         backend.userProfile
           investment_asset: self.asset()
           investment_period: self.period()
+          risk_level: self.risk()
         .done ->
           alert '投资方案已保存！预约理财热线：400-8588-066。'
         .fail (jqXHR, textStatus, errorThrown)->
@@ -88,6 +114,7 @@ require ['jquery',
           asset_max: self.asset()
           period_min: self.period()
           period_max: self.period()
+          risk_score: self.risk()
 
         # TODO add error handling logic
         backend.loadPortfolio params
@@ -164,6 +191,8 @@ require ['jquery',
           '收藏'
         ]
       }
+      self.p2pTable = new p2pTable.viewModel {}
+
       self.emptyTable = new emptyTable.viewModel {}
       self.dataTable = ko.observable()
 
@@ -194,6 +223,9 @@ require ['jquery',
                           data: item))
 
                   self.dataTable self.fundTable
+                when 'p2ps'
+                  self.p2pTable.data data.results
+                  self.dataTable self.p2pTable
                 else
                   self.dataTable self.emptyTable
         else
@@ -208,7 +240,8 @@ require ['jquery',
     .done (data)->
       asset_param = data.investment_asset
       period_param = data.investment_period
-      model = new ViewModel(asset_param, period_param)
+      flexibility_param = data.risk_level
+      model = new ViewModel(asset_param, period_param, flexibility_param)
       ko.applyBindings model
     .fail ->
       model = new ViewModel(30, 3, 1)
@@ -216,6 +249,7 @@ require ['jquery',
   else
     asset_param = parseInt($.url(document.location.href).param('asset'))
     period_param = parseInt($.url(document.location.href).param('period'))
+    flexibility_param = parseInt($.url(document.location.href).param('flexibility'))
 
     if isNaN(asset_param) or asset_param <= 0
       asset_param = 30
@@ -223,7 +257,10 @@ require ['jquery',
     if isNaN(period_param) or period_param <= 0
       period_param = 3
 
-    model = new ViewModel(asset_param, period_param)
+    if isNaN(flexibility_param) or flexibility_param <= 0
+      flexibility_param = 1
+
+    model = new ViewModel(asset_param, period_param, flexibility_param)
     ko.applyBindings model
 
   $('#question-button').click (e)->

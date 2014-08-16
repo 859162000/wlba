@@ -145,6 +145,12 @@ class P2PProductViewSet(PaginatedModelViewSet):
     permission_classes = IsAdminUserOrReadOnly,
     serializer_class = P2PProductSerializer
 
+    def get_queryset(self):
+        qs = super(P2PProductViewSet, self).get_queryset()
+        return qs.filter(hide=False).filter(status__in=[
+                u'正在招标', u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+            ])
+
 
 class RecordView(APIView):
     permission_classes = ()

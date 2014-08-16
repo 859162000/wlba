@@ -15,20 +15,21 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/chart', 'lib/modal', 'purl', 'model/trustTable', 'model/fundTable', 'model/fund', 'model/emptyTable'], function($, _, ko, backend, chart, modal, purl, trustTable, fundTable, fund, emptyTable) {
-    var ViewModel, asset_param, model, period_param;
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/chart', 'lib/modal', 'purl', 'model/trustTable', 'model/fundTable', 'model/fund', 'model/emptyTable', 'model/p2pTable'], function($, _, ko, backend, chart, modal, purl, trustTable, fundTable, fund, emptyTable, p2pTable) {
+    var ViewModel, asset_param, flexibility_param, model, period_param;
     ViewModel = (function() {
-      function ViewModel(asset_param, period_param) {
+      function ViewModel(asset_param, period_param, flexibility_param) {
         var productTypeColorMapping, self;
         self = this;
         self.asset = ko.observable(asset_param);
         self.period = ko.observable(period_param);
+        self.risk = ko.observable(flexibility_param);
         self.portfolioName = ko.observable();
         self.portfolioEarningRate = ko.observable(0);
         self.bankRate = .35;
         self.timesBankRate = ko.observable(1);
         self.finishSurvey = function(data, event) {
-          var asset, period;
+          var asset, period, risk;
           asset = self.questions[0].answer();
           if (asset && parseInt(asset) > 0) {
             self.asset(parseInt(asset));
@@ -36,6 +37,10 @@
           period = self.questions[1].answer();
           if (period && parseInt(period) > 0) {
             self.period(period);
+          }
+          risk = self.questions[2].answer();
+          if (risk && parseInt(risk) > 0) {
+            self.risk(risk);
           }
           return $.modal.close();
         };
@@ -52,12 +57,28 @@
             input: {
               suffix: '个月'
             }
+          }, {
+            question: '流动性要求',
+            answer: ko.observable(self.risk()),
+            options: [
+              {
+                title: '投资期间不需要赎回',
+                value: 1
+              }, {
+                title: '可能需要提前赎回',
+                value: 2
+              }, {
+                title: '随时能赎回',
+                value: 3
+              }
+            ]
           }
         ];
         self.savePortfolio = function() {
           return backend.userProfile({
             investment_asset: self.asset(),
-            investment_period: self.period()
+            investment_period: self.period(),
+            risk_level: self.risk()
           }).done(function() {
             return alert('投资方案已保存！预约理财热线：400-8588-066。');
           }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -84,7 +105,8 @@
             asset_min: self.asset(),
             asset_max: self.asset(),
             period_min: self.period(),
-            period_max: self.period()
+            period_max: self.period(),
+            risk_score: self.risk()
           };
           return backend.loadPortfolio(params).done(function(data) {
             return self.myPortfolio(_.first(data.results));
@@ -149,6 +171,7 @@
         self.fundTable = new fundTable.viewModel({
           fields: ['名称', '七日年化利率', '近一月收益率', '起购金额(元)', '购买', '收藏']
         });
+        self.p2pTable = new p2pTable.viewModel({});
         self.emptyTable = new emptyTable.viewModel({});
         self.dataTable = ko.observable();
         self.productsType = ko.observable();
@@ -179,6 +202,9 @@
                       });
                     });
                     return self.dataTable(self.fundTable);
+                  case 'p2ps':
+                    self.p2pTable.data(data.results);
+                    return self.dataTable(self.p2pTable);
                   default:
                     return self.dataTable(self.emptyTable);
                 }
@@ -200,10 +226,11 @@
     })();
     if (!$.url(document.location.href).param('asset')) {
       backend.userProfile().done(function(data) {
-        var asset_param, model, period_param;
+        var asset_param, flexibility_param, model, period_param;
         asset_param = data.investment_asset;
         period_param = data.investment_period;
-        model = new ViewModel(asset_param, period_param);
+        flexibility_param = data.risk_level;
+        model = new ViewModel(asset_param, period_param, flexibility_param);
         return ko.applyBindings(model);
       }).fail(function() {
         var model;
@@ -213,13 +240,17 @@
     } else {
       asset_param = parseInt($.url(document.location.href).param('asset'));
       period_param = parseInt($.url(document.location.href).param('period'));
+      flexibility_param = parseInt($.url(document.location.href).param('flexibility'));
       if (isNaN(asset_param) || asset_param <= 0) {
         asset_param = 30;
       }
       if (isNaN(period_param) || period_param <= 0) {
         period_param = 3;
       }
-      model = new ViewModel(asset_param, period_param);
+      if (isNaN(flexibility_param) || flexibility_param <= 0) {
+        flexibility_param = 1;
+      }
+      model = new ViewModel(asset_param, period_param, flexibility_param);
       ko.applyBindings(model);
     }
     return $('#question-button').click(function(e) {

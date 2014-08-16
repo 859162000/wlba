@@ -54,6 +54,10 @@ define ['jquery'], ($)->
     '现金类理财产品': 'cashes'
     '现金': 'cashes'
 
+    'p2p': 'p2ps'
+    'P2P': 'p2ps'
+    'p2ps': 'p2ps'
+
     'favorite/trusts': 'favorite/trusts'
     'favorite/funds': 'favorite/funds'
     'favorite/cashes': 'favorite/cashes'
