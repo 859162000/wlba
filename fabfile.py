@@ -454,6 +454,7 @@ def config_apache():
 
             if env.get('group') == 'staging':
                 sudo('a2ensite chandao.conf')
+                sudo('rm -rf /var/cache/nginx')
 
             sudo('service apache2 reload')
 
