@@ -19,9 +19,11 @@ ul.sidebar
   li(class=classes)
     a(href='/accounts/transaction/p2p/') 交易记录
     ul.sidebar-secondary
-      li.sidebar-item
+      +sidebar-item('P2P交易记录', '/accounts/transaction/p2p/')
+      +sidebar-item('货基交易记录', '/accounts/transaction/fund/')
+      //li.sidebar-item
         a(href='/accounts/transaction/p2p/') P2P交易记录
-      li.sidebar-item
+      //li.sidebar-item
         a(href='/accounts/transaction/fund/') 货基交易记录
 
   +sidebar-item('银行卡', '/accounts/bankcard/')

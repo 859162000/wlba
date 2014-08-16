@@ -36,6 +36,15 @@
     text-align: center
     cursor: pointer
 
+.sidebar-secondary
+  .sidebar-item
+    a
+      color: #666
+  .sidebar-item
+    &.active
+      a
+        +link-colors($color-pomegranate, $color-pomegranate)
+
 .sidebar-anchor
   +unstyled-link
 
