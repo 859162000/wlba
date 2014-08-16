@@ -18,6 +18,7 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
 
   $('#pay').click (e)->
     if $('#id-is-valid').val() == 'False'
+      e.preventDefault()
       $('#id-validate').modal()
       return
 

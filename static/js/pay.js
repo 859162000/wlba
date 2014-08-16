@@ -22,6 +22,7 @@
     });
     $('#pay').click(function(e) {
       if ($('#id-is-valid').val() === 'False') {
+        e.preventDefault();
         $('#id-validate').modal();
       }
     });
