@@ -316,7 +316,7 @@ class WithdrawTransactions(TemplateView):
         elif action == 'confirm':
             for payinfo in payinfos:
                 with transaction.atomic():
-                    if payinfo.status != PayInfo.ACCEPTED or payinfo.status != PayInfo.PROCESSING:
+                    if payinfo.status != PayInfo.ACCEPTED and payinfo.status != PayInfo.PROCESSING:
                         logger.info("The withdraw status [%s] not in %s or %s, ignore it" % (payinfo.status, PayInfo.ACCEPTED, PayInfo.PROCESSING))
                         continue
 
