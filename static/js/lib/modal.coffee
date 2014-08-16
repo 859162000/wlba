@@ -5,7 +5,7 @@ define ['jquery', 'jquery.modal'], ($, modal)->
     zIndex: 99,
     escapeClose: true,
     clickClose: false,
-    closeText: 'x',
+    closeText: '×',
     closeClass: '',
     modalClass: "modal",
     spinnerHtml: "",
