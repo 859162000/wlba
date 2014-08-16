@@ -23,6 +23,7 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
       return
 
   $("#payform").validate
+    ignore: ""
     rules:
       amount:
         required: true

@@ -27,6 +27,7 @@
       }
     });
     $("#payform").validate({
+      ignore: "",
       rules: {
         amount: {
           required: true

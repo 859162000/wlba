@@ -65,7 +65,7 @@ block main
                                 a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
                 .row.bank-description
                   for bank in banks
-                    if forloop.counter == 1
+                    if default_bank and default_bank.id == bank.id
                       div.bank-desc-container(id="bank-limit-{{bank.id}}")
                         {{bank.limit | safe}}
                     else
