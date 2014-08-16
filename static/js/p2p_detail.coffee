@@ -39,18 +39,18 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       tool.modalConfirm({title: '温馨提示', msg: tip, callback_ok: ()->
         product = $('input[name=product]').val()
         amount = $('input[name=amount]').val()
-        captcha_0 = $('input[name=captcha_0]').val()
-        captcha_1 = $('input[name=captcha_1]').val()
+        validate_code = $('input[name=validate_code]').val()
 
         backend.purchaseP2P {
           product: product
           amount: amount
-          captcha_0: captcha_0
-          captcha_1: captcha_1
+          validate_code: validate_code
         }
         .done (data)->
-          alert '份额认购成功'
-          location.reload()
+          tool.modalAlert({title: '温馨提示', msg: '份额认购成功', callback_ok: ()->
+              location.reload()
+          })
+
         .fail (xhr)->
           result = JSON.parse xhr.responseText
           if result.error_number == 1
@@ -78,3 +78,38 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $('#purchase-form .submit-button').click (e)->
     e.preventDefault()
     $('#purchase-form').submit()
+
+  $("#get-validate-code-buy").click (e) ->
+    e.preventDefault()
+
+    element = this
+
+    e.preventDefault()
+    if $(element).attr 'disabled'
+      return;
+
+    phoneNumber = $(element).attr("data-phone")
+    $.ajax(
+      url: "/api/phone_validation_code/" + phoneNumber + "/"
+      type: "POST"
+    )
+
+    intervalId
+    count = 60
+
+    $(element).attr 'disabled', 'disabled'
+    timerFunction = ()->
+      if count >= 1
+        count--
+        $(element).text('重新获取(' + count + ')')
+        $(element).addClass('disabled')
+      else
+        clearInterval(intervalId)
+        $(element).text('重新获取')
+        $(element).removeAttr 'disabled'
+        $(element).removeClass('disabled')
+
+   # Fire now and future
+    timerFunction()
+    intervalId = setInterval timerFunction, 1000
+

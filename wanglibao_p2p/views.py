@@ -17,6 +17,7 @@ from wanglibao_p2p.models import P2PProduct
 from wanglibao_p2p.serializers import P2PProductSerializer, P2PRecordSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
+from wanglibao_sms.utils import validate_validation_code
 
 
 class P2PDetailView(TemplateView):
@@ -94,6 +95,15 @@ class PurchaseP2P(APIView):
                 'error_number': ErrorNumber.need_authentication
             }, status=status.HTTP_400_BAD_REQUEST)
         form = PurchaseForm(request.DATA)
+        phone = request.user.wanglibaouserprofile.phone
+        code = request.POST.get('validate_code', '')
+        print(phone + "************" + code)
+        status_code, message = validate_validation_code(phone, code)
+        if status_code != 200:
+            return Response({
+                'message': u'验证码输入错误',
+                'error_number': ErrorNumber.validate_code_wrong
+            }, status=status.HTTP_400_BAD_REQUEST)
         if form.is_valid():
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']

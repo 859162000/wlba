@@ -44,19 +44,22 @@
           title: '温馨提示',
           msg: tip,
           callback_ok: function() {
-            var amount, captcha_0, captcha_1, product;
+            var amount, product, validate_code;
             product = $('input[name=product]').val();
             amount = $('input[name=amount]').val();
-            captcha_0 = $('input[name=captcha_0]').val();
-            captcha_1 = $('input[name=captcha_1]').val();
+            validate_code = $('input[name=validate_code]').val();
             return backend.purchaseP2P({
               product: product,
               amount: amount,
-              captcha_0: captcha_0,
-              captcha_1: captcha_1
+              validate_code: validate_code
             }).done(function(data) {
-              alert('份额认购成功');
-              return location.reload();
+              return tool.modalAlert({
+                title: '温馨提示',
+                msg: '份额认购成功',
+                callback_ok: function() {
+                  return location.reload();
+                }
+              });
             }).fail(function(xhr) {
               var error_message, message, result;
               result = JSON.parse(xhr.responseText);
@@ -95,9 +98,40 @@
         });
       }
     });
-    return $('#purchase-form .submit-button').click(function(e) {
+    $('#purchase-form .submit-button').click(function(e) {
       e.preventDefault();
       return $('#purchase-form').submit();
+    });
+    return $("#get-validate-code-buy").click(function(e) {
+      var count, element, intervalId, phoneNumber, timerFunction;
+      e.preventDefault();
+      element = this;
+      e.preventDefault();
+      if ($(element).attr('disabled')) {
+        return;
+      }
+      phoneNumber = $(element).attr("data-phone");
+      $.ajax({
+        url: "/api/phone_validation_code/" + phoneNumber + "/",
+        type: "POST"
+      });
+      intervalId;
+      count = 60;
+      $(element).attr('disabled', 'disabled');
+      timerFunction = function() {
+        if (count >= 1) {
+          count--;
+          $(element).text('重新获取(' + count + ')');
+          return $(element).addClass('disabled');
+        } else {
+          clearInterval(intervalId);
+          $(element).text('重新获取');
+          $(element).removeAttr('disabled');
+          return $(element).removeClass('disabled');
+        }
+      };
+      timerFunction();
+      return intervalId = setInterval(timerFunction, 1000);
     });
   });
 
