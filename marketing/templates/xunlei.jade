@@ -1,0 +1,34 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    - with '迅雷 网利宝狂欢节' as title
+      include include/common_head
+      meta(name="keywords", content="迅雷,网利宝,狂欢节")
+      meta(name="description", content="8月20日至9月5日，迅雷+网利宝狂欢节，错过绝对会后悔”")
+
+  body
+    .full-container
+
+
+    .full-container.activity-footer
+      .weixin-img
+        img(src="/static/images/activity/weixin.png",alt="扫一扫官方微信 获取更多理财咨询！")
+        p 扫一扫官方微信 获取更多理财咨询！
+      .wanglibao-logo
+        img(src="/static/images/activity/wanglibao_logo.png",alt="网利宝")
+      .weixin-qq-hotline
+        span
+          i.icon.icon-share-weixin
+          | 官方微信：iwanglibao
+        span
+          i.icon.icon-share-qq
+          | 官方QQ群：362121062
+        span
+          i.icon.icon-share-hotline
+          | 理财热线预约：4008 588 066
+
+
+    include include/tracking

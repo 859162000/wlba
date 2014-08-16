@@ -97,7 +97,6 @@ class PurchaseP2P(APIView):
         form = PurchaseForm(request.DATA)
         phone = request.user.wanglibaouserprofile.phone
         code = request.POST.get('validate_code', '')
-        print(phone + "************" + code)
         status_code, message = validate_validation_code(phone, code)
         if status_code != 200:
             return Response({
