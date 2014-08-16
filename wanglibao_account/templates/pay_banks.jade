@@ -45,7 +45,7 @@ block main
                     .row
                       for col_index in cols
                         bank = banks[row_index * col_num + col_index]
-                        if col_index != 2
+                        if col_index != col_num - 1
                           .span3
                             a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
                         else
