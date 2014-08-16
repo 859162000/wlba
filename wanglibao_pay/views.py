@@ -191,7 +191,7 @@ class WithdrawCompleteView(TemplateView):
             amount_str = request.POST.get('amount', '')
             amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
-            if amount <= 0:
+            if amount <= 0 or amount > 50000:
                 raise decimal.DecimalException
 
             fee = (amount * HuifuPay.FEE).quantize(TWO_PLACES)
@@ -226,7 +226,7 @@ class WithdrawCompleteView(TemplateView):
                 'messages': [messages.withdraw_submitted(amount, timezone.now())]
             })
         except decimal.DecimalException:
-            result = u'金额格式错误'
+            result = u'提款金额在0～50000之间'
         except Card.DoesNotExist:
             result = u'请选择有效的银行卡'
         except MarginLack as e:
