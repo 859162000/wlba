@@ -146,7 +146,7 @@ html
                       percent = float(product.ordered_amount) / product.total_amount * 100
                       .progress-indicator(style="width:{{percent | percentage}}")
                     span.highlight &nbsp;&nbsp; {{percent | percentage}}
-                  .span4.align-right
+                  .span4.align-left
                     span 担保机构: &nbsp;&nbsp;
                     span.d3-text {{product.warrant_company.name}}
                   .span4-omega.align-right
