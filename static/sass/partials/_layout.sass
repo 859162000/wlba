@@ -5,6 +5,26 @@
 // Susy configuration
 $total-columns: 12
 $column-width: 4rem
+$gutter-width: 0rem
+$grid-padding: 0
+
+$container-style: static
+$container-width: 1104px
+
+$container-style: magic
+
+@for $i from 1 to $total-columns + 1
+  .wl-column#{$i}
+    +span-columns($i, $total-columns)
+  .wl-column#{$i}-omega
+    +span-columns($i omega, $total-columns)
+  .prefix#{$i}
+    +pre($i)
+
+// Susy configuration
+
+$total-columns: 12
+$column-width: 4rem
 $gutter-width: 1rem
 $grid-padding: 0
 

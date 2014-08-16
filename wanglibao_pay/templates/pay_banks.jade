@@ -50,17 +50,19 @@ block main
                         bank = banks[row_index * col_num + col_index]
                         active = default_bank and bank.id == default_bank.id
                         if col_index != 3
-                          .span3
-                            if active
-                              a.active(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
-                            else
-                              a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                          .grid
+                            .inner
+                              if active
+                                a.active(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                              else
+                                a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
                         else
-                          .span3-omega
-                            if active
-                              a.active(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
-                            else
-                              a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                          .grid-omega
+                            .inner
+                              if active
+                                a.active(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                              else
+                                a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
                 .row.bank-description
                   for bank in banks
                     if forloop.counter == 1
