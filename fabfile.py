@@ -12,23 +12,27 @@ from config.nginx_conf import generate_conf
 
 env.apache_conf = 'config/apache.conf'
 env.nginx_listen_on_80 = True
+env.migrate = True
+env.supervisord = True
+
 
 def production():
-    env.host_string = 'www.wanglibao.com'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'production2.0'
 
-    env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
-    env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
+    env.pip_install = "pip install -r requirements.txt"
+    env.pip_install_command = "pip install"
 
     env.debug = False
     env.production = True
     env.staging = False
 
     env.mysql = False  # Use RDS, so we no need to install mysql
+    env.migrate = False
+    env.supervisord = False
 
 
 def pre_production():
@@ -38,8 +42,8 @@ def pre_production():
     env.depot_name = 'wanglibao-backend'
     env.branch = 'master'
 
-    env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
-    env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
+    env.pip_install = "pip install -r requirements.txt"
+    env.pip_install_command = "pip install"
 
     env.debug = False
     env.production = True
@@ -99,11 +103,14 @@ if env.get('group') == 'staging':
 
 elif env.get('group') == 'production':
     env.roledefs = {
-        'old-lb': [],
-        'lb': ['pre.wanglibao.com'],
-        'old-web': ['www.wanglibao.com'],
-        'web': ['pre.wanglibao.com'],
-        'task_queue': ['pre.wanglibao.com']
+        'old_lb': [],
+        'lb': ['115.28.151.49'],
+        'old_web': [],
+        'web': ['115.28.166.203', '121.42.11.194'],
+        'web_private': ['10.144.172.198', '10.165.54.41'],
+        'cron_tab': ['115.28.166.203'],
+        'db': [],
+        'task_queue': [],
     }
     production()
 
@@ -144,16 +151,13 @@ elif env.get('group') == 'dev':
 elif env.get('group') == 'pre':
     env.roledefs = {
         # Old lb is the load balancer which points to old version, it should take out of the new webs
-        'old_lb': [
-            #'192.168.1.161'
-        ],
+        'old_lb': [],
 
         # New lb is the load balancer which points to new version, it should only with new web
         'lb': ['115.28.80.27'],
 
         # Old web is the server running with old version, they should not be touched
-        'old_web': [
-        ],
+        'old_web': [],
 
         # Web is the server to be deployed with new version
         'web': [
@@ -302,7 +306,11 @@ def init():
 @roles('lb')
 def generate_nginx_conf():
     print green('Generate the nginx conf file for new lb')
-    conf_content = generate_conf(apps=env.roledefs['web'], listen_on_80=env.nginx_listen_on_80)
+    apps = env.roledefs['web']
+    if 'web_private' in env.roledefs:
+        apps = env.roledefs['web_private']
+
+    conf_content = generate_conf(apps=apps, listen_on_80=env.nginx_listen_on_80)
     put(StringIO(conf_content), "/etc/nginx/sites-available/wanglibao-proxy.conf", use_sudo=True)
     sudo('rm -f /etc/nginx/sites-enabled/*')
     sudo('nginx_ensite wanglibao-proxy.conf')
@@ -312,7 +320,10 @@ def generate_nginx_conf():
 @roles('old_lb')
 def take_out_of_rotation():
     banner('Generate the nginx conf file for old lb')
-    conf_content = generate_conf(apps=env.roledefs['old_web'])
+    apps = env.roledefs['old_web']
+    if 'old_web_private' in env.roledefs:
+        apps = env.roledefs['old_web_private']
+    conf_content = generate_conf(apps=apps)
     put(StringIO(conf_content), "/etc/nginx/sites-available/wanglibao-proxy.conf", use_sudo=True)
     with settings(warn_only=True):
         sudo('nginx_dissite default')
@@ -323,30 +334,32 @@ def take_out_of_rotation():
 @roles('lb', 'web', 'db')
 def check_out():
     banner("check out")
-    with cd(env.path):
-        if not exists(os.path.join(env.path, env.depot_name)):
-            print green('Git folder not there, create it')
-            run("git clone %s" % env.depot)
-            sudo("chmod 777 %s" % env.depot_name)
-            with cd(env.depot_name):
-                run("git checkout %s" % env.branch)
-        else:
-            with cd(env.depot_name):
-                with settings(warn_only=True):
-                    run('git reset --hard HEAD')
-                    run('git remote set-url origin %s' % env.depot)
+    if not env.get('no-checkout'):
+        with cd(env.path):
+            if not exists(os.path.join(env.path, env.depot_name)):
+                print green('Git folder not there, create it')
+                run("git clone %s" % env.depot)
+                sudo("chmod 777 %s" % env.depot_name)
+                with cd(env.depot_name):
+                    run("git checkout %s" % env.branch)
+            else:
+                with cd(env.depot_name):
+                    with settings(warn_only=True):
+                        run('git reset --hard HEAD')
+                        run('git remote set-url origin %s' % env.depot)
 
-                    result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
-                    if result.return_code > 0:
-                        run('git fetch origin %s:%s' % (env.branch, env.branch))
-                        run("git checkout %s" % env.branch)
-                    else:
-                        run('git checkout %s' % env.branch)
-                        run('git pull origin %s' % env.branch)
+                        result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
+                        if result.return_code > 0:
+                            run('git fetch origin %s:%s' % (env.branch, env.branch))
+                            run("git checkout %s" % env.branch)
+                        else:
+                            run('git checkout %s' % env.branch)
+                            run('git pull origin %s' % env.branch)
 
 
 @roles('cron_tab')
 def setup_cron_tab():
+    banner("Setup crontab")
     with cd(env.path):
         scrawl_job_file = '/usr/bin/scrawl_job'
         manage_py = '/var/wsgi/wanglibao/manage.py'
@@ -371,16 +384,17 @@ def setup_cron_tab():
         add_cron_tab(sync_sm_info, sync_sm_log, env, '0 */1 * * *', manage_py, ['syncsm -f', 'syncsm -m'])
         add_cron_tab(sync_sm_income, sync_sm_log, env, '0 18-23/1 * * *', manage_py, ['syncsm -i'], _end=True)
 
-        print green('Start the supervisor in daemon mode')
+        if env.supervisord:
+            print green('Start the supervisor in daemon mode')
 
-        with virtualenv():
-            with cd('/var/wsgi/wanglibao'):
-                if exists('/var/run/wanglibao/supervisor.pid'):
-                    run("python manage.py supervisor stop all")
-                    sudo("kill `cat /var/run/wanglibao/supervisor.pid`")
-                run("python manage.py supervisor --daemonize --logfile=/var/log/wanglibao/supervisord.log --pidfile=/var/run/wanglibao/supervisor.pid")
-                run("python manage.py supervisor update")
-                run("python manage.py supervisor restart all")
+            with virtualenv():
+                with cd('/var/wsgi/wanglibao'):
+                    if exists('/var/run/wanglibao/supervisor.pid'):
+                        run("python manage.py supervisor stop all")
+                        sudo("kill `cat /var/run/wanglibao/supervisor.pid`")
+                    run("python manage.py supervisor --daemonize --logfile=/var/log/wanglibao/supervisord.log --pidfile=/var/run/wanglibao/supervisor.pid")
+                    run("python manage.py supervisor update")
+                    run("python manage.py supervisor restart all")
 
 
 
@@ -438,14 +452,15 @@ def config_apache():
                 sudo('chgrp -R www-data /var/wsgi/wanglibao')
                 sudo('chown -R www-data /var/wsgi/wanglibao')
 
-            with cd('/var/wsgi/wanglibao'):
-                # use --noinput to prevent create super user. When super user created, then a profile object needs
-                # to be created, at that point, that table is not created yet. Then it crashes.
-                with hide('output'):
-                    run("python manage.py syncdb --noinput")
-                run("python manage.py migrate")
+            if env.migrate:
+                with cd('/var/wsgi/wanglibao'):
+                    # use --noinput to prevent create super user. When super user created, then a profile object needs
+                    # to be created, at that point, that table is not created yet. Then it crashes.
+                    with hide('output'):
+                        run("python manage.py syncdb --noinput")
+                    run("python manage.py migrate")
 
-            print green("Copy apache config file")
+                print green("Copy apache config file")
 
             sudo('cp %s /etc/apache2/sites-available/' % env.apache_conf)
             # Disable all other sites
@@ -457,8 +472,10 @@ def config_apache():
                 sudo('rm -rf /var/cache/nginx')
 
             sudo('service apache2 reload')
+            sudo('chown -R www-data:www-data /var/log/wanglibao/')
 
 
+@task
 @roles('lb')
 def config_loadbalancer():
     with cd(env.path):
