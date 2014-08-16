@@ -161,6 +161,25 @@ class P2PProduct(ProductBase):
     preview_link.short_description = u'预览'
     preview_link.allow_tags = True
 
+    display_status_mapping = {
+        u'录标': u'录标',
+        u'录标完成': u'录标完成',
+        u'待审核': u'待审核',
+        u'正在招标': u'正在招标',
+        u'满标待打款': u'满标审核中',
+        u'满标已打款': u'满标审核中',
+        u'满标待审核': u'满标审核中',
+        u'满标已审核': u'满标审核中',
+        u'还款中': u'还款中',
+        u'流标': u'流标',
+        u'已完成': u'已完成',
+    }
+
+    @property
+    def display_status(self):
+        return self.display_status_mapping[self.status]
+
+
 reversion.register(P2PProduct)
 
 

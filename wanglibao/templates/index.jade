@@ -91,6 +91,7 @@ html
       .row
         .span8
           for product in p2p_products
+            status = product.display_status
             .panel-p2p-product
               .panel-title-bar
                 if product.warrant_company
@@ -122,16 +123,12 @@ html
                     p 可投资金额(元)
                   .span3-omega.align-right
                     p
-                      if product.status == '正在招标'
-                        a.button-primary(href="/p2p/detail/{{product.id}}/") 正在招标
+                      if status == '正在招标'
+                        a.button-primary(href="/p2p/detail/{{product.id}}/") {{status}}
                       else
-                        status = product.status
-                        full = status.startswith(u'满标')
-                        if full
-                          status = '满标审核中'
                         a.button-disabled(href="javascript:void(0)", disabled) {{status}}
 
-                    if product.status == '正在招标'
+                    if status == '正在招标'
                       p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
                         span(id="counter_{{product.id}}") {{product.end_time | timedelta_now_day }}
                     else
@@ -152,7 +149,7 @@ html
                   .span4-omega.align-right
                     span 还款方式: &nbsp;&nbsp;
                     span.d3-text {{product.pay_method}}
-              if product.status == '还款中' or product.status == '已完成'
+              if status == '还款中' or status == '已完成'
                 .panel-p2p-stamp
 
         .span4-omega

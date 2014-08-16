@@ -24,7 +24,7 @@ class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
 
     def get_context_data(self, id, **kwargs):
-        status = 'finished'
+        context = super(P2PDetailView, self).get_context_data(**kwargs)
 
         try:
             p2p = P2PProduct.objects.get(pk=id)
@@ -34,15 +34,6 @@ class P2PDetailView(TemplateView):
                 end_time = p2p.soldout_time
             else:
                 end_time = p2p.end_time
-
-            if p2p.status != u'正在招标':
-                status = 'finished'
-            else:
-                if p2p.publish_time <= timezone.now() < p2p.end_time:
-                    status = 'open'
-                elif timezone.now() > p2p.end_time:
-                    status = 'finished'
-
         except P2PProduct.DoesNotExist:
             raise Http404(u'您查找的产品不存在')
 
@@ -64,16 +55,17 @@ class P2PDetailView(TemplateView):
 
         site_data = SiteData.objects.all()[0]
 
-        return {
+        context.update({
             'p2p': p2p,
             'form': form,
-            'status': status,
             'end_time': end_time,
             'orderable_amount': orderable_amount,
             'total_earning': total_earning,
             'current_equity': current_equity,
             'site_data': site_data,
-        }
+        })
+
+        return context
 
 
 class PurchaseP2P(APIView):

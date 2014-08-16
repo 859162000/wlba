@@ -229,7 +229,6 @@ class ResetPassword(TemplateView):
         if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 30 * 60:
             user.set_password(password1)
             user.save()
-            #auth.login(request, user)
             return HttpResponseRedirect(redirect_to='/accounts/password/reset/done/')
 
         else:

@@ -114,18 +114,19 @@ block main
                     p 期限：{{equity.product.period}}个月
                   td {{equity.equity | money_format}}
 
-                  if equity.product.status != '还款中'
-                    if equity.product.status != '流标'
-                      td 募集中
-                    else
-                      td {{equity.product.status}}
+                  status = equity.product.display_status
+
+                  if status != '还款中'
+                    td {{status}}
                   else
-                    td {{equity.product.status}}{{term}}/{{equity.product.amortization_count}}
-                  if equity.product.status == '还款中'
+                    td {{status}}{{term}}/{{equity.product.amortization_count}}
+
+                  if status == '还款中'
                     td <span class="highlight">{{equity.paid_interest | money_format}}</span> / {{total_income | money_format}}
                   else
                     td -
-                  if equity.product.status == '还款中' or equity.product.status == '已完成'
+
+                  if status == '还款中' or status == '已完成'
                     td
                       a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{equity.product.id}}/") 还款计划
                     td
