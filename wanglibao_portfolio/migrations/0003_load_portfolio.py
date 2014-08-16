@@ -12,6 +12,7 @@ class Migration(DataMigration):
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
         from wanglibao_portfolio.mock_generator import MockGenerator
+        MockGenerator.generate_products(clean=True)
         MockGenerator.load_portfolio_from_file('fixture/portfolio.csv', clean=True)
 
     def backwards(self, orm):
