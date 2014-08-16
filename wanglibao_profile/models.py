@@ -26,6 +26,8 @@ class WanglibaoUserProfile(models.Model):
     investment_asset = models.IntegerField(help_text=u'可投资额度(万)', default=30)
     investment_period = models.IntegerField(help_text=u'可投资期限(月)', default=3)
 
+    deposit_default_bank_name = models.CharField(u'默认充值银行', max_length=32, blank=True)
+
     def __unicode__(self):
         return "phone: %s nickname: %s  %s" % (self.phone, self.nick_name, self.user.username)
 

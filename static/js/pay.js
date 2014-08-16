@@ -37,6 +37,9 @@
       messages: {
         amount: {
           required: '不能为空'
+        },
+        gate_id: {
+          required: '请选择银行'
         }
       }
     });
