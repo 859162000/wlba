@@ -12,6 +12,7 @@ from config.nginx_conf import generate_conf
 
 env.apache_conf = 'config/apache.conf'
 env.nginx_listen_on_80 = True
+env.migrate = True
 
 def production():
     env.host_string = 'www.wanglibao.com'
@@ -29,6 +30,7 @@ def production():
     env.staging = False
 
     env.mysql = False  # Use RDS, so we no need to install mysql
+    env.migrate = False
 
 
 def pre_production():
@@ -99,11 +101,13 @@ if env.get('group') == 'staging':
 
 elif env.get('group') == 'production':
     env.roledefs = {
-        'old-lb': [],
-        'lb': ['pre.wanglibao.com'],
-        'old-web': ['www.wanglibao.com'],
-        'web': ['pre.wanglibao.com'],
-        'task_queue': ['pre.wanglibao.com']
+        'old_lb': [],
+        'lb': [],
+        'old_web': [],
+        'web': ['115.28.166.203'],
+        'cron_tab': [],
+        'db': [],
+        'task_queue': [],
     }
     production()
 
@@ -438,14 +442,15 @@ def config_apache():
                 sudo('chgrp -R www-data /var/wsgi/wanglibao')
                 sudo('chown -R www-data /var/wsgi/wanglibao')
 
-            with cd('/var/wsgi/wanglibao'):
-                # use --noinput to prevent create super user. When super user created, then a profile object needs
-                # to be created, at that point, that table is not created yet. Then it crashes.
-                with hide('output'):
-                    run("python manage.py syncdb --noinput")
-                run("python manage.py migrate")
+            if env.migrate:
+                with cd('/var/wsgi/wanglibao'):
+                    # use --noinput to prevent create super user. When super user created, then a profile object needs
+                    # to be created, at that point, that table is not created yet. Then it crashes.
+                    with hide('output'):
+                        run("python manage.py syncdb --noinput")
+                    run("python manage.py migrate")
 
-            print green("Copy apache config file")
+                print green("Copy apache config file")
 
             sudo('cp %s /etc/apache2/sites-available/' % env.apache_conf)
             # Disable all other sites
