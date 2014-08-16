@@ -107,7 +107,7 @@ block main
                   term = equity.term
                   total_income = equity.total_interest
 
-                  td {{equity.product.publish_time | date:"Y-m-d h:i:s"}}
+                  td {{equity.product.publish_time | date:"Y-m-d H:i:s"}}
                   td
                     p <a href="/p2p/detail/{{equity.product.id}}/">{{equity.product.short_name}}</a>
                     p 年化收益：{{equity.product.expected_earning_rate}}%

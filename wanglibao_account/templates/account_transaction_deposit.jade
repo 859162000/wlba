@@ -32,7 +32,7 @@ block main
           each trade_record in pay_records
             tr
               td {{trade_record.id}}
-              td {{trade_record.create_time | date:"Y-m-d h:i:s"}}
+              td {{trade_record.create_time | date:"Y-m-d H:i:s"}}
               td {{trade_record.amount}}
               td {{trade_record.status}}
               td {{trade_record.margin_record.margin_current}}
