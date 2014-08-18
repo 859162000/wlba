@@ -10,14 +10,21 @@ html
       meta(name="description", content="8月20日至9月5日，迅雷+网利宝狂欢节，错过绝对会后悔”")
 
   body.xunlei-background
+    span.scroll-gif
+      a(href="#foot")
+        img(src="/static/images/arrow_down.gif")
     .container
       .align-center
         img(src="/static/images/activity/xunlei_top.png",alt="迅雷+网利宝狂欢节")
       .space-vertical-l
+      a(name="foot")
       .align-center
         a.xunlei-button(href="/")
           span.white 立刻赚钱
       .xunlei-content-box
+        .shadow-images
+          .left-shadow
+          .right-shadow
         h2.blue.align-center 活动细则
         div
          | 时间：
@@ -68,5 +75,19 @@ html
       .weixin-qq-hotline
         img(src="/static/images/activity/weixin_qq_hotline.jpg",alt="官方微信：iwanglibao 官方QQ群：362121062 理财预约热线：4008588066")
 
-
+    script(src="/static/js/lib/jquery.min.js")
+    script.
+      $(document).ready(function(){
+        $(window).scroll(function(){
+          var wHeight = $(window).height();
+          var dHeight = $(document).height();
+          var dTop = $(document).scrollTop();
+          $(".scroll-gif").css("top",dTop+340);
+          if(dTop >= (dHeight - wHeight)) {
+            $(".scroll-gif").hide();
+          } else {
+            $(".scroll-gif").show();
+          }
+        });
+      });
     include include/tracking
