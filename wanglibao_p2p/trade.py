@@ -149,7 +149,7 @@ class P2POperator(object):
             ProductKeeper(product).fail()
 
         product = P2PProduct.objects.get(id=product.id)
-        phones = [u.wanglibaouserprofile.phone for u in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        phones = [equity.user.wanglibaouserprofile.phone for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
         send_messages.apply_async(kwargs={
             "phones": phones,
             "messages": [messages.product_failed(product)]
