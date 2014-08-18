@@ -99,12 +99,11 @@ INSTALLED_APPS = (
     'djcelery', # Use django orm as the backend
     'djsupervisor',
     'adminplus',
-    'debug_toolbar',
+    'file_storage'
 )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'concurrency.middleware.ConcurrencyMiddleware',
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -216,6 +215,7 @@ STATICFILES_DIRS = (
 # Media files path
 MEDIA_ROOT = '/var/media/wanglibao/'
 MEDIA_URL = '/media/'
+DEFAULT_FILE_STORAGE = 'file_storage.storages.DatabaseStorage'
 
 # The request rate for some apis
 request_rate = '2/minute'
