@@ -55,19 +55,13 @@ class Aes(object):
 
 class ReportCrypto(object):
     @classmethod
-    def encrypt_file(cls, path):
-        file_object = open(path, "r+")
+    def encrypt_file(cls, content):
         rsa = Rsa()
         ase = Aes()
-        all_text = file_object.read()
         crypt_key = binascii.b2a_hex(os.urandom(16))
-        encrypt_text = ase.encrypt(crypt_key, all_text)
+        encrypt_text = ase.encrypt(crypt_key, content)
         encrypt_key = base64.b64encode(rsa.encrypt(crypt_key))
-        file_object.seek(0)
-        file_object.write(encrypt_key)
-        file_object.write('\n')
-        file_object.write(encrypt_text)
-        file_object.close()
+        return "%s\n%s" % (encrypt_key, encrypt_text)
 
     @classmethod
     def decrypt_file(cls, path):
