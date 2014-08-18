@@ -1,0 +1,58 @@
+.media-list-container
+  @extend .white-container
+  padding: $space-s 0
+
+.media-list-title
+  border-bottom: solid 1px #ff0000
+  line-height: 30px
+  height: 33px
+
+  h3
+    @extend .pull-left
+    width: 80px
+    line-height: 30px
+    border-bottom: solid 2px #ff0000
+
+.media-list-content
+  @extend .clearfix
+  margin: $space-l 0
+  padding-bottom: $space-l
+  border-bottom: dashed 1px #cccccc
+
+  p
+    float: left
+    width: 270px
+    height: 170px
+    margin-right: $space-l
+
+  dl
+    line-height: 1.8
+
+    dt
+      font-size: $font-m
+      padding-bottom: $space-s
+
+      a
+        color: $color-text-d2
+
+    dd
+      font-size: $font-s
+      color: $color-text-d4
+
+  .media-time,
+  .media-from
+    font-size: $font-xs
+
+  .media-from
+    color: $color-text-d2
+
+  .media-more
+    +inline-block
+    @extend .button
+    @include border-radius(3px)
+    border: solid 1px #ff0000
+    font-size: $font-s
+    color: #ff0000
+    padding: 8px $space-ssm
+    margin-right: $space-s
+

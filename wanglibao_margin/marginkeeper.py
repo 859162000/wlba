@@ -55,7 +55,7 @@ class MarginKeeper(KeeperBaseMixin):
     def amortize(self, principal, interest, penal_interest, description=u'', savepoint=True):
         check_amount(principal)
         check_amount(interest)
-        check_amount(penal_interest, allow_zero=True)
+        check_amount(penal_interest)
         principal = Decimal(principal)
         interest = Decimal(interest)
         penal_interest = Decimal(penal_interest)
@@ -132,11 +132,6 @@ class MarginKeeper(KeeperBaseMixin):
         return trace
 
 
-def check_amount(amount, allow_zero=False):
-    if not allow_zero:
-        if amount <= 0:
-            raise ValueError(u'amount must be positive.')
+def check_amount(amount):
     if amount < 0:
         raise ValueError(u'amount must positive or zero.')
-    # todo add decimal len check
-

@@ -80,16 +80,15 @@ class ReportGeneratorBase(object):
         assert(isinstance(start_time, datetime))
 
         path = cls.get_file_path(start_time, end_time)
-        absolute_path = os.path.join(settings.MEDIA_ROOT, path)
 
         content = cls.generate_report_content(start_time, end_time)
-        storage.save(path, ContentFile(content))
+        encrypted_content = ReportCrypto.encrypt_file(content)
+        path = storage.save(path, ContentFile(encrypted_content))
 
         report = Report(name=cls.get_report_name(start_time, end_time))
         report.file = path
         report.content = content
         report.save()
-        ReportCrypto.encrypt_file(absolute_path)
         return report
 
 
