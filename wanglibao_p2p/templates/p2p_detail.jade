@@ -97,7 +97,10 @@ html
                   .span4
                     input#validate_code(type='text', name='validate_code', placeholder='验证码')
                   .span4-omega
-                    button#get-validate-code-buy.button-red.button-middle(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                    if user.wanglibaouserprofile.phone
+                      button#get-validate-code-buy.button-red.button-middle(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                    else
+                      button#get-validate-code-buy.button-red.button-middle.disabled(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 抢购请登录
                 .row.margin-top-s
                   span.span4
                   span.span8-omega
