@@ -22,7 +22,7 @@
       return backend.checkMoney(value, element);
     });
     $.validator.addMethod("huge", function(value, element) {
-      return value <= 5000;
+      return value <= 50000;
     });
     $("#withdraw-form").validate({
       rules: {

@@ -122,9 +122,12 @@
     top: -80px
     font-size: $font-m
 
-.wanglibao-logo
-  position: relative
-  top: -50px
+    img
+      border: solid 3px #1ca0dd
+
+  .wanglibao-logo
+    position: relative
+    top: -50px
 
 .share-icons
   position: relative
@@ -178,7 +181,125 @@
 
 .weixin-qq-hotline
   font-size: $font-m
+  padding-bottom: $space-s
 
   span
     +inline-block
     padding: $space-s $space-s*3
+
+.xunlei-background
+  background: #d4dfe3 url("/static/images/activity/xunlei_background.jpg") no-repeat center top
+
+.xunlei-button
+  +inline-block
+  @include border-radius(10px)
+  border: solid 1px #cd1d68
+  background: #fd4b97
+  font-size: $font-xxl
+  width: 255px
+  color: #ffffff
+  line-height: 57px
+
+.shadow-images
+  position: relative
+  height: 1px
+
+.left-shadow
+  background: url("/static/images/activity/left_shadow.png") no-repeat
+  width: 45px
+  height: 826px
+  position: relative
+  top: -30px
+  left: -85px
+
+.right-shadow
+  background: url("/static/images/activity/right_shadow.png") no-repeat
+  width: 45px
+  height: 826px
+  position: relative
+  top: -857px
+  left: 639px
+
+.xunlei-content-box
+  margin: $space-xl auto
+  width: 680px
+  height: 825px
+  padding: $space-l $space-xl
+  border: solid 1px #b3b4b6
+  background: #ffffff
+  font-size: $font-s
+  line-height: 2
+
+  h2
+    line-height: 0
+    padding-top: $space-xs
+    padding-bottom: $space-m
+
+  .highlight
+    color: #ff4b94
+
+  table
+    border-left: solid 1px $color-text-d5
+    border-top: solid 1px $color-text-d5
+    width: 100%
+
+    th,td
+      border-right: solid 1px $color-text-d5
+      border-bottom: solid 1px $color-text-d5
+      width: 50%
+      text-align: center
+      font-size: $font-s
+      padding: $space-s
+    th
+      color: #ff4b94
+      font-size: $font-m
+      background: #f6f7f9
+
+  ul
+    font-size: $font-xs
+    line-height: 1.8
+    background: #f6f7f9
+    text-indent: 15px
+    padding: $space-s 0
+    margin-top: $space-l
+
+
+.xunlei-flow
+  background: url("/static/images/activity/xunlei_flow.png") no-repeat left top
+  height: 110px
+  margin: $space-m auto
+  padding-top: $space-xxxl
+  line-height: 1.5
+
+  p
+    font-size: $font-s
+    float: left
+    width: 155px
+    text-align: center
+    color: $color-dusty-gray
+
+    &:nth-child(2)
+      margin-left: 65px
+      margin-right: 48px
+
+.xunlei-footer
+  background: none
+  margin-top: $space-l
+  color: #b6c4c7
+
+  .wanglibao-logo
+    top: 0
+    margin-top: $space-xl
+
+  .weixin-img
+    top: 0
+
+    img
+      border: solid 3px #b4c3c8
+
+.scroll-gif
+  position: absolute
+  top: 340px
+  right: 10%
+  z-index: 9
+  cursor: pointer

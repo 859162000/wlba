@@ -253,10 +253,14 @@
       model = new ViewModel(asset_param, period_param, flexibility_param);
       ko.applyBindings(model);
     }
-    return $('#question-button').click(function(e) {
+    $('#question-button').click(function(e) {
       e.preventDefault();
       return $(this).modal();
     });
+    $('#question-button').modal();
+    return setInterval(function() {
+      return $('input', "#question-form").first().focus();
+    }, 0);
   });
 
 }).call(this);

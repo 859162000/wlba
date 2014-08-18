@@ -267,3 +267,9 @@ require ['jquery',
     e.preventDefault()
     $(this).modal()
 
+  $('#question-button').modal()
+  setInterval(() ->
+    $('input',"#question-form").first().focus()
+  ,0)
+
+

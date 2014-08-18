@@ -8,6 +8,8 @@ import codecs
 import cStringIO
 import logging
 from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import DefaultStorage
 from report.crypto import ReportCrypto
 from report.models import Report
 from wanglibao_p2p.models import UserAmortization, P2PProduct
@@ -15,6 +17,7 @@ from wanglibao_pay.models import PayInfo
 
 
 logger = logging.getLogger(__name__)
+storage = DefaultStorage()
 
 
 class UnicodeWriter:
@@ -77,18 +80,9 @@ class ReportGeneratorBase(object):
 
         path = cls.get_file_path(start_time, end_time)
         absolute_path = os.path.join(settings.MEDIA_ROOT, path)
-        folder, name = os.path.split(absolute_path)
-
-        try:
-            makedirs(folder)
-        except OSError, e:
-            if e.errno != 17:
-                raise
 
         content = cls.generate_report_content(start_time, end_time)
-
-        with open(absolute_path, 'w+b') as tsv_file:
-            tsv_file.write(content)
+        storage.save(path, ContentFile(content))
 
         report = Report(name=cls.get_report_name(start_time, end_time))
         report.file = path

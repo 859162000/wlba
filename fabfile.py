@@ -346,6 +346,7 @@ def check_out():
                 with cd(env.depot_name):
                     with settings(warn_only=True):
                         run('git reset --hard HEAD')
+                        run('git clean -f -d')
                         run('git remote set-url origin %s' % env.depot)
 
                         result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
