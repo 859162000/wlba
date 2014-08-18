@@ -9,26 +9,64 @@ html
       meta(name="keywords", content="迅雷,网利宝,狂欢节")
       meta(name="description", content="8月20日至9月5日，迅雷+网利宝狂欢节，错过绝对会后悔”")
 
-  body
-    .full-container
+  body.xunlei-background
+    .container
+      .align-center
+        img(src="/static/images/activity/xunlei_top.png",alt="迅雷+网利宝狂欢节")
+      .space-vertical-l
+      .align-center
+        a.xunlei-button(href="/")
+          span.white 立刻赚钱
+      .xunlei-content-box
+        h2.blue.align-center 活动细则
+        div
+         | 时间：
+         span.highlight 2014.08.20 — 2014.09.05
+        div
+         | 内容：点击
+         span.highlight 【立刻赚钱】
+         | 100元起投年化收益11%+1%（活动补贴收益）理财产品，满以下额度100%送奖。
+        .xunlei-flow
+          p 点击【立刻赚钱】<br/>购买网利宝理财产品
+          p 手机收到迅雷会员兑换码<br/>（投资成功100%赠送）
+          p 前往迅雷官网兑换
+        table
+          tr
+            th 在网利宝P2P理财购买金额
+            th 迅雷赠送
+          tr
+            td 100-1000元（含）
+            td 1个月迅雷白金会员
+          tr
+            td 10001-10000元
+            td 半年迅雷白金会员
+          tr
+            td 10000元以上
+            td 1年迅雷白金会员
+        .space-vertical-s
+        p.align-right
+          a.blue.font-s(href="http://www.xunlei.com",target="_blank") 点击此处激活迅雷会员>>
+        .space-vertical-m
+        .align-center
+          a.xunlei-button(href="/")
+            span.white 我要领奖
+        ul
+          li · 一个账号最多只能获得一次迅雷会员赠送，具体以活动结束后的投资总金额为准。
+          li · 获奖通知将统一短信发送至交易手机号
+          li · 奖品统一于活动结束后7个工作日内开始发放。
+          li · 本活动不另外收取用户任何费用，谨防上当受骗。
+          li · 此次活动解释权归网利宝官方网站所有。
 
 
-    .full-container.activity-footer
+    .container.activity-footer.xunlei-footer
       .weixin-img
         img(src="/static/images/activity/weixin.png",alt="扫一扫官方微信 获取更多理财咨询！")
-        p 扫一扫官方微信 获取更多理财咨询！
+        p.font-s 扫一扫官方微信 获取更多理财咨询！
       .wanglibao-logo
-        img(src="/static/images/activity/wanglibao_logo.png",alt="网利宝")
+        img(src="/static/images/activity/wanglibao_logo_xunlei.png",alt="网利宝")
+      .space-vertical-s
       .weixin-qq-hotline
-        span
-          i.icon.icon-share-weixin
-          | 官方微信：iwanglibao
-        span
-          i.icon.icon-share-qq
-          | 官方QQ群：362121062
-        span
-          i.icon.icon-share-hotline
-          | 理财热线预约：4008 588 066
+        img(src="/static/images/activity/weixin_qq_hotline.jpg",alt="官方微信：iwanglibao 官方QQ群：362121062 理财预约热线：4008588066")
 
 
     include include/tracking
