@@ -18,7 +18,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
   $.validator.addMethod "money", (value, element)->
     return backend.checkMoney(value, element)
   $.validator.addMethod "huge", (value, element)->
-    return value <= 5000
+    return value <= 50000
 
   $("#withdraw-form").validate
     rules:
