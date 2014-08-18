@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'File'
         db.create_table(u'file_storage_file', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('path', self.gf('django.db.models.fields.CharField')(max_length=128, db_index=True)),
+            ('path', self.gf('django.db.models.fields.CharField')(unique=True, max_length=128, db_index=True)),
             ('content', self.gf('django.db.models.fields.BinaryField')(max_length=20971520)),
             ('size', self.gf('django.db.models.fields.PositiveIntegerField')(default=0)),
             ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
@@ -29,7 +29,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'File'},
             'content': ('django.db.models.fields.BinaryField', [], {'max_length': '20971520'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'path': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
+            'path': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '128', 'db_index': 'True'}),
             'size': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         }
