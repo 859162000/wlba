@@ -37,7 +37,10 @@
   padding-top: 20px
   padding-bottom: 5px
   font-size: $font-m
-  margin-bottom: $space-l
+  margin-left: 40px
+  margin-right: 40px
+  .detail-view
+    font-size: 12px
 
 .account-home-panel--action-bar
   @extend .row
@@ -56,6 +59,7 @@
   line-height: 70px
   font-size: $font-xl
   text-align: center
+  color: #999
 
 %brief--basic
   float: left
@@ -72,11 +76,21 @@
   height: 70px
   width: 276px
 
+.brief--p2p-total-asset.active
+  border: 3px solid $color-text-d5
+  p
+    color: #e6370d
+
 .brief--fund-total-asset
   @extend %brief--basic
   @extend %brief--basic__border
   height: 70px
   width: 276px
+
+.brief--fund-total-asset.active
+  border: 3px solid $color-text-d5
+  p
+    color: #e6370d
 
 .account-home-panel
   margin-top: 15px
@@ -103,12 +117,15 @@
 .p2p-asset--detail-container
   float: left
   background: #FAFAFA
+  padding-right: 5px
 
 .p2p-asset--detail
   float: left
   width: 130px
   text-align: center
   padding: 10px 0
+  .desc
+    color: #999
 
 .nickname
   padding-right: 5px
