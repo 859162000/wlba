@@ -1,4 +1,5 @@
 # encoding: utf-8
+from datetime import *
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from django.core.files.base import ContentFile
@@ -84,6 +85,7 @@ class EquityKeeper(KeeperBaseMixin):
                 raise P2PException(u'已超过可认购份额限制，该产品每个客户最大投资金额为%s元' % str(limit))
 
             self.equity.equity += amount
+            self.equity.created_at = datetime.now()
             self.equity.save()
             catalog = u'申购'
             record = self.__tracer(catalog, amount, description)
