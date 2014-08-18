@@ -85,7 +85,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     element = this
 
     e.preventDefault()
-    if $(element).attr 'disabled'
+    if $(element).attr 'disabled' || $(element).hasClass 'disabled'
       return;
 
     phoneNumber = $(element).attr("data-phone")

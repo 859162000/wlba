@@ -22,7 +22,7 @@ html
           .p2p-detail-bar.clearfix
             .row
               .span8
-                .p2p-detail-title.pull-left.text-overflow-hidden(title="{{p2p.short_name}}") {{p2p.short_name}}
+                .p2p-detail-title.pull-left.text-overflow-hidden(title="{{p2p.name}}") {{p2p.name}}
                 div.pull-left.p2p-warrant-way
                   span.icon-check-shield 第三方本息担保
               if status == '正在招标'
@@ -97,7 +97,10 @@ html
                   .span4
                     input#validate_code(type='text', name='validate_code', placeholder='验证码')
                   .span4-omega
-                    button#get-validate-code-buy.button-red.button-middle(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                    if user.wanglibaouserprofile.phone
+                      button#get-validate-code-buy.button-red.button-middle(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                    else
+                      button#get-validate-code-buy.button-red.button-middle.disabled(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 抢购请登录
                 .row.margin-top-s
                   span.span4
                   span.span8-omega

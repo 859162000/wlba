@@ -479,6 +479,8 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
                 auth_login(request, form.get_user())
                 if request.POST.has_key('remember_me'):
                     request.session.set_expiry(604800)
+                else:
+                    request.session.set_expiry(10800)
                 return HttpResponse(messenger('done', user=request.user))
             else:
                 return HttpResponseForbidden(messenger(form.errors))

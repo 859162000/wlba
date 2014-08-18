@@ -5,6 +5,7 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
     conf = [
         ['proxy_cache_path', '/var/cache/nginx levels=1:2 keys_zone=static-cache:8m max_size=1000m inactive=600m'],
         ['proxy_temp_path', '/var/cache/tmp'],
+        ['add_header', 'X-Cached $upstream_cache_status']
     ]
 
     if listen_on_80:
