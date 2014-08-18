@@ -75,20 +75,14 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           tool.modalAlert({title: '温馨提示', msg: error_message})
       })
 
-  $('#purchase-form .submit-button').click (e)->
-    e.preventDefault()
-    $('#purchase-form').submit()
-
-  $("#get-validate-code-buy").click (e) ->
-    e.preventDefault()
-
+  $("#get-validate-code-buy").click () ->
     element = this
-
-    e.preventDefault()
-    if $(element).attr 'disabled' || $(element).hasClass 'disabled'
-      return;
+    if $(element).hasClass 'disabled'
+      return
 
     phoneNumber = $(element).attr("data-phone")
+    if !phoneNumber
+      return
     $.ajax(
       url: "/api/phone_validation_code/" + phoneNumber + "/"
       type: "POST"
@@ -97,19 +91,24 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     intervalId
     count = 60
 
-    $(element).attr 'disabled', 'disabled'
     timerFunction = ()->
       if count >= 1
         count--
         $(element).text('重新获取(' + count + ')')
-        $(element).addClass('disabled')
+        if !$(element).hasClass('disabled')
+          $(element).addClass('disabled')
       else
         clearInterval(intervalId)
         $(element).text('重新获取')
-        $(element).removeAttr 'disabled'
         $(element).removeClass('disabled')
 
    # Fire now and future
     timerFunction()
     intervalId = setInterval timerFunction, 1000
+
+  $('#purchase-form .submit-button').click (e)->
+    e.preventDefault()
+    $('#purchase-form').submit()
+
+
 

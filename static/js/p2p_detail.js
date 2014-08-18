@@ -98,40 +98,41 @@
         });
       }
     });
-    $('#purchase-form .submit-button').click(function(e) {
-      e.preventDefault();
-      return $('#purchase-form').submit();
-    });
-    return $("#get-validate-code-buy").click(function(e) {
+    $("#get-validate-code-buy").click(function() {
       var count, element, intervalId, phoneNumber, timerFunction;
-      e.preventDefault();
       element = this;
-      e.preventDefault();
-      if ($(element).attr('disabled' || $(element).hasClass('disabled'))) {
+      if ($(element).hasClass('disabled')) {
         return;
       }
       phoneNumber = $(element).attr("data-phone");
+      if (!phoneNumber) {
+        return;
+      }
       $.ajax({
         url: "/api/phone_validation_code/" + phoneNumber + "/",
         type: "POST"
       });
       intervalId;
       count = 60;
-      $(element).attr('disabled', 'disabled');
       timerFunction = function() {
         if (count >= 1) {
           count--;
           $(element).text('重新获取(' + count + ')');
-          return $(element).addClass('disabled');
+          if (!$(element).hasClass('disabled')) {
+            return $(element).addClass('disabled');
+          }
         } else {
           clearInterval(intervalId);
           $(element).text('重新获取');
-          $(element).removeAttr('disabled');
           return $(element).removeClass('disabled');
         }
       };
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
+    });
+    return $('#purchase-form .submit-button').click(function(e) {
+      e.preventDefault();
+      return $('#purchase-form').submit();
     });
   });
 
