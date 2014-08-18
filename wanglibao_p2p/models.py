@@ -79,6 +79,7 @@ class P2PProduct(ProductBase):
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)')
     excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)')
+    excess_earning_description = models.CharField(u'超额收益描述', max_length=100, blank=True, null=True)
 
     pay_method = models.CharField(u'支付方式', max_length=32, blank=True, default=u'等额本息', choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)

@@ -65,22 +65,22 @@ block main
     var _activity_url = encodeURIComponent('https://www.wanglibao.com/activity/invite/');
     var _share_url = encodeURIComponent('https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
     var _share_pic = 'https://staging.wanglibao.com/static/images/share_pic.jpg';
-    var _share_site = '';
+    var _share_site = 'https://www.wanglibao.com';
     $(document).ready(function(){
       $(".wlb_tsina").click(function(){
         window.open("http://v.t.sina.com.cn/share/share.php?url=&title="+_share_content);
       });
       $(".wlb_tqq").click(function(){
-        window.open("http://v.t.qq.com/share/share.php?url=&pic="+_share_pic+"&title="+_share_content+"&content="+_share_content);
+        window.open("http://share.v.t.qq.com/index.php?c=share&a=index&url=&pic="+_share_pic+"&title="+_share_content+"&content="+_share_title+"&site="+_share_site);
       });
       $(".wlb_kaixin001").click(function(){
-        window.open("http://www.kaixin001.com/repaste/share.php?rurl="+_share_url+"&rcontent="+_share_content);
+        window.open("http://www.kaixin001.com/repaste/share.php?rurl=&rcontent="+_share_content);
       });
       $(".wlb_douban").click(function(){
         window.open("http://www.douban.com/recommend/?url="+_share_url+"&title="+_share_content);
       });
       $(".wlb_renren").click(function(){
-        window.open("http://share.renren.com/share/buttonshare.do?link="+_share_url+"&title="+_share_content);
+        window.open("http://widget.renren.com/dialog/share?resourceUrl="+_activity_url+"&title="+_share_title+"&pic="+_share_pic+"&description="+_share_content);
       });
       $(".wlb_qzone").click(function(){
         window.open("http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url="+_activity_url+"&title="+_share_title+"&pics="+_share_pic+"&desc="+_share_content);

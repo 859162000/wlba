@@ -20,13 +20,14 @@ class DatabaseStorage(Storage):
         filename = original_name
 
         count = 10
+        content_data = content.file.read()
         while count:
             count -= 1
             try:
                 with transaction.atomic():
                     file_record = File()
                     file_record.path = filename + ext
-                    file_record.content = content.file.read()
+                    file_record.content = content_data
                     file_record.size = len(content)
                     file_record.save()
                     return file_record.path
