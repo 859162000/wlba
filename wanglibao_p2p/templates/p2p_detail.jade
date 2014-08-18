@@ -45,7 +45,9 @@ html
                     earning_rate = str(p2p.expected_earning_rate - p2p.excess_earning_rate) + '+' + str(p2p.excess_earning_rate)
                   span.font-xxl {{earning_rate}}
                   span.font-xl %
-                  span.detail-icon
+                  if p2p.excess_earning_description
+                    span.detail-icon(title="{{p2p.excess_earning_description}}")
+
                 p 年化收益
           .p2p-detail-footer
             .row
