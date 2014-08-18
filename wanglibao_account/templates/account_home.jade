@@ -28,28 +28,44 @@ block main
         p.align-center 总资产(元)
       .sign-money-card
         =
-      .brief--p2p-total-asset
-        a(href="/accounts/home/")
-          p.align-center
-            span.big_number {{p2p_total_asset|money_format}}
-          p.align-center P2P资产(元)
-      .sign-money-card
-        +
-      .brief--fund-total-asset
-        a(href="/accounts/home/fund/")
-          p.align-center
-            span.big_number {{fund_total_asset|money_format}}
-          p.align-center 货币基金(元)
+      if mode == 'p2p'
+        .brief--p2p-total-asset.active
+          a(href="/accounts/home/")
+            p.align-center
+              span.big_number {{p2p_total_asset|money_format}}
+            p.align-center P2P资产(元)
+        .sign-money-card
+          +
+      else
+        .brief--p2p-total-asset
+          a(href="/accounts/home/")
+            p.align-center
+              span.big_number {{p2p_total_asset|money_format}}
+            p.align-center P2P资产(元)
+        .sign-money-card
+          +
+      if mode == 'p2p'
+        .brief--fund-total-asset
+          a(href="/accounts/home/fund/")
+            p.align-center
+              span.big_number {{fund_total_asset|money_format}}
+            p.align-center 货币基金(元)
+      else
+        .brief--fund-total-asset.active
+          a(href="/accounts/home/fund/")
+            p.align-center
+              span.big_number {{fund_total_asset|money_format}}
+            p.align-center 货币基金(元)
 
   if mode == 'p2p'
     .account-home-panel__no-padding
-      .account-home-panel--title-bar__product.clamp-xl
+      .account-home-panel--title-bar__product
         ul.title-bar--tabs
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") P2P
           li.title-bar--tab
             a.title-bar--tab--anchor(href="/accounts/home/fund/") 货币基金
-        a.pull-right.align-right(href='/accounts/transaction/p2p/') 查看交易记录
+        a.pull-right.align-right.detail-view(href='/accounts/transaction/p2p/') 查看交易记录
       .clamp-xl
         .account-home-panel--action-bar
           a.button-home-action(href="/pay/banks/") 充值
@@ -59,7 +75,7 @@ block main
           .total-asset-money-card
             p.align-center
               span.big_number {{p2p_total_asset|money_format}}
-            p.align-center P2P资产(元)
+            p.align-center.desc P2P资产(元)
 
           .sign-money-card
             =
@@ -68,25 +84,25 @@ block main
             .p2p-asset--detail
               p
                 span.big_number {{user.margin.margin | money_format}}
-              p P2P余额
+              p.desc P2P余额
             .sign-money-card
               +
             .p2p-asset--detail
               p
                 span.big_number {{p2p_unpay_principle|money_format}}
-              p 待收本金
+              p.desc 待收本金
             .sign-money-card
               +
             .p2p-asset--detail
               p
                 span.big_number {{margin_freeze|money_format}}
-              p 投资中冻结金额
+              p.desc 投资中冻结金额
             .sign-money-card
               +
             .p2p-asset--detail
               p
                 span.big_number {{margin_withdrawing|money_format}}
-              p 提现中冻结金额
+              p.desc 提现中冻结金额
 
         .space-vertical-s
 

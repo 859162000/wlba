@@ -59,9 +59,9 @@ block main
               .span5
                 input.withdraw-input(type='text', name='validate_code', placeholder='请输入验证码')
               .span4
-                button.ispan4-omega#button-get-validate-code.button-red.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                button.ispan4-omega#button-get-validate-code.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
           tr
-            td(colspan=2)
+            td.opt(colspan=2)
               .withdraw-td
                 input#withdraw.withdraw-button(type='submit', value='提 现')
                 p.d4-text 申请通过后 3 个工作日内（此为预估时间，具体实际到账为准）
