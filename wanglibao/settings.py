@@ -34,7 +34,7 @@ ENV_STAGING = 'staging'
 
 ENV = ENV_DEV
 
-if ENV == ENV_PRODUCTION or ENV == ENV_PREPRODUCTION:
+if ENV != ENV_DEV:
     DEBUG = False
 
 ADMINS = (
