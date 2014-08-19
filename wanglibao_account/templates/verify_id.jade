@@ -44,13 +44,13 @@ block main
             form#validate_id_form.form.span5(method="POST")
               - csrf_token
               .form-row
-                .span3
+                .span3(style="line-height:40px")
                   label 真实姓名
                 .span9-omega
                   input#id_name(type='text', name='name', placeholder='真实姓名')
                   .form-row-error
               .form-row
-                .span3
+                .span3(style="line-height:40px")
                   label 身份证号
                 .span9-omega
                   input#id_id_number(type='text', name='id_number', placeholder='身份证号')
