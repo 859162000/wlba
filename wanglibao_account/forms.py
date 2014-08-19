@@ -148,8 +148,8 @@ class IdVerificationForm(forms.Form):
         user = self._user
         verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
-        if verify_counter.count >= 2:
-            raise ValidationError(u'验证次数超过两次，请联系客服进行人工验证')
+        if verify_counter.count >= 3:
+            raise ValidationError(u'验证次数超过三次，请联系客服进行人工验证')
 
         name = cleaned_data.get('name')
         id_number = cleaned_data.get('id_number')

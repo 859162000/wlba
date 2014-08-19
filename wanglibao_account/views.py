@@ -38,6 +38,7 @@ from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyInco
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
+from wanglibao_account.models import VerifyCounter
 
 
 logger = logging.getLogger(__name__)
@@ -522,13 +523,18 @@ def ajax_register(request):
         return HttpResponseNotAllowed()
 
 
-class IdVerificationView(FormView):
+class IdVerificationView(TemplateView):
     template_name = 'verify_id.jade'
     form_class = IdVerificationForm
     success_url = '/accounts/id_verify/'
 
-    def get_form(self, form_class):
-        return form_class(user=self.request.user, **self.get_form_kwargs())
+    def get_context_data(self, **kwargs):
+        counter = VerifyCounter.objects.filter(user=self.request.user).first()
+        print counter.count
+        return {
+            'user': self.request.user,
+            'counter': counter.count
+        }
 
     def form_valid(self, form):
         user = self.request.user
