@@ -25,9 +25,6 @@ html
                 .p2p-detail-title.pull-left.text-overflow-hidden(title="{{p2p.name}}") {{p2p.name}}
                 div.pull-left.p2p-warrant-way
                   span.icon-check-shield 第三方本息担保
-              if status == '正在招标'
-                .span4-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余：
-                  span#countdown{{p2p.end_time | timedelta_now_day }}
           .p2p-detail-content.clearfix
             .row
               .span4
@@ -51,15 +48,18 @@ html
                 p 年化收益
           .p2p-detail-footer
             .row
-              .span7
+              .span4
                 |还款方式：
                 span.dark-gray {{p2p.pay_method}}
-              .span5-omega
+              .span4
                 span.pull-right 进度：
                   .progress-container
                     percent = float(p2p.ordered_amount) / p2p.total_amount * 100
                     .progress-indicator(style="width:{{percent | percentage}}")
                   span.highlight &nbsp;&nbsp; {{percent | percentage}}
+              if status == '正在招标'
+                .span4-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余：
+                  span#countdown{{p2p.end_time | timedelta_now_day }}
 
           dl.p2p-detail-intro.clearfix
             dt 项目用途：
