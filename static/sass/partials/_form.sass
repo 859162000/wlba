@@ -65,18 +65,20 @@ label.error
     line-height: 30px
 
 #passwordChangeForm
+  width: 450px
+  margin: 0 auto
 
   input
     min-height: 25px
-    width: 276px
+    width: 170px
 
   table
     td
       padding: 5px 10px
-      text-align: right
+      text-align: left
 
 #passwordChangeButton
-  width: 276px
+  width: 170px
   background-color: $color-pomegranate
   border: 0
   color: white
@@ -126,12 +128,14 @@ input.captcha
 
 a.captcha-refresh
   cursor: pointer
+  display: inline-block
   width: 33px
   height: 43px
   border: 0
   font-size: 30px
   padding-left: 10px
   vertical-align: middle
+  background: url(/static/images/refresh.png) no-repeat 0 0
   +link-colors(black, black)
 
 .login-modal-tab
