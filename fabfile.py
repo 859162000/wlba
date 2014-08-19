@@ -26,13 +26,11 @@ def production():
     env.pip_install = "pip install -r requirements.txt"
     env.pip_install_command = "pip install"
 
-    env.debug = False
-    env.production = True
-    env.staging = False
-
     env.mysql = False  # Use RDS, so we no need to install mysql
     env.migrate = False
     env.supervisord = False
+
+    env.environment = 'ENV_PRODUCTION'
 
 
 def pre_production():
@@ -45,11 +43,9 @@ def pre_production():
     env.pip_install = "pip install -r requirements.txt"
     env.pip_install_command = "pip install"
 
-    env.debug = False
-    env.production = True
-    env.staging = False
-
     env.mysql = False
+
+    env.environment = 'ENV_PREPRODUCTION'
 
 
 def dev():
@@ -62,11 +58,9 @@ def dev():
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
 
-    env.debug = False
-    env.production = True
-    env.staging = True
-
     env.mysql = True
+
+    env.environment = 'ENV_STAGING'
 
 
 def staging():
@@ -81,12 +75,10 @@ def staging():
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
 
-    env.debug = False
-    env.production = True
-    env.staging = True
-
     env.mysql = True
     env.nginx_listen_on_80 = False
+
+    env.environment = "ENV_STAGING"
 
 
 if env.get('group') == 'staging':
@@ -174,7 +166,9 @@ elif env.get('group') == 'pre':
         ],
 
         # Task queue server is the server running rabbitmq or redis.
-        'task_queue': ['115.28.240.194']
+        'task_queue': ['115.28.240.194'],
+
+        'huifu_sign_server': ['115.28.151.49'],
     }
     pre_production()
 
@@ -398,7 +392,6 @@ def setup_cron_tab():
                     run("python manage.py supervisor restart all")
 
 
-
 @roles('web')
 def config_apache():
     banner("config apache")
@@ -409,18 +402,9 @@ def config_apache():
                 run(env.pip_install)
 
                 print green("Generate config file for the environment")
-                if env.production:
-                    print yellow('Replacing wanglibao/settings.py PRODUCTION')
-                    run("fab config:'wanglibao/settings.py','PRODUCTION \= False','PRODUCTION \= True'")
-                if not env.debug:
-                    print yellow('Replacing wanglibao/settings.py DEBUG')
-                    run("fab config:'wanglibao/settings.py','DEBUG \= True','DEBUG \= False'")
-                if env.staging:
-                    print yellow('Replacing wanglibao/settings.py STAGING')
-                    run("fab config:'wanglibao/settings.py','STAGING \= False','STAGING \= True'")
-                if env.mysql:
-                    print red('Overwriting setting file to use local MYSQL')
-                    run("fab config:'wanglibao/settings.py','LOCAL_MYSQL \= not PRODUCTION','LOCAL_MYSQL \= True'")
+
+                print yellow('Replacing wanglibao/settings.py ENV')
+                run("fab config:'wanglibao/settings.py','ENV = DEV','ENV = %s'" % env.environment)
 
                 print green('Collect static files')
                 run("python manage.py collectstatic --noinput")
