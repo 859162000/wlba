@@ -1,7 +1,7 @@
 # coding=utf-8
 from email.utils import formatdate
 import mimetypes
-from django.http import Http404, CompatibleStreamingHttpResponse
+from django.http import Http404, HttpResponse
 import time
 from file_storage.models import File
 
@@ -26,7 +26,7 @@ def serve(request, path):
     content_type, encoding = mimetypes.guess_type(path)
     content_type = content_type or 'application/octet-stream'
 
-    response = CompatibleStreamingHttpResponse(file_record.content, content_type=content_type)
+    response = HttpResponse(file_record.content, content_type=content_type)
 
     response["Last-Modified"] = last_modified
     response["Content-Length"] = file_record.size

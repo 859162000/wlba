@@ -404,7 +404,7 @@ def config_apache():
                 print green("Generate config file for the environment")
 
                 print yellow('Replacing wanglibao/settings.py ENV')
-                run("fab config:'wanglibao/settings.py','ENV = DEV','ENV = %s'" % env.environment)
+                run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
 
                 print green('Collect static files')
                 run("python manage.py collectstatic --noinput")
