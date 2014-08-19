@@ -57,7 +57,10 @@ class UserProfileAdmin(UserAdmin, ImportExportModelAdmin):
 
 
 def user_unicode(self):
-    return u'[%s] %s %s ' % (str(self.id), self.wanglibaouserprofile.name, self.wanglibaouserprofile.phone)
+    if hasattr(self, 'wanglibaouserprofile'):
+        return u'[%s] %s %s ' % (str(self.id), self.wanglibaouserprofile.name, self.wanglibaouserprofile.phone)
+    else:
+        return u'%s [%s]' % (str(self.id), self.username)
 
 User.__unicode__ = user_unicode
 
