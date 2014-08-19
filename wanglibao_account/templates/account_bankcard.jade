@@ -16,26 +16,26 @@ block main
     .bar.padding-l-r-m
       .card-category-bar P2P专用账户
     .row.padding-l-r-m
-    if p2p_cards
-      each card in p2p_cards
-        .bank-card
-          .bank-card--title-bar.row
-            .bank-card--bank-name.span9 {{card.bank.name}}
-            .bank-card--icon.span3-omega
-              img(src='/static/images/bank_card.png')
-          .row
-            dl.bank-card--info-row
-              dt.bank-card--info-title 账号
-              dd.bank-card--info-value {{card.no | bank_card}}
-      a#add-card-button(href='#add-card-form')
-        .add-bank-card
-          .add-icon-large
-          p.add-card-text 添加一张银行卡
-    else
-      a#add-card-button(href='#add-card-form')
-        .add-bank-card
-          .add-icon-large
-          p.add-card-text 添加一张银行卡
+      if p2p_cards
+        each card in p2p_cards
+          .bank-card
+            .bank-card--title-bar.row
+              .bank-card--bank-name.span9 {{card.bank.name}}
+              .bank-card--icon.span3-omega
+                img(src='/static/images/bank_card.png')
+            .row
+              dl.bank-card--info-row
+                dt.bank-card--info-title 账号
+                dd.bank-card--info-value {{card.no | bank_card}}
+        a#add-card-button(href='#add-card-form')
+          .add-bank-card
+            .add-icon-large
+            p.add-card-text 添加一张银行卡
+      else
+        a#add-card-button(href='#add-card-form')
+          .add-bank-card
+            .add-icon-large
+            p.add-card-text 添加一张银行卡
 
     .space-vertical-l
     .bar.padding-l-r-m
