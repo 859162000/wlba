@@ -114,10 +114,6 @@ class IdValidate(APIView):
         user = self.request.user
         name = request.DATA.get("name", "")
         id_number = request.DATA.get("id_number", "")
-        user.wanglibaouserprofile.id_number = id_number
-        user.wanglibaouserprofile.name = name
-        user.wanglibaouserprofile.id_is_valid = True
-        user.wanglibaouserprofile.save()
         verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
         if verify_counter.count >= 3:
@@ -136,6 +132,11 @@ class IdValidate(APIView):
                                 "message": u"验证失败，拨打客服电话进行人工验证",
                                 "error_number": ErrorNumber.unknown_error
                             }, status=400)
+
+        user.wanglibaouserprofile.id_number = id_number
+        user.wanglibaouserprofile.name = name
+        user.wanglibaouserprofile.id_is_valid = True
+        user.wanglibaouserprofile.save()
 
         return Response({
                             "validate": True
