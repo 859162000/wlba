@@ -24,13 +24,23 @@ SECRET_KEY = ')#@a(750mv)cn&#@c#^y%52-pof*w%)ba%w5kd1*u0k=l6znj9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+TEMPLATE_DEBUG = True
 
 # Whether the deploy in production
-PRODUCTION = False
+ENV_DEV = 'debug'
+ENV_PRODUCTION = 'production'
+ENV_PREPRODUCTION = 'pre'
+ENV_STAGING = 'staging'
 
-STAGING = False
+ENV = ENV_DEV
 
-TEMPLATE_DEBUG = True
+if ENV == ENV_PRODUCTION or ENV == ENV_PREPRODUCTION:
+    DEBUG = False
+
+ADMINS = (
+    ('Shuo Li', 'lishuo@wanglibank.com'),
+    ('Zhang Ding Liang', 'zhangdingliang@wanglibank.com')
+)
 
 ALLOWED_HOSTS = ['*']
 
@@ -135,7 +145,7 @@ DATABASES = {
 }
 
 # The deploy file will overwrite this based on flag local db
-LOCAL_MYSQL = not PRODUCTION
+LOCAL_MYSQL = ENV == ENV_DEV or ENV == ENV_STAGING
 
 if LOCAL_MYSQL:
     DATABASES['default'] = {
@@ -276,7 +286,7 @@ RAVEN_CONFIG = {
     'dsn': 'https://efd164e25b604da7b2f38b88d0594ff5:4b1fb0cd10774161a51e33be79e88e84@app.getsentry.com/22349',
 }
 
-if not PRODUCTION:
+if ENV != ENV_PRODUCTION:
     RAVEN_CONFIG = {}
 
 import mimetypes
@@ -333,7 +343,7 @@ LOGGING = {
     }
 }
 
-if PRODUCTION:
+if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
     LOGGING['loggers']['wanglibao_sms']['level'] = 'INFO'
 
@@ -412,7 +422,7 @@ CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
 ID_VERIFY_USERNAME = 'wljr_admin'
 ID_VERIFY_PASSWORD = 'wljr888'
 
-if not DEBUG and not STAGING:
+if ENV == ENV_PRODUCTION:
     CALLBACK_HOST = 'https://www.wanglibao.com'
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
@@ -420,6 +430,16 @@ if not DEBUG and not STAGING:
     SIGN_PORT = 8733
     PAY_URL = 'https://mas.chinapnr.com'
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
+
+elif ENV == ENV_PREPRODUCTION:
+    CALLBACK_HOST = 'https://pre.wanglibao.com'
+    MER_ID = '872724'
+    CUSTOM_ID = '000007522683'
+    SIGN_HOST = 'www.wanglibao.com'
+    SIGN_PORT = 8733
+    PAY_URL = 'https://mas.chinapnr.com'
+    WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
+
 else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
     MER_ID = '510672'
@@ -433,9 +453,9 @@ PAY_BACK_RETURN_URL = CALLBACK_HOST + '/pay/deposit/callback/'
 PAY_RET_URL = CALLBACK_HOST + '/pay/deposit/complete/'
 WITHDRAW_BACK_RETURN_URL = CALLBACK_HOST + '/pay/withdraw/callback/'
 
-ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
-if PRODUCTION:
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+if ENV == ENV_DEV:
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
