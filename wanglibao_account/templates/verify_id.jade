@@ -36,24 +36,27 @@ block main
             p 根据法律，网上投资必须进行实名认证。
             p 请花15秒钟完成免费的实名认证，以方便日后投资理财。
 
+          if counter >= 3
+            p 验证次数到达限额。请拨打客服电话进行人工验证。4008-588-066
+
           .space-vertical-l
           .row
-            form.form.span5(method="POST")
+            form#validate_id_form.form.span5(method="POST")
               - csrf_token
-              .error
-                {{form.non_field_errors}}
               .form-row
-                {{form.name.errors}}
                 .span3
                   label 真实姓名
                 .span9-omega
-                  - render_field form.name
+                  input#id_name(type='text', name='name', placeholder='真实姓名')
+                  .form-row-error
               .form-row
-                {{form.id_number.errors}}
                 .span3
                   label 身份证号
                 .span9-omega
-                  - render_field form.id_number
+                  input#id_id_number(type='text', name='id_number', placeholder='身份证号')
+                  .form-row-error
               .form-row
-                button.button-primary.prefix3.span9-omega(type="submit") 提交
+                button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 提交
         .space-vertical-xl
+  script.
+      require(["/static/js/verifyId.js"])
