@@ -2,6 +2,7 @@ import os
 import random
 from urlparse import urljoin
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.core.files.storage import Storage
 from django.db import IntegrityError
 from django.middleware.transaction import transaction
@@ -36,7 +37,8 @@ class DatabaseStorage(Storage):
                 continue
 
     def open(self, name, mode='rb'):
-        raise NotImplementedError()
+        file_record = File.objects.get(path=name)
+        return ContentFile(file_record.content)
 
     def delete(self, name):
         File.objects.filter(path=name).delete()
