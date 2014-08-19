@@ -83,7 +83,7 @@ class P2PProduct(ProductBase):
 
     pay_method = models.CharField(u'支付方式', max_length=32, blank=True, default=u'等额本息', choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)
-    repaying_source = models.CharField(u'还款资金来源', max_length=256, blank=True)
+    repaying_source = models.TextField(u'还款资金来源', blank=True)
 
     # Bao li related
     baoli_original_contract_number = models.CharField(u'(保理)原合同编号', max_length=64, blank=True)
