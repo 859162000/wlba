@@ -92,21 +92,21 @@ html
                 .row
                   span.span4 预期收益
                   span.span8-omega
-                    span.highlight.font-m#expected_income 0.0
+                    span.highlight.font-m.invest#expected_income 0.0
                     | 元
                 .row
                   span.span4 手机验证码
                   .span4
-                    input#validate_code(type='text', name='validate_code', placeholder='验证码')
+                    input#validate_code.invest(type='text', name='validate_code', placeholder='验证码')
                   .span4-omega
                     if user.wanglibaouserprofile.phone
-                      button#get-validate-code-buy.button-orange.button-middle(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                      button#get-validate-code-buy.button-orange.button-middle.invest(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
                     else
-                      button#get-validate-code-buy.button-orange.button-middle.disabled(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 抢购请登录
+                      button#get-validate-code-buy.button-orange.button-middle.disabled.invest(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 抢购请登录
                 .row.margin-top-s
                   span.span4
                   span.span8-omega
-                    a.submit-button.span12.button-primary.button-middle(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                    a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
           if status != '正在招标'
             .sold-out
               p.align-center
