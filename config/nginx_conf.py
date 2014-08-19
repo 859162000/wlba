@@ -29,6 +29,9 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
 
             [['location', '/'], [
                 ['proxy_pass', 'http://apps'],
+                ['proxy_set_header', 'Host $host'],
+                ['proxy_set_header', 'X-Real-IP $remote_addr'],
+                ['proxy_set_header', 'X-Forwarded-For $proxy_add_x_forwarded_for']
             ]],
 
             [['location', '/nginx_status'], [
