@@ -59,8 +59,9 @@ class IntroducedBy(models.Model):
 
 
 def generate_user_promo_token(sender, instance, **kwargs):
-    p = PromotionToken()
-    p.user = instance
-    p.save()
+    if kwargs["created"]:
+        p = PromotionToken()
+        p.user = instance
+        p.save()
 
 post_save.connect(generate_user_promo_token, sender=get_user_model(), dispatch_uid="generate_promotion_token")
