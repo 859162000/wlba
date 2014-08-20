@@ -15,6 +15,9 @@ env.nginx_listen_on_80 = True
 env.migrate = True
 env.supervisord = True
 
+env.apache_binding_interface = '*'
+env.apache_binding_port = 80
+
 
 def production():
     env.path = '/var/deploy/wanglibao'
@@ -80,11 +83,15 @@ def staging():
 
     env.environment = "ENV_STAGING"
 
+    env.apache_binding_interface = '127.0.0.1'
+    env.apache_binding_port = 8080
+
 
 if env.get('group') == 'staging':
     env.roledefs = {
         'lb': ['staging.wanglibao.com'],
         'web': ['staging.wanglibao.com'],
+        'web_private': ['127.0.0.1'],
         'task_queue': ['staging.wanglibao.com'],
         'db': ['staging.wanglibao.com'],
         'old_lb': [],
@@ -154,6 +161,9 @@ elif env.get('group') == 'pre':
         # Web is the server to be deployed with new version
         'web': [
             '115.28.240.194',
+        ],
+        'web_private': [
+            '10.161.55.165',
         ],
 
         # Cron tab is the server with crontab running. NOTE: The crontab should be with new version, and only
@@ -304,7 +314,9 @@ def generate_nginx_conf():
     if 'web_private' in env.roledefs:
         apps = env.roledefs['web_private']
 
-    conf_content = generate_conf(apps=apps, listen_on_80=env.nginx_listen_on_80)
+    conf_content = generate_conf(apps=apps,
+                                 upstream_port=str(env.apache_binding_port),
+                                 listen_on_80=env.nginx_listen_on_80)
     put(StringIO(conf_content), "/etc/nginx/sites-available/wanglibao-proxy.conf", use_sudo=True)
     sudo('rm -f /etc/nginx/sites-enabled/*')
     sudo('nginx_ensite wanglibao-proxy.conf')
@@ -445,9 +457,14 @@ def config_apache():
                         run("python manage.py syncdb --noinput")
                     run("python manage.py migrate")
 
-                print green("Copy apache config file")
+            with open(env.apache_conf, 'r') as apache_config_file:
+                content = apache_config_file.read()
+                result = content % {
+                    'apache_binding_interface': env.apache_binding_interface,
+                    'apache_binding_port': env.apache_binding_port
+                }
+                put(StringIO(result), '/etc/apache2/sites-available/%s' % os.path.split(env.apache_conf)[-1], use_sudo=True)
 
-            sudo('cp %s /etc/apache2/sites-available/' % env.apache_conf)
             # Disable all other sites
             sudo('rm -f /etc/apache2/sites-enabled/*')
             sudo('a2ensite %s' % os.path.split(env.apache_conf)[-1])
