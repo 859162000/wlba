@@ -24,7 +24,7 @@ def production():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'production2.0'
+    env.branch = 'production3.0'
 
     env.pip_install = "pip install -r requirements.txt"
     env.pip_install_command = "pip install"
@@ -161,9 +161,11 @@ elif env.get('group') == 'pre':
         # Web is the server to be deployed with new version
         'web': [
             '115.28.240.194',
+            '114.215.146.91'
         ],
         'web_private': [
             '10.161.55.165',
+            '10.164.13.228'
         ],
 
         # Cron tab is the server with crontab running. NOTE: The crontab should be with new version, and only
@@ -252,6 +254,9 @@ def init():
     Setup the server for the first time
     :return:
     """
+    if env.get('no-init'):
+        banner("SKIPPED INIT due to configuration")
+        return
 
     banner("init")
     with hide("output"):
