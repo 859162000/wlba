@@ -92,11 +92,15 @@ def password_change(request,
                     post_change_redirect=None,
                     password_change_form=PasswordChangeForm,
                     extra_context=None):
+    if post_change_redirect is None:
+        post_change_redirect = reverse('password_change_done')
+    else:
+        post_change_redirect = resolve_url(post_change_redirect)
     if request.method == "POST":
         form = password_change_form(user=request.user, data=request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponse(status=200)
+            return HttpResponseRedirect(post_change_redirect)
     else:
         form = password_change_form(user=request.user)
     context = {
@@ -226,7 +230,7 @@ class ResetPassword(TemplateView):
         if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 30 * 60:
             user.set_password(password1)
             user.save()
-            return HttpResponseRedirect(redirect_to='/accounts/password/reset/done/')
+            return HttpResponse(u'密码修改成功', status=200)
 
         else:
             return HttpResponse(u'验证超时，请重新验证', status=400)
