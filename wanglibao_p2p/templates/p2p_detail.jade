@@ -22,7 +22,7 @@ html
           .p2p-detail-bar.clearfix
             .row
               .span8
-                .p2p-detail-title.pull-left.text-overflow-hidden(title="{{p2p.name}}") {{p2p.short_name}}
+                .p2p-detail-title.pull-left.text-overflow-hidden(title="{{p2p.name}}") {{p2p.name}}
                 div.pull-left.p2p-warrant-way
                   span.icon-check-shield 第三方本息担保
           .p2p-detail-content.clearfix
@@ -48,10 +48,10 @@ html
                 p 年化收益
           .p2p-detail-footer
             .row
-              .span4
+              .span3
                 |还款方式：
                 span.dark-gray {{p2p.pay_method}}
-              .span4
+              .span5
                 span.pull-right 进度：
                   .progress-container
                     percent = float(p2p.ordered_amount) / p2p.total_amount * 100
@@ -92,7 +92,7 @@ html
                 .row
                   span.span4 预期收益
                   span.span8-omega
-                    span.highlight.font-m.invest#expected_income 0.0
+                    span.highlight.font-m.invest#expected_income 0.00
                     | 元
                 .row
                   span.span4 手机验证码
@@ -130,7 +130,7 @@ html
                 if user.is_authenticated
                   for item_name in section_values
                     dl
-                      dt.span2 {{item_name}}
+                      dt.span2.align-left {{item_name}}
 
                       item_value = section_values[item_name]
                       dd.span10-omega {{item_value|linebreaksbr}}

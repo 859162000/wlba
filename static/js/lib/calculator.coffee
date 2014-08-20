@@ -46,7 +46,7 @@ define ['jquery'], ($)->
 
     amount = parseFloat(existing) + parseFloat(amount)
 
-    earning = ((amount / total_amount) * total_earning).toFixed(1)
+    earning = ((amount / total_amount) * total_earning).toFixed(2)
 
     if earning < 0
       earning = 0
@@ -56,6 +56,6 @@ define ['jquery'], ($)->
       if earning and $.isNumeric(earning)
         $(earning_element).text earning
       else
-        $(earning_element).text "0.0"
+        $(earning_element).text "0.00"
 
   $('input[data-role=p2p-calculator]').keyup()
