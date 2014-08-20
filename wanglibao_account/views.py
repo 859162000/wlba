@@ -92,15 +92,11 @@ def password_change(request,
                     post_change_redirect=None,
                     password_change_form=PasswordChangeForm,
                     extra_context=None):
-    if post_change_redirect is None:
-        post_change_redirect = reverse('password_change_done')
-    else:
-        post_change_redirect = resolve_url(post_change_redirect)
     if request.method == "POST":
         form = password_change_form(user=request.user, data=request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(post_change_redirect)
+            return HttpResponse(status=200)
     else:
         form = password_change_form(user=request.user)
     context = {

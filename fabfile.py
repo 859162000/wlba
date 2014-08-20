@@ -41,7 +41,7 @@ def pre_production():
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'master'
+    env.branch = 'production3.0'
 
     env.pip_install = "pip install -r requirements.txt"
     env.pip_install_command = "pip install"
@@ -491,7 +491,6 @@ def config_apache():
 
             if env.get('group') == 'staging':
                 sudo('a2ensite chandao.conf')
-                sudo('rm -rf /var/cache/nginx')
 
             sudo('service apache2 reload')
             sudo('chown -R www-data:www-data /var/log/wanglibao/')
@@ -503,6 +502,7 @@ def config_loadbalancer():
     with cd(env.path):
         generate_nginx_conf()
         sudo('service nginx reload')
+        sudo('rm -rf /var/cache/nginx')
 
 
 @task

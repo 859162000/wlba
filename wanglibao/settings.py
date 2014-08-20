@@ -426,7 +426,7 @@ if ENV == ENV_PRODUCTION:
     CALLBACK_HOST = 'https://www.wanglibao.com'
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
-    SIGN_HOST = '127.0.0.1'
+    SIGN_HOST = '115.28.151.49'
     SIGN_PORT = 8733
     PAY_URL = 'https://mas.chinapnr.com'
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
