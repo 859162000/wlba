@@ -21,13 +21,13 @@ html
       for index, banner in banners_
         if index == 0
           if banner.type == 'ad'
-            a(href="{{banner.link}}")
+            a(href="{{banner.link}}", target='_blank')
               .home-banner(style="display:block; background-image:url('/media/{{banner.image}}')")
           else
             .home-banner(style="display:block; background-image:url('/media/{{banner.image}}')")
         else
           if banner.type == 'ad'
-            a(href="{{banner.link}}")
+            a(href="{{banner.link}}", target='_blank')
               .home-banner(style="background-image:url('/media/{{banner.image}}')")
           else
             .home-banner(style="background-image:url('/media/{{banner.image}}')")
