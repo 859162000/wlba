@@ -74,10 +74,10 @@ block main
         window.open("http://www.douban.com/recommend/?url="+_share_url+"&title="+_share_content);
       });
       $(".wlb_renren").click(function(){
-        window.open("http://widget.renren.com/dialog/share?resourceUrl=&title="+_share_title+"&pic="+_share_pic+"&description="+_share_content);
+        window.open("http://widget.renren.com/dialog/share?resourceUrl="+_share_url+"&title="+_share_title+"&pic="+_share_pic+"&description="+_share_content);
       });
       $(".wlb_qzone").click(function(){
-        window.open("http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=&title="+_share_title+"&pics="+_share_pic+"&desc="+_share_content);
+        window.open("http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url="+_share_url+"&title="+_share_title+"&pics="+_share_pic+"&desc="+_share_content);
       });
       if(navigator.plugins){
         var isFlashPlugin = 0;
