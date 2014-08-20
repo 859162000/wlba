@@ -258,9 +258,7 @@
       return $(this).modal();
     });
     $('#question-button').modal();
-    return setInterval(function() {
-      return $('input', "#question-form").first().focus();
-    }, 0);
+    return $('input', "#question-form").first().focus();
   });
 
 }).call(this);
