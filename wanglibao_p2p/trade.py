@@ -150,10 +150,11 @@ class P2POperator(object):
 
         product = P2PProduct.objects.get(id=product.id)
         phones = [equity.user.wanglibaouserprofile.phone for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
-        send_messages.apply_async(kwargs={
-            "phones": phones,
-            "messages": [messages.product_failed(product)]
-        })
+        if phones:
+            send_messages.apply_async(kwargs={
+                "phones": phones,
+                "messages": [messages.product_failed(product)]
+            })
 
     @classmethod
     def amortize(cls, amortization):
