@@ -39,6 +39,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
     submitHandler: (form)->
       name = $('#id_name').val()
       id_number = $('#id_id_number').val()
+      if $("#validate_id_button").hasClass "disabled"
+        return;
+      $("#validate_id_button").addClass('disabled')
       $.ajax {
         url: '/api/id_validate/'
         data: {
@@ -53,11 +56,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
         })
 
       .fail (xhr)->
+        $(this).removeClass('disabled')
         result = JSON.parse xhr.responseText
         if result.error_number == 8
           tool.modalAlert({title: '温馨提示', msg: '验证失败，请拨打客服电话进行人工验证。4008-588-066'})
           return
         tool.modalAlert({title: '温馨提示', msg: result.message})
+
 
 
 
