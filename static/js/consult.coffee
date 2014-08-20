@@ -268,8 +268,6 @@ require ['jquery',
     $(this).modal()
 
   $('#question-button').modal()
-  setInterval(() ->
-    $('input',"#question-form").first().focus()
-  ,0)
+  $('input',"#question-form").first().focus()
 
 
