@@ -49,10 +49,10 @@ html
                 p 年化收益
           .p2p-detail-footer
             .row
-              .span3
+              .span4
                 |还款方式：
                 span.dark-gray {{p2p.display_payback_method}}
-              .span5
+              .span4
                 span.pull-right 进度：
                   .progress-container
                     percent = float(p2p.ordered_amount) / p2p.total_amount * 100
