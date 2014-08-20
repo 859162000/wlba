@@ -181,11 +181,26 @@ class P2PProduct(ProductBase):
         return self.display_status_mapping[self.status]
 
 
+    display_payback_mapping = {
+        u'等额本息': u'等额本息',
+        u'先息后本': u'先息后本',
+        u'按月付息': u'按月付息',
+        u'到期还本付息': u'一次性还本付息',
+        u'按季度付息': u'按季度付息',
+    }
+
+    @property
+    def display_payback_method(self):
+        if self.pay_method in self.display_payback_mapping:
+            return self.display_payback_mapping[self.pay_method]
+        return self.pay_method
+
+
 reversion.register(P2PProduct)
 
 
 class Warrant(models.Model):
-    name = models.CharField(max_length=16, verbose_name=u'名字')
+    name = models.CharField(max_length=64, verbose_name=u'名字')
     warranted_at = models.DateTimeField(default=timezone.now, verbose_name=u'认证时间')
     created_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间')
 

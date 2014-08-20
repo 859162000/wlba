@@ -100,19 +100,6 @@ if env.get('group') == 'staging':
     }
     staging()
 
-elif env.get('group') == 'production':
-    env.roledefs = {
-        'old_lb': [],
-        'lb': ['115.28.151.49'],
-        'old_web': [],
-        'web': ['115.28.166.203', '121.42.11.194'],
-        'web_private': ['10.144.172.198', '10.165.54.41'],
-        'cron_tab': ['115.28.166.203'],
-        'db': [],
-        'task_queue': [],
-    }
-    production()
-
 elif env.get('group') == 'dev':
     env.roledefs = {
         # Old lb is the load balancer which points to old version, it should take out of the new webs
@@ -146,6 +133,34 @@ elif env.get('group') == 'dev':
         'task_queue': ['192.168.1.184']
     }
     dev()
+
+elif env.get('group') == 'production':
+    env.roledefs = {
+        'old_lb': [],
+        'lb': ['115.28.151.49'],
+        'old_web': [
+            '115.28.166.203',
+            '121.42.11.194'
+        ],
+        'old_web_private':[
+            '10.144.172.198',
+            '10.165.54.41'
+        ],
+        'web': [
+            '115.28.240.194',
+            '114.215.146.91'
+        ],
+        'web_private': [
+            '10.161.55.165',
+            '10.164.13.228'
+        ],
+        'cron_tab': ['115.28.166.203'],
+        'db': [],
+        'task_queue': ['115.28.166.203'],
+        'huifu_sign_server': ['115.28.151.49']
+    }
+    production()
+
 
 elif env.get('group') == 'pre':
     env.roledefs = {
