@@ -66,12 +66,12 @@ class RegisterView (RegistrationView):
     def get_success_url(self, request=None, user=None):
         if request.GET.get('next'):
             return request.GET.get('next')
-        return '/accounts/login'
+        return '/accounts/login/'
 
     def get_context_data(self, **kwargs):
         context = super(RegisterView, self).get_context_data(**kwargs)
         context.update({
-            'next': self.request.GET.get('next', None)
+            'next': self.request.GET.get('next', '/accounts/login/')
         })
         return context
 
