@@ -202,7 +202,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
     $("#tab-register").removeClass('active')
     $("#login-modal-form").show()
     $("#register-modal-form").hide()
-    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/"
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
     $.getJSON url, {}, (json)->
       $('input[name="captcha_0"]').val(json.key)
       $('img.captcha').attr('src', json.image_url)
@@ -216,7 +216,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
     $("#login-modal-form").hide()
     $("#register-modal-form").show()
 
-    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/"
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
     $.getJSON url, {}, (json)->
       $('input[name="captcha_0"]').val(json.key)
       $('img.captcha').attr('src', json.image_url)
