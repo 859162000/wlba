@@ -52,7 +52,7 @@
         target.val(amount);
       }
       amount = parseFloat(existing) + parseFloat(amount);
-      earning = ((amount / total_amount) * total_earning).toFixed(1);
+      earning = ((amount / total_amount) * total_earning).toFixed(2);
       if (earning < 0) {
         earning = 0;
       }
@@ -63,7 +63,7 @@
         if (earning && $.isNumeric(earning)) {
           _results.push($(earning_element).text(earning));
         } else {
-          _results.push($(earning_element).text("0.0"));
+          _results.push($(earning_element).text("0.00"));
         }
       }
       return _results;

@@ -45,6 +45,10 @@
         var id_number, name;
         name = $('#id_name').val();
         id_number = $('#id_id_number').val();
+        if ($("#validate_id_button").hasClass("disabled")) {
+          return;
+        }
+        $("#validate_id_button").addClass('disabled');
         return $.ajax({
           url: '/api/id_validate/',
           data: {
@@ -62,6 +66,7 @@
           });
         }).fail(function(xhr) {
           var result;
+          $(this).removeClass('disabled');
           result = JSON.parse(xhr.responseText);
           if (result.error_number === 8) {
             tool.modalAlert({

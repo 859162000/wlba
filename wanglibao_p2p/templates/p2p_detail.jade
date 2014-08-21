@@ -21,9 +21,10 @@ html
         .span8.p2p-detail-container
           .p2p-detail-bar.clearfix
             .row
-              .span8
-                .p2p-detail-title.pull-left.text-overflow-hidden(title="{{p2p.name}}") {{p2p.short_name}}
-                div.pull-left.p2p-warrant-way
+              .span9
+                .p2p-detail-title.pull-left.text-overflow-hidden(title="{{p2p.name}}") {{p2p.name}}
+              .span3-omega
+                div.pull-right.p2p-warrant-way
                   span.icon-check-shield 第三方本息担保
           .p2p-detail-content.clearfix
             .row
@@ -50,7 +51,7 @@ html
             .row
               .span4
                 |还款方式：
-                span.dark-gray {{p2p.pay_method}}
+                span.dark-gray {{p2p.display_payback_method}}
               .span4
                 span.pull-right 进度：
                   .progress-container
@@ -62,7 +63,7 @@ html
                   span#countdown{{p2p.end_time | timedelta_now_day }}
 
           dl.p2p-detail-intro.clearfix
-            dt 项目用途：
+            dt 资金用途：
             dd {{p2p.short_usage}}
 
         .span4-omega.invest-form.border-left
@@ -92,7 +93,7 @@ html
                 .row
                   span.span4 预期收益
                   span.span8-omega
-                    span.highlight.font-m.invest#expected_income 0.0
+                    span.highlight.font-m.invest#expected_income 0.00
                     | 元
                 .row
                   span.span4 手机验证码
@@ -130,7 +131,7 @@ html
                 if user.is_authenticated
                   for item_name in section_values
                     dl
-                      dt.span2 {{item_name}}
+                      dt.span2.align-left {{item_name}}
 
                       item_value = section_values[item_name]
                       dd.span10-omega {{item_value|linebreaksbr}}

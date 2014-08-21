@@ -15,13 +15,16 @@ env.nginx_listen_on_80 = True
 env.migrate = True
 env.supervisord = True
 
+env.apache_binding_interface = '*'
+env.apache_binding_port = 80
+
 
 def production():
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
-    env.branch = 'production2.0'
+    env.branch = 'production3.0'
 
     env.pip_install = "pip install -r requirements.txt"
     env.pip_install_command = "pip install"
@@ -80,11 +83,15 @@ def staging():
 
     env.environment = "ENV_STAGING"
 
+    env.apache_binding_interface = '127.0.0.1'
+    env.apache_binding_port = 8080
+
 
 if env.get('group') == 'staging':
     env.roledefs = {
         'lb': ['staging.wanglibao.com'],
         'web': ['staging.wanglibao.com'],
+        'web_private': ['127.0.0.1'],
         'task_queue': ['staging.wanglibao.com'],
         'db': ['staging.wanglibao.com'],
         'old_lb': [],
@@ -92,19 +99,6 @@ if env.get('group') == 'staging':
         'cron_tab': ['staging.wanglibao.com'],
     }
     staging()
-
-elif env.get('group') == 'production':
-    env.roledefs = {
-        'old_lb': [],
-        'lb': ['115.28.151.49'],
-        'old_web': [],
-        'web': ['115.28.166.203', '121.42.11.194'],
-        'web_private': ['10.144.172.198', '10.165.54.41'],
-        'cron_tab': ['115.28.166.203'],
-        'db': [],
-        'task_queue': [],
-    }
-    production()
 
 elif env.get('group') == 'dev':
     env.roledefs = {
@@ -140,6 +134,34 @@ elif env.get('group') == 'dev':
     }
     dev()
 
+elif env.get('group') == 'production':
+    env.roledefs = {
+        'old_lb': [],
+        'lb': ['115.28.151.49'],
+        'old_web': [
+            '115.28.166.203',
+            '121.42.11.194'
+        ],
+        'old_web_private':[
+            '10.144.172.198',
+            '10.165.54.41'
+        ],
+        'web': [
+            '115.28.240.194',
+            '114.215.146.91'
+        ],
+        'web_private': [
+            '10.161.55.165',
+            '10.164.13.228'
+        ],
+        'cron_tab': ['115.28.166.203'],
+        'db': [],
+        'task_queue': ['115.28.166.203'],
+        'huifu_sign_server': ['115.28.151.49']
+    }
+    production()
+
+
 elif env.get('group') == 'pre':
     env.roledefs = {
         # Old lb is the load balancer which points to old version, it should take out of the new webs
@@ -154,6 +176,11 @@ elif env.get('group') == 'pre':
         # Web is the server to be deployed with new version
         'web': [
             '115.28.240.194',
+            '114.215.146.91'
+        ],
+        'web_private': [
+            '10.161.55.165',
+            '10.164.13.228'
         ],
 
         # Cron tab is the server with crontab running. NOTE: The crontab should be with new version, and only
@@ -242,6 +269,9 @@ def init():
     Setup the server for the first time
     :return:
     """
+    if env.get('no-init'):
+        banner("SKIPPED INIT due to configuration")
+        return
 
     banner("init")
     with hide("output"):
@@ -304,7 +334,9 @@ def generate_nginx_conf():
     if 'web_private' in env.roledefs:
         apps = env.roledefs['web_private']
 
-    conf_content = generate_conf(apps=apps, listen_on_80=env.nginx_listen_on_80)
+    conf_content = generate_conf(apps=apps,
+                                 upstream_port=str(env.apache_binding_port),
+                                 listen_on_80=env.nginx_listen_on_80)
     put(StringIO(conf_content), "/etc/nginx/sites-available/wanglibao-proxy.conf", use_sudo=True)
     sudo('rm -f /etc/nginx/sites-enabled/*')
     sudo('nginx_ensite wanglibao-proxy.conf')
@@ -404,7 +436,7 @@ def config_apache():
                 print green("Generate config file for the environment")
 
                 print yellow('Replacing wanglibao/settings.py ENV')
-                run("fab config:'wanglibao/settings.py','ENV = DEV','ENV = %s'" % env.environment)
+                run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
 
                 print green('Collect static files')
                 run("python manage.py collectstatic --noinput")
@@ -445,9 +477,14 @@ def config_apache():
                         run("python manage.py syncdb --noinput")
                     run("python manage.py migrate")
 
-                print green("Copy apache config file")
+            with open(env.apache_conf, 'r') as apache_config_file:
+                content = apache_config_file.read()
+                result = content % {
+                    'apache_binding_interface': env.apache_binding_interface,
+                    'apache_binding_port': env.apache_binding_port
+                }
+                put(StringIO(result), '/etc/apache2/sites-available/%s' % os.path.split(env.apache_conf)[-1], use_sudo=True)
 
-            sudo('cp %s /etc/apache2/sites-available/' % env.apache_conf)
             # Disable all other sites
             sudo('rm -f /etc/apache2/sites-enabled/*')
             sudo('a2ensite %s' % os.path.split(env.apache_conf)[-1])
