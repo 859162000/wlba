@@ -5,33 +5,65 @@ The backend of wanglibao website
 
 Create virtualenv
 -----------------
-- pip install virtualenv --index-url http://pypi.tuna.tsinghua.edu.cn/simple 
-- virtualenv env
+    $ pip install virtualenv --index-url http://pypi.tuna.tsinghua.edu.cn/simple 
+    $ virtualenv env
 
 Install python packages
 -----------------
-- source ../env/bin/activate
-- pip install -r requirements.txt --index-url http://pypi.tuna.tsinghua.edu.cn/simple
+    $ source ../env/bin/activate
+    $ pip install -r requirements.txt --index-url http://pypi.tuna.tsinghua.edu.cn/simple
 
 Create db
 -----------------
-- python manage.py syncdb
-- python manage.py migrate
-- python manage.py generate_mock clean
+create database on UTF8 
+    
+    mysql> CREATE DATABASE wanglibao DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-Install compass
+create database user
+    
+    mysql> INSERT INTO mysql.user(Host,User,Password) values("localhost","wanglibao",password("wanglibank"));
+
+add Permissions
+
+    mysql> grant all privileges on wanglibao.* to wanglibao@localhost identified by 'wanglibank';
+
+flush system permissions 
+    
+    mysql>flush privileges;
+
+
+Sync db
 -----------------
-- gem install bundle
-- bundle install
+    $ python manage.py syncdb
+    $ python manage.py migrate
+    $ python manage.py generate_mock clean
+
+Install compass & sass
+-----------------
+do
+
+    $ gem install bundle
+    $ bundle install
+
+or
+
+    $ gem source --remove 'http://rubygems.org'
+    $ gem source -a 'https://ruby.taobao.org'
+    $ gem install compass --version= 0.12.3
+    $ gem install sass --version=3.2.14
+    $ gem susy --version=1.0.5
+    $ gem install font-icons --pre
+
+
 
 Languages or skills required
------------------
-Programming language: Python, Sass + Compass, jade (pyjade)
+----------------------------
+Programming language: `Python`, `Sass + Compass`, `jade (pyjade)`
 
 
 Deploy
 -----------------
-dev: fab deploy --set group=dev
-staging: fab deploy --set group=staging
-pre: fab deploy --set group=pre
-production: fab deploy --set group=production
+    $ dev: fab deploy --set group=dev
+    $ staging: fab deploy --set group=staging
+    $ pre: fab deploy --set group=pre
+    $ production: fab deploy --set group=production
