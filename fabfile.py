@@ -31,7 +31,7 @@ def production():
 
     env.mysql = False  # Use RDS, so we no need to install mysql
     env.migrate = False
-    env.supervisord = False
+    env.supervisord = True
 
     env.environment = 'ENV_PRODUCTION'
 
@@ -147,16 +147,16 @@ elif env.get('group') == 'production':
             '10.165.54.41'
         ],
         'web': [
-            '115.28.240.194',
+        #    '115.28.240.194',
             '114.215.146.91'
         ],
         'web_private': [
-            '10.161.55.165',
+        #    '10.161.55.165',
             '10.164.13.228'
         ],
-        'cron_tab': ['115.28.166.203'],
+        'cron_tab': ['114.215.146.91'],
         'db': [],
-        'task_queue': ['115.28.166.203'],
+        'task_queue': ['114.215.146.91'],
         'huifu_sign_server': ['115.28.151.49']
     }
     production()
@@ -263,7 +263,7 @@ def install_rabbit_mq():
 
 
 @task
-@roles('old_lb', 'lb', 'db', 'old_web', 'web')
+@roles('lb', 'db', 'web')
 def init():
     """
     Setup the server for the first time
@@ -384,6 +384,7 @@ def check_out():
                             run('git pull origin %s' % env.branch)
 
 
+@task
 @roles('cron_tab')
 def setup_cron_tab():
     banner("Setup crontab")
