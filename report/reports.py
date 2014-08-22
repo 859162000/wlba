@@ -55,7 +55,7 @@ class ReportGeneratorBase(object):
     @classmethod
     def get_file_path(cls, start_time, end_time):
         if hasattr(cls, 'prefix'):
-            filename = '%s-%s.tsv' % (cls.prefix, start_time.strftime('%Y-%m-%d'))
+            filename = '%s-%s-%s.tsv' % (cls.prefix, start_time.strftime('%Y-%m-%d'), end_time.strftime('%Y-%m-%d'))
             path = join('reports', cls.prefix, filename)
             return path
         else:
