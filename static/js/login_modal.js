@@ -241,7 +241,7 @@
       $("#tab-register").removeClass('active');
       $("#login-modal-form").show();
       $("#register-modal-form").hide();
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/";
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
       $.getJSON(url, {}, function(json) {
         $('input[name="captcha_0"]').val(json.key);
         return $('img.captcha').attr('src', json.image_url);
@@ -255,7 +255,7 @@
       $("#tab-register").addClass('active');
       $("#login-modal-form").hide();
       $("#register-modal-form").show();
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/";
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
       $.getJSON(url, {}, function(json) {
         $('input[name="captcha_0"]').val(json.key);
         return $('img.captcha').attr('src', json.image_url);
