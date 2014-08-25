@@ -137,7 +137,10 @@ def safe_id(id_number):
     Show part of id_number
     """
 
-    result = id_number[:6] + '*' * 8 + id_number[13:]
+    # result = id_number[:6] + '*' * 8 + id_number[13:]
+
+    result = id_number[:-4] + '*' * 4
+
     return result
 
 @register.filter
