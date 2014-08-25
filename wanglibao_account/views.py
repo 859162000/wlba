@@ -538,6 +538,7 @@ class IdVerificationView(TemplateView):
             'counter': count
         }
 
+
     def form_valid(self, form):
         user = self.request.user
 
