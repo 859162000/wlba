@@ -17,7 +17,7 @@ def deposit_succeed(amount):
 
 @suffix
 def withdraw_failed(error_message):
-    return u'提现失败，原因如下：%s' % str(error_message)
+    return u'提现失败，原因如下：%s' % error_message
 
 @suffix
 def withdraw_submitted(amount, issue_time):

@@ -342,8 +342,6 @@ class WithdrawRollback(TemplateView):
     def post(self, request):
         uuid = request.POST.get('uuid', '')
         error_message = request.POST.get('error_message', '')
-        print uuid
-        print error_message
         try:
             payinfo = PayInfo.objects.get(uuid=uuid, type='W')
         except PayInfo.DoesNotExist:
