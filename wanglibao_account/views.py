@@ -515,6 +515,7 @@ def ajax_register(request):
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
                 return HttpResponse(messenger('done', user=request.user))
+                # return HttpResponseRedirect("/accounts/id_verify/")
             else:
                 return HttpResponseForbidden(messenger(form.errors))
         else:
