@@ -16,6 +16,10 @@ def deposit_succeed(amount):
     return u'充值操作成功，充值金额%s元。' % str(amount)
 
 @suffix
+def withdraw_failed(error_message):
+    return u'提现失败，原因如下：%s' % str(error_message)
+
+@suffix
 def withdraw_submitted(amount, issue_time):
     arrive_date = issue_time + timedelta(days=3)
     return u'提现申请成功，申请金额%s元，预计%s前到账。' % (str(amount), format_datetime(arrive_date, u'%Y年%m月%d日'))
