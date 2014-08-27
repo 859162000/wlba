@@ -532,8 +532,10 @@ class IdVerificationView(TemplateView):
     def get_context_data(self, **kwargs):
         counter = VerifyCounter.objects.filter(user=self.request.user).first()
         count = 0
+
         if counter:
             count = counter.count
+
         return {
             'user': self.request.user,
             'counter': count

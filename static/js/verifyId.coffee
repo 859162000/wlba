@@ -59,8 +59,12 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
         $(this).removeClass('disabled')
         result = JSON.parse xhr.responseText
         if result.error_number == 8
-          tool.modalAlert({title: '温馨提示', msg: '验证失败，请拨打客服电话进行人工验证。4008-588-066'})
+          tool.modalAlert({title: '温馨提示', msg: result.message})
           return
+        else if result.error_number == 9
+          tool.modalAlert({title: '温馨提示', msg: result.message})
+
+
         tool.modalAlert({title: '温馨提示', msg: result.message})
 
 

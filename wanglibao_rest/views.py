@@ -20,7 +20,7 @@ from wanglibao_rest.serializers import AuthTokenSerializer, RegisterUserSerializ
 from wanglibao_sms.utils import send_validation_code
 from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_account.models import VerifyCounter
+from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_account.utils import verify_id
 
 
@@ -114,13 +114,25 @@ class IdValidate(APIView):
         user = self.request.user
         name = request.DATA.get("name", "")
         id_number = request.DATA.get("id_number", "")
+
         verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
         if verify_counter.count >= 3:
             return Response({
-                                "message": u"验证次数超过三次，请联系客服进行人工验证",
+                                "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066",
                                 "error_number": ErrorNumber.try_too_many_times
                             }, status=400)
+
+
+        id_verify_count = IdVerification.objects.filter(id_number=id_number).count()
+
+        if id_verify_count >= 3:
+            print 'id_verify_count', id_verify_count
+            return Response({
+                                "message": u"每个身份证只能认证三个账户，请联系客服进行人工验证 4008-588-066",
+                                "error_number": ErrorNumber.id_verify_times_error
+                            }, status=400)
+
 
         verify_record, error = verify_id(name, id_number)
 
