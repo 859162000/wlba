@@ -38,11 +38,11 @@ require ['jquery',
 
       self.finishSurvey = (data, event)->
         asset = self.questions[0].answer()
-        if asset and parseInt(asset) > 0
+        if asset and parseInt(asset) > 0 and parseInt(asset) <= 100000
           self.asset(parseInt(asset))
 
         period = self.questions[1].answer()
-        if period and parseInt(period) > 0
+        if period and parseInt(period) > 0 and parseInt(period) <= 100
           self.period(period)
 
         risk = self.questions[2].answer()
