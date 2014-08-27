@@ -100,7 +100,7 @@ def password_change(request,
         form = password_change_form(user=request.user, data=request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(post_change_redirect)
+            return HttpResponse(status=200)
     else:
         form = password_change_form(user=request.user)
     context = {
