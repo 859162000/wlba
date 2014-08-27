@@ -19,7 +19,7 @@
         earning_element = earning_elements[i];
         period = periods[i];
         earning = (rate / 100 * amount / 365 * period).toFixed(1);
-        if (earning && $.isNumeric(earning) && amount <= target.attr('data-max')) {
+        if (earning && $.isNumeric(earning)) {
           _results.push($(earning_element).text(earning));
         } else {
           _results.push($(earning_element).text("0.0"));
