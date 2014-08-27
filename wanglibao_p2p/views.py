@@ -27,7 +27,7 @@ class P2PDetailView(TemplateView):
         context = super(P2PDetailView, self).get_context_data(**kwargs)
 
         try:
-            p2p = P2PProduct.objects.get(pk=id)
+            p2p = P2PProduct.objects.get(pk=id, hide=False)
             form = PurchaseForm(initial={'product': p2p})
 
             if p2p.soldout_time:

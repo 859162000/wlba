@@ -335,3 +335,31 @@ class WithdrawTransactions(TemplateView):
         Only user with change payinfo permission can call this view
         """
         return super(WithdrawTransactions, self).dispatch(request, *args, **kwargs)
+
+class WithdrawRollback(TemplateView):
+    template_name = 'withdraw_rollback.jade'
+
+    def post(self, request):
+        uuid = request.POST.get('uuid', '')
+        error_message = request.POST.get('error_message', '')
+        try:
+            payinfo = PayInfo.objects.get(uuid=uuid, type='W')
+        except PayInfo.DoesNotExist:
+            return HttpResponse({
+                u"没有找到 %s 该记录" % uuid
+            })
+
+        marginKeeper = MarginKeeper(payinfo.user)
+        marginKeeper.withdraw_rollback(payinfo.amount,error_message)
+        payinfo.status = PayInfo.FAIL
+        payinfo.error_message = error_message
+        payinfo.save()
+
+        send_messages.apply_async(kwargs={
+            "phones": [payinfo.user.wanglibaouserprofile.phone],
+            "messages": [messages.withdraw_failed(error_message)]
+        })
+
+        return HttpResponse({
+            u"该 %s 请求已经处理完毕" % uuid
+        })

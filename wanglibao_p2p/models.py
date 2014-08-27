@@ -61,29 +61,57 @@ class P2PProduct(ProductBase):
         (u'到期还本付息', u'到期还本付息'),
         (u'按季度付息', u'按季度付息'),
     )
+    BANK_METHOD_CHOICES = (
+        (u'工商银行',u'工商银行'),
+        (u'农业银行',u'农业银行'),
+        (u'招商银行',u'招商银行'),
+        (u'建设银行',u'建设银行'),
+        (u'北京银行',u'北京银行'),
+        (u'北京农村商业银行', u'北京农村商业银行'),
+        (u'中国银行', u'中国银行'),
+        (u'交通银行', u'交通银行'),
+        (u'民生银行', u'民生银行'),
+        (u'上海银行', u'上海银行'),
+        (u'渤海银行', u'渤海银行'),
+        (u'光大银行', u'光大银行'),
+        (u'兴业银行', u'兴业银行'),
+        (u'中信银行', u'中信银行'),
+        (u'浙商银行', u'浙商银行'),
+        (u'广发银行', u'广发银行'),
+        (u'东亚银行', u'东亚银行'),
+        (u'华夏银行', u'华夏银行'),
+        (u'杭州银行', u'杭州银行'),
+        (u'南京银行', u'南京银行'),
+        (u'平安银行', u'平安银行'),
+        (u'邮政储蓄银行', u'邮政储蓄银行'),
+        (u'深圳发展银行', u'深圳发展银行'),
+        (u'上海浦东发展银行',u'上海浦东发展银行'),
+        (u'上海农村商业银行',u'上海农村商业银行'),
+        (u'汇付天下', u'汇付天下'),
+    )
 
     version = IntegerVersionField()
 
     hide = models.BooleanField(u'隐藏', default=False)
 
-    name = models.CharField(max_length=256, verbose_name=u'名字')
-    short_name = models.CharField(u'短名字', max_length=64)
-    serial_number = models.CharField(u'产品编号', max_length=100, unique=True, null=True)
-    contract_serial_number = models.CharField(u'合同编号', max_length=100, blank=True, null=True)
+    name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
+    short_name = models.CharField(verbose_name=u'短名字*', max_length=64, blank=False)
+    serial_number = models.CharField(verbose_name=u'产品编号*', max_length=100, unique=True, blank=False, null=True)
+    contract_serial_number = models.CharField(verbose_name=u'合同编号*', max_length=100, blank=False, null=True)
 
     status = models.CharField(max_length=16, default=u'录标',
                               choices=STATUS_CHOICES,
-                              verbose_name=u'产品状态')
+                              verbose_name=u'产品状态*')
 
-    period = models.IntegerField(default=0, verbose_name=u'产品期限(月)')
+    period = models.IntegerField(default=0, verbose_name=u'产品期限(月)*', blank=False)
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
-    expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)')
+    expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
     excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)')
     excess_earning_description = models.CharField(u'超额收益描述', max_length=100, blank=True, null=True)
 
-    pay_method = models.CharField(u'支付方式', max_length=32, blank=True, default=u'等额本息', choices=PAY_METHOD_CHOICES)
+    pay_method = models.CharField(verbose_name=u'支付方式*', max_length=32, blank=False, default=u'等额本息', choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)
-    repaying_source = models.TextField(u'还款资金来源', blank=True)
+    repaying_source = models.TextField(verbose_name=u'还款资金来源*', blank=False)
 
     # Bao li related
     baoli_original_contract_number = models.CharField(u'(保理)原合同编号', max_length=64, blank=True)
@@ -91,33 +119,33 @@ class P2PProduct(ProductBase):
     baoli_trade_relation = models.CharField(u'(保理)交易关系', max_length=128, blank=True)
 
     # pay info for the borrower
-    borrower_name = models.CharField(u'借债人姓名', max_length=32, blank=True)
-    borrower_phone = models.CharField(u'借债人手机号', max_length=32, blank=True)
-    borrower_address = models.CharField(u'借债人地址', max_length=128, blank=True)
-    borrower_id_number = models.CharField(u'借债人身份证号', max_length=32, blank=True)
-    borrower_bankcard = models.CharField(u'借债人银行卡号', max_length=64, blank=True)
-    borrower_bankcard_bank_name = models.CharField(u'开户行', max_length=64, blank=True)
-    borrower_bankcard_bank_code = models.CharField(u'借债人银行(汇付表格专用)', max_length=64, blank=True)
+    borrower_name = models.CharField(verbose_name=u'借债人姓名*', max_length=32, blank=False)
+    borrower_phone = models.CharField(verbose_name=u'借债人手机号*', max_length=32, blank=False)
+    borrower_address = models.CharField(verbose_name=u'借债人地址*', max_length=128, blank=False)
+    borrower_id_number = models.CharField(verbose_name=u'借债人身份证号*', max_length=32, blank=False)
+    borrower_bankcard = models.CharField(verbose_name=u'借债人银行卡号*', max_length=64, blank=False)
+    borrower_bankcard_bank_name = models.CharField(verbose_name=u'开户行*', max_length=64, blank=False)
+    borrower_bankcard_bank_code = models.CharField(verbose_name=u'借债人银行(汇付表格专用)*',choices=BANK_METHOD_CHOICES, max_length=64, blank=False)
     borrower_bankcard_bank_province = models.CharField(u'借债人银行省份', max_length=64, blank=True)
     borrower_bankcard_bank_city = models.CharField(u'借债人地区', max_length=64, blank=True)
     borrower_bankcard_bank_branch = models.CharField(u'借债人支行', max_length=64, blank=True)
 
-    total_amount = models.BigIntegerField(default=0, verbose_name=u'借款总额')
+    total_amount = models.BigIntegerField(default=0, verbose_name=u'借款总额*', blank=False)
     ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
 
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
-    publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间')
-    end_time = models.DateTimeField(default=timezone.now, verbose_name=u'终止时间')
+    publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间*', blank=False)
+    end_time = models.DateTimeField(default=timezone.now, verbose_name=u'终止时间*', blank=False)
     soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True)
 
-    limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)', default=0.2)
+    limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)', default=1)
 
-    warrant_company = models.ForeignKey(WarrantCompany)
+    warrant_company = models.ForeignKey(WarrantCompany,blank=False)
     usage = models.TextField(blank=True, verbose_name=u'项目用途')
-    short_usage = models.TextField(blank=True, verbose_name=u'项目用途摘要')
+    short_usage = models.TextField(blank=False, verbose_name=u'资金用途*')
 
-    contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True)
+    contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True ,blank=False)
 
     class Meta:
         verbose_name_plural = u'P2P产品'

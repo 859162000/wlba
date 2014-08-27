@@ -12,4 +12,5 @@ urlpatterns = patterns('',
     url(r'^deposit/callback/$', PayCallback.as_view(), name='deposit-callback'),
     url(r'^deposit/complete/$', login_required(PayCompleteView.as_view(), login_url='/accounts/register/'), name='deposit-callback'),
     url(r'^withdraw/audit/$', login_required(WithdrawTransactions.as_view(), login_url='/accounts/register/'), name='withdraw-transactions'),
+    url(r'^withdraw/rollback/$', login_required(WithdrawTransactions.as_view(), login_url='/accounts/register/'), name='withdraw-rollback'),
 )

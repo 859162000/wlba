@@ -1,0 +1,23 @@
+- load formatters
+
+doctype html
+head
+  - with '提现失败' as title
+  include include/common_head
+  - endwith
+  link(rel="stylesheet", href="/static/stylesheets/jquery-ui.min.css")
+
+body
+  form(method="POST").form
+    - csrf_token
+    .form-row
+      label 唯一标示
+      .row
+        input(name="uuid")
+    .form-row
+      label 错误原因
+      .row
+        textarea(name="error_message", cols=80, rows=10)
+    .form-row
+      button.button-primary(type='submit', value='提交') 提交
+
