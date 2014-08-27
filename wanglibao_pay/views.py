@@ -126,12 +126,6 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
-        phone = request.user.wanglibaouserprofile.phone
-        send_messages.apply_async(kwargs={
-            "phones": [phone],
-            "messages": [messages.deposit_succeed(amount)]
-        })
-
         return self.render_to_response({
             'result': result,
             'amount': amount
