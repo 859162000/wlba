@@ -22,11 +22,16 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
       $('#id-validate').modal()
       return
 
+  $.validator.addMethod 'morethan100', (value, element)->
+    return Number(value) >= 100
+  , '充值金额100元起'
+
   $("#payform").validate
     ignore: ""
     rules:
       amount:
         required: true
+        morethan100: true
       gate_id:
         required: true
 
