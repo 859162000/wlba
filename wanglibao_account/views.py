@@ -591,7 +591,7 @@ def test_contract(request, equity_id):
 
 
 class IdVerificationView(TemplateView):
-    template_name = 'admin_verify_id.jade'
+    template_name = 'verify_id.jade'
     form_class = IdVerificationForm
     success_url = '/accounts/id_verify/'
 
@@ -616,6 +616,33 @@ class IdVerificationView(TemplateView):
 
         return super(IdVerificationView, self).form_valid(form)
 
+
+
+class AdminIdVerificationView(TemplateView):
+    template_name = 'admin_verify_id.jade'
+    form_class = IdVerificationForm
+    success_url = '/accounts/id_verify/'
+
+    def get_context_data(self, **kwargs):
+        counter = VerifyCounter.objects.filter(user=self.request.user).first()
+        count = 0
+        if counter:
+            count = counter.count
+        return {
+            'user': self.request.user,
+            'counter': count
+        }
+
+
+    def form_valid(self, form):
+        user = self.request.user
+
+        user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number')
+        user.wanglibaouserprofile.name = form.cleaned_data.get('name')
+        user.wanglibaouserprofile.id_is_valid = True
+        user.wanglibaouserprofile.save()
+
+        return super(IdVerificationView, self).form_valid(form)
 
 
 
