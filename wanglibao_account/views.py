@@ -39,7 +39,9 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter
-
+from rest_framework.permissions import IsAuthenticated
+from wanglibao.const import ErrorNumber
+from wanglibao_account.utils import verify_id
 
 logger = logging.getLogger(__name__)
 
@@ -586,3 +588,70 @@ def test_contract(request, equity_id):
     equity = P2PEquity.objects.filter(id=equity_id).prefetch_related('product').first()
     return HttpResponse(generate_contract(equity, 'contract_template.jade'))
 
+
+
+class IdVerificationView(TemplateView):
+    template_name = 'admin_verify_id.jade'
+    form_class = IdVerificationForm
+    success_url = '/accounts/id_verify/'
+
+    def get_context_data(self, **kwargs):
+        counter = VerifyCounter.objects.filter(user=self.request.user).first()
+        count = 0
+        if counter:
+            count = counter.count
+        return {
+            'user': self.request.user,
+            'counter': count
+        }
+
+
+    def form_valid(self, form):
+        user = self.request.user
+
+        user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number')
+        user.wanglibaouserprofile.name = form.cleaned_data.get('name')
+        user.wanglibaouserprofile.id_is_valid = True
+        user.wanglibaouserprofile.save()
+
+        return super(IdVerificationView, self).form_valid(form)
+
+
+
+
+class IdValidate(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kwargs):
+        pass
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        name = request.DATA.get("name", "")
+        id_number = request.DATA.get("id_number", "")
+        verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
+
+        if verify_counter.count >= 3:
+            return Response({
+                                "message": u"验证次数超过三次，请联系客服进行人工验证",
+                                "error_number": ErrorNumber.try_too_many_times
+                            }, status=400)
+
+        verify_record, error = verify_id(name, id_number)
+
+        verify_counter.count = F('count') + 1
+        verify_counter.save()
+
+        if error or not verify_record.is_valid:
+            return Response({
+                                "message": u"验证失败，拨打客服电话进行人工验证",
+                                "error_number": ErrorNumber.unknown_error
+                            }, status=400)
+
+        user.wanglibaouserprofile.id_number = id_number
+        user.wanglibaouserprofile.name = name
+        user.wanglibaouserprofile.id_is_valid = True
+        user.wanglibaouserprofile.save()
+
+        return Response({
+                            "validate": True
+                        }, status=200)

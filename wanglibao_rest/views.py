@@ -155,6 +155,25 @@ class IdValidate(APIView):
                         }, status=200)
 
 
+class AdminIdValidate(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        phone = request.DATA.get("phone", "")
+        name = request.DATA.get("name", "")
+        id_number = request.DATA.get("id_number", "")
+        print phone,name,id_number
+        user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
+        user.wanglibaouserprofile.id_number = id_number
+        user.wanglibaouserprofile.name = name
+        user.wanglibaouserprofile.id_is_valid = True
+        user.wanglibaouserprofile.save()
+
+        return Response({
+                            "validate": True
+                        }, status=200)
+
+
 class ObtainAuthTokenCustomized(ObtainAuthToken):
     serializer_class = AuthTokenSerializer
 
