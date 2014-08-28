@@ -158,7 +158,7 @@
     _showModal = function() {
       return $('#login-modal').modal();
     };
-    $("#button-get-validate-code").click(function(e) {
+    $("#button-get-validate-code-modal").click(function(e) {
       var count, element, intervalId, phoneNumber, timerFunction;
       e.preventDefault();
       element = this;

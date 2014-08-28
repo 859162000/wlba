@@ -126,7 +126,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
   _showModal = ()->
     $('#login-modal').modal()
 
-  $("#button-get-validate-code").click (e) ->
+  $("#button-get-validate-code-modal").click (e) ->
       e.preventDefault()
       element = this
       e.preventDefault()
