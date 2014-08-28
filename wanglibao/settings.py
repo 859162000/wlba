@@ -420,6 +420,10 @@ CELERYBEAT_SCHEDULE = {
     'report-generate': {
         'task': 'report.tasks.generate_report',
         'schedule': crontab(minute=15, hour=16),
+    },
+    'generate_site_data': {
+        'task': 'marketing.tasks.generate_site_data',
+        'schedule': crontab(minute=0)
     }
 }
 
