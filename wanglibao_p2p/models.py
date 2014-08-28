@@ -130,7 +130,7 @@ class P2PProduct(ProductBase):
     borrower_bankcard_bank_city = models.CharField(u'借债人地区', max_length=64, blank=True)
     borrower_bankcard_bank_branch = models.CharField(u'借债人支行', max_length=64, blank=True)
 
-    total_amount = models.BigIntegerField(default=0, verbose_name=u'借款总额*', blank=False)
+    total_amount = models.BigIntegerField(default=1, verbose_name=u'借款总额*', blank=False)
     ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
 
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
@@ -235,7 +235,7 @@ class Warrant(models.Model):
     product = models.ForeignKey(P2PProduct)
 
     class Meta:
-        verbose_name_plural = u'产品担保'
+        verbose_name_plural = u'担保细节'
 
     def __unicode__(self):
         return u'%s %s %s' % (str(self.product_id), self.name, str(self.warranted_at))

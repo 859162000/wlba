@@ -20,7 +20,7 @@ from wanglibao_rest.serializers import AuthTokenSerializer, RegisterUserSerializ
 from wanglibao_sms.utils import send_validation_code
 from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_account.models import VerifyCounter, IdVerification
+from wanglibao_account.models import VerifyCounter
 from wanglibao_account.utils import verify_id
 
 
@@ -124,12 +124,12 @@ class IdValidate(APIView):
                             }, status=400)
 
 
-        id_verify_count = IdVerification.objects.filter(id_number=id_number).count()
+        id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
 
         if id_verify_count >= 3:
             print 'id_verify_count', id_verify_count
             return Response({
-                                "message": u"每个身份证只能认证三个账户，请联系客服进行人工验证 4008-588-066",
+                                "message": u"您的身份证已绑定了三个帐号，无法继续验证，请联系客服人工验证 4008-588-066",
                                 "error_number": ErrorNumber.id_verify_times_error
                             }, status=400)
 
@@ -145,6 +145,25 @@ class IdValidate(APIView):
                                 "error_number": ErrorNumber.unknown_error
                             }, status=400)
 
+        user.wanglibaouserprofile.id_number = id_number
+        user.wanglibaouserprofile.name = name
+        user.wanglibaouserprofile.id_is_valid = True
+        user.wanglibaouserprofile.save()
+
+        return Response({
+                            "validate": True
+                        }, status=200)
+
+
+class AdminIdValidate(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        phone = request.DATA.get("phone", "")
+        name = request.DATA.get("name", "")
+        id_number = request.DATA.get("id_number", "")
+        print phone,name,id_number
+        user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
         user.wanglibaouserprofile.id_is_valid = True

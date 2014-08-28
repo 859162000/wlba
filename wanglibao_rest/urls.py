@@ -17,7 +17,7 @@ from wanglibao_pay.views import CardViewSet
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
-from wanglibao_rest.views import SendValidationCodeView, SendRegisterValidationCodeView, UserExisting, RegisterAPIView, IdValidate
+from wanglibao_rest.views import SendValidationCodeView, SendRegisterValidationCodeView, UserExisting, RegisterAPIView, IdValidate, AdminIdValidate
 
 router = DefaultRouter()
 
@@ -74,6 +74,7 @@ urlpatterns = patterns(
     url(r'^p2ps/(?P<product_id>\d+)/records/', RecordView.as_view()),
     url(r'', include(router.urls)),
     url(r'^id_validate/', IdValidate.as_view()),
+    url(r'^admin_id_validate/', AdminIdValidate.as_view()),
 )
 
 urlpatterns += patterns('',
