@@ -51,7 +51,7 @@ or
     $ gem source -a 'https://ruby.taobao.org'
     $ gem install compass --version= 0.12.3
     $ gem install sass --version=3.2.14
-    $ gem susy --version=1.0.5
+    $ gem install susy --version=1.0.5
     $ gem install font-icons --pre
 
 
