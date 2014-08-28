@@ -1,9 +1,21 @@
 # coding=utf-8
 from datetime import timedelta
+from dateutil import tz  
+from datetime import datetime 
 
+# def format_datetime(time, fmt):
+#     return time.strftime(fmt.encode('utf-8')).decode('utf-8')
 
 def format_datetime(time, fmt):
-    return time.strftime(fmt.encode('utf-8')).decode('utf-8')
+    # UTC Zone  
+    from_zone = tz.gettz('UTC')  
+    # China Zone  
+    to_zone = tz.gettz('CST')  
+    # Tell the datetime object that it's in UTC time zone  
+    utc = time.replace(tzinfo=from_zone)  
+    # Convert time zone  
+    local = utc.astimezone(to_zone)  
+    return datetime.strftime(local, fmt.encode('utf-8')).decode('utf-8')
 
 
 def suffix(f):
