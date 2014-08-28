@@ -417,7 +417,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'generate_site_data': {
         'task': 'marketing.tasks.generate_site_data',
-        'schedule': crontab(minute=0)
+        'schedule': crontab(minute=15, hour=16)
     }
 }
 
