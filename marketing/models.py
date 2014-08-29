@@ -65,3 +65,12 @@ def generate_user_promo_token(sender, instance, **kwargs):
         p.save()
 
 post_save.connect(generate_user_promo_token, sender=get_user_model(), dispatch_uid="generate_promotion_token")
+
+
+class TimelySiteData(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    p2p_margin = models.DecimalField(u'P2P余额', max_digits=20, decimal_places=2, default=0)
+    freeze_amount = models.DecimalField(u'投资中冻结金额', max_digits=20, decimal_places=2, default=0)
+    total_amount = models.DecimalField(u'总额', max_digits=20, decimal_places=2, default=0)
+    user_count = models.IntegerField(u'用户总数', default=0)

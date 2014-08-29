@@ -1,0 +1,43 @@
+- load formatters
+- load mathfilters
+- load widget_tweaks
+
+block head
+  include include/head
+
+
+
+block main
+  .panel
+    .well
+      .panel-title-bar__no-border
+        .panel-title 身份验证
+      .space-vertical-s
+      .panel-content.padding-l-r-sm
+          .space-vertical-l
+          .row
+            form#validate_id_form.form.span5(method="POST")
+              - csrf_token
+              .form-row
+                .span3(style="line-height:40px")
+                  label 用户手机
+                .span9-omega
+                  input#id_phone(type='text', name='phone', placeholder='用户手机')
+                  .form-row-error
+              .form-row
+                .span3(style="line-height:40px")
+                  label 真实姓名
+                .span9-omega
+                  input#id_name(type='text', name='name', placeholder='真实姓名')
+                  .form-row-error
+              .form-row
+                .span3(style="line-height:40px")
+                  label 身份证号
+                .span9-omega
+                  input#id_id_number(type='text', name='id_number', placeholder='身份证号')
+                  .form-row-error
+              .form-row
+                button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 提交
+        .space-vertical-xl
+  script.
+      require(["/static/js/adminVerifyId.js"])

@@ -126,12 +126,6 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
-        phone = request.user.wanglibaouserprofile.phone
-        send_messages.apply_async(kwargs={
-            "phones": [phone],
-            "messages": [messages.deposit_succeed(amount)]
-        })
-
         return self.render_to_response({
             'result': result,
             'amount': amount
@@ -191,8 +185,12 @@ class WithdrawCompleteView(TemplateView):
             amount_str = request.POST.get('amount', '')
             amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
-            if amount <= 0 or amount > 50000:
+            margin = self.request.user.margin.margin
+            if amount > 50000:
                 raise decimal.DecimalException
+            if amount < 50:
+                if amount != margin:
+                    raise decimal.DecimalException
 
             fee = (amount * HuifuPay.FEE).quantize(TWO_PLACES)
             actual_amount = amount - fee

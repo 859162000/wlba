@@ -13,7 +13,7 @@ define ['jquery'], ($)->
     for earning_element, i in earning_elements
       period = periods[i]
       earning = (rate / 100 * amount / 365 * period).toFixed(1)
-      if earning and $.isNumeric(earning) and amount <= target.attr 'data-max'
+      if earning and $.isNumeric(earning)
         $(earning_element).text earning
       else
         $(earning_element).text "0.0"

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy
+from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData
 
 
 class NewsAndReportAdmin(admin.ModelAdmin):
@@ -29,7 +29,12 @@ class IntroducedByAdmin(admin.ModelAdmin):
         return qs
 
 
+class TimelySitedataAdmin(admin.ModelAdmin):
+    list_display = ("created_at", "p2p_margin", "freeze_amount", "total_amount", "user_count")
+    readonly_fields = ("p2p_margin", "freeze_amount", "total_amount", "user_count")
+
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
 admin.site.register(PromotionToken, PromotionTokenAdmin)
 admin.site.register(IntroducedBy, IntroducedByAdmin)
+admin.site.register(TimelySiteData, TimelySitedataAdmin)

@@ -1,9 +1,9 @@
 # coding=utf-8
 from datetime import timedelta
-
+from django.utils import timezone
 
 def format_datetime(time, fmt):
-    return time.strftime(fmt.encode('utf-8')).decode('utf-8')
+    return timezone.localtime(time).strftime(fmt.encode('utf-8')).decode('utf-8')
 
 
 def suffix(f):
@@ -17,6 +17,8 @@ def deposit_succeed(amount):
 
 @suffix
 def withdraw_failed(error_message):
+    if len(error_message) < 1:
+        return u'提现失败，请到网站查看余额，联系客服人员再次提现。'
     return u'提现失败，原因如下：%s' % error_message
 
 @suffix

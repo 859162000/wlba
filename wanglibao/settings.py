@@ -11,10 +11,17 @@ from __future__ import absolute_import
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import json
 from celery.schedules import crontab
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+try:
+    with open(os.path.join(BASE_DIR, 'env.json'), 'r') as config_file:
+        env = json.load(config_file)
+except IOError, e:
+    # For dev or other env without env.py, we just ignore it
+    env = {}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -214,7 +221,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'publish/static')
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 STATICFILES_DIRS = (
@@ -397,7 +403,7 @@ CAPTCHA_IMAGE_BEFORE_FIELD = False
 # Celery configuration
 
 # Now since the rabbitmq installed in localhost, we use guest
-BROKER_URL = 'amqp://guest:guest@localhost//'
+BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
@@ -414,6 +420,10 @@ CELERYBEAT_SCHEDULE = {
     'report-generate': {
         'task': 'report.tasks.generate_report',
         'schedule': crontab(minute=15, hour=16),
+    },
+    'generate_site_data': {
+        'task': 'marketing.tasks.generate_site_data',
+        'schedule': crontab(minute=15, hour=16)
     }
 }
 

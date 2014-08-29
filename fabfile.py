@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+import json
 import os
 from StringIO import StringIO
 from timeit import reindent
@@ -18,6 +19,8 @@ env.supervisord = True
 env.apache_binding_interface = '*'
 env.apache_binding_port = 80
 
+# The env dict will be converted to a env.json and loaded in settings.py
+env.env_dict = {}
 
 def production():
     env.path = '/var/deploy/wanglibao'
@@ -92,7 +95,10 @@ if env.get('group') == 'staging':
         'lb': ['staging.wanglibao.com'],
         'web': ['staging.wanglibao.com'],
         'web_private': ['127.0.0.1'],
-        'task_queue': ['staging.wanglibao.com'],
+
+        # task_queue should be ip
+        'task_queue': ['127.0.0.1'],
+
         'db': ['staging.wanglibao.com'],
         'old_lb': [],
         'old_web': [],
@@ -117,12 +123,13 @@ elif env.get('group') == 'dev':
 
         # Web is the server to be deployed with new version
         'web': [
-            '192.168.1.160',
+            '192.168.1.43',
+            '192.168.1.176'
         ],
 
         # Cron tab is the server with crontab running. NOTE: The crontab should be with new version, and only
         # one crontab server should be running at the same time.
-        'cron_tab': ['192.168.1.184'],
+        'cron_tab': ['192.168.1.43'],
 
         # DB is the db servers
         'db': [
@@ -130,7 +137,7 @@ elif env.get('group') == 'dev':
         ],
 
         # Task queue server is the server running rabbitmq or redis.
-        'task_queue': ['192.168.1.184']
+        'task_queue': ['192.168.1.43']
     }
     dev()
 
@@ -324,6 +331,15 @@ def init():
 
         if env.host_string in env.roledefs['task_queue']:
             install_rabbit_mq()
+            sudo('iptables -A INPUT -p tcp -m tcp --dport 5672 --tcp-flags SYN,RST,ACK,ACK SYN -j ACCEPT')
+            users = sudo('rabbitmqctl list_users')
+            if users.find('wanglibao') == -1:
+                sudo('rabbitmqctl add_user wanglibao wanglibank')
+
+            vhosts = sudo('rabbitmqctl list_vhosts')
+            if vhosts.find('wanglibao') == -1:
+                sudo('rabbitmqctl add_vhost wanglibao')
+                sudo('rabbitmqctl set_permissions -p wanglibao wanglibao ".*" ".*" ".*"')
 
 
 @task
@@ -438,6 +454,16 @@ def config_apache():
 
                 print yellow('Replacing wanglibao/settings.py ENV')
                 run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
+
+                print yellow('Generating env.json from env.env_dict')
+                task_queue_host = env.roledefs['task_queue'][0]
+
+                env.env_dict["BROKER_URL"] = "amqp://wanglibao:wanglibank@%(task_queue_host)s/wanglibao" % {
+                    'task_queue_host': task_queue_host
+                }
+
+                json_env = json.dumps(env.env_dict)
+                put(StringIO(json_env), 'env.json')
 
                 print green('Collect static files')
                 run("python manage.py collectstatic --noinput")
