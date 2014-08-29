@@ -22,6 +22,7 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import Bank, Card, PayResult
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay.models import PayInfo
+from wanglibao_p2p.models import P2PRecord
 import decimal
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
@@ -365,32 +366,39 @@ class WithdrawRollback(TemplateView):
         })
 
 
-class WithdrawRechargeRecord(TemplateView):
-    template_name = 'withdraw_recharge_record.jade'
 
-    def post(self, request):
-        phone = self.request.POST.get('phone', None)
-        try:
-            user_profile = WanglibaoUserProfile.objects.get(phone=phone)
-        except WanglibaoUserProfile.DoesNotExist:
-            return self.render_to_response({
-                'message': u"手机号 %s 有误，请输入合法的手机号" % phone
-            })
-        except Exception:
-            return self.render_to_response({
-                'message': u"手机号不能为空"
-            })
+class AdminTransactionP2P(TemplateView):
+    template_name = 'admin_transaction_p2p.jade'
 
-        payinfo_list = PayInfo.objects.filter(user=user_profile.user, type='D')
-        if payinfo_list:
+    def get_context_data(self, **kwargs):
 
-            return  self.render_to_response({
-                'payinfo_list': payinfo_list
-            })
-        else:
-            return self.render_to_response({
-                'message': u"没有记录"
-            })
+        phone = self.request.GET.get('phone', None)
+        if phone:
+            try:
+                user_profile = WanglibaoUserProfile.objects.get(phone=phone)
+            except WanglibaoUserProfile.DoesNotExist:
+                # todo: add message
+                return {
+                    'message': u"手机号 %s 有误，请输入合法的手机号" % phone
+                }
+            except Exception:
+                # todo: add message
+                return {
+                    'message': u"手机号不能为空"
+                }
+
+            trade_records = P2PRecord.objects.filter(user=user_profile.user)
+
+            pager = Paginator(trade_records, 20)
+            page = self.request.GET.get('page')
+            if not page:
+                page = 1
+            trade_records = pager.page(page)
+            return {
+                "trade_records": trade_records,
+                "phone": phone
+
+            }
 
 
 
@@ -404,16 +412,18 @@ class AdminTransactionWithdraw(TemplateView):
             try:
                 user_profile = WanglibaoUserProfile.objects.get(phone=phone)
             except WanglibaoUserProfile.DoesNotExist:
+                # todo: add message
                 return {
                     'message': u"手机号 %s 有误，请输入合法的手机号" % phone
                 }
             except Exception:
+                # todo: add message
                 return {
                     'message': u"手机号不能为空"
                 }
 
             pay_records = PayInfo.objects.filter(user=user_profile.user, type=PayInfo.WITHDRAW)
-            pager = Paginator(pay_records, 1)
+            pager = Paginator(pay_records, 20)
             page = self.request.GET.get('page')
 
             if not page:
@@ -426,4 +436,36 @@ class AdminTransactionWithdraw(TemplateView):
             }
 
 class AdminTransactionDeposit(TemplateView):
-    pass
+
+    template_name = 'admin_transaction_deposit.jade'
+
+    def get_context_data(self, **kwargs):
+        phone = self.request.GET.get('phone', None)
+        if phone:
+            try:
+                user_profile = WanglibaoUserProfile.objects.get(phone=phone)
+            except WanglibaoUserProfile.DoesNotExist:
+                # todo: add message
+                return {
+                    'message': u"手机号 %s 有误，请输入合法的手机号" % phone
+                }
+            except Exception:
+                # todo: add message
+                return {
+                    'message': u"手机号不能为空"
+                }
+
+            pay_records = PayInfo.objects.filter(user=user_profile.user, type=PayInfo.DEPOSIT)
+            pager = Paginator(pay_records, 20)
+            page = self.request.GET.get('page')
+
+            if not page:
+                page = 1
+            pay_records = pager.page(page)
+
+            return {
+                "pay_records": pay_records,
+                "phone": phone
+            }
+
+

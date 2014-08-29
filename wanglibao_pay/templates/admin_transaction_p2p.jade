@@ -1,7 +1,7 @@
 - load formatters
 doctype html
 head
-    - with '查询提现记录' as title
+    - with '查询充值记录' as title
     include include/common_head
     - endwith
         body
@@ -15,37 +15,30 @@ head
         .form-row
             button.button-primary(type='submit', value='查询') 查询
 
-    if message
-        .form-row
-            label.error{{ message }}
-
     .panel
         .account-home-panel--title-bar__product.padding-l-r-xl
             ul.title-bar--tabs
                 li.title-bar--tab.active
-                    a.title-bar--tab--anchor(href='javascript:void(0)') 提现记录
+                    a.title-bar--tab--anchor(href='javascript:void(0)') 交易记录
         .panel-container.padding-l-r-xl
             table.table
                 thead
                     tr
                         th 流水号
+                        th 产品
                         th 时间
-                        th 总金额(元)
-                        th 手续费(元)
-                        th 卡号尾号
-                        th 状态
+                        th 金额(元)
+                        th 交易类型
                 tbody
                     if pay_records
                         each trade_record in pay_records
                             tr
                                 td {{trade_record.id}}
+                                td {{trade_record.product.short_name}}
                                 td {{trade_record.create_time | date:"Y-m-d H:i:s"}}
-                                td {{trade_record.total_amount}}
-                                td {{trade_record.fee}}
-                                td {{trade_record.card_no | last_four_char}}
-                                td {{trade_record.status}}
+                                td {{trade_record.amount}}
+                                td {{trade_record.catalog}}
 
-                        - with data=pay_records uri="/admin/pay/transaction/withdraw"
+                        - with data=pay_records uri="/admin/pay/transaction/p2p"
                         include include/pager_admin
                         - endwith
-
