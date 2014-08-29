@@ -26,6 +26,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip
+from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao.const import ErrorNumber
@@ -360,4 +361,26 @@ class WithdrawRollback(TemplateView):
 
         return HttpResponse({
             u"该 %s 请求已经处理完毕" % uuid
+        })
+
+
+class WithdrawRechargeRecord(TemplateView):
+    template_name = 'withdraw_recharge_record.jade'
+
+    def post(self, request):
+        phone = self.request.POST.get('phone', None)
+        try:
+            user_profile = WanglibaoUserProfile.objects.get(phone=phone)
+        except WanglibaoUserProfile.DoesNotExist:
+            return self.render_to_response({
+                'message': u"没有找到 %s 的记录" % phone
+            })
+        except Exception:
+            return self.render_to_response({
+                'message': u"手机号不能为空"
+            })
+
+        payinfo_list = PayInfo.objects.filter(user=user_profile.user, type='W')
+        return  self.render_to_response({
+            'payinfo_list': payinfo_list
         })

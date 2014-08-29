@@ -1,3 +1,48 @@
-//
-   Created by rsj217 on 14-8-29.
+- load formatters
+doctype html
+head
+  - with '查询用户充值记录' as title
+  include include/common_head
+  - endwith
+  link(rel="stylesheet", href="/static/stylesheets/jquery-ui.min.css")
+    body
+  form(method="POST").form
+    - csrf_token
+    .form-row
+      label 请输入用户手机号
+      .row
+        input(name="phone")
+    .form-row
+        button.button-primary(type='submit', value='查询') 查询
+
+  .form-row
+    label.error{{ message }}
+  .form-row
+    table
+      tbody
+        tr
+          th id
+          th 姓名
+          th 卡号
+          th 类型
+          th 实扣金额
+          th 总金额
+          th 手续费
+          th 状态
+          th 创建时间
+          th 更新时间
+        if payinfo_list
+          for payinfo in payinfo_list
+            tr
+              td {{ payinfo.id }}
+              td {{ payinfo.account_name }}
+              td {{ payinfo.card_no }}
+              td {{ payinfo.type }}
+              td {{ payinfo.amout }}
+              td {{ payinfo.total_amount }}
+              td {{ payinfo.fee }}
+              td {{ payinfo.status }}
+              td {{ payinfo.bank }}
+              td {{ payinfo.create_time }}
+              td {{ payinfo.update_time }}
 
