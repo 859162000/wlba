@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
-from wanglibao_account.views import UserViewSet, ResetPasswordAPI
+from wanglibao_account.views import UserViewSet, ResetPasswordAPI, FundInfoAPIView
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -80,4 +80,8 @@ urlpatterns = patterns(
 urlpatterns += patterns('',
     url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token'),
     url(r'wrapper/', 'drf_wrapper.views.wrapper_view'),
+)
+
+urlpatterns += patterns('',
+    url(r'^fund_info/', FundInfoAPIView.as_view()),
 )
