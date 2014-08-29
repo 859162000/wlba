@@ -162,7 +162,6 @@ class AdminIdValidate(APIView):
         phone = request.DATA.get("phone", "")
         name = request.DATA.get("name", "")
         id_number = request.DATA.get("id_number", "")
-        print phone,name,id_number
         user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
