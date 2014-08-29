@@ -37,5 +37,5 @@ admin.site.register(PayInfo, PayInfoAdmin)
 
 admin.site.register_view('pay/withdraw/audit', view=WithdrawTransactions.as_view(), name=u'提现申请审核页面')
 admin.site.register_view('pay/withdraw/rollback', view=WithdrawRollback.as_view(), name=u'提现申请失败回滚页面')
-admin.site.register_view('pay/withdraw/recharge', view=WithdrawRechargeRecord.as_view(), name=u'用户充值记录详情')
+admin.site.register_view('pay/withdraw/recharge_record', view=WithdrawRechargeRecord.as_view(), name=u'用户充值记录详情')
 
