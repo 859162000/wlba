@@ -1,0 +1,44 @@
+- load formatters
+doctype html
+head
+    - with '查询充值记录' as title
+    include include/common_head
+    - endwith
+        body
+    .form-row
+        a(href="/admin") 返回
+    form(method="GET").form
+        .form-row
+            label 请输入用户手机号
+            .row
+                input(name="phone")
+        .form-row
+            button.button-primary(type='submit', value='查询') 查询
+
+    .panel
+        .account-home-panel--title-bar__product.padding-l-r-xl
+            ul.title-bar--tabs
+                li.title-bar--tab.active
+                    a.title-bar--tab--anchor(href='javascript:void(0)') 交易记录
+        .panel-container.padding-l-r-xl
+            table.table
+                thead
+                    tr
+                        th 流水号
+                        th 产品
+                        th 时间
+                        th 金额(元)
+                        th 交易类型
+                tbody
+                    if pay_records
+                        each trade_record in pay_records
+                            tr
+                                td {{trade_record.id}}
+                                td {{trade_record.product.short_name}}
+                                td {{trade_record.create_time | date:"Y-m-d H:i:s"}}
+                                td {{trade_record.amount}}
+                                td {{trade_record.catalog}}
+
+                        - with data=pay_records uri="/admin/pay/transaction/p2p"
+                        include include/pager_admin
+                        - endwith

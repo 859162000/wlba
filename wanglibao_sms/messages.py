@@ -1,9 +1,9 @@
 # coding=utf-8
 from datetime import timedelta
-
+from django.utils import timezone
 
 def format_datetime(time, fmt):
-    return time.strftime(fmt.encode('utf-8')).decode('utf-8')
+    return timezone.localtime(time).strftime(fmt.encode('utf-8')).decode('utf-8')
 
 
 def suffix(f):

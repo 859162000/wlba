@@ -606,7 +606,7 @@ def test_contract(request, equity_id):
 
 
 class IdVerificationView(TemplateView):
-    template_name = 'admin_verify_id.jade'
+    template_name = 'verify_id.jade'
     form_class = IdVerificationForm
     success_url = '/accounts/id_verify/'
 
@@ -631,6 +631,10 @@ class IdVerificationView(TemplateView):
 
         return super(IdVerificationView, self).form_valid(form)
 
+
+
+class AdminIdVerificationView(TemplateView):
+    template_name = 'admin_verify_id.jade'
 
 
 
