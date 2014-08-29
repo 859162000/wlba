@@ -5,6 +5,9 @@ head
   include include/common_head
   - endwith
     body
+  .form-row
+    a(href="/admin") 返回
+
   form(method="POST").form
     - csrf_token
     .form-row
@@ -38,7 +41,7 @@ head
               td {{ payinfo.id }}
               td {{ payinfo.account_name }}
               td {{ payinfo.card_no }}
-              td {{ payinfo.type }}
+              td {{ payinfo.type | safe_paytype }}
               //td {{ payinfo.amout }}
               td {{ payinfo.total_amount }}
               td {{ payinfo.fee }}
