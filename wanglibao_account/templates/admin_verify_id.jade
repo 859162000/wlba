@@ -12,27 +12,8 @@ block main
     .well
       .panel-title-bar__no-border
         .panel-title 身份验证
-
       .space-vertical-s
       .panel-content.padding-l-r-sm
-        if user.wanglibaouserprofile.id_is_valid
-          .form-row
-            label.span2.font-s 用户手机
-            span {{user.wanglibaouserprofile.phone | safe_phone}}
-          .form-row
-            label.span2.font-s 真实姓名
-            span {{user.wanglibaouserprofile.name | safe_name}}
-          .form-row
-            label.span2.font-s 身份证号
-            span {{user.wanglibaouserprofile.id_number | safe_id}}
-
-        else
-          .panel-annotation
-            p 手工身份验证
-
-          if counter >= 3
-            p 验证次数到达限额。请拨打客服电话进行人工验证。4008-588-066
-
           .space-vertical-l
           .row
             form#validate_id_form.form.span5(method="POST")
