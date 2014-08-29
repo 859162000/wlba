@@ -12,6 +12,9 @@ require.config(
 
 require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, modal, backend, validate, tool)->
 
+  $.validator.addMethod "emailOrPhone", (value, element)->
+    return backend.checkEmail(value) or backend.checkMobile(value)
+
   $.validator.addMethod 'idNumber', (value, element)->
     reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
     return reg.test(value)
@@ -21,6 +24,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
     rules:
       phone:
         required: true
+        emailOrPhone: true
       name:
         required: true
       id_number:
@@ -29,7 +33,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
 
     messages:
       phone:
-        required: '请输入用户手机号'
+        required: '手机号不能为空'
+        emailOrPhone: '请正确的手机号'
       name:
         required: '请输入姓名'
       id_number:
