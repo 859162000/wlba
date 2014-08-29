@@ -24,7 +24,7 @@ block main
     .card-panel
       .total-asset-money-card
         p.align-center
-          span.big_number {{total_asset|money_format}}
+          span#total_asset.big_number(data-p2p="{{p2p_total_asset}}") {{total_asset|money_format}}
         p.align-center 总资产(元)
       .sign-money-card
         =
@@ -48,13 +48,13 @@ block main
         .brief--fund-total-asset
           a(href="/accounts/home/fund/")
             p.align-center
-              span.big_number {{fund_total_asset|money_format}}
+              span#fund_total_asset_title.big_number
             p.align-center 货币基金(元)
       else
         .brief--fund-total-asset.active
           a(href="/accounts/home/fund/")
             p.align-center
-              span.big_number {{fund_total_asset|money_format}}
+              span#fund_total_asset_title.big_number
             p.align-center 货币基金(元)
 
   if mode == 'p2p'
@@ -170,19 +170,19 @@ block main
         .row.total-money
           .gray-card4
             p
-              span.big_number {{fund_total_asset|money_f_2}}
+              span#fund_total_asset.big_number
             p 总资产(元)
           .gray-card4
             p
-              span.big_number {{total_income|money_f_2}}
+              span#total_income.big_number
             p 累积收益(元)
           .gray-card4
             p
-              span.big_number {{fund_income_week|money_f_2}}
+              span#fund_income_week.big_number
             p 近一周收益(元)
           .gray-card4
             p
-              span.big_number {{fund_income_month|money_f_2}}
+              span#fund_income_month.big_number
             p 近一月收益(元)
         .space-vertical-s
 
@@ -193,7 +193,7 @@ block main
               th 金额(元)
               th 收益(元)
               th 操作
-          tbody
+          tbody#fund_detail_body
             if fund_hold_info
               each fund in fund_hold_info
                 tr
