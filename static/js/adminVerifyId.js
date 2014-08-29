@@ -14,6 +14,9 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], function($, modal, backend, validate, tool) {
+    $.validator.addMethod("emailOrPhone", function(value, element) {
+      return backend.checkEmail(value) || backend.checkMobile(value);
+    });
     $.validator.addMethod('idNumber', function(value, element) {
       var reg;
       reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
@@ -22,7 +25,8 @@
     return $('#validate_id_form').validate({
       rules: {
         phone: {
-          required: true
+          required: true,
+          emailOrPhone: true
         },
         name: {
           required: true
@@ -34,7 +38,8 @@
       },
       messages: {
         phone: {
-          required: '请输入用户手机号'
+          required: '手机号不能为空',
+          emailOrPhone: '请正确的手机号'
         },
         name: {
           required: '请输入姓名'

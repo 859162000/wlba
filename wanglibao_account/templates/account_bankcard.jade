@@ -27,7 +27,9 @@ block main
               dl.bank-card--info-row
                 dt.bank-card--info-title 账号
                 dd.bank-card--info-value {{card.no | bank_card}}
-        a#add-card-button(href='#add-card-form')
+            .row
+              a.pull-right(href='') 删除
+        a#add-:::qcard-button(href='#add-card-form')
           .add-bank-card
             .add-icon-large
             p.add-card-text 添加一张银行卡
