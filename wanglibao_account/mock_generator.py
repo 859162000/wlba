@@ -7,8 +7,8 @@ class MockGenerator(object):
     def generate_user(cls, clean=False):
         User = get_user_model()
 
-        if clean:
-            User.objects.all().filter(wanglibaouserprofile__phone__contains='10000000').delete()
+        #if clean:
+            #User.objects.all().filter(wanglibaouserprofile__phone__contains='10000000').delete()
 
         for i in range(0, 10):
             create_user('1000000%.4d' % i, 'wanglibank', 'user %d' % i)
