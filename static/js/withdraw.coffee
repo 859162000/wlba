@@ -21,6 +21,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
     return value <= 50000
   $.validator.addMethod "small", (value, element)->
     balance = $(element).attr('data-balance')
+    if value <= 0
+      return false
     if balance - value == 0
       return true
     else if value >= 50
