@@ -3,7 +3,7 @@ from django.contrib import admin
 
 # Register your models here.
 from wanglibao_pay.models import Bank, PayInfo, Card
-from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, WithdrawRechargeRecord, \
+from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
     AdminTransactionWithdraw, AdminTransactionDeposit, AdminTransactionP2P
 
 

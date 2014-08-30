@@ -125,9 +125,17 @@ html
                     .span3-omega.align-right
                       p
                         if status == '正在招标'
-                          a.button-primary(href="/p2p/detail/{{product.id}}/") {{status}}
+                          a.button-home(href="/p2p/detail/{{product.id}}/")
+                            span.icon.purcharsing
+                            {{status}}
                         else
-                          a.button-disabled(href="javascript:void(0)", disabled) {{status}}
+                          a.button-home-disabled(href="javascript:void(0)", disabled)
+                            if status == '已完成'
+                              span.icon.audit
+                            else
+                              span.icon.finished
+
+                            {{status}}
 
                       if status == '正在招标'
                         p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
@@ -165,10 +173,10 @@ html
                       div.media-title.text-overflow-hidden
                         a.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') ·&nbsp;&nbsp;{{news.name}}
 
-            .panel
+            .panel.invest-history-container
               .panel-title-bar__no-border
                 .panel-title 投资记录
-              .panel-content-container.padding-l-r-sm
+              .panel-content-container
                 table.invest-history-table
                   thead
                     tr
