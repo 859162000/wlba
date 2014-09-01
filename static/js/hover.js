@@ -13,11 +13,7 @@
           var target;
           e.preventDefault();
           target = $(e.target).attr('data-target');
-          $(target).show();
-          return $(target).mouseleave(function(e) {
-            e.preventDefault();
-            return $(e.target).hide();
-          });
+          return $(target).show();
         });
         return $(elem).mouseleave(function(e) {
           var target;
@@ -30,5 +26,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=hover.map
