@@ -366,6 +366,12 @@ class WithdrawRollback(TemplateView):
             u"该 %s 请求已经处理完毕" % uuid
         })
 
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        return super(WithdrawRollback, self).dispatch(request, *args, **kwargs)
 
 class AdminTransaction(TemplateView):
     template_name = 'admin_transaction.jade'
