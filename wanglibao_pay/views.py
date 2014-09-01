@@ -373,6 +373,7 @@ class WithdrawRollback(TemplateView):
         """
         return super(WithdrawRollback, self).dispatch(request, *args, **kwargs)
 
+
 class AdminTransaction(TemplateView):
     template_name = 'admin_transaction.jade'
 
@@ -386,6 +387,9 @@ class AdminTransactionP2P(TemplateView):
         if phone:
             try:
                 user_profile = WanglibaoUserProfile.objects.get(phone=phone)
+
+                print user_profile.user
+
             except WanglibaoUserProfile.DoesNotExist:
                 return {
                     'message': u"手机号 %s 有误，请输入合法的手机号" % phone
@@ -403,7 +407,7 @@ class AdminTransactionP2P(TemplateView):
                 page = 1
             trade_records = pager.page(page)
             return {
-                "trade_records": trade_records,
+                "pay_records": trade_records,
                 "phone": phone
 
             }
