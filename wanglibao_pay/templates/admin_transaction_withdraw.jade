@@ -6,17 +6,22 @@ head
     - endwith
     body
 
-        .form-row
-            a(href="/admin/pay/transaction")
-                button.button-home-action(type='submit') 返回
-
-
-        if message
-            .form-row
-                label.error{{ message }}
-
-
         .panel
+            .well
+                .panel-title-bar__no-border
+                    .panel-title 提现记录查询
+                .space-vertical-s
+
+                .panel-content.padding-l-r-sm
+                    .space-vertical-l
+                    a(href="/admin/pay/transaction")
+                        button.button-home-action(type='submit') 返回
+                    .space-vertical-l
+
+                if message
+                    .form-row
+                        label.error{{ message }}
+
             .account-home-panel--title-bar__product.padding-l-r-xl
                 ul.title-bar--tabs
                     li.title-bar--tab

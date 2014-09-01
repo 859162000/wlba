@@ -5,14 +5,24 @@ head
     include include/common_head
     - endwith
     body
-        .form-row
-            a(href="/admin")
-                button.button-home-action(type='submit') 返回
-        form(method="GET" action='/admin/pay/transaction/withdraw').form
-            - csrf_token
-            .form-row
-                label 请输入用户手机号
-                .row
-                    input(name="phone")
-            .form-row
-                button.button-primary(type='submit', value='查询') 查询
+        .panel
+            .well
+                .panel-title-bar__no-border
+                    .panel-title 交易记录查询
+                .space-vertical-s
+
+                .panel-content.padding-l-r-sm
+                    .space-vertical-l
+                    a(href="/admin")
+                        button.button-home-action(type='submit') 返回
+                    .space-vertical-l
+                    .space-vertical-l
+                    .row
+                        form.form.span5(method="GET" action='/admin/pay/transaction/withdraw')
+                            .form-row
+                                .span3(style="line-height:40px")
+                                    label 手机号码
+                                .span9-omega
+                                    input#id_id_number(type='text', name='phone', placeholder='手机号码')
+                            .form-row
+                                button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 查询
