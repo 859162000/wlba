@@ -260,7 +260,7 @@ class CardViewSet(ModelViewSet):
 
     @property
     def allowed_methods(self):
-        return 'POST'
+        return 'POST', 'DELETE'
 
     def create(self, request):
         card = Card()
@@ -293,6 +293,25 @@ class CardViewSet(ModelViewSet):
             'no': card.no,
             'bank_name': card.bank.name
         })
+
+    def destroy(self, request, pk=None):
+        card_id = request.DATA.get('card_id', '')
+        card = Card.objects.filter(id=card_id)
+        if card:
+            card.delete()
+            return Response({
+            'id': card_id
+             })
+        else:
+            return Response({
+                "message": u"查不到银行卡，请联系管理员",
+                'error_number': ErrorNumber.duplicate
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
 
 
 class WithdrawTransactions(TemplateView):
