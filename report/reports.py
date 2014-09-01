@@ -116,7 +116,7 @@ class DepositReportGenerator(ReportGeneratorBase):
                 str(pay_info.fee),
                 str(pay_info.amount - pay_info.fee),
                 unicode(pay_info.status),
-                timezone.localtime(pay_info.create_time.astimezone).strftime("%Y-%m-%d %H:%M"),
+                timezone.localtime(pay_info.create_time).strftime("%Y-%m-%d %H:%M"),
                 unicode(pay_info.request_ip),
                 unicode(pay_info.uuid)
             ])
@@ -152,7 +152,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 str(payinfo.total_amount),
                 str(payinfo.amount),
                 str(payinfo.fee),
-                timezone.localtime(payinfo.create_time.astimezone).strftime("%Y-%m-%d %H:%M"),
+                timezone.localtime(payinfo.create_time).strftime("%Y-%m-%d %H:%M"),
                 str(payinfo.request_ip),
                 unicode(payinfo.status),
                 unicode(payinfo.uuid)
@@ -183,12 +183,12 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 amortization.product_amortization.product.name,
                 u'第%d期' % amortization.term,
                 u'抵押标',
-                timezone.localtime(amortization.term_date.astimezone).strftime("%Y-%m-%d"),
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
                 str(amortization.principal + amortization.interest),
                 str(amortization.principal),
                 str(amortization.interest),
                 u'待还',
-                timezone.localtime(amortization.term_date.astimezone).strftime("%Y-%m-%d")
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d")
             ])
         return output.getvalue()
 
@@ -223,7 +223,7 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
                 u'抵押标', # Hard code this since it is not used anywhere except this table
                 str(len(product.equities.all())),
                 unicode(product.status),
-                timezone.localtime(product.soldout_time.astimezone).strftime("%Y-%m-%d %H:%M:%S"),
+                timezone.localtime(product.soldout_time).strftime("%Y-%m-%d %H:%M:%S"),
                 unicode(product.borrower_name),
                 unicode(product.borrower_phone),
                 unicode(product.borrower_id_number),
