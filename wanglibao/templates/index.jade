@@ -62,7 +62,7 @@ html
       .investment-process-container
         .row
           .span6.title 投资流程
-          .span6-omega.info 选择网利宝，让您放心！跟随我们，开启您的互联网金融之旅
+          .span6-omega.info 选择网利宝，让您放心！跟随我们，开启您的互联网金融之旅！
         .row
           .step.first-step
             span.icon.icon-first-step
@@ -73,7 +73,7 @@ html
           .step.second-step
             span.icon.icon-second-step
             .process-title 第二步&nbsp;进行认证
-            .process-content 完成手机实名认证
+            .process-content 完成实名认证
           .step-arrow
             ins
           .step.third-step
@@ -91,7 +91,7 @@ html
           .step.fifth-step
             span.icon.icon-fifth-step
             .process-title 第五步&nbsp;自动收款
-            .process-content 借款期满后自助回款
+            .process-content 借款期满后自动回款
     .container
       .row
         .span8
@@ -129,18 +129,18 @@ html
                       p 可投资金额(元)
                     .span3-omega.align-right
                       p
-                        if status == '正在招标'
+                        if status == '抢购中'
                           a.button-home(href="/p2p/detail/{{product.id}}/")
                             span.icon.purcharsing
                             {{status}}
                         else
                           a.button-home-disabled(href="javascript:void(0)", disabled)
                             if status == '已完成'
-                              span.icon.audit
+                              span.icon.finished
                             elif status == '还款中'
                               span.icon.payment
                             else
-                              span.icon.finished
+                              span.icon.audit
 
                             {{status}}
 
@@ -178,11 +178,13 @@ html
                   for news in news_and_reports
                     li.media-item
                       div.media-title.text-overflow-hidden
-                        a.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') ·&nbsp;&nbsp;{{news.name}}
+                        a.news-icon(href="{{news.link}}" title="{{news.name}}", target='_blank')
+                          img(src="/media/{{news.image}}", style="width:65px;height:40px")
+                        a.news-txt.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') {{news.name}}
 
             .panel.invest-history-container
               .panel-title-bar__no-border
-                .panel-title 投资记录
+                .panel-title 最新投资记录
               .panel-content-container
                 table.invest-history-table
                   thead

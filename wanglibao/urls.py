@@ -9,6 +9,8 @@ from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsV
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
+from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
+
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -70,6 +72,16 @@ urlpatterns += patterns(
     url(r'^captcha/', include('captcha.urls')),
     url(r'^media/(?P<path>.*)$', 'file_storage.views.serve')
 )
+
+
+# the admin router about transaciton infomation
+urlpatterns += patterns(
+    '',
+    url(r'transaction/p2p', AdminTransactionP2P.as_view(), name='transaction_p2p'),
+    url(r'transaction/deposit', AdminTransactionDeposit.as_view(), name='transaction_deposit'),
+    url(r'transaction/withdraw', AdminTransactionWithdraw.as_view(), name='transaction_withdraw'),
+)
+
 
 if settings.DEBUG:
     import debug_toolbar

@@ -81,7 +81,8 @@ $home-banner-height: 360px
   margin-bottom: 10px
   width: 240px
   height: 38px
-  padding-top: 10px
+  padding: 0px
+  line-height: 38px
 
 .product-ad-container
   @extend .container
@@ -229,18 +230,16 @@ $home-banner-height: 360px
 
   .partner-logo
     @extend .clearfix
-    height: 200px
-    border-top: dashed 1px #b2b2b2
+    height: 175px
+    border-top: dotted 1px #b2b2b2
+    border-right: dotted 1px #b2b2b2
 
     li
       float: left
       width: 157px
       height: 87px
-      border-bottom: dashed 1px #b2b2b2
-      border-left: dashed 1px #b2b2b2
-
-      &:nth-child(1), &:nth-child(8)
-        border-left: dashed 1px $color-white
+      border-bottom: dotted 1px #b2b2b2
+      border-left: dotted 1px #b2b2b2
 
       a
         display: block
@@ -249,7 +248,7 @@ $home-banner-height: 360px
         border: solid 4px $color-white
 
         &:hover
-          border: solid 4px #f86049
+          border: solid 4px #ddd
       .partner-idg
         background: url("/static/images/partner_logos.png") no-repeat 0 0
       .partner-baidu
@@ -467,6 +466,7 @@ a.hot-item-title-link
   td, th
     text-align: center
     padding: 10px 0
+    font-size: 14px
 
 
   tbody tr
@@ -498,7 +498,21 @@ a.hot-item-title-link
 .media-title
   display: inline-block
   max-width: 332px
-  height: 16px
   line-height: 16px
   padding-top: 1px
   padding-left: 10px
+  margin-bottom: 10px
+  .news-icon
+    float: left
+    width: 65px
+    height: 40px
+    img
+      width: 65px
+      height: 40px
+  .news-txt
+    white-space: normal
+    overflow: hidden
+    zoom: 1
+    padding-left: 10px
+    line-height: 18px
+    display: block

@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
 from wanglibao_pay.views import BankListView, PayCallback, WithdrawCompleteView, WithdrawCallback, PayView, WithdrawView, \
-    PayCompleteView, WithdrawTransactions
+    PayCompleteView, WithdrawTransactions, AdminTransactionP2P, AdminTransactionWithdraw, AdminTransactionDeposit
 
 urlpatterns = patterns('',
     url(r'^banks/$', login_required(BankListView.as_view()), name='pay-banks'),

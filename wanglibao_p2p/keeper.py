@@ -95,9 +95,9 @@ class EquityKeeper(KeeperBaseMixin):
         with transaction.atomic(savepoint=savepoint):
             equity = P2PEquity.objects.select_for_update().filter(user=self.user, product=self.product).first()
             if not equity:
-                raise P2PException
+                raise P2PException(u'No equity available for user')
             if equity.confirm:
-                raise P2PException
+                raise P2PException(u'The equity already confirmed, no way to revert')
             amount = equity.equity
             equity.delete()
             catalog = u'流标取消'
