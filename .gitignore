@@ -12,3 +12,4 @@ static/sass/*.css
 celerybeat-schedule
 gems
 env/
+.sass-cache
