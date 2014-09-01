@@ -28,7 +28,7 @@ block main
                 dt.bank-card--info-title 账号
                 dd.bank-card--info-value {{card.no | bank_card}}
             .row
-              a#del-card.pull-right(card_id='{{card.id}}') 删除
+              a#del-card.pull-right.del-bank-card(card_id='{{card.id}}') 删除
         a#add-card-button(href='#add-card-form')
           .add-bank-card
             .add-icon-large

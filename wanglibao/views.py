@@ -19,7 +19,7 @@ class IndexView(TemplateView):
                 u'正在招标', u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
             ]).order_by('-end_time').select_related('warrant_company')[:20]
 
-        trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:5]
+        trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:7]
         banners = Banner.objects.filter(device=Banner.PC_2)
         news_and_reports = NewsAndReport.objects.all()[:5]
         site_data = SiteData.objects.all().first()

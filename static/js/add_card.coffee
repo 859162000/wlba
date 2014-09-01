@@ -57,8 +57,12 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
         return
       tool.modalAlert({title: '温馨提示', msg: '添加银行卡失败'})
 
+  card_id = ""
+  $('a#del-card').click (e)->
+    card_id = $(this).attr("card_id")
+    tool.modalConfirm({title: '温馨提示', msg: '确定删除？', callback_ok: _delCard})
+
   _delCard = ()->
-    card_id = $('#del-card').attr("card_id")
     $.ajax {
       url: '/api/card/' + card_id + '/'
       data: {
@@ -76,5 +80,4 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
         return
       tool.modalAlert({title: '温馨提示', msg: '删除失败'})
 
-  $('#del-card').click (e)->
-    tool.modalConfirm({title: '温馨提示', msg: '确定删除？', callback_ok: _delCard})
+
