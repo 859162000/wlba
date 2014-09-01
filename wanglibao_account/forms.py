@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import F
 
 from utils import detect_identifier_type, verify_id
-from wanglibao_account.models import VerifyCounter
+from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_sms.utils import validate_validation_code
 
 User = get_user_model()
@@ -74,6 +74,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             if identifier_type == 'phone':
                 phone = identifier
                 validate_code = self.cleaned_data["validate_code"]
+                print validate_code
                 status, message = validate_validation_code(phone, validate_code)
                 if status != 200:
                     raise forms.ValidationError(
@@ -146,6 +147,7 @@ class IdVerificationForm(forms.Form):
         cleaned_data = super(IdVerificationForm, self).clean()
 
         user = self._user
+
         verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
         if verify_counter.count >= 3:
@@ -153,6 +155,7 @@ class IdVerificationForm(forms.Form):
 
         name = cleaned_data.get('name')
         id_number = cleaned_data.get('id_number')
+
         verify_record, error = verify_id(name, id_number)
 
         verify_counter.count = F('count') + 1

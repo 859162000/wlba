@@ -16,7 +16,7 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.validate', 'tools'], function($, modal, backend, placeholder, validate, tool) {
-    var _showModal;
+    var card_id, _delCard, _showModal;
     $('input, textarea').placeholder();
     $('#add-card-button').click(function(e) {
       if ($('#id-is-valid').val() === 'False') {
@@ -29,7 +29,7 @@
     _showModal = function() {
       return $('#add-card-button').modal();
     };
-    return $('#add-card').click(function(e) {
+    $('#add-card').click(function(e) {
       var bank_id, card_no, is_default;
       e.preventDefault();
       card_no = $('#card-no').val();
@@ -78,6 +78,41 @@
         });
       });
     });
+    card_id = "";
+    $('a#del-card').click(function(e) {
+      card_id = $(this).attr("card_id");
+      return tool.modalConfirm({
+        title: '温馨提示',
+        msg: '确定删除？',
+        callback_ok: _delCard
+      });
+    });
+    return _delCard = function() {
+      return $.ajax({
+        url: '/api/card/' + card_id + '/',
+        data: {
+          card_id: card_id
+        },
+        type: 'delete'
+      }).done(function() {
+        return location.reload();
+      }).fail(function(xhr) {
+        var result;
+        $.modal.close();
+        result = JSON.parse(xhr.responseText);
+        if (result.error_number === 5) {
+          tool.modalAlert({
+            title: '温馨提示',
+            msg: result.message
+          });
+          return;
+        }
+        return tool.modalAlert({
+          title: '温馨提示',
+          msg: '删除失败'
+        });
+      });
+    };
   });
 
 }).call(this);

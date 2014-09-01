@@ -7,6 +7,7 @@
   text-align: center
   display: inline-block
   cursor: pointer
+  position: relative
 
   &:focus
     outline: 0
@@ -116,3 +117,55 @@
   padding: 8px 28px
   font-size: $font-m
   cursor: pointer
+
+.button-radius
+  +border-radius(5px)
+
+.button-home
+  @extend .button
+  @extend .button-red
+  +border-radius(5px)
+  text-align: left
+  padding: 5px 0px
+  font-size: 14px
+  font-weight: normal
+  line-height: 20px
+  width: 130px
+  vertical-align: top
+
+.button-home-disabled
+  @extend .button
+  +border-radius(5px)
+  text-align: left
+  padding: 5px 0px
+  font-size: 14px
+  font-weight: normal
+  background-color: #f9f9f9
+  border: 1px solid #f2f2f2
+  line-height: 20px
+  width: 130px
+  vertical-align: top
+  &:hover
+    color: #626972
+
+.icon-p2p-home
+  width: 28px
+  height: 23px
+  background-image: url(/static/images/icon-public.png)
+  background-repeat: no-repeat
+  margin-right: 10px
+  margin-left: 15px
+  display: inline-block
+  zoom: 1
+  position: relative
+  vertical-align: middle
+
+  &.purcharsing
+    background-position: -322px -159px
+  &.audit
+    background-position: -357px -159px
+  &.payment
+    background-position: -425px -159px
+  &.finished
+    background-position: -390px -159px
+

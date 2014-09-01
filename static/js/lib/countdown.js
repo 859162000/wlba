@@ -21,14 +21,16 @@
         seconds = parseInt(components[0]) * 3600 + parseInt(components[1]) * 60 + parseInt(components[2]);
         if (seconds > 0) {
           left = seconds - diffInSeconds;
-          timeString = "";
-          day = Math.floor(left / 86400);
-          if (day > 0) {
-            timeString += day + "天";
-            left = Math.floor(left % 86400);
+          if (left > 0) {
+            timeString = "";
+            day = Math.floor(left / 86400);
+            if (day > 0) {
+              timeString += day + "天";
+              left = Math.floor(left % 86400);
+            }
+            timeString += Math.floor(left / 3600) + "小时" + twoDigit(Math.floor(left % 3600 / 60)) + "分" + twoDigit(Math.floor(left % 60)) + "秒";
+            return $($(e).attr('data-target')).text(timeString);
           }
-          timeString += Math.floor(left / 3600) + "小时" + twoDigit(Math.floor(left % 3600 / 60)) + "分" + twoDigit(Math.floor(left % 60)) + "秒";
-          return $($(e).attr('data-target')).text(timeString);
         }
       });
     };

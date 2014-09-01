@@ -24,13 +24,27 @@
     $.validator.addMethod("huge", function(value, element) {
       return value <= 50000;
     });
+    $.validator.addMethod("small", function(value, element) {
+      var balance;
+      balance = $(element).attr('data-balance');
+      if (value <= 0) {
+        return false;
+      }
+      if (balance - value === 0) {
+        return true;
+      } else if (value >= 50) {
+        return true;
+      }
+      return false;
+    });
     $("#withdraw-form").validate({
       rules: {
         amount: {
           required: true,
           money: true,
           balance: true,
-          huge: true
+          huge: true,
+          small: true
         },
         card_id: {
           required: true
@@ -44,7 +58,8 @@
           required: '不能为空',
           money: '请输入正确的金额格式',
           balance: '余额不足',
-          huge: '提现金额不能超过50000'
+          huge: '提现金额不能超过50000',
+          small: '最低提现金额 50 元起。如果余额低于 50 元，请一次性取完。'
         },
         card_id: {
           required: '请选择银行卡'

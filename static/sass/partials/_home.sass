@@ -1,4 +1,7 @@
-.full-container-home
+body.index
+  background-color: #fff
+
+.full-container-index
   @extend .full-container
   position: relative
   height: 360px
@@ -78,7 +81,8 @@ $home-banner-height: 360px
   margin-bottom: 10px
   width: 240px
   height: 38px
-  padding-top: 10px
+  padding: 0px
+  line-height: 38px
 
 .product-ad-container
   @extend .container
@@ -87,6 +91,7 @@ $home-banner-height: 360px
 
   .title
     font-weight: bold
+
   .content
     text-align: center
   .highlight
@@ -118,18 +123,20 @@ $home-banner-height: 360px
 .investment-process-container
   @extend .container
   padding-top: 15px
-  padding-bottom: 30px
+  padding-bottom: 50px
   background-color: $color-white
   .title
     text-align: left
-    font-size: $font-xll
+    font-size: $font-l
     color: $color-text-d2
     background-color: $color-white
     padding-left: 14px
+    line-height: 60px
   .info
+    font-size: $font-s
     text-align: right
     height: 36px
-    line-height: 36px
+    line-height: 60px
     background-color: $color-white
     padding-right: 16px
   .process-title
@@ -141,11 +148,70 @@ $home-banner-height: 360px
   .process-container
     background: url("/static/images/process.png") no-repeat
     height: 110px
+  .step-arrow
+    float: left
+    width: 12px
+    overflow: hidden
+    padding-top: 45px
+
+    ins
+      display: inline-block
+      width: 7px
+      height: 13px
+      background: url("/static/images/icon-public.png") no-repeat -445px -223px
   .step
     display: inline
     float: left
-    width: 220px
-    background-color: $color-white
+    width: 210px
+    font-size: $font-s
+    text-align: center
+
+    span
+      display: inline-block
+      overflow: hidden
+      width: 82px
+      height: 82px
+      line-height: 82px
+      margin: 10px auto 15px auto
+      background: #ffffff url("/static/images/icon-public.png") no-repeat
+      border: solid 1px #e9e9e9
+      +border-radius(41px)
+      +transition(all .2s ease-in-out)
+
+    .icon-first-step
+      background-position: -46px 22px
+      &:hover
+        background-position: 24px 22px
+        background-color: #f86049
+        border: solid 1px #de5743
+
+    .icon-second-step
+      background-position: -46px -50px
+      &:hover
+        background-position: 22px -50px
+        background-color: #f86049
+        border: solid 1px #de5743
+
+    .icon-third-step
+      background-position: -194px 22px
+      &:hover
+        background-position: -124px 22px
+        background-color: #f86049
+        border: solid 1px #de5743
+
+    .icon-fourth-step
+      background-position: -194px -50px
+      &:hover
+        background-position: -124px -50px
+        background-color: #f86049
+        border: solid 1px #de5743
+
+    .icon-fifth-step
+      background-position: -392px 20px
+      &:hover
+        background-position: -312px 20px
+        background-color: #f86049
+        border: solid 1px #de5743
 
 .partner-container
   @extend .container
@@ -157,13 +223,59 @@ $home-banner-height: 360px
     padding-top: 20px
     padding-bottom: 20px
     text-align: left
-    font-size: $font-xll
+    font-size: 18px
     color: $color-text-d2
     background-color: $color-white
     padding-left: 14px
-  .logo-container
-    background: url('/static/images/partner.jpg') no-repeat top center
-    height: 286px
+
+  .partner-logo
+    @extend .clearfix
+    height: 175px
+    border-top: dotted 1px #b2b2b2
+    border-right: dotted 1px #b2b2b2
+
+    li
+      float: left
+      width: 157px
+      height: 87px
+      border-bottom: dotted 1px #b2b2b2
+      border-left: dotted 1px #b2b2b2
+
+      a
+        display: block
+        width: 100%
+        height: 86px
+        border: solid 4px $color-white
+
+        &:hover
+          border: solid 4px #ddd
+      .partner-idg
+        background: url("/static/images/partner_logos.png") no-repeat 0 0
+      .partner-baidu
+        background: url("/static/images/partner_logos.png") no-repeat 0 -86px
+      .partner-sina
+        background: url("/static/images/partner_logos.png") no-repeat 0 -174px
+      .partner-xunlei
+        background: url("/static/images/partner_logos.png") no-repeat 0 -260px
+      .partner-minsheng
+        background: url("/static/images/partner_logos.png") no-repeat 0 -346px
+      .partner-huifu
+        background: url("/static/images/partner_logos.png") no-repeat 0 -432px
+      .partner-ump
+        background: url("/static/images/partner_logos.png") no-repeat 0 -518px
+      .partner-pingan
+        background: url("/static/images/partner_logos.png") no-repeat 0 -604px
+      .partner-dongyuan
+        background: url("/static/images/partner_logos.png") no-repeat 0 -690px
+      .partner-guoxin
+        background: url("/static/images/partner_logos.png") no-repeat 0 -776px
+      .partner-shumi
+        background: url("/static/images/partner_logos.png") no-repeat 0 -862px
+      .partner-lianhe
+        background: url("/static/images/partner_logos.png") no-repeat 0 -948px
+      .partner-longan
+        background: url("/static/images/partner_logos.png") no-repeat 0 -1034px
+
 
 
 .container-card-holder
@@ -353,9 +465,17 @@ a.hot-item-title-link
 
   td, th
     text-align: center
+    padding: 10px 0
+    font-size: 14px
+
+  tr:nth-child(even)
+    td
+    background-color: #f9f9f9
+
+
 
   tbody tr
-    border-bottom: 1px solid lightgray
+    border-bottom: 1px solid #e8e8e8
     height: 60px
 
     em
@@ -367,6 +487,14 @@ a.hot-item-title-link
     &:last-child
       border-bottom: 0
 
+.news-list-container
+  margin-top: 50px
+  border: 1px solid #e8e8e8
+
+.invest-history-container
+  border: 1px solid #e8e8e8
+  padding-bottom: 0px
+
 .media-item
   padding: 5px 0
   font-size: $font-m
@@ -375,7 +503,21 @@ a.hot-item-title-link
 .media-title
   display: inline-block
   max-width: 332px
-  height: 16px
   line-height: 16px
   padding-top: 1px
   padding-left: 10px
+  margin-bottom: 10px
+  .news-icon
+    float: left
+    width: 65px
+    height: 40px
+    img
+      width: 65px
+      height: 40px
+  .news-txt
+    white-space: normal
+    overflow: hidden
+    zoom: 1
+    padding-left: 10px
+    line-height: 18px
+    display: block

@@ -45,6 +45,7 @@ block main
             td
               .span5
                 input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee}}', data-target-fee='#fee', data-target-actual='#actual-amount')
+              .span6(style="line-height:40px") 50元起，如果账户余额少于50元，可一次性取完
           tr
             th 手续费(元)
             td

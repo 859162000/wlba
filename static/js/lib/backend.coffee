@@ -174,6 +174,10 @@ define ['jquery'], ($)->
     url = apiurl + 'user_exists/' + identifier + '/'
     $.get url
 
+  fundInfo = ()->
+    url = apiurl + 'fund_info/'
+    $.get url
+
   userProfile = (data)->
     url = apiurl + 'profile/'
     if not data?
@@ -268,6 +272,7 @@ define ['jquery'], ($)->
     normalizeType: normalizeType
 
     userExists: userExists
+    fundInfo: fundInfo
     userProfile: userProfile
     isInRange: isInRange
     checkEmail: checkEmail

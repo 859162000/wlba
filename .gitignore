@@ -6,8 +6,10 @@ publish/
 *.log
 static/sass/partials/*.css
 static/sass/*.css
-.swp
+*.swp
 .DS_Store
 *.pid
 celerybeat-schedule
 gems
+env/
+.sass-cache

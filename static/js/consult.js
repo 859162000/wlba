@@ -31,11 +31,11 @@
         self.finishSurvey = function(data, event) {
           var asset, period, risk;
           asset = self.questions[0].answer();
-          if (asset && parseInt(asset) > 0) {
+          if (asset && parseInt(asset) > 0 && parseInt(asset) <= 100000) {
             self.asset(parseInt(asset));
           }
           period = self.questions[1].answer();
-          if (period && parseInt(period) > 0) {
+          if (period && parseInt(period) > 0 && parseInt(period) <= 100) {
             self.period(period);
           }
           risk = self.questions[2].answer();

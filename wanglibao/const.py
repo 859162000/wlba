@@ -9,3 +9,4 @@ class ErrorNumber():
     not_find = 6
     validate_code_wrong = 7
     try_too_many_times = 8
+    id_verify_times_error = 9

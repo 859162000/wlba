@@ -7,6 +7,7 @@
       'jquery.validate': 'lib/jquery.validate.min',
       'jquery.complexify': 'lib/jquery.complexify.min',
       'jquery.placeholder': 'lib/jquery.placeholder',
+      'underscore': 'lib/underscore-min',
       tools: 'lib/modal.tools'
     },
     shim: {
@@ -17,7 +18,7 @@
     }
   });
 
-  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder'], function($, modal, backend, validate, tool, complexify, placeholder) {
+  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder', 'underscore'], function($, modal, backend, validate, tool, complexify, placeholder, _) {
     var checkMobile, container, _showModal;
     $.validator.addMethod("emailOrPhone", function(value, element) {
       return backend.checkEmail(value) || backend.checkMobile(value);
@@ -158,7 +159,7 @@
     _showModal = function() {
       return $('#login-modal').modal();
     };
-    $("#button-get-validate-code").click(function(e) {
+    $("#button-get-validate-code-modal").click(function(e) {
       var count, element, intervalId, phoneNumber, timerFunction;
       e.preventDefault();
       element = this;
@@ -241,7 +242,7 @@
       $("#tab-register").removeClass('active');
       $("#login-modal-form").show();
       $("#register-modal-form").hide();
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/";
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
       $.getJSON(url, {}, function(json) {
         $('input[name="captcha_0"]').val(json.key);
         return $('img.captcha').attr('src', json.image_url);
@@ -255,7 +256,7 @@
       $("#tab-register").addClass('active');
       $("#login-modal-form").hide();
       $("#register-modal-form").show();
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/";
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
       $.getJSON(url, {}, function(json) {
         $('input[name="captcha_0"]').val(json.key);
         return $('img.captcha').attr('src', json.image_url);

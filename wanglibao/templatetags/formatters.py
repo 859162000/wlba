@@ -137,7 +137,8 @@ def safe_id(id_number):
     Show part of id_number
     """
 
-    result = id_number[:6] + '*' * 8 + id_number[13:]
+    result = id_number[:-4] + '*' * 4
+
     return result
 
 @register.filter
@@ -295,3 +296,10 @@ def number_to_chinese(value):
 @register.filter
 def add_months(value, months):
     return value + relativedelta(months=months)
+
+@register.filter
+def safe_paytype(value):
+    if value == 'W':
+        return u'取款'
+    else:
+        return u'充值'

@@ -71,9 +71,14 @@
           if (result.error_number === 8) {
             tool.modalAlert({
               title: '温馨提示',
-              msg: '验证失败，请拨打客服电话进行人工验证。4008-588-066'
+              msg: result.message
             });
             return;
+          } else if (result.error_number === 9) {
+            tool.modalAlert({
+              title: '温馨提示',
+              msg: result.message
+            });
           }
           return tool.modalAlert({
             title: '温馨提示',

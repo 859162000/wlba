@@ -5,6 +5,7 @@ require.config
     'jquery.validate': 'lib/jquery.validate.min'
     'jquery.complexify': 'lib/jquery.complexify.min'
     'jquery.placeholder': 'lib/jquery.placeholder'
+    'underscore': 'lib/underscore-min'
     tools: 'lib/modal.tools'
   shim:
     'jquery.modal': ['jquery']
@@ -12,7 +13,7 @@ require.config
     'jquery.complexify': ['jquery']
     'jquery.placeholder': ['jquery']
 
-require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder'], ($, modal, backend, validate,tool,  complexify, placeholder)->
+require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder', 'underscore'], ($, modal, backend, validate,tool,  complexify, placeholder, _)->
 
   $.validator.addMethod "emailOrPhone", (value, element)->
       return backend.checkEmail(value) or backend.checkMobile(value)
@@ -126,7 +127,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
   _showModal = ()->
     $('#login-modal').modal()
 
-  $("#button-get-validate-code").click (e) ->
+  $("#button-get-validate-code-modal").click (e) ->
       e.preventDefault()
       element = this
       e.preventDefault()

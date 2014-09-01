@@ -58,7 +58,7 @@ html
                     percent = float(p2p.ordered_amount) / p2p.total_amount * 100
                     .progress-indicator(style="width:{{percent | percentage}}")
                   span.highlight &nbsp;&nbsp; {{percent | percentage}}
-              if status == '正在招标'
+              if status == '抢购中'
                 .span4-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余：
                   span#countdown{{p2p.end_time | timedelta_now_day }}
 
@@ -68,7 +68,7 @@ html
 
         .span4-omega.invest-form.border-left
           h1 我要投资
-          if status == '正在招标'
+          if status == '抢购中'
             form#purchase-form
               {{form.product}}
               if current_equity > 0
@@ -82,7 +82,7 @@ html
                 span.span8-omega
                   span.dark-gray.font-m {{orderable_amount|money_format_int}}元
               if orderable_amount > 0
-                .form-row.form-row__middle
+                .form-row__middle
                   span.span4 投资金额
                   span.span8-omega
                     .row
@@ -108,7 +108,7 @@ html
                   span.span4
                   span.span8-omega
                     a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
-          if status != '正在招标'
+          if status != '抢购中'
             .sold-out
               p.align-center
                 button.button-large.button-disabled(type="button")

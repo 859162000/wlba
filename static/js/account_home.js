@@ -4,11 +4,12 @@
     paths: {
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
-      knockout: 'lib/knockout'
+      knockout: 'lib/knockout',
+      tools: 'lib/modal.tools'
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'model/fund'], function($, _, ko, backend, templateLoader, portfolio, fund) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/jquery.number.min'], function($, _, ko, backend, templateLoader, portfolio, tool) {
     var DataViewModel, viewModel;
     DataViewModel = (function() {
       function DataViewModel() {
@@ -85,7 +86,25 @@
 
     })();
     viewModel = new DataViewModel();
-    return ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel);
+    return backend.fundInfo().done(function(data) {
+      var totalAsset;
+      totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"]);
+      $("#total_asset").text($.number(totalAsset, 2));
+      $("#fund_total_asset").text($.number(data["fund_total_asset"], 2));
+      $("#fund_total_asset_title").text($.number(data["fund_total_asset"], 2));
+      $("#total_income").text($.number(data["total_income"], 2));
+      $("#fund_income_week").text($.number(data["fund_income_week"], 2));
+      return $("#fund_income_month").text($.number(data["fund_income_month"], 2));
+    }).fail(function(data) {
+      return tool.modalAlert({
+        title: '温馨提示',
+        msg: '基金获取失败，请刷新重试！',
+        callback_ok: function() {
+          return location.reload();
+        }
+      });
+    });
   });
 
 }).call(this);

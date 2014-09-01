@@ -4,6 +4,7 @@ import re
 import socket
 import datetime
 from django.contrib.auth.decorators import permission_required
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.forms import model_to_dict
 from django.http import HttpResponse
@@ -21,11 +22,13 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import Bank, Card, PayResult
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay.models import PayInfo
+from wanglibao_p2p.models import P2PRecord
 import decimal
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip
+from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao.const import ErrorNumber
@@ -126,12 +129,6 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
-        phone = request.user.wanglibaouserprofile.phone
-        send_messages.apply_async(kwargs={
-            "phones": [phone],
-            "messages": [messages.deposit_succeed(amount)]
-        })
-
         return self.render_to_response({
             'result': result,
             'amount': amount
@@ -191,8 +188,12 @@ class WithdrawCompleteView(TemplateView):
             amount_str = request.POST.get('amount', '')
             amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
-            if amount <= 0 or amount > 50000:
+            margin = self.request.user.margin.margin
+            if amount > 50000 or amount <= 0:
                 raise decimal.DecimalException
+            if amount < 50:
+                if amount != margin:
+                    raise decimal.DecimalException
 
             fee = (amount * HuifuPay.FEE).quantize(TWO_PLACES)
             actual_amount = amount - fee
@@ -335,3 +336,175 @@ class WithdrawTransactions(TemplateView):
         Only user with change payinfo permission can call this view
         """
         return super(WithdrawTransactions, self).dispatch(request, *args, **kwargs)
+
+
+class WithdrawRollback(TemplateView):
+    template_name = 'withdraw_rollback.jade'
+
+    def post(self, request):
+        uuid = request.POST.get('uuid', '')
+        error_message = request.POST.get('error_message', '')
+        try:
+            payinfo = PayInfo.objects.get(uuid=uuid, type='W')
+        except PayInfo.DoesNotExist:
+            return HttpResponse({
+                u"没有找到 %s 该记录" % uuid
+            })
+
+        marginKeeper = MarginKeeper(payinfo.user)
+        marginKeeper.withdraw_rollback(payinfo.amount,error_message)
+        payinfo.status = PayInfo.FAIL
+        payinfo.error_message = error_message
+        payinfo.save()
+
+        send_messages.apply_async(kwargs={
+            "phones": [payinfo.user.wanglibaouserprofile.phone],
+            "messages": [messages.withdraw_failed(error_message)]
+        })
+
+        return HttpResponse({
+            u"该 %s 请求已经处理完毕" % uuid
+        })
+
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        return super(WithdrawRollback, self).dispatch(request, *args, **kwargs)
+
+class AdminTransaction(TemplateView):
+    template_name = 'admin_transaction.jade'
+
+
+class AdminTransactionP2P(TemplateView):
+    template_name = 'admin_transaction_p2p.jade'
+
+    def get_context_data(self, **kwargs):
+
+        phone = self.request.GET.get('phone', None)
+        if phone:
+            try:
+                user_profile = WanglibaoUserProfile.objects.get(phone=phone)
+            except WanglibaoUserProfile.DoesNotExist:
+                return {
+                    'message': u"手机号 %s 有误，请输入合法的手机号" % phone
+                }
+            except Exception:
+                return {
+                    'message': u"手机号不能为空"
+                }
+
+            trade_records = P2PRecord.objects.filter(user=user_profile.user)
+
+            pager = Paginator(trade_records, 20)
+            page = self.request.GET.get('page')
+            if not page:
+                page = 1
+            trade_records = pager.page(page)
+            return {
+                "trade_records": trade_records,
+                "phone": phone
+
+            }
+        else:
+            return {
+                'message': u"手机号不能为空"
+            }
+
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        return super(AdminTransactionP2P, self).dispatch(request, *args, **kwargs)
+
+
+class AdminTransactionWithdraw(TemplateView):
+
+    template_name = 'admin_transaction_withdraw.jade'
+
+
+    def get_context_data(self, **kwargs):
+        phone = self.request.GET.get('phone', None)
+
+        if phone:
+            try:
+                user_profile = WanglibaoUserProfile.objects.get(phone=phone)
+            except WanglibaoUserProfile.DoesNotExist:
+                return {
+                    'message': u"手机号 %s 有误，请输入合法的手机号" % phone
+                }
+            except Exception:
+                return {
+                    'message': u"手机号不能为空"
+                }
+
+            pay_records = PayInfo.objects.filter(user=user_profile.user, type=PayInfo.WITHDRAW)
+            pager = Paginator(pay_records, 20)
+            page = self.request.GET.get('page')
+
+            if not page:
+                page = 1
+            pay_records = pager.page(page)
+
+            return {
+                "pay_records": pay_records,
+                "phone": phone
+            }
+        else:
+            return {
+                'message': u"手机号不能为空"
+            }
+
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        return super(AdminTransactionWithdraw, self).dispatch(request, *args, **kwargs)
+
+
+class AdminTransactionDeposit(TemplateView):
+
+    template_name = 'admin_transaction_deposit.jade'
+
+    def get_context_data(self, **kwargs):
+        phone = self.request.GET.get('phone', None)
+        if phone:
+            try:
+                user_profile = WanglibaoUserProfile.objects.get(phone=phone)
+            except WanglibaoUserProfile.DoesNotExist:
+                return {
+                    'message': u"手机号 %s 有误，请输入合法的手机号" % phone
+                }
+            except Exception:
+                return {
+                    'message': u"手机号不能为空"
+                }
+
+            pay_records = PayInfo.objects.filter(user=user_profile.user, type=PayInfo.DEPOSIT)
+            pager = Paginator(pay_records, 20)
+            page = self.request.GET.get('page')
+
+            if not page:
+                page = 1
+            pay_records = pager.page(page)
+
+            return {
+                "pay_records": pay_records,
+                "phone": phone
+            }
+        else:
+            return {
+                'message': u"手机号不能为空"
+            }
+
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        return super(AdminTransactionDeposit, self).dispatch(request, *args, **kwargs)
+
+

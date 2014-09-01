@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from wanglibao_buy.models import FundHoldInfo
 from wanglibao_buy.serializers import AvailableFundSerializer
 from wanglibao_fund.models import Fund, IssueBackEndChargeRate, IssueFrontEndChargeRate, RedeemFrontEndChargeRate, RedeemBackEndChargeRate
 
@@ -12,6 +13,17 @@ class ChargeRateSerializer(serializers.ModelSerializer):
             'line_type',
             'value',
             'value_type'
+        ]
+
+class FundHoldInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FundHoldInfo
+        fields = [
+            'id',
+            'fund_name',
+            'current_remain_share',
+            'unpaid_income',
+            'fund_code'
         ]
 
 

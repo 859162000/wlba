@@ -1,14 +1,19 @@
 .nav-items
   ul
-    mixin nav-item(name, link, new_class)
+    mixin nav-item(name, link, new_class, free)
       if activeItem == name
         li.nav-item.active
           a.nav-item-anchor(href=link, class=new_class)= name
+          if free == 'yes'
+            span.icon.icon-free 免费
       else
         li.nav-item
           a.nav-item-anchor(href=link, class=new_class)= name
+          if free == 'yes'
+            span.icon.icon-free 免费
 
-    +nav-item('P2P理财', '/', '')
-    +nav-item('信托', '/trust/home', '')
-    +nav-item('基金', '/fund/products', '')
-    +nav-item('免费定制个人方案', '/portfolio', '')
+    +nav-item('P2P理财', '/', '', '')
+    +nav-item('基金', '/fund/products', '', '')
+    +nav-item('信托', '/trust/home', '', '')
+    +nav-item('定制个人理财方案', '/portfolio', '', 'yes')
+    +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav')
