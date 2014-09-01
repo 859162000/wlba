@@ -58,14 +58,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
       tool.modalAlert({title: '温馨提示', msg: '添加银行卡失败'})
 
   _delCard = ()->
+    card_id = $('#del-card').attr("card_id")
     $.ajax {
-      url: '/api/card/'
+      url: '/api/card/' + card_id + '/'
       data: {
-        no: card_no
-        bank: bank_id
-        is_default: is_default
+        card_id: card_id
       }
-      type: 'post'
+      type: 'delete'
     }
     .done ()->
       location.reload()
@@ -79,5 +78,3 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
 
   $('#del-card').click (e)->
     tool.modalConfirm({title: '温馨提示', msg: '确定删除？', callback_ok: _delCard})
-
-

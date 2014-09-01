@@ -130,7 +130,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
 
     @classmethod
     def generate_report_content(cls, start_time, end_time):
-        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W', status=PayInfo.ACCEPTED).prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
+        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W').prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
 
         output = cStringIO.StringIO()
 
@@ -171,7 +171,7 @@ class PaybackReportGenerator(ReportGeneratorBase):
         writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
                          u'应还本息', u'应还本金', u'应还利息', u'状态'])
 
-        amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time, settled=False)\
+        amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time)\
             .prefetch_related('product_amortization').prefetch_related('product_amortization__product')\
             .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 

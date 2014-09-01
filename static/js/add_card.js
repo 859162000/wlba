@@ -79,14 +79,14 @@
       });
     });
     _delCard = function() {
+      var card_id;
+      card_id = $('#del-card').attr("card_id");
       return $.ajax({
-        url: '/api/card/',
+        url: '/api/card/' + card_id + '/',
         data: {
-          no: card_no,
-          bank: bank_id,
-          is_default: is_default
+          card_id: card_id
         },
-        type: 'post'
+        type: 'delete'
       }).done(function() {
         return location.reload();
       }).fail(function(xhr) {
