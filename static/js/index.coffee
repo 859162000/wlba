@@ -46,3 +46,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
       $(banners[index]).fadeIn()
       $(anchors[index]).toggleClass('active')
       currentBanner = index
+
+
+
+  $('.container').on 'click', '.panel-p2p-product', ->
+    url = $('.panel-title-bar a', $(this)).attr('href')
+    window.location.href = url

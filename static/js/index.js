@@ -42,7 +42,7 @@
     $('.background-anchor').mouseout(function(e) {
       return timer = setInterval(switchBanner, 6000);
     });
-    return $('.background-anchor').click(function(e) {
+    $('.background-anchor').click(function(e) {
       var index;
       e.preventDefault();
       index = $(e.target).parent().index();
@@ -53,6 +53,11 @@
         $(anchors[index]).toggleClass('active');
         return currentBanner = index;
       }
+    });
+    return $('.container').on('click', '.panel-p2p-product', function() {
+      var url;
+      url = $('.panel-title-bar a', $(this)).attr('href');
+      return window.location.href = url;
     });
   });
 
