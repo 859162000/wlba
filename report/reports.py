@@ -223,7 +223,7 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
                 u'抵押标', # Hard code this since it is not used anywhere except this table
                 str(len(product.equities.all())),
                 unicode(product.status),
-                timezone.localtime(product.soldout_time).strftime("%Y-%m-%d %H:%M:%S"),
+                (product.soldout_time and timezone.localtime(product.soldout_time).strftime("%Y-%m-%d %H:%M:%S")) or '-',
                 unicode(product.borrower_name),
                 unicode(product.borrower_phone),
                 unicode(product.borrower_id_number),
