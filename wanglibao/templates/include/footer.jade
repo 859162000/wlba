@@ -61,7 +61,7 @@ mixin innerFooter()
 
 .footbar
   .container.footbar-container
-    span
+    span.footbar-building
     dl.pingan
       dt 平安银行全额承保
       dd 网利宝资金账户
@@ -74,9 +74,11 @@ mixin innerFooter()
     dl
       dt 更安全
       dd 8 重保障 安全理财
-    a.footbar-login(href="#") 登陆
+    a.footbar-login.login-modal(href="#login-modal") 登陆
     .footbar-register
-      a(href="#") 极速注册
+      a.register-modal(href="#login-modal")
+        | 极速注册
+        span.icon.icon-footbar-arrow
 
 
 if no_margin
