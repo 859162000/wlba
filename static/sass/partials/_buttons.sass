@@ -7,6 +7,7 @@
   text-align: center
   display: inline-block
   cursor: pointer
+  position: relative
 
   &:focus
     outline: 0
@@ -125,19 +126,23 @@
   @extend .button-red
   +border-radius(5px)
   text-align: left
-  padding: 5px 10px
+  padding: 5px 0px
   font-size: 14px
   font-weight: normal
+  line-height: 24px
+  width: 130px
 
 .button-home-disabled
   @extend .button
   +border-radius(5px)
   text-align: left
-  padding: 5px 10px
+  padding: 5px 0px
   font-size: 14px
   font-weight: normal
   background-color: #f9f9f9
   border: 1px solid #f2f2f2
+  line-height: 24px
+  width: 130px
   &:hover
     color: #626972
 
@@ -146,13 +151,14 @@
   height: 23px
   background-image: url(/static/images/icon-public.png)
   background-repeat: no-repeat
-  margin-right: 5px
+  margin-right: 10px
+  margin-left: 15px
   &.purcharsing
     background-position: -322px -159px
   &.audit
-    background-position: -355px -159px
+    background-position: -357px -159px
   &.payment
-    background-position: -423px -159px
+    background-position: -425px -159px
   &.finished
-    background-position: -388px -159px
+    background-position: -390px -159px
 

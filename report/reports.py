@@ -116,7 +116,7 @@ class DepositReportGenerator(ReportGeneratorBase):
                 str(pay_info.fee),
                 str(pay_info.amount - pay_info.fee),
                 unicode(pay_info.status),
-                timezone.localtime(pay_info.create_time.astimezone).strftime("%Y-%m-%d %H:%M"),
+                timezone.localtime(pay_info.create_time).strftime("%Y-%m-%d %H:%M"),
                 unicode(pay_info.request_ip),
                 unicode(pay_info.uuid)
             ])
@@ -130,7 +130,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
 
     @classmethod
     def generate_report_content(cls, start_time, end_time):
-        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W', status=PayInfo.ACCEPTED).prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
+        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W').prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
 
         output = cStringIO.StringIO()
 
@@ -152,7 +152,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 str(payinfo.total_amount),
                 str(payinfo.amount),
                 str(payinfo.fee),
-                timezone.localtime(payinfo.create_time.astimezone).strftime("%Y-%m-%d %H:%M"),
+                timezone.localtime(payinfo.create_time).strftime("%Y-%m-%d %H:%M"),
                 str(payinfo.request_ip),
                 unicode(payinfo.status),
                 unicode(payinfo.uuid)
@@ -171,7 +171,7 @@ class PaybackReportGenerator(ReportGeneratorBase):
         writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
                          u'应还本息', u'应还本金', u'应还利息', u'状态'])
 
-        amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time, settled=False)\
+        amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time)\
             .prefetch_related('product_amortization').prefetch_related('product_amortization__product')\
             .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
@@ -183,12 +183,12 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 amortization.product_amortization.product.name,
                 u'第%d期' % amortization.term,
                 u'抵押标',
-                timezone.localtime(amortization.term_date.astimezone).strftime("%Y-%m-%d"),
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
                 str(amortization.principal + amortization.interest),
                 str(amortization.principal),
                 str(amortization.interest),
                 u'待还',
-                timezone.localtime(amortization.term_date.astimezone).strftime("%Y-%m-%d")
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d")
             ])
         return output.getvalue()
 
@@ -223,7 +223,7 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
                 u'抵押标', # Hard code this since it is not used anywhere except this table
                 str(len(product.equities.all())),
                 unicode(product.status),
-                timezone.localtime(product.soldout_time.astimezone).strftime("%Y-%m-%d %H:%M:%S"),
+                (product.soldout_time and timezone.localtime(product.soldout_time).strftime("%Y-%m-%d %H:%M:%S")) or '-',
                 unicode(product.borrower_name),
                 unicode(product.borrower_phone),
                 unicode(product.borrower_id_number),

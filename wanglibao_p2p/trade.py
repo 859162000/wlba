@@ -141,7 +141,7 @@ class P2POperator(object):
         if product.status == u'流标':
             raise P2PException('Product already failed')
 
-        cls.logger.info("Product [%d] [%s] not able to reach 100%")
+        cls.logger.info(u"Product [%d] [%s] not able to reach 100%%" % (product.id, product.name))
         with transaction.atomic():
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
