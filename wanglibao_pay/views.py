@@ -337,6 +337,7 @@ class WithdrawTransactions(TemplateView):
         """
         return super(WithdrawTransactions, self).dispatch(request, *args, **kwargs)
 
+
 class WithdrawRollback(TemplateView):
     template_name = 'withdraw_rollback.jade'
 
@@ -372,6 +373,9 @@ class WithdrawRollback(TemplateView):
         """
         return super(WithdrawRollback, self).dispatch(request, *args, **kwargs)
 
+class AdminTransaction(TemplateView):
+    template_name = 'admin_transaction.jade'
+
 
 class AdminTransactionP2P(TemplateView):
     template_name = 'admin_transaction_p2p.jade'
@@ -383,12 +387,10 @@ class AdminTransactionP2P(TemplateView):
             try:
                 user_profile = WanglibaoUserProfile.objects.get(phone=phone)
             except WanglibaoUserProfile.DoesNotExist:
-                # todo: add message
                 return {
                     'message': u"手机号 %s 有误，请输入合法的手机号" % phone
                 }
             except Exception:
-                # todo: add message
                 return {
                     'message': u"手机号不能为空"
                 }
@@ -405,25 +407,35 @@ class AdminTransactionP2P(TemplateView):
                 "phone": phone
 
             }
+        else:
+            return {
+                'message': u"手机号不能为空"
+            }
 
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        return super(AdminTransactionP2P, self).dispatch(request, *args, **kwargs)
 
 
 class AdminTransactionWithdraw(TemplateView):
 
     template_name = 'admin_transaction_withdraw.jade'
 
+
     def get_context_data(self, **kwargs):
         phone = self.request.GET.get('phone', None)
+
         if phone:
             try:
                 user_profile = WanglibaoUserProfile.objects.get(phone=phone)
             except WanglibaoUserProfile.DoesNotExist:
-                # todo: add message
                 return {
                     'message': u"手机号 %s 有误，请输入合法的手机号" % phone
                 }
             except Exception:
-                # todo: add message
                 return {
                     'message': u"手机号不能为空"
                 }
@@ -440,6 +452,18 @@ class AdminTransactionWithdraw(TemplateView):
                 "pay_records": pay_records,
                 "phone": phone
             }
+        else:
+            return {
+                'message': u"手机号不能为空"
+            }
+
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        return super(AdminTransactionWithdraw, self).dispatch(request, *args, **kwargs)
+
 
 class AdminTransactionDeposit(TemplateView):
 
@@ -451,12 +475,10 @@ class AdminTransactionDeposit(TemplateView):
             try:
                 user_profile = WanglibaoUserProfile.objects.get(phone=phone)
             except WanglibaoUserProfile.DoesNotExist:
-                # todo: add message
                 return {
                     'message': u"手机号 %s 有误，请输入合法的手机号" % phone
                 }
             except Exception:
-                # todo: add message
                 return {
                     'message': u"手机号不能为空"
                 }
@@ -473,5 +495,16 @@ class AdminTransactionDeposit(TemplateView):
                 "pay_records": pay_records,
                 "phone": phone
             }
+        else:
+            return {
+                'message': u"手机号不能为空"
+            }
+
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        return super(AdminTransactionDeposit, self).dispatch(request, *args, **kwargs)
 
 
