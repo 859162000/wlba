@@ -7,6 +7,7 @@
       'jquery.validate': 'lib/jquery.validate.min',
       'jquery.complexify': 'lib/jquery.complexify.min',
       'jquery.placeholder': 'lib/jquery.placeholder',
+      'underscore': 'lib/underscore-min',
       tools: 'lib/modal.tools'
     },
     shim: {
@@ -17,7 +18,7 @@
     }
   });
 
-  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder'], function($, modal, backend, validate, tool, complexify, placeholder) {
+  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder', 'underscore'], function($, modal, backend, validate, tool, complexify, placeholder, _) {
     var checkMobile, container, _showModal;
     $.validator.addMethod("emailOrPhone", function(value, element) {
       return backend.checkEmail(value) || backend.checkMobile(value);
