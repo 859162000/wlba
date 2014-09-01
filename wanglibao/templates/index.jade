@@ -16,7 +16,7 @@ html
     include include/navigation
     - endwith
 
-    .full-container-home.clearfix
+    .full-container-index.clearfix
       banners_ = enumerate(banners)
       for index, banner in banners_
         if index == 0
@@ -132,6 +132,8 @@ html
                           a.button-home-disabled(href="javascript:void(0)", disabled)
                             if status == '已完成'
                               span.icon.audit
+                            elseif status == '还款中'
+                              span.icon.payment
                             else
                               span.icon.finished
 
