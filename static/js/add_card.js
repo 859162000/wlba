@@ -16,7 +16,7 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.validate', 'tools'], function($, modal, backend, placeholder, validate, tool) {
-    var _delCard, _showModal;
+    var card_id, _delCard, _showModal;
     $('input, textarea').placeholder();
     $('#add-card-button').click(function(e) {
       if ($('#id-is-valid').val() === 'False') {
@@ -78,9 +78,16 @@
         });
       });
     });
-    _delCard = function() {
-      var card_id;
-      card_id = $('#del-card').attr("card_id");
+    card_id = "";
+    $('a#del-card').click(function(e) {
+      card_id = $(this).attr("card_id");
+      return tool.modalConfirm({
+        title: '温馨提示',
+        msg: '确定删除？',
+        callback_ok: _delCard
+      });
+    });
+    return _delCard = function() {
       return $.ajax({
         url: '/api/card/' + card_id + '/',
         data: {
@@ -106,13 +113,6 @@
         });
       });
     };
-    return $('#del-card').click(function(e) {
-      return tool.modalConfirm({
-        title: '温馨提示',
-        msg: '确定删除？',
-        callback_ok: _delCard
-      });
-    });
   });
 
 }).call(this);
