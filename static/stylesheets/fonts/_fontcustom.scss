@@ -30,11 +30,8 @@
 .icon-phone-footer:before,
 .icon-refresh:before,
 .icon-shield:before,
-.icon-star:before,
-.icon-weibo:before,
-.icon-weibo-circle:before,
-.icon-weixin:before,
-.icon-weixin-circle:before {
+.icon-star:before
+ {
   display: inline-block;
   font-family: "fontcustom";
   font-style: normal;
@@ -57,7 +54,3 @@
 .icon-refresh:before { content: "\f10e"!important; }
 .icon-shield:before { content: "\f10f"; }
 .icon-star:before { content: "\f109"; }
-.icon-weibo:before { content: "\f105"; }
-.icon-weibo-circle:before { content: "\f106"; }
-.icon-weixin:before { content: "\f107"; }
-.icon-weixin-circle:before { content: "\f108"; }
