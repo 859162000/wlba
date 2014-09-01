@@ -59,24 +59,29 @@ mixin innerFooter()
       include include/login_form
       include include/register_form
 
-.footbar
-  .container.footbar-container
-    span
-    dl.pingan
-      dt 平安银行全额承保
-      dd 网利宝资金账户
-    dl
-      dt 高收益
-      dd 收益是银行活期 30 倍以上
-    dl
-      dt 低门槛
-      dd 100元起理财，0 手续费
-    dl
-      dt 更安全
-      dd 8 重保障 安全理财
-    a.footbar-login(href="#") 登陆
-    .footbar-register
-      a(href="#") 极速注册
+if user.is_authenticated
+  div
+else
+  .footbar
+    .container.footbar-container
+      span.footbar-building
+      dl.pingan
+        dt 平安银行全额承保
+        dd 网利宝资金账户
+      dl
+        dt 高收益
+        dd 收益是银行活期 30 倍以上
+      dl
+        dt 低门槛
+        dd 100元起理财，0 手续费
+      dl
+        dt 更安全
+        dd 8 重保障 安全理财
+      a.footbar-login.login-modal(href="#login-modal") 登陆
+      .footbar-register
+        a.register-modal(href="#login-modal")
+          | 极速注册
+          span.icon.icon-footbar-arrow
 
 
 if no_margin

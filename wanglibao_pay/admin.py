@@ -4,7 +4,7 @@ from django.contrib import admin
 # Register your models here.
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
-    AdminTransactionWithdraw, AdminTransactionDeposit, AdminTransactionP2P
+    AdminTransaction, AdminTransactionWithdraw, AdminTransactionDeposit, AdminTransactionP2P
 
 
 class PayInfoAdmin(admin.ModelAdmin):
@@ -39,7 +39,6 @@ admin.site.register(PayInfo, PayInfoAdmin)
 admin.site.register_view('pay/withdraw/audit', view=WithdrawTransactions.as_view(), name=u'提现申请审核页面')
 admin.site.register_view('pay/withdraw/rollback', view=WithdrawRollback.as_view(), name=u'提现申请失败回滚页面')
 
-admin.site.register_view('pay/transaction/p2p', view=AdminTransactionP2P.as_view(), name=u'交易记git 录详情')
-admin.site.register_view('pay/transaction/withdraw', view=AdminTransactionWithdraw.as_view(), name=u'提现记录详情')
-admin.site.register_view('pay/transaction/deposit', view=AdminTransactionDeposit.as_view(), name=u'充值记录详情')
+admin.site.register_view('pay/transaction', view=AdminTransaction.as_view(),name=u'交易记录详情')
+
 

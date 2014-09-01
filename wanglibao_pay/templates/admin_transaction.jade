@@ -1,0 +1,28 @@
+- load formatters
+doctype html
+head
+    - with '查询用户充值记录' as title
+    include include/common_head
+    - endwith
+    body
+        .panel
+            .well
+                .panel-title-bar__no-border
+                    .panel-title 交易记录查询
+                .space-vertical-s
+
+                .panel-content.padding-l-r-sm
+                    .space-vertical-l
+                    a(href="/admin")
+                        button.button-home-action(type='submit') 返回
+                    .space-vertical-l
+                    .space-vertical-l
+                    .row
+                        form.form.span5(method="GET" action='/admin/pay/transaction/withdraw')
+                            .form-row
+                                .span3(style="line-height:40px")
+                                    label 手机号码
+                                .span9-omega
+                                    input#id_id_number(type='text', name='phone', placeholder='手机号码')
+                            .form-row
+                                button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 查询
