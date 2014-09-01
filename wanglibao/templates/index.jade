@@ -157,7 +157,11 @@ html
                       span 进度：
                       .progress-container
                         percent = float(product.ordered_amount) / product.total_amount * 100
-                        .progress-indicator(style="width:{{percent | percentage}}")
+                        if status == '抢购中' or status == '满标审核'
+                          .progress-indicator(style="width:{{percent | percentage}}")
+                        else
+                          .progress-indicator.disabled(style="width:{{percent | percentage}}")
+
                       span.highlight &nbsp;&nbsp; {{percent | percentage}}
                     .span4.align-left
                       span 担保机构: &nbsp;&nbsp;
