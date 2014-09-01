@@ -131,16 +131,16 @@ html
                       p
                         if status == '抢购中'
                           a.button-home(href="/p2p/detail/{{product.id}}/")
-                            span.icon.purcharsing
+                            span.icon-p2p-home.purcharsing
                             {{status}}
                         else
                           a.button-home-disabled(href="javascript:void(0)", disabled)
                             if status == '已完成'
-                              span.icon.finished
+                              span.icon-p2p-home.finished
                             elif status == '还款中'
-                              span.icon.payment
+                              span.icon-p2p-home.payment
                             else
-                              span.icon.audit
+                              span.icon-p2p-home.audit
 
                             {{status}}
 
