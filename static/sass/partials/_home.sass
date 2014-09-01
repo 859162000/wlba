@@ -81,7 +81,8 @@ $home-banner-height: 360px
   margin-bottom: 10px
   width: 240px
   height: 38px
-  padding-top: 10px
+  padding: 0px
+  line-height: 38px
 
 .product-ad-container
   @extend .container
@@ -465,6 +466,7 @@ a.hot-item-title-link
   td, th
     text-align: center
     padding: 10px 0
+    font-size: 14px
 
 
   tbody tr
@@ -496,7 +498,21 @@ a.hot-item-title-link
 .media-title
   display: inline-block
   max-width: 332px
-  height: 16px
   line-height: 16px
   padding-top: 1px
   padding-left: 10px
+  margin-bottom: 10px
+  .news-icon
+    float: left
+    width: 65px
+    height: 40px
+    img
+      width: 65px
+      height: 40px
+  .news-txt
+    white-space: normal
+    overflow: hidden
+    zoom: 1
+    padding-left: 10px
+    line-height: 18px
+    display: block
