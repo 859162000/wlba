@@ -144,7 +144,7 @@ html
 
                             {{status}}
 
-                      if status == '正在招标'
+                      if status == '抢购中'
                         p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
                           span(id="counter_{{product.id}}") {{product.end_time | timedelta_now_day }}
                       else
