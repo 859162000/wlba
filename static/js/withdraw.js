@@ -27,6 +27,9 @@
     $.validator.addMethod("small", function(value, element) {
       var balance;
       balance = $(element).attr('data-balance');
+      if (value <= 0) {
+        return false;
+      }
       if (balance - value === 0) {
         return true;
       } else if (value >= 50) {

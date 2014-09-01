@@ -16,7 +16,7 @@ html
     include include/navigation
     - endwith
 
-    .full-container-home.clearfix
+    .full-container-index.clearfix
       banners_ = enumerate(banners)
       for index, banner in banners_
         if index == 0
@@ -99,68 +99,79 @@ html
           for product in p2p_products
             status = product.display_status
             .panel-p2p-product
-              .panel-title-bar
-                if product.warrant_company
-                  .warrant-icon 担
-                a(href="/p2p/detail/{{product.id}}") {{product.name}}
-              .panel-content
-                .row
-                  .span2.align-center
-                    p
-                      em {{product.total_amount | money_format_int}}
-                    p 融资金额(元)
-                  .span2.align-center
-                    p
-                      em {{product.period}}
-                      span.font-l 个月
-                    p 还款期限
-                  .span3.align-center
-                    p
-                      earning_rate = str(product.expected_earning_rate)
-                      if product.excess_earning_rate > 0
-                        earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
-                      em.highlight {{earning_rate}}
-                      span.highlight.font-m %
-                    p 年化收益
-                  .span2.align-center
-                    p
-                      amount = product.total_amount - product.ordered_amount
-                      em {{amount | money_format_int}}
-                    p 可投资金额(元)
-                  .span3-omega.align-right
-                    p
-                      if status == '正在招标'
-                        a.button-primary(href="/p2p/detail/{{product.id}}/") {{status}}
-                      else
-                        a.button-disabled(href="javascript:void(0)", disabled) {{status}}
-
-                    if status == '正在招标'
-                      p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
-                        span(id="counter_{{product.id}}") {{product.end_time | timedelta_now_day }}
-                    else
+              .shadow-inner
+                .panel-title-bar
+                  if product.warrant_company
+                    .warrant-icon 担
+                  a(href="/p2p/detail/{{product.id}}") {{product.name}}
+                .panel-content
+                  .row
+                    .span2.align-center
                       p
+                        em {{product.total_amount | money_format_int}}
+                      p 融资金额(元)
+                    .span2.align-center
+                      p
+                        em {{product.period}}
+                        span.font-l 个月
+                      p 还款期限
+                    .span3.align-center
+                      p
+                        earning_rate = str(product.expected_earning_rate)
+                        if product.excess_earning_rate > 0
+                          earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
+                        em.highlight {{earning_rate}}
+                        span.highlight.font-m %
+                      p 年化收益
+                    .span2.align-center
+                      p
+                        amount = product.total_amount - product.ordered_amount
+                        em {{amount | money_format_int}}
+                      p 可投资金额(元)
+                    .span3-omega.align-right
+                      p
+                        if status == '正在招标'
+                          a.button-home(href="/p2p/detail/{{product.id}}/")
+                            span.icon.purcharsing
+                            {{status}}
+                        else
+                          a.button-home-disabled(href="javascript:void(0)", disabled)
+                            if status == '已完成'
+                              span.icon.audit
+                            elseif status == '还款中'
+                              span.icon.payment
+                            else
+                              span.icon.finished
+
+                            {{status}}
+
+                      if status == '正在招标'
+                        p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
+                          span(id="counter_{{product.id}}") {{product.end_time | timedelta_now_day }}
+                      else
+                        p
 
 
-              .panel-p2p--footer
-                .row
-                  .span4
-                    span 进度：
-                    .progress-container
-                      percent = float(product.ordered_amount) / product.total_amount * 100
-                      .progress-indicator(style="width:{{percent | percentage}}")
-                    span.highlight &nbsp;&nbsp; {{percent | percentage}}
-                  .span4.align-left
-                    span 担保机构: &nbsp;&nbsp;
-                    span.d3-text {{product.warrant_company.name}}
-                  .span4-omega.align-right
-                    span 还款方式: &nbsp;&nbsp;
-                    span.d3-text {{product.display_payback_method}}
-              if status == '还款中' or status == '已完成'
-                .panel-p2p-stamp
+                .panel-p2p--footer
+                  .row
+                    .span4
+                      span 进度：
+                      .progress-container
+                        percent = float(product.ordered_amount) / product.total_amount * 100
+                        .progress-indicator(style="width:{{percent | percentage}}")
+                      span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                    .span4.align-left
+                      span 担保机构: &nbsp;&nbsp;
+                      span.d3-text {{product.warrant_company.name}}
+                    .span4-omega.align-right
+                      span 还款方式: &nbsp;&nbsp;
+                      span.d3-text {{product.display_payback_method}}
+                if status == '还款中' or status == '已完成'
+                  .panel-p2p-stamp
 
         .span4-omega
           div
-            .panel
+            .panel.news-list-container
               .panel-title-bar__border-gray
                 .panel-title 媒体报道
               .panel-content-container.padding-l-r-s
@@ -170,10 +181,10 @@ html
                       div.media-title.text-overflow-hidden
                         a.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') ·&nbsp;&nbsp;{{news.name}}
 
-            .panel
+            .panel.invest-history-container
               .panel-title-bar__no-border
                 .panel-title 投资记录
-              .panel-content-container.padding-l-r-sm
+              .panel-content-container
                 table.invest-history-table
                   thead
                     tr

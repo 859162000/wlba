@@ -1,8 +1,15 @@
 .panel-p2p-product
   @extend .panel
   overflow: visible
-  padding-bottom: 0
+  padding: 5px
   position: relative
+  margin-top: 50px
+  border: 1px solid #d9d9d9
+  &:hover
+    +box-shadow(#d9d9d9 2px 2px 10px)
+
+
+
 
   .panel-title-bar
     line-height: 55px
@@ -11,11 +18,14 @@
     color: $color-text-d2
     padding: 0 24px
     a
-      font-size: $font-l
-      font-weight: bold
+      font-size: 18px
+      font-weight: normal
       line-height: 55px
-      width: 650px
+      width: 620px
       display: inline-block
+      font-family: Arial,Helvetica,sans-serif,"Microsoft YaHei","宋体"
+      &:hover
+        color: #1f8ccd
 
   .panel-content
     border-bottom: 1px dashed $color-gainsboro
@@ -28,8 +38,9 @@
 
   em
     color: $color-text-d3
-    font-size: $font-xll
-    font-weight: bold
+    font-size: 18px
+    font-weight: normal
+    font-family: Arial,Helvetica,sans-serif,"Microsoft YaHei","宋体"
 
     &.highlight
       color: $color-pomegranate
@@ -45,16 +56,20 @@
 
 .progress-container
   height: 12px
-  border: 1px solid $color-pomegranate
+  border: 0px solid $color-pomegranate
   width: 100px
-  padding: 1px
+  padding: 0px
   display: inline-block
   position: relative
   top: 1px
+  +border-radius(5px)
+  background-color: #c8c8c8
+
 
   .progress-indicator
     background: $color-pomegranate
     height: 100%
+    +border-radius(5px)
 
 .p2p-container
   +container
@@ -247,6 +262,7 @@
   position: relative
   top: -2px
   background-color: $color-red
+  +border-radius(8px)
 
 
 .panel-p2p-stamp

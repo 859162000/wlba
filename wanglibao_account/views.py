@@ -4,6 +4,7 @@ import logging
 import json
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
+from django.core import serializers
 from django.db.models import Q
 
 from django.contrib.auth import get_user_model, authenticate
@@ -42,6 +43,7 @@ from wanglibao_account.models import VerifyCounter
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
+from django.forms.models import model_to_dict
 
 logger = logging.getLogger(__name__)
 
@@ -252,8 +254,53 @@ class AccountHome(TemplateView):
         user = self.request.user
 
         mode = 'p2p'
+        fund_hold_info = []
         if self.request.path.rstrip('/').split('/')[-1] == 'fund':
             mode = 'fund'
+            fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+
+
+        # Followings for p2p
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
+        amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False).prefetch_related("subs")
+
+        unpayed_principle = 0
+        for equity in p2p_equities:
+            if equity.confirm:
+                unpayed_principle += equity.unpaid_principal
+
+        p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
+
+        p2p_product_amortization = {}
+        for amortization in amortizations:
+            if not amortization.product_id in p2p_product_amortization:
+                p2p_product_amortization[amortization.product_id] = amortization
+
+        total_asset = p2p_total_asset
+
+        return {
+            'message': message,
+
+            'p2p_equities': p2p_equities,
+            'amortizations': amortizations,
+            'p2p_product_amortization': p2p_product_amortization,
+            'p2p_unpay_principle': unpayed_principle,
+            'margin_withdrawing': user.margin.withdrawing,
+            'margin_freeze': user.margin.freeze,
+            'fund_hold_info':fund_hold_info,
+            'p2p_total_asset': p2p_total_asset,
+            'total_asset': total_asset,
+
+            'mode': mode
+        }
+
+
+class FundInfoAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+
+        user = self.request.user
 
         try:
             fetcher = UserInfoFetcher(user)
@@ -281,45 +328,13 @@ class AccountHome(TemplateView):
         if fund_total_asset != 0:
             income_rate = total_income / fund_total_asset
 
-        # Followings for p2p
-        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
-        amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False).prefetch_related("subs")
-
-        unpayed_principle = 0
-        for equity in p2p_equities:
-            if equity.confirm:
-                unpayed_principle += equity.unpaid_principal
-
-        p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
-
-        p2p_product_amortization = {}
-        for amortization in amortizations:
-            if not amortization.product_id in p2p_product_amortization:
-                p2p_product_amortization[amortization.product_id] = amortization
-
-        total_asset = fund_total_asset + p2p_total_asset
-
-        return {
-            'fund_hold_info': fund_hold_info,
-            'income_rate': income_rate,
-            'fund_income_week': fund_income_week,
-            'fund_income_month': fund_income_month,
-            'message': message,
-
-            'p2p_equities': p2p_equities,
-            'amortizations': amortizations,
-            'p2p_product_amortization': p2p_product_amortization,
-            'p2p_unpay_principle': unpayed_principle,
-            'margin_withdrawing': user.margin.withdrawing,
-            'margin_freeze': user.margin.freeze,
-
-            'p2p_total_asset': p2p_total_asset,
-            'fund_total_asset': fund_total_asset,
-            'total_asset': total_asset,
-
-            'total_income': total_income,
-            'mode': mode
-        }
+        return Response({
+                            'income_rate': income_rate,
+                            'fund_income_week': fund_income_week,
+                            'fund_income_month': fund_income_month,
+                            'fund_total_asset': fund_total_asset,
+                            'total_income': total_income,
+                        }, status=200)
 
 
 class AccountTransaction(TemplateView):
@@ -591,7 +606,7 @@ def test_contract(request, equity_id):
 
 
 class IdVerificationView(TemplateView):
-    template_name = 'admin_verify_id.jade'
+    template_name = 'verify_id.jade'
     form_class = IdVerificationForm
     success_url = '/accounts/id_verify/'
 
@@ -616,6 +631,10 @@ class IdVerificationView(TemplateView):
 
         return super(IdVerificationView, self).form_valid(form)
 
+
+
+class AdminIdVerificationView(TemplateView):
+    template_name = 'admin_verify_id.jade'
 
 
 
