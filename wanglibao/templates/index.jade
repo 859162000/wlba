@@ -179,7 +179,11 @@ html
                     li.media-item
                       div.media-title.text-overflow-hidden
                         a.news-icon(href="{{news.link}}" title="{{news.name}}", target='_blank')
-                          img(src="/media/{{news.image}}", style="width:65px;height:40px")
+                          if news.image
+                            img(src="/media/{{news.image}}", style="width:65px;height:40px")
+                          else
+                            img(src="/static/images/media_default.jpg", style="width:65px;height:40px")
+
                         a.news-txt.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') {{news.name}}
 
             .panel.invest-history-container
