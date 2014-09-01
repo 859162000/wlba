@@ -7,8 +7,8 @@ from wanglibao.celery import app
 logger = get_task_logger(__name__)
 
 @app.task
-def generate_report():
-    today = timezone.now().date() + timezone.timedelta(days=-2)
+def generate_report(days=-2):
+    today = timezone.now().date() + timezone.timedelta(days=days)
     timestamp_str = today.strftime('%Y %m %d 00 00 00')
     start_time = timezone.datetime.strptime(timestamp_str, '%Y %m %d %H %M %S')
     end_time = timezone.datetime.now()
