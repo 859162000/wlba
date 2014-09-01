@@ -10,13 +10,13 @@ html
     meta(name="keywords", content="网利宝")
     meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
 
-  body.index
+  body.white-background
     include include/header
     - with 'P2P理财' as activeItem
     include include/navigation
     - endwith
 
-    .full-container-home.clearfix
+    .full-container-index.clearfix
       banners_ = enumerate(banners)
       for index, banner in banners_
         if index == 0
@@ -59,34 +59,39 @@ html
             p.align-right.font-s
               span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
     .full-container-white
-      .product-ad-container
+      .investment-process-container
         .row
-          .span3
-            .big-icon-container.income-high
-            p.title 高收益
-            p.content 收益是银行活期
-              span.highlight 30
-              倍以上
-          .span3
-            .big-icon-container.sill-low
-            p.title 低门槛
-            p.content
-              span.highlight 100
-              元起理财，
-              span.highlight 0
-              手续费
-          .span3
-            .big-icon-container.security-more
-            p.title 更安全
-            p.content
-              span.highlight 8
-              重保障&nbsp;安心理财
-          .span3-omega
-            .big-icon-container.wealth-share
-            p.title 超便捷
-            p.content
-              手机理财&nbsp;
-              span.highlight 随时随地
+          .span6.title 投资流程
+          .span6-omega.info 选择网利宝，让您放心！跟随我们，开启您的互联网金融之旅
+        .row
+          .step.first-step
+            span.icon.icon-first-step
+            .process-title 第一步&nbsp;免费注册
+            .process-content 30秒轻松免费注册成为会员
+          .step-arrow
+            ins
+          .step.second-step
+            span.icon.icon-second-step
+            .process-title 第二步&nbsp;进行认证
+            .process-content 完成手机实名认证
+          .step-arrow
+            ins
+          .step.third-step
+            span.icon.icon-third-step
+            .process-title 第三步&nbsp;充值账户
+            .process-content 在线充值，免收手续费
+          .step-arrow
+            ins
+          .step.fourth-step
+            span.icon.icon-fourth-step
+            .process-title 第四步&nbsp;成功投标
+            .process-content 按需筛选借款标并进行投标
+          .step-arrow
+            ins
+          .step.fifth-step
+            span.icon.icon-fifth-step
+            .process-title 第五步&nbsp;自动收款
+            .process-content 借款期满后自助回款
     .container
       .row
         .span8
@@ -125,9 +130,19 @@ html
                     .span3-omega.align-right
                       p
                         if status == '正在招标'
-                          a.button-primary(href="/p2p/detail/{{product.id}}/") {{status}}
+                          a.button-home(href="/p2p/detail/{{product.id}}/")
+                            span.icon.purcharsing
+                            {{status}}
                         else
-                          a.button-disabled(href="javascript:void(0)", disabled) {{status}}
+                          a.button-home-disabled(href="javascript:void(0)", disabled)
+                            if status == '已完成'
+                              span.icon.audit
+                            elif status == '还款中'
+                              span.icon.payment
+                            else
+                              span.icon.finished
+
+                            {{status}}
 
                       if status == '正在招标'
                         p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
@@ -165,10 +180,10 @@ html
                       div.media-title.text-overflow-hidden
                         a.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') ·&nbsp;&nbsp;{{news.name}}
 
-            .panel
+            .panel.invest-history-container
               .panel-title-bar__no-border
                 .panel-title 投资记录
-              .panel-content-container.padding-l-r-sm
+              .panel-content-container
                 table.invest-history-table
                   thead
                     tr
@@ -203,33 +218,37 @@ html
     script.
       require(["/static/js/index.js"])
 
-    .space-vertical-ssm
-    .investment-process-container
-      .row
-        .span6.title 投资流程
-        .span6-omega.info 选择网利宝，让您放心！跟随我们，开启您的互联网金融之旅
-      .row
-        .span12.process-container
-      .row
-        .step.first-step
-          .process-title 第一步&nbsp;免费注册
-          .process-content 30秒轻松免费注册成为会员
-        .step.second-step
-          .process-title 第二步&nbsp;进行认证
-          .process-content 完成手机实名认证
-        .step.third-step
-          .process-title 第三步&nbsp;充值账户
-          .process-content 在线充值，免收手续费
-        .step.fourth-step
-          .process-title 第四步&nbsp;成功投标
-          .process-content 按需筛选借款标并进行投标
-        .step.fifth-step
-          .process-title 第五步&nbsp;自动收款
-          .process-content 借款期满后自助回款
-
     .partner-container
       .title 合作伙伴
-      .logo-container
+      ul.partner-logo
+          li
+            a.partner-idg(href="javascript:void(0)",title="IDG资本")
+          li
+            a.partner-baidu(href="javascript:void(0)",title="百度")
+          li
+            a.partner-sina(href="javascript:void(0)",title="新浪")
+          li
+            a.partner-xunlei(href="javascript:void(0)",title="迅雷")
+          li
+            a.partner-minsheng(href="javascript:void(0)",title="中国民生银行")
+          li
+            a.partner-huifu(href="javascript:void(0)",title="汇付天下")
+          li
+            a.partner-ump(href="javascript:void(0)",title="联动优势")
+          li
+            a.partner-pingan(href="javascript:void(0)",title="中国平安")
+          li
+            a.partner-dongyuan(href="javascript:void(0)",title="东源")
+          li
+            a.partner-guoxin(href="javascript:void(0)",title="苏州国信集团")
+          li
+            a.partner-shumi(href="javascript:void(0)",title="数米基金网")
+          li
+            a.partner-lianhe(href="javascript:void(0)",title="联合信用管理有限公司")
+          li
+            a.partner-longan(href="javascript:void(0)",title="隆安律师事务所")
+          li
+
     - with 1 as no_margin
     include include/footer
     - endwith

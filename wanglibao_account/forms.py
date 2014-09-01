@@ -74,6 +74,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             if identifier_type == 'phone':
                 phone = identifier
                 validate_code = self.cleaned_data["validate_code"]
+                print validate_code
                 status, message = validate_validation_code(phone, validate_code)
                 if status != 200:
                     raise forms.ValidationError(

@@ -189,7 +189,7 @@ class WithdrawCompleteView(TemplateView):
             amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             margin = self.request.user.margin.margin
-            if amount > 50000:
+            if amount > 50000 or amount <= 0:
                 raise decimal.DecimalException
             if amount < 50:
                 if amount != margin:

@@ -85,7 +85,8 @@ a.header-button
 
 .user-div
   float: left
-  width: 25%
+  position: relative
+  width: 550px
   vertical-align: middle
 
 .user-info
@@ -140,8 +141,9 @@ a.user-info--register, a.user-info--login
       border-bottom: 1px dotted $color-silver
 
 .topbar
-  background: $color-tundora
-  line-height: 30px
+  background: #595959
+  line-height: 35px
+  height: 35px
   color: $color-text-d5
   font-size: $font-s
 
@@ -150,3 +152,55 @@ a.topbar-anchor
   margin-left: 10px
   font-size: $font-xl
 
+.icon-weibo,
+.icon-weixin
+  display: inline-block
+  overflow: hidden
+  width: $space-m
+  height: $space-m
+  line-height: $space-m
+  background: #2b2b2b url("/static/images/icon-public.png") no-repeat
+  +border-radius(13px)
+  +transition(all .3s ease-in-out)
+
+.icon-weibo
+  background-position: 0 -152px
+
+.icon-weibo:hover
+  background-position: 0 -200px
+  background-color: #d94a39
+
+.icon-weixin
+  background-position: -33px -152px
+
+.icon-weixin:hover
+  background-position: -33px -200px
+  background-color: #0ca001
+
+.icon-login
+  display: inline-block
+  overflow: hidden
+  width: $space-m
+  height: $space-m
+  line-height: $space-m
+  +border-radius(13px)
+  background: #2b2b2b url("/static/images/icon-public.png") no-repeat -69px -153px
+
+.icon-login-yes
+  background-color: #d94a39
+
+.weibo-qr-code
+  position: absolute
+  bottom: 100%
+  top: 35px
+  left: 220px
+  z-index: 9
+
+.weixin-qr-code
+  position: absolute
+  bottom: 100%
+  top: 35px
+  left: 262px
+  z-index: 9
+  width: 164px
+  height: 194px

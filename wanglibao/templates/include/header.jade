@@ -1,17 +1,21 @@
 - load formatters
 .full-container
   .topbar
-    .container
-      i.icon-phone.font-l &nbsp;
-      span 客服热线：
-      span 4008-588-066
+    .container.row
+      .user-div
+        i.icon-phone.font-l &nbsp;
+        span 客服热线：
+        span 4008-588-066
 
-      span.margin-left-m 关注我们：
-      a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank")
-      a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", style="position:relative", data-role="hover", data-target="#qrcode-top")
-        img#qrcode-top(src="/static/images/weixin-nqr.png", style="display:none; position:absolute; z-index:2")
+        span.margin-left-m 关注我们：
+        a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
+        a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
+        a#qrweibo-top.weibo-qr-code(href="javascript:void(0)", style="display:none")
+          img(src="/static/images/weibo-nqr.png")
+        img#qrcode-top.icon.weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none")
 
       .user-info.white#user-info-ajax
+        span.icon.icon-login
         if user.is_authenticated
           span
             a(href="/accounts/home") {{user | display_name}} 的个人中心

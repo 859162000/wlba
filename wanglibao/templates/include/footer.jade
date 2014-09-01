@@ -3,7 +3,7 @@
 
 mixin innerFooter()
   .container
-    .footer-section--container.row
+    .footer-section--container
       dl.footer-section
         img(src="/static/images/logo-footer.png")
       dl.footer-section
@@ -39,10 +39,12 @@ mixin innerFooter()
         p 客服热线 9:00 - 21:00
 
         .space-vertical-s
-        a.weibo-button(href="http://weibo.com/u/5000682691", target="_blank")
+        a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
         .space-s
-        a.weixin-button(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
-          img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none")
+        a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
+        a#qrweibo.footer--weibo-qr-code(href="javascript:void(0)", style="display:none")
+          img(src="/static/images/weibo-qr.png")
+        img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none")
 
   .footer-line
   .footer-bottom
@@ -56,6 +58,25 @@ mixin innerFooter()
 
       include include/login_form
       include include/register_form
+
+.footbar
+  .container.footbar-container
+    span
+    dl.pingan
+      dt 平安银行全额承保
+      dd 网利宝资金账户
+    dl
+      dt 高收益
+      dd 收益是银行活期 30 倍以上
+    dl
+      dt 低门槛
+      dd 100元起理财，0 手续费
+    dl
+      dt 更安全
+      dd 8 重保障 安全理财
+    a.footbar-login(href="#") 登陆
+    .footbar-register
+      a(href="#") 极速注册
 
 
 if no_margin
