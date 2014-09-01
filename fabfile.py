@@ -22,6 +22,7 @@ env.apache_binding_port = 80
 # The env dict will be converted to a env.json and loaded in settings.py
 env.env_dict = {}
 
+
 def production():
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
@@ -97,7 +98,8 @@ if env.get('group') == 'staging':
         'web_private': ['127.0.0.1'],
 
         # task_queue should be ip
-        'task_queue': ['127.0.0.1'],
+        'task_queue': ['staging.wanglibao.com'],
+        'task_queue_private': ['127.0.0.1'],
 
         'db': ['staging.wanglibao.com'],
         'old_lb': [],
@@ -137,7 +139,8 @@ elif env.get('group') == 'dev':
         ],
 
         # Task queue server is the server running rabbitmq or redis.
-        'task_queue': ['192.168.1.43']
+        'task_queue': ['192.168.1.43'],
+        'task_queue_private': ['127.0.0.1']
     }
     dev()
 
@@ -164,6 +167,8 @@ elif env.get('group') == 'production':
         'cron_tab': ['114.215.146.91'],
         'db': [],
         'task_queue': ['114.215.146.91'],
+        'task_queue_private': ['10.164.13.228'],
+
         'huifu_sign_server': ['115.28.151.49']
     }
     production()
@@ -182,17 +187,17 @@ elif env.get('group') == 'pre':
 
         # Web is the server to be deployed with new version
         'web': [
-            '115.28.240.194',
-            '114.215.146.91'
+            '115.28.166.203',
+            '121.42.11.194'
         ],
         'web_private': [
-            '10.161.55.165',
-            '10.164.13.228'
+            '10.144.172.198',
+            '10.165.54.41'
         ],
 
         # Cron tab is the server with crontab running. NOTE: The crontab should be with new version, and only
         # one crontab server should be running at the same time.
-        'cron_tab': ['115.28.240.194'],
+        'cron_tab': ['115.28.166.203'],
 
         # DB is the db servers
         'db': [
@@ -200,7 +205,8 @@ elif env.get('group') == 'pre':
         ],
 
         # Task queue server is the server running rabbitmq or redis.
-        'task_queue': ['115.28.240.194'],
+        'task_queue': ['115.28.166.203'],
+        'task_queue_private': ['10.144.172.198'],
 
         'huifu_sign_server': ['115.28.151.49'],
     }
@@ -457,6 +463,8 @@ def config_apache():
 
                 print yellow('Generating env.json from env.env_dict')
                 task_queue_host = env.roledefs['task_queue'][0]
+                if 'task_queue_private' in env.roledefs:
+                    task_queue_host = env.roledefs['task_queue_private'][0]
 
                 env.env_dict["BROKER_URL"] = "amqp://wanglibao:wanglibank@%(task_queue_host)s/wanglibao" % {
                     'task_queue_host': task_queue_host
