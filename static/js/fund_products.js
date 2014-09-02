@@ -156,8 +156,6 @@
               });
             });
             return self.pager.totalPageNumber(data.num_pages);
-          }).fail(function(xhr, status, error) {
-            return alert(status + error);
           });
         }).extend({
           throttle: 1
