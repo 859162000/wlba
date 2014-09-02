@@ -162,7 +162,10 @@ html
                         else
                           .progress-indicator.disabled(style="width:{{percent | percentage}}")
 
-                      span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                      if status == '抢购中' or status == '满标审核'
+                        span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                      else
+                        span &nbsp;&nbsp; {{percent | percentage}}
                     .span4.align-left
                       span 担保机构: &nbsp;&nbsp;
                       span.d3-text {{product.warrant_company.name}}
