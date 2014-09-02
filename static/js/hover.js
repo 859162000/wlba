@@ -8,23 +8,23 @@
 
   require(['jquery'], function() {
     return $(document).ready(function() {
-      return $('[data-role=hover]').each(function(index, elem) {
-        $(elem).mouseenter(function(e) {
-          var target;
-          e.preventDefault();
-          target = $(e.target).attr('data-target');
-          return $(target).show();
-        });
-        return $(elem).mouseleave(function(e) {
-          var target;
-          e.preventDefault();
-          target = $(e.target).attr('data-target');
-          return $(target).hide();
-        });
+      $('[data-role=hover]').bind('mouseenter', function(e) {
+        var target;
+        e.preventDefault();
+        target = $(e.target).attr('data-target');
+        return $(target).show();
+      }).bind('mouseleave', function(e) {
+        var target;
+        e.preventDefault();
+        target = $(e.target).attr('data-target');
+        return $(target).hide();
+      });
+      return $('[data-name=hoverbox]').bind('mouseenter', function(e) {
+        return $(this).show();
+      }).bind('mouseleave', function(e) {
+        return $(this).hide();
       });
     });
   });
 
 }).call(this);
-
-//# sourceMappingURL=hover.map
