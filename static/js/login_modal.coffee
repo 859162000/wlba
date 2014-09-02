@@ -266,3 +266,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
     if $(this).hasClass("disabled")
       e.preventDefault()
       return
+
+  $('.nologin').click (e)->
+    e.preventDefault()
+    $('.login-modal').trigger('click')
