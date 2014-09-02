@@ -403,7 +403,7 @@ class AdminTransactionP2P(TemplateView):
                 page = 1
             trade_records = pager.page(page)
             return {
-                "trade_records": trade_records,
+                "pay_records": trade_records,
                 "phone": phone
 
             }
