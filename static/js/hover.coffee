@@ -4,17 +4,17 @@ require.config
 
 require ['jquery'], ->
   $(document).ready ->
-    $('[data-role=hover]').each (index, elem)->
-      $(elem).mouseenter (e)->
-        e.preventDefault()
-        target = $(e.target).attr('data-target')
-        $(target).show()
-
-        #$(target).mouseleave (e)->
-        #  e.preventDefault()
-        #  $(e.target).hide()
-
-      $(elem).mouseleave (e)->
-        e.preventDefault()
-        target = $(e.target).attr('data-target')
-        $(target).hide()
+    $('[data-role=hover]').bind('mouseenter',(e)->
+      e.preventDefault()
+      target = $(e.target).attr('data-target')
+      $(target).show()
+    ).bind('mouseleave', (e)->
+      e.preventDefault()
+      target = $(e.target).attr('data-target')
+      $(target).hide()
+    )
+    $('[data-name=hoverbox]').bind('mouseenter',(e)->
+      $(this).show()
+    ).bind('mouseleave', (e)->
+      $(this).hide()
+    )

@@ -302,10 +302,14 @@
         return $(this).attr("checked", "checked");
       }
     });
-    return $("#register_submit").click(function(e) {
+    $("#register_submit").click(function(e) {
       if ($(this).hasClass("disabled")) {
         e.preventDefault();
       }
+    });
+    return $('.nologin').click(function(e) {
+      e.preventDefault();
+      return $('.login-modal').trigger('click');
     });
   });
 
