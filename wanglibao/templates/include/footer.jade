@@ -41,9 +41,9 @@ mixin innerFooter()
         a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
         .space-xs
         a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
-        a#qrweibo.footer--weibo-qr-code(href="javascript:void(0)", style="display:none")
+        a#qrweibo.footer--weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
           img(src="/static/images/weibo-qr.png")
-        img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none")
+        img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none", data-name="hoverbox")
 
   .footer-line
   .footer-bottom
@@ -77,9 +77,7 @@ else
         dd 8 重保障，安全理财
       a.footbar-login.login-modal(href="#login-modal") 登录
       .footbar-register
-        a.register-modal(href="#login-modal")
-          | 极速注册
-          span.icon.icon-footbar-arrow
+        a.register-modal(href="#login-modal") 极速注册
 
 
 if no_margin
