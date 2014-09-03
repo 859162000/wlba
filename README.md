@@ -67,3 +67,15 @@ Deploy
     $ staging: fab deploy --set group=staging
     $ pre: fab deploy --set group=pre
     $ production: fab deploy --set group=production
+
+Query example
+-------------------
+log in to web server through ssh, then run
+
+    source /var/deploy/wanglibao/virt-python/bin/activate
+    cd /var/wsgi/wanglibao/
+    python manage.py shell
+
+1. Get all equity and user's introduced by
+
+    [(e.user.wanglibaouserprofile.phone, e.equity, "".join([str(hasattr(i.introduced_by, "wanglibaouserprofile") and i.introduced_by.wanglibaouserprofile.phone) + " " + i.introduced_by.username for i in e.user.introducedby_set.all()])) for e in p.equities.all()]
