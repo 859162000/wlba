@@ -67,3 +67,8 @@ Deploy
     $ staging: fab deploy --set group=staging
     $ pre: fab deploy --set group=pre
     $ production: fab deploy --set group=production
+
+Query example
+-------------------
+1. Get all equity and user's introduced by
+    [(e.user.wanglibaouserprofile.phone, e.equity, "".join([str(hasattr(i.introduced_by, "wanglibaouserprofile") and i.introduced_by.wanglibaouserprofile.phone) + " " + i.introduced_by.username for i in e.user.introducedby_set.all()])) for e in p.equities.all()]
