@@ -309,11 +309,6 @@ class CardViewSet(ModelViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-
-
 class WithdrawTransactions(TemplateView):
     template_name = 'withdraw_transactions.jade'
 
