@@ -47,7 +47,7 @@ html
             h1.banner-form--title 欢迎来网利宝投资理财
             .space-vertical-s
             p.banner-form--row.font-s 您的登录账户:
-              span.highlight {{user|display_name}}
+              span {{user|display_name}}
             .space-vertical-m
             .banner-form--row.align-center
               a.banner-form--button(href="/accounts/home") 进入我的账户
@@ -61,7 +61,9 @@ html
     .full-container-white
       .investment-process-container
         .row
-          .span6.title 投资流程
+          .span6.title
+            span.icon.icon-process-title
+            |投资流程
           .span6-omega.info 选择网利宝，让您放心！跟随我们，开启您的互联网金融之旅！
         .row
           .step.first-step
@@ -162,7 +164,10 @@ html
                         else
                           .progress-indicator.disabled(style="width:{{percent | percentage}}")
 
-                      span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                      if status == '抢购中' or status == '满标审核'
+                        span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                      else
+                        span &nbsp;&nbsp; {{percent | percentage}}
                     .span4.align-left
                       span 担保机构: &nbsp;&nbsp;
                       span.d3-text {{product.warrant_company.name}}
@@ -199,7 +204,7 @@ html
                     tr
                       th 申购时间
                       th 投资人
-                      th 金额
+                      th.invest-num 金额
                   tbody
                     trade_records = trade_records
                     top = trade_records[:15]
@@ -210,7 +215,8 @@ html
                           p {{trade.create_time | date:"Y-m-d"}}
                         td
                           em {{trade.user | safe_phone}}
-                        td
+                        td.invest-num
+
                           span.money-highlight {{trade.amount}}
                           span 元
                     tbody(style="display:none")
@@ -221,7 +227,7 @@ html
                             p {{trade.create_time | date:"H:i:s"}}
                           td
                             em {{trade.user | safe_phone}}
-                          td
+                          td.invest-num
                             span.money-highlight {{trade.amount}}
                               span 元
 
@@ -229,34 +235,36 @@ html
       require(["/static/js/index.js"])
 
     .partner-container
-      .title 合作伙伴
+      .title
+        span.icon.icon-partner-title
+        |合作伙伴
       ul.partner-logo
           li
-            a.partner-idg(href="javascript:void(0)",title="IDG资本")
+            a.partner-idg(href="http://www.idgvc.com/",target="_blank", title="IDG资本")
           li
-            a.partner-baidu(href="javascript:void(0)",title="百度")
+            a.partner-baidu(href="http://www.baidu.com/",target="_blank",title="百度")
           li
-            a.partner-sina(href="javascript:void(0)",title="新浪")
+            a.partner-sina(href="http://www.sina.com.cn/",target="_blank",title="新浪")
           li
-            a.partner-xunlei(href="javascript:void(0)",title="迅雷")
+            a.partner-xunlei(href="http://www.kankan.com/",target="_blank",title="迅雷")
           li
-            a.partner-minsheng(href="javascript:void(0)",title="中国民生银行")
+            a.partner-minsheng(href="http://www.cmbc.com.cn/",target="_blank",title="中国民生银行")
           li
-            a.partner-huifu(href="javascript:void(0)",title="汇付天下")
+            a.partner-huifu(href="http://www.chinapnr.com/",target="_blank",title="汇付天下")
           li
-            a.partner-ump(href="javascript:void(0)",title="联动优势")
+            a.partner-ump(href="http://www.umpay.com/",target="_blank",title="联动优势")
           li
-            a.partner-pingan(href="javascript:void(0)",title="中国平安")
+            a.partner-pingan(href="http://www.pingan.com/",target="_blank",title="中国平安")
           li
-            a.partner-dongyuan(href="javascript:void(0)",title="东源")
+            a.partner-dongyuan(href="http://www.easternspringcapital.com/",target="_blank",title="东源")
           li
-            a.partner-guoxin(href="javascript:void(0)",title="苏州国信集团")
+            a.partner-guoxin(href="http://www.szguoxin.com/",target="_blank",title="苏州国信集团")
           li
-            a.partner-shumi(href="javascript:void(0)",title="数米基金网")
+            a.partner-shumi(href="http://www.fund123.cn/",target="_blank",title="数米基金网")
           li
-            a.partner-lianhe(href="javascript:void(0)",title="联合信用管理有限公司")
+            a.partner-lianhe(href="http://www.lhcis.com/",target="_blank",title="联合信用管理有限公司")
           li
-            a.partner-longan(href="javascript:void(0)",title="隆安律师事务所")
+            a.partner-longan(href="http://www.longanlaw.com/",target="_blank",title="隆安律师事务所")
           li
 
     - with 1 as no_margin

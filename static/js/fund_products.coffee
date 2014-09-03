@@ -142,8 +142,6 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/pager', 'mode
             _.map(items.results, (item)->new fund.viewModel({data:item}))
           )
           self.pager.totalPageNumber data.num_pages
-        ).fail( (xhr, status, error)->
-          alert(status + error)
         )
       .extend {throttle: 1}
   viewModel = new DataViewModel()
