@@ -10,7 +10,7 @@ html
     meta(name="keywords", content="安全保障")
     meta(name="description", content="没有最安全，只有更安全")
 
-  body
+  body.white-background
     include include/header
     - with '安全保障' as activeItem
     include include/navigation
@@ -21,13 +21,22 @@ html
       //tabs start
       //tabs end
 
-      //全平台保障策略
-      //start
-      //end
+      .container
+        //全平台保障策略
+        //start
+        .security-panel
+          .security-panel-title
+            .security-panel-center
+              h2 全平台保障策略
+        //end
 
-      //项目本息担保计划
-      //start
-      //end
+        //项目本息担保计划
+        //start
+        .security-panel
+          .security-panel-title
+            .security-panel-center
+              h2 项目本息担保计划
+        //end
 
 
 
