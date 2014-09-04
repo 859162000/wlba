@@ -148,3 +148,57 @@
             width: 60px
             left: 60px
             top: 10px
+
+
+.security-foot-container
+  +clearfix
+  margin-top: 65px
+  margin-bottom: 50px
+  padding: $space-xl 0
+  +border-radius(10px)
+  border: solid 1px #cccccc
+
+  .security-foot-panel
+    float: left
+    margin-left: 40px
+    margin-right: 40px
+    text-align: center
+    font-size: $font-s
+    line-height: 2
+
+    &:nth-child(1)
+      width: 320px
+    &:nth-child(2)
+      width: 250px
+    &:nth-child(3)
+      width: 286px
+
+    h3
+      color: $color-text-d2
+
+    p
+      text-align: left
+      font-size: $font-s
+      color: $color-text-d3
+
+    .security-foot-cash
+      background: url("/static/images/security/icon_security.png") -155px -98px no-repeat
+      width: 165px
+      height: 103px
+      margin: 30px auto
+
+    .security-foot-pingan
+      background: url("/static/images/security/icon_security.png") -97px -207px no-repeat
+      width: 99px
+      height: 113px
+      margin: 25px auto
+
+    .security-foot-law
+      background: url("/static/images/security/icon_security.png") -201px -207px no-repeat
+      width: 119px
+      height: 113px
+      margin: 25px auto
+
+
+.border-no
+  border: 0
