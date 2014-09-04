@@ -303,9 +303,14 @@ class AccountHomeAPIView(APIView):
         p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
 
         unpayed_principle = 0
+        total_paid_interest = 0   # 累积收益
+        total_unpaid_interest = 0 # 待收益
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal
+                total_paid_interest += equity.paid_interest
+                total_unpaid_interest += equity.unpaid_interest
+
 
         p2p_margin = request.user.margin.margin
         p2p_freeze = request.user.margin.freeze
@@ -317,9 +322,11 @@ class AccountHomeAPIView(APIView):
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
         fund_total_asset = 0
         income_rate = 0
+        total_unpaid_income = 0
         if fund_hold_info.exists():
             for hold_info in fund_hold_info:
                 fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+                total_unpaid_income += hold_info.unpaid_income
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
@@ -336,11 +343,14 @@ class AccountHomeAPIView(APIView):
             'p2p_freeze': p2p_freeze,
             'p2p_withdrawing': p2p_withdrawing,
             'p2p_unpayed_principle': p2p_unpayed_principle,
+            'total_paid_interest': total_paid_interest,
             'fund_total_asset': fund_total_asset,
             'total_income': total_income,
             'fund_income_week': fund_income_week,
             'fund_income_month': fund_income_month,
             'income_rate': income_rate,
+            'total_unpaid_income': total_unpaid_income,
+            'total_unpaid_interest': total_unpaid_interest,
         }
 
         return Response(res)
@@ -366,12 +376,14 @@ class AccountP2PRecordAPI(APIView):
         p2p_records = []
         for equity in p2p_equities:
             obj = {
-               'created_at':  equity.created_at,
-               'product_short_name': equity.product.short_name,
-               'product_expected_earning_rate': equity.product.expected_earning_rate,
+               'equity_created_at':  equity.created_at,
+               'equity_product_short_name': equity.product.short_name,
+               'equity_product_expected_earning_rate': equity.product.expected_earning_rate,
                'equity_product_period': equity.product.period,
                'equity_equity': equity.equity,
                'equity_product_display_status':equity.product.display_status,
+               'equity_paid_interest': equity.paid_interest,
+               'equity_product_amortization_count': equity.product.amortization_count,
             }
             p2p_records.append(obj)
         res = {
@@ -410,13 +422,14 @@ class AccountFundRecordAPI(APIView):
                 'fund_unpaid_income': fund.unpaid_income,
             }
             obj.append(obj)
+
         res = {
-            'total_counts': fund_records.paginator.count,
-            'total_page': round(fund_records.paginator.count / fund_records.paginator.per_page),
-            'per_page_number': fund_records.paginator.per_page,
-            'pre_page': fund_records.previous_page_number() if fund_records.has_previous() else None,
-            'next_page': fund_records.next_page_number() if fund_records.has_next() else None,
-            'p2p_records': fund_records,
+            'total_counts': fund_hold_info.paginator.count,
+            'total_page': round(fund_hold_info.paginator.count / fund_hold_info.paginator.per_page),
+            'per_page_number': fund_hold_info.paginator.per_page,
+            'pre_page': fund_hold_info.previous_page_number() if fund_hold_info.has_previous() else None,
+            'next_page': fund_hold_info.next_page_number() if fund_hold_info.has_next() else None,
+            'fund_records': fund_records,
         }
         return Response(res)
 
@@ -429,9 +442,13 @@ class AccountP2PAssetAPI(APIView):
         p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
 
         unpayed_principle = 0
+        total_paid_interest = 0
+        total_unpaid_interest = 0
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal
+                total_paid_interest += equity.paid_interest
+                total_unpaid_interest += equity.unpaid_interest
 
         p2p_margin = request.user.margin.margin
         p2p_freeze = request.user.margin.freeze
@@ -446,6 +463,8 @@ class AccountP2PAssetAPI(APIView):
             'p2p_freeze': p2p_freeze,
             'p2p_withdrawing': p2p_withdrawing,
             'p2p_unpayed_principle': p2p_unpayed_principle,
+            'total_paid_interest': total_paid_interest,
+            'total_unpaid_interest': total_unpaid_interest,
         }
         return Response(res)
 
@@ -457,9 +476,11 @@ class AccountFundAssetAPI(APIView):
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
         fund_total_asset = 0
         income_rate = 0
+        total_unpaid_income = 0
         if fund_hold_info.exists():
             for hold_info in fund_hold_info:
                 fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+                total_unpaid_income += hold_info.unpaid_income
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
@@ -474,6 +495,7 @@ class AccountFundAssetAPI(APIView):
             'fund_income_week': fund_income_week,
             'fund_income_month': fund_income_month,
             'income_rate': income_rate,
+            'total_unpaid_income': total_unpaid_income,
         }
         return Response(res)
 
