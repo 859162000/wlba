@@ -295,6 +295,20 @@ class CardViewSet(ModelViewSet):
         })
 
 
+    def destroy(self, request, pk=None):
+        card_id = request.DATA.get('card_id', '')
+        card = Card.objects.filter(id=card_id)
+        if card:
+            card.delete()
+            return Response({
+            'id': card_id
+             })
+        else:
+            return Response({
+                "message": u"查不到银行卡，请联系管理员",
+                'error_number': ErrorNumber.duplicate
+            }, status=status.HTTP_400_BAD_REQUEST)
+
 class WithdrawTransactions(TemplateView):
     template_name = 'withdraw_transactions.jade'
 

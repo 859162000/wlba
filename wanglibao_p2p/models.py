@@ -261,6 +261,7 @@ class AmortizationReadyManager(models.Manager):
 
 
 class ProductAmortization(models.Model):
+
     version = IntegerVersionField()
 
     product = models.ForeignKey(P2PProduct, related_name='amortizations')
