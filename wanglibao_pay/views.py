@@ -260,7 +260,7 @@ class CardViewSet(ModelViewSet):
 
     @property
     def allowed_methods(self):
-        return 'POST', 'DELETE'
+        return 'POST'
 
     def create(self, request):
         card = Card()
@@ -294,6 +294,7 @@ class CardViewSet(ModelViewSet):
             'bank_name': card.bank.name
         })
 
+
     def destroy(self, request, pk=None):
         card_id = request.DATA.get('card_id', '')
         card = Card.objects.filter(id=card_id)
@@ -307,7 +308,6 @@ class CardViewSet(ModelViewSet):
                 "message": u"查不到银行卡，请联系管理员",
                 'error_number': ErrorNumber.duplicate
             }, status=status.HTTP_400_BAD_REQUEST)
-
 
 class WithdrawTransactions(TemplateView):
     template_name = 'withdraw_transactions.jade'
@@ -387,7 +387,6 @@ class WithdrawRollback(TemplateView):
         """
         return super(WithdrawRollback, self).dispatch(request, *args, **kwargs)
 
-
 class AdminTransaction(TemplateView):
     template_name = 'admin_transaction.jade'
 
@@ -401,9 +400,6 @@ class AdminTransactionP2P(TemplateView):
         if phone:
             try:
                 user_profile = WanglibaoUserProfile.objects.get(phone=phone)
-
-                print user_profile.user
-
             except WanglibaoUserProfile.DoesNotExist:
                 return {
                     'message': u"手机号 %s 有误，请输入合法的手机号" % phone

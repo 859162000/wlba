@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
@@ -69,7 +70,7 @@ class P2PDetailView(TemplateView):
 
 
 class PurchaseP2P(APIView):
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     @property
     def allowed_methods(self):
