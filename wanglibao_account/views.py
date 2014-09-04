@@ -302,31 +302,30 @@ class AccountHomeAPIView(APIView):
         user=request.user
         p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
 
-        unpayed_principle = 0
-        total_paid_interest = 0   # 累积收益
-        total_unpaid_interest = 0 # 待收益
+        unpayed_principle = 0           # 待收本金
+        p2p_total_paid_interest = 0     # 累积收益
+        p2p_total_unpaid_interest = 0   # 待收益
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal
-                total_paid_interest += equity.paid_interest
-                total_unpaid_interest += equity.unpaid_interest
+                p2p_total_paid_interest += equity.paid_interest
+                p2p_total_unpaid_interest += equity.unpaid_interest
 
-
-        p2p_margin = request.user.margin.margin
-        p2p_freeze = request.user.margin.freeze
-        p2p_withdrawing = request.user.margin.withdrawing
-        p2p_unpayed_principle = unpayed_principle
+        p2p_margin = user.margin.margin             # P2P余额
+        p2p_freeze = user.margin.freeze             # P2P投资中冻结金额
+        p2p_withdrawing = user.margin.withdrawing   # P2P提现中冻结金额
+        p2p_unpayed_principle = unpayed_principle   # P2P待收本金
 
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
         fund_total_asset = 0
         income_rate = 0
-        total_unpaid_income = 0
+        fund_total_unpaid_income = 0
         if fund_hold_info.exists():
             for hold_info in fund_hold_info:
                 fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
-                total_unpaid_income += hold_info.unpaid_income
+                fund_total_unpaid_income += hold_info.unpaid_income
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
@@ -337,20 +336,20 @@ class AccountHomeAPIView(APIView):
             income_rate = total_income / fund_total_asset
 
         res = {
-            'total_asset': p2p_total_asset + fund_total_asset,
-            'p2p_total_asset': p2p_total_asset,
-            'p2p_margin': p2p_margin,
-            'p2p_freeze': p2p_freeze,
-            'p2p_withdrawing': p2p_withdrawing,
-            'p2p_unpayed_principle': p2p_unpayed_principle,
-            'total_paid_interest': total_paid_interest,
-            'fund_total_asset': fund_total_asset,
-            'total_income': total_income,
-            'fund_income_week': fund_income_week,
-            'fund_income_month': fund_income_month,
-            'income_rate': income_rate,
-            'total_unpaid_income': total_unpaid_income,
-            'total_unpaid_interest': total_unpaid_interest,
+            'total_asset': p2p_total_asset + fund_total_asset,      # 总资产
+            'p2p_total_asset': p2p_total_asset,                     # p2p总资产
+            'p2p_margin': p2p_margin,                               # P2P余额
+            'p2p_freeze': p2p_freeze,                               # P2P投资中冻结金额
+            'p2p_withdrawing': p2p_withdrawing,                     # P2P提现中冻结金额
+            'p2p_unpayed_principle': p2p_unpayed_principle,         # P2P待收本金
+            'p2p_total_unpaid_interest': p2p_total_unpaid_interest, # P2P待收益
+            'p2p_total_paid_interest': p2p_total_paid_interest,     # P2P总收益
+            'fund_total_asset': fund_total_asset,                   # 基金总资产
+            'fund_total_income': total_income,                      # 基金累积收益
+            'fund_income_week': fund_income_week,                   # 基金近一周收益(元)
+            'fund_income_month': fund_income_month,                 # 基金近一月收益(元)
+            'fund_income_rate': income_rate,
+            'fund_total_unpaid_income': fund_total_unpaid_income,        # 待收益
         }
 
         return Response(res)
@@ -407,6 +406,7 @@ class AccountFundRecordAPI(APIView):
         limit = 20
         paginator = Paginator(fund_hold_info, limit)
         page = request.GET.get('page')
+
         try:
             fund_hold_info = paginator.page(page)
         except PageNotAnInteger:
@@ -442,29 +442,29 @@ class AccountP2PAssetAPI(APIView):
         p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
 
         unpayed_principle = 0
-        total_paid_interest = 0
-        total_unpaid_interest = 0
+        p2p_total_paid_interest = 0
+        p2p_total_unpaid_interest = 0
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal
-                total_paid_interest += equity.paid_interest
-                total_unpaid_interest += equity.unpaid_interest
+                p2p_total_paid_interest += equity.paid_interest
+                p2p_total_unpaid_interest += equity.unpaid_interest
 
-        p2p_margin = request.user.margin.margin
-        p2p_freeze = request.user.margin.freeze
-        p2p_withdrawing = request.user.margin.withdrawing
+        p2p_margin = user.margin.margin
+        p2p_freeze = user.margin.freeze
+        p2p_withdrawing = user.margin.withdrawing
         p2p_unpayed_principle = unpayed_principle
 
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
         res = {
-            'p2p_total_asset': p2p_total_asset,
-            'p2p_margin': p2p_margin,
-            'p2p_freeze': p2p_freeze,
-            'p2p_withdrawing': p2p_withdrawing,
-            'p2p_unpayed_principle': p2p_unpayed_principle,
-            'total_paid_interest': total_paid_interest,
-            'total_unpaid_interest': total_unpaid_interest,
+            'p2p_total_asset': p2p_total_asset,                     #总资产
+            'p2p_margin': p2p_margin,                               # P2P余额
+            'p2p_freeze': p2p_freeze,                               # P2P投资中冻结金额
+            'p2p_withdrawing': p2p_withdrawing,                     # P2P提现中冻结金额
+            'p2p_unpayed_principle': p2p_unpayed_principle,         # P2P待收本金
+            'p2p_total_unpaid_interest': p2p_total_unpaid_interest, # P2P待收益
+            'p2p_total_paid_interest': p2p_total_paid_interest,     # P2P总收益
         }
         return Response(res)
 
@@ -476,11 +476,11 @@ class AccountFundAssetAPI(APIView):
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
         fund_total_asset = 0
         income_rate = 0
-        total_unpaid_income = 0
+        fund_total_unpaid_income = 0
         if fund_hold_info.exists():
             for hold_info in fund_hold_info:
                 fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
-                total_unpaid_income += hold_info.unpaid_income
+                fund_total_unpaid_income += hold_info.unpaid_income
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
@@ -490,12 +490,12 @@ class AccountFundAssetAPI(APIView):
         if fund_total_asset != 0:
             income_rate = total_income / fund_total_asset
         res = {
-            'fund_total_asset': fund_total_asset,
-            'total_income': total_income,
-            'fund_income_week': fund_income_week,
-            'fund_income_month': fund_income_month,
-            'income_rate': income_rate,
-            'total_unpaid_income': total_unpaid_income,
+            'fund_total_asset': fund_total_asset,                   # 基金总资产
+            'fund_total_income': total_income,                      # 基金累积收益
+            'fund_income_week': fund_income_week,                   # 基金近一周收益(元)
+            'fund_income_month': fund_income_month,                 # 基金近一月收益(元)
+            'fund_income_rate': income_rate,
+            'fund_total_unpaid_income': fund_total_unpaid_income,   # 待收益
         }
         return Response(res)
 
