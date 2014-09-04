@@ -32,7 +32,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         number: '请输入有效金额'
 
     errorPlacement: (error, element) ->
-      error.appendTo $(element).closest('.form-row').find('.form-row-error')
+      error.appendTo $(element).closest('.form-row__middle').find('.form-row-error')
 
     submitHandler: (form)->
       tip = '您的投资金额为:' + $('input[name=amount]').val() + '元'
