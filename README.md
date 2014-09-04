@@ -79,3 +79,12 @@ log in to web server through ssh, then run
 1. Get all equity and user's introduced by
 
     [(e.user.wanglibaouserprofile.phone, e.equity, "".join([str(hasattr(i.introduced_by, "wanglibaouserprofile") and i.introduced_by.wanglibaouserprofile.phone) + " " + i.introduced_by.username for i in e.user.introducedby_set.all()])) for e in p.equities.all()]
+
+
+New Contract Template
+------------------
+
+    1. Create a jade under wanglibao_p2p/templates/xxx.jade
+    2. in shell: pyjade wanglibao_p2p/templates/xxx.jade 
+    3. Copy the generated html
+    4. Open /admin, under p2p contract, create a new contract, give it a name and paste the generated html into content
