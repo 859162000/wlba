@@ -5,14 +5,13 @@ import json
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
 from django.core import serializers
-from django.db.models import Q
-
+from django.db.models import Q, Sum, F
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.db.models import Sum, F
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, \
     HttpResponseNotFound, Http404
 from django.shortcuts import resolve_url, render
@@ -44,6 +43,7 @@ from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
 from django.forms.models import model_to_dict
+
 
 logger = logging.getLogger(__name__)
 
@@ -295,12 +295,196 @@ class AccountHome(TemplateView):
         }
 
 
+class AccountHomeAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, format=None):
+        user=request.user
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
+
+        unpayed_principle = 0
+        for equity in p2p_equities:
+            if equity.confirm:
+                unpayed_principle += equity.unpaid_principal
+
+        p2p_margin = request.user.margin.margin
+        p2p_freeze = request.user.margin.freeze
+        p2p_withdrawing = request.user.margin.withdrawing
+        p2p_unpayed_principle = unpayed_principle
+
+        p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
+
+        fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+        fund_total_asset = 0
+        income_rate = 0
+        if fund_hold_info.exists():
+            for hold_info in fund_hold_info:
+                fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+
+        today = timezone.datetime.today()
+        total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+
+        if fund_total_asset != 0:
+            income_rate = total_income / fund_total_asset
+
+        res = {
+            'total_asset': p2p_total_asset + fund_total_asset,
+            'p2p_total_asset': p2p_total_asset,
+            'p2p_margin': p2p_margin,
+            'p2p_freeze': p2p_freeze,
+            'p2p_withdrawing': p2p_withdrawing,
+            'p2p_unpayed_principle': p2p_unpayed_principle,
+            'fund_total_asset': fund_total_asset,
+            'total_income': total_income,
+            'fund_income_week': fund_income_week,
+            'fund_income_month': fund_income_month,
+            'income_rate': income_rate,
+        }
+
+        return Response(res)
+
+
+class AccountP2PRecordAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        user=request.user
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
+
+        limit = 20
+        paginator = Paginator(p2p_equities, limit)
+        page = request.GET.get('page')
+        try:
+            p2p_equities = paginator.page(page)
+        except PageNotAnInteger:
+            p2p_equities = paginator.page(1)
+        except Exception:
+            p2p_equities = paginator.page(paginator.num_pages)
+
+        p2p_records = []
+        for equity in p2p_equities:
+            obj = {
+               'created_at':  equity.created_at,
+               'product_short_name': equity.product.short_name,
+               'product_expected_earning_rate': equity.product.expected_earning_rate,
+               'equity_product_period': equity.product.period,
+               'equity_equity': equity.equity,
+               'equity_product_display_status':equity.product.display_status,
+            }
+            p2p_records.append(obj)
+        res = {
+            'total_counts': p2p_equities.paginator.count,
+            'total_page': round(p2p_equities.paginator.count / p2p_equities.paginator.per_page),
+            'per_page_number': p2p_equities.paginator.per_page,
+            'pre_page': p2p_equities.previous_page_number() if p2p_equities.has_previous() else None,
+            'next_page': p2p_equities.next_page_number() if p2p_equities.has_next() else None,
+            'p2p_records': p2p_records,
+        }
+        return Response(res)
+
+
+class AccountFundRecordAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        user=request.user
+        fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+
+        limit = 20
+        paginator = Paginator(fund_hold_info, limit)
+        page = request.GET.get('page')
+        try:
+            fund_hold_info = paginator.page(page)
+        except PageNotAnInteger:
+            fund_hold_info = paginator.page(1)
+        except Exception:
+            fund_hold_info = paginator.page(paginator.num_pages)
+
+        fund_records = []
+        for fund in fund_hold_info:
+            obj = {
+                'fund_fund_name': fund.fund_name,
+                'fund_current_remain_share': fund.current_remain_share,
+                'fund_unpaid_income': fund.unpaid_income,
+            }
+            obj.append(obj)
+        res = {
+            'total_counts': fund_records.paginator.count,
+            'total_page': round(fund_records.paginator.count / fund_records.paginator.per_page),
+            'per_page_number': fund_records.paginator.per_page,
+            'pre_page': fund_records.previous_page_number() if fund_records.has_previous() else None,
+            'next_page': fund_records.next_page_number() if fund_records.has_next() else None,
+            'p2p_records': fund_records,
+        }
+        return Response(res)
+
+
+class AccountP2PAssetAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        user=request.user
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
+
+        unpayed_principle = 0
+        for equity in p2p_equities:
+            if equity.confirm:
+                unpayed_principle += equity.unpaid_principal
+
+        p2p_margin = request.user.margin.margin
+        p2p_freeze = request.user.margin.freeze
+        p2p_withdrawing = request.user.margin.withdrawing
+        p2p_unpayed_principle = unpayed_principle
+
+        p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
+
+        res = {
+            'p2p_total_asset': p2p_total_asset,
+            'p2p_margin': p2p_margin,
+            'p2p_freeze': p2p_freeze,
+            'p2p_withdrawing': p2p_withdrawing,
+            'p2p_unpayed_principle': p2p_unpayed_principle,
+        }
+        return Response(res)
+
+class AccountFundAssetAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        user = request.user
+        fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+        fund_total_asset = 0
+        income_rate = 0
+        if fund_hold_info.exists():
+            for hold_info in fund_hold_info:
+                fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+
+        today = timezone.datetime.today()
+        total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+
+        if fund_total_asset != 0:
+            income_rate = total_income / fund_total_asset
+        res = {
+            'fund_total_asset': fund_total_asset,
+            'total_income': total_income,
+            'fund_income_week': fund_income_week,
+            'fund_income_month': fund_income_month,
+            'income_rate': income_rate,
+        }
+        return Response(res)
+
+
 class FundInfoAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
 
         user = self.request.user
+
 
         try:
             fetcher = UserInfoFetcher(user)
