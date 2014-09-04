@@ -22,10 +22,73 @@
 .security-panel-center
   @extend .container
 
+.security-content
+  font-size: $font-s
+
+  h3
+    font-size: $font-xl
+    line-height: 60px
+
+  p
+    font-size: $font-s
+    line-height: 1.8
+    color: #7d7d7d
+    padding-bottom: 20px
+
+  i
+    margin-right: 28px
 
 .security-panel
   background-color: #fff
 
+.security-panel-container
+  @extend .security-panel
+  height: 360px
+  border-bottom: solid 1px $color-mercury
+
+.security-num-01
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.png") 0 0 no-repeat
+  margin-top: 85px
+
+.security-num-02
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.png") -82px 0 no-repeat
+  margin-top: 80px
+
+.security-num-03
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.png") -164px 0 no-repeat
+  margin-top: 40px
+
+.security-num-04
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.png") -246px 0 no-repeat
+  margin-top: 40px
+
+.security-num-05
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.png") -328px 0 no-repeat
+  margin-top: 70px
+
+.icon-circle
+  width: 25px
+  height: 27px
+  background: url("/static/images/security/icon_security.png") 0 -50px no-repeat
+  top: -2px
+  margin-right: 6px
+
+  .icon-check-mark
+    width: 22px
+    height: 21px
+    background: url("/static/images/security/icon_security.png") 0 -80px no-repeat
+    top: -3px
+    left: 4px
 
 .security-panel-title
   height: 92px
