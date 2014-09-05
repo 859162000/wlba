@@ -358,7 +358,7 @@ class AccountHomeAPIView(APIView):
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
+    def get(self, request, format=None):
         user=request.user
         p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
 
@@ -372,21 +372,22 @@ class AccountP2PRecordAPI(APIView):
         except Exception:
             p2p_equities = paginator.page(paginator.num_pages)
 
-        p2p_records = []
-        for equity in p2p_equities:
-            obj = {
-               'equity_created_at':  equity.created_at,                                         # 投标时间
-               'equity_product_short_name': equity.product.short_name,                          # 产品名称
-               'equity_product_expected_earning_rate': equity.product.expected_earning_rate,    # 年化收益(%)
-               'equity_product_period': equity.product.period,                                  # 产品期限(月)*
-               'equity_equity': equity.equity,                                                  # 用户所持份额(投资金额)
-               'equity_product_display_status': equity.product.display_status,                  # 状态
-               'equity_term': equity.term,                                                      # 还款期
-               'equity_product_amortization_count': equity.product.amortization_count,          # 还款期数
-               'equity_paid_interest': equity.paid_interest,                                    # 单个已经收益
-               'equity_total_interest': equity.total_interest,                                  # 单个预期收益
-            }
-            p2p_records.append(obj)
+        p2p_records = [{
+                    'equity': equity.id,
+                    'equity_created_at':  equity.created_at,                                         # 投标时间
+                    'equity_product_short_name': equity.product.short_name,                          # 产品名称
+                    'equity_product_expected_earning_rate': equity.product.expected_earning_rate,    # 年化收益(%)
+                    'equity_product_period': equity.product.period,                                  # 产品期限(月)*
+                    'equity_equity': equity.equity,                                                  # 用户所持份额(投资金额)
+                    'equity_product_display_status': equity.product.display_status,                  # 状态
+                    'equity_term': equity.term,                                                      # 还款期
+                    'equity_product_amortization_count': equity.product.amortization_count,          # 还款期数
+                    'equity_paid_interest': equity.paid_interest,                                    # 单个已经收益
+                    'equity_total_interest': equity.total_interest,                                  # 单个预期收益
+                    'equity_contract': 'https://%s/accounts/p2p/contract/%s/' % (request.get_host(), equity.product.id)
+            } for equity in p2p_equities]
+
+
         res = {
             'total_counts': p2p_equities.paginator.count,                                               # 总条目数
             'total_page': round(p2p_equities.paginator.count / p2p_equities.paginator.per_page),        # 总页数
@@ -401,7 +402,7 @@ class AccountP2PRecordAPI(APIView):
 class AccountFundRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
+    def get(self, request, format=None):
         user=request.user
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
 
@@ -416,15 +417,12 @@ class AccountFundRecordAPI(APIView):
         except Exception:
             fund_hold_info = paginator.page(paginator.num_pages)
 
-        fund_records = []
-        for fund in fund_hold_info:
-            obj = {
+        fund_records = [{
                 'fund_fund_name': fund.fund_name,                               # 基金产品名称
                 'fund_current_remain_share': fund.current_remain_share,         # 当前份额余额
                 'fund_unpaid_income': fund.unpaid_income,                       # 未付收益
                 'fund_code': fund.fund_code,                                    # 基金代码
-            }
-            obj.append(obj)
+            } for fund in fund_hold_info]
 
         res = {
             'total_counts': fund_hold_info.paginator.count,
@@ -440,7 +438,7 @@ class AccountFundRecordAPI(APIView):
 class AccountP2PAssetAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
+    def get(self, request, format=None):
         user=request.user
         p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
 
@@ -463,6 +461,7 @@ class AccountP2PAssetAPI(APIView):
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
         res = {
+
             'p2p_total_asset': p2p_total_asset,                     # 总资产
             'p2p_margin': p2p_margin,                               # P2P余额
             'p2p_freeze': p2p_freeze,                               # P2P投资中冻结金额
@@ -479,7 +478,7 @@ class AccountP2PAssetAPI(APIView):
 class AccountFundAssetAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
+    def get(self, request, format=None):
         user = request.user
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
         fund_total_asset = 0
@@ -794,6 +793,30 @@ class P2PAmortizationView(TemplateView):
             'equity': equity,
             'amortizations': amortizations
         }
+
+class P2PAmortizationAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, **kwargs):
+        user = request.user
+        product_id = kwargs['product_id']
+        equity = P2PEquity.objects.filter(user=user, product_id=product_id).prefetch_related('product').first()
+        amortizations = UserAmortization.objects.filter(user=self.request.user, product_amortization__product_id=product_id)
+
+        amortization_record = [{
+                'amortization_term_date': amortization.term_date,                       # 还款时间
+                'amortization_principal': amortization.principal,                       # 本金
+                'amortization_amount_interest':amortization.interest,                   # 利息
+                'amortization_amount': amortization.principal + amortization.interest,  # 总记
+            } for amortization in amortizations ]
+
+        res = {
+            'equity_product_short_name': equity.product.short_name,                     # 还款标题
+            'equity_product_serial_number': equity.product.serial_number,               # 还款计划编号
+            'amortization_record': amortization_record
+
+        }
+        return Response(res)
 
 
 @login_required
