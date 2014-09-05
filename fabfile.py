@@ -24,6 +24,7 @@ env.env_dict = {}
 
 
 def production():
+    env.user = 'lishuo'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
@@ -41,6 +42,7 @@ def production():
 
 
 def pre_production():
+    env.user = 'lishuo'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
