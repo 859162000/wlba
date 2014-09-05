@@ -360,42 +360,49 @@ class AccountP2PRecordAPI(APIView):
 
     def get(self, request, format=None):
         user=request.user
-        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
+        # p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
+        p2p_equities = P2PEquity.objects.filter(user=user).all().select_related('product')
 
-        limit = 20
-        paginator = Paginator(p2p_equities, limit)
+
         page = request.GET.get('page')
-        try:
-            p2p_equities = paginator.page(page)
-        except PageNotAnInteger:
-            p2p_equities = paginator.page(1)
-        except Exception:
-            p2p_equities = paginator.page(paginator.num_pages)
+
+        if int(page) != 0:
+
+            limit = 2
+            paginator = Paginator(p2p_equities, limit)
+
+            try:
+                p2p_equities = paginator.page(page)
+            except PageNotAnInteger:
+                p2p_equities = paginator.page(1)
+            except Exception:
+                p2p_equities = paginator.page(paginator.num_pages)
 
         p2p_records = [{
-                    'equity': equity.id,
-                    'equity_created_at':  equity.created_at,                                         # 投标时间
-                    'equity_product_short_name': equity.product.short_name,                          # 产品名称
-                    'equity_product_expected_earning_rate': equity.product.expected_earning_rate,    # 年化收益(%)
-                    'equity_product_period': equity.product.period,                                  # 产品期限(月)*
-                    'equity_equity': equity.equity,                                                  # 用户所持份额(投资金额)
-                    'equity_product_display_status': equity.product.display_status,                  # 状态
-                    'equity_term': equity.term,                                                      # 还款期
-                    'equity_product_amortization_count': equity.product.amortization_count,          # 还款期数
-                    'equity_paid_interest': equity.paid_interest,                                    # 单个已经收益
-                    'equity_total_interest': equity.total_interest,                                  # 单个预期收益
-                    'equity_contract': 'https://%s/accounts/p2p/contract/%s/' % (request.get_host(), equity.product.id)
+                    'equity_created_at':  timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),          # 投标时间
+                    'equity_product_short_name': equity.product.short_name,                                             # 产品名称
+                    'equity_product_expected_earning_rate': equity.product.expected_earning_rate,                       # 年化收益(%)
+                    'equity_product_period': equity.product.period,                                                     # 产品期限(月)*
+                    'equity_equity': equity.equity,                                                                     # 用户所持份额(投资金额)
+                    'equity_product_display_status': equity.product.display_status,                                     # 状态
+                    'equity_term': equity.term,                                                                         # 还款期
+                    'equity_product_amortization_count': equity.product.amortization_count,                             # 还款期数
+                    'equity_paid_interest': equity.paid_interest,                                                       # 单个已经收益
+                    'equity_total_interest': equity.total_interest,                                                     # 单个预期收益
+                    'equity_contract': 'https://%s/accounts/p2p/contract/%s/' % (request.get_host(), equity.product.id) # 合同
             } for equity in p2p_equities]
 
-
-        res = {
-            'total_counts': p2p_equities.paginator.count,                                               # 总条目数
-            'total_page': round(p2p_equities.paginator.count / p2p_equities.paginator.per_page),        # 总页数
-            'per_page_number': p2p_equities.paginator.per_page,                                         # 每页显示条数
-            'pre_page': p2p_equities.previous_page_number() if p2p_equities.has_previous() else None,   # 前一页页码
-            'next_page': p2p_equities.next_page_number() if p2p_equities.has_next() else None,          # 后一页页码
-            'p2p_records': p2p_records,
-        }
+        if int(page) != 0:
+            res = {
+                'total_counts': p2p_equities.paginator.count,                                               # 总条目数
+                'total_page': round(p2p_equities.paginator.count / p2p_equities.paginator.per_page),        # 总页数
+                'per_page_number': p2p_equities.paginator.per_page,                                         # 每页显示条数
+                'pre_page': p2p_equities.previous_page_number() if p2p_equities.has_previous() else None,   # 前一页页码
+                'next_page': p2p_equities.next_page_number() if p2p_equities.has_next() else None,          # 后一页页码
+                'p2p_records': p2p_records,
+            }
+        else:
+            res = p2p_records
         return Response(res)
 
 
