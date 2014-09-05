@@ -11,11 +11,102 @@
   });
 
   require(['jquery', 'jquery.scroll'], function($, scroll) {
-    $(window).bind('scrollstart', function() {
-      console.log('start');
+    var events, util;
+    util = {
+      getDistanceFromBottom: function(ele) {
+        var distance, wheight;
+        wheight = $(window).height();
+        distance = ele.offset().top - $(window).scrollTop();
+        return wheight - distance;
+      },
+      orders: 0,
+      pipeflow: function() {
+        var mheight, mtds, pheight, pipeline, pwidth, speed, step;
+        step = 5;
+        pwidth = 820;
+        mheight = 108;
+        pheight = 170;
+        speed = 50;
+        pipeline = $('.pipeline_01 .pipeline');
+        mtds = [
+          function() {
+            var currenth;
+            currenth = pipeline.height() + step;
+            pipeline.height(currenth);
+            if (pipeline.height() >= mheight) {
+              util.orders++;
+            }
+            return setTimeout(util.pipeflow, speed);
+          }, function() {
+            var currentw;
+            currentw = pipeline.width() + step;
+            pipeline.width(currentw);
+            if (pipeline.width() >= pwidth) {
+              util.orders++;
+            }
+            return setTimeout(util.pipeflow, speed);
+          }, function() {
+            var currenth;
+            currenth = pipeline.height() + step;
+            pipeline.height(currenth);
+            if (pipeline.height() < pheight) {
+              return setTimeout(util.pipeflow, speed);
+            }
+          }
+        ];
+        mtds[util.orders].call(this);
+      }
+    };
+    events = {
+      item_01: {
+        distance: 200,
+        name: '机构筛选',
+        selector: '.organization',
+        animate: function() {
+          $('.guarantee-list-item', $('.organization')).addClass('fadeInUp');
+        }
+      },
+      item_02: {
+        distance: 50,
+        name: '机构筛选',
+        selector: '.pipeline_01',
+        animate: function() {
+          util.pipeflow();
+        }
+      }
+    };
+    $(window).load(function() {
+      $(window).trigger('scrollstop');
     });
-    return $(window).bind('scrollstop', function() {
-      console.log('stop');
+    $(window).bind('scrollstop', function() {
+      var distanceFromBottom, item, key;
+      for (key in events) {
+        item = events[key];
+        distanceFromBottom = util.getDistanceFromBottom($(item.selector));
+        if (distanceFromBottom >= item.distance) {
+          $(item.selector).css('visibility', 'visible');
+          item.animate();
+        }
+      }
+    });
+    return $('.security-bar').on('click', 'a', function(e) {
+      var id;
+      e.preventDefault();
+      $('.security-bar a').removeClass('active');
+      $(this).addClass('active');
+      id = $(this).attr('href').replace('#', '');
+      $('.security-panel').each(function(index, item) {
+        if ($(item).attr('id') === id) {
+          if ($(item).hasClass('hidden')) {
+            return $(item).removeClass('hidden');
+          }
+        } else {
+          if (!$(item).hasClass('hidden')) {
+            return $(item).addClass('hidden');
+          }
+        }
+      });
+      return $().removeClass('hidden');
     });
   });
 
