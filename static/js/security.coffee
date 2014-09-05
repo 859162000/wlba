@@ -1,12 +1,19 @@
 require.config(
   paths:
-    jquery: 'lib/jquery.min'
-    "jquery.scroll.events": 'lib/jquery.scroll.events'
+    'jquery': 'lib/jquery.min'
+    'jquery.scroll': 'lib/jquery.scroll'
 
-  shims:
-    "jquery.scroll.events": ['jquery']
+
+  shim:
+    'jquery.scroll': ['jquery']
 )
 
-require ['jquery'], ($) ->
-  $(document.body).bind 'scrollstart', () ->
+require ['jquery', 'jquery.scroll'], ($, scroll) ->
+
+  $(window).bind 'scrollstart', ->
     console.log('start')
+    return
+
+  $(window).bind 'scrollstop', ->
+    console.log('stop')
+    return

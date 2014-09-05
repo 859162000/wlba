@@ -2,17 +2,20 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'lib/jquery.min',
-      "jquery.scroll.events": 'lib/jquery.scroll.events'
+      'jquery': 'lib/jquery.min',
+      'jquery.scroll': 'lib/jquery.scroll'
     },
-    shims: {
-      "jquery.scroll.events": ['jquery']
+    shim: {
+      'jquery.scroll': ['jquery']
     }
   });
 
-  require(['jquery'], function($) {
-    return $(document.body).bind('scrollstart', function() {
-      return console.log('start');
+  require(['jquery', 'jquery.scroll'], function($, scroll) {
+    $(window).bind('scrollstart', function() {
+      console.log('start');
+    });
+    return $(window).bind('scrollstop', function() {
+      console.log('stop');
     });
   });
 

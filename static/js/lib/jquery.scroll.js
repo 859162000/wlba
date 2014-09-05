@@ -29,7 +29,7 @@ jQuery.event.special.scrollstart = {
                                 clearTimeout(timer);
                         } else {
                                 evt.type = 'scrollstart';
-                                jQuery.event.handle.apply(_self, _args);
+                                jQuery.event.dispatch.apply(_self, _args);
                         }
 
                         timer = setTimeout( function(){
@@ -66,7 +66,7 @@ jQuery.event.special.scrollstop = {
                                         timer = null;
                                         evt.type = 'scrollstop';
 
-                                        jQuery.event.handle.apply(_self, _args);
+                                        jQuery.event.dispatch.apply(_self, _args);
                         }, jQuery.event.special.scrollstop.latency);
 
                 };
@@ -95,7 +95,7 @@ jQuery.event.special.scrollreachtop = {
     handler: function(evt) {
         evt.type = 'scrollreachtop';
         if (parseInt(jQuery(this).scrollTop()) == 0 )
-                jQuery.event.handle.apply(this, arguments);
+                jQuery.event.dispatch.apply(this, arguments);
     }
 };
 
@@ -115,6 +115,6 @@ jQuery.event.special.scrollreachbottom = {
                 evt.type = 'scrollreachbottom';
         var scrollMaxTop = parseInt(jQuery(this).attr('scrollHeight')) - parseInt(jQuery(this).innerHeight()) - 1;
         if (parseInt(jQuery(this).scrollTop()) >= scrollMaxTop )
-                jQuery.event.handle.apply(this, arguments);
+                jQuery.event.dispatch.apply(this, arguments);
     }
 };
