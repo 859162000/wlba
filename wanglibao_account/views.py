@@ -322,7 +322,6 @@ class AccountHomeAPIView(APIView):
 
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
         fund_total_asset = 0
-        income_rate = 0
         fund_total_unpaid_income = 0
         if fund_hold_info.exists():
             for hold_info in fund_hold_info:
@@ -364,7 +363,7 @@ class AccountP2PRecordAPI(APIView):
         p2p_equities = P2PEquity.objects.filter(user=user).all().select_related('product')
 
 
-        page = request.GET.get('page')
+        page = request.GET.get('page', 0)
 
         if int(page) != 0:
 
