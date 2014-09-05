@@ -375,6 +375,10 @@ class P2PEquity(models.Model):
         return paid_interest
 
     @property
+    def unpaid_interest(self):
+        return self.total_interest - self.paid_interest
+
+    @property
     def penal_interest(self):
         if not self.confirm:
             return Decimal('0')
@@ -383,10 +387,6 @@ class P2PEquity(models.Model):
             return Decimal('0')
         penal_interest = paid_amos.aggregate(Sum('penal_interest'))['penal_interest__sum']
         return penal_interest
-
-    @property
-    def unpaid_interest(self):
-        return self.total_interest - self.paid_interest
 
     @property
     def paid_principal(self):

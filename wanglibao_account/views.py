@@ -302,14 +302,16 @@ class AccountHomeAPIView(APIView):
         user=request.user
         p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
 
-        unpayed_principle = 0           # 待收本金
-        p2p_total_paid_interest = 0     # 累积收益
-        p2p_total_unpaid_interest = 0   # 待收益
+        unpayed_principle = 0
+        p2p_total_paid_interest = 0
+        p2p_total_unpaid_interest = 0
+        p2p_total_interest = 0
         for equity in p2p_equities:
             if equity.confirm:
-                unpayed_principle += equity.unpaid_principal
-                p2p_total_paid_interest += equity.paid_interest
-                p2p_total_unpaid_interest += equity.unpaid_interest
+                unpayed_principle += equity.unpaid_principal        # 待收本金
+                p2p_total_paid_interest += equity.paid_interest     # 累积收益
+                p2p_total_unpaid_interest += equity.unpaid_interest # 待收益
+                p2p_total_interest += equity.total_interest         # 总收益
 
         p2p_margin = user.margin.margin             # P2P余额
         p2p_freeze = user.margin.freeze             # P2P投资中冻结金额
@@ -332,9 +334,6 @@ class AccountHomeAPIView(APIView):
         fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
-        if fund_total_asset != 0:
-            income_rate = total_income / fund_total_asset
-
         res = {
             'total_asset': p2p_total_asset + fund_total_asset,      # 总资产
             'p2p_total_asset': p2p_total_asset,                     # p2p总资产
@@ -342,14 +341,15 @@ class AccountHomeAPIView(APIView):
             'p2p_freeze': p2p_freeze,                               # P2P投资中冻结金额
             'p2p_withdrawing': p2p_withdrawing,                     # P2P提现中冻结金额
             'p2p_unpayed_principle': p2p_unpayed_principle,         # P2P待收本金
-            'p2p_total_unpaid_interest': p2p_total_unpaid_interest, # P2P待收益
-            'p2p_total_paid_interest': p2p_total_paid_interest,     # P2P总收益
+            'p2p_total_unpaid_interest':p2p_total_unpaid_interest,  # p2p总待收益
+            'p2p_total_paid_interest': p2p_total_paid_interest,     # P2P总累积收益
+            'p2p_total_interest': p2p_total_interest,               # P2P总收益
+
             'fund_total_asset': fund_total_asset,                   # 基金总资产
             'fund_total_income': total_income,                      # 基金累积收益
             'fund_income_week': fund_income_week,                   # 基金近一周收益(元)
             'fund_income_month': fund_income_month,                 # 基金近一月收益(元)
-            'fund_income_rate': income_rate,
-            'fund_total_unpaid_income': fund_total_unpaid_income,        # 待收益
+            'fund_total_unpaid_income': fund_total_unpaid_income,   # 待收益
         }
 
         return Response(res)
@@ -375,22 +375,24 @@ class AccountP2PRecordAPI(APIView):
         p2p_records = []
         for equity in p2p_equities:
             obj = {
-               'equity_created_at':  equity.created_at,
-               'equity_product_short_name': equity.product.short_name,
-               'equity_product_expected_earning_rate': equity.product.expected_earning_rate,
-               'equity_product_period': equity.product.period,
-               'equity_equity': equity.equity,
-               'equity_product_display_status':equity.product.display_status,
-               'equity_paid_interest': equity.paid_interest,
-               'equity_product_amortization_count': equity.product.amortization_count,
+               'equity_created_at':  equity.created_at,                                         # 投标时间
+               'equity_product_short_name': equity.product.short_name,                          # 产品名称
+               'equity_product_expected_earning_rate': equity.product.expected_earning_rate,    # 年化收益(%)
+               'equity_product_period': equity.product.period,                                  # 产品期限(月)*
+               'equity_equity': equity.equity,                                                  # 用户所持份额(投资金额)
+               'equity_product_display_status': equity.product.display_status,                  # 状态
+               'equity_term': equity.term,                                                      # 还款期
+               'equity_product_amortization_count': equity.product.amortization_count,          # 还款期数
+               'equity_paid_interest': equity.paid_interest,                                    # 单个已经收益
+               'equity_total_interest': equity.total_interest,                                  # 单个预期收益
             }
             p2p_records.append(obj)
         res = {
-            'total_counts': p2p_equities.paginator.count,
-            'total_page': round(p2p_equities.paginator.count / p2p_equities.paginator.per_page),
-            'per_page_number': p2p_equities.paginator.per_page,
-            'pre_page': p2p_equities.previous_page_number() if p2p_equities.has_previous() else None,
-            'next_page': p2p_equities.next_page_number() if p2p_equities.has_next() else None,
+            'total_counts': p2p_equities.paginator.count,                                               # 总条目数
+            'total_page': round(p2p_equities.paginator.count / p2p_equities.paginator.per_page),        # 总页数
+            'per_page_number': p2p_equities.paginator.per_page,                                         # 每页显示条数
+            'pre_page': p2p_equities.previous_page_number() if p2p_equities.has_previous() else None,   # 前一页页码
+            'next_page': p2p_equities.next_page_number() if p2p_equities.has_next() else None,          # 后一页页码
             'p2p_records': p2p_records,
         }
         return Response(res)
@@ -417,9 +419,10 @@ class AccountFundRecordAPI(APIView):
         fund_records = []
         for fund in fund_hold_info:
             obj = {
-                'fund_fund_name': fund.fund_name,
-                'fund_current_remain_share': fund.current_remain_share,
-                'fund_unpaid_income': fund.unpaid_income,
+                'fund_fund_name': fund.fund_name,                               # 基金产品名称
+                'fund_current_remain_share': fund.current_remain_share,         # 当前份额余额
+                'fund_unpaid_income': fund.unpaid_income,                       # 未付收益
+                'fund_code': fund.fund_code,                                    # 基金代码
             }
             obj.append(obj)
 
@@ -443,12 +446,14 @@ class AccountP2PAssetAPI(APIView):
 
         unpayed_principle = 0
         p2p_total_paid_interest = 0
+        p2p_total_interest = 0
         p2p_total_unpaid_interest = 0
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal
-                p2p_total_paid_interest += equity.paid_interest
                 p2p_total_unpaid_interest += equity.unpaid_interest
+                p2p_total_paid_interest += equity.paid_interest
+                p2p_total_interest += equity.total_interest
 
         p2p_margin = user.margin.margin
         p2p_freeze = user.margin.freeze
@@ -458,15 +463,18 @@ class AccountP2PAssetAPI(APIView):
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
         res = {
-            'p2p_total_asset': p2p_total_asset,                     #总资产
+            'p2p_total_asset': p2p_total_asset,                     # 总资产
             'p2p_margin': p2p_margin,                               # P2P余额
             'p2p_freeze': p2p_freeze,                               # P2P投资中冻结金额
             'p2p_withdrawing': p2p_withdrawing,                     # P2P提现中冻结金额
             'p2p_unpayed_principle': p2p_unpayed_principle,         # P2P待收本金
-            'p2p_total_unpaid_interest': p2p_total_unpaid_interest, # P2P待收益
-            'p2p_total_paid_interest': p2p_total_paid_interest,     # P2P总收益
+            'p2p_total_unpaid_interest':p2p_total_unpaid_interest,  # p2p总待收益
+            'p2p_total_paid_interest': p2p_total_paid_interest,     # P2P总累积收益
+            'p2p_total_interest': p2p_total_interest,               # P2P总收益
+
         }
         return Response(res)
+
 
 class AccountFundAssetAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -487,14 +495,11 @@ class AccountFundAssetAPI(APIView):
         fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
-        if fund_total_asset != 0:
-            income_rate = total_income / fund_total_asset
         res = {
             'fund_total_asset': fund_total_asset,                   # 基金总资产
             'fund_total_income': total_income,                      # 基金累积收益
             'fund_income_week': fund_income_week,                   # 基金近一周收益(元)
-            'fund_income_month': fund_income_month,                 # 基金近一月收益(元)
-            'fund_income_rate': income_rate,
+            'fund_income_month': fund_income_month,                 # 基金近一月收益(元)                    #
             'fund_total_unpaid_income': fund_total_unpaid_income,   # 待收益
         }
         return Response(res)
@@ -810,7 +815,6 @@ def test_contract(request, equity_id):
     return HttpResponse(generate_contract(equity, 'contract_template.jade'))
 
 
-
 class IdVerificationView(TemplateView):
     template_name = 'verify_id.jade'
     form_class = IdVerificationForm
@@ -838,10 +842,8 @@ class IdVerificationView(TemplateView):
         return super(IdVerificationView, self).form_valid(form)
 
 
-
 class AdminIdVerificationView(TemplateView):
     template_name = 'admin_verify_id.jade'
-
 
 
 class IdValidate(APIView):
