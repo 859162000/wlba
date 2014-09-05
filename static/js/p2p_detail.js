@@ -35,7 +35,7 @@
         }
       },
       errorPlacement: function(error, element) {
-        return error.appendTo($(element).closest('.form-row').find('.form-row-error'));
+        return error.appendTo($(element).closest('.form-row__middle').find('.form-row-error'));
       },
       submitHandler: function(form) {
         var tip;
