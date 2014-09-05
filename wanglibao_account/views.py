@@ -364,10 +364,14 @@ class AccountP2PRecordAPI(APIView):
 
 
         page = request.GET.get('page', 0)
+        try:
+            page = int(page)
+        except:
+            return Response({ "detail": "Query String must be a number." }, status=404)
 
-        if int(page) != 0:
+        if page != 0:
 
-            limit = 2
+            limit = 20
             paginator = Paginator(p2p_equities, limit)
 
             try:
