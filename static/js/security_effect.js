@@ -115,7 +115,7 @@ require(['jquery', 'raphael'], function($, raphael) {
             rect2.attr('fill', '#fff');
             rect2.attr('stroke', '#fff');
 
-            var rect3 = paper.rect(840, 80, 30, 80);
+            var rect3 = paper.rect(880, 80, 50, 100);
             rect3.attr('fill', '#fff');
             rect3.attr('stroke', '#fff');
 
