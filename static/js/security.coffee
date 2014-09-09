@@ -3,7 +3,6 @@ require.config(
     'jquery': 'lib/jquery.min'
     'jquery.scroll': 'lib/jquery.scroll'
     'security_effect': 'security_effect'
-    'autofloat': 'lib/autofloat'
 
 
   shim:
@@ -11,10 +10,9 @@ require.config(
     'security_effect': ['jquery']
     'autofloat': ['jquery']
 
-
 )
 
-require ['jquery', 'jquery.scroll', 'security_effect', 'autofloat'], ($, scroll, effect, autofloat) ->
+require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
 
   util =
     getDistanceFromBottom: (ele) ->

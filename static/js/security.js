@@ -4,8 +4,7 @@
     paths: {
       'jquery': 'lib/jquery.min',
       'jquery.scroll': 'lib/jquery.scroll',
-      'security_effect': 'security_effect',
-      'autofloat': 'lib/autofloat'
+      'security_effect': 'security_effect'
     },
     shim: {
       'jquery.scroll': ['jquery'],
@@ -14,7 +13,7 @@
     }
   });
 
-  require(['jquery', 'jquery.scroll', 'security_effect', 'autofloat'], function($, scroll, effect, autofloat) {
+  require(['jquery', 'jquery.scroll', 'security_effect'], function($, scroll, effect) {
     var events, util;
     util = {
       getDistanceFromBottom: function(ele) {
