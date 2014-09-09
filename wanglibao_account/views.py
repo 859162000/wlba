@@ -323,11 +323,9 @@ class AccountHomeAPIView(APIView):
 
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
         fund_total_asset = 0
-        fund_total_unpaid_income = 0
         if fund_hold_info.exists():
             for hold_info in fund_hold_info:
                 fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
-                fund_total_unpaid_income += hold_info.unpaid_income
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
@@ -349,7 +347,7 @@ class AccountHomeAPIView(APIView):
             'fund_total_income': total_income,                      # 基金累积收益
             'fund_income_week': fund_income_week,                   # 基金近一周收益(元)
             'fund_income_month': fund_income_month,                 # 基金近一月收益(元)
-            'fund_total_unpaid_income': fund_total_unpaid_income,   # 待收益
+
         }
 
         return Response(res)
@@ -495,14 +493,13 @@ class AccountFundAssetAPI(APIView):
         user = request.user
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
         fund_total_asset = 0
-        income_rate = 0
-        fund_total_unpaid_income = 0
         if fund_hold_info.exists():
             for hold_info in fund_hold_info:
                 fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
-                fund_total_unpaid_income += hold_info.unpaid_income
+
 
         today = timezone.datetime.today()
+
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
@@ -511,8 +508,7 @@ class AccountFundAssetAPI(APIView):
             'fund_total_asset': fund_total_asset,                   # 基金总资产
             'fund_total_income': total_income,                      # 基金累积收益
             'fund_income_week': fund_income_week,                   # 基金近一周收益(元)
-            'fund_income_month': fund_income_month,                 # 基金近一月收益(元)                    #
-            'fund_total_unpaid_income': fund_total_unpaid_income,   # 待收益
+            'fund_income_month': fund_income_month,                 # 基金近一月收益(元)
         }
         return Response(res)
 
