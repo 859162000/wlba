@@ -104,8 +104,28 @@ require(['jquery', 'raphael'], function($, raphael) {
             $('.guarantee-list-item', $(this.selector)).addClass('fadeInUp');
         };
 
+        var module_07 = new Module(400, '.project');
+        module_07.animate = function () {
+            $(this.selector).css('visibility', 'visible')
+            $('.guarantee-list-item', $(this.selector)).addClass('fadeInUp');
+        };
+
+        var module_08 = new Module(400, '.online');
+        module_08.animate = function () {
+            $(this.selector).css('visibility', 'visible')
+            $('.guarantee-list-item', $(this.selector)).addClass('fadeInUp');
+        };
+
+        var module_09 = new Module(400, '.overdue');
+        module_09.animate = function () {
+            $(this.selector).css('visibility', 'visible')
+            $('.guarantee-list-item', $(this.selector)).addClass('fadeInUp');
+        };
+
+
         var module_02 = new Module(50, '.pipeline_01');
         module_02.animate = function () {
+            /*
             var paper = Raphael("pipeline_01");
             var rect1 = paper.rect(150, 0, 30, 100);
             rect1.attr('fill', '#fff');
@@ -118,7 +138,7 @@ require(['jquery', 'raphael'], function($, raphael) {
             var rect3 = paper.rect(880, 80, 50, 100);
             rect3.attr('fill', '#fff');
             rect3.attr('stroke', '#fff');
-
+            */
         };
 
         var module_03 = new Module(300, '.platform_02');
@@ -152,6 +172,10 @@ require(['jquery', 'raphael'], function($, raphael) {
         page.register(module_04);
         page.register(module_05);
         page.register(module_06);
+        page.register(module_07);
+        page.register(module_08);
+        page.register(module_09);
+
 
 
         $.effect = page;
