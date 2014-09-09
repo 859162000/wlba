@@ -2,6 +2,7 @@
 import datetime
 import logging
 import json
+import math
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
 from django.core import serializers
@@ -400,7 +401,7 @@ class AccountP2PRecordAPI(APIView):
         if int(page) != 0:
             res = {
                 'total_counts': p2p_equities.paginator.count,                                               # 总条目数
-                'total_page': int(round(p2p_equities.paginator.count / p2p_equities.paginator.per_page)),        # 总页数
+                'total_page': int(math.ceil(p2p_equities.paginator.count / float(p2p_equities.paginator.per_page))),        # 总页数
                 'per_page_number': p2p_equities.paginator.per_page,                                         # 每页显示条数
                 'pre_page': p2p_equities.previous_page_number() if p2p_equities.has_previous() else None,   # 前一页页码
                 'next_page': p2p_equities.next_page_number() if p2p_equities.has_next() else None,          # 后一页页码
