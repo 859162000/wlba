@@ -40,11 +40,49 @@ require(['jquery', 'raphael'], function($, raphael) {
             }
         };
 
+        function PipePart(config) {
+            this.start = config.start;
+            this.end = config.end;
+        }
+
         var pipeline = function () {
             var speed = 50,
                 step = 5;
+            var paper = Raphael("pipeline_01", '100%', 200),
+                st = paper.set();
+            return {
+                init: function() {
+                    var rect1 = paper.rect(150, 0, 30, 100);
+                    rect1.attr('fill', '#fff');
+                    rect1.attr('stroke', '#fff');
+
+                    var rect2 = paper.rect(150, 80, 870, 30);
+                    rect2.attr('fill', '#fff');
+                    rect2.attr('stroke', '#fff');
+
+                    var rect3 = paper.rect(880, 80, 50, 100);
+                    rect3.attr('fill', '#fff');
+                    rect3.attr('stroke', '#fff');
+
+                    st.push(rect1, rect2, rect3);
+                },
+                animate: function() {
+                    var arr = [];
+                    st.forEach(function() {});
+                    //if(st.size() > 0) {
+                        st.pop().animate({y: 80, height: 0}, 500);
+                   // }
+                }
+            };
 
         };
+
+        //管道
+        //var module_07 = new Module(300, '.');
+
+        var pipes = pipeline();
+        pipes.init();
+
 
         $.fn.checked = function () {
             var arr = [],
@@ -125,20 +163,7 @@ require(['jquery', 'raphael'], function($, raphael) {
 
         var module_02 = new Module(50, '.pipeline_01');
         module_02.animate = function () {
-            /*
-            var paper = Raphael("pipeline_01");
-            var rect1 = paper.rect(150, 0, 30, 100);
-            rect1.attr('fill', '#fff');
-            rect1.attr('stroke', '#fff');
-
-            var rect2 = paper.rect(150, 80, 870, 30);
-            rect2.attr('fill', '#fff');
-            rect2.attr('stroke', '#fff');
-
-            var rect3 = paper.rect(880, 80, 50, 100);
-            rect3.attr('fill', '#fff');
-            rect3.attr('stroke', '#fff');
-            */
+            pipes.animate();
         };
 
         var module_03 = new Module(300, '.platform_02');
@@ -161,8 +186,7 @@ require(['jquery', 'raphael'], function($, raphael) {
             $(this.selector).checked();
         };
 
-        //管道
-        //var module_07 = new Module(300, '.');
+
 
         var page = control();
         page.register(module_01);
