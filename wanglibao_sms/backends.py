@@ -50,13 +50,11 @@ class ManDaoSMSBackEnd(SMSBackEnd):
 
         if len(phones) > 1 and len(messages) == 1:
             url = settings.SMS_MANDAO_MULTICAST_URL
-        print "ext = 1"
         params = {
             'sn': settings.SMS_MANDAO_SN,
             'pwd': settings.SMS_MANDAO_MD5_PWD,
             'mobile': phone,
-            'content': text,
-            'ext': "1"
+            'content': text
         }
 
         response = requests.post(url, params)
