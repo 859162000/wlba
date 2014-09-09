@@ -2,13 +2,19 @@ require.config(
   paths:
     'jquery': 'lib/jquery.min'
     'jquery.scroll': 'lib/jquery.scroll'
+    'security_effect': 'security_effect'
+    'autofloat': 'lib/autofloat'
 
 
   shim:
     'jquery.scroll': ['jquery']
+    'security_effect': ['jquery']
+    'autofloat': ['jquery']
+
+
 )
 
-require ['jquery', 'jquery.scroll'], ($, scroll) ->
+require ['jquery', 'jquery.scroll', 'security_effect', 'autofloat'], ($, scroll, effect, autofloat) ->
 
   util =
     getDistanceFromBottom: (ele) ->
@@ -71,16 +77,12 @@ require ['jquery', 'jquery.scroll'], ($, scroll) ->
     $(window).trigger('scrollstop')
     return
 
+  $(window).bind 'scroll', ->
+    $.effect.setTabBar()
+    return
+
   $(window).bind 'scrollstop', ->
-    for key of events
-      item = events[key]
-
-      distanceFromBottom = util.getDistanceFromBottom($(item.selector))
-
-      if distanceFromBottom >= item.distance
-        $(item.selector).css('visibility', 'visible')
-        item.animate()
-
+    $.effect.dispatch()
     return
 
   $('.security-bar').on 'click', 'a', (e) ->

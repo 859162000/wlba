@@ -3,14 +3,18 @@
   require.config({
     paths: {
       'jquery': 'lib/jquery.min',
-      'jquery.scroll': 'lib/jquery.scroll'
+      'jquery.scroll': 'lib/jquery.scroll',
+      'security_effect': 'security_effect',
+      'autofloat': 'lib/autofloat'
     },
     shim: {
-      'jquery.scroll': ['jquery']
+      'jquery.scroll': ['jquery'],
+      'security_effect': ['jquery'],
+      'autofloat': ['jquery']
     }
   });
 
-  require(['jquery', 'jquery.scroll'], function($, scroll) {
+  require(['jquery', 'jquery.scroll', 'security_effect', 'autofloat'], function($, scroll, effect, autofloat) {
     var events, util;
     util = {
       getDistanceFromBottom: function(ele) {
@@ -78,16 +82,11 @@
     $(window).load(function() {
       $(window).trigger('scrollstop');
     });
+    $(window).bind('scroll', function() {
+      $.effect.setTabBar();
+    });
     $(window).bind('scrollstop', function() {
-      var distanceFromBottom, item, key;
-      for (key in events) {
-        item = events[key];
-        distanceFromBottom = util.getDistanceFromBottom($(item.selector));
-        if (distanceFromBottom >= item.distance) {
-          $(item.selector).css('visibility', 'visible');
-          item.animate();
-        }
-      }
+      $.effect.dispatch();
     });
     return $('.security-bar').on('click', 'a', function(e) {
       var id;

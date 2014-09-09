@@ -3,21 +3,28 @@
   background: #0268a5 url(/static/images/security/banner_03.jpg) center 0 no-repeat
   height: 360px
 
-.security-bar
+.security-bar-container
+  position: relative
   height: 60px
-  background: url("/static/images/security/security_tab_bg.png") 0 0 repeat-x
-
-  a
-    +inline-block
-    font-size: $font-xll
+  .security-bar
     height: 60px
-    line-height: 60px
-    text-align: center
-    color: $color-white
-    width: 50%
+    background: url("/static/images/security/security_tab_bg.png") 0 0 repeat-x
+    z-index: 1000
+    left: 0
+    top: 0
+    width: 100%
 
-    &:hover, &.active
-      background: url("/static/images/security/security_tab_bg.png") 0 -60px repeat-x
+    a
+      +inline-block
+      font-size: $font-xll
+      height: 60px
+      line-height: 60px
+      text-align: center
+      color: $color-white
+      width: 50%
+
+      &:hover, &.active
+        background: url("/static/images/security/security_tab_bg.png") 0 -60px repeat-x
 
 .security-panel-center
   @extend .container
@@ -84,7 +91,7 @@
   margin-right: 6px
 
   .icon-check-mark
-    width: 21px
+    width: 0px
     height: 22px
     background: url("/static/images/security/icon_security.png") 0 -80px no-repeat
     top: -2px
