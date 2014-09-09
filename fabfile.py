@@ -27,7 +27,7 @@ def production():
     env.user = 'lishuo'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'production3.0'
 
@@ -45,7 +45,7 @@ def pre_production():
     env.user = 'lishuo'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'production3.0'
 
@@ -60,7 +60,7 @@ def pre_production():
 def dev():
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'master'
 
@@ -77,7 +77,7 @@ def staging():
     env.password = 'wanglibank'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'master'
 

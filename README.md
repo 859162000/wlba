@@ -89,6 +89,3 @@ New Contract Template
     3. Copy the generated html
     4. Open /admin, under p2p contract, create a new contract, give it a name and paste the generated html into content
 
-
-
-test
