@@ -298,6 +298,7 @@ require(['jquery', 'raphael'], function($, raphael) {
         };
 
 
+
         var module_02 = new Module(50, '.pipeline_01');
         module_02.animate = function () {
             if(!$('#organization').hasClass('hidden')) {
@@ -306,31 +307,80 @@ require(['jquery', 'raphael'], function($, raphael) {
 
         };
 
-        var module_03 = new Module(300, '.platform_02');
+        var module_10 = new Module(50, '.platform_01');
+        module_10.animate = function () {
+            if(!$('#platform').hasClass('hidden')) {
+                $(this.selector).css('visibility', 'visible');
+                var _self = this;
+                $('.animation_01', $(this.selector)).addClass('fade-in-left');
+                setTimeout(function(){
+                    $('.animation_02', $(_self.selector)).css('visibility', 'visible');
+                    $('.animation_02', $(_self.selector)).addClass('bounceIn');
+                }, 500);
+            }
+        };
+
+        var module_03 = new Module(200, '.platform_02');
         module_03.animate = function () {
             if(!$('#platform').hasClass('hidden')) {
+                $(this.selector).css('visibility', 'visible');
+                var _self = this;
+                $('.animation_05', $(this.selector)).addClass('fade-in-right');
                 $(this.selector).checked();
+                $('.animation_03', $(_self.selector)).css('visibility', 'visible');
+                $('.animation_03', $(_self.selector)).addClass('fade-in-left');
+
+                setTimeout(function(){
+                    $('.animation_04', $(_self.selector)).css('visibility', 'visible');
+                    $('.animation_04', $(_self.selector)).addClass('bounceIn');
+                }, 1000);
             }
         };
 
-        var module_04 = new Module(400, '.platform_03');
+        var module_04 = new Module(200, '.platform_03');
         module_04.animate = function () {
             if(!$('#platform').hasClass('hidden')) {
+                $(this.selector).css('visibility', 'visible');
+                var _self = this;
+                $('.animation_06', $(this.selector)).addClass('fade-in-left');
+                $('.animation_07', $(this.selector)).addClass('fade-in-right');
                 $(this.selector).checked();
+                setTimeout(function(){
+                    $('.animation_08', $(_self.selector)).css('visibility', 'visible');
+                    $('.animation_08', $(_self.selector)).addClass('fade-to-small');
+                }, 500);
             }
         };
 
-        var module_05 = new Module(400, '.platform_04');
+        var module_05 = new Module(200, '.platform_04');
         module_05.animate = function () {
             if(!$('#platform').hasClass('hidden')) {
+                $(this.selector).css('visibility', 'visible');
+                var _self = this;
+                $('.animation_11', $(this.selector)).addClass('fade-in-right');
                 $(this.selector).checked();
+                setTimeout(function(){
+                    $('.animation_09', $(_self.selector)).css('visibility', 'visible');
+                    $('.animation_09', $(_self.selector)).addClass('fadeInDown');
+                    setTimeout(function() {
+                        $('.animation_10', $(_self.selector)).css('visibility', 'visible');
+                        $('.animation_10', $(_self.selector)).addClass('fade-to-small');
+                    }, 200)
+                }, 200);
             }
         };
 
-        var module_06 = new Module(400, '.platform_05');
+        var module_06 = new Module(200, '.platform_05');
         module_06.animate = function () {
             if(!$('#platform').hasClass('hidden')) {
+                $(this.selector).css('visibility', 'visible');
+                var _self = this;
+                $('.animation_12', $(this.selector)).addClass('fade-in-left');
                 $(this.selector).checked();
+                setTimeout(function(){
+                    $('.animation_13', $(_self.selector)).css('visibility', 'visible');
+                    $('.animation_13', $(_self.selector)).addClass('fade-to-small');
+                }, 500);
             }
         };
 
@@ -347,7 +397,7 @@ require(['jquery', 'raphael'], function($, raphael) {
         page.register(module_07);
         page.register(module_08);
         page.register(module_09);
-
+        page.register(module_10);
 
 
         $.effect = page;
