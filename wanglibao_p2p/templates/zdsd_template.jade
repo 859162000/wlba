@@ -56,8 +56,7 @@ html
           td 网利宝用户名
           td 出借金额
           td 借款期限
-          if e.product.pay_method == '等额本息'
-            td 每月应收本息
+          td 每月应收本息
         equities = equity.product.equities.all()
         for e in equities
           tr
