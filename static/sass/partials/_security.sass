@@ -103,6 +103,31 @@
   background: url("/static/images/security/num.png") -328px 0 no-repeat
   margin-top: 70px
 
+.organization-num-01
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.png") 0 -50px no-repeat
+  display: inline-block
+
+
+.organization-num-02
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.png") -82px -50px no-repeat
+  display: inline-block
+
+.organization-num-03
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.png") -164px -50px no-repeat
+  display: inline-block
+
+.organization-num-04
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.png") -246px -50px no-repeat
+  display: inline-block
+
 .icon-circle
   width: 25px
   height: 27px
@@ -150,6 +175,7 @@
 
       h3
         font-size: 28px
+        background: url("/static/images/security/num.png") 0 -100px no-repeat
       p
         font-size: 14px
 
@@ -506,6 +532,18 @@
   100%
     -webkit-transform: scale(1)
 
+@keyframes bounceIn
+  0%
+    opacity: 0
+    -webkit-transform: scale(.3)
+  50%
+    opacity: 1
+    -webkit-transform: scale(1.05)
+  70%
+    -webkit-transform: scale(.9)
+  100%
+    -webkit-transform: scale(1)
+
 @-webkit-keyframes fadeInUp
   0%
     opacity: 0
@@ -515,6 +553,14 @@
     -webkit-transform: translateY(0)
 
 @-moz-keyframes fadeInUp
+  0%
+    opacity: 0
+    -moz-transform: translateY(20px)
+  100%
+    opacity: 1
+    -moz-transform: translateY(0)
+
+@keyframes fadeInUp
   0%
     opacity: 0
     -moz-transform: translateY(20px)
@@ -538,6 +584,14 @@
     opacity: 1
     -moz-transform: translateY(0)
 
+@keyframes fadeInDown
+  0%
+    opacity: 0
+    -moz-transform: translateY(-20px)
+  100%
+    opacity: 1
+    -moz-transform: translateY(0)
+
 @-webkit-keyframes fadeToSmall
   0%
     opacity: 0
@@ -549,6 +603,16 @@
     opacity: 1
 
 @-moz-keyframes fadeToSmall
+  0%
+    opacity: 0
+    -webkit-transform: scale(6)
+  50%
+    opacity: 1
+    -webkit-transform: scale(1)
+  100%
+    opacity: 1
+
+@keyframes fadeToSmall
   0%
     opacity: 0
     -webkit-transform: scale(6)

@@ -292,9 +292,8 @@ require(['jquery', 'raphael'], function($, raphael) {
             if(!$('#organization').hasClass('hidden')) {
                 $(this.selector).css('visibility', 'visible')
                 $('.guarantee-list-item', $(this.selector)).addClass('fadeInUp');
-                if (!$('#organization').hasClass('hidden')) {
-                    pipe_03.animate();
-                }
+                pipe_03.animate();
+
             }
         };
 
@@ -309,22 +308,30 @@ require(['jquery', 'raphael'], function($, raphael) {
 
         var module_03 = new Module(300, '.platform_02');
         module_03.animate = function () {
-            $(this.selector).checked();
+            if(!$('#platform').hasClass('hidden')) {
+                $(this.selector).checked();
+            }
         };
 
         var module_04 = new Module(400, '.platform_03');
         module_04.animate = function () {
-            $(this.selector).checked();
+            if(!$('#platform').hasClass('hidden')) {
+                $(this.selector).checked();
+            }
         };
 
         var module_05 = new Module(400, '.platform_04');
         module_05.animate = function () {
-            $(this.selector).checked();
+            if(!$('#platform').hasClass('hidden')) {
+                $(this.selector).checked();
+            }
         };
 
         var module_06 = new Module(400, '.platform_05');
         module_06.animate = function () {
-            $(this.selector).checked();
+            if(!$('#platform').hasClass('hidden')) {
+                $(this.selector).checked();
+            }
         };
 
 
