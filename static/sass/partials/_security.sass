@@ -120,7 +120,8 @@
     background: url(/static/images/security/funnel_01.png) no-repeat 63px 70px
     padding-top: 80px
     visibility: hidden
-
+    &.untreated
+      -webkit-filter: grayscale(100%)
     .guarantee-container-title
       position: absolute
       left: 395px
@@ -169,8 +170,10 @@
   &.project
     height: 450px
     background: url(/static/images/security/box_02.png) no-repeat 98px -6px
-    padding-top: 80px
+    padding-top: 80
     visibility: hidden
+    &.untreated
+      -webkit-filter: grayscale(100%)
 
     .guarantee-container-title
       position: absolute
@@ -205,6 +208,10 @@
     height: 320px
     background: url(/static/images/security/online.png) no-repeat 39px 23px
     padding-top: 10px
+    visibility: hidden
+    &.untreated
+      -webkit-filter: grayscale(100%)
+
     .guarantee-container-title
       position: absolute
       left: 455px
@@ -239,6 +246,9 @@
     background: url(/static/images/security/overdue.png) no-repeat 87px 0px
     padding-top: 0px
     margin-top: -10px
+    visibility: hidden
+    &.untreated
+      -webkit-filter: grayscale(100%)
     .guarantee-container-title
       position: absolute
       left: 185px
@@ -273,6 +283,8 @@
       background: url(/static/images/security/gear.png) no-repeat 0px 0px
       top: 175px
       left: 775px
+      &.untreated
+        -webkit-filter: grayscale(100%)
     .investor
       width: 165px
       height: 165px
@@ -280,6 +292,8 @@
       background: url(/static/images/security/investor.png) no-repeat 0px 0px
       top: 389px
       left: 462px
+      &.untreated
+        -webkit-filter: grayscale(100%)
 
 
 .guarantee-container
