@@ -35,7 +35,7 @@ def production():
     env.pip_install_command = "pip install"
 
     env.mysql = False  # Use RDS, so we no need to install mysql
-    env.migrate = False
+    env.migrate = True
     env.supervisord = True
 
     env.environment = 'ENV_PRODUCTION'
