@@ -384,6 +384,20 @@ require(['jquery', 'raphael'], function($, raphael) {
             }
         };
 
+        var module_11 = new Module(200, '.platform_06');
+        module_11.animate = function () {
+            if(!$('#organization').hasClass('hidden')) {
+                $(this.selector).css('visibility', 'visible');
+                var _self = this;
+                $('.animation_14', $(this.selector)).addClass('fade-in-left');
+                $('.animation_16', $(this.selector)).addClass('fade-in-right');
+                setTimeout(function(){
+                    $('.animation_15', $(_self.selector)).css('visibility', 'visible');
+                    $('.animation_15', $(_self.selector)).addClass('fade-in');
+                }, 500);
+            }
+        };
+
 
 
         var page = control();
@@ -398,6 +412,7 @@ require(['jquery', 'raphael'], function($, raphael) {
         page.register(module_08);
         page.register(module_09);
         page.register(module_10);
+        page.register(module_11);
 
 
         $.effect = page;
