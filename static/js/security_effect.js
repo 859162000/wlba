@@ -39,49 +39,111 @@ require(['jquery', 'raphael'], function($, raphael) {
                 }
             }
         };
-
-        function PipePart(config) {
+        /*
+        function PipePart(config, paper) {
             this.start = config.start;
             this.end = config.end;
+            this.paper = paper;
+        }
+
+        PipePart.prototype.draw = function() {
+            console.log(this.start);
+            this.rect = this.paper.rect.apply(this.paper, this.start);
+        }
+
+        PipePart.prototype.animate = function() {
+            console.log('rect', this.rect)
+            this.rect.stop().animate.apply(this.paper, this.end);
         }
 
         var pipeline = function () {
             var speed = 50,
                 step = 5;
             var paper = Raphael("pipeline_01", '100%', 200),
+                parts = [],
                 st = paper.set();
+            parts.push(new PipePart({start: [150, 0, 30, 100], end: [{y: 80, height: 0}, 500]}, paper));
             return {
                 init: function() {
-                    var rect1 = paper.rect(150, 0, 30, 100);
-                    rect1.attr('fill', '#fff');
-                    rect1.attr('stroke', '#fff');
-
-                    var rect2 = paper.rect(150, 80, 870, 30);
-                    rect2.attr('fill', '#fff');
-                    rect2.attr('stroke', '#fff');
-
-                    var rect3 = paper.rect(880, 80, 50, 100);
-                    rect3.attr('fill', '#fff');
-                    rect3.attr('stroke', '#fff');
-
-                    st.push(rect1, rect2, rect3);
+                    for(var i = 0, len = parts.length; i < len; i++) {
+                        parts[i].draw();
+                    }
                 },
                 animate: function() {
-                    var arr = [];
-                    st.forEach(function() {});
-                    //if(st.size() > 0) {
-                        st.pop().animate({y: 80, height: 0}, 500);
-                   // }
+                    parts[0].animate();
                 }
             };
+
+        };
+        */
+        var pipeline_01 = function() {
+            var paper = Raphael("pipeline_01", '100%', 200),
+                property = {fill: "#fff", stroke: "#fff"},
+                rect_01,
+                rect_02,
+                rect_03;
+
+            rect_01 = paper.rect(150, 0, 30, 100);
+            rect_01.attr(property);
+
+            rect_02 = paper.rect(150, 80, 780, 30);
+            rect_02.attr(property);
+
+            rect_03 = paper.rect(880, 100, 50, 80);
+            rect_03.attr(property);
+
+            return {
+                animate: function() {
+
+                    rect_01.stop().animate({y: 80, height: 0}, 3000, 'linear', function() {
+                        rect_02.stop().animate({x: 930, width: 0}, 3000, 'linear', function() {
+                            rect_03.stop().animate({y: 180, height: 0}, 3000, 'linear');
+                        })
+                    });
+
+                }
+            }
+
+        };
+
+        var pipeline_02 = function() {
+            var paper = Raphael("pipeline_02", '100%', 200),
+                property = {fill: "red", stroke: "#fff"},
+                rect_01,
+                rect_02,
+                rect_03;
+
+            rect_01 = paper.rect(150, 0, 30, 100);
+            rect_01.attr(property);
+
+            rect_02 = paper.rect(150, 80, 780, 30);
+            rect_02.attr(property);
+
+            rect_03 = paper.rect(880, 100, 50, 80);
+            rect_03.attr(property);
+
+            return {
+                animate: function() {
+                    /*
+                    rect_01.stop().animate({y: 80, height: 0}, 3000, 'linear', function() {
+                        rect_02.stop().animate({x: 930, width: 0}, 3000, 'linear', function() {
+                            rect_03.stop().animate({y: 180, height: 0}, 3000, 'linear');
+                        })
+                    });
+                    */
+
+                }
+            }
 
         };
 
         //管道
         //var module_07 = new Module(300, '.');
 
-        var pipes = pipeline();
-        pipes.init();
+        //var pipes = pipeline();
+        //pipes.init();
+        var pipe_01 = pipeline_01();
+        var pipe_02 = pipeline_02();
 
 
         $.fn.checked = function () {
@@ -163,7 +225,10 @@ require(['jquery', 'raphael'], function($, raphael) {
 
         var module_02 = new Module(50, '.pipeline_01');
         module_02.animate = function () {
-            pipes.animate();
+            if(!$('#organization').hasClass('hidden')) {
+                pipe_01.animate();
+            }
+
         };
 
         var module_03 = new Module(300, '.platform_02');
