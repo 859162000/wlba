@@ -48,10 +48,30 @@
 .security-panel
   background-color: #fff
 
+.security-image
+  position: relative
+
+.panel-03-1
+  position: relative
+  background: url("/static/images/security/panel_03_1.png") no-repeat
+  width: 74px
+  height: 94px
+  top: -222px
+  left: 192px
+
+.panel-04-1
+  position: relative
+  background: url("/static/images/security/panel_04_1.png") no-repeat
+  width: 99px
+  height: 82px
+  top: -155px
+  left: 125px
+
 .security-panel-container
   @extend .security-panel
   height: 360px
   border-bottom: solid 1px $color-mercury
+  overflow: hidden
 
 .security-num-01
   width: 82px
@@ -402,6 +422,17 @@
   -moz-animation: fadeInUp 1s .5s ease both
   animation: fadeInUp 1s .5s ease both
 
+.fadeInDown
+  -webkit-animation: fadeInDown .5s .2s ease both
+  -moz-animation: fadeInDown .5s .2s ease both
+  animation: fadeInDown .5s .2s ease both
+
+.fade-to-small
+  -webkit-animation: fadeToSmall .5s .6s ease both
+  -moz-animation: fadeToSmall .5s .6s ease both
+  animation: fadeToSmall .5s .6s ease both
+
+
 @-webkit-keyframes fadeInLeft
   0%
     opacity: 0
@@ -491,6 +522,41 @@
     opacity: 1
     -moz-transform: translateY(0)
 
+@-webkit-keyframes fadeInDown
+  0%
+    opacity: 0
+    -webkit-transform: translateY(-20px)
+  100%
+    opacity: 1
+    -webkit-transform: translateY(0)
+
+@-moz-keyframes fadeInDown
+  0%
+    opacity: 0
+    -moz-transform: translateY(-20px)
+  100%
+    opacity: 1
+    -moz-transform: translateY(0)
+
+@-webkit-keyframes fadeToSmall
+  0%
+    opacity: 0
+    -webkit-transform: scale(6)
+  50%
+    opacity: 1
+    -webkit-transform: scale(1)
+  100%
+    opacity: 1
+
+@-moz-keyframes fadeToSmall
+  0%
+    opacity: 0
+    -webkit-transform: scale(6)
+  50%
+    opacity: 1
+    -webkit-transform: scale(1)
+  100%
+    opacity: 1
 
 .border-no
   border: 0
