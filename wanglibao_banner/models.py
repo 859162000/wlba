@@ -10,7 +10,7 @@ class Banner(models.Model):
     PC = 'PC'
     PC_2 = 'PC_2'
     DEVICES = (
-        (MOBILE, MOBILE)
+        (MOBILE, MOBILE),
         (PC, PC),
         (PC_2, PC_2),
     )
