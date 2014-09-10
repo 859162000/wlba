@@ -107,30 +107,62 @@ require(['jquery', 'raphael'], function($, raphael) {
         };
 
         var pipeline_02 = function() {
-            var paper = Raphael("pipeline_02", '100%', 200),
+            var paper = Raphael("pipeline_02", '100%', 400),
+                property = {fill: "#fff", stroke: "#fff"},
+                rect_01,
+                rect_02,
+                rect_03;
+
+            rect_01 = paper.rect(880, 113, 50, 180);
+            rect_01.attr(property);
+
+            rect_02 = paper.rect(140, 280, 780, 30);
+            rect_02.attr(property);
+
+            rect_03 = paper.rect(140, 280, 50, 100);
+            rect_03.attr(property);
+
+            return {
+                animate: function() {
+
+                    rect_01.stop().animate({y: 293, height: 0}, 3000, 'linear', function() {
+                        rect_02.stop().animate({x: 150, width: 0}, 3000, 'linear', function() {
+                            rect_03.stop().animate({y: 380, height: 0}, 3000, 'linear');
+                        })
+                    });
+
+
+                }
+            }
+
+        };
+
+
+        var pipeline_03 = function() {
+            var paper = Raphael("pipeline_03", '100%', 400),
                 property = {fill: "red", stroke: "#fff"},
                 rect_01,
                 rect_02,
                 rect_03;
 
-            rect_01 = paper.rect(150, 0, 30, 100);
+            rect_01 = paper.rect(170, 10, 30, 70);
             rect_01.attr(property);
 
-            rect_02 = paper.rect(150, 80, 780, 30);
+            rect_02 = paper.rect(170, 80, 780, 30);
             rect_02.attr(property);
 
-            rect_03 = paper.rect(880, 100, 50, 80);
+            rect_03 = paper.rect(950, 110, 30, 200);
             rect_03.attr(property);
 
             return {
                 animate: function() {
-                    /*
-                    rect_01.stop().animate({y: 80, height: 0}, 3000, 'linear', function() {
-                        rect_02.stop().animate({x: 930, width: 0}, 3000, 'linear', function() {
-                            rect_03.stop().animate({y: 180, height: 0}, 3000, 'linear');
+
+                    rect_01.stop().animate({y: 293, height: 0}, 3000, 'linear', function() {
+                        rect_02.stop().animate({x: 150, width: 0}, 3000, 'linear', function() {
+                            rect_03.stop().animate({y: 380, height: 0}, 3000, 'linear');
                         })
                     });
-                    */
+
 
                 }
             }
@@ -144,6 +176,8 @@ require(['jquery', 'raphael'], function($, raphael) {
         //pipes.init();
         var pipe_01 = pipeline_01();
         var pipe_02 = pipeline_02();
+        var pipe_03 = pipeline_03();
+
 
 
         $.fn.checked = function () {
@@ -208,6 +242,9 @@ require(['jquery', 'raphael'], function($, raphael) {
         module_07.animate = function () {
             $(this.selector).css('visibility', 'visible')
             $('.guarantee-list-item', $(this.selector)).addClass('fadeInUp');
+            if(!$('#organization').hasClass('hidden')) {
+                pipe_02.animate();
+            }
         };
 
         var module_08 = new Module(400, '.online');
