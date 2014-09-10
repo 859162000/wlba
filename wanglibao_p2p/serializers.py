@@ -21,6 +21,7 @@ class P2PRecordSerializer(serializers.ModelSerializer):
 
 
 class P2PProductSerializer(ModelSerializerExtended):
+    #总收益
     total_earning = serializers.SerializerMethodField('total_earning_joined')
 
     class Meta:
