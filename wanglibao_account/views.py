@@ -393,7 +393,8 @@ class AccountP2PRecordAPI(APIView):
                     'equity_product_amortization_count': equity.product.amortization_count,                             # 还款期数
                     'equity_paid_interest': equity.paid_interest,                                                       # 单个已经收益
                     'equity_total_interest': equity.total_interest,                                                     # 单个预期收益
-                    'equity_contract': 'https://%s/accounts/p2p/contract/%s/' % (request.get_host(), equity.product.id) # 合同
+                    'equity_contract': 'https://%s/accounts/p2p/contract/%s/' % (request.get_host(), equity.product.id), # 合同
+                    'product_id': equity.product_id
             } for equity in p2p_equities]
 
         if int(page) != 0:
