@@ -85,14 +85,12 @@
       $.effect.setTabBar();
     });
     $(window).bind('scrollstop', function() {
+      console.log($('#organization').offset().top, 'top', $(window).scrollTop());
       $.effect.dispatch();
     });
     $('.security-bar').on('click', 'a', function(e) {
-      var id;
       $('.security-bar a').removeClass('active');
-      $(this).addClass('active');
-      id = $(this).attr('href').replace('#', '');
-      return $().removeClass('hidden');
+      return $(this).addClass('active');
     });
     $('.animation_02,.animation_13').mouseover(function() {
       var image;

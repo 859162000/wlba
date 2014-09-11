@@ -29,12 +29,21 @@ require(['jquery', 'raphael'], function($, raphael) {
                 },
                 setTabBar: function () {
                     var wheight = $(window).height(),
-                        distance = $('.security-bar-container').offset().top - $(window).scrollTop();
+                        distance = $('.security-bar-container').offset().top - $(window).scrollTop(),
+                        tabDistance = $('#organization').offset().top - $(window).scrollTop();
 
                     if (distance < 0) {
                         $('.security-bar').css('position', 'fixed');
                     } else {
                         $('.security-bar').css('position', '');
+                    }
+
+                    if(tabDistance > 50) {
+                        $('.security-bar a').removeClass('active')
+                        $('.security-bar a[href="#platform"]').addClass('active')
+                    } else {
+                        $('.security-bar a').removeClass('active')
+                        $('.security-bar a[href="#organization"]').addClass('active')
                     }
                 }
             }

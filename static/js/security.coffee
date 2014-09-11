@@ -80,6 +80,7 @@ require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
     return
 
   $(window).bind 'scrollstop', ->
+    console.log($('#organization').offset().top, 'top', $(window).scrollTop())
     $.effect.dispatch()
     return
 
@@ -87,18 +88,6 @@ require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
     #e.preventDefault()
     $('.security-bar a').removeClass('active')
     $(this).addClass('active')
-    id = $(this).attr('href').replace('#', '')
-
-    #$('.security-panel').each( (index, item) ->
-    #  if $(item).attr('id') == id
-    #    if $(item).hasClass('hidden')
-    #      $(item).removeClass('hidden')
-    #  else
-    #    if !$(item).hasClass('hidden')
-    #      $(item).addClass('hidden')
-    #)
-
-    $().removeClass('hidden')
 
   #mouseover
   $('.animation_02,.animation_13').mouseover ->
