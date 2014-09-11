@@ -84,18 +84,19 @@ require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
     return
 
   $('.security-bar').on 'click', 'a', (e) ->
-    e.preventDefault()
+    #e.preventDefault()
     $('.security-bar a').removeClass('active')
     $(this).addClass('active')
     id = $(this).attr('href').replace('#', '')
-    $('.security-panel').each( (index, item) ->
-      if $(item).attr('id') == id
-        if $(item).hasClass('hidden')
-          $(item).removeClass('hidden')
-      else
-        if !$(item).hasClass('hidden')
-          $(item).addClass('hidden')
-    )
+
+    #$('.security-panel').each( (index, item) ->
+    #  if $(item).attr('id') == id
+    #    if $(item).hasClass('hidden')
+    #      $(item).removeClass('hidden')
+    #  else
+    #    if !$(item).hasClass('hidden')
+    #      $(item).addClass('hidden')
+    #)
 
     $().removeClass('hidden')
 
@@ -106,6 +107,3 @@ require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
 
   $('.animation_04').mouseover ->
     $(this).bounceIn()
-
-
-
