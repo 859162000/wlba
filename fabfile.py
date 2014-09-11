@@ -27,7 +27,7 @@ def production():
     env.user = 'lishuo'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'production3.0'
 
@@ -159,11 +159,11 @@ elif env.get('group') == 'production':
             '10.165.54.41'
         ],
         'web': [
-        #    '115.28.240.194',
+            '115.28.240.194',
             '114.215.146.91'
         ],
         'web_private': [
-        #    '10.161.55.165',
+            '10.161.55.165',
             '10.164.13.228'
         ],
         'cron_tab': ['114.215.146.91'],
