@@ -103,48 +103,88 @@ html
             - endwith
 
         .span4-omega
-          div
             .panel.news-list-container
               .panel-title-bar__border-gray
-                .panel-title-b.interst 收益最高
+                .panel-title-b.earning 收益最高
               .panel-content-container
                   ul.p2pinfo-ul-box
-                    li.p2pinfo-list-box
-                      div
-                        span.p2pinfo-title-number 1
-                        h3.p2pinfo-title-content 伏案大现金同伙比A
-                      div.p2pinfo-list
-                        span.p2pinfo-ceil
-                          em 15%
-                        span.p2pinfo-ceil
-                          em.p2pinfo-active 12
-                          em 个月
-                        span.p2pinfo-ceil
-                          em 2500.00
-                    li.p2pinfo-list-box
-                      div
-                        span.p2pinfo-title-number 1
-                        h3.p2pinfo-title-content 伏案大现金同伙比A
-                      div.p2pinfo-list
-                        span.p2pinfo-ceil
-                          em.p2pinfo-active 15%
-                        span.p2pinfo-ceil
-                          em 12
-                          em 个月
-                        span.p2pinfo-ceil
-                          em 2500.00
+                    for p2p in p2p_earning
+                      li.p2pinfo-list-box
+                        div.p2pinfo-list-title
+                          if forloop.counter == 1
+                            span.p2pinfo-title-number {{ forloop.counter }}
+                            h3.p2pinfo-title-content {{ p2p.name }}
+                          elif 1 < forloop.counter < 4
+                            span.p2pinfo-title-number-2-3 {{ forloop.counter }}
+                            h3.p2pinfo-title-content {{ p2p.name }}
+                          else
+                            span.p2pinfo-title-number-4-5 {{ forloop.counter }}
+                            h3.p2pinfo-title-content {{ p2p.name }}
 
-            .panel.invest-history-container
-              .panel-title-bar__border-gray
-                .panel-title 期限最短
-              .panel-content-container.padding-l-r-s
-                ul.margin-top-s
+                        div.p2pinfo-list
+                          span.p2pinfo-ceil
+                            em.p2pinfo-active  {{ p2p.expected_earning_rate }} %
+                          span.p2pinfo-ceil
+                            em{{ p2p.period }}
+                            em 个月
+                          span.p2pinfo-ceil
+                            amount = p2p.total_amount - p2p.ordered_amount
+                            em {{ amount }}
 
-            .panel.invest-history-container
+            .panel.news-list-container
               .panel-title-bar__border-gray
-                .panel-title 即将满标
-              .panel-content-container.padding-l-r-s
-                ul.margin-top-s
+                .panel-title-b.period  期限最短
+              .panel-content-container
+                  ul.p2pinfo-ul-box
+                    for p2p in p2p_period
+                      li.p2pinfo-list-box
+                        div.p2pinfo-list-title
+                          if forloop.counter == 1
+                            span.p2pinfo-title-number {{ forloop.counter }}
+                            h3.p2pinfo-title-content {{ p2p.name }}
+                          elif 1 < forloop.counter < 4
+                            span.p2pinfo-title-number-2-3 {{ forloop.counter }}
+                            h3.p2pinfo-title-content {{ p2p.name }}
+                          else
+                            span.p2pinfo-title-number-4-5 {{ forloop.counter }}
+                            h3.p2pinfo-title-content {{ p2p.name }}
+
+                        div.p2pinfo-list
+                          span.p2pinfo-ceil
+                            em  {{ p2p.expected_earning_rate }} %
+                          span.p2pinfo-ceil
+                            em.p2pinfo-active {{ p2p.period }}
+                            em 个月
+                          span.p2pinfo-ceil
+                            amount = p2p.total_amount - p2p.ordered_amount
+                            em {{ amount }}
+
+            .panel.news-list-container
+              .panel-title-bar__border-gray
+                .panel-title-b.amount  即将满标
+              .panel-content-container
+                  ul.p2pinfo-ul-box
+                    for p2p in p2p_amount
+                      li.p2pinfo-list-box
+                        div.p2pinfo-list-title
+                          if forloop.counter == 1
+                            span.p2pinfo-title-number {{ forloop.counter }}
+                            h3.p2pinfo-title-content {{ p2p.name }}
+                          elif 1 < forloop.counter < 4
+                            span.p2pinfo-title-number-2-3 {{ forloop.counter }}
+                            h3.p2pinfo-title-content {{ p2p.name }}
+                          else
+                            span.p2pinfo-title-number-4-5 {{ forloop.counter }}
+                            h3.p2pinfo-title-content {{ p2p.name }}
+                        div.p2pinfo-list
+                          span.p2pinfo-ceil
+                            em  {{ p2p.expected_earning_rate }} %
+                          span.p2pinfo-ceil
+                            em {{ p2p.period }}
+                            em 个月
+                          span.p2pinfo-ceil
+                            amount = p2p.total_amount - p2p.ordered_amount
+                            em.p2pinfo-active {{ amount }}
 
     .space-vertical-l
 
