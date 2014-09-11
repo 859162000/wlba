@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, url
-
 from views import P2PDetailView, audit_product_view, P2PListView
 
 urlpatterns = patterns('',

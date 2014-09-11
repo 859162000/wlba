@@ -1,6 +1,5 @@
 -load formatters
 -load mathfilters
-
 doctype html
 html
   head
@@ -9,12 +8,13 @@ html
     - endwith
     meta(name="keywords", content="网利宝")
     meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
-
   body.white-background
     include include/header
     - with 'P2P理财' as activeItem
     include include/navigation
     - endwith
+
+    .full-container-white
 
     .container
       .row
@@ -97,11 +97,10 @@ html
                       span.d3-text {{product.display_payback_method}}
                 if status == '还款中' or status == '已完成'
                   .panel-p2p-stamp
-          .row
+          .row.margin-top-l
             - with data=p2p_products uri='/p2p/list/'
             include include/pager
             - endwith
-
 
         .span4-omega
           div
@@ -188,8 +187,13 @@ html
                             amount = p2p.total_amount - p2p.ordered_amount
                             em.p2pinfo-active {{ amount }}
 
+            .panel.invest-history-container
+              .panel-title-bar__border-gray
+                .panel-title 即将满标
+              .panel-content-container.padding-l-r-s
+                ul.margin-top-s
 
-
+    .space-vertical-l
 
     - with 1 as no_margin
     include include/footer

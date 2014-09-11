@@ -23,6 +23,7 @@ from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from operator import attrgetter
 
+
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
 
@@ -213,3 +214,4 @@ class P2PListView(TemplateView):
             'p2p_period': p2p_period[:5],
             'p2p_amount': p2p_amount[:5],
         }
+
