@@ -163,8 +163,7 @@
       var count, element, intervalId, phoneNumber, timerFunction;
       e.preventDefault();
       element = this;
-      e.preventDefault();
-      phoneNumber = $("#reg_identifier").val().trim();
+      phoneNumber = $.trim($("#reg_identifier").val());
       if (checkMobile(phoneNumber)) {
         if (typeof console !== "undefined" && console !== null) {
           console.log("Phone number checked, now send the valdiation code");

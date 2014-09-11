@@ -29,12 +29,21 @@ require(['jquery', 'raphael'], function($, raphael) {
                 },
                 setTabBar: function () {
                     var wheight = $(window).height(),
-                        distance = $('.security-bar-container').offset().top - $(window).scrollTop();
+                        distance = $('.security-bar-container').offset().top - $(window).scrollTop(),
+                        tabDistance = $('#organization').offset().top - $(window).scrollTop();
 
                     if (distance < 0) {
                         $('.security-bar').css('position', 'fixed');
                     } else {
                         $('.security-bar').css('position', '');
+                    }
+
+                    if(tabDistance > 50) {
+                        $('.security-bar a').removeClass('active')
+                        $('.security-bar a[href="#platform"]').addClass('active')
+                    } else {
+                        $('.security-bar a').removeClass('active')
+                        $('.security-bar a[href="#organization"]').addClass('active')
                     }
                 }
             }
@@ -234,6 +243,27 @@ require(['jquery', 'raphael'], function($, raphael) {
             show();
         };
 
+        $.fn.bounceIn = function() {
+            if(this.attr('data-active') == 1) {
+                return;
+            }
+            this.attr('data-active', '1');
+            var image = this,
+                normalWidth = image.width(),
+                zoomInWidth = normalWidth + normalWidth*0.2,
+                zoomOutWidth = normalWidth - normalWidth*0.1;
+                zoomIn = function() {
+                    image.animate({ width: zoomInWidth }, 200, restore);
+                },
+
+                restore = function() {
+                    image.animate({ width: normalWidth }, 200, function() {
+                        image.removeAttr('data-active');
+                    });
+                }
+            image.animate({ width: zoomOutWidth }, 200, zoomIn);
+        }
+
 
         //2. module
         function Module(distance, selector) {
@@ -330,10 +360,10 @@ require(['jquery', 'raphael'], function($, raphael) {
                 $('.animation_03', $(_self.selector)).css('visibility', 'visible');
                 $('.animation_03', $(_self.selector)).addClass('fade-in-left');
 
-                setTimeout(function(){
+                //setTimeout(function(){
                     $('.animation_04', $(_self.selector)).css('visibility', 'visible');
-                    $('.animation_04', $(_self.selector)).addClass('bounceIn');
-                }, 1000);
+                    //$('.animation_04', $(_self.selector)).addClass('bounceIn');
+                //}, 1000);
             }
         };
 
