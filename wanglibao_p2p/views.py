@@ -21,7 +21,7 @@ from wanglibao_p2p.serializers import P2PProductSerializer, P2PRecordSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
-
+from itertools import chain
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -179,13 +179,19 @@ class P2PListView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        p2p_products = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
+        p2p_done = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+            .filter(status= u'正在招标').order_by('-publish_time').order_by('-priority').select_related('warrant_company')
+
+        p2p_others = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
             status__in=[
-                u'正在招标', u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
-            ]).order_by('-end_time').order_by('-priority').select_related('warrant_company')
+                u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+            ]).order_by('-end_time').select_related('warrant_company')
 
+        p2p_products = []
+        p2p_products.extend(p2p_done)
+        p2p_products.extend(p2p_others)
 
-        limit = 6
+        limit = 10
         paginator = Paginator(p2p_products, limit)
         page = self.request.GET.get('page')
 
