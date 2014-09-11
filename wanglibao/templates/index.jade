@@ -176,8 +176,7 @@ html
                 if status == '还款中' or status == '已完成'
                   .panel-p2p-stamp
           .row
-            if get_more
-              a.get-more.get-more-active(href="/p2p/list")查看更多
+              a.get-more.get-more-active(href="{% url 'p2p_list' %}") 查看更多
 
 
         .span4-omega
@@ -233,6 +232,7 @@ html
                           td.invest-num
                             span.money-highlight {{trade.amount}}
                               span 元
+
     hr.bottom-hr
     script.
       require(["/static/js/index.js"])
