@@ -72,7 +72,7 @@ require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
 
 
   $(window).load  ->
-    $(window).trigger('scrollstop')
+    $.effect.dispatch()
     return
 
   $(window).bind 'scroll', ->
@@ -80,19 +80,15 @@ require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
     return
 
   $(window).bind 'scrollstop', ->
-    console.log($('#organization').offset().top, 'top', $(window).scrollTop())
     $.effect.dispatch()
     return
 
   $('.security-bar').on 'click', 'a', (e) ->
-    #e.preventDefault()
     $('.security-bar a').removeClass('active')
     $(this).addClass('active')
 
   #mouseover
-  $('.animation_02,.animation_13').mouseover ->
+  $('.animation_02,.animation_13,.animation_03').mouseover ->
     image = $('img', $(this))
     image.bounceIn()
 
-  $('.animation_04').mouseover ->
-    $(this).bounceIn()

@@ -360,10 +360,10 @@ require(['jquery', 'raphael'], function($, raphael) {
                 $('.animation_03', $(_self.selector)).css('visibility', 'visible');
                 $('.animation_03', $(_self.selector)).addClass('fade-in-left');
 
-                setTimeout(function(){
+                //setTimeout(function(){
                     $('.animation_04', $(_self.selector)).css('visibility', 'visible');
-                    $('.animation_04', $(_self.selector)).addClass('bounceIn');
-                }, 1000);
+                    //$('.animation_04', $(_self.selector)).addClass('bounceIn');
+                //}, 1000);
             }
         };
 

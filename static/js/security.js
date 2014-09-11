@@ -79,26 +79,22 @@
       }
     };
     $(window).load(function() {
-      $(window).trigger('scrollstop');
+      $.effect.dispatch();
     });
     $(window).bind('scroll', function() {
       $.effect.setTabBar();
     });
     $(window).bind('scrollstop', function() {
-      console.log($('#organization').offset().top, 'top', $(window).scrollTop());
       $.effect.dispatch();
     });
     $('.security-bar').on('click', 'a', function(e) {
       $('.security-bar a').removeClass('active');
       return $(this).addClass('active');
     });
-    $('.animation_02,.animation_13').mouseover(function() {
+    return $('.animation_02,.animation_13,.animation_03').mouseover(function() {
       var image;
       image = $('img', $(this));
       return image.bounceIn();
-    });
-    return $('.animation_04').mouseover(function() {
-      return $(this).bounceIn();
     });
   });
 
