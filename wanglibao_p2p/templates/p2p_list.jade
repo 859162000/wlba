@@ -103,7 +103,6 @@ html
             - endwith
 
         .span4-omega
-          div
             .panel.news-list-container
               .panel-title-bar__border-gray
                 .panel-title-b.earning 收益最高
@@ -111,7 +110,7 @@ html
                   ul.p2pinfo-ul-box
                     for p2p in p2p_earning
                       li.p2pinfo-list-box
-                        div
+                        div.p2pinfo-list-title
                           if forloop.counter == 1
                             span.p2pinfo-title-number {{ forloop.counter }}
                             h3.p2pinfo-title-content {{ p2p.name }}
@@ -139,7 +138,7 @@ html
                   ul.p2pinfo-ul-box
                     for p2p in p2p_period
                       li.p2pinfo-list-box
-                        div
+                        div.p2pinfo-list-title
                           if forloop.counter == 1
                             span.p2pinfo-title-number {{ forloop.counter }}
                             h3.p2pinfo-title-content {{ p2p.name }}
@@ -167,7 +166,7 @@ html
                   ul.p2pinfo-ul-box
                     for p2p in p2p_amount
                       li.p2pinfo-list-box
-                        div
+                        div.p2pinfo-list-title
                           if forloop.counter == 1
                             span.p2pinfo-title-number {{ forloop.counter }}
                             h3.p2pinfo-title-content {{ p2p.name }}
@@ -186,12 +185,6 @@ html
                           span.p2pinfo-ceil
                             amount = p2p.total_amount - p2p.ordered_amount
                             em.p2pinfo-active {{ amount }}
-
-            .panel.invest-history-container
-              .panel-title-bar__border-gray
-                .panel-title 即将满标
-              .panel-content-container.padding-l-r-s
-                ul.margin-top-s
 
     .space-vertical-l
 
