@@ -21,7 +21,7 @@ from wanglibao_p2p.serializers import P2PProductSerializer, P2PRecordSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
-from itertools import chain
+from operator import attrgetter
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -187,6 +187,11 @@ class P2PListView(TemplateView):
                 u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
             ]).order_by('-end_time').select_related('warrant_company')
 
+        p2p_earning = sorted(p2p_done, key=attrgetter('expected_earning_rate'), reverse=True)
+        p2p_period = sorted(p2p_done, key=attrgetter('period'), reverse=True)
+        p2p_amount = sorted(p2p_done, key=attrgetter('total_amount'), reverse=False)
+
+
         p2p_products = []
         p2p_products.extend(p2p_done)
         p2p_products.extend(p2p_others)
@@ -203,5 +208,8 @@ class P2PListView(TemplateView):
             p2p_products = paginator.page(paginator.num_pages)
 
         return {
-            'p2p_products': p2p_products
+            'p2p_products': p2p_products,
+            'p2p_earning': p2p_earning[:5],
+            'p2p_period': p2p_period[:5],
+            'p2p_amount': p2p_amount[:5],
         }
