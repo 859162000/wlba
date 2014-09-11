@@ -10,101 +10,319 @@ html
     meta(name="keywords", content="安全保障")
     meta(name="description", content="没有最安全，只有更安全")
 
-  body
+  body.white-background
     include include/header
     - with '安全保障' as activeItem
     include include/navigation
     - endwith
 
       .security-container-banner
-      .security-container-gallery
-        .row.security-guarantee
-          h1 银行级网站安全保障, 全方位保障数据安全
-        .row
-          .security-column
-            .security-box.cash
-              .header
-              .content
-                p 平安银行为每一位投资人的账户资金进行全额担保，如出现被盗平安银行进行全额赔付。
-                p 委托银行和专业第三方支付机构对投资者账户进行资金托管，用户账户资金与网利宝运营资金严格分离。
-          .security-column
-              .security-box.data
-                .header
-                .content
-                  p 网利宝通过国际标准的SSL安全加密技术保障数据信息安全，三层防火墙隔离系统的访问层、应用层和数据层集群；有效的入侵防范及容灾备份，确保交易数据安全无虞。
-          .security-column-last
-              .security-box.privacy
-                .header
-                .content
-                  p 网利宝上所有的隐私信息都经过128位加密处理，防止任何人包括公司员工获取用户信息。网利宝在任何情况下都绝不会出售、出租或以任何其他形式泄漏您的信息。您的信息将按照《网利宝用户注册协议》中的规定被严格保护。
 
-      .security-container-white.partners-container
-        .row
-          h1 合作伙伴
-          ul.items
-            li
-              span.icon-right-dir
-              span.content 安全、合规、稳健的可持续战略规划，保障与合作伙伴的长期稳定、携手共赢；
-            li
-              span.icon-right-dir
-              span.content 百度、腾讯、阿里巴巴、360等一线互联网流量入口资源
-            li
-              span.icon-right-dir
-              span.content P2P行业巨头陆金所、宜信等战略合作；全国各地拥有多个分支机构，全面控制源头风险
-          .partners
+      //tabs start
+      .security-bar-container
+        .security-bar
+          .container
+            a.active(href="#platform") 全平台保障策略
+            a(href="#organization") P2P项目本息保障计划
+      //tabs end
+
+      //全平台保障策略
+      //start
+      .security-panel#platform
+        .security-panel-title
+          .security-panel-center
+            h2 全平台保障策略
+        .security-panel-container.platform_01
+          .row
+            .span5
+              .security-content.animation_01
+                .security-num-01
+                h3 综合完整理财业务，稳健个人资产增值强力保障
+                p 真正意义上的资产配置。网利宝为投资人定制一对多综合投资模型，不将投资人的“鸡蛋放在同一个篮子”里，以分摊风险，实现投资人资产稳健增值。
+            .span2 &nbsp;
+            .span4
+              .security-image.padding-top-xxxl.animation_02
+                img(src="/static/images/security/panel_01.jpg")
+
+        .security-panel-container.platform_02
+          .row
+            .span6
+              .security-image.padding-top-xl.animation_03
+                img(src="/static/images/security/panel_02.png")
+              .panel-02-1.animation_04
+            .span5
+              .security-content.animation_05
+                .security-num-02
+                h3 4 重身份认证 锁定账户安全
+                p 账户资金对应唯一身份——理财资金同卡进出/4重身份验证。
+                p
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 姓名
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 手机号
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 身份证
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 银行卡号
+
+        .security-panel-container.platform_03
+          .row
+            .span7
+              .security-content.animation_06
+                .security-num-03
+                h3 权威机构合作 从源头控制风险
+                p
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 与东源、苏州国信集团、数米基金网、联合信用等权威机构合作
+                p
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 顶级风控团队：国际顶级投行、知名国内外银行及互联网金融领域团队协作把关信息
+                p
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 精选优质理财产品，网利宝风控团队把关筛选，优中取精
+                p
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 实地项目考察及全程监管
+            .span4
+              .security-image.padding-top-xxxl.align-center.animation_07
+                img(src="/static/images/security/panel_03.jpg")
+              .panel-03-1.animation_08
+
+        .security-panel-container.platform_04
+          .row
+            .span4
+              .security-image.padding-top-xxxl.align-center.animation_09
+                img(src="/static/images/security/panel_04.jpg")
+              .panel-04-1.animation_10
+            .span2 &nbsp;
+            .span5
+              .security-content.animation_11
+                .security-num-04
+                h3 资金链360°保障，不动用户1分钱
+                p
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 支付结算由汇付天下等第三方支付通道完成
+                p
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 交易全程由民生银行监管
+                p
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 资金托管与联动优势合作
+                p
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 平安保险对用户资金账户全额承保
+
+        .security-panel-container.border-no.platform_05
+          .row
+            .span7
+              .security-content.animation_12
+                .security-num-05
+                h3 全站信息加密，银行级保障
+                p 最高256位全站加密方式，让你的账户无论登录或登出都一样安全
+                p
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 最高256位加密
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 99%浏览器/设备兼容
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 全站加密
+                  span.icon.icon-circle
+                    span.icon.icon-check-mark
+                  i 三重防火墙
+            .span4
+              .security-image.padding-top-xxxl.align-center.animation_13
+                img(src="/static/images/security/panel_05.jpg")
 
 
-      .patterns-container
-        .row
-          h1 P2P业务运作模式图
-          .patterns-image
+      //end
 
-      .law-container
-        .row
-          h1 政策法规保障
-          .security-column
-            .security-box.law1
-              .header
-              .content 法律顾问从服务合规性、政策走向等多方面提供法律意见，保障融资方式、平台和项目的合法性。
-          .security-column
-            .security-box.law2
-              .header
-              .content 一切合同和规章制度将由我们的法律顾问和专业的金融机构一同起草，保证投资人在平台上的所有操作都合法有效。
-          .security-column-last
-            .security-box.law3
-              .header
-              .content 法律顾问将会为投资者的合法权益提供法律担保。当项目或者投资人利益受损时，均能快速找到我们的法律顾问并得到法律援助。
+      //项目本息担保计划
+      //start
+      .security-panel.hidden#organization
+        .security-panel-title
+          .security-panel-center
+            h2 项目本息担保计划
 
-      .security-risk-container
-        .row.risk-row
-          h1 权威风控体系
-          .item-row
-            span.icon-right-dir
-            span.content   严格机构审核和内部审核机制，第三方担保及第三方权威评级的优秀债权项目
-          .item-row
-            span.icon-right-dir
-            span.content 多元化投资，使投资资金分散，风险最小化
-          .item-row
-            span.icon-right-dir
-            span.content 网利宝投资理财用户账户安全由国内领先的保险公司全额承保
-          .item-row
-            span.icon-right-dir
-            span.content 网利宝拥有自己专业且严格的风控团队，对合作金融机构进行严格筛选并对投资项目进行双重审核。
-          .item-row
-            span.icon-right-dir
-            span.content 完善的贷后跟踪控制机制
+        .security-panel-content
+          .security-panel-center
 
-        .row
-          if user.is_authenticated
-            a.home-btn(href='/') 立即赚钱
-            else
-              a.register-modal(href='#login-modal') 立即赚钱，马上注册
+            .guarantee-container.organization.untreadted
+              .guarantee-list-item.guarantee-container-title
+                h3
+                  机构筛选
+                  .organization-num-01
+                p 选择权威评级前10%优质小贷、担保等具有担保资质的机构为合作伙伴。
+
+              .guarantee-list-item.guarantee-container-list
+                ul
+                  li
+                    span.list-label
+                      .list-icon.list-01
+                      按月审核
+                    span.list-content 网利宝平台风控团队审核合作机构“风控标准、风控流程、放款标准、贷后管理等”，按月审核合作机构资质。
+                  li
+                    span.list-label
+                      .list-icon.list-02
+                      授信额度制
+                    span.list-content 对合作机构实行授信额度制，结合权威评级、机构资产规模、往期风控案例表现综合给定合作授信额度。
+
+                  li
+                    span.list-label
+                      .list-icon.list-03
+                      实时监控
+                    span.list-content 网利宝风控团队实时监控合作机构资产情况。
+
+            //pipeline_01
+            .guarantee-container.pipeline_01
+              .pipeline
+              #pipeline_01
+
+            .guarantee-container.project.untreated
+              .guarantee-list-item.guarantee-container-title
+                 h3
+                    项目筛选
+                    .organization-num-02
+
+                  p 合作机构推荐排名前10%的优质项目
+
+              .guarantee-list-item.guarantee-container-list
+                ul
+                  li
+                    span.list-label
+                      .list-icon.list-01
+                      权威推荐
+                    span.list-content 小贷机构严格审核，担保公司本息担保，大额项目，国家级权威评级机构会予以权威评级
+                  li
+                    span.list-label
+                      .list-icon.list-02
+                      二次审核
+                    span.list-content 对合作机构: 风控体系、历史数据、财务数据等。<br>对贷款项目: 第三方机构出具评估报告，按市场估值50% - 70%以下额度批款，借款方交付保证金，借款企业股承诺回购，担保公司本息担保。逾期合作机构代偿，抵押质押物处置。
+
+                  li
+                    span.list-label
+                      .list-icon.list-03
+                      实地考察
+                    span.list-content 网利宝团队已铺设全国8省市办事网点及项目实地考察机制，保障每一个项目在酝酿期就受到最实际的严格把控
+
+              .pipeline_02#pipeline_02
+
+            //pipeline_02
+            //.guarantee-container.pipeline_02
+              .pipeline
+              #pipeline_02
+
+            .guarantee-container.online.untreated
+              .guarantee-list-item.guarantee-container-title
+                 h3
+                   上线项目保障
+                   .organization-num-03
+
+
+              .guarantee-list-item.guarantee-container-list
+                ul
+                  li
+                    span.list-label
+                      .list-icon.list-01
+                      无限连带责任制
+                    span.list-content 合作机构签署无限连带责任制还款协议，机构实际皑皑人/大股东将承担连带还款；借款企业需承诺回购、借款企业股东承诺担保
+                  li
+                    span.list-label
+                      .list-icon.list-02
+                      一对一保障计划
+                    span.list-content 从审核，评定，放、回款流程上都从头到尾二次评估定制保障计划
+
+                  li
+                    span.list-label
+                      .list-icon.list-03
+                      按月抽查
+                    span.list-content 网利宝风控团队按月抽查还款中项目；
+                  li
+                    span.list-label
+                      .list-icon.list-04
+                      实时监管
+                    span.list-content 网利宝风控团队(包括全国8大省市网点)实时监控放、还款进度;
+                  li
+                    span.list-label
+                      .list-icon.list-05
+                      全额承保
+                    span.list-content 网利宝用户账户资金由平安保险全额承保。（强调）
+                  li
+                    span.list-label
+                      .list-icon.list-06
+                      抵押、质押保障
+                    span.list-content 网利宝要求项目方提供固定资产抵押或流通货物质押
+
+            //逾期处理
+            .guarantee-container.overdue
+              .guarantee-list-item.guarantee-container-title
+                 h3
+                   逾期处理
+                   .organization-num-04
+
+
+              .guarantee-list-item.guarantee-container-list
+                ul
+                  li
+                    span.list-label ①
+                    span.list-content 机构实际控制人/大股东将承担连带还款；借款企业承诺回购；借款企业股东承诺担保。
+                  li
+                    span.list-label ②
+                    span.list-content 项目方提供的固定资产抵押或流通质押抵押变卖，以保障第一时间实现债权。
+
+                  li
+                    span.list-label ③
+                    span.list-content 风险保证金制度保证一旦出现逾期，可以启动代尝。
+                  li
+                    span.list-label ④
+                    span.list-content 一旦出现以上保障机制全部失效，投资人能快速及时获得法律援助
+
+              .gear.untreated
+              .investor.untreated
+              .pipeline_03#pipeline_03
+
+
+
+        //保证金制度，平安保险，法律保障 start
+        .container
+          .security-foot-container.platform_06
+            .security-foot-panel.animation_14
+              h3 保证金制度
+              .security-foot-cash
+              p ① 合作机构对所推荐项目提供一定比例风险准备金
+              p ② 项目方提供项目借款保证金
+              p ③ 抵押质押物管理与处置计划
+              p ④ 平台自有资金提供一定比例风险准备金
+            .security-foot-panel.animation_15
+              h3 平安承保
+              .security-foot-pingan
+              div 平安保险对用户账户资金全额承保
+            .security-foot-panel.animation_16
+              h3 法律保障
+              .security-foot-law
+              p 由战略合作律所——隆安律师事务所提供从项目审核、上线、投资流程及放款、回款、追款全线落实法律支持机制，让投资人的每一笔投资都合法有效。
+      //end
+
 
 
     script.
-      require(["/static/js/index.js"])
+      require(["/static/js/security.js"])
 
-    - with 1 as no_margin
+    - with 1 as no_footbar
     include include/footer
     - endwith
 
