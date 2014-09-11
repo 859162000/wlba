@@ -130,8 +130,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
   $("#button-get-validate-code-modal").click (e) ->
       e.preventDefault()
       element = this
-      e.preventDefault()
-      phoneNumber = $("#reg_identifier").val().trim()
+      phoneNumber = $.trim($("#reg_identifier").val())
       if checkMobile(phoneNumber)
         if console?
           console.log "Phone number checked, now send the valdiation code"

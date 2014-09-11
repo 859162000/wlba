@@ -87,7 +87,7 @@
     $(window).bind('scrollstop', function() {
       $.effect.dispatch();
     });
-    return $('.security-bar').on('click', 'a', function(e) {
+    $('.security-bar').on('click', 'a', function(e) {
       var id;
       e.preventDefault();
       $('.security-bar a').removeClass('active');
@@ -105,6 +105,14 @@
         }
       });
       return $().removeClass('hidden');
+    });
+    $('.animation_02,.animation_13').mouseover(function() {
+      var image;
+      image = $('img', $(this));
+      return image.bounceIn();
+    });
+    return $('.animation_04').mouseover(function() {
+      return $(this).bounceIn();
     });
   });
 

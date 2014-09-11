@@ -234,6 +234,27 @@ require(['jquery', 'raphael'], function($, raphael) {
             show();
         };
 
+        $.fn.bounceIn = function() {
+            if(this.attr('data-active') == 1) {
+                return;
+            }
+            this.attr('data-active', '1');
+            var image = this,
+                normalWidth = image.width(),
+                zoomInWidth = normalWidth + normalWidth*0.2,
+                zoomOutWidth = normalWidth - normalWidth*0.1;
+                zoomIn = function() {
+                    image.animate({ width: zoomInWidth }, 200, restore);
+                },
+
+                restore = function() {
+                    image.animate({ width: normalWidth }, 200, function() {
+                        image.removeAttr('data-active');
+                    });
+                }
+            image.animate({ width: zoomOutWidth }, 200, zoomIn);
+        }
+
 
         //2. module
         function Module(distance, selector) {

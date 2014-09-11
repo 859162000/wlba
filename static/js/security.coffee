@@ -98,3 +98,14 @@ require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
     )
 
     $().removeClass('hidden')
+
+  #mouseover
+  $('.animation_02,.animation_13').mouseover ->
+    image = $('img', $(this))
+    image.bounceIn()
+
+  $('.animation_04').mouseover ->
+    $(this).bounceIn()
+
+
+
