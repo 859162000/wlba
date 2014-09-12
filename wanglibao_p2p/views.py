@@ -191,7 +191,7 @@ class P2PListView(TemplateView):
         p2p_earning = sorted(p2p_done, key=lambda x: (-x.expected_earning_rate, x.available_amout))
 
         p2p_period = sorted(p2p_done, key=lambda x: (x.period, x.available_amout))
-        p2p_amount = sorted(p2p_done, key=attrgetter('available_amout'), reverse=True)
+        p2p_amount = sorted(p2p_done, key=attrgetter('available_amout'))
 
 
         p2p_products = []
