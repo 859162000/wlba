@@ -133,6 +133,8 @@ class P2PProduct(ProductBase):
     total_amount = models.BigIntegerField(default=1, verbose_name=u'借款总额*', blank=False)
     ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
 
+    # _available_amout = models.BigIntegerField(default=0, verbose_name=u'可投资金额')
+
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
     publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间*', blank=False)
@@ -170,6 +172,10 @@ class P2PProduct(ProductBase):
     @property
     def current_limit(self):
         return min(self.remain, self.limit_amount_per_user)
+
+    @property
+    def available_amout(self):
+        return self.total_amount - self.ordered_amount
 
     def has_amount(self, amount):
         if amount <= self.remain:
