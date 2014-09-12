@@ -184,7 +184,7 @@ html
                           if forloop.counter == 1
                             span.p2pinfo-title-number {{ forloop.counter }}
                             h3.p2pinfo-title-content {{ p2p.name }}
-                          elif 1 < forloop.counter < 4
+                          elif 1 < forloop.counter and forloop.counter < 4
                             span.p2pinfo-title-number-2-3 {{ forloop.counter }}
                             h3.p2pinfo-title-content {{ p2p.name }}
                           else
