@@ -113,6 +113,7 @@ html
               .panel-title-bar__border-gray
                 .panel-title-b.earning 收益最高
               .panel-content-container
+                if p2p_earning
                   ul.p2pinfo-ul-box
                     for p2p in p2p_earning
                       li.p2pinfo-list-box
@@ -136,11 +137,14 @@ html
                             em &nbsp;个月
                           .span5-omega.p2pinfo-ceil
                             em {{ p2p.available_amout }} 元可投
+                else
+                  p.p2pinfo-message 没有记录
             .space-vertical-m
             .panel.news-list-container
               .panel-title-bar__border-gray
                 .panel-title-b.period  期限最短
               .panel-content-container
+                if p2p_period
                   ul.p2pinfo-ul-box
                     for p2p in p2p_period
                       li.p2pinfo-list-box
@@ -164,11 +168,15 @@ html
                             em &nbsp;个月
                           .span5-omega.p2pinfo-ceil
                             em {{ p2p.available_amout }} 元可投
+                else
+                  p.p2pinfo-message 没有记录
             .space-vertical-m
+
             .panel.news-list-container
               .panel-title-bar__border-gray
                 .panel-title-b.amount  即将满标
               .panel-content-container
+                if p2p_amount
                   ul.p2pinfo-ul-box
                     for p2p in p2p_amount
                       li.p2pinfo-list-box
@@ -192,6 +200,8 @@ html
                           .span5-omega.p2pinfo-ceil
                             em.p2pinfo-active.highlight {{ p2p.available_amout }}
                             | &nbsp;元可投
+                else
+                  p.p2pinfo-message 没有记录
 
     .space-vertical-xl
 
