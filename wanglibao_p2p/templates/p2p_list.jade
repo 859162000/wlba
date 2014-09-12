@@ -128,8 +128,7 @@ html
                             em{{ p2p.period }}
                             em 个月
                           span.p2pinfo-ceil
-                            amount = p2p.total_amount - p2p.ordered_amount
-                            em {{ amount }}
+                            em {{ p2p.available_amout }}
 
             .panel.news-list-container
               .panel-title-bar__border-gray
@@ -156,8 +155,7 @@ html
                             em.p2pinfo-active {{ p2p.period }}
                             em 个月
                           span.p2pinfo-ceil
-                            amount = p2p.total_amount - p2p.ordered_amount
-                            em {{ amount }}
+                            em {{ p2p.available_amout }}
 
             .panel.news-list-container
               .panel-title-bar__border-gray
@@ -183,8 +181,7 @@ html
                             em {{ p2p.period }}
                             em 个月
                           span.p2pinfo-ceil
-                            amount = p2p.total_amount - p2p.ordered_amount
-                            em.p2pinfo-active {{ amount }}
+                            em.p2pinfo-active {{ p2p.available_amout }}
 
     .space-vertical-l
 
