@@ -105,7 +105,7 @@ require(['jquery', 'raphael'], function($, raphael) {
                 animate: function() {
                     $('.organization').removeClass('untreated');
                     rect_01.stop().animate({y: 80, height: 0}, 1000, 'linear', function() {
-                        rect_02.stop().animate({x: 930, width: 0}, 3000, 'linear', function() {
+                        rect_02.stop().animate({x: 930, width: 0}, 1000, 'linear', function() {
                             rect_03.stop().animate({y: 180, height: 0}, 1000, 'linear', function() {
                                 $('.project').removeClass('untreated');
                             });
@@ -137,7 +137,7 @@ require(['jquery', 'raphael'], function($, raphael) {
                 animate: function() {
 
                     rect_01.stop().animate({y: 368, height: 0}, 1000, 'linear', function() {
-                        rect_02.stop().animate({x: 150, width: 0}, 3000, 'linear', function() {
+                        rect_02.stop().animate({x: 150, width: 0}, 1000, 'linear', function() {
                             rect_03.stop().animate({y: 455, height: 0}, 1000, 'linear', function() {
                                 $('.online').removeClass('untreated');
                             });
@@ -187,19 +187,19 @@ require(['jquery', 'raphael'], function($, raphael) {
             return {
                 animate: function() {
 
-                    rect_01.stop().animate({y: 80, height: 0}, 800, 'linear', function() {
-                        rect_02.stop().animate({x: 920, width: 0}, 1500, 'linear', function() {
-                            rect_03.stop().animate({y: 170, height: 0}, 600, 'linear', function() {
+                    rect_01.stop().animate({y: 80, height: 0}, 500, 'linear', function() {
+                        rect_02.stop().animate({x: 920, width: 0}, 1000, 'linear', function() {
+                            rect_03.stop().animate({y: 170, height: 0}, 500, 'linear', function() {
                                 $('.gear').removeClass('untreated');
-                                rect_04.stop().animate({y: 500, height: 0}, 600, 'linear', function() {
-                                    rect_05.stop().animate({x: 630, width: 0}, 1500, 'linear');
+                                rect_04.stop().animate({y: 500, height: 0}, 500, 'linear', function() {
+                                    rect_05.stop().animate({x: 630, width: 0}, 1000, 'linear');
                                 });
                             });
                         })
                     });
 
-                    rect_06.stop().animate({y: 500, height: 0}, 3000, 'linear', function() {
-                        rect_07.stop().animate({x: 450, width: 0}, 2000, 'linear', function() {
+                    rect_06.stop().animate({y: 500, height: 0}, 2000, 'linear', function() {
+                        rect_07.stop().animate({x: 450, width: 0}, 1500, 'linear', function() {
                             $('.investor').removeClass('untreated');
                         });
                     });
