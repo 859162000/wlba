@@ -120,13 +120,16 @@ html
                         .p2pinfo-list-title
                           if forloop.counter == 1
                             span.p2pinfo-title-number.highlight {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
+                            h3.p2pinfo-title-content
+                             a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
                           elif 1 < forloop.counter and forloop.counter < 4
                             span.p2pinfo-title-number-2-3 {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
                           else
                             span.p2pinfo-title-number-4-5 {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
 
                         .row.p2pinfo-list
                           .span4.p2pinfo-ceil
@@ -151,13 +154,16 @@ html
                         div.p2pinfo-list-title
                           if forloop.counter == 1
                             span.p2pinfo-title-number {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
                           elif 1 < forloop.counter and forloop.counter < 4
                             span.p2pinfo-title-number-2-3 {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
                           else
                             span.p2pinfo-title-number-4-5 {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
 
                         .row.p2pinfo-list
                           .span4.p2pinfo-ceil
@@ -183,13 +189,16 @@ html
                         div.p2pinfo-list-title
                           if forloop.counter == 1
                             span.p2pinfo-title-number {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
                           elif 1 < forloop.counter and forloop.counter < 4
                             span.p2pinfo-title-number-2-3 {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
                           else
                             span.p2pinfo-title-number-4-5 {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
                         .row.p2pinfo-list
                           .span4.p2pinfo-ceil
                             em.font-weight  {{ p2p.expected_earning_rate }}%
