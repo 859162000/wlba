@@ -15,7 +15,12 @@ html
     - endwith
 
     .full-container-white
-
+      .container
+        .position
+          | P2P理财
+          span.padding-l-r-s >
+          span.highlight 项目投资列表
+    .space-vertical-xl
     .container
       .row
         .span8
@@ -97,7 +102,8 @@ html
                       span.d3-text {{product.display_payback_method}}
                 if status == '还款中' or status == '已完成'
                   .panel-p2p-stamp
-          .row.margin-top-l
+            .space-vertical-xl
+          .row
             - with data=p2p_products uri='/p2p/list/'
             include include/pager
             - endwith
@@ -110,9 +116,9 @@ html
                   ul.p2pinfo-ul-box
                     for p2p in p2p_earning
                       li.p2pinfo-list-box
-                        div.p2pinfo-list-title
+                        .p2pinfo-list-title
                           if forloop.counter == 1
-                            span.p2pinfo-title-number {{ forloop.counter }}
+                            span.p2pinfo-title-number.highlight {{ forloop.counter }}
                             h3.p2pinfo-title-content {{ p2p.name }}
                           elif 1 < forloop.counter < 4
                             span.p2pinfo-title-number-2-3 {{ forloop.counter }}
@@ -121,15 +127,16 @@ html
                             span.p2pinfo-title-number-4-5 {{ forloop.counter }}
                             h3.p2pinfo-title-content {{ p2p.name }}
 
-                        div.p2pinfo-list
-                          span.p2pinfo-ceil
-                            em.p2pinfo-active  {{ p2p.expected_earning_rate }} %
-                          span.p2pinfo-ceil
-                            em{{ p2p.period }}
-                            em 个月
-                          span.p2pinfo-ceil
-                            em {{ p2p.available_amout }}
-
+                        .row.p2pinfo-list
+                          .span4.p2pinfo-ceil
+                            em.p2pinfo-active.highlight.font-weight  {{ p2p.expected_earning_rate }}%
+                            | &nbsp;收益
+                          .span3.p2pinfo-ceil
+                            em.font-weight {{ p2p.period }}
+                            em &nbsp;个月
+                          .span5-omega.p2pinfo-ceil
+                            em {{ p2p.available_amout }} 元可投
+            .space-vertical-m
             .panel.news-list-container
               .panel-title-bar__border-gray
                 .panel-title-b.period  期限最短
@@ -148,15 +155,16 @@ html
                             span.p2pinfo-title-number-4-5 {{ forloop.counter }}
                             h3.p2pinfo-title-content {{ p2p.name }}
 
-                        div.p2pinfo-list
-                          span.p2pinfo-ceil
-                            em  {{ p2p.expected_earning_rate }} %
-                          span.p2pinfo-ceil
-                            em.p2pinfo-active {{ p2p.period }}
-                            em 个月
-                          span.p2pinfo-ceil
-                            em {{ p2p.available_amout }}
-
+                        .row.p2pinfo-list
+                          .span4.p2pinfo-ceil
+                            em.font-weight  {{ p2p.expected_earning_rate }}%
+                            | &nbsp;收益
+                          .span3.p2pinfo-ceil
+                            em.p2pinfo-active.highlight.font-weight {{ p2p.period }}
+                            em &nbsp;个月
+                          .span5-omega.p2pinfo-ceil
+                            em {{ p2p.available_amout }} 元可投
+            .space-vertical-m
             .panel.news-list-container
               .panel-title-bar__border-gray
                 .panel-title-b.amount  即将满标
@@ -174,16 +182,18 @@ html
                           else
                             span.p2pinfo-title-number-4-5 {{ forloop.counter }}
                             h3.p2pinfo-title-content {{ p2p.name }}
-                        div.p2pinfo-list
-                          span.p2pinfo-ceil
-                            em  {{ p2p.expected_earning_rate }} %
-                          span.p2pinfo-ceil
-                            em {{ p2p.period }}
-                            em 个月
-                          span.p2pinfo-ceil
-                            em.p2pinfo-active {{ p2p.available_amout }}
+                        .row.p2pinfo-list
+                          .span4.p2pinfo-ceil
+                            em.font-weight  {{ p2p.expected_earning_rate }}%
+                            | &nbsp;收益
+                          .span3.p2pinfo-ceil
+                            em.font-weight {{ p2p.period }}
+                            em &nbsp;个月
+                          .span5-omega.p2pinfo-ceil
+                            em.p2pinfo-active.highlight {{ p2p.available_amout }}
+                            | &nbsp;元可投
 
-    .space-vertical-l
+    .space-vertical-xl
 
     - with 1 as no_margin
     include include/footer
