@@ -15,6 +15,8 @@ class AmortizationInline(admin.TabularInline):
     model = ProductAmortization
     extra = 0
     exclude = ('version',)
+    can_delete = False
+    readonly_fields = ('term', 'term_date', 'principal', 'interest', 'penal_interest', 'ready_for_settle', 'description')
 
 
 class WarrantInline(admin.TabularInline):
