@@ -21,7 +21,7 @@ from wanglibao_p2p.serializers import P2PProductSerializer, P2PRecordSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 
 
 class P2PDetailView(TemplateView):
@@ -188,8 +188,9 @@ class P2PListView(TemplateView):
                 u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
             ]).order_by('-end_time').select_related('warrant_company')
 
-        p2p_earning = sorted(p2p_done, key=attrgetter('expected_earning_rate'), reverse=True)
-        p2p_period = sorted(p2p_done, key=attrgetter('period'), reverse=False)
+        p2p_earning = sorted(p2p_done, key=lambda x: (-x.expected_earning_rate, x.available_amout))
+
+        p2p_period = sorted(p2p_done, key=lambda x: (x.period, x.available_amout))
         p2p_amount = sorted(p2p_done, key=attrgetter('available_amout'), reverse=True)
 
 
