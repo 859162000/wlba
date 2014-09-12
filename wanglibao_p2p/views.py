@@ -181,7 +181,7 @@ class P2PListView(TemplateView):
     def get_context_data(self, **kwargs):
 
         p2p_done = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status= u'正在招标').order_by('publish_time').order_by('-priority').select_related('warrant_company')
+            .filter(status= u'正在招标').order_by('-publish_time').select_related('warrant_company')
 
         p2p_others = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
             status__in=[
