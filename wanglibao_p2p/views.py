@@ -189,8 +189,8 @@ class P2PListView(TemplateView):
             ]).order_by('-end_time').select_related('warrant_company')
 
         p2p_earning = sorted(p2p_done, key=attrgetter('expected_earning_rate'), reverse=True)
-        p2p_period = sorted(p2p_done, key=attrgetter('period'), reverse=True)
-        p2p_amount = sorted(p2p_done, key=attrgetter('total_amount'), reverse=False)
+        p2p_period = sorted(p2p_done, key=attrgetter('period'), reverse=False)
+        p2p_amount = sorted(p2p_done, key=attrgetter('available_amout'), reverse=True)
 
 
         p2p_products = []
