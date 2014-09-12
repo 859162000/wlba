@@ -548,9 +548,11 @@ a.hot-item-title-link
   font-size: 15px
   margin: 30px auto 20px auto
   background: url("/static/images/next.png") no-repeat right center
-  color: $color-text-d4
 
-  &:hover
+  &:link, &:visited
+    color: $color-text-d4
+
+  &:hover, &:active
     background: url("/static/images/next_active.png") no-repeat right center
     color: $color-text-d3
 
