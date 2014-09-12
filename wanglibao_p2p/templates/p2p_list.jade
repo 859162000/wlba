@@ -107,6 +107,7 @@ html
               .panel-title-bar__border-gray
                 .panel-title-b.earning 收益最高
               .panel-content-container
+                if p2p_earning
                   ul.p2pinfo-ul-box
                     for p2p in p2p_earning
                       li.p2pinfo-list-box
@@ -129,59 +130,67 @@ html
                             em 个月
                           span.p2pinfo-ceil
                             em {{ p2p.available_amout }}
+                else
+                  p.p2pinfo-message 没有记录
 
             .panel.news-list-container
               .panel-title-bar__border-gray
                 .panel-title-b.period  期限最短
               .panel-content-container
-                  ul.p2pinfo-ul-box
-                    for p2p in p2p_period
-                      li.p2pinfo-list-box
-                        div.p2pinfo-list-title
-                          if forloop.counter == 1
-                            span.p2pinfo-title-number {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
-                          elif 1 < forloop.counter < 4
-                            span.p2pinfo-title-number-2-3 {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
-                          else
-                            span.p2pinfo-title-number-4-5 {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
+                  if p2p_period
+                    ul.p2pinfo-ul-box
+                      for p2p in p2p_period
+                        li.p2pinfo-list-box
+                          div.p2pinfo-list-title
+                            if forloop.counter == 1
+                              span.p2pinfo-title-number {{ forloop.counter }}
+                              h3.p2pinfo-title-content {{ p2p.name }}
+                            elif 1 < forloop.counter < 4
+                              span.p2pinfo-title-number-2-3 {{ forloop.counter }}
+                              h3.p2pinfo-title-content {{ p2p.name }}
+                            else
+                              span.p2pinfo-title-number-4-5 {{ forloop.counter }}
+                              h3.p2pinfo-title-content {{ p2p.name }}
 
-                        div.p2pinfo-list
-                          span.p2pinfo-ceil
-                            em  {{ p2p.expected_earning_rate }} %
-                          span.p2pinfo-ceil
-                            em.p2pinfo-active {{ p2p.period }}
-                            em 个月
-                          span.p2pinfo-ceil
-                            em {{ p2p.available_amout }}
+                          div.p2pinfo-list
+                            span.p2pinfo-ceil
+                              em  {{ p2p.expected_earning_rate }} %
+                            span.p2pinfo-ceil
+                              em.p2pinfo-active {{ p2p.period }}
+                              em 个月
+                            span.p2pinfo-ceil
+                              em {{ p2p.available_amout }}
+                  else
+                    p.p2pinfo-message 没有记录
 
             .panel.news-list-container
               .panel-title-bar__border-gray
                 .panel-title-b.amount  即将满标
               .panel-content-container
-                  ul.p2pinfo-ul-box
-                    for p2p in p2p_amount
-                      li.p2pinfo-list-box
-                        div.p2pinfo-list-title
-                          if forloop.counter == 1
-                            span.p2pinfo-title-number {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
-                          elif 1 < forloop.counter < 4
-                            span.p2pinfo-title-number-2-3 {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
-                          else
-                            span.p2pinfo-title-number-4-5 {{ forloop.counter }}
-                            h3.p2pinfo-title-content {{ p2p.name }}
-                        div.p2pinfo-list
-                          span.p2pinfo-ceil
-                            em  {{ p2p.expected_earning_rate }} %
-                          span.p2pinfo-ceil
-                            em {{ p2p.period }}
-                            em 个月
-                          span.p2pinfo-ceil
-                            em.p2pinfo-active {{ p2p.available_amout }}
+                  if p2p_amount
+                    ul.p2pinfo-ul-box
+                      for p2p in p2p_amount
+                        li.p2pinfo-list-box
+                          div.p2pinfo-list-title
+                            if forloop.counter == 1
+                              span.p2pinfo-title-number {{ forloop.counter }}
+                              h3.p2pinfo-title-content {{ p2p.name }}
+                            elif 1 < forloop.counter < 4
+                              span.p2pinfo-title-number-2-3 {{ forloop.counter }}
+                              h3.p2pinfo-title-content {{ p2p.name }}
+                            else
+                              span.p2pinfo-title-number-4-5 {{ forloop.counter }}
+                              h3.p2pinfo-title-content {{ p2p.name }}
+                          div.p2pinfo-list
+                            span.p2pinfo-ceil
+                              em  {{ p2p.expected_earning_rate }} %
+                            span.p2pinfo-ceil
+                              em {{ p2p.period }}
+                              em 个月
+                            span.p2pinfo-ceil
+                              em.p2pinfo-active {{ p2p.available_amout }}
+                  else
+                    p.p2pinfo-message 没有记录
 
     .space-vertical-l
 
