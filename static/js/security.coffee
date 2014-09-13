@@ -72,7 +72,7 @@ require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
 
 
   $(window).load  ->
-    $(window).trigger('scrollstop')
+    $.effect.dispatch()
     return
 
   $(window).bind 'scroll', ->
@@ -84,17 +84,11 @@ require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
     return
 
   $('.security-bar').on 'click', 'a', (e) ->
-    e.preventDefault()
     $('.security-bar a').removeClass('active')
     $(this).addClass('active')
-    id = $(this).attr('href').replace('#', '')
-    $('.security-panel').each( (index, item) ->
-      if $(item).attr('id') == id
-        if $(item).hasClass('hidden')
-          $(item).removeClass('hidden')
-      else
-        if !$(item).hasClass('hidden')
-          $(item).addClass('hidden')
-    )
 
-    $().removeClass('hidden')
+  #mouseover
+  $('.animation_02,.animation_13,.animation_03').mouseover ->
+    image = $('img', $(this))
+    image.bounceIn()
+

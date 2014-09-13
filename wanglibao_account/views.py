@@ -5,7 +5,6 @@ import json
 import math
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
-from django.core import serializers
 from django.db.models import Q, Sum, F
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
@@ -13,16 +12,13 @@ from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, \
-    HttpResponseNotFound, Http404
-from django.shortcuts import resolve_url, render
-from django.template import Template, Context
-from django.template.loader import get_template
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404
+from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
-from django.views.generic import TemplateView, FormView, View
+from django.views.generic import TemplateView
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -43,7 +39,6 @@ from wanglibao_account.models import VerifyCounter
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
-from django.forms.models import model_to_dict
 
 
 logger = logging.getLogger(__name__)
