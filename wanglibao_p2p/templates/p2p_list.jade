@@ -94,6 +94,7 @@ html
                         span.highlight &nbsp;&nbsp; {{percent | percentage}}
                       else
                         span &nbsp;&nbsp; {{percent | percentage}}
+
                     .span4.align-left
                       span 担保机构: &nbsp;&nbsp;
                       span.d3-text {{product.warrant_company.name}}
@@ -116,6 +117,7 @@ html
                 if p2p_earning
                   ul.p2pinfo-ul-box
                     for p2p in p2p_earning
+
                       li.p2pinfo-list-box
                         .p2pinfo-list-title
                           if forloop.counter == 1
@@ -140,6 +142,29 @@ html
                             em &nbsp;个月
                           .span5-omega.p2pinfo-ceil
                             em {{ p2p.available_amout }} 元可投
+
+                        .p2pinfo-flow(id="earing_{{ forloop.counter }}")
+                          .row.p2pinfo-flow-top
+                            .span6
+                              span.font-weight {{ p2p.total_amount | money_format_int }}
+                              | 元总金额
+                            .span6-omega 担保公司：{{ p2p.warrant_company.name }}
+                          .row.p2pinfo-flow-foot
+                            .span6
+                              span 进度：
+                              .progress-container
+                                percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+
+                                if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                  .progress-indicator(style="width:{{percent | percentage}}")
+                                else
+                                  .progress-indicator.disabled(style="width:{{percent | percentage}}")
+
+                              if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                              else
+                                span &nbsp;&nbsp; {{percent | percentage}}
+                            .span6-omega 还款方式：{{ p2p.display_payback_method }}
                 else
                   p.p2pinfo-message 没有记录
             .space-vertical-m
@@ -174,6 +199,28 @@ html
                             em &nbsp;个月
                           .span5-omega.p2pinfo-ceil
                             em {{ p2p.available_amout }} 元可投
+
+                        .p2pinfo-flow(id="earing_{{ forloop.counter }}")
+                          .row.p2pinfo-flow-top
+                            .span6
+                              span.font-weight {{ p2p.total_amount | money_format_int }}
+                              | 元总金额
+                            .span6-omega 担保公司：{{ p2p.warrant_company.name }}
+                          .row.p2pinfo-flow-foot
+                            .span6
+                              span 进度：
+                              .progress-container
+                                percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                                if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                  .progress-indicator(style="width:{{percent | percentage}}")
+                                else
+                                  .progress-indicator.disabled(style="width:{{percent | percentage}}")
+
+                              if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                              else
+                                span &nbsp;&nbsp; {{percent | percentage}}
+                            .span6-omega 还款方式：{{ p2p.display_payback_method }}
                 else
                   p.p2pinfo-message 没有记录
             .space-vertical-m
@@ -209,6 +256,28 @@ html
                           .span5-omega.p2pinfo-ceil
                             em.p2pinfo-active.highlight {{ p2p.available_amout }}
                             | &nbsp;元可投
+
+                        .p2pinfo-flow(id="earing_{{ forloop.counter }}")
+                          .row.p2pinfo-flow-top
+                            .span6
+                              span.font-weight {{ p2p.total_amount | money_format_int }}
+                              | 元总金额
+                            .span6-omega 担保公司：{{ p2p.warrant_company.name }}
+                          .row.p2pinfo-flow-foot
+                            .span6
+                              span 进度：
+                              .progress-container
+                                percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                                if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                  .progress-indicator(style="width:{{percent | percentage}}")
+                                else
+                                  .progress-indicator.disabled(style="width:{{percent | percentage}}")
+
+                              if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                              else
+                                span &nbsp;&nbsp; {{percent | percentage}}
+                            .span6-omega 还款方式：{{ p2p.display_payback_method }}
                 else
                   p.p2pinfo-message 没有记录
 
