@@ -809,9 +809,9 @@ class P2PAmortizationAPI(APIView):
 
         amortization_record = [{
                 'amortization_term_date': amortization.term_date,                       # 还款时间
-                'amortization_principal': amortization.principal,                       # 本金
-                'amortization_amount_interest':amortization.interest,                   # 利息
-                'amortization_amount': amortization.principal + amortization.interest,  # 总记
+                'amortization_principal': float(amortization.principal),                      # 本金
+                'amortization_amount_interest': float(amortization.interest),                 # 利息
+                'amortization_amount': float(amortization.principal + amortization.interest), # 总记
             } for amortization in amortizations ]
 
         res = {
