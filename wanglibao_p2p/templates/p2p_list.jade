@@ -148,7 +148,7 @@ html
                             .span6
                               span.font-weight {{ p2p.total_amount | money_format_int }}
                               | 元总金额
-                            .span6-omega 担保公司：{{ p2p.warrant_company.name }}
+                            .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
                           .row.p2pinfo-flow-foot
                             .span6
                               span 进度：
@@ -161,9 +161,9 @@ html
                                   .progress-indicator.disabled(style="width:{{percent | percentage}}")
 
                               if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
-                                span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                                span.highlight.font-xs {{percent | percentage}}
                               else
-                                span &nbsp;&nbsp; {{percent | percentage}}
+                                span.font-xs {{percent | percentage}}
                             .span6-omega 还款方式：{{ p2p.display_payback_method }}
                 else
                   p.p2pinfo-message 没有记录
@@ -200,12 +200,12 @@ html
                           .span5-omega.p2pinfo-ceil
                             em {{ p2p.available_amout }} 元可投
 
-                        .p2pinfo-flow(id="earing_{{ forloop.counter }}")
+                        .p2pinfo-flow(id="period_{{ forloop.counter }}")
                           .row.p2pinfo-flow-top
                             .span6
                               span.font-weight {{ p2p.total_amount | money_format_int }}
                               | 元总金额
-                            .span6-omega 担保公司：{{ p2p.warrant_company.name }}
+                            .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
                           .row.p2pinfo-flow-foot
                             .span6
                               span 进度：
@@ -217,9 +217,9 @@ html
                                   .progress-indicator.disabled(style="width:{{percent | percentage}}")
 
                               if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
-                                span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                                span.highlight.font-xs {{percent | percentage}}
                               else
-                                span &nbsp;&nbsp; {{percent | percentage}}
+                                span.font-xs {{percent | percentage}}
                             .span6-omega 还款方式：{{ p2p.display_payback_method }}
                 else
                   p.p2pinfo-message 没有记录
@@ -257,12 +257,12 @@ html
                             em.p2pinfo-active.highlight {{ p2p.available_amout }}
                             | &nbsp;元可投
 
-                        .p2pinfo-flow(id="earing_{{ forloop.counter }}")
+                        .p2pinfo-flow(id="amount_{{ forloop.counter }}")
                           .row.p2pinfo-flow-top
                             .span6
                               span.font-weight {{ p2p.total_amount | money_format_int }}
                               | 元总金额
-                            .span6-omega 担保公司：{{ p2p.warrant_company.name }}
+                            .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
                           .row.p2pinfo-flow-foot
                             .span6
                               span 进度：
@@ -274,14 +274,16 @@ html
                                   .progress-indicator.disabled(style="width:{{percent | percentage}}")
 
                               if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
-                                span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                                span.highlight.font-xs {{percent | percentage}}
                               else
-                                span &nbsp;&nbsp; {{percent | percentage}}
+                                span.font-xs {{percent | percentage}}
                             .span6-omega 还款方式：{{ p2p.display_payback_method }}
                 else
                   p.p2pinfo-message 没有记录
 
     .space-vertical-xl
+    script.
+      require(["/static/js/p2p_list.js"])
 
     - with 1 as no_margin
     include include/footer
