@@ -48,50 +48,96 @@ require(['jquery', 'raphael'], function($, raphael) {
                 }
             }
         };
-        /*
-        function PipePart(config, paper) {
-            this.start = config.start;
-            this.end = config.end;
-            this.paper = paper;
-        }
 
-        PipePart.prototype.draw = function() {
-            console.log(this.start);
-            this.rect = this.paper.rect.apply(this.paper, this.start);
-        }
+        var ball = function() {
+            var obj = $('.ball'),
+                diameter = obj.height(),
+                perimeter = Math.PI * diameter,
+                is = false;
 
-        PipePart.prototype.animate = function() {
-            console.log('rect', this.rect)
-            this.rect.stop().animate.apply(this.paper, this.end);
-        }
-
-        var pipeline = function () {
-            var speed = 50,
-                step = 5;
-            var paper = Raphael("pipeline_01", '100%', 200),
-                parts = [],
-                st = paper.set();
-            parts.push(new PipePart({start: [150, 0, 30, 100], end: [{y: 80, height: 0}, 500]}, paper));
             return {
-                init: function() {
-                    for(var i = 0, len = parts.length; i < len; i++) {
-                        parts[i].draw();
+                rotateBall: function(distance) {
+                    if(is) {
+                        return;
                     }
+                    is = true;
+                    var degree = distance * 360 / perimeter;
+                    obj.css({
+                        transition: ".7s cubic-bezier(1.000, 1.450, 0.185, 0.850)",
+                        transform: 'translateY('+ distance +'px)'
+                    }).find('div').css({
+                        transition: ".7s cubic-bezier(1.000, 1.450, 0.185, 0.850)",
+                        transform: 'rotate(' + degree + 'deg)'
+                    });
+                    is = false;
                 },
-                animate: function() {
-                    parts[0].animate();
+                rolling: function(distance) {
+                    var degree = distance * 360 / perimeter,
+                        leftx = parseInt(obj.css('left'));
+                    obj.animate({
+                        left: '+=' + leftx,
+                        rotate: degree + 'deg'
+                    }, 1000);
+                },
+                start: function() {
+
                 }
             };
-
         };
-        */
+
+        function Ball(x, y, paper) {
+            this.x = x;
+            this.y = y;
+            this.paper = paper;
+
+            this.width = 9;
+            this.height = 9;
+
+            this.set = this.paper.set();
+            this.text = '￥';
+            this.textProperty = {fill: '#fff'};
+            this.property = {fill: '#ff9c00', stroke: 'none'};
+
+            //this.set.push();
+        }
+
+        Ball.prototype.draw = function() {
+            this.ball = this.paper.circle(this.x, this.y, this.width, this.height);
+            this.ball.attr(this.property);
+            this.textElement = this.paper.text(this.x, this.y+2, this.text);
+            this.textElement.attr(this.textProperty);
+
+            this.set.push(this.ball);
+            this.set.push(this.textElement);
+        };
+
+        Ball.prototype.roll = function(callback) {
+            var diameter = 9,
+                _self = this,
+                perimeter = Math.PI * diameter;
+
+            var degree = 700 * 360 / perimeter;
+
+            _self.set.stop().animate({'transform': 't0,90r'+ 20}, 500, function() {
+                _self.set.stop().animate({'transform': 't738,90r'+ degree}, 5000, function() {
+                    _self.set.stop().animate({'transform': 't738,230r'+ 30}, 500, function() {
+                        callback && callback.call(_self)
+                    });
+                });
+            });
+        };
+
+        var ball01 = ball();
+
         var pipeline_01 = function() {
-            var paper = Raphael("pipeline_01", '100%', 200),
+            var paper = Raphael("pipeline_01", '100%', 220),
                 property = {fill: "#fff", stroke: "#fff"},
                 rect_01,
                 rect_02,
                 rect_03;
 
+
+            /*
             rect_01 = paper.rect(150, 0, 30, 100);
             rect_01.attr(property);
 
@@ -101,9 +147,38 @@ require(['jquery', 'raphael'], function($, raphael) {
             rect_03 = paper.rect(880, 100, 50, 80);
             rect_03.attr(property);
 
+            var st = paper.set();
+
+            ball = paper.circle(165, 9, 9, 9);
+            ball.attr({fill: 'red', stroke: 'none'});
+            text = paper.text(165, 11, '￥');
+            text.attr({fill: '#fff'});
+
+            st.push(ball);
+            st.push(text);
+            var diameter = 9,
+                perimeter = Math.PI * diameter;
+
+            var degree = 700 * 360 / perimeter;
+
+            st.stop().animate({'transform': 't0,90r'+ 20}, 500, function() {
+                st.stop().animate({'transform': 't738,90r'+ degree}, 5000, function() {
+                    st.stop().animate({'transform': 't738,190r'+ 30}, 500);
+                });
+            });
+             */
+
+            var ball = new Ball(165, 9, paper);
+
             return {
                 animate: function() {
+                    console.log('start');
+                    if(!$('.organization').hasClass('untreated')) {
+                        console.log('inner');
+                        return;
+                    }
                     $('.organization').removeClass('untreated');
+                    /*
                     rect_01.stop().animate({y: 80, height: 0}, 1000, 'linear', function() {
                         rect_02.stop().animate({x: 930, width: 0}, 1000, 'linear', function() {
                             rect_03.stop().animate({y: 180, height: 0}, 1000, 'linear', function() {
@@ -111,6 +186,25 @@ require(['jquery', 'raphael'], function($, raphael) {
                             });
                         })
                     });
+                     */
+
+                    //ball01.rolling(87);
+                    ball.draw();
+
+                    ball.roll(function() {
+                        if($('.funnel_02').attr('data-active') && $('.funnel_02').attr('data-active') == 1) {
+                            return;
+                        }
+                        $('.funnel_02').attr('data-active', 1);
+                        var funnel = $('.funnel_02'),
+                            _self = $('.project');
+                        funnel.fadeTo(1000, 0.2, function() {
+                            funnel.removeClass('gray').addClass('color').fadeTo(1000, 1, function() {
+                                 $('.guarantee-list-item', $(_self.selector)).css('visibility', 'visible').addClass('fadeInUp');
+                            });
+                        });
+                    });
+                    console.log('rolling');
 
                 }
             }
@@ -124,24 +218,45 @@ require(['jquery', 'raphael'], function($, raphael) {
                 rect_02,
                 rect_03;
 
-            rect_01 = paper.rect(880, 188, 50, 180);
-            rect_01.attr(property);
+            var ball = new Ball(905, 219, paper);
+            ball.roll_02 = function(callback) {
+                var diameter = 9,
+                    _self = this,
+                    perimeter = Math.PI * diameter;
 
-            rect_02 = paper.rect(140, 355, 780, 30);
-            rect_02.attr(property);
+                var degree = -700 * 360 / perimeter;
 
-            rect_03 = paper.rect(140, 355, 50, 100);
-            rect_03.attr(property);
+                _self.set.stop().animate({'transform': 't0,167r'+ 20}, 500, function() {
+                    _self.set.stop().animate({'transform': 't-738,167r'+ degree}, 5000, function() {
+                        _self.set.stop().animate({'transform': 't-738,270r'+ 30}, 500, function() {
+                            callback && callback.call(_self)
+                        });
+                    });
+                });
+            };
 
             return {
                 animate: function() {
 
-                    rect_01.stop().animate({y: 368, height: 0}, 1000, 'linear', function() {
-                        rect_02.stop().animate({x: 150, width: 0}, 1000, 'linear', function() {
-                            rect_03.stop().animate({y: 455, height: 0}, 1000, 'linear', function() {
-                                $('.online').removeClass('untreated');
+                    if(!$('.project').hasClass('untreated')) {
+                        return;
+                    }
+                    $('.project').removeClass('untreated');
+                    ball.draw();
+
+                    ball.roll_02(function() {
+                        if($('.funnel_03').attr('data-active') && $('.funnel_03').attr('data-active') == 1) {
+                            return;
+                        }
+                        $('.funnel_03').attr('data-active', 1);
+                        var funnel = $('.funnel_03'),
+                            _self = $('.online');
+                        funnel.fadeTo(1000, 0.2, function() {
+                            funnel.removeClass('gray').addClass('color').fadeTo(1000, 1, function() {
+                                 $('.guarantee-list-item', $(_self.selector)).css('visibility', 'visible').addClass('fadeInUp');
                             });
-                        })
+                        });
+
                     });
 
 
@@ -158,6 +273,7 @@ require(['jquery', 'raphael'], function($, raphael) {
                 rect_02,
                 rect_03;
 
+            /*
             rect_01 = paper.rect(170, 10, 30, 70);
             rect_01.attr(property);
 
@@ -180,13 +296,69 @@ require(['jquery', 'raphael'], function($, raphael) {
             rect_07 = paper.rect(150, 460, 300, 50);
             rect_07.attr(property);
 
+            */
 
+            var ball1 = new Ball(137, 19, paper);
 
+            ball1.roll = function(callback) {
+                var diameter = 9,
+                    _self = this,
+                    perimeter = Math.PI * diameter;
 
+                var degree = -700 * 360 / perimeter;
 
+                _self.set.stop().animate({'transform': 't0,465r'+ 20}, 500, function() {
+                    _self.set.stop().animate({'transform': 't718,465r'+ degree}, 5000, function() {
+                         callback && callback.call(_self)
+                    });
+                });
+            };
+            var ball2 = new Ball(190, 19, paper);
+
+            ball2.roll = function(callback) {
+                var diameter = 9,
+                    _self = this,
+                    perimeter = Math.PI * diameter;
+
+                var degree = 700 * 360 / perimeter;
+
+                _self.set.stop().animate({'transform': 't0,75r'+ 20}, 500, function() {
+                    _self.set.stop().animate({'transform': 't718,75r'+ degree}, 5000, function() {
+                        _self.set.stop().animate({'transform': 't718,170r'+ 30}, 500, function() {
+                            callback && callback.call(_self)
+                        });
+                    });
+                });
+            }
+
+            console.log('overdue');
             return {
                 animate: function() {
+                    if(!$('.overdue').hasClass('untreated')) {
+                        return;
+                    }
+                    $('.overdue').removeClass('untreated');
+                    ball1.draw();
+                    ball2.draw();
+                    console.log('overdue');
 
+                    ball1.roll();
+
+                    ball2.roll(function() {
+                        if($('.gear').attr('data-active') && $('.gear').attr('data-active') == 1) {
+                            return;
+                        }
+                        $('.gear').attr('data-active', 1);
+                        var funnel = $('.gear'),
+                            _self = $('.overdue');
+                        funnel.fadeTo(1000, 0.2, function() {
+                            funnel.removeClass('gray').addClass('color').fadeTo(1000, 1, function() {
+                                 $('.guarantee-list-item', $(_self.selector)).css('visibility', 'visible').addClass('fadeInUp');
+                            });
+                        });
+                    });
+
+                    /*
                     rect_01.stop().animate({y: 80, height: 0}, 500, 'linear', function() {
                         rect_02.stop().animate({x: 920, width: 0}, 1000, 'linear', function() {
                             rect_03.stop().animate({y: 170, height: 0}, 500, 'linear', function() {
@@ -203,7 +375,7 @@ require(['jquery', 'raphael'], function($, raphael) {
                             $('.investor').removeClass('untreated');
                         });
                     });
-
+                    */
 
                 }
             }
@@ -211,10 +383,7 @@ require(['jquery', 'raphael'], function($, raphael) {
         };
 
         //管道
-        //var module_07 = new Module(300, '.');
 
-        //var pipes = pipeline();
-        //pipes.init();
         var pipe_01 = pipeline_01();
         var pipe_02 = pipeline_02();
         var pipe_03 = pipeline_03();
@@ -250,18 +419,23 @@ require(['jquery', 'raphael'], function($, raphael) {
             this.attr('data-active', '1');
             var image = this,
                 normalWidth = image.width(),
-                zoomInWidth = normalWidth + normalWidth*0.2,
-                zoomOutWidth = normalWidth - normalWidth*0.1;
+                normalHeight = image.height(),
+                zoomInWidth = normalWidth + normalWidth*0.03,
+                zoomOutWidth = normalWidth - normalWidth*0.03;
+                this.css('position', 'relative');
+                this.wrap('<div class="temp-wrap" style="position:relative"></div>');
                 zoomIn = function() {
-                    image.animate({ width: zoomInWidth }, 200, restore);
+                    image.animate({ width: zoomOutWidth, left: normalWidth*0.03/2, top:  normalHeight*0.03/2}, 250, restore);
                 },
 
                 restore = function() {
-                    image.animate({ width: normalWidth }, 200, function() {
+                    image.animate({ width: normalWidth, left: 0, top: 0 }, 300, function() {
                         image.removeAttr('data-active');
+                        image.css('position', '');
+                        image.unwrap();
                     });
                 }
-            image.animate({ width: zoomOutWidth }, 200, zoomIn);
+            image.animate({ width: zoomInWidth, left: -normalWidth*0.03/2, top: -normalHeight*0.03/2}, 400, restore);
         }
 
 
@@ -296,11 +470,20 @@ require(['jquery', 'raphael'], function($, raphael) {
 
         var module_01 = new Module(400, '.organization');
         module_01.animate = function () {
-            $(this.selector).css('visibility', 'visible')
-            $('.guarantee-list-item', $(this.selector)).addClass('fadeInUp');
+            if($('.funnel_01').attr('data-active') && $('.funnel_01').attr('data-active') == 1) {
+                return;
+            }
+            $('.funnel_01').attr('data-active', 1);
+            var funnel = $('.funnel_01'),
+                _self = this;
+            funnel.fadeTo(1000, 0.2, function() {
+                funnel.removeClass('gray').addClass('color').fadeTo(1000, 1, function() {
+                     $('.guarantee-list-item', $(_self.selector)).css('visibility', 'visible').addClass('fadeInUp');
+                });
+            });
         };
 
-        var module_07 = new Module(400, '.project');
+        var module_07 = new Module(500, '.project');
         module_07.animate = function () {
             if(!$('#organization').hasClass('hidden')) {
                 $(this.selector).css('visibility', 'visible')
@@ -329,7 +512,7 @@ require(['jquery', 'raphael'], function($, raphael) {
 
 
 
-        var module_02 = new Module(50, '.pipeline_01');
+        var module_02 = new Module(500, '.pipeline_01');
         module_02.animate = function () {
             if(!$('#organization').hasClass('hidden')) {
                 pipe_01.animate();
