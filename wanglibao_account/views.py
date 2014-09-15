@@ -808,10 +808,10 @@ class P2PAmortizationAPI(APIView):
         amortizations = UserAmortization.objects.filter(user=self.request.user, product_amortization__product_id=product_id)
 
         amortization_record = [{
-                'amortization_term_date': amortization.term_date,                       # 还款时间
-                'amortization_principal': amortization.principal,                       # 本金
-                'amortization_amount_interest':amortization.interest,                   # 利息
-                'amortization_amount': amortization.principal + amortization.interest,  # 总记
+                'amortization_term_date': timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),                       # 还款时间
+                'amortization_principal': float(amortization.principal),                      # 本金
+                'amortization_amount_interest': float(amortization.interest),                 # 利息
+                'amortization_amount': float(amortization.principal + amortization.interest), # 总记
             } for amortization in amortizations ]
 
         res = {
