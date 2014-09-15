@@ -17,7 +17,7 @@ class IndexView(TemplateView):
 
 
         p2p_pre_four = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status=u'正在招标').order_by('-total_amount').order_by('-priority').select_related('warrant_company')[:4]
+            .filter(status=u'正在招标').order_by('-priority', '-total_amount').select_related('warrant_company')[:4]
 
         p2p_last = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
             .filter(status=u'还款中').order_by('-soldout_time').select_related('warrant_company')[0:1]
