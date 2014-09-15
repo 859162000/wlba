@@ -304,8 +304,12 @@
 .amount
   background: url("/static/images/amount.png") no-repeat 5px center
 
+.panel-content-container
+  position: relative
+
 .p2pinfo-ul-box
   margin: 0
+  position: relative
 
 .p2pinfo-list-box
   margin: 0
@@ -313,6 +317,7 @@
   cursor: pointer
   position: relative
   border-bottom: 1px solid #e8e8e8
+  overflow: visible
 
   &:last-child
     border-bottom: 0
@@ -374,3 +379,30 @@
   margin: 20px auto
   text-align: center
   font-size: 15px
+
+.p2pinfo-flow
+  position: absolute
+  border: solid 1px #e8e8e8
+  background: #f9f9f9
+  height: 92px
+  width: 400px
+  top: -1px
+  left: -400px
+  z-index: 9
+  font-size: $font-s
+  color: $color-text-d4
+
+  .p2pinfo-flow-top
+    text-indent: 10px
+    line-height: 45px
+    border-bottom: dotted 1px $color-text-d5
+
+  .p2pinfo-flow-foot
+    text-indent: 10px
+    line-height: 40px
+
+    .progress-container
+      height: 8px
+      width: 80px
+      top: -1px
+      margin-right: 5px

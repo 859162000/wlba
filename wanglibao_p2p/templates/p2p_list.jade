@@ -140,6 +140,20 @@ html
                             em &nbsp;个月
                           .span5-omega.p2pinfo-ceil
                             em {{ p2p.available_amout }} 元可投
+
+                        .p2pinfo-flow(id="earing_{{ forloop.counter }}")
+                          .row.p2pinfo-flow-top
+                            .span6
+                              span.font-weight 10,000
+                              | 元总金额
+                            .span6-omega 担保公司：安佳世行
+                          .row.p2pinfo-flow-foot
+                            .span6
+                              span 进度：
+                              .progress-container
+                                .progress-indicator(style="width:80%")
+                              span 100%
+                            .span6-omega 还款方式：一次性还款
                 else
                   p.p2pinfo-message 没有记录
             .space-vertical-m
@@ -174,6 +188,20 @@ html
                             em &nbsp;个月
                           .span5-omega.p2pinfo-ceil
                             em {{ p2p.available_amout }} 元可投
+
+                        .p2pinfo-flow(id="period_{{ forloop.counter }}")
+                          .row.p2pinfo-flow-top
+                            .span6
+                              span.font-weight 10,000
+                              | 元总金额
+                            .span6-omega 担保公司：安佳世行
+                          .row.p2pinfo-flow-foot
+                            .span6
+                              span 进度：
+                              .progress-container
+                                .progress-indicator(style="width:80%")
+                              span 100%
+                            .span6-omega 还款方式：一次性还款
                 else
                   p.p2pinfo-message 没有记录
             .space-vertical-m
@@ -209,6 +237,20 @@ html
                           .span5-omega.p2pinfo-ceil
                             em.p2pinfo-active.highlight {{ p2p.available_amout }}
                             | &nbsp;元可投
+
+                        .p2pinfo-flow(id="amount_{{ forloop.counter }}")
+                          .row.p2pinfo-flow-top
+                            .span6
+                              span.font-weight 10,000
+                              | 元总金额
+                            .span6-omega 担保公司：安佳世行
+                          .row.p2pinfo-flow-foot
+                            .span6
+                              span 进度：
+                              .progress-container
+                                .progress-indicator(style="width:80%")
+                              span 100%
+                            .span6-omega 还款方式：一次性还款
                 else
                   p.p2pinfo-message 没有记录
 
