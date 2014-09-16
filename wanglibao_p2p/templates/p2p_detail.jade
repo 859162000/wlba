@@ -152,15 +152,71 @@ html
             h1 担保机构
             table
               caption {{p2p.warrant_company.name}}
-              tbody
-                warrants = p2p.warrant_set.all()
-                for warrant in warrants
-                  tr
-                    td {{warrant.name}}
-                    td
-                      span
-                      span.icon.icon-approve
-                      | 已认证
+              warrants = p2p.warrant_set.all()
+              length = len(warrants)
+              if length > 0
+                tbody
+                  for warrant in warrants
+                    tr
+                      td {{warrant.name}}
+                      td
+                        span
+                        span.icon.icon-approve
+                        | 已认证
+              else
+                if p2p.category == "证大速贷"
+                  if "企业贷" in p2p.name
+                    tbody
+                      tr
+                        td 身份证
+                        td
+                          span
+                          span.icon.icon-approve
+                          | 已认证
+                      tr
+                        td 信用报告
+                        td
+                          span
+                          span.icon.icon-approve
+                          | 已认证
+                      tr
+                        td 工作证明
+                        td
+                          span
+                          span.icon.icon-approve
+                          | 已认证
+                      tr
+                        td 收入证明
+                        td
+                          span
+                          span.icon.icon-approve
+                          | 已认证
+                  if "工薪贷" in p2p.name
+                    tbody
+                      tr
+                        td 身份证
+                        td
+                          span
+                          span.icon.icon-approve
+                          | 已认证
+                      tr
+                        td 信用报告
+                        td
+                          span
+                          span.icon.icon-approve
+                          | 已认证
+                      tr
+                        td 工作证明
+                        td
+                          span
+                          span.icon.icon-approve
+                          | 已认证
+                      tr
+                        td 收入证明
+                        td
+                          span
+                          span.icon.icon-approve
+                          | 已认证
           .clearfix
             .p2p-detail-container
               h1 投资记录
