@@ -353,8 +353,10 @@ class AccountP2PRecordAPI(APIView):
 
     def get(self, request, format=None):
         user=request.user
-        p2p_equities = P2PEquity.objects.filter(user=user).all().select_related('product')
-
+        # p2p_equities = P2PEquity.objects.filter(user=user).all().select_related('product')
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+            u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+        ]).select_related('product')
 
         page = request.GET.get('page', 0)
         try:
