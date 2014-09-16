@@ -9,7 +9,6 @@ require.config({
 });
 require(['jquery', 'raphael'], function($, raphael) {
 
-
     $.fn.checked = function () {
         var arr = [],
             step = 1,
@@ -98,7 +97,6 @@ require(['jquery', 'raphael'], function($, raphael) {
     };
 
 
-
     function Ball(x, y, paper) {
         this.x = x;
         this.y = y;
@@ -124,31 +122,144 @@ require(['jquery', 'raphael'], function($, raphael) {
         this.set.push(this.textElement);
     };
 
-    Ball.prototype.roll = function(callback) {
-        var diameter = 9,
-            _self = this,
-            perimeter = Math.PI * diameter;
 
-        var degree = 700 * 360 / perimeter;
+    function Funnel(selector, context) {
+        this.context = context;
+        this.funnel = $(selector, this.context);
+    }
 
-        _self.set.stop().animate({'transform': 't0,90r'+ 20}, 500, function() {
-            _self.set.stop().animate({'transform': 't738,90r'+ degree}, 5000, function() {
-                _self.set.stop().animate({'transform': 't738,230r'+ 30}, 500, function() {
-                    callback && callback.call(_self)
-                });
+    Funnel.prototype.fadeToColor = function() {
+        var funnel = this.funnel,
+            context = this.context;
+        if(funnel.attr('data-active') && funnel.attr('data-active') == 1) {
+            return;
+        }
+        funnel.attr('data-active', 1);
+        funnel.fadeTo(1000, 0.2, function() {
+            funnel.removeClass('gray').addClass('color').fadeTo(1000, 1, function() {
+                 $('.guarantee-list-item', context).css('visibility', 'visible').addClass('fadeInUp');
             });
         });
     };
 
 
+    function Roll(ball, props) {
+        this.ball = ball;
+        this.props = props;
+        this._transfer();
+        this.init();
+    }
+
+    Roll.prototype.init = function() {
+        var animations = this.animations,
+            ball = this.ball,
+            _self = this,
+            current = null,
+            reference = null;
+
+        this.start = new Animation(ball, animations[0]),
+        reference = this.start;
+
+        for(var i = 1; i < animations.length; i++) {
+            current = new Animation(ball, animations[i]);
+            reference.setNext(current);
+            reference = current;
+        }
+
+        current.setComplete(function() {
+            for(var i = 0, len = _self.events.length; i < len; i++) {
+                _self.context.trigger(_self.events[i]);
+            }
+        });
+    };
+
+    Roll.prototype.move = function() {
+        this.start.move();
+    };
+
+    Roll.prototype.setDispach = function(context, events) {
+        this.context = context;
+        this.events = events;
+    };
+
+    Roll.prototype._transfer = function() {
+        var start = [0, 0],
+            props = this.props,
+            current = start,
+            animations = [];
+
+        for(var i = 0, len = props.length; i < len; i++) {
+            var coord = this._getEnd(current, props[i].direction, props[i].distance);
+            animations.push({transform: coord.str, time: props[i].time});
+            current = coord.coord;
+        }
+        this.animations = animations;
+    };
+
+    Roll.prototype._getEnd = function(source, direction, distance) {
+        var diameter = 9,
+            degree,
+            perimeter = Math.PI * diameter;
+        switch(direction) {
+            case 0:
+                source[0] += distance;
+                degree = distance * 360 / perimeter;
+                break;
+            case 1:
+                source[1] += distance;
+                degree = distance * 360 / perimeter;
+                break;
+            case 2:
+                source[0] -= distance;
+                degree = -distance * 360 / perimeter;
+                break;
+            case 3:
+                source[1] -= distance;
+                degree = -distance * 360 / perimeter;
+                break;
+
+        }
+        return {str: 't' + source.join(',') + 'r' + degree, coord: source};
+
+    }
+
+
+    function Animation(ball, prop) {
+        this.ball = ball;
+        this.prop = prop;
+    }
+
+
+    Animation.prototype.move = function() {
+        var next = this.next,
+            complete = this.complete,
+            prop = this.prop;
+        this.ball.set.stop().animate({transform: prop.transform}, prop.time, function() {
+            next && next.move.call(next);
+            complete && complete.call(null);
+        });
+    }
+
+    Animation.prototype.setComplete = function(complete) {
+        this.complete = complete;
+    };
+
+    Animation.prototype.setNext = function(next) {
+        this.next = next;
+        return this.next;
+    };
+
+
     var pipeline_01 = function() {
         var paper = Raphael("pipeline_01", '100%', 220),
-            property = {fill: "#fff", stroke: "#fff"},
-            rect_01,
-            rect_02,
-            rect_03;
+            property = {fill: "#fff", stroke: "#fff"};
 
         var ball = new Ball(165, 9, paper);
+
+        $('.project').on('rollcomplete', function() {
+            var funnel = new Funnel('.funnel_02', $('.project'));
+                funnel.fadeToColor();
+        });
 
         return {
             animate: function() {
@@ -156,23 +267,16 @@ require(['jquery', 'raphael'], function($, raphael) {
                     return;
                 }
                 $('.organization').removeClass('untreated');
-
-
                 ball.draw();
 
-                ball.roll(function() {
-                    if($('.funnel_02').attr('data-active') && $('.funnel_02').attr('data-active') == 1) {
-                        return;
-                    }
-                    $('.funnel_02').attr('data-active', 1);
-                    var funnel = $('.funnel_02'),
-                        _self = $('.project');
-                    funnel.fadeTo(1000, 0.2, function() {
-                        funnel.removeClass('gray').addClass('color').fadeTo(1000, 1, function() {
-                             $('.guarantee-list-item', $(_self.selector)).css('visibility', 'visible').addClass('fadeInUp');
-                        });
-                    });
-                });
+                var animations = [
+                    {distance: 90, direction: 1, time: 500},
+                    {distance: 738, direction: 0, time: 5000},
+                    {distance: 140, direction: 1, time: 500}
+                ]
+                var roll = new Roll(ball, animations);
+                roll.setDispach($('.project'), ['rollcomplete']);
+                roll.move();
 
             }
         }
@@ -181,52 +285,32 @@ require(['jquery', 'raphael'], function($, raphael) {
 
     var pipeline_02 = function() {
         var paper = Raphael("pipeline_02", '100%', 475),
-            property = {fill: "#fff", stroke: "#fff"},
-            rect_01,
-            rect_02,
-            rect_03;
+            property = {fill: "#fff", stroke: "#fff"};
 
         var ball = new Ball(905, 219, paper);
-        ball.roll_02 = function(callback) {
-            var diameter = 9,
-                _self = this,
-                perimeter = Math.PI * diameter;
 
-            var degree = -700 * 360 / perimeter;
-
-            _self.set.stop().animate({'transform': 't0,167r'+ 20}, 500, function() {
-                _self.set.stop().animate({'transform': 't-738,167r'+ degree}, 5000, function() {
-                    _self.set.stop().animate({'transform': 't-738,270r'+ 30}, 500, function() {
-                        callback && callback.call(_self)
-                    });
-                });
-            });
-        };
+        $('.online').on('rollcomplete', function() {
+            var funnel = new Funnel('.funnel_03', $('.online'));
+                funnel.fadeToColor();
+        });
 
         return {
             animate: function() {
 
-                if(!$('.project').hasClass('untreated')) {
+                if(!$('.online').hasClass('untreated')) {
                     return;
                 }
-                $('.project').removeClass('untreated');
+                $('.online').removeClass('untreated');
                 ball.draw();
 
-                ball.roll_02(function() {
-                    if($('.funnel_03').attr('data-active') && $('.funnel_03').attr('data-active') == 1) {
-                        return;
-                    }
-                    $('.funnel_03').attr('data-active', 1);
-                    var funnel = $('.funnel_03'),
-                        _self = $('.online');
-                    funnel.fadeTo(1000, 0.2, function() {
-                        funnel.removeClass('gray').addClass('color').fadeTo(1000, 1, function() {
-                             $('.guarantee-list-item', $(_self.selector)).css('visibility', 'visible').addClass('fadeInUp');
-                        });
-                    });
-
-                });
-
+                var animations = [
+                    {distance: 167, direction: 1, time: 500},
+                    {distance: 738, direction: 2, time: 5000},
+                    {distance: 103, direction: 1, time: 500}
+                ]
+                var roll = new Roll(ball, animations);
+                roll.setDispach($('.online'), ['rollcomplete']);
+                roll.move();
 
             }
         }
@@ -236,10 +320,7 @@ require(['jquery', 'raphael'], function($, raphael) {
 
     var pipeline_03 = function() {
         var paper = Raphael("pipeline_03", '100%', 600),
-            property = {fill: "#fff", stroke: "#fff"},
-            rect_01,
-            rect_02,
-            rect_03;
+            property = {fill: "#fff", stroke: "#fff"};
 
 
         var ball1 = new Ball(137, 19, paper);
@@ -249,7 +330,7 @@ require(['jquery', 'raphael'], function($, raphael) {
                 _self = this,
                 perimeter = Math.PI * diameter;
 
-            var degree = -700 * 360 / perimeter;
+            var degree = 700 * 360 / perimeter;
 
             _self.set.stop().animate({'transform': 't0,465r'+ 20}, 500, function() {
                 _self.set.stop().animate({'transform': 't718,465r'+ degree}, 5000, function() {
@@ -273,7 +354,7 @@ require(['jquery', 'raphael'], function($, raphael) {
                     });
                 });
             });
-        }
+        };
 
         return {
             animate: function() {
@@ -283,22 +364,12 @@ require(['jquery', 'raphael'], function($, raphael) {
                 $('.overdue').removeClass('untreated');
                 ball1.draw();
                 ball2.draw();
-                console.log('overdue');
 
                 ball1.roll();
 
                 ball2.roll(function() {
-                    if($('.gear').attr('data-active') && $('.gear').attr('data-active') == 1) {
-                        return;
-                    }
-                    $('.gear').attr('data-active', 1);
-                    var funnel = $('.gear'),
-                        _self = $('.overdue');
-                    funnel.fadeTo(1000, 0.2, function() {
-                        funnel.removeClass('gray').addClass('color').fadeTo(1000, 1, function() {
-                             $('.guarantee-list-item', $(_self.selector)).css('visibility', 'visible').addClass('fadeInUp');
-                        });
-                    });
+                    var funnel = new Funnel('.gear', $('.overdue'));
+                    funnel.fadeToColor();
                 });
 
 
@@ -346,43 +417,21 @@ require(['jquery', 'raphael'], function($, raphael) {
 
     var module_01 = new Module(400, '.organization');
     module_01.animate = function () {
-        if($('.funnel_01').attr('data-active') && $('.funnel_01').attr('data-active') == 1) {
-            return;
-        }
-        $('.funnel_01').attr('data-active', 1);
-        var funnel = $('.funnel_01'),
-            _self = this;
-        funnel.fadeTo(1000, 0.2, function() {
-            funnel.removeClass('gray').addClass('color').fadeTo(1000, 1, function() {
-                 $('.guarantee-list-item', $(_self.selector)).css('visibility', 'visible').addClass('fadeInUp');
-            });
-        });
+        var funnel = new Funnel('.funnel_01', $('.organization'));
+        funnel.fadeToColor();
     };
 
     var module_07 = new Module(500, '.project');
     module_07.animate = function () {
         if(!$('#organization').hasClass('hidden')) {
-            $(this.selector).css('visibility', 'visible')
-            $('.guarantee-list-item', $(this.selector)).addClass('fadeInUp');
             pipe_02.animate();
-        }
-    };
-
-    var module_08 = new Module(400, '.online');
-    module_08.animate = function () {
-        if(!$('#organization').hasClass('hidden')) {
-            $(this.selector).css('visibility', 'visible')
-            $('.guarantee-list-item', $(this.selector)).addClass('fadeInUp');
         }
     };
 
     var module_09 = new Module(400, '.overdue');
     module_09.animate = function () {
         if(!$('#organization').hasClass('hidden')) {
-            $(this.selector).css('visibility', 'visible')
-            $('.guarantee-list-item', $(this.selector)).addClass('fadeInUp');
             pipe_03.animate();
-
         }
     };
 
@@ -498,7 +547,6 @@ require(['jquery', 'raphael'], function($, raphael) {
     page.register(module_05);
     page.register(module_06);
     page.register(module_07);
-    page.register(module_08);
     page.register(module_09);
     page.register(module_10);
     page.register(module_11);
