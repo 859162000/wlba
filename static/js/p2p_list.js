@@ -15,14 +15,18 @@
       url = $('.panel-title-bar a', $(this)).attr('href');
       return window.location.href = url;
     });
-    return $('.p2pinfo-list-box').bind('mouseenter', function(e) {
+    return $('.p2pinfo-list-box').on('mouseenter', function(e) {
       var target;
       target = e.currentTarget.lastElementChild.id;
-      return $('#' + target).show();
-    }).bind('mouseleave', function(e) {
+      return $('#' + target).fadeIn();
+    }).on('mouseleave', function(e) {
       var target;
       target = e.currentTarget.lastElementChild.id;
-      return $('#' + target).hide();
+      return $('#' + target).fadeOut();
+    }).on('click', function() {
+      var url;
+      url = $('.p2pinfo-title-content>a', $(this)).attr('href');
+      return window.location.href = url;
     });
   });
 

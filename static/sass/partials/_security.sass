@@ -51,6 +51,16 @@
 
 .security-image
   position: relative
+  &:hover
+    .swing-image
+      -webkit-animation: swing .5s .2s ease both
+      -moz-animation: swing .5s .2s ease both
+
+.swing-container
+  &:hover
+    .swing-image
+      -webkit-animation: swing .5s .2s ease both
+      -moz-animation: swing .5s .2s ease both
 
 .panel-02-1
   position: absolute
@@ -85,56 +95,56 @@
 .security-num-01
   width: 82px
   height: 50px
-  background: url("/static/images/security/num.png") 0 0 no-repeat
+  background: url("/static/images/security/num.jpg") 0 0 no-repeat
   margin-top: 85px
 
 .security-num-02
   width: 82px
   height: 50px
-  background: url("/static/images/security/num.png") -82px 0 no-repeat
+  background: url("/static/images/security/num.jpg") -82px 0 no-repeat
   margin-top: 80px
 
 .security-num-03
   width: 82px
   height: 50px
-  background: url("/static/images/security/num.png") -164px 0 no-repeat
+  background: url("/static/images/security/num.jpg") -164px 0 no-repeat
   margin-top: 40px
 
 .security-num-04
   width: 82px
   height: 50px
-  background: url("/static/images/security/num.png") -246px 0 no-repeat
+  background: url("/static/images/security/num.jpg") -246px 0 no-repeat
   margin-top: 40px
 
 .security-num-05
   width: 82px
   height: 50px
-  background: url("/static/images/security/num.png") -328px 0 no-repeat
+  background: url("/static/images/security/num.jpg") -328px 0 no-repeat
   margin-top: 70px
 
 .organization-num-01
   width: 82px
   height: 50px
-  background: url("/static/images/security/num.png") 0 -50px no-repeat
+  background: url("/static/images/security/num.jpg") 0 -50px no-repeat
   display: inline-block
 
 
 .organization-num-02
   width: 82px
   height: 50px
-  background: url("/static/images/security/num.png") -82px -50px no-repeat
+  background: url("/static/images/security/num.jpg") -82px -50px no-repeat
   display: inline-block
 
 .organization-num-03
   width: 82px
   height: 50px
-  background: url("/static/images/security/num.png") -164px -50px no-repeat
+  background: url("/static/images/security/num.jpg") -164px -50px no-repeat
   display: inline-block
 
 .organization-num-04
   width: 82px
   height: 50px
-  background: url("/static/images/security/num.png") -246px -50px no-repeat
+  background: url("/static/images/security/num.jpg") -246px -50px no-repeat
   display: inline-block
 
 .icon-circle
@@ -153,16 +163,27 @@
 
 .security-panel-title
   height: 92px
-  font-size: 18px
-  padding-top: 40px
-  color: #333
+  font-size: 48px
+  padding-top: 30px
+  color: #ff0000
   overflow: hidden
+  text-align: center
+  font-weight: bold
   border-bottom: 1px solid #cccccc
+  border-top: 1px dashed #cccccc
+
+  position: relative
   h2
-    background: url(/static/images/security/icon_security.png) no-repeat
+    //background: url(/static/images/security/icon_security.png) no-repeat
     padding-left: 40px
     height: 40px
     line-height: 40px
+
+  .anchor
+    position: absolute
+    top: -57px
+    height: 0px
+    font-size: 0px
 
 .guarantee-list-item
   visibility: hidden
@@ -190,7 +211,7 @@
 
       h3
         font-size: 28px
-        background: url("/static/images/security/num.png") 0 -100px no-repeat
+        background: url("/static/images/security/num.jpg") 0 -100px no-repeat
       p
         font-size: 14px
 
@@ -413,6 +434,7 @@
       top: 389px
       left: 462px
       z-index: 10000
+      background-color: #fff
       &.gray
         background-image: url(/static/images/security/investor_gray.png)
       &.color
@@ -735,6 +757,34 @@
     -moz-transform: translateY(-10px)
   100%
     -moz-transform: translateY(0)
+
+@-webkit-keyframes swing
+  20%,40%,60%,80%,100%
+    -webkit-transform-origin: top center
+  20%
+    -webkit-transform: rotate(15deg)
+  40%
+    -webkit-transform: rotate(-10deg)
+  60%
+    -webkit-transform: rotate(5deg)
+  80%
+    -webkit-transform: rotate(-5deg)
+  100%
+    -webkit-transform: rotate(0deg)
+
+@-moz-keyframes swing
+  20%,40%,60%,80%,100%
+    -moz-transform-origin: top center
+  20%
+    -moz-transform: rotate(15deg)
+  40%
+    -moz-transform: rotate(-10deg)
+  60%
+    -moz-transform: rotate(5deg)
+  80%
+    -moz-transform: rotate(-5deg)
+  100%
+    -moz-transform: rotate(0deg)
 
 
 .border-no
