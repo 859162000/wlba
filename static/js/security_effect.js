@@ -115,12 +115,12 @@ require(['jquery', 'raphael'], function($, raphael) {
     Ball.prototype.draw = function() {
         var url = '/static/images/security/ball.png';
         this.ball = this.paper.image(url, this.x, this.y, this.width, this.height);
-        this.ball.attr(this.property);
-        this.textElement = this.paper.text(this.x, this.y+2, this.text);
-        this.textElement.attr(this.textProperty);
+        //this.ball.attr(this.property);
+        //this.textElement = this.paper.text(this.x, this.y+2, this.text);
+        //this.textElement.attr(this.textProperty);
 
         this.set.push(this.ball);
-        this.set.push(this.textElement);
+        //this.set.push(this.textElement);
     };
 
     Ball.prototype.remove = function() {
