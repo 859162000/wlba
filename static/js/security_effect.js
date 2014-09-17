@@ -324,37 +324,18 @@ require(['jquery', 'raphael'], function($, raphael) {
 
 
         var ball1 = new Ball(137, 19, paper);
-
-        ball1.roll = function(callback) {
-            var diameter = 9,
-                _self = this,
-                perimeter = Math.PI * diameter;
-
-            var degree = 700 * 360 / perimeter;
-
-            _self.set.stop().animate({'transform': 't0,465r'+ 20}, 500, function() {
-                _self.set.stop().animate({'transform': 't718,465r'+ degree}, 5000, function() {
-                     callback && callback.call(_self)
-                });
-            });
-        };
         var ball2 = new Ball(190, 19, paper);
 
-        ball2.roll = function(callback) {
-            var diameter = 9,
-                _self = this,
-                perimeter = Math.PI * diameter;
 
-            var degree = 700 * 360 / perimeter;
+        $('.overdue').on('rollcomplete1', function() {
+            var funnel = new Funnel('.investor', $('.overdue'));
+                funnel.fadeToColor();
+        });
 
-            _self.set.stop().animate({'transform': 't0,75r'+ 20}, 500, function() {
-                _self.set.stop().animate({'transform': 't718,75r'+ degree}, 5000, function() {
-                    _self.set.stop().animate({'transform': 't718,170r'+ 30}, 500, function() {
-                        callback && callback.call(_self)
-                    });
-                });
-            });
-        };
+        $('.overdue').on('rollcomplete2', function() {
+            var funnel = new Funnel('.gear', $('.overdue'));
+                funnel.fadeToColor();
+        });
 
         return {
             animate: function() {
@@ -365,13 +346,33 @@ require(['jquery', 'raphael'], function($, raphael) {
                 ball1.draw();
                 ball2.draw();
 
-                ball1.roll();
+                //ball1.roll();
 
+                var animations1 = [
+                    {distance: 465, direction: 1, time: 500},
+                    {distance: 400, direction: 0, time: 2000}
+                ]
+                var roll1 = new Roll(ball1, animations1);
+                roll1.setDispach($('.overdue'), ['rollcomplete1']);
+                roll1.move();
+
+                /*
                 ball2.roll(function() {
                     var funnel = new Funnel('.gear', $('.overdue'));
                     funnel.fadeToColor();
                 });
+                */
 
+                var animations2 = [
+                    {distance: 75, direction: 1, time: 500},
+                    {distance: 718, direction: 0, time: 2000},
+                    {distance: 390, direction: 1, time: 500},
+                    {distance: 355, direction: 2, time: 1000}
+                ]
+
+                var roll2 = new Roll(ball2, animations2);
+                roll2.setDispach($('.overdue'), ['rollcomplete2']);
+                roll2.move();
 
             }
         }

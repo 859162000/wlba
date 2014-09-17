@@ -397,18 +397,26 @@
       width: 200px
       height: 185px
       position: absolute
-      background: url(/static/images/security/gear.png) no-repeat 0px 0px
       top: 175px
       left: 775px
+      z-index: 10000
+      &.gray
+        background-image: url(/static/images/security/gear_gray.png)
+      &.color
+        background-image: url(/static/images/security/gear.png)
       &.untreated
         //-webkit-filter: grayscale(100%)
     .investor
       width: 165px
       height: 165px
       position: absolute
-      background: url(/static/images/security/investor.png) no-repeat 0px 0px
       top: 389px
       left: 462px
+      z-index: 10000
+      &.gray
+        background-image: url(/static/images/security/investor_gray.png)
+      &.color
+        background-image: url(/static/images/security/investor.png)
       &.untreated
         //-webkit-filter: grayscale(100%)
         //-moz-filter: grayscale(100%)
