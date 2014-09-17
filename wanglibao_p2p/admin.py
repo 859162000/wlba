@@ -22,7 +22,7 @@ class AmortizationInline(admin.TabularInline):
     exclude = ('version',)
     can_delete = False
     readonly_fields = (
-        'term', 'term_date', 'principal', 'interest', 'penal_interest', 'ready_for_settle', 'description')
+        'term', 'term_date', 'principal', 'interest', 'penal_interest', 'description')
 
 
 class WarrantInline(admin.TabularInline):
