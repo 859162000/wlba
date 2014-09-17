@@ -54,6 +54,11 @@ class P2PProduct(ProductBase):
         (u'已完成', u'已完成')
     )
 
+    CATEGORY_CHOICES = (
+        (u'普通', u'普通'),
+        (u'证大速贷', u'证大速贷')
+    )
+
     PAY_METHOD_CHOICES = (
         (u'等额本息', u'等额本息'),
         (u'先息后本', u'先息后本'),
@@ -91,6 +96,9 @@ class P2PProduct(ProductBase):
     )
 
     version = IntegerVersionField()
+    category = models.CharField(max_length=16, default=u'普通',
+                              choices=CATEGORY_CHOICES,
+                              verbose_name=u'产品类别')
 
     hide = models.BooleanField(u'隐藏', default=False)
 
