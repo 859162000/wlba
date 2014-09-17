@@ -123,6 +123,10 @@ require(['jquery', 'raphael'], function($, raphael) {
         this.set.push(this.textElement);
     };
 
+    Ball.prototype.remove = function() {
+        this.set.remove();
+    };
+
 
     function Funnel(selector, context) {
         this.context = context;
@@ -171,6 +175,7 @@ require(['jquery', 'raphael'], function($, raphael) {
             for(var i = 0, len = _self.events.length; i < len; i++) {
                 _self.context.trigger(_self.events[i]);
             }
+            _self.ball.remove();
         });
     };
 
