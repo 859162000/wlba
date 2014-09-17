@@ -13,4 +13,3 @@ celerybeat-schedule
 gems
 env/
 .sass-cache
-apache.conf
