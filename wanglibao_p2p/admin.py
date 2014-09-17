@@ -63,7 +63,8 @@ class P2PProductResource(resources.ModelResource):
         # birthday = datetime.date(row[u'出生日期'])
         #today = datetime.date.today()
         #age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
-        instance.name = u"网利%s %s%s" % (row[u'产品名称'], now, str(self.count).zfill(3))
+        instance.category = "证大速贷"
+        instance.name = u"%s %s%s" % (row[u'产品名称'], now, str(self.count).zfill(3))
         instance.short_name = instance.name
         instance.serial_number = "E_ZDSD_%s%s" % (now, str(self.count).zfill(5))
         instance.contract_serial_number = row[u'合同编号']

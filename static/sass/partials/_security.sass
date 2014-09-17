@@ -6,6 +6,7 @@
 .security-bar-container
   position: relative
   height: 60px
+  z-index: 10000
   .security-bar
     height: 60px
     background: url("/static/images/security/security_tab_bg.png") 0 0 repeat-x
@@ -163,6 +164,8 @@
     height: 40px
     line-height: 40px
 
+.guarantee-list-item
+  visibility: hidden
 
 .guarantee-container
   position: relative
@@ -170,14 +173,12 @@
   //01
   &.organization
     height: 320px
-    background: url(/static/images/security/funnel_01.png) no-repeat 63px 70px
     padding-top: 80px
-    visibility: hidden
     &.untreated
-      -webkit-filter: grayscale(100%)
-      -moz-filter: grayscale(100%)
-      -ms-filter: grayscale(100%)
-      -o-filter: grayscale(100%)
+      //-webkit-filter: grayscale(100%)
+      //-moz-filter: grayscale(100%)
+      //-ms-filter: grayscale(100%)
+      //-o-filter: grayscale(100%)
 
       //filter: grayscale(100%)
       //filter: gray
@@ -226,17 +227,28 @@
             left: 20px
             top: 10px
 
+    .funnel_01
+      width: 328px
+      height: 250px
+      position: absolute
+      background-repeat: no-repeat
+      left: 60px
+      top: 70px
+      &.gray
+        background-image: url(/static/images/security/funnel_01_gray.png)
+      &.color
+        background-image: url(/static/images/security/funnel_01.png)
+
   //02
   &.project
-    height: 450px
-    background: url(/static/images/security/box_02.png) no-repeat 98px -6px
+    height: 470px
+    background: url(/static/images/security/box_02.png) no-repeat 98px 8px
     padding-top: 80
-    visibility: hidden
     &.untreated
-      -webkit-filter: grayscale(100%)
-      -moz-filter: grayscale(100%)
-      -ms-filter: grayscale(100%)
-      -o-filter: grayscale(100%)
+      //-webkit-filter: grayscale(100%)
+      //-moz-filter: grayscale(100%)
+      //-ms-filter: grayscale(100%)
+      //-o-filter: grayscale(100%)
 
       //filter: grayscale(100%)
       //filter: gray
@@ -257,6 +269,11 @@
       left: 104px
       line-height: 38px
       font-size: 14px
+      background: url(/static/images/security/list_bg.png) 60px -35px no-repeat
+      width: 900px
+      height: 260px
+      visibility: hidden
+      padding-top: 15px
       .list-label
         display: inline-block
         width: 85px
@@ -268,17 +285,29 @@
       .list-content
         display: inline-block
         width: 560px
+    .funnel_02
+      width: 328px
+      height: 250px
+      position: absolute
+      background-repeat: no-repeat
+      right: 78px
+      top: -39px
+      &.gray
+        background-image: url(/static/images/security/funnel_02_gray.png)
+      &.color
+        background-image: url(/static/images/security/funnel_02.png)
+
+
   //03
   &.online
     height: 320px
-    background: url(/static/images/security/online.png) no-repeat 39px 23px
+    //background: url(/static/images/security/online.png) no-repeat 39px 23px
     padding-top: 10px
-    visibility: hidden
     &.untreated
-      -webkit-filter: grayscale(100%)
-      -moz-filter: grayscale(100%)
-      -ms-filter: grayscale(100%)
-      -o-filter: grayscale(100%)
+      //-webkit-filter: grayscale(100%)
+      //-moz-filter: grayscale(100%)
+      //-ms-filter: grayscale(100%)
+      //-o-filter: grayscale(100%)
 
       //filter: grayscale(100%)
       //filter: gray
@@ -310,18 +339,30 @@
       .list-content
         display: inline-block
         width: 560px
+
+    .funnel_03
+      width: 250px
+      height: 250px
+      position: absolute
+      background-repeat: no-repeat
+      left: 40px
+      top: 16px
+      &.gray
+        background-image: url(/static/images/security/online_gray.png)
+      &.color
+        background-image: url(/static/images/security/online.png)
+
   //04
   &.overdue
     height: 510px
     background: url(/static/images/security/overdue.png) no-repeat 87px 0px
     padding-top: 0px
     margin-top: -10px
-    visibility: hidden
     &.untreated
-      -webkit-filter: grayscale(100%)
-      -moz-filter: grayscale(100%)
-      -ms-filter: grayscale(100%)
-      -o-filter: grayscale(100%)
+      //-webkit-filter: grayscale(100%)
+      //-moz-filter: grayscale(100%)
+      //-ms-filter: grayscale(100%)
+      //-o-filter: grayscale(100%)
 
       //filter: grayscale(100%)
       //filter: gray
@@ -338,7 +379,7 @@
     .guarantee-container-list
       position: absolute
       z-index: 10
-      top: 190px
+      top: 220px
       left: 185px
       line-height: 38px
       font-size: 14px
@@ -360,7 +401,7 @@
       top: 175px
       left: 775px
       &.untreated
-        -webkit-filter: grayscale(100%)
+        //-webkit-filter: grayscale(100%)
     .investor
       width: 165px
       height: 165px
@@ -369,10 +410,10 @@
       top: 389px
       left: 462px
       &.untreated
-        -webkit-filter: grayscale(100%)
-        -moz-filter: grayscale(100%)
-        -ms-filter: grayscale(100%)
-        -o-filter: grayscale(100%)
+        //-webkit-filter: grayscale(100%)
+        //-moz-filter: grayscale(100%)
+        //-ms-filter: grayscale(100%)
+        //-o-filter: grayscale(100%)
 
         //filter: grayscale(100%)
         //filter: gray
@@ -381,6 +422,8 @@
   &.pipeline_01
     height: 170px
     visibility: visible
+    overflow: visible
+    z-index: 1000
     .pipeline
       width: 820px
       //width: 37px
@@ -662,3 +705,43 @@
 
 .platform_01,.platform_02,.platform_03,.platform_04,.platform_05,.platform_06,.animation_02,.animation_03,.animation_04,.animation_08,.animation_09,.animation_10,.animation_13
   visibility: hidden
+
+.ball
+  position: absolute
+  left: 155px
+  top: 0px
+  width: 20px
+  height: 20px
+  background: #004E99
+  border-radius: 50%
+  box-shadow: 2px 3px 3px -2px rgba(0,0,0,0.4)
+
+.ball>div
+  position: absolute
+  width: 100%
+  height: 100%
+  border-radius:  50%
+
+.ball>div>span
+  position: absolute
+  left: 2px
+  top: 4px
+  width: 15px
+  height: 15px
+  border-radius: 50%
+  text-align: center
+  line-height: 15px
+  font-size: 10px
+  font-weight: normal
+  //background: #fff
+  color: #fff
+
+/* YOUR COLORS */
+.ball.blue
+  background: radial-gradient(circle at 5px 5px, #09f, #001)
+.ball.red
+  background: radial-gradient(circle at 2px 2px, #f30, #001)
+.ball.green
+  background: radial-gradient(circle at 5px 5px, #0f4, #001)
+.ball.yellow
+  background: radial-gradient(circle at 5px 5px, #fc0, #001)
