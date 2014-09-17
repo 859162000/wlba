@@ -163,17 +163,27 @@
 
 .security-panel-title
   height: 92px
-  font-size: 28px
-  padding-top: 40px
+  font-size: 48px
+  padding-top: 30px
   color: #ff0000
   overflow: hidden
   text-align: center
+  font-weight: bold
   border-bottom: 1px solid #cccccc
+  border-top: 1px dashed #cccccc
+
+  position: relative
   h2
     //background: url(/static/images/security/icon_security.png) no-repeat
     padding-left: 40px
     height: 40px
     line-height: 40px
+
+  .anchor
+    position: absolute
+    top: -57px
+    height: 0px
+    font-size: 0px
 
 .guarantee-list-item
   visibility: hidden
@@ -424,6 +434,7 @@
       top: 389px
       left: 462px
       z-index: 10000
+      background-color: #fff
       &.gray
         background-image: url(/static/images/security/investor_gray.png)
       &.color

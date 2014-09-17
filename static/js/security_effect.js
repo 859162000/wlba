@@ -85,12 +85,12 @@ require(['jquery', 'raphael'], function($, raphael) {
                     $('.security-bar').css('position', '');
                 }
 
-                if(tabDistance > 50) {
+                if(tabDistance > 62) {
                     $('.security-bar a').removeClass('active')
-                    $('.security-bar a[href="#platform"]').addClass('active')
+                    $('.security-bar a[href="#platformAnchor"]').addClass('active')
                 } else {
                     $('.security-bar a').removeClass('active')
-                    $('.security-bar a[href="#organization"]').addClass('active')
+                    $('.security-bar a[href="#organizationAnchor"]').addClass('active')
                 }
             }
         }
@@ -98,12 +98,12 @@ require(['jquery', 'raphael'], function($, raphael) {
 
 
     function Ball(x, y, paper) {
-        this.x = x;
-        this.y = y;
+        this.x = x-9;
+        this.y = y-9;
         this.paper = paper;
 
-        this.width = 9;
-        this.height = 9;
+        this.width = 18;
+        this.height = 18;
 
         this.set = this.paper.set();
         this.text = '￥';
@@ -113,7 +113,8 @@ require(['jquery', 'raphael'], function($, raphael) {
     }
 
     Ball.prototype.draw = function() {
-        this.ball = this.paper.circle(this.x, this.y, this.width, this.height);
+        var url = '/static/images/security/ball.png';
+        this.ball = this.paper.image(url, this.x, this.y, this.width, this.height);
         this.ball.attr(this.property);
         this.textElement = this.paper.text(this.x, this.y+2, this.text);
         this.textElement.attr(this.textProperty);
@@ -347,7 +348,7 @@ require(['jquery', 'raphael'], function($, raphael) {
                 ball2.draw();
 
                 var animations1 = [
-                    {distance: 465, direction: 1, time: 500},
+                    {distance: 465, direction: 1, time: 1000},
                     {distance: 400, direction: 0, time: 2000}
                 ]
                 var roll1 = new Roll(ball1, animations1);
@@ -357,7 +358,7 @@ require(['jquery', 'raphael'], function($, raphael) {
 
                 var animations2 = [
                     {distance: 75, direction: 1, time: 500},
-                    {distance: 718, direction: 0, time: 2000},
+                    {distance: 718, direction: 0, time: 1000},
                     {distance: 390, direction: 1, time: 500},
                     {distance: 355, direction: 2, time: 1000}
                 ]
@@ -414,7 +415,7 @@ require(['jquery', 'raphael'], function($, raphael) {
         funnel.fadeToColor();
     };
 
-    var module_07 = new Module(500, '.project');
+    var module_07 = new Module(800, '.project');
     module_07.animate = function () {
         if(!$('#organization').hasClass('hidden')) {
             pipe_02.animate();
