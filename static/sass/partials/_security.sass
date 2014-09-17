@@ -535,15 +535,18 @@
   animation: fadeInUp 1s .5s ease both
 
 .fadeInDown
-  -webkit-animation: fadeInDown .5s .2s ease both
-  -moz-animation: fadeInDown .5s .2s ease both
-  animation: fadeInDown .5s .2s ease both
+  -webkit-animation: fadeInDown .5s .2s linear both
+  -moz-animation: fadeInDown .5s .2s linear both
+  animation: fadeInDown .5s .2s linear both
 
 .fade-to-small
   -webkit-animation: fadeToSmall .5s .6s ease both
   -moz-animation: fadeToSmall .5s .6s ease both
   animation: fadeToSmall .5s .6s ease both
 
+.bounceInDown
+  -webkit-animation: bounceInDown 1s .2s ease both
+  -moz-animation: bounceInDown 1s .2s ease both
 
 @-webkit-keyframes fadeInLeft
   0%
@@ -708,10 +711,39 @@
   100%
     opacity: 1
 
+@-webkit-keyframes bounceInDown
+  0%
+    opacity: 0
+    -webkit-transform: translateY(-2000px)
+  60%
+    opacity: 1
+    -webkit-transform: translateY(30px)
+  80%
+    -webkit-transform: translateY(-10px)
+  100%
+    -webkit-transform: translateY(0)
+
+@-moz-keyframes bounceInDown
+  0%
+    opacity: 0
+    -moz-transform: translateY(-2000px)
+  60%
+    opacity: 1
+    -moz-transform: translateY(30px)
+
+  80%
+    -moz-transform: translateY(-10px)
+  100%
+    -moz-transform: translateY(0)
+
+
 .border-no
   border: 0
 
-.platform_01,.platform_02,.platform_03,.platform_04,.platform_05,.platform_06,.animation_02,.animation_03,.animation_04,.animation_08,.animation_09,.animation_10,.animation_13
+.animation_02,.animation_03,.animation_04,.animation_08,.animation_09,.animation_10,.animation_13
+  visibility: hidden
+
+.animation-item
   visibility: hidden
 
 .ball
