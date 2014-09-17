@@ -11,11 +11,14 @@ require ['jquery'], ($)->
     url = $('.panel-title-bar a', $(this)).attr('href')
     window.location.href = url
 
-  $('.p2pinfo-list-box').bind('mouseenter',(e)->
+  $('.p2pinfo-list-box').on('mouseenter',(e)->
     target = e.currentTarget.lastElementChild.id
     #console.log(target)
-    $('#'+target).show()
-  ).bind('mouseleave', (e)->
+    $('#'+target).fadeIn()
+  ).on('mouseleave', (e)->
     target = e.currentTarget.lastElementChild.id
-    $('#'+target).hide()
+    $('#'+target).fadeOut()
+  ).on('click',->
+    url = $('.p2pinfo-title-content>a', $(this)).attr('href')
+    window.location.href = url
   )

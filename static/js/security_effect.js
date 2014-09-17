@@ -85,12 +85,12 @@ require(['jquery', 'raphael'], function($, raphael) {
                     $('.security-bar').css('position', '');
                 }
 
-                if(tabDistance > 50) {
+                if(tabDistance > 62) {
                     $('.security-bar a').removeClass('active')
-                    $('.security-bar a[href="#platform"]').addClass('active')
+                    $('.security-bar a[href="#platformAnchor"]').addClass('active')
                 } else {
                     $('.security-bar a').removeClass('active')
-                    $('.security-bar a[href="#organization"]').addClass('active')
+                    $('.security-bar a[href="#organizationAnchor"]').addClass('active')
                 }
             }
         }
@@ -98,12 +98,12 @@ require(['jquery', 'raphael'], function($, raphael) {
 
 
     function Ball(x, y, paper) {
-        this.x = x;
-        this.y = y;
+        this.x = x-9;
+        this.y = y-9;
         this.paper = paper;
 
-        this.width = 9;
-        this.height = 9;
+        this.width = 18;
+        this.height = 18;
 
         this.set = this.paper.set();
         this.text = '￥';
@@ -113,13 +113,18 @@ require(['jquery', 'raphael'], function($, raphael) {
     }
 
     Ball.prototype.draw = function() {
-        this.ball = this.paper.circle(this.x, this.y, this.width, this.height);
-        this.ball.attr(this.property);
-        this.textElement = this.paper.text(this.x, this.y+2, this.text);
-        this.textElement.attr(this.textProperty);
+        var url = '/static/images/security/ball.png';
+        this.ball = this.paper.image(url, this.x, this.y, this.width, this.height);
+        //this.ball.attr(this.property);
+        //this.textElement = this.paper.text(this.x, this.y+2, this.text);
+        //this.textElement.attr(this.textProperty);
 
         this.set.push(this.ball);
-        this.set.push(this.textElement);
+        //this.set.push(this.textElement);
+    };
+
+    Ball.prototype.remove = function() {
+        this.set.remove();
     };
 
 
@@ -170,6 +175,7 @@ require(['jquery', 'raphael'], function($, raphael) {
             for(var i = 0, len = _self.events.length; i < len; i++) {
                 _self.context.trigger(_self.events[i]);
             }
+            _self.ball.remove();
         });
     };
 
@@ -324,37 +330,18 @@ require(['jquery', 'raphael'], function($, raphael) {
 
 
         var ball1 = new Ball(137, 19, paper);
-
-        ball1.roll = function(callback) {
-            var diameter = 9,
-                _self = this,
-                perimeter = Math.PI * diameter;
-
-            var degree = 700 * 360 / perimeter;
-
-            _self.set.stop().animate({'transform': 't0,465r'+ 20}, 500, function() {
-                _self.set.stop().animate({'transform': 't718,465r'+ degree}, 5000, function() {
-                     callback && callback.call(_self)
-                });
-            });
-        };
         var ball2 = new Ball(190, 19, paper);
 
-        ball2.roll = function(callback) {
-            var diameter = 9,
-                _self = this,
-                perimeter = Math.PI * diameter;
 
-            var degree = 700 * 360 / perimeter;
+        $('.overdue').on('rollcomplete1', function() {
+            var funnel = new Funnel('.investor', $('.overdue'));
+                funnel.fadeToColor();
+        });
 
-            _self.set.stop().animate({'transform': 't0,75r'+ 20}, 500, function() {
-                _self.set.stop().animate({'transform': 't718,75r'+ degree}, 5000, function() {
-                    _self.set.stop().animate({'transform': 't718,170r'+ 30}, 500, function() {
-                        callback && callback.call(_self)
-                    });
-                });
-            });
-        };
+        $('.overdue').on('rollcomplete2', function() {
+            var funnel = new Funnel('.gear', $('.overdue'));
+                funnel.fadeToColor();
+        });
 
         return {
             animate: function() {
@@ -365,13 +352,25 @@ require(['jquery', 'raphael'], function($, raphael) {
                 ball1.draw();
                 ball2.draw();
 
-                ball1.roll();
+                var animations1 = [
+                    {distance: 465, direction: 1, time: 1000},
+                    {distance: 400, direction: 0, time: 2000}
+                ]
+                var roll1 = new Roll(ball1, animations1);
+                roll1.setDispach($('.overdue'), ['rollcomplete1']);
+                roll1.move();
 
-                ball2.roll(function() {
-                    var funnel = new Funnel('.gear', $('.overdue'));
-                    funnel.fadeToColor();
-                });
 
+                var animations2 = [
+                    {distance: 75, direction: 1, time: 500},
+                    {distance: 718, direction: 0, time: 1000},
+                    {distance: 390, direction: 1, time: 500},
+                    {distance: 355, direction: 2, time: 1000}
+                ]
+
+                var roll2 = new Roll(ball2, animations2);
+                roll2.setDispach($('.overdue'), ['rollcomplete2']);
+                roll2.move();
 
             }
         }
@@ -421,7 +420,7 @@ require(['jquery', 'raphael'], function($, raphael) {
         funnel.fadeToColor();
     };
 
-    var module_07 = new Module(500, '.project');
+    var module_07 = new Module(800, '.project');
     module_07.animate = function () {
         if(!$('#organization').hasClass('hidden')) {
             pipe_02.animate();
@@ -448,13 +447,14 @@ require(['jquery', 'raphael'], function($, raphael) {
     var module_10 = new Module(50, '.platform_01');
     module_10.animate = function () {
         if(!$('#platform').hasClass('hidden')) {
-            $(this.selector).css('visibility', 'visible');
             var _self = this;
-            $('.animation_01', $(this.selector)).addClass('fade-in-left');
+            $(_self.selector).css('visibility', 'visible');
+            $('.animation_02', $(_self.selector)).css('visibility', 'visible');
+            $('.animation_02', $(_self.selector)).addClass('bounceIn');
             setTimeout(function(){
-                $('.animation_02', $(_self.selector)).css('visibility', 'visible');
-                $('.animation_02', $(_self.selector)).addClass('bounceIn');
-            }, 500);
+                $('.animation_01', $(_self.selector)).css('visibility', 'visible');
+                $('.animation_01', $(_self.selector)).addClass('fade-in-left');
+            }, 1500);
         }
     };
 
@@ -463,15 +463,21 @@ require(['jquery', 'raphael'], function($, raphael) {
         if(!$('#platform').hasClass('hidden')) {
             $(this.selector).css('visibility', 'visible');
             var _self = this;
-            $('.animation_05', $(this.selector)).addClass('fade-in-right');
-            $(this.selector).checked();
+
             $('.animation_03', $(_self.selector)).css('visibility', 'visible');
             $('.animation_03', $(_self.selector)).addClass('fade-in-left');
 
-            //setTimeout(function(){
-                $('.animation_04', $(_self.selector)).css('visibility', 'visible');
-                //$('.animation_04', $(_self.selector)).addClass('bounceIn');
-            //}, 1000);
+            $('.animation_04', $(_self.selector)).css('visibility', 'visible');
+            $('.animation_04', $(_self.selector)).addClass('bounceIn');
+
+            setTimeout(function(){
+                $('.animation_05', $(_self.selector)).css('visibility', 'visible');
+                $('.animation_05', $(_self.selector)).addClass('fade-in-right');
+            }, 1000);
+
+            setTimeout(function() {
+                $(_self.selector).checked();
+            }, 1800);
         }
     };
 
@@ -480,13 +486,25 @@ require(['jquery', 'raphael'], function($, raphael) {
         if(!$('#platform').hasClass('hidden')) {
             $(this.selector).css('visibility', 'visible');
             var _self = this;
-            $('.animation_06', $(this.selector)).addClass('fade-in-left');
+
+            $('.animation_07', $(_self.selector)).css('visibility', 'visible');
             $('.animation_07', $(this.selector)).addClass('fade-in-right');
-            $(this.selector).checked();
+
             setTimeout(function(){
                 $('.animation_08', $(_self.selector)).css('visibility', 'visible');
                 $('.animation_08', $(_self.selector)).addClass('fade-to-small');
-            }, 500);
+            }, 700);
+
+            setTimeout(function() {
+                $('.animation_06', $(_self.selector)).css('visibility', 'visible');
+                $('.animation_06', $(_self.selector)).addClass('fade-in-left');
+            }, 1600);
+
+            setTimeout(function() {
+                $(_self.selector).checked();
+            }, 2000);
+
+
         }
     };
 
@@ -495,44 +513,65 @@ require(['jquery', 'raphael'], function($, raphael) {
         if(!$('#platform').hasClass('hidden')) {
             $(this.selector).css('visibility', 'visible');
             var _self = this;
-            $('.animation_11', $(this.selector)).addClass('fade-in-right');
-            $(this.selector).checked();
+            //1. 显示金币
+            $('.animation_10', $(_self.selector)).css('visibility', 'visible');
+            $('.animation_10', $(_self.selector)).addClass('fade-in');
+
+            //2. 显示盾牌
             setTimeout(function(){
                 $('.animation_09', $(_self.selector)).css('visibility', 'visible');
-                $('.animation_09', $(_self.selector)).addClass('fadeInDown');
-                setTimeout(function() {
-                    $('.animation_10', $(_self.selector)).css('visibility', 'visible');
-                    $('.animation_10', $(_self.selector)).addClass('fade-to-small');
-                }, 200)
-            }, 200);
+                $('.animation_09', $(_self.selector)).addClass('bounceInDown');
+            }, 500);
+
+            //3. 显示文字
+            setTimeout(function(){
+                $('.animation_11', $(_self.selector)).css('visibility', 'visible');
+                $('.animation_11', $(_self.selector)).addClass('fade-in-right');
+            }, 1500);
+
+            //4. 显示勾号
+            setTimeout(function(){
+                $(_self.selector).checked();
+            }, 2000);
+
         }
     };
 
     var module_06 = new Module(200, '.platform_05');
     module_06.animate = function () {
         if(!$('#platform').hasClass('hidden')) {
-            $(this.selector).css('visibility', 'visible');
             var _self = this;
-            $('.animation_12', $(this.selector)).addClass('fade-in-left');
-            $(this.selector).checked();
+            //1. 显示图
+            $('.animation_13', $(_self.selector)).css('visibility', 'visible');
+            $('.animation_13', $(_self.selector)).addClass('fade-to-small');
+
+            //2. 显示文字
             setTimeout(function(){
-                $('.animation_13', $(_self.selector)).css('visibility', 'visible');
-                $('.animation_13', $(_self.selector)).addClass('fade-to-small');
-            }, 500);
+                $('.animation_12', $(_self.selector)).css('visibility', 'visible');
+                $('.animation_12', $(_self.selector)).addClass('fade-in-left');
+            }, 800);
+
+            //3. 显示打勾
+            setTimeout(function(){
+                $(_self.selector).checked();
+            }, 1800);
+
         }
     };
 
     var module_11 = new Module(200, '.platform_06');
     module_11.animate = function () {
         if(!$('#organization').hasClass('hidden')) {
-            $(this.selector).css('visibility', 'visible');
             var _self = this;
-            $('.animation_14', $(this.selector)).addClass('fade-in-left');
-            $('.animation_16', $(this.selector)).addClass('fade-in-right');
-            setTimeout(function(){
-                $('.animation_15', $(_self.selector)).css('visibility', 'visible');
-                $('.animation_15', $(_self.selector)).addClass('fade-in');
-            }, 500);
+            $('.animation_14', $(_self.selector)).css('visibility', 'visible');
+            $('.animation_14', $(_self.selector)).addClass('fadeInUp');
+
+            $('.animation_15', $(_self.selector)).css('visibility', 'visible');
+            $('.animation_15', $(_self.selector)).addClass('fadeInUp');
+
+            $('.animation_16', $(_self.selector)).css('visibility', 'visible');
+            $('.animation_16', $(_self.selector)).addClass('fadeInUp');
+
         }
     };
 
