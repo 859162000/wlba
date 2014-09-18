@@ -560,7 +560,7 @@ require(['jquery', 'raphael'], function($, raphael) {
         }
     };
 
-    var module_11 = new Module(200, '.platform_06');
+    var module_11 = new Module(90, '.platform_06');
     module_11.animate = function () {
         if(!$('#organization').hasClass('hidden')) {
             var _self = this;
