@@ -182,7 +182,7 @@ class P2PListView(TemplateView):
 
         p2p_done = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
             .filter(status= u'正在招标').order_by('-publish_time').select_related('warrant_company')
-
+        print p2p_done
         p2p_others = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
             status__in=[
                 u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
@@ -194,7 +194,8 @@ class P2PListView(TemplateView):
             p2p_earning = sorted(p2p_done, key=lambda x: (-x.expected_earning_rate, x.available_amout))
             p2p_period = sorted(p2p_done, key=lambda x: (x.period, x.available_amout))
             p2p_amount = sorted(p2p_done, key=attrgetter('available_amout'))
-
+        else:
+            p2p_earning = p2p_period = p2p_amount = []
 
         p2p_products = []
         p2p_products.extend(p2p_done)
