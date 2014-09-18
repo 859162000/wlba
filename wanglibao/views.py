@@ -17,12 +17,18 @@ class IndexView(TemplateView):
 
 
         p2p_pre_four = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status=u'正在招标').order_by('-priority', '-total_amount').select_related('warrant_company')[:4]
+            .filter(status=u'正在招标').order_by('-priority', '-total_amount').select_related('warrant_company')[:5]
 
         p2p_last = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
             .filter(status=u'还款中').order_by('-soldout_time').select_related('warrant_company')[0:1]
 
-        p2p_products = chain(p2p_pre_four, p2p_last)
+        p2p_products = chain(p2p_pre_four[:4], p2p_last)
+
+        getmore = False
+        if p2p_pre_four.count() > 4 and p2p_last:
+            getmore = True
+
+
 
         trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:7]
         banners = Banner.objects.filter(device=Banner.PC_2)
@@ -35,6 +41,7 @@ class IndexView(TemplateView):
             "news_and_reports": news_and_reports,
             'banners': banners,
             'site_data': site_data,
+            'getmore': getmore
         }
 
 
