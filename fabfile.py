@@ -100,7 +100,7 @@ if env.get('group') == 'staging':
         'web_private': ['127.0.0.1'],
 
         # task_queue should be ip
-        'task_queue': ['staging.wanglibao.com'],
+        'task_queue': ['111.206.165.43'],
         'task_queue_private': ['127.0.0.1'],
 
         'db': ['staging.wanglibao.com'],
