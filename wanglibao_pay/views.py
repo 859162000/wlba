@@ -276,8 +276,10 @@ class CardViewSet(ModelViewSet):
 
         is_default = request.DATA.get('is_default', False)
 
-        if is_default == 'ture':
+        if is_default == 'true':
             card.is_default = True
+        elif is_default == 'false':
+            card.is_default = False
         else:
             return Response({
                 "message": u"设置是否默认银行卡错误",
@@ -285,16 +287,17 @@ class CardViewSet(ModelViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-        if not re.match('^[\d]{0,25}$',card.no):
+        if not re.match('^[\d]{0,25}$', card.no):
             return Response({
-                "message": u"银行账号超过长度或者银行卡不是数字",
+                "message": u"银行账号超过长度",
                 'error_number': ErrorNumber.form_error
             }, status=status.HTTP_400_BAD_REQUEST)
 
         bank_id = request.DATA.get('bank', '')
 
-        exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
-        if exist_cards:
+        try:
+            Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
+        except:
             return Response({
                 "message": u"该银行卡已经存在",
                 'error_number': ErrorNumber.duplicate
