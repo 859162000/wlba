@@ -276,8 +276,10 @@ class CardViewSet(ModelViewSet):
 
         is_default = request.DATA.get('is_default', False)
 
-        if is_default == 'ture':
+        if is_default == 'true':
             card.is_default = True
+        elif is_default == 'false':
+            card.is_default = False
         else:
             return Response({
                 "message": u"设置是否默认银行卡错误",
