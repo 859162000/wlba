@@ -503,6 +503,7 @@ require(['jquery', 'raphael'], function($, raphael) {
 
             setTimeout(function() {
                 $(_self.selector).checked();
+                $('.animation_08', $(_self.selector)).removeClass('fade-to-small');
             }, 1500);
 
 
