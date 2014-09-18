@@ -18,11 +18,11 @@
     return $('.p2pinfo-list-box').on('mouseenter', function(e) {
       var target;
       target = e.currentTarget.lastElementChild.id;
-      return $('#' + target).fadeIn();
+      return $('#' + target).show();
     }).on('mouseleave', function(e) {
       var target;
       target = e.currentTarget.lastElementChild.id;
-      return $('#' + target).fadeOut();
+      return $('#' + target).hide();
     }).on('click', function() {
       var url;
       url = $('.p2pinfo-title-content>a', $(this)).attr('href');
@@ -31,5 +31,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_list.map
