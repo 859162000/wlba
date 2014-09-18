@@ -275,8 +275,9 @@ class CardViewSet(ModelViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         is_default = request.DATA.get('is_default', False)
-        if isinstance(is_default, bool):
-            card.is_default = is_default
+
+        if is_default == 'ture':
+            card.is_default = True
         else:
             return Response({
                 "message": u"设置是否默认银行卡错误",
