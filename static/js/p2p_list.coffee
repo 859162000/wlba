@@ -14,10 +14,10 @@ require ['jquery'], ($)->
   $('.p2pinfo-list-box').on('mouseenter',(e)->
     target = e.currentTarget.lastElementChild.id
     #console.log(target)
-    $('#'+target).fadeIn()
+    $('#'+target).show()
   ).on('mouseleave', (e)->
     target = e.currentTarget.lastElementChild.id
-    $('#'+target).fadeOut()
+    $('#'+target).hide()
   ).on('click',->
     url = $('.p2pinfo-title-content>a', $(this)).attr('href')
     window.location.href = url
