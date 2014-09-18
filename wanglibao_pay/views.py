@@ -280,7 +280,7 @@ class CardViewSet(ModelViewSet):
         else:
             return Response({
                 "message": u"设置是否默认银行卡错误",
-                'error_number': ErrorNumber.form_error
+                'error_number': ErrorNumber.card_isdefault_error
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
