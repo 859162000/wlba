@@ -286,7 +286,7 @@ class CardViewSet(ModelViewSet):
 
         if not re.match('^[\d]{0,25}$',card.no):
             return Response({
-                "message": u"银行账号超过长度",
+                "message": u"银行账号超过长度或者银行卡不是数字",
                 'error_number': ErrorNumber.form_error
             }, status=status.HTTP_400_BAD_REQUEST)
 
