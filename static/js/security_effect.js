@@ -135,13 +135,14 @@ require(['jquery', 'raphael'], function($, raphael) {
 
     Funnel.prototype.fadeToColor = function() {
         var funnel = this.funnel,
-            context = this.context;
+            context = this.context,
+            time = 1500;
         if(funnel.attr('data-active') && funnel.attr('data-active') == 1) {
             return;
         }
         funnel.attr('data-active', 1);
-        funnel.fadeTo(1000, 0.2, function() {
-            funnel.removeClass('gray').addClass('color').fadeTo(1000, 1, function() {
+        funnel.fadeTo(time, 0, function() {
+            funnel.removeClass('gray').addClass('color').fadeTo(time, 1, function() {
                  $('.guarantee-list-item', context).css('visibility', 'visible').addClass('fadeInUp');
             });
         });
