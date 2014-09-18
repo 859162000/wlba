@@ -38,7 +38,6 @@ class ShuMiAPI(object):
         if response.status_code == 200:
             json_string = response.text
             return json.loads(json_string)
-
         else:
             raise FetchException('%s' % response.text)
 

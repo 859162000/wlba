@@ -421,14 +421,14 @@ require(['jquery', 'raphael'], function($, raphael) {
         funnel.fadeToColor();
     };
 
-    var module_07 = new Module(800, '.project');
+    var module_07 = new Module(500, '.project');
     module_07.animate = function () {
         if(!$('#organization').hasClass('hidden')) {
             pipe_02.animate();
         }
     };
 
-    var module_09 = new Module(400, '.overdue');
+    var module_09 = new Module(200, '.overdue');
     module_09.animate = function () {
         if(!$('#organization').hasClass('hidden')) {
             pipe_03.animate();
@@ -437,7 +437,7 @@ require(['jquery', 'raphael'], function($, raphael) {
 
 
 
-    var module_02 = new Module(500, '.pipeline_01');
+    var module_02 = new Module(250, '.pipeline_01');
     module_02.animate = function () {
         if(!$('#organization').hasClass('hidden')) {
             pipe_01.animate();
@@ -455,7 +455,7 @@ require(['jquery', 'raphael'], function($, raphael) {
             setTimeout(function(){
                 $('.animation_01', $(_self.selector)).css('visibility', 'visible');
                 $('.animation_01', $(_self.selector)).addClass('fade-in-left');
-            }, 1500);
+            }, 800);
         }
     };
 
@@ -474,11 +474,11 @@ require(['jquery', 'raphael'], function($, raphael) {
             setTimeout(function(){
                 $('.animation_05', $(_self.selector)).css('visibility', 'visible');
                 $('.animation_05', $(_self.selector)).addClass('fade-in-right');
-            }, 1000);
+            }, 800);
 
             setTimeout(function() {
                 $(_self.selector).checked();
-            }, 1800);
+            }, 1200);
         }
     };
 
@@ -499,11 +499,11 @@ require(['jquery', 'raphael'], function($, raphael) {
             setTimeout(function() {
                 $('.animation_06', $(_self.selector)).css('visibility', 'visible');
                 $('.animation_06', $(_self.selector)).addClass('fade-in-left');
-            }, 1600);
+            }, 1200);
 
             setTimeout(function() {
                 $(_self.selector).checked();
-            }, 2000);
+            }, 1500);
 
 
         }
@@ -528,12 +528,12 @@ require(['jquery', 'raphael'], function($, raphael) {
             setTimeout(function(){
                 $('.animation_11', $(_self.selector)).css('visibility', 'visible');
                 $('.animation_11', $(_self.selector)).addClass('fade-in-right');
-            }, 1500);
+            }, 800);
 
             //4. 显示勾号
             setTimeout(function(){
                 $(_self.selector).checked();
-            }, 2000);
+            }, 1200);
 
         }
     };
@@ -555,7 +555,7 @@ require(['jquery', 'raphael'], function($, raphael) {
             //3. 显示打勾
             setTimeout(function(){
                 $(_self.selector).checked();
-            }, 1800);
+            }, 1200);
 
         }
     };
