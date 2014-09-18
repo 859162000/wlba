@@ -188,10 +188,12 @@ class P2PListView(TemplateView):
                 u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
             ]).order_by('-soldout_time').select_related('warrant_company')
 
-        p2p_earning = sorted(p2p_done, key=lambda x: (-x.expected_earning_rate, x.available_amout))
-
-        p2p_period = sorted(p2p_done, key=lambda x: (x.period, x.available_amout))
-        p2p_amount = sorted(p2p_done, key=attrgetter('available_amout'))
+        show_slider = False
+        if p2p_done:
+            show_slider = True
+            p2p_earning = sorted(p2p_done, key=lambda x: (-x.expected_earning_rate, x.available_amout))
+            p2p_period = sorted(p2p_done, key=lambda x: (x.period, x.available_amout))
+            p2p_amount = sorted(p2p_done, key=attrgetter('available_amout'))
 
 
         p2p_products = []
@@ -209,10 +211,12 @@ class P2PListView(TemplateView):
         except Exception:
             p2p_products = paginator.page(paginator.num_pages)
 
+
         return {
             'p2p_products': p2p_products,
             'p2p_earning': p2p_earning[:5],
             'p2p_period': p2p_period[:5],
             'p2p_amount': p2p_amount[:5],
+            'show_slider': show_slider,
         }
 
