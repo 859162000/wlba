@@ -30,6 +30,10 @@ require ['jquery', 'jquery.scroll', 'security_effect'], ($, scroll, effect) ->
     $('.security-bar a').removeClass('active')
     $(this).addClass('active')
 
+    t = $($(this).attr('href')).offset().top
+    $(window).scrollTop(t)
+
+
   #mouseover
   $('.animation_02,.animation_13,.animation_03').mouseover ->
     image = $('img', $(this))

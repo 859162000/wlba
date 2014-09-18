@@ -136,7 +136,7 @@ require(['jquery', 'raphael'], function($, raphael) {
     Funnel.prototype.fadeToColor = function() {
         var funnel = this.funnel,
             context = this.context,
-            time = 1500;
+            time = 200;
         if(funnel.attr('data-active') && funnel.attr('data-active') == 1) {
             return;
         }
