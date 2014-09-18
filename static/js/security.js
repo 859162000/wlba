@@ -24,8 +24,11 @@
       $.effect.dispatch();
     });
     $('.security-bar').on('click', 'a', function(e) {
+      var t;
       $('.security-bar a').removeClass('active');
-      return $(this).addClass('active');
+      $(this).addClass('active');
+      t = $($(this).attr('href')).offset().top;
+      return $(window).scrollTop(t);
     });
     return $('.animation_02,.animation_13,.animation_03').mouseover(function() {
       var image;
