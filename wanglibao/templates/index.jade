@@ -157,7 +157,7 @@ html
                         if status == '抢购中' or status == '满标审核'
                           .progress-indicator(style="width:{{percent | percentage}}")
                         else
-                          .progress-indicator.disabled(style="width:{{percent | percentage}}")
+                          .progress-indicator(style="width:{{percent | percentage}}")
 
                       if status == '抢购中' or status == '满标审核'
                         span.highlight &nbsp;&nbsp; {{percent | percentage}}
@@ -195,7 +195,7 @@ html
 
                         a.news-txt.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') {{news.name}}
 
-            .panel.invest-history-container
+            div(style="margin-top: 33px;").panel.invest-history-container
               .panel-title-bar__no-border
                 .panel-title 最新投资记录
               .panel-content-container

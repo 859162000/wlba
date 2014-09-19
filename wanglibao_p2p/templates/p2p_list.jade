@@ -88,7 +88,7 @@ html
                         if status == '抢购中' or status == '满标审核'
                           .progress-indicator(style="width:{{percent | percentage}}")
                         else
-                          .progress-indicator.disabled(style="width:{{percent | percentage}}")
+                          .progress-indicator(style="width:{{percent | percentage}}")
 
                       if status == '抢购中' or status == '满标审核'
                         span.highlight &nbsp;&nbsp; {{percent | percentage}}
@@ -159,7 +159,7 @@ html
                                 if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
                                   .progress-indicator(style="width:{{percent | percentage}}")
                                 else
-                                  .progress-indicator.disabled(style="width:{{percent | percentage}}")
+                                  .progress-indicator(style="width:{{percent | percentage}}")
 
                               if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
                                 span.highlight.font-xs {{percent | percentage}}
@@ -215,7 +215,7 @@ html
                                 if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
                                   .progress-indicator(style="width:{{percent | percentage}}")
                                 else
-                                  .progress-indicator.disabled(style="width:{{percent | percentage}}")
+                                  .progress-indicator(style="width:{{percent | percentage}}")
 
                               if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
                                 span.highlight.font-xs {{percent | percentage}}
@@ -272,7 +272,7 @@ html
                                 if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
                                   .progress-indicator(style="width:{{percent | percentage}}")
                                 else
-                                  .progress-indicator.disabled(style="width:{{percent | percentage}}")
+                                  .progress-indicator(style="width:{{percent | percentage}}")
 
                               if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
                                 span.highlight.font-xs {{percent | percentage}}
