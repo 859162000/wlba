@@ -74,6 +74,10 @@
   background: #3b3b3b
   padding: 1em 0 70px 0
 
+.footer-bottom-normal
+  background: #3b3b3b
+  padding: 1em 0 20px 0
+
 %footer-button-base
   +link-colors($color-text-d4, $color-text-d6)
   font-size: 40px
@@ -195,3 +199,28 @@
 
       &:hover
         background: url("/static/images/footbar_bg.png") repeat-x 0 -195px
+
+.footer-auth
+  text-align: center
+  padding-top: $space-ssm
+  padding-bottom: $space-ssm
+
+  a
+    margin-left: 10px
+    margin-right: 10px
+
+.icon-auth-ssl
+  width: 33px
+  height: 33px
+  background: url("/static/images/icon-auth-footer.png") 0 0 no-repeat
+
+  &:hover
+    background: url("/static/images/icon-auth-footer.png") 0 -34px no-repeat
+
+.icon-auth-itrust
+  width: 46px
+  height: 31px
+  background: url("/static/images/icon-auth-footer.png") -37px 0 no-repeat
+
+  &:hover
+    background: url("/static/images/icon-auth-footer.png") -37px -33px no-repeat

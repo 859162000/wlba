@@ -8,22 +8,25 @@
   +inline-block()
 
   .pager-anchor
-    height: 30px
-    width: 30px
-    line-height: 30px
+    height: 28px
+    width: 28px
+    line-height: 25px
     margin: 0 1px
     +inline-block()
     +unstyled-link
-    color: gray
-    background: lighten(lightgray, 10%)
+    color: $color-text-d4
+    border: solid 2px #d0d0d0
+    +border-radius(15px)
+    font-size: $font-s
+    background-color: $color-white
 
   &.active, &:hover
     .pager-anchor
-      color: white
-      background-color: $color-pomegranate
+      border-color: $color-pager
+      background: $color-pager
+      color: #ffffff
 
   &:hover.disabled, &.disabled
     .pager-anchor
-      color: darkgray
-      background-color: transparent
-      border-color: darkgray
+      border-color: #DDDDDD
+      color: #DDDDDD

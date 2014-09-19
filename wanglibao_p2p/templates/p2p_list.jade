@@ -1,0 +1,293 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
+  body.white-background
+    include include/header
+    - with 'P2P理财' as activeItem
+    include include/navigation
+    - endwith
+
+    .full-container
+      .container(style="border-bottom: 1px dashed #dcdcdc;")
+        .position
+          a(href="/") P2P理财
+          span.padding-l-r-s >
+          span.highlight 项目投资列表
+    .space-vertical-l
+    .container
+      .row
+        .span8
+          for product in p2p_products
+            status = product.display_status
+            .panel-p2p-product
+              .shadow-inner
+                .panel-title-bar
+                  if product.warrant_company
+                    .warrant-icon 担
+                  a(href="/p2p/detail/{{product.id}}") {{product.name}}
+                .panel-content
+                  .row
+                    .span2.align-center
+                      p
+                        em {{product.total_amount | money_format_int}}
+                      p 融资金额(元)
+                    .span2.align-center
+                      p
+                        em {{product.period}}
+                        span.font-l 个月
+                      p 还款期限
+                    .span3.align-center
+                      p
+                        earning_rate = str(product.expected_earning_rate)
+                        if product.excess_earning_rate > 0
+                          earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
+                        em.highlight {{earning_rate}}
+                        span.highlight.font-m %
+                      p 年化收益
+                    .span2.align-center
+                      p
+                        amount = product.total_amount - product.ordered_amount
+                        em {{amount | money_format_int}}
+                      p 可投资金额(元)
+                    .span3-omega.align-right
+                      p
+                        if status == '抢购中'
+                          a.button-home(href="/p2p/detail/{{product.id}}/")
+                            span.icon-p2p-home.purcharsing
+                            {{status}}
+                        else
+                          a.button-home-disabled(href="javascript:void(0)", disabled)
+                            if status == '已完成'
+                              span.icon-p2p-home.finished
+                            elif status == '还款中'
+                              span.icon-p2p-home.payment
+                            else
+                              span.icon-p2p-home.audit
+
+                            {{status}}
+
+                      if status == '抢购中'
+                        p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
+                          span(id="counter_{{product.id}}") {{product.end_time | timedelta_now_day }}
+                      else
+                        p
+
+                .panel-p2p--footer
+                  .row
+                    .span4
+                      span 进度：
+                      .progress-container
+                        percent = float(product.ordered_amount) / product.total_amount * 100
+                        if status == '抢购中' or status == '满标审核'
+                          .progress-indicator(style="width:{{percent | percentage}}")
+                        else
+                          .progress-indicator(style="width:{{percent | percentage}}")
+
+                      if status == '抢购中' or status == '满标审核'
+                        span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                      else
+                        span &nbsp;&nbsp; {{percent | percentage}}
+
+                    .span4.align-left
+                      span 担保机构: &nbsp;&nbsp;
+                      span.d3-text {{product.warrant_company.name}}
+                    .span4-omega.align-right
+                      span 还款方式: &nbsp;&nbsp;
+                      span.d3-text {{product.display_payback_method}}
+                if status == '还款中' or status == '已完成'
+                  .panel-p2p-stamp
+            .space-vertical-xl
+          .row
+            - with data=p2p_products uri='/p2p/list/'
+            include include/pager
+            - endwith
+
+        .span4-omega
+          if show_slider
+            .panel.news-list-container
+              .panel-title-bar__border-gray
+                .panel-title-b.earning 收益最高
+              .panel-content-container
+                if p2p_earning
+                  ul.p2pinfo-ul-box
+                    for p2p in p2p_earning
+
+                      li.p2pinfo-list-box
+                        .p2pinfo-list-title
+                          if forloop.counter == 1
+                            span.p2pinfo-title-number.highlight {{ forloop.counter }}
+                            h3.p2pinfo-title-content
+                             a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
+                          elif 1 < forloop.counter and forloop.counter < 4
+                            span.p2pinfo-title-number-2-3 {{ forloop.counter }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
+                          else
+                            span.p2pinfo-title-number-4-5 {{ forloop.counter }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
+
+                        .row.p2pinfo-list
+                          .span4.p2pinfo-ceil
+                            em.p2pinfo-active.highlight.font-weight  {{ p2p.expected_earning_rate }}%
+                            | &nbsp;收益
+                          .span3.p2pinfo-ceil
+                            em.font-weight {{ p2p.period }}
+                            em &nbsp;个月
+                          .span5-omega.p2pinfo-ceil
+                            em {{ p2p.available_amout }} 元可投
+
+                        .p2pinfo-flow(id="earing_{{ forloop.counter }}")
+                          .row.p2pinfo-flow-top
+                            .span6
+                              span.font-weight {{ p2p.total_amount | money_format_int }}
+                              | 元总金额
+                            .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
+                          .row.p2pinfo-flow-foot
+                            .span6
+                              span 进度：
+                              .progress-container
+                                percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+
+                                if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                  .progress-indicator(style="width:{{percent | percentage}}")
+                                else
+                                  .progress-indicator(style="width:{{percent | percentage}}")
+
+                              if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                span.highlight.font-xs {{percent | percentage}}
+                              else
+                                span.font-xs {{percent | percentage}}
+                            .span6-omega 还款方式：{{ p2p.display_payback_method }}
+                else
+                  p.p2pinfo-message 没有记录
+            .space-vertical-m
+            .panel.news-list-container
+              .panel-title-bar__border-gray
+                .panel-title-b.period  期限最短
+              .panel-content-container
+                if p2p_period
+                  ul.p2pinfo-ul-box
+                    for p2p in p2p_period
+                      li.p2pinfo-list-box
+                        div.p2pinfo-list-title
+                          if forloop.counter == 1
+                            span.p2pinfo-title-number {{ forloop.counter }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
+                          elif 1 < forloop.counter and forloop.counter < 4
+                            span.p2pinfo-title-number-2-3 {{ forloop.counter }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
+                          else
+                            span.p2pinfo-title-number-4-5 {{ forloop.counter }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
+
+                        .row.p2pinfo-list
+                          .span4.p2pinfo-ceil
+                            em.font-weight  {{ p2p.expected_earning_rate }}%
+                            | &nbsp;收益
+                          .span3.p2pinfo-ceil
+                            em.p2pinfo-active.highlight.font-weight {{ p2p.period }}
+                            em &nbsp;个月
+                          .span5-omega.p2pinfo-ceil
+                            em {{ p2p.available_amout }} 元可投
+
+                        .p2pinfo-flow(id="period_{{ forloop.counter }}")
+                          .row.p2pinfo-flow-top
+                            .span6
+                              span.font-weight {{ p2p.total_amount | money_format_int }}
+                              | 元总金额
+                            .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
+                          .row.p2pinfo-flow-foot
+                            .span6
+                              span 进度：
+                              .progress-container
+                                percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                                if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                  .progress-indicator(style="width:{{percent | percentage}}")
+                                else
+                                  .progress-indicator(style="width:{{percent | percentage}}")
+
+                              if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                span.highlight.font-xs {{percent | percentage}}
+                              else
+                                span.font-xs {{percent | percentage}}
+                            .span6-omega 还款方式：{{ p2p.display_payback_method }}
+                else
+                  p.p2pinfo-message 没有记录
+            .space-vertical-m
+
+            .panel.news-list-container
+              .panel-title-bar__border-gray
+                .panel-title-b.amount  即将满标
+              .panel-content-container
+                if p2p_amount
+                  ul.p2pinfo-ul-box
+                    for p2p in p2p_amount
+                      li.p2pinfo-list-box
+                        div.p2pinfo-list-title
+                          if forloop.counter == 1
+                            span.p2pinfo-title-number {{ forloop.counter }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
+                          elif 1 < forloop.counter and forloop.counter < 4
+                            span.p2pinfo-title-number-2-3 {{ forloop.counter }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
+                          else
+                            span.p2pinfo-title-number-4-5 {{ forloop.counter }}
+                            h3.p2pinfo-title-content
+                              a(href="/p2p/detail/{{p2p.id}}") {{ p2p.name }}
+                        .row.p2pinfo-list
+                          .span4.p2pinfo-ceil
+                            em.font-weight  {{ p2p.expected_earning_rate }}%
+                            | &nbsp;收益
+                          .span3.p2pinfo-ceil
+                            em.font-weight {{ p2p.period }}
+                            em &nbsp;个月
+                          .span5-omega.p2pinfo-ceil
+                            em.p2pinfo-active.highlight {{ p2p.available_amout }}
+                            | &nbsp;元可投
+
+                        .p2pinfo-flow(id="amount_{{ forloop.counter }}")
+                          .row.p2pinfo-flow-top
+                            .span6
+                              span.font-weight {{ p2p.total_amount | money_format_int }}
+                              | 元总金额
+                            .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
+                          .row.p2pinfo-flow-foot
+                            .span6
+                              span 进度：
+                              .progress-container
+                                percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                                if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                  .progress-indicator(style="width:{{percent | percentage}}")
+                                else
+                                  .progress-indicator(style="width:{{percent | percentage}}")
+
+                              if p2p.display_status == '抢购中' or p2p.display_status == '满标审核'
+                                span.highlight.font-xs {{percent | percentage}}
+                              else
+                                span.font-xs {{percent | percentage}}
+                            .span6-omega 还款方式：{{ p2p.display_payback_method }}
+                else
+                  p.p2pinfo-message 没有记录
+
+    .space-vertical-xl
+    script.
+      require(["/static/js/p2p_list.js"])
+
+    - with 1 as no_margin
+    include include/footer
+    - endwith
+
+    include include/tracking

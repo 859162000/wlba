@@ -54,6 +54,11 @@ class P2PProduct(ProductBase):
         (u'已完成', u'已完成')
     )
 
+    CATEGORY_CHOICES = (
+        (u'普通', u'普通'),
+        (u'证大速贷', u'证大速贷')
+    )
+
     PAY_METHOD_CHOICES = (
         (u'等额本息', u'等额本息'),
         (u'先息后本', u'先息后本'),
@@ -91,6 +96,9 @@ class P2PProduct(ProductBase):
     )
 
     version = IntegerVersionField()
+    category = models.CharField(max_length=16, default=u'普通',
+                              choices=CATEGORY_CHOICES,
+                              verbose_name=u'产品类别')
 
     hide = models.BooleanField(u'隐藏', default=False)
 
@@ -102,7 +110,7 @@ class P2PProduct(ProductBase):
     status = models.CharField(max_length=16, default=u'录标',
                               choices=STATUS_CHOICES,
                               verbose_name=u'产品状态*')
-
+    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先')
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)*', blank=False)
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
@@ -111,7 +119,7 @@ class P2PProduct(ProductBase):
 
     pay_method = models.CharField(verbose_name=u'支付方式*', max_length=32, blank=False, default=u'等额本息', choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)
-    repaying_source = models.TextField(verbose_name=u'还款资金来源*', blank=False)
+    repaying_source = models.TextField(verbose_name=u'还款资金来源*', blank=True)
 
     # Bao li related
     baoli_original_contract_number = models.CharField(u'(保理)原合同编号', max_length=64, blank=True)
@@ -132,6 +140,8 @@ class P2PProduct(ProductBase):
 
     total_amount = models.BigIntegerField(default=1, verbose_name=u'借款总额*', blank=False)
     ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
+
+    # _available_amout = models.BigIntegerField(default=0, verbose_name=u'可投资金额')
 
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
@@ -170,6 +180,10 @@ class P2PProduct(ProductBase):
     @property
     def current_limit(self):
         return min(self.remain, self.limit_amount_per_user)
+
+    @property
+    def available_amout(self):
+        return self.total_amount - self.ordered_amount
 
     def has_amount(self, amount):
         if amount <= self.remain:
@@ -261,6 +275,7 @@ class AmortizationReadyManager(models.Manager):
 
 
 class ProductAmortization(models.Model):
+
     version = IntegerVersionField()
 
     product = models.ForeignKey(P2PProduct, related_name='amortizations')
@@ -374,6 +389,10 @@ class P2PEquity(models.Model):
         return paid_interest
 
     @property
+    def unpaid_interest(self):
+        return self.total_interest - self.paid_interest
+
+    @property
     def penal_interest(self):
         if not self.confirm:
             return Decimal('0')
@@ -382,10 +401,6 @@ class P2PEquity(models.Model):
             return Decimal('0')
         penal_interest = paid_amos.aggregate(Sum('penal_interest'))['penal_interest__sum']
         return penal_interest
-
-    @property
-    def unpaid_interest(self):
-        return self.total_interest - self.paid_interest
 
     @property
     def paid_principal(self):

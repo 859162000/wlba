@@ -24,9 +24,10 @@ env.env_dict = {}
 
 
 def production():
+    env.user = 'lishuo'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'production3.0'
 
@@ -34,16 +35,17 @@ def production():
     env.pip_install_command = "pip install"
 
     env.mysql = False  # Use RDS, so we no need to install mysql
-    env.migrate = False
+    env.migrate = True
     env.supervisord = True
 
     env.environment = 'ENV_PRODUCTION'
 
 
 def pre_production():
+    env.user = 'lishuo'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'production3.0'
 
@@ -58,7 +60,7 @@ def pre_production():
 def dev():
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'master'
 
@@ -75,7 +77,7 @@ def staging():
     env.password = 'wanglibank'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
-    env.depot = 'git@github.com:shuoli84/wanglibao-backend.git'
+    env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
     env.depot_name = 'wanglibao-backend'
     env.branch = 'master'
 
@@ -99,6 +101,7 @@ if env.get('group') == 'staging':
 
         # task_queue should be ip
         'task_queue': ['staging.wanglibao.com'],
+        # 'task_queue': ['111.206.165.43'],
         'task_queue_private': ['127.0.0.1'],
 
         'db': ['staging.wanglibao.com'],
@@ -157,11 +160,11 @@ elif env.get('group') == 'production':
             '10.165.54.41'
         ],
         'web': [
-        #    '115.28.240.194',
+            '115.28.240.194',
             '114.215.146.91'
         ],
         'web_private': [
-        #    '10.161.55.165',
+            '10.161.55.165',
             '10.164.13.228'
         ],
         'cron_tab': ['114.215.146.91'],

@@ -265,27 +265,52 @@ class CardViewSet(ModelViewSet):
     def create(self, request):
         card = Card()
         card.user = request.user
-        card.no = request.DATA.get('no', '')
-        if request.DATA.get('is_default') == "true":
+        no = request.DATA.get('no', '')
+        if no:
+            card.no = no
+        else:
+            return Response({
+                "message": u"银行账号不能为空",
+                'error_number': ErrorNumber.card_number_error
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        is_default = request.DATA.get('is_default', False)
+
+        if is_default == 'true':
             card.is_default = True
-        if not re.match('^[\d]{0,25}$',card.no):
+        elif is_default == 'false':
+            card.is_default = False
+        else:
+            return Response({
+                "message": u"设置是否默认银行卡错误",
+                'error_number': ErrorNumber.card_isdefault_error
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+        if not re.match('^[\d]{0,25}$', card.no):
             return Response({
                 "message": u"银行账号超过长度",
                 'error_number': ErrorNumber.form_error
             }, status=status.HTTP_400_BAD_REQUEST)
+
         bank_id = request.DATA.get('bank', '')
-        exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
-        if exist_cards:
+
+        try:
+            Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
+        except:
             return Response({
                 "message": u"该银行卡已经存在",
                 'error_number': ErrorNumber.duplicate
             }, status=status.HTTP_400_BAD_REQUEST)
-        card.bank = Bank.objects.get(pk=bank_id)
-        if not card.bank:
+
+        try:
+            card.bank = Bank.objects.get(pk=bank_id)
+        except:
             return Response({
                 "message": u"没有找到该银行",
                 'error_number': ErrorNumber.not_find
             }, status=status.HTTP_400_BAD_REQUEST)
+
         card.save()
 
         return Response({
@@ -294,6 +319,20 @@ class CardViewSet(ModelViewSet):
             'bank_name': card.bank.name
         })
 
+
+    def destroy(self, request, pk=None):
+        card_id = request.DATA.get('card_id', '')
+        card = Card.objects.filter(id=card_id)
+        if card:
+            card.delete()
+            return Response({
+            'id': card_id
+             })
+        else:
+            return Response({
+                "message": u"查不到银行卡，请联系管理员",
+                'error_number': ErrorNumber.duplicate
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 class WithdrawTransactions(TemplateView):
     template_name = 'withdraw_transactions.jade'

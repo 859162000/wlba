@@ -1,12 +1,15 @@
 # encoding: utf8
 from django.contrib.admin.views.decorators import staff_member_required
-
+from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.views.generic import TemplateView
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
@@ -18,6 +21,7 @@ from wanglibao_p2p.serializers import P2PProductSerializer, P2PRecordSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
+from operator import attrgetter, itemgetter
 
 
 class P2PDetailView(TemplateView):
@@ -69,7 +73,7 @@ class P2PDetailView(TemplateView):
 
 
 class PurchaseP2P(APIView):
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     @property
     def allowed_methods(self):
@@ -149,7 +153,7 @@ class P2PProductViewSet(PaginatedModelViewSet):
     def get_queryset(self):
         qs = super(P2PProductViewSet, self).get_queryset()
         return qs.filter(hide=False).filter(status__in=[
-                u'正在招标', u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+                u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
             ])
 
 
@@ -169,3 +173,51 @@ class RecordView(APIView):
         serializer = P2PRecordSerializer(equities, many=True, context={"request": request})
 
         return Response(data=serializer.data)
+
+
+class P2PListView(TemplateView):
+    template_name = 'p2p_list.jade'
+
+    def get_context_data(self, **kwargs):
+
+        p2p_done = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+            .filter(status= u'正在招标').order_by('-publish_time').select_related('warrant_company')
+        print p2p_done
+        p2p_others = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
+            status__in=[
+                u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+            ]).order_by('-soldout_time').select_related('warrant_company')
+
+        show_slider = False
+        if p2p_done:
+            show_slider = True
+            p2p_earning = sorted(p2p_done, key=lambda x: (-x.expected_earning_rate, x.available_amout))
+            p2p_period = sorted(p2p_done, key=lambda x: (x.period, x.available_amout))
+            p2p_amount = sorted(p2p_done, key=attrgetter('available_amout'))
+        else:
+            p2p_earning = p2p_period = p2p_amount = []
+
+        p2p_products = []
+        p2p_products.extend(p2p_done)
+        p2p_products.extend(p2p_others)
+
+        limit = 10
+        paginator = Paginator(p2p_products, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            p2p_products = paginator.page(page)
+        except PageNotAnInteger:
+            p2p_products = paginator.page(1)
+        except Exception:
+            p2p_products = paginator.page(paginator.num_pages)
+
+
+        return {
+            'p2p_products': p2p_products,
+            'p2p_earning': p2p_earning[:5],
+            'p2p_period': p2p_period[:5],
+            'p2p_amount': p2p_amount[:5],
+            'show_slider': show_slider,
+        }
+

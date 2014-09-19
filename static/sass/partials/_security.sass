@@ -1,115 +1,838 @@
 .security-container-banner
   @extend .full-container
-  background: url(/static/images/security/banner.jpg) center top
-  height: 425px
+  background: #0268a5 url(/static/images/security/banner_03.jpg) center 0 no-repeat
+  height: 319px
 
-.security-container-gallery
-  @extend .full-container
-  background-color: #f9f9f9
-  border-bottom: solid 1px $color-alto
-  padding-bottom: 50px
+.security-bar-container
+  position: relative
+  height: 60px
+  z-index: 100
+  .security-bar
+    height: 60px
+    background: url("/static/images/security/security_tab_bg.png") 0 0 repeat-x
+    z-index: 1000
+    left: 0
+    top: 0
+    width: 100%
 
-.security-container-white
+    a
+      +inline-block
+      font-size: $font-xll
+      height: 60px
+      line-height: 60px
+      text-align: center
+      color: $color-white
+      width: 50%
+
+      &:hover, &.active
+        background: url("/static/images/security/security_tab_bg.png") 0 -60px repeat-x
+
+.security-panel-center
+  @extend .container
+
+.security-content
+  font-size: $font-s
+
+  h3
+    font-size: $font-xl
+    line-height: 60px
+
+  p
+    font-size: $font-s
+    line-height: 1.8
+    color: #7d7d7d
+    padding-bottom: 20px
+
+  i
+    margin-right: 28px
+
+.security-panel
   background-color: #fff
-  padding: 40px 0px
 
-.security-guarantee
-  padding-top: 20px
+.security-image
+  position: relative
+  &:hover
+    .swing-image
+      -webkit-animation: swing .5s .2s ease both
+      -moz-animation: swing .5s .2s ease both
 
-.security-container-white h1, .security-container-gallery h1
-  margin-bottom: 20px
-  color: #333
+.swing-container
+  &:hover
+    .swing-image
+      -webkit-animation: swing .5s .2s ease both
+      -moz-animation: swing .5s .2s ease both
 
-.security-column
-  @include span-columns(3, 9)
+.panel-02-1
+  position: absolute
+  background: url("/static/images/security/panel_02.png") 0px 40px no-repeat
+  width: 314px
+  height: 283px
+  top: 0
+  left: 0
 
-.security-column-last
-  @include span-columns(3 omega, 9)
+.panel-03-1
+  position: relative
+  background: url("/static/images/security/panel_03_1.png") no-repeat
+  width: 74px
+  height: 94px
+  top: -222px
+  left: 192px
 
-.security-column .header, .security-column-last .header
-  height: 100px
-  width: 335px
+.panel-04-1
+  position: relative
+  background: url("/static/images/security/panel_04_1.png") no-repeat
+  width: 99px
+  height: 82px
+  top: -155px
+  left: 125px
 
-.security-column .content, .security-column-last .content
-  width: 335px
-  height: 125px
-  padding: 20px 10px
-  border: 1px solid #e0e0e0
-  background-color: #fff
-  color: #333333
-  font-size: 14px
+.security-panel-container
+  @extend .security-panel
+  height: 360px
+  border-bottom: solid 1px $color-mercury
+  overflow: hidden
 
-.security-column .content p, .security-column-last .content p
-  line-height: 20px
+.security-num-01
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.jpg") 0 0 no-repeat
+  margin-top: 85px
 
-.cash .header
-  background: url(/static/images/security/box_header_cash.png) left top no-repeat
+.security-num-02
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.jpg") -82px 0 no-repeat
+  margin-top: 80px
 
-.data .header
-  background: url(/static/images/security/box_header_data.png) left top no-repeat
+.security-num-03
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.jpg") -164px 0 no-repeat
+  margin-top: 40px
 
-.privacy .header
-  background: url(/static/images/security/box_header_privacy.png) left top no-repeat
+.security-num-04
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.jpg") -246px 0 no-repeat
+  margin-top: 40px
 
-.law1 .header
-  background: url(/static/images/security/box_header_law1.png) left top no-repeat
+.security-num-05
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.jpg") -328px 0 no-repeat
+  margin-top: 70px
 
-.law2 .header
-  background: url(/static/images/security/box_header_law2.png) left top no-repeat
+.organization-num-01
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.jpg") 0 -50px no-repeat
+  display: inline-block
 
-.law3 .header
-  background: url(/static/images/security/box_header_law3.png) left top no-repeat
 
-.security-container-white .partners
-  background: url(/static/images/security/partners.png) left top no-repeat
-  height: 170px
+.organization-num-02
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.jpg") -82px -50px no-repeat
+  display: inline-block
 
-.patterns-container
-  @extend .security-container-gallery
+.organization-num-03
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.jpg") -164px -50px no-repeat
+  display: inline-block
+
+.organization-num-04
+  width: 82px
+  height: 50px
+  background: url("/static/images/security/num.jpg") -246px -50px no-repeat
+  display: inline-block
+
+.icon-circle
+  width: 25px
+  height: 27px
+  background: url("/static/images/security/icon_security.png") 0 -50px no-repeat
+  top: -2px
+  margin-right: 6px
+
+  .icon-check-mark
+    width: 0px
+    height: 22px
+    background: url("/static/images/security/icon_security.png") 0 -80px no-repeat
+    top: -2px
+    left: 4px
+
+.security-panel-title
+  height: 92px
+  font-size: 48px
   padding-top: 30px
+  color: #ff4646
+  overflow: hidden
+  text-align: center
+  font-weight: bold
+  border-bottom: 1px solid #cccccc
+  border-top: 1px dashed #cccccc
+
+  position: relative
+  h2
+    //background: url(/static/images/security/icon_security.png) no-repeat
+    padding-left: 40px
+    height: 40px
+    line-height: 40px
+    font-size: 40px
+
+  .anchor
+    position: absolute
+    top: -57px
+    height: 0px
+    font-size: 0px
+
+.guarantee-list-item
+  visibility: hidden
+
+.guarantee-container
+  position: relative
+  z-index: 0
+  //01
+  &.organization
+    height: 320px
+    padding-top: 80px
+    &.untreated
+      //-webkit-filter: grayscale(100%)
+      //-moz-filter: grayscale(100%)
+      //-ms-filter: grayscale(100%)
+      //-o-filter: grayscale(100%)
+
+      //filter: grayscale(100%)
+      //filter: gray
+    .guarantee-container-title
+      position: absolute
+      left: 395px
+      top: 80px
+      z-index: 10
+
+      h3
+        font-size: 28px
+        background: url("/static/images/security/num.jpg") 0 -100px no-repeat
+      p
+        font-size: 14px
+
+    .guarantee-container-list
+      position: absolute
+      z-index: 10
+      top: 185px
+      left: 178px
+      line-height: 38px
+      font-size: 14px
+
+      .list-label
+        display: inline-block
+        width: 217px
+        padding-right: 25px
+        text-align: right
+        color: #e7350d
+        position: relative
+
+        .list-icon
+          position: absolute
+          background: url(/static/images/security/list_icon_01.png) no-repeat left center
+          height: 15px
+          &.list-01
+            width: 60px
+            left: 60px
+            top: 10px
+          &.list-02
+            width: 70px
+            left: 40px
+            top: 10px
+          &.list-03
+            width: 110px
+            left: 20px
+            top: 10px
+
+    .funnel_01
+      width: 328px
+      height: 250px
+      position: absolute
+      background-repeat: no-repeat
+      left: 60px
+      top: 70px
+      &.gray
+        background-image: url(/static/images/security/funnel_01_gray.png)
+      &.color
+        background-image: url(/static/images/security/funnel_01.png)
+
+  //02
+  &.project
+    height: 470px
+    background: url(/static/images/security/box_02.png) no-repeat 98px 8px
+    padding-top: 80
+    &.untreated
+      //-webkit-filter: grayscale(100%)
+      //-moz-filter: grayscale(100%)
+      //-ms-filter: grayscale(100%)
+      //-o-filter: grayscale(100%)
+
+      //filter: grayscale(100%)
+      //filter: gray
+    .guarantee-container-title
+      position: absolute
+      left: 189px
+      top: -17px
+      z-index: 10
+
+      h3
+        font-size: 28px
+      p
+        font-size: 14px
+    .guarantee-container-list
+      position: absolute
+      z-index: 10
+      top: 79px
+      left: 104px
+      line-height: 38px
+      font-size: 14px
+      background: url(/static/images/security/list_bg.png) 60px -35px no-repeat
+      width: 900px
+      height: 260px
+      visibility: hidden
+      padding-top: 15px
+      .list-label
+        display: inline-block
+        width: 85px
+        padding-right: 25px
+        text-align: left
+        color: #e7350d
+        position: relative
+        vertical-align: top
+      .list-content
+        display: inline-block
+        width: 560px
+    .funnel_02
+      width: 328px
+      height: 250px
+      position: absolute
+      background-repeat: no-repeat
+      right: 78px
+      top: -39px
+      &.gray
+        background-image: url(/static/images/security/funnel_02_gray.png)
+      &.color
+        background-image: url(/static/images/security/funnel_02.png)
 
 
-ul.items
-  margin-bottom: 20px
+  //03
+  &.online
+    height: 320px
+    //background: url(/static/images/security/online.png) no-repeat 39px 23px
+    padding-top: 10px
+    &.untreated
+      //-webkit-filter: grayscale(100%)
+      //-moz-filter: grayscale(100%)
+      //-ms-filter: grayscale(100%)
+      //-o-filter: grayscale(100%)
 
-ul.items li
-  color: #333
-  line-height: 25px
-  .content
-    margin-left: 10px
+      //filter: grayscale(100%)
+      //filter: gray
+    .guarantee-container-title
+      position: absolute
+      left: 455px
+      top: -17px
+      z-index: 10
 
-.patterns-image
-  background: url(/static/images/security/patterns.png) left top no-repeat
-  height: 520px
+      h3
+        font-size: 28px
+      p
+        font-size: 14px
+    .guarantee-container-list
+      position: absolute
+      z-index: 10
+      top: 49px
+      left: 305px
+      line-height: 38px
+      font-size: 14px
+      .list-label
+        display: inline-block
+        width: 150px
+        padding-right: 25px
+        text-align: right
+        color: #e7350d
+        position: relative
+        vertical-align: top
+      .list-content
+        display: inline-block
+        width: 560px
 
-.law-container
-  @extend .security-container-white
+    .funnel_03
+      width: 250px
+      height: 250px
+      position: absolute
+      background-repeat: no-repeat
+      left: 40px
+      top: 16px
+      &.gray
+        background-image: url(/static/images/security/online_gray.png)
+      &.color
+        background-image: url(/static/images/security/online.png)
 
-.security-risk-container
-  @extend .security-container-gallery
-  padding-top: 30px
-  margin-bottom: 30px
-  .risk-row
-    margin-bottom: 50px
+  //04
+  &.overdue
+    height: 510px
+    background: url(/static/images/security/overdue.png) no-repeat 87px 0px
+    padding-top: 0px
+    margin-top: -10px
+    &.untreated
+      //-webkit-filter: grayscale(100%)
+      //-moz-filter: grayscale(100%)
+      //-ms-filter: grayscale(100%)
+      //-o-filter: grayscale(100%)
 
-    .item-row
-      .content
-        line-height: 35px
-        margin-left: 10px
-    .non-icon
-      .content
-        margin-left: 20px
+      //filter: grayscale(100%)
+      //filter: gray
+    .guarantee-container-title
+      position: absolute
+      left: 185px
+      top: 140px
+      z-index: 10
 
-  .register-modal,.home-btn
-    width: 320px
-    height: 54px
-    line-height: 45px
+      h3
+        font-size: 28px
+      p
+        font-size: 14px
+    .guarantee-container-list
+      position: absolute
+      z-index: 10
+      top: 220px
+      left: 185px
+      line-height: 38px
+      font-size: 14px
+      .list-label
+        display: inline-block
+        padding-right: 5px
+        text-align: right
+        color: #e7350d
+        position: relative
+        vertical-align: top
+      .list-content
+        display: inline-block
+        width: 560px
+    .gear
+      width: 200px
+      height: 185px
+      position: absolute
+      top: 175px
+      left: 775px
+      z-index: 10000
+      &.gray
+        background-image: url(/static/images/security/gear_gray.png)
+      &.color
+        background-image: url(/static/images/security/gear.png)
+      &.untreated
+        //-webkit-filter: grayscale(100%)
+    .investor
+      width: 165px
+      height: 165px
+      position: absolute
+      top: 389px
+      left: 462px
+      z-index: 10000
+      background-color: #fff
+      &.gray
+        background-image: url(/static/images/security/investor_gray.png)
+      &.color
+        background-image: url(/static/images/security/investor.png)
+      &.untreated
+        //-webkit-filter: grayscale(100%)
+        //-moz-filter: grayscale(100%)
+        //-ms-filter: grayscale(100%)
+        //-o-filter: grayscale(100%)
+
+        //filter: grayscale(100%)
+        //filter: gray
+
+.guarantee-container
+  &.pipeline_01
+    height: 170px
+    visibility: visible
+    overflow: visible
+    z-index: 1
+    .pipeline
+      width: 820px
+      //width: 37px
+      height: 170px
+      //height: 0px
+      background: url(/static/images/security/pipeline_01.png) no-repeat
+      position: absolute
+      left: 140px
+      top: -2px
+  &.pipeline_02
+    height: 120px
+    visibility: visible
+    .pipeline
+      width: 820px
+      //width: 37px
+      height: 253px
+      //height: 0px
+      background: url(/static/images/security/pipeline_02.png) no-repeat
+      position: absolute
+      left: 130px
+      top: -127px
+
+
+.security-foot-container
+  +clearfix
+  margin-top: 65px
+  margin-bottom: 50px
+  padding: $space-xl 0
+  +border-radius(10px)
+  border: solid 1px #cccccc
+
+  .security-foot-panel
+    float: left
+    margin-left: 40px
+    margin-right: 40px
     text-align: center
-    font-size: 17px
-    color: #fff !important
-    background: url(/static/images/security/register.png)
-    display: block
-    margin: 0px auto
+    font-size: $font-s
+    line-height: 2
 
-.content.link
-  color: #0067d6
+    &.system
+      width: 320px
+    &.insurance
+      width: 250px
+    &.law
+      width: 286px
+
+    h3
+      color: $color-text-d2
+
+    p
+      text-align: left
+      font-size: $font-s
+      color: $color-text-d3
+
+    .security-foot-cash
+      background: url("/static/images/security/icon_security.png") -155px -98px no-repeat
+      width: 165px
+      height: 103px
+      margin: 30px auto
+
+    .security-foot-pingan
+      background: url("/static/images/security/icon_security.png") -97px -207px no-repeat
+      width: 99px
+      height: 113px
+      margin: 25px auto
+
+    .security-foot-law
+      background: url("/static/images/security/icon_security.png") -201px -207px no-repeat
+      width: 119px
+      height: 113px
+      margin: 25px auto
+
+.fade-in
+  -webkit-animation: fadeIn 1s .2s ease both
+  -moz-animation: fadeIn 1s .2s ease both
+  animation: fadeIn 1s .2s ease both
+
+  0%
+    opacity: 0
+  100%
+    opacity: 1
+
+.fade-in-left
+  -webkit-animation: fadeInLeft 1s .2s ease both
+  -moz-animation: fadeInLeft 1s .2s ease both
+  animation: fadeInLeft 1s .2s ease both
+
+.fade-in-right
+  -webkit-animation: fadeInRight 1s .2s ease both
+  -moz-animation: fadeInRight 1s .2s ease both
+  animation: fadeInRight 1s .2s ease both
+
+.bounceIn
+  -webkit-animation: bounceIn 1s .6s ease both
+  -moz-animation: bounceIn 1s .6s ease both
+  animation: bounceIn 1s .6s ease both
+
+.fadeInUp
+  -webkit-animation: fadeInUp 1s .5s ease both
+  -moz-animation: fadeInUp 1s .5s ease both
+  animation: fadeInUp 1s .5s ease both
+
+.fadeInDown
+  -webkit-animation: fadeInDown .5s .2s linear both
+  -moz-animation: fadeInDown .5s .2s linear both
+  animation: fadeInDown .5s .2s linear both
+
+.fade-to-small
+  -webkit-animation: fadeToSmall .5s .6s ease both
+  -moz-animation: fadeToSmall .5s .6s ease both
+  animation: fadeToSmall .5s .6s ease both
+
+.bounceInDown
+  -webkit-animation: bounceInDown 1s .2s ease both
+  -moz-animation: bounceInDown 1s .2s ease both
+
+@-webkit-keyframes fadeInLeft
+  0%
+    opacity: 0
+    -webkit-transform: translateX(-20px)
+  100%
+    opacity: 1
+    -webkit-transform: translateX(0)
+
+@-moz-keyframes fadeInLeft
+  0%
+    opacity: 0
+    -moz-transform: translateX(-20px)
+  100%
+    opacity: 1
+    -moz-transform: translateX(0)
+
+@keyframes fadeInLeft
+  0%
+    opacity: 0
+    -moz-transform: translateX(-20px)
+  100%
+    opacity: 1
+    -moz-transform: translateX(0)
+
+
+@-webkit-keyframes fadeInRight
+  0%
+    opacity: 0
+    -webkit-transform: translateX(20px)
+  100%
+    opacity: 1
+    -webkit-transform: translateX(0)
+
+@-moz-keyframes fadeInRight
+  0%
+    opacity: 0
+    -moz-transform: translateX(20px)
+  100%
+    opacity: 1
+    -moz-transform: translateX(0)
+
+@keyframes fadeInRight
+  0%
+    opacity: 0
+    -moz-transform: translateX(20px)
+  100%
+    opacity: 1
+    -moz-transform: translateX(0)
+
+@-webkit-keyframes bounceIn
+  0%
+    opacity: 0
+    -webkit-transform: scale(.3)
+  50%
+    opacity: 1
+    -webkit-transform: scale(1.05)
+  70%
+    -webkit-transform: scale(.9)
+  100%
+    -webkit-transform: scale(1)
+
+@-moz-keyframes bounceIn
+  0%
+    opacity: 0
+    -webkit-transform: scale(.3)
+  50%
+    opacity: 1
+    -webkit-transform: scale(1.05)
+  70%
+    -webkit-transform: scale(.9)
+  100%
+    -webkit-transform: scale(1)
+
+@keyframes bounceIn
+  0%
+    opacity: 0
+    -webkit-transform: scale(.3)
+  50%
+    opacity: 1
+    -webkit-transform: scale(1.05)
+  70%
+    -webkit-transform: scale(.9)
+  100%
+    -webkit-transform: scale(1)
+
+@-webkit-keyframes fadeInUp
+  0%
+    opacity: 0
+    -webkit-transform: translateY(20px)
+  100%
+    opacity: 1
+    -webkit-transform: translateY(0)
+
+@-moz-keyframes fadeInUp
+  0%
+    opacity: 0
+    -moz-transform: translateY(20px)
+  100%
+    opacity: 1
+    -moz-transform: translateY(0)
+
+@keyframes fadeInUp
+  0%
+    opacity: 0
+    -moz-transform: translateY(20px)
+  100%
+    opacity: 1
+    -moz-transform: translateY(0)
+
+@-webkit-keyframes fadeInDown
+  0%
+    opacity: 0
+    -webkit-transform: translateY(-20px)
+  100%
+    opacity: 1
+    -webkit-transform: translateY(0)
+
+@-moz-keyframes fadeInDown
+  0%
+    opacity: 0
+    -moz-transform: translateY(-20px)
+  100%
+    opacity: 1
+    -moz-transform: translateY(0)
+
+@keyframes fadeInDown
+  0%
+    opacity: 0
+    -moz-transform: translateY(-20px)
+  100%
+    opacity: 1
+    -moz-transform: translateY(0)
+
+@-webkit-keyframes fadeToSmall
+  0%
+    opacity: 0
+    -webkit-transform: scale(6)
+  50%
+    opacity: 1
+    -webkit-transform: scale(1)
+  100%
+    opacity: 1
+
+@-moz-keyframes fadeToSmall
+  0%
+    opacity: 0
+    -webkit-transform: scale(6)
+  50%
+    opacity: 1
+    -webkit-transform: scale(1)
+  100%
+    opacity: 1
+
+@keyframes fadeToSmall
+  0%
+    opacity: 0
+    -webkit-transform: scale(6)
+  50%
+    opacity: 1
+    -webkit-transform: scale(1)
+  100%
+    opacity: 1
+
+@-webkit-keyframes bounceInDown
+  0%
+    opacity: 0
+    -webkit-transform: translateY(-2000px)
+  60%
+    opacity: 1
+    -webkit-transform: translateY(30px)
+  80%
+    -webkit-transform: translateY(-10px)
+  100%
+    -webkit-transform: translateY(0)
+
+@-moz-keyframes bounceInDown
+  0%
+    opacity: 0
+    -moz-transform: translateY(-2000px)
+  60%
+    opacity: 1
+    -moz-transform: translateY(30px)
+
+  80%
+    -moz-transform: translateY(-10px)
+  100%
+    -moz-transform: translateY(0)
+
+@-webkit-keyframes swing
+  20%,40%,60%,80%,100%
+    -webkit-transform-origin: top center
+  20%
+    -webkit-transform: rotate(15deg)
+  40%
+    -webkit-transform: rotate(-10deg)
+  60%
+    -webkit-transform: rotate(5deg)
+  80%
+    -webkit-transform: rotate(-5deg)
+  100%
+    -webkit-transform: rotate(0deg)
+
+@-moz-keyframes swing
+  20%,40%,60%,80%,100%
+    -moz-transform-origin: top center
+  20%
+    -moz-transform: rotate(15deg)
+  40%
+    -moz-transform: rotate(-10deg)
+  60%
+    -moz-transform: rotate(5deg)
+  80%
+    -moz-transform: rotate(-5deg)
+  100%
+    -moz-transform: rotate(0deg)
+
+
+.border-no
+  border: 0
+
+.animation_02,.animation_03,.animation_04,.animation_08,.animation_09,.animation_10,.animation_13
+  visibility: hidden
+
+.animation-item
+  visibility: hidden
+
+.ball
+  position: absolute
+  left: 155px
+  top: 0px
+  width: 20px
+  height: 20px
+  background: #004E99
+  border-radius: 50%
+  box-shadow: 2px 3px 3px -2px rgba(0,0,0,0.4)
+
+.ball>div
+  position: absolute
+  width: 100%
+  height: 100%
+  border-radius:  50%
+
+.ball>div>span
+  position: absolute
+  left: 2px
+  top: 4px
+  width: 15px
+  height: 15px
+  border-radius: 50%
+  text-align: center
+  line-height: 15px
+  font-size: 10px
+  font-weight: normal
+  //background: #fff
+  color: #fff
+
+/* YOUR COLORS */
+.ball.blue
+  background: radial-gradient(circle at 5px 5px, #09f, #001)
+.ball.red
+  background: radial-gradient(circle at 2px 2px, #f30, #001)
+.ball.green
+  background: radial-gradient(circle at 5px 5px, #0f4, #001)
+.ball.yellow
+  background: radial-gradient(circle at 5px 5px, #fc0, #001)

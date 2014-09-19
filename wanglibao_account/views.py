@@ -2,27 +2,23 @@
 import datetime
 import logging
 import json
+import math
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
-from django.core import serializers
-from django.db.models import Q
-
+from django.db.models import Q, Sum, F
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.db.models import Sum, F
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, \
-    HttpResponseNotFound, Http404
-from django.shortcuts import resolve_url, render
-from django.template import Template, Context
-from django.template.loader import get_template
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404
+from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
-from django.views.generic import TemplateView, FormView, View
+from django.views.generic import TemplateView
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -43,7 +39,7 @@ from wanglibao_account.models import VerifyCounter
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
-from django.forms.models import model_to_dict
+
 
 logger = logging.getLogger(__name__)
 
@@ -261,7 +257,12 @@ class AccountHome(TemplateView):
 
 
         # Followings for p2p
-        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
+        # p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
+
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+            u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+        ]).select_related('product')
+
         amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False).prefetch_related("subs")
 
         unpayed_principle = 0
@@ -295,12 +296,237 @@ class AccountHome(TemplateView):
         }
 
 
+class AccountHomeAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, format=None):
+        user=request.user
+
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+            u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+        ]).select_related('product')
+
+
+
+        unpayed_principle = 0
+        p2p_total_paid_interest = 0
+        p2p_total_unpaid_interest = 0
+        p2p_total_interest = 0
+        for equity in p2p_equities:
+            if equity.confirm:
+                unpayed_principle += equity.unpaid_principal        # 待收本金
+                p2p_total_paid_interest += equity.paid_interest     # 累积收益
+                p2p_total_unpaid_interest += equity.unpaid_interest # 待收益
+                p2p_total_interest += equity.total_interest         # 总收益
+
+        p2p_margin = user.margin.margin             # P2P余额
+        p2p_freeze = user.margin.freeze             # P2P投资中冻结金额
+        p2p_withdrawing = user.margin.withdrawing   # P2P提现中冻结金额
+        p2p_unpayed_principle = unpayed_principle   # P2P待收本金
+
+        p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
+
+        fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+        fund_total_asset = 0
+        if fund_hold_info.exists():
+            for hold_info in fund_hold_info:
+                fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+
+        today = timezone.datetime.today()
+        total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+
+        res = {
+            'total_asset': float(p2p_total_asset + fund_total_asset),      # 总资产
+            'p2p_total_asset': float(p2p_total_asset),                    # p2p总资产
+            'p2p_margin': float(p2p_margin),                              # P2P余额
+            'p2p_freeze': float(p2p_freeze),                              # P2P投资中冻结金额
+            'p2p_withdrawing': float(p2p_withdrawing),                   # P2P提现中冻结金额
+            'p2p_unpayed_principle': float(p2p_unpayed_principle),        # P2P待收本金
+            'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest),  # p2p总待收益
+            'p2p_total_paid_interest': float(p2p_total_paid_interest),    # P2P总累积收益
+            'p2p_total_interest': float(p2p_total_interest),              # P2P总收益
+
+            'fund_total_asset': float(fund_total_asset),                   # 基金总资产
+            'fund_total_income': float(total_income),                     # 基金累积收益
+            'fund_income_week': float(fund_income_week),                   # 基金近一周收益(元)
+            'fund_income_month': float(fund_income_month),                 # 基金近一月收益(元)
+
+        }
+
+        return Response(res)
+
+
+class AccountP2PRecordAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, format=None):
+        user=request.user
+        # p2p_equities = P2PEquity.objects.filter(user=user).all().select_related('product')
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+            u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+        ]).select_related('product')
+
+        page = request.GET.get('page', 0)
+        try:
+            page = int(page)
+            if page < 0:
+                return Response({ "detail": "Query String must be a number." }, status=404)
+        except:
+            return Response({ "detail": "Query String must be a number." }, status=404)
+
+        if page != 0:
+
+            limit = 2
+            paginator = Paginator(p2p_equities, limit)
+
+            try:
+                p2p_equities = paginator.page(page)
+            except PageNotAnInteger:
+                p2p_equities = paginator.page(1)
+            except Exception:
+                p2p_equities = paginator.page(paginator.num_pages)
+
+        p2p_records = [{
+                    'equity_created_at':  timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),          # 投标时间
+                    'equity_product_short_name': equity.product.short_name,                                             # 产品名称
+                    'equity_product_expected_earning_rate': equity.product.expected_earning_rate,                       # 年化收益(%)
+                    'equity_product_period': equity.product.period,                                                     # 产品期限(月)*
+                    'equity_equity': float(equity.equity),                                                                     # 用户所持份额(投资金额)
+                    'equity_product_display_status': equity.product.display_status,                                     # 状态
+                    'equity_term': equity.term,                                                                         # 还款期
+                    'equity_product_amortization_count': equity.product.amortization_count,                             # 还款期数
+                    'equity_paid_interest': float(equity.paid_interest),                                                       # 单个已经收益
+                    'equity_total_interest': float(equity.total_interest),                                                     # 单个预期收益
+                    'equity_contract': 'https://%s/accounts/p2p/contract/%s/' % (request.get_host(), equity.product.id), # 合同
+                    'product_id': equity.product_id
+            } for equity in p2p_equities]
+
+        if int(page) != 0:
+            res = {
+                'total_counts': p2p_equities.paginator.count,                                               # 总条目数
+                'total_page': int(math.ceil(p2p_equities.paginator.count / float(p2p_equities.paginator.per_page))),        # 总页数
+                'per_page_number': p2p_equities.paginator.per_page,                                         # 每页显示条数
+                'pre_page': p2p_equities.previous_page_number() if p2p_equities.has_previous() else None,   # 前一页页码
+                'next_page': p2p_equities.next_page_number() if p2p_equities.has_next() else None,          # 后一页页码
+                'p2p_records': p2p_records,
+            }
+        else:
+            res = p2p_records
+        return Response(res)
+
+
+class AccountFundRecordAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, format=None):
+        user=request.user
+        fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+
+        limit = 20
+        paginator = Paginator(fund_hold_info, limit)
+        page = request.GET.get('page')
+
+        try:
+            fund_hold_info = paginator.page(page)
+        except PageNotAnInteger:
+            fund_hold_info = paginator.page(1)
+        except Exception:
+            fund_hold_info = paginator.page(paginator.num_pages)
+
+        fund_records = [{
+                'fund_fund_name': fund.fund_name,                               # 基金产品名称
+                'fund_current_remain_share': float(fund.current_remain_share),         # 当前份额余额
+                'fund_unpaid_income': float(fund.unpaid_income),                       # 未付收益
+                'fund_code': fund.fund_code,                                    # 基金代码
+            } for fund in fund_hold_info]
+
+        res = {
+            'total_counts': fund_hold_info.paginator.count,
+            'total_page': round(fund_hold_info.paginator.count / fund_hold_info.paginator.per_page),
+            'per_page_number': fund_hold_info.paginator.per_page,
+            'pre_page': fund_hold_info.previous_page_number() if fund_hold_info.has_previous() else None,
+            'next_page': fund_hold_info.next_page_number() if fund_hold_info.has_next() else None,
+            'fund_records': fund_records,
+        }
+        return Response(res)
+
+
+class AccountP2PAssetAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, format=None):
+        user=request.user
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
+
+        unpayed_principle = 0
+        p2p_total_paid_interest = 0
+        p2p_total_interest = 0
+        p2p_total_unpaid_interest = 0
+        for equity in p2p_equities:
+            if equity.confirm:
+                unpayed_principle += equity.unpaid_principal
+                p2p_total_unpaid_interest += equity.unpaid_interest
+                p2p_total_paid_interest += equity.paid_interest
+                p2p_total_interest += equity.total_interest
+
+        p2p_margin = user.margin.margin
+        p2p_freeze = user.margin.freeze
+        p2p_withdrawing = user.margin.withdrawing
+        p2p_unpayed_principle = unpayed_principle
+
+        p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
+
+        res = {
+
+            'p2p_total_asset': float(p2p_total_asset),                     # 总资产
+            'p2p_margin': float(p2p_margin),                               # P2P余额
+            'p2p_freeze': float(p2p_freeze),                               # P2P投资中冻结金额
+            'p2p_withdrawing': float(p2p_withdrawing),                     # P2P提现中冻结金额
+            'p2p_unpayed_principle': float(p2p_unpayed_principle),         # P2P待收本金
+            'p2p_total_unpaid_interest':float(p2p_total_unpaid_interest),  # p2p总待收益
+            'p2p_total_paid_interest': float(p2p_total_paid_interest),     # P2P总累积收益
+            'p2p_total_interest': float(p2p_total_interest),               # P2P总收益
+
+        }
+        return Response(res)
+
+
+class AccountFundAssetAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, format=None):
+        user = request.user
+        fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+        fund_total_asset = 0
+        if fund_hold_info.exists():
+            for hold_info in fund_hold_info:
+                fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+
+
+        today = timezone.datetime.today()
+
+        total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+
+        res = {
+            'fund_total_asset': float(fund_total_asset),                   # 基金总资产
+            'fund_total_income': float(total_income),                      # 基金累积收益
+            'fund_income_week': float(fund_income_week),                   # 基金近一周收益(元)
+            'fund_income_month': float(fund_income_month),                 # 基金近一月收益(元)
+        }
+        return Response(res)
+
+
 class FundInfoAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
 
         user = self.request.user
+
 
         try:
             fetcher = UserInfoFetcher(user)
@@ -584,6 +810,30 @@ class P2PAmortizationView(TemplateView):
             'amortizations': amortizations
         }
 
+class P2PAmortizationAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, **kwargs):
+        user = request.user
+        product_id = kwargs['product_id']
+        equity = P2PEquity.objects.filter(user=user, product_id=product_id).prefetch_related('product').first()
+        amortizations = UserAmortization.objects.filter(user=self.request.user, product_amortization__product_id=product_id)
+
+        amortization_record = [{
+                'amortization_term_date': timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),                       # 还款时间
+                'amortization_principal': float(amortization.principal),                      # 本金
+                'amortization_amount_interest': float(amortization.interest),                 # 利息
+                'amortization_amount': float(amortization.principal + amortization.interest), # 总记
+            } for amortization in amortizations ]
+
+        res = {
+            'equity_product_short_name': equity.product.short_name,                     # 还款标题
+            'equity_product_serial_number': equity.product.serial_number,               # 还款计划编号
+            'amortization_record': amortization_record
+
+        }
+        return Response(res)
+
 
 @login_required
 def user_product_contract(request, product_id):
@@ -601,8 +851,7 @@ def user_product_contract(request, product_id):
 @login_required
 def test_contract(request, equity_id):
     equity = P2PEquity.objects.filter(id=equity_id).prefetch_related('product').first()
-    return HttpResponse(generate_contract(equity, 'contract_template.jade'))
-
+    return HttpResponse(generate_contract(equity, 'zdsd_template.jade'))
 
 
 class IdVerificationView(TemplateView):
@@ -632,10 +881,8 @@ class IdVerificationView(TemplateView):
         return super(IdVerificationView, self).form_valid(form)
 
 
-
 class AdminIdVerificationView(TemplateView):
     template_name = 'admin_verify_id.jade'
-
 
 
 class IdValidate(APIView):

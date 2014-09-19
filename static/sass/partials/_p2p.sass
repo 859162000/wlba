@@ -3,10 +3,8 @@
   overflow: visible
   padding: 5px
   position: relative
-  margin-top: 50px
   border: 1px solid #e8e8e8
   cursor: pointer
-
 
   &:hover
     +box-shadow(#d9d9d9 2px 2px 10px)
@@ -14,9 +12,6 @@
     .panel-title-bar
       a
         color: #1f8ccd
-
-
-
 
   .panel-title-bar
     line-height: 55px
@@ -30,7 +25,6 @@
       line-height: 55px
       width: 620px
       display: inline-block
-      font-family: Arial,Helvetica,sans-serif,"Microsoft YaHei","宋体"
       &:hover
         color: #1f8ccd
 
@@ -73,9 +67,6 @@
   background-color: #e8e8e8
   overflow: hidden
 
-
-
-
   .progress-indicator
     background: $color-pomegranate
     height: 100%
@@ -83,7 +74,6 @@
     &.disabled
       background-color: #c8c8c8
       border: 1px solid #c8c8c8
-
 
 .p2p-container
   +container
@@ -278,7 +268,6 @@
   background-color: $color-red
   +border-radius(8px)
 
-
 .panel-p2p-stamp
   background: url("/static/images/stamp.png") no-repeat
   width: 70px
@@ -296,3 +285,129 @@
     border: 1px solid #D9D9D9
     color: #666666
     cursor: default
+
+.earning
+  background: url("/static/images/earning.png") no-repeat 5px center
+
+.period
+  background: url("/static/images/period.png") no-repeat 5px center
+
+.amount
+  background: url("/static/images/amount.png") no-repeat 5px center
+
+.panel-content-container
+  position: relative
+
+.p2pinfo-ul-box
+  margin: 0
+  position: relative
+
+.p2pinfo-list-box
+  margin: 0
+  height: 90px
+  cursor: pointer
+  position: relative
+  border-bottom: 1px solid #e8e8e8
+  overflow: visible
+
+  &:last-child
+    border-bottom: 0
+
+  &:hover
+    background: #f9f9f9
+
+    a
+      color: #1f8ccd
+
+.p2pinfo-list-title
+  +clearfix
+  border-bottom: dotted 1px #eeeeee
+
+  a
+    &:hover
+      color: #1f8ccd
+
+.p2pinfo-title-number
+  background: rgb(243, 96, 73)
+  color: #fff
+  border-radius: 10px
+  width: 20px
+  height: 20px
+  display: inline-block
+  text-align: center
+  line-height: 20px
+  float: left
+  margin: 10px
+
+.p2pinfo-title-number-2-3
+  @extend .p2pinfo-title-number
+  background: rgb(42, 145, 208)
+
+.p2pinfo-title-number-4-5
+  @extend .p2pinfo-title-number
+  background: rgb(204, 204, 204)
+
+.p2pinfo-title-content
+  float: left
+  margin: 10px 10px 10px 0
+  font-size: $font-s
+
+.p2pinfo-list
+  clear: both
+  margin: 10px 0 15px 0
+  font-size: $font-s
+
+.p2pinfo-ceil
+  text-indent: 15px
+  color: $color-text-d4
+  display: inline-block
+
+.p2pinfo-active
+  color: rgb(243,96,73)
+
+.position
+  line-height: 70px
+  font-size: $font-s
+
+  a
+    &:hover
+      color: #1f8ccd
+
+.p2pinfo-message
+  margin: 20px auto
+  text-align: center
+  font-size: 15px
+
+.p2pinfo-flow
+  position: absolute
+  border: solid 1px #e8e8e8
+  background: #f9f9f9
+  height: 91px
+  width: 400px
+  top: -1px
+  left: -400px
+  z-index: 9
+  font-size: $font-s
+  color: $color-text-d4
+  display: none
+
+  .row
+    .span6-omega
+      overflow: hidden
+
+  .p2pinfo-flow-top
+    text-indent: 10px
+    line-height: 45px
+    height: 45px
+    overflow: hidden
+    border-bottom: dotted 1px $color-text-d5
+
+  .p2pinfo-flow-foot
+    text-indent: 10px
+    line-height: 40px
+
+    .progress-container
+      height: 8px
+      width: 70px
+      top: -1px
+      margin-right: 5px

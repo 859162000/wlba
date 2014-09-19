@@ -4,9 +4,9 @@ body.index
 .full-container-index
   @extend .full-container
   position: relative
-  height: 360px
+  height: 320px
 
-$home-banner-height: 360px
+$home-banner-height: 320px
 
 .home-banner
   $file: 'home0.jpg'
@@ -40,7 +40,7 @@ $home-banner-height: 360px
 .banner-overlay
   background-color: #000
   opacity: 0.4
-  top: 45px
+  top: 30px
   filter: alpha(opacity=40)
   position: absolute
   width: 320px
@@ -125,13 +125,6 @@ $home-banner-height: 360px
   padding-top: 15px
   padding-bottom: 50px
   background-color: $color-white
-
-  .icon-process-title
-    width: 22px
-    height: 20px
-    background: url("/static/images/icon-public.png") no-repeat -325px -195px
-    margin-right: 10px
-    top: -1px
 
   .title
     text-align: left
@@ -290,6 +283,8 @@ $home-banner-height: 360px
         background: url("/static/images/partner_logos.png") no-repeat 0 -948px
       .partner-longan
         background: url("/static/images/partner_logos.png") no-repeat 0 -1034px
+      .partner-zdsd
+        background: url("/static/images/partner_logos.png") no-repeat 0 -1126px
 
 
 
@@ -506,7 +501,7 @@ a.hot-item-title-link
       border-bottom: 0
 
 .news-list-container
-  margin-top: 50px
+  padding: 0
   border: 1px solid #e8e8e8
 
 .invest-history-container
@@ -541,3 +536,21 @@ a.hot-item-title-link
     display: block
     float: left
     width: 240px
+
+.get-more
+  display: block
+  width: 90px
+  font-size: 15px
+  margin: 0 auto 30px auto
+  background: url("/static/images/next.png") no-repeat right center
+
+  &:link, &:visited
+    color: $color-text-d4
+
+  &:hover, &:active
+    background: url("/static/images/next_active.png") no-repeat right center
+    color: #f86049
+
+.bottom-hr
+  border: none
+  border-top: 1px solid #ccc

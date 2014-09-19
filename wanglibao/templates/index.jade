@@ -58,13 +58,9 @@ html
             a.banner-form--button.full-width.register-modal(href="#login-modal") 免费注册
             p.align-right.font-s
               span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
-    .full-container-white
+    .space-vertical-xl
+    .full-container-white-no-border
       .investment-process-container
-        .row
-          .span6.title
-            span.icon.icon-process-title
-            |投资流程
-          .span6-omega.info 选择网利宝，让您放心！跟随我们，开启您的互联网金融之旅！
         .row
           .step.first-step
             span.icon.icon-first-step
@@ -152,7 +148,6 @@ html
                       else
                         p
 
-
                 .panel-p2p--footer
                   .row
                     .span4
@@ -162,7 +157,7 @@ html
                         if status == '抢购中' or status == '满标审核'
                           .progress-indicator(style="width:{{percent | percentage}}")
                         else
-                          .progress-indicator.disabled(style="width:{{percent | percentage}}")
+                          .progress-indicator(style="width:{{percent | percentage}}")
 
                       if status == '抢购中' or status == '满标审核'
                         span.highlight &nbsp;&nbsp; {{percent | percentage}}
@@ -176,6 +171,11 @@ html
                       span.d3-text {{product.display_payback_method}}
                 if status == '还款中' or status == '已完成'
                   .panel-p2p-stamp
+            .space-vertical-xl
+          if getmore
+            .row
+              a.get-more(href="{% url 'p2p_list' %}" target="_blank") 查看更多
+
 
         .span4-omega
           div
@@ -195,7 +195,7 @@ html
 
                         a.news-txt.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') {{news.name}}
 
-            .panel.invest-history-container
+            div(style="margin-top: 33px;").panel.invest-history-container
               .panel-title-bar__no-border
                 .panel-title 最新投资记录
               .panel-content-container
@@ -231,6 +231,7 @@ html
                             span.money-highlight {{trade.amount}}
                               span 元
 
+    hr.bottom-hr
     script.
       require(["/static/js/index.js"])
 
@@ -241,6 +242,8 @@ html
       ul.partner-logo
           li
             a.partner-idg(href="http://www.idgvc.com/",target="_blank", title="IDG资本")
+          li
+            a.partner-zdsd(href="http://www.zdcredit.com/",target="_blank",title="证大速贷")
           li
             a.partner-baidu(href="http://www.baidu.com/",target="_blank",title="百度")
           li
