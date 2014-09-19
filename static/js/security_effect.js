@@ -355,7 +355,7 @@ require(['jquery', 'raphael'], function($, raphael) {
 
                 var animations1 = [
                     {distance: 465, direction: 1, time: 1000},
-                    {distance: 300, direction: 0, time: 2000}
+                    {distance: 280, direction: 0, time: 2000}
                 ]
                 var roll1 = new Roll(ball1, animations1);
                 roll1.setDispach($('.overdue'), ['rollcomplete1']);
