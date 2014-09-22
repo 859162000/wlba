@@ -457,8 +457,11 @@ class AccountP2PAssetAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, format=None):
+
         user=request.user
-        p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+            u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+        ]).select_related('product')
 
         unpayed_principle = 0
         p2p_total_paid_interest = 0

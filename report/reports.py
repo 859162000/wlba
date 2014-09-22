@@ -188,7 +188,7 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 str(amortization.principal),
                 str(amortization.interest),
                 u'待还',
-                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d")
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
             ])
         return output.getvalue()
 

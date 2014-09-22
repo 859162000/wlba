@@ -171,9 +171,15 @@ class RecordView(APIView):
 
         equities = product.p2precord_set.filter(catalog=u'申购').prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
-        serializer = P2PRecordSerializer(equities, many=True, context={"request": request})
+        # serializer = P2PRecordSerializer(equities, many=True, context={"request": request})
 
-        return Response(data=serializer.data)
+        record = [{
+           "amount": float(eq.amount),
+            "user": eq.user.wanglibaouserprofile.phone,
+            "create_time": timezone.localtime(eq.create_time).strftime("%Y-%m-%d %H:%M:%S")
+        } for eq in equities]
+
+        return Response(record)
 
 
 class P2PListView(TemplateView):
