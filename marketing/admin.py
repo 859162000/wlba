@@ -1,5 +1,6 @@
 from django.contrib import admin
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData
+from views import MarketingView
 
 
 class NewsAndReportAdmin(admin.ModelAdmin):
@@ -38,3 +39,6 @@ admin.site.register(SiteData, SiteDataAdmin)
 admin.site.register(PromotionToken, PromotionTokenAdmin)
 admin.site.register(IntroducedBy, IntroducedByAdmin)
 admin.site.register(TimelySiteData, TimelySitedataAdmin)
+
+
+admin.site.register_view('statistics/diary', view=MarketingView.as_view(),name=u'diary')
