@@ -26,8 +26,8 @@ class P2PProductSerializer(ModelSerializerExtended):
     total_earning = serializers.SerializerMethodField('total_earning_joined')
 
     publish_time = serializers.SerializerMethodField('publish_time_format')
-
     end_time = serializers.SerializerMethodField('end_time_format')
+    soldout_time = serializers.SerializerMethodField('soldout_time_format')
 
     class Meta:
         model = P2PProduct
@@ -56,6 +56,11 @@ class P2PProductSerializer(ModelSerializerExtended):
 
     def end_time_format(self, obj):
         return timezone.localtime(obj.end_time).strftime("%Y-%m-%d %H:%M:%S")
+
+    def soldout_time_format(self, obj):
+        if obj.soldout_time:
+            return timezone.localtime(obj.soldout_time).strftime("%Y-%m-%d %H:%M:%S")
+        return ""
 
     def transform_extra_data(self, obj, value):
         if value is None:
