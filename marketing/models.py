@@ -49,6 +49,12 @@ class PromotionToken(models.Model):
     def __unicode__(self):
         return self.token
 
+class InviteCode(models.Model):
+    code = models.CharField(u'邀请码', max_length=6, db_index=True, unique=True)
+    is_used = models.BooleanField(u'是否使用', default=False)
+
+    def __unicode__(self):
+        return self.code
 
 class IntroducedBy(models.Model):
     user = models.ForeignKey(get_user_model())
