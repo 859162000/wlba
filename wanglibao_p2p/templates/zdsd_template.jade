@@ -44,8 +44,8 @@ html
 
   body
     h1 网利宝平台借款协议
-    .align-right 协议编号：【{{product.baoli_original_contract_number}}】
-    .align-right 网利宝平台编号：【{{product.contract_serial_number}}】
+    .align-right 协议编号：【{{product.contract_serial_number}}】
+    .align-right 网利宝平台编号：【{{product.serial_number}}】
     p 本网利宝平台借款协议（“本协议”）由以下各方于{{now|date:"【Y】年【m】月【d】日"}}签订：
     br
     p 甲方（小额借款客户）：【{{ product.borrower_name }}】
@@ -71,7 +71,7 @@ html
             td {{ e.product.period }}个月
             if e.product.pay_method == '等额本息'
               total = e.amortizations.first().principal + e.amortizations.first().interest
-              td {{total}}元
+              td ￥{{total}}元
     br
 
     p 丙方：深圳市证大速贷小额贷款股份有限公司
@@ -105,7 +105,7 @@ html
           td 【{{product.usage}}】
         tr
           td 借款年化利率
-          td 【{{product.expected_earning_rate}}】
+          td 【{{product.expected_earning_rate}}%】
         tr
           td 借款本金数额
           td 【￥{{product.total_amount}}】
