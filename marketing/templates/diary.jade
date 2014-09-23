@@ -1,5 +1,6 @@
 //
    Created by taohe on 14-9-22.
+-load formatters
 doctype html
 html
   head
@@ -51,13 +52,17 @@ html
                         th(rowspan="2") 当日交易总额
                         th(rowspan="2") APRU值
                       tr
-                        th 当时新增
+                        th 当日新增
                         th 老用户首次交易
                         th 汇总
                     tbody
-                      {% for user in users %}
+                      {% for l in all %}
                       tr
-                        td {{ user.join_date }}
-                        td {{ user.count }}
+                        td {{ l.each_day | date:"Y-m-d"}}
+                        td {{ l.joined_num }}
+                        td {{ l.trade_num }}
 
                       {% endfor %}
+
+
+              .test
