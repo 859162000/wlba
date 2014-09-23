@@ -87,4 +87,4 @@ class P2PProductSerializer(ModelSerializerExtended):
                 for item_key in extra_data[section_key]:
                     extra_data[section_key][item_key] = u'请登录后查看'
 
-        return json.dumps(extra_data, ensure_ascii=False)
+        return extra_data
