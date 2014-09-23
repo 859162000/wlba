@@ -67,6 +67,7 @@ class P2PDetailView(TemplateView):
             'total_earning': total_earning,
             'current_equity': current_equity,
             'site_data': site_data,
+            'attachments': p2p.attachment_set.all()
         })
 
         return context
