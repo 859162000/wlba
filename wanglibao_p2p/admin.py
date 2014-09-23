@@ -57,7 +57,7 @@ class P2PProductResource(resources.ModelResource):
         super(P2PProductResource, self).import_obj(instance, row, false)
         # todo update later
 
-        now = datetime.datetime.now().date().strftime('%Y%m%d')
+        now = datetime.datetime.now().date().strftime('%Y%m%d%H%m%s')
         self.count += 1
         type = row[u'产品名称']
         # birthday = datetime.date(row[u'出生日期'])
@@ -74,12 +74,18 @@ class P2PProductResource(resources.ModelResource):
         instance.excess_earning_rate = 0
         instance.pay_method = "等额本息"
 
+
+
+
         instance.borrower_name = row[u'姓名']
         instance.borrower_phone = row[u'手机号码']
         instance.borrower_address = row[u'现住址']
         instance.borrower_id_number = row[u'身份证号码']
         instance.borrower_bankcard = row[u'提现帐号']
         instance.borrower_bankcard_bank_name = row[u'开户行']
+
+
+
         for bank in P2PProduct.BANK_METHOD_CHOICES:
             if bank[0] in instance.borrower_bankcard_bank_name:
                 instance.borrower_bankcard_bank_code = bank
@@ -88,6 +94,8 @@ class P2PProductResource(resources.ModelResource):
         instance.end_time = datetime.datetime.now() + datetime.timedelta(days=2)
         instance.usage = row[u'贷款用途']
         instance.short_usage = row[u'贷款用途']
+
+
 
         if type == u"工薪贷":
             instance.extra_data = OrderedDict([

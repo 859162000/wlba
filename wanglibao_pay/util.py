@@ -1,5 +1,7 @@
 import base64
 import uuid
+import string
+import random
 
 
 def get_client_ip(request):
@@ -15,3 +17,7 @@ def get_client_ip(request):
 def get_a_uuid():
     r_uuid = base64.urlsafe_b64encode(uuid.uuid4().bytes)
     return r_uuid.replace('=', '')
+
+
+def get_a_invitecode():
+    salt = ''.join(random.sample(string.ascii_letters+string.digits, 6))
