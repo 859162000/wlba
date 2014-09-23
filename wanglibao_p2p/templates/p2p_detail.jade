@@ -147,6 +147,16 @@ html
                         a.register-modal.blue(href="#login-modal") 注册用户
                         |才能看到，现在
                         a.login-modal.blue(href="#login-modal") 登录
+
+          if attachments
+            .p2p-detail-list.clearfix
+              h1 图片介绍
+
+              for attachment in attachments
+                .img-container
+                  img(src="/media/{{attachment.file}}")
+                  h2 {{attachment.name}}
+
         .span4-omega.border-left.clearfix
           .p2p-detail-container.guarantee-company
             h1 担保机构
