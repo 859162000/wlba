@@ -8,7 +8,7 @@ from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
 
 
 class PayInfoAdmin(admin.ModelAdmin):
-    list_display = ('get_phone', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time')
+    list_display = ('get_phone', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time', 'error_message')
     search_fields = ['user__wanglibaouserprofile__phone', 'card__no']
     raw_id_fields = ('order', 'margin_record')
 
