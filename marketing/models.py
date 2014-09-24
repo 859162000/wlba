@@ -41,26 +41,26 @@ class SiteData(models.Model):
     def one_year_times(self):
         return int(self.highest_earning_rate / self.one_year_interest_rate)
 
-class InviteCode(models.Model):
-    code = models.CharField(u'邀请码', max_length=6, db_index=True, unique=True)
-    is_used = models.BooleanField(u'是否使用', default=False)
+# class InviteCode(models.Model):
+#     code = models.CharField(u'邀请码', max_length=6, db_index=True, unique=True)
+#     is_used = models.BooleanField(u'是否使用', default=False)
+#
+#     def __unicode__(self):
+#         return self.code
 
-    def __unicode__(self):
-        return self.code
-
-
-def get_a_invitecode():
-    with transaction.atomic():
-        invite_code = InviteCode.objects.select_for_update().filter(is_used=False).first()
-        invite_code.is_used = True
-        invite_code.save()
-        return invite_code.code
+#
+# def get_a_invitecode():
+#     with transaction.atomic():
+#         invite_code = InviteCode.objects.select_for_update().filter(is_used=False).first()
+#         invite_code.is_used = True
+#         invite_code.save()
+#         return invite_code.code
 
 
 
 class PromotionToken(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)
-    token = models.CharField(u'推广代码', max_length=64, db_index=True, default=get_a_invitecode)
+    token = models.CharField(u'推广代码', max_length=64, db_index=True, default=get_a_uuid)
 
     def __unicode__(self):
         return self.token
