@@ -25,9 +25,9 @@ html
         .activity-banner
           p.container
             if user.is_authenticated
-              a.buying(href="/",title="立即抢购",target="_blank")
+              a.buying(href="/#p2p",title="立即抢购",target="_blank")
             else
-              a.buying(href="/accounts/register/?next=/",title="立即抢购",target="_blank")
+              a.buying(href="/accounts/register/?next=/#p2p",title="立即抢购",target="_blank")
 
       .container.activity-text
         .activity-line
