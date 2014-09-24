@@ -16,16 +16,16 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
 
 
-        p2p_pre_four = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+        p2p_pre_three = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
             .filter(status=u'正在招标').order_by('-priority', '-total_amount').select_related('warrant_company')[:4]
 
         p2p_last = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
             .filter(status=u'还款中').order_by('-soldout_time').select_related('warrant_company')[0:1]
 
-        p2p_products = chain(p2p_pre_four[:3], p2p_last)
+        p2p_products = chain(p2p_pre_three[:3], p2p_last)
 
         getmore = False
-        if p2p_pre_four.count() > 3 and p2p_last:
+        if p2p_pre_three.count() > 3 and p2p_last:
             getmore = True
 
         trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:11]

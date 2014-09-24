@@ -110,7 +110,7 @@ class P2PProduct(ProductBase):
     status = models.CharField(max_length=16, default=u'录标',
                               choices=STATUS_CHOICES,
                               verbose_name=u'产品状态*')
-    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先')
+    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先', blank=True)
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)*', blank=False)
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
@@ -226,7 +226,7 @@ class P2PProduct(ProductBase):
     display_payback_mapping = {
         u'等额本息': u'等额本息',
         u'先息后本': u'先息后本',
-        u'按月付息': u'按月付息',
+        u'按月付息': u'按月付息到期还本',
         u'到期还本付息': u'一次性还本付息',
         u'按季度付息': u'按季度付息',
     }
