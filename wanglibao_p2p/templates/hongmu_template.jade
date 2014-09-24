@@ -94,9 +94,9 @@ html
           th ￥{{ equity.product.total_amount }}元
           th ——
     br
-    p.bold 乙方（借款方）：{{ product.borrower_name }}
-    p 法定代表人：{{ product.borrower_id_number }}
-    p 地址：{{ product.borrower_address }}
+    p.bold 乙方（借款方）：{{ product.borrower_name|safe_name_last }}
+    p 法定代表人：{{ product.borrower_id_number|safe_id}}
+    p 地址：{{ product.borrower_address|safe_id }}
     br
 
     p.bold 丙方（质物监管方/仓储方）：**联信汇业仓储有限公司
