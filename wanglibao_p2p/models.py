@@ -226,7 +226,7 @@ class P2PProduct(ProductBase):
     display_payback_mapping = {
         u'等额本息': u'等额本息',
         u'先息后本': u'先息后本',
-        u'按月付息': u'按月付息',
+        u'按月付息': u'按月付息到期还本',
         u'到期还本付息': u'一次性还本付息',
         u'按季度付息': u'按季度付息',
     }
