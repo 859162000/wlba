@@ -48,19 +48,19 @@ class InviteCode(models.Model):
     def __unicode__(self):
         return self.code
 
-
-def get_a_invitecode():
-    with transaction.atomic():
-        invite_code = InviteCode.objects.select_for_update().filter(is_used=False).first()
-        invite_code.is_used = True
-        invite_code.save()
-        return invite_code.code
+#
+# def get_a_invitecode():
+#     with transaction.atomic():
+#         invite_code = InviteCode.objects.select_for_update().filter(is_used=False).first()
+#         invite_code.is_used = True
+#         invite_code.save()
+#         return invite_code.code
 
 
 
 class PromotionToken(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)
-    token = models.CharField(u'推广代码', max_length=64, db_index=True, default=get_a_invitecode)
+    token = models.CharField(u'推广代码', max_length=64, db_index=True, default=get_a_uuid)
 
     def __unicode__(self):
         return self.token
