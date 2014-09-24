@@ -15,3 +15,7 @@ def set_promo_user(request, user):
 
             # Clean the session
             del request.session[settings.PROMO_TOKEN_USER_SESSION_KEY]
+
+
+
+

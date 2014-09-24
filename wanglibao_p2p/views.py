@@ -154,8 +154,9 @@ class P2PProductViewSet(PaginatedModelViewSet):
     def get_queryset(self):
         qs = super(P2PProductViewSet, self).get_queryset()
         return qs.filter(hide=False).filter(status__in=[
-                u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
             ])
+
 
 
 class RecordView(APIView):
@@ -171,9 +172,15 @@ class RecordView(APIView):
 
         equities = product.p2precord_set.filter(catalog=u'申购').prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
-        serializer = P2PRecordSerializer(equities, many=True, context={"request": request})
+        # serializer = P2PRecordSerializer(equities, many=True, context={"request": request})
 
-        return Response(data=serializer.data)
+        record = [{
+           "amount": float(eq.amount),
+            "user": eq.user.wanglibaouserprofile.phone,
+            "create_time": timezone.localtime(eq.create_time).strftime("%Y-%m-%d %H:%M:%S")
+        } for eq in equities]
+
+        return Response(record)
 
 
 class P2PListView(TemplateView):
