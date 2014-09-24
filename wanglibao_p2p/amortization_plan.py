@@ -61,7 +61,7 @@ class MonthlyInterest(AmortizationPlan):
     @classmethod
     def generate(cls, amount, year_rate, term, period=None):
         amount = Decimal(amount)
-        year_rate = Decimal(year_rate)
+        # year_rate = Decimal(year_rate)
 
         month_rate = year_rate / 12
         month_rate = Decimal(month_rate).quantize(Decimal('0.000000001'))
