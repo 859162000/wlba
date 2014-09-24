@@ -63,7 +63,7 @@ html
                   span#countdown{{p2p.end_time | timedelta_now_day }}
 
           dl.p2p-detail-intro.clearfix
-            dt 资金用途：
+            dt 借款用途：
             dd {{p2p.short_usage}}
 
         .span4-omega.invest-form.border-left
@@ -150,7 +150,7 @@ html
 
           if attachments
             .p2p-detail-list.clearfix
-              h1 图片介绍
+              h1 相关文件
 
               for attachment in attachments
                 .img-container
