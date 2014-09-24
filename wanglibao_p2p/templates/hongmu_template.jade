@@ -95,7 +95,7 @@ html
           th ——
     br
     p.bold 乙方（借款方）：{{ product.borrower_name|safe_name_last }}
-    p 法定代表人：{{ product.borrower_phone|safe_name_last}}
+    p 法定代表人：{{ product.borrower_id_number|safe_name_last}}
     p 地址：{{ product.borrower_address|safe_address }}
     br
 
