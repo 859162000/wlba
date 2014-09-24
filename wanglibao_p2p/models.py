@@ -139,7 +139,7 @@ class P2PProduct(ProductBase):
     borrower_bankcard_bank_branch = models.CharField(u'借债人支行', max_length=64, blank=True)
 
     total_amount = models.BigIntegerField(default=1, verbose_name=u'借款总额*', blank=False)
-    ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额')
+    ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额*')
 
     # _available_amout = models.BigIntegerField(default=0, verbose_name=u'可投资金额')
 
