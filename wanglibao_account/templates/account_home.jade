@@ -137,7 +137,7 @@ block main
                   else
                     td {{status}}{{term}}/{{equity.product.amortization_count}}
 
-                  if status == '还款中'
+                  if status == '还款中' or status == '已完成'
                     td <span class="highlight">{{equity.paid_interest | money_format}}</span> / {{total_income | money_format}}
                   else
                     td -

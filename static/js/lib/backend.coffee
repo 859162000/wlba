@@ -185,7 +185,6 @@ define ['jquery'], ($)->
     else
       $.ajax
         url: url
-        #type: 'PUT'
         data: data
 
   window.addToFavorite = (e, type)->
