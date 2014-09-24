@@ -69,6 +69,7 @@ class PayView(TemplateView):
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             amount_str = str(amount)
             if amount <= 0:
+                # todo handler the raise
                 raise decimal.DecimalException()
 
             gate_id = request.POST.get('gate_id', '')
@@ -97,6 +98,7 @@ class PayView(TemplateView):
                 'GateId': gate_id,
                 'OrdAmt': amount_str
             }
+
             pay = HuifuPay()
             form = pay.pay(post)
             pay_info.request = str(form)
