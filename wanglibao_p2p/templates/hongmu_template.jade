@@ -95,8 +95,8 @@ html
           th ——
     br
     p.bold 乙方（借款方）：{{ product.borrower_name|safe_name_last }}
-    p 法定代表人：{{ product.borrower_id_number|safe_id}}
-    p 地址：{{ product.borrower_address|safe_id }}
+    p 法定代表人：{{ product.borrower_phone|safe_name_last}}
+    p 地址：{{ product.borrower_address|safe_address }}
     br
 
     p.bold 丙方（质物监管方/仓储方）：福建省联信汇业仓储有限公司
@@ -199,7 +199,7 @@ html
 
     h3 第三条  还款
     ol
-      if product.pay_method == '先息后本'
+      if product.pay_method == '按月付息'
         p 还款方式及计划：本协议项下的借款采用以下第（1）种还款方式：
       if product.pay_method == '到期还本付息'
         p 还款方式及计划：本协议项下的借款采用以下第（2）种还款方式：
@@ -216,7 +216,7 @@ html
               td 还款本金
               td 还款利息
           tbody
-            if product.pay_method == '先息后本'
+            if product.pay_method == '按月付息'
               amortizations = equity.amortizations.all()
               for amortization in amortizations
                 tr
