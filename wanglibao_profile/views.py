@@ -34,11 +34,11 @@ class ProfileView(APIView):
 
         verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
-        # if verify_counter.count >= 3:
-        #     return Response({
-        #                         "message": u"验证次数超过三次，请联系客服进行人工验证",
-        #                         "error_number": ErrorNumber.try_too_many_times
-        #                     }, status=400)
+        if verify_counter.count >= 3:
+            return Response({
+                                "message": u"验证次数超过三次，请联系客服进行人工验证",
+                                "error_number": ErrorNumber.try_too_many_times
+                            }, status=400)
 
         verify_record, error = verify_id(name, id_number)
 

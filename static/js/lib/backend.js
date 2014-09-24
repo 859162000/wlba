@@ -209,7 +209,6 @@
       } else {
         return $.ajax({
           url: url,
-          type: 'PUT',
           data: data
         });
       }
@@ -327,5 +326,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=backend.map

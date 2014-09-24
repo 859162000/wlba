@@ -73,15 +73,6 @@ class P2PDetailView(TemplateView):
         return context
 
 
-class P2PHongMu(TemplateView):
-    template_name = 'p2p_hongmu.jade'
-    def get_context_data(self, **kwargs):
-        return {
-            'hongmu': 'hongmu'
-        }
-
-
-
 class PurchaseP2P(APIView):
     permission_classes = (IsAuthenticated,)
 
