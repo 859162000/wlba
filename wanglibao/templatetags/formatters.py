@@ -148,6 +148,27 @@ def safe_name(name):
     """
 
     result = "*" * 3 + name[1:]
+<<<<<<< HEAD
+=======
+    return result
+
+@register.filter
+def safe_name_last(name):
+    """
+    Show part of name
+    """
+
+    result = name[:1] + "*" * 3
+    return result
+
+@register.filter
+def safe_address(name):
+    """
+    Show part of name
+    """
+
+    result = name[:3] + '*' * 3
+>>>>>>> newproduct
     return result
 
 @register.filter
