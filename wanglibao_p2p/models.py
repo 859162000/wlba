@@ -98,7 +98,7 @@ class P2PProduct(ProductBase):
     version = IntegerVersionField()
     category = models.CharField(max_length=16, default=u'普通',
                               choices=CATEGORY_CHOICES,
-                              verbose_name=u'产品类别')
+                              verbose_name=u'产品类别*')
 
     hide = models.BooleanField(u'隐藏', default=False)
 
@@ -110,11 +110,11 @@ class P2PProduct(ProductBase):
     status = models.CharField(max_length=16, default=u'录标',
                               choices=STATUS_CHOICES,
                               verbose_name=u'产品状态*')
-    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先', blank=False)
+    priority = models.IntegerField(verbose_name=u'优先级*', help_text=u'越大越优先', blank=False)
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)*', blank=False)
     brief = models.TextField(blank=True, verbose_name=u'产品点评')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
-    excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)')
+    excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)*')
     excess_earning_description = models.CharField(u'超额收益描述', max_length=100, blank=True, null=True)
 
     pay_method = models.CharField(verbose_name=u'支付方式*', max_length=32, blank=False, default=u'等额本息', choices=PAY_METHOD_CHOICES)
@@ -149,11 +149,11 @@ class P2PProduct(ProductBase):
     end_time = models.DateTimeField(default=timezone.now, verbose_name=u'终止时间*', blank=False)
     soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True)
 
-    limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)', default=1)
+    limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)*', default=1)
 
     warrant_company = models.ForeignKey(WarrantCompany,blank=False)
-    usage = models.TextField(blank=False, verbose_name=u'借款用途(合同用)')
-    short_usage = models.TextField(blank=False, verbose_name=u'借款用途')
+    usage = models.TextField(blank=False, verbose_name=u'借款用途(合同用)*')
+    short_usage = models.TextField(blank=False, verbose_name=u'借款用途*')
 
     contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True ,blank=False)
 
