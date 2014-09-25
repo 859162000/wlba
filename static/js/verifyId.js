@@ -80,10 +80,13 @@
               msg: result.message
             });
           }
-          return tool.modalAlert({
+          tool.modalAlert({
             title: '温馨提示',
             msg: result.message
           });
+          if (!$("#validate_id_button").hasClass("disabled")) {
+            "#validate_id_button".removeClass("disabled");
+          }
         });
       }
     });
