@@ -4,7 +4,7 @@ from django.contrib import admin
 # Register your models here.
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
-    AdminTransaction, AdminTransactionWithdraw, AdminTransactionDeposit, AdminTransactionP2P
+    AdminTransaction
 
 
 class PayInfoAdmin(admin.ModelAdmin):
