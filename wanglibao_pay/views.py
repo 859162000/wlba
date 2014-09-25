@@ -437,12 +437,13 @@ class AdminTransactionP2P(TemplateView):
                 }
 
             trade_records = P2PRecord.objects.filter(user=user_profile.user)
-
             pager = Paginator(trade_records, 20)
             page = self.request.GET.get('page')
             if not page:
                 page = 1
             trade_records = pager.page(page)
+
+
             return {
                 "pay_records": trade_records,
                 "phone": phone

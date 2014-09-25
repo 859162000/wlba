@@ -187,7 +187,7 @@ class EquityRecordAdmin(admin.ModelAdmin):
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
 
 class ProductAmortizationAdmin(admin.ModelAdmin):
-    list_display = ('term', 'principal', 'interest', 'penal_interest', 'description')
+    list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled', 'settlement_time', 'created_time', 'description', )
 
 
 
@@ -201,3 +201,5 @@ admin.site.register(P2PRecord, P2PRecordAdmin)
 admin.site.register(EquityRecord, EquityRecordAdmin)
 admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
 admin.site.register(ProductAmortization, ProductAmortizationAdmin)
+
+
