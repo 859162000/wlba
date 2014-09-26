@@ -56,7 +56,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
         })
 
       .fail (xhr)->
-        $(this).removeClass('disabled')
+        ("#validate_id_button").removeClass "disabled"
         result = JSON.parse xhr.responseText
         if result.error_number == 8
           tool.modalAlert({title: '温馨提示', msg: result.message})
@@ -67,10 +67,4 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
 
         tool.modalAlert({title: '温馨提示', msg: result.message})
 
-        if  $("#validate_id_button").hasClass "disabled"
-          ("#validate_id_button").removeClass "disabled"
-          return
-
-
-
-
+        

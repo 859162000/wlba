@@ -66,7 +66,7 @@
           });
         }).fail(function(xhr) {
           var result;
-          $(this).removeClass('disabled');
+          "#validate_id_button".removeClass("disabled");
           result = JSON.parse(xhr.responseText);
           if (result.error_number === 8) {
             tool.modalAlert({
@@ -80,13 +80,10 @@
               msg: result.message
             });
           }
-          tool.modalAlert({
+          return tool.modalAlert({
             title: '温馨提示',
             msg: result.message
           });
-          if ($("#validate_id_button").hasClass("disabled")) {
-            "#validate_id_button".removeClass("disabled");
-          }
         });
       }
     });
