@@ -52,8 +52,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       .done (data,textStatus) ->
         location.reload()
       .fail (xhr)->
-        alert('hello')
-        alert(xhr.responseText)
         result = JSON.parse xhr.responseText
         message = result.message
         error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
