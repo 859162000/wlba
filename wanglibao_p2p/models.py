@@ -251,6 +251,7 @@ class Warrant(models.Model):
     product = models.ForeignKey(P2PProduct)
 
     class Meta:
+        verbose_name = u'担保细节'
         verbose_name_plural = u'担保细节'
 
     def __unicode__(self):
