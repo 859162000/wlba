@@ -66,4 +66,3 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
 
 
         tool.modalAlert({title: '温馨提示', msg: result.message})
-
