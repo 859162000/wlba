@@ -66,7 +66,7 @@
           });
         }).fail(function(xhr) {
           var result;
-          "#validate_id_button".removeClass("disabled");
+          $("#validate_id_button").removeClass("disabled");
           result = JSON.parse(xhr.responseText);
           if (result.error_number === 8) {
             tool.modalAlert({

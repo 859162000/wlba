@@ -64,8 +64,6 @@
           return location.reload();
         }).fail(function(xhr) {
           var error_message, message, result;
-          alert('hello');
-          alert(xhr.responseText);
           result = JSON.parse(xhr.responseText);
           message = result.message;
           error_message = _.chain(message).pairs().map(function(e) {
