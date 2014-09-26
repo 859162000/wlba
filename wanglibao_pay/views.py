@@ -123,6 +123,10 @@ class PayView(TemplateView):
         }
         return self.render_to_response(context)
 
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(PayView, self).dispatch(request, *args, **kwargs)
+
 
 class PayCompleteView(TemplateView):
     template_name = 'pay_complete.jade'
