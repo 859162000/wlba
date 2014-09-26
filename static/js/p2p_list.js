@@ -17,11 +17,11 @@
     });
     return $('.p2pinfo-list-box').on('mouseenter', function(e) {
       var target;
-      target = e.currentTarget.lastElementChild.id;
+      target = e.currentTarget.lastChild.id || e.currentTarget.lastElementChild.id;
       return $('#' + target).show();
     }).on('mouseleave', function(e) {
       var target;
-      target = e.currentTarget.lastElementChild.id;
+      target = e.currentTarget.lastChild.id || e.currentTarget.lastElementChild.id;
       return $('#' + target).hide();
     }).on('click', function() {
       var url;
