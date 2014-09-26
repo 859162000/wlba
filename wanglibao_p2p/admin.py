@@ -187,8 +187,11 @@ class EquityRecordAdmin(admin.ModelAdmin):
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
 
 class ProductAmortizationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled', 'settlement_time', 'created_time', 'description', )
+    list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled',
+                    'settlement_time', 'created_time', 'status', 'description', )
 
+    def status(self, obj):
+        return obj.product.status
 
 
 admin.site.register(P2PProduct, P2PProductAdmin)
