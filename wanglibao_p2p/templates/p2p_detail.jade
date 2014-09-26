@@ -27,7 +27,10 @@ html
                   span.tip 满标后持满180天即可债权转让
               .span3-omega
                 div.pull-right.p2p-warrant-way
-                  span.icon-check-shield 第三方本息担保
+                  if p2p.category == '证大速贷'
+                    span.icon-check-shield 第三方本息保障
+                  else
+                    span.icon-check-shield 第三方本息担保
           .p2p-detail-content.clearfix
             .row
               .span4
@@ -164,7 +167,10 @@ html
 
         .span4-omega.border-left.clearfix
           .p2p-detail-container.guarantee-company
-            h1 担保机构
+            if p2p.category == '证大速贷'
+              h1 本息保障
+            else
+              h1 担保机构
             table
               caption {{p2p.warrant_company.name}}
               warrants = p2p.warrant_set.all()
