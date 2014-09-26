@@ -66,7 +66,6 @@
           });
         }).fail(function(xhr) {
           var result;
-          $("#validate_id_button").removeClass("disabled");
           result = JSON.parse(xhr.responseText);
           if (result.error_number === 8) {
             tool.modalAlert({
@@ -75,11 +74,13 @@
             });
             return;
           } else if (result.error_number === 9) {
+            $("#validate_id_button").removeClass("disabled");
             tool.modalAlert({
               title: '温馨提示',
               msg: result.message
             });
           }
+          $("#validate_id_button").removeClass("disabled");
           return tool.modalAlert({
             title: '温馨提示',
             msg: result.message
