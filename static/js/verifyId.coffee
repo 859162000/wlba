@@ -54,10 +54,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
         tool.modalAlert({title: '温馨提示', msg: '实名认证成功', callback_ok: ()->
           location.reload()
         })
-s
       .fail (xhr)->
         result = JSON.parse xhr.responseText
-        
         if result.error_number == 8
           tool.modalAlert({title: '温馨提示', msg: result.message})
           return
