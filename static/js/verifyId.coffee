@@ -54,7 +54,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
         tool.modalAlert({title: '温馨提示', msg: '实名认证成功', callback_ok: ()->
           location.reload()
         })
-
+s
       .fail (xhr)->
         $("#validate_id_button").removeClass "disabled"
         result = JSON.parse xhr.responseText
