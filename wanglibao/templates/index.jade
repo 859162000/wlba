@@ -54,7 +54,11 @@ html
           else
             h1.banner-form--title 网利宝年化收益率
             p.banner-form--row.font-s 平均收益 <em class="highlight">{{site_data.highest_earning_rate | percentage}}</em>
-            p.banner-form--row.font-s <span class="highlight">{{site_data.demand_rate_times}}</span>倍以上活期收益&nbsp;&nbsp;&nbsp;第三方本息担保
+            if product.category == '证大速贷'
+              p.banner-form--row.font-s <span class="highlight">{{site_data.demand_rate_times}}</span>倍以上活期收益&nbsp;&nbsp;&nbsp;第三方本息保障
+            else
+              p.banner-form--row.font-s <span class="highlight">{{site_data.demand_rate_times}}</span>倍以上活期收益&nbsp;&nbsp;&nbsp;第三方本息担保
+
             a.banner-form--button.full-width.register-modal(href="#login-modal") 免费注册
             p.align-right.font-s
               span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
@@ -167,7 +171,11 @@ html
                       else
                         span &nbsp;&nbsp; {{percent | percentage}}
                     .span4.align-left
-                      span 担保机构: &nbsp;&nbsp;
+                      if product.category == '证大速贷'
+                        span 本息保障: &nbsp;&nbsp;
+                      else
+                        span 担保机构: &nbsp;&nbsp;
+
                       span.d3-text {{product.warrant_company.name}}
                     .span4-omega.align-right
                       span 还款方式: &nbsp;&nbsp;
