@@ -57,7 +57,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
 s
       .fail (xhr)->
         result = JSON.parse xhr.responseText
-        
         if result.error_number == 8
           tool.modalAlert({title: '温馨提示', msg: result.message})
           return
