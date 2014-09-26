@@ -42,14 +42,14 @@
         return error.appendTo($(element).closest('.form-row').find('.form-row-error'));
       },
       submitHandler: function(form) {
-        var id_number, name;
+        var id_number, name, result;
         name = $('#id_name').val();
         id_number = $('#id_id_number').val();
         if ($("#validate_id_button").hasClass("disabled")) {
           return;
         }
         $("#validate_id_button").addClass('disabled');
-        return $.ajax({
+        $.ajax({
           url: '/api/id_validate/',
           data: {
             name: name,
@@ -65,25 +65,24 @@
             }
           });
         }).fail(function(xhr) {
-          var result;
-          "#validate_id_button".removeClass("disabled");
-          result = JSON.parse(xhr.responseText);
-          if (result.error_number === 8) {
-            tool.modalAlert({
-              title: '温馨提示',
-              msg: result.message
-            });
-            return;
-          } else if (result.error_number === 9) {
-            tool.modalAlert({
-              title: '温馨提示',
-              msg: result.message
-            });
-          }
-          return tool.modalAlert({
+          return "#validate_id_button".removeClass("disabled");
+        });
+        result = JSON.parse(xhr.responseText);
+        if (result.error_number === 8) {
+          tool.modalAlert({
             title: '温馨提示',
             msg: result.message
           });
+          return;
+        } else if (result.error_number === 9) {
+          tool.modalAlert({
+            title: '温馨提示',
+            msg: result.message
+          });
+        }
+        return tool.modalAlert({
+          title: '温馨提示',
+          msg: result.message
         });
       }
     });
