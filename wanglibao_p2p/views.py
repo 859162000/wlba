@@ -243,11 +243,13 @@ class GenP2PUserProfileReport(TemplateView):
         id = request.POST.get('p2p_id', 0)
         try:
             P2PUserReportGenerator.generate_report(start_time, end_time, id=id)
+            # content = P2PUserReportGenerator.generate_report_content(start_time, end_time, id=id)
+
         except:
             message = u'生成表格错误'
         message = u'生成成功，请到导出表格下面察看数据'
 
         return HttpResponse({
-            message: message
+            message: message,
         })
 

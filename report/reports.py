@@ -248,7 +248,7 @@ class P2PUserReportGenerator(ReportGeneratorBase):
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'姓名', u'身份正号', u'手机号', u'购买', u'购买时间'])
 
-        p2pequity = P2PEquity.objects.filter(product__id=id).filter(confirm=True)
+        p2pequity = P2PEquity.objects.filter(product__id=id)
 
 
         for index, p2pequity in enumerate(p2pequity):
