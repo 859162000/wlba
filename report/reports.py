@@ -257,6 +257,7 @@ class P2PUserReportGenerator(ReportGeneratorBase):
                 unicode(p2pequity.user.wanglibaouserprofile.name),
                 unicode(p2pequity.user.wanglibaouserprofile.id_number),
                 unicode(p2pequity.user.wanglibaouserprofile.phone),
+                u"购买成功",
                 unicode(p2pequity.confirm_at)
             ])
 
