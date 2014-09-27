@@ -305,9 +305,9 @@ class P2PUserReportGenerator(ReportGeneratorBase):
         output = cStringIO.StringIO()
 
         writer = UnicodeWriter(output, delimiter='\t')
-        writer.writerow([u'序号', u'姓名', u'身份正号', u'手机号', u'购买', u'购买时间'])
+        writer.writerow([u'序号', u'姓名', u'身份正号', u'手机号', u'购买', u'购买时间', u'----'])
 
-        p2pequity = P2PEquity.objects.filter(product__id=id).filter(confirm=True)
+        p2pequity = P2PEquity.objects.filter(product__id=id)
 
 
         for index, p2pequity in enumerate(p2pequity):
@@ -316,7 +316,9 @@ class P2PUserReportGenerator(ReportGeneratorBase):
                 unicode(p2pequity.user.wanglibaouserprofile.name),
                 unicode(p2pequity.user.wanglibaouserprofile.id_number),
                 unicode(p2pequity.user.wanglibaouserprofile.phone),
-                unicode(p2pequity.confirm_at)
+                u"购买成功",
+                unicode(p2pequity.confirm_at),
+                u'----'
             ])
 
         return output.getvalue()
