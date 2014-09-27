@@ -229,3 +229,25 @@ class P2PListView(TemplateView):
             'show_slider': show_slider,
         }
 
+
+
+class GenP2PUserProfileReport(TemplateView):
+    template_name = 'gen_p2p_user_profile_report.jade'
+
+    def post(self, request):
+
+        from report.reports import P2PUserReportGenerator
+        start_time = timezone.datetime(2014, 9, 10)
+        end_time = timezone.now()
+        # print P2PUserReportGenerator.generate_report_content()
+        id = request.POST.get('p2p_id', 0)
+        try:
+            P2PUserReportGenerator.generate_report(start_time, end_time, id=id)
+        except:
+            message = u'生成表格错误'
+        message = u'生成成功，请到导出表格下面察看数据'
+
+        return HttpResponse({
+            message: message
+        })
+
