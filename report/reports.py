@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import DefaultStorage
 from report.crypto import ReportCrypto
 from report.models import Report
-from wanglibao_p2p.models import UserAmortization, P2PProduct
+from wanglibao_p2p.models import UserAmortization, P2PProduct, P2PEquity
 from wanglibao_pay.models import PayInfo
 from django.utils import timezone
 from wanglibao_pay.util import get_a_uuid
@@ -236,6 +236,51 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
 
         return output.getvalue()
 
+
+class P2PUserReportGenerator(ReportGeneratorBase):
+    prefix = 'p2p_user'
+    reportname_format = u'p2p购买用户信息 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time, id=0):
+        output = cStringIO.StringIO()
+
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'姓名', u'身份正号', u'手机号', u'购买', u'购买时间'])
+
+        p2pequity = P2PEquity.objects.filter(product__id=id).filter(confirm=True)
+
+
+        for index, p2pequity in enumerate(p2pequity):
+            writer.writerow([
+                str(index + 1),
+                unicode(p2pequity.user.wanglibaouserprofile.name),
+                unicode(p2pequity.user.wanglibaouserprofile.id_number),
+                unicode(p2pequity.user.wanglibaouserprofile.phone),
+                unicode(p2pequity.confirm_at)
+            ])
+
+        return output.getvalue()
+
+    @classmethod
+    def generate_report(cls, start_time, end_time=None, id=0):
+        if end_time is None:
+            end_time = start_time + timedelta(days=1)
+
+        assert(isinstance(start_time, datetime))
+        assert(isinstance(start_time, datetime))
+
+        path = cls.get_file_path(start_time, end_time)
+
+        content = cls.generate_report_content(start_time, end_time, id=id)
+        encrypted_content = ReportCrypto.encrypt_file(content)
+        path = storage.save(path, ContentFile(encrypted_content))
+
+        report = Report(name=cls.get_report_name(start_time, end_time))
+        report.file = path
+        report.content = content
+        report.save()
+        return report
 
 class ReportGenerator(object):
 

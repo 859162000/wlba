@@ -12,7 +12,7 @@ from import_export.admin import ImportExportModelAdmin
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (
-        'user', 'product', 'equity', 'confirm', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
+        'id', 'user', 'product', 'equity', 'confirm', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
     list_filter = ('confirm',)
 
 
