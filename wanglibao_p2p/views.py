@@ -16,13 +16,12 @@ from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_p2p.serializers import P2PProductSerializer, P2PRecordSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from operator import attrgetter, itemgetter
-
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -234,22 +233,18 @@ class P2PListView(TemplateView):
 class GenP2PUserProfileReport(TemplateView):
     template_name = 'gen_p2p_user_profile_report.jade'
 
-    def post(self, request):
 
-        from report.reports import P2PUserReportGenerator
-        start_time = timezone.datetime(2014, 9, 10)
-        end_time = timezone.now()
-        # print P2PUserReportGenerator.generate_report_content()
-        id = request.POST.get('p2p_id', 0)
-        try:
-            P2PUserReportGenerator.generate_report(start_time, end_time, id=id)
-            content = P2PUserReportGenerator.generate_report_content(start_time, end_time, id=id)
-        except:
-            message = u'生成表格错误'
 
-        message = u'生成成功，请到导出表格下面察看数据'
 
-        return HttpResponse({
-            content
-        })
+class AdminP2PUserRecord(TemplateView):
+    template_name = 'p2p_user_record.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_id = self.request.GET['p2p_id']
+        p2pequity = P2PEquity.objects.filter(product__id=p2p_id)
+
+        return {
+            'p2pequity': p2pequity
+        }
+
 
