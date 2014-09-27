@@ -33,6 +33,7 @@ class ContractTemplate(models.Model):
     content = models.TextField(u'模板内容', default='')
 
     class Meta:
+        verbose_name = u'借款合同'
         verbose_name_plural = u'借款合同'
 
     def __unicode__(self):
@@ -250,6 +251,7 @@ class Warrant(models.Model):
     product = models.ForeignKey(P2PProduct)
 
     class Meta:
+        verbose_name = u'担保细节'
         verbose_name_plural = u'担保细节'
 
     def __unicode__(self):
