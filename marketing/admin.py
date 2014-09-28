@@ -3,6 +3,10 @@
 from django.contrib import admin
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode
 from marketing.views import GennaeratorCode
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
+from import_export import fields
+
 
 class NewsAndReportAdmin(admin.ModelAdmin):
     list_display = ("name", "link", "score")
@@ -18,11 +22,27 @@ class PromotionTokenAdmin(admin.ModelAdmin):
     list_display = ("user", "token")
     readonly_fields = ("user", "token")
 
+class IntroducedByResource(resources.ModelResource):
 
-class IntroducedByAdmin(admin.ModelAdmin):
+    user_name = fields.Field(attribute="user__wanglibaouserprofile__name")
+    user_phone = fields.Field(attribute="user__wanglibaouserprofile__phone")
+    introduce_name = fields.Field(attribute="introduced_by__wanglibaouserprofile__name")
+    introduce_phone = fields.Field(attribute="introduced_by__wanglibaouserprofile__phone")
+
+    class Meta:
+        model = IntroducedBy
+        fields = ('user_name', 'user_phone','introduce_name', 'introduce_phone',
+                  'created_at', 'bought_at', 'gift_send_at' )
+
+
+
+
+class IntroducedByAdmin(ImportExportModelAdmin):
     list_display = ("user", "introduced_by", "created_at", "bought_at", "gift_send_at")
     readonly_fields = ("bought_at", "user", "introduced_by")
     list_editable = ("gift_send_at",)
+
+    resource_class = IntroducedByResource
 
     def get_queryset(self, request):
         qs = super(IntroducedByAdmin, self).get_queryset(request)
