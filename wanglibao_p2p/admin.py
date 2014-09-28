@@ -8,11 +8,11 @@ from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, At
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin
-
+from views import GenP2PUserProfileReport
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (
-        'user', 'product', 'equity', 'confirm', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
+        'id', 'user', 'product', 'equity', 'confirm', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
     list_filter = ('confirm',)
 
 
@@ -155,7 +155,7 @@ class P2PProductAdmin(ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
     ]
-    list_display = ('name', 'short_name', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'priority')
+    list_display = ('id', 'name', 'short_name', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'priority')
     list_editable = ('status', 'priority')
     list_filter = ('status',)
     search_fields = ('name',)
@@ -206,3 +206,4 @@ admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
 admin.site.register(ProductAmortization, ProductAmortizationAdmin)
 
 
+admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(),name=u'生成p2p用户表')

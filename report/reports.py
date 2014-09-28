@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import DefaultStorage
 from report.crypto import ReportCrypto
 from report.models import Report
-from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization
+from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PEquity
 from wanglibao_pay.models import PayInfo
 from django.utils import timezone
 from wanglibao_pay.util import get_a_uuid
