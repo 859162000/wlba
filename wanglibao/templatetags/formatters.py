@@ -147,7 +147,7 @@ def safe_name(name):
     Show part of name
     """
 
-    result = "*" * 3 + name[1:]
+    result = "*" + name[1:]
     return result
 
 @register.filter
