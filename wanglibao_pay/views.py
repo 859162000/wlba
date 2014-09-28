@@ -336,6 +336,7 @@ class CardViewSet(ModelViewSet):
                 'error_number': ErrorNumber.duplicate
             }, status=status.HTTP_400_BAD_REQUEST)
 
+
 class WithdrawTransactions(TemplateView):
     template_name = 'withdraw_transactions.jade'
 
