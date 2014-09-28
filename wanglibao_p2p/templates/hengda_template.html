@@ -56,7 +56,7 @@ ul>li{
 </style>
   </head>
   <body>
-    <h2>借款协议（恒大）</h2><!--.align-right 协议编号：<span class="border-bot">{{product.contract_serial_number}}</span>号-->
+    <h2>借款协议</h2><!--.align-right 协议编号：<span class="border-bot">{{product.contract_serial_number}}</span>号-->
     <p>本协议由以下四方于<span class="border-bot">{{now|date:"Y"}}</span>年<span class="border-bot">{{now|date:"m"}}</span>月<span class="border-bot">{{now|date:"d"}}</span>日签署：
     </p><br>
     <p class="bold">甲方（出借方）：</p>
@@ -173,11 +173,11 @@ ul>li{
       <li>甲方应按本协议约定的起息日将足额的借款本金支付给乙方。</li>
       <li>甲方授权并委托丁方自收到居间服务费后一个工作日内通过第三方支付平台下发支付指令，从甲方账户向乙方账户按时足额划转借款本金。</li>
       <li>乙方指定收款银行账户
-        <p>账&nbsp;&nbsp;&nbsp;&nbsp;号：<span class="border-bot">{{product.borrower_bankcard}}</span>
+        <p>账&nbsp;&nbsp;&nbsp;&nbsp;号：<span class="border-bot">{{product.borrower_bankcard|bank_card}}</span>
         </p>
-        <p>账户名：<span class="border-bot">{{product.borrower_name}}</span>
+        <p>账户名：<span class="border-bot">{{product.borrower_name|safe_name_last}}</span>
         </p>
-        <p>开户行：<span class="border-bot">{{product.borrower_bankcard_bank_name}}</span>
+        <p>开户行：<span class="border-bot">{{product.borrower_bankcard_bank_name|safe_address}}</span>
         </p>
         <p>（支持开户行：工行、招行、民生银行）</p>
         <p>如居间服务费支付主体逾期支付居间服务费的，甲乙双方在此授权并同意丁方于逾期支付居间服务费下一工作日扣除相应居间服务费后通过第三方支付平台下发支付指令，从甲方账户向乙方账户划转剩余借款本金数额。乙方收到扣除居间服务费的剩余借款本金款项后，视为乙方代居间服务费支付主体支付相应居间服务费用，乙方有权依据法律法规规定或乙方与居间服务费支付主体约定代位追偿相应居间服务费用，并要求丙方赔偿因逾期支付居间服务费给乙方造成的相应损失。</p>
@@ -262,8 +262,7 @@ ul>li{
         </tbody>
       </table><br>
       <li>乙方保证按本协议约定的借款用途使用借款，并保证在本协议约定的当期还款日前将足额当期应还本息及当期应付其他相关费用支付给丙方。具体支付方式由乙方、丙方另行签署协议约定。如乙方未依约按时还款或者支付其他相关费用，则应依本协议之约定承担违约责任及由此而产生的各项费用。</li>
-      <li>丙方保证在本协议约定的当期还款日当日[16]时前将足额当期乙方应还本息及当期乙方应付其他相关费用存入丙方账户，且同意并授权丁方通过向第三方支付平台发出指令于当期还款日将当期乙方应还本息及当期乙方应付其他相关费用划扣至甲方账户。如丙方未依约按时还款或者支付其他相关费用，则应依本协议之约定承担违约责任及由此而产生的各项费用。</li>
-      <li>甲乙双方同意并授权丙方将代为收取的本息向丁方支付完成后，即视为乙方已经履行本协议项下对甲方的相应还款义务，丁方须根据其与甲方之间的约定向甲方支付对等资金。</li>
+      <li>乙方保证在本协议约定的当期还款日当日[16]时前将足额当期乙方应还本息及当期乙方应付其他相关费用存入乙方账户，且同意并授权丁方通过向第三方支付平台发出指令于当期还款日将当期乙方应还本息及当期乙方应付其他相关费用划扣至甲方账户。如乙方未依约按时还款或者支付其他相关费用，则应依本协议之约定承担违约责任及由此而产生的各项费用。</li>
       <li>如果还款日遇到法定假日或公休日，还款日期顺延至节后第一个工作日。</li>
       <li>如果还款日为每月30或31日，则遇到无还款日对应日的月份，还款日为应还款当月的最后一日。</li>
       <li>乙方支付的各项费用（如有）均应按照如下顺序清偿：
