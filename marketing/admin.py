@@ -1,6 +1,7 @@
 from django.contrib import admin
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData
-
 
 class NewsAndReportAdmin(admin.ModelAdmin):
     list_display = ("name", "link", "score")
@@ -16,11 +17,18 @@ class PromotionTokenAdmin(admin.ModelAdmin):
     list_display = ("user", "token")
     readonly_fields = ("user", "token")
 
+class IntroducedByResource(resources.ModelResource):
 
-class IntroducedByAdmin(admin.ModelAdmin):
+    class Meta:
+        model = IntroducedBy
+
+
+class IntroducedByAdmin(ImportExportModelAdmin):
     list_display = ("user", "introduced_by", "created_at", "bought_at", "gift_send_at")
     readonly_fields = ("bought_at", "user", "introduced_by")
     list_editable = ("gift_send_at",)
+
+    resource_class = IntroducedByResource
 
     def get_queryset(self, request):
         qs = super(IntroducedByAdmin, self).get_queryset(request)
