@@ -19,10 +19,16 @@ class IndexView(TemplateView):
         p2p_pre_three = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
             .filter(status=u'正在招标').order_by('-priority', '-total_amount').select_related('warrant_company')[:4]
 
-        p2p_last = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status=u'还款中').order_by('-soldout_time').select_related('warrant_company')[0:1]
+        p2p_middle = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+            .filter(status__in=[
+                u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'
+        ]).order_by('-priority', '-soldout_time').select_related('warrant_company')
 
-        p2p_products = chain(p2p_pre_three[:3], p2p_last)
+
+        p2p_last = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+            .filter(status=u'还款中').order_by('-priority', '-soldout_time').select_related('warrant_company')
+
+        p2p_products = chain(p2p_pre_three[:3], p2p_middle, p2p_last)
 
         getmore = False
         if p2p_pre_three.count() > 3 and p2p_last:
