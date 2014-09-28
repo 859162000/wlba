@@ -99,7 +99,7 @@ html
     p 地址：{{ product.borrower_address|safe_address }}
     br
 
-    p.bold 丙方（质物监管方/仓储方）：福建省联信汇业仓储有限公司
+    p.bold 丙方（质物监管方/仓储方）：福建省联信汇业仓储有限责任公司
     p 法定代表人：田雷
     p 地址：福建省仙游县宝泉工业园区
     br
@@ -181,11 +181,11 @@ html
 
       li 乙方指定收款银行账户
         p 账&nbsp;&nbsp;&nbsp;&nbsp;号：
-          span.border-bot 6214835940368333
+          span.border-bot {{product.borrower_bankcard|bank_card}}
         p 账户名：
-          span.border-bot 龚树忠
+          span.border-bot {{product.borrower_name|safe_name_last}}
         p 开户行：
-          span.border-bot 招商银行莆田分行荔城支行
+          span.border-bot {{product.borrower_bankcard_bank_name|safe_address}}
         p （请在工商银行，招商银行、民生银行开户。）
       li 甲方授权并委托丁方在以下条件全部满足时，代为向乙方支付本协议项下借款本金：
         p （1） 质物入库并以质押标签（见附件）标示；
