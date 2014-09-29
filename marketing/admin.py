@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode
-from marketing.views import GennaeratorCode
+from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData
+# from marketing.views import GennaeratorCode
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export import fields
@@ -56,19 +56,19 @@ class TimelySitedataAdmin(admin.ModelAdmin):
     readonly_fields = ("p2p_margin", "freeze_amount", "total_amount", "user_count")
 
 
-class InviteCodeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'code', 'is_used')
-    readonly_fields = ('code', )
-
-    def has_add_permission(self, request, obj=None):
-        return False
+# class InviteCodeAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'code', 'is_used')
+#     readonly_fields = ('code', )
+#
+#     def has_add_permission(self, request, obj=None):
+#         return False
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
 admin.site.register(PromotionToken, PromotionTokenAdmin)
 admin.site.register(IntroducedBy, IntroducedByAdmin)
 admin.site.register(TimelySiteData, TimelySitedataAdmin)
-admin.site.register(InviteCode, InviteCodeAdmin)
+# admin.site.register(InviteCode, InviteCodeAdmin)
 
 
-admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')
+# admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')
