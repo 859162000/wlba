@@ -68,17 +68,17 @@ class IntroducedBy(models.Model):
     gift_send_at = models.DateTimeField(u'奖品发放时间', null=True)
 
 
-def generate_user_promo_token_and_invitecode(sender, instance, **kwargs):
-    if kwargs["created"]:
-        with transaction.atomic():
-            invite_code = InviteCode.objects.select_for_update().filter(is_used=False).first()
-            invite_code.is_used = True
-            invite_code.save()
-
-        p = PromotionToken()
-        p.token = invite_code.code
-        p.user = instance
-        p.save()
+# def generate_user_promo_token_and_invitecode(sender, instance, **kwargs):
+#     if kwargs["created"]:
+#         with transaction.atomic():
+#             invite_code = InviteCode.objects.select_for_update().filter(is_used=False).first()
+#             invite_code.is_used = True
+#             invite_code.save()
+#
+#         p = PromotionToken()
+#         p.token = invite_code.code
+#         p.user = instance
+#         p.save()
 
 def generate_user_promo_token(sender, instance, **kwargs):
     if kwargs["created"]:
