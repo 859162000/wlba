@@ -64,13 +64,13 @@ html
       span.border-bot {{product.contract_serial_number}}
       | 号
 
-    p 本协议由以下四方于
+    p 本协议由以下各方于
       span.border-bot {{now|date:"Y"}}
       | 年
       span.border-bot {{now|date:"m"}}
       | 月
       span.border-bot {{now|date:"d"}}
-      | 日签署：
+      | 日签订：
     br
     p.bold 甲方（出借方）：
     table
@@ -203,7 +203,7 @@ html
         p 还款方式及计划：本协议项下的借款采用以下第（2）种还款方式：
       if product.pay_method == '等额本息'
         p 还款方式及计划：本协议项下的借款采用以下第（3）种还款方式：
-      p 按月付息到期还本
+      p （1）按月付息到期还本
       p 乙方每月应还利息=本金×月利率。
       table
           thead
@@ -228,7 +228,7 @@ html
               tr
                 td(colspan=5)
       br
-      p 到期还本付息
+      p （2）到期还本付息
       p 利息＝借款金额*借款年利率/12*借款期限（月），到期一次性偿还本金及利息。
       table
           thead
@@ -252,7 +252,7 @@ html
             else
               td(colspan=5)
       br
-      p 按月等额本息
+      p （3）按月等额本息
       p 乙方每月应还本息=[贷款本金×月利率×（1+月利率）^还款期数]÷[（1+月利率）^还款期数－1]
       table
           thead
