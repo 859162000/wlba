@@ -16,6 +16,7 @@ class Bank(models.Model):
 
     class Meta:
         ordering = '-sort_order',
+        verbose_name_plural = "银行"
 
     def __unicode__(self):
         return u'%s' % self.name
@@ -35,6 +36,9 @@ class Card(models.Model):
     user = models.ForeignKey(get_user_model())
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
     add_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "银行卡"
 
     def __unicode__(self):
         return u'%s' % self.no
@@ -72,7 +76,7 @@ class PayInfo(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
     order = models.ForeignKey(Order, blank=True, null=True)
     margin_record = models.ForeignKey(MarginRecord, blank=True, null=True)
-    bank = models.ForeignKey(Bank, blank=True, null=True, on_delete=models.PROTECT)
+    bank = models.ForeignKey(Bank, blank=True, null=True, on_delete=models.PROTECT, verbose_name=u'银行')
     account_name = models.CharField(u'姓名', max_length=12, blank=True, null=True)
     card_no = models.CharField(u'卡号', max_length=25, blank=True, null=True)
 

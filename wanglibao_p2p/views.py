@@ -16,13 +16,12 @@ from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_p2p.serializers import P2PProductSerializer, P2PRecordSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from operator import attrgetter, itemgetter
-
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -67,6 +66,7 @@ class P2PDetailView(TemplateView):
             'total_earning': total_earning,
             'current_equity': current_equity,
             'site_data': site_data,
+            'attachments': p2p.attachment_set.all()
         })
 
         return context
@@ -153,8 +153,9 @@ class P2PProductViewSet(PaginatedModelViewSet):
     def get_queryset(self):
         qs = super(P2PProductViewSet, self).get_queryset()
         return qs.filter(hide=False).filter(status__in=[
-                u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
             ])
+
 
 
 class RecordView(APIView):
@@ -170,9 +171,15 @@ class RecordView(APIView):
 
         equities = product.p2precord_set.filter(catalog=u'申购').prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
-        serializer = P2PRecordSerializer(equities, many=True, context={"request": request})
+        # serializer = P2PRecordSerializer(equities, many=True, context={"request": request})
 
-        return Response(data=serializer.data)
+        record = [{
+           "amount": float(eq.amount),
+            "user": eq.user.wanglibaouserprofile.phone,
+            "create_time": timezone.localtime(eq.create_time).strftime("%Y-%m-%d %H:%M:%S")
+        } for eq in equities]
+
+        return Response(record)
 
 
 class P2PListView(TemplateView):
@@ -220,4 +227,24 @@ class P2PListView(TemplateView):
             'p2p_amount': p2p_amount[:5],
             'show_slider': show_slider,
         }
+
+
+
+class GenP2PUserProfileReport(TemplateView):
+    template_name = 'gen_p2p_user_profile_report.jade'
+
+
+
+
+class AdminP2PUserRecord(TemplateView):
+    template_name = 'p2p_user_record.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_id = self.request.GET['p2p_id']
+        p2pequity = P2PEquity.objects.filter(product__id=p2p_id)
+
+        return {
+            'p2pequity': p2pequity
+        }
+
 

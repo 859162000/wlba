@@ -10,8 +10,6 @@ block sidebar
 block main
   .account-home-panel
     .well-s.lh-m
-      .font-s.d4-text 网利宝P2P理财，3个月期，年化收益最高达12%（11%年化收益+网利宝独家补贴1%）.第三方本息担保，限量发售，先到先得，平安保险对用户资金全额承保，让您投资更安心。现在就买，还能跟好友一起共享60元话费。
-      .space-vertical-l
       dl.font-s
         dt.font-xl.dark-text “邀请好友送话费”活动：
         dd 通过以下任意一种方式邀请好友购买网利宝P2P理财
@@ -25,7 +23,7 @@ block main
         .pull-right.invite-content
           .invite-title-bgcolor 这是您的专用邀请链接，您可点击【复制】按钮，将本文粘贴并发送给您的好友：
           .invite-textarea
-            |我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～
+            |我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPhone6，1000元京东卡...快来看看吧～
             |戳这里>>
             span.blue https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}
           input.pull-right.button.button-red#inviteCopyButton(type="button",value="复制")
@@ -57,7 +55,7 @@ block main
   script(src="/static/js/lib/jquery.modal.min.js")
   script.
     var _share_title = encodeURI('“邀请好友送话费”活动');
-    var _share_content = encodeURI('我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPad Air，1000元京东卡...快来看看吧～ 戳这里  https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
+    var _share_content = encodeURI('我刚刚注册了网利宝，现在购买100元P2P理财产品，即得30元话费。还有iPhone6，1000元京东卡...快来看看吧～ 戳这里>>https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
     var _activity_url = encodeURIComponent('https://www.wanglibao.com/activity/invite/');
     var _share_url = encodeURIComponent('https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
     var _share_pic = 'https://staging.wanglibao.com/static/images/share_pic.jpg';
