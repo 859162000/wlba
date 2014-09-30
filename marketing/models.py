@@ -46,6 +46,7 @@ class SiteData(models.Model):
 #     is_used = models.BooleanField(u'是否使用', default=False)
 #
 #     class Meta:
+
 #         ordering = ['id']
 #
 #     def __unicode__(self):
