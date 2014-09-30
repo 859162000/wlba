@@ -26,15 +26,14 @@ class IntroducedByResource(resources.ModelResource):
 
     user_name = fields.Field(attribute="user__wanglibaouserprofile__name")
     user_phone = fields.Field(attribute="user__wanglibaouserprofile__phone")
-    introduce_name = fields.Field(attribute="introduced_by__wanglibaouserprofile__name")
-    introduce_phone = fields.Field(attribute="introduced_by__wanglibaouserprofile__phone")
+    introduced_name = fields.Field(attribute="introduced_by__wanglibaouserprofile__name")
+    introduced_phone = fields.Field(attribute="introduced_by__wanglibaouserprofile__phone")
+    chanel = fields.Field(attribute="introduced_by__username")
 
     class Meta:
         model = IntroducedBy
-        fields = ('user_name', 'user_phone','introduce_name', 'introduce_phone',
+        fields = ('user_name', 'user_phone','introduce_name', 'introduce_phone', 'chanel',
                   'created_at', 'bought_at', 'gift_send_at' )
-
-
 
 
 class IntroducedByAdmin(ImportExportModelAdmin):
