@@ -10,7 +10,7 @@ from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
-
+from wanglibao_p2p.views import AdminP2PUserRecord
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -80,6 +80,7 @@ urlpatterns += patterns(
     url(r'transaction/p2p', AdminTransactionP2P.as_view(), name='transaction_p2p'),
     url(r'transaction/deposit', AdminTransactionDeposit.as_view(), name='transaction_deposit'),
     url(r'transaction/withdraw', AdminTransactionWithdraw.as_view(), name='transaction_withdraw'),
+    url(r'p2pequity/profile', AdminP2PUserRecord.as_view(), name='p2p_user_record'),
 )
 
 

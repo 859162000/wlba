@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
 from wanglibao_pay.util import get_a_uuid
-
+from django.db import transaction
 
 class NewsAndReport(models.Model):
     name = models.CharField(u'名字', max_length=128)
@@ -41,6 +41,17 @@ class SiteData(models.Model):
     def one_year_times(self):
         return int(self.highest_earning_rate / self.one_year_interest_rate)
 
+# class InviteCode(models.Model):
+#     code = models.CharField(u'邀请码', max_length=6, db_index=True, unique=True)
+#     is_used = models.BooleanField(u'是否使用', default=False)
+#
+#     class Meta:
+#
+#         ordering = ['id']
+#
+#     def __unicode__(self):
+#         return self.code
+
 
 class PromotionToken(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)
@@ -58,11 +69,24 @@ class IntroducedBy(models.Model):
     gift_send_at = models.DateTimeField(u'奖品发放时间', null=True)
 
 
+# def generate_user_promo_token_and_invitecode(sender, instance, **kwargs):
+#     if kwargs["created"]:
+#         with transaction.atomic():
+#             invite_code = InviteCode.objects.select_for_update().filter(is_used=False).first()
+#             invite_code.is_used = True
+#             invite_code.save()
+#
+#         p = PromotionToken()
+#         p.token = invite_code.code
+#         p.user = instance
+#         p.save()
+
 def generate_user_promo_token(sender, instance, **kwargs):
     if kwargs["created"]:
         p = PromotionToken()
         p.user = instance
         p.save()
+
 
 post_save.connect(generate_user_promo_token, sender=get_user_model(), dispatch_uid="generate_promotion_token")
 
@@ -74,3 +98,7 @@ class TimelySiteData(models.Model):
     freeze_amount = models.DecimalField(u'投资中冻结金额', max_digits=20, decimal_places=2, default=0)
     total_amount = models.DecimalField(u'总额', max_digits=20, decimal_places=2, default=0)
     user_count = models.IntegerField(u'用户总数', default=0)
+
+
+
+

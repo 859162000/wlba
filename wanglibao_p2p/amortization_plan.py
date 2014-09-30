@@ -26,11 +26,11 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
     @classmethod
     def generate(cls, amount, year_rate, term, period=None):
         amount = Decimal(amount)
-        year_rate = Decimal(year_rate)
-
         month_rate = year_rate / 12
+        month_rate = Decimal(month_rate).quantize(Decimal('0.000000001'))
+
         term_amount = amount * (month_rate * pow(1 + month_rate, period)) / (pow(1 + month_rate, period) - 1)
-        term_amount = term_amount.quantize(Decimal('.01'), rounding=ROUND_UP)
+        term_amount = Decimal(term_amount).quantize(Decimal('.01'))
 
         total = period * term_amount
 
@@ -61,11 +61,12 @@ class MonthlyInterest(AmortizationPlan):
     @classmethod
     def generate(cls, amount, year_rate, term, period=None):
         amount = Decimal(amount)
-        year_rate = Decimal(year_rate)
+        # year_rate = Decimal(year_rate)
 
         month_rate = year_rate / 12
+        month_rate = Decimal(month_rate).quantize(Decimal('0.000000001'))
         month_interest = amount * month_rate
-        month_interest = month_interest.quantize(Decimal('.01'), ROUND_UP)
+        month_interest = month_interest.quantize(Decimal('.01'))
 
         total = month_interest * period + amount
 

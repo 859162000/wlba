@@ -151,6 +151,24 @@ def safe_name(name):
     return result
 
 @register.filter
+def safe_name_last(name):
+    """
+    Show part of name
+    """
+
+    result = name[:1] + "*" * 3
+    return result
+
+@register.filter
+def safe_address(name):
+    """
+    Show part of name
+    """
+
+    result = name[:3] + '*' * 3
+    return result
+
+@register.filter
 def display_name(user):
     if user.wanglibaouserprofile.nick_name:
         return user.wanglibaouserprofile.nick_name

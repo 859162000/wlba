@@ -1,11 +1,47 @@
 .common-inform
   background-color: #fff
-  border: 1px solid #f9b1a2
-  padding: 20px 60px 30px 55px
+  border-top: 1px solid #dfdfdf
+  border-bottom: 1px solid #dfdfdf
+  padding: 10px 0
   line-height: 30px
-  p
-    font-size: 14px
-    color: #cd0603
-    background: url(/static/images/inform/icon_inform.png) no-repeat
-    text-indent: 50px
-    padding-top: 5px
+  margin-bottom: 10px
+  .inform-head
+    position: relative
+    .top-notice-expanded
+      font-size: 14px
+    .w-n-l-i-date
+      position: absolute
+      right: 0px
+      font-size: 14px
+
+  .website-notice-icon
+    margin: 6px 10px 0 0
+    background: url(/static/images/inform/index-notice-arrow.png) no-repeat
+    background-position: 0 -20px
+    width: 18px
+    height: 18px
+    overflow: hidden
+    float: left
+    text-inden: t-9999px
+
+  &:hover
+    .website-notice-icon
+      background-position: 0 -20px
+
+  &.off
+    .website-notice-icon
+      background-position: 0 0px
+    &:hover
+      .website-notice-icon
+        background-position: 0 -40px
+    ul
+      display: none
+  ul
+    padding-left: 30px
+    li
+      font-size: 14px
+      color: #666
+      padding-top: 5px
+      text-indent: 20px
+      &.notice
+        color: red

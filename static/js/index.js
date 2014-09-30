@@ -54,10 +54,13 @@
         return currentBanner = index;
       }
     });
-    return $('.container').on('click', '.panel-p2p-product', function() {
+    $('.container').on('click', '.panel-p2p-product', function() {
       var url;
       url = $('.panel-title-bar a', $(this)).attr('href');
       return window.location.href = url;
+    });
+    return $('#topNotice').click(function(e) {
+      return $('.common-inform').toggleClass('off');
     });
   });
 
