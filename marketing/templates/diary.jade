@@ -37,6 +37,30 @@ html
               .panel-heading 每日注册用户详细数据
 
               .panel-body
+                .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 日期
+                        th(rowspan="1") 注册数
+                        th(rowspan="1", colspan="1") 新增交易数
+                        th(rowspan="1") 新增交易额
+                    tbody
+                      {% for l in result %}
+                      tr
+                        td {{ l.each_day | date:"Y-m-d"}}
+                        td {{ l.joined_num }}
+                        td {{ l.trade_num }}
+                        td {{ l.amount }}
+
+                      {% endfor %}
+
+        .row(style="display:block")
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading 每日注册用户详细数据
+
+              .panel-body
 
                 .table-responsive
                   table.table.table-striped.table-bordered.table-hover
@@ -56,11 +80,11 @@ html
                         th 老用户首次交易
                         th 汇总
                     tbody
-                      {% for l in all %}
+                      {% for l in users %}
                       tr
                         td {{ l.each_day | date:"Y-m-d"}}
                         td {{ l.joined_num }}
-                        td {{ l.trade_num }}
+                        td
                         td
                         td
                         td
