@@ -419,7 +419,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'report-generate': {
         'task': 'report.tasks.generate_report',
-        'schedule': crontab(minute=15, hour=16),
+        'schedule': crontab(minute=0, hour=15),
     },
     'generate_site_data': {
         'task': 'marketing.tasks.generate_site_data',
