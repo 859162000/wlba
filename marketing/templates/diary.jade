@@ -9,6 +9,7 @@ html
     link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", media="screen, projection", rel="stylesheet", type="text/css")
     link(href="/static/css/plugins/metisMenu/metisMenu.css", media="screen, projection", rel="stylesheet", type="text/css")
     link(href="/static/css/sb-admin-2.css", media="screen, projection", rel="stylesheet", type="text/css")
+    script(src="/static/js/require.js", data-main="/static/js/header")
 
   body(role="document")
 
@@ -55,6 +56,9 @@ html
 
                       {% endfor %}
 
+                .chart
+                  #container
+
         .row(style="display:block")
           .col-lg-12
             .panel.panel-default
@@ -97,3 +101,7 @@ html
 
 
               .test
+script.
+  var result = {{ json_re | safe }};
+script.
+  require(["/static/js/lib/jquery.min.js", "/static/js/lib/highcharts.js", "/static/js/diary.js"])

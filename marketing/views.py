@@ -42,8 +42,25 @@ class MarketingView(TemplateView):
 
         #result = d.values()
 
+        import json
+        import decimal
+        from django.db.models.base import ModelState
+
+        class DateTimeEncoder(json.JSONEncoder):
+            def default(self, obj):
+               if hasattr(obj, 'isoformat'):
+                   return obj.isoformat()
+               elif isinstance(obj, decimal.Decimal):
+                   return float(obj)
+               elif isinstance(obj, ModelState):
+                   return None
+               else:
+                   return json.JSONEncoder.default(self, obj)
+
+        json_re = json.dumps(result, cls=DateTimeEncoder)
 
         return {
             'result': result,
-            'users': users
+            'users': users,
+            'json_re': json_re
         }
