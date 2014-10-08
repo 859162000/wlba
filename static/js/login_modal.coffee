@@ -221,7 +221,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
 
   container = $('.password-strength-container')
   $('#reg_password').complexify {minimumChars:6, strengthScaleFactor:1}, (valid, complexity)->
-      console.log 'complexity: ' + complexity
       if complexity == 0
         container.removeClass 'low'
         container.removeClass 'soso'
@@ -312,3 +311,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
   $('.nologin').click (e)->
     e.preventDefault()
     $('.login-modal').trigger('click')
+
+  $("input:password").bind "copy cut paste", (e) ->
+    element = this
+    setTimeout (->
+      text = $(element).val()
+      if(!/[^\u4e00-\u9fa5]+/ig.test(text) || /\s+/ig.test(text))
+        $(element).val('')
+      return
+    ), 100
+    #return false

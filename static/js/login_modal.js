@@ -251,7 +251,6 @@
       minimumChars: 6,
       strengthScaleFactor: 1
     }, function(valid, complexity) {
-      console.log('complexity: ' + complexity);
       if (complexity === 0) {
         container.removeClass('low');
         container.removeClass('soso');
@@ -341,9 +340,20 @@
         e.preventDefault();
       }
     });
-    return $('.nologin').click(function(e) {
+    $('.nologin').click(function(e) {
       e.preventDefault();
       return $('.login-modal').trigger('click');
+    });
+    return $("input:password").bind("copy cut paste", function(e) {
+      var element;
+      element = this;
+      return setTimeout((function() {
+        var text;
+        text = $(element).val();
+        if (!/[^\u4e00-\u9fa5]+/ig.test(text) || /\s+/ig.test(text)) {
+          $(element).val('');
+        }
+      }), 100);
     });
   });
 

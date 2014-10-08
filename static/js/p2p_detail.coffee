@@ -11,7 +11,7 @@ require.config
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools'], ($, _, backend, calculator, countdown, tool)->
 
   $.validator.addMethod 'dividableBy100', (value, element)->
-    return value % 100 == 0
+    return value % 100 == 0 && !/\./ig.test(value)
   , '请输入100的整数倍'
 
   $.validator.addMethod 'positiveNumber', (value, element)->
