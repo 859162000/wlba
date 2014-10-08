@@ -79,7 +79,9 @@ def percentage(value):
     """
     Convert float based percentage to string
     """
-    return u'%.1f%%' % (value, )
+    rs = "%s" % value
+    return "%s%%" % rs[:rs.find(".")+2]
+    #return u'%.1f%%' % (value, )
 
 @register.filter
 def percentage_number(value):
