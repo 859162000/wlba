@@ -209,7 +209,6 @@
       } else {
         return $.ajax({
           url: url,
-          type: 'PUT',
           data: data
         });
       }

@@ -52,3 +52,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
   $('.container').on 'click', '.panel-p2p-product', ->
     url = $('.panel-title-bar a', $(this)).attr('href')
     window.location.href = url
+
+  $('#topNotice').click (e) ->
+        $('.common-inform').toggleClass('off')

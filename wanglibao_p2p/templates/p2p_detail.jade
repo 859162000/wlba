@@ -23,9 +23,14 @@ html
             .row
               .span9
                 .p2p-detail-title.pull-left.text-overflow-hidden(title="{{p2p.name}}") {{p2p.name}}
+                if p2p.category == '证大速贷'
+                  span.tip 满标后持满180天即可债权转让
               .span3-omega
                 div.pull-right.p2p-warrant-way
-                  span.icon-check-shield 第三方本息担保
+                  if p2p.category == '证大速贷'
+                    span.icon-check-shield 第三方本息保障
+                  else
+                    span.icon-check-shield 第三方本息担保
           .p2p-detail-content.clearfix
             .row
               .span4
@@ -63,8 +68,11 @@ html
                   span#countdown{{p2p.end_time | timedelta_now_day }}
 
           dl.p2p-detail-intro.clearfix
-            dt 资金用途：
+            dt 借款用途：
             dd {{p2p.short_usage}}
+            if p2p.category == '证大速贷'
+              dt 债权转让：
+              dd 选择“债权转让”后，即可提前赎回未到期债权，但您需承担提前赎回本金0-5%不等的年化收益率折让费（由提前赎回投资人自行设置），折让费将转给下一个接收投资人，投资人相应权利义务同时转移。
 
         .span4-omega.invest-form.border-left
           h1 我要投资
@@ -115,9 +123,7 @@ html
                   span.font-xl {{status}}
               p.align-center.padding-s {{end_time|date:"m-d H:i:s"}} 完成
               p.font-s
-                | 新的投资产品将在工作日
-                span.highlight {{site_data.product_release_time}}
-                | 固定时间发布，请查看网站<a href="/">首页</a>。
+                | 新的投资产品将在工作日11点左右发布，到时请查看网站<a href="/">首页</a>。
 
     .space-m
     .full-container-home.clearfix
@@ -147,9 +153,22 @@ html
                         a.register-modal.blue(href="#login-modal") 注册用户
                         |才能看到，现在
                         a.login-modal.blue(href="#login-modal") 登录
+
+          if attachments and user.is_authenticated
+            .p2p-detail-list.clearfix
+              h1 相关文件
+
+              for attachment in attachments
+                .img-container
+                  img(src="/media/{{attachment.file}}")
+                  h2 {{attachment.name}}
+
         .span4-omega.border-left.clearfix
           .p2p-detail-container.guarantee-company
-            h1 担保机构
+            if p2p.category == '证大速贷'
+              h1 本息保障
+            else
+              h1 担保机构
             table
               caption {{p2p.warrant_company.name}}
               warrants = p2p.warrant_set.all()
@@ -227,7 +246,7 @@ html
                     th 投资人
                     th 金额
                 tbody
-                  trade_records = p2p.p2precord_set.filter(catalog=u'申购')[:20]
+                  trade_records = p2p.p2precord_set.filter(catalog=u'申购')
                   for trade in trade_records
                     tr
                       td

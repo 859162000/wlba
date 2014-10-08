@@ -69,6 +69,7 @@ class PayView(TemplateView):
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             amount_str = str(amount)
             if amount <= 0:
+                # todo handler the raise
                 raise decimal.DecimalException()
 
             gate_id = request.POST.get('gate_id', '')
@@ -97,6 +98,7 @@ class PayView(TemplateView):
                 'GateId': gate_id,
                 'OrdAmt': amount_str
             }
+
             pay = HuifuPay()
             form = pay.pay(post)
             pay_info.request = str(form)
@@ -120,6 +122,10 @@ class PayView(TemplateView):
             'form': form
         }
         return self.render_to_response(context)
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(PayView, self).dispatch(request, *args, **kwargs)
 
 
 class PayCompleteView(TemplateView):
@@ -334,6 +340,7 @@ class CardViewSet(ModelViewSet):
                 'error_number': ErrorNumber.duplicate
             }, status=status.HTTP_400_BAD_REQUEST)
 
+
 class WithdrawTransactions(TemplateView):
     template_name = 'withdraw_transactions.jade'
 
@@ -435,12 +442,13 @@ class AdminTransactionP2P(TemplateView):
                 }
 
             trade_records = P2PRecord.objects.filter(user=user_profile.user)
-
             pager = Paginator(trade_records, 20)
             page = self.request.GET.get('page')
             if not page:
                 page = 1
             trade_records = pager.page(page)
+
+
             return {
                 "pay_records": trade_records,
                 "phone": phone

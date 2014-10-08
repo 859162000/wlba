@@ -1,0 +1,38 @@
+- load formatters
+doctype html
+head
+    - with '查询提现记录' as title
+    include include/common_head
+    - endwith
+    body
+        .panel
+            .well
+                .panel-title-bar__no-border
+                    .panel-title 用户资料
+                .space-vertical-s
+                .panel-content.padding-l-r-sm
+                    .space-vertical-l
+                    a(href="/admin")
+                        button.button-home-action(type='submit') 返回
+                    .space-vertical-l
+            .panel-container.padding-l-r-xl
+                table.table
+                    thead
+                        tr
+                            th 序
+                            th 姓名
+                            th 身份正号
+                            th 手机号
+                            th 购买
+                            th 购买时间
+                    if p2pequity
+                        tbody
+                            each pe in p2pequity
+                                tr
+                                    td {{pe.id}}
+                                    td {{pe.user.wanglibaouserprofile.name}}
+                                    td {{pe.user.wanglibaouserprofile.id_number}}
+                                    td {{pe.user.wanglibaouserprofile.phone}}
+                                    td {{pe.confirm}}
+                                    td {{pe.confirm_at | date:"Y-m-d H:i:s"}}
+

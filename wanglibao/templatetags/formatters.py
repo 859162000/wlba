@@ -79,7 +79,9 @@ def percentage(value):
     """
     Convert float based percentage to string
     """
-    return u'%.1f%%' % (value, )
+    rs = "%s" % value
+    return "%s%%" % rs[:rs.find(".")+2]
+    #return u'%.1f%%' % (value, )
 
 @register.filter
 def percentage_number(value):
@@ -148,6 +150,24 @@ def safe_name(name):
     """
 
     result = "*" + name[1:]
+    return result
+
+@register.filter
+def safe_name_last(name):
+    """
+    Show part of name
+    """
+
+    result = name[:1] + "*" * 3
+    return result
+
+@register.filter
+def safe_address(name):
+    """
+    Show part of name
+    """
+
+    result = name[:3] + '*' * 3
     return result
 
 @register.filter

@@ -477,3 +477,10 @@ INTERNAL_IPS = ('127.0.0.1',)
 DEBUG_TOOLBAR_CONFIG = {
     'JQUERY_URL': '/static/js/lib/jquery.min.js'
 }
+
+
+USE_L10N=False
+DATETIME_FORMAT='Y-m-d H:i:s'
+# DATE_FORMAT='Y-m-d'
+
+# AUTH_PROFILE_MODULE = 'wanglibao_profile.WanglibaoUserProfile'

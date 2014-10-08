@@ -54,7 +54,11 @@ html
           else
             h1.banner-form--title 网利宝年化收益率
             p.banner-form--row.font-s 平均收益 <em class="highlight">{{site_data.highest_earning_rate | percentage}}</em>
-            p.banner-form--row.font-s <span class="highlight">{{site_data.demand_rate_times}}</span>倍以上活期收益&nbsp;&nbsp;&nbsp;第三方本息担保
+            if product.category == '证大速贷'
+              p.banner-form--row.font-s <span class="highlight">{{site_data.demand_rate_times}}</span>倍以上活期收益&nbsp;&nbsp;&nbsp;第三方本息保障
+            else
+              p.banner-form--row.font-s <span class="highlight">{{site_data.demand_rate_times}}</span>倍以上活期收益&nbsp;&nbsp;&nbsp;第三方本息担保
+
             a.banner-form--button.full-width.register-modal(href="#login-modal") 免费注册
             p.align-right.font-s
               span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
@@ -90,9 +94,12 @@ html
             span.icon.icon-fifth-step
             .process-title 第五步&nbsp;自动收款
             .process-content 借款期满后自动回款
+
+
     .container
       .row
         .span8
+          a(name="p2p")
           for product in p2p_products
             status = product.display_status
             .panel-p2p-product
@@ -101,6 +108,8 @@ html
                   if product.warrant_company
                     .warrant-icon 担
                   a(href="/p2p/detail/{{product.id}}") {{product.name}}
+                  if product.category == '证大速贷'
+                      span.tip 满标后持满180天即可债权转让
                 .panel-content
                   .row
                     .span2.align-center
@@ -164,7 +173,11 @@ html
                       else
                         span &nbsp;&nbsp; {{percent | percentage}}
                     .span4.align-left
-                      span 担保机构: &nbsp;&nbsp;
+                      if product.category == '证大速贷'
+                        span 本息保障: &nbsp;&nbsp;
+                      else
+                        span 担保机构: &nbsp;&nbsp;
+
                       span.d3-text {{product.warrant_company.name}}
                     .span4-omega.align-right
                       span 还款方式: &nbsp;&nbsp;
@@ -172,7 +185,7 @@ html
                 if status == '还款中' or status == '已完成'
                   .panel-p2p-stamp
             .space-vertical-xl
-          if getmore
+          if True
             .row
               a.get-more(href="{% url 'p2p_list' %}" target="_blank") 查看更多
 

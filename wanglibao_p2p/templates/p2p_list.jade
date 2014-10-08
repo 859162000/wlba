@@ -32,6 +32,8 @@ html
                   if product.warrant_company
                     .warrant-icon 担
                   a(href="/p2p/detail/{{product.id}}") {{product.name}}
+                  if product.category == '证大速贷'
+                    span.tip 满标后持满180天即可债权转让
                 .panel-content
                   .row
                     .span2.align-center
@@ -96,7 +98,11 @@ html
                         span &nbsp;&nbsp; {{percent | percentage}}
 
                     .span4.align-left
-                      span 担保机构: &nbsp;&nbsp;
+                      if product.category == '证大速贷'
+                        span 本息保障: &nbsp;&nbsp;
+                      else
+                        span 担保机构: &nbsp;&nbsp;
+
                       span.d3-text {{product.warrant_company.name}}
                     .span4-omega.align-right
                       span 还款方式: &nbsp;&nbsp;
@@ -142,14 +148,18 @@ html
                             em.font-weight {{ p2p.period }}
                             em &nbsp;个月
                           .span5-omega.p2pinfo-ceil
-                            em {{ p2p.available_amout }} 元可投
+                            em {{ p2p.available_amout | money_format_int }} 元可投
 
                         .p2pinfo-flow(id="earing_{{ forloop.counter }}")
                           .row.p2pinfo-flow-top
                             .span6
                               span.font-weight {{ p2p.total_amount | money_format_int }}
                               | 元总金额
-                            .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
+                            if p2p.category == '证大速贷'
+                              .span6-omega(title="本息保障：{{ p2p.warrant_company.name }}") 本息保障：{{ p2p.warrant_company.name }}
+                            else
+                              .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
+
                           .row.p2pinfo-flow-foot
                             .span6
                               span 进度：
@@ -199,14 +209,17 @@ html
                             em.p2pinfo-active.highlight.font-weight {{ p2p.period }}
                             em &nbsp;个月
                           .span5-omega.p2pinfo-ceil
-                            em {{ p2p.available_amout }} 元可投
+                            em {{ p2p.available_amout | money_format_int }} 元可投
 
                         .p2pinfo-flow(id="period_{{ forloop.counter }}")
                           .row.p2pinfo-flow-top
                             .span6
                               span.font-weight {{ p2p.total_amount | money_format_int }}
                               | 元总金额
-                            .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
+                            if p2p.category == '证大速贷'
+                              .span6-omega(title="本息保障：{{ p2p.warrant_company.name }}") 本息保障：{{ p2p.warrant_company.name }}
+                            else
+                              .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
                           .row.p2pinfo-flow-foot
                             .span6
                               span 进度：
@@ -255,7 +268,7 @@ html
                             em.font-weight {{ p2p.period }}
                             em &nbsp;个月
                           .span5-omega.p2pinfo-ceil
-                            em.p2pinfo-active.highlight {{ p2p.available_amout }}
+                            em.p2pinfo-active.highlight {{ p2p.available_amout | money_format_int }}
                             | &nbsp;元可投
 
                         .p2pinfo-flow(id="amount_{{ forloop.counter }}")
@@ -263,7 +276,10 @@ html
                             .span6
                               span.font-weight {{ p2p.total_amount | money_format_int }}
                               | 元总金额
-                            .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
+                            if p2p.category == '证大速贷'
+                              .span6-omega(title="本息保障：{{ p2p.warrant_company.name }}") 本息保障：{{ p2p.warrant_company.name }}
+                            else
+                              .span6-omega(title="担保公司：{{ p2p.warrant_company.name }}") 担保公司：{{ p2p.warrant_company.name }}
                           .row.p2pinfo-flow-foot
                             .span6
                               span 进度：

@@ -1,20 +1,18 @@
 # coding=utf-8
 from datetime import timedelta, datetime
-import os
 from os.path import join
-from os import makedirs
 import csv
 import codecs
 import cStringIO
 import logging
-from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import DefaultStorage
 from report.crypto import ReportCrypto
 from report.models import Report
-from wanglibao_p2p.models import UserAmortization, P2PProduct
+from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PEquity
 from wanglibao_pay.models import PayInfo
 from django.utils import timezone
+from wanglibao_pay.util import get_a_uuid
 
 
 logger = logging.getLogger(__name__)
@@ -161,15 +159,15 @@ class WithDrawReportGenerator(ReportGeneratorBase):
 
 
 class PaybackReportGenerator(ReportGeneratorBase):
-    prefix = 'hkjl'
-    reportname_format = u'还款 %s--%s'
+    prefix = 'yhhkjl'
+    reportname_format = u'用户还款计划 %s--%s'
 
     @classmethod
     def generate_report_content(cls, start_time, end_time):
         output = cStringIO.StringIO()
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
-                         u'应还本息', u'应还本金', u'应还利息', u'状态'])
+                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号'])
 
         amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time)\
             .prefetch_related('product_amortization').prefetch_related('product_amortization__product')\
@@ -187,11 +185,72 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 str(amortization.principal + amortization.interest),
                 str(amortization.principal),
                 str(amortization.interest),
-                u'待还',
-                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d")
+                # u'待还',
+                amortization.product_amortization.product.status,
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
+                unicode(get_a_uuid())
             ])
         return output.getvalue()
 
+
+class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
+    prefix = 'cphkjl'
+    reportname_format = u'产品还款计划 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
+                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号'])
+
+        amortizations = ProductAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time)\
+            .filter(product__status=u'还款中')
+
+        for index, amortization in enumerate(amortizations):
+            writer.writerow([
+                str(index + 1),
+                amortization.product.serial_number,
+                amortization.product.borrower_name,
+                amortization.product.name,
+                u'第%d期' % amortization.term,
+                u'抵押标',
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
+                str(amortization.principal + amortization.interest),
+                str(amortization.principal),
+                str(amortization.interest),
+                u'待还',
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
+                unicode(get_a_uuid())
+            ])
+        return output.getvalue()
+
+
+class ProductionAmortizationsSettledReportGenerator(ReportGeneratorBase):
+    prefix = 'hkjijs'
+    reportname_format = u'产品还款结算 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'贷款号', u'借款人', u'借款类型', u'还款金额', u'状态', u'操作时间', u'编号'])
+
+        amortizations = ProductAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time)\
+            .filter(settled=True)
+
+        for index, amortization in enumerate(amortizations):
+            writer.writerow([
+                str(index + 1),
+                amortization.product.serial_number,
+                amortization.product.borrower_name,
+                u'抵押标',
+                str(amortization.principal + amortization.interest),
+                u'成功',
+                timezone.localtime(amortization.settlement_time).strftime("%Y-%m-%d"),
+                unicode(get_a_uuid())
+            ])
+        return output.getvalue()
 
 class P2PAuditReportGenerator(ReportGeneratorBase):
     prefix = 'p2p_audit'
@@ -245,3 +304,8 @@ class ReportGenerator(object):
         WithDrawReportGenerator.generate_report(start_time=start_time, end_time=end_time)
         PaybackReportGenerator.generate_report(start_time=start_time, end_time=end_time)
         P2PAuditReportGenerator.generate_report(start_time=start_time, end_time=end_time)
+        ProductionAmortizationsReportGenerator.generate_report(start_time=start_time, end_time=end_time)
+
+
+
+

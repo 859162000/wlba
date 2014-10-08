@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-
+from django.utils import timezone
 # Register your models here.
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
-    AdminTransaction, AdminTransactionWithdraw, AdminTransactionDeposit, AdminTransactionP2P
+    AdminTransaction
 
 
 class PayInfoAdmin(admin.ModelAdmin):
-    list_display = ('get_phone', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time')
-    search_fields = ['user__wanglibaouserprofile__phone', 'card__no']
+    list_display = ('id', 'get_phone', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time', 'update_time', 'error_message')
+    search_fields = ['=user__wanglibaouserprofile__phone', '=id']
     raw_id_fields = ('order', 'margin_record')
+    list_filter = ('status', )
 
     def get_phone(self, obj):
         return obj.user.wanglibaouserprofile.phone

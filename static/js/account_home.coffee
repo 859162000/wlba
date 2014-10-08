@@ -83,9 +83,11 @@ require ['jquery', 'underscore', 'knockout',
     $("#total_income").text($.number(data["total_income"], 2))
     $("#fund_income_week").text($.number(data["fund_income_week"], 2))
     $("#fund_income_month").text($.number(data["fund_income_month"], 2))
+    return
   .fail (data)->
     tool.modalAlert({title: '温馨提示', msg: '基金获取失败，请刷新重试！', callback_ok: ()->
               location.reload()
           })
+    return
 
 
