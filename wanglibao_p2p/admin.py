@@ -47,7 +47,7 @@ class P2PEquityInline(admin.TabularInline):
 
 
 class P2PProductResource(resources.ModelResource):
-    count = 14
+    count = 0
 
     class Meta:
         model = P2PProduct
