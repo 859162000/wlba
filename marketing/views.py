@@ -16,7 +16,7 @@ class MarketingView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        d0 = date(2014, 3, 01)
+        d0 = date(2014, 8, 01)
         d1 = date.today()
 
         users = User.objects.filter(date_joined__range=(d0, d1)).order_by('each_day')\
