@@ -189,7 +189,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
           $(element).addClass 'button-red'
           $(element).removeClass 'button-gray'
           result = JSON.parse xhr.responseText
-          if xhr.errorCode == 429
+          if xhr.status == 429
+
             tool.modalAlert({title: '温馨提示', msg: "访问过于频繁，请稍候重试", callback_ok: _showModal})
           else
             tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
