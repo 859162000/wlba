@@ -77,7 +77,7 @@ class P2PProductResource(resources.ModelResource):
 
 
 
-        instance.borrower_name = row[u'姓名']
+        instance.borrower_nameinstance.borrower_name = row[u'姓名']
         instance.borrower_phone = row[u'手机号码']
         instance.borrower_address = row[u'现住址']
         instance.borrower_id_number = row[u'身份证号码']
@@ -94,8 +94,6 @@ class P2PProductResource(resources.ModelResource):
         instance.end_time = datetime.datetime.now() + datetime.timedelta(days=2)
         #instance.usage = row[u'贷款用途']
         #instance.short_usage = row[u'贷款用途']
-
-
 
         if type == u"工薪贷":
             instance.extra_data = OrderedDict([
