@@ -220,7 +220,6 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
                 str(amortization.principal),
                 str(amortization.interest),
                 u'待还',
-                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
                 unicode(get_a_uuid())
             ])
         return output.getvalue()
