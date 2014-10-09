@@ -28,15 +28,12 @@ class P2PProductSerializer(ModelSerializerExtended):
     publish_time = serializers.SerializerMethodField('publish_time_format')
     end_time = serializers.SerializerMethodField('end_time_format')
     soldout_time = serializers.SerializerMethodField('soldout_time_format')
-    # total_amount = serializers.SerializerMethodField('total_amount_format')
-    # ordered_amount = serializers.SerializerMethodField('ordered_amount_format')
     display_status = serializers.SerializerMethodField('display_status_format')
 
 
     class Meta:
         model = P2PProduct
         depth = 1
-        # exclude = ('contract_template', 'bought_people_count', 'bought_count', 'bought_amount', 'bought_count_random', 'bought_amount_random', 'version')
         fields = ("total_earning", "id", "version", "category", "hide", "name", "short_name", "serial_number",
                   "contract_serial_number", "status", "priority", "period", "brief", "expected_earning_rate",
                   "excess_earning_rate", "excess_earning_description", "pay_method", "amortization_count",
@@ -65,13 +62,6 @@ class P2PProductSerializer(ModelSerializerExtended):
         if obj.soldout_time:
             return timezone.localtime(obj.soldout_time).strftime("%Y-%m-%d %H:%M:%S")
         return ""
-
-    # def total_amount_format(self, obj):
-    #     return float(obj.total_amount) / 10000
-    #
-    # def ordered_amount_format(self, obj):
-    #     return float(obj.total_amount) / 10000
-
 
     def display_status_format(self, obj):
         return obj.display_status
