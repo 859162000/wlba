@@ -201,8 +201,7 @@ class P2PProducListView(generics.ListCreateAPIView):
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
                 ])
 
-class P2PProductDetailView(mixins.RetrieveModelMixin,
-                        generics.GenericAPIView):
+class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     model = P2PProduct
     permission_classes = IsAdminUserOrReadOnly,
