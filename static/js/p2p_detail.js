@@ -13,6 +13,7 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools'], function($, _, backend, calculator, countdown, tool) {
+    var buildTable;
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0 && !/\./ig.test(value);
     }, '请输入100的整数倍');
@@ -130,9 +131,41 @@
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
     });
-    return $('#purchase-form .submit-button').click(function(e) {
+    $('#purchase-form .submit-button').click(function(e) {
       e.preventDefault();
       return $('#purchase-form').submit();
+    });
+    buildTable = function(list) {
+      var html, i, len;
+      html = [];
+      i = 0;
+      len = list.length;
+      while (i < len) {
+        html.push(["<tr>", "<td>", list[i].create_time, "</td>", "<td>", list[i].user, "</td>", "<td>", list[i].amount, "</td>", "</tr>"].join(""));
+        i++;
+      }
+      return html.join("");
+    };
+    $(window).load(function(e) {
+      if (invest_result && invest_result.length > 0) {
+        $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 5)));
+        if (invest_result.length > 5) {
+          return $('.get-more').show();
+        } else {
+          return $('.get-more').hide();
+        }
+      }
+    });
+    return $('.get-more').click(function(e) {
+      e.preventDefault();
+      if (invest_result && invest_result.length > 0) {
+        $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 5)));
+        if (invest_result.length > 0) {
+          return $('.get-more').show();
+        } else {
+          return $('.get-more').hide();
+        }
+      }
     });
   });
 

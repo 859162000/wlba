@@ -111,4 +111,45 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     $('#purchase-form').submit()
 
 
+  #build the table for invest history
+  buildTable = (list) ->
+    html = []
+    i = 0
+    len = list.length
+
+    while i < len
+      html.push [
+        "<tr>"
+        "<td>"
+        list[i].create_time
+        "</td>"
+        "<td>"
+        list[i].user
+        "</td>"
+        "<td>"
+        list[i].amount
+        "</td>"
+        "</tr>"
+      ].join("")
+      i++
+    html.join ""
+
+  $(window).load (e) ->
+    if(invest_result && invest_result.length > 0)
+      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 5)))
+      if(invest_result.length > 5)
+        $('.get-more').show()
+      else
+        $('.get-more').hide()
+
+
+  $('.get-more').click (e) ->
+    e.preventDefault()
+    if(invest_result && invest_result.length > 0)
+      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 5)))
+      if(invest_result.length > 0)
+        $('.get-more').show()
+      else
+        $('.get-more').hide()
+
 
