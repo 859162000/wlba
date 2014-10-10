@@ -66,7 +66,8 @@
         },
         password: {
           required: true,
-          minlength: 6
+          minlength: 6,
+          maxlength: 20
         },
         captcha_1: {
           required: true,
@@ -80,7 +81,8 @@
         },
         password: {
           required: '不能为空',
-          minlength: $.format("密码需要最少{0}位")
+          minlength: $.format("密码需要最少{0}位"),
+          maxlength: '密码不能超过20位'
         },
         captcha_1: {
           required: '不能为空',
@@ -123,7 +125,8 @@
         },
         password: {
           required: true,
-          minlength: 6
+          minlength: 6,
+          maxlength: 20
         },
         password2: {
           equalTo: "#reg_password"
@@ -142,7 +145,8 @@
         },
         password: {
           required: '不能为空',
-          minlength: $.format("密码需要最少{0}位")
+          minlength: $.format("密码需要最少{0}位"),
+          maxlength: '密码不能超过20位'
         },
         password2: {
           equalTo: '密码不一致'
