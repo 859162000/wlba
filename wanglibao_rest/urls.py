@@ -75,7 +75,7 @@ urlpatterns = patterns(
     url(r'^p2p/purchase/', PurchaseP2P.as_view()),
     url(r'^p2ps/(?P<product_id>\d+)/records/', RecordView.as_view()),
 
-    url(r'^p2ps/', P2PProducListView.as_view()),
+    url(r'^p2ps/$', P2PProducListView.as_view()),
     url(r'^p2ps/(?P<pk>[0-9]+)/$', P2PProductDetailView.as_view()),
 
     url(r'', include(router.urls)),
