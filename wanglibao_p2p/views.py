@@ -7,6 +7,8 @@ from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from rest_framework import status
+from rest_framework import mixins
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -171,6 +173,46 @@ class P2PProductViewSet(ModelViewSet):
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
                 ])
 
+
+class P2PProducListView(generics.ListCreateAPIView):
+
+    model = P2PProduct
+    permission_classes = IsAdminUserOrReadOnly,
+    serializer_class = P2PProductSerializer
+
+
+    def get_queryset(self):
+
+        maxid = self.request.QUERY_PARAMS.get('maxid', '')
+        minid = self.request.QUERY_PARAMS.get('minid', '')
+
+        pager = None
+        if maxid and not minid:
+            pager = Q(id__gt=maxid)
+        if minid and not maxid:
+            pager = Q(id__lt=minid)
+
+        if pager:
+            return  P2PProduct.objects.filter(hide=False).filter(status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+                ]).filter(pager)
+        else:
+            return P2PProduct.objects.filter(hide=False).filter(status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+                ])
+
+class P2PProductDetailView(mixins.RetrieveModelMixin,
+                        generics.GenericAPIView):
+
+    model = P2PProduct
+    permission_classes = IsAdminUserOrReadOnly,
+    serializer_class = P2PProductSerializer
+    queryset = P2PProduct.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+
 class RecordView(APIView):
     permission_classes = ()
 
@@ -183,8 +225,6 @@ class RecordView(APIView):
             )
 
         equities = product.p2precord_set.filter(catalog=u'申购').prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
-
-        # serializer = P2PRecordSerializer(equities, many=True, context={"request": request})
 
         record = [{
            "amount": float(eq.amount),
