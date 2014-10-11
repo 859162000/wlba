@@ -52,6 +52,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           validate_code: validate_code
         }
         .done (data)->
+
           tool.modalAlert({title: '温馨提示', msg: '份额认购成功', callback_ok: ()->
               location.reload()
           })
@@ -125,15 +126,15 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     while i < len
       html.push [
         "<tr>"
-        "<td>"
+        "<td><p>"
         list[i].create_time
-        "</td>"
-        "<td>"
+        "</p></td>"
+        "<td><em>"
         list[i].user
-        "</td>"
-        "<td>"
+        "</em></td>"
+        "<td><span class='money-highlight'>"
         list[i].amount
-        "</td>"
+        "</span><span>元</span></td>"
         "</tr>"
       ].join("")
       i++
@@ -141,7 +142,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   $(window).load (e) ->
     if(invest_result && invest_result.length > 0)
-      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 5)))
+      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
       if(invest_result.length > 5)
         $('.get-more').show()
       else
@@ -151,7 +152,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $('.get-more').click (e) ->
     e.preventDefault()
     if(invest_result && invest_result.length > 0)
-      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 5)))
+      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
       if(invest_result.length > 0)
         $('.get-more').show()
       else

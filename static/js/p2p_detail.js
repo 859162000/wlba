@@ -145,14 +145,14 @@
       i = 0;
       len = list.length;
       while (i < len) {
-        html.push(["<tr>", "<td>", list[i].create_time, "</td>", "<td>", list[i].user, "</td>", "<td>", list[i].amount, "</td>", "</tr>"].join(""));
+        html.push(["<tr>", "<td><p>", list[i].create_time, "</p></td>", "<td><em>", list[i].user, "</em></td>", "<td><span class='money-highlight'>", list[i].amount, "</span><span>元</span></td>", "</tr>"].join(""));
         i++;
       }
       return html.join("");
     };
     $(window).load(function(e) {
       if (invest_result && invest_result.length > 0) {
-        $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 5)));
+        $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)));
         if (invest_result.length > 5) {
           return $('.get-more').show();
         } else {
@@ -163,7 +163,7 @@
     return $('.get-more').click(function(e) {
       e.preventDefault();
       if (invest_result && invest_result.length > 0) {
-        $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 5)));
+        $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)));
         if (invest_result.length > 0) {
           return $('.get-more').show();
         } else {
