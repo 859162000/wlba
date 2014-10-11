@@ -92,18 +92,24 @@ class P2PProductSerializer(ModelSerializerExtended):
 
 
 from views import P2PEquity
-class P2PProductAPISerializer(ModelSerializerExtended):
+class P2PEquitySerializer(ModelSerializerExtended):
+    """ there noting """
+    class Meta:
+        model = P2PEquity
+        fields = ('id', 'created_at')
 
-    p2pequity = serializers.SerializerMethodField('p2pequity_format')
+class P2PProductAPISerializer(ModelSerializerExtended):
+    """ there noting """
+    equities = P2PEquitySerializer()
 
     class Meta:
         model = P2PProduct
         deep = 1
-        fields = ( "id", "version", "category", "equities", "p2pequity")
+        fields = ( "id", "version", "category", "equities")
 
 
-    def p2pequity_format(self, obj):
-        p2pequity_list = P2PEquity.objects.filter(product__id=obj.id)
-        return  p2pequity_list
+    # def p2pequity_format(self, obj):
+    #     p2pequity_list = P2PEquity.objects.filter(product__id=obj.id)
+    #     return  p2pequity_list
 
 

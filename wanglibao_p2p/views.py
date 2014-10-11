@@ -147,7 +147,7 @@ audit_product_view = staff_member_required(AuditProductView.as_view())
 
 class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
-    permission_classes = IsAdminUserOrReadOnly,
+    permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = P2PProductSerializer
 
     def get_queryset(self):
@@ -156,13 +156,15 @@ class P2PProductViewSet(PaginatedModelViewSet):
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
             ])
 
-from rest_framework import generics
-from serializers import P2PProductAPISerializer
-class GetNoWProjectsAPI(generics.ListCreateAPIView):
-    model = P2PProduct
-    serializer_class = P2PProductAPISerializer
 
+class GetNoWProjectsAPI(APIView):
 
+    permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get(self, request):
+        return Response({
+            'message': 'ok'
+        })
 
 
 class RecordView(APIView):
