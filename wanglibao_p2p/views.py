@@ -156,8 +156,11 @@ class P2PProductViewSet(PaginatedModelViewSet):
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
             ])
 
-class GetNoWProjectsAPI(APIView):
+from rest_framework import generics
+from serializers import P2PProductAPISerializer
+class GetNoWProjectsAPI(generics.ListCreateAPIView):
     model = P2PProduct
+    serializer_class = P2PProductAPISerializer
 
 
 

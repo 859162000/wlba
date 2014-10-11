@@ -88,3 +88,22 @@ class P2PProductSerializer(ModelSerializerExtended):
                     extra_data[section_key][item_key] = u'请登录后查看'
 
         return json.dumps(extra_data, ensure_ascii=False)
+
+
+
+from views import P2PEquity
+class P2PProductAPISerializer(ModelSerializerExtended):
+
+    p2pequity = serializers.SerializerMethodField('p2pequity_format')
+
+    class Meta:
+        model = P2PProduct
+        deep = 1
+        fields = ( "id", "version", "category", "equities", "p2pequity")
+
+
+    def p2pequity_format(self, obj):
+        p2pequity_list = P2PEquity.objects.filter(product__id=obj.id)
+        return  p2pequity_list
+
+
