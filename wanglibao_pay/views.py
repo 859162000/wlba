@@ -370,6 +370,7 @@ class WithdrawTransactions(TemplateView):
                     marginKeeper = MarginKeeper(payinfo.user)
                     marginKeeper.withdraw_ack(payinfo.amount)
                     payinfo.status = PayInfo.SUCCESS
+                    payinfo.confirm_time = timezone.now()
                     payinfo.save()
 
             return HttpResponse({
@@ -401,6 +402,7 @@ class WithdrawRollback(TemplateView):
         marginKeeper.withdraw_rollback(payinfo.amount,error_message)
         payinfo.status = PayInfo.FAIL
         payinfo.error_message = error_message
+        payinfo.confirm_time = None
         payinfo.save()
 
         send_messages.apply_async(kwargs={
