@@ -142,7 +142,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   $(window).load (e) ->
     if(invest_result && invest_result.length > 0)
-      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 5)))
+      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
       if(invest_result.length > 5)
         $('.get-more').show()
       else
@@ -152,7 +152,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $('.get-more').click (e) ->
     e.preventDefault()
     if(invest_result && invest_result.length > 0)
-      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 5)))
+      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
       if(invest_result.length > 0)
         $('.get-more').show()
       else
