@@ -14,7 +14,9 @@
   require(['jquery', 'underscore', 'lib/modal'], function($, _, modal) {
     return $('a[data-role=modal]').click(function(e) {
       e.preventDefault();
-      return $(this).modal();
+      return $(this).modal({
+        closeText: ''
+      });
     });
   });
 
