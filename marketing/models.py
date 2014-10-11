@@ -41,16 +41,16 @@ class SiteData(models.Model):
     def one_year_times(self):
         return int(self.highest_earning_rate / self.one_year_interest_rate)
 
-# class InviteCode(models.Model):
-#     code = models.CharField(u'邀请码', max_length=6, db_index=True, unique=True)
-#     is_used = models.BooleanField(u'是否使用', default=False)
-#
-#     class Meta:
-#
-#         ordering = ['id']
-#
-#     def __unicode__(self):
-#         return self.code
+class InviteCode(models.Model):
+    code = models.CharField(u'邀请码', max_length=6, db_index=True, unique=True)
+    is_used = models.BooleanField(u'是否使用', default=False)
+
+    class Meta:
+
+        ordering = ['id']
+
+    def __unicode__(self):
+        return self.code
 
 
 class PromotionToken(models.Model):
