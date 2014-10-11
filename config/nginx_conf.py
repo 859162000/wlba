@@ -12,6 +12,7 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
         conf += [
             [['server'], [
                 ['listen', '80'],
+                ['server_name', 'wanglibao.com'],
                 ['return', '301 https://$host$request_uri'],
             ]]
         ]
