@@ -134,7 +134,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
 
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号',
-                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'编号'])
+                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'审核时间', u'编号'])
 
         for payinfo in payinfos:
             writer.writerow([
@@ -153,6 +153,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 timezone.localtime(payinfo.create_time).strftime("%Y-%m-%d %H:%M"),
                 str(payinfo.request_ip),
                 unicode(payinfo.status),
+                timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M"),
                 unicode(payinfo.uuid)
             ])
         return output.getvalue()

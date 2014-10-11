@@ -66,6 +66,7 @@ class PayInfo(models.Model):
     total_amount = models.DecimalField(u'总金额', max_digits=20, decimal_places=2, default=0)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     update_time = models.DateTimeField(u'更新时间', auto_now=True)
+    confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
     request = models.TextField(u'请求数据', blank=True)
     response = models.TextField(u'返回数据', blank=True)
     status = models.CharField(u'状态', max_length=15)
