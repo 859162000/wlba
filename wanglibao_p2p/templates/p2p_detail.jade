@@ -103,19 +103,23 @@ html
                   span.span8-omega
                     span.highlight.font-m.invest#expected_income 0.00
                     | 元
-                .row
-                  span.span4 手机验证码
-                  .span4
-                    input#validate_code.invest(type='text', name='validate_code', placeholder='验证码')
-                  .span4-omega
-                    if user.wanglibaouserprofile.phone
+                //author: hetao; time: 2014.10.11 target: 用户未登陆时不显示手机验证码
+                if user.is_authenticated
+                  .row
+                    span.span4 手机验证码
+                    .span4
+                      input#validate_code.invest(type='text', name='validate_code', placeholder='验证码')
+                    .span4-omega
                       button#get-validate-code-buy.button-orange.button-middle.invest(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
-                    else
-                      button#get-validate-code-buy.button-orange.button-middle.disabled.invest(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 抢购请登录
+
                 .row.margin-top-s
                   span.span4
                   span.span8-omega
-                    a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                    //author: hetao; time: 2014.10.11 target: 用户未登陆时先弹出登陆框
+                    if user.is_authenticated
+                      a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                    else
+                      a.submit-button.span12.button-primary.button-middle.invest.notlogin(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
           if status != '抢购中'
             .sold-out
               p.align-center

@@ -35,6 +35,11 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       error.appendTo $(element).closest('.form-row__middle').find('.form-row-error')
 
     submitHandler: (form)->
+      #autho: hetao; time: 2014.10.11; target: 抢购时未登录状态弹出登录层
+      if $('.invest').hasClass('notlogin')
+        $('.login-modal').trigger('click')
+        return
+
       tip = '您的投资金额为:' + $('input[name=amount]').val() + '元'
       tool.modalConfirm({title: '温馨提示', msg: tip, callback_ok: ()->
         product = $('input[name=product]').val()

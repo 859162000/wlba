@@ -40,6 +40,10 @@
       },
       submitHandler: function(form) {
         var tip;
+        if ($('.invest').hasClass('notlogin')) {
+          $('.login-modal').trigger('click');
+          return;
+        }
         tip = '您的投资金额为:' + $('input[name=amount]').val() + '元';
         return tool.modalConfirm({
           title: '温馨提示',
