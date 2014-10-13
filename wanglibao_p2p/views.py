@@ -278,7 +278,6 @@ class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
         return self.retrieve(request, *args, **kwargs)
 
 
-
 class GetNoWProjectsAPI(APIView):
 
     permission_classes = (IsAdminUserOrReadOnly,)
@@ -307,8 +306,6 @@ class GetNoWProjectsAPI(APIView):
             p2pequities = p2p.equities.all()
             subscribes = []
             for eq in p2pequities:
-
-                addDate = timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S")
 
                 temp_eq = {
                     "subscribeUserName": eq.user.username,
@@ -382,7 +379,6 @@ class GetProjectsByDateAPI(APIView):
             p2pequities = p2p.equities.all()
             subscribes = []
             for eq in p2pequities:
-                addDate = timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S")
                 temp_eq = {
                     "subscribeUserName": eq.user.username,
                     "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
