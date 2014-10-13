@@ -198,13 +198,12 @@ class GetNoWProjectsAPI(APIView):
             subscribes = []
             addDate = ""
             for eq in p2pequities:
-                if eq.confirm_at:
-                    addDate = timezone.localtime(eq.confirm_at).strftime("%Y-%m-%d %H:%M:%S")
+
                 temp_eq = {
                     "subscribeUserName": eq.user.username,
                     "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
                     "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
-                    "addDate": addDate,
+                    "addDate": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
                     "status": "1",
                     "type": "0"
                 }
@@ -272,13 +271,11 @@ class GetProjectsByDateAPI(APIView):
             subscribes = []
             addDate = ""
             for eq in p2pequities:
-                if eq.confirm_at:
-                    addDate = timezone.localtime(eq.confirm_at).strftime("%Y-%m-%d %H:%M:%S")
                 temp_eq = {
                     "subscribeUserName": eq.user.username,
                     "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
                     "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
-                    "addDate": addDate,
+                    "addDate": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
                     "status": "1",
                     "type": "0"
                 }
