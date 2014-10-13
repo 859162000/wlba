@@ -33,6 +33,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -461,7 +462,7 @@ class AdminTransactionP2P(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
@@ -506,7 +507,7 @@ class AdminTransactionWithdraw(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
@@ -549,7 +550,7 @@ class AdminTransactionDeposit(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view

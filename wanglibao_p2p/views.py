@@ -24,6 +24,7 @@ from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from operator import attrgetter, itemgetter
+from django.conf import settings
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -193,7 +194,7 @@ class AuditProductView(TemplateView):
         pk = kwargs['id']
         p2p = P2PProduct.objects.get(pk=pk)
         ProductKeeper(p2p).audit(request.user)
-        return HttpResponseRedirect('/admin/wanglibao_p2p/p2pproduct/')
+        return HttpResponseRedirect('/'+settings.ADMIN_ADDRESS+'/wanglibao_p2p/p2pproduct/')
 
 
 audit_product_view = staff_member_required(AuditProductView.as_view())

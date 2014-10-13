@@ -12,12 +12,12 @@ head
                 .space-vertical-s
                 .panel-content.padding-l-r-sm
                     .space-vertical-l
-                    a(href="/admin")
+                    a(href='/{{ "" | admin_address}}')
                         button.button-home-action(type='submit') 返回
                     .space-vertical-l
                     .space-vertical-l
                     .row
-                        form.form.span5(method="GET" action="/admin/p2p/p2pequity/profile")
+                        form.form.span5(method="GET" action='/{{ "" | admin_address}}/p2p/p2pequity/profile')
                             - csrf_token
                             .form-row
                                 .span3(style="line-height:40px")
