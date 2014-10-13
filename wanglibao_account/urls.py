@@ -76,3 +76,4 @@ if settings.DEBUG:
         '',
         url(r'^contract/test/(?P<equity_id>\w+)/', test_contract)
     )
+
