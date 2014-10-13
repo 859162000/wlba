@@ -108,7 +108,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       identifier:
         required: true
         isMobile: true
-      validation_code:
+      validate_code:
         required: true
         depends: (e)->
           checkMobile($('#reg_identifier').val())
@@ -125,7 +125,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       identifier:
         required: '不能为空'
         isMobile: '请输入手机号'
-      validation_code:
+      validate_code:
         required: '不能为空'
       password:
         required: '不能为空'

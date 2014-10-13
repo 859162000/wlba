@@ -117,7 +117,7 @@
           required: true,
           isMobile: true
         },
-        validation_code: {
+        validate_code: {
           required: true,
           depends: function(e) {
             return checkMobile($('#reg_identifier').val());
@@ -140,7 +140,7 @@
           required: '不能为空',
           isMobile: '请输入手机号'
         },
-        validation_code: {
+        validate_code: {
           required: '不能为空'
         },
         password: {
@@ -370,3 +370,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=login_modal.map
