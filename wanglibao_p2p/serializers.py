@@ -5,6 +5,8 @@ from rest_framework import serializers
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from django.utils import timezone
+from views import P2PEquity
+
 
 def safe_phone(phone):
     return phone[:3] + '*' * (len(phone) - 4 - 3) + phone[-4:]
@@ -79,6 +81,29 @@ class P2PProductSerializer(ModelSerializerExtended):
 
         return json.dumps(extra_data, ensure_ascii=False)
 
+
     def pay_method_format(self, obj):
         pay_method = obj.display_payback_mapping.get(obj.pay_method)
         return pay_method
+
+class P2PEquitySerializer(ModelSerializerExtended):
+    """ there noting """
+    class Meta:
+        model = P2PEquity
+        fields = ('id', 'created_at')
+
+class P2PProductAPISerializer(ModelSerializerExtended):
+    """ there noting """
+    equities = P2PEquitySerializer()
+
+    class Meta:
+        model = P2PProduct
+        deep = 1
+        fields = ( "id", "version", "category", "equities")
+
+
+    # def p2pequity_format(self, obj):
+    #     p2pequity_list = P2PEquity.objects.filter(product__id=obj.id)
+    #     return  p2pequity_list
+
+

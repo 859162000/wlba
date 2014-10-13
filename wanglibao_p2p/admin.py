@@ -12,7 +12,7 @@ from views import GenP2PUserProfileReport
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (
-        'id', 'user', 'product', 'equity', 'confirm', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
+        'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
     list_filter = ('confirm',)
 
 
