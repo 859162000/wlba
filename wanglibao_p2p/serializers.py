@@ -29,7 +29,7 @@ class P2PProductSerializer(ModelSerializerExtended):
     end_time = serializers.SerializerMethodField('end_time_format')
     soldout_time = serializers.SerializerMethodField('soldout_time_format')
     display_status = serializers.SerializerMethodField('display_status_format')
-
+    pay_method = serializers.SerializerMethodField('pay_method_format')
 
     class Meta:
         model = P2PProduct
@@ -78,3 +78,7 @@ class P2PProductSerializer(ModelSerializerExtended):
                     extra_data[section_key][item_key] = u'请登录后查看'
 
         return json.dumps(extra_data, ensure_ascii=False)
+
+    def pay_method_format(self, obj):
+        pay_method = obj.display_payback_mapping.get(obj.pay_method)
+        return pay_method
