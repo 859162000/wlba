@@ -162,6 +162,8 @@ class GetNoWProjectsAPI(APIView):
     permission_classes = (IsAdminUserOrReadOnly,)
 
     def get(self, request):
+
+
         return Response({
             'message': 'ok'
         })
