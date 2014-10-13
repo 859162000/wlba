@@ -47,7 +47,7 @@ class P2PEquityInline(admin.TabularInline):
 
 
 class P2PProductResource(resources.ModelResource):
-    count = 16
+    count = 0
 
     class Meta:
         model = P2PProduct
@@ -55,7 +55,6 @@ class P2PProductResource(resources.ModelResource):
 
     def import_obj(self, instance, row, false):
         super(P2PProductResource, self).import_obj(instance, row, false)
-        # todo update later
 
         now = datetime.datetime.now().date().strftime('%Y%m%d')
         self.count += 1
