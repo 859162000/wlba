@@ -279,7 +279,10 @@ class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class GetNoWProjectsAPI(APIView):
-
+    """
+    网贷之家数据接口， 获取正在招标的数据
+    """
+    # todo 合并代码
     permission_classes = (IsAdminUserOrReadOnly,)
 
     def get(self, request):
@@ -341,10 +344,13 @@ class GetNoWProjectsAPI(APIView):
 
 
 class GetProjectsByDateAPI(APIView):
+    """
+    网贷之家数据接口， 获取已经完成的数据
+    """
 
-     permission_classes = (IsAdminUserOrReadOnly,)
+    permission_classes = (IsAdminUserOrReadOnly,)
 
-     def get(self, request):
+    def get(self, request):
 
         date = request.GET.get('date', '')
         if not date:
