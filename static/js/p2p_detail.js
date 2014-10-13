@@ -13,8 +13,9 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools'], function($, _, backend, calculator, countdown, tool) {
+    var buildTable;
     $.validator.addMethod('dividableBy100', function(value, element) {
-      return value % 100 === 0;
+      return value % 100 === 0 && !/\./ig.test(value);
     }, '请输入100的整数倍');
     $.validator.addMethod('positiveNumber', function(value, element) {
       return Number(value) > 0;
@@ -39,6 +40,10 @@
       },
       submitHandler: function(form) {
         var tip;
+        if ($('.invest').hasClass('notlogin')) {
+          $('.login-modal').trigger('click');
+          return;
+        }
         tip = '您的投资金额为:' + $('input[name=amount]').val() + '元';
         return tool.modalConfirm({
           title: '温馨提示',
@@ -130,12 +135,42 @@
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
     });
-    return $('#purchase-form .submit-button').click(function(e) {
+    $('#purchase-form .submit-button').click(function(e) {
       e.preventDefault();
       return $('#purchase-form').submit();
+    });
+    buildTable = function(list) {
+      var html, i, len;
+      html = [];
+      i = 0;
+      len = list.length;
+      while (i < len) {
+        html.push(["<tr>", "<td><p>", list[i].create_time, "</p></td>", "<td><em>", list[i].user, "</em></td>", "<td><span class='money-highlight'>", list[i].amount, "</span><span>元</span></td>", "</tr>"].join(""));
+        i++;
+      }
+      return html.join("");
+    };
+    $(window).load(function(e) {
+      if (invest_result && invest_result.length > 0) {
+        $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)));
+        if (invest_result.length > 5) {
+          return $('.get-more').show();
+        } else {
+          return $('.get-more').hide();
+        }
+      }
+    });
+    return $('.get-more').click(function(e) {
+      e.preventDefault();
+      if (invest_result && invest_result.length > 0) {
+        $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)));
+        if (invest_result.length > 0) {
+          return $('.get-more').show();
+        } else {
+          return $('.get-more').hide();
+        }
+      }
     });
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_detail.map

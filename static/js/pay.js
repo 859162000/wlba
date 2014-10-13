@@ -66,5 +66,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=pay.map

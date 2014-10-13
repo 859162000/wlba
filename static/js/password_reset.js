@@ -42,5 +42,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=password_reset.map

@@ -12,14 +12,21 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
         conf += [
             [['server'], [
                 ['listen', '80'],
+                ['server_name', 'www.wanglibao.com staging.wanglibao.com pre.wanglibao.com'],
                 ['return', '301 https://$host$request_uri'],
+            ]],
+            [['server'], [
+                ['listen', '80'],
+                ['server_name', 'wanglibao.com'],
+                ['return', '301 https://www.wanglibao.com$request_uri'],
             ]]
         ]
 
     conf += [
         [['server'], [
             ['listen', '443 ssl'],
-            ['server_name', 'localhost'],
+            #['server_name', 'localhost'],
+            ['server_name', 'www.wanglibao.com pre.wanglibao.com staging.wanglibao.com'],
             ['ssl_certificate', '/etc/nginx/ssl/wanglibao.crt'],
             ['ssl_certificate_key', '/etc/nginx/ssl/wanglibao.key'],
             ['ssl_protocols', 'SSLv3 TLSv1 TLSv1.1 TLSv1.2'],

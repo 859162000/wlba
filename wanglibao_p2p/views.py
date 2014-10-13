@@ -7,11 +7,13 @@ from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from rest_framework import status
+from rest_framework import mixins
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
 from marketing.models import SiteData
-from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
@@ -121,6 +123,58 @@ class PurchaseP2P(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
+class PurchaseP2PMobile(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @property
+    def allowed_methods(self):
+        return ['POST']
+
+    def post(self, request):
+
+        if not request.user.is_authenticated():
+            return Response({
+                'message': u'请登录',
+                'error_number': ErrorNumber.unauthorized
+            }, status=status.HTTP_200_OK)
+        if not request.user.wanglibaouserprofile.id_is_valid:
+            return Response({
+                'message': u'请先进行实名认证',
+                'error_number': ErrorNumber.need_authentication
+            }, status=status.HTTP_200_OK)
+        form = PurchaseForm(request.DATA)
+        phone = request.user.wanglibaouserprofile.phone
+        code = request.POST.get('validate_code', '')
+
+        status_code, message = validate_validation_code(phone, code)
+
+        if status_code != 200:
+            return Response({
+                'message': u'验证码输入错误',
+                'error_number': ErrorNumber.validate_code_wrong
+            }, status=status.HTTP_200_OK)
+        if form.is_valid():
+            p2p = form.cleaned_data['product']
+            amount = form.cleaned_data['amount']
+
+            try:
+                trader = P2PTrader(product=p2p, user=request.user)
+                product_info, margin_info, equity_info = trader.purchase(amount)
+                return Response({
+                    'data': product_info.amount
+                })
+            except Exception, e:
+                return Response({
+                    'message': e.message,
+                    'error_number': ErrorNumber.unknown_error
+                }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "message": form.errors,
+                'error_number': ErrorNumber.form_error
+            }, status=status.HTTP_200_OK)
+
+
 class AuditProductView(TemplateView):
     template_name = 'audit_p2p.jade'
 
@@ -145,17 +199,70 @@ class AuditProductView(TemplateView):
 audit_product_view = staff_member_required(AuditProductView.as_view())
 
 
-class P2PProductViewSet(PaginatedModelViewSet):
+class P2PProductViewSet(ModelViewSet):
     model = P2PProduct
     permission_classes = IsAdminUserOrReadOnly,
     serializer_class = P2PProductSerializer
 
     def get_queryset(self):
         qs = super(P2PProductViewSet, self).get_queryset()
-        return qs.filter(hide=False).filter(status__in=[
-                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ])
 
+        maxid = self.request.QUERY_PARAMS.get('maxid', '')
+        minid = self.request.QUERY_PARAMS.get('minid', '')
+
+        pager = None
+        if maxid and not minid:
+            pager = Q(id__gt=maxid)
+        if minid and not maxid:
+            pager = Q(id__lt=minid)
+
+        if pager:
+            return qs.filter(hide=False).filter(status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+                ]).filter(pager)
+        else:
+            return qs.filter(hide=False).filter(status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+                ])
+
+
+class P2PProductListView(generics.ListCreateAPIView):
+
+    model = P2PProduct
+    permission_classes = IsAdminUserOrReadOnly,
+    serializer_class = P2PProductSerializer
+
+
+    def get_queryset(self):
+
+        maxid = self.request.QUERY_PARAMS.get('maxid', '')
+        minid = self.request.QUERY_PARAMS.get('minid', '')
+
+        pager = None
+        if maxid and not minid:
+            pager = Q(id__gt=maxid)
+        if minid and not maxid:
+            pager = Q(id__lt=minid)
+
+        if pager:
+            return  P2PProduct.objects.filter(hide=False).filter(status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+                ]).filter(pager)
+        else:
+            return P2PProduct.objects.filter(hide=False).filter(status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+                ])
+
+
+class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
+
+    model = P2PProduct
+    permission_classes = IsAdminUserOrReadOnly,
+    serializer_class = P2PProductSerializer
+    queryset = P2PProduct.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
 
 class RecordView(APIView):
@@ -170,8 +277,6 @@ class RecordView(APIView):
             )
 
         equities = product.p2precord_set.filter(catalog=u'申购').prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
-
-        # serializer = P2PRecordSerializer(equities, many=True, context={"request": request})
 
         record = [{
            "amount": float(eq.amount),
@@ -229,11 +334,8 @@ class P2PListView(TemplateView):
         }
 
 
-
 class GenP2PUserProfileReport(TemplateView):
     template_name = 'gen_p2p_user_profile_report.jade'
-
-
 
 
 class AdminP2PUserRecord(TemplateView):

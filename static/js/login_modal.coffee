@@ -69,6 +69,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       password:
         required: true
         minlength: 6
+        maxlength: 20
       captcha_1:
         required: true
         minlength: 4
@@ -80,6 +81,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       password:
         required: '不能为空'
         minlength: $.format("密码需要最少{0}位")
+        maxlength: '密码不能超过20位'
       captcha_1:
         required: '不能为空'
         minlength: $.format("验证码要输入4位")
@@ -113,6 +115,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       password:
         required: true
         minlength: 6
+        maxlength: 20
       password2:
         equalTo: "#reg_password"
       agreement:
@@ -127,6 +130,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       password:
         required: '不能为空'
         minlength: $.format("密码需要最少{0}位")
+        maxlength: '密码不能超过20位'
       password2:
         equalTo: '密码不一致'
       agreement:
@@ -189,7 +193,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
           $(element).addClass 'button-red'
           $(element).removeClass 'button-gray'
           result = JSON.parse xhr.responseText
-          tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
+          if xhr.status == 429
+
+            tool.modalAlert({title: '温馨提示', msg: "访问过于频繁，请稍候重试", callback_ok: _showModal})
+          else
+            tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
 
         intervalId
         count = 60
@@ -221,7 +229,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
 
   container = $('.password-strength-container')
   $('#reg_password').complexify {minimumChars:6, strengthScaleFactor:1}, (valid, complexity)->
-      console.log 'complexity: ' + complexity
       if complexity == 0
         container.removeClass 'low'
         container.removeClass 'soso'
@@ -312,3 +319,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
   $('.nologin').click (e)->
     e.preventDefault()
     $('.login-modal').trigger('click')
+
+  $("input:password").bind "copy cut paste", (e) ->
+    element = this
+    setTimeout (->
+      text = $(element).val()
+      if(!/[^\u4e00-\u9fa5]+/ig.test(text) || /\s+/ig.test(text))
+        $(element).val('')
+      return
+    ), 100
+    #return false

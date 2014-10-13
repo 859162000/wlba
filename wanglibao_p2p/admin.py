@@ -57,7 +57,7 @@ class P2PProductResource(resources.ModelResource):
         super(P2PProductResource, self).import_obj(instance, row, false)
         # todo update later
 
-        now = datetime.datetime.now().date().strftime('%Y%m%d%H%m%s')
+        now = datetime.datetime.now().date().strftime('%Y%m%d')
         self.count += 1
         type = row[u'产品名称']
         # birthday = datetime.date(row[u'出生日期'])
@@ -67,7 +67,7 @@ class P2PProductResource(resources.ModelResource):
         instance.name = u"%s %s%s" % (row[u'产品名称'], now, str(self.count).zfill(3))
         instance.short_name = instance.name
         instance.serial_number = "E_ZDSD_%s%s" % (now, str(self.count).zfill(5))
-        instance.contract_serial_number = row[u'合同编号']
+        instance.contract_serial_number = "E_ZDSD_%s%s" % (now, str(self.count).zfill(5))
         instance.priority = 0
         instance.period = row[u'申请还款期限（月）']
         instance.expected_earning_rate = 12
@@ -77,7 +77,7 @@ class P2PProductResource(resources.ModelResource):
 
 
 
-        instance.borrower_name = row[u'姓名']
+        instance.borrower_nameinstance.borrower_name = row[u'姓名']
         instance.borrower_phone = row[u'手机号码']
         instance.borrower_address = row[u'现住址']
         instance.borrower_id_number = row[u'身份证号码']
@@ -92,60 +92,57 @@ class P2PProductResource(resources.ModelResource):
 
         instance.total_amount = row[u'申请贷款金额（元）']
         instance.end_time = datetime.datetime.now() + datetime.timedelta(days=2)
-        instance.usage = row[u'贷款用途']
-        instance.short_usage = row[u'贷款用途']
-
-
+        #instance.usage = row[u'贷款用途']
+        #instance.short_usage = row[u'贷款用途']
 
         if type == u"工薪贷":
             instance.extra_data = OrderedDict([
-                (u'个人信息', {
-                    u'用户ID': row[u'姓名'],
-                    u'性别': row[u'性别'],
-                    u'出生日期': row[u'出生日期'],
-                    u'学历': row[u'学历'],
-                    u'是否已婚': row[u'是否结婚'],
-                    u'子女状况': row[u'子女状况'],
-                    u'户籍城市': row[u'户籍城市']
-                }),
-                (u'个人资产及征信信息', {
-                    u'月收入水平': row[u'个人月收入（元）'],
-                    u'房产': row[u'有无房产'],
-                    u'车产': row[u'有无车产']
-                }),
-                (u'工作信息', {
-                    u'工作城市': row[u'工作城市'],
-                    u'现有公司工作时间': row[u'工作时间'],
-                    u'公司行业': row[u'公司行业'],
-                    u'公司性质': row[u'公司性质'],
-                    u'岗位': row[u'所在部门']
-                })
+                (u'个人信息', OrderedDict([
+                    (u'性别', row[u'性别']),
+                    (u'出生日期', row[u'出生日期']),
+                    (u'学历', row[u'学历']),
+                    (u'是否已婚', row[u'是否结婚']),
+                    (u'子女状况', row[u'子女状况']),
+                    (u'户籍城市', row[u'户籍城市'])
+                ])),
+                (u'个人资产及征信信息', OrderedDict([
+                    (u'月收入水平', row[u'个人月收入（元）']),
+                    (u'房产', row[u'有无房产']),
+                    (u'车产', row[u'有无车产'])
+                ])),
+                (u'工作信息', OrderedDict([
+                    (u'工作城市', row[u'工作城市']),
+                    (u'现有公司工作时间', row[u'工作时间']),
+                    (u'公司行业', row[u'公司行业']),
+                    (u'公司性质', row[u'公司性质']),
+                    (u'岗位', row[u'岗位（职务）'])
+                ]))
             ])
 
         if type == u"企业贷":
             instance.extra_data = OrderedDict([
-                (u'个人信息', {
-                    u'用户ID': row[u'姓名'],
-                    u'性别': row[u'性别'],
-                    u'出生日期': row[u'出生日期'],
-                    u'学历': row[u'学历'],
-                    u'是否已婚': row[u'是否结婚'],
-                    u'子女状况': row[u'子女状况'],
-                    u'户籍城市': row[u'户籍城市']
-                }),
-                (u'企业经营信息', {
-                    u'月销售收入（元）': row[u'月销售收入（元）'],
-                    u'房产': row[u'有无房产'],
-                    u'车产': row[u'有无车产']
-                }),
-                (u'企业信息', {
-                    u'企业所在城市': row[u'企业所在城市'],
-                    u'企业规模': row[u'企业规模'],
-                    u'所属行业': row[u'所属行业'],
-                    u'企业类型': row[u'企业类型'],
-                    u'成立时间': row[u'成立时间'],
-                    u'企业地址': row[u'企业地址']
-                })
+                (u'个人信息', OrderedDict([
+                    (u'性别', row[u'性别']),
+                    (u'出生日期', row[u'出生日期']),
+                    (u'学历', row[u'学历']),
+                    (u'是否已婚', row[u'是否结婚']),
+                    (u'子女状况', row[u'子女状况']),
+                    (u'户籍城市', row[u'户籍城市']),
+                    (u'月收入水平', row[u'个人月收入（元）'])
+                ])),
+                (u'企业经营信息', OrderedDict([
+                    (u'月销售收入(元)', row[u'月销售收入（元）']),
+                    (u'房产', row[u'有无房产']),
+                    (u'车产', row[u'有无车产'])
+                ])),
+                (u'企业信息', OrderedDict([
+                    (u'企业所在城市', row[u'企业所在城市']),
+                    (u'企业规模', row[u'企业规模']),
+                    (u'所属行业', row[u'所属行业']),
+                    (u'企业类型', row[u'企业类型']),
+                    (u'成立时间', row[u'成立时间']),
+                    (u'企业地址', row[u'企业地址'])
+                ]))
             ])
         instance.warrant_company = WarrantCompany.objects.get(name='证大速贷')
         instance.contract_template = ContractTemplate.objects.get(name='证大速贷')

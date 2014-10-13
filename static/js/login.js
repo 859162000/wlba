@@ -51,5 +51,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=login.map

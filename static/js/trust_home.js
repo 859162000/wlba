@@ -177,5 +177,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=trust_home.map

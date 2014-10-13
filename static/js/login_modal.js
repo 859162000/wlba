@@ -66,7 +66,8 @@
         },
         password: {
           required: true,
-          minlength: 6
+          minlength: 6,
+          maxlength: 20
         },
         captcha_1: {
           required: true,
@@ -80,7 +81,8 @@
         },
         password: {
           required: '不能为空',
-          minlength: $.format("密码需要最少{0}位")
+          minlength: $.format("密码需要最少{0}位"),
+          maxlength: '密码不能超过20位'
         },
         captcha_1: {
           required: '不能为空',
@@ -123,7 +125,8 @@
         },
         password: {
           required: true,
-          minlength: 6
+          minlength: 6,
+          maxlength: 20
         },
         password2: {
           equalTo: "#reg_password"
@@ -142,7 +145,8 @@
         },
         password: {
           required: '不能为空',
-          minlength: $.format("密码需要最少{0}位")
+          minlength: $.format("密码需要最少{0}位"),
+          maxlength: '密码不能超过20位'
         },
         password2: {
           equalTo: '密码不一致'
@@ -215,11 +219,19 @@
           $(element).addClass('button-red');
           $(element).removeClass('button-gray');
           result = JSON.parse(xhr.responseText);
-          return tool.modalAlert({
-            title: '温馨提示',
-            msg: result.message,
-            callback_ok: _showModal
-          });
+          if (xhr.status === 429) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: "访问过于频繁，请稍候重试",
+              callback_ok: _showModal
+            });
+          } else {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: result.message,
+              callback_ok: _showModal
+            });
+          }
         });
         intervalId;
         count = 60;
@@ -251,7 +263,6 @@
       minimumChars: 6,
       strengthScaleFactor: 1
     }, function(valid, complexity) {
-      console.log('complexity: ' + complexity);
       if (complexity === 0) {
         container.removeClass('low');
         container.removeClass('soso');
@@ -341,12 +352,21 @@
         e.preventDefault();
       }
     });
-    return $('.nologin').click(function(e) {
+    $('.nologin').click(function(e) {
       e.preventDefault();
       return $('.login-modal').trigger('click');
+    });
+    return $("input:password").bind("copy cut paste", function(e) {
+      var element;
+      element = this;
+      return setTimeout((function() {
+        var text;
+        text = $(element).val();
+        if (!/[^\u4e00-\u9fa5]+/ig.test(text) || /\s+/ig.test(text)) {
+          $(element).val('');
+        }
+      }), 100);
     });
   });
 
 }).call(this);
-
-//# sourceMappingURL=login_modal.map

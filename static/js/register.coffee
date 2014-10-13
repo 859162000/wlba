@@ -40,7 +40,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
     phoneNumber = $("#id_identifier").val().trim()
     if checkMobile(phoneNumber)
       if console?
-        console.log "Phone number checked, now send the valdiation code"
+        console.log "Phone number checked, now send the validation code"
 
       $.ajax
           url: "/api/phone_validation_code/register/" + phoneNumber + "/"
@@ -85,6 +85,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       password:
         required: true
         minlength: 6
+        maxlength: 20
       password2:
         equalTo: "#id_password"
       'validation_code':
@@ -99,6 +100,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       password:
         required: '不能为空'
         minlength: $.format("密码需要最少{0}位")
+        maxlength: '密码不能超过20位'
       'validation_code':
         required: '不能为空'
       password2:
