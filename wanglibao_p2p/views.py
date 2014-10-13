@@ -27,6 +27,14 @@ from decimal import Decimal
 from hashlib import md5
 
 
+REPAYMENTTYPEMAP = (
+                (u'到期还本付息', 1),
+                (u'等额本息', 2),
+                (u'按月付息', 5),
+                (u'按季度付息', 7)
+            )
+
+
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
 
@@ -181,14 +189,7 @@ class GetNoWProjectsAPI(APIView):
                 type = u"信用标"
             type = u"抵押标"
 
-            repaymentTypeMap = (
-                (u'到期还本付息', 1),
-                (u'等额本息', 2),
-                (u'先息后本', 5),
-                (u'按季度付息', 7)
-            )
-
-            for pay_method, value in repaymentTypeMap:
+            for pay_method, value in REPAYMENTTYPEMAP:
                 if pay_method == p2p.pay_method:
                     repaymentType = value
                     break
@@ -201,8 +202,8 @@ class GetNoWProjectsAPI(APIView):
                     addDate = timezone.localtime(eq.confirm_at).strftime("%Y-%m-%d %H:%M:%S")
                 temp_eq = {
                     "subscribeUserName": eq.user.username,
-                    "amount": Decimal.from_float(eq.equity),
-                    "validAmount": Decimal.from_float(eq.equity),
+                    "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+                    "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
                     "addDate": addDate,
                     "status": "1",
                     "type": "0"
@@ -224,7 +225,7 @@ class GetNoWProjectsAPI(APIView):
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
                 "amountUsedDesc": p2p.short_usage,
                 "loanUrl": "https://www.wanglibao.com/p2p/detail/%s" % p2p.id,
-                "successTime": p2p.soldout_time,
+                # "successTime": p2p.soldout_time,
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
             p2p_list.append(temp_p2p)
@@ -247,7 +248,7 @@ class GetProjectsByDateAPI(APIView):
 
         p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
             u'还款中', u'已完成'
-        ]).filter(soldout_time__gte=start_time, soldout_time__lte=end_time)
+        ]).filter(soldout_time__range=(start_time, end_time))
 
         p2p_list = []
         for p2p in p2pproducts:
@@ -260,14 +261,8 @@ class GetProjectsByDateAPI(APIView):
                 type = u"信用标"
             type = u"抵押标"
 
-            repaymentTypeMap = (
-                (u'到期还本付息', 1),
-                (u'等额本息', 2),
-                (u'按月付息', 5),
-                (u'按季度付息', 7)
-            )
 
-            for pay_method, value in repaymentTypeMap:
+            for pay_method, value in REPAYMENTTYPEMAP:
                 if pay_method == p2p.pay_method:
                     repaymentType = value
                     break
@@ -281,8 +276,8 @@ class GetProjectsByDateAPI(APIView):
                     addDate = timezone.localtime(eq.confirm_at).strftime("%Y-%m-%d %H:%M:%S")
                 temp_eq = {
                     "subscribeUserName": eq.user.username,
-                    "amount": Decimal.from_float(eq.equity),
-                    "validAmount": Decimal.from_float(eq.equity),
+                    "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+                    "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
                     "addDate": addDate,
                     "status": "1",
                     "type": "0"
@@ -304,7 +299,7 @@ class GetProjectsByDateAPI(APIView):
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
                 "amountUsedDesc": p2p.short_usage,
                 "loanUrl": "https://www.wanglibao.com/p2p/detail/%s" % p2p.id,
-                "successTime": p2p.soldout_time,
+                "successTime": timezone.localtime(p2p.soldout_time).strftime("%Y-%m-%d %H:%M:%S"),
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
             p2p_list.append(temp_p2p)
