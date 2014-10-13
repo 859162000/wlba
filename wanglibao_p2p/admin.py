@@ -47,7 +47,7 @@ class P2PEquityInline(admin.TabularInline):
 
 
 class P2PProductResource(resources.ModelResource):
-    count = 0
+    count = 4
 
     class Meta:
         model = P2PProduct
@@ -63,7 +63,7 @@ class P2PProductResource(resources.ModelResource):
         # birthday = datetime.date(row[u'出生日期'])
         #today = datetime.date.today()
         #age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
-        instance.category = "证大速贷"
+        instance.category = u"证大速贷"
         instance.name = u"%s %s%s" % (row[u'产品名称'], now, str(self.count).zfill(3))
         instance.short_name = instance.name
         instance.serial_number = "E_ZDSD_%s%s" % (now, str(self.count).zfill(5))
@@ -72,12 +72,12 @@ class P2PProductResource(resources.ModelResource):
         instance.period = row[u'申请还款期限（月）']
         instance.expected_earning_rate = 12
         instance.excess_earning_rate = 0
-        instance.pay_method = "等额本息"
+        instance.pay_method = u"等额本息"
 
 
 
 
-        instance.borrower_nameinstance.borrower_name = row[u'姓名']
+        instance.borrower_name = row[u'姓名']
         instance.borrower_phone = row[u'手机号码']
         instance.borrower_address = row[u'现住址']
         instance.borrower_id_number = row[u'身份证号码']
@@ -95,7 +95,8 @@ class P2PProductResource(resources.ModelResource):
         #instance.usage = row[u'贷款用途']
         #instance.short_usage = row[u'贷款用途']
 
-        if type == u"工薪贷":
+        if type == u"工薪族":
+            instance.name = u"%s %s%s" % (u"工薪日常消费", str(now)[2:], str(self.count).zfill(3))
             instance.extra_data = OrderedDict([
                 (u'个人信息', OrderedDict([
                     (u'性别', row[u'性别']),
@@ -119,7 +120,8 @@ class P2PProductResource(resources.ModelResource):
                 ]))
             ])
 
-        if type == u"企业贷":
+        if type == u"企业主":
+            instance.name = u"%s %s%s" % (u"企业扩大经营", str(now)[2:], str(self.count).zfill(3))
             instance.extra_data = OrderedDict([
                 (u'个人信息', OrderedDict([
                     (u'性别', row[u'性别']),
