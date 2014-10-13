@@ -226,7 +226,7 @@ class P2PProductViewSet(ModelViewSet):
                 ])
 
 
-class P2PProducListView(generics.ListCreateAPIView):
+class P2PProductListView(generics.ListCreateAPIView):
 
     model = P2PProduct
     permission_classes = IsAdminUserOrReadOnly,
