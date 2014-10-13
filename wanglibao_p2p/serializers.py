@@ -80,12 +80,18 @@ class P2PProductSerializer(ModelSerializerExtended):
 
         return json.dumps(extra_data, ensure_ascii=False)
 
+<<<<<<< HEAD
     def pay_method_format(self, obj):
         pay_method = obj.display_payback_mapping.get(obj.pay_method)
         return pay_method
 
 
 
+=======
+
+
+from views import P2PEquity
+>>>>>>> api
 class P2PEquitySerializer(ModelSerializerExtended):
     """ there noting """
     class Meta:

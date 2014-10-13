@@ -7,8 +7,11 @@ from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from rest_framework import status
+<<<<<<< HEAD
 from rest_framework import mixins
 from rest_framework import generics
+=======
+>>>>>>> api
 from rest_framework import renderers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,7 +28,10 @@ from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from operator import attrgetter, itemgetter
+<<<<<<< HEAD
 from django.conf import settings
+=======
+>>>>>>> api
 from decimal import Decimal
 from hashlib import md5
 
@@ -219,6 +225,7 @@ class P2PProductViewSet(ModelViewSet):
 
     def get_queryset(self):
         qs = super(P2PProductViewSet, self).get_queryset()
+<<<<<<< HEAD
 
         maxid = self.request.QUERY_PARAMS.get('maxid', '')
         minid = self.request.QUERY_PARAMS.get('minid', '')
@@ -277,6 +284,13 @@ class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
+=======
+        return qs.filter(hide=False).filter(status__in=[
+                u'正在招标', u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+            ])
+
+
+>>>>>>> api
 class GetNoWProjectsAPI(APIView):
 
     permission_classes = (IsAdminUserOrReadOnly,)
@@ -306,13 +320,21 @@ class GetNoWProjectsAPI(APIView):
             subscribes = []
             addDate = ""
             for eq in p2pequities:
+<<<<<<< HEAD
                 if eq.confirm_at:
                     addDate = timezone.localtime(eq.confirm_at).strftime("%Y-%m-%d %H:%M:%S")
+=======
+
+>>>>>>> api
                 temp_eq = {
                     "subscribeUserName": eq.user.username,
                     "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
                     "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+<<<<<<< HEAD
                     "addDate": addDate,
+=======
+                    "addDate": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+>>>>>>> api
                     "status": "1",
                     "type": "0"
                 }
@@ -380,13 +402,20 @@ class GetProjectsByDateAPI(APIView):
             subscribes = []
             addDate = ""
             for eq in p2pequities:
+<<<<<<< HEAD
                 if eq.confirm_at:
                     addDate = timezone.localtime(eq.confirm_at).strftime("%Y-%m-%d %H:%M:%S")
+=======
+>>>>>>> api
                 temp_eq = {
                     "subscribeUserName": eq.user.username,
                     "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
                     "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+<<<<<<< HEAD
                     "addDate": addDate,
+=======
+                    "addDate": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+>>>>>>> api
                     "status": "1",
                     "type": "0"
                 }
