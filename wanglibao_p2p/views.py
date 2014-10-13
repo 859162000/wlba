@@ -131,6 +131,7 @@ class PurchaseP2PMobile(APIView):
         return ['POST']
 
     def post(self, request):
+
         if not request.user.is_authenticated():
             return Response({
                 'message': u'请登录',
@@ -144,7 +145,9 @@ class PurchaseP2PMobile(APIView):
         form = PurchaseForm(request.DATA)
         phone = request.user.wanglibaouserprofile.phone
         code = request.POST.get('validate_code', '')
+
         status_code, message = validate_validation_code(phone, code)
+
         if status_code != 200:
             return Response({
                 'message': u'验证码输入错误',
@@ -170,6 +173,7 @@ class PurchaseP2PMobile(APIView):
                 "message": form.errors,
                 'error_number': ErrorNumber.form_error
             }, status=status.HTTP_200_OK)
+
 
 class AuditProductView(TemplateView):
     template_name = 'audit_p2p.jade'
@@ -248,6 +252,7 @@ class P2PProducListView(generics.ListCreateAPIView):
             return P2PProduct.objects.filter(hide=False).filter(status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
                 ])
+
 
 class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
 
