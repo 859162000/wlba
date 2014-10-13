@@ -47,7 +47,7 @@ class P2PEquityInline(admin.TabularInline):
 
 
 class P2PProductResource(resources.ModelResource):
-    count = 4
+    count = 16
 
     class Meta:
         model = P2PProduct
@@ -64,18 +64,16 @@ class P2PProductResource(resources.ModelResource):
         #today = datetime.date.today()
         #age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
         instance.category = u"证大速贷"
-        instance.name = u"%s %s%s" % (row[u'产品名称'], now, str(self.count).zfill(3))
-        instance.short_name = instance.name
         instance.serial_number = "E_ZDSD_%s%s" % (now, str(self.count).zfill(5))
         instance.contract_serial_number = "E_ZDSD_%s%s" % (now, str(self.count).zfill(5))
         instance.priority = 0
         instance.period = row[u'申请还款期限（月）']
-        instance.expected_earning_rate = 12
+        instance.expected_earning_rate = 12.5
         instance.excess_earning_rate = 0
+        if int(instance.period) <= 18:
+            instance.excess_earning_rate = 0.5
+            instance.excess_earning_description = u"网利宝活动补贴"
         instance.pay_method = u"等额本息"
-
-
-
 
         instance.borrower_name = row[u'姓名']
         instance.borrower_phone = row[u'手机号码']
@@ -88,7 +86,7 @@ class P2PProductResource(resources.ModelResource):
 
         for bank in P2PProduct.BANK_METHOD_CHOICES:
             if bank[0] in instance.borrower_bankcard_bank_name:
-                instance.borrower_bankcard_bank_code = bank
+                instance.borrower_bankcard_bank_code = bank[0]
 
         instance.total_amount = row[u'申请贷款金额（元）']
         instance.end_time = datetime.datetime.now() + datetime.timedelta(days=2)
@@ -96,7 +94,7 @@ class P2PProductResource(resources.ModelResource):
         #instance.short_usage = row[u'贷款用途']
 
         if type == u"工薪族":
-            instance.name = u"%s %s%s" % (u"工薪日常消费", str(now)[2:], str(self.count).zfill(3))
+            instance.name = u"%s%s%s" % (u"工薪日常消费", str(now)[2:], str(self.count).zfill(3))
             instance.extra_data = OrderedDict([
                 (u'个人信息', OrderedDict([
                     (u'性别', row[u'性别']),
@@ -113,7 +111,7 @@ class P2PProductResource(resources.ModelResource):
                 ])),
                 (u'工作信息', OrderedDict([
                     (u'工作城市', row[u'工作城市']),
-                    (u'现有公司工作时间', row[u'工作时间']),
+                    (u'现公司工作时间', row[u'工作时间']),
                     (u'公司行业', row[u'公司行业']),
                     (u'公司性质', row[u'公司性质']),
                     (u'岗位', row[u'岗位（职务）'])
@@ -121,7 +119,7 @@ class P2PProductResource(resources.ModelResource):
             ])
 
         if type == u"企业主":
-            instance.name = u"%s %s%s" % (u"企业扩大经营", str(now)[2:], str(self.count).zfill(3))
+            instance.name = u"%s%s%s" % (u"企业扩大经营", str(now)[2:], str(self.count).zfill(3))
             instance.extra_data = OrderedDict([
                 (u'个人信息', OrderedDict([
                     (u'性别', row[u'性别']),
@@ -146,6 +144,7 @@ class P2PProductResource(resources.ModelResource):
                     (u'企业地址', row[u'企业地址'])
                 ]))
             ])
+        instance.short_name = instance.name
         instance.warrant_company = WarrantCompany.objects.get(name='证大速贷')
         instance.contract_template = ContractTemplate.objects.get(name='证大速贷')
 
