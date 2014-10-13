@@ -29,7 +29,7 @@ html
               .form-row-error
                 #{ form.validate_code.errors }
             .form-row
-              - render_field form.password class+="input-large" placeholder="* 请输入密码" autocomplete='off' title="* 请输入密码"
+              - render_field form.password class+="input-large" placeholder="* 请输入密码" autocomplete='off' title="* 请输入密码" maxlength="20"
               .password-strength-container
                 span.password-strength-1 低
                 span.password-strength-2 中

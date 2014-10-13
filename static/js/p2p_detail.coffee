@@ -11,7 +11,7 @@ require.config
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools'], ($, _, backend, calculator, countdown, tool)->
 
   $.validator.addMethod 'dividableBy100', (value, element)->
-    return value % 100 == 0
+    return value % 100 == 0 && !/\./ig.test(value)
   , '请输入100的整数倍'
 
   $.validator.addMethod 'positiveNumber', (value, element)->
@@ -35,6 +35,11 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       error.appendTo $(element).closest('.form-row__middle').find('.form-row-error')
 
     submitHandler: (form)->
+      #autho: hetao; time: 2014.10.11; target: 抢购时未登录状态弹出登录层
+      if $('.invest').hasClass('notlogin')
+        $('.login-modal').trigger('click')
+        return
+
       tip = '您的投资金额为:' + $('input[name=amount]').val() + '元'
       tool.modalConfirm({title: '温馨提示', msg: tip, callback_ok: ()->
         product = $('input[name=product]').val()
@@ -47,6 +52,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           validate_code: validate_code
         }
         .done (data)->
+
           tool.modalAlert({title: '温馨提示', msg: '份额认购成功', callback_ok: ()->
               location.reload()
           })
@@ -110,5 +116,46 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     e.preventDefault()
     $('#purchase-form').submit()
 
+
+  #build the table for invest history
+  buildTable = (list) ->
+    html = []
+    i = 0
+    len = list.length
+
+    while i < len
+      html.push [
+        "<tr>"
+        "<td><p>"
+        list[i].create_time
+        "</p></td>"
+        "<td><em>"
+        list[i].user
+        "</em></td>"
+        "<td><span class='money-highlight'>"
+        list[i].amount
+        "</span><span>元</span></td>"
+        "</tr>"
+      ].join("")
+      i++
+    html.join ""
+
+  $(window).load (e) ->
+    if(invest_result && invest_result.length > 0)
+      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
+      if(invest_result.length > 5)
+        $('.get-more').show()
+      else
+        $('.get-more').hide()
+
+
+  $('.get-more').click (e) ->
+    e.preventDefault()
+    if(invest_result && invest_result.length > 0)
+      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
+      if(invest_result.length > 0)
+        $('.get-more').show()
+      else
+        $('.get-more').hide()
 
 

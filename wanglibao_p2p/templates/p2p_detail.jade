@@ -103,19 +103,23 @@ html
                   span.span8-omega
                     span.highlight.font-m.invest#expected_income 0.00
                     | 元
-                .row
-                  span.span4 手机验证码
-                  .span4
-                    input#validate_code.invest(type='text', name='validate_code', placeholder='验证码')
-                  .span4-omega
-                    if user.wanglibaouserprofile.phone
+                //author: hetao; time: 2014.10.11 target: 用户未登陆时不显示手机验证码
+                if user.is_authenticated
+                  .row
+                    span.span4 手机验证码
+                    .span4
+                      input#validate_code.invest(type='text', name='validate_code', placeholder='验证码')
+                    .span4-omega
                       button#get-validate-code-buy.button-orange.button-middle.invest(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
-                    else
-                      button#get-validate-code-buy.button-orange.button-middle.disabled.invest(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 抢购请登录
+
                 .row.margin-top-s
                   span.span4
                   span.span8-omega
-                    a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                    //author: hetao; time: 2014.10.11 target: 用户未登陆时先弹出登陆框
+                    if user.is_authenticated
+                      a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                    else
+                      a.submit-button.span12.button-primary.button-middle.invest.notlogin(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
           if status != '抢购中'
             .sold-out
               p.align-center
@@ -170,48 +174,83 @@ html
             else
               h1 担保机构
             table
-              caption {{p2p.warrant_company.name}}
               warrants = p2p.warrant_set.all()
               length = len(warrants)
               if length > 0
-                tbody
-                  for warrant in warrants
-                    tr
-                      td {{warrant.name}}
-                      td
-                        span
-                        span.icon.icon-approve
-                        | 已认证
+                caption {{p2p.warrant_company.name}}
               else
-                if p2p.category == "证大速贷"
-                    tbody
-                      tr
-                        td 身份证
                         td
                           span
                           span.icon.icon-approve
                           | 已认证
-                      tr
-                        td 信用报告
-                        td
-                          span
-                          span.icon.icon-approve
-                          | 已认证
-                      tr
-                        td 工作证明
-                        td
-                          span
-                          span.icon.icon-approve
-                          | 已认证
-                      tr
-                        td 收入证明
-                        td
-                          span
-                          span.icon.icon-approve
-                          | 已认证
+                else
+                  if p2p.category == "证大速贷"
+                    if "企业贷" in p2p.name
+                      tbody
+                        tr
+                          td 身份证
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 已认证
+                        tr
+                          td 信用报告
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 已认证
+                        tr
+                          td 工作证明
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 已认证
+                        tr
+                          td 收入证明
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 已认证
+                    if "工薪贷" in p2p.name
+                      tbody
+                        tr
+                          td 身份证
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 已认证
+                        tr
+                          td 信用报告
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 已认证
+                        tr
+                          td 工作证明
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 已认证
+                        tr
+                          td 收入证明
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 已认证
           .clearfix
             .p2p-detail-container
+              script.
+                var invest_result = [];
+
               h1 投资记录
+                trade_records = p2p.p2precord_set.filter(catalog=u'申购')
+                for trade in trade_records
+                  script.
+                    invest_result.push({
+                      create_time: '{{trade.create_time | date:"Y-m-d"}}',
+                      user: '{{trade.user | safe_phone}}',
+                      amount: '{{trade.amount}}'
+                    });
               table.invest-history-table
                 thead
                   tr
@@ -219,16 +258,11 @@ html
                     th 投资人
                     th 金额
                 tbody
-                  trade_records = p2p.p2precord_set.filter(catalog=u'申购')
-                  for trade in trade_records
-                    tr
-                      td
-                        p {{trade.create_time | date:"Y-m-d"}}
-                      td
-                        em {{trade.user | safe_phone}}
-                      td
-                        span.money-highlight {{trade.amount}}
-                        span 元
+
+
+              if trade_records.count > 30
+                .row
+                  a.get-more(href="#") 查看更多
 
     script.
       require(['/static/js/p2p_detail.js'])

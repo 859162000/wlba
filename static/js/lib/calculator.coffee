@@ -27,8 +27,16 @@ define ['jquery'], ($)->
     actual_element = target.attr 'data-target-actual'
     fee = (rate * amount).toFixed(2)
     actual = (amount - fee).toFixed(2)
-    $(fee_element).text fee
-    $(actual_element).text actual
+    if fee and $.isNumeric(fee)
+      $(fee_element).text fee
+    else
+      $(fee_element).text "0.00"
+
+    if actual and $.isNumeric(actual)
+      $(actual_element).text actual
+    else
+      $(actual_element).text "0.00"
+
 
 
   $('input[data-role=fee-calculator]').keyup()
