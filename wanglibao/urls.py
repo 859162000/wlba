@@ -83,6 +83,12 @@ urlpatterns += patterns(
     url(r'p2pequity/profile', AdminP2PUserRecord.as_view(), name='p2p_user_record'),
 )
 
+from wanglibao_p2p.views import GetNoWProjectsAPI, GetProjectsByDateAPI
+urlpatterns += patterns(
+    '',
+    url(r'^tdt/getNowProjects.json', GetNoWProjectsAPI.as_view()),
+    url(r'^tdt/getProjectsByDate.json', GetProjectsByDateAPI.as_view()),
+)
 
 if settings.DEBUG:
     import debug_toolbar
