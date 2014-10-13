@@ -77,7 +77,7 @@ class P2PProductResource(resources.ModelResource):
 
 
 
-        instance.borrower_nameinstance.borrower_name = row[u'姓名']
+        instance.borrower_name = row[u'姓名']
         instance.borrower_phone = row[u'手机号码']
         instance.borrower_address = row[u'现住址']
         instance.borrower_id_number = row[u'身份证号码']
@@ -95,7 +95,7 @@ class P2PProductResource(resources.ModelResource):
         #instance.usage = row[u'贷款用途']
         #instance.short_usage = row[u'贷款用途']
 
-        if type == u"工薪贷":
+        if type == u"工薪族":
             instance.extra_data = OrderedDict([
                 (u'个人信息', OrderedDict([
                     (u'性别', row[u'性别']),
@@ -119,7 +119,7 @@ class P2PProductResource(resources.ModelResource):
                 ]))
             ])
 
-        if type == u"企业贷":
+        if type == u"企业主":
             instance.extra_data = OrderedDict([
                 (u'个人信息', OrderedDict([
                     (u'性别', row[u'性别']),
