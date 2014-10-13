@@ -73,8 +73,8 @@ urlpatterns = patterns(
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^profile/', ProfileView.as_view()),
     url(r'^total_income', TotalIncome.as_view()),
-    url(r'^p2p/purchase/', PurchaseP2P.as_view()),
-    url(r'^p2p/purchase/mobile/', PurchaseP2PMobile.as_view()),
+    url(r'^p2p/purchase/$', PurchaseP2P.as_view()),
+    url(r'^p2p/purchase/mobile/$', PurchaseP2PMobile.as_view()),
     url(r'^p2ps/(?P<product_id>\d+)/records/', RecordView.as_view()),
 
     url(r'^p2ps/$', P2PProducListView.as_view()),
