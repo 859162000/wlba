@@ -153,7 +153,7 @@ class P2PProductViewSet(PaginatedModelViewSet):
     def get_queryset(self):
         qs = super(P2PProductViewSet, self).get_queryset()
         return qs.filter(hide=False).filter(status__in=[
-                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+                u'正在招标', u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
             ])
 
 
@@ -163,10 +163,19 @@ class GetNoWProjectsAPI(APIView):
 
     def get(self, request):
 
+        p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
+                u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+            ])
+        p2p_list = []
+        for p2p in p2pproducts:
+            temp = {
+                'projectid': p2p.pk,
+                'title': p2p.name,
+                'amount': p2p.total_amount
+            }
+            p2p_list.append(temp)
 
-        return Response({
-            'message': 'ok'
-        })
+        return Response(p2p_list)
 
 
 class RecordView(APIView):
