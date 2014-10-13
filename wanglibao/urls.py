@@ -40,7 +40,7 @@ urlpatterns = patterns(
 
     url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^api/', include('wanglibao_rest.urls')),
-    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/admin/', include(admin.site.urls)),
+    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
