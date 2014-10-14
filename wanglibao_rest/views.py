@@ -91,7 +91,7 @@ class RegisterAPIView(APIView):
         if serializer.is_valid():
             create_user(serializer.object['identifier'], serializer.object['password'], serializer.object['nickname'])
             return Response({'message': 'user generated'})
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_200_OK)
 
 
 class UserExisting(APIView):
