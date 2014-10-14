@@ -64,7 +64,7 @@ class P2PProductResource(resources.ModelResource):
         #age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
         instance.category = u"证大速贷"
         instance.serial_number = "E_ZDSD_%s%s" % (now, str(self.count).zfill(5))
-        instance.contract_serial_number = "E_ZDSD_%s%s" % (now, str(self.count).zfill(5))
+        instance.contract_serial_number = row[u'合同编号']
         instance.priority = 0
         instance.period = row[u'申请还款期限（月）']
         instance.expected_earning_rate = 12.5
@@ -91,6 +91,20 @@ class P2PProductResource(resources.ModelResource):
         instance.end_time = datetime.datetime.now() + datetime.timedelta(days=2)
         #instance.usage = row[u'贷款用途']
         #instance.short_usage = row[u'贷款用途']
+        month_income = int(row[u'个人月收入（元）'])
+        month_income_str = ""
+        if month_income <= 2000:
+            month_income_str = u"0-2000元"
+        if month_income > 2000 and month_income < 5000:
+            month_income_str = u"2000元-5000元"
+        if month_income >= 5000 and month_income < 8000:
+            month_income_str = u"5000元-8000元"
+        if month_income >= 8000 and month_income <= 12000:
+            month_income_str = u"8000元-12000元"
+        if month_income > 12000 and month_income <= 18000:
+            month_income_str = u"12000元-18000元"
+        if month_income > 18000:
+            month_income_str = u"18000元以上"
 
         if type == u"工薪族":
             instance.name = u"%s%s%s" % (u"工薪日常消费", str(now)[2:], str(self.count).zfill(3))
@@ -104,7 +118,7 @@ class P2PProductResource(resources.ModelResource):
                     (u'户籍城市', row[u'户籍城市'])
                 ])),
                 (u'个人资产及征信信息', OrderedDict([
-                    (u'月收入水平', row[u'个人月收入（元）']),
+                    (u'月收入水平', month_income_str),
                     (u'房产', row[u'有无房产']),
                     (u'车产', row[u'有无车产'])
                 ])),
@@ -127,7 +141,7 @@ class P2PProductResource(resources.ModelResource):
                     (u'是否已婚', row[u'是否结婚']),
                     (u'子女状况', row[u'子女状况']),
                     (u'户籍城市', row[u'户籍城市']),
-                    (u'月收入水平', row[u'个人月收入（元）'])
+                    (u'月收入水平', month_income_str)
                 ])),
                 (u'企业经营信息', OrderedDict([
                     (u'月销售收入(元)', row[u'月销售收入（元）']),
