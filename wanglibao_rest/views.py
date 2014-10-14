@@ -179,7 +179,7 @@ class AdminIdValidate(APIView):
 
         if error:
             return Response({
-                        "message": u"验证失败，拨打客服电话进行人工验证",
+                        "message": u"验证失败",
                         "error_number": ErrorNumber.unknown_error
                     }, status=400)
 
