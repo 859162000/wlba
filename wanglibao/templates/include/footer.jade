@@ -43,6 +43,12 @@ mixin innerFooter()
         a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
         .space-xs
         a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
+        .space-vertical-s
+        dd.section--item
+          .qq-container#qq-container
+            在线客服
+            .qq-icon
+
         a#qrweibo.footer--weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
           img(src="/static/images/weibo-qr.png")
         img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none", data-name="hoverbox")
@@ -99,3 +105,16 @@ else
 
 script.
   require(['/static/js/hover.js','/static/js/login_modal.js'])
+script(src="http://wpa.b.qq.com/cgi/wpa.php")
+script
+  BizQQWPA.addCustom([{
+   aty: '1', //指定工号类型
+   a: '1001', //指定的工号企业 WPA OpenAPI
+   nameAccount: '4008588066', //营销 QQ 号码
+   selector: "qq-container" //WPA 被放置的元素
+  },{
+   aty: '1', //指定工号类型
+   a: '1001', //指定的工号企业 WPA OpenAPI
+   nameAccount: '4008588066', //营销 QQ 号码
+   selector: "top-qq" //WPA 被放置的元素
+  }])
