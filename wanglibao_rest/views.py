@@ -174,6 +174,15 @@ class AdminIdValidate(APIView):
         phone = request.DATA.get("phone", "")
         name = request.DATA.get("name", "")
         id_number = request.DATA.get("id_number", "")
+
+        verify_record, error = verify_id(name, id_number)
+
+        if error:
+            return Response({
+                        "message": u"验证失败，拨打客服电话进行人工验证",
+                        "error_number": ErrorNumber.unknown_error
+                    }, status=400)
+
         user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
