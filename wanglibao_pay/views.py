@@ -302,9 +302,8 @@ class CardViewSet(ModelViewSet):
 
         bank_id = request.DATA.get('bank', '')
 
-        try:
-            Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
-        except:
+        exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
+        if exist_cards:
             return Response({
                 "message": u"该银行卡已经存在",
                 'error_number': ErrorNumber.duplicate
