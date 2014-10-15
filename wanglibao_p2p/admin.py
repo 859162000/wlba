@@ -7,7 +7,7 @@ from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportModelAdmin, ExportMixin
 from views import GenP2PUserProfileReport
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
@@ -180,9 +180,20 @@ class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
 
 
-class P2PRecordAdmin(admin.ModelAdmin):
+class P2PRecordResource(resources.ModelResource):
+    user_name = fields.Field(attribute="user__wanglibaouserprofile__name")
+    product_name = fields.Field(attribute="product__name")
+
+    class Meta:
+        model = P2PRecord
+        fields = ('user_name', 'product_name', 'catalog', 'order_id', 'amount', 'product_balance_after', 'create_time', 'description')
+
+#class P2PRecordAdmin(admin.ModelAdmin):
+class P2PRecordAdmin(ImportExportModelAdmin):
     list_display = (
         'catalog', 'order_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
+    resource_class = P2PRecordResource
+    change_list_template = 'admin/import_export/change_list_export.html'
 
 
 class WarrantAdmin(admin.ModelAdmin):
