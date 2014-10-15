@@ -19,14 +19,10 @@ def set_promo_user(request, user, invitecode=''):
     if user:
         user_id = request.session.get(settings.PROMO_TOKEN_USER_SESSION_KEY, None)
 
-        print 'user_id.................',user_id
-
         if user_id:
             introduced_by_user = get_user_model().objects.get(pk=user_id)
-            record = IntroducedBy()
-            record.introduced_by = introduced_by_user
-            record.user = user
-            record.save()
+            save_introducedBy(user, introduced_by_user)
+
             # Clean the session
             del request.session[settings.PROMO_TOKEN_USER_SESSION_KEY]
         else:
@@ -34,10 +30,12 @@ def set_promo_user(request, user, invitecode=''):
                 recordpromo = PromotionToken.objects.filter(token=invitecode).first()
                 if recordpromo:
                     introduced_by_user = get_user_model().objects.get(pk=recordpromo.pk)
-                    record = IntroducedBy()
-                    record.introduced_by = introduced_by_user
-                    record.user = user
-                    record.save()
+                    save_introducedBy(user, introduced_by_user)
 
+def save_introducedBy(user, introduced_by_user):
+    record = IntroducedBy()
+    record.introduced_by = introduced_by_user
+    record.user = user
+    record.save()
 
 
