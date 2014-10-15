@@ -35,7 +35,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         'invalid_identifier_type': u'请提供邮箱或者手机号',
         'validate_code_for_email': u'邮箱注册时不需要提供验证码',
         'validate code not match': u'验证码不正确',
-        'validate code not exist': u'没有发送验证码'
+        'validate code not exist': u'没有发送验证码',
+        'validate must not be null': u'验证码不能为空'
     }
 
     class Meta:
@@ -73,14 +74,19 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             identifier_type = detect_identifier_type(identifier)
             if identifier_type == 'phone':
                 phone = identifier
-                validate_code = self.cleaned_data["validate_code"]
-                print validate_code
-                status, message = validate_validation_code(phone, validate_code)
-                if status != 200:
+                validate_code =  self.cleaned_data.get('validate_code', '')
+                if validate_code:
+                    status, message = validate_validation_code(phone, validate_code)
+                    if status != 200:
+                        raise forms.ValidationError(
+                            self.error_messages['validate code not match'],
+                            code='validate_code_error',
+                        )
+                else:
                     raise forms.ValidationError(
-                        self.error_messages['validate code not match'],
-                        code='validate_code_error',
-                    )
+                            self.error_messages['validate must not be null'],
+                            code='validate_code_error',
+                        )
         return self.cleaned_data
 
 

@@ -91,7 +91,7 @@ class RegisterAPIView(APIView):
         if serializer.is_valid():
             create_user(serializer.object['identifier'], serializer.object['password'], serializer.object['nickname'])
             return Response({'message': 'user generated'})
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_200_OK)
 
 
 class UserExisting(APIView):
@@ -116,7 +116,7 @@ class UserExisting(APIView):
         except get_user_model().DoesNotExist:
             return Response({
                                 "existing": False
-                            }, status=404)
+                            }, status=200)
 
 
 class IdValidate(APIView):
@@ -174,6 +174,15 @@ class AdminIdValidate(APIView):
         phone = request.DATA.get("phone", "")
         name = request.DATA.get("name", "")
         id_number = request.DATA.get("id_number", "")
+
+        verify_record, error = verify_id(name, id_number)
+
+        if error:
+            return Response({
+                        "message": u"验证失败",
+                        "error_number": ErrorNumber.unknown_error
+                    }, status=400)
+
         user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name

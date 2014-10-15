@@ -33,6 +33,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -301,9 +302,8 @@ class CardViewSet(ModelViewSet):
 
         bank_id = request.DATA.get('bank', '')
 
-        try:
-            Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
-        except:
+        exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
+        if exist_cards:
             return Response({
                 "message": u"该银行卡已经存在",
                 'error_number': ErrorNumber.duplicate
@@ -461,7 +461,7 @@ class AdminTransactionP2P(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
@@ -506,7 +506,7 @@ class AdminTransactionWithdraw(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
@@ -549,7 +549,7 @@ class AdminTransactionDeposit(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view

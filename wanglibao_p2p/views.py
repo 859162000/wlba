@@ -9,6 +9,7 @@ from django.core.paginator import PageNotAnInteger
 from rest_framework import status
 from rest_framework import mixins
 from rest_framework import generics
+from rest_framework import renderers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -19,11 +20,23 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct, P2PEquity
-from wanglibao_p2p.serializers import P2PProductSerializer, P2PRecordSerializer
+from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from operator import attrgetter, itemgetter
+from django.conf import settings
+from decimal import Decimal
+from hashlib import md5
+
+
+REPAYMENTTYPEMAP = (
+                (u'到期还本付息', 1),
+                (u'等额本息', 2),
+                (u'按月付息', 5),
+                (u'按季度付息', 7)
+            )
+
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -193,7 +206,7 @@ class AuditProductView(TemplateView):
         pk = kwargs['id']
         p2p = P2PProduct.objects.get(pk=pk)
         ProductKeeper(p2p).audit(request.user)
-        return HttpResponseRedirect('/admin/wanglibao_p2p/p2pproduct/')
+        return HttpResponseRedirect('/'+settings.ADMIN_ADDRESS+'/wanglibao_p2p/p2pproduct/')
 
 
 audit_product_view = staff_member_required(AuditProductView.as_view())
@@ -201,7 +214,7 @@ audit_product_view = staff_member_required(AuditProductView.as_view())
 
 class P2PProductViewSet(ModelViewSet):
     model = P2PProduct
-    permission_classes = IsAdminUserOrReadOnly,
+    permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = P2PProductSerializer
 
     def get_queryset(self):
@@ -263,6 +276,146 @@ class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
+
+
+class GetNoWProjectsAPI(APIView):
+    """
+    网贷之家数据接口， 获取正在招标的数据
+    """
+    # todo 合并代码
+    permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get(self, request):
+
+        p2pproducts = P2PProduct.objects.filter(hide=False).filter(status=u'正在招标')
+
+        p2p_list = []
+        for p2p in p2pproducts:
+
+            amount = Decimal.from_float(p2p.total_amount).quantize(Decimal('0.00'))
+            percent = p2p.ordered_amount / amount * 100
+            # percent = 1499900 / Decimal.from_float(1500000) * 100
+            schedule = '{}%'.format(percent.quantize(Decimal('0.0'), 'ROUND_DOWN'))
+
+            if p2p.category == u'证大速贷':
+                type = u"信用标"
+            type = u"抵押标"
+
+            for pay_method, value in REPAYMENTTYPEMAP:
+                if pay_method == p2p.pay_method:
+                    repaymentType = value
+                    break
+
+            p2pequities = p2p.equities.all()
+            subscribes = []
+            for eq in p2pequities:
+
+                temp_eq = {
+                    "subscribeUserName": eq.user.username,
+                    "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+                    "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+                    "addDate": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "status": "1",
+                    "type": "0"
+                }
+                subscribes.append(temp_eq)
+
+            temp_p2p = {
+                "projectid": str(p2p.pk),
+                "title": p2p.name,
+                "amount": amount,
+                "schedule": schedule,
+                "interestRate": '{}%'.format(p2p.expected_earning_rate),
+                "deadline": str(p2p.period),
+                "deadlineUnit": u"月",
+                "reward": '{}%'.format(p2p.excess_earning_rate),
+                "type": type,
+                "repaymentType": str(repaymentType),
+                "subscribes": subscribes,
+                "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
+                "amountUsedDesc": p2p.short_usage,
+                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s" % p2p.id,
+                # "successTime": p2p.soldout_time,
+                "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
+            }
+            p2p_list.append(temp_p2p)
+
+        return HttpResponse(renderers.JSONRenderer().render(p2p_list, 'application/json'))
+
+
+class GetProjectsByDateAPI(APIView):
+    """
+    网贷之家数据接口， 获取已经完成的数据
+    """
+
+    permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get(self, request):
+
+        date = request.GET.get('date', '')
+        if not date:
+            return HttpResponse(renderers.JSONRenderer().render({'message': u'错误的date'}, 'application/json'))
+
+        date = [int(i) for i in date.split('-')]
+        start_time = timezone.datetime(*date)
+        end_time = start_time + timezone.timedelta(days=1)
+
+        p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
+            u'还款中', u'已完成'
+        ]).filter(soldout_time__range=(start_time, end_time))
+
+        p2p_list = []
+        for p2p in p2pproducts:
+
+            amount = Decimal.from_float(p2p.total_amount).quantize(Decimal('0.00'))
+            percent = p2p.ordered_amount / amount * 100
+            schedule = '{}%'.format(percent.quantize(Decimal('0.0'), 'ROUND_DOWN'))
+
+            if p2p.category == u'证大速贷':
+                type = u"信用标"
+            type = u"抵押标"
+
+
+            for pay_method, value in REPAYMENTTYPEMAP:
+                if pay_method == p2p.pay_method:
+                    repaymentType = value
+                    break
+
+
+            p2pequities = p2p.equities.all()
+            subscribes = []
+            for eq in p2pequities:
+                temp_eq = {
+                    "subscribeUserName": eq.user.username,
+                    "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+                    "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+                    "addDate": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "status": "1",
+                    "type": "0"
+                }
+                subscribes.append(temp_eq)
+
+            temp_p2p = {
+                "projectid": str(p2p.pk),
+                "title": p2p.name,
+                "amount": amount,
+                "schedule": schedule,
+                "interestRate": '{}%'.format(p2p.expected_earning_rate),
+                "deadline": str(p2p.period),
+                "deadlineUnit": u"月",
+                "reward": '{}%'.format(p2p.excess_earning_rate),
+                "type": type,
+                "repaymentType": str(repaymentType),
+                "subscribes": subscribes,
+                "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
+                "amountUsedDesc": p2p.short_usage,
+                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s" % p2p.id,
+                "successTime": timezone.localtime(p2p.soldout_time).strftime("%Y-%m-%d %H:%M:%S"),
+                "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
+            }
+            p2p_list.append(temp_p2p)
+
+        return HttpResponse(renderers.JSONRenderer().render(p2p_list, 'application/json'))
 
 
 class RecordView(APIView):

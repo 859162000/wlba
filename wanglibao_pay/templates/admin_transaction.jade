@@ -13,12 +13,12 @@ head
 
                 .panel-content.padding-l-r-sm
                     .space-vertical-l
-                    a(href="/admin")
+                    a(href='/{{ "" | admin_address}}')
                         button.button-home-action(type='submit') 返回
                     .space-vertical-l
                     .space-vertical-l
                     .row
-                        form.form.span5(method="GET" action='/admin/pay/transaction/withdraw')
+                        form.form.span5(method="GET" action='/{{ "" | admin_address}}/pay/transaction/withdraw')
                             .form-row
                                 .span3(style="line-height:40px")
                                     label 手机号码

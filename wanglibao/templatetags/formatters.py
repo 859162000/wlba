@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 
 from django import template
 from django.utils import timezone
+from django.conf import settings
 
 register = template.Library()
 
@@ -323,3 +324,10 @@ def safe_paytype(value):
         return u'取款'
     else:
         return u'充值'
+
+@register.filter
+def admin_address(value):
+    """
+    Convert the number into 10k based string
+    """
+    return settings.ADMIN_ADDRESS
