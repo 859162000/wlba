@@ -672,19 +672,19 @@ class ResetPasswordAPI(APIView):
         if password is None:
             return Response({
                 'message': u'缺少new_password这个字段'
-            }, status=400)
+            }, status=200)
         else:
             password = password.strip()
 
         if identifier is None:
             return Response({
                 'message': u'缺少identifier这个字段'
-            }, status=400)
+            }, status=200)
 
         if validate_code is None:
             return Response({
                 'message': u'缺少validate_code'
-            }, status=400)
+            }, status=200)
 
         identifier_type = detect_identifier_type(identifier)
 
@@ -693,7 +693,7 @@ class ResetPasswordAPI(APIView):
         else:
             return Response({
                 'message': u'请输入手机号码'
-            }, status=400)
+            }, status=200)
 
         status, message = validate_validation_code(identifier, validate_code)
         if status == 200:
@@ -705,7 +705,7 @@ class ResetPasswordAPI(APIView):
         else:
             return Response({
                 'message': u'验证码验证失败'
-            }, status=400)
+            }, status=200)
 
 
 @sensitive_post_parameters()
