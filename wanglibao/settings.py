@@ -100,6 +100,7 @@ INSTALLED_APPS = (
     'wanglibao_pay',
     'order',
     'wanglibao_margin',
+    'wanglibao_help',
 
     'marketing',
     'report',
