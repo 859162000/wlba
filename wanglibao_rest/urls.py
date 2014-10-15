@@ -50,7 +50,7 @@ router.register(r'favorite/funds', FavoriteFundViewSet)
 router.register(r'favorite/financings', FavoriteFinancingViewSet)
 router.register(r'favorite/cashes', FavoriteCashViewSet)
 
-# router.register(r'p2ps', P2PProductViewSet)
+router.register(r'p2ps', P2PProductViewSet)
 
 router.register(r'pre_orders', PreOrderViewSet)
 router.register(r'feedbacks', FeedbackViewSet)
@@ -77,7 +77,7 @@ urlpatterns = patterns(
     url(r'^p2p/purchase/mobile/$', PurchaseP2PMobile.as_view()),
     url(r'^p2ps/(?P<product_id>\d+)/records/', RecordView.as_view()),
 
-    url(r'^p2ps/$', P2PProductListView.as_view()),
+    # url(r'^p2ps/$', P2PProductListView.as_view()),
     url(r'^p2ps/(?P<pk>[0-9]+)/$', P2PProductDetailView.as_view()),
 
     url(r'', include(router.urls)),

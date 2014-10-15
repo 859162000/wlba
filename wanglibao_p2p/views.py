@@ -212,7 +212,8 @@ class AuditProductView(TemplateView):
 audit_product_view = staff_member_required(AuditProductView.as_view())
 
 
-class P2PProductViewSet(ModelViewSet):
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = P2PProductSerializer
