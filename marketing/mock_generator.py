@@ -22,19 +22,11 @@ class MockGenerator(object):
 
     @classmethod
     def generate_codes(cls, item_counts):
-        count = 0
-        while count <= item_counts:
-            letters = 'abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ'
-            digits = '23456789'
-            salt = ''.join(random.sample(letters+digits, 6))
-            insert_flag = False
-            try:
-                invite_code = InviteCode.objects.create(code=salt)
-                invite_code.save()
-                insert_flag = True
-            except IntegrityError, e:
-                logging.debug(e)
 
-            if insert_flag:
-                count += 1
+        letters = 'abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ'
+        digits = '23456789'
+        salt = [''.join(random.sample(letters+digits, 6)) for i in range(item_counts)]
+        salt_list = list(set(salt))
+        insert_list = [InviteCode(code=salt) for salt in salt_list]
+        InviteCode.objects.bulk_create(insert_list)
         logging.debug('code inserted has been done')
