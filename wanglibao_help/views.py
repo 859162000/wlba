@@ -9,12 +9,12 @@ from wanglibao_help.models import Topic, Question
 class HelpView(TemplateView):
     template_name = 'help.jade'
 
-    def get(self, request):
+    def get_context_data(self, **kwargs):
         #topic 帮助中心左侧的栏目
         topics = Topic.objects.order_by("-id").all()
         #question field: title, answer,
         questions = Question.objects.order_by("-id").all()
-        hot = '热门问题'
+        hot = u'热门问题'
         result = {hot:[]}
         nav = [hot]
         for x in topics:
