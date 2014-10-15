@@ -28,5 +28,7 @@ class MockGenerator(object):
         salt = [''.join(random.sample(letters+digits, 6)) for i in range(item_counts)]
         salt_list = list(set(salt))
         insert_list = [InviteCode(code=salt) for salt in salt_list]
+
+
         InviteCode.objects.bulk_create(insert_list)
         logging.debug('code inserted has been done')
