@@ -24,7 +24,9 @@ class MockGenerator(object):
     def generate_codes(cls, item_counts):
         count = 0
         while count <= item_counts:
-            salt = ''.join(random.sample(string.ascii_letters+string.digits, 6))
+            letters = 'abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ'
+            digits = '23456789'
+            salt = ''.join(random.sample(letters+digits, 6))
             insert_flag = False
             try:
                 invite_code = InviteCode.objects.create(code=salt)
