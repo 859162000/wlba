@@ -37,7 +37,7 @@ class IntroducedByResource(resources.ModelResource):
 
 
 class IntroducedByAdmin(ImportExportModelAdmin):
-    list_display = ("user", "introduced_by", "created_at", "bought_at", "gift_send_at")
+    list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
     readonly_fields = ("bought_at", "user", "introduced_by")
     list_editable = ("gift_send_at",)
 
