@@ -25,8 +25,11 @@ class MockGenerator(object):
 
         letters = 'abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ'
         digits = '23456789'
-        salt = [''.join(random.sample(letters+digits, 6)) for i in range(item_counts)]
-        salt_list = list(set(salt))
-        insert_list = [InviteCode(code=salt) for salt in salt_list]
+        # salt = [''.join(random.sample(letters+digits, 6)) for i in range(item_counts)]
+        # salt_list = list(set(salt))
+        # insert_list = [InviteCode(code=salt) for salt in salt_list]
+        insert_list = [InviteCode(code=salt)
+                       for salt in list(set([''.join(random.sample(letters+digits, 6))
+                                             for i in range(item_counts)]))]
         InviteCode.objects.bulk_create(insert_list)
         logging.debug('code inserted has been done')
