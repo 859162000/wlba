@@ -174,3 +174,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=p2p_detail.map

@@ -95,6 +95,10 @@ class P2PProduct(ProductBase):
         (u'上海农村商业银行',u'上海农村商业银行'),
         (u'汇付天下', u'汇付天下'),
     )
+    BANK_TYPE_CHOICES = (
+        (u'对公', u'对公'),
+        (u'对私', u'对私'),
+    )
 
     version = IntegerVersionField()
     category = models.CharField(max_length=16, default=u'普通',
@@ -134,6 +138,7 @@ class P2PProduct(ProductBase):
     borrower_address = models.CharField(verbose_name=u'借债人地址*', max_length=128, blank=False)
     borrower_id_number = models.CharField(verbose_name=u'借债人身份证号*', max_length=32, blank=False)
     borrower_bankcard = models.CharField(verbose_name=u'借债人银行卡号*', max_length=64, blank=False)
+    borrower_bankcard_type = models.CharField(verbose_name=u'借款人银行卡类型*',max_length=20, choices=BANK_TYPE_CHOICES, blank=False)
     borrower_bankcard_bank_name = models.CharField(verbose_name=u'开户行*', max_length=64, blank=False)
     borrower_bankcard_bank_code = models.CharField(verbose_name=u'借债人银行(汇付表格专用)*',choices=BANK_METHOD_CHOICES, max_length=64, blank=False)
     borrower_bankcard_bank_province = models.CharField(u'借债人银行省份', max_length=64, blank=True)

@@ -23,8 +23,9 @@ def withdraw_failed(error_message):
 
 @suffix
 def withdraw_submitted(amount, issue_time):
-    arrive_date = issue_time + timedelta(days=3)
-    return u'提现申请成功，申请金额%s元，预计%s前到账。' % (str(amount), format_datetime(arrive_date, u'%Y年%m月%d日'))
+    #arrive_date = issue_time + timedelta(days=3)
+    #return u'提现申请成功，申请金额%s元，预计%s前到账。' % (str(amount), format_datetime(arrive_date, u'%Y年%m月%d日'))
+    return u'提现申请成功，申请金额%s元，预计3个工作日内到账。' % amount
 
 @suffix
 def product_settled(product, settled_time):
