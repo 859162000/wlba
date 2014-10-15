@@ -356,7 +356,7 @@
       e.preventDefault();
       return $('.login-modal').trigger('click');
     });
-    return $("input:password").bind("copy cut paste", function(e) {
+    $("input:password").bind("copy cut paste", function(e) {
       var element;
       element = this;
       return setTimeout((function() {
@@ -366,6 +366,23 @@
           $(element).val('');
         }
       }), 100);
+    });
+    return $(window).load(function(e) {
+      return $.getScript("http://wpa.b.qq.com/cgi/wpa.php", function(data, textStatus, jqxhr) {
+        return BizQQWPA.addCustom([
+          {
+            aty: "1",
+            a: "1001",
+            nameAccount: "4008588066",
+            selector: "qq-container"
+          }, {
+            aty: "1",
+            a: "1001",
+            nameAccount: "4008588066",
+            selector: "top-qq"
+          }
+        ]);
+      });
     });
   });
 

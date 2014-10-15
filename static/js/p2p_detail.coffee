@@ -18,6 +18,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     return Number(value) > 0
   , '请输入有效金额'
 
+
   $('#purchase-form').validate
     rules:
       amount:
