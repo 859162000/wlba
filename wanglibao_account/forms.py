@@ -76,7 +76,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         invite_code = self.cleaned_data.get('invitecode')
         if invite_code:
             try:
-                InviteCode.objects.get(code=invite_code)
+                InviteCode.objects.get(code=invite_code, is_used=True)
             except:
                 raise forms.ValidationError(
                             self.error_messages['invite code not match'],
