@@ -82,6 +82,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                             self.error_messages['invite code not match'],
                             code='invite code not match',
                         )
+            return invite_code
 
     def clean(self):
         if 'identifier' in self.cleaned_data:

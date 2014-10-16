@@ -88,7 +88,8 @@ def generate_user_promo_token(sender, instance, **kwargs):
         p.save()
 
 
-post_save.connect(generate_user_promo_token, sender=get_user_model(), dispatch_uid="generate_promotion_token")
+# post_save.connect(generate_user_promo_token, sender=get_user_model(), dispatch_uid="generate_promotion_token")
+post_save.connect(generate_user_promo_token_and_invitecode, sender=get_user_model(), dispatch_uid="generate_promotion_token")
 
 
 class TimelySiteData(models.Model):
