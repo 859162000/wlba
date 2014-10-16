@@ -15,22 +15,22 @@ from marketing.models import IntroducedBy, PromotionToken
 #             # Clean the session
 #             del request.session[settings.PROMO_TOKEN_USER_SESSION_KEY]
 
+
 def set_promo_user(request, user, invitecode=''):
     if user:
-        user_id = request.session.get(settings.PROMO_TOKEN_USER_SESSION_KEY, None)
-
-        if user_id:
-            introduced_by_user = get_user_model().objects.get(pk=user_id)
-            save_introducedBy(user, introduced_by_user)
-
-            # Clean the session
-            del request.session[settings.PROMO_TOKEN_USER_SESSION_KEY]
+        if invitecode:
+            recordpromo = PromotionToken.objects.filter(token=invitecode).first()
+            if recordpromo:
+                introduced_by_user = get_user_model().objects.get(pk=recordpromo.pk)
+                save_introducedBy(user, introduced_by_user)
         else:
-            if invitecode:
-                recordpromo = PromotionToken.objects.filter(token=invitecode).first()
-                if recordpromo:
-                    introduced_by_user = get_user_model().objects.get(pk=recordpromo.pk)
-                    save_introducedBy(user, introduced_by_user)
+            user_id = request.session.get(settings.PROMO_TOKEN_USER_SESSION_KEY, None)
+            if user_id:
+                introduced_by_user = get_user_model().objects.get(pk=user_id)
+                save_introducedBy(user, introduced_by_user)
+
+                # Clean the session
+                del request.session[settings.PROMO_TOKEN_USER_SESSION_KEY]
 
 def save_introducedBy(user, introduced_by_user):
     record = IntroducedBy()
