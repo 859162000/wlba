@@ -1,0 +1,52 @@
+.help
+  .sub-nav
+    height: 70px
+    line-height: 70px
+    border-bottom: 1px dashed #D9D9D9
+    font-size: 14px
+    margin-bottom: 40px
+    span
+      margin-right: 10px
+
+
+  .help-menu
+    width: 270px
+    float: left
+
+    li
+      height: 45px
+      line-height: 45px
+      text-align: center
+      border-bottom: 1px dashed #cccccc
+
+      a
+
+      &.current
+        background-color: #fafafa
+        border-left: 3px solid red
+
+      &.last
+        border-bottom-width: 0px
+
+
+
+  .help-content
+    overflow: hidden
+    zoom: 1
+    padding-left: 50px
+
+    .list-item
+      border-width: 1px
+      border-style: solid
+      border-color: #fafafa
+      .list-item-title
+        height: 42px
+        line-height: 42px
+        background-color: #fafafa
+
+      .list-item-content
+        display: none
+      &.active
+        border-color: #d3d3d3
+        .list-item-content
+          display: block
