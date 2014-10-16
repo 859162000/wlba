@@ -77,7 +77,7 @@ class SendRegisterValidationCodeView(APIView):
 
         status, message = send_validation_code(phone_number)
         return Response({
-                            'message': message
+                        'message': message
                         }, status=status)
 
 

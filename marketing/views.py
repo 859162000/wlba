@@ -1,3 +1,5 @@
+# encoding:utf-8
+
 from datetime import date, timedelta, datetime
 from collections import defaultdict
 
