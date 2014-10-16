@@ -19,6 +19,17 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
                 ['listen', '80'],
                 ['server_name', 'wanglibao.com'],
                 ['return', '301 https://www.wanglibao.com$request_uri'],
+            ]],
+            [['server'], [
+                ['listen', '443 ssl'],
+                ['server_name', 'wanglibao.com'],
+                ['ssl_certificate', '/etc/nginx/ssl/wanglibao.crt'],
+                ['ssl_certificate_key', '/etc/nginx/ssl/wanglibao.key'],
+                ['ssl_protocols', 'SSLv3 TLSv1 TLSv1.1 TLSv1.2'],
+                ['ssl_ciphers', 'RC4:HIGH:!aNULL:!MD5'],
+                ['ssl_session_cache', 'shared:SSL:10m'],
+                ['ssl_session_timeout', '10m'],
+                ['return', '301 https://www.wanglibao.com$request_uri'],
             ]]
         ]
 

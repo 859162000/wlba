@@ -137,6 +137,9 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                          u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'审核时间', u'编号'])
 
         for payinfo in payinfos:
+            confirm_time = ""
+            if payinfo.confirm_time:
+                confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M")
             writer.writerow([
                 str(payinfo.id),
                 payinfo.user.wanglibaouserprofile.phone,
@@ -153,7 +156,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 timezone.localtime(payinfo.create_time).strftime("%Y-%m-%d %H:%M"),
                 str(payinfo.request_ip),
                 unicode(payinfo.status),
-                timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M"),
+                confirm_time,
                 unicode(payinfo.uuid)
             ])
         return output.getvalue()
@@ -263,7 +266,7 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'贷款号', u'用户名称', u'借款标题', u'借款金额', u'已借金额', u'利率', u'借款期限', u'还款方式',
                          u'借款类型', u'投资次数', u'状态', u'满标时间', u'真实姓名', u'手机号', u'身份证', u'银行名', u'银行账号',
-                         u'省份', u'地区', u'支行'])
+                         u'银行卡类型', u'省份', u'地区', u'支行'])
 
         # Get all products with status 满标待打款
         products = P2PProduct.objects.filter(status=u'满标待打款')
@@ -288,6 +291,7 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
                 unicode(product.borrower_id_number),
                 unicode(product.borrower_bankcard_bank_code),
                 unicode(product.borrower_bankcard),
+                unicode(product.borrower_bankcard_type),
                 unicode(product.borrower_bankcard_bank_province),
                 unicode(product.borrower_bankcard_bank_city),
                 unicode(product.borrower_bankcard_bank_branch)

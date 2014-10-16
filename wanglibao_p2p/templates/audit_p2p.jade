@@ -1,3 +1,5 @@
+- load formatters
+
 doctype html
 
 html
@@ -89,4 +91,4 @@ html
             -csrf_token
             button.button-primary(type="submit") 审核通过
 
-          a.button-primary.margin-left-m(href="/admin/wanglibao_p2p/p2pproduct/") 返回
+          a.button-primary.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/p2pproduct/') 返回

@@ -100,6 +100,7 @@ INSTALLED_APPS = (
     'wanglibao_pay',
     'order',
     'wanglibao_margin',
+    'wanglibao_help',
 
     'marketing',
     'report',
@@ -481,6 +482,7 @@ DEBUG_TOOLBAR_CONFIG = {
 
 USE_L10N=False
 DATETIME_FORMAT='Y-m-d H:i:s'
+ADMIN_ADDRESS='AK7WtEQ4Q9KPs8Io_zOncw'
 # DATE_FORMAT='Y-m-d'
 
 # AUTH_PROFILE_MODULE = 'wanglibao_profile.WanglibaoUserProfile'
