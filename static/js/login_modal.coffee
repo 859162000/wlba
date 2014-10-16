@@ -331,19 +331,19 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
     #return false
 
   #author: hetao; time: 2014.10.15
-  $(window).load (e) ->
-    $.getScript "http://wpa.b.qq.com/cgi/wpa.php", (data, textStatus, jqxhr) ->
-      BizQQWPA.addCustom [
-        {
-          aty: "1" #指定工号类型
-          a: "1001" #指定的工号企业 WPA OpenAPI
-          nameAccount: "4008588066" #营销 QQ 号码
-          selector: "qq-container" #WPA 被放置的元素
-        }
-        {
-          aty: "1" #指定工号类型
-          a: "1001" #指定的工号企业 WPA OpenAPI
-          nameAccount: "4008588066" #营销 QQ 号码
-          selector: "top-qq" #WPA 被放置的元素
-        }
-      ]
+#  $(window).load (e) ->
+#    $.getScript "http://wpa.b.qq.com/cgi/wpa.php", (data, textStatus, jqxhr) ->
+#      BizQQWPA.addCustom [
+#        {
+#          aty: "1" #指定工号类型
+#          a: "1001" #指定的工号企业 WPA OpenAPI
+#          nameAccount: "4008588066" #营销 QQ 号码
+#          selector: "qq-container" #WPA 被放置的元素
+#        }
+#        {
+#          aty: "1" #指定工号类型
+#          a: "1001" #指定的工号企业 WPA OpenAPI
+#          nameAccount: "4008588066" #营销 QQ 号码
+#          selector: "top-qq" #WPA 被放置的元素
+#        }
+#      ]
