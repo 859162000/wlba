@@ -96,14 +96,14 @@ block main
         if(isFlashPlugin == 1){
           $(".inviteCopyButton[data-target='invite-textarea']").zclip({
             path: "/static/images/ZeroClipboard.swf",
-            copy: $('.invite-textarea').text(),
+            copy: $.trim($('.invite-textarea').text()),
             afterCopy:function(){
               $('#copyed_modal').modal();
             }
           });
           $(".inviteCopyButton[data-target='invite-input']").zclip({
             path: "/static/images/ZeroClipboard.swf",
-            copy: $('.invite-input').text(),
+            copy: $.trim($('.invite-input').text()),
             afterCopy:function(){
               $('#copyed_modal').modal();
             }
