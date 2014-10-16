@@ -9,6 +9,7 @@ from django.db.models import F
 from utils import detect_identifier_type, verify_id
 from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_sms.utils import validate_validation_code
+from marketing.models import InviteCode
 
 User = get_user_model()
 
@@ -29,6 +30,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     identifier = forms.CharField(label="Email/Phone")
     validate_code = forms.CharField(label="Validate code for phone", required=True)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    invitecode = forms.CharField(label="Invitecode", required=False)
+
 
     error_messages = {
         'duplicate_username': u'该邮箱或手机号已经注册',
@@ -36,7 +39,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         'validate_code_for_email': u'邮箱注册时不需要提供验证码',
         'validate code not match': u'验证码不正确',
         'validate code not exist': u'没有发送验证码',
-        'validate must not be null': u'验证码不能为空'
+        'validate must not be null': u'验证码不能为空',
+        'invite code not match': u'邀请码错误'
     }
 
     class Meta:
@@ -67,6 +71,18 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         raise forms.ValidationError(
             self.error_messages['duplicate_username'],
             code='duplicate_username', )
+
+    def clean_invitecode(self):
+        invite_code = self.cleaned_data.get('invitecode')
+        if invite_code:
+            try:
+                InviteCode.objects.get(code=invite_code)
+            except:
+                raise forms.ValidationError(
+                            self.error_messages['invite code not match'],
+                            code='invite code not match',
+                        )
+            return invite_code
 
     def clean(self):
         if 'identifier' in self.cleaned_data:

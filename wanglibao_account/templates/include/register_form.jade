@@ -20,6 +20,9 @@ form#register-modal-form.login-form(method='post', action='/accounts/register/aj
   .form-row
     input#reg_password2(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
     .form-row-error
+  .form-row
+    input#reg_password2(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码", maxlength="20")
+    .form-row-error
   .form-row.form-bottom-bar
     button#register_submit.button-account.span12(type='submit') 注 册
     .agreement

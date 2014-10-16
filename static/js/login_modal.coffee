@@ -108,7 +108,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       identifier:
         required: true
         isMobile: true
-      validation_code:
+      validate_code:
         required: true
         depends: (e)->
           checkMobile($('#reg_identifier').val())
@@ -125,7 +125,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       identifier:
         required: '不能为空'
         isMobile: '请输入手机号'
-      validation_code:
+      validate_code:
         required: '不能为空'
       password:
         required: '不能为空'
@@ -195,7 +195,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
           result = JSON.parse xhr.responseText
           if xhr.status == 429
 
-            tool.modalAlert({title: '温馨提示', msg: "访问过于频繁，请稍候重试", callback_ok: _showModal})
+            tool.modalAlert({title: '温馨提示', msg: "系统繁忙，请稍候重试", callback_ok: _showModal})
           else
             tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
 
@@ -329,3 +329,21 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       return
     ), 100
     #return false
+
+  #author: hetao; time: 2014.10.15
+#  $(window).load (e) ->
+#    $.getScript "http://wpa.b.qq.com/cgi/wpa.php", (data, textStatus, jqxhr) ->
+#      BizQQWPA.addCustom [
+#        {
+#          aty: "1" #指定工号类型
+#          a: "1001" #指定的工号企业 WPA OpenAPI
+#          nameAccount: "4008588066" #营销 QQ 号码
+#          selector: "qq-container" #WPA 被放置的元素
+#        }
+#        {
+#          aty: "1" #指定工号类型
+#          a: "1001" #指定的工号企业 WPA OpenAPI
+#          nameAccount: "4008588066" #营销 QQ 号码
+#          selector: "top-qq" #WPA 被放置的元素
+#        }
+#      ]

@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
+from views import MarketingView
+
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode
 from marketing.views import GennaeratorCode
+
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export import fields
@@ -37,7 +40,7 @@ class IntroducedByResource(resources.ModelResource):
 
 
 class IntroducedByAdmin(ImportExportModelAdmin):
-    list_display = ("user", "introduced_by", "created_at", "bought_at", "gift_send_at")
+    list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
     readonly_fields = ("bought_at", "user", "introduced_by")
     list_editable = ("gift_send_at",)
 
@@ -67,7 +70,8 @@ admin.site.register(SiteData, SiteDataAdmin)
 admin.site.register(PromotionToken, PromotionTokenAdmin)
 admin.site.register(IntroducedBy, IntroducedByAdmin)
 admin.site.register(TimelySiteData, TimelySitedataAdmin)
-admin.site.register(InviteCode, InviteCodeAdmin)
 
+admin.site.register_view('statistics/diary', view=MarketingView.as_view(),name=u'diary')
+admin.site.register(InviteCode, InviteCodeAdmin)
 
 admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')
