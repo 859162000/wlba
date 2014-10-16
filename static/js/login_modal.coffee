@@ -110,8 +110,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         isMobile: true
       validate_code:
         required: true
-        depends: (e)->
-          checkMobile($('#reg_identifier').val())
+
       password:
         required: true
         minlength: 6
