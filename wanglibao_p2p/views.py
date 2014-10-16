@@ -325,7 +325,7 @@ class GetNoWProjectsAPI(APIView):
                 "title": p2p.name,
                 "amount": amount,
                 "schedule": schedule,
-                "interestRate": '{}%'.format(p2p.expected_earning_rate),
+                "interestRate": '{}%'.format(p2p.expected_earning_rate - p2p.excess_earning_rate),
                 "deadline": str(p2p.period),
                 "deadlineUnit": u"月",
                 "reward": '{}%'.format(p2p.excess_earning_rate),
@@ -400,7 +400,7 @@ class GetProjectsByDateAPI(APIView):
                 "title": p2p.name,
                 "amount": amount,
                 "schedule": schedule,
-                "interestRate": '{}%'.format(p2p.expected_earning_rate),
+                "interestRate": '{}%'.format(p2p.expected_earning_rate - p2p.excess_earning_rate),
                 "deadline": str(p2p.period),
                 "deadlineUnit": u"月",
                 "reward": '{}%'.format(p2p.excess_earning_rate),
@@ -433,7 +433,7 @@ class FinancesAPI(APIView):
         p2p_list = []
         status = 1
         for p2p in p2pproducts:
-            shouyi = "{}%".format(p2p.expected_earning_rate + p2p.excess_earning_rate)
+            shouyi = "{}%".format(p2p.expected_earning_rate)
             # 获取结束时间，把utc时间转换成北京时间
             end_time = timezone.localtime(p2p.end_time)
             end_date =  end_time.strptime(end_time.strftime("%Y-%m-%d"), '%Y-%m-%d').date()
