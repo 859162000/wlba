@@ -7,6 +7,7 @@
     margin-bottom: 40px
     span
       margin-right: 10px
+      font-size: 14px
 
 
   .help-menu
@@ -20,10 +21,13 @@
       border-bottom: 1px dashed #cccccc
 
       a
+        font-size: 16px
 
       &.current
         background-color: #fafafa
         border-left: 3px solid red
+        a
+          color: red
 
       &.last
         border-bottom-width: 0px
@@ -39,14 +43,24 @@
       border-width: 1px
       border-style: solid
       border-color: #fafafa
+      font-size: 14px
+      margin-bottom: 10px
+      +border-radius(5px)
+
       .list-item-title
         height: 42px
         line-height: 42px
         background-color: #fafafa
+        padding-left: 10px
+        cursor: pointer
 
       .list-item-content
         display: none
+        padding: 10px
       &.active
         border-color: #d3d3d3
+        .list-item-title
+          background-color: #d3d3d3
+
         .list-item-content
           display: block

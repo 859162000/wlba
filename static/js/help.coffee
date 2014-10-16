@@ -4,6 +4,5 @@ require.config(
 )
 
 require ['jquery'], ($) ->
-  console.log 'hello, world'
-
+  $('.list-item-title').on 'click', () ->
 
