@@ -118,10 +118,7 @@
           isMobile: true
         },
         validate_code: {
-          required: true,
-          depends: function(e) {
-            return checkMobile($('#reg_identifier').val());
-          }
+          required: true
         },
         password: {
           required: true,
