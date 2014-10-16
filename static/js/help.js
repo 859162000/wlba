@@ -7,7 +7,9 @@
   });
 
   require(['jquery'], function($) {
-    return $('.list-item-title').on('click', function() {});
+    return $('.list-item-title').on('click', '.list-item-title', function(e) {
+      return console.log('hello, world');
+    });
   });
 
 }).call(this);
