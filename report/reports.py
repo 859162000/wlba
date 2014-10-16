@@ -137,6 +137,9 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                          u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'审核时间', u'编号'])
 
         for payinfo in payinfos:
+            confirm_time = ""
+            if payinfo.confirm_time:
+                confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M")
             writer.writerow([
                 str(payinfo.id),
                 payinfo.user.wanglibaouserprofile.phone,
@@ -153,7 +156,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 timezone.localtime(payinfo.create_time).strftime("%Y-%m-%d %H:%M"),
                 str(payinfo.request_ip),
                 unicode(payinfo.status),
-                timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M"),
+                confirm_time,
                 unicode(payinfo.uuid)
             ])
         return output.getvalue()
