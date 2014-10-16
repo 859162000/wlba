@@ -217,6 +217,7 @@ class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = P2PProductSerializer
+    paginate_by = 10
 
     def get_queryset(self):
         qs = super(P2PProductViewSet, self).get_queryset()
