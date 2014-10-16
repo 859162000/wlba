@@ -117,7 +117,7 @@
           required: true,
           isMobile: true
         },
-        validation_code: {
+        validate_code: {
           required: true,
           depends: function(e) {
             return checkMobile($('#reg_identifier').val());
@@ -140,7 +140,7 @@
           required: '不能为空',
           isMobile: '请输入手机号'
         },
-        validation_code: {
+        validate_code: {
           required: '不能为空'
         },
         password: {
@@ -222,7 +222,7 @@
           if (xhr.status === 429) {
             return tool.modalAlert({
               title: '温馨提示',
-              msg: "访问过于频繁，请稍候重试",
+              msg: "系统繁忙，请稍候重试",
               callback_ok: _showModal
             });
           } else {
@@ -356,7 +356,7 @@
       e.preventDefault();
       return $('.login-modal').trigger('click');
     });
-    return $("input:password").bind("copy cut paste", function(e) {
+    $("input:password").bind("copy cut paste", function(e) {
       var element;
       element = this;
       return setTimeout((function() {
@@ -366,6 +366,23 @@
           $(element).val('');
         }
       }), 100);
+    });
+    return $(window).load(function(e) {
+      return $.getScript("http://wpa.b.qq.com/cgi/wpa.php", function(data, textStatus, jqxhr) {
+        return BizQQWPA.addCustom([
+          {
+            aty: "1",
+            a: "1001",
+            nameAccount: "4008588066",
+            selector: "qq-container"
+          }, {
+            aty: "1",
+            a: "1001",
+            nameAccount: "4008588066",
+            selector: "top-qq"
+          }
+        ]);
+      });
     });
   });
 

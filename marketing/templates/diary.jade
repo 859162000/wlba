@@ -1,0 +1,107 @@
+//
+   Created by taohe on 14-9-22.
+-load formatters
+doctype html
+html
+  head
+    - with '日数据明细 ' as title
+    - endwith
+    link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/metisMenu/metisMenu.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/sb-admin-2.css", media="screen, projection", rel="stylesheet", type="text/css")
+    script(src="/static/js/require.js", data-main="/static/js/header")
+
+  body(role="document")
+
+    #wrapper
+      nav.navbar.navbar-default.navbar-static-top(role="navigation", style="margin-bottom:0px")
+        .navbar-header
+          a.navbar-brand(href="?") 网利宝统计数据
+
+        .navbar-default.sidebar(role="navigation")
+          .sidebar-nav.navbar-collapse
+            ul.nav#side-menu
+              li
+                a.active
+                  i.fa.fa-table.fa-fw
+                  日数据明细
+
+      #page-wrapper
+
+        .row
+          .col-lg-12
+            h1.page-header 日明细数据
+
+        .row
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading 每日注册用户详细数据
+
+              .panel-body
+                .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 日期
+                        th(rowspan="1") 注册数
+                        th(rowspan="1", colspan="1") 新增交易数
+                        th(rowspan="1") 新增交易额
+                    tbody
+                      {% for l in result %}
+                      tr
+                        td {{ l.each_day | date:"Y-m-d"}}
+                        td {{ l.joined_num }}
+                        td {{ l.trade_num }}
+                        td {{ l.amount }}
+
+                      {% endfor %}
+
+                .chart
+                  #container
+
+        .row(style="display:none")
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading 每日注册用户详细数据
+
+              .panel-body
+
+                .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="2") 日期
+                        th(rowspan="2") 注册数
+                        th(rowspan="1", colspan="3") 新增交易用户数
+                        th(rowspan="2") 2次以上交易用户数
+                        th(rowspan="2") 总交易数
+                        th(rowspan="2") 交易/注册
+                        th(rowspan="2") 新用户新增交易金额
+                        th(rowspan="2") 当日交易总额
+                        th(rowspan="2") APRU值
+                      tr
+                        th 当日新增
+                        th 老用户首次交易
+                        th 汇总
+                    tbody
+                      {% for l in users %}
+                      tr
+                        td {{ l.each_day | date:"Y-m-d"}}
+                        td {{ l.joined_num }}
+                        td
+                        td
+                        td
+                        td
+                        td
+                        td
+                        td
+                        td
+                        td
+                      {% endfor %}
+
+
+              .test
+script.
+  var result = {{ json_re | safe }};
+script.
+  require(["/static/js/lib/jquery.min.js", "/static/js/lib/highcharts.js", "/static/js/diary.js"])
