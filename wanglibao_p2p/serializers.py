@@ -6,6 +6,7 @@ from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from django.utils import timezone
 from views import P2PEquity
+from collections import OrderedDict
 
 
 def safe_phone(phone):
@@ -74,15 +75,15 @@ class P2PProductSerializer(ModelSerializerExtended):
         if value is None:
             return value
 
-        extra_data = json.loads(value)
+        extra_data = json.loads(value, object_pairs_hook=OrderedDict)
 
         if not self.request.user.is_authenticated():
             for section_key in extra_data:
                 for item_key in extra_data[section_key]:
                     extra_data[section_key][item_key] = u'请登录后查看'
 
-        return json.dumps(extra_data, ensure_ascii=False)
-        # return extra_data
+        return extra_data
+
 
     def pay_method_format(self, obj):
         pay_method = obj.display_payback_mapping.get(obj.pay_method)
