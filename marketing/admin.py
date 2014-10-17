@@ -23,7 +23,9 @@ class SiteDataAdmin(admin.ModelAdmin):
 
 class PromotionTokenAdmin(admin.ModelAdmin):
     list_display = ("user", "token")
-    readonly_fields = ("user", "token")
+    search_fields = ['user__wanglibaouserprofile__phone']
+    #readonly_fields = ("user", "token")
+
 
 class IntroducedByResource(resources.ModelResource):
 
@@ -62,8 +64,8 @@ class InviteCodeAdmin(admin.ModelAdmin):
     list_display = ('id', 'code', 'is_used')
     readonly_fields = ('code', )
 
-    def has_add_permission(self, request, obj=None):
-        return False
+    #def has_add_permission(self, request, obj=None):
+    #    return False
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
