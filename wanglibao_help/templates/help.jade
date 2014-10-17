@@ -25,30 +25,33 @@ html
         .help-menu
           ul
             for item in nav
-              li(data-target="{{item.title}}")
-                a(href="#") {{item.title}}
+              li(data-target="topic_{{item.id}}")
+                a(href="#") {{item.name}}
         .help-content
           for key,value in questions.items
-            if key == '热门问题'
-              .hot-items.help-box(data-source="{{key}}")
-                h1 {{key}}
+            if key == '0'
+              .hot-items.help-box(data-source="topic_{{key}}")
+                h1 热点问题
                 ul
                   for item in value
                     if forloop.counter|divisibleby:2
                       li.odd
-                        a(href="") {{item.title}}
+                        a(href="#",data-topic="topic_{{item.topic.id}}",data-item="content_{{item.id}}") {{item.title}}
                     else
                       li
-                        a(href="") {{item.title}}
+                        a(href="#",data-topic="topic_{{item.topic.id}}",data-item="content_{{item.id}}") {{item.title}}
 
             else
-              .list-items.help-box(data-source="{{key}}")
-                h1 {{key}}
+              .list-items.help-box(data-source="topic_{{key}}")
+                itemId = key
+                h1 {{map|lookup:key}}
                 .list-container
                   for item in value
                     .list-item(data-source="content_{{item.id}}")
                       .list-item-title {{item.title}}
                       .list-item-content {{item.answer}}
+
+
 
     script.
         require(["/static/js/help.js"])
