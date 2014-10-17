@@ -24,27 +24,36 @@ html
 
         .help-menu
           ul
-            li
-              a(href="#") 热门问题
-            li.current
-              a(href="#") 注册登录
-            li
-              a(href="#") P2P
-            li
-              a(href="#") 货币基金
-            li.last
-              a(href="#") 安全保障
-
+            //li
+            //  a(href="#") 热门问题
+            //li.current
+            //  a(href="#") 注册登录
+            //li
+            //  a(href="#") P2P
+            //li
+            //  a(href="#") 货币基金
+            //li.last
+            //  a(href="#") 安全保障
+            for item in nav
+              li(data-target="{{item.title}}")
+                a(href="#") {{item.title}}
         .help-content
-          h1 注册登录
-          .list-container
-            .list-item.active
-              .list-item-title 为什么要进行实名认证
-              .list-item-content 各种内容
-
-          .list-item
-              .list-item-title 为什么要进行实名认证
-              .list-item-content 各种内容
+          for key,value in questions.items
+            if key == '热门问题'
+              .hot-items.help-box(data-source="{{key}}")
+                h1 {{key}}
+                ul
+                  for item in value
+                    li
+                      a(href="") {{item.title}}
+            else
+              .list-items.help-box(data-source="{{key}}")
+                h1 {{key}}
+                .list-container
+                  for item in value
+                    .list-item
+                      .list-item-title {{item.title}}
+                      .list-item-content {{item.answer}}
 
     script.
         require(["/static/js/help.js"])

@@ -7,8 +7,25 @@
   });
 
   require(['jquery'], function($) {
-    return $('.list-item-title').on('click', '.list-item-title', function(e) {
-      return console.log('hello, world');
+    $('.list-container').on('click', '.list-item-title', function(e) {
+      var item;
+      item = $(this).parent();
+      if (item.hasClass('active')) {
+        return;
+      }
+      $('.list-item').removeClass('active');
+      item.addClass('active');
+    });
+    $('.host-items').on('click', 'li', function(e) {
+      return $('.help-box').removeClass('active');
+    });
+    return $(window).load(function(e) {
+      var source, tar;
+      tar = $('.help-menu li:eq(0)');
+      tar.addClass('current');
+      source = $('.help-box[data-source="' + tar.attr('data-target') + '"]');
+      source.addClass('active');
+      return $('.list-item:eq(0)', source).addClass('active');
     });
   });
 
