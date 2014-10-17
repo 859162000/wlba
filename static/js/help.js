@@ -16,8 +16,20 @@
       $('.list-item').removeClass('active');
       item.addClass('active');
     });
-    $('.host-items').on('click', 'li', function(e) {
-      return $('.help-box').removeClass('active');
+    $('.help-menu').on('click', 'li', function(e) {
+      var source, tar;
+      e.preventDefault();
+      if ($(this).hasClass('current')) {
+        return;
+      }
+      $('.help-menu li.current').removeClass('current');
+      $(this).addClass('current');
+      $('.help-box').removeClass('active');
+      $('.list-item').removeClass('active');
+      tar = $(this);
+      source = $('.help-box[data-source="' + tar.attr('data-target') + '"]');
+      source.addClass('active');
+      return $('.list-item:eq(0)', source).addClass('active');
     });
     return $(window).load(function(e) {
       var source, tar;
