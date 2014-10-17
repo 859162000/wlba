@@ -23,7 +23,7 @@ class SiteDataAdmin(admin.ModelAdmin):
 
 class PromotionTokenAdmin(admin.ModelAdmin):
     list_display = ("user", "token")
-    readonly_fields = ("user", "token")
+    #readonly_fields = ("user", "token")
 
 class IntroducedByResource(resources.ModelResource):
 
