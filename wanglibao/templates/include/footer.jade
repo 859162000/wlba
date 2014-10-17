@@ -43,11 +43,11 @@ mixin innerFooter()
         a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
         .space-xs
         a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
-        //.space-vertical-s
-        //dd.section--item
-        //  .qq-container#qq-container
-        //    在线客服
-        //    .qq-icon
+        .space-vertical-s
+        dd.section--item
+          a.qq-container#qq-container(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18xOTY5OTBfNDAwODU4ODA2Nl8yXw" target="_blank")
+            在线客服
+            .qq-icon
 
         a#qrweibo.footer--weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
           img(src="/static/images/weibo-qr.png")
