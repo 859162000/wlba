@@ -46,7 +46,7 @@ html
                 h1 {{key}}
                 .list-container
                   for item in value
-                    .list-item
+                    .list-item(data-source="content_{{item.id}}")
                       .list-item-title {{item.title}}
                       .list-item-content {{item.answer}}
 
