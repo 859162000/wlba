@@ -28,7 +28,7 @@ from operator import attrgetter, itemgetter
 from django.conf import settings
 from decimal import Decimal
 from hashlib import md5
-
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 
 REPAYMENTTYPEMAP = (
                 (u'到期还本付息', 1),
@@ -212,7 +212,7 @@ class AuditProductView(TemplateView):
 audit_product_view = staff_member_required(AuditProductView.as_view())
 
 
-from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+
 class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = (IsAdminUserOrReadOnly,)
@@ -262,11 +262,11 @@ class P2PProductListView(generics.ListCreateAPIView):
         if pager:
             return  P2PProduct.objects.filter(hide=False).filter(status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-                ]).filter(pager)
+                ]).filter(pager).order_by('-priority')
         else:
             return P2PProduct.objects.filter(hide=False).filter(status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-                ])
+                ]).order_by('-priority')
 
 
 class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
