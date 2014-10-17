@@ -12,3 +12,4 @@ class ErrorNumber():
     id_verify_times_error = 9
     card_number_error = 10
     card_isdefault_error = 11
+    contract_not_found = 12
