@@ -2,7 +2,8 @@ from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import UserViewSet, ResetPasswordAPI, FundInfoAPIView, \
-    AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI, AccountFundAssetAPI, P2PAmortizationAPI
+    AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI, AccountFundAssetAPI,\
+    P2PAmortizationAPI, UserProductContract
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -90,6 +91,8 @@ urlpatterns = patterns(
     url(r'^home/p2passet', AccountP2PAssetAPI.as_view()),
     url(r'^home/fundasset', AccountFundAssetAPI.as_view()),
     url(r'^home/p2p/amortization/(?P<product_id>\d+)', P2PAmortizationAPI.as_view()),
+
+    url(r'^p2p/contract/(?P<product_id>\d+)', UserProductContract.as_view()),
 )
 
 urlpatterns += patterns('',
