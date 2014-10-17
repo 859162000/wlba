@@ -33,6 +33,8 @@ class P2PProductSerializer(ModelSerializerExtended):
     display_status = serializers.SerializerMethodField('display_status_format')
     pay_method = serializers.SerializerMethodField('pay_method_format')
 
+    product_amortization = serializers.SerializerMethodField('product_amortization_format')
+
     class Meta:
         model = P2PProduct
         depth = 1
@@ -44,7 +46,7 @@ class P2PProductSerializer(ModelSerializerExtended):
                   "borrower_id_number", "borrower_bankcard", "borrower_bankcard_bank_name",
                   "borrower_bankcard_bank_code", "borrower_bankcard_bank_province", "borrower_bankcard_bank_city",
                   "borrower_bankcard_bank_branch", "total_amount", "ordered_amount", "extra_data", "publish_time",
-                  "end_time", "soldout_time", "limit_per_user", "warrant_company", "usage", "short_usage", "display_status")
+                  "end_time", "soldout_time", "limit_per_user", "warrant_company", "usage", "short_usage", "display_status", "product_amortization")
 
 
     def total_earning_joined(self, obj):
@@ -80,11 +82,26 @@ class P2PProductSerializer(ModelSerializerExtended):
                     extra_data[section_key][item_key] = u'请登录后查看'
 
         return json.dumps(extra_data, ensure_ascii=False)
-        return extra_data
+        # return extra_data
 
     def pay_method_format(self, obj):
         pay_method = obj.display_payback_mapping.get(obj.pay_method)
         return pay_method
+
+
+    def product_amortization_format(self, obj):
+        amortizations = obj.amortizations.all()
+
+        pro_amort_list = [{
+                'term': i.term,
+                'principal': float(i.principal),
+                'interest': float(i.interest),
+                'penal_interest': float(i.penal_interest)
+            } for i in amortizations]
+
+        return pro_amort_list
+
+
 
 class P2PEquitySerializer(ModelSerializerExtended):
     """ there noting """
