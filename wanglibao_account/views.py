@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404
 from django.shortcuts import resolve_url
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
@@ -400,7 +400,7 @@ class AccountP2PRecordAPI(APIView):
                     'equity_product_amortization_count': equity.product.amortization_count,                             # 还款期数
                     'equity_paid_interest': float(equity.paid_interest),                                                       # 单个已经收益
                     'equity_total_interest': float(equity.total_interest),                                                     # 单个预期收益
-                    'equity_contract': 'https://%s/accounts/p2p/contract/%s/' % (request.get_host(), equity.product.id), # 合同
+                    'equity_contract': 'https://%s/api/p2p/contract/%s/' % (request.get_host(), equity.product.id), # 合同
                     'product_id': equity.product_id
             } for equity in p2p_equities]
 
@@ -853,6 +853,26 @@ def user_product_contract(request, product_id):
         return HttpResponse("\n".join(lines))
     except ValueError, e:
         raise Http404
+
+
+class UserProductContract(APIView):
+
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, product_id):
+        equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
+
+        try:
+            f = equity.contract
+            lines = f.readlines()
+            f.close()
+            return HttpResponse("\n".join(lines))
+        except:
+            return Response({
+                'message': u'合同没有找到',
+                'error_number': ErrorNumber.contract_not_found
+            })
+
 
 
 @login_required
