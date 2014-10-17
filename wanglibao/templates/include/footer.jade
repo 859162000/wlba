@@ -31,27 +31,30 @@ mixin innerFooter()
       dl.footer-section
         dt.section--title 关注我们
         dd.section--item
-          span 官方QQ讨论群
-        dd.section--item
-          span 362121062
-
-      dl.footer-section
-        //.icon-phone-footer.font-xxxl
-        dt.section--title.footer--phone 4008-588-066
-        dd.section--item 客服热线 9:00 - 21:00
+          a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
+          a.social-text(href="http://weibo.com/u/5000682691", target="_blank", data-target="#qrweibo") 新浪微博
         .space-vertical-s
-        a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
-        .space-xs
-        a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
-        //.space-vertical-s
-        //dd.section--item
-        //  .qq-container#qq-container
-        //    在线客服
-        //    .qq-icon
+        dd.section--item
+          a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
+          a.social-text(href="javascript:void(0)", data-target="#qrcode") 微信
+
 
         a#qrweibo.footer--weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
           img(src="/static/images/weibo-qr.png")
         img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none", data-name="hoverbox")
+
+      dl.footer-section
+        //.icon-phone-footer.font-xxxl
+        dt.section--title.footer--phone 4008-588-066
+        dd.section--item 客服热线 9:00 - 18:00（工作日）
+
+        .space-vertical-s
+        dd.section--item
+          a.qq-container#qq-container(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18xOTY5OTBfNDAwODU4ODA2Nl8yXw" target="_blank")
+            在线客服
+            .qq-icon
+
+
 
   .footer-line
   if user.is_authenticated

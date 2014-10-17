@@ -1,10 +1,61 @@
-
-- load formatters
-- load mathfilters
-
+-load formatters
+-load mathfilters
 doctype html
 html
   head
-    title = nav[0]
+    - with '安全保障' as title
     include include/common_head
-    meta(name="keywords", content="网利宝")
+    - endwith
+    meta(name="keywords", content="安全保障")
+    meta(name="description", content="没有最安全，只有更安全")
+  body.white-background
+    include include/header
+    - with '安全保障' as activeItem
+    include include/navigation
+    - endwith
+
+      .container.help
+        .sub-nav
+          span 首页
+          span &gt;
+          span 帮助中心
+          span &gt;
+          span 注册登录
+
+        .help-menu
+          ul
+            for item in nav
+              li(data-target="topic_{{item.id}}")
+                a(href="#") {{item.name}}
+        .help-content
+          for key,value in questions.items
+            if key == '0'
+              .hot-items.help-box(data-source="topic_{{key}}")
+                h1 热点问题
+                ul
+                  for item in value
+                    if forloop.counter|divisibleby:2
+                      li.odd
+                        a(href="#",data-topic="topic_{{item.topic.id}}",data-item="content_{{item.id}}") {{item.title}}
+                    else
+                      li
+                        a(href="#",data-topic="topic_{{item.topic.id}}",data-item="content_{{item.id}}") {{item.title}}
+
+            else
+              .list-items.help-box(data-source="topic_{{key}}")
+                itemId = key
+                h1 {{map|lookup:key}}
+                .list-container
+                  for item in value
+                    .list-item(data-source="content_{{item.id}}")
+                      .list-item-title {{item.title}}
+                      .list-item-content {{item.answer}}
+
+
+
+    script.
+        require(["/static/js/help.js"])
+    - with 1 as no_footbar
+    include include/footer
+    - endwith
+    include include/tracking

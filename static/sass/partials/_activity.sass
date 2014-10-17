@@ -3,8 +3,27 @@
   font-size: $font-s
   padding: $space-l 0
 
+.activity-invite-top
+  @extend .full-container
+  background: url(/static/images/activity/invite_top_bg.jpg) top center no-repeat
+  height: 800px
+
 .back-home
   padding-top: $space-l
+
+.invite-back-home
+  width: 120px
+  height: 40px
+  float: right
+  background: url("/static/images/activity/go_home.jpg") no-repeat
+
+.invite-buying
+  float: left
+  background: url("/static/images/activity/buy_bg.png") no-repeat
+  width: 210px
+  height: 65px
+  margin-top: 410px
+  margin-left: 17px
 
 .icon-home
   width: 19px
@@ -29,7 +48,7 @@
     background: url("/static/images/activity/buying.png") no-repeat
 
 .activity-text
-  border-top: solid 2px #ef4a58
+  border-top: solid 1px #d4d4d4
   position: relative
   margin-top: $space-xxl
   text-align: center
@@ -43,10 +62,67 @@
     padding: 0 $space-sm
 
 .activity-title
-  font-size: $font-xl
+  font-size: $font-xll
   color: #ef4a58
   font-weight: normal
   text-align: center
+
+.activity-list-image
+  +clearfix
+  padding: 20px 0
+
+  ul
+    float: left
+    width: 313px
+    text-align: center
+    position: relative
+
+    li
+      position: relative
+
+    &:first-child
+      margin-right: 77px
+
+    &:last-child
+      float: right
+
+    .list-image-active
+      width: 313px
+      height: 313px
+      line-height: 300px
+      text-align: center
+      border: solid 1px #d4d4d4
+      margin-bottom: 10px
+
+      img
+        vertical-align: middle
+
+    .icon-activity-hot
+      +inline-block
+      position: absolute
+      top: 0
+      left: 0
+      width: 70px
+      height: 70px
+
+    .icon-activity-hot1
+      background: url("/static/images/activity/icon_hot.png") 0 0 no-repeat
+
+    .icon-activity-hot2
+      background: url("/static/images/activity/icon_hot.png") -70px 0 no-repeat
+
+    .icon-activity-hot3
+      background: url("/static/images/activity/icon_hot.png") -140px 0 no-repeat
+
+    .icon-activity-hot4
+      background: url("/static/images/activity/icon_hot.png") -210px 0 no-repeat
+
+    p
+      font-size: $font-l
+
+  .margin-space
+    width: 77px
+
 
 .activity-list
   padding: $space-l 0
@@ -59,7 +135,7 @@
   li
     line-height: 47px
     height: 47px
-    font-size: $font-s
+    font-size: $font-m
     text-indent: 15px
 
     &.active
@@ -99,16 +175,21 @@
 .invite-text
   text-align: center
   padding: $space-l 0
-  font-size: $font-m
+  font-size: $font-l
   line-height: 30px
 
 .make-money-guide
-  height: 315px
-  background: #ef4a58 url("/static/images/activity/bg.png") repeat-x 0 -97px
+  height: 320px
+  background: #ef4a58 url("/static/images/activity/makemoney.jpg") top center
 
   .container
     text-align: center
     padding-top: $space-xxxl
+
+.activity-footer-invite
+  margin-top: $space-xxl
+  height: 360px
+  background: #d64c45 url("/static/images/activity/icon_hot.png") left -85px repeat-x
 
 .activity-footer
   margin-top: $space-xxl * 3

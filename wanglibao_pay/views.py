@@ -15,17 +15,19 @@ from django.views.generic import TemplateView, View
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from order.models import Order
 from order.utils import OrderHelper
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import Bank, Card, PayResult
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
+from wanglibao_pay.lianlian_pay import LianlianPay
 from wanglibao_pay.models import PayInfo
 from wanglibao_p2p.models import P2PRecord
 import decimal
-from rest_framework.response import Response
-from rest_framework.throttling import UserRateThrottle
 from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -557,3 +559,23 @@ class AdminTransactionDeposit(TemplateView):
         return super(AdminTransactionDeposit, self).dispatch(request, *args, **kwargs)
 
 
+#连连支付IOS生成订单
+class LianlianAppPayView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def POST(self, request):
+        lianpay = LianlianPay()
+        result = lianpay.ios_pay(request)
+        return Response(result)
+
+#连连支付IOS支付成功回调
+class LianlianAppPayCallbackView(APIView):
+    permission_classes = ()
+
+    def POST(self, request):
+        lianpay = LianlianPay()
+        result = lianpay.ios_pay_callback(request)
+        if not result['ret_code']:
+            result['ret_code'] = "0000"
+            result['ret_msg'] = "SUCCESS"
+        return Response(result)
