@@ -54,11 +54,12 @@ class RegisterView (RegistrationView):
         nickname = cleaned_data['nickname']
         password = cleaned_data['password']
         identifier = cleaned_data['identifier']
+        invitecode = cleaned_data['invitecode']
 
         user = create_user(identifier, password, nickname)
 
-        set_promo_user(request, user)
-
+        # set_promo_user(request, user)
+        set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
         return user
@@ -814,6 +815,7 @@ class P2PAmortizationView(TemplateView):
             'equity': equity,
             'amortizations': amortizations
         }
+
 
 class P2PAmortizationAPI(APIView):
     permission_classes = (IsAuthenticated, )

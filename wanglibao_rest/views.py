@@ -49,6 +49,7 @@ class SendValidationCodeView(APIView):
                         }, status=status)
 
 
+from django.utils.decorators import method_decorator
 class SendRegisterValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone
@@ -79,6 +80,11 @@ class SendRegisterValidationCodeView(APIView):
         return Response({
                         'message': message
                         }, status=status)
+
+    def dispatch(self, request, *args, **kwargs):
+        # ip = request.META['REMOTE_ADDR']
+        # print ip
+        return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
 
 
 class RegisterAPIView(APIView):

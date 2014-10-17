@@ -23,7 +23,7 @@ class MockGenerator(object):
     @classmethod
     def generate_codes(cls, item_counts):
 
-        letters = 'abcdefghijkmnpqrstuvwxyzABCDEFGHIJKMNPQRSTUVWXYZ'
+        letters = 'abcdefghijkmnpqrstuvwxyz'
         digits = '23456789'
         # salt = [''.join(random.sample(letters+digits, 6)) for i in range(item_counts)]
         # salt_list = list(set(salt))
