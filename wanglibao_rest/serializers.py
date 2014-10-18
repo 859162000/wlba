@@ -38,19 +38,13 @@ class RegisterUserSerializer(serializers.Serializer):
     password = serializers.CharField()
     nickname = serializers.CharField()
     validate_code = serializers.CharField()
-    #invite_code = serializers.CharField()
+   # invite_code = serializers.CharField()
 
     def validate(self, attrs):
         identifier = attrs.get('identifier')
         password = attrs.get('password')
         validate_code = attrs.get('validate_code')
         nickname = attrs.get('nickname')
-        invite_code = attrs.get('invite_code')
-        if invite_code:
-            try:
-                PromotionToken.objects.get(token=invite_code)
-            except:
-                raise serializers.ValidationError(u"邀请码错误")
 
         if identifier and password and validate_code and nickname:
             identifier_type = detect_identifier_type(identifier)
