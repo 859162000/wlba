@@ -36,17 +36,16 @@ class RegisterUserSerializer(serializers.Serializer):
     """
     identifier = serializers.CharField()
     password = serializers.CharField()
-    nickname = serializers.CharField()
+    #nickname = serializers.CharField()
     validate_code = serializers.CharField()
-   # invite_code = serializers.CharField()
 
     def validate(self, attrs):
         identifier = attrs.get('identifier')
         password = attrs.get('password')
         validate_code = attrs.get('validate_code')
-        nickname = attrs.get('nickname')
+        #nickname = attrs.get('nickname')
 
-        if identifier and password and validate_code and nickname:
+        if identifier and password and validate_code:
             identifier_type = detect_identifier_type(identifier)
 
             if identifier_type != 'phone':
