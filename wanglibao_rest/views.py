@@ -13,6 +13,7 @@ from rest_framework import status
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from marketing.utils import set_promo_user
 from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
@@ -95,8 +96,10 @@ class RegisterAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.DATA)
         if serializer.is_valid():
-            create_user(serializer.object['identifier'], serializer.object['password'], serializer.object['nickname'])
-            return Response({'message': 'user generated'})
+            invite_code = serializer.object['invite_code']
+            user = create_user(serializer.object['identifier'], serializer.object['password'], serializer.object['nickname'])
+            set_promo_user(request, user, invitecode=invite_code)
+            return Response({'message': '注册成功'})
         return Response(serializer.errors, status=status.HTTP_200_OK)
 
 
