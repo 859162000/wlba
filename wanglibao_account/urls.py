@@ -41,6 +41,7 @@ urlpatterns = patterns(
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
+    url(r'^register/wap/$', TemplateView.as_view(template_name='register_wap.jade'), name='wap_register'),
     url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
     url(r'^email/sent/$', EmailSentView.as_view(), name='email_sent'),
 
