@@ -103,11 +103,11 @@ class RegisterAPIView(APIView):
                 try:
                     PromotionToken.objects.get(token=invite_code)
                 except:
-                    return Response(u"邀请码错误", status=status.HTTP_200_OK)
+                    return Response({"non_field_errors": u"邀请码错误"}, status=status.HTTP_200_OK)
             user = create_user(serializer.object['identifier'], serializer.object['password'], "")
             if invite_code:
                 set_promo_user(request, user, invitecode=invite_code)
-            return Response({'message': '注册成功'})
+            return Response(u'注册成功', status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_200_OK)
 
 
