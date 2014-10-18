@@ -38,7 +38,7 @@ class RegisterUserSerializer(serializers.Serializer):
     password = serializers.CharField()
     nickname = serializers.CharField()
     validate_code = serializers.CharField()
-    invite_code = serializers.CharField()
+    #invite_code = serializers.CharField()
 
     def validate(self, attrs):
         identifier = attrs.get('identifier')
@@ -46,7 +46,6 @@ class RegisterUserSerializer(serializers.Serializer):
         validate_code = attrs.get('validate_code')
         nickname = attrs.get('nickname')
         invite_code = attrs.get('invite_code')
-
         if invite_code:
             try:
                 PromotionToken.objects.get(token=invite_code)

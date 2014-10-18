@@ -94,9 +94,10 @@ class RegisterAPIView(APIView):
     serializer_class = RegisterUserSerializer
 
     def post(self, request, *args, **kwargs):
+
         serializer = self.serializer_class(data=request.DATA)
         if serializer.is_valid():
-            invite_code = serializer.object['invite_code']
+            invite_code = request.DATA['invite_code']
             user = create_user(serializer.object['identifier'], serializer.object['password'], serializer.object['nickname'])
             if invite_code:
                 set_promo_user(request, user, invitecode=invite_code)
