@@ -19,6 +19,9 @@ html
         box-sizing:border-box;
         margin-top:15px;
       }
+      input:focus{
+        border:1px solid #f67313;
+      }
       button{
         width:100%;
         height:100px;
@@ -27,13 +30,31 @@ html
         cursor:pointer;
         box-sizing:border-box;
         margin-top:15px;
+        border:1px solid transparent;
       }
       #button-get-validate-code-modal{
         background-color:#f90;
         width:300px;
+
+      }
+      #button-get-validate-code-modal:hover{
+        background-color:#f67313;
+      }
+      #button-get-validate-code-modal:active{
+        background-color:#fff;
+        color:#f67313;
+        border:1px solid #f67313;
       }
       #td-get-validate-code-modal{
         width:300px;
+      }
+      #register_submit{
+        background-color:#e7350d;
+      }
+      #register_submit:active{
+        background-color:#fff;
+        color:#e7350d;
+        border:1px solid #e7350d;
       }
   body
     form#register-modal-form(method='post', action='/accounts/register/ajax/')
@@ -41,24 +62,24 @@ html
       table
         tr
           td
-            input#reg_identifier(type="text", name="identifier", placeholder="请输入手机号")
+            input#reg_identifier(type="text", name="identifier", placeholder="请输您常用手机号")
           td#td-get-validate-code-modal
             button#button-get-validate-code-modal(type='button',style="top:-2px") 获取验证码
         tr
           td(colspan=2)
-            input#id_validate_code(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+            input#id_validate_code(type="text", name="validate_code", placeholder="请输入获取到的验证码", autocomplete='off', title="请输入刚刚获取到的验证码")
         tr
           td(colspan=2)
-            input#reg_password2(type="password", name="password1", placeholder="请输入密码", autocomplete='off', title="请输入密码", maxlength="20")
+            input#reg_password2(type="password", name="password1", placeholder="请输入大于6位密码", autocomplete='off', title="请输入大于6位密码", maxlength="20")
         tr
           td(colspan=2)
-            input#reg_password2(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+            input#reg_password2(type="password", name="password2", placeholder="请再次输入该密码", autocomplete='off', title="请再次输入该密码", maxlength="20")
         tr
           td(colspan=2)
-            input#reg_password2(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码", maxlength="20")
+            input#reg_password2(type="text", name="invitecode", placeholder="请输入6位邀请码（选填）", autocomplete='off', title="6位邀请码（选填，但填了获取有意外收获）", maxlength="6")
         tr
           td(colspan=2)
-            button#register_submit.button-account.span12(type='submit') 注 册
+            button#register_submit.button-account.span12(type='submit') 来吧，注册又不花钱
 
     script.
       require(["/static/js/register.js"])
