@@ -13,6 +13,7 @@ from rest_framework import status
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from marketing.models import PromotionToken
 from marketing.utils import set_promo_user
 from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
@@ -98,6 +99,11 @@ class RegisterAPIView(APIView):
         serializer = self.serializer_class(data=request.DATA)
         if serializer.is_valid():
             invite_code = request.DATA['invite_code']
+            if invite_code:
+                try:
+                    PromotionToken.objects.get(token=invite_code)
+                except:
+                    return Response(u"邀请码错误", status=status.HTTP_200_OK)
             user = create_user(serializer.object['identifier'], serializer.object['password'], serializer.object['nickname'])
             if invite_code:
                 set_promo_user(request, user, invitecode=invite_code)
