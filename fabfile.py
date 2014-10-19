@@ -529,7 +529,7 @@ def config_apache():
 
             if env.get('group') == 'staging':
                 sudo('a2ensite chandao.conf')
-                sudo('ln -s /etc/apache2/sites-available/staging_80_redirect')
+                sudo('ln -s /etc/apache2/sites-available/staging_80_redirect /etc/apache2/sites-enabled/')
 
             sudo('service apache2 reload')
             sudo('chown -R www-data:www-data /var/log/wanglibao/')
