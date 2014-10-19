@@ -107,7 +107,7 @@ class RegisterAPIView(APIView):
             user = create_user(serializer.object['identifier'], serializer.object['password'], "")
             if invite_code:
                 set_promo_user(request, user, invitecode=invite_code)
-            return Response([u'注册成功'], status=status.HTTP_200_OK)
+            return Response([{"message":u'注册成功'}], status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_200_OK)
 
 
