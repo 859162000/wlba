@@ -85,7 +85,7 @@ def staging():
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
 
     env.mysql = True
-    env.nginx_listen_on_80 = False
+    env.nginx_listen_on_80 = True
 
     env.environment = "ENV_STAGING"
 
