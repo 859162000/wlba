@@ -126,7 +126,7 @@ class RegisterAPIView(APIView):
             try:
                 PromotionToken.objects.get(token=invite_code)
             except:
-                return Response({"ret_code":30011, "message":"邀请码错误"})
+                return Response({"ret_code":30016, "message":"邀请码错误"})
 
         #user = create_user(serializer.object['identifier'], serializer.object['password'], "")
         user = create_user(identifier, password, "")

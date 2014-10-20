@@ -670,24 +670,22 @@ class ResetPasswordAPI(APIView):
         identifier = request.DATA.get('identifier', "")
         validate_code = request.DATA.get('validate_code', "")
 
+        identifier = identifier.strip()
         password = password.strip()
         validate_code = validate_code.strip()
 
+        if not password or not identifier or not validate_code:
+            return Response({'ret_code':30002, 'message':u'信息输入不完整'})
+
         if not 6 <= len(password) <= 20:
             return Response({'ret_code':30001, 'message':u'密码需要在6-20位之间'})
-
-        if not identifier:
-            return Response({'ret_code':30002, 'message':u'identifier不能为空'})
-
-        if not validate_code:
-            return Response({'ret_code':30003, 'message':u'验证码不能为空'})
 
         identifier_type = detect_identifier_type(identifier)
 
         if identifier_type == 'phone':
             user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
         else:
-            return Response({'ret_code':30004, 'message': u'请输入手机号码'})
+            return Response({'ret_code':30003, 'message': u'请输入手机号码'})
 
         status, message = validate_validation_code(identifier, validate_code)
         if status == 200:
@@ -695,7 +693,7 @@ class ResetPasswordAPI(APIView):
             user.save()
             return Response({'ret_code':0, 'message':u'修改成功'})
         else:
-            return Response({'ret_code':30005, 'message':u'验证码验证失败'})
+            return Response({'ret_code':30004, 'message':u'验证码验证失败'})
 
 
 @sensitive_post_parameters()
