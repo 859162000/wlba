@@ -666,20 +666,21 @@ class ResetPasswordAPI(APIView):
     permission_classes = ()
 
     def post(self, request):
-        password = request.DATA.get('new_password')
-        identifier = request.DATA.get('identifier')
-        validate_code = request.DATA.get('validate_code')
+        password = request.DATA.get('new_password', "")
+        identifier = request.DATA.get('identifier', "")
+        validate_code = request.DATA.get('validate_code', "")
 
-        if password is None:
-            return Response({'ret_code':30001, 'message':u'缺少new_password这个字段'})
-        else:
-            password = password.strip()
+        password = password.strip()
+        validate_code = validate_code.strip()
 
-        if identifier is None:
-            return Response({'ret_code':30002, 'message':u'缺少identifier这个字段'})
+        if not 6 <= len(password) <= 20:
+            return Response({'ret_code':30001, 'message':u'密码需要在6-20位之间'})
 
-        if validate_code is None:
-            return Response({'ret_code':30003, 'message':u'缺少validate_code'})
+        if not identifier:
+            return Response({'ret_code':30002, 'message':u'identifier不能为空'})
+
+        if not validate_code:
+            return Response({'ret_code':30003, 'message':u'验证码不能为空'})
 
         identifier_type = detect_identifier_type(identifier)
 
