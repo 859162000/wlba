@@ -39,6 +39,7 @@ from wanglibao_account.models import VerifyCounter
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
+from order.models import Order
 
 
 logger = logging.getLogger(__name__)
@@ -602,6 +603,12 @@ class AccountTransactionP2P(TemplateView):
         if not page:
             page = 1
         trade_records = pager.page(page)
+        for t in trade_records:
+            status = Order.objects.filter(id=t.order_id).first().status
+            if status == "":
+                t.status = "异常"
+            else:
+                t.status = status
         return {
             "trade_records": trade_records
         }

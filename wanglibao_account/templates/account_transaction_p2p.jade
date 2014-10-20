@@ -30,6 +30,7 @@ block main
             th 时间
             th 金额(元)
             th 交易类型
+            th 状态
         tbody
           each trade_record in trade_records
             tr
@@ -38,6 +39,7 @@ block main
               td {{trade_record.create_time | date:"Y-m-d H:i:s"}}
               td {{trade_record.amount}}
               td {{trade_record.catalog}}
+              td {{trade_record.status}}
     - with data=trade_records uri='/accounts/transaction/p2p/'
     include include/pager
     - endwith
