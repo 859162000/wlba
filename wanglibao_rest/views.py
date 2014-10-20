@@ -95,10 +95,10 @@ class RegisterAPIView(APIView):
     # throttle_classes = (UserRateThrottle,)
     # serializer_class = RegisterUserSerializer
 
-    def get(self, request, *args, **kwargs):
-        identifier = request.GET.get('identifier', "")
-        password = request.GET.get('password', "")
-        validate_code = request.GET.get('validate_code', "")
+    def post(self, request, *args, **kwargs):
+        identifier = request.POST.get('identifier', "")
+        password = request.POST.get('password', "")
+        validate_code = request.POST.get('validate_code', "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -121,7 +121,7 @@ class RegisterAPIView(APIView):
         if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
         	return Response({"ret_code":30015, "message":u"该手机号已经注册"})
 
-        invite_code = request.GET.get('invite_code', "")
+        invite_code = request.POST.get('invite_code', "")
         if invite_code:
             try:
                 PromotionToken.objects.get(token=invite_code)
