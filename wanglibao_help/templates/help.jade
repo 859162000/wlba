@@ -51,7 +51,7 @@ html
                       .list-item-title
                         {{item.title}}
                         .help-arrow
-                      .list-item-content {{item.answer}}
+                      .list-item-content {% autoescape off %}{{item.answer}}{% endautoescape %}
 
 
 
