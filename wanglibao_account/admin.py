@@ -32,8 +32,12 @@ class PromotionTokenInline(admin.StackedInline):
 class UserResource(resources.ModelResource):
     margin = fields.Field(attribute="margin__margin", widget=DecimalWidget())
 
+    phone = fields.Field(attribute="wanglibaouserprofile__phone")
+    name = fields.Field(attribute="wanglibaouserprofile__name")
+
     class Meta:
         model = User
+        fields = ('id', 'phone', 'name', 'joined_date')
 
 
 class UserProfileAdmin(UserAdmin, ImportExportModelAdmin):
