@@ -41,12 +41,16 @@ class RegisterUserSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         identifier = attrs.get('identifier')
-        password = attrs.get('password')
+        password = attrs.get('password', "")
         validate_code = attrs.get('validate_code')
         #nickname = attrs.get('nickname')
+        password = password.strip()
 
         if identifier and password and validate_code:
             identifier_type = detect_identifier_type(identifier)
+
+            if not 6 <= len(password) <= 20:
+                raise serializers.ValidationError(u"密码需要在6-20位之间")
 
             if identifier_type != 'phone':
                 raise serializers.ValidationError(u"手机号输入错误")

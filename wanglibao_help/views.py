@@ -17,7 +17,7 @@ class HelpView(TemplateView):
         #topic 帮助中心左侧的栏目
         topics = Topic.objects.order_by("-id").all()
         #question field: title, answer, id
-        questions = Question.objects.order_by("-id").all()
+        questions = Question.objects.order_by("-sortord").all()
         nav = [{"id":"0", "name":u'热门问题'}]
         result = {"0":[]}
         for x in topics:

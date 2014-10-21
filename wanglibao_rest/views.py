@@ -1,6 +1,7 @@
 # encoding:utf-8
-import urlparse
 
+import urlparse
+from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import resolve
 from django.db.models import Q
@@ -19,12 +20,12 @@ from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer, RegisterUserSerializer
-from wanglibao_sms.utils import send_validation_code
+from wanglibao_sms.utils import send_validation_code, validate_validation_code
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter
-from wanglibao_account.utils import verify_id
+from wanglibao_account.utils import verify_id, detect_identifier_type
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -92,23 +93,47 @@ class SendRegisterValidationCodeView(APIView):
 class RegisterAPIView(APIView):
     permission_classes = ()
     # throttle_classes = (UserRateThrottle,)
-    serializer_class = RegisterUserSerializer
+    # serializer_class = RegisterUserSerializer
 
     def post(self, request, *args, **kwargs):
+        identifier = request.POST.get('identifier', "")
+        password = request.POST.get('password', "")
+        validate_code = request.POST.get('validate_code', "")
 
-        serializer = self.serializer_class(data=request.DATA)
-        if serializer.is_valid():
-            invite_code = request.DATA['invite_code']
-            if invite_code:
-                try:
-                    PromotionToken.objects.get(token=invite_code)
-                except:
-                    return Response({"non_field_errors": [u"邀请码错误"]}, status=status.HTTP_200_OK)
-            user = create_user(serializer.object['identifier'], serializer.object['password'], "")
-            if invite_code:
-                set_promo_user(request, user, invitecode=invite_code)
-            return Response([{"message":u'注册成功'}], status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_200_OK)
+        identifier = identifier.strip()
+        password = password.strip()
+        validate_code = validate_code.strip()
+
+        if not identifier or not password or not validate_code:
+            return Response({"ret_code":30011, "message":"信息输入不完整"})
+
+        if not 6 <= len(password) <= 20:
+            return Response({"ret_code":30012, "message":u"密码需要在6-20位之间"})
+
+        identifier_type = detect_identifier_type(identifier)
+        if identifier_type != 'phone':
+        	return Response({"ret_code":30013, "message":u"手机号输入错误"})
+
+        status, message = validate_validation_code(identifier, validate_code)
+        if status != 200:
+        	return Response({"ret_code":30014, "message":u"验证码输入错误"})
+
+        if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
+        	return Response({"ret_code":30015, "message":u"该手机号已经注册"})
+
+        invite_code = request.POST.get('invite_code', "")
+        if invite_code:
+            try:
+                PromotionToken.objects.get(token=invite_code)
+            except:
+                return Response({"ret_code":30016, "message":"邀请码错误"})
+
+        #user = create_user(serializer.object['identifier'], serializer.object['password'], "")
+        user = create_user(identifier, password, "")
+        if invite_code:
+            set_promo_user(request, user, invitecode=invite_code)
+        return Response({"ret_code":0, "message":"注册成功"})
+
 
 
 class UserExisting(APIView):
