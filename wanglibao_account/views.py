@@ -753,12 +753,10 @@ def ajax_register(request):
                 invitecode = form.cleaned_data['invitecode']
 
                 user = create_user(identifier, password, nickname)
-                # set_promo_user(request, user)
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
                 return HttpResponse(messenger('done', user=request.user))
-                # return HttpResponseRedirect("/accounts/id_verify/")
             else:
                 return HttpResponseForbidden(messenger(form.errors))
         else:

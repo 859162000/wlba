@@ -112,14 +112,14 @@ class RegisterAPIView(APIView):
 
         identifier_type = detect_identifier_type(identifier)
         if identifier_type != 'phone':
-        	return Response({"ret_code":30013, "message":u"手机号输入错误"})
+            return Response({"ret_code":30013, "message":u"手机号输入错误"})
 
         status, message = validate_validation_code(identifier, validate_code)
         if status != 200:
-        	return Response({"ret_code":30014, "message":u"验证码输入错误"})
+            return Response({"ret_code":30014, "message":u"验证码输入错误"})
 
         if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
-        	return Response({"ret_code":30015, "message":u"该手机号已经注册"})
+            return Response({"ret_code":30015, "message":u"该手机号已经注册"})
 
         invite_code = request.POST.get('invite_code', "")
         if invite_code:
@@ -135,6 +135,20 @@ class RegisterAPIView(APIView):
         return Response({"ret_code":0, "message":"注册成功"})
 
 
+'''
+class PushTestView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        push_user_id = request.GET.get("push_user_id", "")
+        push_channel_id = request.GET.get("push_channel_id", "")
+        from wanglibao_sms import bae_channel
+        channel = bae_channel.BaeChannel()
+        message = {"message":"push Test"}
+        msg_key = "wanglibao_staging"
+        res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
+        return Response({"ret_code":0, "message":cont})
+'''
 
 class UserExisting(APIView):
     permission_classes = ()
