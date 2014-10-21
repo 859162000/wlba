@@ -28,9 +28,11 @@ html
               .span3-omega
                 div.pull-right.p2p-warrant-way
                   if p2p.category == '证大速贷'
-                    span.icon-check-shield 第三方本息保障
+                    span.icon-check-shield
+                    a(href="/security/", target="_blank") 第三方本息保障
                   else
-                    span.icon-check-shield 第三方本息担保
+                    span.icon-check-shield
+                    a(href="/security/", target="_blank") 第三方本息担保
           .p2p-detail-content.clearfix
             .row
               .span4
