@@ -22,25 +22,35 @@ html
                 - render_field form.identifier class+="input-large" placeholder="* 请输入手机号码" title="* 请输入邮箱或手机"
               .span5-omega
                 button.ispan4-omega#button-get-validate-code.button-orange.button-large(type='button') 获取验证码
-              .form-row-error
-                #{ form.identifier.errors }
+              if form.identifier.errors
+                label.form-row-error.error
+                  for error in form.identifier.errors
+                    #{ error }
             #validate-code-container.form-row
               - render_field form.validate_code class+="ispan6 clear-margin" placeholder="* 请输入验证码" autocomplete='off' title="* 请输入验证码"
-              .form-row-error
-                #{ form.validate_code.errors }
+              if form.validate_code.errors
+                label.form-row-error.error
+                  for error in form.validate_code.errors
+                    #{ error }
             .form-row
               - render_field form.password class+="input-large" placeholder="* 请输入密码" autocomplete='off' title="* 请输入密码" maxlength="20"
               .password-strength-container
                 span.password-strength-1 低
                 span.password-strength-2 中
                 span.password-strength-3 高
-              #{ form.password.errors }
+              if form.password.errors
+                label.form-row-error.error
+                  for error in form.password.errors
+                    #{ error }
             .form-row
               input.input-large(type="password", name="password2", placeholder="* 请确认密码", autocomplete='off', title="* 请确认密码")
                 .form-row-error
             .form-row
-              input#reg_password2(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码", maxlength="20")
-                .form-row-error
+              input(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码", maxlength="20")
+              if form.invitecode.errors
+                label.form-row-error.error
+                  for error in form.invitecode.errors
+                    #{ error }
             .form-row.form-bottom-bar
               button#register_submit.button-red.button-middle.span12(type='submit') 注 册
               .agreement
