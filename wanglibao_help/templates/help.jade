@@ -3,11 +3,11 @@
 doctype html
 html
   head
-    - with '安全保障' as title
+    - with '帮助中心' as title
     include include/common_head
     - endwith
-    meta(name="keywords", content="安全保障")
-    meta(name="description", content="没有最安全，只有更安全")
+    meta(name="keywords", content="帮助中心")
+    meta(name="description", content="帮助中心，热点问题")
   body.white-background
     include include/header
     - with '安全保障' as activeItem
@@ -36,10 +36,10 @@ html
                   for item in value
                     if forloop.counter|divisibleby:2
                       li.odd
-                        a(href="#",data-topic="topic_{{item.topic.id}}",data-item="content_{{item.id}}") {{item.title}}
+                        a(href="#",data-topic="topic_{{item.topic.id}}",data-item="content_{{item.id}}") {{item.title|slice:":20"}}
                     else
                       li
-                        a(href="#",data-topic="topic_{{item.topic.id}}",data-item="content_{{item.id}}") {{item.title}}
+                        a(href="#",data-topic="topic_{{item.topic.id}}",data-item="content_{{item.id}}") {{item.title|slice:":20"}}
 
             else
               .list-items.help-box(data-source="topic_{{key}}")
@@ -48,7 +48,9 @@ html
                 .list-container
                   for item in value
                     .list-item(data-source="content_{{item.id}}")
-                      .list-item-title {{item.title}}
+                      .list-item-title
+                        {{item.title}}
+                        .help-arrow
                       .list-item-content {{item.answer}}
 
 

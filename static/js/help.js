@@ -11,6 +11,7 @@
       var item;
       item = $(this).parent();
       if (item.hasClass('active')) {
+        item.removeClass('active');
         return;
       }
       $('.list-item').removeClass('active');
@@ -28,8 +29,7 @@
       $('.list-item').removeClass('active');
       tar = $(this);
       source = $('.help-box[data-source="' + tar.attr('data-target') + '"]');
-      source.addClass('active');
-      return $('.list-item:eq(0)', source).addClass('active');
+      return source.addClass('active');
     });
     $('.hot-items').on('click', 'li', function(e) {
       var contentId, item, menu, topic, topicId;
@@ -51,8 +51,7 @@
       tar = $('.help-menu li:eq(0)');
       tar.addClass('current');
       source = $('.help-box[data-source="' + tar.attr('data-target') + '"]');
-      source.addClass('active');
-      return $('.list-item:eq(0)', source).addClass('active');
+      return source.addClass('active');
     });
   });
 

@@ -7,6 +7,7 @@ require ['jquery'], ($) ->
   $('.list-container').on 'click', '.list-item-title', (e) ->
     item = $(this).parent()
     if(item.hasClass('active'))
+      item.removeClass('active');
       return
 
     $('.list-item').removeClass('active')
@@ -29,7 +30,7 @@ require ['jquery'], ($) ->
     tar = $(this)
     source = $('.help-box[data-source="' + tar.attr('data-target') + '"]')
     source.addClass('active')
-    $('.list-item:eq(0)', source).addClass('active')
+    #$('.list-item:eq(0)', source).addClass('active')
 
   $('.hot-items').on 'click', 'li', (e) ->
     e.preventDefault()
@@ -56,4 +57,4 @@ require ['jquery'], ($) ->
     tar.addClass('current')
     source = $('.help-box[data-source="' + tar.attr('data-target') + '"]')
     source.addClass('active')
-    $('.list-item:eq(0)', source).addClass('active')
+    #$('.list-item:eq(0)', source).addClass('active')
