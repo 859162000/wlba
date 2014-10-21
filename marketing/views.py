@@ -8,9 +8,6 @@ from django.db.models import Count, F, Sum
 from django.contrib.auth.decorators import permission_required
 from django.utils.decorators import method_decorator
 
-from django.views.decorators.csrf import csrf_exempt
-
-from wanglibao_profile.models import WanglibaoUserProfile
 from django.contrib.auth.models import User
 from wanglibao_buy.models import TradeHistory
 
@@ -77,10 +74,13 @@ class MarketingView(TemplateView):
             'users': users,
             'json_re': json_re
         }
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
+    @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
-
         return super(MarketingView, self).dispatch(request, *args, **kwargs)
+
+
+class GennaeratorCode(TemplateView):
+    template_name = 'gennerator_code.jade'
 
     def post(self, request):
 
