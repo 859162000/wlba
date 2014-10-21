@@ -428,21 +428,13 @@ class FinancesAPI(APIView):
         p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
             u'正在招标', u'还款中', u'已完成'
         ])
-        # 获取后天的日期
-        three_days = timezone.datetime.today() + timezone.timedelta(days=3)
-        # 转换成可比较的date类型
-        expired_date =  three_days.strptime(three_days.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+
         p2p_list = []
-        status = 1
+        status = u'已融资'
         for p2p in p2pproducts:
             shouyi = "{}%".format(p2p.expected_earning_rate)
-            # 获取结束时间，把utc时间转换成北京时间
-            end_time = timezone.localtime(p2p.end_time)
-            end_date =  end_time.strptime(end_time.strftime("%Y-%m-%d"), '%Y-%m-%d').date()
-            # 比较结束日期
-            if not p2p.soldout_time:
-                if expired_date < end_date:
-                    status = 0
+            if p2p.status == u'正在招标':
+                status = u'融资中'
 
             temp_p2p = {
                 "link": "https://{}/p2p/detail/{}/?promo_token=TL86KmhJShuqyBO0ZxR17A".format(self.request.get_host(), p2p.id),
