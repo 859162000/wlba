@@ -5,6 +5,11 @@ from collections import defaultdict
 
 from django.views.generic import  TemplateView
 from django.db.models import Count, F, Sum
+from django.contrib.auth.decorators import permission_required
+from django.utils.decorators import method_decorator
+
+from django.views.decorators.csrf import csrf_exempt
+
 from wanglibao_profile.models import WanglibaoUserProfile
 from django.contrib.auth.models import User
 from wanglibao_buy.models import TradeHistory
@@ -12,6 +17,8 @@ from wanglibao_buy.models import TradeHistory
 from django.views.generic import TemplateView
 from django.http.response import HttpResponse
 from mock_generator import MockGenerator
+from django.conf import settings
+
 
 
 # Create your views here.
@@ -70,10 +77,10 @@ class MarketingView(TemplateView):
             'users': users,
             'json_re': json_re
         }
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
+    def dispatch(self, request, *args, **kwargs):
 
-
-class GennaeratorCode(TemplateView):
-    template_name = 'gennerator_code.jade'
+        return super(MarketingView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request):
 
