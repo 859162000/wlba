@@ -135,6 +135,20 @@ class RegisterAPIView(APIView):
         return Response({"ret_code":0, "message":"注册成功"})
 
 
+'''
+class PushTestView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        push_user_id = request.GET.get("push_user_id", "")
+        push_channel_id = request.GET.get("push_channel_id", "")
+        from wanglibao_sms import bae_channel
+        channel = bae_channel.BaeChannel()
+        message = {"message":"push Test"}
+        msg_key = "wanglibao_staging"
+        res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
+        return Response({"ret_code":0, "message":cont})
+'''
 
 class UserExisting(APIView):
     permission_classes = ()
