@@ -9,6 +9,7 @@ class Announcement(models.Model):
     )
     TYPES = (
         ('homepage', u'首页'),
+        ('p2pproduct', u'p2p产品'),
         ('fund', u'基金页面'),
         ('trust', u'信托页面'),
         ('accounts', u'账户中心'),
