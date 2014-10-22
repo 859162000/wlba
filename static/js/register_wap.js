@@ -7,7 +7,13 @@
   });
 
   require(['jquery', 'lib/backend'], function($, backend) {
-    var checkMobile;
+    var Request, checkMobile, promo_token;
+    Request = new Object();
+    Request = backend.getRequest();
+    promo_token = Request['promo_token'];
+    if (promo_token) {
+      $("#reg_invitecode").val(promo_token);
+    }
     checkMobile = function(identifier) {
       var re;
       re = void 0;
@@ -66,9 +72,13 @@
         validate_code: validate_code,
         invite_code: invite_code
       }).done(function(data) {
-        return window.location.href = 'www.wanglibao.com';
+        if (data.ret_code > 0) {
+          return $(".error-message").text(data.message);
+        } else {
+          return window.location.href = '/';
+        }
       }).fail(function() {
-        return $(".error-message").text("手机号输入错误");
+        return $(".error-message").text("注册失败");
       });
     });
   });

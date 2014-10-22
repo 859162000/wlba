@@ -4,6 +4,11 @@ require.config
 
 require ['jquery', 'lib/backend'], ($, backend)->
 
+  Request = new Object()
+  Request = backend.getRequest();
+  promo_token = Request['promo_token']
+  if promo_token
+    $("#reg_invitecode").val(promo_token)
 
   checkMobile = (identifier) ->
     re = undefined
@@ -58,6 +63,9 @@ require ['jquery', 'lib/backend'], ($, backend)->
           invite_code: invite_code
         }
     .done (data)->
-      window.location.href = 'www.wanglibao.com'
+      if data.ret_code > 0
+        $(".error-message").text(data.message)
+      else
+        window.location.href = '/'
     .fail ()->
-      $(".error-message").text("手机号输入错误")
+      $(".error-message").text("注册失败")
