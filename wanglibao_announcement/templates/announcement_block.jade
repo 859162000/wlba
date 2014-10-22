@@ -1,0 +1,15 @@
+- load formatters
+
+if announcements
+  .space-vertical-s
+  .container
+    .announcement-block
+      .announcement-block-bar
+        for announce in announcements
+          .row
+            .span10.announcement-block-title
+              a(href="javascript:void(0);",id="announcement-block-title") {{announce.title}}
+              span {{announce.updatetime|date:'Y-m-d'}}
+            .span2-omega.align-right
+              a.button.button-default(href="/announcement") 更多公告
+          .announcement-block-content(style="display:none") {{announce.content | safe}}

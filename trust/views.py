@@ -1,3 +1,5 @@
+from django.db.models import Q
+from django.utils import timezone
 from django.http import Http404
 from django.views.generic import TemplateView
 from trust.filters import TrustFilterSet
@@ -7,6 +9,7 @@ from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_favorite.models import FavoriteTrust
 from wanglibao_hotlist.models import HotTrust
+from wanglibao_announcement.models import Announcement
 
 
 class TrustHomeView(TemplateView):
@@ -15,8 +18,13 @@ class TrustHomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         hot_trusts = HotTrust.objects.all().prefetch_related('trust').prefetch_related('trust__issuer')[:3]
+
+        Announcements = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
+            .filter(Q(type='all') | Q(type='trust')).filter(status=1).order_by('-priority')[:1]
+
         return {
-            'hot_trusts': hot_trusts
+            'hot_trusts': hot_trusts,
+            'announcements': Announcements
         }
 
 
@@ -37,6 +45,11 @@ class TrustDetailView(TemplateView):
             if FavoriteTrust.objects.filter(user=self.request.user, item=trust).exists():
                 is_favorited = 1
         context['is_favorited'] = is_favorited
+
+        Announcements = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
+            .filter(Q(type='all') | Q(type='trust')).filter(status=1).order_by('-priority')[:1]
+        context['announcements'] = Announcements
+
         return context
 
 

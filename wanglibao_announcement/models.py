@@ -1,5 +1,6 @@
 # encoding: utf-8
 from django.db import models
+from ckeditor.fields import RichTextField
 
 
 class Announcement(models.Model):
@@ -22,7 +23,7 @@ class Announcement(models.Model):
     device = models.CharField(max_length=15, verbose_name=u'设备', default='pc', choices=DEVICES, help_text=u'目标设备 PC 或 mobile')
     type = models.CharField(max_length=15, verbose_name=u'类型', choices=TYPES, default='all', help_text=u'类型 首页 基金 信托 账户中心 所有页面')
     title = models.CharField(max_length=100, verbose_name=u'公告名称', help_text=u'公告名称')
-    content = models.TextField(verbose_name=u'公告内容', help_text=u'公告内容')
+    content = RichTextField()
     priority = models.IntegerField(blank=True, default=0, verbose_name=u'优先级', help_text=u'越大越优先')
     starttime = models.DateTimeField(auto_now=False, verbose_name=u'开始时间', help_text=u'开始时间')
     endtime = models.DateTimeField(auto_now=False, verbose_name=u'结束时间', help_text=u'结束时间')

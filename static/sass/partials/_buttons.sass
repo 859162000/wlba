@@ -170,3 +170,14 @@
   &.finished
     background-position: -390px -159px
 
+.button-default
+  @extend .button
+  +border-radius(5px)
+  padding: 5px 15px
+  font-size: $font-s
+  border: solid 1px #cccccc
+
+  &:hover
+    color: #ffffff
+    background: $color-red
+    border: solid 1px $color-red
