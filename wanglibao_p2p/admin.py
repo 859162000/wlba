@@ -3,6 +3,7 @@ from collections import OrderedDict
 from concurrency.admin import ConcurrentModelAdmin
 import datetime
 from django.contrib import admin
+from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
@@ -187,9 +188,13 @@ class P2PRecordResource(resources.ModelResource):
 
     class Meta:
         model = P2PRecord
-        fields = ('user_name', 'user_phone', 'product_name', 'catalog', 'order_id', 'amount', 'product_balance_after', 'create_time', 'description')
+        fields = ('user_name', 'user_phone', 'product_name', 'catalog', 'order_id', 'amount',
+                  'product_balance_after', 'create_time', 'description')
 
-#class P2PRecordAdmin(admin.ModelAdmin):
+    def dehydrate_create_time(self, obj):
+        return timezone.localtime(obj.create_time).strftime("%Y-%m-%d %H:%M:%S")
+
+
 class P2PRecordAdmin(ImportExportModelAdmin):
     list_display = (
         'catalog', 'order_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
@@ -208,6 +213,7 @@ class AmortizationRecordAdmin(admin.ModelAdmin):
 
 class EquityRecordAdmin(admin.ModelAdmin):
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
+
 
 class ProductAmortizationAdmin(admin.ModelAdmin):
     list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled',
