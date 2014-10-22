@@ -29,6 +29,7 @@ from django.conf import settings
 from decimal import Decimal
 from hashlib import md5
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from wanglibao_p2p.utility import strip_tags
 
 REPAYMENTTYPEMAP = (
                 (u'到期还本付息', 1),
@@ -335,8 +336,8 @@ class GetNoWProjectsAPI(APIView):
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
-                "amountUsedDesc": p2p.short_usage,
-                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s/?promo_token=TL86KmhJShuqyBO0ZxR17A" % p2p.id,
+                "amountUsedDesc": strip_tags(p2p.short_usage),
+                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s" % p2p.id,
                 # "successTime": p2p.soldout_time,
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
@@ -410,8 +411,8 @@ class GetProjectsByDateAPI(APIView):
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
-                "amountUsedDesc": p2p.short_usage,
-                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s/?promo_token=TL86KmhJShuqyBO0ZxR17A" % p2p.id,
+                "amountUsedDesc": strip_tags(p2p.short_usage),
+                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s" % p2p.id,
                 "successTime": timezone.localtime(p2p.soldout_time).strftime("%Y-%m-%d %H:%M:%S"),
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
