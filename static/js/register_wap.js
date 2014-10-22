@@ -66,7 +66,7 @@
         validate_code: validate_code,
         invite_code: invite_code
       }).done(function(data) {
-        return window.location.href = 'wanglibao.com';
+        return window.location.href = 'www.wanglibao.com';
       }).fail(function() {
         return $(".error-message").text("手机号输入错误");
       });

@@ -58,6 +58,6 @@ require ['jquery', 'lib/backend'], ($, backend)->
           invite_code: invite_code
         }
     .done (data)->
-      window.location.href = 'wanglibao.com'
+      window.location.href = 'www.wanglibao.com'
     .fail ()->
       $(".error-message").text("手机号输入错误")

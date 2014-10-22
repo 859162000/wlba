@@ -143,9 +143,8 @@ html
       height:40px;
       line-height:40px;
       font-size:30px;
-      margin:30px 30px 0px 30px;
+      margin:30px;
       color:#ea123a;
-      display:none;
     }
     .left{
       float:left;
@@ -174,11 +173,10 @@ html
         span.left
           邀请码：
         div.input-container
-          input#reg_invitecode(type="text", name="invitecode", maxlength="6")
+          input#reg_invitecode(type="text", name="invitecode")
       div.button-container
         button#register_submit.button-account.span12(type='button') 来吧，注册又不花钱
       div.error-message
-
 
     script.
       require(["/static/js/register_wap.js"])
