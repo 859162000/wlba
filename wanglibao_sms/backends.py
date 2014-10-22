@@ -4,7 +4,6 @@
 from django.conf import settings
 import requests
 import logging
-import urllib
 #from suds.client import Client
 
 
@@ -83,15 +82,16 @@ class ManDaoSMSBackEnd(SMSBackEnd):
         }
 
 """
-softwareSerialNo = "0SDK-EMY-0130-XXXXX"
-key = "123456"
+softwareSerialNo = "6SDK-EMY-6688-KEZSM"
+key = "wanglibao"
+password = "660687"
 url = "http://sdk4report.eucp.b2m.cn:8080/sdk/SDKService?wsdl"
 
 class EmaySMS:
     @classmethod
     def register(cls):
         ws = Client(url).service
-        rs = ws.registEx(softwareSerialNo, key, "wanglibank")
+        rs = ws.registEx(softwareSerialNo, key, password)
         print(rs)
 
     @classmethod
@@ -100,17 +100,23 @@ class EmaySMS:
             return 400, "params invalid"
 
         if not isinstance(destmobile, list):
-            destmobile = str([destmobile])
+            destmobile = [destmobile]
         try:
             ws = Client(url).service
-            rs = ws.sendSMS(softwareSerialNo, key, "", str(destmobile), smsContent, "", "GBK", smsPriority, smsID)
+            rs = ws.sendSMS(softwareSerialNo, key, "", destmobile, smsContent, "", "GBK", smsPriority, smsID)
         except:
             return 400,"Internal server error"
         print(rs)
 
+    @classmethod
+    def balance(cls,):
+        ws = Client(url).service
+        rs = ws.getBalance(softwareSerialNo, key)
+        print(rs)
+
 
 if __name__ == "__main__":
-    EmaySMS.register()
-    EmaySMS.send("18637172100", "abcdefg")
+    #EmaySMS.register()
+    #EmaySMS.send("18637172100", "abcdefg")
+    EmaySMS.balance()
 """
-
