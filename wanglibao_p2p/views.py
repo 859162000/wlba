@@ -437,6 +437,7 @@ class FinancesAPI(APIView):
                 status = u'融资中'
 
             temp_p2p = {
+                "logo": "https://{}/static/images/wlblogo.png".format(self.request.get_host()),
                 "link": "https://{}/p2p/detail/{}/?promo_token=TL86KmhJShuqyBO0ZxR17A".format(self.request.get_host(), p2p.id),
                 "chanpin": p2p.name,
                 "serial": "WLB{}{}".format(timezone.localtime(p2p.publish_time).strftime("%Y%m%d%H%M%S"), p2p.id),
