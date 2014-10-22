@@ -256,6 +256,9 @@ define ['jquery'], ($)->
   purchaseP2P = (data)->
     $.post '/api/p2p/purchase/', data
 
+  registerWap = (data)->
+    $.post '/api/register/wx/', data
+
   return {
     loadData: loadData
     isValidType: isValidType
@@ -281,4 +284,5 @@ define ['jquery'], ($)->
     checkBalance: checkBalance
     checkMoney: checkMoney
     checkCardNo: checkCardNo
+    registerWap: registerWap
   }

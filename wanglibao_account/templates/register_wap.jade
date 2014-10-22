@@ -4,93 +4,181 @@ doctype html
 html
   - with '注册网利宝' as title
   - endwith
+  <meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=0.5, maximum-scale=1.0"/>
+  script(src="/static/js/require.js", data-main="/static/js/header")
   style.
-      table {
-        width: 100%;
-        padding:20px;
-      }
-      table td{
-        position:relative;
-      }
-      input{
-        width:100%;
-        height:100px;
-        border:1px solid #d9d9d9;
-        font-size:30px;
-        padding-left:30px;
-        padding-right:30px;
-        box-sizing:border-box;
-        margin-top:15px;
-      }
-      input:focus{
-        border:1px solid #f67313;
-      }
-      button{
-        width:100%;
-        height:100px;
-        color:#fff;
-        font-size:30px;
-        cursor:pointer;
-        box-sizing:border-box;
-        margin-top:15px;
-        border:1px solid transparent;
-      }
-      #button-get-validate-code-modal{
-        background-color:#f90;
-        width:300px;
+    body{
+      margin:0;
+      text-align:center;
+    }
+    .header{
+      width:100%;
+      height:200px;
+      border-bottom:1px #fff solid;
+      background: -ms-linear-gradient(top, #ee1339,  #b32122);
+      background: -moz-linear-gradient(top, #ee1339, #b32122);
+      background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ee1339), to(#b32122));
+      background: -webkit-linear-gradient(top, #ee1339, #b32122);
+      background: -o-linear-gradient(top, #ee1339, #b32122);
+    }
+    .header-line{
+      border-top:1px #fff solid;
+      border-bottom:1px #ddd solid;
+    }
+    .logo-container{
+      margin-left:auto;
+      margin-right:auto;
+      margin-top:-97.5px;
+      width:195px;
+      height:195px;
+      -moz-border-radius: 97.5px;
+      -webkit-border-radius: 97.5px;
+      border-radius: 97.5px;
+      -moz-box-shadow:0px 1px 1px #666;
+      -webkit-box-shadow:0px 1px 1px #666;
+      box-shadow:0px 1px 1px #666;
+      background-image:url("/static/images/wap_logo.png");
+    }
+    .website{
+      margin-top:20px;
+      color:#959595;
+      font-size:50px;
+    }
+    .slogan{
+      margin-top:10px;
+      color:#575757;
+      font-size:35px;
+    }
+    .container{
+      height:88px;
+      line-height:88px;
+      border:1px solid #d9d9d9;
+      font-size:30px;
+      -moz-border-radius: 10px;
+      -webkit-border-radius: 10px;
+      border-radius: 10px;
+      margin:30px 30px 0px 30px;
+      text-align:left;
+      padding-left:30px;
+      color:#b8b8b8;
+      position:relative;
+    }
+    .button-container{
+      height:88px;
+      line-height:88px;
+      -moz-border-radius: 10px;
+      -webkit-border-radius: 10px;
+      border-radius: 10px;
+      margin:30px 30px 0px 30px;
+      position:relative;
+    }
+    input{
+      font-size:30px;
+      border:none;
+      height:80px;
+      line-height:80px;
+      width:100%;
+      box-sizing:border-box;
+    }
 
-      }
-      #button-get-validate-code-modal:hover{
-        background-color:#f67313;
-      }
-      #button-get-validate-code-modal:active{
-        background-color:#fff;
-        color:#f67313;
-        border:1px solid #f67313;
-      }
-      #td-get-validate-code-modal{
-        width:300px;
-      }
-      #register_submit{
-        background-color:#e7350d;
-      }
-      #register_submit:active{
-        background-color:#fff;
-        color:#e7350d;
-        border:1px solid #e7350d;
-      }
-      .error-message-container{
-        color:red;
-        font-size:25px;
-        position:absolute;
-        right:30px;
-        top:55px;
-      }
+    button{
+      height:88px;
+      color:#fff;
+      font-size:30px;
+      cursor:pointer;
+      border:none;
+    }
+    .button-get-validate-code-modal{
+      background-color:#bbb;
+      width:230px;
+      height:90px;
+      position:absolute;
+      right:-1px;
+      -moz-border-radius: 0px 10px 10px 0px;
+      -webkit-border-radius:0px 10px 10px 0px;
+      border-radius:0px 10px 10px 0px;
+      top:-1px;
+    }
+    .disable{
+      cursor:default;
+      background-color:#aaa;
+    }
+    .button-get-validate-code-modal:hover{
+      background-color:#aaa;
+    }
+
+    .input-container{
+      overflow:hidden;
+      zoom:1;
+    }
+
+    .reg-identifier-container{
+      overflow:hidden;
+      zoom:1;
+      margin-right:230px;
+    }
+
+    #register_submit{
+      width:100%;
+      background: -ms-linear-gradient(top, #ee1339,  #b32122);
+      background: -moz-linear-gradient(top, #ee1339, #b32122);
+      background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ee1339), to(#b32122));
+      background: -webkit-linear-gradient(top, #ee1339, #b32122);
+      background: -o-linear-gradient(top, #ee1339, #b32122);
+      -moz-border-radius: 10px;
+      -webkit-border-radius: 10px;
+      border-radius: 10px;
+
+    }
+
+    #register_submit:hover{
+      background-color:#f67313;
+      background: -ms-linear-gradient(top, #ea123a,  #b21c1c);
+      background: -moz-linear-gradient(top, #ea123a, #b21c1c);
+      background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ea123a), to(#b21c1c));
+      background: -webkit-linear-gradient(top, #ea123a, #b21c1c);
+      background: -o-linear-gradient(top, #ea123a, #b21c1c);
+    }
+    .error-message{
+      height:40px;
+      line-height:40px;
+      font-size:30px;
+      margin:30px 30px 0px 30px;
+      color:#ea123a;
+      display:none;
+    }
+    .left{
+      float:left;
+    }
+
   body
     form#register-modal-form(method='post', action='/accounts/register/ajax/')
       - csrf_token
-      table
-        tr
-          td
-            input#reg_identifier(type="text", name="identifier", placeholder="请输您常用手机号")
-            div.error-message-container 测试
-          td#td-get-validate-code-modal
-            button#button-get-validate-code-modal(type='button',style="top:-2px") 获取验证码
-        tr
-          td(colspan=2)
-            input#id_validate_code(type="text", name="validate_code", placeholder="请输入获取到的验证码", autocomplete='off', title="请输入刚刚获取到的验证码")
-        tr
-          td(colspan=2)
-            input#reg_password2(type="password", name="password1", placeholder="请输入大于6位密码", autocomplete='off', title="请输入大于6位密码", maxlength="20")
-        tr
-          td(colspan=2)
-            input#reg_password2(type="password", name="password2", placeholder="请再次输入该密码", autocomplete='off', title="请再次输入该密码", maxlength="20")
-        tr
-          td(colspan=2)
-            input#reg_password2(type="text", name="invitecode", placeholder="请输入6位邀请码（选填）", autocomplete='off', title="6位邀请码（选填，但填了获取有意外收获）", maxlength="6")
-        tr
-          td(colspan=2)
-            button#register_submit.button-account.span12(type='submit') 来吧，注册又不花钱
+      div.header
+      div.header-line
+      div.logo-container
+      div.website wanglibao.com
+      div.slogan 互 联 网 私 人 银 行
+      div.container
+        span.left
+          手机号：
+        div.input-container
+          input#reg_identifier(type="text", name="identifier")
+      div.container
+        span.left
+          验证码：
+        div.reg-identifier-container
+          input#id_validate_code(type="text", name="validate_code")
+          button.button-get-validate-code-modal#button-get-validate-code-modal(type='button') 获取验证码
+      div.container
+        span.left
+          邀请码：
+        div.input-container
+          input#reg_invitecode(type="text", name="invitecode", maxlength="6")
+      div.button-container
+        button#register_submit.button-account.span12(type='button') 来吧，注册又不花钱
+      div.error-message
+
 
     script.
-      require(["/static/js/register.js"])
+      require(["/static/js/register_wap.js"])
