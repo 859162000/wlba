@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
+from django.utils import timezone
 from views import MarketingView
 
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode
@@ -39,6 +40,17 @@ class IntroducedByResource(resources.ModelResource):
         model = IntroducedBy
         fields = ('user_name', 'user_phone','introduce_name', 'introduce_phone', 'chanel',
                   'created_at', 'bought_at', 'gift_send_at' )
+
+    def dehydrate_created_at(self, obj):
+        return timezone.localtime(obj.created_at).strftime("%Y-%m-%d %H:%M:%S")
+
+    def dehydrate_bought_at(self, obj):
+        if obj.bought_at:
+            return timezone.localtime(obj.bought_at).strftime("%Y-%m-%d %H:%M:%S")
+
+    def dehydrate_gift_send_at(self, obj):
+        if obj.gift_send_at:
+            return timezone.localtime(obj.gift_send_at).strftime("%Y-%m-%d %H:%M:%S")
 
 
 class IntroducedByAdmin(ImportExportModelAdmin):
