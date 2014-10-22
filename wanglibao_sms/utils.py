@@ -41,6 +41,8 @@ def send_messages(phones, messages):
 def send_sms(phone, message):
     return send_messages([phone], [message])
 
+def send_rand_pass(phone, password):
+    return send_messages([phone], [messages.rand_pass(password)])
 
 def send_validation_code(phone, validate_code=None):
     if validate_code is None:

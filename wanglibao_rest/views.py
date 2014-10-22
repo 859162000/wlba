@@ -1,6 +1,7 @@
 # encoding:utf-8
 
 import urlparse
+import random
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import resolve
@@ -21,7 +22,7 @@ from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer, RegisterUserSerializer
-from wanglibao_sms.utils import send_validation_code, validate_validation_code
+from wanglibao_sms.utils import send_validation_code, validate_validation_code, send_rand_pass
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -135,6 +136,41 @@ class RegisterAPIView(APIView):
             set_promo_user(request, user, invitecode=invite_code)
         return Response({"ret_code":0, "message":"注册成功"})
 
+#wechat register
+class WeixinRegisterAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request, *args, **kwargs):
+        identifier = request.POST.get('identifier', "").strip()
+        validate_code = request.POST.get('validate_code', "").strip()
+
+        if not identifier or not validate_code:
+            return Response({"ret_code":30021, "message":"信息输入不完整"})
+
+        identifier_type = detect_identifier_type(identifier)
+        if identifier_type != 'phone':
+            return Response({"ret_code":30022, "message":u"请输入正确的手机号"})
+
+        status, message = validate_validation_code(identifier, validate_code)
+        if status != 200:
+            return Response({"ret_code":30023, "message":"验证码输入错误"})
+
+        if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
+            return Response({"ret_code":30024, "message":"该手机号已经注册"})
+
+        invite_code = request.POST.get('invite_code', "").strip()
+        if invite_code:
+            try:
+                PromotionToken.objects.get(token=invite_code)
+            except:
+                return Response({"ret_code":30025, "message":"邀请码错误"})
+
+        password = random.randint(100000, 999999)
+        user = create_user(identifier, password, "")
+        if invite_code:
+            set_promo_user(request, user, invitecode=invite_code)
+        send_rand_pass(identifier, password)
+        return Response({"ret_code":0, "message":"注册成功"})
 
 class PushTestView(APIView):
     permission_classes = ()
