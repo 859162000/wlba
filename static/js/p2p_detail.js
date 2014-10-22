@@ -150,16 +150,6 @@
       }
       return html.join("");
     };
-    $(window).load(function(e) {
-      if (invest_result && invest_result.length > 0) {
-        $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)));
-        if (invest_result.length > 5) {
-          return $('.get-more').show();
-        } else {
-          return $('.get-more').hide();
-        }
-      }
-    });
     return $('.get-more').click(function(e) {
       e.preventDefault();
       if (invest_result && invest_result.length > 0) {
@@ -174,5 +164,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_detail.map

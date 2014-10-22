@@ -32,8 +32,12 @@ class PromotionTokenInline(admin.StackedInline):
 class UserResource(resources.ModelResource):
     margin = fields.Field(attribute="margin__margin", widget=DecimalWidget())
 
+    phone = fields.Field(attribute="wanglibaouserprofile__phone")
+    name = fields.Field(attribute="wanglibaouserprofile__name")
+
     class Meta:
         model = User
+        fields = ('id', 'phone', 'name', 'joined_date')
 
 
 class UserProfileAdmin(UserAdmin, ImportExportModelAdmin):
@@ -55,6 +59,10 @@ class UserProfileAdmin(UserAdmin, ImportExportModelAdmin):
         return obj.wanglibaouserprofile.id_number
     id_num.short_description = u'身份证'
 
+    def get_export_queryset(self, request):
+        qs = super(UserProfileAdmin, self).get_queryset(request)
+        qs = qs.select_related('user').select_related('wanglibaouserprofile__phone')
+        return qs
 
 def user_unicode(self):
     if hasattr(self, 'wanglibaouserprofile'):

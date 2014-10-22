@@ -77,6 +77,8 @@ INSTALLED_APPS = (
     'south',
     'registration',
 
+    'marketing',
+
     'trust',
     'wanglibao_account',
     'wanglibao_sms',
@@ -102,7 +104,6 @@ INSTALLED_APPS = (
     'wanglibao_margin',
     'wanglibao_help',
 
-    'marketing',
     'report',
 
     'provider',

@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404
 from django.shortcuts import resolve_url
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
@@ -39,6 +39,7 @@ from wanglibao_account.models import VerifyCounter
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
+from order.models import Order
 
 
 logger = logging.getLogger(__name__)
@@ -400,7 +401,7 @@ class AccountP2PRecordAPI(APIView):
                     'equity_product_amortization_count': equity.product.amortization_count,                             # 还款期数
                     'equity_paid_interest': float(equity.paid_interest),                                                       # 单个已经收益
                     'equity_total_interest': float(equity.total_interest),                                                     # 单个预期收益
-                    'equity_contract': 'https://%s/accounts/p2p/contract/%s/' % (request.get_host(), equity.product.id), # 合同
+                    'equity_contract': 'https://%s/api/p2p/contract/%s/' % (request.get_host(), equity.product.id), # 合同
                     'product_id': equity.product_id
             } for equity in p2p_equities]
 
@@ -602,6 +603,12 @@ class AccountTransactionP2P(TemplateView):
         if not page:
             page = 1
         trade_records = pager.page(page)
+        for t in trade_records:
+            status = Order.objects.filter(id=t.order_id).first().status
+            if status == "":
+                t.status = "异常"
+            else:
+                t.status = status
         return {
             "trade_records": trade_records
         }
@@ -666,47 +673,34 @@ class ResetPasswordAPI(APIView):
     permission_classes = ()
 
     def post(self, request):
-        password = request.DATA.get('new_password')
-        identifier = request.DATA.get('identifier')
-        validate_code = request.DATA.get('validate_code')
+        password = request.DATA.get('new_password', "")
+        identifier = request.DATA.get('identifier', "")
+        validate_code = request.DATA.get('validate_code', "")
 
-        if password is None:
-            return Response({
-                'message': u'缺少new_password这个字段'
-            }, status=200)
-        else:
-            password = password.strip()
+        identifier = identifier.strip()
+        password = password.strip()
+        validate_code = validate_code.strip()
 
-        if identifier is None:
-            return Response({
-                'message': u'缺少identifier这个字段'
-            }, status=200)
+        if not password or not identifier or not validate_code:
+            return Response({'ret_code':30002, 'message':u'信息输入不完整'})
 
-        if validate_code is None:
-            return Response({
-                'message': u'缺少validate_code'
-            }, status=200)
+        if not 6 <= len(password) <= 20:
+            return Response({'ret_code':30001, 'message':u'密码需要在6-20位之间'})
 
         identifier_type = detect_identifier_type(identifier)
 
         if identifier_type == 'phone':
             user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
         else:
-            return Response({
-                'message': u'请输入手机号码'
-            }, status=200)
+            return Response({'ret_code':30003, 'message': u'请输入手机号码'})
 
         status, message = validate_validation_code(identifier, validate_code)
         if status == 200:
             user.set_password(password)
             user.save()
-            return Response({
-                'message': u'修改成功'
-            })
+            return Response({'ret_code':0, 'message':u'修改成功'})
         else:
-            return Response({
-                'message': u'验证码验证失败'
-            }, status=200)
+            return Response({'ret_code':30004, 'message':u'验证码验证失败'})
 
 
 @sensitive_post_parameters()
@@ -759,12 +753,10 @@ def ajax_register(request):
                 invitecode = form.cleaned_data['invitecode']
 
                 user = create_user(identifier, password, nickname)
-                # set_promo_user(request, user)
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
                 return HttpResponse(messenger('done', user=request.user))
-                # return HttpResponseRedirect("/accounts/id_verify/")
             else:
                 return HttpResponseForbidden(messenger(form.errors))
         else:
@@ -853,6 +845,26 @@ def user_product_contract(request, product_id):
         return HttpResponse("\n".join(lines))
     except ValueError, e:
         raise Http404
+
+
+class UserProductContract(APIView):
+
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, product_id):
+        equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
+
+        try:
+            f = equity.contract
+            lines = f.readlines()
+            f.close()
+            return HttpResponse("\n".join(lines))
+        except:
+            return Response({
+                'message': u'合同没有找到',
+                'error_number': ErrorNumber.contract_not_found
+            })
+
 
 
 @login_required

@@ -76,7 +76,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         invite_code = self.cleaned_data.get('invitecode')
         if invite_code:
             try:
-                PromotionToken.objects.get(token=invite_code)
+                p = PromotionToken.objects.get(token=invite_code)
             except:
                 raise forms.ValidationError(
                             self.error_messages['invite code not match'],

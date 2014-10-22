@@ -16,6 +16,7 @@ class Banner(models.Model):
     )
 
     TYPES = (
+        ('p2p', 'p2p'),
         ('fund', 'fund'),
         ('trust', 'trust'),
         ('banner', 'banner'),

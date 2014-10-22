@@ -529,6 +529,7 @@ def config_apache():
 
             if env.get('group') == 'staging':
                 sudo('a2ensite chandao.conf')
+                sudo('ln -s /etc/apache2/sites-available/staging_80_redirect /etc/apache2/sites-enabled/')
 
             sudo('service apache2 reload')
             sudo('chown -R www-data:www-data /var/log/wanglibao/')
@@ -542,9 +543,18 @@ def config_loadbalancer():
         sudo('service nginx reload')
         sudo('rm -rf /var/cache/nginx')
 
+@roles('web')
+def reload_apache():
+    sudo('service apache2 reload')
 
 @task
 def deploy():
+    if env.get("fast", "").lower() == "true":
+        execute(check_out)
+        execute(reload_apache)
+        banner('Fast Deploy Succeeded')
+        return
+
     execute(init)
 
     execute(check_out)

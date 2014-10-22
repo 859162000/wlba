@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from rest_framework.serializers import HyperlinkedModelSerializer
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
+from marketing.models import PromotionToken
 from wanglibao_account.utils import detect_identifier_type
 from wanglibao_sms.utils import validate_validation_code
 
@@ -34,28 +36,32 @@ class RegisterUserSerializer(serializers.Serializer):
     """
     identifier = serializers.CharField()
     password = serializers.CharField()
-    nickname = serializers.CharField()
+    #nickname = serializers.CharField()
     validate_code = serializers.CharField()
 
     def validate(self, attrs):
         identifier = attrs.get('identifier')
-        password = attrs.get('password')
+        password = attrs.get('password', "")
         validate_code = attrs.get('validate_code')
-        nickname = attrs.get('nickname')
+        #nickname = attrs.get('nickname')
+        password = password.strip()
 
-        if identifier and password and validate_code and nickname:
+        if identifier and password and validate_code:
             identifier_type = detect_identifier_type(identifier)
 
+            if not 6 <= len(password) <= 20:
+                raise serializers.ValidationError(u"密码需要在6-20位之间")
+
             if identifier_type != 'phone':
-                raise serializers.ValidationError('Identifier must be phone format')
+                raise serializers.ValidationError(u"手机号输入错误")
             else:
                 status, message = validate_validation_code(identifier, validate_code)
                 if status != 200:
-                    raise serializers.ValidationError('Validate code not valid')
+                    raise serializers.ValidationError(u"验证码输入错误")
 
                 if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
-                    raise serializers.ValidationError('User with same identifier already existed')
+                    raise serializers.ValidationError(u"该手机号已经注册")
             return super(RegisterUserSerializer, self).validate(attrs)
 
         else:
-            raise serializers.ValidationError('Must include identifier, password, validate_code and nickname')
+            raise serializers.ValidationError(u"信息输入不完整")

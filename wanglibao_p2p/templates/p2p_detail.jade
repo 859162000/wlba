@@ -28,9 +28,11 @@ html
               .span3-omega
                 div.pull-right.p2p-warrant-way
                   if p2p.category == '证大速贷'
-                    span.icon-check-shield 第三方本息保障
+                    span.icon-check-shield
+                    a(href="/security/", target="_blank") 第三方本息保障
                   else
-                    span.icon-check-shield 第三方本息担保
+                    span.icon-check-shield
+                    a(href="/security/", target="_blank") 第三方本息担保
           .p2p-detail-content.clearfix
             .row
               .span4
@@ -69,7 +71,7 @@ html
 
           dl.p2p-detail-intro.clearfix
             dt 借款用途：
-            dd {{p2p.short_usage}}
+            dd {% autoescape off %}{{p2p.short_usage}}{% endautoescape %}
             if p2p.category == '证大速贷'
               dt 债权转让：
               dd 选择“债权转让”后，即可提前赎回未到期债权，但您需承担提前赎回本金0-5%不等的年化收益率折让费（由提前赎回投资人自行设置），折让费将转给下一个接收投资人，投资人相应权利义务同时转移。
@@ -222,7 +224,8 @@ html
 
               h1 投资记录
                 trade_records = p2p.p2precord_set.filter(catalog=u'申购')
-                for trade in trade_records
+                more_list = trade_records[30:]
+                for trade in more_list
                   script.
                     invest_result.push({
                       create_time: '{{trade.create_time | date:"Y-m-d"}}',
@@ -236,6 +239,16 @@ html
                     th 投资人
                     th 金额
                 tbody
+                  show_list = trade_records[0:30]
+                  for trade in show_list
+                    tr
+                      td
+                        p {{trade.create_time | date:"Y-m-d"}}
+                      td
+                        em {{trade.user | safe_phone}}
+                      td.invest-num
+                        span.money-highlight {{trade.amount}}
+                          span 元
 
 
               if trade_records.count > 30

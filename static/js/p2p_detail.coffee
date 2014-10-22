@@ -141,13 +141,13 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       i++
     html.join ""
 
-  $(window).load (e) ->
-    if(invest_result && invest_result.length > 0)
-      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
-      if(invest_result.length > 5)
-        $('.get-more').show()
-      else
-        $('.get-more').hide()
+#  $(window).load (e) ->
+#    if(invest_result && invest_result.length > 0)
+#      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
+#      if(invest_result.length > 5)
+#        $('.get-more').show()
+#      else
+#        $('.get-more').hide()
 
 
   $('.get-more').click (e) ->

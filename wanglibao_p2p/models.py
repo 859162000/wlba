@@ -136,7 +136,7 @@ class P2PProduct(ProductBase):
     borrower_name = models.CharField(verbose_name=u'借债人姓名*', max_length=32, blank=False)
     borrower_phone = models.CharField(verbose_name=u'借债人手机号*', max_length=32, blank=False)
     borrower_address = models.CharField(verbose_name=u'借债人地址*', max_length=128, blank=False)
-    borrower_id_number = models.CharField(verbose_name=u'借债人身份证号*', max_length=32, blank=False)
+    borrower_id_number = models.CharField(verbose_name=u'借债人身份证号/法定代表人*', max_length=32, blank=False)
     borrower_bankcard = models.CharField(verbose_name=u'借债人银行卡号*', max_length=64, blank=False)
     borrower_bankcard_type = models.CharField(verbose_name=u'借款人银行卡类型*',max_length=20, choices=BANK_TYPE_CHOICES, blank=False)
     borrower_bankcard_bank_name = models.CharField(verbose_name=u'开户行*', max_length=64, blank=False)
