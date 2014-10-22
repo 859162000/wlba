@@ -1,7 +1,5 @@
 # encoding:utf-8
 
-from django.db.models import Q
-from django.utils import timezone
 from django.http import Http404
 from django.views.generic import TemplateView
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
@@ -11,7 +9,7 @@ from wanglibao_fund.filters import FundFilterSet
 from wanglibao_fund.models import Fund, FundIssuer
 from wanglibao_fund.serializers import FundSerializer
 from wanglibao_hotlist.models import HotFund
-from wanglibao_announcement.models import Announcement
+from wanglibao_announcement.utility import Announcementfund
 
 
 class FundViewSet(PaginatedModelViewSet):
@@ -34,12 +32,9 @@ class FundProductsView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        Announcements = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
-            .filter(Q(type='all') | Q(type='fund')).filter(status=1).order_by('-priority')[:1]
-
         return {
             'hot_funds': HotFund.objects.all().prefetch_related('fund').prefetch_related('fund__issuer')[:3],
-            'announcements': Announcements
+            'announcements': Announcementfund
         }
 
 
@@ -65,9 +60,6 @@ class FundDetailView(TemplateView):
         else:
             self.template_name = 'fund_detail.jade'
 
-        Announcements = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
-            .filter(Q(type='all') | Q(type='fund')).filter(status=1).order_by('-priority')[:1]
-
-        context['announcements'] = Announcements
+        context['announcements'] = Announcementfund
 
         return context

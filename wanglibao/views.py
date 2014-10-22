@@ -8,7 +8,7 @@ from marketing.models import NewsAndReport, SiteData
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner
 from itertools import chain
-from wanglibao_announcement.models import Announcement
+from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2P
 
 
 class IndexView(TemplateView):
@@ -40,11 +40,6 @@ class IndexView(TemplateView):
         news_and_reports = NewsAndReport.objects.all()[:5]
         site_data = SiteData.objects.all().first()
 
-        Announcements = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
-            .filter(Q(type='all') | Q(type='homepage')).filter(status=1).order_by('-priority')[:1]
-        Announcements_p2p = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
-            .filter(status=1, type='p2pproduct').order_by('-priority')[:1]
-
         return {
             "p2p_products": p2p_products,
             "trade_records": trade_records,
@@ -52,8 +47,8 @@ class IndexView(TemplateView):
             'banners': banners,
             'site_data': site_data,
             'getmore': getmore,
-            'announcements': Announcements,
-            'announcements_p2p': Announcements_p2p
+            'announcements': AnnouncementHomepage,
+            'announcements_p2p': AnnouncementP2P
         }
 
 

@@ -28,6 +28,7 @@ from operator import attrgetter, itemgetter
 from django.conf import settings
 from decimal import Decimal
 from hashlib import md5
+from wanglibao_announcement.utility import AnnouncementP2P
 
 
 REPAYMENTTYPEMAP = (
@@ -81,7 +82,8 @@ class P2PDetailView(TemplateView):
             'total_earning': total_earning,
             'current_equity': current_equity,
             'site_data': site_data,
-            'attachments': p2p.attachment_set.all()
+            'attachments': p2p.attachment_set.all(),
+            'announcements': AnnouncementP2P
         })
 
         return context
@@ -523,6 +525,7 @@ class P2PListView(TemplateView):
             'p2p_period': p2p_period[:5],
             'p2p_amount': p2p_amount[:5],
             'show_slider': show_slider,
+            'announcements': AnnouncementP2P
         }
 
 

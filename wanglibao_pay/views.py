@@ -34,6 +34,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from django.conf import settings
+from wanglibao_announcement.utility import AnnouncementAccounts
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -49,7 +50,8 @@ class BankListView(TemplateView):
 
         context.update({
             'default_bank': default_bank,
-            'banks': Bank.get_deposit_banks()[:12]
+            'banks': Bank.get_deposit_banks()[:12],
+            'announcements': AnnouncementAccounts
         })
         return context
 
@@ -168,7 +170,8 @@ class WithdrawView(TemplateView):
             'banks': banks,
             'user_profile': self.request.user.wanglibaouserprofile,
             'margin': self.request.user.margin.margin,
-            'fee': HuifuPay.FEE
+            'fee': HuifuPay.FEE,
+            'announcements': AnnouncementAccounts
         }
 
 

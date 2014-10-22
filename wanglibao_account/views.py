@@ -39,6 +39,7 @@ from wanglibao_account.models import VerifyCounter
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
+from wanglibao_announcement.utility import AnnouncementAccounts
 
 
 logger = logging.getLogger(__name__)
@@ -292,7 +293,8 @@ class AccountHome(TemplateView):
             'p2p_total_asset': p2p_total_asset,
             'total_asset': total_asset,
 
-            'mode': mode
+            'mode': mode,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -587,7 +589,8 @@ class AccountTransaction(TemplateView):
         transactions = pager.page(page)
         return {
             "transactions": transactions,
-            "message": message
+            "message": message,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -602,7 +605,8 @@ class AccountTransactionP2P(TemplateView):
             page = 1
         trade_records = pager.page(page)
         return {
-            "trade_records": trade_records
+            "trade_records": trade_records,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -617,7 +621,8 @@ class AccountTransactionDeposit(TemplateView):
             page = 1
         pay_records = pager.page(page)
         return {
-            "pay_records": pay_records
+            "pay_records": pay_records,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -632,7 +637,8 @@ class AccountTransactionWithdraw(TemplateView):
             page = 1
         pay_records = pager.page(page)
         return {
-            "pay_records": pay_records
+            "pay_records": pay_records,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -657,7 +663,8 @@ class AccountBankCard(TemplateView):
             'p2p_cards': p2p_cards,
             'banks': banks,
             'user_profile': self.request.user.wanglibaouserprofile,
-            "message": message
+            "message": message,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -786,7 +793,8 @@ class IdVerificationView(TemplateView):
 
         return {
             'user': self.request.user,
-            'counter': count
+            'counter': count,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -812,7 +820,8 @@ class P2PAmortizationView(TemplateView):
         amortizations = UserAmortization.objects.filter(user=self.request.user, product_amortization__product_id=product_id)
         return {
             'equity': equity,
-            'amortizations': amortizations
+            'amortizations': amortizations,
+            'announcements': AnnouncementAccounts
         }
 
 class P2PAmortizationAPI(APIView):
