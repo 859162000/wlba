@@ -28,3 +28,13 @@ class VerifyCounter(models.Model):
 
     def __unicode__(self):
         return u'%s: %d' % (self.user.wanglibaouserprofile.phone, self.count)
+
+
+class UserPushId(models.Model):
+    """
+        app push table, store all the user and all the device
+    """
+    user = models.ForeignKey(get_user_model(), null=True)
+    device_type = models.CharField(max_length=20, verbose_name="设备类型")
+    push_user_id = models.CharField(max_length=50, db_index=True)
+    push_channel_id = models.CharField(max_length=50)
