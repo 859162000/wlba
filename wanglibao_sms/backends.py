@@ -1,6 +1,11 @@
+#!/usr/bin/env python
+# encoding:utf-8
+
 from django.conf import settings
 import requests
 import logging
+import urllib
+#from suds.client import Client
 
 
 logger = logging.getLogger(__name__)
@@ -76,3 +81,36 @@ class ManDaoSMSBackEnd(SMSBackEnd):
             "response_status": response.status_code,
             "response_text": response.text
         }
+
+"""
+softwareSerialNo = "0SDK-EMY-0130-XXXXX"
+key = "123456"
+url = "http://sdk4report.eucp.b2m.cn:8080/sdk/SDKService?wsdl"
+
+class EmaySMS:
+    @classmethod
+    def register(cls):
+        ws = Client(url).service
+        rs = ws.registEx(softwareSerialNo, key, "wanglibank")
+        print(rs)
+
+    @classmethod
+    def send(cls, destmobile, smsContent, smsPriority=5, smsID=0):
+        if not destmobile or not smsContent:
+            return 400, "params invalid"
+
+        if not isinstance(destmobile, list):
+            destmobile = str([destmobile])
+        try:
+            ws = Client(url).service
+            rs = ws.sendSMS(softwareSerialNo, key, "", str(destmobile), smsContent, "", "GBK", smsPriority, smsID)
+        except:
+            return 400,"Internal server error"
+        print(rs)
+
+
+if __name__ == "__main__":
+    EmaySMS.register()
+    EmaySMS.send("18637172100", "abcdefg")
+"""
+
