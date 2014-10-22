@@ -21,8 +21,8 @@ from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
-								UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
-								WeixinRegisterAPIView)
+            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
+            WeixinRegisterAPIView)
 
 router = DefaultRouter()
 
