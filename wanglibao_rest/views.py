@@ -98,9 +98,9 @@ class RegisterAPIView(APIView):
     # serializer_class = RegisterUserSerializer
 
     def post(self, request, *args, **kwargs):
-        identifier = request.POST.get('identifier', "")
-        password = request.POST.get('password', "")
-        validate_code = request.POST.get('validate_code', "")
+        identifier = request.DATA.get('identifier', "")
+        password = request.DATA.get('password', "")
+        validate_code = request.DATA.get('validate_code', "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -123,7 +123,7 @@ class RegisterAPIView(APIView):
         if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
             return Response({"ret_code":30015, "message":u"该手机号已经注册"})
 
-        invite_code = request.POST.get('invite_code', "")
+        invite_code = request.DATA.get('invite_code', "")
         if invite_code:
             try:
                 PromotionToken.objects.get(token=invite_code)
@@ -141,8 +141,8 @@ class WeixinRegisterAPIView(APIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-        identifier = request.POST.get('identifier', "").strip()
-        validate_code = request.POST.get('validate_code', "").strip()
+        identifier = request.DATA.get('identifier', "").strip()
+        validate_code = request.DATA.get('validate_code', "").strip()
 
         if not identifier or not validate_code:
             return Response({"ret_code":30021, "message":"信息输入不完整"})
@@ -158,7 +158,7 @@ class WeixinRegisterAPIView(APIView):
         if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
             return Response({"ret_code":30024, "message":"该手机号已经注册"})
 
-        invite_code = request.POST.get('invite_code', "").strip()
+        invite_code = request.DATA.get('invite_code', "").strip()
         if invite_code:
             try:
                 PromotionToken.objects.get(token=invite_code)
