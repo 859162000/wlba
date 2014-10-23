@@ -135,8 +135,6 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
-        auth_user = authenticate(identifier=identifier, password=password)
-        auth_login(request, auth_user)
         return Response({"ret_code":0, "message":"注册成功"})
 
 #wechat register
@@ -172,6 +170,8 @@ class WeixinRegisterAPIView(APIView):
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
+        auth_user = authenticate(identifier=identifier, password=password)
+        auth_login(request, auth_user)
         send_rand_pass(identifier, password)
         return Response({"ret_code":0, "message":"注册成功"})
 

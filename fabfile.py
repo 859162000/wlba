@@ -543,15 +543,11 @@ def config_loadbalancer():
         sudo('service nginx reload')
         sudo('rm -rf /var/cache/nginx')
 
-@roles('web')
-def reload_apache():
-    sudo('service apache2 reload')
-
 @task
 def deploy():
     if env.get("fast", "").lower() == "true":
         execute(check_out)
-        execute(reload_apache)
+        execute(config_apache)
         banner('Fast Deploy Succeeded')
         return
 
