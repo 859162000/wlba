@@ -1,0 +1,19 @@
+doctype html
+- with '网站公告' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .container.margin-bottom-xxl
+    .siderbar-div
+      - with '网站公告' as title
+      include include/about_sidebar
+      - endwith
+    .panel-padding.span9-omega
+      .well-s
+
+
+
+  include include/footer
+  include include/tracking
