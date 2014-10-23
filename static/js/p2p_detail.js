@@ -49,14 +49,12 @@
           title: '温馨提示',
           msg: tip,
           callback_ok: function() {
-            var amount, product, validate_code;
+            var amount, product;
             product = $('input[name=product]').val();
             amount = $('input[name=amount]').val();
-            validate_code = $('input[name=validate_code]').val();
             return backend.purchaseP2P({
               product: product,
-              amount: amount,
-              validate_code: validate_code
+              amount: amount
             }).done(function(data) {
               return tool.modalAlert({
                 title: '温馨提示',

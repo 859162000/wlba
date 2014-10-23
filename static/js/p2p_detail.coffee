@@ -45,12 +45,12 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       tool.modalConfirm({title: '温馨提示', msg: tip, callback_ok: ()->
         product = $('input[name=product]').val()
         amount = $('input[name=amount]').val()
-        validate_code = $('input[name=validate_code]').val()
+#        validate_code = $('input[name=validate_code]').val()
 
         backend.purchaseP2P {
           product: product
           amount: amount
-          validate_code: validate_code
+#          validate_code: validate_code
         }
         .done (data)->
 

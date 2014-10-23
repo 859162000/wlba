@@ -105,14 +105,14 @@ html
                   span.span8-omega
                     span.highlight.font-m.invest#expected_income 0.00
                     | 元
-                //author: hetao; time: 2014.10.11 target: 用户未登陆时不显示手机验证码
-                if user.is_authenticated
-                  .row
-                    span.span4 手机验证码
-                    .span4
-                      input#validate_code.invest(type='text', name='validate_code', placeholder='验证码')
-                    .span4-omega
-                      button#get-validate-code-buy.button-orange.button-middle.invest(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                //author: hetao; time: 2014.10.24 target: 用户未登陆时不显示手机验证码 暂时不做验证
+                //if user.is_authenticated
+                //  .row
+                //    span.span4 手机验证码
+                //    .span4
+                //      input#validate_code.invest(type='text', name='validate_code', placeholder='验证码')
+                //    .span4-omega
+                //      button#get-validate-code-buy.button-orange.button-middle.invest(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
 
                 .row.margin-top-s
                   span.span4
