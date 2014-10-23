@@ -4,7 +4,7 @@ doctype html
 html
   - with '注册网利宝' as title
   - endwith
-  <meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=0.5, maximum-scale=1.0"/>
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=0.5, maximum-scale=1.0"/>
   script(src="/static/js/require.js", data-main="/static/js/header")
   style.
     body{
@@ -99,10 +99,6 @@ html
       border-radius:0px 10px 10px 0px;
       top:-1px;
     }
-    .disable{
-      cursor:default;
-      background-color:#aaa;
-    }
     .button-get-validate-code-modal:hover{
       background-color:#aaa;
     }
@@ -118,7 +114,7 @@ html
       margin-right:230px;
     }
 
-    #register_submit{
+    .register_submit{
       width:100%;
       background: -ms-linear-gradient(top, #ee1339,  #b32122);
       background: -moz-linear-gradient(top, #ee1339, #b32122);
@@ -131,13 +127,21 @@ html
 
     }
 
-    #register_submit:hover{
+    .register_submit:hover{
       background-color:#f67313;
       background: -ms-linear-gradient(top, #ea123a,  #b21c1c);
       background: -moz-linear-gradient(top, #ea123a, #b21c1c);
       background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ea123a), to(#b21c1c));
       background: -webkit-linear-gradient(top, #ea123a, #b21c1c);
       background: -o-linear-gradient(top, #ea123a, #b21c1c);
+    }
+    .disable{
+      cursor:default;
+      background:#aaa;
+    }
+    .disable:hover{
+      cursor:default;
+      background:#aaa;
     }
     .error-message{
       height:40px;
@@ -175,7 +179,7 @@ html
         div.input-container
           input#reg_invitecode(type="text", name="invitecode")
       div.button-container
-        button#register_submit.button-account.span12(type='button') 来吧，注册又不花钱
+        button.register_submit#register_submit(type='button') 来吧，注册又不花钱
       div.error-message
 
     script.
