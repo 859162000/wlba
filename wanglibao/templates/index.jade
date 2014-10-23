@@ -214,9 +214,9 @@ html
               .panel-content-container
                 table.invest-history-table
                   colgroup
+                    col(width="35%")
                     col(width="30%")
-                    col(width="30%")
-                    col(width="40%")
+                    col(width="35%")
                   thead
                     tr
                       th 申购时间
@@ -234,7 +234,7 @@ html
                           em {{trade.user | safe_phone}}
                         td.invest-num
 
-                          span.money-highlight {{trade.amount}}
+                          span.money-highlight {{trade.amount|money_format_int}}
                           span 元
                     tbody(style="display:none")
                       for trade in rest
@@ -245,7 +245,7 @@ html
                           td
                             em {{trade.user | safe_phone}}
                           td.invest-num
-                            span.money-highlight {{trade.amount}}
+                            span.money-highlight {{trade.amount|money_format_int}}
                               span 元
 
     hr.bottom-hr

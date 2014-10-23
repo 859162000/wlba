@@ -230,13 +230,13 @@ html
                     invest_result.push({
                       create_time: '{{trade.create_time | date:"Y-m-d"}}',
                       user: '{{trade.user | safe_phone}}',
-                      amount: '{{trade.amount}}'
+                      amount: '{{trade.amount|money_format_int}}'
                     });
               table.invest-history-table
                 colgroup
+                  col(width="35%")
                   col(width="30%")
-                  col(width="30%")
-                  col(width="40%")
+                  col(width="35%")
                 thead
                   tr
                     th 申购时间
@@ -251,7 +251,7 @@ html
                       td
                         em {{trade.user | safe_phone}}
                       td.invest-num
-                        span.money-highlight {{trade.amount}}
+                        span.money-highlight {{trade.amount|money_format_int}}
                           span 元
 
 
