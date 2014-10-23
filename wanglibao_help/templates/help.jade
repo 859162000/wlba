@@ -30,7 +30,7 @@ html
         .help-content
           for key,value in questions.items
             if key == '0'
-              .hot-items.help-box(data-source="topic_{{key}}")
+              .hot-items.help-box.active(data-source="topic_{{key}}")
                 h1 热点问题
                 ul
                   for item in value
