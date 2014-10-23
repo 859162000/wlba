@@ -282,6 +282,12 @@ SMS_MANDAO_MD5_PWD = '4A4080BB5FCCC3422E14EA8247D1062C'
 
 SMS_BACKEND = 'wanglibao_sms.backends.ManDaoSMSBackEnd'
 
+
+SMS_EMAY_SN = "6SDK-EMY-6688-KEZSM"
+SMS_EMAY_KEY = "wanglibao"
+SMS_EMAY_PWD = "660687"
+SMS_EMAY_URL = "http://sdk4report.eucp.b2m.cn:8080/sdk/SDKService?wsdl"
+
 # Default login redirect url
 LOGIN_REDIRECT_URL = '/'
 

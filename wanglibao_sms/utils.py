@@ -2,11 +2,11 @@
 import json
 import random
 from django.conf import settings
-from django.template.loader import render_to_string
 import datetime
 from django.utils import timezone
-from django.utils.module_loading import import_by_path
-from wanglibao_sms import messages
+#from django.utils.module_loading import import_by_path
+#from django.template.loader import render_to_string
+from wanglibao_sms import messages, backends
 from wanglibao_sms.models import PhoneValidateCode, ShortMessage
 import logging
 logger = logging.getLogger(__name__)
@@ -24,8 +24,12 @@ def send_messages(phones, messages):
     else:
         short_message.contents = u"%s: %s" % (",".join(phones), "|".join(messages))
     short_message.save()
-    backend = import_by_path(settings.SMS_BACKEND)
-    status, context = backend.send_messages(phones, messages)
+    #backend = import_by_path(settings.SMS_BACKEND)
+    #status, context = backend.send_messages(phones, messages)
+    status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages)
+    #失败使用emay重发
+    if status != 200:
+        status, context = backends.EmaySMS.send_messages(phones, messages)
 
     if status != 200:
         short_message.status = u'失败'
