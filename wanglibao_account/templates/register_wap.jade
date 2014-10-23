@@ -166,20 +166,20 @@ html
         span.left
           手机号：
         div.input-container
-          input#reg_identifier(type="text", name="identifier")
+          input#reg_identifier(type="text", pattern="[0-9]*", name="identifier")
       div.container
         span.left
           验证码：
         div.reg-identifier-container
-          input#id_validate_code(type="text", name="validate_code")
+          input#id_validate_code(type="text", pattern="[0-9]*", name="validate_code")
           button.button-get-validate-code-modal#button-get-validate-code-modal(type='button') 获取验证码
       div.container
         span.left
           邀请码：
         div.input-container
-          input#reg_invitecode(type="text", name="invitecode")
+          input#reg_invitecode(type="text", pattern="[0-9]*", name="invitecode")
       div.button-container
-        button.register_submit#register_submit(type='button') 来吧，注册又不花钱
+        button.register_submit#register_submit(type='button') 注册赚收益
       div.error-message
 
     script.

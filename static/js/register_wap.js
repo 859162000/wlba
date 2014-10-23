@@ -26,6 +26,7 @@
       if ($(element).hasClass('disable')) {
         return;
       }
+      $(".error-message").text("");
       phoneNumber = $("#reg_identifier").val().trim();
       if (checkMobile(phoneNumber)) {
         $.ajax({
@@ -64,16 +65,30 @@
       if ($(element).hasClass("disable")) {
         return;
       }
-      $(element).addClass('disable');
+      $(".error-message").text("");
       identifier = $("#reg_identifier").val().trim();
+      if (!checkMobile(identifier)) {
+        $(".error-message").text("手机号输入错误");
+        return;
+      }
       validate_code = $("#id_validate_code").val().trim();
+      if (validate_code.length !== 6) {
+        $(".error-message").text("请输入6位验证码");
+        return;
+      }
       invite_code = $("#reg_invitecode").val().trim();
+      if (invite_code.length > 0 && invite_code.length !== 6) {
+        $(".error-message").text("请输入6位邀请码");
+        return;
+      }
+      $(element).addClass('disable');
       return backend.registerWap({
         identifier: identifier,
         validate_code: validate_code,
         invite_code: invite_code
       }).done(function(data) {
         if (data.ret_code > 0) {
+          $(element).removeClass('disable');
           return $(".error-message").text(data.message);
         } else {
           return window.location.href = '/';
