@@ -59,11 +59,12 @@
       }
     });
     return $("#register_submit").click(function(e) {
-      var identifier, invite_code, validate_code;
-      if ($(this).hasClass("disable")) {
+      var element, identifier, invite_code, validate_code;
+      element = this;
+      if ($(element).hasClass("disable")) {
         return;
       }
-      $(this).addClass('disable');
+      $(element).addClass('disable');
       identifier = $("#reg_identifier").val().trim();
       validate_code = $("#id_validate_code").val().trim();
       invite_code = $("#reg_invitecode").val().trim();

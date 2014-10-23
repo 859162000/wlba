@@ -51,9 +51,10 @@ require ['jquery', 'lib/backend'], ($, backend)->
 
 
   $("#register_submit").click (e)->
-    if $(this).hasClass("disable")
+    element = this;
+    if $(element).hasClass("disable")
       return
-    $(this).addClass 'disable'
+    $(element).addClass 'disable'
     identifier = $("#reg_identifier").val().trim()
     validate_code = $("#id_validate_code").val().trim()
     invite_code = $("#reg_invitecode").val().trim()
@@ -64,6 +65,7 @@ require ['jquery', 'lib/backend'], ($, backend)->
         }
     .done (data)->
       if data.ret_code > 0
+        #$(element).removeClass 'disable'
         $(".error-message").text(data.message)
       else
         window.location.href = '/'
