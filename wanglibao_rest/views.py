@@ -3,7 +3,7 @@
 import urlparse
 import random
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.core.urlresolvers import resolve
 from django.db.models import Q
 from django.db.models import F
@@ -134,6 +134,9 @@ class RegisterAPIView(APIView):
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
+
+        auth_user = authenticate(identifier=identifier, password=password)
+        auth_login(request, auth_user)
         return Response({"ret_code":0, "message":"注册成功"})
 
 #wechat register
