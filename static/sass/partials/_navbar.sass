@@ -63,10 +63,22 @@
 
 a.nav-item-anchor
   margin: 0 auto
-  padding: 0 2em
+  padding: 0 1em
   +unstyled-link
   +link-colors($color-text-d3, $color-pomegranate)
   cursor: pointer
+  font-size: 16px
+  line-height: 30px
+  height: 30px
+  display: inline-block
+  &.left-line
+    padding-left: 1.6em
+    margin-left: .8em
+    border-left: 1px solid #efefef
+  &.right-line
+    padding-right: 1.6em
+    border-right: 1px solid #efefef
+    margin-right: .8em
 
 .security-nav
   display: inline-block
