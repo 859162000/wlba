@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import DefaultStorage
 from report.crypto import ReportCrypto
 from report.models import Report
-from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PEquity
+from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PRecord
 from wanglibao_pay.models import PayInfo
 from django.utils import timezone
 from wanglibao_pay.util import get_a_uuid
@@ -98,7 +98,8 @@ class DepositReportGenerator(ReportGeneratorBase):
     def generate_report_content(cls, start_time, end_time):
 
         output = cStringIO.StringIO()
-        pay_infos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='D').select_related('user').select_related('user__wanglibaouserprofile').select_related('order')
+        pay_infos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='D')\
+            .select_related('user').select_related('user__wanglibaouserprofile').select_related('order')
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow(['Id', u'用户名', u'交易号', u'类型', u'充值银行', u'充值金额', u'充值手续费', u'实际到账金额',
                          u'状态', u'操作时间', u'操作ip', u'编号'])
@@ -118,7 +119,6 @@ class DepositReportGenerator(ReportGeneratorBase):
                 unicode(pay_info.request_ip),
                 unicode(pay_info.uuid)
             ])
-
         return output.getvalue()
 
 
@@ -128,7 +128,8 @@ class WithDrawReportGenerator(ReportGeneratorBase):
 
     @classmethod
     def generate_report_content(cls, start_time, end_time):
-        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W').prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
+        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W')\
+            .prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
 
         output = cStringIO.StringIO()
 
@@ -158,6 +159,43 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 unicode(payinfo.status),
                 confirm_time,
                 unicode(payinfo.uuid)
+            ])
+        return output.getvalue()
+
+
+class ProductionRecordReportGenerator(ReportGeneratorBase):
+    prefix = 'cpls'
+    reportname_format = u'产品流水 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+
+        p2precords = P2PRecord.objects.filter(create_time__gte=start_time, create_time__lt=end_time)\
+            .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+
+        output = cStringIO.StringIO()
+
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'流水类型', u'关联订单号', u'p2p产品', u'购买者', u'购买者手机号',
+                         u'发生数', u'标后余额', u'发生时间', u'摘要', u'编号'])
+        name = ''
+        phone = ''
+        for index, p2precord in enumerate(p2precords):
+            if p2precord.user:
+                name = p2precord.user.wanglibaouserprofile.name
+                phoen = p2precord.user.wanglibaouserprofile.phone
+            writer.writerow([
+                str(index + 1),
+                p2precord.catalog,
+                unicode(p2precord.order_id),
+                p2precord.product.name,
+                name,
+                phone,
+                unicode(p2precord.amount),
+                unicode(p2precord.product_balance_after),
+                timezone.localtime(p2precord.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                p2precord.description,
+                unicode(get_a_uuid())
             ])
         return output.getvalue()
 
@@ -254,6 +292,7 @@ class ProductionAmortizationsSettledReportGenerator(ReportGeneratorBase):
                 unicode(get_a_uuid())
             ])
         return output.getvalue()
+
 
 class P2PAuditReportGenerator(ReportGeneratorBase):
     prefix = 'p2p_audit'
