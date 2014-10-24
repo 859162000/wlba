@@ -2,6 +2,7 @@
 # encoding:utf-8
 
 from django.db import models
+from ckeditor.fields import RichTextField
 
 
 class Topic(models.Model):
@@ -16,7 +17,7 @@ class Topic(models.Model):
 class Question(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.PROTECT, verbose_name='话题')
     title = models.CharField(max_length=200, verbose_name=u'问题')
-    answer = models.TextField(blank=True, verbose_name=u'答案')
+    answer = RichTextField()
     hotspot = models.BooleanField(default=False, verbose_name=u'是否是热点问题')
     sortord = models.IntegerField(default=0, verbose_name=u'排序值(大的排在前)')
 
