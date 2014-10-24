@@ -56,10 +56,10 @@ def login_back(args, user):
             tmpuser = Binding.objects.filter(user=user).filter(btype=state).first()
             #绑定过的不再绑定,一对一关系
             if tmpuser:
-                return {"ret_code":0, "message":"ok", "data":userinfo}
+                return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
             tmpuser = Binding.objects.filter(bid=userinfo['uid']).filter(btype=state).first()
             if tmpuser:
-                return {"ret_code":0, "message":"ok", "data":userinfo}
+                return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
             bindinfo = Binding()
             bindinfo.user = user
             bindinfo.btype = state
@@ -75,7 +75,7 @@ def login_back(args, user):
             bindinfo.refresh_token = dic['refresh_token']
             bindinfo.created_at = long(time.time())
             bindinfo.save()
-            return {"ret_code":0, "message":"ok", "data":userinfo}
+            return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
         else:
             return {"ret_code":30033, "message":content}
     else:
