@@ -50,7 +50,7 @@ def login_back(args, user):
             url = partner[state]['api'] + uri + urllib.urlencode(params)
             response, content = http.request(url, 'GET')
             if str(response['status']) != "200":
-                return {"ret_code":30034, "message":"userinfo error"}
+                return {"ret_code":30034, "message":content}
             userinfo = json.loads(content)
 
             tmpuser = Binding.objects.filter(user=user).filter(btype=state).first()
