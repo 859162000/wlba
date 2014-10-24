@@ -74,6 +74,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
 
     def clean_invitecode(self):
         invite_code = self.cleaned_data.get('invitecode')
+
         if invite_code:
             try:
                 p = PromotionToken.objects.get(token=invite_code)
@@ -84,7 +85,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                         )
             return invite_code
 
-    def clean(self):
+    def clean_validate_code(self):
         if 'identifier' in self.cleaned_data:
             identifier = self.cleaned_data["identifier"]
             identifier_type = detect_identifier_type(identifier)

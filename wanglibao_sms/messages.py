@@ -60,3 +60,7 @@ def gift_inviter(invited_phone, money):
 def gift_invited(inviter_phone, money):
     return u'感谢你接受用户%s的邀请注册网利宝并成功购买理财产品！网利宝将奖励你%s元手机话费，5个工作日内将直接充值到你的注册手机号。' \
            % (inviter_phone, str(money))
+
+@suffix
+def rand_pass(password):
+    return u'感谢注册网利宝，您的初始密码是%s，请登录wanglibao.com修改密码。' % password

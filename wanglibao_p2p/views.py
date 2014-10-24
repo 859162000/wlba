@@ -29,6 +29,7 @@ from django.conf import settings
 from decimal import Decimal
 from hashlib import md5
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from wanglibao_p2p.utility import strip_tags
 
 REPAYMENTTYPEMAP = (
                 (u'到期还本付息', 1),
@@ -108,12 +109,12 @@ class PurchaseP2P(APIView):
         form = PurchaseForm(request.DATA)
         phone = request.user.wanglibaouserprofile.phone
         code = request.POST.get('validate_code', '')
-        status_code, message = validate_validation_code(phone, code)
-        if status_code != 200:
-            return Response({
-                'message': u'验证码输入错误',
-                'error_number': ErrorNumber.validate_code_wrong
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # status_code, message = validate_validation_code(phone, code)
+        # if status_code != 200:
+        #     return Response({
+        #         'message': u'验证码输入错误',
+        #         'error_number': ErrorNumber.validate_code_wrong
+        #     }, status=status.HTTP_400_BAD_REQUEST)
         if form.is_valid():
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
@@ -157,15 +158,14 @@ class PurchaseP2PMobile(APIView):
             }, status=status.HTTP_200_OK)
         form = PurchaseForm(request.DATA)
         phone = request.user.wanglibaouserprofile.phone
-        code = request.POST.get('validate_code', '')
-
-        status_code, message = validate_validation_code(phone, code)
-
-        if status_code != 200:
-            return Response({
-                'message': u'验证码输入错误',
-                'error_number': ErrorNumber.validate_code_wrong
-            }, status=status.HTTP_200_OK)
+        # code = request.POST.get('validate_code', '')
+        # status_code, message = validate_validation_code(phone, code)
+        #
+        # if status_code != 200:
+        #     return Response({
+        #         'message': u'验证码输入错误',
+        #         'error_number': ErrorNumber.validate_code_wrong
+        #     }, status=status.HTTP_200_OK)
         if form.is_valid():
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
@@ -335,8 +335,8 @@ class GetNoWProjectsAPI(APIView):
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
-                "amountUsedDesc": p2p.short_usage,
-                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s/?promo_token=TL86KmhJShuqyBO0ZxR17A" % p2p.id,
+                "amountUsedDesc": strip_tags(p2p.short_usage),
+                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s" % p2p.id,
                 # "successTime": p2p.soldout_time,
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
@@ -410,8 +410,8 @@ class GetProjectsByDateAPI(APIView):
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
-                "amountUsedDesc": p2p.short_usage,
-                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s/?promo_token=TL86KmhJShuqyBO0ZxR17A" % p2p.id,
+                "amountUsedDesc": strip_tags(p2p.short_usage),
+                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s" % p2p.id,
                 "successTime": timezone.localtime(p2p.soldout_time).strftime("%Y-%m-%d %H:%M:%S"),
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
@@ -437,6 +437,7 @@ class FinancesAPI(APIView):
                 status = u'融资中'
 
             temp_p2p = {
+                "logo": "https://{}/static/images/wlblogo.png".format(self.request.get_host()),
                 "link": "https://{}/p2p/detail/{}/?promo_token=TL86KmhJShuqyBO0ZxR17A".format(self.request.get_host(), p2p.id),
                 "chanpin": p2p.name,
                 "serial": "WLB{}{}".format(timezone.localtime(p2p.publish_time).strftime("%Y%m%d%H%M%S"), p2p.id),

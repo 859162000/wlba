@@ -20,7 +20,9 @@ from wanglibao_pay.views import CardViewSet, LianlianAppPayView, LianlianAppPayC
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
-from wanglibao_rest.views import SendValidationCodeView, SendRegisterValidationCodeView, UserExisting, RegisterAPIView, IdValidate, AdminIdValidate
+from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
+            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
+            WeixinRegisterAPIView)
 
 router = DefaultRouter()
 
@@ -66,8 +68,9 @@ router.register(r'card', CardViewSet)
 
 urlpatterns = patterns(
     '',
-    url(r'^register/', RegisterAPIView.as_view()),
-    url(r'^reset_password/', ResetPasswordAPI.as_view()),
+    url(r'^register/$', RegisterAPIView.as_view()),
+    url(r'^register/wx/$', WeixinRegisterAPIView.as_view()),
+    url(r'^reset_password/$', ResetPasswordAPI.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),

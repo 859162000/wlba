@@ -1,8 +1,9 @@
 # encoding:utf-8
 
 import urlparse
+import random
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.core.urlresolvers import resolve
 from django.db.models import Q
 from django.db.models import F
@@ -11,6 +12,7 @@ from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -20,11 +22,11 @@ from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer, RegisterUserSerializer
-from wanglibao_sms.utils import send_validation_code, validate_validation_code
+from wanglibao_sms.utils import send_validation_code, validate_validation_code, send_rand_pass
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_account.models import VerifyCounter
+from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_account.utils import verify_id, detect_identifier_type
 
 
@@ -94,9 +96,9 @@ class RegisterAPIView(APIView):
     # serializer_class = RegisterUserSerializer
 
     def post(self, request, *args, **kwargs):
-        identifier = request.POST.get('identifier', "")
-        password = request.POST.get('password', "")
-        validate_code = request.POST.get('validate_code', "")
+        identifier = request.DATA.get('identifier', "")
+        password = request.DATA.get('password', "")
+        validate_code = request.DATA.get('validate_code', "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -119,7 +121,7 @@ class RegisterAPIView(APIView):
         if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
             return Response({"ret_code":30015, "message":u"该手机号已经注册"})
 
-        invite_code = request.POST.get('invite_code', "")
+        invite_code = request.DATA.get('invite_code', "")
         if invite_code:
             try:
                 PromotionToken.objects.get(token=invite_code)
@@ -130,23 +132,59 @@ class RegisterAPIView(APIView):
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
+
         return Response({"ret_code":0, "message":"注册成功"})
 
+#wechat register
+class WeixinRegisterAPIView(APIView):
+    permission_classes = ()
 
-'''
+    def post(self, request, *args, **kwargs):
+        identifier = request.DATA.get('identifier', "").strip()
+        validate_code = request.DATA.get('validate_code', "").strip()
+
+        if not identifier or not validate_code:
+            return Response({"ret_code":30021, "message":"信息输入不完整"})
+
+        identifier_type = detect_identifier_type(identifier)
+        if identifier_type != 'phone':
+            return Response({"ret_code":30022, "message":u"请输入正确的手机号"})
+
+        status, message = validate_validation_code(identifier, validate_code)
+        if status != 200:
+            return Response({"ret_code":30023, "message":"验证码输入错误"})
+
+        if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
+            return Response({"ret_code":30024, "message":"该手机号已经注册"})
+
+        invite_code = request.DATA.get('invite_code', "").strip()
+        if invite_code:
+            try:
+                PromotionToken.objects.get(token=invite_code)
+            except:
+                return Response({"ret_code":30025, "message":"邀请码错误"})
+
+        password = random.randint(100000, 999999)
+        user = create_user(identifier, password, "")
+        if invite_code:
+            set_promo_user(request, user, invitecode=invite_code)
+        auth_user = authenticate(identifier=identifier, password=password)
+        auth_login(request, auth_user)
+        send_rand_pass(identifier, password)
+        return Response({"ret_code":0, "message":"注册成功"})
+
 class PushTestView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        push_user_id = request.GET.get("push_user_id", "")
-        push_channel_id = request.GET.get("push_channel_id", "")
+        push_user_id = request.GET.get("push_user_id", "761084096993596699")
+        push_channel_id = request.GET.get("push_channel_id", "5381965014230748586")
         from wanglibao_sms import bae_channel
         channel = bae_channel.BaeChannel()
         message = {"message":"push Test"}
         msg_key = "wanglibao_staging"
         res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
         return Response({"ret_code":0, "message":cont})
-'''
 
 class UserExisting(APIView):
     permission_classes = ()
@@ -251,5 +289,30 @@ class AdminIdValidate(APIView):
 class ObtainAuthTokenCustomized(ObtainAuthToken):
     serializer_class = AuthTokenSerializer
 
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.DATA)
+
+        if serializer.is_valid():
+            push_user_id = request.DATA.get("user_id", "")
+            push_channel_id = request.DATA.get("channel_id", "")
+            #设备类型，默认为IOS
+            device_type = request.DATA.get("device_type", "ios")
+
+            if push_user_id and push_channel_id:
+                pu = UserPushId.objects.filter(push_user_id=push_user_id).first()
+                exist = False
+                if not pu:
+                    pu = UserPushId()
+                    pu.device_type = device_type
+                    exist = True
+                if exist or pu.user != serializer.object['user'] or pu.push_channel_id != push_channel_id:
+                    pu.user = serializer.object['user']
+                    pu.push_user_id = push_user_id
+                    pu.push_channel_id = push_channel_id
+                    pu.save()
+            token, created = Token.objects.get_or_create(user=serializer.object['user'])
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 obtain_auth_token = ObtainAuthTokenCustomized.as_view()
