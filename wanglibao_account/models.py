@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # encoding: utf8
+
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -38,3 +40,25 @@ class UserPushId(models.Model):
     device_type = models.CharField(max_length=20, verbose_name="设备类型")
     push_user_id = models.CharField(max_length=50, db_index=True)
     push_channel_id = models.CharField(max_length=50)
+
+
+class Binding(models.Model):
+    """
+        third app bind table, store bind related
+    """
+    user = models.ForeignKey(get_user_model())
+    btype = models.CharField(max_length=10, choices=(
+        ('xunlei', 'xunlei'),
+    ))
+    bid = models.CharField(max_length=20, db_index=True)
+    bname = models.CharField(max_length=50)
+    gender = models.CharField(max_length=5, choices=(
+        ("m", "m"),
+        ("w", "w"),
+        ("n", "n"),
+    ))
+    isvip = models.BooleanField(default=False, verbose_name=u"是否是vip")
+    extra = models.CharField(max_length=200, default="")
+    access_token = models.CharField(max_length=100)
+    refresh_token = models.CharField(max_length=100)
+    created_at = models.BigIntegerField(default=0, verbose_name=u'创建时间')
