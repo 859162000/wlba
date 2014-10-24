@@ -9,14 +9,16 @@ from django.contrib.auth.decorators import permission_required
 from django.utils.decorators import method_decorator
 
 from django.contrib.auth.models import User
-from wanglibao_buy.models import TradeHistory
+from wanglibao_p2p.models import P2PRecord
 
 from django.views.generic import TemplateView
 from django.http.response import HttpResponse
 from mock_generator import MockGenerator
 from django.conf import settings
 
-
+import json
+import decimal
+from django.db.models.base import ModelState
 
 # Create your views here.
 
@@ -28,15 +30,19 @@ class MarketingView(TemplateView):
 
         d0 = date(2014, 8, 01)
         d1 = date.today()
+        context = super(MarketingView, self).get_context_data(**kwargs)
+
+
+        print self.request.GET.get('hello'),'--------------'
 
         users = User.objects.filter(date_joined__range=(d0, d1)).order_by('each_day')\
             .extra({'each_day': 'date(date_joined)'}).values('each_day')\
             .annotate(joined_num=Count('id'))
 
 
-        trades = TradeHistory.objects.filter(business_type='022', create_date__range=(d0, d1)).order_by('each_day')\
-            .extra({'each_day': 'date(create_date)'}).values('each_day')\
-            .annotate(trade_num=Count('id'), amount=Sum('shares'))
+        trades = P2PRecord.objects.filter(create_time__range=(d0, d1)).order_by('each_day')\
+            .extra({'each_day': 'date(create_time)'}).values('each_day')\
+            .annotate(trade_num=Count('id'), amount=Sum('amount'))
 
         d = defaultdict(dict)
 
@@ -48,13 +54,6 @@ class MarketingView(TemplateView):
 
         result = sorted(dd, key=lambda x: x['each_day'])
 
-        print result
-
-        #result = d.values()
-
-        import json
-        import decimal
-        from django.db.models.base import ModelState
 
         class DateTimeEncoder(json.JSONEncoder):
             def default(self, obj):
