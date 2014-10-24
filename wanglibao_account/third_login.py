@@ -45,9 +45,9 @@ def login_back(args, user):
             dic = json.loads(content)
             if dic['result'] != 200:
                 return {"ret_code":30033, "message":"token error"}
-            uri = "/get_user_info?"
+            uri = "http://developer.open-api-auth.xunlei.com/get_user_info?"
             params = {"client_id":partner[state]['client_id'], "scope":"get_user_info", "access_token":dic['access_token']}
-            url = partner[state]['api'] + uri + urllib.urlencode(params)
+            url = uri + urllib.urlencode(params)
             response, content = http.request(url, 'GET')
             if str(response['status']) != "200":
                 return {"ret_code":30034, "message":content}
