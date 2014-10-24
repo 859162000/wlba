@@ -70,7 +70,6 @@ class IntroducedBy(models.Model):
 
 
 def generate_user_promo_token_and_invitecode(sender, instance, **kwargs):
-    print kwargs
     if kwargs["created"]:
         with transaction.atomic():
             invite_code = InviteCode.objects.select_for_update().filter(is_used=False).first()
