@@ -77,6 +77,6 @@ def login_back(args, user):
             bindinfo.save()
             return {"ret_code":0, "message":"ok", "data":userinfo}
         else:
-            return {"ret_code":30033, "message":"token error"}
+            return {"ret_code":30033, "message":content}
     else:
         return {"ret_code":30032, "message":"state error"}
