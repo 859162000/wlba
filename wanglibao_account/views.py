@@ -712,7 +712,7 @@ class Third_login_back(View):
     def get(self, request):
         result = third_login.login_back(request.GET, request.user)
         if result['ret_code']:
-            return HttpResponse(result['message'])
+            return HttpResponse(result)
         return HttpResponseRedirect(result['url'])
 
 @sensitive_post_parameters()
