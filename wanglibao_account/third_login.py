@@ -19,7 +19,7 @@ def assem_params(login_type):
         uri = "/platform?"
         params = {"client_id":partner[login_type]["client_id"],
                 "grant_type":"code","wap":0,
-                "redirect_uri":settings.CALLBACK_HOST+"/login/callback/",
+                "redirect_uri":settings.CALLBACK_HOST+"/accounts/login/callback/",
                 "state":login_type}
         return partner[login_type]['api'] + uri + urllib.urlencode(params)
     else:
