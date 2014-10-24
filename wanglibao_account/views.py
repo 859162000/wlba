@@ -12,13 +12,13 @@ from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404, HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -29,6 +29,7 @@ from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from wanglibao_account import third_login
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
@@ -702,6 +703,17 @@ class ResetPasswordAPI(APIView):
         else:
             return Response({'ret_code':30004, 'message':u'验证码验证失败'})
 
+class Third_login(View):
+    def get(self, request, login_type):
+        url = third_login.assem_params(login_type)
+        return HttpResponseRedirect(url)
+
+class Third_login_back(View):
+    def get(self, request):
+        result = third_login.login_back(request.GET, request.user)
+        if result['ret_code']:
+            return HttpResponse(result['message'])
+        return HttpResponseRedirect(result['url'])
 
 @sensitive_post_parameters()
 @csrf_protect
