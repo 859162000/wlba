@@ -3,7 +3,7 @@
 import urlparse
 import random
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.core.urlresolvers import resolve
 from django.db.models import Q
 from django.db.models import F
@@ -72,14 +72,14 @@ class SendRegisterValidationCodeView(APIView):
                             }, status=400)
 
 
-        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
-        if phone_validate_code_item:
-            count = phone_validate_code_item.code_send_count
-            if count > 10:
-                return Response({
-                                "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
-                                "error_number": ErrorNumber.duplicate
-                            }, status=400)
+        # phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        # if phone_validate_code_item:
+        #     count = phone_validate_code_item.code_send_count
+        #     if count > 10:
+        #         return Response({
+        #                         "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
+        #                         "error_number": ErrorNumber.duplicate
+        #                     }, status=400)
 
         status, message = send_validation_code(phone_number)
         return Response({
@@ -87,8 +87,6 @@ class SendRegisterValidationCodeView(APIView):
                         }, status=status)
 
     def dispatch(self, request, *args, **kwargs):
-        # ip = request.META['REMOTE_ADDR']
-        # print ip
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
 
 
@@ -98,9 +96,9 @@ class RegisterAPIView(APIView):
     # serializer_class = RegisterUserSerializer
 
     def post(self, request, *args, **kwargs):
-        identifier = request.POST.get('identifier', "")
-        password = request.POST.get('password', "")
-        validate_code = request.POST.get('validate_code', "")
+        identifier = request.DATA.get('identifier', "")
+        password = request.DATA.get('password', "")
+        validate_code = request.DATA.get('validate_code', "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -123,7 +121,7 @@ class RegisterAPIView(APIView):
         if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
             return Response({"ret_code":30015, "message":u"该手机号已经注册"})
 
-        invite_code = request.POST.get('invite_code', "")
+        invite_code = request.DATA.get('invite_code', "")
         if invite_code:
             try:
                 PromotionToken.objects.get(token=invite_code)
@@ -134,6 +132,7 @@ class RegisterAPIView(APIView):
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
+
         return Response({"ret_code":0, "message":"注册成功"})
 
 #wechat register
@@ -141,8 +140,8 @@ class WeixinRegisterAPIView(APIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-        identifier = request.POST.get('identifier', "").strip()
-        validate_code = request.POST.get('validate_code', "").strip()
+        identifier = request.DATA.get('identifier', "").strip()
+        validate_code = request.DATA.get('validate_code', "").strip()
 
         if not identifier or not validate_code:
             return Response({"ret_code":30021, "message":"信息输入不完整"})
@@ -158,7 +157,7 @@ class WeixinRegisterAPIView(APIView):
         if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
             return Response({"ret_code":30024, "message":"该手机号已经注册"})
 
-        invite_code = request.POST.get('invite_code', "").strip()
+        invite_code = request.DATA.get('invite_code', "").strip()
         if invite_code:
             try:
                 PromotionToken.objects.get(token=invite_code)
@@ -169,6 +168,8 @@ class WeixinRegisterAPIView(APIView):
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
+        auth_user = authenticate(identifier=identifier, password=password)
+        auth_login(request, auth_user)
         send_rand_pass(identifier, password)
         return Response({"ret_code":0, "message":"注册成功"})
 

@@ -46,7 +46,7 @@ html
               input.input-large(type="password", name="password2", placeholder="* 请确认密码", autocomplete='off', title="* 请确认密码")
                 .form-row-error
             .form-row
-              input(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码", maxlength="20")
+              input(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
               if form.invitecode.errors
                 label.form-row-error.error
                   for error in form.invitecode.errors

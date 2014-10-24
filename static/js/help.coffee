@@ -56,5 +56,6 @@ require ['jquery'], ($) ->
     tar = $('.help-menu li:eq(0)')
     tar.addClass('current')
     source = $('.help-box[data-source="' + tar.attr('data-target') + '"]')
-    source.addClass('active')
+    if !source.hasClass('active')
+      source.addClass('active')
     #$('.list-item:eq(0)', source).addClass('active')
