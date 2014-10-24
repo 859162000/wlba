@@ -28,10 +28,14 @@ class MarketingView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        d0 = date(2014, 8, 01)
-        d1 = date.today()
-        context = super(MarketingView, self).get_context_data(**kwargs)
-
+        start = self.request.GET.get('start', '')
+        end = self.request.GET.get('end', '')
+        if start and end:
+            d0 = datetime.strptime(start, '%Y-%m-%d').date()
+            d1 = datetime.strptime(end, '%Y-%m-%d').date()
+        else:
+            d0 = (datetime.now() - timedelta(days=7)).date()
+            d1 = date.today()
 
         print self.request.GET.get('hello'),'--------------'
 
@@ -40,7 +44,7 @@ class MarketingView(TemplateView):
             .annotate(joined_num=Count('id'))
 
 
-        trades = P2PRecord.objects.filter(create_time__range=(d0, d1)).order_by('each_day')\
+        trades = P2PRecord.objects.filter(create_time__range=(d0, d1),catalog='申购').order_by('each_day')\
             .extra({'each_day': 'date(create_time)'}).values('each_day')\
             .annotate(trade_num=Count('id'), amount=Sum('amount'))
 
@@ -71,7 +75,9 @@ class MarketingView(TemplateView):
         return {
             'result': result,
             'users': users,
-            'json_re': json_re
+            'json_re': json_re,
+            'start': d0.strftime('%Y-%m-%d'),
+            'end': d1.strftime('%Y-%m-%d')
         }
     @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):

@@ -65,6 +65,7 @@ $(function() {
         },
         initCondition = function() {
             $('.input-daterange').datepicker({
+                format: 'yyyy-mm-dd'
             });
         };
     init();
