@@ -37,7 +37,7 @@ def login_back(args, user):
         params = {"grant_type":"authorization_code", "code":code,
                 "client_id":partner[state]["client_id"],
                 "client_secret":partner[state]["secret_key"],
-                "redirect_uri":settings.CALLBACK_HOST+"/login/callback/"}
+                "redirect_uri":settings.CALLBACK_HOST+"/accounts/login/callback/"}
         http = httplib2.Http()
         url = partner[state]['api'] + uri + urllib.urlencode(params)
         response, content = http.request(url, 'GET')
