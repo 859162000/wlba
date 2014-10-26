@@ -32,10 +32,13 @@ def send_messages(phones, messages, channel=0):
         #失败使用emay重发
         if status != 200:
             status, context = backends.EmaySMS.send_messages(phones, messages)
+            short_message.channel = u"亿美"
     elif channel == 1:
         status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages)
     else:
+        short_message.channel = u"慢道"
         status, context = backends.EmaySMS.send_messages(phones, messages)
+        short_message.channel = u"亿美"
 
     if status != 200:
         short_message.status = u'失败'
