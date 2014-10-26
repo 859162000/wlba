@@ -111,7 +111,7 @@ html
                     .panel-announce-bar-content
                       for announce in announcements_p2p
                         span.icon.icon-up-arrow
-                        | {{announce.title}}
+                        a(href="/announcement/detail/{{announce.id}}", target="_blank") {{announce.title}}
                 .panel-title-bar
                   if product.warrant_company
                     .warrant-icon 担

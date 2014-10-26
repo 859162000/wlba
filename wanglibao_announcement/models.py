@@ -10,10 +10,11 @@ class Announcement(models.Model):
     )
     TYPES = (
         ('homepage', u'首页'),
-        ('p2pproduct', u'p2p产品'),
+        ('p2p', u'p2p页面'),
+        ('p2pnew', u'p2p新标'),
         ('fund', u'基金页面'),
         ('trust', u'信托页面'),
-        ('accounts', u'账户中心'),
+        ('accounts', u'用户账户中心'),
         ('all', u'所有页面')
     )
     STATUS = (
@@ -21,12 +22,13 @@ class Announcement(models.Model):
         (1, u'已审核')
     )
     device = models.CharField(max_length=15, verbose_name=u'设备', default='pc', choices=DEVICES, help_text=u'目标设备 PC 或 mobile')
-    type = models.CharField(max_length=15, verbose_name=u'类型', choices=TYPES, default='all', help_text=u'类型 首页 基金 信托 账户中心 所有页面')
+    type = models.CharField(max_length=15, blank=True, null=True, verbose_name=u'展示位置', choices=TYPES, help_text=u'公告区块的展示位置（页面横条公告）')
     title = models.CharField(max_length=100, verbose_name=u'公告名称', help_text=u'公告名称')
     content = RichTextField()
     priority = models.IntegerField(blank=True, default=0, verbose_name=u'优先级', help_text=u'越大越优先')
-    starttime = models.DateTimeField(auto_now=False, verbose_name=u'开始时间', help_text=u'开始时间')
-    endtime = models.DateTimeField(auto_now=False, verbose_name=u'结束时间', help_text=u'结束时间')
+    hideinlist = models.BooleanField(verbose_name=u'是否隐藏（公告列表页面）', default=False)
+    starttime = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示开始时间', help_text=u'展示开始时间')
+    endtime = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示结束时间', help_text=u'展示结束时间')
     status = models.SmallIntegerField(verbose_name=u'审核状态', help_text=u'审核状态', max_length=2, choices=STATUS, default=0)
     updatetime = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'更新时间')
 

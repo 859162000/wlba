@@ -356,7 +356,7 @@
       e.preventDefault();
       return $('.login-modal').trigger('click');
     });
-    $("input:password").bind("copy cut paste", function(e) {
+    return $("input:password").bind("copy cut paste", function(e) {
       var element;
       element = this;
       return setTimeout((function() {
@@ -366,15 +366,6 @@
           $(element).val('');
         }
       }), 100);
-    });
-    return $('#announcement-block-title').click(function(e) {
-      if ($('#announcement-block-title').hasClass('blue')) {
-        $('.announcement-block-content').slideUp();
-        return $('#announcement-block-title').removeClass('blue');
-      } else {
-        $('.announcement-block-content').slideDown();
-        return $('#announcement-block-title').addClass('blue');
-      }
     });
   });
 

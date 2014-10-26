@@ -1,5 +1,7 @@
+-load formatters
+
 doctype html
-- with '网站公告' as title
+- with  '网站公告' as title
 include include/head
 - endwith
 body
@@ -11,7 +13,13 @@ body
       include include/about_sidebar
       - endwith
     .panel-padding.span9-omega
-      .well-s
+      .row.announce-content-title
+        .span10
+          h2 {{announce.title}}
+        .span2-omega
+          .announce-date {{announce.updatetime | date:'Y-m-d'}}
+      .announce-content
+        | {{announce.content|safe}}
 
 
 

@@ -347,11 +347,3 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
 #          selector: "top-qq" #WPA 被放置的元素
 #        }
 #      ]
-
-  $('#announcement-block-title').click (e) ->
-    if($('#announcement-block-title').hasClass('blue'))
-      $('.announcement-block-content').slideUp()
-      $('#announcement-block-title').removeClass('blue')
-    else
-      $('.announcement-block-content').slideDown()
-      $('#announcement-block-title').addClass('blue')

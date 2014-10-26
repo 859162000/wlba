@@ -1,7 +1,7 @@
 mixin sidebar-item(name, link, expected_title)
   if title == expected_title
     li.sidebar-item.active
-      a= name
+      a(href=link)= name
   else
     li.sidebar-item
       a(href=link)= name
