@@ -62,17 +62,16 @@
     $('#topNotice').click(function(e) {
       return $('.common-inform').toggleClass('off');
     });
-    window.announceScroll = function(obj) {
-      $(obj).find("ul:first").animate({
-        marginTop: "-25px"
-      }, 500, function() {
-        $(this).css({
-          marginTop: "0px"
-        }).find("li:first").appendTo(this);
-      });
-    };
-    return $(document).ready(function() {
-      setInterval("announceScroll('#announce-title-scroll')", 3000);
+    $(document).ready(function() {
+      return setInterval((function() {
+        $("#announce-title-scroll").find("ul:first").animate({
+          marginTop: "-25px"
+        }, 500, function() {
+          $(this).css({
+            marginTop: "0px"
+          }).find("li:first").appendTo(this);
+        });
+      }), 3000);
     });
   });
 
