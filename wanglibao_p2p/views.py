@@ -325,7 +325,7 @@ class GetNoWProjectsAPI(APIView):
                 subscribes.append(temp_eq)
 
             temp_p2p = {
-                "projectid": str(p2p.pk),
+                "projectId": str(p2p.pk),
                 "title": p2p.name,
                 "amount": amount,
                 "schedule": schedule,
@@ -400,7 +400,7 @@ class GetProjectsByDateAPI(APIView):
                 subscribes.append(temp_eq)
 
             temp_p2p = {
-                "projectid": str(p2p.pk),
+                "projectId": str(p2p.pk),
                 "title": p2p.name,
                 "amount": amount,
                 "schedule": schedule,
