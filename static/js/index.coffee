@@ -55,3 +55,15 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
 
   $('#topNotice').click (e) ->
         $('.common-inform').toggleClass('off')
+
+  announceScroll = (obj) ->
+    $(obj).find("ul:first").animate
+      marginTop: "-25px"
+    , 500, ->
+      $(this).css(marginTop: "0px").find("li:first").appendTo this
+      return
+    return
+  $(document).ready ->
+    setInterval "announceScroll('#announce-title-scroll')", 3000
+    return
+

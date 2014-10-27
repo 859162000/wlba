@@ -1,0 +1,32 @@
+-load formatters
+
+doctype html
+- with '网站公告' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .container.margin-bottom-xxl
+    .siderbar-div
+      - with '网站公告' as title
+      include include/about_sidebar
+      - endwith
+    .panel-padding.span9-omega
+      .row.announce-content-title
+        .span10
+          h2 网站公告
+      ul.announce-content-list
+        for announce in announcements
+          li
+            a.span10(href="/announcement/detail/{{announce.id}}", target="_blank") &bull; {{announce.title}}
+            .span2-omega.align-center {{announce.updatetime | date:'Y-m-d'}}
+      .space-vertical-l
+      .row
+        - with data=announcements uri='/announcement/'
+        include include/pager
+        - endwith
+
+
+  include include/footer
+  include include/tracking

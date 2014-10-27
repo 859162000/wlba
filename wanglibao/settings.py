@@ -81,6 +81,7 @@ INSTALLED_APPS = (
 
     'trust',
     'wanglibao_account',
+    'wanglibao_announcement',
     'wanglibao_sms',
     'wanglibao_bank_financing',
     'wanglibao_fund',
