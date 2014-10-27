@@ -11,7 +11,7 @@ class AnnouncementHomeView(TemplateView):
     template_name = 'announcement_home.jade'
 
     def get_context_data(self, **kwargs):
-        announcements = Announcement.objects.filter(status=1, hideinlist=False).order_by('-updatetime')
+        announcements = Announcement.objects.filter(status=1, hideinlist=False).order_by('-priority', '-createtime')
 
         announcements_list = []
         announcements_list.extend(announcements)
