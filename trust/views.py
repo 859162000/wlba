@@ -7,6 +7,7 @@ from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_favorite.models import FavoriteTrust
 from wanglibao_hotlist.models import HotTrust
+from wanglibao_announcement.utility import AnnouncementTrust
 
 
 class TrustHomeView(TemplateView):
@@ -15,8 +16,10 @@ class TrustHomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         hot_trusts = HotTrust.objects.all().prefetch_related('trust').prefetch_related('trust__issuer')[:3]
+
         return {
-            'hot_trusts': hot_trusts
+            'hot_trusts': hot_trusts,
+            'announcements': AnnouncementTrust
         }
 
 
@@ -37,6 +40,9 @@ class TrustDetailView(TemplateView):
             if FavoriteTrust.objects.filter(user=self.request.user, item=trust).exists():
                 is_favorited = 1
         context['is_favorited'] = is_favorited
+
+        context['announcements'] = AnnouncementTrust
+
         return context
 
 

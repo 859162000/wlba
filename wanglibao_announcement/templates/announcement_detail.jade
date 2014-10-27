@@ -1,0 +1,28 @@
+-load formatters
+
+doctype html
+title1 =  announce.title + u'-网站公告'
+- with title1 as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .container.margin-bottom-xxl
+    .siderbar-div
+      - with '网站公告' as title
+      include include/about_sidebar
+      - endwith
+    .panel-padding.span9-omega
+      .row.announce-content-title
+        .span10
+          h2 {{announce.title}}
+        .span2-omega
+          .announce-date {{announce.updatetime | date:'Y-m-d'}}
+      .announce-content
+        | {{announce.content|safe}}
+
+
+
+  include include/footer
+  include include/tracking

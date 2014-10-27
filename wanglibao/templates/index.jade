@@ -95,6 +95,7 @@ html
             .process-title 第五步&nbsp;自动收款
             .process-content 借款期满后自动回款
 
+    include announcement_block
 
     .container
       .row
@@ -104,6 +105,13 @@ html
             status = product.display_status
             .panel-p2p-product
               .shadow-inner
+                if forloop.counter == 1
+                  .panel-announce-bar
+                    .panel-announce-bar-title 投资列表
+                    .panel-announce-bar-content
+                      for announce in announcements_p2p
+                        span.icon.icon-up-arrow
+                        a(href="/announcement/detail/{{announce.id}}", target="_blank") {{announce.title}}
                 .panel-title-bar
                   if product.warrant_company
                     .warrant-icon 担

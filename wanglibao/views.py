@@ -8,6 +8,7 @@ from marketing.models import NewsAndReport, SiteData
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner
 from itertools import chain
+from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
 
 
 class IndexView(TemplateView):
@@ -45,7 +46,9 @@ class IndexView(TemplateView):
             "news_and_reports": news_and_reports,
             'banners': banners,
             'site_data': site_data,
-            'getmore': getmore
+            'getmore': getmore,
+            'announcements': AnnouncementHomepage,
+            'announcements_p2p': AnnouncementP2PNew
         }
 
 
