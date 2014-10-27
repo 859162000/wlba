@@ -64,6 +64,7 @@ def login_back(args, user):
                     return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
             else:
                 bindinfo = Binding()
+                bindinfo.user = user
             bindinfo.btype = state
             bindinfo.bid = userinfo['uid']
             bindinfo.bname = userinfo['nickname']
@@ -80,8 +81,6 @@ def login_back(args, user):
             bindinfo.extra = '{"level":%s}' % userinfo['level']
             bindinfo.access_token = dic['access_token']
             bindinfo.refresh_token = dic['refresh_token']
-            if not tmpuser1:
-                bindinfo.user = user
             bindinfo.created_at = long(time.time())
             bindinfo.save()
             return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
