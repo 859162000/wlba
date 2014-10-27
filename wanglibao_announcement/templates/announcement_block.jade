@@ -1,15 +1,24 @@
-- load formatters
+-load formatters
+
+mixin announceLoop()
+  ul.announcement-block-title
+    for announce in announcements
+      li
+        a(href="/announcement/detail/{{announce.id}}", target="_blank", id="announcement-block-title") {{announce.title}}
+        span {{announce.updatetime|date:'Y-m-d'}}
 
 if announcements
   .space-vertical-s
   .container
     .announcement-block
       .row
-        .span10.scrollText#announce-title-scroll
-          ul.announcement-block-title
-            for announce in announcements
-              li
-                a(href="/announcement/detail/{{announce.id}}", target="_blank", id="announcement-block-title") {{announce.title}}
-                span {{announce.updatetime|date:'Y-m-d'}}
+        if announcements.count > 1
+          .span10.scrollText#announce-title-scroll
+            +announceLoop()
+        else
+          .span10.scrollText
+            +announceLoop()
+
         .span2-omega.align-right
             a.button.button-default(href="/announcement") 更多公告
+
