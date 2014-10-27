@@ -4,12 +4,12 @@ if announcements
   .space-vertical-s
   .container
     .announcement-block
-      .announcement-block-bar
-        .row
-          .span10
+      .row
+        .span10.scrollText#announce-title-scroll
+          ul.announcement-block-title
             for announce in announcements
-              .announcement-block-title
+              li
                 a(href="/announcement/detail/{{announce.id}}", target="_blank", id="announcement-block-title") {{announce.title}}
                 span {{announce.updatetime|date:'Y-m-d'}}
-          .span2-omega.align-right
-              a.button.button-default(href="/announcement") 更多公告
+        .span2-omega.align-right
+            a.button.button-default(href="/announcement") 更多公告

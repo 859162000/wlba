@@ -3,18 +3,22 @@
   padding: 5px 5px 5px 0
   font-size: $font-s
 
+  .scrollText
+    height: 25px
+    overflow: hidden
+
   .announcement-block-title
     border-left: solid 2px $color-red
-    line-height: 22px
+
     text-indent: 10px
 
-    span
-      +inline-block
-      margin-left: 20px
+    li
+      line-height: 25px
+      height: 25px
 
-  .announcement-block-content
-    padding: $space-s
-    font-size: $font-s
+      span
+        +inline-block
+        margin-left: 20px
 
 .announce-content-title
   padding-top: $space-s
