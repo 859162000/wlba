@@ -30,6 +30,7 @@ class Announcement(models.Model):
     starttime = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示开始时间', help_text=u'展示开始时间')
     endtime = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示结束时间', help_text=u'展示结束时间')
     status = models.SmallIntegerField(verbose_name=u'审核状态', help_text=u'审核状态', max_length=2, choices=STATUS, default=0)
+    createtime = models.DateTimeField(auto_now=False, verbose_name=u'发布时间', help_text=u'发布时间')
     updatetime = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'更新时间')
 
     class Meta:
