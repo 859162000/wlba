@@ -62,6 +62,10 @@
     $('#topNotice').click(function(e) {
       return $('.common-inform').toggleClass('off');
     });
+    $('#p2p-new-announce').click(function(e) {
+      e.stopPropagation();
+      return window.open($(this).attr('data-url'));
+    });
     $(document).ready(function() {
       return setInterval((function() {
         $("#announce-title-scroll").find("ul:first").animate({
