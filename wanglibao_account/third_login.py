@@ -55,7 +55,7 @@ def login_back(args, user):
 
             tmpuser = Binding.objects.filter(user=user).filter(btype=state).first()
             #绑定过的不再绑定,一对一关系
-            if tmpuser and tmpuser.bid != userinfo['bid']:
+            if tmpuser and tmpuser.bid != userinfo['uid']:
                 return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
 
             bindinfo = Binding.objects.filter(bid=userinfo['uid']).filter(btype=state).first()
