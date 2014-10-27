@@ -70,6 +70,10 @@ def login_back(args, user):
                 bindinfo.gender = "m"
             else:
                 bindinfo.gender = "n"
+            if str(userinfo['isvip']) == "0":
+                bindinfo.isvip = False
+            else:
+                bindinfo.isvip = True
             bindinfo.access_token = dic['access_token']
             bindinfo.refresh_token = dic['refresh_token']
             if not tmpuser1:
