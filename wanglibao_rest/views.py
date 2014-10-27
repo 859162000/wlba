@@ -72,14 +72,14 @@ class SendRegisterValidationCodeView(APIView):
                             }, status=400)
 
 
-        # phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
-        # if phone_validate_code_item:
-        #     count = phone_validate_code_item.code_send_count
-        #     if count > 10:
-        #         return Response({
-        #                         "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
-        #                         "error_number": ErrorNumber.duplicate
-        #                     }, status=400)
+        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        if phone_validate_code_item:
+            count = phone_validate_code_item.code_send_count
+            if count > 6:
+                return Response({
+                                "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
+                                "error_number": ErrorNumber.duplicate
+                            }, status=400)
 
         status, message = send_validation_code(phone_number)
         return Response({
