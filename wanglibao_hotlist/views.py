@@ -57,14 +57,35 @@ class MobileMainPageP2PViewSet(PaginatedModelViewSet):
     model = MobileMainPageP2P
     serializer_class = MobileMainPageP2PSerializer
 
+    # def get_queryset(self):
+    #     if not self.model.objects.all().exists():
+    #         h = MobileMainPageP2P()
+    #         h.item = P2PProduct.objects.filter(end_time__gt=timezone.now()).filter(status__in=[
+    #             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标']).order_by('end_time').first()
+    #         h.added = timezone.now()
+    #         h.hot_score = 1
+    #
+    #         return [h]
+    #
+    #     return super(MobileMainPageP2PViewSet, self).get_queryset()
+
     def get_queryset(self):
+
         if not self.model.objects.all().exists():
             h = MobileMainPageP2P()
-            h.item = P2PProduct.objects.filter(end_time__gt=timezone.now()).filter(status__in=[
-                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标']).order_by('end_time').first()
+            item = P2PProduct.objects.filter(end_time__gt=timezone.now()).\
+                filter(status__in=u'正在招标').order_by('end_time').first()
+            if item:
+                h.item = item
+            else:
+                h.item = P2PProduct.objects.filter(end_time__gt=timezone.now()).filter(status__in=[
+                        u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'])\
+                    .order_by('end_time').first()
+
             h.added = timezone.now()
             h.hot_score = 1
-
             return [h]
+        else:
+            return MobileMainPageP2P.objects.filter(item__status=u'正在招标').order_by('hot_score')
 
-        return super(MobileMainPageP2PViewSet, self).get_queryset()
+        # return super(MobileMainPageP2PViewSet, self).get_queryset()
