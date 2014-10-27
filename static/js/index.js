@@ -12,7 +12,7 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], function($, _, backend, modal, countdown) {
-    var anchors, announceScroll, bannerCount, banners, currentBanner, switchBanner, timer;
+    var anchors, bannerCount, banners, currentBanner, switchBanner, timer;
     $('.portfolio-submit').click(function() {
       var asset, period;
       asset = $('#portfolio-asset')[0].value;
@@ -62,7 +62,7 @@
     $('#topNotice').click(function(e) {
       return $('.common-inform').toggleClass('off');
     });
-    announceScroll = function(obj) {
+    window.announceScroll = function(obj) {
       $(obj).find("ul:first").animate({
         marginTop: "-25px"
       }, 500, function() {

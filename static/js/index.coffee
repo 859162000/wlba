@@ -56,7 +56,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
   $('#topNotice').click (e) ->
         $('.common-inform').toggleClass('off')
 
-  announceScroll = (obj) ->
+  window.announceScroll = (obj) ->
     $(obj).find("ul:first").animate
       marginTop: "-25px"
     , 500, ->
