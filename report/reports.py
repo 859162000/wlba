@@ -66,7 +66,7 @@ class ReportGeneratorBase(object):
     @classmethod
     def get_report_name(cls, start_time, end_time):
         if hasattr(cls, 'reportname_format'):
-            return cls.reportname_format % (start_time.strftime('%Y-%m-%d'), end_time.strftime('%Y-%m-%d'))
+            return cls.reportname_format % (start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
 
 
     @classmethod

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import time
+import datetime
 from django.utils import timezone
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
@@ -69,5 +71,5 @@ class AdminReportExport(TemplateView):
         except Exception, e:
             messages.info(request, u'导出失败，请重新生成.错误信息{}'.format(e))
 
-    def _timeformat(self, time):
-        return timezone.datetime(*[int(i) for i in time.split('-')])
+    def _timeformat(self, str_time):
+        return datetime.datetime.strptime(str_time, "%Y-%m-%d %H:%M:%S")
