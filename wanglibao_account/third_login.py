@@ -55,13 +55,16 @@ def login_back(args, user):
 
             tmpuser = Binding.objects.filter(user=user).filter(btype=state).first()
             #绑定过的不再绑定,一对一关系
-            if tmpuser:
+            if tmpuser and tmpuser.bid != userinfo['uid']:
                 return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
-            tmpuser = Binding.objects.filter(bid=userinfo['uid']).filter(btype=state).first()
-            if tmpuser:
-                return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
-            bindinfo = Binding()
-            bindinfo.user = user
+
+            bindinfo = Binding.objects.filter(bid=userinfo['uid']).filter(btype=state).first()
+            if bindinfo:
+                if bindinfo.user != user:
+                    return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
+            else:
+                bindinfo = Binding()
+                bindinfo.user = user
             bindinfo.btype = state
             bindinfo.bid = userinfo['uid']
             bindinfo.bname = userinfo['nickname']
@@ -71,6 +74,11 @@ def login_back(args, user):
                 bindinfo.gender = "m"
             else:
                 bindinfo.gender = "n"
+            if str(userinfo['isvip']) == "0":
+                bindinfo.isvip = False
+            else:
+                bindinfo.isvip = True
+            bindinfo.extra = '{"level":%s}' % userinfo['level']
             bindinfo.access_token = dic['access_token']
             bindinfo.refresh_token = dic['refresh_token']
             bindinfo.created_at = long(time.time())
