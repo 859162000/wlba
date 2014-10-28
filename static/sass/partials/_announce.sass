@@ -16,9 +16,19 @@
       line-height: 25px
       height: 25px
 
+      a
+        &:hover
+          color: #1f8ccd
+
       span
         +inline-block
+        color: $color-text-d4
         margin-left: 20px
+
+.panel-announce-bar-content
+  a
+    &:hover
+      color: #1f8ccd
 
 .announce-content-title
   padding-top: $space-s
@@ -33,6 +43,7 @@
 .announce-content
   font-size: $font-s
   padding: $space-sm $space-s
+  overflow: hidden
 
   p
     font-size: $font-s

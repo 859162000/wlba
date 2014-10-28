@@ -494,3 +494,19 @@ ADMIN_ADDRESS='AK7WtEQ4Q9KPs8Io_zOncw'
 # DATE_FORMAT='Y-m-d'
 
 # AUTH_PROFILE_MODULE = 'wanglibao_profile.WanglibaoUserProfile'
+CKEDITOR_CONFIGS = {
+    "default": {
+        'toolbar_custom': [
+            ['Source'],['Cut','Copy','Paste','PasteText','PasteFromWord'],
+            ['Styles','Format','Font','FontSize'],
+            ['-','Find','Replace','-','SelectAll','RemoveFormat'],
+            '/',
+            ['Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker','Undo','Redo'],
+            ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+            ['TextColor', 'BGColor'],
+            ['Image', 'Flash', 'Table', 'HorizontalRule'],
+            ['Smiley', 'SpecialChar'],
+        ],
+        'toolbar': 'custom',
+    }
+}

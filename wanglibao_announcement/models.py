@@ -36,7 +36,7 @@ class Announcement(models.Model):
 
     class Meta:
         verbose_name_plural = u'公告'
-        ordering = ['-priority', '-updatetime']
+        ordering = ['-createtime']
 
     def __unicode__(self):
         return "%s" % self.title
