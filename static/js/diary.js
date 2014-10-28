@@ -14,6 +14,7 @@ $(function() {
             amount.push(getNum(result[key].amount));
         }
         drawChart({categories: categories, joined: joined, trade: trade, amount: amount});
+        initCondition();
     },
         drawChart = function(result) {
             $('#container').highcharts({
@@ -60,6 +61,11 @@ $(function() {
                     name: '新增交易额',
                     data: result.amount
                 }]
+            });
+        },
+        initCondition = function() {
+            $('.input-daterange').datepicker({
+                format: 'yyyy-mm-dd'
             });
         };
     init();

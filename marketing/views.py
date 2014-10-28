@@ -9,14 +9,16 @@ from django.contrib.auth.decorators import permission_required
 from django.utils.decorators import method_decorator
 
 from django.contrib.auth.models import User
-from wanglibao_buy.models import TradeHistory
+from wanglibao_p2p.models import P2PRecord
 
 from django.views.generic import TemplateView
 from django.http.response import HttpResponse
 from mock_generator import MockGenerator
 from django.conf import settings
 
-
+import json
+import decimal
+from django.db.models.base import ModelState
 
 # Create your views here.
 
@@ -26,17 +28,25 @@ class MarketingView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        d0 = date(2014, 8, 01)
-        d1 = date.today()
+        start = self.request.GET.get('start', '')
+        end = self.request.GET.get('end', '')
+        if start and end:
+            d0 = datetime.strptime(start, '%Y-%m-%d').date()
+            d1 = datetime.strptime(end, '%Y-%m-%d').date()
+        else:
+            d0 = (datetime.now() - timedelta(days=7)).date()
+            d1 = date.today()
+
+        print self.request.GET.get('hello'),'--------------'
 
         users = User.objects.filter(date_joined__range=(d0, d1)).order_by('each_day')\
             .extra({'each_day': 'date(date_joined)'}).values('each_day')\
             .annotate(joined_num=Count('id'))
 
 
-        trades = TradeHistory.objects.filter(business_type='022', create_date__range=(d0, d1)).order_by('each_day')\
-            .extra({'each_day': 'date(create_date)'}).values('each_day')\
-            .annotate(trade_num=Count('id'), amount=Sum('shares'))
+        trades = P2PRecord.objects.filter(create_time__range=(d0, d1),catalog='申购').order_by('each_day')\
+            .extra({'each_day': 'date(create_time)'}).values('each_day')\
+            .annotate(trade_num=Count('id'), amount=Sum('amount'))
 
         d = defaultdict(dict)
 
@@ -48,13 +58,6 @@ class MarketingView(TemplateView):
 
         result = sorted(dd, key=lambda x: x['each_day'])
 
-        print result
-
-        #result = d.values()
-
-        import json
-        import decimal
-        from django.db.models.base import ModelState
 
         class DateTimeEncoder(json.JSONEncoder):
             def default(self, obj):
@@ -72,7 +75,9 @@ class MarketingView(TemplateView):
         return {
             'result': result,
             'users': users,
-            'json_re': json_re
+            'json_re': json_re,
+            'start': d0.strftime('%Y-%m-%d'),
+            'end': d1.strftime('%Y-%m-%d')
         }
     @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
