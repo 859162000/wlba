@@ -15,18 +15,17 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 
 logger = logging.getLogger(__name__)
 
-MER_ID = settings.Lian_MER_ID
-PAY_SECRET_KEY = settings.Lian_PAY_SECRET_KEY
-PAY_URL = settings.Lian_PAY_URL
-PAY_RETURN_URL = settings.Lian_PAY_RETURN_URL
-PAY_BACK_RETURN_URL = settings.Lian_PAY_BACK_RETURN_URL
 
 
 class LianlianPay:
     FEE = 0
 
     def __init__(self):
-        pass
+        self.MER_ID = settings.Lian_MER_ID
+        self.PAY_SECRET_KEY = settings.Lian_PAY_SECRET_KEY
+        self.PAY_URL = settings.Lian_PAY_URL
+        self.PAY_RETURN_URL = settings.Lian_PAY_RETURN_URL
+        self.PAY_BACK_RETURN_URL = settings.Lian_PAY_BACK_RETURN_URL
 
     def _sign(self, dic):
         keys = dic.keys()
@@ -35,13 +34,13 @@ class LianlianPay:
         for x in keys:
             if dic[x] != "":
                 s.append("%s=%s" % (x, dic[x]))
-        s.append("key=%s" % PAY_SECRET_KEY)
+        s.append("key=%s" % self.PAY_SECRET_KEY)
         return hashlib.md5("&".join(s)).hexdigest()
 
     def ios_sign(self, params):
         dic = {"no_order":params['id'], "busi_partner":"108001",
                 "sign_type":"MD5", "money_order":params['amount'],
-                "notify_url":PAY_BACK_RETURN_URL, "oid_partner":MER_ID}
+                "notify_url":self.PAY_BACK_RETURN_URL, "oid_partner":self.MER_ID}
         dic['dt_order'] = util.fmt_dt_14(params['create_time'])
         dic['sign'] = self._sign(dic)
         return dic
@@ -122,7 +121,7 @@ class LianlianPay:
 
 
         #dic = {"no_order":117183, "sign_type":"MD5", "money_order":"100.00",
-        #        "oid_partner":MER_ID}
+        #        "oid_partner":self.MER_ID}
         #import datetime
         #dic['create_time'] = datetime.datetime.fromtimestamp(1413488234.0)
         #dic['oid_paybill'] = 2011030900001098
