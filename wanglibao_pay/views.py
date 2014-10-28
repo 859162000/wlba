@@ -566,7 +566,7 @@ class AdminTransactionDeposit(TemplateView):
 class LianlianAppPayView(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def POST(self, request):
+    def post(self, request):
         lianpay = LianlianPay()
         result = lianpay.ios_pay(request)
         return Response(result)
@@ -575,7 +575,7 @@ class LianlianAppPayView(APIView):
 class LianlianAppPayCallbackView(APIView):
     permission_classes = ()
 
-    def POST(self, request):
+    def post(self, request):
         lianpay = LianlianPay()
         result = lianpay.ios_pay_callback(request)
         if not result['ret_code']:
