@@ -5,7 +5,7 @@ mixin announceLoop()
     for announce in announcements
       li
         a(href="/announcement/detail/{{announce.id}}", target="_blank", id="announcement-block-title") {{announce.title}}
-        span {{announce.updatetime|date:'Y-m-d'}}
+        span {{announce.createtime|date:'Y-m-d'}}
 
 if announcements
   .space-vertical-s
