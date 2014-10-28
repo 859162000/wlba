@@ -111,11 +111,13 @@ class ActivityRule(models.Model):
 
     rule_type = models.CharField(u'规则类型', max_length=50, null=False)
     rule_amount = models.DecimalField(u'数额', max_digits=20, decimal_places=2, default=0)
-    create_time = models.DateTimeField(u'活动创建时间')
+    create_time = models.DateTimeField(u'活动创建时间', auto_now_add=True)
 
     def get_earning(self, amount, type):
         return amount*self.rule_amount
 
+    def __unicode__(self):
+        return u'<%s>' % self.name
 
 #author: hetao
 #datetime: 2014.10.27
@@ -128,4 +130,7 @@ class Activity(models.Model):
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     start_time = models.DateTimeField(u'开始时间')
     end_time = models.DateTimeField(u'结束时间')
+
+    def __unicode__(self):
+        return u'<%s>' % self.name
 

@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.utils import timezone
 from views import MarketingView
 
-from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, Activity
+from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, Activity, ActivityRule
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -84,12 +84,17 @@ class InviteCodeAdmin(admin.ModelAdmin):
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'description')
 
+class ActivityRuleAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'description', 'rule_type', 'rule_amount')
+
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
 admin.site.register(PromotionToken, PromotionTokenAdmin)
 admin.site.register(IntroducedBy, IntroducedByAdmin)
 admin.site.register(TimelySiteData, TimelySitedataAdmin)
 admin.site.register(Activity, ActivityAdmin)
+admin.site.register(ActivityRule, ActivityRuleAdmin)
+
 
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(),name=u'diary')
 admin.site.register(InviteCode, InviteCodeAdmin)

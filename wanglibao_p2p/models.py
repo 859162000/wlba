@@ -554,4 +554,5 @@ class Earning(models.Model):
     amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=2, default=0)
 
     user = models.ForeignKey(get_user_model(), help_text=u'投资用户')
+    paid = models.BooleanField(u'已打款', default=False)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
