@@ -115,7 +115,7 @@ class DepositReportGenerator(ReportGeneratorBase):
                 str(pay_info.fee),
                 str(pay_info.amount - pay_info.fee),
                 unicode(pay_info.status),
-                timezone.localtime(pay_info.create_time).strftime("%Y-%m-%d %H:%M"),
+                timezone.localtime(pay_info.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                 unicode(pay_info.request_ip),
                 unicode(pay_info.uuid)
             ])
@@ -140,7 +140,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
         for payinfo in payinfos:
             confirm_time = ""
             if payinfo.confirm_time:
-                confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M")
+                confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
             writer.writerow([
                 str(payinfo.id),
                 payinfo.user.wanglibaouserprofile.phone,
@@ -154,7 +154,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 str(payinfo.total_amount),
                 str(payinfo.amount),
                 str(payinfo.fee),
-                timezone.localtime(payinfo.create_time).strftime("%Y-%m-%d %H:%M"),
+                timezone.localtime(payinfo.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                 str(payinfo.request_ip),
                 unicode(payinfo.status),
                 confirm_time,
@@ -223,13 +223,13 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 amortization.product_amortization.product.name,
                 u'第%d期' % amortization.term,
                 u'抵押标',
-                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),
                 str(amortization.principal + amortization.interest),
                 str(amortization.principal),
                 str(amortization.interest),
                 # u'待还',
                 amortization.product_amortization.product.status,
-                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),
                 unicode(get_a_uuid())
             ])
         return output.getvalue()
@@ -257,7 +257,7 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
                 amortization.product.name,
                 u'第%d期' % amortization.term,
                 u'抵押标',
-                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),
                 str(amortization.principal + amortization.interest),
                 str(amortization.principal),
                 str(amortization.interest),
@@ -288,7 +288,7 @@ class ProductionAmortizationsSettledReportGenerator(ReportGeneratorBase):
                 u'抵押标',
                 str(amortization.principal + amortization.interest),
                 u'成功',
-                timezone.localtime(amortization.settlement_time).strftime("%Y-%m-%d"),
+                timezone.localtime(amortization.settlement_time).strftime("%Y-%m-%d %H:%M:%S"),
                 unicode(get_a_uuid())
             ])
         return output.getvalue()
