@@ -124,7 +124,7 @@ class Activity(models.Model):
     name = models.CharField(u'活动名称', max_length=128)
     description = models.TextField(u'活动描述')
 
-    rule = models.ForeignKey(ActivityRule, help_text=u'活动规则', null=True, on_delete=models.SET_NULL)
+    rule = models.ForeignKey(ActivityRule, help_text=u'活动规则', null=True, on_delete=models.SET_NULL, blank=True)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     start_time = models.DateTimeField(u'开始时间')
     end_time = models.DateTimeField(u'结束时间')

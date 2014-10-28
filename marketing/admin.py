@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.utils import timezone
 from views import MarketingView
 
-from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode
+from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, Activity
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -81,11 +81,15 @@ class InviteCodeAdmin(admin.ModelAdmin):
     #def has_add_permission(self, request, obj=None):
     #    return False
 
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'description')
+
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
 admin.site.register(PromotionToken, PromotionTokenAdmin)
 admin.site.register(IntroducedBy, IntroducedByAdmin)
 admin.site.register(TimelySiteData, TimelySitedataAdmin)
+admin.site.register(Activity, ActivityAdmin)
 
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(),name=u'diary')
 admin.site.register(InviteCode, InviteCodeAdmin)
