@@ -247,7 +247,7 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
                          u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号'])
 
         amortizations = ProductAmortization.objects.filter(
-            term_date__gte=start_time, product__status=u'还款中', settled=False)
+            term_date__gte=start_time, term_date__lt=end_time, product__status=u'还款中', settled=False)
 
         for index, amortization in enumerate(amortizations):
             writer.writerow([
