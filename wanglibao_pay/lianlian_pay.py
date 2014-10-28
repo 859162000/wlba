@@ -53,11 +53,11 @@ class LianlianPay:
         if not request.user.wanglibaouserprofile.id_is_valid:
             return {"ret_code":20001, "message":"请先进行实名认证"}
 
-        amount = util.fmt_two_amount(request.POST.get('amount', 0))
+        amount = util.fmt_two_amount(request.DATA.get('amount', 0))
         if amount <= 0:
             return {"ret_code":20002, 'message':'金额格式错误'}
 
-        #gate_id = request.POST.get('gate_id', 0)
+        #gate_id = request.DATA.get('gate_id', 0)
         #if gate_id == 0:
         #    return {"ret_code":20003, 'message':'请选择银行'}
 
@@ -107,21 +107,21 @@ class LianlianPay:
     def ios_pay_callback(self, request):
         #做来源IP限制
         dic = {}
-        dic['oid_partner'] = request.POST.get('oid_partner', "")
-        dic['sign_type'] = request.POST.get('sign_type', "")
-        dic['dt_order'] = request.POST.get('dt_order', "")
-        dic['no_order'] = request.POST.get('no_order', "")
-        dic['oid_paybill'] = request.POST.get('oid_paybill', "")
-        dic['money_order'] = request.POST.get('money_order', "")
-        dic['result_pay'] = request.POST.get('result_pay', "")
-        dic['settle_date'] = request.POST.get('settle_date', "")
-        dic['info_order'] = request.POST.get('info_order', "")
-        dic['pay_type'] = request.POST.get('pay_type', "")
-        dic['bank_code'] = request.POST.get('bank_code', "")
-        dic['no_agree'] = request.POST.get('no_agree', "")
-        dic['id_type'] = request.POST.get('id_type', "")
-        dic['id_no'] = request.POST.get('id_no', "")
-        dic['acct_name'] = request.POST.get('acct_name', "")
+        dic['oid_partner'] = request.DATA.get('oid_partner', "")
+        dic['sign_type'] = request.DATA.get('sign_type', "")
+        dic['dt_order'] = request.DATA.get('dt_order', "")
+        dic['no_order'] = request.DATA.get('no_order', "")
+        dic['oid_paybill'] = request.DATA.get('oid_paybill', "")
+        dic['money_order'] = request.DATA.get('money_order', "")
+        dic['result_pay'] = request.DATA.get('result_pay', "")
+        dic['settle_date'] = request.DATA.get('settle_date', "")
+        dic['info_order'] = request.DATA.get('info_order', "")
+        dic['pay_type'] = request.DATA.get('pay_type', "")
+        dic['bank_code'] = request.DATA.get('bank_code', "")
+        dic['no_agree'] = request.DATA.get('no_agree', "")
+        dic['id_type'] = request.DATA.get('id_type', "")
+        dic['id_no'] = request.DATA.get('id_no', "")
+        dic['acct_name'] = request.DATA.get('acct_name', "")
 
 
         #dic = {"no_order":117183, "sign_type":"MD5", "money_order":"100.00",
@@ -139,7 +139,7 @@ class LianlianPay:
             logger.error('sign error')
             return {"ret_code":20105, "message":u"不支持的签名算法"}
 
-        ret_sign = request.POST.get('sign', "")
+        ret_sign = request.DATA.get('sign', "")
         if sign != ret_sign:
             return {"ret_code":20101, "message":u"签名错误"}
 
