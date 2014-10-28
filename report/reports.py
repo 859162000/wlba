@@ -195,7 +195,7 @@ class ProductionRecordReportGenerator(ReportGeneratorBase):
                 unicode(p2precord.product_balance_after),
                 timezone.localtime(p2precord.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                 p2precord.description,
-                unicode(get_a_uuid())
+                unicode("wanglibao_cpls_" + p2precord.id)
             ])
         return output.getvalue()
 
@@ -230,7 +230,7 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 # u'待还',
                 amortization.product_amortization.product.status,
                 timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),
-                unicode(get_a_uuid())
+                unicode("wanglibao_yhhkjl_" + amortization.id)
             ])
         return output.getvalue()
 
@@ -262,7 +262,7 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
                 str(amortization.principal),
                 str(amortization.interest),
                 u'待还',
-                unicode(get_a_uuid())
+                unicode("wanglibao_cphkjl_" + amortization.id)
             ])
         return output.getvalue()
 
@@ -289,7 +289,7 @@ class ProductionAmortizationsSettledReportGenerator(ReportGeneratorBase):
                 str(amortization.principal + amortization.interest),
                 u'成功',
                 timezone.localtime(amortization.settlement_time).strftime("%Y-%m-%d %H:%M:%S"),
-                unicode(get_a_uuid())
+                unicode("wanglibao_hkjijs_" + amortization.id)
             ])
         return output.getvalue()
 
