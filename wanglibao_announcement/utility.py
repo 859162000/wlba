@@ -11,29 +11,29 @@ def AnnouncementHomepage(*args):
 
 def AnnouncementP2P(*args):
     P2P = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
-        .filter(Q(type='all') | Q(type='p2p')).order_by('-priority', '-createtime')[:1]
+        .filter(Q(type='all') | Q(type='p2p')).filter(status=1, device='pc').order_by('-priority', '-createtime')[:1]
     return P2P
 
 
 def AnnouncementP2PNew(*args):
     P2P = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
-        .filter(status=1, type='p2pnew').order_by('-priority', '-createtime')[:1]
+        .filter(status=1, type='p2pnew', device='pc').order_by('-priority', '-createtime')[:1]
     return P2P
 
 
 def AnnouncementTrust(*args):
     Trust = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
-        .filter(Q(type='all') | Q(type='trust')).filter(status=1).order_by('-priority', '-createtime')[:1]
+        .filter(Q(type='all') | Q(type='trust')).filter(status=1, device='pc').order_by('-priority', '-createtime')[:1]
     return Trust
 
 
 def Announcementfund(*args):
     Fund = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
-        .filter(Q(type='all') | Q(type='fund')).filter(status=1).order_by('-priority', '-createtime')[:1]
+        .filter(Q(type='all') | Q(type='fund')).filter(status=1, device='pc').order_by('-priority', '-createtime')[:1]
     return Fund
 
 
 def AnnouncementAccounts(*args):
     Accounts = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
-        .filter(Q(type='all') | Q(type='accounts')).filter(status=1).order_by('-priority', '-createtime')[:1]
+        .filter(Q(type='all') | Q(type='accounts')).filter(status=1, device='pc').order_by('-priority', '-createtime')[:1]
     return Accounts

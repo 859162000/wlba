@@ -11,7 +11,7 @@ class AnnouncementHomeView(TemplateView):
     template_name = 'announcement_home.jade'
 
     def get_context_data(self, **kwargs):
-        announcements = Announcement.objects.filter(status=1, hideinlist=False).order_by('-priority', '-createtime')
+        announcements = Announcement.objects.filter(status=1, device='pc', hideinlist=False).order_by('-priority', '-createtime')
 
         announcements_list = []
         announcements_list.extend(announcements)
@@ -39,7 +39,7 @@ class AnnouncementDetailView(TemplateView):
         context = super(AnnouncementDetailView, self).get_context_data(**kwargs)
 
         try:
-            announce = Announcement.objects.get(pk=id, status=1)
+            announce = Announcement.objects.get(pk=id, status=1, device='pc')
 
         except Announcement.DoesNotExist:
             raise Http404(u'您查找的公告不存在')
