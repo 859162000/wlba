@@ -61,7 +61,6 @@ class AdminReportExport(TemplateView):
 
     def _apply_generate(self, request, start_time, end_time, cls, message=''):
         try:
-            print cls
             cls.generate_report(start_time, end_time)
             messages.info(
                 request, u'生成{}成功，请到'
