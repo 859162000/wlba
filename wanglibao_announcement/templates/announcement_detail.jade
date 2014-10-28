@@ -18,7 +18,7 @@ body
         .span10
           h2 {{announce.title}}
         .span2-omega
-          .announce-date {{announce.updatetime | date:'Y-m-d'}}
+          .announce-date {{announce.createtime | date:'Y-m-d'}}
       .announce-content
         | {{announce.content|safe}}
 
