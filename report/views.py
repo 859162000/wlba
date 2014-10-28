@@ -67,8 +67,7 @@ class AdminReportExport(TemplateView):
                 request, u'生成{}成功，请到'
                          u'<a href="/AK7WtEQ4Q9KPs8Io_zOncw/report/report" />导出表格处 </a> 查看'.format(message))
         except Exception, e:
-            # messages.info(request, u'导出失败，请重新生成')
-            messages.info(request, str(e))
+            messages.info(request, u'导出失败，请重新生成.错误信息{}'.format(e))
 
     def _timeformat(self, time):
         return timezone.datetime(*[int(i) for i in time.split('-')])
