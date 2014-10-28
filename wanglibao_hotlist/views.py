@@ -73,24 +73,25 @@ class MobileMainPageP2PViewSet(PaginatedModelViewSet):
 
         h = MobileMainPageP2P()
         if self.model.objects.all().exists():
-            mp = MobileMainPageP2P.objects.filter(item__status=u'正在招标').order_by('hot_score')
+
+            mp = MobileMainPageP2P.objects.filter(item__status=u'正在招标').order_by('-hot_score').first()
             if mp:
-                return mp
+                return [mp]
             else:
                 item = P2PProduct.objects.filter(end_time__gt=timezone.now()).\
-                    filter(status__in=u'正在招标').order_by('end_time').first()
+                    filter(status__in=u'正在招标').order_by('-priority').first()
                 if not item:
                     item = P2PProduct.objects.filter(end_time__gt=timezone.now()).filter(status__in=[
                         u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'])\
-                    .order_by('end_time').first()
+                    .order_by('-soldout_time').first()
 
         else:
             item = P2PProduct.objects.filter(end_time__gt=timezone.now()).\
-                    filter(status__in=u'正在招标').order_by('end_time').first()
+                    filter(status__in=u'正在招标').order_by('-priority').first()
             if not item:
                 item = P2PProduct.objects.filter(end_time__gt=timezone.now()).filter(status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'])\
-                .order_by('end_time').first()
+                .order_by('-soldout_time').first()
 
         h.item = item
         h.added = timezone.now()

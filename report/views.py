@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 from django.contrib import messages
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
     PaybackReportGenerator, ProductionAmortizationsReportGenerator
+import logging
 
 type = (
     (u'充值', 0),
@@ -61,14 +62,13 @@ class AdminReportExport(TemplateView):
 
     def _apply_generate(self, request, start_time, end_time, cls, message=''):
         try:
-            print cls
             cls.generate_report(start_time, end_time)
             messages.info(
                 request, u'生成{}成功，请到'
                          u'<a href="/AK7WtEQ4Q9KPs8Io_zOncw/report/report" />导出表格处 </a> 查看'.format(message))
-        except:
-            messages.info(request, u'导出失败，请重新生成')
-
+        except Exception, e:
+            # messages.info(request, u'导出失败，请重新生成')
+            messages.info(request, str(e))
 
     def _timeformat(self, time):
         return timezone.datetime(*[int(i) for i in time.split('-')])
