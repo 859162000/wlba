@@ -15,14 +15,11 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 
 logger = logging.getLogger(__name__)
 
-if settings.DEBUG:
-    MER_ID = '201408071000001543'
-    PAY_SECRET_KEY = '201408071000001543test_20140812'
-    PAY_URL = ''
-    PAY_RETURN_URL = settings.CALLBACK_HOST + '/api/pay/lianlian/app/deposit/complete/'
-    PAY_BACK_RETURN_URL = settings.CALLBACK_HOST + '/api/pay/lianlian/app/deposit/callback/'
-else:
-    pass
+MER_ID = settings.Lian_MER_ID
+PAY_SECRET_KEY = settings.Lian_PAY_SECRET_KEY
+PAY_URL = settings.Lian_PAY_URL
+PAY_RETURN_URL = settings.Lian_PAY_RETURN_URL
+PAY_BACK_RETURN_URL = settings.Lian_PAY_BACK_RETURN_URL
 
 
 class LianlianPay:

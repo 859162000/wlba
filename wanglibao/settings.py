@@ -450,6 +450,9 @@ if ENV == ENV_PRODUCTION:
     PAY_URL = 'https://mas.chinapnr.com'
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
+    Lian_MER_ID = ''
+    Lian_PAY_SECRET_KEY = ''
+    Lian_PAY_URL = ''
 elif ENV == ENV_PREPRODUCTION:
     CALLBACK_HOST = 'https://pre.wanglibao.com'
     MER_ID = '872724'
@@ -459,6 +462,9 @@ elif ENV == ENV_PREPRODUCTION:
     PAY_URL = 'https://mas.chinapnr.com'
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
+    Lian_MER_ID = ''
+    Lian_PAY_SECRET_KEY = ''
+    Lian_PAY_URL = ''
 else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
     MER_ID = '510672'
@@ -468,9 +474,16 @@ else:
     PAY_URL = 'http://test.chinapnr.com'
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
+    Lian_MER_ID = '201408071000001543'
+    Lian_PAY_SECRET_KEY = '201408071000001543test_20140812'
+    Lian_PAY_URL = ''
+
 PAY_BACK_RETURN_URL = CALLBACK_HOST + '/pay/deposit/callback/'
 PAY_RET_URL = CALLBACK_HOST + '/pay/deposit/complete/'
 WITHDRAW_BACK_RETURN_URL = CALLBACK_HOST + '/pay/withdraw/callback/'
+
+Lian_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/lianlian/app/deposit/complete/'
+Lian_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/lianlian/app/deposit/callback/'
 
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 if ENV == ENV_DEV:
