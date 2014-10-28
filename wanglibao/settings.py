@@ -516,7 +516,7 @@ CKEDITOR_CONFIGS = {
             '/',
             ['Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker','Undo','Redo'],
             ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-            ['TextColor', 'BGColor'],
+            ['TextColor', 'BGColor'],['Link','Unlink','Anchor'],
             ['Image', 'Flash', 'Table', 'HorizontalRule'],
             ['Smiley', 'SpecialChar'],
         ],
