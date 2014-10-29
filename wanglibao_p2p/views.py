@@ -1,6 +1,6 @@
 # encoding: utf8
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.views.generic import TemplateView
@@ -19,7 +19,7 @@ from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.models import P2PProduct, P2PEquity, P2PRecord, Earning
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
@@ -31,6 +31,7 @@ from hashlib import md5
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_p2p.utility import strip_tags
 from wanglibao_announcement.utility import AnnouncementP2P
+from wanglibao_account.models import Binding
 
 REPAYMENTTYPEMAP = (
                 (u'到期还本付息', 1),
@@ -71,6 +72,11 @@ class P2PDetailView(TemplateView):
             if equity_record is not None:
                 current_equity = equity_record.equity
 
+            xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
+            context.update({
+                'xunlei_vip': xunlei_vip
+            })
+
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
 
         site_data = SiteData.objects.all()[0]
@@ -84,7 +90,7 @@ class P2PDetailView(TemplateView):
             'current_equity': current_equity,
             'site_data': site_data,
             'attachments': p2p.attachment_set.all(),
-            'announcements': AnnouncementP2P
+            'announcements': AnnouncementP2P,
         })
 
         return context
@@ -206,8 +212,18 @@ class AuditProductView(TemplateView):
 
     def post(self, request, **kwargs):
         pk = kwargs['id']
-        p2p = P2PProduct.objects.get(pk=pk)
+        p2p = P2PProduct.objects.select_related('activity__rule').get(pk=pk)
         ProductKeeper(p2p).audit(request.user)
+
+        if p2p.activity:
+            print p2p.activity, '#######----------'
+            from celery.execute import send_task
+            send_task("wanglibao_p2p.tasks.build_earning", kwargs={
+                "product_id": 3
+            })
+
+
+
         return HttpResponseRedirect('/'+settings.ADMIN_ADDRESS+'/wanglibao_p2p/p2pproduct/')
 
 

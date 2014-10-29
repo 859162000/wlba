@@ -136,6 +136,10 @@ html
                           earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
                         em.highlight {{earning_rate}}
                         span.highlight.font-m %
+                        if product.activity_id > 0
+                          em.highlight +
+                          span.xunlei-vip-rate(title="迅雷会员专享") 1.5%
+                            span.xunlei-vip-tip(title="迅雷会员专享")
                       p 年化收益
                     .span2.align-center
                       p

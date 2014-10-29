@@ -102,5 +102,35 @@ class TimelySiteData(models.Model):
     user_count = models.IntegerField(u'用户总数', default=0)
 
 
+#author: hetao
+#datetime: 2014.10.27
+#description: 市场活动规则
+class ActivityRule(models.Model):
+    name = models.CharField(u'规则名称', max_length=128)
+    description = models.TextField(u'规则描述')
 
+    rule_type = models.CharField(u'规则类型', max_length=50, null=False)
+    rule_amount = models.DecimalField(u'数额', max_digits=20, decimal_places=2, default=0)
+    create_time = models.DateTimeField(u'活动创建时间', auto_now_add=True)
+
+    def get_earning(self, amount, type):
+        return amount*self.rule_amount
+
+    def __unicode__(self):
+        return u'<%s>' % self.name
+
+#author: hetao
+#datetime: 2014.10.27
+#description: 市场活动
+class Activity(models.Model):
+    name = models.CharField(u'活动名称', max_length=128)
+    description = models.TextField(u'活动描述')
+
+    rule = models.ForeignKey(ActivityRule, help_text=u'活动规则', null=True, on_delete=models.SET_NULL, blank=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    start_time = models.DateTimeField(u'开始时间')
+    end_time = models.DateTimeField(u'结束时间')
+
+    def __unicode__(self):
+        return u'<%s>' % self.name
 

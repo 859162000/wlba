@@ -4,11 +4,12 @@ require.config
     underscore: 'lib/underscore-min'
     tools: 'lib/modal.tools'
     "jquery.validate": 'lib/jquery.validate.min'
+    'jquery.modal': 'lib/jquery.modal.min'
 
   shims:
     "jquery.validate": ['jquery']
 
-require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools'], ($, _, backend, calculator, countdown, tool)->
+require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal'], ($, _, backend, calculator, countdown, tool, modal)->
 
   $.validator.addMethod 'dividableBy100', (value, element)->
     return value % 100 == 0 && !/\./ig.test(value)
@@ -159,4 +160,5 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       else
         $('.get-more').hide()
 
-
+  $(".xunlei-binding-modal").click () ->
+    $('#xunlei-binding-modal').modal()
