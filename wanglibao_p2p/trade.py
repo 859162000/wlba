@@ -41,7 +41,7 @@ class P2PTrader(object):
 
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
         #phone_verified 渠道客户判断
-        if introduced_by and not introduced_by.user.username.find("channel") and introduced_by.bought_at is None:
+        if introduced_by and "channel" not in introduced_by.user.username and introduced_by.bought_at is None:
             introduced_by.bought_at = timezone.now()
             introduced_by.save()
 
