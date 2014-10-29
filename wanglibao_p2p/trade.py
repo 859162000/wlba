@@ -40,7 +40,8 @@ class P2PTrader(object):
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
-        if introduced_by and introduced_by.bought_at is None:
+        #phone_verified 渠道客户判断
+        if introduced_by and introduced_by.user.wanglibaouserprofile.phone_verified and introduced_by.bought_at is None:
             introduced_by.bought_at = timezone.now()
             introduced_by.save()
 
