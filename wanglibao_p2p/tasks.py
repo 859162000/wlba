@@ -12,6 +12,8 @@ def p2p_watchdog():
 def process_paid_product(product_id):
     P2POperator.preprocess_for_settle(P2PProduct.objects.get(pk=product_id))
 
+import os
 @app.task
 def build_earning():
-    print 'test'
+
+    os.system('touch ~/workspace/test.txt')
