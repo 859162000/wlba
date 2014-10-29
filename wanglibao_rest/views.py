@@ -173,6 +173,7 @@ class WeixinRegisterAPIView(APIView):
         send_rand_pass(identifier, password)
         return Response({"ret_code":0, "message":"注册成功"})
 
+"""
 class PushTestView(APIView):
     permission_classes = ()
 
@@ -185,6 +186,47 @@ class PushTestView(APIView):
         msg_key = "wanglibao_staging"
         res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
         return Response({"ret_code":0, "message":cont})
+"""
+
+class IdValidateAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        name = request.DATA.get("name", "").strip()
+        id_number = request.DATA.get("id_number", "").strip()
+
+        if not name or not id_number:
+            return Response({"ret_code":30051, "message":u"信息输入不完整"})
+
+        user = request.user
+        profile = WanglibaoUserProfile.objects.filter(user=user).first()
+        if profile.id_is_valid:
+            return Response({"ret_code":30055, "message":u"您已认证通过，请勿重复认证。如有问题，请联系客服 4008-588-066"})
+
+        verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
+
+        if verify_counter.count >= 3:
+            return Response({"ret_code":30052, "message":u"验证次数超过三次，请联系客服进行人工验证 4008-588-066"})
+
+        id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
+
+        if id_verify_count >= 3:
+            return Response({"ret_code":30053, "message":u"您的身份证已绑定了三个帐号，无法继续验证，请联系客服人工验证 4008-588-066"})
+
+        verify_record, error = verify_id(name, id_number)
+
+        verify_counter.count = F('count') + 1
+        verify_counter.save()
+
+        if error or not verify_record.is_valid:
+            return Response({"ret_code":30054, "message":u"验证失败，拨打客服电话进行人工验证"})
+
+        user.wanglibaouserprofile.id_number = id_number
+        user.wanglibaouserprofile.name = name
+        user.wanglibaouserprofile.id_is_valid = True
+        user.wanglibaouserprofile.save()
+
+        return Response({"ret_code":0, "message":"验证成功"})
 
 class UserExisting(APIView):
     permission_classes = ()

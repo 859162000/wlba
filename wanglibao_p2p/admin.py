@@ -5,7 +5,7 @@ import datetime
 from django.contrib import admin
 from django.utils import timezone
 from reversion.admin import VersionAdmin
-from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate
+from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
@@ -223,6 +223,11 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
     def status(self, obj):
         return obj.product.status
 
+class EarningAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'product', 'amount', )
+
+
+
 
 admin.site.register(P2PProduct, P2PProductAdmin)
 admin.site.register(Warrant, WarrantAdmin)
@@ -234,6 +239,7 @@ admin.site.register(P2PRecord, P2PRecordAdmin)
 admin.site.register(EquityRecord, EquityRecordAdmin)
 admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
 admin.site.register(ProductAmortization, ProductAmortizationAdmin)
+admin.site.register(Earning, EarningAdmin)
 
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(),name=u'生成p2p用户表')

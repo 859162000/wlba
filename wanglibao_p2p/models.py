@@ -13,6 +13,7 @@ from wanglibao.fields import JSONFieldUtf8
 from wanglibao.models import ProductBase
 from utility import gen_hash_list
 from wanglibao_p2p.amortization_plan import get_amortization_plan
+from marketing.models import Activity
 
 logger = logging.getLogger(__name__)
 
@@ -163,6 +164,10 @@ class P2PProduct(ProductBase):
     short_usage = models.TextField(blank=False, verbose_name=u'借款用途*')
 
     contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True ,blank=False)
+
+    #author: hetao; datetime: 2014.10.27; description: 活动是否参加活动
+    activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True)
+
 
     class Meta:
         verbose_name_plural = u'P2P产品'
@@ -539,3 +544,15 @@ def post_save_process(sender, instance, **kwargs):
     process_after_money_paided(instance)
 
 post_save.connect(post_save_process, sender=P2PProduct, dispatch_uid="generate_amortization_plan")
+
+
+#author: hetao
+#datetime: 2014.10.27
+#description: 市场活动收益
+class Earning(models.Model):
+    product = models.ForeignKey(P2PProduct, help_text=u'投资标的')
+    amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=2, default=0)
+
+    user = models.ForeignKey(get_user_model(), help_text=u'投资用户')
+    paid = models.BooleanField(u'已打款', default=False)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)

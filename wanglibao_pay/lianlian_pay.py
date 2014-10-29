@@ -21,11 +21,11 @@ class LianlianPay:
     FEE = 0
 
     def __init__(self):
-        self.MER_ID = settings.Lian_MER_ID
-        self.PAY_SECRET_KEY = settings.Lian_PAY_SECRET_KEY
-        self.PAY_URL = settings.Lian_PAY_URL
-        self.PAY_RETURN_URL = settings.Lian_PAY_RETURN_URL
-        self.PAY_BACK_RETURN_URL = settings.Lian_PAY_BACK_RETURN_URL
+        self.MER_ID = settings.LIAN_MER_ID
+        self.PAY_SECRET_KEY = settings.LIAN_PAY_SECRET_KEY
+        self.PAY_URL = settings.LIAN_PAY_URL
+        self.PAY_RETURN_URL = settings.LIAN_PAY_RETURN_URL
+        self.PAY_BACK_RETURN_URL = settings.LIAN_PAY_BACK_RETURN_URL
 
     def _sign(self, dic):
         keys = dic.keys()
@@ -50,8 +50,8 @@ class LianlianPay:
             return {"ret_code":20001, "message":"请先进行实名认证"}
 
         amount = util.fmt_two_amount(request.DATA.get('amount', 0))
-        if amount <= 0:
-            return {"ret_code":20002, 'message':'金额格式错误'}
+        if amount < 100:
+            return {"ret_code":20002, 'message':'金额格式错误，大于100元'}
 
         #gate_id = request.DATA.get('gate_id', 0)
         #if gate_id == 0:
