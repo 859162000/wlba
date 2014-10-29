@@ -57,10 +57,7 @@ class IntroducedByResource(resources.ModelResource):
 
 class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
-<<<<<<< HEAD
-=======
     #readonly_fields = ("bought_at", "user", "introduced_by")
->>>>>>> b83842592bd73e38ad0abc031bacc44929e771bf
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
 
