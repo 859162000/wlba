@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# encoding:utf-8
+
 from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
@@ -21,8 +24,8 @@ from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
-            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
-            WeixinRegisterAPIView)
+                            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
+                            WeixinRegisterAPIView, IdValidateAPIView)
 
 router = DefaultRouter()
 
@@ -86,6 +89,9 @@ urlpatterns = patterns(
     url(r'^p2ps/(?P<pk>[0-9]+)/$', P2PProductDetailView.as_view()),
 
     url(r'', include(router.urls)),
+    #客户端使用,重写
+    url(r'^id_validation/$', IdValidateAPIView.as_view()),
+
     url(r'^id_validate/', IdValidate.as_view()),
     url(r'^admin_id_validate/', AdminIdValidate.as_view()),
 
