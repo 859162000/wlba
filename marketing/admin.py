@@ -10,6 +10,8 @@ from marketing.views import GennaeratorCode
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export import fields
+from wanglibao.admin import ReadPermissionModelAdmin
+
 
 
 class NewsAndReportAdmin(admin.ModelAdmin):
@@ -22,7 +24,7 @@ class SiteDataAdmin(admin.ModelAdmin):
     list_display_link = ('id',)
 
 
-class PromotionTokenAdmin(admin.ModelAdmin):
+class PromotionTokenAdmin(ReadPermissionModelAdmin):
     list_display = ("user", "token")
     search_fields = ['user__wanglibaouserprofile__phone']
     #readonly_fields = ("user", "token")
@@ -53,9 +55,8 @@ class IntroducedByResource(resources.ModelResource):
             return timezone.localtime(obj.gift_send_at).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class IntroducedByAdmin(ImportExportModelAdmin):
+class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
-    readonly_fields = ("bought_at", "user", "introduced_by")
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
 
@@ -73,7 +74,7 @@ class TimelySitedataAdmin(admin.ModelAdmin):
     readonly_fields = ("p2p_margin", "freeze_amount", "total_amount", "user_count")
 
 
-class InviteCodeAdmin(admin.ModelAdmin):
+class InviteCodeAdmin(ReadPermissionModelAdmin):
     list_display = ('id', 'code', 'is_used')
     search_fields = ['code']
     #readonly_fields = ('code', )

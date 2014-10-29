@@ -6,6 +6,7 @@ from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import DecimalWidget
 from marketing.models import PromotionToken, IntroducedBy
+from wanglibao.admin import ReadPermissionModelAdmin
 from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
@@ -40,7 +41,7 @@ class UserResource(resources.ModelResource):
         fields = ('id', 'phone', 'name', 'joined_date')
 
 
-class UserProfileAdmin(UserAdmin, ImportExportModelAdmin):
+class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin, ImportExportModelAdmin):
     inlines = [ProfileInline, MarginInline, PromotionTokenInline, P2PEquityInline]
     list_display = ('id', 'username', 'phone', 'name', 'id_num', 'is_active', 'date_joined', 'is_staff')
     list_display_links = ('id', 'username', 'phone')
@@ -64,6 +65,12 @@ class UserProfileAdmin(UserAdmin, ImportExportModelAdmin):
         qs = qs.select_related('user').select_related('wanglibaouserprofile__phone')
         return qs
 
+
+class IdVerificationAdmin(ReadPermissionModelAdmin):
+    list_display = ("id_number", "name", "is_valid", "created_at")
+
+
+
 def user_unicode(self):
     if hasattr(self, 'wanglibaouserprofile'):
         return u'[%s] %s %s ' % (str(self.id), self.wanglibaouserprofile.name, self.wanglibaouserprofile.phone)
@@ -74,6 +81,6 @@ User.__unicode__ = user_unicode
 
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
-admin.site.register(IdVerification)
+admin.site.register(IdVerification, IdVerificationAdmin)
 admin.site.register(VerifyCounter)
 admin.site.register_view('accounts/id_verify/', view=AdminIdVerificationView.as_view(), name=u'网利宝-身份验证')
