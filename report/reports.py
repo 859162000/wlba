@@ -66,7 +66,7 @@ class ReportGeneratorBase(object):
     @classmethod
     def get_report_name(cls, start_time, end_time):
         if hasattr(cls, 'reportname_format'):
-            return cls.reportname_format % (start_time.strftime('%Y-%m-%d'), end_time.strftime('%Y-%m-%d'))
+            return cls.reportname_format % (start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
 
 
     @classmethod
@@ -195,7 +195,7 @@ class ProductionRecordReportGenerator(ReportGeneratorBase):
                 unicode(p2precord.product_balance_after),
                 timezone.localtime(p2precord.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                 p2precord.description,
-                unicode(get_a_uuid())
+                unicode("wanglibao_cpls_" + str(p2precord.id))
             ])
         return output.getvalue()
 
@@ -230,7 +230,7 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 # u'待还',
                 amortization.product_amortization.product.status,
                 timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),
-                unicode(get_a_uuid())
+                unicode("wanglibao_yhhkjl_" + str(amortization.id))
             ])
         return output.getvalue()
 
@@ -247,7 +247,7 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
                          u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号'])
 
         amortizations = ProductAmortization.objects.filter(
-            term_date__gte=start_time, product__status=u'还款中', settled=False)
+            term_date__gte=start_time, term_date__lt=end_time, product__status=u'还款中', settled=False)
 
         for index, amortization in enumerate(amortizations):
             writer.writerow([
@@ -262,7 +262,7 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
                 str(amortization.principal),
                 str(amortization.interest),
                 u'待还',
-                unicode(get_a_uuid())
+                unicode("wanglibao_cphkjl_" + str(amortization.id))
             ])
         return output.getvalue()
 
@@ -289,7 +289,7 @@ class ProductionAmortizationsSettledReportGenerator(ReportGeneratorBase):
                 str(amortization.principal + amortization.interest),
                 u'成功',
                 timezone.localtime(amortization.settlement_time).strftime("%Y-%m-%d %H:%M:%S"),
-                unicode(get_a_uuid())
+                unicode("wanglibao_hkjijs_" + str(amortization.id))
             ])
         return output.getvalue()
 

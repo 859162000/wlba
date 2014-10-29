@@ -79,18 +79,18 @@ class MobileMainPageP2PViewSet(PaginatedModelViewSet):
                 return [mp]
             else:
                 item = P2PProduct.objects.filter(end_time__gt=timezone.now()).\
-                    filter(status__in=u'正在招标').order_by('-priority').first()
+                    filter(status=u'正在招标').order_by('-priority').first()
                 if not item:
                     item = P2PProduct.objects.filter(end_time__gt=timezone.now()).filter(status__in=[
-                        u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'])\
+                        u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'])\
                     .order_by('-soldout_time').first()
 
         else:
             item = P2PProduct.objects.filter(end_time__gt=timezone.now()).\
-                    filter(status__in=u'正在招标').order_by('-priority').first()
+                    filter(status=u'正在招标').order_by('-priority').first()
             if not item:
                 item = P2PProduct.objects.filter(end_time__gt=timezone.now()).filter(status__in=[
-                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'])\
+                    u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'])\
                 .order_by('-soldout_time').first()
 
         h.item = item

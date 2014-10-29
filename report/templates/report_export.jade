@@ -30,8 +30,9 @@ head
                                         label {{ typename }}
                                     .span9-omega
                                         input(type="hidden", name="type", value="{{ value }}")
-                                        input(type='date', name='start_time', min="2014-01-01", max="2020-01-01", value="{{ yestoday }}")
-                                        input(type='date', name='end_time',  min="2014-01-01", max="2020-01-01", value="{{ today }}")
+                                        span 2014-10-28 18:13:24
+                                        input(type='text', name='start_time', min="2014-01-01", max="2020-01-01", value="{{ yestoday }}")
+                                        input(type='text', name='end_time',  min="2014-01-01", max="2020-01-01", value="{{ today }}")
                                 .form-row
                                     button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 生成
 
