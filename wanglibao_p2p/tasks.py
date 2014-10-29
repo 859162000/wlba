@@ -11,3 +11,7 @@ def p2p_watchdog():
 @app.task
 def process_paid_product(product_id):
     P2POperator.preprocess_for_settle(P2PProduct.objects.get(pk=product_id))
+
+@app.task
+def build_earning():
+    print 'test'
