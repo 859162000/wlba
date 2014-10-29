@@ -199,6 +199,10 @@ class IdValidateAPIView(APIView):
             return Response({"ret_code":30051, "message":u"信息输入不完整"})
 
         user = request.user
+        profile = WanglibaoUserProfile.objects.filter(user=user).first()
+        if profile.id_is_valid:
+            return Response({"ret_code":30055, "message":u"您已认证通过，请勿重复认证。如有问题，请联系客服 4008-588-066"})
+
         verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
         if verify_counter.count >= 3:
