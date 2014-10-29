@@ -31,6 +31,7 @@ from hashlib import md5
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_p2p.utility import strip_tags
 from wanglibao_announcement.utility import AnnouncementP2P
+from wanglibao_account.models import Binding
 
 REPAYMENTTYPEMAP = (
                 (u'到期还本付息', 1),
@@ -71,6 +72,11 @@ class P2PDetailView(TemplateView):
             if equity_record is not None:
                 current_equity = equity_record.equity
 
+            xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
+            context.update({
+                'xunlei_vip': xunlei_vip
+            })
+
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
 
         site_data = SiteData.objects.all()[0]
@@ -84,7 +90,7 @@ class P2PDetailView(TemplateView):
             'current_equity': current_equity,
             'site_data': site_data,
             'attachments': p2p.attachment_set.all(),
-            'announcements': AnnouncementP2P
+            'announcements': AnnouncementP2P,
         })
 
         return context

@@ -36,7 +36,7 @@ html
                   //else
                     span.icon-check-shield
                     a(href="/security/", target="_blank") 第三方本息担保
-          .p2p-detail-content.clearfix
+          .p2p-detail-content
             .row
               .span4
                 p.dark-gray.font-xxl {{p2p.total_amount | money_format_int}}
@@ -55,7 +55,11 @@ html
                   span.font-xl %
                   if p2p.excess_earning_description
                     span.detail-icon(title="{{p2p.excess_earning_description}}")
-
+                  if p2p.activity_id > 0
+                    em.font-xxl +
+                    span.xunlei-vip-rate-detail(title="迅雷会员专享") 1.5
+                      span.font-xl %
+                      span.xunlei-vip-tip-detail(title="迅雷会员专享")
                 p 年化收益
           .p2p-detail-footer
             .row
@@ -108,14 +112,30 @@ html
                   span.span8-omega
                     span.highlight.font-m.invest#expected_income 0.00
                     | 元
-                //author: hetao; time: 2014.10.24 target: 用户未登陆时不显示手机验证码 暂时不做验证
-                //if user.is_authenticated
-                //  .row
-                //    span.span4 手机验证码
-                //    .span4
-                //      input#validate_code.invest(type='text', name='validate_code', placeholder='验证码')
-                //    .span4-omega
-                //      button#get-validate-code-buy.button-orange.button-middle.invest(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                if p2p.activity_id > 0
+                  .row
+                    span.span4
+                    span.span8-omega.xunlei-vip-form-txt
+                      if user.is_authenticated
+                        if xunlei_vip.isvip == True
+                          span 已绑定迅雷会员，满标之后还可享受额外
+                          span.highlight#xunlei-vip-income 65
+                          |元的收益
+                        else
+                          span 现在
+                          a.blue(href="#") 开通迅雷会员
+                          span ，还可享受额外
+                          span.highlight#xunlei-vip-income 65
+                          |元的收益
+                          br
+                          span 已经是迅雷会员了？
+                          a.blue.xunlei-binding-modal(href="#xunlei-binding-modal") 现在就去绑定
+                      else
+                        span 现在
+                        a.blue(href="#") 开通迅雷会员
+                        span ，还可享受额外
+                        span.highlight#xunlei-vip-income 65
+                        |元的收益
 
                 .row.margin-top-s
                   span.span4
@@ -261,6 +281,27 @@ html
               if trade_records.count > 30
                 .row
                   a.get-more(href="#") 查看更多
+    if p2p.activity_id > 0
+      #xunlei-binding-modal(style="display:none;")
+        .modal-header
+          .modal-title-bar
+            .modal-title 绑定迅雷会员
+        .modal-body
+          .modal-content-padding
+            p.align-center
+              img(src="/static/images/activity/xunlei_wanglibao.png")
+            ul.clearfix
+              li &bull; 绑定迅雷会员后，投资指定P2P，即可额外获得1%收益！
+              li &bull; 满标后2个工作日发放！
+            .space-vertical-l
+            .row
+              .span7
+                a.button.button-account(href='#')
+                  span.font-s.padding-l-r-m 我是迅雷会员，立即绑定
+              .span5-omega.padding-top-xs.align-center
+                span 我还不是会员，
+                a.blue(href="#") 前去开通
+          .space-vertical-s
 
     script.
       var v = new Date().getTime()
