@@ -100,3 +100,6 @@ admin.site.register_view('statistics/diary', view=MarketingView.as_view(),name=u
 admin.site.register(InviteCode, InviteCodeAdmin)
 
 admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')
+
+
+

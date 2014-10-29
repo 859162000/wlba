@@ -208,6 +208,10 @@ class AuditProductView(TemplateView):
         pk = kwargs['id']
         p2p = P2PProduct.objects.get(pk=pk)
         ProductKeeper(p2p).audit(request.user)
+
+        from celery.execute import send_task
+        send_task(("wanglibao_p2p.tasks.build_earning"))
+
         return HttpResponseRedirect('/'+settings.ADMIN_ADDRESS+'/wanglibao_p2p/p2pproduct/')
 
 
