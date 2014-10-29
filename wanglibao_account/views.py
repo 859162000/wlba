@@ -722,6 +722,27 @@ class Third_login_back(View):
             return HttpResponse(result['message'])
         return HttpResponseRedirect(result['url'])
 
+class ChangePasswordAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        new_password = request.DATA.get('new_password', "").strip()
+        old_password = request.DATA.get('old_password', "").strip()
+
+        if not old_password or not new_password:
+            return Response({'ret_code':30041, 'message':u'信息输入不完整'})
+
+        if not 6 <= len(new_password) <= 20:
+            return Response({'ret_code':30042, 'message':u'密码需要在6-20位之间'})
+
+        user = request.user
+        if not user.check_password(old_password):
+            return Response({'ret_code':30043, 'message':u'旧密码错误'})
+
+        user.set_password(new_password)
+        user.save()
+        return Response({'ret_code':0, 'message':u'修改成功'})
+
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache

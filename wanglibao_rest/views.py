@@ -173,6 +173,7 @@ class WeixinRegisterAPIView(APIView):
         send_rand_pass(identifier, password)
         return Response({"ret_code":0, "message":"注册成功"})
 
+"""
 class PushTestView(APIView):
     permission_classes = ()
 
@@ -185,6 +186,7 @@ class PushTestView(APIView):
         msg_key = "wanglibao_staging"
         res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
         return Response({"ret_code":0, "message":cont})
+"""
 
 class UserExisting(APIView):
     permission_classes = ()
