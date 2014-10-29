@@ -37,7 +37,6 @@ class MarketingView(TemplateView):
             d0 = (datetime.now() - timedelta(days=7)).date()
             d1 = date.today()
 
-        print self.request.GET.get('hello'),'--------------'
 
         users = User.objects.filter(date_joined__range=(d0, d1)).order_by('each_day')\
             .extra({'each_day': 'date(date_joined)'}).values('each_day')\
