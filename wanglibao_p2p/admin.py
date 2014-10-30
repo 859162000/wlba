@@ -16,6 +16,11 @@ class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
         'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
     list_filter = ('confirm',)
 
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
+            return [f.name for f in self.model._meta.fields]
+        return ()
+
 
 class AmortizationInline(admin.TabularInline):
     model = ProductAmortization
@@ -176,6 +181,11 @@ class P2PProductAdmin(ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'
 
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
+            return [f.name for f in self.model._meta.fields]
+        return ()
+
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
@@ -201,6 +211,9 @@ class P2PRecordAdmin(ImportExportModelAdmin):
     resource_class = P2PRecordResource
     change_list_template = 'admin/import_export/change_list_export.html'
 
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
+
 
 class WarrantAdmin(admin.ModelAdmin):
     list_display = ('product', 'name')
@@ -214,6 +227,9 @@ class AmortizationRecordAdmin(admin.ModelAdmin):
 class EquityRecordAdmin(admin.ModelAdmin):
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
 
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
+
 
 class ProductAmortizationAdmin(admin.ModelAdmin):
     list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled',
@@ -221,6 +237,11 @@ class ProductAmortizationAdmin(admin.ModelAdmin):
 
     def status(self, obj):
         return obj.product.status
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_p2p.view_productamortization'):
+            return [f.name for f in self.model._meta.fields]
+        return ()
 
 
 admin.site.register(P2PProduct, P2PProductAdmin)
