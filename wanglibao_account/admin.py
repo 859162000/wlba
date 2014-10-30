@@ -11,7 +11,8 @@ from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_account.views import AdminIdVerificationView
+from wanglibao_account.views import AdminIdVerificationView, IntroduceRelation
+
 
 class ProfileInline(admin.StackedInline):
     model = WanglibaoUserProfile
@@ -84,3 +85,4 @@ admin.site.register(User, UserProfileAdmin)
 admin.site.register(IdVerification, IdVerificationAdmin)
 admin.site.register(VerifyCounter)
 admin.site.register_view('accounts/id_verify/', view=AdminIdVerificationView.as_view(), name=u'网利宝-身份验证')
+admin.site.register_view('accounts/add_introduce/', view=IntroduceRelation.as_view(), name=u'网利宝-新增邀请')

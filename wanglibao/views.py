@@ -31,8 +31,6 @@ class IndexView(TemplateView):
 
         p2p_products = chain(p2p_pre_four, p2p_middle, p2p_last)
 
-        print p2p_pre_four[1].activity.rule.rule_amount
-
         getmore = False
         if p2p_pre_four.count() > 3 and p2p_last:
             getmore = True
