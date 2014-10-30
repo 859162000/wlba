@@ -132,8 +132,8 @@ html
                     .span3.align-center
                       p
                         earning_rate = str(product.expected_earning_rate)
-                        if product.excess_earning_rate > 0
-                          earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
+                        //if product.excess_earning_rate > 0
+                        //  earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
                         em.highlight {{earning_rate}}
                         span.highlight.font-m %
                         if product.activity

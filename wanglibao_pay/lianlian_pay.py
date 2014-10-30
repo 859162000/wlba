@@ -7,8 +7,8 @@ from django.conf import settings
 from django.forms import model_to_dict
 from django.db import transaction
 from django.utils.decorators import method_decorator
-from wanglibao_pay import util
-from wanglibao_pay.models import PayInfo, PayResult, Bank
+from wanglibao_pay import util, bankcard_checker
+from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -59,38 +59,39 @@ class LianlianPay:
         if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
             return {"ret_code":20002, 'message':'金额格式错误，大于100元且为100倍数'}
 
-        #gate_id = request.DATA.get('gate_id', 0)
-        #if gate_id == 0:
-        #    return {"ret_code":20003, 'message':'请选择银行'}
+        card_id = request.DATA.get("card_id", "")
+        user = request.user
 
         try:
-            #bank = Bank.objects.get(gate_id=gate_id)
-
-            # Store this as the default bank
-            #request.user.wanglibaouserprofile.deposit_default_bank_name = bank.name
-            #request.user.wanglibaouserprofile.save()
-
             pay_info = PayInfo()
             pay_info.amount = amount
             pay_info.total_amount = amount
             pay_info.type = PayInfo.DEPOSIT
             pay_info.status = PayInfo.INITIAL
-            pay_info.user = request.user
-            #pay_info.bank = bank
+            pay_info.user = user
+
+            if card_id:
+                card =  Card.objects.filter(id=card_id, user=user).first()
+                if not card:
+                    return {"ret_code":20006, 'message':'选择的银行卡不存在'}
+                pay_info.bank = card.bank
+                pay_info.card_no = card.no
+
             pay_info.request_ip = util.get_client_ip(request)
-            order = OrderHelper.place_order(request.user, Order.PAY_ORDER, pay_info.status,
+            order = OrderHelper.place_order(user, Order.PAY_ORDER, pay_info.status,
                                             pay_info = model_to_dict(pay_info))
             pay_info.order = order
             pay_info.save()
 
-            tuser = request.user.wanglibaouserprofile
+            profile = user.wanglibaouserprofile
             data = self.ios_sign({"id":order.id, "amount":amount, "create_time":pay_info.create_time})
-            data.update({"user_name":tuser.name, "id_number":tuser.id_number})
+            data.update({"user_name":profile.name, "id_number":profile.id_number})
 
             pay_info.request = str(data)
             pay_info.status = PayInfo.PROCESSING
+            pay_info.account_name = profile.name
             pay_info.save()
-            OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+            OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
             return {"ret_code":0, "data":data}
         except Bank.DoesNotExist:
@@ -181,3 +182,60 @@ class LianlianPay:
         pay_info.save()
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
+
+
+def add_bank_card(request):
+    card_no = request.DATA.get("card_number", "")
+    if not card_no or len(card_no) > 25 or not card_no.isdigit():
+        return {"ret_code":20021, "message":"请输入正确的银行卡号"}
+    bank_card_name = bankcard_checker.check(int(card_no[:6]))
+    if not bank_card_name:
+        return {"ret_code":20022, "message":"请输入合法的银行卡号"}
+    bank_card_name = bank_card_name.upper()
+    if "信用" in bank_card_name or "VISA" in bank_card_name or "MASTER" in bank_card_name or "万事达" in bank_card_name or "贷记" in bank_card_name:
+        return {"ret_code":20023, "message":"不支付信用卡"}
+
+    user = request.user
+    exist_cards = Card.objects.filter(no=card_no, user=user)
+    if exist_cards:
+        return {"ret_code":20024, "message":"该银行卡已经存在"}
+    bank_name = ".".join(bank_card_name.split(".")[:-1])
+    try:
+        bank = Bank.objects.filter(name=bank_name).first()
+    except:
+        return {"ret_code":20025, "message":"%s,不支持该银行" % bank_name}
+
+    is_default = request.DATA.get("is_default", "false")
+    if is_default.lower() == "true":
+        is_default = True
+    else:
+        is_default = False
+    card = Card()
+    card.bank = bank
+    card.no = card_no
+    card.user = user
+    card.is_default = is_default
+    card.save()
+
+    return {"ret_code":0, "message":"ok", "bank_name":bank_name, "card_id":card.id}
+
+def list_bank_card(request):
+    try:
+       cards =  Card.objects.filter(user=request.user)
+    except Exception,e:
+        return {"ret_code":20031, "message":"请添加银行卡"}
+    rs = []
+    for x in cards:
+        rs.append({"bank_name":x.bank.name, "card_no":x.no, "card_id":x.id, "default":x.is_default})
+    return {"ret_code":0, "message":"ok", "cards":rs}
+
+def del_bank_card(request):
+    card_id = request.DATA.get("card_id", "")
+    if not card_id or not card_id.isdigit():
+        return {"ret_code":20041, "message":"请输入正确的ID"}
+
+    card =  Card.objects.filter(id=card_id, user=request.user).first()
+    if not card:
+        return {"ret_code":20042, "message":"该银行卡不存在"}
+    card.delete()
+    return {"ret_code":0, "message":"删除成功"}

@@ -49,12 +49,12 @@ html
               .span3-omega
                 p.highlight
                   earning_rate = str(p2p.expected_earning_rate)
-                  if p2p.excess_earning_rate > 0
-                    earning_rate = str(p2p.expected_earning_rate - p2p.excess_earning_rate) + '+' + str(p2p.excess_earning_rate)
+                  //if p2p.excess_earning_rate > 0
+                  //  earning_rate = str(p2p.expected_earning_rate - p2p.excess_earning_rate) + '+' + str(p2p.excess_earning_rate)
                   span.font-xxl {{earning_rate}}
                   span.font-xl %
-                  if p2p.excess_earning_description
-                    span.detail-icon(title="{{p2p.excess_earning_description}}")
+                  //if p2p.excess_earning_description
+                  //  span.detail-icon(title="{{p2p.excess_earning_description}}")
                   if p2p.activity
                     em.font-xxl +
                     span.xunlei-vip-rate-detail(title="迅雷会员专享") {{p2p.activity.rule.rule_amount|money_f_2}}
