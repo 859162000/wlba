@@ -79,8 +79,25 @@ def user_unicode(self):
 
 User.__unicode__ = user_unicode
 
+
+class IdVerificationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'id_number', 'is_valid', 'created_at')
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_account.view_idverification'):
+            return ( 'name', 'id_number', 'is_valid', 'created_at')
+        return ()
+
+class VerifyCounterAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'count')
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_account.view_verifycounter'):
+            return ( 'user', 'count')
+        return ()
+
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(IdVerification, IdVerificationAdmin)
-admin.site.register(VerifyCounter)
+admin.site.register(VerifyCounter, VerifyCounterAdmin)
 admin.site.register_view('accounts/id_verify/', view=AdminIdVerificationView.as_view(), name=u'网利宝-身份验证')
