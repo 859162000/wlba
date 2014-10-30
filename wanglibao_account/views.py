@@ -1032,7 +1032,7 @@ class IntroduceRelation(TemplateView):
             u" %s与%s的邀请关系已经存在" % (user_phone, introduced_by)
         })
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo'))
+    @method_decorator(permission_required('marketing.add_introducedby'))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
