@@ -1,0 +1,45 @@
+- load formatters
+
+doctype html
+head
+  - with '邀请关系' as title
+  include include/common_head
+  - endwith
+
+
+body
+  .panel
+    .well
+      .panel-title-bar__no-border
+        .panel-title 添加邀请
+
+      .space-vertical-s
+      form(method="POST").form
+        - csrf_token
+        .form-row
+          .span3(style="line-height:40px")
+            label 受邀者电话
+          .span9-omega
+            input(type='text', name="user_phone")
+        .form-row
+          .span3(style="line-height:40px")
+            label 邀请者电话
+          .span9-omega
+            input(type='text', name="introduced_by_phone")
+        .form-row
+          .span3(style="line-height:40px")
+            label 第一次购买时间（2014-10-28 18:13:24）
+          .span9-omega
+            input(type='text', name="bought_at")
+        .form-row
+          .span3(style="line-height:40px")
+            label 奖品发放时间（2014-10-28 18:13:24）
+          .span9-omega
+            input(type='text', name="gift_send_at")
+        .form-row
+          .span3(style="line-height:40px")
+          .span9-omega
+            button.button-primary(type='submit', value='提交') 提交
+
+        .space-vertical-xl
+

@@ -7,7 +7,7 @@ from forms import EmailOrPhoneAuthenticationForm
 from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome,
     				AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView, AccountTransactionDeposit,
 				    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
-					Third_login, Third_login_back)
+					Third_login, Third_login_back, IntroduceRelation)
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -32,6 +32,7 @@ urlpatterns = patterns(
     url(r'^setting/$', login_required(TemplateView.as_view(template_name='account_setting.jade'),
                                      login_url='/accounts/register/')),
     url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/register/')),
+    url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/register/')),
 
     url(r'^invite/$', login_required(TemplateView.as_view(template_name='invite.jade'), login_url='/accounts/login/')),
 
