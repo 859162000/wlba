@@ -48,7 +48,7 @@ class P2PDetailView(TemplateView):
         context = super(P2PDetailView, self).get_context_data(**kwargs)
 
         try:
-            p2p = P2PProduct.objects.get(pk=id, hide=False)
+            p2p = P2PProduct.objects.select_related('activity').get(pk=id, hide=False)
             form = PurchaseForm(initial={'product': p2p})
 
             if p2p.soldout_time:
@@ -496,13 +496,13 @@ class P2PListView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        p2p_done = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status= u'正在招标').order_by('-publish_time').select_related('warrant_company')
+        p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+            .filter(status= u'正在招标').order_by('-publish_time')
         print p2p_done
-        p2p_others = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
+        p2p_others = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
             status__in=[
                 u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
-            ]).order_by('-soldout_time').select_related('warrant_company')
+            ]).order_by('-soldout_time')
 
         show_slider = False
         if p2p_done:
