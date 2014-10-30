@@ -7,7 +7,8 @@ from django.db import models
 from django.db.models import F, Sum, SET_NULL
 from django.db.models.signals import post_save
 from django.utils import timezone
-from django.contrib.auth import get_user_model
+#from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 import reversion
 from wanglibao.fields import JSONFieldUtf8
 from wanglibao.models import ProductBase
@@ -326,7 +327,7 @@ class UserAmortization(models.Model):
     version = IntegerVersionField()
 
     product_amortization = models.ForeignKey(ProductAmortization, related_name='subs')
-    user = models.ForeignKey(get_user_model())
+    user = models.ForeignKey(User)
     term = models.IntegerField(u'还款期数')
     term_date = models.DateTimeField(u'还款时间')
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
@@ -350,7 +351,7 @@ class UserAmortization(models.Model):
 class P2PEquity(models.Model):
     version = IntegerVersionField()
 
-    user = models.ForeignKey(get_user_model(), related_name='equities')
+    user = models.ForeignKey(User, related_name='equities')
     product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
     equity = models.BigIntegerField(u'用户所持份额', default=0)
     confirm = models.BooleanField(u'确认成功', default=False)
@@ -452,7 +453,7 @@ class AmortizationRecord(models.Model):
     interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2)
 
-    user = models.ForeignKey(get_user_model(), null=True)
+    user = models.ForeignKey(User, null=True)
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
     description = models.CharField(u'摘要', max_length=1000)
@@ -476,7 +477,7 @@ class P2PRecord(models.Model):
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
     product_balance_after = models.IntegerField(u'标的后余额', help_text=u'该笔流水发生后标的剩余量', null=True)
 
-    user = models.ForeignKey(get_user_model(), null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     create_time = models.DateTimeField(u'发生时间', auto_now_add=True)
 
@@ -496,7 +497,7 @@ class P2PRecord(models.Model):
 class EquityRecord(models.Model):
     catalog = models.CharField(u'流水类型', max_length=100)
     order_id = models.IntegerField(u'相关流水号', null=True)
-    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(P2PProduct, verbose_name=u'产品', on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(u'发生数量', max_digits=20, decimal_places=2)
     description = models.CharField(u'摘要', max_length=1000, default=u'')
@@ -553,6 +554,6 @@ class Earning(models.Model):
     product = models.ForeignKey(P2PProduct, help_text=u'投资标的')
     amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=2, default=0)
 
-    user = models.ForeignKey(get_user_model(), help_text=u'投资用户')
+    user = models.ForeignKey(User, help_text=u'投资用户')
     paid = models.BooleanField(u'已打款', default=False)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
