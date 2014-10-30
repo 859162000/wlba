@@ -56,7 +56,7 @@ class LianlianPay:
             return {"ret_code":20006, 'message':'金额格式错误'}
 
         amount = util.fmt_two_amount(amount)
-        if amount < 100 or amount % 100 != 0:
+        if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
             return {"ret_code":20002, 'message':'金额格式错误，大于100元且为100倍数'}
 
         #gate_id = request.DATA.get('gate_id', 0)
