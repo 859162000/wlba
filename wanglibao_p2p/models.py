@@ -552,7 +552,7 @@ post_save.connect(post_save_process, sender=P2PProduct, dispatch_uid="generate_a
 #description: 市场活动收益
 class Earning(models.Model):
     product = models.ForeignKey(P2PProduct, help_text=u'投资标的')
-    amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=2, default=0)
+    amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=8, default=0)
 
     user = models.ForeignKey(User, help_text=u'投资用户')
     paid = models.BooleanField(u'已打款', default=False)

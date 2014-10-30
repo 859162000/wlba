@@ -44,8 +44,8 @@ class P2PTrader(object):
         if introduced_by and introduced_by.bought_at is None:
             introduced_by.bought_at = timezone.now()
             introduced_by.save()
-            if "channel" not in introduced_by.introduced_by.username:
 
+            if "channel" not in introduced_by.introduced_by.username:
                 inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
                 invited_phone = introduced_by.user.wanglibaouserprofile.phone
 

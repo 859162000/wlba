@@ -6,7 +6,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.contrib import messages
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
-    PaybackReportGenerator, ProductionAmortizationsReportGenerator
+    PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator
 import logging
 
 type = (
@@ -15,6 +15,7 @@ type = (
     (u'产品流水', 2),
     (u'产品还款', 3),
     (u'用户还款', 4),
+    (u'满标复审', 5)
 )
 
 class AdminReportExport(TemplateView):
@@ -44,6 +45,8 @@ class AdminReportExport(TemplateView):
             self._generate_production_amortizations(request, start_time, end_time)
         if type == '4':
             self._generate_user_amortizations(request, start_time, end_time)
+        if type == '5':
+            self._generate_p2paudit(request, start_time, end_time)
 
         return HttpResponseRedirect('export')
 
@@ -61,6 +64,9 @@ class AdminReportExport(TemplateView):
 
     def _generate_user_amortizations(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, PaybackReportGenerator, u'用户还款')
+
+    def _generate_p2paudit(self, request, start_time, end_time):
+        self._apply_generate(request, start_time, end_time, P2PAuditReportGenerator, u'满标复审')
 
     def _apply_generate(self, request, start_time, end_time, cls, message=''):
         try:
