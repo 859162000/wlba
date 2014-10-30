@@ -37,7 +37,7 @@ class PortfolioHomeView(TemplateView):
     def get_context_data(self, **kwargs):
 
         Announcements = Announcement.objects.filter(starttime__lte=timezone.now(), endtime__gte=timezone.now())\
-            .filter(Q(type='all') | Q(type='fund')).filter(status=1).order_by('-priority')[:1]
+            .filter(type='all').filter(status=1).order_by('-priority')[:1]
 
         return {
             'announcements': Announcements
