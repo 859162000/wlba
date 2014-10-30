@@ -223,7 +223,6 @@ def list_bank_card(request):
     try:
        cards =  Card.objects.filter(user=request.user)
     except Exception,e:
-        print(e)
         return {"ret_code":20031, "message":"请添加银行卡"}
     rs = []
     for x in cards:
