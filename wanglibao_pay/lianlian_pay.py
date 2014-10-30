@@ -191,7 +191,7 @@ def add_bank_card(request):
     if not card_no or not gate_id:
         return {"ret_code":20021, "message":"信息输入不完整"}
 
-    if not card_no or not gate_id or len(card_no) > 25 or not card_no.isdigit() or not gate_id.isdigit():
+    if not card_no or not gate_id or len(card_no) > 25 or not card_no.isdigit():
         return {"ret_code":20022, "message":"请输入正确的银行卡号"}
     #bank_card_name = bankcard_checker.check(int(card_no[:6]))
     #if not bank_card_name:
@@ -201,7 +201,7 @@ def add_bank_card(request):
         return {"ret_code":20023, "message":"不支付信用卡"}
 
     user = request.user
-    exist_cards = Card.objects.filter(no=card_no, user=user)
+    exist_cards = Card.objects.filter(no=card_no, user=user).first()
     if exist_cards:
         return {"ret_code":20024, "message":"该银行卡已经存在"}
     bank = Bank.objects.filter(gate_id=gate_id).first()
