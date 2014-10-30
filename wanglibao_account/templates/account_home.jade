@@ -123,37 +123,39 @@ block main
               th 还款计划
               th 借款合同
           tbody
-            if p2p_equities
-              each equity in p2p_equities
+            if result
+              for row in result
+
+                //equity = row.equity
+                //
+                //earning = row.earning
+                //term = equity.term
+                //total_income = equity.total_interest
                 tr
-                  term = equity.term
-                  total_income = equity.total_interest
-
-                  td {{equity.created_at | date:"Y-m-d H:i:s"}}
+                  td {{row.equity.created_at | date:"Y-m-d H:i:s"}}
                   td
-                    p <a href="/p2p/detail/{{equity.product.id}}/">{{equity.product.short_name}}</a>
-                    p 年化收益：{{equity.product.expected_earning_rate}}%
-                    p 期限：{{equity.product.period}}个月
-                  td {{equity.equity | money_format}}
+                    p <a href="/p2p/detail/{{row.equity.product.id}}/">{{row.equity.product.short_name}}</a>
+                    p 年化收益：{{row.equity.product.expected_earning_rate}}%
+                    p 期限：{{row.equity.product.period}}个月
+                  td {{row.equity.equity | money_format}}
 
-                  status = equity.product.display_status
-
-                  if status != '还款中'
-                    td {{status}}
+                  if row.equity.product.display_status != '还款中'
+                    td {{row.equity.product.display_status}}
                   else
-                    td {{status}}{{term}}/{{equity.product.amortization_count}}
+                    td {{row.equity.product.display_status}}{{row.equity.term}}/{{row.equity.product.amortization_count}}
 
-                  if status == '还款中' or status == '已完成'
-                    td <span class="highlight">{{equity.paid_interest | money_format}}</span> / {{total_income | money_format}}
+                  if row.equity.product.display_status == '还款中' or row.equity.product.display_status == '已完成'
+                    td <span class="highlight">{{row.equity.paid_interest | money_format}}</span> / {{row.equity.total_interest | money_format}}
                   else
                     td -
 
                   td
-                    p.highlight 41.00
-                    p 迅雷1%返现
-                    p 满标后2个工作日内发放
+                    if row.earning
+                      p.highlight {{row.earning.amount}}
+                      p 迅雷{{row.earning.product.activity.rule.percent_text}}%返现
+                      p 满标后2个工作日内发放
 
-                  if status == '还款中' or status == '已完成'
+                  if row.equity.product.display_status == '还款中' or row.equity.product.display_status == '已完成'
                     td
                       a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{equity.product.id}}/") 还款计划
                     td

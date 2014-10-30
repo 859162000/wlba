@@ -163,6 +163,15 @@ def safe_name_last(name):
     return result
 
 @register.filter
+def safe_name_first(name):
+    """
+    Show last word
+    """
+
+    result = "*" * 2 + name[-1]
+    return result
+
+@register.filter
 def safe_address(name):
     """
     Show part of name

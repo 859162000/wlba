@@ -7,7 +7,7 @@ from django.contrib import auth
 from django.contrib.auth import login as auth_login
 from django.db.models import Q, Sum, F
 from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404, HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -24,6 +25,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
+from marketing.models import IntroducedBy
 from marketing.utils import set_promo_user
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
@@ -33,7 +35,7 @@ from wanglibao_account import third_login
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
-from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization
+from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter
@@ -44,6 +46,7 @@ from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
 from wanglibao_account.models import Binding
 
+from django.template.defaulttags import register
 
 logger = logging.getLogger(__name__)
 
@@ -250,6 +253,10 @@ class UserViewSet(PaginatedModelViewSet):
 class AccountHome(TemplateView):
     template_name = 'account_home.jade'
 
+    @register.filter(name="lookup")
+    def get_item(dictionary, key):
+        return dictionary.get(key)
+
     def get_context_data(self, **kwargs):
         message = ''
         user = self.request.user
@@ -267,6 +274,18 @@ class AccountHome(TemplateView):
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
             u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
+
+        #author: hetao; datetime: 2014.10.30; description: 加上活动所得收益
+        earnings = Earning.objects.select_related('product__activity').filter(user=user)
+
+        earning_map = {earning.product_id : earning for earning in earnings}
+        result = []
+        for equity in p2p_equities:
+            obj = {"equity": equity}
+            if earning_map.get(equity.product_id):
+                obj["earning"] = earning_map.get(equity.product_id)
+
+            result.append(obj)
 
         amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False).prefetch_related("subs")
 
@@ -288,7 +307,8 @@ class AccountHome(TemplateView):
 
         return {
             'message': message,
-            'p2p_equities': p2p_equities,
+            #'p2p_equities': p2p_equities,
+            'result': result,
             'amortizations': amortizations,
             'p2p_product_amortization': p2p_product_amortization,
             'p2p_unpay_principle': unpayed_principle,
@@ -986,3 +1006,53 @@ class IdValidate(APIView):
         return Response({
                             "validate": True
                         }, status=200)
+
+
+class IntroduceRelation(TemplateView):
+    template_name = 'introduce_add.jade'
+
+    def post(self, request):
+        user_phone = request.POST.get('user_phone', '').strip()
+        introduced_by_phone = request.POST.get('introduced_by_phone', '').strip()
+        bought_at = request.POST.get('bought_at', '').strip()
+        gift_send_at = request.POST.get('gift_send_at', '').strip()
+        try:
+            user = User.objects.get(wanglibaouserprofile__phone=user_phone)
+        except User.DoesNotExist:
+            return HttpResponse({
+                u"没有找到 %s 该记录" % user_phone
+            })
+        try:
+            introduced_by = User.objects.get(wanglibaouserprofile__phone=introduced_by_phone)
+        except User.DoesNotExist:
+            return HttpResponse({
+                u"没有找到 %s 该记录" % user_phone
+            })
+        try:
+            introduce = IntroducedBy.objects.get(user=user, introduced_by=introduced_by)
+        except IntroducedBy.DoesNotExist:
+            record = IntroducedBy()
+            record.introduced_by = introduced_by
+            record.user = user
+            if bought_at:
+                print(bought_at)
+                record.bought_at = bought_at
+            if gift_send_at:
+                print(gift_send_at)
+                record.gift_send_at = gift_send_at
+            record.created_by = request.user
+            record.save()
+            return HttpResponse({
+                u" %s与%s的邀请关系已经确定" % (user_phone, introduced_by)
+            })
+
+        return HttpResponse({
+            u" %s与%s的邀请关系已经存在" % (user_phone, introduced_by)
+        })
+
+    @method_decorator(permission_required('marketing.add_introducedby'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)

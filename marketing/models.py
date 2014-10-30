@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from wanglibao_pay.util import get_a_uuid
 from django.db import transaction
+from decimal import *
 
 
 class NewsAndReport(models.Model):
@@ -68,6 +69,7 @@ class IntroducedBy(models.Model):
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
     gift_send_at = models.DateTimeField(u'奖品发放时间', null=True, blank=True)
+    created_by = models.ForeignKey(User, null=True, blank=True, related_name='creator')
 
 
 def generate_user_promo_token_and_invitecode(sender, instance, **kwargs):
@@ -113,6 +115,10 @@ class ActivityRule(models.Model):
     rule_type = models.CharField(u'规则类型', max_length=50, null=False)
     rule_amount = models.DecimalField(u'数额', max_digits=20, decimal_places=2, default=0)
     create_time = models.DateTimeField(u'活动创建时间', auto_now_add=True)
+
+    @property
+    def percent_text(self):
+        return Decimal(self.rule_amount*100).quantize(Decimal('0.1'))
 
     def get_earning(self, amount, type):
         return amount*self.rule_amount
