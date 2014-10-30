@@ -1,5 +1,6 @@
 # coding=utf-8
-from django.contrib.auth import get_user_model
+#from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from wanglibao_pay.util import get_a_uuid
@@ -54,7 +55,7 @@ class InviteCode(models.Model):
 
 
 class PromotionToken(models.Model):
-    user = models.OneToOneField(get_user_model(), primary_key=True)
+    user = models.OneToOneField(User, primary_key=True)
     token = models.CharField(u'推广代码', max_length=64, db_index=True, default=get_a_uuid)
 
     def __unicode__(self):
@@ -62,8 +63,8 @@ class PromotionToken(models.Model):
 
 
 class IntroducedBy(models.Model):
-    user = models.ForeignKey(get_user_model())
-    introduced_by = models.ForeignKey(get_user_model(), related_name='introduces')
+    user = models.ForeignKey(User)
+    introduced_by = models.ForeignKey(User, related_name='introduces')
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
     gift_send_at = models.DateTimeField(u'奖品发放时间', null=True, blank=True)
@@ -89,8 +90,8 @@ def generate_user_promo_token(sender, instance, **kwargs):
         p.save()
 
 
-# post_save.connect(generate_user_promo_token, sender=get_user_model(), dispatch_uid="generate_promotion_token")
-post_save.connect(generate_user_promo_token_and_invitecode, sender=get_user_model(), dispatch_uid="generate_promotion_token")
+# post_save.connect(generate_user_promo_token, sender=User, dispatch_uid="generate_promotion_token")
+post_save.connect(generate_user_promo_token_and_invitecode, sender=User, dispatch_uid="generate_promotion_token")
 
 
 class TimelySiteData(models.Model):

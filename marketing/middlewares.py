@@ -1,5 +1,5 @@
 from django.conf import settings
-from marketing.models import PromotionToken
+from .models import PromotionToken
 
 
 class PromotionTokenMiddleWare(object):
