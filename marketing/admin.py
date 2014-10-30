@@ -25,8 +25,11 @@ class SiteDataAdmin(admin.ModelAdmin):
 class PromotionTokenAdmin(admin.ModelAdmin):
     list_display = ("user", "token")
     search_fields = ['user__wanglibaouserprofile__phone']
-    #readonly_fields = ("user", "token")
 
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('marketing.view_promotiontoken'):
+            return ("user", "token")
+        return ()
 
 class IntroducedByResource(resources.ModelResource):
 
@@ -55,7 +58,6 @@ class IntroducedByResource(resources.ModelResource):
 
 class IntroducedByAdmin(ImportExportModelAdmin):
     list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
-    #readonly_fields = ("bought_at", "user", "introduced_by")
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
 
@@ -67,6 +69,10 @@ class IntroducedByAdmin(ImportExportModelAdmin):
             .select_related('introduced_by').select_related('introduced_by__wanglibaouserprofile')
         return qs
 
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('marketing.view_introducedby'):
+            return ("bought_at", "user", "introduced_by")
+        return ()
 
 class TimelySitedataAdmin(admin.ModelAdmin):
     list_display = ("created_at", "p2p_margin", "freeze_amount", "total_amount", "user_count")
@@ -78,9 +84,11 @@ class InviteCodeAdmin(admin.ModelAdmin):
     search_fields = ['code']
 
     def get_readonly_fields(self, request, obj=None):
-        if request.user.is_superuser:
-            return ()
-        return ('code', )
+        """ 如果没有设置 view 权限，则返回字段为只读
+        """
+        if not request.user.has_perm('marketing.view_invitecode'):
+            return ('id', 'code', 'is_used')
+        return ()
 
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
