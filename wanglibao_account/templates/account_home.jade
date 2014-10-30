@@ -20,6 +20,11 @@ block main
       else
         span
           a(href="/accounts/id_verify/") 还未进行实名认证
+      |&nbsp;&nbsp;&nbsp;
+      if xunlei_vip.isvip == True
+        span.icon.xunlei-vip-yes(title="已绑定迅雷会员")
+      else
+        span.icon.xunlei-vip-no(title="未绑定迅雷会员")
 
     .card-panel
       .total-asset-money-card
@@ -114,6 +119,7 @@ block main
               th 投资金额
               th 状态
               th 已收益/预期收益
+              th 活动收益
               th 还款计划
               th 借款合同
           tbody
@@ -142,6 +148,11 @@ block main
                   else
                     td -
 
+                  td
+                    p.highlight 41.00
+                    p 迅雷1%返现
+                    p 满标后2个工作日内发放
+
                   if status == '还款中' or status == '已完成'
                     td
                       a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{equity.product.id}}/") 还款计划
@@ -152,7 +163,7 @@ block main
                     td -
             else
               tr
-                td(colspan='7') 无持仓记录
+                td(colspan='8') 无持仓记录
 
         .space-vertical-m
 

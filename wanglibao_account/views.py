@@ -42,6 +42,7 @@ from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
+from wanglibao_account.models import Binding
 
 
 logger = logging.getLogger(__name__)
@@ -283,9 +284,10 @@ class AccountHome(TemplateView):
 
         total_asset = p2p_total_asset
 
+        xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
+
         return {
             'message': message,
-
             'p2p_equities': p2p_equities,
             'amortizations': amortizations,
             'p2p_product_amortization': p2p_product_amortization,
@@ -295,9 +297,9 @@ class AccountHome(TemplateView):
             'fund_hold_info':fund_hold_info,
             'p2p_total_asset': p2p_total_asset,
             'total_asset': total_asset,
-
             'mode': mode,
-            'announcements': AnnouncementAccounts
+            'announcements': AnnouncementAccounts,
+            'xunlei_vip': xunlei_vip
         }
 
 
