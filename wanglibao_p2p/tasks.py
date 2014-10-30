@@ -2,6 +2,7 @@
 
 from wanglibao.celery import app
 from wanglibao_p2p.models import P2PProduct, P2PRecord
+from wanglibao_account.models import Binding
 from wanglibao_p2p.trade import P2POperator
 from django.db.models import Sum, connection
 from datetime import datetime
@@ -29,8 +30,10 @@ def build_earning(product_id):
 
     #把收益数据插入earning表内
     for obj in earning:
-        amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
-        value_list.append(((p2p.pk, obj.get('user'), amount, datetime.now(), 0)))
+        bind = Binding.objects.get(user=obj.get('user'))
+        if bind and bind.isvip:
+            amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
+            value_list.append(((p2p.pk, obj.get('user'), amount, datetime.now(), 0)))
 
 
     cursor = connection.cursor()
