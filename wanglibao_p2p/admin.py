@@ -10,6 +10,7 @@ from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAm
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from views import GenP2PUserProfileReport
+from wanglibao.admin import ReadPermissionModelAdmin
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (
@@ -163,7 +164,7 @@ class P2PProductResource(resources.ModelResource):
         instance.contract_template = ContractTemplate.objects.get(name='证大速贷')
 
 
-class P2PProductAdmin(ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
+class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
     ]
@@ -195,7 +196,7 @@ class P2PRecordResource(resources.ModelResource):
         return timezone.localtime(obj.create_time).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class P2PRecordAdmin(ImportExportModelAdmin):
+class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     list_display = (
         'catalog', 'order_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
     resource_class = P2PRecordResource
@@ -211,11 +212,11 @@ class AmortizationRecordAdmin(admin.ModelAdmin):
         'catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
 
 
-class EquityRecordAdmin(admin.ModelAdmin):
+class EquityRecordAdmin(ReadPermissionModelAdmin):
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
 
 
-class ProductAmortizationAdmin(admin.ModelAdmin):
+class ProductAmortizationAdmin(ReadPermissionModelAdmin):
     list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled',
                     'settlement_time', 'created_time', 'status', 'description', )
 
