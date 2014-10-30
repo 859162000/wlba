@@ -35,7 +35,7 @@ from wanglibao_account import third_login
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
-from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization
+from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter
@@ -46,6 +46,7 @@ from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
 from wanglibao_account.models import Binding
 
+from django.template.defaulttags import register
 
 logger = logging.getLogger(__name__)
 
@@ -252,6 +253,10 @@ class UserViewSet(PaginatedModelViewSet):
 class AccountHome(TemplateView):
     template_name = 'account_home.jade'
 
+    @register.filter(name="lookup")
+    def get_item(dictionary, key):
+        return dictionary.get(key)
+
     def get_context_data(self, **kwargs):
         message = ''
         user = self.request.user
@@ -269,6 +274,18 @@ class AccountHome(TemplateView):
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
             u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
+
+        #author: hetao; datetime: 2014.10.30; description: 加上活动所得收益
+        earnings = Earning.objects.select_related('product__activity').filter(user=user)
+
+        earning_map = {earning.product_id : earning for earning in earnings}
+        result = []
+        for equity in p2p_equities:
+            obj = {"equity": equity}
+            if earning_map.get(equity.product_id):
+                obj["earning"] = earning_map.get(equity.product_id)
+
+            result.append(obj)
 
         amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False).prefetch_related("subs")
 
@@ -290,7 +307,8 @@ class AccountHome(TemplateView):
 
         return {
             'message': message,
-            'p2p_equities': p2p_equities,
+            #'p2p_equities': p2p_equities,
+            'result': result,
             'amortizations': amortizations,
             'p2p_product_amortization': p2p_product_amortization,
             'p2p_unpay_principle': unpayed_principle,

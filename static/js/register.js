@@ -164,5 +164,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=register.map

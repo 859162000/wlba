@@ -7,7 +7,7 @@ from django.conf import settings
 from django.forms import model_to_dict
 from django.db import transaction
 from django.utils.decorators import method_decorator
-from wanglibao_pay import util, bankcard_checker
+from wanglibao_pay import util
 from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
@@ -186,24 +186,27 @@ class LianlianPay:
 
 def add_bank_card(request):
     card_no = request.DATA.get("card_number", "")
-    if not card_no or len(card_no) > 25 or not card_no.isdigit():
-        return {"ret_code":20021, "message":"请输入正确的银行卡号"}
-    bank_card_name = bankcard_checker.check(int(card_no[:6]))
-    if not bank_card_name:
-        return {"ret_code":20022, "message":"请输入合法的银行卡号"}
-    bank_card_name = bank_card_name.upper()
-    if "信用" in bank_card_name or "VISA" in bank_card_name or "MASTER" in bank_card_name or "万事达" in bank_card_name or "贷记" in bank_card_name:
+    gate_id = request.DATA.get("gate_id", "")
+
+    if not card_no or not gate_id:
+        return {"ret_code":20021, "message":"信息输入不完整"}
+
+    if not card_no or not gate_id or len(card_no) > 25 or not card_no.isdigit() or not gate_id.isdigit():
+        return {"ret_code":20022, "message":"请输入正确的银行卡号"}
+    #bank_card_name = bankcard_checker.check(int(card_no[:6]))
+    #if not bank_card_name:
+    #    return {"ret_code":20022, "message":"请输入合法的银行卡号"}
+    #bank_card_name = bank_card_name.upper()
+    if card_no[0] in ("3", "4", "5"):
         return {"ret_code":20023, "message":"不支付信用卡"}
 
     user = request.user
     exist_cards = Card.objects.filter(no=card_no, user=user)
     if exist_cards:
         return {"ret_code":20024, "message":"该银行卡已经存在"}
-    bank_name = ".".join(bank_card_name.split(".")[:-1])
-    try:
-        bank = Bank.objects.filter(name=bank_name).first()
-    except:
-        return {"ret_code":20025, "message":"%s,不支持该银行" % bank_name}
+    bank = Bank.objects.filter(gate_id=gate_id).first()
+    if not bank:
+        return {"ret_code":20025, "message":"不支持该银行"}
 
     is_default = request.DATA.get("is_default", "false")
     if is_default.lower() == "true":
@@ -217,7 +220,7 @@ def add_bank_card(request):
     card.is_default = is_default
     card.save()
 
-    return {"ret_code":0, "message":"ok", "bank_name":bank_name, "card_id":card.id}
+    return {"ret_code":0, "message":"ok", "card_id":card.id}
 
 def list_bank_card(request):
     try:
@@ -227,6 +230,8 @@ def list_bank_card(request):
     rs = []
     for x in cards:
         rs.append({"bank_name":x.bank.name, "card_no":x.no, "card_id":x.id, "default":x.is_default})
+    if not rs:
+        return {"ret_code":20031, "message":"请添加银行卡"}
     return {"ret_code":0, "message":"ok", "cards":rs}
 
 def del_bank_card(request):
@@ -239,3 +244,12 @@ def del_bank_card(request):
         return {"ret_code":20042, "message":"该银行卡不存在"}
     card.delete()
     return {"ret_code":0, "message":"删除成功"}
+
+def list_bank(request):
+    banks = Bank.get_deposit_banks()
+    rs = []
+    for x in banks:
+        rs.append({"name":x.name, "gate_id":x.gate_id})
+    if not rs:
+        return {"ret_code":20051, "message":"没有可选择的银行"}
+    return {"ret_code":0, "message":"ok", "banks":rs}

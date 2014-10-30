@@ -64,6 +64,11 @@ class P2PDetailView(TemplateView):
                                                                p2p.period)
         total_earning = terms.get("total") - p2p.total_amount
 
+        total_fee_earning = 0
+
+        if p2p.activity:
+            total_fee_earning = Decimal(p2p.total_amount*p2p.activity.rule.rule_amount*(Decimal(p2p.period)/Decimal(12))).quantize(Decimal('0.01'))
+
         user = self.request.user
         current_equity = 0
 
@@ -91,6 +96,7 @@ class P2PDetailView(TemplateView):
             'site_data': site_data,
             'attachments': p2p.attachment_set.all(),
             'announcements': AnnouncementP2P,
+            'total_fee_earning': total_fee_earning
         })
 
         return context
@@ -130,6 +136,7 @@ class PurchaseP2P(APIView):
             try:
                 trader = P2PTrader(product=p2p, user=request.user)
                 product_info, margin_info, equity_info = trader.purchase(amount)
+                print product_info, '####'
                 return Response({
                     'data': product_info.amount
                 })

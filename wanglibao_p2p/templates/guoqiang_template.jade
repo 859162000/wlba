@@ -94,8 +94,8 @@ html
           th ￥{{ equity.product.total_amount }}元
           th ——
     br
-    p.bold 乙方（借款方）：【{{ product.borrower_name|safe_name_last }}】
-    p 身份证号/法定代表人：{{ product.borrower_id_number|safe_name_last}}
+    p.bold 乙方（借款方）：【{{ product.borrower_name|safe_name_first }}】
+    p 身份证号/法定代表人：{{ product.borrower_id_number|safe_name_first}}
     p 地址：{{ product.borrower_address|safe_address }}
     p 网利宝平台用户名：
     br

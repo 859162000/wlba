@@ -8,14 +8,45 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'Activity'
+        db.create_table(u'marketing_activity', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('rule', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.ActivityRule'], null=True, on_delete=models.SET_NULL, blank=True)),
+            ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('start_time', self.gf('django.db.models.fields.DateTimeField')()),
+            ('end_time', self.gf('django.db.models.fields.DateTimeField')()),
+        ))
+        db.send_create_signal(u'marketing', ['Activity'])
 
-        # Changing field 'ActivityRule.rule_amount'
-        db.alter_column(u'marketing_activityrule', 'rule_amount', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2))
+        # Adding model 'ActivityRule'
+        db.create_table(u'marketing_activityrule', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('rule_type', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('rule_amount', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=20, decimal_places=2)),
+            ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal(u'marketing', ['ActivityRule'])
+
+        # Adding field 'IntroducedBy.created_by'
+        db.add_column(u'marketing_introducedby', 'created_by',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='creator', null=True, to=orm['auth.User']),
+                      keep_default=False)
+
 
     def backwards(self, orm):
+        # Deleting model 'Activity'
+        db.delete_table(u'marketing_activity')
 
-        # Changing field 'ActivityRule.rule_amount'
-        db.alter_column(u'marketing_activityrule', 'rule_amount', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=8))
+        # Deleting model 'ActivityRule'
+        db.delete_table(u'marketing_activityrule')
+
+        # Deleting field 'IntroducedBy.created_by'
+        db.delete_column(u'marketing_introducedby', 'created_by_id')
+
 
     models = {
         u'auth.group': {
@@ -77,6 +108,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'IntroducedBy'},
             'bought_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'creator'", 'null': 'True', 'to': u"orm['auth.User']"}),
             'gift_send_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'introduced_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'introduces'", 'to': u"orm['auth.User']"}),
@@ -99,7 +131,7 @@ class Migration(SchemaMigration):
         },
         u'marketing.promotiontoken': {
             'Meta': {'object_name': 'PromotionToken'},
-            'token': ('django.db.models.fields.CharField', [], {'default': "'qStvPCicSIec7lwXsXPBXA'", 'max_length': '64', 'db_index': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'ljEvMecCSTiPfwWvxmhhDQ'", 'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         u'marketing.sitedata': {

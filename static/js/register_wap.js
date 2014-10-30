@@ -100,5 +100,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=register_wap.map
