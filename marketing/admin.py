@@ -76,10 +76,12 @@ class TimelySitedataAdmin(admin.ModelAdmin):
 class InviteCodeAdmin(admin.ModelAdmin):
     list_display = ('id', 'code', 'is_used')
     search_fields = ['code']
-    #readonly_fields = ('code', )
 
-    #def has_add_permission(self, request, obj=None):
-    #    return False
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return ()
+        return ('code', )
+
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
