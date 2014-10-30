@@ -105,27 +105,32 @@ html
                     .row
                       period = p2p.period * 30
                       user_limit = u"100的整数倍"
-                      -render_field form.amount class+="span12" type="text" placeholder=user_limit data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
+                      -render_field form.amount class+="span12" type="text" placeholder=user_limit data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income,#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
                     .form-row-error
                 .row
                   span.span4 预期收益
                   span.span8-omega
                     span.highlight.font-m.invest#expected_income 0.00
                     | 元
+                    if user.is_authenticated
+                      if xunlei_vip.isvip == True
+                        span.font-m +
+                        span.highlight.font-m#xunlei-vip-income-head 0.00
+                        |元
                 if p2p.activity
                   .row
                     span.span4
                     span.span8-omega.xunlei-vip-form-txt
                       if user.is_authenticated
                         if xunlei_vip.isvip == True
-                          span 已绑定迅雷会员，满标之后还可享受额外
-                          span.highlight#xunlei-vip-income 65
-                          |元的收益
+                          span 迅雷活动返现
+                          span.highlight#xunlei-vip-income 0.00
+                          |元，将在满标后2个工作日内，一次性发放
                         else
                           span 现在
                           a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 开通迅雷会员
                           span ，还可享受额外
-                          span.highlight#xunlei-vip-income 65
+                          span.highlight#xunlei-vip-income 0.00
                           |元的收益
                           br
                           span 已经是迅雷会员了？
@@ -134,7 +139,7 @@ html
                         span 现在
                         a.blue(href="#") 开通迅雷会员
                         span ，还可享受额外
-                        span.highlight#xunlei-vip-income 65
+                        span.highlight#xunlei-vip-income 0.00
                         |元的收益
 
                 .row.margin-top-s
