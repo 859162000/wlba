@@ -49,9 +49,15 @@ class LianlianPay:
         if not request.user.wanglibaouserprofile.id_is_valid:
             return {"ret_code":20001, "message":"请先进行实名认证"}
 
-        amount = util.fmt_two_amount(request.DATA.get('amount', 0))
-        if amount < 100:
-            return {"ret_code":20002, 'message':'金额格式错误，大于100元'}
+        amount = request.DATA.get("amount", "")
+        try:
+            float(amount)
+        except:
+            return {"ret_code":20006, 'message':'金额格式错误'}
+
+        amount = util.fmt_two_amount(amount)
+        if amount < 100 or amount % 100 != 0:
+            return {"ret_code":20002, 'message':'金额格式错误，大于100元且为100倍数'}
 
         #gate_id = request.DATA.get('gate_id', 0)
         #if gate_id == 0:
