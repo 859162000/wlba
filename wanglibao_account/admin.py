@@ -11,7 +11,8 @@ from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_account.views import AdminIdVerificationView
+from wanglibao_account.views import AdminIdVerificationView, IntroduceRelation
+
 
 class ProfileInline(admin.StackedInline):
     model = WanglibaoUserProfile
@@ -79,8 +80,26 @@ def user_unicode(self):
 
 User.__unicode__ = user_unicode
 
+
+class IdVerificationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'id_number', 'is_valid', 'created_at')
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_account.view_idverification'):
+            return ( 'name', 'id_number', 'is_valid', 'created_at')
+        return ()
+
+class VerifyCounterAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'count')
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_account.view_verifycounter'):
+            return ( 'user', 'count')
+        return ()
+
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(IdVerification, IdVerificationAdmin)
-admin.site.register(VerifyCounter)
+admin.site.register(VerifyCounter, VerifyCounterAdmin)
 admin.site.register_view('accounts/id_verify/', view=AdminIdVerificationView.as_view(), name=u'网利宝-身份验证')
+admin.site.register_view('accounts/add_introduce/', view=IntroduceRelation.as_view(), name=u'网利宝-新增邀请')

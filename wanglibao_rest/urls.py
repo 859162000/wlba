@@ -19,7 +19,8 @@ from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTr
     MobileHotFundViewSet, MobileMainPageViewSet, MobileMainPageP2PViewSet
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
     P2PProductDetailView, P2PProductListView
-from wanglibao_pay.views import CardViewSet, LianlianAppPayView, LianlianAppPayCallbackView
+from wanglibao_pay.views import (CardViewSet, LianlianAppPayView, LianlianAppPayCallbackView,
+                            BankCardAddView, BankCardListView, BankCardDelView)
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
@@ -91,6 +92,9 @@ urlpatterns = patterns(
     url(r'', include(router.urls)),
     #客户端使用,重写
     url(r'^id_validation/$', IdValidateAPIView.as_view()),
+    url(r'^bank_card/add/$', BankCardAddView.as_view()),
+    url(r'^bank_card/list/$', BankCardListView.as_view()),
+    url(r'^bank_card/del/$', BankCardDelView.as_view()),
 
     url(r'^id_validate/', IdValidate.as_view()),
     url(r'^admin_id_validate/', AdminIdValidate.as_view()),
