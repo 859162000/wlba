@@ -65,7 +65,7 @@ class P2PDetailView(TemplateView):
         total_earning = terms.get("total") - p2p.total_amount
 
         total_fee_earning = 0
-        
+
         if p2p.activity:
             total_fee_earning = Decimal(p2p.total_amount*p2p.activity.rule.rule_amount*(Decimal(p2p.period)/Decimal(12))).quantize(Decimal('0.01'))
 
