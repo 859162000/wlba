@@ -8,6 +8,29 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'Activity'
+        db.create_table(u'marketing_activity', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('rule', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.ActivityRule'], null=True, on_delete=models.SET_NULL, blank=True)),
+            ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('start_time', self.gf('django.db.models.fields.DateTimeField')()),
+            ('end_time', self.gf('django.db.models.fields.DateTimeField')()),
+        ))
+        db.send_create_signal(u'marketing', ['Activity'])
+
+        # Adding model 'ActivityRule'
+        db.create_table(u'marketing_activityrule', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('rule_type', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('rule_amount', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=20, decimal_places=2)),
+            ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal(u'marketing', ['ActivityRule'])
+
         # Adding field 'IntroducedBy.created_by'
         db.add_column(u'marketing_introducedby', 'created_by',
                       self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='creator', null=True, to=orm['auth.User']),
@@ -15,6 +38,12 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
+        # Deleting model 'Activity'
+        db.delete_table(u'marketing_activity')
+
+        # Deleting model 'ActivityRule'
+        db.delete_table(u'marketing_activityrule')
+
         # Deleting field 'IntroducedBy.created_by'
         db.delete_column(u'marketing_introducedby', 'created_by_id')
 
@@ -102,7 +131,7 @@ class Migration(SchemaMigration):
         },
         u'marketing.promotiontoken': {
             'Meta': {'object_name': 'PromotionToken'},
-            'token': ('django.db.models.fields.CharField', [], {'default': "'X5Ij9DJPQQet2cDTQIxpWw'", 'max_length': '64', 'db_index': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'ljEvMecCSTiPfwWvxmhhDQ'", 'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         u'marketing.sitedata': {
