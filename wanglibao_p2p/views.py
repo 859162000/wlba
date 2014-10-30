@@ -432,11 +432,11 @@ class FinancesAPI(APIView):
         ])
 
         p2p_list = []
-        status = u'已融资'
+        status = 0
         for p2p in p2pproducts:
             shouyi = "{}%".format(p2p.expected_earning_rate)
             if p2p.status == u'正在招标':
-                status = u'融资中'
+                status = 1
 
             temp_p2p = {
                 "logo": "https://{}/static/images/wlblogo.png".format(self.request.get_host()),
