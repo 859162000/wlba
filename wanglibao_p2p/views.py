@@ -223,7 +223,6 @@ class AuditProductView(TemplateView):
         ProductKeeper(p2p).audit(request.user)
 
         if p2p.activity:
-            print p2p.activity, '#######----------'
             from celery.execute import send_task
             send_task("wanglibao_p2p.tasks.build_earning", kwargs={
                 "product_id": 3
