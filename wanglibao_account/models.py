@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf8
 
-from django.contrib.auth import get_user_model
+#from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -25,7 +26,7 @@ class VerifyCounter(models.Model):
     The table stores the count each user called the id verify api
     """
 
-    user = models.OneToOneField(get_user_model())
+    user = models.OneToOneField(User)
     count = models.IntegerField(u'尝试认证次数', default=0)
 
     def __unicode__(self):
@@ -36,7 +37,7 @@ class UserPushId(models.Model):
     """
         app push table, store all the user and all the device
     """
-    user = models.ForeignKey(get_user_model(), null=True)
+    user = models.ForeignKey(User, null=True)
     device_type = models.CharField(max_length=20, verbose_name="设备类型")
     push_user_id = models.CharField(max_length=50, db_index=True)
     push_channel_id = models.CharField(max_length=50)
@@ -46,7 +47,7 @@ class Binding(models.Model):
     """
         third app bind table, store bind related
     """
-    user = models.ForeignKey(get_user_model())
+    user = models.ForeignKey(User)
     btype = models.CharField(max_length=10, choices=(
         ('xunlei', 'xunlei'),
     ))

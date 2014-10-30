@@ -1,7 +1,8 @@
 # encoding:utf8
 import json
 import collections
-from django.contrib.auth import get_user_model
+#from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import models
 from wanglibao.fields import JSONFieldUtf8
 
@@ -29,7 +30,7 @@ class Order(models.Model):
 
 class OrderNote(models.Model):
     order = models.ForeignKey(Order, related_name='notes', verbose_name=u'订单', null=True, on_delete=models.SET_NULL)
-    user = models.ForeignKey(get_user_model(), null=True, verbose_name=u'用户', on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, null=True, verbose_name=u'用户', on_delete=models.SET_NULL)
 
     # System generated note can't be edited
 
