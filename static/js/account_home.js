@@ -111,7 +111,7 @@
     });
     isXunleiBindSuccess = function() {
       var result;
-      result = /[\?|&]result=(\w+)$|(&|#)/ig.exec(window.location.href);
+      result = /[\?|&]result=(\w+)$|&/ig.exec(window.location.href);
       if (result) {
         if (result[1] === 'ok') {
           return tool.modalAlert({
