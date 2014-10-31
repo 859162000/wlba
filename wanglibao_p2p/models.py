@@ -170,7 +170,7 @@ class P2PProduct(ProductBase):
     contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True ,blank=False)
 
     #author: hetao; datetime: 2014.10.27; description: 活动是否参加活动
-    activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True)
+    activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True, verbose_name=u'返现活动')
 
 
     class Meta:
