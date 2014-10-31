@@ -10,11 +10,6 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
 
-        # Adding field 'Earning.order'
-        db.add_column(u'wanglibao_p2p_earning', 'order',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['order.Order'], null=True, blank=True),
-                      keep_default=False)
-
         # Adding field 'Earning.margin_record'
         db.add_column(u'wanglibao_p2p_earning', 'margin_record',
                       self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_margin.MarginRecord'], null=True, blank=True),
@@ -35,9 +30,6 @@ class Migration(SchemaMigration):
         db.alter_column(u'wanglibao_p2p_earning', 'product_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProduct'], null=True))
 
     def backwards(self, orm):
-
-        # Deleting field 'Earning.order'
-        db.delete_column(u'wanglibao_p2p_earning', 'order_id')
 
         # Deleting field 'Earning.margin_record'
         db.delete_column(u'wanglibao_p2p_earning', 'margin_record_id')
