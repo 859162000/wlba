@@ -86,7 +86,7 @@ def login_back(args, user):
             bindinfo.save()
             """
 
-            rs = _bind_account(user, state, userinfo)
+            rs = _bind_account(user, state, userinfo, dic)
             if rs:
                 return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
             else:
@@ -131,14 +131,14 @@ def check_xunlei(dic):
         if userinfo['result'] != 200:
             return {"ret_code":30065, "message":content}
 
-    rs = _bind_account(user, state, userinfo)
+    rs = _bind_account(user, state, userinfo, dic)
     if rs:
         return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
     else:
         return {"ret_code":30066, "message":"server error"}
 
 #内部方法，绑定和检查用户关系
-def _bind_account(user, state, userinfo):
+def _bind_account(user, state, userinfo, dic):
     tmpuser = Binding.objects.filter(user=user).filter(btype=state).first()
     #绑定过的不再绑定,一对一关系
     if tmpuser and tmpuser.bid != userinfo['uid']:
