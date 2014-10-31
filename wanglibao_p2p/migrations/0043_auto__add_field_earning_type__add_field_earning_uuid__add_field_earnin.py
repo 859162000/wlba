@@ -9,28 +9,11 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
 
-        # Adding field 'Earning.update_time'
-        db.add_column(u'wanglibao_p2p_earning', 'update_time',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, null=True, blank=True),
-                      keep_default=False)
-
-        # Adding field 'Earning.confirm_time'
-        db.add_column(u'wanglibao_p2p_earning', 'confirm_time',
-                      self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True),
-                      keep_default=False)
-
 
         # Changing field 'Earning.product'
         db.alter_column(u'wanglibao_p2p_earning', 'product_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProduct'], null=True))
 
     def backwards(self, orm):
-        
-        # Deleting field 'Earning.update_time'
-        db.delete_column(u'wanglibao_p2p_earning', 'update_time')
-
-        # Deleting field 'Earning.confirm_time'
-        db.delete_column(u'wanglibao_p2p_earning', 'confirm_time')
-
 
         # Changing field 'Earning.product'
         db.alter_column(u'wanglibao_p2p_earning', 'product_id', self.gf('django.db.models.fields.related.ForeignKey')(default=datetime.datetime(2014, 10, 31, 0, 0), to=orm['wanglibao_p2p.P2PProduct']))
