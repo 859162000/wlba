@@ -112,13 +112,13 @@ class ActivityRule(models.Model):
 
     class Meta:
         ordering = ['-create_time']
-        verbose_name_plural = u'活动规则'
+        verbose_name_plural = u'返现活动规则'
 
     name = models.CharField(u'规则名称', max_length=128)
     description = models.TextField(u'规则描述')
 
     rule_type = models.CharField(u'规则类型', max_length=50, null=False)
-    rule_amount = models.DecimalField(u'数额', max_digits=20, decimal_places=8, default=0)
+    rule_amount = models.DecimalField(u'数额', max_digits=20, decimal_places=4, default=0)
     create_time = models.DateTimeField(u'活动创建时间', auto_now_add=True)
 
     @property
@@ -138,7 +138,7 @@ class Activity(models.Model):
 
     class Meta:
         ordering = ['-create_time']
-        verbose_name_plural = u'活动'
+        verbose_name_plural = u'返现活动'
 
     name = models.CharField(u'活动名称', max_length=128)
     description = models.TextField(u'活动描述')

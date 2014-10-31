@@ -246,7 +246,9 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
 
 class EarningAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'product', 'amount', )
+    raw_id_fields = ('order', 'margin_record')
     search_fields = ('user__wanglibaouserprofile__phone',)
+
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_productamortization'):

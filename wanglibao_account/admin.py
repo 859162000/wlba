@@ -99,6 +99,7 @@ class VerifyCounterAdmin(admin.ModelAdmin):
 
 class BindingAdmin(admin.ModelAdmin):
     list_display = ("user", "bid", "btype", "isvip")
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
