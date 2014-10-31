@@ -109,6 +109,11 @@ class TimelySiteData(models.Model):
 #datetime: 2014.10.27
 #description: 市场活动规则
 class ActivityRule(models.Model):
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'活动规则'
+
     name = models.CharField(u'规则名称', max_length=128)
     description = models.TextField(u'规则描述')
 
@@ -130,6 +135,11 @@ class ActivityRule(models.Model):
 #datetime: 2014.10.27
 #description: 市场活动
 class Activity(models.Model):
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'活动'
+
     name = models.CharField(u'活动名称', max_length=128)
     description = models.TextField(u'活动描述')
 
