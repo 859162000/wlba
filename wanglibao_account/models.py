@@ -50,16 +50,16 @@ class Binding(models.Model):
     user = models.ForeignKey(User)
     btype = models.CharField(max_length=10, choices=(
         ('xunlei', 'xunlei'),
-    ))
-    bid = models.CharField(max_length=20, db_index=True)
-    bname = models.CharField(max_length=50)
+    ), verbose_name=u"类型")
+    bid = models.CharField(max_length=20, db_index=True, verbose_name=u"第三方用户id")
+    bname = models.CharField(max_length=50, blank=True, verbose_name=u"第三方用户昵称")
     gender = models.CharField(max_length=5, choices=(
         ("m", "m"),
         ("w", "w"),
         ("n", "n"),
-    ))
+    ), verbose_name=u"性别", blank=True)
     isvip = models.BooleanField(default=False, verbose_name=u"是否是vip")
-    extra = models.CharField(max_length=200, default="")
-    access_token = models.CharField(max_length=100)
-    refresh_token = models.CharField(max_length=100)
-    created_at = models.BigIntegerField(default=0, verbose_name=u'创建时间')
+    extra = models.CharField(max_length=200, default="", blank=True)
+    access_token = models.CharField(max_length=100, blank=True)
+    refresh_token = models.CharField(max_length=100, blank=True)
+    created_at = models.BigIntegerField(default=0, verbose_name=u'创建时间', blank=True)

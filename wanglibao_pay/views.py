@@ -604,7 +604,7 @@ class BankCardDelView(APIView):
         result = lianlian_pay.del_bank_card(request)
         return Response(result)
 
-class BankListView(APIView):
+class BankListAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):

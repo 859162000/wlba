@@ -7,7 +7,7 @@ from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import DecimalWidget
 from marketing.models import PromotionToken, IntroducedBy
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_account.models import VerifyCounter, IdVerification
+from wanglibao_account.models import VerifyCounter, IdVerification, Binding
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -97,9 +97,13 @@ class VerifyCounterAdmin(admin.ModelAdmin):
             return ( 'user', 'count')
         return ()
 
+class BindingAdmin(admin.ModelAdmin):
+    list_display = ("user", "bid", "btype", "isvip")
+
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(IdVerification, IdVerificationAdmin)
 admin.site.register(VerifyCounter, VerifyCounterAdmin)
 admin.site.register_view('accounts/id_verify/', view=AdminIdVerificationView.as_view(), name=u'网利宝-身份验证')
 admin.site.register_view('accounts/add_introduce/', view=IntroduceRelation.as_view(), name=u'网利宝-新增邀请')
+admin.site.register(Binding, BindingAdmin)
