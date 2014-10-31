@@ -77,7 +77,7 @@ html
                   span#countdown{{p2p.end_time | timedelta_now_day }}
 
           dl.p2p-detail-intro.clearfix
-            dt 借款用途：
+            dt 借款描述：
             dd {% autoescape off %}{{p2p.short_usage}}{% endautoescape %}
             if p2p.category == '证大速贷'
               dt 债权转让：
@@ -115,7 +115,7 @@ html
                     if user.is_authenticated
                       if xunlei_vip.isvip == True
                         span.font-m +
-                        span.highlight.font-m#xunlei-vip-income-head 0.00
+                        span.blue.font-m#xunlei-vip-income-head 0.00
                         |元
                 if p2p.activity
                   .row
@@ -124,13 +124,13 @@ html
                       if user.is_authenticated
                         if xunlei_vip.isvip == True
                           span 迅雷活动返现
-                          span.highlight#xunlei-vip-income 0.00
+                          span.blue#xunlei-vip-income 0.00
                           |元，将在满标后2个工作日内，一次性发放
                         else
                           span 现在
                           a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 开通迅雷会员
                           span ，还可享受额外
-                          span.highlight#xunlei-vip-income 0.00
+                          span.blue#xunlei-vip-income 0.00
                           |元的收益
                           br
                           span 已经是迅雷会员了？
@@ -139,7 +139,7 @@ html
                         span 现在
                         a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 开通迅雷会员
                         span ，还可享受额外
-                        span.highlight#xunlei-vip-income 0.00
+                        span.blue#xunlei-vip-income 0.00
                         |元的收益
 
                 .row.margin-top-s
@@ -302,11 +302,11 @@ html
               .space-vertical-l
               .row
                 .span7
-                  a.button.button-account(href='/accounts/login/xunlei')
+                  a.button.button-account(href='/accounts/login/xunlei', target="_blank")
                     span.font-s.padding-l-r-m 立即绑定迅雷会员
                 .span5-omega.padding-top-xs.align-center
                   span 我还不是会员，
-                  a.blue(href="http://pay.vip.xunlei.com/baijin.html") 立即开通
+                  a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 立即开通
             .space-vertical-s
 
     script.
