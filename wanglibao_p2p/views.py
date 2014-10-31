@@ -225,9 +225,8 @@ class AuditProductView(TemplateView):
         if p2p.activity:
             from celery.execute import send_task
             send_task("wanglibao_p2p.tasks.build_earning", kwargs={
-                "product_id": 3
+                "product_id": pk
             })
-
 
 
         return HttpResponseRedirect('/'+settings.ADMIN_ADDRESS+'/wanglibao_p2p/p2pproduct/')

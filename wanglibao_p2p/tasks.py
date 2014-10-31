@@ -6,7 +6,7 @@ from wanglibao_account.models import Binding
 from wanglibao_p2p.trade import P2POperator
 from django.db.models import Sum, connection
 from datetime import datetime
-
+import os
 
 @app.task
 def p2p_watchdog():
@@ -20,6 +20,9 @@ def process_paid_product(product_id):
 @app.task
 def build_earning(product_id):
 
+    # command = 'touch ~/workspace/%s.txt' % 'test'
+    # os.system(command)
+
     p2p = P2PProduct.objects.select_related('activity__rule').get(pk=product_id)
 
     #按用户汇总某个标的收益
@@ -28,9 +31,12 @@ def build_earning(product_id):
     value_list = []
     rule = p2p.activity.rule
 
+
+
     #把收益数据插入earning表内
     for obj in earning:
-        bind = Binding.objects.get(user=obj.get('user'))
+
+        bind = Binding.objects.get(user_id=obj.get('user'))
         if bind and bind.isvip:
             amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
             value_list.append(((p2p.pk, obj.get('user'), amount, datetime.now(), 0)))
