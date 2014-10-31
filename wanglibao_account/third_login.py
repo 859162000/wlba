@@ -15,8 +15,6 @@ partner = {
 }
 
 def assem_params(login_type, request):
-    referer = request.META.get("HTTP_REFERRER", "/accounts/home/")
-    request.session["bind_referer"] = referer
     if login_type == "xunlei":
         uri = "/platform?"
         params = {"client_id":partner[login_type]["client_id"],
@@ -30,14 +28,14 @@ def assem_params(login_type, request):
 def login_back(request):
     args = request.GET
     user = request.user
-    referer = request.session.get("bind_referer", "/accounts/home/")
 
     ret = args.get("ret", "")
     code = args.get("code", "")
     state = args.get("state", "")
     if ret != "0" or not code or not state:
-        return {"ret_code":30031, "message":"parameter error"}
+        return {"ret_code":30031, "message":"parameter error", "url":location + "false"}
 
+    location = "/accounts/home/?result="
     if state == "xunlei":
         uri = "/auth2/token?"
         params = {"grant_type":"authorization_code", "code":code,
@@ -50,13 +48,13 @@ def login_back(request):
         if str(response['status']) == "200":
             dic = json.loads(content)
             if dic['result'] != 200:
-                return {"ret_code":30033, "message":"token error"}
+                return {"ret_code":30033, "message":"token error", "url":location + "false"}
             uri = "http://developer.open-api-auth.xunlei.com/get_user_info?"
             params = {"client_id":partner[state]['client_id'], "scope":"get_user_info", "access_token":dic['access_token']}
             url = uri + urllib.urlencode(params)
             response, content = http.request(url, 'GET')
             if str(response['status']) != "200":
-                return {"ret_code":30034, "message":content}
+                return {"ret_code":30034, "message":content, "url":location + "false"}
             userinfo = json.loads(content)
 
             """
@@ -96,13 +94,13 @@ def login_back(request):
             rs = _bind_account(user, state, userinfo, dic)
             if rs:
                 #return {"ret_code":0, "message":"ok", "data":userinfo, "url":"<script>location.href=" + settings.CALLBACK_HOST + "/accounts/home/;" + "</script>"}
-                return {"ret_code":0, "message":"ok", "data":userinfo, "url":referer}
+                return {"ret_code":0, "message":"ok", "data":userinfo, "url":location + "ok"}
             else:
-                return {"ret_code":30034, "message":"server error"}
+                return {"ret_code":30034, "message":"server error", "url":location + "false"}
         else:
-            return {"ret_code":30033, "message":content}
+            return {"ret_code":30033, "message":content, "url":location + "false"}
     else:
-        return {"ret_code":30032, "message":"state error"}
+        return {"ret_code":30032, "message":"state error", "url":location + "false"}
 
 #检查迅雷账号VIP
 def check_xunlei(dic):

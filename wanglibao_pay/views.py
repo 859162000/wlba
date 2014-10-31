@@ -610,3 +610,16 @@ class BankListAPIView(APIView):
     def post(self, request):
         result = lianlian_pay.list_bank(request)
         return Response(result)
+
+class LianlianWithdrawAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        lianpay = LianlianPay()
+        result = lianpay.ios_withdraw(request)
+        if not result['ret_code']:
+            send_messages.apply_async(kwargs={
+                'phones': [result['phone']],
+                'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
+            })
+        return Response(result)
