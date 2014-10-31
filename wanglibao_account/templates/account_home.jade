@@ -153,7 +153,7 @@ block main
                   td
                     if row.earning
                       p.highlight {{row.earning.amount | money_format}}
-                      p {{row.earning.product.activity.rule.name}}{{row.earning.product.activity.rule.percent_text}}%返现
+                      p {{row.earning.product.activity.rule.name}}
                       p 满标后2个工作日内发放
 
                   if row.equity.product.display_status == '还款中' or row.equity.product.display_status == '已完成'
