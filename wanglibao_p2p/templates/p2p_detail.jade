@@ -287,7 +287,7 @@ html
                 .row
                   a.get-more(href="#") 查看更多
     if p2p.activity
-      if user.is_authenticated and xunlei_vip.isvip == False
+      if user.is_authenticated and not xunlei_vip.isvip
         #xunlei-binding-modal(style="display:none;")
           .modal-header
             .modal-title-bar
