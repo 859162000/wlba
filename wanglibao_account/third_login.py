@@ -14,7 +14,9 @@ partner = {
             "api":"https://open-api-auth.xunlei.com"}
 }
 
-def assem_params(login_type):
+def assem_params(login_type, request):
+    referer = request.META.get("HTTP_REFERRER", "/accounts/home/")
+    request.session["bind_referer"] = referer
     if login_type == "xunlei":
         uri = "/platform?"
         params = {"client_id":partner[login_type]["client_id"],
@@ -25,7 +27,11 @@ def assem_params(login_type):
     else:
         return settings.LOGIN_REDIRECT_URL
 
-def login_back(args, user):
+def login_back(request):
+    args = request.GET
+    user = request.user
+    referer = request.session.get("bind_referer", "/accounts/home/")
+
     ret = args.get("ret", "")
     code = args.get("code", "")
     state = args.get("state", "")
@@ -89,7 +95,8 @@ def login_back(args, user):
             #return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
             rs = _bind_account(user, state, userinfo, dic)
             if rs:
-                return {"ret_code":0, "message":"ok", "data":userinfo, "url":"<script>location.href=" + settings.CALLBACK_HOST + "/accounts/home/;" + "</script>"}
+                #return {"ret_code":0, "message":"ok", "data":userinfo, "url":"<script>location.href=" + settings.CALLBACK_HOST + "/accounts/home/;" + "</script>"}
+                return {"ret_code":0, "message":"ok", "data":userinfo, "url":referer}
             else:
                 return {"ret_code":30034, "message":"server error"}
         else:
