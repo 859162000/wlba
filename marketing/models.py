@@ -113,15 +113,15 @@ class ActivityRule(models.Model):
     description = models.TextField(u'规则描述')
 
     rule_type = models.CharField(u'规则类型', max_length=50, null=False)
-    rule_amount = models.DecimalField(u'数额', max_digits=20, decimal_places=2, default=0)
+    rule_amount = models.DecimalField(u'数额', max_digits=20, decimal_places=8, default=0)
     create_time = models.DateTimeField(u'活动创建时间', auto_now_add=True)
 
     @property
     def percent_text(self):
         return Decimal(self.rule_amount*100).quantize(Decimal('0.1'))
 
-    def get_earning(self, amount, type):
-        return amount*self.rule_amount
+    def get_earning(self, amount, months, type):
+         return Decimal(amount*self.rule_amount*(Decimal(months)/Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
     def __unicode__(self):
         return u'<%s>' % self.name
