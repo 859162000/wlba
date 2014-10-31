@@ -53,7 +53,6 @@ def login_back(args, user):
                 return {"ret_code":30034, "message":content}
             userinfo = json.loads(content)
 
-            """
             tmpuser = Binding.objects.filter(user=user).filter(btype=state).first()
             #绑定过的不再绑定,一对一关系
             if tmpuser and tmpuser.bid != userinfo['uid']:
@@ -84,13 +83,13 @@ def login_back(args, user):
             bindinfo.refresh_token = dic['refresh_token']
             bindinfo.created_at = long(time.time())
             bindinfo.save()
-            """
 
-            rs = _bind_account(user, state, userinfo, dic)
-            if rs:
-                return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
-            else:
-                return {"ret_code":30034, "message":"server error"}
+            return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
+            #rs = _bind_account(user, state, userinfo, dic)
+            #if rs:
+            #    return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
+            #else:
+            #    return {"ret_code":30034, "message":"server error"}
         else:
             return {"ret_code":30033, "message":content}
     else:
