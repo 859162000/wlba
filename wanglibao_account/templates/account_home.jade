@@ -153,7 +153,7 @@ block main
                   td
                     if row.earning
                       p.highlight {{row.earning.amount | money_format}}
-                      p {{row.earning.product.activity.rule.name}}
+                      p {{row.earning.product.activity.name}}
                       p 满标后2个工作日内发放
                     else
                       | -
