@@ -112,11 +112,12 @@ html
                   span.span8-omega
                     span.highlight.font-m.invest#expected_income 0.00
                     | 元
-                    if user.is_authenticated
-                      if xunlei_vip.isvip == True
-                        span.font-m +
-                        span.blue.font-m#xunlei-vip-income-head 0.00
-                        |元
+                    if p2p.activity
+                      if user.is_authenticated
+                        if xunlei_vip.isvip == True
+                          span.font-m +
+                          span.blue.font-m#xunlei-vip-income-head 0.00
+                          |元
                 if p2p.activity
                   .row
                     span.span4
