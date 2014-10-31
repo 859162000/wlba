@@ -9,10 +9,6 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
 
-        # Adding field 'Earning.uuid'
-        db.add_column(u'wanglibao_p2p_earning', 'uuid',
-                      self.gf('django.db.models.fields.CharField')(default='wo7hjr_YTMSEirYGldp96A', unique=True, max_length=32, db_index=True),
-                      keep_default=False)
 
         # Adding field 'Earning.order'
         db.add_column(u'wanglibao_p2p_earning', 'order',
@@ -39,9 +35,6 @@ class Migration(SchemaMigration):
         db.alter_column(u'wanglibao_p2p_earning', 'product_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProduct'], null=True))
 
     def backwards(self, orm):
-
-        # Deleting field 'Earning.uuid'
-        db.delete_column(u'wanglibao_p2p_earning', 'uuid')
 
         # Deleting field 'Earning.order'
         db.delete_column(u'wanglibao_p2p_earning', 'order_id')
