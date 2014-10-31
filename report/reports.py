@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import DefaultStorage
 from report.crypto import ReportCrypto
 from report.models import Report
-from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PRecord
+from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PRecord, Earning
 from wanglibao_pay.models import PayInfo
 from django.utils import timezone
 from wanglibao_pay.util import get_a_uuid
@@ -338,6 +338,36 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
 
         return output.getvalue()
 
+
+class EearningReportGenerator(ReportGeneratorBase):
+    prefix = 'zsjljs'
+    reportname_format = u'赠送记录 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'用户姓名', u'用户手机号', u'p2p的id', u'p2p名',
+                         u'收益金额', u'订单号', u'交易流水id', u'是否打款', u'创建时间', u'更新时间', u'审核时间'])
+
+        earnings = Earning.objects.filter(create_time__gte=start_time, create_time__lt=end_time)
+
+        for index, earning in enumerate(earnings):
+            writer.writerow([
+                str(index + 1),
+                earning.user.wanglibaouserprofile.nick_name,
+                earning.user.wanglibaouserprofile.phone,
+                str(earning.product_id),
+                earning.product.short_name,
+                str(earning.amount),
+                str(earning.order_id),
+                str(earning.margin_record_id),
+                str(earning.paid),
+                timezone.localtime(earning.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                timezone.localtime(earning.update_time).strftime("%Y-%m-%d %H:%M:%S"),
+                timezone.localtime(earning.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
+            ])
+        return output.getvalue()
 
 class ReportGenerator(object):
 

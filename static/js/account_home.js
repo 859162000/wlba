@@ -5,11 +5,12 @@
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
       knockout: 'lib/knockout',
-      tools: 'lib/modal.tools'
+      tools: 'lib/modal.tools',
+      'jquery.modal': 'lib/jquery.modal.min'
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/jquery.number.min'], function($, _, ko, backend, templateLoader, portfolio, tool) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/jquery.number.min', 'lib/modal'], function($, _, ko, backend, templateLoader, portfolio, tool, modal) {
     var DataViewModel, viewModel;
     DataViewModel = (function() {
       function DataViewModel() {
@@ -87,7 +88,7 @@
     })();
     viewModel = new DataViewModel();
     ko.applyBindings(viewModel);
-    return backend.fundInfo().done(function(data) {
+    backend.fundInfo().done(function(data) {
       var totalAsset;
       totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"]);
       $("#total_asset").text($.number(totalAsset, 2));
@@ -104,6 +105,9 @@
           return location.reload();
         }
       });
+    });
+    return $(".xunlei-binding-modal").click(function() {
+      return $('#xunlei-binding-modal').modal();
     });
   });
 

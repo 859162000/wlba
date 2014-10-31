@@ -210,7 +210,7 @@ def add_bank_card(request):
         return {"ret_code":20024, "message":"该银行卡已经存在"}
 
     is_default = request.DATA.get("is_default", "false")
-    if is_default.lower() == "true":
+    if is_default.lower() in ("true", "1"):
         is_default = True
     else:
         is_default = False

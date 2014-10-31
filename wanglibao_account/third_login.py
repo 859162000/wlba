@@ -89,7 +89,7 @@ def login_back(args, user):
             #return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
             rs = _bind_account(user, state, userinfo, dic)
             if rs:
-                return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
+                return {"ret_code":0, "message":"ok", "data":userinfo, "url":"<script>location.href=" + settings.CALLBACK_HOST + "/accounts/home/;" + "</script>"}
             else:
                 return {"ret_code":30034, "message":"server error"}
         else:

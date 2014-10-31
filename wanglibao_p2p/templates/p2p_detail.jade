@@ -99,7 +99,7 @@ html
                 span.span8-omega
                   span.dark-gray.font-m {{orderable_amount|money_format_int}}元
               if orderable_amount > 0
-                .form-row.form-row__middle
+                .row
                   span.span4 投资金额
                   span.span8-omega
                     .row
@@ -115,7 +115,7 @@ html
                     if p2p.activity
                       if user.is_authenticated
                         if xunlei_vip.isvip == True
-                          span.font-m +
+                          span.font-m +&nbsp;
                           span.blue.font-m#xunlei-vip-income-head 0.00
                           |元
                 if p2p.activity
@@ -124,23 +124,25 @@ html
                     span.span8-omega.xunlei-vip-form-txt
                       if user.is_authenticated
                         if xunlei_vip.isvip == True
-                          span 迅雷活动返现
-                          span.blue#xunlei-vip-income 0.00
-                          |元，将在满标后2个工作日内，一次性发放
+                          span 您已绑定迅雷会员，将在满标2个工作日内，一次性获得
+                          span.blue.font-ss#xunlei-vip-income 0.00
+                          |元。
                         else
-                          span 现在
-                          a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 开通迅雷会员
-                          span ，还可享受额外
-                          span.blue#xunlei-vip-income 0.00
+                          a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 开通
+                          | &nbsp;并&nbsp;
+                          a.blue.xunlei-binding-modal(href="#xunlei-binding-modal") 绑定迅雷会员
+
+                          span ，还可额外享受
+                          span.blue.font-ss#xunlei-vip-income 0.00
                           |元的收益
-                          br
-                          span 已经是迅雷会员了？
-                          a.blue.xunlei-binding-modal(href="#xunlei-binding-modal") 现在就去绑定
+                          //br
+                          //span 还不是迅雷会员？
+                          //a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 现在去开通
                       else
                         span 现在
                         a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 开通迅雷会员
                         span ，还可享受额外
-                        span.blue#xunlei-vip-income 0.00
+                        span.blue.font-ss#xunlei-vip-income 0.00
                         |元的收益
 
                 .row.margin-top-s
