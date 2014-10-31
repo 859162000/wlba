@@ -86,6 +86,7 @@ def login_back(args, user):
             bindinfo.save()
             """
 
+            #return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
             rs = _bind_account(user, state, userinfo, dic)
             if rs:
                 return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
