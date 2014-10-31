@@ -112,7 +112,7 @@ class ActivityRule(models.Model):
 
     class Meta:
         ordering = ['-create_time']
-        verbose_name_plural = u'活动规则'
+        verbose_name_plural = u'返现活动规则'
 
     name = models.CharField(u'规则名称', max_length=128)
     description = models.TextField(u'规则描述')
@@ -138,7 +138,7 @@ class Activity(models.Model):
 
     class Meta:
         ordering = ['-create_time']
-        verbose_name_plural = u'活动'
+        verbose_name_plural = u'返现活动'
 
     name = models.CharField(u'活动名称', max_length=128)
     description = models.TextField(u'活动描述')
