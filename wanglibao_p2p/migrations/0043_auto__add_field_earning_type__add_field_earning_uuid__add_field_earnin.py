@@ -8,10 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Earning.type'
-        db.add_column(u'wanglibao_p2p_earning', 'type',
-                      self.gf('django.db.models.fields.CharField')(default='D', max_length=5),
-                      keep_default=False)
 
         # Adding field 'Earning.uuid'
         db.add_column(u'wanglibao_p2p_earning', 'uuid',
@@ -43,8 +39,6 @@ class Migration(SchemaMigration):
         db.alter_column(u'wanglibao_p2p_earning', 'product_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProduct'], null=True))
 
     def backwards(self, orm):
-        # Deleting field 'Earning.type'
-        db.delete_column(u'wanglibao_p2p_earning', 'type')
 
         # Deleting field 'Earning.uuid'
         db.delete_column(u'wanglibao_p2p_earning', 'uuid')
