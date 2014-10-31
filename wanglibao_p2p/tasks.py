@@ -30,7 +30,7 @@ def build_earning(product_id):
 
     #把收益数据插入earning表内
     for obj in earning:
-        bind = Binding.objects.get(user=obj.get('user'))
+        bind = Binding.objects.get(user_id=obj.get('user'))
         if bind and bind.isvip:
             amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
             value_list.append(((p2p.pk, obj.get('user'), amount, datetime.now(), 0)))

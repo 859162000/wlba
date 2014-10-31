@@ -223,12 +223,36 @@ class AuditProductView(TemplateView):
         ProductKeeper(p2p).audit(request.user)
 
         if p2p.activity:
-            from celery.execute import send_task
-            send_task("wanglibao_p2p.tasks.build_earning", kwargs={
-                "product_id": 3
-            })
+            # from celery.execute import send_task
+            # send_task("wanglibao_p2p.tasks.build_earning", kwargs={
+            #     "product_id": 3
+            # })
+
+            #p2p = P2PProduct.objects.select_related('activity__rule').get(pk=product_id)
+
+            from django.db.models import connection
+            from datetime import datetime
+            #按用户汇总某个标的收益
+            earning = P2PRecord.objects.values('user').annotate(sum_amount=Sum('amount')).filter(product=p2p, catalog=u'申购')
+
+            value_list = []
+            rule = p2p.activity.rule
+
+            #把收益数据插入earning表内
+            for obj in earning:
+                bind = Binding.objects.get(user_id=obj.get('user'))
+                if bind and bind.isvip:
+                    amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
+                    value_list.append(((p2p.pk, obj.get('user'), amount, datetime.now(), 0)))
 
 
+            cursor = connection.cursor()
+            cursor.executemany("""insert into wanglibao_p2p_earning (product_id, user_id,amount, create_time,paid) values (%s, %s, %s, %s, %s)""", value_list)
+
+
+        # from django.contrib.auth.models import User
+        # bind = Binding.objects.get(user=User.objects.get(pk=25))
+        # print bind.isvip, '$$$$$$$$$$$$$'
 
         return HttpResponseRedirect('/'+settings.ADMIN_ADDRESS+'/wanglibao_p2p/p2pproduct/')
 
