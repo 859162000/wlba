@@ -10,11 +10,14 @@ from django.utils import timezone
 #from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 import reversion
+from order.models import Order
 from wanglibao.fields import JSONFieldUtf8
 from wanglibao.models import ProductBase
 from utility import gen_hash_list
+from wanglibao_margin.models import MarginRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from marketing.models import Activity
+from wanglibao_pay.util import get_a_uuid
 
 logger = logging.getLogger(__name__)
 
@@ -551,9 +554,23 @@ post_save.connect(post_save_process, sender=P2PProduct, dispatch_uid="generate_a
 #datetime: 2014.10.27
 #description: 市场活动收益
 class Earning(models.Model):
-    product = models.ForeignKey(P2PProduct, help_text=u'投资标的')
+    #满标直接送
+    DIRECT = 'D'
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'赠送记录'
+    type = models.CharField(u'类型', help_text=u'满标直接送：D', max_length=5)
+    uuid = models.CharField(u'唯一标示', max_length=32, unique=True, db_index=True, default=get_a_uuid)
+    product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True)
     amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=8, default=0)
+
+    order = models.ForeignKey(Order, blank=True, null=True)
+    margin_record = models.ForeignKey(MarginRecord, blank=True, null=True)
 
     user = models.ForeignKey(User, help_text=u'投资用户')
     paid = models.BooleanField(u'已打款', default=False)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    update_time = models.DateTimeField(u'更新时间', auto_now=True)
+    confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
+

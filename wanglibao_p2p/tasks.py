@@ -1,12 +1,19 @@
 # encoding:utf-8
+from django.forms import model_to_dict
+from order.models import Order
+from order.utils import OrderHelper
 
 from wanglibao.celery import app
-from wanglibao_p2p.models import P2PProduct, P2PRecord
+from wanglibao_margin.marginkeeper import MarginKeeper
+from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning
 from wanglibao_account.models import Binding
 from wanglibao_p2p.trade import P2POperator
 from django.db.models import Sum, connection
 from datetime import datetime
+from django.contrib.auth.models import User
 import os
+
+
 
 @app.task
 def p2p_watchdog():
@@ -38,9 +45,21 @@ def build_earning(product_id):
 
         bind = Binding.objects.get(user_id=obj.get('user'))
         if bind and bind.isvip:
+            earning = Earning()
             amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
-            value_list.append(((p2p.pk, obj.get('user'), amount, datetime.now(), 0)))
+            earning.amount = amount
+            earning.type = 'D'
+            earning.product = p2p
+            user = User.objects.get(pk=obj.get('user'))
+            order = OrderHelper.place_order(user, Order.ACTIVITY, u"活动赠送",
+                                            earning = model_to_dict(earning))
+            earning.order = order
+
+            keeper = MarginKeeper(user, order.pk)
+            earning.margin_record = keeper.deposit(amount)
+            earning.save()
+            #value_list.append(((p2p.pk, obj.get('user'), amount, datetime.now(), 0)))
 
 
-    cursor = connection.cursor()
-    cursor.executemany("""insert into wanglibao_p2p_earning (product_id, user_id,amount, create_time,paid) values (%s, %s, %s, %s, %s)""", value_list)
+    #cursor = connection.cursor()
+    #cursor.executemany("""insert into wanglibao_p2p_earning (product_id, user_id,amount, create_time,paid) values (%s, %s, %s, %s, %s)""", value_list)
