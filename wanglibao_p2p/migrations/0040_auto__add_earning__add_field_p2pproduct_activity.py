@@ -25,9 +25,9 @@ class Migration(SchemaMigration):
         db.send_create_signal(u'wanglibao_p2p', ['Earning'])
 
         # Adding field 'P2PProduct.activity'
-        db.add_column(u'wanglibao_p2p_p2pproduct', 'activity',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.Activity'], null=True, on_delete=models.SET_NULL, blank=True),
-                      keep_default=False)
+        #db.add_column(u'wanglibao_p2p_p2pproduct', 'activity',
+        #              self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.Activity'], null=True, on_delete=models.SET_NULL, blank=True),
+        #             keep_default=False)
 
 
     def backwards(self, orm):
@@ -35,7 +35,7 @@ class Migration(SchemaMigration):
         db.delete_table(u'wanglibao_p2p_earning')
 
         # Deleting field 'P2PProduct.activity'
-        db.delete_column(u'wanglibao_p2p_p2pproduct', 'activity_id')
+        #db.delete_column(u'wanglibao_p2p_p2pproduct', 'activity_id')
 
 
     models = {
