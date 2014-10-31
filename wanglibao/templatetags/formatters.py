@@ -140,7 +140,7 @@ def safe_id(id_number):
     Show part of id_number
     """
 
-    result = id_number[:-4] + '*' * 4
+    result = id_number[:-12] + '*' * 12
 
     return result
 
