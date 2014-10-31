@@ -742,7 +742,8 @@ class Third_login_back(View):
         result = third_login.login_back(request.GET, request.user)
         if result['ret_code']:
             return HttpResponse(result['message'])
-        return HttpResponseRedirect(result['url'])
+        return HttpResponse(result['url'])
+        #return HttpResponseRedirect(result['url'])
 
 class ChangePasswordAPIView(APIView):
     permission_classes = (IsAuthenticated, )
