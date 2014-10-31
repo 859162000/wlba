@@ -6,7 +6,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.contrib import messages
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
-    PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator
+    PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator, EearningReportGenerator
 import logging
 
 type = (
@@ -15,7 +15,8 @@ type = (
     (u'产品流水', 2),
     (u'产品还款', 3),
     (u'用户还款', 4),
-    (u'满标复审', 5)
+    (u'满标复审', 5),
+    (u'赠送记录', 6)
 )
 
 class AdminReportExport(TemplateView):
@@ -25,8 +26,8 @@ class AdminReportExport(TemplateView):
         today = timezone.datetime.today()
         yestoday = timezone.datetime.today() - timezone.timedelta(days=2)
         return {
-            'yestoday': yestoday.strftime("%Y-%m-%d"),
-            'today': today.strftime("%Y-%m-%d"),
+            'yestoday': yestoday.strftime("%Y-%m-%d %H:%M:%S"),
+            'today': today.strftime("%Y-%m-%d %H:%M:%S"),
             'type': type
         }
 
@@ -47,6 +48,8 @@ class AdminReportExport(TemplateView):
             self._generate_user_amortizations(request, start_time, end_time)
         if type == '5':
             self._generate_p2paudit(request, start_time, end_time)
+        if type == '6':
+            self._generate_earning(request, start_time, end_time)
 
         return HttpResponseRedirect('export')
 
@@ -67,6 +70,9 @@ class AdminReportExport(TemplateView):
 
     def _generate_p2paudit(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, P2PAuditReportGenerator, u'满标复审')
+
+    def _generate_earning(self, request, start_time, end_time):
+        self._apply_generate(request, start_time, end_time, EearningReportGenerator, u'赠送记录')
 
     def _apply_generate(self, request, start_time, end_time, cls, message=''):
         try:
