@@ -68,5 +68,5 @@ def build_earning(product_id):
             #发送活动赠送短信
             send_messages.apply_async(kwargs={
                             "phones": [user.wanglibaouserprofile.phone],
-                            "messages": [messages.earning_message(p2p.name, p2p.activity.name, amount)]
+                            "messages": [messages.earning_message(amount)]
                         })

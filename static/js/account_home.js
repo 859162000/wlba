@@ -11,7 +11,7 @@
   });
 
   require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/jquery.number.min', 'lib/modal'], function($, _, ko, backend, templateLoader, portfolio, tool, modal) {
-    var DataViewModel, viewModel;
+    var DataViewModel, isXunleiBindSuccess, viewModel;
     DataViewModel = (function() {
       function DataViewModel() {
         var self;
@@ -106,11 +106,32 @@
         }
       });
     });
-    return $(".xunlei-binding-modal").click(function() {
+    $(".xunlei-binding-modal").click(function() {
       return $('#xunlei-binding-modal').modal();
     });
+    isXunleiBindSuccess = function() {
+      var result;
+      result = /[\?|&]result=(\w+)$|(&|#)/ig.exec(window.location.href);
+      if (result) {
+        if (result[1] === 'ok') {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: '抱歉您还不是迅雷付费会员，不能享受额外收益。<br/>请开通迅雷付费会员后，再绑定一次，即可享受额外收益。'
+          });
+        } else if (result[1] === 'vip') {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: '恭喜！迅雷付费会员绑定成功，投资指定标的后可享受额外收益。'
+          });
+        } else {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: '迅雷帐号绑定失败，请再试一次'
+          });
+        }
+      }
+    };
+    return isXunleiBindSuccess();
   });
 
 }).call(this);
-
-//# sourceMappingURL=account_home.map
