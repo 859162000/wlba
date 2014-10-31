@@ -452,7 +452,7 @@ class FinancesAPI(APIView):
 
         p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
             u'正在招标', u'还款中', u'已完成'
-        ])
+        ]).order_by("-priority")
 
         p2p_list = []
         status = 0
