@@ -562,7 +562,7 @@ class Earning(models.Model):
         verbose_name_plural = u'赠送记录'
     type = models.CharField(u'类型', help_text=u'满标直接送：D', max_length=5, default='D')
     product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True, default=None)
-    amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=8, default=0)
+    amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=2, default=0)
 
     order = models.ForeignKey(Order, blank=True, null=True)
     margin_record = models.ForeignKey(MarginRecord, blank=True, null=True)
