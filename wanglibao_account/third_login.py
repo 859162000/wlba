@@ -90,11 +90,12 @@ def login_back(request):
             bindinfo.save()
             """
 
-            #return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
             rs = _bind_account(user, state, userinfo, dic)
             if rs:
-                #return {"ret_code":0, "message":"ok", "data":userinfo, "url":"<script>location.href=" + settings.CALLBACK_HOST + "/accounts/home/;" + "</script>"}
-                return {"ret_code":0, "message":"ok", "data":userinfo, "url":location + "ok"}
+                if str(userinfo['isvip']) == "0":
+                    return {"ret_code":0, "message":"ok", "data":userinfo, "url":location + "ok"}
+                else:
+                    return {"ret_code":0, "message":"ok", "data":userinfo, "url":location + "vip"}
             else:
                 return {"ret_code":30034, "message":"server error", "url":location + "false"}
         else:
