@@ -64,3 +64,7 @@ def gift_invited(inviter_phone, money):
 @suffix
 def rand_pass(password):
     return u'感谢注册网利宝，您的初始密码是%s，请登录wanglibao.com修改密码。' % password
+
+@suffix
+def earning_message(p2p_name, activity_name, amount):
+    return u'感谢您购买%s,%s赠送您%s' % (p2p_name, activity_name, amount)

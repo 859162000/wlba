@@ -12,6 +12,8 @@ from django.db.models import Sum, connection
 from datetime import datetime
 from django.contrib.auth.models import User
 import os
+from wanglibao_sms import messages
+from wanglibao_sms.tasks import send_messages
 
 
 
@@ -35,7 +37,7 @@ def build_earning(product_id):
     #按用户汇总某个标的收益
     earning = P2PRecord.objects.values('user').annotate(sum_amount=Sum('amount')).filter(product=p2p, catalog=u'申购')
 
-    value_list = []
+    phone_list = []
     rule = p2p.activity.rule
 
 
@@ -56,10 +58,15 @@ def build_earning(product_id):
             earning.order = order
 
             keeper = MarginKeeper(user, order.pk)
-            earning.margin_record = keeper.deposit(amount)
+
+            #赠送活动描述
+            desc = u'%s,%s赠送%s%s' % (p2p.name, p2p.activity.name, p2p.activity.rule.rule_amount*100, '%')
+            earning.margin_record = keeper.deposit(amount,description=desc)
+            earning.user = user
             earning.save()
-            #value_list.append(((p2p.pk, obj.get('user'), amount, datetime.now(), 0)))
 
-
-    #cursor = connection.cursor()
-    #cursor.executemany("""insert into wanglibao_p2p_earning (product_id, user_id,amount, create_time,paid) values (%s, %s, %s, %s, %s)""", value_list)
+            #发送活动赠送短信
+            send_messages.apply_async(kwargs={
+                            "phones": user.wanglibaouserprofile.phone,
+                            "messages": [messages.earning_message(p2p.name, p2p.activity.name, amount)]
+                        })
