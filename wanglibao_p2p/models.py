@@ -560,9 +560,9 @@ class Earning(models.Model):
     class Meta:
         ordering = ['-create_time']
         verbose_name_plural = u'赠送记录'
-    type = models.CharField(u'类型', help_text=u'满标直接送：D', max_length=5)
+    type = models.CharField(u'类型', help_text=u'满标直接送：D', max_length=5, default='D')
     uuid = models.CharField(u'唯一标示', max_length=32, unique=True, db_index=True, default=get_a_uuid)
-    product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True)
+    product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True, default=None)
     amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=8, default=0)
 
     order = models.ForeignKey(Order, blank=True, null=True)
@@ -571,6 +571,6 @@ class Earning(models.Model):
     user = models.ForeignKey(User, help_text=u'投资用户')
     paid = models.BooleanField(u'已打款', default=False)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
-    update_time = models.DateTimeField(u'更新时间', auto_now=True)
+    update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
     confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
 
