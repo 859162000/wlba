@@ -103,19 +103,19 @@ html
                       else
                         span &nbsp;&nbsp; {{percent | percentage}}
 
-                    .span4.align-left
+                    .span5.align-left
                       if product.category == '证大速贷'
                         span 本息保障: &nbsp;&nbsp;
                       else
                         span 担保机构: &nbsp;&nbsp;
 
                       span.d3-text {{product.warrant_company.name}}
-                    .span4-omega.align-right
+                    .span3-omega.align-right
                       span 还款方式: &nbsp;&nbsp;
                       span.d3-text {{product.display_payback_method}}
                 if status == '还款中' or status == '已完成'
                   .panel-p2p-stamp
-            .space-vertical-xl
+            .space-vertical-sm
           .row
             - with data=p2p_products uri='/p2p/list/'
             include include/pager

@@ -4,11 +4,13 @@ require.config(
     underscore: 'lib/underscore-min'
     knockout: 'lib/knockout'
     tools: 'lib/modal.tools'
+    'jquery.modal': 'lib/jquery.modal.min'
 )
 
 require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
-         'model/portfolio', 'tools', 'lib/jquery.number.min'], ($, _, ko, backend, templateLoader, portfolio, tool)->
+         'model/portfolio', 'tools', 'lib/jquery.number.min',
+         'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
   class DataViewModel
     constructor: ->
       self = this
@@ -90,4 +92,5 @@ require ['jquery', 'underscore', 'knockout',
           })
     return
 
-
+  $(".xunlei-binding-modal").click () ->
+    $('#xunlei-binding-modal').modal()

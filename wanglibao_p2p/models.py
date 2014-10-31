@@ -561,7 +561,6 @@ class Earning(models.Model):
         ordering = ['-create_time']
         verbose_name_plural = u'赠送记录'
     type = models.CharField(u'类型', help_text=u'满标直接送：D', max_length=5, default='D')
-    uuid = models.CharField(u'唯一标示', max_length=32, unique=True, db_index=True, default=get_a_uuid)
     product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True, default=None)
     amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=8, default=0)
 
