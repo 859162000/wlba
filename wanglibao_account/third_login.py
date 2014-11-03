@@ -19,23 +19,11 @@ def assem_params(login_type, request):
         uri = "/platform?"
         params = {"client_id":partner[login_type]["client_id"],
                 "grant_type":"code","wap":0,
-                "redirect_uri":settings.CALLBACK_HOST+"/accounts/login/callback/",
+                "redirect_uri":settings.CALLBACK_HOST+"/accounts/home/",
                 "state":login_type}
         return partner[login_type]['api'] + uri + urllib.urlencode(params)
     else:
         return settings.LOGIN_REDIRECT_URL
-
-def login_back2(request):
-    args = request.GET
-    user = request.user
-
-    ret = args.get("ret", "")
-    code = args.get("code", "")
-    state = args.get("state", "")
-    if ret != "0" or not code or not state:
-        return {"ret_code":30031, "message":"parameter error"}
-    url = settings.CALLBACK_HOST+"/accounts/login/callback2/?ret=%s&code=%s&state=%s" % (ret, code, state)
-    return {"ret_code":0, "message":"ok", "url":url}
 
 def login_back(request):
     args = request.GET
