@@ -33,6 +33,7 @@ def login_back(request):
     ret = args.get("ret", "")
     code = args.get("code", "")
     state = args.get("state", "")
+    location = "/accounts/home/?result="
     if ret != "0" or not code or not state:
         return {"ret_code":30031, "message":"parameter error", "url":location + "false"}
 
