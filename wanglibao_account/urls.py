@@ -7,7 +7,7 @@ from forms import EmailOrPhoneAuthenticationForm
 from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome,
     				AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView, AccountTransactionDeposit,
 				    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
-					Third_login, Third_login_back, IntroduceRelation)
+					Third_login, Third_login_back, IntroduceRelation,)
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
