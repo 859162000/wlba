@@ -33,7 +33,6 @@ def login_back(request):
     ret = args.get("ret", "")
     code = args.get("code", "")
     state = args.get("state", "")
-    location = "/accounts/home/?result="
     if ret != "0" or not code or not state:
         return {"ret_code":30031, "message":"parameter error", "url":location + "false"}
 
@@ -93,6 +92,9 @@ def login_back(request):
 
             rs = _bind_account(user, state, userinfo, dic)
             if rs:
+                if rs == "exist":
+                    return {"ret_code":30035, "message":"bind related exist", "data":userinfo, "url":location + "false"}
+
                 if str(userinfo['isvip']) == "0":
                     return {"ret_code":0, "isvip":0, "message":"ok", "data":userinfo, "url":location + "ok"}
                 else:
@@ -155,7 +157,7 @@ def _bind_account(user, state, userinfo, dic):
     bindinfo = Binding.objects.filter(bid=userinfo['uid']).filter(btype=state).first()
     if bindinfo:
         if bindinfo.user != user:
-            return True
+            return "exist"
     else:
         bindinfo = Binding()
         bindinfo.user = user
