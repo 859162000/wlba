@@ -25,7 +25,7 @@ def assem_params(login_type, request):
     else:
         return settings.LOGIN_REDIRECT_URL
 
-def login_back(request):
+def login_back2(request):
     args = request.GET
     user = request.user
 
@@ -37,7 +37,7 @@ def login_back(request):
     url = settings.CALLBACK_HOST+"/accounts/login/callback2/?ret=%s&code=%s&state=%s" % (ret, code, state)
     return {"ret_code":0, "message":"ok", "url":url}
 
-def login_back2(request):
+def login_back(request):
     args = request.GET
     user = request.user
     location = "/accounts/home/?result="
