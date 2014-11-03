@@ -38,6 +38,7 @@ def login_back2(request):
     return {"ret_code":0, "message":"ok", "url":url}
 
 def login_back(request):
+    return "sadfasfasdf"
     args = request.GET
     user = request.user
     location = "/accounts/home/?result="

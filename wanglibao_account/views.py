@@ -740,7 +740,7 @@ class Third_login(View):
 class Third_login_back(View):
     def get(self, request):
         result = third_login.login_back(request)
-        return HttpResponse(result['url'])
+        return HttpResponse(result)
         return HttpResponseRedirect(result['url'])
 
 class ChangePasswordAPIView(APIView):
