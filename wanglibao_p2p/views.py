@@ -574,12 +574,12 @@ class P2PListView(TemplateView):
     def get_context_data(self, **kwargs):
 
         p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status= u'正在招标').order_by('-publish_time')
-        print p2p_done
+            .filter(status= u'正在招标').exclude(id=46).exclude(id=47).order_by('-publish_time')
+
         p2p_others = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
             status__in=[
                 u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
-            ]).order_by('-soldout_time')
+            ]).exclude(id=46).exclude(id=47).order_by('-soldout_time')
 
         show_slider = False
         if p2p_done:
