@@ -739,6 +739,7 @@ class Third_login(View):
 
 class Third_login_back(View):
     def get(self, request):
+        return HttpResponse('message')
         result = third_login.login_back(request)
         return HttpResponse(result['message'])
         #if result['ret_code']:
