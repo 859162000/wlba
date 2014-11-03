@@ -28,6 +28,17 @@ def assem_params(login_type, request):
 def login_back(request):
     args = request.GET
     user = request.user
+
+    ret = args.get("ret", "")
+    code = args.get("code", "")
+    state = args.get("state", "")
+    if ret != "0" or not code or not state:
+        return {"ret_code":30031, "message":"parameter error"}
+    return {"ret_code":0, "message":"ok", "url":settings.CALLBACK_HOST+"/accounts/login/callback2/"}
+
+def login_back2(request):
+    args = request.GET
+    user = request.user
     location = "/accounts/home/?result="
 
     ret = args.get("ret", "")
