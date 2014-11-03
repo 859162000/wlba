@@ -112,7 +112,6 @@
     isXunleiBindSuccess = function() {
       var result;
       result = backend.getRequest();
-      debugger;
       if (!result['ret'] || !result['code'] || !result['state']) {
         return;
       }
@@ -139,6 +138,14 @@
               }
             });
           }
+        } else if (data.ret_code === 30035) {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: '绑定失败。你使用的迅雷帐号已被绑定，请换一个帐号再试。',
+            callback_ok: function() {
+              return window.location.href = "/accounts/home/";
+            }
+          });
         } else {
           return tool.modalAlert({
             title: '温馨提示',

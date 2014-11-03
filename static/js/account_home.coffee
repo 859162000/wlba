@@ -97,7 +97,6 @@ require ['jquery', 'underscore', 'knockout',
 
   isXunleiBindSuccess = () ->
     result = backend.getRequest()
-    debugger
     if !result['ret'] || !result['code'] || !result['state']
       return
     backend.registerXunlei {
@@ -115,15 +114,13 @@ require ['jquery', 'underscore', 'knockout',
           tool.modalAlert({title: '温馨提示', msg: '恭喜！迅雷付费会员绑定成功，投资指定标的后可享受额外收益。', callback_ok: ()->
             window.location.href = "/accounts/home/"
           })
+      else if data.ret_code == 30035
+        tool.modalAlert({title: '温馨提示', msg: '绑定失败。你使用的迅雷帐号已被绑定，请换一个帐号再试。', callback_ok: ()->
+            window.location.href = "/accounts/home/"
+          })
       else
         tool.modalAlert({title: '温馨提示', msg: '迅雷帐号绑定失败，请再试一次'})
-    #if result
-    #  if result[1] == 'ok'
-    #    tool.modalAlert({title: '温馨提示', msg: '抱歉您还不是迅雷付费会员，不能享受额外收益。<br/>请开通迅雷付费会员后，再绑定一次，即可享受额外收益。'})
-    #  else if result[1] == 'vip'
-    #    tool.modalAlert({title: '温馨提示', msg: '恭喜！迅雷付费会员绑定成功，投资指定标的后可享受额外收益。'})
-    #  else
-    #    tool.modalAlert({title: '温馨提示', msg: '迅雷帐号绑定失败，请再试一次'})
+
 
   isXunleiBindSuccess()
 
