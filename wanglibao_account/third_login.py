@@ -28,6 +28,7 @@ def assem_params(login_type, request):
 def login_back(request):
     args = request.GET
     user = request.user
+    location = "/accounts/home/?result="
 
     ret = args.get("ret", "")
     code = args.get("code", "")
@@ -35,7 +36,6 @@ def login_back(request):
     if ret != "0" or not code or not state:
         return {"ret_code":30031, "message":"parameter error", "url":location + "false"}
 
-    location = "/accounts/home/?result="
     if state == "xunlei":
         uri = "/auth2/token?"
         params = {"grant_type":"authorization_code", "code":code,
