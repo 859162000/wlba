@@ -329,11 +329,11 @@ class P2PProductViewSet(PaginatedModelViewSet):
         if pager:
             return qs.filter(hide=False).filter(status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-                ]).filter(pager).order_by('-priority')
+                ]).filter(pager).exclude(id=46).exclude(id=47).order_by('-priority')
         else:
             return qs.filter(hide=False).filter(status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-                ]).order_by('-priority')
+                ]).exclude(id=46).exclude(id=47).order_by('-priority')
 
 
 class P2PProductListView(generics.ListCreateAPIView):
