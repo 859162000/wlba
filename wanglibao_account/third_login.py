@@ -19,23 +19,11 @@ def assem_params(login_type, request):
         uri = "/platform?"
         params = {"client_id":partner[login_type]["client_id"],
                 "grant_type":"code","wap":0,
-                "redirect_uri":settings.CALLBACK_HOST+"/accounts/login/callback/",
+                "redirect_uri":settings.CALLBACK_HOST+"/accounts/home/",
                 "state":login_type}
         return partner[login_type]['api'] + uri + urllib.urlencode(params)
     else:
         return settings.LOGIN_REDIRECT_URL
-
-def login_back2(request):
-    args = request.GET
-    user = request.user
-
-    ret = args.get("ret", "")
-    code = args.get("code", "")
-    state = args.get("state", "")
-    if ret != "0" or not code or not state:
-        return {"ret_code":30031, "message":"parameter error"}
-    url = settings.CALLBACK_HOST+"/accounts/login/callback2/?ret=%s&code=%s&state=%s" % (ret, code, state)
-    return {"ret_code":0, "message":"ok", "url":url}
 
 def login_back(request):
     args = request.GET
@@ -104,10 +92,13 @@ def login_back(request):
 
             rs = _bind_account(user, state, userinfo, dic)
             if rs:
+                if rs == "exist":
+                    return {"ret_code":30035, "message":"bind related exist", "data":userinfo, "url":location + "false"}
+
                 if str(userinfo['isvip']) == "0":
-                    return {"ret_code":0, "message":"ok", "data":userinfo, "url":location + "ok"}
+                    return {"ret_code":0, "isvip":0, "message":"ok", "data":userinfo, "url":location + "ok"}
                 else:
-                    return {"ret_code":0, "message":"ok", "data":userinfo, "url":location + "vip"}
+                    return {"ret_code":0, "isvip":1, "message":"ok", "data":userinfo, "url":location + "vip"}
             else:
                 return {"ret_code":30034, "message":"server error", "url":location + "false"}
         else:
@@ -166,7 +157,7 @@ def _bind_account(user, state, userinfo, dic):
     bindinfo = Binding.objects.filter(bid=userinfo['uid']).filter(btype=state).first()
     if bindinfo:
         if bindinfo.user != user:
-            return True
+            return "exist"
     else:
         bindinfo = Binding()
         bindinfo.user = user
