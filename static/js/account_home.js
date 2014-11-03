@@ -111,25 +111,41 @@
     });
     isXunleiBindSuccess = function() {
       var result;
-      result = /[\?|&]result=(\w+)$|&/ig.exec(window.location.href);
-      if (result) {
-        if (result[1] === 'ok') {
-          return tool.modalAlert({
-            title: '温馨提示',
-            msg: '抱歉您还不是迅雷付费会员，不能享受额外收益。<br/>请开通迅雷付费会员后，再绑定一次，即可享受额外收益。'
-          });
-        } else if (result[1] === 'vip') {
-          return tool.modalAlert({
-            title: '温馨提示',
-            msg: '恭喜！迅雷付费会员绑定成功，投资指定标的后可享受额外收益。'
-          });
+      result = backend.getRequest();
+      debugger;
+      if (!result['ret'] || !result['code'] || !result['state']) {
+        return;
+      }
+      return backend.registerXunlei({
+        "ret": result['ret'],
+        "code": result['code'],
+        "state": result['state']
+      }).done(function(data) {
+        if (data.ret_code === 0) {
+          if (data.isvip === 0) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: '抱歉您还不是迅雷付费会员，不能享受额外收益。<br/>请开通迅雷付费会员后，再绑定一次，即可享受额外收益。',
+              callback_ok: function() {
+                return window.location.href = "/accounts/home/";
+              }
+            });
+          } else {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: '恭喜！迅雷付费会员绑定成功，投资指定标的后可享受额外收益。',
+              callback_ok: function() {
+                return window.location.href = "/accounts/home/";
+              }
+            });
+          }
         } else {
           return tool.modalAlert({
             title: '温馨提示',
             msg: '迅雷帐号绑定失败，请再试一次'
           });
         }
-      }
+      });
     };
     return isXunleiBindSuccess();
   });

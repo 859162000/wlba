@@ -259,6 +259,9 @@ define ['jquery'], ($)->
   registerWap = (data)->
     $.post '/api/register/wx/', data
 
+  registerXunlei = (data)->
+    $.get '/accounts/login/callback/', data
+
   #var Request = new Object();
   #Request = GetRequest();
   #var 参数1,参数2,参数3,参数N;
@@ -303,4 +306,5 @@ define ['jquery'], ($)->
     checkCardNo: checkCardNo
     registerWap: registerWap
     getRequest:getRequest
+    registerXunlei:registerXunlei
   }
