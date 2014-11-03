@@ -105,9 +105,9 @@ def login_back(request):
             rs = _bind_account(user, state, userinfo, dic)
             if rs:
                 if str(userinfo['isvip']) == "0":
-                    return {"ret_code":0, "isvip":"0", "message":"ok", "data":userinfo, "url":location + "ok"}
+                    return {"ret_code":0, "isvip":0, "message":"ok", "data":userinfo, "url":location + "ok"}
                 else:
-                    return {"ret_code":0, "isvip":"1", "message":"ok", "data":userinfo, "url":location + "vip"}
+                    return {"ret_code":0, "isvip":1, "message":"ok", "data":userinfo, "url":location + "vip"}
             else:
                 return {"ret_code":30034, "message":"server error", "url":location + "false"}
         else:
