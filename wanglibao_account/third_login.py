@@ -34,7 +34,8 @@ def login_back(request):
     state = args.get("state", "")
     if ret != "0" or not code or not state:
         return {"ret_code":30031, "message":"parameter error"}
-    return {"ret_code":0, "message":"ok", "url":settings.CALLBACK_HOST+"/accounts/login/callback2/"}
+    url = settings.CALLBACK_HOST+"/accounts/login/callback2/?ret=%s&code=%s&state=%s" % (ret, code, state)
+    return {"ret_code":0, "message":"ok", "url":url}
 
 def login_back2(request):
     args = request.GET
