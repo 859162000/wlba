@@ -732,17 +732,16 @@ class ResetPasswordAPI(APIView):
         else:
             return Response({'ret_code':30004, 'message':u'验证码验证失败'})
 
-class Third_login(APIView):
-    permission_classes = ()
+class Third_login(View):
     def get(self, request, login_type):
         url = third_login.assem_params(login_type, request)
         return HttpResponseRedirect(url)
 
-class Third_login_back(APIView):
-    permission_classes = ()
+class Third_login_back(View):
     def get(self, request):
         result = third_login.login_back(request)
-        return HttpResponseRedirect(result['url'])
+        return HttpResponse(result)
+        #return HttpResponseRedirect(result['url'])
 
 class ChangePasswordAPIView(APIView):
     permission_classes = (IsAuthenticated, )
