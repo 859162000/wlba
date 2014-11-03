@@ -15,17 +15,19 @@ from django.views.generic import TemplateView, View
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from order.models import Order
 from order.utils import OrderHelper
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_pay.models import Bank, Card, PayResult
+from wanglibao_pay.models import Bank, Card, PayResult, PayInfo
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
-from wanglibao_pay.models import PayInfo
+from wanglibao_pay.lianlian_pay import LianlianPay
+from wanglibao_pay import lianlian_pay
 from wanglibao_p2p.models import P2PRecord
 import decimal
-from rest_framework.response import Response
-from rest_framework.throttling import UserRateThrottle
 from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -33,6 +35,8 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
+from django.conf import settings
+from wanglibao_announcement.utility import AnnouncementAccounts
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -48,7 +52,8 @@ class BankListView(TemplateView):
 
         context.update({
             'default_bank': default_bank,
-            'banks': Bank.get_deposit_banks()[:12]
+            'banks': Bank.get_deposit_banks()[:12],
+            'announcements': AnnouncementAccounts
         })
         return context
 
@@ -167,7 +172,8 @@ class WithdrawView(TemplateView):
             'banks': banks,
             'user_profile': self.request.user.wanglibaouserprofile,
             'margin': self.request.user.margin.margin,
-            'fee': HuifuPay.FEE
+            'fee': HuifuPay.FEE,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -301,9 +307,8 @@ class CardViewSet(ModelViewSet):
 
         bank_id = request.DATA.get('bank', '')
 
-        try:
-            Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
-        except:
+        exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
+        if exist_cards:
             return Response({
                 "message": u"该银行卡已经存在",
                 'error_number': ErrorNumber.duplicate
@@ -370,6 +375,7 @@ class WithdrawTransactions(TemplateView):
                     marginKeeper = MarginKeeper(payinfo.user)
                     marginKeeper.withdraw_ack(payinfo.amount)
                     payinfo.status = PayInfo.SUCCESS
+                    payinfo.confirm_time = timezone.now()
                     payinfo.save()
 
             return HttpResponse({
@@ -401,6 +407,7 @@ class WithdrawRollback(TemplateView):
         marginKeeper.withdraw_rollback(payinfo.amount,error_message)
         payinfo.status = PayInfo.FAIL
         payinfo.error_message = error_message
+        payinfo.confirm_time = None
         payinfo.save()
 
         send_messages.apply_async(kwargs={
@@ -459,7 +466,7 @@ class AdminTransactionP2P(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
@@ -504,7 +511,7 @@ class AdminTransactionWithdraw(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
@@ -547,7 +554,7 @@ class AdminTransactionDeposit(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
@@ -555,3 +562,64 @@ class AdminTransactionDeposit(TemplateView):
         return super(AdminTransactionDeposit, self).dispatch(request, *args, **kwargs)
 
 
+#连连支付IOS生成订单
+class LianlianAppPayView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        lianpay = LianlianPay()
+        result = lianpay.ios_pay(request)
+        return Response(result)
+
+#连连支付IOS支付成功回调
+class LianlianAppPayCallbackView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        lianpay = LianlianPay()
+        result = lianpay.ios_pay_callback(request)
+        if not result['ret_code']:
+            result['ret_code'] = "0000"
+            result['ret_msg'] = "SUCCESS"
+        return Response(result)
+
+class BankCardAddView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = lianlian_pay.add_bank_card(request)
+        return Response(result)
+
+class BankCardListView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = lianlian_pay.list_bank_card(request)
+        return Response(result)
+
+class BankCardDelView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = lianlian_pay.del_bank_card(request)
+        return Response(result)
+
+class BankListAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = lianlian_pay.list_bank(request)
+        return Response(result)
+
+class LianlianWithdrawAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        lianpay = LianlianPay()
+        result = lianpay.ios_withdraw(request)
+        if not result['ret_code']:
+            send_messages.apply_async(kwargs={
+                'phones': [result['phone']],
+                'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
+            })
+        return Response(result)

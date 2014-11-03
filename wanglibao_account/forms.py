@@ -9,6 +9,7 @@ from django.db.models import F
 from utils import detect_identifier_type, verify_id
 from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_sms.utils import validate_validation_code
+from marketing.models import InviteCode, PromotionToken
 
 User = get_user_model()
 
@@ -29,13 +30,17 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     identifier = forms.CharField(label="Email/Phone")
     validate_code = forms.CharField(label="Validate code for phone", required=True)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    invitecode = forms.CharField(label="Invitecode", required=False)
+
 
     error_messages = {
         'duplicate_username': u'该邮箱或手机号已经注册',
         'invalid_identifier_type': u'请提供邮箱或者手机号',
         'validate_code_for_email': u'邮箱注册时不需要提供验证码',
         'validate code not match': u'验证码不正确',
-        'validate code not exist': u'没有发送验证码'
+        'validate code not exist': u'没有发送验证码',
+        'validate must not be null': u'验证码不能为空',
+        'invite code not match': u'邀请码错误'
     }
 
     class Meta:
@@ -67,20 +72,38 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             self.error_messages['duplicate_username'],
             code='duplicate_username', )
 
-    def clean(self):
+    def clean_invitecode(self):
+        invite_code = self.cleaned_data.get('invitecode')
+
+        if invite_code:
+            try:
+                p = PromotionToken.objects.get(token=invite_code)
+            except:
+                raise forms.ValidationError(
+                            self.error_messages['invite code not match'],
+                            code='invite code not match',
+                        )
+            return invite_code
+
+    def clean_validate_code(self):
         if 'identifier' in self.cleaned_data:
             identifier = self.cleaned_data["identifier"]
             identifier_type = detect_identifier_type(identifier)
             if identifier_type == 'phone':
                 phone = identifier
-                validate_code = self.cleaned_data["validate_code"]
-                print validate_code
-                status, message = validate_validation_code(phone, validate_code)
-                if status != 200:
+                validate_code =  self.cleaned_data.get('validate_code', '')
+                if validate_code:
+                    status, message = validate_validation_code(phone, validate_code)
+                    if status != 200:
+                        raise forms.ValidationError(
+                            self.error_messages['validate code not match'],
+                            code='validate_code_error',
+                        )
+                else:
                     raise forms.ValidationError(
-                        self.error_messages['validate code not match'],
-                        code='validate_code_error',
-                    )
+                            self.error_messages['validate must not be null'],
+                            code='validate_code_error',
+                        )
         return self.cleaned_data
 
 

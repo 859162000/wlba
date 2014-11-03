@@ -12,9 +12,10 @@
   @extend .full-container
   $file: 'login.jpg'
   background-image: image-url($file)
-  height: image-height($file)
+  min-height: image-height($file)
   background-position: center
   padding-top: 80px
+  padding-bottom: 80px
 
 .container-login-nav
   @extend .container

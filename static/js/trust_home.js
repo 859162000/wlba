@@ -150,7 +150,9 @@
       e.preventDefault();
       trustId = $(e.target).attr('data-trust-id');
       trustName = $(e.target).attr('data-trust-name');
-      return $(this).modal();
+      return $(this).modal({
+        closeText: ''
+      });
     });
     return $('#preorder_submit').click(function(event) {
       var name, phone;
@@ -177,5 +179,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=trust_home.map

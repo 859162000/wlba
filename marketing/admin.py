@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData
-# from marketing.views import GennaeratorCode
+from django.utils import timezone
+from views import MarketingView
+
+from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, Activity, ActivityRule
+from marketing.views import GennaeratorCode
+
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export import fields
+from wanglibao.admin import ReadPermissionModelAdmin
 
 
 class NewsAndReportAdmin(admin.ModelAdmin):
@@ -18,9 +23,14 @@ class SiteDataAdmin(admin.ModelAdmin):
     list_display_link = ('id',)
 
 
-class PromotionTokenAdmin(admin.ModelAdmin):
+class PromotionTokenAdmin(ReadPermissionModelAdmin):
     list_display = ("user", "token")
-    readonly_fields = ("user", "token")
+    search_fields = ['user__wanglibaouserprofile__phone']
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('marketing.view_promotiontoken'):
+            return ("user", "token")
+        return ()
 
 class IntroducedByResource(resources.ModelResource):
 
@@ -35,11 +45,22 @@ class IntroducedByResource(resources.ModelResource):
         fields = ('user_name', 'user_phone','introduce_name', 'introduce_phone', 'chanel',
                   'created_at', 'bought_at', 'gift_send_at' )
 
+    def dehydrate_created_at(self, obj):
+        return timezone.localtime(obj.created_at).strftime("%Y-%m-%d %H:%M:%S")
 
-class IntroducedByAdmin(ImportExportModelAdmin):
-    list_display = ("user", "introduced_by", "created_at", "bought_at", "gift_send_at")
-    readonly_fields = ("bought_at", "user", "introduced_by")
+    def dehydrate_bought_at(self, obj):
+        if obj.bought_at:
+            return timezone.localtime(obj.bought_at).strftime("%Y-%m-%d %H:%M:%S")
+
+    def dehydrate_gift_send_at(self, obj):
+        if obj.gift_send_at:
+            return timezone.localtime(obj.gift_send_at).strftime("%Y-%m-%d %H:%M:%S")
+
+
+class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
+    list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
     list_editable = ("gift_send_at",)
+    search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
 
     resource_class = IntroducedByResource
 
@@ -49,25 +70,47 @@ class IntroducedByAdmin(ImportExportModelAdmin):
             .select_related('introduced_by').select_related('introduced_by__wanglibaouserprofile')
         return qs
 
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('marketing.view_introducedby'):
+            return ("bought_at", "user", "introduced_by")
+        return ()
 
 class TimelySitedataAdmin(admin.ModelAdmin):
     list_display = ("created_at", "p2p_margin", "freeze_amount", "total_amount", "user_count")
     readonly_fields = ("p2p_margin", "freeze_amount", "total_amount", "user_count")
 
 
-# class InviteCodeAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'code', 'is_used')
-#     readonly_fields = ('code', )
-#
-#     def has_add_permission(self, request, obj=None):
-#         return False
+class InviteCodeAdmin(ReadPermissionModelAdmin):
+    list_display = ('id', 'code', 'is_used')
+    search_fields = ['code']
+
+    def get_readonly_fields(self, request, obj=None):
+        """ 如果没有设置 view 权限，则返回字段为只读
+        """
+        if not request.user.has_perm('marketing.view_invitecode'):
+            return ('id', 'code', 'is_used')
+        return ()
+
+
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'description')
+
+class ActivityRuleAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'description', 'rule_type', 'rule_amount')
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
 admin.site.register(PromotionToken, PromotionTokenAdmin)
 admin.site.register(IntroducedBy, IntroducedByAdmin)
 admin.site.register(TimelySiteData, TimelySitedataAdmin)
-# admin.site.register(InviteCode, InviteCodeAdmin)
+admin.site.register(Activity, ActivityAdmin)
+admin.site.register(ActivityRule, ActivityRuleAdmin)
 
 
-# admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')
+admin.site.register_view('statistics/diary', view=MarketingView.as_view(),name=u'diary')
+admin.site.register(InviteCode, InviteCodeAdmin)
+
+admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')
+
+
+

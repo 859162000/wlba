@@ -15,3 +15,15 @@ def gen_hash_list(*args):
     for arg in args:
         hash_list.append(arg)
     return [str(item) for item in hash_list]
+
+
+def strip_tags(html):
+    from HTMLParser import HTMLParser
+    html = html.strip()
+    html = html.strip("\n")
+    result = []
+    parse = HTMLParser()
+    parse.handle_data = result.append
+    parse.feed(html)
+    parse.close()
+    return "".join(result)

@@ -23,8 +23,9 @@ def withdraw_failed(error_message):
 
 @suffix
 def withdraw_submitted(amount, issue_time):
-    arrive_date = issue_time + timedelta(days=3)
-    return u'提现申请成功，申请金额%s元，预计%s前到账。' % (str(amount), format_datetime(arrive_date, u'%Y年%m月%d日'))
+    #arrive_date = issue_time + timedelta(days=3)
+    #return u'提现申请成功，申请金额%s元，预计%s前到账。' % (str(amount), format_datetime(arrive_date, u'%Y年%m月%d日'))
+    return u'提现申请成功，申请金额%s元，预计3个工作日内到账。' % amount
 
 @suffix
 def product_settled(product, settled_time):
@@ -59,3 +60,11 @@ def gift_inviter(invited_phone, money):
 def gift_invited(inviter_phone, money):
     return u'感谢你接受用户%s的邀请注册网利宝并成功购买理财产品！网利宝将奖励你%s元手机话费，5个工作日内将直接充值到你的注册手机号。' \
            % (inviter_phone, str(money))
+
+@suffix
+def rand_pass(password):
+    return u'感谢注册网利宝，您的初始密码是%s，请登录wanglibao.com修改密码。' % password
+
+@suffix
+def earning_message(amount):
+    return u'亲，您的投标奖励收益%s元，已赠送到您的网利宝账户，可用于理财投资' % amount

@@ -1,8 +1,12 @@
+#!/usr/bin/env python
+# encoding:utf-8
+
 from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
-from wanglibao_account.views import UserViewSet, ResetPasswordAPI, FundInfoAPIView, \
-    AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI, AccountFundAssetAPI, P2PAmortizationAPI
+from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIView,
+                            AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI, AccountFundAssetAPI,
+                            P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -13,12 +17,17 @@ from wanglibao_feedback.views import FeedbackViewSet
 from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
 from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTrustViewSet, \
     MobileHotFundViewSet, MobileMainPageViewSet, MobileMainPageP2PViewSet
-from wanglibao_p2p.views import PurchaseP2P, P2PProductViewSet, RecordView
-from wanglibao_pay.views import CardViewSet
+from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
+    P2PProductDetailView, P2PProductListView
+from wanglibao_pay.views import (CardViewSet, LianlianAppPayView, LianlianAppPayCallbackView,
+                            BankCardAddView, BankCardListView, BankCardDelView, BankListAPIView,
+							LianlianWithdrawAPIView)
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
-from wanglibao_rest.views import SendValidationCodeView, SendRegisterValidationCodeView, UserExisting, RegisterAPIView, IdValidate, AdminIdValidate
+from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
+                            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
+                            WeixinRegisterAPIView, IdValidateAPIView)
 
 router = DefaultRouter()
 
@@ -64,17 +73,31 @@ router.register(r'card', CardViewSet)
 
 urlpatterns = patterns(
     '',
-    url(r'^register/', RegisterAPIView.as_view()),
-    url(r'^reset_password/', ResetPasswordAPI.as_view()),
+    url(r'^register/$', RegisterAPIView.as_view()),
+    url(r'^register/wx/$', WeixinRegisterAPIView.as_view()),
+    url(r'^change_password/$', ChangePasswordAPIView.as_view()),
+    url(r'^reset_password/$', ResetPasswordAPI.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^profile/', ProfileView.as_view()),
     url(r'^total_income', TotalIncome.as_view()),
-    url(r'^p2p/purchase/', PurchaseP2P.as_view()),
+    url(r'^p2p/purchase/$', PurchaseP2P.as_view()),
+    url(r'^p2p/purchase/mobile/$', PurchaseP2PMobile.as_view()),
     url(r'^p2ps/(?P<product_id>\d+)/records/', RecordView.as_view()),
+
+    # url(r'^p2ps/$', P2PProductListView.as_view()),
+    url(r'^p2ps/(?P<pk>[0-9]+)/$', P2PProductDetailView.as_view()),
+
     url(r'', include(router.urls)),
+    #客户端使用,重写
+    url(r'^id_validation/$', IdValidateAPIView.as_view()),
+    url(r'^bank_card/add/$', BankCardAddView.as_view()),
+    url(r'^bank_card/list/$', BankCardListView.as_view()),
+    url(r'^bank_card/del/$', BankCardDelView.as_view()),
+    url(r'^bank/list/$', BankListAPIView.as_view()),
+
     url(r'^id_validate/', IdValidate.as_view()),
     url(r'^admin_id_validate/', AdminIdValidate.as_view()),
 
@@ -84,6 +107,11 @@ urlpatterns = patterns(
     url(r'^home/p2passet', AccountP2PAssetAPI.as_view()),
     url(r'^home/fundasset', AccountFundAssetAPI.as_view()),
     url(r'^home/p2p/amortization/(?P<product_id>\d+)', P2PAmortizationAPI.as_view()),
+
+    url(r'^p2p/contract/(?P<product_id>\d+)', UserProductContract.as_view()),
+    url(r'^pay/lianlian/app/deposit/$', LianlianAppPayView.as_view(), name="lianlian-deposit-view"),
+    url(r'^pay/lianlian/app/deposit/callback/$', LianlianAppPayCallbackView.as_view(), name="lianlian-deposit-view"),
+    url(r'^withdraw/$', LianlianWithdrawAPIView.as_view(), name="lianlian-withdraw-view"),
 )
 
 urlpatterns += patterns('',

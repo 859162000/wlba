@@ -3,17 +3,25 @@ from collections import OrderedDict
 from concurrency.admin import ConcurrentModelAdmin
 import datetime
 from django.contrib import admin
+from django.utils import timezone
 from reversion.admin import VersionAdmin
-from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate
+from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportModelAdmin, ExportMixin
 from views import GenP2PUserProfileReport
+from wanglibao.admin import ReadPermissionModelAdmin
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (
-        'id', 'user', 'product', 'equity', 'confirm', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
+        'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
     list_filter = ('confirm',)
+    search_fields = ('user__wanglibaouserprofile__phone',)
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
+            return [f.name for f in self.model._meta.fields]
+        return ()
 
 
 class AmortizationInline(admin.TabularInline):
@@ -55,27 +63,24 @@ class P2PProductResource(resources.ModelResource):
 
     def import_obj(self, instance, row, false):
         super(P2PProductResource, self).import_obj(instance, row, false)
-        # todo update later
 
-        now = datetime.datetime.now().date().strftime('%Y%m%d%H%m%s')
+        now = datetime.datetime.now().date().strftime('%Y%m%d')
         self.count += 1
         type = row[u'产品名称']
         # birthday = datetime.date(row[u'出生日期'])
         #today = datetime.date.today()
         #age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
-        instance.category = "证大速贷"
-        instance.name = u"%s %s%s" % (row[u'产品名称'], now, str(self.count).zfill(3))
-        instance.short_name = instance.name
+        instance.category = u"证大速贷"
         instance.serial_number = "E_ZDSD_%s%s" % (now, str(self.count).zfill(5))
         instance.contract_serial_number = row[u'合同编号']
         instance.priority = 0
         instance.period = row[u'申请还款期限（月）']
-        instance.expected_earning_rate = 12
+        instance.expected_earning_rate = 12.5
         instance.excess_earning_rate = 0
-        instance.pay_method = "等额本息"
-
-
-
+        if int(instance.period) <= 18:
+            instance.excess_earning_rate = 0.5
+            instance.excess_earning_description = u"网利宝活动补贴"
+        instance.pay_method = u"等额本息"
 
         instance.borrower_name = row[u'姓名']
         instance.borrower_phone = row[u'手机号码']
@@ -88,70 +93,84 @@ class P2PProductResource(resources.ModelResource):
 
         for bank in P2PProduct.BANK_METHOD_CHOICES:
             if bank[0] in instance.borrower_bankcard_bank_name:
-                instance.borrower_bankcard_bank_code = bank
+                instance.borrower_bankcard_bank_code = bank[0]
 
         instance.total_amount = row[u'申请贷款金额（元）']
         instance.end_time = datetime.datetime.now() + datetime.timedelta(days=2)
-        instance.usage = row[u'贷款用途']
-        instance.short_usage = row[u'贷款用途']
+        #instance.usage = row[u'贷款用途']
+        #instance.short_usage = row[u'贷款用途']
+        month_income = int(row[u'个人月收入（元）'])
+        month_income_str = ""
+        if month_income <= 2000:
+            month_income_str = u"0-2000元"
+        if month_income > 2000 and month_income < 5000:
+            month_income_str = u"2000元-5000元"
+        if month_income >= 5000 and month_income < 8000:
+            month_income_str = u"5000元-8000元"
+        if month_income >= 8000 and month_income <= 12000:
+            month_income_str = u"8000元-12000元"
+        if month_income > 12000 and month_income <= 18000:
+            month_income_str = u"12000元-18000元"
+        if month_income > 18000:
+            month_income_str = u"18000元以上"
 
-
-
-        if type == u"工薪贷":
+        if type == u"工薪族":
+            instance.name = u"%s%s%s" % (u"工薪日常消费", str(now)[2:], str(self.count).zfill(3))
             instance.extra_data = OrderedDict([
-                (u'个人信息', {
-                    u'用户ID': row[u'姓名'],
-                    u'性别': row[u'性别'],
-                    u'出生日期': row[u'出生日期'],
-                    u'学历': row[u'学历'],
-                    u'是否已婚': row[u'是否结婚'],
-                    u'子女状况': row[u'子女状况'],
-                    u'户籍城市': row[u'户籍城市']
-                }),
-                (u'个人资产及征信信息', {
-                    u'月收入水平': row[u'个人月收入（元）'],
-                    u'房产': row[u'有无房产'],
-                    u'车产': row[u'有无车产']
-                }),
-                (u'工作信息', {
-                    u'工作城市': row[u'工作城市'],
-                    u'现有公司工作时间': row[u'工作时间'],
-                    u'公司行业': row[u'公司行业'],
-                    u'公司性质': row[u'公司性质'],
-                    u'岗位': row[u'所在部门']
-                })
+                (u'个人信息', OrderedDict([
+                    (u'性别', row[u'性别']),
+                    (u'出生日期', row[u'出生日期']),
+                    (u'学历', row[u'学历']),
+                    (u'是否已婚', row[u'是否结婚']),
+                    (u'子女状况', row[u'子女状况']),
+                    (u'户籍城市', row[u'户籍城市'])
+                ])),
+                (u'个人资产及征信信息', OrderedDict([
+                    (u'月收入水平', month_income_str),
+                    (u'房产', row[u'有无房产']),
+                    (u'车产', row[u'有无车产'])
+                ])),
+                (u'工作信息', OrderedDict([
+                    (u'工作城市', row[u'工作城市']),
+                    (u'现公司工作时间', row[u'工作时间']),
+                    (u'公司行业', row[u'公司行业']),
+                    (u'公司性质', row[u'公司性质']),
+                    (u'岗位', row[u'岗位（职务）'])
+                ]))
             ])
 
-        if type == u"企业贷":
+        if type == u"企业主":
+            instance.name = u"%s%s%s" % (u"企业扩大经营", str(now)[2:], str(self.count).zfill(3))
             instance.extra_data = OrderedDict([
-                (u'个人信息', {
-                    u'用户ID': row[u'姓名'],
-                    u'性别': row[u'性别'],
-                    u'出生日期': row[u'出生日期'],
-                    u'学历': row[u'学历'],
-                    u'是否已婚': row[u'是否结婚'],
-                    u'子女状况': row[u'子女状况'],
-                    u'户籍城市': row[u'户籍城市']
-                }),
-                (u'企业经营信息', {
-                    u'月销售收入（元）': row[u'月销售收入（元）'],
-                    u'房产': row[u'有无房产'],
-                    u'车产': row[u'有无车产']
-                }),
-                (u'企业信息', {
-                    u'企业所在城市': row[u'企业所在城市'],
-                    u'企业规模': row[u'企业规模'],
-                    u'所属行业': row[u'所属行业'],
-                    u'企业类型': row[u'企业类型'],
-                    u'成立时间': row[u'成立时间'],
-                    u'企业地址': row[u'企业地址']
-                })
+                (u'个人信息', OrderedDict([
+                    (u'性别', row[u'性别']),
+                    (u'出生日期', row[u'出生日期']),
+                    (u'学历', row[u'学历']),
+                    (u'是否已婚', row[u'是否结婚']),
+                    (u'子女状况', row[u'子女状况']),
+                    (u'户籍城市', row[u'户籍城市']),
+                    (u'月收入水平', month_income_str)
+                ])),
+                (u'企业经营信息', OrderedDict([
+                    (u'月销售收入(元)', row[u'月销售收入（元）']),
+                    (u'房产', row[u'有无房产']),
+                    (u'车产', row[u'有无车产'])
+                ])),
+                (u'企业信息', OrderedDict([
+                    (u'企业所在城市', row[u'企业所在城市']),
+                    (u'企业规模', row[u'企业规模']),
+                    (u'所属行业', row[u'所属行业']),
+                    (u'企业类型', row[u'企业类型']),
+                    (u'成立时间', row[u'成立时间']),
+                    (u'企业地址', row[u'企业地址'])
+                ]))
             ])
+        instance.short_name = instance.name
         instance.warrant_company = WarrantCompany.objects.get(name='证大速贷')
         instance.contract_template = ContractTemplate.objects.get(name='证大速贷')
 
 
-class P2PProductAdmin(ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
+class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
     ]
@@ -164,14 +183,39 @@ class P2PProductAdmin(ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'
 
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
+            return [f.name for f in self.model._meta.fields]
+        return ()
+
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
 
-class P2PRecordAdmin(admin.ModelAdmin):
+class P2PRecordResource(resources.ModelResource):
+    user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name='姓名')
+    user_phone = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name='手机号')
+    product_name = fields.Field(attribute="product__name", column_name='产品名称')
+
+    class Meta:
+        model = P2PRecord
+        fields = ('user_name', 'user_phone', 'product_name', 'catalog', 'order_id', 'amount',
+                  'product_balance_after', 'create_time', 'description')
+
+    def dehydrate_create_time(self, obj):
+        return timezone.localtime(obj.create_time).strftime("%Y-%m-%d %H:%M:%S")
+
+
+class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     list_display = (
         'catalog', 'order_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
+    resource_class = P2PRecordResource
+    change_list_template = 'admin/import_export/change_list_export.html'
+
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
 
 
 class WarrantAdmin(admin.ModelAdmin):
@@ -181,17 +225,35 @@ class WarrantAdmin(admin.ModelAdmin):
 class AmortizationRecordAdmin(admin.ModelAdmin):
     list_display = (
         'catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
 
-class EquityRecordAdmin(admin.ModelAdmin):
+class EquityRecordAdmin(ReadPermissionModelAdmin):
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
-class ProductAmortizationAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
+
+
+class ProductAmortizationAdmin(ReadPermissionModelAdmin):
     list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled',
                     'settlement_time', 'created_time', 'status', 'description', )
 
     def status(self, obj):
         return obj.product.status
+
+
+class EarningAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'product', 'amount', )
+    raw_id_fields = ('order', 'margin_record')
+    search_fields = ('user__wanglibaouserprofile__phone',)
+
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_p2p.view_productamortization'):
+            return [f.name for f in self.model._meta.fields]
+        return ()
 
 
 admin.site.register(P2PProduct, P2PProductAdmin)
@@ -204,6 +266,7 @@ admin.site.register(P2PRecord, P2PRecordAdmin)
 admin.site.register(EquityRecord, EquityRecordAdmin)
 admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
 admin.site.register(ProductAmortization, ProductAmortizationAdmin)
+admin.site.register(Earning, EarningAdmin)
 
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(),name=u'生成p2p用户表')

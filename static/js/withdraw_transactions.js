@@ -15,5 +15,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=withdraw_transactions.map

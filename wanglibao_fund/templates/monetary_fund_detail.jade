@@ -10,7 +10,7 @@ body
   include include/navigation
   - endwith
 
-  .space-vertical-ssm
+  include announcement_block
 
   .container
     .span8.panel.fund-panel-header
@@ -21,7 +21,7 @@ body
                 span.star
                 添加到我的收藏
             else
-              a#addToFavorite.favorite.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")取消
+              a#addToFavorite.favorite.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}")取消收藏
 
             {{ fund.name }} ({{ fund.product_code }})
       .row

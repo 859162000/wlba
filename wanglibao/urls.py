@@ -10,7 +10,8 @@ from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
-from wanglibao_p2p.views import AdminP2PUserRecord
+from wanglibao_p2p.views import AdminP2PUserRecord,GetNoWProjectsAPI, GetProjectsByDateAPI, FinancesAPI
+
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -40,9 +41,10 @@ urlpatterns = patterns(
 
     url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^api/', include('wanglibao_rest.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^help/', include('wanglibao_help.urls')),
+    url(r'^'+settings.ADMIN_ADDRESS+'/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    #url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
     url(r'^shumi/', include('shumi_backend.urls')),
     url(r'^pay/', include('wanglibao_pay.urls')),
@@ -65,6 +67,7 @@ urlpatterns = patterns(
 
     url(r'^preorder/', include('wanglibao_preorder.urls')),
     url(r'^activity/', include('marketing.urls')),
+    url(r'^announcement/', include('wanglibao_announcement.urls')),
 )
 
 urlpatterns += patterns(
@@ -83,6 +86,13 @@ urlpatterns += patterns(
     url(r'p2pequity/profile', AdminP2PUserRecord.as_view(), name='p2p_user_record'),
 )
 
+# the other Platform API
+urlpatterns += patterns(
+    '',
+    url(r'^tdt/getNowProjects.json', GetNoWProjectsAPI.as_view()),
+    url(r'^tdt/getProjectsByDate.json', GetProjectsByDateAPI.as_view()),
+    url(r'^2345/finances.json', FinancesAPI.as_view()),
+)
 
 if settings.DEBUG:
     import debug_toolbar

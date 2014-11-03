@@ -40,18 +40,20 @@ class P2PTrader(object):
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
+        #phone_verified 渠道客户判断
         if introduced_by and introduced_by.bought_at is None:
             introduced_by.bought_at = timezone.now()
             introduced_by.save()
 
-            inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
-            invited_phone = introduced_by.user.wanglibaouserprofile.phone
+            if "channel" not in introduced_by.introduced_by.username:
+                inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
+                invited_phone = introduced_by.user.wanglibaouserprofile.phone
 
-            send_messages.apply_async(kwargs={
-                "phones": [inviter_phone, invited_phone],
-                "messages": [messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
-                             messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)]
-            })
+                send_messages.apply_async(kwargs={
+                    "phones": [inviter_phone, invited_phone],
+                    "messages": [messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
+                                 messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)]
+                })
 
         return product_record, margin_record, equity
 

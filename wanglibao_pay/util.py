@@ -1,5 +1,9 @@
+# encoding:utf-8
+
 import base64
 import uuid
+import decimal
+import time
 
 
 def get_client_ip(request):
@@ -16,3 +20,14 @@ def get_a_uuid():
     r_uuid = base64.urlsafe_b64encode(uuid.uuid4().bytes)
     return r_uuid.replace('=', '')
 
+TWO_PLACES = decimal.Decimal(10) ** -2
+#format amount two places
+def fmt_two_amount(value):
+	amount = decimal.Decimal(value).quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
+	return amount
+
+def fmt_dt_14(dt):
+    return dt.strftime("%Y%m%d%H%M%S")
+
+def fmt_time_14(t):
+    return time.strftime("%Y%m%d%H%M%S", time.localtime(t))

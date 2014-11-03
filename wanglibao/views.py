@@ -8,6 +8,7 @@ from marketing.models import NewsAndReport, SiteData
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner
 from itertools import chain
+from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
 
 
 class IndexView(TemplateView):
@@ -16,25 +17,25 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
 
 
-        p2p_pre_three = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status=u'正在招标').order_by('-priority', '-total_amount').select_related('warrant_company')[:4]
+        p2p_pre_four = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+            .filter(status=u'正在招标').order_by('-priority', '-total_amount')[:4]
 
-        p2p_middle = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+        p2p_middle = P2PProduct.objects.select_related('warrant_company','activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
             .filter(status__in=[
                 u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'
-        ]).order_by('-priority', '-soldout_time').select_related('warrant_company')
+        ]).order_by('-soldout_time', '-priority')
 
 
-        p2p_last = P2PProduct.objects.filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status=u'还款中').order_by('-priority', '-soldout_time').select_related('warrant_company')
+        p2p_last = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+            .filter(status=u'还款中').order_by('-soldout_time', '-priority')[:2]
 
-        p2p_products = chain(p2p_pre_three[:3], p2p_middle, p2p_last)
+        p2p_products = chain(p2p_pre_four, p2p_middle, p2p_last)
 
         getmore = False
-        if p2p_pre_three.count() > 3 and p2p_last:
+        if p2p_pre_four.count() > 3 and p2p_last:
             getmore = True
 
-        trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:11]
+        trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:20]
         banners = Banner.objects.filter(device=Banner.PC_2)
         news_and_reports = NewsAndReport.objects.all()[:5]
         site_data = SiteData.objects.all().first()
@@ -45,7 +46,9 @@ class IndexView(TemplateView):
             "news_and_reports": news_and_reports,
             'banners': banners,
             'site_data': site_data,
-            'getmore': getmore
+            'getmore': getmore,
+            'announcements': AnnouncementHomepage,
+            'announcements_p2p': AnnouncementP2PNew
         }
 
 

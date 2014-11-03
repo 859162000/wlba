@@ -5,6 +5,9 @@ from rest_framework import serializers
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from django.utils import timezone
+from views import P2PEquity
+from collections import OrderedDict
+
 
 def safe_phone(phone):
     return phone[:3] + '*' * (len(phone) - 4 - 3) + phone[-4:]
@@ -28,15 +31,14 @@ class P2PProductSerializer(ModelSerializerExtended):
     publish_time = serializers.SerializerMethodField('publish_time_format')
     end_time = serializers.SerializerMethodField('end_time_format')
     soldout_time = serializers.SerializerMethodField('soldout_time_format')
-    # total_amount = serializers.SerializerMethodField('total_amount_format')
-    # ordered_amount = serializers.SerializerMethodField('ordered_amount_format')
     display_status = serializers.SerializerMethodField('display_status_format')
+    pay_method = serializers.SerializerMethodField('pay_method_format')
 
+    product_amortization = serializers.SerializerMethodField('product_amortization_format')
 
     class Meta:
         model = P2PProduct
         depth = 1
-        # exclude = ('contract_template', 'bought_people_count', 'bought_count', 'bought_amount', 'bought_count_random', 'bought_amount_random', 'version')
         fields = ("total_earning", "id", "version", "category", "hide", "name", "short_name", "serial_number",
                   "contract_serial_number", "status", "priority", "period", "brief", "expected_earning_rate",
                   "excess_earning_rate", "excess_earning_description", "pay_method", "amortization_count",
@@ -45,7 +47,7 @@ class P2PProductSerializer(ModelSerializerExtended):
                   "borrower_id_number", "borrower_bankcard", "borrower_bankcard_bank_name",
                   "borrower_bankcard_bank_code", "borrower_bankcard_bank_province", "borrower_bankcard_bank_city",
                   "borrower_bankcard_bank_branch", "total_amount", "ordered_amount", "extra_data", "publish_time",
-                  "end_time", "soldout_time", "limit_per_user", "warrant_company", "usage", "short_usage", "display_status")
+                  "end_time", "soldout_time", "limit_per_user", "warrant_company", "usage", "short_usage", "display_status", "product_amortization")
 
 
     def total_earning_joined(self, obj):
@@ -66,13 +68,6 @@ class P2PProductSerializer(ModelSerializerExtended):
             return timezone.localtime(obj.soldout_time).strftime("%Y-%m-%d %H:%M:%S")
         return ""
 
-    # def total_amount_format(self, obj):
-    #     return float(obj.total_amount) / 10000
-    #
-    # def ordered_amount_format(self, obj):
-    #     return float(obj.total_amount) / 10000
-
-
     def display_status_format(self, obj):
         return obj.display_status
 
@@ -80,11 +75,53 @@ class P2PProductSerializer(ModelSerializerExtended):
         if value is None:
             return value
 
-        extra_data = json.loads(value)
+        extra_data = json.loads(value, object_pairs_hook=OrderedDict)
 
         if not self.request.user.is_authenticated():
             for section_key in extra_data:
                 for item_key in extra_data[section_key]:
                     extra_data[section_key][item_key] = u'请登录后查看'
 
-        return json.dumps(extra_data, ensure_ascii=False)
+        return extra_data
+
+
+    def pay_method_format(self, obj):
+        pay_method = obj.display_payback_mapping.get(obj.pay_method)
+        return pay_method
+
+
+    def product_amortization_format(self, obj):
+        amortizations = obj.amortizations.all()
+
+        pro_amort_list = [{
+                'term': i.term,
+                'principal': float(i.principal),
+                'interest': float(i.interest),
+                'penal_interest': float(i.penal_interest)
+            } for i in amortizations]
+
+        return pro_amort_list
+
+
+
+class P2PEquitySerializer(ModelSerializerExtended):
+    """ there noting """
+    class Meta:
+        model = P2PEquity
+        fields = ('id', 'created_at')
+
+class P2PProductAPISerializer(ModelSerializerExtended):
+    """ there noting """
+    equities = P2PEquitySerializer()
+
+    class Meta:
+        model = P2PProduct
+        deep = 1
+        fields = ( "id", "version", "category", "equities")
+
+
+    # def p2pequity_format(self, obj):
+    #     p2pequity_list = P2PEquity.objects.filter(product__id=obj.id)
+    #     return  p2pequity_list
+
+

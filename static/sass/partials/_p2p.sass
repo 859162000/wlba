@@ -15,7 +15,7 @@
 
   .panel-title-bar
     line-height: 55px
-    border-bottom: 1px dashed $color-gainsboro
+    border-bottom: 0
     font-size: $font-m
     color: $color-text-d2
     padding: 0 24px
@@ -38,7 +38,7 @@
   .panel-content
     border-bottom: 1px dashed $color-gainsboro
     color: $color-text-d4
-    padding: 15px 24px
+    padding: 5px 24px 15px 24px
     line-height: 30px
 
     &:last-child
@@ -61,6 +61,29 @@
     padding-top: 0
     padding-bottom: 0
     line-height: 55px
+
+.panel-announce-bar
+  @extend .clearfix
+  padding: 0 24px
+  position: relative
+  line-height: 50px
+  border-bottom: 1px solid $color-gainsboro
+
+  .panel-announce-bar-title
+    +float-left
+    font-size: $font-l
+    color: $color-text-d2
+
+  .panel-announce-bar-content
+    +float-right
+    color: $color-text-d3
+    font-size: $font-s
+
+.icon-up-arrow
+  width: 18px
+  height: 18px
+  margin-right: 5px
+  background: url("/static/images/icon-public.png") -281px -194px no-repeat
 
 .progress-container
   height: 12px
@@ -97,6 +120,10 @@
     padding: 10px 0
     color: $color-emperor
 
+  .get-more
+    background-image: none
+    width: 60px
+
 .p2p-detail-bar
   padding-bottom: 10px
   font-size: $font-s
@@ -122,6 +149,13 @@
     margin-left: 10px
     top: -2px
 
+  a
+    color: $color-sea-green
+
+    &:hover
+      color: $color-white
+      background: $color-sea-green
+
 .p2p-detail-endtime
   padding-top: 0px
 
@@ -129,6 +163,8 @@
   padding: 10px 0
   text-align: center
   font-size: $font-s
+  position: relative
+
   .detail-icon
     display: inline-block
     width: 20px
@@ -214,7 +250,7 @@
   height: 320px
   font-size: $font-s
   color: $color-dusty-gray
-  line-height: 40px
+  line-height: 35px
 
   .invest
     height: 35px
@@ -231,6 +267,12 @@
 
   button
     font-size: $font-m
+
+  .form-row
+    padding-top: 0
+
+  .form-row__middle
+    line-height: 35px
 
 .sold-out
   padding-top: 50px
@@ -256,6 +298,8 @@
       font-size: $font-l
       padding: 5px 0
       color: $color-emperor
+      &.nowarrant
+        border-bottom: 1px solid $color-alto
 
     td
       border-bottom: solid 1px $color-alto
@@ -434,3 +478,50 @@
       width: 70px
       top: -1px
       margin-right: 5px
+
+.xunlei-vip-rate
+  color: $color-denim
+  font-size: $font-l
+  position: relative
+
+.xunlei-vip-rate-detail
+  @extend .xunlei-vip-rate
+  font-size: $font-xxl
+
+.xunlei-vip-tip
+  +inline-block
+  position: absolute
+  z-index: 9
+  top: -25px
+  left: -25px
+  background: url("/static/images/activity/xunlei_vip.png") no-repeat
+  width: 86px
+  height: 23px
+
+.xunlei-vip-tip-detail
+  @extend .xunlei-vip-tip
+  top: -22px
+  left: -23px
+
+.xunlei-vip-form-txt
+  font-size: $font-xs
+  line-height: 20px
+
+#xunlei-binding-modal
+  width: 560px
+  height: 340px
+
+  ul
+    padding-top: 10px
+    line-height: 26px
+    font-size: $font-s
+
+.xunlei-vip-yes
+  background: url("/static/images/activity/xunlei_vip.png") 0 -24px no-repeat
+  width: 20px
+  height: 20px
+
+.xunlei-vip-no
+  background: url("/static/images/activity/xunlei_vip.png") -20px -24px no-repeat
+  width: 20px
+  height: 20px

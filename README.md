@@ -68,6 +68,9 @@ Deploy
     $ pre: fab deploy --set group=pre
     $ production: fab deploy --set group=production
 
+	Fast deploy, add one parameter fast=true
+    $ staging: fab deploy --set group=staging,fast=true
+
 Query example
 -------------------
 log in to web server through ssh, then run

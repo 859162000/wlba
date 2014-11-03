@@ -48,8 +48,8 @@ html
     .align-right 网利宝平台编号：【{{product.serial_number}}】
     p 本网利宝平台借款协议（“本协议”）由以下各方于{{now|date:"【Y】年【m】月【d】日"}}签订：
     br
-    p 甲方（小额借款客户）：【{{ product.borrower_name }}】
-    p 身份证号码：{{ product.borrower_id_number }}
+    p 甲方（小额借款客户）：【{{ product.borrower_name | safe_name_last }}】
+    p 身份证号码：{{ product.borrower_id_number | safe_id }}
     br
     p 乙方（出借人）：
     table

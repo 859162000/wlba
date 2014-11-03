@@ -9,6 +9,7 @@ from wanglibao_fund.filters import FundFilterSet
 from wanglibao_fund.models import Fund, FundIssuer
 from wanglibao_fund.serializers import FundSerializer
 from wanglibao_hotlist.models import HotFund
+from wanglibao_announcement.utility import Announcementfund
 
 
 class FundViewSet(PaginatedModelViewSet):
@@ -30,8 +31,10 @@ class FundProductsView(TemplateView):
     template_name = "fund_products.jade"
 
     def get_context_data(self, **kwargs):
+
         return {
-            'hot_funds': HotFund.objects.all().prefetch_related('fund').prefetch_related('fund__issuer')[:3]
+            'hot_funds': HotFund.objects.all().prefetch_related('fund').prefetch_related('fund__issuer')[:3],
+            'announcements': Announcementfund
         }
 
 
@@ -56,4 +59,7 @@ class FundDetailView(TemplateView):
             self.template_name = 'monetary_fund_detail.jade'
         else:
             self.template_name = 'fund_detail.jade'
+
+        context['announcements'] = Announcementfund
+
         return context

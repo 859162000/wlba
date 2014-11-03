@@ -1,5 +1,8 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from django.contrib.auth import get_user_model
+
+#from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import models
 from order.models import Order
 from wanglibao_margin.models import MarginRecord
@@ -33,7 +36,7 @@ class Bank(models.Model):
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号')
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
-    user = models.ForeignKey(get_user_model())
+    user = models.ForeignKey(User)
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
     add_at = models.DateTimeField(auto_now=True)
 
@@ -66,6 +69,7 @@ class PayInfo(models.Model):
     total_amount = models.DecimalField(u'总金额', max_digits=20, decimal_places=2, default=0)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     update_time = models.DateTimeField(u'更新时间', auto_now=True)
+    confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
     request = models.TextField(u'请求数据', blank=True)
     response = models.TextField(u'返回数据', blank=True)
     status = models.CharField(u'状态', max_length=15)
@@ -73,7 +77,7 @@ class PayInfo(models.Model):
     error_message = models.CharField(u'错误原因', max_length=100, blank=True)
     request_ip = models.CharField(u'请求地址', max_length=50, blank=True, null=True)
     response_ip = models.CharField(u'响应地址', max_length=50, blank=True, null=True)
-    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     order = models.ForeignKey(Order, blank=True, null=True)
     margin_record = models.ForeignKey(MarginRecord, blank=True, null=True)
     bank = models.ForeignKey(Bank, blank=True, null=True, on_delete=models.PROTECT, verbose_name=u'银行')

@@ -7,12 +7,17 @@ from django.db import models
 from django.db.models import F, Sum, SET_NULL
 from django.db.models.signals import post_save
 from django.utils import timezone
-from django.contrib.auth import get_user_model
+#from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 import reversion
+from order.models import Order
 from wanglibao.fields import JSONFieldUtf8
 from wanglibao.models import ProductBase
 from utility import gen_hash_list
+from wanglibao_margin.models import MarginRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
+from marketing.models import Activity
+from wanglibao_pay.util import get_a_uuid
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +100,10 @@ class P2PProduct(ProductBase):
         (u'上海农村商业银行',u'上海农村商业银行'),
         (u'汇付天下', u'汇付天下'),
     )
+    BANK_TYPE_CHOICES = (
+        (u'对公', u'对公'),
+        (u'对私', u'对私'),
+    )
 
     version = IntegerVersionField()
     category = models.CharField(max_length=16, default=u'普通',
@@ -132,8 +141,9 @@ class P2PProduct(ProductBase):
     borrower_name = models.CharField(verbose_name=u'借债人姓名*', max_length=32, blank=False)
     borrower_phone = models.CharField(verbose_name=u'借债人手机号*', max_length=32, blank=False)
     borrower_address = models.CharField(verbose_name=u'借债人地址*', max_length=128, blank=False)
-    borrower_id_number = models.CharField(verbose_name=u'借债人身份证号*', max_length=32, blank=False)
+    borrower_id_number = models.CharField(verbose_name=u'借债人身份证号/法定代表人*', max_length=32, blank=False)
     borrower_bankcard = models.CharField(verbose_name=u'借债人银行卡号*', max_length=64, blank=False)
+    borrower_bankcard_type = models.CharField(verbose_name=u'借款人银行卡类型*',max_length=20, choices=BANK_TYPE_CHOICES, blank=False)
     borrower_bankcard_bank_name = models.CharField(verbose_name=u'开户行*', max_length=64, blank=False)
     borrower_bankcard_bank_code = models.CharField(verbose_name=u'借债人银行(汇付表格专用)*',choices=BANK_METHOD_CHOICES, max_length=64, blank=False)
     borrower_bankcard_bank_province = models.CharField(u'借债人银行省份', max_length=64, blank=True)
@@ -158,6 +168,10 @@ class P2PProduct(ProductBase):
     short_usage = models.TextField(blank=False, verbose_name=u'借款用途*')
 
     contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True ,blank=False)
+
+    #author: hetao; datetime: 2014.10.27; description: 活动是否参加活动
+    activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True, verbose_name=u'返现活动')
+
 
     class Meta:
         verbose_name_plural = u'P2P产品'
@@ -316,7 +330,7 @@ class UserAmortization(models.Model):
     version = IntegerVersionField()
 
     product_amortization = models.ForeignKey(ProductAmortization, related_name='subs')
-    user = models.ForeignKey(get_user_model())
+    user = models.ForeignKey(User)
     term = models.IntegerField(u'还款期数')
     term_date = models.DateTimeField(u'还款时间')
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
@@ -340,7 +354,7 @@ class UserAmortization(models.Model):
 class P2PEquity(models.Model):
     version = IntegerVersionField()
 
-    user = models.ForeignKey(get_user_model(), related_name='equities')
+    user = models.ForeignKey(User, related_name='equities')
     product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
     equity = models.BigIntegerField(u'用户所持份额', default=0)
     confirm = models.BooleanField(u'确认成功', default=False)
@@ -442,7 +456,7 @@ class AmortizationRecord(models.Model):
     interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2)
 
-    user = models.ForeignKey(get_user_model(), null=True)
+    user = models.ForeignKey(User, null=True)
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
     description = models.CharField(u'摘要', max_length=1000)
@@ -466,7 +480,7 @@ class P2PRecord(models.Model):
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
     product_balance_after = models.IntegerField(u'标的后余额', help_text=u'该笔流水发生后标的剩余量', null=True)
 
-    user = models.ForeignKey(get_user_model(), null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     create_time = models.DateTimeField(u'发生时间', auto_now_add=True)
 
@@ -486,7 +500,7 @@ class P2PRecord(models.Model):
 class EquityRecord(models.Model):
     catalog = models.CharField(u'流水类型', max_length=100)
     order_id = models.IntegerField(u'相关流水号', null=True)
-    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(P2PProduct, verbose_name=u'产品', on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(u'发生数量', max_digits=20, decimal_places=2)
     description = models.CharField(u'摘要', max_length=1000, default=u'')
@@ -534,3 +548,28 @@ def post_save_process(sender, instance, **kwargs):
     process_after_money_paided(instance)
 
 post_save.connect(post_save_process, sender=P2PProduct, dispatch_uid="generate_amortization_plan")
+
+
+#author: hetao
+#datetime: 2014.10.27
+#description: 市场活动收益
+class Earning(models.Model):
+    #满标直接送
+    DIRECT = 'D'
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'赠送记录'
+    type = models.CharField(u'类型', help_text=u'满标直接送：D', max_length=5, default='D')
+    product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True, default=None)
+    amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=2, default=0)
+
+    order = models.ForeignKey(Order, blank=True, null=True)
+    margin_record = models.ForeignKey(MarginRecord, blank=True, null=True)
+
+    user = models.ForeignKey(User, help_text=u'投资用户')
+    paid = models.BooleanField(u'已打款', default=False)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
+    confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
+

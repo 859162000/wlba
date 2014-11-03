@@ -256,6 +256,26 @@ define ['jquery'], ($)->
   purchaseP2P = (data)->
     $.post '/api/p2p/purchase/', data
 
+  registerWap = (data)->
+    $.post '/api/register/wx/', data
+
+  #var Request = new Object();
+  #Request = GetRequest();
+  #var 参数1,参数2,参数3,参数N;
+  #参数1 = Request['参数1'];
+  getRequest = ->
+    url = location.search #获取url中"?"符后的字串
+    theRequest = new Object()
+    unless url.indexOf("?") is -1
+      str = url.substr(1)
+      strs = str.split("&")
+      i = 0
+
+      while i < strs.length
+        theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1])
+        i++
+    theRequest
+
   return {
     loadData: loadData
     isValidType: isValidType
@@ -281,4 +301,6 @@ define ['jquery'], ($)->
     checkBalance: checkBalance
     checkMoney: checkMoney
     checkCardNo: checkCardNo
+    registerWap: registerWap
+    getRequest:getRequest
   }

@@ -12,14 +12,32 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
         conf += [
             [['server'], [
                 ['listen', '80'],
+                ['server_name', 'www.wanglibao.com staging.wanglibao.com pre.wanglibao.com'],
                 ['return', '301 https://$host$request_uri'],
+            ]],
+            [['server'], [
+                ['listen', '80'],
+                ['server_name', 'wanglibao.com'],
+                ['return', '301 https://www.wanglibao.com$request_uri'],
+            ]],
+            [['server'], [
+                ['listen', '443 ssl'],
+                ['server_name', 'wanglibao.com'],
+                ['ssl_certificate', '/etc/nginx/ssl/wanglibao.crt'],
+                ['ssl_certificate_key', '/etc/nginx/ssl/wanglibao.key'],
+                ['ssl_protocols', 'SSLv3 TLSv1 TLSv1.1 TLSv1.2'],
+                ['ssl_ciphers', 'RC4:HIGH:!aNULL:!MD5'],
+                ['ssl_session_cache', 'shared:SSL:10m'],
+                ['ssl_session_timeout', '10m'],
+                ['return', '301 https://www.wanglibao.com$request_uri'],
             ]]
         ]
 
     conf += [
         [['server'], [
             ['listen', '443 ssl'],
-            ['server_name', 'localhost'],
+            #['server_name', 'localhost'],
+            ['server_name', 'www.wanglibao.com pre.wanglibao.com staging.wanglibao.com'],
             ['ssl_certificate', '/etc/nginx/ssl/wanglibao.crt'],
             ['ssl_certificate_key', '/etc/nginx/ssl/wanglibao.key'],
             ['ssl_protocols', 'SSLv3 TLSv1 TLSv1.1 TLSv1.2'],
@@ -44,6 +62,7 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
                 ['proxy_cache', 'static-cache'],
                 ['proxy_cache_valid', '200 302 60m'],
                 ['proxy_cache_valid', '404 1m'],
+                ['access_log', 'off'],
             ]],
 
             [['location', '/media'], [
@@ -51,6 +70,7 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
                 ['proxy_cache', 'static-cache'],
                 ['proxy_cache_valid', '200 302 60m'],
                 ['proxy_cache_valid', '404 1m'],
+                ['access_log', 'off'],
             ]],
         ]],
         [['upstream apps'], [('server', name + ':' + upstream_port) for name in apps]]
