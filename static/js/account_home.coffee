@@ -94,3 +94,16 @@ require ['jquery', 'underscore', 'knockout',
 
   $(".xunlei-binding-modal").click () ->
     $('#xunlei-binding-modal').modal()
+
+  isXunleiBindSuccess = () ->
+    result = /[\?|&]result=(\w+)$|&/ig.exec(window.location.href)
+    if result
+      if result[1] == 'ok'
+        tool.modalAlert({title: '温馨提示', msg: '抱歉您还不是迅雷付费会员，不能享受额外收益。<br/>请开通迅雷付费会员后，再绑定一次，即可享受额外收益。'})
+      else if result[1] == 'vip'
+        tool.modalAlert({title: '温馨提示', msg: '恭喜！迅雷付费会员绑定成功，投资指定标的后可享受额外收益。'})
+      else
+        tool.modalAlert({title: '温馨提示', msg: '迅雷帐号绑定失败，请再试一次'})
+
+  isXunleiBindSuccess()
+

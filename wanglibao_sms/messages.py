@@ -64,3 +64,7 @@ def gift_invited(inviter_phone, money):
 @suffix
 def rand_pass(password):
     return u'感谢注册网利宝，您的初始密码是%s，请登录wanglibao.com修改密码。' % password
+
+@suffix
+def earning_message(amount):
+    return u'亲，您的投标奖励收益%s元，已赠送到您的网利宝账户，可用于理财投资' % amount

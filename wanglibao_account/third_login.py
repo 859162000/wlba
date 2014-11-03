@@ -14,7 +14,7 @@ partner = {
             "api":"https://open-api-auth.xunlei.com"}
 }
 
-def assem_params(login_type):
+def assem_params(login_type, request):
     if login_type == "xunlei":
         uri = "/platform?"
         params = {"client_id":partner[login_type]["client_id"],
@@ -25,13 +25,17 @@ def assem_params(login_type):
     else:
         return settings.LOGIN_REDIRECT_URL
 
-def login_back(args, user):
+def login_back(request):
+    args = request.GET
+    user = request.user
+
     ret = args.get("ret", "")
     code = args.get("code", "")
     state = args.get("state", "")
     if ret != "0" or not code or not state:
-        return {"ret_code":30031, "message":"parameter error"}
+        return {"ret_code":30031, "message":"parameter error", "url":location + "false"}
 
+    location = "/accounts/home/?result="
     if state == "xunlei":
         uri = "/auth2/token?"
         params = {"grant_type":"authorization_code", "code":code,
@@ -44,13 +48,13 @@ def login_back(args, user):
         if str(response['status']) == "200":
             dic = json.loads(content)
             if dic['result'] != 200:
-                return {"ret_code":30033, "message":"token error"}
+                return {"ret_code":30033, "message":"token error", "url":location + "false"}
             uri = "http://developer.open-api-auth.xunlei.com/get_user_info?"
             params = {"client_id":partner[state]['client_id'], "scope":"get_user_info", "access_token":dic['access_token']}
             url = uri + urllib.urlencode(params)
             response, content = http.request(url, 'GET')
             if str(response['status']) != "200":
-                return {"ret_code":30034, "message":content}
+                return {"ret_code":30034, "message":content, "url":location + "false"}
             userinfo = json.loads(content)
 
             """
@@ -86,16 +90,18 @@ def login_back(args, user):
             bindinfo.save()
             """
 
-            #return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
             rs = _bind_account(user, state, userinfo, dic)
             if rs:
-                return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
+                if str(userinfo['isvip']) == "0":
+                    return {"ret_code":0, "message":"ok", "data":userinfo, "url":location + "ok"}
+                else:
+                    return {"ret_code":0, "message":"ok", "data":userinfo, "url":location + "vip"}
             else:
-                return {"ret_code":30034, "message":"server error"}
+                return {"ret_code":30034, "message":"server error", "url":location + "false"}
         else:
-            return {"ret_code":30033, "message":content}
+            return {"ret_code":30033, "message":content, "url":location + "false"}
     else:
-        return {"ret_code":30032, "message":"state error"}
+        return {"ret_code":30032, "message":"state error", "url":location + "false"}
 
 #检查迅雷账号VIP
 def check_xunlei(dic):

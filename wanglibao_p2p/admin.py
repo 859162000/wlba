@@ -16,6 +16,7 @@ class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (
         'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
     list_filter = ('confirm',)
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
@@ -190,6 +191,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
 
 class P2PRecordResource(resources.ModelResource):
@@ -223,10 +225,12 @@ class WarrantAdmin(admin.ModelAdmin):
 class AmortizationRecordAdmin(admin.ModelAdmin):
     list_display = (
         'catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
 
 class EquityRecordAdmin(ReadPermissionModelAdmin):
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]
@@ -242,6 +246,8 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
 
 class EarningAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'product', 'amount', )
+    raw_id_fields = ('order', 'margin_record')
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
 
     def get_readonly_fields(self, request, obj=None):

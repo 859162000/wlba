@@ -153,14 +153,16 @@ block main
                   td
                     if row.earning
                       p.highlight {{row.earning.amount | money_format}}
-                      p {{row.earning.product.activity.rule.name}}{{row.earning.product.activity.rule.percent_text}}%返现
+                      p {{row.earning.product.activity.name}}
                       p 满标后2个工作日内发放
+                    else
+                      | -
 
                   if row.equity.product.display_status == '还款中' or row.equity.product.display_status == '已完成'
                     td
-                      a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{equity.product.id}}/") 还款计划
+                      a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{row.equity.product.id}}/") 还款计划
                     td
-                      a.button.button-small.button-pink(href="/accounts/p2p/contract/{{equity.product.id}}/" target="_blank") 合同
+                      a.button.button-small.button-pink(href="/accounts/p2p/contract/{{row.equity.product.id}}/" target="_blank") 合同
                   else
                     td -
                     td -
