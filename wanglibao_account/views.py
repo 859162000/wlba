@@ -937,7 +937,7 @@ class UserProductContract(APIView):
 @login_required
 def test_contract(request, equity_id):
     equity = P2PEquity.objects.filter(id=equity_id).prefetch_related('product').first()
-    return HttpResponse(generate_contract(equity, 'hongmu_template.jade'))
+    return HttpResponse(generate_contract(equity, 'tongchenghuodi_template.jade'))
 
 
 class IdVerificationView(TemplateView):
