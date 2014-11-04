@@ -15,13 +15,11 @@ partner = {
 }
 
 def assem_params(login_type, request):
-    referer = request.META.get("HTTP_REFERRER", "/accounts/home/")
-    request.session["bind_referer"] = referer
     if login_type == "xunlei":
         uri = "/platform?"
         params = {"client_id":partner[login_type]["client_id"],
                 "grant_type":"code","wap":0,
-                "redirect_uri":settings.CALLBACK_HOST+"/accounts/login/callback/",
+                "redirect_uri":settings.CALLBACK_HOST+"/accounts/home/",
                 "state":login_type}
         return partner[login_type]['api'] + uri + urllib.urlencode(params)
     else:
@@ -30,13 +28,13 @@ def assem_params(login_type, request):
 def login_back(request):
     args = request.GET
     user = request.user
-    referer = request.session.get("bind_referer", "/accounts/home/")
+    location = "/accounts/home/?result="
 
     ret = args.get("ret", "")
     code = args.get("code", "")
     state = args.get("state", "")
     if ret != "0" or not code or not state:
-        return {"ret_code":30031, "message":"parameter error"}
+        return {"ret_code":30031, "message":"parameter error", "url":location + "false"}
 
     if state == "xunlei":
         uri = "/auth2/token?"
@@ -50,13 +48,13 @@ def login_back(request):
         if str(response['status']) == "200":
             dic = json.loads(content)
             if dic['result'] != 200:
-                return {"ret_code":30033, "message":"token error"}
+                return {"ret_code":30033, "message":"token error", "url":location + "false"}
             uri = "http://developer.open-api-auth.xunlei.com/get_user_info?"
             params = {"client_id":partner[state]['client_id'], "scope":"get_user_info", "access_token":dic['access_token']}
             url = uri + urllib.urlencode(params)
             response, content = http.request(url, 'GET')
             if str(response['status']) != "200":
-                return {"ret_code":30034, "message":content}
+                return {"ret_code":30034, "message":content, "url":location + "false"}
             userinfo = json.loads(content)
 
             """
@@ -92,17 +90,21 @@ def login_back(request):
             bindinfo.save()
             """
 
-            #return {"ret_code":0, "message":"ok", "data":userinfo, "url":"/accounts/home/"}
             rs = _bind_account(user, state, userinfo, dic)
             if rs:
-                #return {"ret_code":0, "message":"ok", "data":userinfo, "url":"<script>location.href=" + settings.CALLBACK_HOST + "/accounts/home/;" + "</script>"}
-                return {"ret_code":0, "message":"ok", "data":userinfo, "url":referer}
+                if rs == "exist":
+                    return {"ret_code":30035, "message":"bind related exist", "data":userinfo, "url":location + "false"}
+
+                if str(userinfo['isvip']) == "0":
+                    return {"ret_code":0, "isvip":0, "message":"ok", "data":userinfo, "url":location + "ok"}
+                else:
+                    return {"ret_code":0, "isvip":1, "message":"ok", "data":userinfo, "url":location + "vip"}
             else:
-                return {"ret_code":30034, "message":"server error"}
+                return {"ret_code":30034, "message":"server error", "url":location + "false"}
         else:
-            return {"ret_code":30033, "message":content}
+            return {"ret_code":30033, "message":content, "url":location + "false"}
     else:
-        return {"ret_code":30032, "message":"state error"}
+        return {"ret_code":30032, "message":"state error", "url":location + "false"}
 
 #检查迅雷账号VIP
 def check_xunlei(dic):
@@ -155,7 +157,7 @@ def _bind_account(user, state, userinfo, dic):
     bindinfo = Binding.objects.filter(bid=userinfo['uid']).filter(btype=state).first()
     if bindinfo:
         if bindinfo.user != user:
-            return True
+            return "exist"
     else:
         bindinfo = Binding()
         bindinfo.user = user

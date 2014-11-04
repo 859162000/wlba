@@ -6,4 +6,5 @@ urlpatterns = patterns(
     '',
     url(r'^invite/$', TemplateView.as_view(template_name="activity_invite.jade")),
     url(r'^xunlei/$', TemplateView.as_view(template_name="xunlei.jade")),
+    url(r'^gold/$', TemplateView.as_view(template_name="gold.jade")),
 )

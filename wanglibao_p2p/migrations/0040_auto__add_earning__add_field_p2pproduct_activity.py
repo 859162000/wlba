@@ -11,17 +11,23 @@ class Migration(SchemaMigration):
         # Adding model 'Earning'
         db.create_table(u'wanglibao_p2p_earning', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('product', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProduct'])),
+            ('type', self.gf('django.db.models.fields.CharField')(default='D', max_length=5)),
+            ('product', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['wanglibao_p2p.P2PProduct'], null=True, blank=True)),
             ('amount', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=20, decimal_places=2)),
+            ('order', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['order.Order'], null=True, blank=True)),
+            ('margin_record', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_margin.MarginRecord'], null=True, blank=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('paid', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('update_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, null=True, blank=True)),
+            ('confirm_time', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
         ))
         db.send_create_signal(u'wanglibao_p2p', ['Earning'])
 
         # Adding field 'P2PProduct.activity'
-        db.add_column(u'wanglibao_p2p_p2pproduct', 'activity',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.Activity'], null=True, on_delete=models.SET_NULL),
-                      keep_default=False)
+        #db.add_column(u'wanglibao_p2p_p2pproduct', 'activity',
+        #              self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.Activity'], null=True, on_delete=models.SET_NULL, blank=True),
+        #             keep_default=False)
 
 
     def backwards(self, orm):
@@ -29,7 +35,7 @@ class Migration(SchemaMigration):
         db.delete_table(u'wanglibao_p2p_earning')
 
         # Deleting field 'P2PProduct.activity'
-        db.delete_column(u'wanglibao_p2p_p2pproduct', 'activity_id')
+        #db.delete_column(u'wanglibao_p2p_p2pproduct', 'activity_id')
 
 
     models = {
@@ -70,7 +76,7 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'marketing.activity': {
-            'Meta': {'object_name': 'Activity'},
+            'Meta': {'ordering': "['-create_time']", 'object_name': 'Activity'},
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {}),
             'end_time': ('django.db.models.fields.DateTimeField', [], {}),
@@ -80,13 +86,33 @@ class Migration(SchemaMigration):
             'start_time': ('django.db.models.fields.DateTimeField', [], {})
         },
         u'marketing.activityrule': {
-            'Meta': {'object_name': 'ActivityRule'},
-            'create_time': ('django.db.models.fields.DateTimeField', [], {}),
+            'Meta': {'ordering': "['-create_time']", 'object_name': 'ActivityRule'},
+            'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'rule_amount': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '20', 'decimal_places': '2'}),
+            'rule_amount': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '20', 'decimal_places': '4'}),
             'rule_type': ('django.db.models.fields.CharField', [], {'max_length': '50'})
+        },
+        u'order.order': {
+            'Meta': {'object_name': 'Order'},
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'extra_data': ('wanglibao.fields.JSONFieldUtf8', [], {'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'children'", 'null': 'True', 'to': u"orm['order.Order']"}),
+            'status': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+        },
+        u'wanglibao_margin.marginrecord': {
+            'Meta': {'ordering': "['-create_time']", 'object_name': 'MarginRecord'},
+            'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
+            'catalog': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '1000'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'margin_current': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
+            'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
         },
         u'wanglibao_p2p.amortizationrecord': {
             'Meta': {'object_name': 'AmortizationRecord'},
@@ -119,11 +145,17 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '32'})
         },
         u'wanglibao_p2p.earning': {
-            'Meta': {'object_name': 'Earning'},
+            'Meta': {'ordering': "['-create_time']", 'object_name': 'Earning'},
             'amount': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '20', 'decimal_places': '2'}),
+            'confirm_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']"}),
+            'margin_record': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_margin.MarginRecord']", 'null': 'True', 'blank': 'True'}),
+            'order': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['order.Order']", 'null': 'True', 'blank': 'True'}),
+            'paid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'product': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['wanglibao_p2p.P2PProduct']", 'null': 'True', 'blank': 'True'}),
+            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+            'update_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'wanglibao_p2p.equityrecord': {
@@ -151,7 +183,7 @@ class Migration(SchemaMigration):
         },
         u'wanglibao_p2p.p2pproduct': {
             'Meta': {'object_name': 'P2PProduct'},
-            'activity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['marketing.Activity']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
+            'activity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['marketing.Activity']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'amortization_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'baoli_original_contract_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'baoli_original_contract_number': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),

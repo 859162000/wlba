@@ -737,13 +737,13 @@ class Third_login(View):
         url = third_login.assem_params(login_type, request)
         return HttpResponseRedirect(url)
 
-class Third_login_back(View):
+class Third_login_back(APIView):
+    permission_classes = ()
+
     def get(self, request):
         result = third_login.login_back(request)
-        if result['ret_code']:
-            return HttpResponse(result['message'])
-        #return HttpResponse(result['url'])
-        return HttpResponseRedirect(result['url'])
+        return Response(result)
+        #return HttpResponseRedirect(result['url'])
 
 class ChangePasswordAPIView(APIView):
     permission_classes = (IsAuthenticated, )

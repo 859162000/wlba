@@ -113,7 +113,7 @@ class P2PProduct(ProductBase):
     hide = models.BooleanField(u'隐藏', default=False)
 
     name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
-    short_name = models.CharField(verbose_name=u'短名字*', max_length=64, blank=False)
+    short_name = models.CharField(verbose_name=u'短名字*', max_length=64, blank=False, help_text=u'短名字要求不超过13个字')
     serial_number = models.CharField(verbose_name=u'产品编号*', max_length=100, unique=True, blank=False, null=True)
     contract_serial_number = models.CharField(verbose_name=u'合同编号*', max_length=100, blank=False, null=True)
 
@@ -170,7 +170,7 @@ class P2PProduct(ProductBase):
     contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True ,blank=False)
 
     #author: hetao; datetime: 2014.10.27; description: 活动是否参加活动
-    activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True)
+    activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True, verbose_name=u'返现活动')
 
 
     class Meta:
