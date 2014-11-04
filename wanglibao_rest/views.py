@@ -54,7 +54,6 @@ class SendValidationCodeView(APIView):
                         }, status=status)
 
 
-from django.utils.decorators import method_decorator
 class SendRegisterValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone
@@ -227,6 +226,7 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.save()
 
         return Response({"ret_code":0, "message":"验证成功"})
+
 
 class UserExisting(APIView):
     permission_classes = ()
