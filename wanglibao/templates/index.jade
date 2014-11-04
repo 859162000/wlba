@@ -195,7 +195,10 @@ html
                       span 还款方式: &nbsp;&nbsp;
                       span.d3-text {{product.display_payback_method}}
                 if status == '还款中' or status == '已完成'
-                  .panel-p2p-stamp
+                  if forloop.counter == 1
+                    .panel-p2p-stamp(style="top:55px")
+                  else
+                    .panel-p2p-stamp
             .space-vertical-sm
           if True
             .row
