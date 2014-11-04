@@ -525,8 +525,9 @@ class FinancesAPI(APIView):
         ]).order_by("-priority")
 
         p2p_list = []
-        status = 0
+
         for p2p in p2pproducts:
+            status = 0
             shouyi = "{}%".format(p2p.expected_earning_rate)
             if p2p.status == u'正在招标':
                 status = 1
