@@ -28,20 +28,12 @@ def send_messages(phones, messages, channel=0):
     #status, context = backend.send_messages(phones, messages)
 
     if channel == 0:
-<<<<<<< HEAD
-        status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages)
-        #失败使用yimei重发
-        if status != 200:
-            status, context = backends.EmaySMS.send_messages(phones, messages)
-            short_message.channel = u"亿美"
-=======
         status, context = backends.EmaySMS.send_messages(phones, messages)
         short_message.channel = u"亿美"
         #失败使用maodao重发
         if status != 200:
             status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages)
             short_message.channel = u"慢道"
->>>>>>> 5823082bc3d20cee06d35c4d90283ecd91f54eda
     elif channel == 1:
         status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages)
     else:
