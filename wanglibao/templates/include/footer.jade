@@ -35,11 +35,12 @@ mixin innerFooter()
 
         .space-vertical-s
         dd.section--item
-          a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
-          a.social-text.social-space(href="http://weibo.com/u/5000682691", target="_blank", data-target="#qrweibo") 新浪微博
-
-          a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
-          a.social-text(href="javascript:void(0)", data-target="#qrcode") 微信
+          span.weibo-container
+            a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
+            a.social-text.social-space(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo") 新浪微博
+          span.weixin-container
+            a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
+            a.social-text(href="javascript:void(0)", data-role="hover", data-target="#qrcode") 微信
 
 
 
