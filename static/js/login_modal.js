@@ -168,14 +168,7 @@
           type: "POST",
           data: $(form).serialize()
         }).done(function(data, textStatus) {
-          var next_url;
-          next_url = '';
-          if (window.location.search) {
-            next_url = window.location.search.substring(6);
-            return window.location.href = next_url;
-          } else {
-            return location.reload();
-          }
+          return location.reload();
         }).fail(function(xhr) {
           var error_message, message, result;
           result = JSON.parse(xhr.responseText);
