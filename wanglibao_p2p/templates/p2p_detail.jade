@@ -84,7 +84,10 @@ html
               dd 选择“债权转让”后，即可提前赎回未到期债权，但您需承担提前赎回本金0-5%不等的年化收益率折让费（由提前赎回投资人自行设置），折让费将转给下一个接收投资人，投资人相应权利义务同时转移。
 
         .span4-omega.invest-form.border-left
-          h1 我要投资
+          if user.is_authenticated
+            h1 我要投资<span class="detail-margin">(余额:{{user.margin.margin}}元 <a href="/pay/banks">充值</a>)</span>
+          else
+            h1 我要投资
           if status == '抢购中'
             form#purchase-form
               {{form.product}}
