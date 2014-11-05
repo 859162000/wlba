@@ -85,7 +85,7 @@ html
 
         .span4-omega.invest-form.border-left
           if user.is_authenticated
-            h1 我要投资<span class="detail-margin">(余额:{{user.margin.margin}}元 <a href="/pay/banks">充值</a>)</span>
+            h1 我要投资<span class="detail-margin">（余额：{{user.margin.margin}}元 <a href="/pay/banks">充值</a>）</span>
           else
             h1 我要投资
           if status == '抢购中'
