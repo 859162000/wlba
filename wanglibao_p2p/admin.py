@@ -213,6 +213,7 @@ class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
         'catalog', 'order_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
     resource_class = P2PRecordResource
     change_list_template = 'admin/import_export/change_list_export.html'
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]

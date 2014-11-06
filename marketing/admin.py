@@ -26,6 +26,7 @@ class SiteDataAdmin(admin.ModelAdmin):
 class PromotionTokenAdmin(ReadPermissionModelAdmin):
     list_display = ("user", "token")
     search_fields = ['user__wanglibaouserprofile__phone']
+    raw_id_fields = ('user', )
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('marketing.view_promotiontoken'):
@@ -61,7 +62,7 @@ class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
-
+    raw_id_fields = ('user', 'introduced_by', 'created_by')
     resource_class = IntroducedByResource
 
     def get_queryset(self, request):
