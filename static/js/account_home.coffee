@@ -97,7 +97,9 @@ require ['jquery', 'underscore', 'knockout',
 
   isXunleiBindSuccess = () ->
     result = backend.getRequest()
+
     if !result['ret'] || !result['code'] || !result['state']
+      tool.modalAlert({title: '温馨提示', msg: '迅雷帐号绑定失败'})
       return
     backend.registerXunlei {
       "ret":result['ret'],
