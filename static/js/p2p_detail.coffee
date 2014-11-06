@@ -56,7 +56,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         .done (data)->
 
           tool.modalAlert({title: '温馨提示', msg: '份额认购成功', callback_ok: ()->
-              location.reload()
+              window.location.href="/accounts/home"
           })
 
         .fail (xhr)->
