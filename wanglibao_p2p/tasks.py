@@ -42,8 +42,6 @@ def build_earning(product_id):
 
     #把收益数据插入earning表内
     for obj in earning:
-        if obj.get('user') == 13933:
-            continue
 
         bind = Binding.objects.filter(user_id=obj.get('user')).first()
         if bind and bind.isvip:
