@@ -278,6 +278,8 @@ html
               if trade_records.count > 30
                 .row
                   a.get-more(href="#") 查看更多
+
+    .space-vertical-sm
     if p2p.activity
       if user.is_authenticated and not xunlei_vip.isvip
         #xunlei-binding-modal(style="display:none;")

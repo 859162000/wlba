@@ -112,11 +112,13 @@
     isXunleiBindSuccess = function() {
       var result;
       result = backend.getRequest();
-      if (!result['ret'] || !result['code'] || !result['state']) {
+      if (result['ret'] && result['ret'] > 0) {
         tool.modalAlert({
           title: '温馨提示',
           msg: '迅雷帐号绑定失败'
         });
+      }
+      if (!result['ret'] || !result['code'] || !result['state']) {
         return;
       }
       return backend.registerXunlei({
