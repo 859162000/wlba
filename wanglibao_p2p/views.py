@@ -80,6 +80,7 @@ class P2PDetailView(TemplateView):
                 'xunlei_vip': xunlei_vip
             })
 
+
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
 
         site_data = SiteData.objects.all()[0]
