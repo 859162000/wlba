@@ -111,6 +111,14 @@ block main
               p.desc 提现中冻结金额
 
         .space-vertical-s
+        .row
+          .xunlei-tip-container
+            span.p2p-xunlei-icon
+            if user.is_authenticated and xunlei_vip.isvip == True
+              您已是绑定迅雷会员，投资即可获额外收益。
+            else
+              只要在满标之前<a href="#xunlei-binding-modal" class="blue xunlei-binding-modal">绑定迅雷会员</a>，即可获额外收益。
+        .space-vertical-s
 
         table.table
           thead
@@ -135,7 +143,11 @@ block main
                 tr
                   td {{row.equity.created_at | date:"Y-m-d H:i:s"}}
                   td
-                    p <a href="/p2p/detail/{{row.equity.product.id}}/">{{row.equity.product.short_name}}</a>
+                    p
+                      if row.equity.product.activity
+                        span.p2p-xunlei-icon
+                      a(href="/p2p/detail/{{row.equity.product.id}}/") {{row.equity.product.short_name}}
+                      //<a href="/p2p/detail/{{row.equity.product.id}}/">{{row.equity.product.short_name}}</a>
                     p 年化收益：{{row.equity.product.expected_earning_rate}}%
                     p 期限：{{row.equity.product.period}}个月
                   td {{row.equity.equity | money_format}}
