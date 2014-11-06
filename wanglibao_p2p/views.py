@@ -120,14 +120,7 @@ class PurchaseP2P(APIView):
                 'error_number': ErrorNumber.need_authentication
             }, status=status.HTTP_400_BAD_REQUEST)
         form = PurchaseForm(request.DATA)
-        phone = request.user.wanglibaouserprofile.phone
-        code = request.POST.get('validate_code', '')
-        # status_code, message = validate_validation_code(phone, code)
-        # if status_code != 200:
-        #     return Response({
-        #         'message': u'验证码输入错误',
-        #         'error_number': ErrorNumber.validate_code_wrong
-        #     }, status=status.HTTP_400_BAD_REQUEST)
+
         if form.is_valid():
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
@@ -135,7 +128,7 @@ class PurchaseP2P(APIView):
             try:
                 trader = P2PTrader(product=p2p, user=request.user)
                 product_info, margin_info, equity_info = trader.purchase(amount)
-                print product_info, '####'
+
                 return Response({
                     'data': product_info.amount
                 })
@@ -172,14 +165,6 @@ class PurchaseP2PMobile(APIView):
             }, status=status.HTTP_200_OK)
         form = PurchaseForm(request.DATA)
         phone = request.user.wanglibaouserprofile.phone
-        # code = request.POST.get('validate_code', '')
-        # status_code, message = validate_validation_code(phone, code)
-        #
-        # if status_code != 200:
-        #     return Response({
-        #         'message': u'验证码输入错误',
-        #         'error_number': ErrorNumber.validate_code_wrong
-        #     }, status=status.HTTP_200_OK)
         if form.is_valid():
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
