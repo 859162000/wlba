@@ -365,7 +365,7 @@ class EearningReportGenerator(ReportGeneratorBase):
                 str(earning.paid),
                 timezone.localtime(earning.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                 timezone.localtime(earning.update_time).strftime("%Y-%m-%d %H:%M:%S"),
-                timezone.localtime(earning.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
+                # timezone.localtime(earning.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
             ])
         return output.getvalue()
 
