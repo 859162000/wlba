@@ -13,7 +13,7 @@
         return window.location.href = '/accounts/invite/';
       }).fail(function(xhr) {
         if (xhr.status === 403) {
-          $('.login-modal').trigger('click');
+          window.location.href = '/activity/gold/';
         }
       });
     });
