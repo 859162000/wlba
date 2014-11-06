@@ -40,12 +40,12 @@ def build_earning(product_id):
     phone_list = []
     rule = p2p.activity.rule
 
-
-
     #把收益数据插入earning表内
     for obj in earning:
+        if obj.get('user') == 13933:
+            continue
 
-        bind = Binding.objects.get(user_id=obj.get('user'))
+        bind = Binding.objects.filter(user_id=obj.get('user')).first()
         if bind and bind.isvip:
             earning = Earning()
             amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)

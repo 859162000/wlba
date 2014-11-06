@@ -13,18 +13,16 @@ from rest_framework import renderers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
 from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct, P2PEquity, P2PRecord, Earning
+from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
-from wanglibao_sms.utils import validate_validation_code
-from operator import attrgetter, itemgetter
+from operator import attrgetter
 from django.conf import settings
 from decimal import Decimal
 from hashlib import md5
@@ -82,69 +80,6 @@ class P2PDetailView(TemplateView):
                 'xunlei_vip': xunlei_vip
             })
 
-        orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
-
-        site_data = SiteData.objects.all()[0]
-
-        context.update({
-            'p2p': p2p,
-            'form': form,
-            'end_time': end_time,
-            'orderable_amount': orderable_amount,
-            'total_earning': total_earning,
-            'current_equity': current_equity,
-            'site_data': site_data,
-            'attachments': p2p.attachment_set.all(),
-            'announcements': AnnouncementP2P,
-            'total_fee_earning': total_fee_earning
-        })
-
-        return context
-
-
-from django.contrib.auth.decorators import permission_required
-from django.utils.decorators import method_decorator
-
-class TestP2PDetailView(TemplateView):
-    template_name = "test_p2p_detail.jade"
-
-    def get_context_data(self, id, **kwargs):
-        context = super(TestP2PDetailView, self).get_context_data(**kwargs)
-
-        try:
-            p2p = P2PProduct.objects.select_related('activity').get(pk=id, hide=False)
-            form = PurchaseForm(initial={'product': p2p})
-
-            if p2p.soldout_time:
-                end_time = p2p.soldout_time
-            else:
-                end_time = p2p.end_time
-        except P2PProduct.DoesNotExist:
-            raise Http404(u'您查找的产品不存在')
-
-        terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
-                                                               p2p.expected_earning_rate/100,
-                                                               p2p.amortization_count,
-                                                               p2p.period)
-        total_earning = terms.get("total") - p2p.total_amount
-
-        total_fee_earning = 0
-
-        if p2p.activity:
-            total_fee_earning = Decimal(p2p.total_amount*p2p.activity.rule.rule_amount*(Decimal(p2p.period)/Decimal(12))).quantize(Decimal('0.01'))
-
-        user = self.request.user
-        current_equity = 0
-
-        if user.is_authenticated():
-            equity_record = p2p.equities.filter(user=user).first()
-            if equity_record is not None:
-                current_equity = equity_record.equity
-
-            xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
-            context.update({
-                'xunlei_vip': xunlei_vip
-            })
 
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
 
@@ -164,13 +99,6 @@ class TestP2PDetailView(TemplateView):
         })
 
         return context
-
-    @method_decorator(permission_required('wanglibao_p2p.view_p2pproduct', login_url='/'))
-    def dispatch(self, request, *args, **kwargs):
-        """
-        Only user with view p2pproduct permission can call this view
-        """
-        return super(TestP2PDetailView, self).dispatch(request, *args, **kwargs)
 
 
 class PurchaseP2P(APIView):
@@ -307,7 +235,6 @@ class AuditProductView(TemplateView):
 audit_product_view = staff_member_required(AuditProductView.as_view())
 
 
-
 class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = (IsAdminUserOrReadOnly,)
@@ -329,11 +256,11 @@ class P2PProductViewSet(PaginatedModelViewSet):
         if pager:
             return qs.filter(hide=False).filter(status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-                ]).filter(pager).exclude(id=46).exclude(id=47).order_by('-priority')
+                ]).filter(pager).order_by('-priority')
         else:
             return qs.filter(hide=False).filter(status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-                ]).exclude(id=46).exclude(id=47).order_by('-priority')
+                ]).order_by('-priority')
 
 
 class P2PProductListView(generics.ListCreateAPIView):
@@ -575,12 +502,12 @@ class P2PListView(TemplateView):
     def get_context_data(self, **kwargs):
 
         p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status= u'正在招标').exclude(id=46).exclude(id=47).order_by('-publish_time')
+            .filter(status= u'正在招标').order_by('-publish_time')
 
         p2p_others = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
             status__in=[
                 u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
-            ]).exclude(id=46).exclude(id=47).order_by('-soldout_time')
+            ]).order_by('-soldout_time')
 
         show_slider = False
         if p2p_done:
