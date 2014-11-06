@@ -270,12 +270,11 @@ class IdValidate(APIView):
                             }, status=400)
 
 
+        # id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
         id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
-
-        if id_verify_count >= 3:
-            print 'id_verify_count', id_verify_count
+        if id_verify_count >= 1:
             return Response({
-                                "message": u"您的身份证已绑定了三个帐号，无法继续验证，请联系客服人工验证 4008-588-066",
+                                "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066",
                                 "error_number": ErrorNumber.id_verify_times_error
                             }, status=400)
 

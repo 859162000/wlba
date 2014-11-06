@@ -304,7 +304,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       window.location.href = $("#invite_top_bar").attr("data-url")
     .fail (xhr)->
       if xhr.status == 403
-        $('.login-modal').trigger('click')
+        window.location.href = '/activity/gold/'
         return
 
   $("#agreement").change (value)->

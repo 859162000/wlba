@@ -48,12 +48,12 @@ class P2PTrader(object):
             if "channel" not in introduced_by.introduced_by.username:
                 inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
                 invited_phone = introduced_by.user.wanglibaouserprofile.phone
-
-                send_messages.apply_async(kwargs={
-                    "phones": [inviter_phone, invited_phone],
-                    "messages": [messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
-                                 messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)]
-                })
+                if amount >= 1000:
+                    send_messages.apply_async(kwargs={
+                        "phones": [inviter_phone, invited_phone],
+                        "messages": [messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
+                                     messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)]
+                    })
 
         return product_record, margin_record, equity
 
