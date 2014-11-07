@@ -370,7 +370,7 @@ class GetProjectsByDateAPI(APIView):
         end_time = start_time + timezone.timedelta(days=1)
 
         p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
-            u'还款中', u'已完成'
+             u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'已完成'
         ]).filter(soldout_time__range=(start_time, end_time))
 
         p2p_list = []
@@ -389,7 +389,6 @@ class GetProjectsByDateAPI(APIView):
                 if pay_method == p2p.pay_method:
                     repaymentType = value
                     break
-
 
             p2pequities = p2p.equities.all()
             subscribes = []
