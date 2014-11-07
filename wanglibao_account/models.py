@@ -120,5 +120,6 @@ def send_public_message(sender, instance, **kwargs):
         from celery.execute import send_task
         send_task("wanglibao_account.message.send_all", kwargs={'msgTxt_id': instance.id})
         instance.save()
+        post_save.connect(send_public_message, sender=MessageText)
 
 post_save.connect(send_public_message, sender=MessageText)
