@@ -29,15 +29,16 @@ def list_msg(params, user):
     """
         分页获取消息
     """
-    pagesize = 10
+    pagesize = params.get("pagesize", "10").strip()
     pagenum = params.get("pagenum", "").strip()
     listtype = params.get("listtype", "").strip()
     if not pagenum or not listtype:
         return {"ret_code":30081, "message":"信息输入不完整"}
-    if not pagenum.isdigit() or listtype not in ("read", "unread", "all"):
+    if not pagenum.isdigit() or not pagesize.isdigit() or listtype not in ("read", "unread", "all"):
         return {"ret_code":30082, "message":"参数输入错误"}
     pagenum = int(pagenum)
-    if not 1<=pagenum<100:
+	pagesize = int(pagesize)
+    if not 1<=pagenum<100 or not 1<=pagesize<=50:
         return {"ret_code":30083, "message":"参数输入错误"}
     if listtype == "unread":
         msgs = Message.objects.filter(target_user=user, read_status=False, notice=True)[(pagenum-1)*pagesize:pagenum*pagesize]
