@@ -37,7 +37,7 @@ def list_msg(params, user):
     if not pagenum.isdigit() or not pagesize.isdigit() or listtype not in ("read", "unread", "all"):
         return {"ret_code":30082, "message":"参数输入错误"}
     pagenum = int(pagenum)
-	pagesize = int(pagesize)
+    pagesize = int(pagesize)
     if not 1<=pagenum<100 or not 1<=pagesize<=50:
         return {"ret_code":30083, "message":"参数输入错误"}
     if listtype == "unread":
@@ -68,6 +68,9 @@ def sign_read(user, message_id):
 def create(title, content, mtype):
     if not title or not content or not mtype:
         return False
+    nt = dict(message_type).keys()
+    if mtype not in nt:
+        return False
     msgTxt = MessageText()
     msgTxt.title = title
     msgTxt.content = content
@@ -76,10 +79,8 @@ def create(title, content, mtype):
     msgTxt.save()
     return msgTxt
     
-def send(target_user, msgTxt):
+def _send(target_user, msgTxt):
     msg = Message()
-    if not isinstance(msgTxt, MessageText) or not isinstance(target_user, User):
-        return False
     msg.target_user = target_user
     msg.message_text = msgTxt
     mset = MessageNoticeSet.objects.filter(user=target_user, mtype=msgTxt.mtype).first()
@@ -138,3 +139,18 @@ def send_all(msgTxt_id):
             msg.save()
         start += 1
     return "send to all ok"
+
+@app.task
+def send_one(user_id, title, content, mtype):
+    """
+        给某个人发送站内信（需要推送时也在这里写）
+    """
+    user = User.objects.filter(pk=user_id).first()
+    if not user:
+        return False
+    msgTxt = create(title, content, mtype)
+    if msgTxt:
+        _send(user, msgTxt)
+        return True
+    else:
+        return False
