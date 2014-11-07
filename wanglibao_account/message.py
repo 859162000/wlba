@@ -115,21 +115,16 @@ def notice_set(params, user):
     return {"ret_code":0, "message":"设置成功"}
 
 
-import sys
-debug = sys.stderr
 @app.task
 def send_all(msgTxt_id):
-    print >>debug,"================="
-    print >>debug,"%s" % msgTxt_id
+    time.sleep(5)
     msgTxt = MessageText.objects.filter(pk=msgTxt_id).first()
     if not msgTxt:
         return False
-    print >>debug, "%s" % msgTxt
     pagesize = 50
     start = 0
     while True:
         users = User.objects.all()[start*pagesize:(start+1)*pagesize]
-        print >>debug, "len users %s" % len(users)
         if not users:
             break
         for x in users:
@@ -138,8 +133,7 @@ def send_all(msgTxt_id):
             msg.message_text = msgTxt
             msg.read_status = False
             msg.read_at = 0
-            msg.notice = notice
+            msg.notice = True
             msg.save()
         start += 1
-    print >>debug, "send ok"
     return "send to all ok"
