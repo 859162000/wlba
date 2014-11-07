@@ -122,7 +122,6 @@ def send_all(msgTxt_id):
         return False
     pagesize = 50
     start = 0
-    return True
     while True:
         users = User.objects.all()[start*pagesize:(start+1)*pagesize]
         if not users:
