@@ -117,7 +117,9 @@ class MessageNoticeSet(models.Model):
 #发给所有人
 def send_public_message(sender, instance, **kwargs):
     if instance.mtype == "public":
-        from celery.execute import send_task
-        send_task("wanglibao_account.message.send_all", kwargs={'msgTxt_id': instance.id})
+        from wanglibao_account import message
+        message.send_all.apply_async(kwargs={
+            "msgTxt_id": instance.id
+        })
 
 post_save.connect(send_public_message, sender=MessageText)
