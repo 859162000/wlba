@@ -31,20 +31,19 @@ from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao_account import third_login
+from wanglibao_account import third_login, message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from wanglibao_account.models import VerifyCounter
+from wanglibao_account.models import VerifyCounter, Binding
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
-from wanglibao_account.models import Binding
 
 from django.template.defaulttags import register
 
@@ -765,6 +764,32 @@ class ChangePasswordAPIView(APIView):
         user.set_password(new_password)
         user.save()
         return Response({'ret_code':0, 'message':u'修改成功'})
+
+class MessageView(TemplateView):
+
+    def get_context_data(self, request):
+        pass
+
+class MessageListView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = message.list_msg(request.DATA, request.user)
+        return Response(result)
+
+class MessageCountView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = message.count_msg(request.DATA, request.user)
+        return Response(result)
+
+class MessageDetailView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, message_id):
+        result = message.sign_read(request.user, message_id)
+        return Response(result)
 
 @sensitive_post_parameters()
 @csrf_protect

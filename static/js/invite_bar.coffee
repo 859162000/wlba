@@ -14,6 +14,6 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
       window.location.href = '/accounts/invite/'
     .fail (xhr)->
       if xhr.status == 403
-        $('.login-modal').trigger('click')
+        window.location.href = '/activity/gold/'
         return
 

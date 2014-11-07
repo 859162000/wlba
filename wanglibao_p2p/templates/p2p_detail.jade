@@ -125,26 +125,12 @@ html
                   .row
                     span.span4
                     span.span8-omega.xunlei-vip-form-txt
-                      if user.is_authenticated
-                        if xunlei_vip.isvip == True
-                          span 您已绑定迅雷会员，投资后将在满标2个工作日内，一次性获得
-                          span.blue.font-ss#xunlei-vip-income 0.00
-                          |元。
-                        else
-                          a.blue(href="http://pay.vip.xunlei.com/baijin.html?referfrom=wlb", target="_blank") 开通
-                          | &nbsp;并&nbsp;
-                          a.blue.xunlei-binding-modal(href="#xunlei-binding-modal") 绑定迅雷会员
-
-                          span ，还可额外享受
-                          span.blue.font-ss#xunlei-vip-income 0.00
-                          |元的收益
-                          //br
-                          //span 还不是迅雷会员？
-                          //a.blue(href="http://pay.vip.xunlei.com/baijin.html?referfrom=wlb", target="_blank") 现在去开通
+                      if user.is_authenticated and xunlei_vip.isvip == True
+                        span 您已绑定迅雷会员，投资后将在满标2个工作日内，一次性获得
+                        span.blue.font-ss#xunlei-vip-income 0.00
+                        |元。
                       else
-                        span 现在
-                        a.blue(href="http://pay.vip.xunlei.com/baijin.html?referfrom=wlb", target="_blank") 开通迅雷会员
-                        span ，还可享受额外
+                        span 投资后绑定迅雷会员，可额外享受
                         span.blue.font-ss#xunlei-vip-income 0.00
                         |元的收益
 
@@ -292,6 +278,8 @@ html
               if trade_records.count > 30
                 .row
                   a.get-more(href="#") 查看更多
+
+    .space-vertical-sm
     if p2p.activity
       if user.is_authenticated and not xunlei_vip.isvip
         #xunlei-binding-modal(style="display:none;")
