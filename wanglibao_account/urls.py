@@ -36,6 +36,13 @@ urlpatterns = patterns(
 
     url(r'^invite/$', login_required(TemplateView.as_view(template_name='invite.jade'), login_url='/accounts/login/')),
 
+    url(r'^message/$', login_required(TemplateView.as_view(template_name='message.jade'),
+                                      login_url='/accounts/login/')),
+    url(r'^message/read/$', login_required(TemplateView.as_view(template_name='message_read.jade'),
+                                      login_url='/accounts/login/')),
+    url(r'^message/unread/$', login_required(TemplateView.as_view(template_name='message_unread.jade'),
+                                      login_url='/accounts/login/')),
+
     url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
     url(r'^login/$', 'django.contrib.auth.views.login',
         {

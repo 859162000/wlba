@@ -402,4 +402,32 @@ $add-icon-large-width: 8px
   height: 22px
   vertical-align: bottom
 
+.message-table
+  @extend .table
+  font-size: $font-s
+  line-height: 28px
 
+  tr
+    border-bottom: dotted 1px #dddddd
+
+  tr:nth-child(even)
+    background-color: #ffffff
+
+  td
+    vertical-align: top
+
+    p
+      font-size: $font-s
+
+  .message-content
+    color: #999999
+
+.icon-msg-arrow-up
+  width: 13px
+  height: 7px
+  background: url("/static/images/icon-public.png") -420px -222px no-repeat
+
+.icon-msg-arrow-down
+  width: 13px
+  height: 7px
+  background: url("/static/images/icon-public.png") -420px -229px no-repeat
