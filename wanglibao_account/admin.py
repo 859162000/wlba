@@ -102,10 +102,10 @@ class BindingAdmin(admin.ModelAdmin):
     search_fields = ('user__wanglibaouserprofile__phone',)
 
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ("target_user", "message_text", "read_status", "read_at")
+    list_display = ("id", "target_user", "message_text", "read_status", "read_at")
 
 class MessageTextAdmin(admin.ModelAdmin):
-    list_display = ("mtype", "title", "content")
+    list_display = ("id", "mtype", "title", "content")
 
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)

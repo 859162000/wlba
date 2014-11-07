@@ -116,9 +116,13 @@ def notice_set(params, user):
 
 
 @app.task
-def send_all(msgTxt):
+def send_all(msgTxt_id):
+    msgTxt = MessageText.objects.filter(pk=msgTxt_id).first()
+    if not msgTxt:
+        return False
     pagesize = 50
     start = 0
+    return True
     while True:
         users = User.objects.all()[start*pagesize:(start+1)*pagesize]
         if not users:
