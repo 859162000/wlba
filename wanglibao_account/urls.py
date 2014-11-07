@@ -52,7 +52,7 @@ urlpatterns = patterns(
     url(r'^register/wap/$', TemplateView.as_view(template_name='register_wap.jade'), name='wap_register'),
     url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
 
-    url(r'^message/$', MessageView.as_view(), name='message_view'),
+    url(r'^message/$', login_required(MessageView.as_view(), login_url='/accounts/login/')),
     url(r'^message/list/$', MessageListView.as_view(), name='message_list_view'),
     url(r'^message/count/$', MessageCountView.as_view(), name='message_count_view'),
     url(r'^message/(?P<message_id>\d+)/$', MessageDetailView.as_view(), name='message_detail_view'),

@@ -731,10 +731,12 @@ class ResetPasswordAPI(APIView):
         else:
             return Response({'ret_code':30004, 'message':u'验证码验证失败'})
 
+
 class Third_login(View):
     def get(self, request, login_type):
         url = third_login.assem_params(login_type, request)
         return HttpResponseRedirect(url)
+
 
 class Third_login_back(APIView):
     permission_classes = ()
@@ -743,6 +745,7 @@ class Third_login_back(APIView):
         result = third_login.login_back(request)
         return Response(result)
         #return HttpResponseRedirect(result['url'])
+
 
 class ChangePasswordAPIView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -765,10 +768,13 @@ class ChangePasswordAPIView(APIView):
         user.save()
         return Response({'ret_code':0, 'message':u'修改成功'})
 
-class MessageView(TemplateView):
 
-    def get_context_data(self, request):
-        pass
+class MessageView(TemplateView):
+    template_name = 'message.jade'
+
+    def get_context_data(self,  **kwargs):
+        return {}
+
 
 class MessageListView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -777,12 +783,14 @@ class MessageListView(APIView):
         result = message.list_msg(request.DATA, request.user)
         return Response(result)
 
+
 class MessageCountView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
         result = message.count_msg(request.DATA, request.user)
         return Response(result)
+
 
 class MessageDetailView(APIView):
     permission_classes = (IsAuthenticated, )
