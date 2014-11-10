@@ -149,3 +149,17 @@ class Activity(models.Model):
 
     def __unicode__(self):
         return u'<%s>' % self.name
+
+
+class Reward(models.Model):
+    """ 奖品存储
+    """
+    pass
+
+
+class RewardRecord(models.Model):
+    """ 奖品发放流水
+    """
+    pass
+
+
