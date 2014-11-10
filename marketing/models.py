@@ -154,12 +154,19 @@ class Activity(models.Model):
 class Reward(models.Model):
     """ 奖品存储
     """
-    pass
+    type = models.CharField(u'奖品类型', max_length=40)
+    description = models.TextField(u'奖品描述', null=True)
+    content = models.CharField(u'奖品内容', max_length=128)
+    is_used = models.BooleanField(u'是否使用', default=False)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
 
 class RewardRecord(models.Model):
     """ 奖品发放流水
     """
-    pass
+    user = models.ForeignKey(User)
+    reward = models.ForeignKey(Reward)
+    description = models.TextField(u'发放奖品流水说明', null=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
 
