@@ -541,6 +541,10 @@ def process_after_money_paided(product):
         send_task("wanglibao_p2p.tasks.process_paid_product", kwargs={
             'product_id': product.id
         })
+    elif product.status == u"流标":
+        #流标发站内信
+        from wanglibao_p2p.tasks import bids_send_message
+        bids_send_message.apply_async(kwargs={"product_id":product.id})
 
 
 def post_save_process(sender, instance, **kwargs):
