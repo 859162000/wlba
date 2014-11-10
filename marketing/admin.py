@@ -4,7 +4,8 @@ from django.contrib import admin
 from django.utils import timezone
 from views import MarketingView
 
-from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, Activity, ActivityRule
+from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
+    Activity, ActivityRule, Reward, RewardRecord
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -96,8 +97,17 @@ class InviteCodeAdmin(ReadPermissionModelAdmin):
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'description')
 
+
 class ActivityRuleAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'description', 'rule_type', 'rule_amount')
+
+
+class RewardAdmin(admin.ModelAdmin):
+    list_display = ('id', 'type', 'content', 'description', 'is_used', 'create_time')
+
+
+class RewardRecordAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'reward', 'description', 'create_time')
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
@@ -106,9 +116,10 @@ admin.site.register(IntroducedBy, IntroducedByAdmin)
 admin.site.register(TimelySiteData, TimelySitedataAdmin)
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ActivityRule, ActivityRuleAdmin)
+admin.site.register(Reward, RewardAdmin)
+admin.site.register(RewardRecord, RewardRecordAdmin)
 
-
-admin.site.register_view('statistics/diary', view=MarketingView.as_view(),name=u'diary')
+admin.site.register_view('statistics/diary', view=MarketingView.as_view(),name=u'日明细数据')
 admin.site.register(InviteCode, InviteCodeAdmin)
 
 admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')

@@ -174,6 +174,7 @@ class Activity(models.Model):
 class Reward(models.Model):
     """ 奖品存储
     """
+
     type = models.CharField(u'奖品类型', max_length=40)
     description = models.TextField(u'奖品描述', null=True)
     content = models.CharField(u'奖品内容', max_length=128)
