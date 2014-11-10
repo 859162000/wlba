@@ -193,18 +193,32 @@ h1 {
     padding: 1em 0em 1em;
     font-size: 1.2em;
     font-weight: normal;
-    color: red;
+    color: #b01d15;
     border-bottom: 1px solid #e0e0e0;
     margin: 0;
     text-align: center;
 }
 header {
-    background: #b21b14 url(/static/images/wap/header_03.png) center center no-repeat;
-    webkit-background-size: 100%;
-    -moz-background-size: 100%;
-    -o-background-size: 100%;
-    background-size: 100%;
+    background: #b21b14 url(/static/images/wap/header_01.png) center center no-repeat;
+    webkit-background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    background-size: 100% 100%;
 
+}
+header.xunlei_02 {
+    background: #b21b14 url(/static/images/wap/header_02.png) center center no-repeat;
+    webkit-background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    background-size: 100% 100%;
+}
+header.xunlei_03 {
+    background: #b21b14 url(/static/images/wap/header_03.png) center center no-repeat;
+    webkit-background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    background-size: 100% 100%;
 }
 dl {
     margin: 0px;
@@ -213,6 +227,9 @@ dl {
 }
 dl.list {
     position: relative;
+    border-bottom: 1px solid #e0e0e0;
+}
+dl.bottom-line {
     border-bottom: 1px solid #e0e0e0;
 }
 dl.list dt {
@@ -235,7 +252,12 @@ dl.list dd {
 main {
 
 }
-
+p {
+    padding: 1.2em 1em;
+    line-height: 1.6em;
+    border-bottom: 1px solid #e0e0e0;
+    color: #666;
+}
 @media screen and (max-width: 320px) {
   header {
      height: 12em;
@@ -267,11 +289,11 @@ main {
 
 footer {
     padding: 0em 1.2em 0;
-    color: red;
+    color: #b01d15;
     text-align: center;
 }
 footer a {
-    color: red;
+    color: #b01d15;
     text-decoration: none;
 }
 
@@ -283,4 +305,11 @@ footer a {
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
+}
+
+dt.note {
+    color: #b01d15;
+}
+span.note {
+    color: #b01d15;
 }
