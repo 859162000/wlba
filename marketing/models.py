@@ -180,6 +180,7 @@ class Reward(models.Model):
     content = models.CharField(u'奖品内容', max_length=128)
     is_used = models.BooleanField(u'是否使用', default=False)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    end_time = models.DateTimeField(u'结束时间', null=True, blank=True)
 
     class Meta:
         ordering = ['-create_time']
