@@ -145,12 +145,29 @@ def send_one(user_id, title, content, mtype):
     """
         给某个人发送站内信（需要推送时也在这里写）
     """
+    msgTxt = create(title, content, mtype)
+    if not msgTxt:
+        return False
+
     user = User.objects.filter(pk=user_id).first()
     if not user:
         return False
-    msgTxt = create(title, content, mtype)
-    if msgTxt:
+    _send(user, msgTxt)
+    return True
+
+@app.task
+def send_batch(users, title=None, content=None, mtype=None, msgTxt=None):
+    """
+        批量发送站内信, users is a user_id list.
+    """
+    if not isinstance(msgTxt, MessageText):
+        msgTxt = create(title, content, mtype)
+        if not msgTxt:
+            return False
+
+    for user_id in users:
+        user = User.objects.filter(pk=user_id).first()
+        if not user:
+            continue
         _send(user, msgTxt)
-        return True
-    else:
-        return False
+    return True
