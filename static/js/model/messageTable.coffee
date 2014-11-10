@@ -11,11 +11,7 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
             name: '标题'
             colspan: 1
             text: (item)->
-              if item.is_read == 1
-                '<p class="blue" data-is-read=' + item.is_read + ' data-id="' + item.id + '">'+ item.title +'</p>' +
-                '<p class="message-content">'+ item.content +'</p>'
-              else
-                '<p data-is-read=' + item.is_read + ' data-id="' + item.id + '">'+ item.title +'</p>' +
+                '<p class="blue" data-id="' + item.id + '">'+ item.title +'</p>' +
                 '<p class="message-content">'+ item.content +'</p>'
           ,
             name: '时间'
@@ -32,8 +28,8 @@ define ['jquery', 'underscore', 'model/table'], ($, _, table)->
       _.extend(context, defaultContext)
       super context
 
-      transform_favorite: (msg)->
-        items = _.pluck(msg.results, 'item')
+      transform_message: (msg)->
+        items = _.pluck(msg.data, 'item')
         _.each(items, (item)->
           item.is_read = 1)
         @data items

@@ -22,11 +22,7 @@
               name: '标题',
               colspan: 1,
               text: function(item) {
-                if (item.is_read === 1) {
-                  return '<p class="blue" data-is-read=' + item.is_read + ' data-id="' + item.id + '">' + item.title(+'</p>' + '<p class="message-content">' + item.content(+'</p>'));
-                } else {
-                  return '<p data-is-read=' + item.is_read + ' data-id="' + item.id + '">' + item.title(+'</p>' + '<p class="message-content">' + item.content(+'</p>'));
-                }
+                return '<p class="blue" data-id="' + item.id + '">' + item.title(+'</p>' + '<p class="message-content">' + item.content(+'</p>'));
               }
             }, {
               name: '时间',
@@ -46,9 +42,9 @@
         _.extend(context, defaultContext);
         viewModel.__super__.constructor.call(this, context);
         ({
-          transform_favorite: function(msg) {
+          transform_message: function(msg) {
             var items;
-            items = _.pluck(msg.results, 'item');
+            items = _.pluck(msg.data, 'item');
             _.each(items, function(item) {
               return item.is_read = 1;
             });

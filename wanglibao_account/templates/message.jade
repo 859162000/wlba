@@ -10,46 +10,12 @@ block sidebar
 block main
   .panel
     .account-home-panel--title-bar__product
-      ul.title-bar--tabs
-        li.title-bar--tab.active
-          a.title-bar--tab--anchor(href="javascript:void(0)") 全部
-        li.title-bar--tab
-          a.title-bar--tab--anchor(href='/accounts/message/unread/') 未读
-        li.title-bar--tab
-          a.title-bar--tab--anchor(href='/accounts/message/read/') 已读
+      // ko template: {name: 'tabs', data: tab}
+      // /ko
     .panel-container.padding-l-r-xl
-      table.message-table
-        thead
-          tr
-            th(width="20%") 类型
-            th(width="55%") 标题
-            th(width="15%") 时间
-            th(width="10%")
-        tbody(id="messageBody")
-          tr
-            td 提现通知
-            td.align-left
-              p.blue 提现通知提现通知
-              p.message-content
-                | 提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知
-            td 2014-11-07
-            td
-              span.icon.icon-msg-arrow-down
-          tr
-            td 提现通知
-            td.align-left
-              p.blue 提现通知提现通知
-              p.message-content
-                | 提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知
-            td 2014-11-07
-            td
-              span.icon.icon-msg-arrow-down
-          tr
-            td 提现通知
-            td.align-left
-              p.blue 提现通知提现通知
-              p.message-content
-                | 提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知提现通知
-            td 2014-11-07
-            td
-              span.icon.icon-msg-arrow-down
+      //ko template: {name: 'data-table', data: dataTable}
+      // /ko
+
+block script
+  script.
+    require(['/static/js/accounts_message.js'])
