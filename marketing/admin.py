@@ -102,13 +102,25 @@ class ActivityRuleAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'description', 'rule_type', 'rule_amount')
 
 
-class RewardAdmin(admin.ModelAdmin):
-    list_display = ('id', 'type', 'content', 'description', 'is_used', 'create_time')
+class RewardResource(resources.ModelResource):
 
+    class Meta:
+        model = Reward
+        fields = ('id', 'type', 'content', 'description', 'is_used', 'create_time')
+
+    def import_obj(self, instance, row, False):
+        super(RewardResource, self).import_obj(instance, row, False)
+
+
+class RewardAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ('id', 'type', 'content', 'description', 'is_used', 'create_time')
+    resource_class = RewardResource
 
 class RewardRecordAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'reward', 'description', 'create_time')
     search_fields = ('user__wanglibaouserprofile__phone', )
+
+
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
