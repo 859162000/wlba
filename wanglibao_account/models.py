@@ -68,6 +68,7 @@ class Binding(models.Model):
 
 message_type = (
     ("withdraw", "提现"),
+    ("pay", "充值"),
     ("repay", "还款"),
     ("activity", "活动"),
     ("public", "发给所有"),
@@ -116,10 +117,9 @@ class MessageNoticeSet(models.Model):
 #发给所有人
 def send_public_message(sender, instance, **kwargs):
     if instance.mtype == "public":
-        post_save.disconnect(send_public_message, sender=MessageText)
-        from celery.execute import send_task
-        send_task("wanglibao_account.message.send_all", kwargs={'msgTxt_id': instance.id})
-        instance.save()
-        post_save.connect(send_public_message, sender=MessageText)
+        from wanglibao_account import message
+        message.send_all.apply_async(kwargs={
+            "msgTxt_id": instance.id
+        })
 
 post_save.connect(send_public_message, sender=MessageText)

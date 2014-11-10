@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 import os
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
+from wanglibao_account.message import send_all
 
 
 

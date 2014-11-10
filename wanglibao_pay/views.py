@@ -33,6 +33,7 @@ from wanglibao_pay.util import get_client_ip
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
+from wanglibao_account import message as inside_message
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from django.conf import settings
@@ -140,6 +141,13 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":request.user.id,
+            "title":"%s" % result,
+            "content":"%s,%s元" % (result, amount),
+            "mtype":"pay"
+        })
+
         return self.render_to_response({
             'result': result,
             'amount': amount
@@ -237,6 +245,12 @@ class WithdrawCompleteView(TemplateView):
             send_messages.apply_async(kwargs={
                 'phones': [request.user.wanglibaouserprofile.phone],
                 'messages': [messages.withdraw_submitted(amount, timezone.now())]
+            })
+            inside_message.send_one.apply_async(kwargs={
+                "user_id":request.user.id,
+                "title":u"提现%s元成功" % amount,
+                "content":messages.withdraw_submitted(amount, timezone.now()),
+                "mtype":"withdraw"
             })
         except decimal.DecimalException:
             result = u'提款金额在0～50000之间'

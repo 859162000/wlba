@@ -29,15 +29,16 @@ def list_msg(params, user):
     """
         分页获取消息
     """
-    pagesize = 10
+    pagesize = params.get("pagesize", "10").strip()
     pagenum = params.get("pagenum", "").strip()
     listtype = params.get("listtype", "").strip()
     if not pagenum or not listtype:
         return {"ret_code":30081, "message":"信息输入不完整"}
-    if not pagenum.isdigit() or listtype not in ("read", "unread", "all"):
+    if not pagenum.isdigit() or not pagesize.isdigit() or listtype not in ("read", "unread", "all"):
         return {"ret_code":30082, "message":"参数输入错误"}
     pagenum = int(pagenum)
-    if not 1<=pagenum<100:
+    pagesize = int(pagesize)
+    if not 1<=pagenum<100 or not 1<=pagesize<=50:
         return {"ret_code":30083, "message":"参数输入错误"}
     if listtype == "unread":
         msgs = Message.objects.filter(target_user=user, read_status=False, notice=True)[(pagenum-1)*pagesize:pagenum*pagesize]
@@ -67,6 +68,9 @@ def sign_read(user, message_id):
 def create(title, content, mtype):
     if not title or not content or not mtype:
         return False
+    nt = dict(message_type).keys()
+    if mtype not in nt:
+        return False
     msgTxt = MessageText()
     msgTxt.title = title
     msgTxt.content = content
@@ -75,10 +79,8 @@ def create(title, content, mtype):
     msgTxt.save()
     return msgTxt
     
-def send(target_user, msgTxt):
+def _send(target_user, msgTxt):
     msg = Message()
-    if not isinstance(msgTxt, MessageText) or not isinstance(target_user, User):
-        return False
     msg.target_user = target_user
     msg.message_text = msgTxt
     mset = MessageNoticeSet.objects.filter(user=target_user, mtype=msgTxt.mtype).first()
@@ -117,6 +119,7 @@ def notice_set(params, user):
 
 @app.task
 def send_all(msgTxt_id):
+    time.sleep(5)
     msgTxt = MessageText.objects.filter(pk=msgTxt_id).first()
     if not msgTxt:
         return False
@@ -132,7 +135,22 @@ def send_all(msgTxt_id):
             msg.message_text = msgTxt
             msg.read_status = False
             msg.read_at = 0
-            msg.notice = notice
+            msg.notice = True
             msg.save()
         start += 1
     return "send to all ok"
+
+@app.task
+def send_one(user_id, title, content, mtype):
+    """
+        给某个人发送站内信（需要推送时也在这里写）
+    """
+    user = User.objects.filter(pk=user_id).first()
+    if not user:
+        return False
+    msgTxt = create(title, content, mtype)
+    if msgTxt:
+        _send(user, msgTxt)
+        return True
+    else:
+        return False
