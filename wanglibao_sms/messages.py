@@ -68,3 +68,11 @@ def rand_pass(password):
 @suffix
 def earning_message(amount):
     return u'亲，您的投标奖励收益%s元，已赠送到您的网利宝账户，可用于理财投资' % amount
+
+@suffix
+def reg_reward_message(xunlei_code):
+    return u'亲，感谢注册网利宝，现赠送您迅雷三天会员体验，激活码: %s' % xunlei_code
+
+@suffix
+def purchase_reward_message(amount, xunlei_code):
+    return u'亲，您的投标奖励收益%s元，现赠送您迅雷一个月会员体验，激活码: %s' % (amount, xunlei_code)

@@ -186,6 +186,9 @@ class Reward(models.Model):
         ordering = ['-create_time']
         verbose_name_plural = u'奖品'
 
+    def __unicode__(self):
+        return u'<%s>' % self.type
+
 
 class RewardRecord(models.Model):
     """ 奖品发放流水
@@ -198,5 +201,8 @@ class RewardRecord(models.Model):
     class Meta:
         ordering = ['-create_time']
         verbose_name_plural = u'奖品发放流水'
+
+    def __unicode__(self):
+        return u'<%s>' % self.user
 
 

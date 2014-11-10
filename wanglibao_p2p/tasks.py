@@ -44,28 +44,30 @@ def build_earning(product_id):
     #把收益数据插入earning表内
     for obj in earning:
 
-        bind = Binding.objects.filter(user_id=obj.get('user')).first()
-        if bind and bind.isvip:
-            earning = Earning()
-            amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
-            earning.amount = amount
-            earning.type = 'D'
-            earning.product = p2p
-            user = User.objects.get(pk=obj.get('user'))
-            order = OrderHelper.place_order(user, Order.ACTIVITY, u"活动赠送",
-                                            earning = model_to_dict(earning))
-            earning.order = order
+        # bind = Binding.objects.filter(user_id=obj.get('user')).first()
+        # if bind and bind.isvip:
 
-            keeper = MarginKeeper(user, order.pk)
 
-            #赠送活动描述
-            desc = u'%s,%s赠送%s%s' % (p2p.name, p2p.activity.name, p2p.activity.rule.rule_amount*100, '%')
-            earning.margin_record = keeper.deposit(amount,description=desc)
-            earning.user = user
-            earning.save()
+        earning = Earning()
+        amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
+        earning.amount = amount
+        earning.type = 'D'
+        earning.product = p2p
+        user = User.objects.get(pk=obj.get('user'))
+        order = OrderHelper.place_order(user, Order.ACTIVITY, u"活动赠送",
+                                        earning = model_to_dict(earning))
+        earning.order = order
 
-            #发送活动赠送短信
-            send_messages.apply_async(kwargs={
-                            "phones": [user.wanglibaouserprofile.phone],
-                            "messages": [messages.earning_message(amount)]
-                        })
+        keeper = MarginKeeper(user, order.pk)
+
+        #赠送活动描述
+        desc = u'%s,%s赠送%s%s' % (p2p.name, p2p.activity.name, p2p.activity.rule.rule_amount*100, '%')
+        earning.margin_record = keeper.deposit(amount,description=desc)
+        earning.user = user
+        earning.save()
+
+        #发送活动赠送短信
+        send_messages.apply_async(kwargs={
+                        "phones": [user.wanglibaouserprofile.phone],
+                        "messages": [messages.earning_message(amount)]
+                    })

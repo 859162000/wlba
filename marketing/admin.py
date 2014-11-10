@@ -108,6 +108,7 @@ class RewardAdmin(admin.ModelAdmin):
 
 class RewardRecordAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'reward', 'description', 'create_time')
+    search_fields = ('user__wanglibaouserprofile__phone', )
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
