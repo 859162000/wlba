@@ -71,6 +71,7 @@ message_type = (
     ("pay", "充值"),
     ("repay", "还款"),
     ("activity", "活动"),
+    ("bids", "流标"),
     ("public", "发给所有"),
 )
 class MessageText(models.Model):

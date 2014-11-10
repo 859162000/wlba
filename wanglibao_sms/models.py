@@ -66,12 +66,18 @@ class ShortMessage(models.Model):
 
 def send_manual_message(sender, instance, **kwargs):
     if instance.type == u'手动' and instance.status == u'发送中':
-        from celery.execute import send_task
+        #from celery.execute import send_task
+        from wanglibao_sms.tasks import send_messages
         if instance.channel == u'慢道':
             channel = 1
         else:
             channel = 2
-        send_task("wanglibao_sms.tasks.send_messages", kwargs={
+        #send_task("wanglibao_sms.tasks.send_messages", kwargs={
+        #    'phones': instance.phones.split(' '),
+        #    'messages': [instance.contents],
+        #    'channel': channel
+        #})
+        send_messages.apply_async(kwargs={
             'phones': instance.phones.split(' '),
             'messages': [instance.contents],
             'channel': channel

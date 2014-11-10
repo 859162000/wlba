@@ -1,5 +1,4 @@
 # coding=utf-8
-#from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -150,4 +149,24 @@ class Activity(models.Model):
 
     def __unicode__(self):
         return u'<%s>' % self.name
+
+
+class Reward(models.Model):
+    """ 奖品存储
+    """
+    type = models.CharField(u'奖品类型', max_length=40)
+    description = models.TextField(u'奖品描述', null=True)
+    content = models.CharField(u'奖品内容', max_length=128)
+    is_used = models.BooleanField(u'是否使用', default=False)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+
+class RewardRecord(models.Model):
+    """ 奖品发放流水
+    """
+    user = models.ForeignKey(User)
+    reward = models.ForeignKey(Reward)
+    description = models.TextField(u'发放奖品流水说明', null=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
 
