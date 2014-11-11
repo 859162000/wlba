@@ -75,6 +75,7 @@ message_type = (
     ("repay", "还款"),
     ("activity", "活动"),
     ("bids", "流标"),
+    ("fullbid", "满标"),
     ("audited", "满标已审核"),
     ("invite", "邀请"),
     ("public", "发给所有"),

@@ -85,7 +85,7 @@ class LianlianPay:
             pay_info.save()
 
             profile = user.wanglibaouserprofile
-            data = self.ios_sign({"id":order.id, "amount":amount, "create_time":pay_info.create_time})
+            data = self.ios_sign({"id":str(order.id), "amount":str(amount), "create_time":pay_info.create_time})
             data.update({"user_name":profile.name, "id_number":profile.id_number})
 
             pay_info.request = str(data)

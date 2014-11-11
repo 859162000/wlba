@@ -13,7 +13,6 @@ from wanglibao_p2p.trade import P2POperator
 from django.db.models import Sum, connection
 from datetime import datetime
 from django.contrib.auth.models import User
-import os
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
@@ -27,6 +26,22 @@ def p2p_watchdog():
 @app.task
 def process_paid_product(product_id):
     P2POperator.preprocess_for_settle(P2PProduct.objects.get(pk=product_id))
+
+@app.task
+def full_send_message(product_name):
+    user_ids = ["183",]
+    phones = ["18637172100",]
+    title = u"%s 满标了" % product_name
+    send_messages.apply_async(kwargs={
+        "phones": phones,
+        "messages": [title],
+    })
+    inside_message.send_batch.apply_async(kwargs={
+        "users":user_ids,
+        "title":title,
+        "content":title,
+        "mtype":"fullbid"
+    })
 
 @app.task
 def build_earning(product_id):
