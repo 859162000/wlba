@@ -43,11 +43,13 @@ class P2PTrader(object):
 
         start_time = timezone.datetime(2014, 11, 1)
         # 首次购买
-        if P2PRecord.objects.filter(user=self.user, create_time__gte=start_time).count() == 0:
+        if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
+
             now = timezone.now()
+            print now
+
             with transaction.atomic():
                 if Reward.objects.filter(is_used=False, type=u'一个月迅雷会员', end_time__gte=now).exists():
-
                     try:
                         reward = Reward.objects.select_for_update()\
                             .filter(is_used=False, type=u'一个月迅雷会员').first()
@@ -55,7 +57,7 @@ class P2PTrader(object):
                         reward.save()
                         RewardRecord.objects.create(user=self.user, reward=reward,
                                                     description=u'首次购买P2P产品赠送一个月迅雷会员')
-
+                        print '-'*30
                         send_messages.apply_async(kwargs={
                                 "phones": [self.user.wanglibaouserprofile.phone],
                                 "messages": [messages.purchase_reward_message(reward.content)]
