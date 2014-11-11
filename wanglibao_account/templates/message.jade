@@ -40,14 +40,14 @@ block main
         tbody(id="messageBody")
           for msg in messageList
             tr(id="msg_{{msg.id}}", data-read-status="{{msg.read_status}}", data-show="False", data-msg-id="{{msg.id}}").msg-id
-              td {{ msg.message_text.mtype }}
+              td {{ msg.message_text.display_mtype }}
               td.align-left
                 if msg.read_status == True
                   p(id="title_msg_{{msg.id}}") {{ msg.message_text.title }}
                 else
                   p(id="title_msg_{{msg.id}}").blue {{ msg.message_text.title }}
                 p.message-content(id="cnt_msg_{{msg.id}}") {{ msg.message_text.content }}
-              td {{ msg.message_text.created_at | date:'Y-m-d' }}
+              td {{ msg.message_text.format_time | date:'Y-m-d' }}
               td
                 span.icon-msg-arrow-down(id="icon_msg_{{msg.id}}")
       .space-vertical-l

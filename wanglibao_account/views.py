@@ -72,6 +72,24 @@ class RegisterView (RegistrationView):
         set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
+
+        now = timezone.now()
+        with transaction.atomic():
+            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                try:
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=auth_user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+                    send_messages.apply_async(kwargs={
+                            "phones": [identifier],
+                            "messages": [messages.reg_reward_message(reward.content)]
+                        })
+                except:
+                    pass
+
         return user
 
     def get_success_url(self, request=None, user=None):
@@ -788,9 +806,6 @@ class MessageView(TemplateView):
             messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True)
         else:
             messages = Message.objects.filter(target_user=self.request.user)
-
-        for msg in messages:
-            msg.message_text.created_at = datetime.datetime.fromtimestamp(msg.message_text.created_at)
 
         messages_list = []
         messages_list.extend(messages)
