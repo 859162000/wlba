@@ -3,6 +3,7 @@
 
 import hashlib
 import logging
+import json
 from django.conf import settings
 from django.forms import model_to_dict
 from django.db import transaction
@@ -41,7 +42,8 @@ class LianlianPay:
     def ios_sign(self, params):
         dic = {"no_order":params['id'], "busi_partner":"108001",
                 "sign_type":"MD5", "money_order":params['amount'],
-                "notify_url":self.PAY_BACK_RETURN_URL, "oid_partner":self.MER_ID}
+                "notify_url":self.PAY_BACK_RETURN_URL, "oid_partner":self.MER_ID,
+                "risk_item":params['risk_item']}
         dic['dt_order'] = util.fmt_dt_14(params['create_time'])
         dic['sign'] = self._sign(dic)
         return dic
@@ -85,8 +87,17 @@ class LianlianPay:
             pay_info.save()
 
             profile = user.wanglibaouserprofile
-            data = self.ios_sign({"id":str(order.id), "amount":str(amount), "create_time":pay_info.create_time})
-            data.update({"user_name":profile.name, "id_number":profile.id_number})
+            data = self.ios_sign({"id":str(order.id), "amount":str(amount), "create_time":pay_info.create_time,
+                                "risk_item":str({"frms_ware_category":"2009",
+                                            "user_info_mercht_userno":str(user.id),
+                                            "user_info_bind_phone":profile.phone,
+                                            "user_info_dt_register":util.fmt_dt_14(user.date_joined),
+                                            "user_info_full_name":profile.name,
+                                            "user_info_id_type":"0",
+                                            "user_info_id_no":profile.id_number,
+                                            "user_info_identify_state":"1",
+                                            "user_info_identify_type":"3"})})
+            data.update({"id_no":profile.id_number, "id_type":"0", "acct_name":profile.name})
 
             pay_info.request = str(data)
             pay_info.status = PayInfo.PROCESSING

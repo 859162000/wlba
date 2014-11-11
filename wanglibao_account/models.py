@@ -3,6 +3,7 @@
 
 #from django.contrib.auth import get_user_model
 import time
+import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -97,6 +98,14 @@ class MessageText(models.Model):
         verbose_name = u"站内信内容"
         verbose_name_plural = u"站内信内容"
 
+    @property
+    def display_mtype(self):
+        message_type_temp = dict(message_type)
+        return message_type_temp.get(self.mtype)
+
+    @property
+    def format_time(self):
+        return datetime.datetime.fromtimestamp(self.created_at)
 
 class Message(models.Model):
     """

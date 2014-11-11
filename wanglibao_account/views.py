@@ -807,9 +807,6 @@ class MessageView(TemplateView):
         else:
             messages = Message.objects.filter(target_user=self.request.user)
 
-        for msg in messages:
-            msg.message_text.created_at = datetime.datetime.fromtimestamp(msg.message_text.created_at)
-
         messages_list = []
         messages_list.extend(messages)
 
