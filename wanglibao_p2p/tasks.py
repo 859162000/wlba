@@ -29,19 +29,19 @@ def process_paid_product(product_id):
 
 @app.task
 def full_send_message(product_name):
-    phones = ["18637172100",]
+    users = User.objects.filter(groups__name='管理员')
+    if not users:
+        return False
+
+    phones, user_ids = [], []
+    for x in users:
+        phones.append(x.wanglibaouserprofile.phone)
+        user_ids.append(x.id)
     title = u"%s 满标了" % product_name
     send_messages.apply_async(kwargs={
         "phones": phones,
         "messages": [title],
     })
-    user_ids = []
-    for p in phones:
-        user = User.objects.filter(wanglibaouserprofile__phone=p).first()
-        if user:
-            user_ids.append(user.id)
-    if not user_ids:
-        return False
     inside_message.send_batch.apply_async(kwargs={
         "users":user_ids,
         "title":title,
@@ -92,25 +92,3 @@ def build_earning(product_id):
                         "phones": [user.wanglibaouserprofile.phone],
                         "messages": [messages.earning_message(amount)]
                     })
-
-@app.task
-def bids_send_message(product_id):
-    """
-        流标给购买人发送站内信
-    """
-    from django.db.models import Count
-    p2p = P2PProduct.objects.filter(pk=product_id).first()
-    if not p2p:
-        return
-    title = u"%s 流标" % p2p.name
-    buyers = P2PRecord.objects.values('user').annotate(dcount=Count("user")).filter(product_id=product_id, catalog=u'申购')
-    arr = []
-    for x in buyers:
-        arr.append(x['user'])
-
-    inside_message.send_batch.apply_async(kwargs={
-        "users":arr,
-        "title":title,
-        "content":title,
-        "mtype":"bids"
-    })
