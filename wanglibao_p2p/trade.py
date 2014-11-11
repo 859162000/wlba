@@ -96,6 +96,11 @@ class P2PTrader(object):
                         "mtype":"invite"
                     })
 
+        #满标给管理员发短信
+        if product_record.product_balance_after <= 0:
+            from wanglibao_p2p.tasks import full_send_message
+            full_send_message.apply_async(kwargs={"product_name":self.product.short_name})
+
         return product_record, margin_record, equity
 
 
