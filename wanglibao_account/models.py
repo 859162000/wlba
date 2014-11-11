@@ -97,6 +97,7 @@ class MessageText(models.Model):
         verbose_name = u"站内信内容"
         verbose_name_plural = u"站内信内容"
 
+
 class Message(models.Model):
     """
         store station letters relation(站内信收发关系，不存在私信功能)
