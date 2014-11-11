@@ -29,13 +29,19 @@ def process_paid_product(product_id):
 
 @app.task
 def full_send_message(product_name):
-    user_ids = ["183",]
     phones = ["18637172100",]
     title = u"%s 满标了" % product_name
     send_messages.apply_async(kwargs={
         "phones": phones,
         "messages": [title],
     })
+    user_ids = []
+    for p in phones:
+        user = User.objects.filter(wanglibaouserprofile__phone=p).first()
+        if user:
+            user_ids.append(user.id)
+    if not user_ids:
+        return False
     inside_message.send_batch.apply_async(kwargs={
         "users":user_ids,
         "title":title,
