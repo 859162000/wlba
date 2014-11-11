@@ -409,6 +409,7 @@ $add-icon-large-width: 8px
 
   tr
     border-bottom: dotted 1px #dddddd
+    cursor: pointer
 
   tr:nth-child(even)
     background-color: #ffffff
@@ -424,11 +425,32 @@ $add-icon-large-width: 8px
     display: none
 
 .icon-msg-arrow-up
+  @extend .icon
   width: 13px
   height: 7px
   background: url("/static/images/icon-public.png") -420px -222px no-repeat
 
 .icon-msg-arrow-down
+  @extend .icon
   width: 13px
   height: 7px
   background: url("/static/images/icon-public.png") -420px -229px no-repeat
+
+.message-tip
+  +inline-block
+  position: relative
+
+  .message-count
+    +inline-block
+    +border-radius(9px)
+    position: absolute
+    right: 0
+    top: 0
+    width: 18px
+    height: 18px
+    background: $color-pomegranate
+    color: $color-white
+    font-size: $font-xs
+    line-height: 18px
+    text-align: center
+    display: none

@@ -10,11 +10,52 @@ block sidebar
 block main
   .panel
     .account-home-panel--title-bar__product
-      // ko template: {name: 'tabs', data: tab}
-      // /ko
+      ul.title-bar--tabs
+        if request.GET.listtype == 'all' or not request.GET.listtype
+          li.title-bar--tab.active
+            a.title-bar--tab--anchor(href="/accounts/message/?listtype=all") 全部
+        else
+          li.title-bar--tab
+            a.title-bar--tab--anchor(href="/accounts/message/?listtype=all") 全部
+        if request.GET.listtype == 'unread'
+          li.title-bar--tab.active
+            a.title-bar--tab--anchor(href='/accounts/message/?listtype=unread') 未读
+        else
+          li.title-bar--tab
+            a.title-bar--tab--anchor(href='/accounts/message/?listtype=unread') 未读
+        if request.GET.listtype == 'read'
+          li.title-bar--tab.active
+            a.title-bar--tab--anchor(href='/accounts/message/?listtype=read') 已读
+        else
+          li.title-bar--tab
+            a.title-bar--tab--anchor(href='/accounts/message/?listtype=read') 已读
     .panel-container.padding-l-r-xl
-      //ko template: {name: 'data-table', data: dataTable}
-      // /ko
+      table.message-table
+        thead
+          tr
+            th(width="20%") 类型
+            th(width="55%") 标题
+            th(width="15%") 时间
+            th(width="10%")
+        tbody(id="messageBody")
+          for msg in messageList
+            tr(id="msg_{{msg.id}}", data-read-status="{{msg.read_status}}", data-show="False", data-msg-id="{{msg.id}}").msg-id
+              td {{ msg.message_text.mtype }}
+              td.align-left
+                if msg.read_status == True
+                  p(id="title_msg_{{msg.id}}") {{ msg.message_text.title }}
+                else
+                  p(id="title_msg_{{msg.id}}").blue {{ msg.message_text.title }}
+                p.message-content(id="cnt_msg_{{msg.id}}") {{ msg.message_text.content }}
+              td {{ msg.message_text.created_at | date:'Y-m-d' }}
+              td
+                span.icon-msg-arrow-down(id="icon_msg_{{msg.id}}")
+      .space-vertical-l
+      .row
+
+        - with data=messageList uri='/accounts/message/?listtype=list_type'
+        include include/pager_other
+        - endwith
 
 block script
   script.

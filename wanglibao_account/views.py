@@ -44,6 +44,7 @@ from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
+from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type
 
 from django.template.defaulttags import register
 
@@ -772,8 +773,39 @@ class ChangePasswordAPIView(APIView):
 class MessageView(TemplateView):
     template_name = 'message.jade'
 
-    def get_context_data(self,  **kwargs):
-        return {}
+    def get_context_data(self, **kwargs):
+        listtype = self.request.GET.get("listtype")
+
+        if not listtype or listtype not in ("read", "unread", "all"):
+            listtype = 'all'
+
+        if listtype == "unread":
+            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True)
+        elif listtype == "read":
+            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True)
+        else:
+            messages = Message.objects.filter(target_user=self.request.user)
+
+        for msg in messages:
+            msg.message_text.created_at = datetime.datetime.fromtimestamp(msg.message_text.created_at)
+
+        messages_list = []
+        messages_list.extend(messages)
+
+        limit = 10
+        paginator = Paginator(messages_list, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            messages_list = paginator.page(page)
+        except PageNotAnInteger:
+            messages_list = paginator.page(1)
+        except Exception:
+            messages_list = paginator.page(paginator.num_pages)
+
+        return {
+            'messageList': messages_list
+        }
 
 
 class MessageListView(APIView):

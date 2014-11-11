@@ -9,67 +9,29 @@
   });
 
   require(['jquery', 'knockout', 'underscore', 'lib/backend', 'model/messageTable', 'model/pager', 'model/tab'], function($, ko, _, backend, message, pager, tab) {
-    var viewModel;
-    viewModel = (function() {
-      function viewModel() {
-        var self;
-        self = this;
-        self.pager = new pager.viewModel();
-        self.pager.currentPageNumber(1);
-        self.messageTable = new message.viewModel({
-          fields: ['类型', '标题', '时间', '&nbsp;']
-        });
-        self.tabTree = {
-          tabs: [
-            {
-              name: '全部',
-              value: {
-                type: 'all',
-                table: self.messageTable
-              }
-            }, {
-              name: '未读',
-              value: {
-                type: 'unread',
-                table: self.messageTable
-              }
-            }, {
-              name: '已读',
-              value: {
-                type: 'read',
-                table: self.messageTable
-              }
-            }
-          ]
-        };
-        self.type = ko.observable();
-        self.dataTable = ko.observable();
-        self.tab = new tab.viewModel({
-          tabs: self.tabTree.tabs,
-          events: {
-            tabSelected: function(data, event) {
-              self.dataTable(data.value.table);
-              return self.type(data.value.type);
-            }
-          }
-        });
-        ko.computed(function() {
-          return backend.loadMessage(self.type(), 10, 1).done(function(data) {
-            var num_pages;
-            self.dataTable().isEmpty(data.data.length === 0);
-            num_pages = 0;
-            backend.loadMessageCount(self.type()).done(function(data) {
-              return num_pages = data.count / 10;
-            });
-            return self.pager.totalPageNumber(num_pages);
+    return $('.msg-id').click(function(e) {
+      var msg_icon, msg_id, msg_id_id, read_status;
+      e.preventDefault();
+      msg_id = e.currentTarget.id;
+      msg_icon = $("#icon_" + msg_id).attr('class');
+      read_status = $('#' + msg_id).attr('data-read-status');
+      msg_id_id = $('#' + msg_id).attr('data-msg-id');
+      if (msg_icon === 'icon-msg-arrow-down') {
+        $("#cnt_" + msg_id).show();
+        $("#title_" + msg_id).removeClass('blue');
+        $("#icon_" + msg_id).removeClass('icon-msg-arrow-down');
+        $("#icon_" + msg_id).addClass('icon-msg-arrow-up');
+        if (read_status === 'False') {
+          return backend.readMessage(msg_id_id).done(function(data) {
+            return $('#' + msg_id).attr('data-read-status', 'True');
           });
-        });
+        }
+      } else {
+        $("#cnt_" + msg_id).hide();
+        $("#icon_" + msg_id).removeClass('icon-msg-arrow-up');
+        return $("#icon_" + msg_id).addClass('icon-msg-arrow-down');
       }
-
-      return viewModel;
-
-    })();
-    return ko.applyBindings(new viewModel());
+    });
   });
 
 }).call(this);

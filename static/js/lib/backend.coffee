@@ -274,6 +274,9 @@ define ['jquery'], ($)->
     $.post url, {
       listtype: type
     }
+  readMessage = (message_id)->
+    url = '/accounts/message/' + message_id + '/'
+    $.post url
 
   #var Request = new Object();
   #Request = GetRequest();
@@ -322,4 +325,5 @@ define ['jquery'], ($)->
     registerXunlei:registerXunlei
     loadMessage: loadMessage
     loadMessageCount: loadMessageCount
+    readMessage: readMessage
   }
