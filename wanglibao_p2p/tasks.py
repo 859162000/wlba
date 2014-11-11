@@ -16,7 +16,6 @@ from django.contrib.auth.models import User
 import os
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
-#from wanglibao_account.message import send_all
 from wanglibao_account import message as inside_message
 
 
@@ -45,7 +44,6 @@ def build_earning(product_id):
 
     #把收益数据插入earning表内
     for obj in earning:
-
         # bind = Binding.objects.filter(user_id=obj.get('user')).first()
         # if bind and bind.isvip:
 

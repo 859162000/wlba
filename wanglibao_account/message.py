@@ -5,7 +5,8 @@
 import time
 from django.contrib.auth.models import User
 from wanglibao.celery import app
-from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type
+from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type, UserPushId
+from wanglibao_sms import bae_channel
 
 def count_msg(params, user):
     """
@@ -87,6 +88,18 @@ def _send(target_user, msgTxt):
     notice = True
     if mset:
         notice = mset.notice
+        #发推送,先按设置推，有需求再做判断
+        devices = UserPushId.objects.filter(user=target_user)
+        if devices:
+            channel = bae_channel.BaeChannel()
+            msg_key = "wanglibao"
+            message = {"message":msgTxt.content}
+            for d in devices:
+                if d.device_type == "ios":
+                    res, cont = channel.pushIosMessage(d.push_user_id, d.push_channel_id, message, msg_key)
+                elif d.device_type == "android":
+                    res, cont = channel.pushAndroidMessage(d.push_user_id, d.push_channel_id, message, msg_key)
+
     msg.notice = notice
     msg.save()
     return True
