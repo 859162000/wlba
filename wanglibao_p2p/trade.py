@@ -9,9 +9,10 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
 from exceptions import P2PException
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
+from marketing.models import Reward, RewardRecord
 from wanglibao_account import message as inside_message
 
 
@@ -39,6 +40,28 @@ class P2PTrader(object):
             equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
+
+        start_time = timezone.datetime(2014, 11, 1)
+        # 首次购买
+        if P2PRecord.objects.filter(user=self.user, create_time__gte=start_time).count() == 0:
+            now = timezone.now()
+            with transaction.atomic():
+                if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                    try:
+                        reward = Reward.objects.select_for_update()\
+                            .filter(is_used=False, type=u'一个月迅雷会员').first()
+                        reward.is_used = True
+                        reward.save()
+                        RewardRecord.objects.create(user=self.user, reward=reward,
+                                                    description=u'首次购买P2P产品赠送一个月迅雷会员')
+
+                        send_messages.apply_async(kwargs={
+                                "phones": [self.user.wanglibaouserprofile.phone],
+                                "messages": [messages.purchase_reward_message(reward.content)]
+                            })
+                    except:
+                        pass
+
 
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
         #phone_verified 渠道客户判断

@@ -2,7 +2,7 @@
 from marketing.models import NewsAndReport
 from django.db import IntegrityError
 import string, random, logging
-from marketing.models import InviteCode
+from marketing.models import InviteCode, Reward
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -33,3 +33,13 @@ class MockGenerator(object):
                                              for i in range(item_counts)]))]
         InviteCode.objects.bulk_create(insert_list)
         logging.debug('code inserted has been done')
+
+    @classmethod
+    def generate_reward(cls, item_counts):
+        salt = [''.join(random.sample(string.ascii_letters+string.digits, 8))
+                for i in range(item_counts)]
+        salt_list = list(set(salt))
+        insert_list = [Reward(type=u'一个月迅雷会员',description=u'迅雷活动赠送会员', content=salt)
+                        for salt in salt_list]
+        Reward.objects.bulk_create(insert_list)
+        logging.debug('reword has been done')
