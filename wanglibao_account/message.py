@@ -3,6 +3,7 @@
 
 
 import time
+import datetime
 from django.contrib.auth.models import User
 from wanglibao.celery import app
 from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type, UserPushId
@@ -50,7 +51,7 @@ def list_msg(params, user):
     rs = []
     for x in msgs:
         rs.append({"id":x.id, "title":x.message_text.title, "content":x.message_text.content, 
-                    "timestamp":x.message_text.created_at, "read_status":x.read_status})
+                    "timestamp":datetime.datetime.fromtimestamp(x.message_text.created_at), "read_status":x.read_status})
     return {"ret_code":0, "message":"ok", "data":rs}
 
 def sign_read(user, message_id):

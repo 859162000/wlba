@@ -262,6 +262,22 @@ define ['jquery'], ($)->
   registerXunlei = (data)->
     $.get '/accounts/login/callback/', data
 
+  loadMessage = (type,pagesize,pagenum)->
+    url = '/accounts/message/list/'
+    $.post url, {
+      listtype: type
+      pagesize: pagesize
+      pagenum: pagenum
+    }
+  loadMessageCount = (type)->
+    url = '/accounts/message/count/'
+    $.post url, {
+      listtype: type
+    }
+  readMessage = (message_id)->
+    url = '/accounts/message/' + message_id + '/'
+    $.post url
+
   #var Request = new Object();
   #Request = GetRequest();
   #var 参数1,参数2,参数3,参数N;
@@ -307,4 +323,7 @@ define ['jquery'], ($)->
     registerWap: registerWap
     getRequest:getRequest
     registerXunlei:registerXunlei
+    loadMessage: loadMessage
+    loadMessageCount: loadMessageCount
+    readMessage: readMessage
   }

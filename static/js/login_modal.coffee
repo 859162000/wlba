@@ -334,6 +334,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
     ), 100
     #return false
 
+  backend.loadMessageCount('unread')
+    .done (data)->
+      if data.count > 0
+        $('#message_count').show()
+        $('#message_count').html(data.count)
   #author: hetao; time: 2014.10.15
 #  $(window).load (e) ->
 #    $.getScript "http://wpa.b.qq.com/cgi/wpa.php", (data, textStatus, jqxhr) ->

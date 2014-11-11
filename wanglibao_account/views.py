@@ -44,6 +44,7 @@ from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
+from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type
 from marketing.models import Reward, RewardRecord
 from django.template.defaulttags import register
 from django.db import transaction
@@ -734,10 +735,12 @@ class ResetPasswordAPI(APIView):
         else:
             return Response({'ret_code':30004, 'message':u'验证码验证失败'})
 
+
 class Third_login(View):
     def get(self, request, login_type):
         url = third_login.assem_params(login_type, request)
         return HttpResponseRedirect(url)
+
 
 class Third_login_back(APIView):
     permission_classes = ()
@@ -746,6 +749,7 @@ class Third_login_back(APIView):
         result = third_login.login_back(request)
         return Response(result)
         #return HttpResponseRedirect(result['url'])
+
 
 class ChangePasswordAPIView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -768,10 +772,44 @@ class ChangePasswordAPIView(APIView):
         user.save()
         return Response({'ret_code':0, 'message':u'修改成功'})
 
-class MessageView(TemplateView):
 
-    def get_context_data(self, request):
-        pass
+class MessageView(TemplateView):
+    template_name = 'message.jade'
+
+    def get_context_data(self, **kwargs):
+        listtype = self.request.GET.get("listtype")
+
+        if not listtype or listtype not in ("read", "unread", "all"):
+            listtype = 'all'
+
+        if listtype == "unread":
+            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True)
+        elif listtype == "read":
+            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True)
+        else:
+            messages = Message.objects.filter(target_user=self.request.user)
+
+        for msg in messages:
+            msg.message_text.created_at = datetime.datetime.fromtimestamp(msg.message_text.created_at)
+
+        messages_list = []
+        messages_list.extend(messages)
+
+        limit = 10
+        paginator = Paginator(messages_list, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            messages_list = paginator.page(page)
+        except PageNotAnInteger:
+            messages_list = paginator.page(1)
+        except Exception:
+            messages_list = paginator.page(paginator.num_pages)
+
+        return {
+            'messageList': messages_list
+        }
+
 
 class MessageListView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -780,12 +818,14 @@ class MessageListView(APIView):
         result = message.list_msg(request.DATA, request.user)
         return Response(result)
 
+
 class MessageCountView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
         result = message.count_msg(request.DATA, request.user)
         return Response(result)
+
 
 class MessageDetailView(APIView):
     permission_classes = (IsAuthenticated, )
