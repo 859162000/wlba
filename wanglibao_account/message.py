@@ -6,7 +6,8 @@ import time
 import datetime
 from django.contrib.auth.models import User
 from wanglibao.celery import app
-from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type
+from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type, UserPushId
+from wanglibao_sms import bae_channel
 
 def count_msg(params, user):
     """
@@ -88,6 +89,18 @@ def _send(target_user, msgTxt):
     notice = True
     if mset:
         notice = mset.notice
+        #发推送,先按设置推，有需求再做判断
+        devices = UserPushId.objects.filter(user=target_user)
+        if devices:
+            channel = bae_channel.BaeChannel()
+            msg_key = "wanglibao"
+            message = {"message":msgTxt.content}
+            for d in devices:
+                if d.device_type == "ios":
+                    res, cont = channel.pushIosMessage(d.push_user_id, d.push_channel_id, message, msg_key)
+                elif d.device_type == "android":
+                    res, cont = channel.pushAndroidMessage(d.push_user_id, d.push_channel_id, message, msg_key)
+
     msg.notice = notice
     msg.save()
     return True
@@ -146,12 +159,29 @@ def send_one(user_id, title, content, mtype):
     """
         给某个人发送站内信（需要推送时也在这里写）
     """
+    msgTxt = create(title, content, mtype)
+    if not msgTxt:
+        return False
+
     user = User.objects.filter(pk=user_id).first()
     if not user:
         return False
-    msgTxt = create(title, content, mtype)
-    if msgTxt:
+    _send(user, msgTxt)
+    return True
+
+@app.task
+def send_batch(users, title=None, content=None, mtype=None, msgTxt=None):
+    """
+        批量发送站内信, users is a user_id list.
+    """
+    if not isinstance(msgTxt, MessageText):
+        msgTxt = create(title, content, mtype)
+        if not msgTxt:
+            return False
+
+    for user_id in users:
+        user = User.objects.filter(pk=user_id).first()
+        if not user:
+            continue
         _send(user, msgTxt)
-        return True
-    else:
-        return False
+    return True

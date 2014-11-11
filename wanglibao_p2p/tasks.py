@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # encoding:utf-8
+
 from django.forms import model_to_dict
 from order.models import Order
 from order.utils import OrderHelper
@@ -11,11 +13,9 @@ from wanglibao_p2p.trade import P2POperator
 from django.db.models import Sum, connection
 from datetime import datetime
 from django.contrib.auth.models import User
-import os
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
-from wanglibao_account.message import send_all
-
+from wanglibao_account import message as inside_message
 
 
 @app.task
@@ -26,6 +26,22 @@ def p2p_watchdog():
 @app.task
 def process_paid_product(product_id):
     P2POperator.preprocess_for_settle(P2PProduct.objects.get(pk=product_id))
+
+@app.task
+def full_send_message(product_name):
+    user_ids = ["183",]
+    phones = ["18637172100",]
+    title = u"%s 满标了" % product_name
+    send_messages.apply_async(kwargs={
+        "phones": phones,
+        "messages": [title],
+    })
+    inside_message.send_batch.apply_async(kwargs={
+        "users":user_ids,
+        "title":title,
+        "content":title,
+        "mtype":"fullbid"
+    })
 
 @app.task
 def build_earning(product_id):
@@ -43,29 +59,52 @@ def build_earning(product_id):
 
     #把收益数据插入earning表内
     for obj in earning:
+        # bind = Binding.objects.filter(user_id=obj.get('user')).first()
+        # if bind and bind.isvip:
 
-        bind = Binding.objects.filter(user_id=obj.get('user')).first()
-        if bind and bind.isvip:
-            earning = Earning()
-            amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
-            earning.amount = amount
-            earning.type = 'D'
-            earning.product = p2p
-            user = User.objects.get(pk=obj.get('user'))
-            order = OrderHelper.place_order(user, Order.ACTIVITY, u"活动赠送",
-                                            earning = model_to_dict(earning))
-            earning.order = order
 
-            keeper = MarginKeeper(user, order.pk)
+        earning = Earning()
+        amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
+        earning.amount = amount
+        earning.type = 'D'
+        earning.product = p2p
+        user = User.objects.get(pk=obj.get('user'))
+        order = OrderHelper.place_order(user, Order.ACTIVITY, u"活动赠送",
+                                        earning = model_to_dict(earning))
+        earning.order = order
 
-            #赠送活动描述
-            desc = u'%s,%s赠送%s%s' % (p2p.name, p2p.activity.name, p2p.activity.rule.rule_amount*100, '%')
-            earning.margin_record = keeper.deposit(amount,description=desc)
-            earning.user = user
-            earning.save()
+        keeper = MarginKeeper(user, order.pk)
 
-            #发送活动赠送短信
-            send_messages.apply_async(kwargs={
-                            "phones": [user.wanglibaouserprofile.phone],
-                            "messages": [messages.earning_message(amount)]
-                        })
+        #赠送活动描述
+        desc = u'%s,%s赠送%s%s' % (p2p.name, p2p.activity.name, p2p.activity.rule.rule_amount*100, '%')
+        earning.margin_record = keeper.deposit(amount,description=desc)
+        earning.user = user
+        earning.save()
+
+        #发送活动赠送短信
+        send_messages.apply_async(kwargs={
+                        "phones": [user.wanglibaouserprofile.phone],
+                        "messages": [messages.earning_message(amount)]
+                    })
+
+@app.task
+def bids_send_message(product_id):
+    """
+        流标给购买人发送站内信
+    """
+    from django.db.models import Count
+    p2p = P2PProduct.objects.filter(pk=product_id).first()
+    if not p2p:
+        return
+    title = u"%s 流标" % p2p.name
+    buyers = P2PRecord.objects.values('user').annotate(dcount=Count("user")).filter(product_id=product_id, catalog=u'申购')
+    arr = []
+    for x in buyers:
+        arr.append(x['user'])
+
+    inside_message.send_batch.apply_async(kwargs={
+        "users":arr,
+        "title":title,
+        "content":title,
+        "mtype":"bids"
+    })
