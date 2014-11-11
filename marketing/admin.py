@@ -106,7 +106,7 @@ class RewardResource(resources.ModelResource):
 
     class Meta:
         model = Reward
-        fields = ('id', 'type', 'content', 'description', 'is_used', 'create_time')
+        fields = ('id', 'type', 'content', 'description', 'is_used', 'end_time', 'create_time')
 
     def import_obj(self, instance, row, False):
         super(RewardResource, self).import_obj(instance, row, False)

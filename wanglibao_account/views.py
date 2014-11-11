@@ -848,8 +848,10 @@ def ajax_register(request):
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
 
+                now = timezone.now()
+
                 with transaction.atomic():
-                    if Reward.objects.filter(is_used=False, type=u'三天迅雷会员').exists():
+                    if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
                         try:
                             reward = Reward.objects.select_for_update()\
                                 .filter(is_used=False, type=u'三天迅雷会员').first()
