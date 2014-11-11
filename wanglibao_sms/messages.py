@@ -71,8 +71,8 @@ def earning_message(amount):
 
 @suffix
 def reg_reward_message(xunlei_code):
-    return u'亲，感谢注册网利宝，现赠送您迅雷三天会员体验，激活码: %s' % xunlei_code
+    return u'感谢注册成功。迅雷白金会员激活码%s有效期2015年12月31日回复TD退订4008-588-066' % xunlei_code
 
 @suffix
-def purchase_reward_message(amount, xunlei_code):
-    return u'亲，您的投标奖励收益%s元，现赠送您迅雷一个月会员体验，激活码: %s' % (amount, xunlei_code)
+def purchase_reward_message(xunlei_code):
+    return u'恭喜理财成功。迅雷白金会员激活码%s有效期2015年12月31日回复TD退订4008-588-066' % xunlei_code

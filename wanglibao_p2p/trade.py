@@ -56,7 +56,7 @@ class P2PTrader(object):
 
                         send_messages.apply_async(kwargs={
                                 "phones": [self.user.wanglibaouserprofile.phone],
-                                "messages": [messages.purchase_reward_message(amount, reward.content)]
+                                "messages": [messages.purchase_reward_message(reward.content)]
                             })
                     except:
                         pass
