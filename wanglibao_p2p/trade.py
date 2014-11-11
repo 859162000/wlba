@@ -12,6 +12,7 @@ from exceptions import P2PException
 from wanglibao_p2p.models import P2PProduct
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
+from wanglibao_account import message as inside_message
 
 
 class P2PTrader(object):
@@ -48,11 +49,27 @@ class P2PTrader(object):
             if "channel" not in introduced_by.introduced_by.username:
                 inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
                 invited_phone = introduced_by.user.wanglibaouserprofile.phone
+
+                inviter_id = introduced_by.introduced_by.id
+                invited_id = introduced_by.user.id
                 if amount >= 1000:
                     send_messages.apply_async(kwargs={
                         "phones": [inviter_phone, invited_phone],
                         "messages": [messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
                                      messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)]
+                    })
+                    #发站内信
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":inviter_id,
+                        "title":messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
+                        "content":messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
+                        "mtype":"invite"
+                    })
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":invited_id,
+                        "title":messages.gift_invited(invited_phone=safe_phone_str(inviter_phone), money=30),
+                        "content":messages.gift_invited(invited_phone=safe_phone_str(inviter_phone), money=30),
+                        "mtype":"invite"
                     })
 
         return product_record, margin_record, equity
@@ -132,10 +149,20 @@ class P2POperator(object):
             product.save()
 
         product = P2PProduct.objects.get(id=product.id)
-        phones = [e.user.wanglibaouserprofile.phone for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        equitys = product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+        #phones = [e.user.wanglibaouserprofile.phone for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        phones = [e.user.wanglibaouserprofile.phone for e in equitys]
+        user_ids = [equity.user.id for equity in equitys]
+
         send_messages.apply_async(kwargs={
             "phones": phones,
             "messages": [messages.product_settled(product, timezone.now())]
+        })
+        inside_message.send_batch.apply_async(kwargs={
+            "users":user_ids,
+            "title":messages.product_settled(product, timezone.now()),
+            "content":messages.product_settled(product, timezone.now()),
+            "mtype":"audited"
         })
 
     @classmethod
@@ -151,11 +178,20 @@ class P2POperator(object):
             ProductKeeper(product).fail()
 
         product = P2PProduct.objects.get(id=product.id)
-        phones = [equity.user.wanglibaouserprofile.phone for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        equitys = product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+        #phones = [equity.user.wanglibaouserprofile.phone for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        phones = [equity.user.wanglibaouserprofile.phone for equity in equitys]
+        user_ids = [equity.user.id for equity in equitys]
         if phones:
             send_messages.apply_async(kwargs={
                 "phones": phones,
                 "messages": [messages.product_failed(product)]
+            })
+            inside_message.send_batch.apply_async(kwargs={
+                "users":user_ids,
+                "title":messages.product_failed(product),
+                "content":messages.product_failed(product),
+                "mtype":"bids"
             })
 
     @classmethod

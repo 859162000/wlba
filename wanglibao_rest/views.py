@@ -338,6 +338,8 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
             push_channel_id = request.DATA.get("channel_id", "")
             #设备类型，默认为IOS
             device_type = request.DATA.get("device_type", "ios")
+            if device_type not in ("ios", "android"):
+                return Response({'message': "device_type error"}, status=status.HTTP_200_OK)
 
             if push_user_id and push_channel_id:
                 pu = UserPushId.objects.filter(push_user_id=push_user_id).first()

@@ -16,7 +16,6 @@ from django.contrib.auth.models import User
 import os
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
-#from wanglibao_account.message import send_all
 from wanglibao_account import message as inside_message
 
 
@@ -71,25 +70,3 @@ def build_earning(product_id):
                             "phones": [user.wanglibaouserprofile.phone],
                             "messages": [messages.earning_message(amount)]
                         })
-
-@app.task
-def bids_send_message(product_id):
-    """
-        流标给购买人发送站内信
-    """
-    from django.db.models import Count
-    p2p = P2PProduct.objects.filter(pk=product_id).first()
-    if not p2p:
-        return
-    title = u"%s 流标" % p2p.name
-    buyers = P2PRecord.objects.values('user').annotate(dcount=Count("user")).filter(product_id=product_id, catalog=u'申购')
-    arr = []
-    for x in buyers:
-        arr.append(x['user'])
-
-    inside_message.send_batch.apply_async(kwargs={
-        "users":arr,
-        "title":title,
-        "content":title,
-        "mtype":"bids"
-    })

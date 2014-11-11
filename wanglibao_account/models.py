@@ -40,7 +40,10 @@ class UserPushId(models.Model):
         app push table, store all the user and all the device
     """
     user = models.ForeignKey(User, null=True)
-    device_type = models.CharField(max_length=20, verbose_name="设备类型")
+    device_type = models.CharField(max_length=20, verbose_name="设备类型", choices=(
+        ("ios", "iPhone"),
+        ("android", "Android")
+    ))
     push_user_id = models.CharField(max_length=50, db_index=True)
     push_channel_id = models.CharField(max_length=50)
 
@@ -72,6 +75,8 @@ message_type = (
     ("repay", "还款"),
     ("activity", "活动"),
     ("bids", "流标"),
+    ("audited", "满标已审核"),
+    ("invite", "邀请"),
     ("public", "发给所有"),
 )
 class MessageText(models.Model):
