@@ -109,7 +109,7 @@ class P2PProductSerializer(ModelSerializerExtended):
     def activity_format(self, obj):
 
         return dict(zip(('name', 'rule_amount'),
-                    (obj.activity.name, float(obj.activity.rule.rule_amount)))) if obj.activity else {}
+                    (obj.activity.name, float(obj.activity.rule.rule_amount)))) if obj.activity else None
 
 
 class P2PEquitySerializer(ModelSerializerExtended):
