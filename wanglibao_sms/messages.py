@@ -115,21 +115,21 @@ def msg_bid_success(product_name, date):
 
 def msg_withdraw(withtime, amount):
     title = u"申请提现"
-    content = u"您于%s申请的提现￥%s元已经提交，如您填写的账户信息正确无误，您的资金将会于3个工作日内到达您的银行账户。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (withtime, amount)
+    content = u"您于%s申请的提现￥%s元已经提交，如您填写的账户信息正确无误，您的资金将会于3个工作日内到达您的银行账户。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (format_datetime(withtime, u"%Y年%m月%d日%H:%M:%S"), amount)
     return title, content
 
 def msg_withdraw_fail(withtime, amount):
     title=u"提现结果"
-    content = u"您于%s申请的提现￥%s元，由于您填写的银行账户信息有误，未能成功汇款。请您填写正确的银行账户信息，重新提交申请。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (withtime, amount)
+    content = u"您于%s申请的提现￥%s元，由于您填写的银行账户信息有误，未能成功汇款。请您填写正确的银行账户信息，重新提交申请。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (format_datetime(withtime, u"%Y年%m月%d日%H:%M:%S"), amount)
     return title, content
 
 def msg_withdraw_success(withtime, amount):
     title = u"提现成功"
-    content = u"您于%s申请的提现￥%s元，已汇款，请注意查收。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (withtime, amount)
+    content = u"您于%s申请的提现￥%s元，已汇款，请注意查收。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (format_datetime(withtime, u"%Y年%m月%d日%H:%M:%S"), amount)
     return title, content
 
 def msg_bid_repay(product_name, retime, amount):
     title = u"项目还款"
-    content = u"借款项目“%s”第1/3期于%s还款￥%s元，请注意查收。<br/>查看账户余额（超链）<br/>感谢您对我们的支持与关注。<br/>网利宝" % (product_name, retime, amount)
+    content = u"借款项目“%s”第1/3期于%s还款￥%s元，请注意查收。<br/>查看账户余额（超链）<br/>感谢您对我们的支持与关注。<br/>网利宝" % (product_name, format_datetime(retime, u"%Y年%m月%d日%H:%M:%S"), amount)
     return title, content
 
