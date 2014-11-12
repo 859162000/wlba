@@ -927,7 +927,7 @@ def ajax_register(request):
                                     "phones": [identifier],
                                     "messages": [messages.reg_reward_message(reward.content)]
                             })
-                            title,content = messages.msg_register_authok(reward.content)
+                            title, content = messages.msg_register_authok(reward.content)
                             inside_message.send_one.apply_async(kwargs={
                                 "user_id":auth_user.id,
                                 "title":title,
