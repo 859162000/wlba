@@ -41,7 +41,7 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-        start_time = timezone.datetime(2014, 11, 1)
+        start_time = timezone.datetime(2014, 11, 12)
         # 首次购买
         if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
 
