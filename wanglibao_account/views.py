@@ -830,7 +830,7 @@ class MessageListView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        result = message.list_msg(request.DATA, request.user)
+        result = inside_message.list_msg(request.DATA, request.user)
         return Response(result)
 
 
@@ -838,7 +838,7 @@ class MessageCountView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        result = message.count_msg(request.DATA, request.user)
+        result = inside_message.count_msg(request.DATA, request.user)
         return Response(result)
 
 
@@ -846,7 +846,7 @@ class MessageDetailView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, message_id):
-        result = message.sign_read(request.user, message_id)
+        result = inside_message.sign_read(request.user, message_id)
         return Response(result)
 
 @sensitive_post_parameters()
