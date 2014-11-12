@@ -31,22 +31,25 @@ from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao_account import third_login
+from wanglibao_account import third_login, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from wanglibao_account.models import VerifyCounter
+from wanglibao_account.models import VerifyCounter, Binding
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
-from wanglibao_account.models import Binding
-
+from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type
+from marketing.models import Reward, RewardRecord
 from django.template.defaulttags import register
+from django.db import transaction
+from wanglibao_sms.tasks import send_messages
+from wanglibao_sms import messages
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +72,33 @@ class RegisterView (RegistrationView):
         set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
+
+        now = timezone.now()
+        with transaction.atomic():
+            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                try:
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=auth_user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+                    send_messages.apply_async(kwargs={
+                            "phones": [identifier],
+                            "messages": [messages.reg_reward_message(reward.content)]
+                    })
+
+                    title,content = messages.msg_register_authok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":auth_user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+                except Exception, e:
+                    print(e)
+                    pass
+
         return user
 
     def get_success_url(self, request=None, user=None):
@@ -732,10 +762,12 @@ class ResetPasswordAPI(APIView):
         else:
             return Response({'ret_code':30004, 'message':u'验证码验证失败'})
 
+
 class Third_login(View):
     def get(self, request, login_type):
         url = third_login.assem_params(login_type, request)
         return HttpResponseRedirect(url)
+
 
 class Third_login_back(APIView):
     permission_classes = ()
@@ -744,6 +776,7 @@ class Third_login_back(APIView):
         result = third_login.login_back(request)
         return Response(result)
         #return HttpResponseRedirect(result['url'])
+
 
 class ChangePasswordAPIView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -765,6 +798,65 @@ class ChangePasswordAPIView(APIView):
         user.set_password(new_password)
         user.save()
         return Response({'ret_code':0, 'message':u'修改成功'})
+
+
+class MessageView(TemplateView):
+    template_name = 'message.jade'
+
+    def get_context_data(self, **kwargs):
+        listtype = self.request.GET.get("listtype")
+
+        if not listtype or listtype not in ("read", "unread", "all"):
+            listtype = 'all'
+
+        if listtype == "unread":
+            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by('-message_text__created_at')
+        elif listtype == "read":
+            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by('-message_text__created_at')
+        else:
+            messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
+
+        messages_list = []
+        messages_list.extend(messages)
+
+        limit = 10
+        paginator = Paginator(messages_list, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            messages_list = paginator.page(page)
+        except PageNotAnInteger:
+            messages_list = paginator.page(1)
+        except Exception:
+            messages_list = paginator.page(paginator.num_pages)
+
+        return {
+            'messageList': messages_list
+        }
+
+
+class MessageListView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = inside_message.list_msg(request.DATA, request.user)
+        return Response(result)
+
+
+class MessageCountView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = inside_message.count_msg(request.DATA, request.user)
+        return Response(result)
+
+
+class MessageDetailView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, message_id):
+        result = inside_message.sign_read(request.user, message_id)
+        return Response(result)
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -816,10 +908,36 @@ def ajax_register(request):
                 invitecode = form.cleaned_data['invitecode']
 
                 user = create_user(identifier, password, nickname)
-                # set_promo_user(request, user)
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
+
+                now = timezone.now()
+
+                with transaction.atomic():
+                    if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                        try:
+                            reward = Reward.objects.select_for_update()\
+                                .filter(is_used=False, type=u'三天迅雷会员').first()
+                            reward.is_used = True
+                            reward.save()
+                            RewardRecord.objects.create(user=auth_user, reward=reward,
+                                                        description=u'新用户注册赠送三天迅雷会员')
+                            send_messages.apply_async(kwargs={
+                                    "phones": [identifier],
+                                    "messages": [messages.reg_reward_message(reward.content)]
+                            })
+                            title, content = messages.msg_register_authok(reward.content)
+                            inside_message.send_one.apply_async(kwargs={
+                                "user_id":auth_user.id,
+                                "title":title,
+                                "content":content,
+                                "mtype":"activity"
+                            })
+                        except Exception,e:
+                            import traceback
+                            print(traceback.format_exc())
+
                 return HttpResponse(messenger('done', user=request.user))
                 # return HttpResponseRedirect("/accounts/id_verify/")
             else:

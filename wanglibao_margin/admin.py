@@ -10,6 +10,7 @@ class UserMarginAdmin(admin.ModelAdmin):
 class MarginRecordAdmin(admin.ModelAdmin):
     list_display = ('catalog', 'user', 'amount', 'description', 'margin_current')
     search_fields = ('user__wanglibaouserprofile__phone',)
+    raw_id_fields = ('user', )
 
 admin.site.register(Margin, UserMarginAdmin)
 admin.site.register(MarginRecord, MarginRecordAdmin)

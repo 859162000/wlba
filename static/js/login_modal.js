@@ -360,7 +360,7 @@
       e.preventDefault();
       return $('.login-modal').trigger('click');
     });
-    return $("input:password").bind("copy cut paste", function(e) {
+    $("input:password").bind("copy cut paste", function(e) {
       var element;
       element = this;
       return setTimeout((function() {
@@ -371,6 +371,14 @@
         }
       }), 100);
     });
+    return backend.loadMessageCount('unread').done(function(data) {
+      if (data.count > 0) {
+        $('#message_count').show();
+        return $('#message_count').html(data.count);
+      }
+    });
   });
 
 }).call(this);
+
+//# sourceMappingURL=login_modal.map
