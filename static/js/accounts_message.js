@@ -11,7 +11,6 @@
   require(['jquery', 'knockout', 'underscore', 'lib/backend', 'model/messageTable', 'model/pager', 'model/tab'], function($, ko, _, backend, message, pager, tab) {
     return $('.msg-id').click(function(e) {
       var msg_icon, msg_id, msg_id_id, read_status;
-      e.preventDefault();
       msg_id = e.currentTarget.id;
       msg_icon = $("#icon_" + msg_id).attr('class');
       read_status = $('#' + msg_id).attr('data-read-status');
