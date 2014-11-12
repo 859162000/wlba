@@ -383,6 +383,7 @@ class WithdrawTransactions(TemplateView):
                 }
             )
         elif action == 'confirm':
+            total_amount = 0
             for payinfo in payinfos:
                 with transaction.atomic():
                     if payinfo.status != PayInfo.ACCEPTED and payinfo.status != PayInfo.PROCESSING:
@@ -391,10 +392,22 @@ class WithdrawTransactions(TemplateView):
 
                     marginKeeper = MarginKeeper(payinfo.user)
                     marginKeeper.withdraw_ack(payinfo.amount)
+
+                    total_amount += payinfo.amount
                     payinfo.status = PayInfo.SUCCESS
                     payinfo.confirm_time = timezone.now()
                     payinfo.save()
 
+            #发站内信
+            if total_amount:
+                user_id = payinfos[0].user.id
+                title,content = messages.msg_withdraw_success(timezone.now(), total_amount)
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":user_id,
+                    "title":title,
+                    "content":content,
+                    "mtype":"withdraw"
+                })
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
             })
@@ -430,6 +443,14 @@ class WithdrawRollback(TemplateView):
         send_messages.apply_async(kwargs={
             "phones": [payinfo.user.wanglibaouserprofile.phone],
             "messages": [messages.withdraw_failed(error_message)]
+        })
+
+        title,content = messages.msg_withdraw_fail(timezone.now(), payinfo.amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":payinfo.user.id,
+            "title":title,
+            "content":content,
+            "mtype":"withdraw"
         })
 
         return HttpResponse({
