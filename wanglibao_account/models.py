@@ -98,6 +98,7 @@ class MessageText(models.Model):
     class Meta:
         verbose_name = u"站内信内容"
         verbose_name_plural = u"站内信内容"
+        ordering = ['-created_at']
 
     @property
     def display_mtype(self):

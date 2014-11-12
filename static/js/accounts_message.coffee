@@ -67,7 +67,7 @@ require ['jquery', 'knockout', 'underscore', 'lib/backend', 'model/messageTable'
 #  ko.applyBindings(new viewModel())
 
   $('.msg-id').click (e)->
-    #e.preventDefault()
+    e.preventDefault()
     #console.log(e.currentTarget)
     msg_id = e.currentTarget.id
     msg_icon = $("#icon_" + msg_id).attr('class')
