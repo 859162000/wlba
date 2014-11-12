@@ -926,11 +926,8 @@ def ajax_register(request):
                                 "mtype":"activity"
                             })
                         except Exception,e:
-                            print("="*50)
-                            print(e)
                             import traceback
                             print(traceback.format_exc())
-                            pass
 
                 return HttpResponse(messenger('done', user=request.user))
                 # return HttpResponseRedirect("/accounts/id_verify/")
