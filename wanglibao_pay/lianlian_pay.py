@@ -219,7 +219,7 @@ class LianlianPay:
             return {"ret_code":20065, 'message':u'余额不足'}
 
         phone = user.wanglibaouserprofile.phone
-        status, message = validate_validation_code(phone, code)
+        status, message = validate_validation_code(phone, vcode)
         if status != 200:
             return {"ret_code":20066, "message":u"验证码输入错误"}
         fee = amount * LianlianPay.FEE
