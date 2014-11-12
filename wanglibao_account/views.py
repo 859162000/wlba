@@ -86,8 +86,17 @@ class RegisterView (RegistrationView):
                     send_messages.apply_async(kwargs={
                             "phones": [identifier],
                             "messages": [messages.reg_reward_message(reward.content)]
-                        })
-                except:
+                    })
+
+                    title,content = messages.msg_register_authok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":auth_user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+                except Exception, e:
+                    print(e)
                     pass
 
         return user
