@@ -106,7 +106,7 @@ class P2PTrader(object):
                     })
 
         #投标成功发站内信
-        title,content = messages.msg_bid_purchase(self.order_id, self.product.short_name, amount)
+        title,content = messages.msg_bid_purchase(self.order_id, self.product.name, amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id":self.user.id,
             "title":title,
@@ -116,7 +116,7 @@ class P2PTrader(object):
         #满标给管理员发短信
         if product_record.product_balance_after <= 0:
             from wanglibao_p2p.tasks import full_send_message
-            full_send_message.apply_async(kwargs={"product_name":self.product.short_name})
+            full_send_message.apply_async(kwargs={"product_name":self.product.name})
 
         return product_record, margin_record, equity
 
@@ -211,7 +211,7 @@ class P2POperator(object):
             "phones": phones,
             "messages": [messages.product_settled(product, timezone.now())]
         })
-        title,content = messages.msg_bid_success(product.short_name, timezone.now())
+        title,content = messages.msg_bid_success(product.name, timezone.now())
         inside_message.send_batch.apply_async(kwargs={
             "users":user_ids,
             "title":title,
@@ -246,7 +246,7 @@ class P2POperator(object):
                 "phones": phones,
                 "messages": [messages.product_failed(product)]
             })
-            title,content = messages.msg_bid_fail(product.short_name)
+            title,content = messages.msg_bid_fail(product.name)
             inside_message.send_batch.apply_async(kwargs={
                 "users":user_ids,
                 "title":title,
