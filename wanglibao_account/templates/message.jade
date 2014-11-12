@@ -46,7 +46,10 @@ block main
                   p(id="title_msg_{{msg.id}}") {{ msg.message_text.title }}
                 else
                   p(id="title_msg_{{msg.id}}").blue {{ msg.message_text.title }}
-                p.message-content(id="cnt_msg_{{msg.id}}") {{ msg.message_text.content | safe }}
+                p.message-content(id="cnt_msg_{{msg.id}}")
+                  | 亲爱的{{user | display_name}}您好：
+                  br
+                  | {{ msg.message_text.content | safe }}
               td {{ msg.message_text.format_time | date:'Y-m-d' }}
               td
                 span.icon-msg-arrow-down(id="icon_msg_{{msg.id}}")
