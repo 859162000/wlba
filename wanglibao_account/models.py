@@ -71,14 +71,15 @@ class Binding(models.Model):
     created_at = models.BigIntegerField(default=0, verbose_name=u'创建时间', blank=True)
 
 message_type = (
-    ("withdraw", "提现"),
-    ("pay", "充值"),
-    ("repay", "还款"),
-    ("activity", "活动"),
-    ("bids", "流标"),
-    ("fullbid", "满标"),
-    ("audited", "满标已审核"),
-    ("invite", "邀请"),
+    ("withdraw", "提现通知"),
+    ("pay", "充值通知"),
+    ("repay", "项目还款"),
+    ("activity", "活动奖励"),
+    ("bids", "流标通知"),
+    ("purchase", "投标通知"),
+    ("fullbid", "满标"), #给管理员发
+    ("loaned", "投标成功"),#给持仓人发
+    #("audited", "满标已审核"),
     ("public", "发给所有"),
 )
 class MessageText(models.Model):

@@ -31,7 +31,7 @@ from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao_account import third_login, message
+from wanglibao_account import third_login, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
@@ -917,7 +917,14 @@ def ajax_register(request):
                             send_messages.apply_async(kwargs={
                                     "phones": [identifier],
                                     "messages": [messages.reg_reward_message(reward.content)]
-                                })
+                            })
+                            title,content = messages.msg_register_authok(reward.content)
+                            inside_message.send_one.apply_async(kwargs={
+                                "user_id":auth_user.id,
+                                "title":title,
+                                "content":content,
+                                "mtype":"activity"
+                            })
                         except:
                             pass
 

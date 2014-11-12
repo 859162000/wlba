@@ -46,7 +46,6 @@ class P2PTrader(object):
         if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
 
             now = timezone.now()
-            print now
 
             with transaction.atomic():
                 if Reward.objects.filter(is_used=False, type=u'一个月迅雷会员', end_time__gte=now).exists():
@@ -61,6 +60,13 @@ class P2PTrader(object):
                                 "phones": [self.user.wanglibaouserprofile.phone],
                                 "messages": [messages.purchase_reward_message(reward.content)]
                             })
+                        title,content = messages.msg_first_licai(reward.content)
+                        inside_message.send_one.apply_async(kwargs={
+                            "user_id":self.user.id,
+                            "title":title,
+                            "content":content,
+                            "mtype":"activity"
+                        })
                     except:
                         pass
 
@@ -84,21 +90,29 @@ class P2PTrader(object):
                                      messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)]
                     })
                     #发站内信
-                    ivt1 = messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30)
+                    title,content = messages.msg_invite_major(inviter_phone, invited_phone)
                     inside_message.send_one.apply_async(kwargs={
                         "user_id":inviter_id,
-                        "title":ivt1,
-                        "content":ivt1,
-                        "mtype":"invite"
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
                     })
-                    ivt2 = messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)
+                    title2,content2 = messages.msg_invite_are(inviter_phone, invited_phone)
                     inside_message.send_one.apply_async(kwargs={
                         "user_id":invited_id,
-                        "title":ivt2,
-                        "content":ivt2,
-                        "mtype":"invite"
+                        "title":title2,
+                        "content":content2,
+                        "mtype":"activity"
                     })
 
+        #投标成功发站内信
+        title,content = messages.msg_bid_purchase(self.order_id, self.product.short_name, amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":self.user.id,
+            "title":title,
+            "content":content,
+            "mtype":"purchase"
+        })
         #满标给管理员发短信
         if product_record.product_balance_after <= 0:
             from wanglibao_p2p.tasks import full_send_message
@@ -173,27 +187,36 @@ class P2POperator(object):
             raise P2PException(u'产品已申购额度(%s)不等于总额度(%s)' % (str(product.ordered_amount), str(product.total_amount)))
         if product.status != u'满标已审核':
             raise P2PException(u'产品状态(%s)不是(满标已审核)' % product.status)
+
+        phones = []
+        user_ids = []
         with transaction.atomic():
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
                 equity_keeper.settle(savepoint=False)
+
+                user_ids.append(equity.user.id)
+                phones.append(equity.user.wanglibaouserprofile.phone)
             product.status = u'还款中'
             product.save()
 
-        product = P2PProduct.objects.get(id=product.id)
-        equitys = product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
-        phones = [e.user.wanglibaouserprofile.phone for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
-        user_ids = [e.user.id for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        #product = P2PProduct.objects.get(id=product.id)
+        #equitys = product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+        #phones = [e.user.wanglibaouserprofile.phone for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        #user_ids = [e.user.id for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        phones = {}.fromkeys(phones).keys()
+        user_ids = {}.fromkeys(user_ids).keys()
 
         send_messages.apply_async(kwargs={
             "phones": phones,
             "messages": [messages.product_settled(product, timezone.now())]
         })
+        title,content = messages.msg_bid_success(product.short_name, timezone.now())
         inside_message.send_batch.apply_async(kwargs={
             "users":user_ids,
-            "title":messages.product_settled(product, timezone.now()),
-            "content":messages.product_settled(product, timezone.now()),
-            "mtype":"audited"
+            "title":title,
+            "content":title,
+            "mtype":"loaned"
         })
 
     @classmethod
@@ -202,24 +225,32 @@ class P2POperator(object):
             raise P2PException('Product already failed')
 
         cls.logger.info(u"Product [%d] [%s] not able to reach 100%%" % (product.id, product.name))
+        user_ids = []
+        phones = []
+
         with transaction.atomic():
             for equity in product.equities.all():
                 equity_keeper = EquityKeeper(equity.user, equity.product)
                 equity_keeper.rollback(savepoint=False)
+
+                user_ids.append(equity.user.id)
+                phones.append(equity.user.wanglibaouserprofile.phone)
             ProductKeeper(product).fail()
 
-        product = P2PProduct.objects.get(id=product.id)
-        phones = [equity.user.wanglibaouserprofile.phone for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
-        user_ids = [equity.user.id for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        #product = P2PProduct.objects.get(id=product.id)
+        #phones = [equity.user.wanglibaouserprofile.phone for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        phones = {}.fromkeys(phones).keys()
+        user_ids = {}.fromkeys(user_ids).keys()
         if phones:
             send_messages.apply_async(kwargs={
                 "phones": phones,
                 "messages": [messages.product_failed(product)]
             })
+            title,content = messages.msg_bid_fail(product.short_name)
             inside_message.send_batch.apply_async(kwargs={
                 "users":user_ids,
-                "title":messages.product_failed(product),
-                "content":messages.product_failed(product),
+                "title":title,
+                "content":content,
                 "mtype":"bids"
             })
 
