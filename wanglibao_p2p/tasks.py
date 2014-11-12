@@ -29,7 +29,7 @@ def process_paid_product(product_id):
 
 @app.task
 def full_send_message(product_name):
-    users = User.objects.filter(groups__name='管理员')
+    users = User.objects.filter(groups__name=u'满标管理员')
     if not users:
         return False
 
