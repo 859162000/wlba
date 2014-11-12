@@ -925,7 +925,9 @@ def ajax_register(request):
                                 "content":content,
                                 "mtype":"activity"
                             })
-                        except:
+                        except Exception,e:
+                            print("="*30)
+                            print(e)
                             pass
 
                 return HttpResponse(messenger('done', user=request.user))
