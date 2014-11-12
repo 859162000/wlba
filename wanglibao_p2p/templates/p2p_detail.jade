@@ -108,7 +108,7 @@ html
                     .row
                       period = p2p.period * 30
                       user_limit = u"100的整数倍"
-                      -render_field form.amount class+="span12" type="text" placeholder=user_limit data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income,#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
+                      -render_field form.amount class+="span12" type="text" placeholder=user_limit data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
                     .form-row-error
                 .row
                   span.span4 预期收益
@@ -121,18 +121,18 @@ html
                           span.font-m +&nbsp;
                           span.blue.font-m#xunlei-vip-income-head 0.00
                           |元
-                if p2p.activity
-                  .row
-                    span.span4
-                    span.span8-omega.xunlei-vip-form-txt
-                      if user.is_authenticated and xunlei_vip.isvip == True
-                        span 您已绑定迅雷会员，投资后将在满标2个工作日内，一次性获得
-                        span.blue.font-ss#xunlei-vip-income 0.00
-                        |元。
-                      else
-                        span 投资后绑定迅雷会员，可额外享受
-                        span.blue.font-ss#xunlei-vip-income 0.00
-                        |元的收益
+                //if p2p.activity
+                //  .row
+                //    span.span4
+                //    span.span8-omega.xunlei-vip-form-txt
+                //      if user.is_authenticated and xunlei_vip.isvip == True
+                //        span 您已绑定迅雷会员，投资后将在满标2个工作日内，一次性获得
+                //        span.blue.font-ss#xunlei-vip-income 0.00
+                //        |元。
+                //      else
+                //        span 投资后绑定迅雷会员，可额外享受
+                //        span.blue.font-ss#xunlei-vip-income 0.00
+                //        |元的收益
 
                 .row.margin-top-s
                   span.span4
@@ -191,10 +191,7 @@ html
 
         .span4-omega.border-left.clearfix
           .p2p-detail-container.guarantee-company
-            if p2p.category == '证大速贷'
-              h1 合作机构
-            else
-              h1 担保机构
+            h1 担保机构审核清单
             table
               warrants = p2p.warrant_set.all()
               length = len(warrants)

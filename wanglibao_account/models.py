@@ -88,7 +88,7 @@ class MessageText(models.Model):
     mtype = models.CharField(max_length=50, verbose_name=u"消息类型", db_index=True,
         choices=message_type)
     title = models.CharField(max_length=100, verbose_name=u"消息标题")
-    content = models.CharField(max_length=1000, verbose_name=u"正文")
+    content = models.TextField(verbose_name=u"正文")
     created_at = models.BigIntegerField(default=long(time.time()), verbose_name=u"时间戳", blank=True)
 
     def __unicode__(self):
