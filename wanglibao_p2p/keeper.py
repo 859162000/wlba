@@ -82,7 +82,11 @@ class EquityKeeper(KeeperBaseMixin):
             limit = self.limit
 
             if amount > limit:
-                raise P2PException(u'已超过可认购份额限制，该产品每个客户最大投资金额为%s元' % str(limit))
+                # raise P2PException(u'已超过可认购份额限制，该产品每个客户最大投资金额为%s元' % str(limit))
+                raise P2PException(u'已超过可认购份额限制，'
+                                   u'该产品每个客户最大投资金额为%s元' % str(self.product.limit_amount_per_user))
+
+
 
             self.equity.equity += amount
             self.equity.created_at = datetime.now()
