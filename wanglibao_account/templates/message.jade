@@ -39,13 +39,14 @@ block main
             th(width="10%")
         tbody(id="messageBody")
           for msg in messageList
-            tr(id="msg_{{msg.id}}", data-read-status="{{msg.read_status}}", data-show="False", data-msg-id="{{msg.id}}").msg-id
+            tr
               td {{ msg.message_text.display_mtype }}
               td.align-left
-                if msg.read_status == True
-                  p(id="title_msg_{{msg.id}}") {{ msg.message_text.title }}
-                else
-                  p(id="title_msg_{{msg.id}}").blue {{ msg.message_text.title }}
+                div(id="msg_{{msg.id}}", data-read-status="{{msg.read_status}}", data-show="False", data-msg-id="{{msg.id}}").msg-id
+                  if msg.read_status == True
+                    p(id="title_msg_{{msg.id}}") {{ msg.message_text.title }}
+                  else
+                    p(id="title_msg_{{msg.id}}").blue {{ msg.message_text.title }}
                 p.message-content(id="cnt_msg_{{msg.id}}")
                   | 亲爱的{{user | display_name}}您好：
                   br
