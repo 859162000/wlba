@@ -235,6 +235,7 @@ class WithdrawCompleteView(TemplateView):
 
             order = OrderHelper.place_order(request.user, Order.WITHDRAW_ORDER, pay_info.status,
                                             pay_info=model_to_dict(pay_info))
+
             pay_info.order = order
             keeper = MarginKeeper(request.user, pay_info.order.pk)
             margin_record = keeper.withdraw_pre_freeze(amount)
@@ -361,6 +362,8 @@ class CardViewSet(ModelViewSet):
 
 
 class WithdrawTransactions(TemplateView):
+    """ for admin
+    """
     template_name = 'withdraw_transactions.jade'
 
     def post(self, request):

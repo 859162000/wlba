@@ -46,7 +46,6 @@ class P2PTrader(object):
         if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
 
             now = timezone.now()
-            print now
 
             with transaction.atomic():
                 if Reward.objects.filter(is_used=False, type=u'一个月迅雷会员', end_time__gte=now).exists():
