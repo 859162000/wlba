@@ -41,7 +41,7 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-        start_time = timezone.datetime(2014, 11, 1)
+        start_time = timezone.datetime(2014, 11, 12)
         # 首次购买
         if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
 
@@ -57,7 +57,6 @@ class P2PTrader(object):
                         reward.save()
                         RewardRecord.objects.create(user=self.user, reward=reward,
                                                     description=u'首次购买P2P产品赠送一个月迅雷会员')
-                        print '-'*30
                         send_messages.apply_async(kwargs={
                                 "phones": [self.user.wanglibaouserprofile.phone],
                                 "messages": [messages.purchase_reward_message(reward.content)]
@@ -85,16 +84,18 @@ class P2PTrader(object):
                                      messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)]
                     })
                     #发站内信
+                    ivt1 = messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30)
                     inside_message.send_one.apply_async(kwargs={
                         "user_id":inviter_id,
-                        "title":messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
-                        "content":messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
+                        "title":ivt1,
+                        "content":ivt1,
                         "mtype":"invite"
                     })
+                    ivt2 = messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)
                     inside_message.send_one.apply_async(kwargs={
                         "user_id":invited_id,
-                        "title":messages.gift_invited(invited_phone=safe_phone_str(inviter_phone), money=30),
-                        "content":messages.gift_invited(invited_phone=safe_phone_str(inviter_phone), money=30),
+                        "title":ivt2,
+                        "content":ivt2,
                         "mtype":"invite"
                     })
 
@@ -181,9 +182,8 @@ class P2POperator(object):
 
         product = P2PProduct.objects.get(id=product.id)
         equitys = product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
-        #phones = [e.user.wanglibaouserprofile.phone for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
-        phones = [e.user.wanglibaouserprofile.phone for e in equitys]
-        user_ids = [equity.user.id for equity in equitys]
+        phones = [e.user.wanglibaouserprofile.phone for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        user_ids = [e.user.id for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
 
         send_messages.apply_async(kwargs={
             "phones": phones,
@@ -209,10 +209,8 @@ class P2POperator(object):
             ProductKeeper(product).fail()
 
         product = P2PProduct.objects.get(id=product.id)
-        equitys = product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
-        #phones = [equity.user.wanglibaouserprofile.phone for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
-        phones = [equity.user.wanglibaouserprofile.phone for equity in equitys]
-        user_ids = [equity.user.id for equity in equitys]
+        phones = [equity.user.wanglibaouserprofile.phone for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+        user_ids = [equity.user.id for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
         if phones:
             send_messages.apply_async(kwargs={
                 "phones": phones,
