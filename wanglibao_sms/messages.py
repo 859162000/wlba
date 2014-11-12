@@ -130,6 +130,6 @@ def msg_withdraw_success(withtime, amount):
 
 def msg_bid_amortize(product_name, retime, amount):
     title = u"项目还款"
-    content = u"借款项目“%s”于%s还款￥%s元，请注意查收。<br/>查看账户余额（超链）<br/>感谢您对我们的支持与关注。<br/>网利宝" % (product_name, format_datetime(retime, u"%Y年%m月%d日%H:%M:%S"), amount)
+    content = u"借款项目“%s”于%s还款￥%s元，请注意查收。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % (product_name, format_datetime(retime, u"%Y年%m月%d日%H:%M:%S"), amount)
     return title, content
 
