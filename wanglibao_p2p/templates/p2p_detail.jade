@@ -191,10 +191,7 @@ html
 
         .span4-omega.border-left.clearfix
           .p2p-detail-container.guarantee-company
-            if p2p.category == '证大速贷'
-              h1 合作机构
-            else
-              h1 担保机构
+            h1 担保机构审核清单
             table
               warrants = p2p.warrant_set.all()
               length = len(warrants)
