@@ -144,7 +144,7 @@ class PayCompleteView(TemplateView):
         inside_message.send_one.apply_async(kwargs={
             "user_id":request.user.id,
             "title":"%s" % result,
-            "content":"%s,%s元" % (result, amount),
+            "content":u"%s,%s元" % (result, amount),
             "mtype":"pay"
         })
 
