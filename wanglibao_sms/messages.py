@@ -110,7 +110,7 @@ def msg_invite_are(inviter, invited):
 
 def msg_bid_success(product_name, date):
     title = u"投标成功通知"
-    content = u"感谢您投资 借款项目“%s”，该项目已满标放款，将于%s开始计息。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (product_name, date)
+    content = u"感谢您投资 借款项目“%s”，该项目已满标放款，将于%s开始计息。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (product_name, format_datetime(date, u"%Y年%m月%d日"))
     return title, content
 
 def msg_withdraw(withtime, amount):
