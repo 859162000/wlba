@@ -80,12 +80,12 @@ def purchase_reward_message(xunlei_code):
 #站内信模板
 def msg_bid_purchase(order_id, product_name, amount):
     title = u"投标通知"
-    content = u"感谢您投资订单号【%s】借款项目“%s”￥%s元，该项目正在招标中，您的投标资金暂时被冻结，满标后将放款计息。<br/><a href='/accounts/home/' target='_blank'>查看账户余额<a/><br/> 感谢您对我们的支持与关注！ 网利宝" % (order_id, product_name, amount)
+    content = u"感谢您投资订单号【%s】借款项目“%s”￥%s元，该项目正在招标中，您的投标资金暂时被冻结，满标后将放款计息。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (order_id, product_name, amount)
     return title, content
 
 def msg_bid_fail(product_name):
     title = u"流标通知"
-    content = u"感谢您投资 借款项目“%s”，该项目在有效期内未满标，视为流标，您的该笔投资金额已取消冻结，您可继续投资其他理财产品。<br/><a href='/accounts/home/' target='_blank'>查看账户余额<a/><br/>感谢您对我们的支持与关注！<br/>网利宝" % product_name
+    content = u"感谢您投资 借款项目“%s”，该项目在有效期内未满标，视为流标，您的该笔投资金额已取消冻结，您可继续投资其他理财产品。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % product_name
     return title, content
 
 def msg_register_authok(activation):
@@ -110,22 +110,22 @@ def msg_invite_are(inviter, invited):
 
 def msg_bid_success(product_name, date):
     title = u"投标成功通知"
-    content = u"感谢您投资 借款项目“%s”，该项目已满标放款，将于%s开始计息。<br/><a href='/accounts/home/' target='_blank'>查看账户余额<a/><br/>感谢您对我们的支持与关注！<br/>网利宝" % (product_name, date)
+    content = u"感谢您投资 借款项目“%s”，该项目已满标放款，将于%s开始计息。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (product_name, date)
     return title, content
 
 def msg_withdraw(withtime, amount):
     title = u"申请提现"
-    content = u"您于%s申请的提现￥%s元已经提交，如您填写的账户信息正确无误，您的资金将会于3个工作日内到达您的银行账户。<br/><a href='/accounts/home/' target='_blank'>查看账户余额<a/><br/>感谢您对我们的支持与关注！<br/>网利宝" % (withtime, amount)
+    content = u"您于%s申请的提现￥%s元已经提交，如您填写的账户信息正确无误，您的资金将会于3个工作日内到达您的银行账户。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (withtime, amount)
     return title, content
 
 def msg_withdraw_fail(withtime, amount):
     title=u"提现结果"
-    content = u"您于%s申请的提现￥%s元，由于您填写的银行账户信息有误，未能成功汇款。请您填写正确的银行账户信息，重新提交申请。<br/><a href='/accounts/home/' target='_blank'>查看账户余额<a/><br/>感谢您对我们的支持与关注！<br/>网利宝" % (withtime, amount)
+    content = u"您于%s申请的提现￥%s元，由于您填写的银行账户信息有误，未能成功汇款。请您填写正确的银行账户信息，重新提交申请。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (withtime, amount)
     return title, content
 
 def msg_withdraw_success(withtime, amount):
     title = u"提现成功"
-    content = u"您于%s申请的提现￥%s元，已汇款，请注意查收。<br/><a href='/accounts/home/' target='_blank'>查看账户余额<a/><br/>感谢您对我们的支持与关注！<br/>网利宝" % (withtime, amount)
+    content = u"您于%s申请的提现￥%s元，已汇款，请注意查收。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (withtime, amount)
     return title, content
 
 def msg_bid_repay(product_name, retime, amount):
