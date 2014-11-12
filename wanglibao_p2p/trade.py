@@ -106,7 +106,8 @@ class P2PTrader(object):
                     })
 
         #投标成功发站内信
-        title,content = messages.msg_bid_purchase(self.order_id, self.product.name, amount)
+        pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
+        title,content = messages.msg_bid_purchase(self.order_id, pname, amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id":self.user.id,
             "title":title,
@@ -211,7 +212,9 @@ class P2POperator(object):
             "phones": phones,
             "messages": [messages.product_settled(product, timezone.now())]
         })
-        title,content = messages.msg_bid_success(product.name, timezone.now())
+
+        pname = u"%s,期限%s个月" % (product.name, product.period)
+        title,content = messages.msg_bid_success(pname, timezone.now())
         inside_message.send_batch.apply_async(kwargs={
             "users":user_ids,
             "title":title,
@@ -246,7 +249,9 @@ class P2POperator(object):
                 "phones": phones,
                 "messages": [messages.product_failed(product)]
             })
-            title,content = messages.msg_bid_fail(product.name)
+
+            pname = u"%s,期限%s个月" % (product.name, product.period)
+            title,content = messages.msg_bid_fail(pname)
             inside_message.send_batch.apply_async(kwargs={
                 "users":user_ids,
                 "title":title,
