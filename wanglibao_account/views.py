@@ -801,11 +801,11 @@ class MessageView(TemplateView):
             listtype = 'all'
 
         if listtype == "unread":
-            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True)
+            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by('-message_text__created_at')
         elif listtype == "read":
-            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True)
+            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by('-message_text__created_at')
         else:
-            messages = Message.objects.filter(target_user=self.request.user)
+            messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
 
         messages_list = []
         messages_list.extend(messages)
