@@ -15,6 +15,7 @@ from exceptions import ProductLack, P2PException
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
+from wanglibao_account import message as inside_message
 
 
 class ProductKeeper(KeeperBaseMixin):
@@ -216,6 +217,8 @@ class AmortizationKeeper(KeeperBaseMixin):
             sub_amortizations = amortization.subs.all()
             description = unicode(amortization)
             catalog = u'分期还款'
+            product = amortization.product
+            pname = u"%s,期限%s个月" % (product.name, product.period)
             for sub_amo in sub_amortizations:
                 user_margin_keeper = MarginKeeper(sub_amo.user)
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest,
@@ -224,10 +227,20 @@ class AmortizationKeeper(KeeperBaseMixin):
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()
                 sub_amo.save()
-
+                
+                amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest
                 send_messages.apply_async(kwargs={
                     "phones": [sub_amo.user.wanglibaouserprofile.phone],
-                    "messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, sub_amo.principal + sub_amo.interest + sub_amo.penal_interest)]
+                    #"messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, sub_amo.principal + sub_amo.interest + sub_amo.penal_interest)]
+                    "messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, amo_amount)]
+                })
+
+                title,content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":sub_amo.user.id,
+                    "title":title,
+                    "content":content,
+                    "mtype":"amortize"
                 })
 
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
