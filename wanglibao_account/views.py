@@ -1088,6 +1088,31 @@ class IdVerificationView(TemplateView):
 class AdminIdVerificationView(TemplateView):
     template_name = 'admin_verify_id.jade'
 
+class AdminSendMessageView(TemplateView):
+    template_name = "admin_send_message.jade"
+
+class AdminSendMessageAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        phone = request.DATA.get("phone", "")
+        title = request.DATA.get("title", "")
+        content = request.DATA.get("content", "")
+        mtype = request.DATA.get("mtype", "")
+        if not phone or not title or not content or not mtype:
+            return Response({"ret_code":1, "message":"信息输入不完整"})
+        user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+        if not user:
+            return Response({"ret_code":1, "message":"没有此用户"})
+
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":user.id,
+            "title":title,
+            "content":content,
+            "mtype":mtype
+        })
+        return Response({"ret_code":0, "message":"发送成功"})
+
 
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)

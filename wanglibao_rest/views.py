@@ -208,7 +208,7 @@ class WeixinRegisterAPIView(APIView):
 
 #客户端升级
 class ClientUpdateAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     def post(self, request, *args, **kwargs):
         device_type = request.DATA.get("device_type", "")

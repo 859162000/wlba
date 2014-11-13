@@ -13,7 +13,7 @@ from wanglibao_account.models import VerifyCounter, IdVerification, Binding, Mes
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_account.views import AdminIdVerificationView, IntroduceRelation
+from wanglibao_account.views import AdminIdVerificationView, IntroduceRelation, AdminSendMessageView
 
 
 class ProfileInline(admin.StackedInline):
@@ -127,3 +127,5 @@ admin.site.register(Binding, BindingAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(MessageText, MessageTextAdmin)
 admin.site.register(UserPushId, UserPushIdAdmin)
+
+admin.site.register_view('accounts/message/', view=AdminSendMessageView.as_view(), name=u'网利宝-发送站内信')
