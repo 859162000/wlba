@@ -90,13 +90,14 @@ New Contract Template
     4. Open /admin, under p2p contract, create a new contract, give it a name and paste the generated html into content
     
     
-     Mac Build question：
-error：ImportError: The _imagingft C module is not installed
-＊	＊＊＊＊＊First install PIL Package，Then install jpeg.
-a.	Download PIL code,instaill：http://effbot.org/media/downloads/Imaging-1.1.7.tar.gz
-pip install Imaging-1.1.7
-b. brew uninstall jpeg
-c.	Instaill pillow:
-pip install pillow
+Mac Build question：
+-------------------
+	error：ImportError: The _imagingft C module is not installed
+			＊	＊＊＊＊＊First install PIL Package，Then install jpeg.
+	a.	Download PIL code,instaill：http://effbot.org/media/downloads/Imaging-1.1.7.tar.gz
+		pip install Imaging-1.1.7
+	b. brew uninstall jpeg
+	c.	Instaill pillow:
+		pip install pillow
 
 
