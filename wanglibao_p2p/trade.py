@@ -84,10 +84,12 @@ class P2PTrader(object):
                 inviter_id = introduced_by.introduced_by.id
                 invited_id = introduced_by.user.id
                 if amount >= 1000:
+                    inviter_phone = safe_phone_str(inviter_phone)
+                    invited_phone = safe_phone_str(invited_phone)
                     send_messages.apply_async(kwargs={
                         "phones": [inviter_phone, invited_phone],
-                        "messages": [messages.gift_inviter(invited_phone=safe_phone_str(invited_phone), money=30),
-                                     messages.gift_invited(inviter_phone=safe_phone_str(inviter_phone), money=30)]
+                        "messages": [messages.gift_inviter(invited_phone=invited_phone, money=30),
+                                     messages.gift_invited(inviter_phone=inviter_phone, money=30)]
                     })
                     #发站内信
                     title,content = messages.msg_invite_major(inviter_phone, invited_phone)
@@ -218,7 +220,7 @@ class P2POperator(object):
         inside_message.send_batch.apply_async(kwargs={
             "users":user_ids,
             "title":title,
-            "content":title,
+            "content":content,
             "mtype":"loaned"
         })
 

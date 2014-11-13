@@ -73,7 +73,7 @@ class Binding(models.Model):
 message_type = (
     ("withdraw", "提现通知"),
     ("pay", "充值通知"),
-    ("repay", "项目还款"),
+    ("amortize", "项目还款"),
     ("activity", "活动奖励"),
     ("bids", "流标通知"),
     ("purchase", "投标通知"),

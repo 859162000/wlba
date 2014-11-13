@@ -144,7 +144,7 @@ class PayCompleteView(TemplateView):
         inside_message.send_one.apply_async(kwargs={
             "user_id":request.user.id,
             "title":"%s" % result,
-            "content":"%s,%s元" % (result, amount),
+            "content":u"%s,%s元" % (result, amount),
             "mtype":"pay"
         })
 
@@ -247,10 +247,11 @@ class WithdrawCompleteView(TemplateView):
                 'phones': [request.user.wanglibaouserprofile.phone],
                 'messages': [messages.withdraw_submitted(amount, timezone.now())]
             })
+            title,content = messages.msg_withdraw(timezone.now(), amount)
             inside_message.send_one.apply_async(kwargs={
                 "user_id":request.user.id,
-                "title":u"提现%s元成功" % amount,
-                "content":messages.withdraw_submitted(amount, timezone.now()),
+                "title":title,
+                "content":content,
                 "mtype":"withdraw"
             })
         except decimal.DecimalException:
