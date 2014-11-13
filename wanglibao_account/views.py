@@ -85,8 +85,7 @@ class RegisterView (RegistrationView):
                                                 description=u'新用户注册赠送三天迅雷会员')
                     send_messages.apply_async(kwargs={
                             "phones": [identifier],
-                            "messages": [messages.reg_reward_message(reward.content)]
-                    })
+                            "messages": [messages.reg_reward_message(reward.content)]})
 
                     title,content = messages.msg_register_authok(reward.content)
                     inside_message.send_one.apply_async(kwargs={
