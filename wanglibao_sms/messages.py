@@ -79,7 +79,7 @@ def purchase_reward_message(xunlei_code):
 
 @suffix
 def product_full_message(name):
-    return u's%，满标了。' % name
+    return u'%s，满标了。' % name
 
 #站内信模板
 def msg_bid_purchase(order_id, product_name, amount):
