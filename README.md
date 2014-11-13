@@ -98,6 +98,6 @@ Mac Build question：
 		pip install Imaging-1.1.7
 	b. brew uninstall jpeg
 	c.	Instaill pillow:
-		pip install pillow
+		pip install pillow (2.6.1)
 
 
