@@ -67,15 +67,19 @@ def rand_pass(password):
 
 @suffix
 def earning_message(amount):
-    return u'亲，您的投标奖励收益%s元，已赠送到您的网利宝账户，可用于理财投资' % amount
+    return u'亲，您的投标奖励收益%s元，已赠送到您的网利宝账户，可用于理财投资。' % amount
 
 @suffix
 def reg_reward_message(xunlei_code):
-    return u'感谢注册成功。迅雷白金会员激活码%s有效期2015年12月31日回复TD退订4008-588-066' % xunlei_code
+    return u'感谢注册成功。迅雷白金会员激活码%s有效期2015年12月31日。' % xunlei_code
 
 @suffix
 def purchase_reward_message(xunlei_code):
-    return u'恭喜理财成功。迅雷白金会员激活码%s有效期2015年12月31日回复TD退订4008-588-066' % xunlei_code
+    return u'恭喜理财成功。迅雷白金会员激活码%s有效期2015年12月31日。' % xunlei_code
+
+@suffix
+def product_full_message(name):
+    return u's%，满标了。' % name
 
 #站内信模板
 def msg_bid_purchase(order_id, product_name, amount):
