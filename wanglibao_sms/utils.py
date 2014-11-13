@@ -29,6 +29,7 @@ def send_messages(phones, messages, channel=0):
 
     if channel == 0:
         status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages)
+        short_message.channel = u"慢道"
         #失败使用emay重发
         if status != 200:
             status, context = backends.EmaySMS.send_messages(phones, messages)
@@ -71,9 +72,9 @@ def send_validation_code(phone, validate_code=None):
             phone_validate_code_item.validate_code = validate_code
             phone_validate_code_item.last_send_time = now
             phone_validate_code_item.code_send_count += 1
+            phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
     except PhoneValidateCode.DoesNotExist:
-
         PhoneValidateCode.objects.create(
             phone=phone,
             validate_code=validate_code,

@@ -61,7 +61,7 @@
                 title: '温馨提示',
                 msg: '份额认购成功',
                 callback_ok: function() {
-                  return location.reload();
+                  return window.location.href = "/accounts/home";
                 }
               });
             }).fail(function(xhr) {
@@ -166,3 +166,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=p2p_detail.map

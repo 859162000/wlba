@@ -13,18 +13,16 @@ from rest_framework import renderers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
 from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct, P2PEquity, P2PRecord, Earning
+from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
-from wanglibao_sms.utils import validate_validation_code
-from operator import attrgetter, itemgetter
+from operator import attrgetter
 from django.conf import settings
 from decimal import Decimal
 from hashlib import md5
@@ -82,6 +80,7 @@ class P2PDetailView(TemplateView):
                 'xunlei_vip': xunlei_vip
             })
 
+
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
 
         site_data = SiteData.objects.all()[0]
@@ -121,14 +120,7 @@ class PurchaseP2P(APIView):
                 'error_number': ErrorNumber.need_authentication
             }, status=status.HTTP_400_BAD_REQUEST)
         form = PurchaseForm(request.DATA)
-        phone = request.user.wanglibaouserprofile.phone
-        code = request.POST.get('validate_code', '')
-        # status_code, message = validate_validation_code(phone, code)
-        # if status_code != 200:
-        #     return Response({
-        #         'message': u'验证码输入错误',
-        #         'error_number': ErrorNumber.validate_code_wrong
-        #     }, status=status.HTTP_400_BAD_REQUEST)
+
         if form.is_valid():
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
@@ -136,7 +128,7 @@ class PurchaseP2P(APIView):
             try:
                 trader = P2PTrader(product=p2p, user=request.user)
                 product_info, margin_info, equity_info = trader.purchase(amount)
-                print product_info, '####'
+
                 return Response({
                     'data': product_info.amount
                 })
@@ -173,14 +165,6 @@ class PurchaseP2PMobile(APIView):
             }, status=status.HTTP_200_OK)
         form = PurchaseForm(request.DATA)
         phone = request.user.wanglibaouserprofile.phone
-        # code = request.POST.get('validate_code', '')
-        # status_code, message = validate_validation_code(phone, code)
-        #
-        # if status_code != 200:
-        #     return Response({
-        #         'message': u'验证码输入错误',
-        #         'error_number': ErrorNumber.validate_code_wrong
-        #     }, status=status.HTTP_200_OK)
         if form.is_valid():
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
@@ -223,19 +207,17 @@ class AuditProductView(TemplateView):
         ProductKeeper(p2p).audit(request.user)
 
         if p2p.activity:
-            print p2p.activity, '#######----------'
+
             from celery.execute import send_task
             send_task("wanglibao_p2p.tasks.build_earning", kwargs={
-                "product_id": 3
+                "product_id": pk
             })
-
 
 
         return HttpResponseRedirect('/'+settings.ADMIN_ADDRESS+'/wanglibao_p2p/p2pproduct/')
 
 
 audit_product_view = staff_member_required(AuditProductView.as_view())
-
 
 
 class P2PProductViewSet(PaginatedModelViewSet):
@@ -388,7 +370,7 @@ class GetProjectsByDateAPI(APIView):
         end_time = start_time + timezone.timedelta(days=1)
 
         p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
-            u'还款中', u'已完成'
+             u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'已完成'
         ]).filter(soldout_time__range=(start_time, end_time))
 
         p2p_list = []
@@ -407,7 +389,6 @@ class GetProjectsByDateAPI(APIView):
                 if pay_method == p2p.pay_method:
                     repaymentType = value
                     break
-
 
             p2pequities = p2p.equities.all()
             subscribes = []
@@ -455,8 +436,9 @@ class FinancesAPI(APIView):
         ]).order_by("-priority")
 
         p2p_list = []
-        status = 0
+
         for p2p in p2pproducts:
+            status = 0
             shouyi = "{}%".format(p2p.expected_earning_rate)
             if p2p.status == u'正在招标':
                 status = 1
@@ -505,7 +487,7 @@ class P2PListView(TemplateView):
 
         p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
             .filter(status= u'正在招标').order_by('-publish_time')
-        print p2p_done
+
         p2p_others = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
             status__in=[
                 u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'

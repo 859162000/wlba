@@ -33,6 +33,7 @@ from wanglibao_pay.util import get_client_ip
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
+from wanglibao_account import message as inside_message
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from django.conf import settings
@@ -140,6 +141,13 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":request.user.id,
+            "title":"%s" % result,
+            "content":u"%s,%s元" % (result, amount),
+            "mtype":"pay"
+        })
+
         return self.render_to_response({
             'result': result,
             'amount': amount
@@ -227,6 +235,7 @@ class WithdrawCompleteView(TemplateView):
 
             order = OrderHelper.place_order(request.user, Order.WITHDRAW_ORDER, pay_info.status,
                                             pay_info=model_to_dict(pay_info))
+
             pay_info.order = order
             keeper = MarginKeeper(request.user, pay_info.order.pk)
             margin_record = keeper.withdraw_pre_freeze(amount)
@@ -237,6 +246,13 @@ class WithdrawCompleteView(TemplateView):
             send_messages.apply_async(kwargs={
                 'phones': [request.user.wanglibaouserprofile.phone],
                 'messages': [messages.withdraw_submitted(amount, timezone.now())]
+            })
+            title,content = messages.msg_withdraw(timezone.now(), amount)
+            inside_message.send_one.apply_async(kwargs={
+                "user_id":request.user.id,
+                "title":title,
+                "content":content,
+                "mtype":"withdraw"
             })
         except decimal.DecimalException:
             result = u'提款金额在0～50000之间'
@@ -347,6 +363,8 @@ class CardViewSet(ModelViewSet):
 
 
 class WithdrawTransactions(TemplateView):
+    """ for admin
+    """
     template_name = 'withdraw_transactions.jade'
 
     def post(self, request):
@@ -366,6 +384,7 @@ class WithdrawTransactions(TemplateView):
                 }
             )
         elif action == 'confirm':
+            total_amount = 0
             for payinfo in payinfos:
                 with transaction.atomic():
                     if payinfo.status != PayInfo.ACCEPTED and payinfo.status != PayInfo.PROCESSING:
@@ -374,10 +393,22 @@ class WithdrawTransactions(TemplateView):
 
                     marginKeeper = MarginKeeper(payinfo.user)
                     marginKeeper.withdraw_ack(payinfo.amount)
+
+                    total_amount += payinfo.amount
                     payinfo.status = PayInfo.SUCCESS
                     payinfo.confirm_time = timezone.now()
                     payinfo.save()
 
+            #发站内信
+            if total_amount:
+                user_id = payinfos[0].user.id
+                title,content = messages.msg_withdraw_success(timezone.now(), total_amount)
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":user_id,
+                    "title":title,
+                    "content":content,
+                    "mtype":"withdraw"
+                })
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
             })
@@ -413,6 +444,14 @@ class WithdrawRollback(TemplateView):
         send_messages.apply_async(kwargs={
             "phones": [payinfo.user.wanglibaouserprofile.phone],
             "messages": [messages.withdraw_failed(error_message)]
+        })
+
+        title,content = messages.msg_withdraw_fail(timezone.now(), payinfo.amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":payinfo.user.id,
+            "title":title,
+            "content":content,
+            "mtype":"withdraw"
         })
 
         return HttpResponse({
@@ -609,4 +648,17 @@ class BankListAPIView(APIView):
 
     def post(self, request):
         result = lianlian_pay.list_bank(request)
+        return Response(result)
+
+class LianlianWithdrawAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        lianpay = LianlianPay()
+        result = lianpay.ios_withdraw(request)
+        if not result['ret_code']:
+            send_messages.apply_async(kwargs={
+                'phones': [result['phone']],
+                'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
+            })
         return Response(result)

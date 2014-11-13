@@ -113,7 +113,7 @@ class P2PProduct(ProductBase):
     hide = models.BooleanField(u'隐藏', default=False)
 
     name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
-    short_name = models.CharField(verbose_name=u'短名字*', max_length=64, blank=False)
+    short_name = models.CharField(verbose_name=u'短名字*', max_length=64, blank=False, help_text=u'短名字要求不超过13个字')
     serial_number = models.CharField(verbose_name=u'产品编号*', max_length=100, unique=True, blank=False, null=True)
     contract_serial_number = models.CharField(verbose_name=u'合同编号*', max_length=100, blank=False, null=True)
 
@@ -170,7 +170,7 @@ class P2PProduct(ProductBase):
     contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True ,blank=False)
 
     #author: hetao; datetime: 2014.10.27; description: 活动是否参加活动
-    activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True)
+    activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True, verbose_name=u'返现活动')
 
 
     class Meta:
@@ -562,7 +562,7 @@ class Earning(models.Model):
         verbose_name_plural = u'赠送记录'
     type = models.CharField(u'类型', help_text=u'满标直接送：D', max_length=5, default='D')
     product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True, default=None)
-    amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=8, default=0)
+    amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=2, default=0)
 
     order = models.ForeignKey(Order, blank=True, null=True)
     margin_record = models.ForeignKey(MarginRecord, blank=True, null=True)

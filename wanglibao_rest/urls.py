@@ -20,7 +20,8 @@ from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTr
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
     P2PProductDetailView, P2PProductListView
 from wanglibao_pay.views import (CardViewSet, LianlianAppPayView, LianlianAppPayCallbackView,
-                            BankCardAddView, BankCardListView, BankCardDelView, BankListAPIView)
+                            BankCardAddView, BankCardListView, BankCardDelView, BankListAPIView,
+							LianlianWithdrawAPIView)
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
@@ -110,6 +111,7 @@ urlpatterns = patterns(
     url(r'^p2p/contract/(?P<product_id>\d+)', UserProductContract.as_view()),
     url(r'^pay/lianlian/app/deposit/$', LianlianAppPayView.as_view(), name="lianlian-deposit-view"),
     url(r'^pay/lianlian/app/deposit/callback/$', LianlianAppPayCallbackView.as_view(), name="lianlian-deposit-view"),
+    url(r'^withdraw/$', LianlianWithdrawAPIView.as_view(), name="lianlian-withdraw-view"),
 )
 
 urlpatterns += patterns('',

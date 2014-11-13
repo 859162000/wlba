@@ -84,7 +84,10 @@ html
               dd 选择“债权转让”后，即可提前赎回未到期债权，但您需承担提前赎回本金0-5%不等的年化收益率折让费（由提前赎回投资人自行设置），折让费将转给下一个接收投资人，投资人相应权利义务同时转移。
 
         .span4-omega.invest-form.border-left
-          h1 我要投资
+          if user.is_authenticated
+            h1 我要投资<span class="detail-margin">（余额：{{user.margin.margin}}元 <a href="/pay/banks">充值</a>）</span>
+          else
+            h1 我要投资
           if status == '抢购中'
             form#purchase-form
               {{form.product}}
@@ -99,13 +102,13 @@ html
                 span.span8-omega
                   span.dark-gray.font-m {{orderable_amount|money_format_int}}元
               if orderable_amount > 0
-                .row
+                .form-row.form-row__middle
                   span.span4 投资金额
                   span.span8-omega
                     .row
                       period = p2p.period * 30
                       user_limit = u"100的整数倍"
-                      -render_field form.amount class+="span12" type="text" placeholder=user_limit data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income,#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
+                      -render_field form.amount class+="span12" type="text" placeholder=user_limit data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
                     .form-row-error
                 .row
                   span.span4 预期收益
@@ -118,32 +121,18 @@ html
                           span.font-m +&nbsp;
                           span.blue.font-m#xunlei-vip-income-head 0.00
                           |元
-                if p2p.activity
-                  .row
-                    span.span4
-                    span.span8-omega.xunlei-vip-form-txt
-                      if user.is_authenticated
-                        if xunlei_vip.isvip == True
-                          span 您已绑定迅雷会员，将在满标2个工作日内，一次性获得
-                          span.blue.font-ss#xunlei-vip-income 0.00
-                          |元。
-                        else
-                          a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 开通
-                          | &nbsp;并&nbsp;
-                          a.blue.xunlei-binding-modal(href="#xunlei-binding-modal") 绑定迅雷会员
-
-                          span ，还可额外享受
-                          span.blue.font-ss#xunlei-vip-income 0.00
-                          |元的收益
-                          //br
-                          //span 还不是迅雷会员？
-                          //a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 现在去开通
-                      else
-                        span 现在
-                        a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 开通迅雷会员
-                        span ，还可享受额外
-                        span.blue.font-ss#xunlei-vip-income 0.00
-                        |元的收益
+                //if p2p.activity
+                //  .row
+                //    span.span4
+                //    span.span8-omega.xunlei-vip-form-txt
+                //      if user.is_authenticated and xunlei_vip.isvip == True
+                //        span 您已绑定迅雷会员，投资后将在满标2个工作日内，一次性获得
+                //        span.blue.font-ss#xunlei-vip-income 0.00
+                //        |元。
+                //      else
+                //        span 投资后绑定迅雷会员，可额外享受
+                //        span.blue.font-ss#xunlei-vip-income 0.00
+                //        |元的收益
 
                 .row.margin-top-s
                   span.span4
@@ -202,10 +191,7 @@ html
 
         .span4-omega.border-left.clearfix
           .p2p-detail-container.guarantee-company
-            if p2p.category == '证大速贷'
-              h1 合作机构
-            else
-              h1 担保机构
+            h1 担保机构审核清单
             table
               warrants = p2p.warrant_set.all()
               length = len(warrants)
@@ -289,6 +275,8 @@ html
               if trade_records.count > 30
                 .row
                   a.get-more(href="#") 查看更多
+
+    .space-vertical-sm
     if p2p.activity
       if user.is_authenticated and not xunlei_vip.isvip
         #xunlei-binding-modal(style="display:none;")
@@ -311,7 +299,7 @@ html
                     span.font-s.padding-l-r-m 立即绑定迅雷会员
                 .span5-omega.padding-top-xs.align-center.font-s
                   span 我还不是会员，
-                  a.blue(href="http://pay.vip.xunlei.com/baijin.html", target="_blank") 立即开通
+                  a.blue(href="http://pay.vip.xunlei.com/baijin.html?referfrom=wlb", target="_blank") 立即开通
             .space-vertical-s
 
     script.

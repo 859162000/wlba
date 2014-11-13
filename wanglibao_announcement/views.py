@@ -50,3 +50,23 @@ class AnnouncementDetailView(TemplateView):
         })
 
         return context
+
+
+class AnnouncementPreviewView(TemplateView):
+    template_name = 'announcement_preview.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(AnnouncementPreviewView, self).get_context_data(**kwargs)
+
+        try:
+            announce = Announcement.objects.get(pk=id)
+
+        except Announcement.DoesNotExist:
+            raise Http404(u'您查找的公告不存在')
+
+        context.update({
+            'announce': announce,
+
+        })
+
+        return context

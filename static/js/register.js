@@ -157,10 +157,14 @@
       }
     });
     return $("#register_submit").click(function(e) {
+      e.preventDefault();
       if ($(this).hasClass("disabled")) {
-        e.preventDefault();
+        return;
       }
+      return $('#register_submit').submit();
     });
   });
 
 }).call(this);
+
+//# sourceMappingURL=register.map

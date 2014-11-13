@@ -16,7 +16,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import PromotionToken
+from marketing.models import PromotionToken, Reward, RewardRecord
 from marketing.utils import set_promo_user
 from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
@@ -28,6 +28,11 @@ from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_account.utils import verify_id, detect_identifier_type
+from django.db import transaction
+from wanglibao_sms.tasks import send_messages
+from wanglibao_sms import messages
+from django.utils import timezone
+from wanglibao_account import third_login, message as inside_message
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -54,7 +59,6 @@ class SendValidationCodeView(APIView):
                         }, status=status)
 
 
-from django.utils.decorators import method_decorator
 class SendRegisterValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone
@@ -132,6 +136,33 @@ class RegisterAPIView(APIView):
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
+
+
+        now = timezone.now()
+
+        with transaction.atomic():
+            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                try:
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+                    send_messages.apply_async(kwargs={
+                            "phones": [identifier],
+                            "messages": [messages.reg_reward_message(reward.content)]
+                    })
+                    title, content = messages.msg_register_authok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+                except Exception,e:
+                    import traceback
+                    print(traceback.format_exc())
 
         return Response({"ret_code":0, "message":"注册成功"})
 
@@ -228,6 +259,7 @@ class IdValidateAPIView(APIView):
 
         return Response({"ret_code":0, "message":"验证成功"})
 
+
 class UserExisting(APIView):
     permission_classes = ()
 
@@ -270,12 +302,11 @@ class IdValidate(APIView):
                             }, status=400)
 
 
+        # id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
         id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
-
-        if id_verify_count >= 3:
-            print 'id_verify_count', id_verify_count
+        if id_verify_count >= 1:
             return Response({
-                                "message": u"您的身份证已绑定了三个帐号，无法继续验证，请联系客服人工验证 4008-588-066",
+                                "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066",
                                 "error_number": ErrorNumber.id_verify_times_error
                             }, status=400)
 
@@ -339,6 +370,8 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
             push_channel_id = request.DATA.get("channel_id", "")
             #设备类型，默认为IOS
             device_type = request.DATA.get("device_type", "ios")
+            if device_type not in ("ios", "android"):
+                return Response({'message': "device_type error"}, status=status.HTTP_200_OK)
 
             if push_user_id and push_channel_id:
                 pu = UserPushId.objects.filter(push_user_id=push_user_id).first()

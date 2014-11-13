@@ -40,3 +40,8 @@ class Announcement(models.Model):
 
     def __unicode__(self):
         return "%s" % self.title
+
+    def preview_link(self):
+        return u'<a href="/announcement/preview/%s" target="_blank">预览</a>' % str(self.id)
+    preview_link.short_description = u'预览'
+    preview_link.allow_tags = True

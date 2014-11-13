@@ -168,14 +168,7 @@
           type: "POST",
           data: $(form).serialize()
         }).done(function(data, textStatus) {
-          var next_url;
-          next_url = '';
-          if (window.location.search) {
-            next_url = window.location.search.substring(6);
-            return window.location.href = next_url;
-          } else {
-            return location.reload();
-          }
+          return location.reload();
         }).fail(function(xhr) {
           var error_message, message, result;
           result = JSON.parse(xhr.responseText);
@@ -345,7 +338,7 @@
         return window.location.href = $("#invite_top_bar").attr("data-url");
       }).fail(function(xhr) {
         if (xhr.status === 403) {
-          $('.login-modal').trigger('click');
+          window.location.href = '/activity/gold/';
         }
       });
     });
@@ -367,7 +360,7 @@
       e.preventDefault();
       return $('.login-modal').trigger('click');
     });
-    return $("input:password").bind("copy cut paste", function(e) {
+    $("input:password").bind("copy cut paste", function(e) {
       var element;
       element = this;
       return setTimeout((function() {
@@ -378,6 +371,14 @@
         }
       }), 100);
     });
+    return backend.loadMessageCount('unread').done(function(data) {
+      if (data.count > 0) {
+        $('#message_count').show();
+        return $('#message_count').html(data.count);
+      }
+    });
   });
 
 }).call(this);
+
+//# sourceMappingURL=login_modal.map

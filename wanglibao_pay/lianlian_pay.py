@@ -3,6 +3,7 @@
 
 import hashlib
 import logging
+import json
 from django.conf import settings
 from django.forms import model_to_dict
 from django.db import transaction
@@ -12,6 +13,7 @@ from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
+from wanglibao_sms.utils import validate_validation_code
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +42,8 @@ class LianlianPay:
     def ios_sign(self, params):
         dic = {"no_order":params['id'], "busi_partner":"108001",
                 "sign_type":"MD5", "money_order":params['amount'],
-                "notify_url":self.PAY_BACK_RETURN_URL, "oid_partner":self.MER_ID}
+                "notify_url":self.PAY_BACK_RETURN_URL, "oid_partner":self.MER_ID,
+                "risk_item":params['risk_item']}
         dic['dt_order'] = util.fmt_dt_14(params['create_time'])
         dic['sign'] = self._sign(dic)
         return dic
@@ -84,8 +87,17 @@ class LianlianPay:
             pay_info.save()
 
             profile = user.wanglibaouserprofile
-            data = self.ios_sign({"id":order.id, "amount":amount, "create_time":pay_info.create_time})
-            data.update({"user_name":profile.name, "id_number":profile.id_number})
+            data = self.ios_sign({"id":str(order.id), "amount":str(amount), "create_time":pay_info.create_time,
+                                "risk_item":str({"frms_ware_category":"2009",
+                                            "user_info_mercht_userno":str(user.id),
+                                            "user_info_bind_phone":profile.phone,
+                                            "user_info_dt_register":util.fmt_dt_14(user.date_joined),
+                                            "user_info_full_name":profile.name,
+                                            "user_info_id_type":"0",
+                                            "user_info_id_no":profile.id_number,
+                                            "user_info_identify_state":"1",
+                                            "user_info_identify_type":"3"})})
+            data.update({"id_no":profile.id_number, "id_type":"0", "acct_name":profile.name})
 
             pay_info.request = str(data)
             pay_info.status = PayInfo.PROCESSING
@@ -182,6 +194,68 @@ class LianlianPay:
         pay_info.save()
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
+
+    @method_decorator(transaction.atomic)
+    def ios_withdraw(self, request):
+        amount = request.DATA.get("amount", "").strip()
+        card_id = request.DATA.get("card_id", "").strip()
+        vcode = request.DATA.get("validate_code", "").strip()
+        if not amount or not card_id :
+            return {"ret_code":20061, "message":u"信息输入不完整"}
+
+        user = request.user
+        if not user.wanglibaouserprofile.id_is_valid:
+            return {"ret_code":20062, "message":u"请先进行实名认证"}
+
+        try:
+            float(amount)
+        except:
+            return {"ret_code":20063, 'message':u'金额格式错误'}
+        amount = util.fmt_two_amount(amount)
+        if not 0 <= amount <= 50000:
+            return {"ret_code":20064, 'message':u'提款金额在0～50000之间'}
+        margin = user.margin.margin
+        if amount > margin:
+            return {"ret_code":20065, 'message':u'余额不足'}
+
+        phone = user.wanglibaouserprofile.phone
+        status, message = validate_validation_code(phone, vcode)
+        if status != 200:
+            return {"ret_code":20066, "message":u"验证码输入错误"}
+        fee = amount * LianlianPay.FEE
+        #实际提现金额
+        actual_amount = amount - fee
+        card = Card.objects.filter(pk=card_id).first()
+        if not card or card.user != user:
+            return {"ret_code":20067, "message":u"请选择有效的银行卡"}
+
+        pay_info = PayInfo()
+        pay_info.amount = actual_amount
+        pay_info.fee = fee
+        pay_info.total_amount = amount
+        pay_info.type = PayInfo.WITHDRAW
+        pay_info.user = user
+        pay_info.card_no = card.no
+        pay_info.account_name = user.wanglibaouserprofile.name
+        pay_info.bank = card.bank
+        pay_info.request_ip = util.get_client_ip(request)
+        pay_info.status = PayInfo.ACCEPTED
+
+        try:
+            order = OrderHelper.place_order(user, Order.WITHDRAW_ORDER, pay_info.status,
+                                            pay_info=model_to_dict(pay_info))
+            pay_info.order = order
+            keeper = MarginKeeper(user, pay_info.order.pk)
+            margin_record = keeper.withdraw_pre_freeze(amount)
+            pay_info.margin_record = margin_record
+
+            pay_info.save()
+            return {"ret_code":0, 'message':u'提现成功', "amount":amount, "phone":phone}
+        except Exception, e:
+            pay_info.error_message = str(e)
+            pay_info.status = PayInfo.FAIL
+            pay_info.save()
+            return {"ret_code":20065, 'message':u'余额不足'}
 
 
 def add_bank_card(request):

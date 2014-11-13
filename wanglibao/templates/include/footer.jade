@@ -18,6 +18,8 @@ mixin innerFooter()
           a(href="/milestone") 网利宝大事记
         dd.section--item
           a(href="/security") 安全保障
+        dd.section--item
+          a(href="/announcement") 网站公告
 
       dl.footer-section
         dt.section--title 加入网利宝
@@ -33,11 +35,12 @@ mixin innerFooter()
 
         .space-vertical-s
         dd.section--item
-          a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
-          a.social-text.social-space(href="http://weibo.com/u/5000682691", target="_blank", data-target="#qrweibo") 新浪微博
-
-          a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
-          a.social-text(href="javascript:void(0)", data-target="#qrcode") 微信
+          span.weibo-container
+            a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
+            a.social-text.social-space(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo") 新浪微博
+          span.weixin-container
+            a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
+            a.social-text(href="javascript:void(0)", data-role="hover", data-target="#qrcode") 微信
 
 
 
@@ -51,7 +54,7 @@ mixin innerFooter()
 
         .space-vertical-s
         dd.section--item
-          a.qq-container#qq-container(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18xOTY5OTBfNDAwODU4ODA2Nl8yXw" target="_blank")
+          a.qq-container#qq-container(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
             在线客服
             .qq-icon
 

@@ -1,5 +1,4 @@
 # coding=utf-8
-#from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -20,6 +19,9 @@ class NewsAndReport(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        verbose_name_plural = u'新闻报道'
 
 
 class SiteData(models.Model):
@@ -44,6 +46,9 @@ class SiteData(models.Model):
     def one_year_times(self):
         return int(self.highest_earning_rate / self.one_year_interest_rate)
 
+    class Meta:
+        verbose_name_plural = u'网站数据'
+
 class InviteCode(models.Model):
     code = models.CharField(u'邀请码', max_length=6, db_index=True, unique=True)
     is_used = models.BooleanField(u'是否使用', default=False)
@@ -54,6 +59,9 @@ class InviteCode(models.Model):
     def __unicode__(self):
         return self.code
 
+    class Meta:
+        verbose_name_plural = u'原始邀请码'
+
 
 class PromotionToken(models.Model):
     user = models.OneToOneField(User, primary_key=True)
@@ -61,6 +69,9 @@ class PromotionToken(models.Model):
 
     def __unicode__(self):
         return self.token
+
+    class Meta:
+        verbose_name_plural = u'用户邀请码'
 
 
 class IntroducedBy(models.Model):
@@ -70,6 +81,10 @@ class IntroducedBy(models.Model):
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
     gift_send_at = models.DateTimeField(u'奖品发放时间', null=True, blank=True)
     created_by = models.ForeignKey(User, null=True, blank=True, related_name='creator')
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = u'邀请关系'
 
 
 def generate_user_promo_token_and_invitecode(sender, instance, **kwargs):
@@ -104,16 +119,24 @@ class TimelySiteData(models.Model):
     total_amount = models.DecimalField(u'总额', max_digits=20, decimal_places=2, default=0)
     user_count = models.IntegerField(u'用户总数', default=0)
 
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = u'交易数据'
 
-#author: hetao
-#datetime: 2014.10.27
-#description: 市场活动规则
 class ActivityRule(models.Model):
+    """ author: hetao
+        datetime: 2014.10.27
+        description: 市场活动规则
+    """
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'返现活动规则'
+
     name = models.CharField(u'规则名称', max_length=128)
     description = models.TextField(u'规则描述')
 
     rule_type = models.CharField(u'规则类型', max_length=50, null=False)
-    rule_amount = models.DecimalField(u'数额', max_digits=20, decimal_places=8, default=0)
+    rule_amount = models.DecimalField(u'数额', max_digits=20, decimal_places=4, default=0)
     create_time = models.DateTimeField(u'活动创建时间', auto_now_add=True)
 
     @property
@@ -126,10 +149,16 @@ class ActivityRule(models.Model):
     def __unicode__(self):
         return u'<%s>' % self.name
 
-#author: hetao
-#datetime: 2014.10.27
-#description: 市场活动
+
 class Activity(models.Model):
+    """ author: hetao
+        datetime: 2014.10.27
+        description: 市场活动
+    """
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'返现活动'
+
     name = models.CharField(u'活动名称', max_length=128)
     description = models.TextField(u'活动描述')
 
@@ -140,4 +169,40 @@ class Activity(models.Model):
 
     def __unicode__(self):
         return u'<%s>' % self.name
+
+
+class Reward(models.Model):
+    """ 奖品存储
+    """
+
+    type = models.CharField(u'奖品类型', max_length=40)
+    description = models.TextField(u'奖品描述', null=True)
+    content = models.CharField(u'奖品内容', max_length=128)
+    is_used = models.BooleanField(u'是否使用', default=False)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    end_time = models.DateTimeField(u'结束时间', null=True, blank=True)
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'奖品'
+
+    def __unicode__(self):
+        return u'<%s>' % self.type
+
+
+class RewardRecord(models.Model):
+    """ 奖品发放流水
+    """
+    user = models.ForeignKey(User)
+    reward = models.ForeignKey(Reward)
+    description = models.TextField(u'发放奖品流水说明', null=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'奖品发放流水'
+
+    def __unicode__(self):
+        return u'<%s>' % self.user
+
 
