@@ -1,0 +1,47 @@
+- load formatters
+doctype html
+head
+    - with '发送站内信' as title
+    include include/common_head
+    - endwith
+    body
+        .panel
+            .well
+                .panel-title-bar__no-border
+                    .panel-title 发送站内信
+                .space-vertical-s
+                .panel-content.padding-l-r-sm
+                    .space-vertical-l
+                    a(href='/{{ "" | admin_address}}')
+                        button.button-home-action(type='submit') 返回
+                    .space-vertical-l
+                    .space-vertical-l
+                    .span6
+                        .span3(style="line-height:40px")
+                            label 用户手机号
+                        .span4
+                            input#phone(type='text', name='phone', placeholder='手机号')
+                    .span6(style="margin-top:20px")
+                        .span3(style="line-height:40px")
+                            label 标题
+                        .span4
+                            input#title(type='text', name='title', placeholder='标题')
+                    .span6(style="margin-top:20px")
+                        .span3(style="line-height:40px")
+                            label 内容
+                        .span8
+                            textarea#content(name='content', placeholder='内容', style="width:200px;height:80px")
+                    .span6(style="margin-top:20px")
+                        .span3(style="line-height:40px")
+                            label 站内信类型
+                        .span4
+                            <select id="mtype">
+                            <option value ="activity">活动奖励</option>
+                            </select>
+                    .span(style="clear:both")
+                    button#btn_sub.button-primary(style="margin-top:30px",type="button") 确定
+
+    script.
+      require(["/static/js/admin_send_message.js"])
+    - with 1 as no_footbar
+    - endwith

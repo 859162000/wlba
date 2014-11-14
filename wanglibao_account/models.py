@@ -48,6 +48,9 @@ class UserPushId(models.Model):
     push_user_id = models.CharField(max_length=50, db_index=True)
     push_channel_id = models.CharField(max_length=50)
 
+    class Meta:
+        verbose_name_plural = u"推送信息"
+
 
 class Binding(models.Model):
     """

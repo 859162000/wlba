@@ -1,4 +1,6 @@
 # coding=utf-8
+
+import datetime
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -7,11 +9,11 @@ from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import DecimalWidget
 from marketing.models import PromotionToken, IntroducedBy
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_account.models import VerifyCounter, IdVerification, Binding, Message, MessageText
+from wanglibao_account.models import VerifyCounter, IdVerification, Binding, Message, MessageText, UserPushId
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_account.views import AdminIdVerificationView, IntroduceRelation
+from wanglibao_account.views import AdminIdVerificationView, IntroduceRelation, AdminSendMessageView
 
 
 class ProfileInline(admin.StackedInline):
@@ -97,12 +99,20 @@ class VerifyCounterAdmin(admin.ModelAdmin):
             return ( 'user', 'count')
         return ()
 
+class UserPushIdAdmin(admin.ModelAdmin):
+    list_display = ("user", "device_type", "push_user_id", "push_channel_id")
+
 class BindingAdmin(admin.ModelAdmin):
     list_display = ("user", "bid", "btype", "isvip")
     search_fields = ('user__wanglibaouserprofile__phone',)
 
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ("id", "target_user", "message_text", "read_status", "read_at")
+    list_display = ("id", "target_user", "message_text", "read_status", "format_read_at")
+    raw_id_fields = ('target_user', 'message_text')
+
+    def format_read_at(self, obj):
+        return datetime.datetime.fromtimestamp(obj.read_at)
+    format_read_at.short_description = u"查看时间"
 
 class MessageTextAdmin(admin.ModelAdmin):
     list_display = ("id", "mtype", "title", "content")
@@ -116,3 +126,6 @@ admin.site.register_view('accounts/add_introduce/', view=IntroduceRelation.as_vi
 admin.site.register(Binding, BindingAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(MessageText, MessageTextAdmin)
+admin.site.register(UserPushId, UserPushIdAdmin)
+
+admin.site.register_view('accounts/message/', view=AdminSendMessageView.as_view(), name=u'网利宝-发送站内信')

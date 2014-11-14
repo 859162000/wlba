@@ -106,6 +106,7 @@ INSTALLED_APPS = (
     'wanglibao_help',
 
     'report',
+    'misc',
 
     'provider',
     'provider.oauth2',
