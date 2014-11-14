@@ -42,10 +42,11 @@ def full_send_message(product_name):
         "phones": phones,
         "messages": [title],
     })
+    msg = u"%s, 满标了。" % product_name
     inside_message.send_batch.apply_async(kwargs={
         "users":user_ids,
-        "title":title,
-        "content":title,
+        "title":msg,
+        "content":msg,
         "mtype":"fullbid"
     })
 
