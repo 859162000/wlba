@@ -56,8 +56,8 @@ html
                         span.highlight.font-m %
                         if product.activity
                           em.highlight +
-                          span.xunlei-vip-rate(title="迅雷会员专享") {{product.activity.rule.percent_text}}%
-                            span.xunlei-vip-tip(title="迅雷会员专享") {{product.activity.name}}
+                          span.xunlei-vip-rate(title="{{product.activity.name}}") {{product.activity.rule.percent_text}}%
+                            span.xunlei-vip-tip(title="{{product.activity.name}}") {{product.activity.name}}
                       p 年化收益
                     .span2.align-center
                       p
