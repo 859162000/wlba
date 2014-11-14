@@ -93,7 +93,7 @@ class MessageText(models.Model):
         choices=message_type)
     title = models.CharField(max_length=100, verbose_name=u"消息标题")
     content = models.TextField(verbose_name=u"正文")
-    created_at = models.BigIntegerField(default=long(time.time()), verbose_name=u"时间戳", blank=True)
+    created_at = models.BigIntegerField(default=time.time, verbose_name=u"时间戳", blank=True)
 
     def __unicode__(self):
         return u'%s type:%s' % (self.title, self.mtype)
