@@ -8,7 +8,7 @@ class UserMarginAdmin(admin.ModelAdmin):
 
 
 class MarginRecordAdmin(admin.ModelAdmin):
-    list_display = ('catalog', 'user', 'amount', 'description', 'margin_current')
+    list_display = ('catalog', 'user', 'amount', 'description', 'margin_current', 'create_time')
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('user', )
 

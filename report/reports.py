@@ -11,6 +11,7 @@ from report.crypto import ReportCrypto
 from report.models import Report
 from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PRecord, Earning
 from wanglibao_pay.models import PayInfo
+from wanglibao_margin.models import MarginRecord
 from django.utils import timezone
 from wanglibao_pay.util import get_a_uuid
 
@@ -161,6 +162,52 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 unicode(payinfo.uuid)
             ])
         return output.getvalue()
+
+
+class WithDrawDetailReportGenerator(ReportGeneratorBase):
+    prefix = 'txjl'
+    reportname_format = u'提现详细记录 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+
+        # payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W')\
+        #     .prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
+
+        margins = MarginRecord.objects.filter(catalog__icontains=u'取款',
+                                              create_time__gte=start_time, create_time__lt=end_time)\
+            .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+
+        output = cStringIO.StringIO()
+
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号',
+                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'编号'])
+
+        for margin in margins:
+
+            writer.writerow([
+                str(margin.id),
+                margin.user.username,
+                margin.user.wanglibaouserprofile.name,
+                margin.user.wanglibaouserprofile.id_number,
+                margin.user.wanglibaouserprofile.phone,
+                margin.payinfo_set.all().first().bank.name,
+                '-',
+                '-',
+                margin.payinfo_set.first().card_no,
+                str(margin.payinfo_set.first().total_amount),
+                str(margin.payinfo_set.first().amount),
+                str(margin.payinfo_set.first().fee),
+                timezone.localtime(margin.payinfo_set.first().create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                str(margin.payinfo_set.first().request_ip),
+                unicode(margin.payinfo_set.first().status),
+                unicode(margin.payinfo_set.first().uuid)
+            ])
+
+
+        return output.getvalue()
+
 
 
 class ProductionRecordReportGenerator(ReportGeneratorBase):
