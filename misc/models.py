@@ -13,4 +13,4 @@ class Misc(models.Model):
     updated_at = models.BigIntegerField(default=long(time.time()), verbose_name=u"更新时间", blank=True)
 
     class Meta:
-        verbose_name_plural = u"键值对配置表"
+        verbose_name_plural = u"杂项配置表"
