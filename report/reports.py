@@ -165,7 +165,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
 
 
 class WithDrawDetailReportGenerator(ReportGeneratorBase):
-    prefix = 'txjl'
+    prefix = 'txxxjl'
     reportname_format = u'提现详细记录 %s--%s'
 
     @classmethod
@@ -207,7 +207,6 @@ class WithDrawDetailReportGenerator(ReportGeneratorBase):
 
 
         return output.getvalue()
-
 
 
 class ProductionRecordReportGenerator(ReportGeneratorBase):
@@ -381,6 +380,49 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
                 unicode(product.borrower_bankcard_bank_province),
                 unicode(product.borrower_bankcard_bank_city),
                 unicode(product.borrower_bankcard_bank_branch)
+            ])
+
+        return output.getvalue()
+
+
+class P2PstatusReportGenerator(ReportGeneratorBase):
+    prefix = 'mbztbh'
+    reportname_format = u'满标状态变化 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'贷款号', u'用户名称', u'借款标题', u'借款金额', u'已借金额', u'利率', u'借款期限', u'还款方式',
+                        u'投资次数', u'状态', u'满标时间', u'真实姓名', u'手机号', u'身份证', u'银行名', u'银行账号',
+                         u'银行卡类型', u'省份', u'地区', u'支行'])
+
+        p2precords = P2PRecord.objects.filter(catalog=u'状态变化', create_time__gte=start_time, create_time__lt=end_time)
+
+        for index, p2precord in enumerate(p2precords):
+            writer.writerow([
+                str(index + 1),
+                p2precord.product.serial_number,
+                '-',
+                unicode(p2precord.product.name),
+                str(p2precord.product.total_amount),
+                str(p2precord.product.ordered_amount),
+                str(p2precord.product.expected_earning_rate),
+                str(p2precord.product.period),
+                unicode(p2precord.product.pay_method),
+                str(len(p2precord.product.equities.all())),
+                unicode(p2precord.product.status),
+                (p2precord.product.soldout_time and timezone.localtime(p2precord.product.soldout_time).strftime("%Y-%m-%d %H:%M:%S")) or '-',
+                unicode(p2precord.product.borrower_name),
+                unicode(p2precord.product.borrower_phone),
+                unicode(p2precord.product.borrower_id_number),
+                unicode(p2precord.product.borrower_bankcard_bank_code),
+                unicode(p2precord.product.borrower_bankcard),
+                unicode(p2precord.product.borrower_bankcard_type),
+                unicode(p2precord.product.borrower_bankcard_bank_province),
+                unicode(p2precord.product.borrower_bankcard_bank_city),
+                unicode(p2precord.product.borrower_bankcard_bank_branch)
             ])
 
         return output.getvalue()
