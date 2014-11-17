@@ -532,6 +532,7 @@ def generate_amortization_plan(sender, instance, **kwargs):
         instance.amortization_count = len(terms['terms'])
 
         instance.status = u'待审核'
+        instance.priority = instance.id * 10
         instance.save()
 
 
