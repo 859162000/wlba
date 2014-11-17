@@ -195,9 +195,10 @@ class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
 
 
 class P2PRecordResource(resources.ModelResource):
-    user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name='姓名')
-    user_phone = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name='手机号')
-    product_name = fields.Field(attribute="product__name", column_name='产品名称')
+    user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name=u'姓名')
+    user_phone = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name=u'手机号')
+    product_name = fields.Field(attribute="product__name", column_name=u'产品名称')
+    product_id = fields.Field(attribute="product__id", column_name=u'产品ID')
 
     class Meta:
         model = P2PRecord

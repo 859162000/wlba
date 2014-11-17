@@ -6,7 +6,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.contrib import messages
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
-    PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator, EearningReportGenerator
+    PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator,\
+    EearningReportGenerator, WithDrawDetailReportGenerator, P2PstatusReportGenerator
 import logging
 
 type = (
@@ -16,7 +17,9 @@ type = (
     (u'产品还款', 3),
     (u'用户还款', 4),
     (u'满标复审', 5),
-    (u'赠送记录', 6)
+    (u'赠送记录', 6),
+    (u'提现详细记录', 7),
+    (u'满标状态变化', 8)
 )
 
 class AdminReportExport(TemplateView):
@@ -50,6 +53,10 @@ class AdminReportExport(TemplateView):
             self._generate_p2paudit(request, start_time, end_time)
         if type == '6':
             self._generate_earning(request, start_time, end_time)
+        if type == '7':
+            self._generate_withdrawdetail(request, start_time, end_time)
+        if type == '8':
+            self._generate_p2pstatus(request, start_time, end_time)
 
         return HttpResponseRedirect('export')
 
@@ -73,6 +80,12 @@ class AdminReportExport(TemplateView):
 
     def _generate_earning(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, EearningReportGenerator, u'赠送记录')
+
+    def _generate_withdrawdetail(self, request, start_time, end_time):
+        self._apply_generate(request, start_time, end_time, WithDrawDetailReportGenerator, u'提现详细记录')
+
+    def _generate_p2pstatus(self, request, start_time, end_time):
+        self._apply_generate(request, start_time, end_time, P2PstatusReportGenerator, u'满标状态变化')
 
     def _apply_generate(self, request, start_time, end_time, cls, message=''):
         try:

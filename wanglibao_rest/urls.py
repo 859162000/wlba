@@ -6,7 +6,8 @@ from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIView,
                             AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI, AccountFundAssetAPI,
-                            P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView)
+                            P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
+                            AdminSendMessageAPIView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -27,7 +28,7 @@ from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
-                            WeixinRegisterAPIView, IdValidateAPIView)
+                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView)
 
 router = DefaultRouter()
 
@@ -99,7 +100,8 @@ urlpatterns = patterns(
     url(r'^bank/list/$', BankListAPIView.as_view()),
 
     url(r'^id_validate/', IdValidate.as_view()),
-    url(r'^admin_id_validate/', AdminIdValidate.as_view()),
+    url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
+    url(r'^admin_send_message/$', AdminSendMessageAPIView.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
     url(r'^home/p2precord', AccountP2PRecordAPI.as_view()),
@@ -112,6 +114,7 @@ urlpatterns = patterns(
     url(r'^pay/lianlian/app/deposit/$', LianlianAppPayView.as_view(), name="lianlian-deposit-view"),
     url(r'^pay/lianlian/app/deposit/callback/$', LianlianAppPayCallbackView.as_view(), name="lianlian-deposit-view"),
     url(r'^withdraw/$', LianlianWithdrawAPIView.as_view(), name="lianlian-withdraw-view"),
+    url(r'^client_update/$', ClientUpdateAPIView.as_view()),
 )
 
 urlpatterns += patterns('',

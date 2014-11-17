@@ -2,6 +2,7 @@
 
 import urlparse
 import random
+import json
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.core.urlresolvers import resolve
@@ -33,6 +34,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_sms import messages
 from django.utils import timezone
 from wanglibao_account import third_login, message as inside_message
+from misc.models import Misc
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -203,6 +205,25 @@ class WeixinRegisterAPIView(APIView):
         auth_login(request, auth_user)
         send_rand_pass(identifier, password)
         return Response({"ret_code":0, "message":"注册成功"})
+
+#客户端升级
+class ClientUpdateAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request, *args, **kwargs):
+        device_type = request.DATA.get("device_type", "")
+        if not device_type or device_type not in ("iPhone", "iPad", "android"):
+            return Response({"ret_code":30101, "message":"信息输入有误"})
+
+        key = device_type.lower() + "_update"
+        sets = Misc.objects.filter(key=key).first()
+        if not sets:
+            return Response({"ret_code":30102, "message":"This is no update"})
+        try:
+            info = json.loads(sets.value)
+            return Response({"ret_code":0, "message":"ok", "data":info})
+        except Exception, e:
+            return Response({"ret_code":30103, "message":"This is no update"})
 
 """
 class PushTestView(APIView):

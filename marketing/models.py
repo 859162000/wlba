@@ -168,7 +168,7 @@ class Activity(models.Model):
     end_time = models.DateTimeField(u'结束时间')
 
     def __unicode__(self):
-        return u'<%s>' % self.name
+        return u'<%s %s>' % (self.name, self.description)
 
 
 class Reward(models.Model):

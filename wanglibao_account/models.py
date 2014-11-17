@@ -48,6 +48,9 @@ class UserPushId(models.Model):
     push_user_id = models.CharField(max_length=50, db_index=True)
     push_channel_id = models.CharField(max_length=50)
 
+    class Meta:
+        verbose_name_plural = u"推送信息"
+
 
 class Binding(models.Model):
     """
@@ -82,6 +85,9 @@ message_type = (
     #("audited", "满标已审核"),
     ("public", "发给所有"),
 )
+def timestamp():
+    return long(time.time())
+
 class MessageText(models.Model):
     """
         store station letters(站内信内容)
@@ -90,7 +96,7 @@ class MessageText(models.Model):
         choices=message_type)
     title = models.CharField(max_length=100, verbose_name=u"消息标题")
     content = models.TextField(verbose_name=u"正文")
-    created_at = models.BigIntegerField(default=long(time.time()), verbose_name=u"时间戳", blank=True)
+    created_at = models.BigIntegerField(default=timestamp, verbose_name=u"时间戳", blank=True)
 
     def __unicode__(self):
         return u'%s type:%s' % (self.title, self.mtype)
