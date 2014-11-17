@@ -2,7 +2,7 @@
 from collections import OrderedDict
 from concurrency.admin import ConcurrentModelAdmin
 import datetime
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning
@@ -187,6 +187,14 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
         if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
             return [f.name for f in self.model._meta.fields]
         return ()
+
+    def save_model(self, request, obj, form, change):
+        if obj.status == u'正在招标':
+            pa = ProductAmortization.objects.filter(product=obj)
+            if not pa:
+                messages.error(request, u'录标发生错误, 请回退到录标完成状态')
+                return
+        super(P2PProductAdmin, self).save_model(request, obj, form, change)
 
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):

@@ -253,15 +253,15 @@ class P2PProduct(ProductBase):
             return self.display_payback_mapping[self.pay_method]
         return self.pay_method
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
-
-        if self.status == u'正在招标':
-            pa = ProductAmortization.objects.filter(product=self)
-            if not pa:
-                return
-        super(P2PProduct, self).save(force_insert=False, force_update=False, using=None,
-                     update_fields=None)
+    # def save(self, force_insert=False, force_update=False, using=None,
+    #          update_fields=None):
+    #
+    #     if self.status == u'正在招标':
+    #         pa = ProductAmortization.objects.filter(product=self)
+    #         if not pa:
+    #             return
+    #     super(P2PProduct, self).save(force_insert=False, force_update=False, using=None,
+    #                  update_fields=None)
 
 reversion.register(P2PProduct)
 
