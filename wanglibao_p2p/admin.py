@@ -3,6 +3,7 @@ from collections import OrderedDict
 from concurrency.admin import ConcurrentModelAdmin
 import datetime
 from django.contrib import admin, messages
+from django import forms
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning
@@ -170,6 +171,20 @@ class P2PProductResource(resources.ModelResource):
         instance.contract_template = ContractTemplate.objects.get(name='证大速贷')
 
 
+class P2PProductForm(forms.ModelForm):
+    class Meta:
+        model = P2PProduct
+
+    def clean_status(self):
+        if self.cleaned_data['status'] == u'正在招标':
+
+            print self
+
+            pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
+            if not pa:
+                raise forms.ValidationError(u'录标发生错误, 请回退到录标完成状态')
+        return self.cleaned_data['status']
+
 class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
@@ -182,6 +197,8 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     resource_class = P2PProductResource
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'
+
+    form = P2PProductForm
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
