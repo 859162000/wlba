@@ -182,7 +182,7 @@ class P2PProductForm(forms.ModelForm):
 
             pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
             if not pa:
-                raise forms.ValidationError(u'录标发生错误, 请回退到录标完成状态')
+                raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
         return self.cleaned_data['status']
 
 class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
@@ -209,7 +209,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
         if obj.status == u'正在招标':
             pa = ProductAmortization.objects.filter(product=obj)
             if not pa:
-                messages.error(request, u'录标发生错误, 请回退到录标完成状态')
+                messages.error(request, u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
                 return
         super(P2PProductAdmin, self).save_model(request, obj, form, change)
 
