@@ -28,7 +28,8 @@ from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
-                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView)
+                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
+                            YTXVoiceCallbackAPIView, SendVoiceCodeAPIView)
 
 router = DefaultRouter()
 
@@ -115,6 +116,8 @@ urlpatterns = patterns(
     url(r'^pay/lianlian/app/deposit/callback/$', LianlianAppPayCallbackView.as_view(), name="lianlian-deposit-view"),
     url(r'^withdraw/$', LianlianWithdrawAPIView.as_view(), name="lianlian-withdraw-view"),
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
+    url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
+    url(r'^ytx/send_voice_code', SendVoiceCodeAPIView.as_view()),
 )
 
 urlpatterns += patterns('',
