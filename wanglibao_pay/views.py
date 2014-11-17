@@ -141,12 +141,19 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
+        title,content = messages.msg_pay_ok(amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id":request.user.id,
-            "title":"%s" % result,
-            "content":u"%s,%s元" % (result, amount),
-            "mtype":"pay"
+            "title":title,
+            "content":content,
+            "mtype":"activityintro"
         })
+        #inside_message.send_one.apply_async(kwargs={
+        #    "user_id":request.user.id,
+        #    "title":"%s" % result,
+        #    "content":u"%s,%s元" % (result, amount),
+        #    "mtype":"pay"
+        #})
 
         return self.render_to_response({
             'result': result,
