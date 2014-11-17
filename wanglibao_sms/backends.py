@@ -2,7 +2,12 @@
 # encoding:utf-8
 
 from django.conf import settings
+import time
+import json
+import hashlib
 import requests
+import httplib2
+import base64
 import logging
 from suds.client import Client
 
@@ -130,9 +135,31 @@ class EmaySMS:
         rs = ws.getReport(settings.SMS_EMAY_SN, settings.SMS_EMAY_KEY)
         print(rs)
 
+class YTXVoice:
+    @classmethod
+    def verify(cls, phone, vcode):
+        uri = "%s/Accounts/%s/Calls/VoiceVerify" % (settings.YTX_API_URL, settings.YTX_SID)
+        ct = time.strftime("%Y%m%d%H%M%S", time.localtime())
+        sig = hashlib.md5("%s%s%s" % (settings.YTX_SID, settings.YTX_TOKEN, ct)).hexdigest().upper()
+        uri += "?sig=%s" % sig
+        http = httplib2.Http()
+        params = {"appId":settings.YTX_APPID, "verifyCode":vcode, "to":phone, 
+                    "playTimes":"3", "respUrl":settings.YTX_BACK_RETURN_URL}
+        data = json.dumps(params)
+        headers = {"Accept":"application/json", "Content-Type":"application/json;charset=utf-8",
+                    "Content-Length":str(len(data))}
+        headers['Authorization'] = base64.encodestring("%s:%s" % (settings.YTX_SID, ct))
+        response, content = http.request(uri, 'POST', headers=headers, body=data)
+        if str(response['status']) == "200":
+            # resp = {"statusCode":"000000","VoiceVerify":{"dateCreated":"2013-02-01 15:53:06","callSid":" ff8080813c373cab013c94be9fe300c5"}}
+            resp = json.loads(content)
+            if resp["statusCode"] == "000000":
+                return 200, content
+        return 500, content
 
 if __name__ == "__main__":
     #EmaySMS.register()
     #EmaySMS.send_messages("18664387989", [u"abcdefg中国李振璟"])
     EmaySMS.balance()
     EmaySMS.get_report()
+    #backends.YTXVoice.verify("18637172100", "123456")
