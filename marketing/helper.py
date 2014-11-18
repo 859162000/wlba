@@ -45,9 +45,10 @@ def send_message_about_code():
     now = timezone.now()
     users_generate = collect_valided_user()
     for user in users_generate:
-        with transaction.atomic():
-            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-                try:
+        try:
+            with transaction.atomic():
+                if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+
                     reward = Reward.objects.select_for_update()\
                         .filter(is_used=False, type=u'三天迅雷会员').first()
                     reward.is_used = True
@@ -62,6 +63,6 @@ def send_message_about_code():
                         "content": content,
                         "mtype": "activity"
                     })
-                except Exception, e:
-                    print(e)
+        except Exception, e:
+            print(e)
 
