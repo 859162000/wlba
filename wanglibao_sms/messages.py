@@ -94,7 +94,7 @@ def msg_bid_fail(product_name):
 
 def msg_register():
     title = u"注册成功"
-    content = u"感谢您注册网利宝。完成实名认证（绑定身份证、银行卡号），免费领取3天迅雷会员激活码。<br/>感谢您对我们的支持与关注。<br/>网利宝"
+    content = u"感谢您注册网利宝。完成实名认证，免费领取3天迅雷会员激活码。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
     return title, content
 
 def msg_register_authok(activation):
@@ -104,7 +104,7 @@ def msg_register_authok(activation):
 
 def msg_validate_ok(activation):
     title = u"实名认证成功"
-    content = u"恭喜您完成实名认证。赠送给您的3天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>立即兑换（<a href='http://pay.vip.xunlei.com/baijin.html' target='_blank'>http://pay.vip.xunlei.com/baijin.html</a>）<br/>迅雷会员理财专享1%额外收益，<a href='/' target='_blank'>立即赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"恭喜您完成实名认证，赠送给您的3天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 #迅雷会员
@@ -136,7 +136,7 @@ def msg_bid_success(product_name, date):
 
 def msg_pay_ok(amount):
     title = u"充值成功"
-    content = u"您的网利宝账户已成功充值￥%s元，请查收。<br/>活动期间：2014年11月1日-2014年12月31日<br/>活动1：现在理财不同产品，即送1个月迅雷白金会员或10G、50G、100G快盘网盘。<br/>活动2：迅雷/快盘会员理财，额外获赠1%年化收益奖励。<br/>活动3：理财达到一定额度“迅雷白金会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/>活动4：邀请好友完成首次单笔1000元理财，双方共享60元话费，您再获赠好友首笔理财额度0.5%年化收益奖励。<br/><a href='/activity/gold/' target='_blank'>点击查看详情</a><br/>感谢您对我们的支持与关注。 <br/>网利宝" % amount
+    content = u"您的网利宝账户已成功充值￥%s元，请查收。<br/>活动期间：2014年11月1日-2014年12月31日<br/>活动1：投资不同产品，即送1个月迅雷白金会员或10G、50G、100G快盘网盘。<br/>活动2：参加精彩活动，额外获赠1%年化收益奖励。<br/>活动3：理财达到一定额度“迅雷白金会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/>活动4：邀请好友完成首次单笔1000元理财，双方共享60元话费，您再获赠好友首笔理财额度0.5%年化收益奖励。<br/><a href='/' target='_blank'>点击此处进行理财</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % amount
     return title, content
 
 def msg_withdraw(withtime, amount):
@@ -157,4 +157,10 @@ def msg_withdraw_success(withtime, amount):
 def msg_bid_amortize(product_name, retime, amount):
     title = u"项目还款"
     content = u"借款项目“%s”于%s还款￥%s元，请注意查收。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % (product_name, format_datetime(retime, u"%Y年%m月%d日%H:%M:%S"), amount)
+    return title, content
+
+#满额送京东卡
+def msg_invest_jdcard(total, nominal, activation):
+    title = u"满额送京东卡"
+    content = u"您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得%s元京东卡奖励。<br/>京东卡密码：%s,请注意查收。<br/>感谢您对我们的支持与关注！<br/>网利宝" % (total, nominal, activation)
     return title, content
