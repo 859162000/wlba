@@ -31,18 +31,37 @@ def collect_valided_user():
 def send_message_about_id_valid():
     """ 针对没有实名的用户发送站内信
     """
-
-    title,content = messages.msg_register()
+    title, content = messages.msg_register()
     users_generate = collect_unvalid_user()
-    now = timezone.now()
     for user in users_generate:
         inside_message.send_one.apply_async(kwargs={
-            "user_id":user.id,
-            "title":title,
-            "content":content,
+            "user_id": user.id,
+            "title": title,
+            "content": content,
             "mtype":"activityintro"
         })
 
 def send_message_about_code():
-    pass
+    now = timezone.now()
+    users_generate = collect_unvalid_user()
+    for user in users_generate:
+        with transaction.atomic():
+            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                try:
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+
+                    title, content = messages.msg_validate_ok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": user.id,
+                        "title": title,
+                        "content": content,
+                        "mtype": "activity"
+                    })
+                except Exception, e:
+                    print(e)
 
