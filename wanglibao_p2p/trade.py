@@ -77,7 +77,7 @@ class P2PTrader(object):
                             reward.is_used = True
                             reward.save()
                             RewardRecord.objects.create(user=self.user, reward=reward,
-                                                        description=u'首次购买快盘活动P2P产品赠送s%快盘容量' % reward.description)
+                                                        description=u'首次购买快盘活动P2P产品赠送%s快盘容量' % reward.description)
                             title,content = messages.msg_first_kuaipan(reward.description, reward.content)
                             inside_message.send_one.apply_async(kwargs={
                                 "user_id":self.user.id,
@@ -103,6 +103,7 @@ class P2PTrader(object):
                 if amount >= 1000:
                     inviter_phone = safe_phone_str(inviter_phone)
                     invited_phone = safe_phone_str(invited_phone)
+
                     send_messages.apply_async(kwargs={
                         "phones": [inviter_phone, invited_phone],
                         "messages": [messages.gift_inviter(invited_phone=invited_phone, money=30),
@@ -123,6 +124,14 @@ class P2PTrader(object):
                         "content":content2,
                         "mtype":"activity"
                     })
+
+                    rwd = Reward.objects.filter(type=u'30元话费').first()
+                    if rwd:
+                        try:
+                            RewardRecord.objects.create(user=introduced_by.introduced_by, reward=rwd, description=content)
+                            RewardRecord.objects.create(user=introduced_by.user, reward=rwd, description=content2)
+                        except Exception,e:
+                            print(e)
 
         #投标成功发站内信
         pname = u"%s,期限%s个月" % (self.product.name, self.product.period)

@@ -43,7 +43,7 @@ def send_message_about_id_valid():
 
 def send_message_about_code():
     now = timezone.now()
-    users_generate = collect_unvalid_user()
+    users_generate = collect_valided_user()
     for user in users_generate:
         with transaction.atomic():
             if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
