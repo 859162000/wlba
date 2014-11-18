@@ -927,32 +927,6 @@ def ajax_register(request):
                     "content":content,
                     "mtype":"activityintro"
                 })
-                """
-                now = timezone.now()
-                with transaction.atomic():
-                    if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-                        try:
-                            reward = Reward.objects.select_for_update()\
-                                .filter(is_used=False, type=u'三天迅雷会员').first()
-                            reward.is_used = True
-                            reward.save()
-                            RewardRecord.objects.create(user=auth_user, reward=reward,
-                                                        description=u'新用户注册赠送三天迅雷会员')
-                            send_messages.apply_async(kwargs={
-                                    "phones": [identifier],
-                                    "messages": [messages.reg_reward_message(reward.content)]
-                            })
-                            title, content = messages.msg_register_authok(reward.content)
-                            inside_message.send_one.apply_async(kwargs={
-                                "user_id":auth_user.id,
-                                "title":title,
-                                "content":content,
-                                "mtype":"activity"
-                            })
-                        except Exception,e:
-                            import traceback
-                            print(traceback.format_exc())
-                """
 
                 return HttpResponse(messenger('done', user=request.user))
                 # return HttpResponseRedirect("/accounts/id_verify/")
