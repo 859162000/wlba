@@ -49,29 +49,29 @@ class P2PTrader(object):
             activity = self.product.activity
             #activity.name 包含迅雷就送一个月迅雷会员，包含快盘就送流量
             if u"迅雷" in activity.name:
-                with transaction.atomic():
-                    if Reward.objects.filter(is_used=False, type=u'一个月迅雷会员', end_time__gte=now).exists():
-                        try:
-                            reward = Reward.objects.select_for_update()\
-                                .filter(is_used=False, type=u'一个月迅雷会员').first()
-                            reward.is_used = True
-                            reward.save()
-                            RewardRecord.objects.create(user=self.user, reward=reward,
-                                                        description=u'首次购买迅雷活动P2P产品赠送一个月迅雷会员')
-                            title,content = messages.msg_first_licai(reward.content)
-                            inside_message.send_one.apply_async(kwargs={
-                                "user_id":self.user.id,
-                                "title":title,
-                                "content":content,
-                                "mtype":"activity"
-                            })
-                        except:
-                            pass
+                try:
+                    with transaction.atomic():
+                        if Reward.objects.filter(is_used=False, type=u'一个月迅雷会员', end_time__gte=now).exists():
+                                reward = Reward.objects.select_for_update()\
+                                    .filter(is_used=False, type=u'一个月迅雷会员').first()
+                                reward.is_used = True
+                                reward.save()
+                                RewardRecord.objects.create(user=self.user, reward=reward,
+                                                            description=u'首次购买迅雷活动P2P产品赠送一个月迅雷会员')
+                                title,content = messages.msg_first_licai(reward.content)
+                                inside_message.send_one.apply_async(kwargs={
+                                    "user_id":self.user.id,
+                                    "title":title,
+                                    "content":content,
+                                    "mtype":"activity"
+                                })
+                except:
+                    pass
 
             if u"快盘" in activity.name:
-                with transaction.atomic():
-                    if Reward.objects.filter(is_used=False, type=u'快盘随机容量', end_time__gte=now).exists():
-                        try:
+                try:
+                    with transaction.atomic():
+                        if Reward.objects.filter(is_used=False, type=u'快盘随机容量', end_time__gte=now).exists():
                             reward = Reward.objects.select_for_update()\
                                 .filter(is_used=False, type=u'快盘随机容量').first()
                             reward.is_used = True
@@ -85,8 +85,8 @@ class P2PTrader(object):
                                 "content":content,
                                 "mtype":"activity"
                             })
-                        except:
-                            pass
+                except:
+                    pass
 
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
         #phone_verified 渠道客户判断

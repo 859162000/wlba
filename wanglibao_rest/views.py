@@ -297,9 +297,10 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.save()
 
         now = timezone.now()
-        with transaction.atomic():
-            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-                try:
+        try:
+            with transaction.atomic():
+                if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+
                     reward = Reward.objects.select_for_update()\
                         .filter(is_used=False, type=u'三天迅雷会员').first()
                     reward.is_used = True
@@ -314,8 +315,8 @@ class IdValidateAPIView(APIView):
                         "content":content,
                         "mtype":"activity"
                     })
-                except Exception, e:
-                    print(e)
+        except Exception, e:
+            print(e)
 
         return Response({"ret_code":0, "message":"验证成功"})
 
@@ -412,7 +413,6 @@ class IdValidate(APIView):
                             }, status=400)
 
 
-        # id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
         id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
         if id_verify_count >= 1:
             return Response({
@@ -439,9 +439,10 @@ class IdValidate(APIView):
 
 
         now = timezone.now()
-        with transaction.atomic():
-            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-                try:
+        try:
+            with transaction.atomic():
+                if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+
                     reward = Reward.objects.select_for_update()\
                         .filter(is_used=False, type=u'三天迅雷会员').first()
                     reward.is_used = True
@@ -456,9 +457,8 @@ class IdValidate(APIView):
                         "content":content,
                         "mtype":"activity"
                     })
-                except Exception, e:
-                    print(e)
-                    pass
+        except Exception, e:
+            print(e)
 
         return Response({
                             "validate": True
