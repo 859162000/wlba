@@ -29,7 +29,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from django.db import transaction
-from wanglibao_sms.tasks import send_messages
+#from wanglibao_sms.tasks import send_messages
 from wanglibao_sms import messages, backends
 from django.utils import timezone
 from wanglibao_account import third_login, message as inside_message
@@ -141,9 +141,16 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
+        title,content = messages.msg_register()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":user.id,
+            "title":title,
+            "content":content,
+            "mtype":"activityintro"
+        })
 
+        """
         now = timezone.now()
-
         with transaction.atomic():
             if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
                 try:
@@ -167,6 +174,7 @@ class RegisterAPIView(APIView):
                 except Exception,e:
                     import traceback
                     print(traceback.format_exc())
+		"""
 
         return Response({"ret_code":0, "message":"注册成功"})
 
@@ -207,6 +215,14 @@ class WeixinRegisterAPIView(APIView):
         auth_user = authenticate(identifier=identifier, password=password)
         auth_login(request, auth_user)
         send_rand_pass(identifier, password)
+
+        title,content = messages.msg_register()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":auth_user.id,
+            "title":title,
+            "content":content,
+            "mtype":"activityinfo"
+        })
         return Response({"ret_code":0, "message":"注册成功"})
 
 #客户端升级
@@ -400,6 +416,29 @@ class IdValidate(APIView):
         user.wanglibaouserprofile.name = name
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
+
+
+        now = timezone.now()
+        with transaction.atomic():
+            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                try:
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+
+                    title,content = messages.msg_validate_ok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+                except Exception, e:
+                    print(e)
+                    pass
 
         return Response({
                             "validate": True

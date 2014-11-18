@@ -77,6 +77,7 @@ message_type = (
     ("withdraw", "提现通知"),
     ("pay", "充值通知"),
     ("amortize", "项目还款"),
+    ("activityintro", "活动介绍"),
     ("activity", "活动奖励"),
     ("bids", "流标通知"),
     ("purchase", "投标通知"),
