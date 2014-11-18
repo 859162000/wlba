@@ -104,7 +104,7 @@ def msg_register_authok(activation):
 
 def msg_validate_ok(activation):
     title = u"实名认证成功"
-    content = u"恭喜您完成实名认证，赠送给您的3天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"恭喜您完成实名认证，赠送给您的3天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 #迅雷会员

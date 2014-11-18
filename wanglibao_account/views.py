@@ -1130,6 +1130,7 @@ class AdminSendMessageAPIView(APIView):
         return Response({"ret_code":0, "message":"发送成功"})
 
 
+"""
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kwargs):
@@ -1188,6 +1189,7 @@ class IdValidate(APIView):
         return Response({
                             "validate": True
                         }, status=200)
+"""
 
 
 class IntroduceRelation(TemplateView):
