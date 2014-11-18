@@ -77,7 +77,7 @@ class P2PTrader(object):
                             reward.is_used = True
                             reward.save()
                             RewardRecord.objects.create(user=self.user, reward=reward,
-                                                        description=u'首次购买快盘活动P2P产品赠送s%快盘容量' % reward.description)
+                                                        description=u'首次购买快盘活动P2P产品赠送%s快盘容量' % reward.description)
                             title,content = messages.msg_first_kuaipan(reward.description, reward.content)
                             inside_message.send_one.apply_async(kwargs={
                                 "user_id":self.user.id,
@@ -125,7 +125,7 @@ class P2PTrader(object):
                         "mtype":"activity"
                     })
 
-                	rwd = Reward.objects.filter(type=u'30元话费').first()
+                    rwd = Reward.objects.filter(type=u'30元话费').first()
                     if rwd:
                         try:
                             RewardRecord.objects.create(user=introduced_by.introduced_by, reward=rwd, description=content)
