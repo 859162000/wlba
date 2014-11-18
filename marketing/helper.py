@@ -5,20 +5,44 @@ __author__ = 'rsj217'
 
 
 from django.contrib.auth.models import User
-from wanglibao_profile.models import WanglibaoUserProfile
-from marketing.models import RewardRecord
+from django.db import transaction
+from django.utils import timezone
+from marketing.models import RewardRecord, Reward
+from wanglibao_sms import messages
+from wanglibao_account import message as inside_message
 
 
-def collection_user():
-    users = User.objects.filter(wanglibaouserprofile__id_is_valid=False)
+def collect_unvalid_user():
+    """ 没有实名注册的用户,也没有发送激活码的用户,发送短信提示实名注册
+    """
+    joined_time = timezone.datetime(2014, 11, 14)
+    users = User.objects.filter(wanglibaouserprofile__id_is_valid=False, date_joined__gte=joined_time)
+    users_generate = (user for user in users if not RewardRecord.objects.filter(user=user))
+    return users_generate
 
-    users = User.objects.filter(wanglibaouserprofile__id_is_valid=False)
+def collect_valided_user():
+    """ 已经实名认证，没有发送激活码的用户,发送激活码
+    """
+    joined_time = timezone.datetime(2014, 11, 14)
+    users = User.objects.filter(wanglibaouserprofile__id_is_valid=True, date_joined__gte=joined_time)
+    users_generate = (user for user in users if not RewardRecord.objects.filter(user=user))
+    return users_generate
 
-    user_phone = User.objects.get()
-    user_phone = (User.objects.filter(user=u) for u in users)
+def send_message_about_id_valid():
+    """ 针对没有实名的用户发送站内信
+    """
 
-def send_message():
-    pass
+    title,content = messages.msg_register()
+    users_generate = collect_unvalid_user()
+    now = timezone.now()
+    for user in users_generate:
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":user.id,
+            "title":title,
+            "content":content,
+            "mtype":"activityintro"
+        })
 
 def send_message_about_code():
     pass
+
