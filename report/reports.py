@@ -444,7 +444,7 @@ class EearningReportGenerator(ReportGeneratorBase):
         for index, earning in enumerate(earnings):
             writer.writerow([
                 str(index + 1),
-                earning.user.wanglibaouserprofile.nick_name,
+                earning.user.wanglibaouserprofile.name,
                 earning.user.wanglibaouserprofile.phone,
                 str(earning.product_id),
                 earning.product.short_name,
