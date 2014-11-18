@@ -10,5 +10,5 @@ urlpatterns = patterns(
     url(r'^wap/01/$', TemplateView.as_view(template_name="xunlei_01.jade")),
     url(r'^wap/02/$', TemplateView.as_view(template_name="xunlei_02.jade")),
     url(r'^wap/03/$', TemplateView.as_view(template_name="xunlei_03.jade")),
-
+    url(r'^kuaipan/$', TemplateView.as_view(template_name="kuaipan.jade")),
 )
