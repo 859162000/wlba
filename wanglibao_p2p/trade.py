@@ -125,7 +125,7 @@ class P2PTrader(object):
                         "mtype":"activity"
                     })
 
-                	rwd = Reward.objects.filter(type=u'30元话费').first()
+                    rwd = Reward.objects.filter(type=u'30元话费').first()
                     if rwd:
                         try:
                             RewardRecord.objects.create(user=introduced_by.introduced_by, reward=rwd, description=content)
