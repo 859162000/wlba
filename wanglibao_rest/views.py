@@ -280,9 +280,8 @@ class IdValidateAPIView(APIView):
             return Response({"ret_code":30052, "message":u"验证次数超过三次，请联系客服进行人工验证 4008-588-066"})
 
         id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
-
-        if id_verify_count >= 3:
-            return Response({"ret_code":30053, "message":u"您的身份证已绑定了三个帐号，无法继续验证，请联系客服人工验证 4008-588-066"})
+        if id_verify_count >= 1:
+            return Response({"ret_code":30053, "message":u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066"})
 
         verify_record, error = verify_id(name, id_number)
 
@@ -296,6 +295,27 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.name = name
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
+
+        now = timezone.now()
+        with transaction.atomic():
+            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                try:
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+
+                    title,content = messages.msg_validate_ok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+                except Exception, e:
+                    print(e)
 
         return Response({"ret_code":0, "message":"验证成功"})
 
@@ -416,6 +436,29 @@ class IdValidate(APIView):
         user.wanglibaouserprofile.name = name
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
+
+
+        now = timezone.now()
+        with transaction.atomic():
+            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                try:
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+
+                    title,content = messages.msg_validate_ok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+                except Exception, e:
+                    print(e)
+                    pass
 
         return Response({
                             "validate": True
