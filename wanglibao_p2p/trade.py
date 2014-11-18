@@ -103,6 +103,7 @@ class P2PTrader(object):
                 if amount >= 1000:
                     inviter_phone = safe_phone_str(inviter_phone)
                     invited_phone = safe_phone_str(invited_phone)
+
                     send_messages.apply_async(kwargs={
                         "phones": [inviter_phone, invited_phone],
                         "messages": [messages.gift_inviter(invited_phone=invited_phone, money=30),
@@ -123,6 +124,14 @@ class P2PTrader(object):
                         "content":content2,
                         "mtype":"activity"
                     })
+
+                	rwd = Reward.objects.filter(type=u'30元话费').first()
+                    if rwd:
+                        try:
+                            RewardRecord.objects.create(user=introduced_by.introduced_by, reward=rwd, description=content)
+                            RewardRecord.objects.create(user=introduced_by.user, reward=rwd, description=content2)
+                        except Exception,e:
+                            print(e)
 
         #投标成功发站内信
         pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
