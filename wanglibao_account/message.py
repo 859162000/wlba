@@ -93,7 +93,7 @@ def _send(target_user, msgTxt):
         devices = UserPushId.objects.filter(user=target_user)
         if devices:
             channel = bae_channel.BaeChannel()
-            msg_key = "wanglibao"
+            msg_key = "wanglibao_%s" % time.time()
             message = {"message":msgTxt.content}
             for d in devices:
                 if d.device_type == "ios":
