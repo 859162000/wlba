@@ -217,20 +217,18 @@ class ClientUpdateAPIView(APIView):
         except Exception, e:
             return Response({"ret_code":30103, "message":"This is no update"})
 
-"""
 class PushTestView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        push_user_id = request.GET.get("push_user_id", "761084096993596699")
-        push_channel_id = request.GET.get("push_channel_id", "5381965014230748586")
+        push_user_id = request.GET.get("push_user_id", "921913645184221981")
+        push_channel_id = request.GET.get("push_channel_id", "4922700431463139292")
         from wanglibao_sms import bae_channel
         channel = bae_channel.BaeChannel()
         message = {"message":"push Test"}
         msg_key = "wanglibao_staging"
         res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
         return Response({"ret_code":0, "message":cont})
-"""
 
 class IdValidateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
