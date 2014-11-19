@@ -1,8 +1,7 @@
 # encoding:utf-8
 
-import urlparse
-import random
 import json
+import logging
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.core.urlresolvers import resolve
@@ -23,18 +22,21 @@ from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer, RegisterUserSerializer
-from wanglibao_sms.utils import send_validation_code, validate_validation_code, send_rand_pass
+from wanglibao_sms.utils import send_validation_code, validate_validation_code, send_rand_pass, generate_validate_code
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from django.db import transaction
-from wanglibao_sms.tasks import send_messages
-from wanglibao_sms import messages
+#from wanglibao_sms.tasks import send_messages
+from wanglibao_sms import messages, backends
 from django.utils import timezone
 from wanglibao_account import third_login, message as inside_message
 from misc.models import Misc
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -139,32 +141,13 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
-
-        now = timezone.now()
-
-        with transaction.atomic():
-            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-                try:
-                    reward = Reward.objects.select_for_update()\
-                        .filter(is_used=False, type=u'三天迅雷会员').first()
-                    reward.is_used = True
-                    reward.save()
-                    RewardRecord.objects.create(user=user, reward=reward,
-                                                description=u'新用户注册赠送三天迅雷会员')
-                    send_messages.apply_async(kwargs={
-                            "phones": [identifier],
-                            "messages": [messages.reg_reward_message(reward.content)]
-                    })
-                    title, content = messages.msg_register_authok(reward.content)
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id":user.id,
-                        "title":title,
-                        "content":content,
-                        "mtype":"activity"
-                    })
-                except Exception,e:
-                    import traceback
-                    print(traceback.format_exc())
+        title,content = messages.msg_register()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":user.id,
+            "title":title,
+            "content":content,
+            "mtype":"activityintro"
+        })
 
         return Response({"ret_code":0, "message":"注册成功"})
 
@@ -197,13 +180,22 @@ class WeixinRegisterAPIView(APIView):
             except:
                 return Response({"ret_code":30025, "message":"邀请码错误"})
 
-        password = random.randint(100000, 999999)
+        password = generate_validate_code()
+        #password = random.randint(100000, 999999)
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
         auth_user = authenticate(identifier=identifier, password=password)
         auth_login(request, auth_user)
         send_rand_pass(identifier, password)
+
+        title,content = messages.msg_register()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":auth_user.id,
+            "title":title,
+            "content":content,
+            "mtype":"activityinfo"
+        })
         return Response({"ret_code":0, "message":"注册成功"})
 
 #客户端升级
@@ -261,9 +253,8 @@ class IdValidateAPIView(APIView):
             return Response({"ret_code":30052, "message":u"验证次数超过三次，请联系客服进行人工验证 4008-588-066"})
 
         id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
-
-        if id_verify_count >= 3:
-            return Response({"ret_code":30053, "message":u"您的身份证已绑定了三个帐号，无法继续验证，请联系客服人工验证 4008-588-066"})
+        if id_verify_count >= 1:
+            return Response({"ret_code":30053, "message":u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066"})
 
         verify_record, error = verify_id(name, id_number)
 
@@ -278,8 +269,80 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
 
+        now = timezone.now()
+        try:
+            with transaction.atomic():
+                if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+
+                    title,content = messages.msg_validate_ok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+        except Exception, e:
+            print(e)
+
         return Response({"ret_code":0, "message":"验证成功"})
 
+class SendVoiceCodeAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        phone_number = request.DATA.get("phone", "").strip()
+        if not phone_number or not phone_number.isdigit():
+            return Response({"ret_code":30111, "message": u"信息输入不完整"})
+
+        phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
+        if phone_check:
+            return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
+
+        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        if phone_validate_code_item:
+            count = phone_validate_code_item.code_send_count
+            if count > 6:
+                return Response({"ret_code":30113, "message": u"该手机号验证次数过于频繁，请联系客服人工注册"})
+
+            phone_validate_code_item.code_send_count += 1
+            phone_validate_code_item.save()
+        else:
+            now = timezone.now()
+            phone_validate_code_item = PhoneValidateCode()
+            validate_code = generate_validate_code()
+            phone_validate_code_item.validate_code = validate_code
+            phone_validate_code_item.phone = phone_number
+            phone_validate_code_item.last_send_time = now
+            phone_validate_code_item.code_send_count = 1
+            phone_validate_code_item.is_validated = False
+            phone_validate_code_item.save()
+
+        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
+        logger.info("voice_code: %s" % cont)
+        return Response({"ret_code":0, "message":"ok"})
+
+#云通讯语音验证码回调
+class YTXVoiceCallbackAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        action = request.DATA.get("action", "").strip()
+        call_sid = request.DATA.get("callSid", "").strip()
+        phone = request.DATA.get("number", "").strip()
+        state = request.DATA.get("state", "").strip()
+        duration = request.DATA.get("duration", "").strip()
+
+        if not action or not phone or not state:
+            return Response({"statuscode":"1"})
+
+        return Response({"statuscode":"000000"})
 
 class UserExisting(APIView):
     permission_classes = ()
@@ -323,7 +386,6 @@ class IdValidate(APIView):
                             }, status=400)
 
 
-        # id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
         id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
         if id_verify_count >= 1:
             return Response({
@@ -347,6 +409,29 @@ class IdValidate(APIView):
         user.wanglibaouserprofile.name = name
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
+
+
+        now = timezone.now()
+        try:
+            with transaction.atomic():
+                if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+
+                    title,content = messages.msg_validate_ok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+        except Exception, e:
+            print(e)
 
         return Response({
                             "validate": True

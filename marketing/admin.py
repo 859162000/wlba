@@ -120,8 +120,7 @@ class RewardAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 class RewardRecordAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'reward', 'description', 'create_time')
-    search_fields = ('user__wanglibaouserprofile__phone', 'reward')
-    list_filter = ('reward', )
+    search_fields = ('user__wanglibaouserprofile__phone', 'description', "reward__type")
 
 
 

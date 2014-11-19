@@ -48,7 +48,7 @@ from wanglibao_account.models import Message, MessageText, MessageNoticeSet, mes
 from marketing.models import Reward, RewardRecord
 from django.template.defaulttags import register
 from django.db import transaction
-from wanglibao_sms.tasks import send_messages
+#from wanglibao_sms.tasks import send_messages
 from wanglibao_sms import messages
 
 logger = logging.getLogger(__name__)
@@ -73,6 +73,14 @@ class RegisterView (RegistrationView):
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
 
+        title,content = messages.msg_register()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":auth_user.id,
+            "title":title,
+            "content":content,
+            "mtype":"activityintro"
+        })
+        """
         now = timezone.now()
         with transaction.atomic():
             if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
@@ -97,6 +105,7 @@ class RegisterView (RegistrationView):
                 except Exception, e:
                     print(e)
                     pass
+        """
 
         return user
 
@@ -911,31 +920,13 @@ def ajax_register(request):
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
 
-                now = timezone.now()
-
-                with transaction.atomic():
-                    if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-                        try:
-                            reward = Reward.objects.select_for_update()\
-                                .filter(is_used=False, type=u'三天迅雷会员').first()
-                            reward.is_used = True
-                            reward.save()
-                            RewardRecord.objects.create(user=auth_user, reward=reward,
-                                                        description=u'新用户注册赠送三天迅雷会员')
-                            send_messages.apply_async(kwargs={
-                                    "phones": [identifier],
-                                    "messages": [messages.reg_reward_message(reward.content)]
-                            })
-                            title, content = messages.msg_register_authok(reward.content)
-                            inside_message.send_one.apply_async(kwargs={
-                                "user_id":auth_user.id,
-                                "title":title,
-                                "content":content,
-                                "mtype":"activity"
-                            })
-                        except Exception,e:
-                            import traceback
-                            print(traceback.format_exc())
+                title,content = messages.msg_register()
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":auth_user.id,
+                    "title":title,
+                    "content":content,
+                    "mtype":"activityintro"
+                })
 
                 return HttpResponse(messenger('done', user=request.user))
                 # return HttpResponseRedirect("/accounts/id_verify/")
@@ -1113,6 +1104,7 @@ class AdminSendMessageAPIView(APIView):
         return Response({"ret_code":0, "message":"发送成功"})
 
 
+"""
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kwargs):
@@ -1146,9 +1138,32 @@ class IdValidate(APIView):
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
 
+        now = timezone.now()
+        with transaction.atomic():
+            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                try:
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+
+                    title,content = messages.msg_validate_ok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+                except Exception, e:
+                    print(e)
+                    pass
+
         return Response({
                             "validate": True
                         }, status=200)
+"""
 
 
 class IntroduceRelation(TemplateView):

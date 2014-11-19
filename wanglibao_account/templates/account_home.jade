@@ -20,12 +20,12 @@ block main
       else
         span
           a(href="/accounts/id_verify/") 还未进行实名认证
-      |&nbsp;&nbsp;&nbsp;
-      if xunlei_vip.isvip == True
-        span.icon.xunlei-vip-yes(title="已绑定迅雷会员")
-      else
-        a.xunlei-binding-modal(href="#xunlei-binding-modal")
-          span.icon.xunlei-vip-no(title="未绑定迅雷会员")
+      //|&nbsp;&nbsp;&nbsp;
+      //if xunlei_vip.isvip == True
+      //  span.icon.xunlei-vip-yes(title="已绑定迅雷会员")
+      //else
+      //  a.xunlei-binding-modal(href="#xunlei-binding-modal")
+      //    span.icon.xunlei-vip-no(title="未绑定迅雷会员")
 
     .card-panel
       .total-asset-money-card
@@ -110,14 +110,14 @@ block main
                 span.big_number {{margin_withdrawing|money_format}}
               p.desc 提现中冻结金额
 
-        .space-vertical-s
-        .row
-          .xunlei-tip-container
-            span.p2p-xunlei-icon
-            if user.is_authenticated and xunlei_vip.isvip == True
-              您已是绑定迅雷会员，投资即可获额外收益。
-            else
-              只要在满标之前<a href="#xunlei-binding-modal" class="blue xunlei-binding-modal">绑定迅雷会员</a>，即可获额外收益。
+        //.space-vertical-s
+        //.row
+        //  .xunlei-tip-container
+        //    span.p2p-xunlei-icon
+        //    if user.is_authenticated and xunlei_vip.isvip == True
+        //      您已是绑定迅雷会员，投资即可获额外收益。
+        //    else
+        //      只要在满标之前<a href="#xunlei-binding-modal" class="blue xunlei-binding-modal">绑定迅雷会员</a>，即可获额外收益。
         .space-vertical-s
 
         table.table
@@ -144,8 +144,8 @@ block main
                   td {{row.equity.created_at | date:"Y-m-d H:i:s"}}
                   td
                     p
-                      if row.equity.product.activity
-                        span.p2p-xunlei-icon
+                      //if row.equity.product.activity
+                      //  span.p2p-xunlei-icon
                       a(href="/p2p/detail/{{row.equity.product.id}}/") {{row.equity.product.short_name}}
                       //<a href="/p2p/detail/{{row.equity.product.id}}/">{{row.equity.product.short_name}}</a>
                     p 年化收益：{{row.equity.product.expected_earning_rate}}%

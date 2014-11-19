@@ -16,7 +16,7 @@ from wanglibao_pay.util import get_client_ip
 from wanglibao_pay.views import PayResult
 import xml.etree.ElementTree as ET
 from wanglibao_sms import messages
-from wanglibao_sms.tasks import send_messages
+#from wanglibao_sms.tasks import send_messages
 
 logger = logging.getLogger(__name__)
 
@@ -250,10 +250,10 @@ class HuifuPay(Pay):
                         pay_info.status = PayInfo.SUCCESS
                         result = PayResult.DEPOSIT_SUCCESS
                         phone = pay_info.user.wanglibaouserprofile.phone
-                        send_messages.apply_async(kwargs={
-                            "phones": [phone],
-                            "messages": [messages.deposit_succeed(amount)]
-                        })
+                        #send_messages.apply_async(kwargs={
+                        #    "phones": [phone],
+                        #    "messages": [messages.deposit_succeed(amount)]
+                        #})
                     else:
                         pay_info.status = PayInfo.FAIL
                         result = PayResult.DEPOSIT_FAIL
