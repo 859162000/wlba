@@ -60,10 +60,10 @@ class P2PTrader(object):
                                                             description=u'首次购买迅雷活动P2P产品赠送一个月迅雷会员')
                                 title,content = messages.msg_first_licai(reward.content)
                                 inside_message.send_one.apply_async(kwargs={
-                                    "user_id":self.user.id,
-                                    "title":title,
-                                    "content":content,
-                                    "mtype":"activity"
+                                    "user_id": self.user.id,
+                                    "title": title,
+                                    "content": content,
+                                    "mtype": "activity"
                                 })
                 except:
                     pass
@@ -78,12 +78,12 @@ class P2PTrader(object):
                             reward.save()
                             RewardRecord.objects.create(user=self.user, reward=reward,
                                                         description=u'首次购买快盘活动P2P产品赠送%s快盘容量' % reward.description)
-                            title,content = messages.msg_first_kuaipan(reward.description, reward.content)
+                            title, content = messages.msg_first_kuaipan(reward.description, reward.content)
                             inside_message.send_one.apply_async(kwargs={
-                                "user_id":self.user.id,
-                                "title":title,
-                                "content":content,
-                                "mtype":"activity"
+                                "user_id": self.user.id,
+                                "title": title,
+                                "content": content,
+                                "mtype": "activity"
                             })
                 except:
                     pass
