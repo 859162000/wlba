@@ -109,7 +109,7 @@ def msg_first_licai(activation):
 
 #金山快盘
 def msg_first_kuaipan(size, activation):
-    title = u"活动期首次理财成功"
+    title = u"活动期理财成功"
     content = u"感谢您在活动期间完成首次理财。<br/>网利宝赠送您%s快盘网盘，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/><a href='http://www.kuaipan.cn/n/user/records/lottery' target='_blank'>立即兑换</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % (size, activation)
     return title, content
 
