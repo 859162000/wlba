@@ -1,5 +1,6 @@
 # encoding:utf-8
 
+import re
 import json
 import logging
 from django.contrib.auth.models import User
@@ -68,7 +69,7 @@ class SendRegisterValidationCodeView(APIView):
     The phone validate view which accept a post request and send a validate code to the phone
     """
     permission_classes = ()
-    #throttle_classes = (UserRateThrottle,)
+    throttle_classes = (UserRateThrottle,)
 
     def post(self, request, phone, format=None):
         phone_number = phone.strip()
@@ -299,9 +300,12 @@ class SendVoiceCodeAPIView(APIView):
         if not phone_number or not phone_number.isdigit():
             return Response({"ret_code":30111, "message": u"信息输入不完整"})
 
-        phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
-        if phone_check:
-            return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
+        if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
+            return Response({"ret_code":30112, "message": u"手机号输入有误"})
+
+        #phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
+        #if phone_check:
+        #    return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
 
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
         if phone_validate_code_item:

@@ -19,6 +19,7 @@ def collect_unvalid_user():
     users = User.objects.filter(wanglibaouserprofile__id_is_valid=False, date_joined__gte=joined_time)
     users_generate = (user for user in users if not RewardRecord.objects.filter(user=user,
                                                                                 description=u'新用户注册赠送三天迅雷会员'))
+
     return users_generate
 
 def collect_valided_user():
@@ -28,6 +29,7 @@ def collect_valided_user():
     users = User.objects.filter(wanglibaouserprofile__id_is_valid=True, date_joined__gte=joined_time)
     users_generate = (user for user in users if not RewardRecord.objects.filter(user=user,
                                                                                 description=u'新用户注册赠送三天迅雷会员'))
+
     return users_generate
 
 def send_message_about_id_valid():
@@ -40,7 +42,7 @@ def send_message_about_id_valid():
             "user_id": user.id,
             "title": title,
             "content": content,
-            "mtype":"activityintro"
+            "mtype": "activityintro"
         })
 
 def send_message_about_code():
@@ -66,5 +68,5 @@ def send_message_about_code():
                         "mtype": "activity"
                     })
         except Exception, e:
-            print(e)
+            continue
 

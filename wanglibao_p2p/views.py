@@ -458,6 +458,50 @@ class FinancesAPI(APIView):
         return HttpResponse(renderers.JSONRenderer().render(p2p_list, 'application/json'))
 
 
+class P2PListAPI(APIView):
+    permission_classes = (IsAdminUserOrReadOnly, )
+
+    def get(self, request):
+
+        date = request.GET.get('date', '')
+        if not date:
+            return HttpResponse(renderers.JSONRenderer().render({'message': u'错误的date'}, 'application/json'))
+
+        date = [int(i) for i in date.split('-')]
+        start_time = timezone.datetime(*date)
+
+        p2pproducts = P2PProduct.objects.filter(hide=False)\
+            .filter(status=u'正在招标').filter(publish_time__gte=start_time)
+
+        p2p_list = []
+        for p2p in p2pproducts:
+
+            amount = Decimal.from_float(p2p.total_amount).quantize(Decimal('0.00'))
+            percent = p2p.ordered_amount / amount * 100
+            fld_lend_progress = percent.quantize(Decimal('0.0'), 'ROUND_DOWN')
+
+            p2pequity_count = p2p.equities.all().count()
+
+            temp_p2p = {
+                "fld_proname": p2p.name,
+                "fld_name": u'网利宝',
+                "fld_finstarttime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S"),
+                "fld_finendtime": timezone.localtime(p2p.end_time).strftime("%Y-%m-%d %H:%M:%S"),
+                "fld_total_finance": p2p.total_amount,
+                "fld_lend_period": p2p.period * 30,
+                "fld_interest_year": p2p.expected_earning_rate - p2p.excess_earning_rate,
+                "fld_guarantee_org": p2p.warrant_company.name,
+                "fld_mininvest": 100.0,
+                "fld_awards": 1 if p2p.activity else 0,
+                "fld_lend_progress": fld_lend_progress,
+                "fld_invest_number": p2pequity_count,
+                "fld_finance_left": p2p.total_amount - p2p.ordered_amount
+            }
+            p2p_list.append(temp_p2p)
+
+        return HttpResponse(renderers.JSONRenderer().render(p2p_list, 'application/json'))
+
+
 class RecordView(APIView):
     permission_classes = ()
 
