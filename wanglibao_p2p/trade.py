@@ -91,26 +91,6 @@ class P2PTrader(object):
                 except:
                     pass
 
-            if u"快盘" in activity.name:
-                try:
-                    with transaction.atomic():
-                        if Reward.objects.filter(is_used=False, type=u'快盘随机容量', end_time__gte=now).exists():
-                            reward = Reward.objects.select_for_update()\
-                                .filter(is_used=False, type=u'快盘随机容量').first()
-                            reward.is_used = True
-                            reward.save()
-                            RewardRecord.objects.create(user=self.user, reward=reward,
-                                                        description=u'首次购买快盘活动P2P产品赠送%s快盘容量' % reward.description)
-                            title, content = messages.msg_first_kuaipan(reward.description, reward.content)
-                            inside_message.send_one.apply_async(kwargs={
-                                "user_id": self.user.id,
-                                "title": title,
-                                "content": content,
-                                "mtype": "activity"
-                            })
-                except:
-                    pass
-
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
         #phone_verified 渠道客户判断
         if introduced_by and introduced_by.bought_at is None:
