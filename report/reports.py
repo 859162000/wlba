@@ -7,12 +7,14 @@ import cStringIO
 import logging
 from django.core.files.base import ContentFile
 from django.core.files.storage import DefaultStorage
+from marketing.models import IntroducedBy
 from report.crypto import ReportCrypto
 from report.models import Report
 from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PRecord, Earning
 from wanglibao_pay.models import PayInfo
 from wanglibao_margin.models import MarginRecord
 from django.utils import timezone
+from django.contrib.auth.models import User
 from wanglibao_pay.util import get_a_uuid
 
 
@@ -457,6 +459,64 @@ class EearningReportGenerator(ReportGeneratorBase):
                 # timezone.localtime(earning.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
             ])
         return output.getvalue()
+
+
+class UserReportGenerator(ReportGeneratorBase):
+    prefix = 'user'
+    reportname_format = u'用户记录 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'用户姓名', u'用户手机号', u'账户余额', u'加入日期',u'邀请人姓名', u'邀请人电话'])
+
+        users = User.objects.filter(date_joined__gte=start_time, date_joined__lt=end_time)
+
+        for index, user in enumerate(users):
+            introduced_by = IntroducedBy.objects.filter(user=user).first()
+            introduced_by_name = ""
+            introduced_by_phone = ""
+            name = user.username
+            phone = ""
+            margin = 0
+            if introduced_by:
+                introduced_by_name = introduced_by.introduced_by.wanglibaouserprofile.name
+                introduced_by_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
+            if hasattr(user, "wanglibaouserprofile"):
+                name = user.wanglibaouserprofile.name
+                phone = user.wanglibaouserprofile.phone
+            if hasattr(user, "margin"):
+                margin = user.margin.margin
+            writer.writerow([
+                str(user.id),
+                name,
+                phone,
+                str(margin),
+                timezone.localtime(user.date_joined).strftime("%Y-%m-%d %H:%M:%S"),
+                introduced_by_name,
+                introduced_by_phone,
+            ])
+        return output.getvalue()
+
+    @classmethod
+    def generate_report(cls, start_time, end_time=None):
+        if end_time is None:
+            end_time = start_time + timedelta(days=1)
+
+        assert(isinstance(start_time, datetime))
+        assert(isinstance(start_time, datetime))
+
+        path = cls.get_file_path(start_time, end_time)
+
+        content = cls.generate_report_content(start_time, end_time)
+
+        path = storage.save(path, ContentFile(content))
+        report = Report(name=cls.get_report_name(start_time, end_time))
+        report.file = path
+        report.content = content
+        report.save()
+        return report
 
 class ReportGenerator(object):
 
