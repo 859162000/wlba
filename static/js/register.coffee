@@ -70,6 +70,8 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
           clearInterval(intervalId)
           $(element).text('重新获取')
           $(element).removeAttr 'disabled'
+          $(element).addClass 'button-red'
+          $(element).removeClass 'button-gray'
           #author:hetao;datetime:2014.11.19;description: 增加语音验证链接（计时完成后）
           $('.voice').removeClass('hidden')
           $('.voice-validate').removeAttr 'disabled'
@@ -185,7 +187,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
         timerFunction = ()->
           if count >= 1
             count--
-            element.text('语音验证码已经发送，请注意接听。（' + count + '）')
+            element.text('语音验证码已经发送，请注意接听（' + count + '）')
           else
             clearInterval(intervalId)
             element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code" class="voice-validate">语音验证</a>')

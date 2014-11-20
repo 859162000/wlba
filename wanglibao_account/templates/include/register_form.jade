@@ -9,7 +9,7 @@ form#register-modal-form.login-form(method='post', action='/accounts/register/aj
     .form-row-error
   .form-row.voice.hidden
     .span12-omega
-      没有收到验证码？请尝试<a href="/api/ytx/send_voice_code" class="voice-validate">语音验证</a>
+      没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
   #validate-code-container.form-row
     input#id_validate_code(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
     .form-row-error
