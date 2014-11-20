@@ -330,6 +330,41 @@ class SendVoiceCodeAPIView(APIView):
         logger.info("voice_code: %s" % cont)
         return Response({"ret_code":0, "message":"ok"})
 
+class SendVoiceCodeTwoAPIView(APIView):
+    permission_classes = ()
+    throttle_classes = (UserRateThrottle,)
+
+    def post(self, request):
+        phone_number = request.DATA.get("phone", "").strip()
+        if not phone_number or not phone_number.isdigit():
+            return Response({"ret_code":30121, "message": u"信息输入不完整"})
+
+        if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
+            return Response({"ret_code":30122, "message": u"手机号输入有误"})
+
+        user = User.objects.filter(wanglibaouserprofile__phone=phone_number).first()
+        if not user:
+            return Response({"ret_code":30123, "message": u"手机号不存在"})
+
+        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        if phone_validate_code_item:
+            phone_validate_code_item.code_send_count += 1
+            phone_validate_code_item.save()
+        else:
+            now = timezone.now()
+            phone_validate_code_item = PhoneValidateCode()
+            validate_code = generate_validate_code()
+            phone_validate_code_item.validate_code = validate_code
+            phone_validate_code_item.phone = phone_number
+            phone_validate_code_item.last_send_time = now
+            phone_validate_code_item.code_send_count = 1
+            phone_validate_code_item.is_validated = False
+            phone_validate_code_item.save()
+
+        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
+        logger.info("voice_code2: %s" % cont)
+        return Response({"ret_code":0, "message":"ok"})
+
 #云通讯语音验证码回调
 class YTXVoiceCallbackAPIView(APIView):
     permission_classes = ()
