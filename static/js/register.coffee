@@ -58,7 +58,10 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       intervalId
       count = 60
 
+      $(element).removeClass 'button-red'
+      $(element).addClass 'button-gray'
       $(element).attr 'disabled', 'disabled'
+      $('.voice-validate').attr 'disabled', 'disabled'
       timerFunction = ()->
         if count >= 1
           count--
@@ -69,6 +72,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
           $(element).removeAttr 'disabled'
           #author:hetao;datetime:2014.11.19;description: 增加语音验证链接（计时完成后）
           $('.voice').removeClass('hidden')
+          $('.voice-validate').removeAttr 'disabled'
 
       # Fire now and future
       timerFunction()
@@ -154,7 +158,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       $("#validate-code-container").show()
       return
 
-    if($(this).attr('disable') && $(this).attr('disable') == 'disable')
+    if($(this).attr('disabled') && $(this).attr('disabled') == 'disabled')
       return
 
     element = $('.voice .span12-omega')
@@ -181,7 +185,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
         timerFunction = ()->
           if count >= 1
             count--
-            element.text('请注意接听010-12345的来电（' + count + '）')
+            element.text('语音验证码已经发送，请注意接听。（' + count + '）')
           else
             clearInterval(intervalId)
             element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code" class="voice-validate">语音验证</a>')

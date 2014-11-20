@@ -209,6 +209,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         $(element).attr 'disabled', 'disabled'
         $(element).removeClass 'button-red'
         $(element).addClass 'button-gray'
+        $('.voice-validate').attr 'disabled', 'disabled'
 
         timerFunction = ()->
           if count >= 1
@@ -220,6 +221,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
             $(element).removeAttr 'disabled'
             $(element).addClass 'button-red'
             $(element).removeClass 'button-gray'
+            $('.voice').removeClass('hidden')
+            $('.voice-validate').removeAttr 'disabled'
 
         # Fire now and future
         timerFunction()
@@ -356,3 +359,55 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
 #          selector: "top-qq" #WPA 被放置的元素
 #        }
 #      ]
+  #author: hetao; time: 2014.11.20; description: 语音验证事件绑定
+  $(".voice").on 'click', '.voice-validate', (e)->
+    e.preventDefault()
+    isMobile = checkMobile($("#reg_identifier").val().trim())
+    if !isMobile
+      $("#id_type").val "phone"
+      $("#validate-code-container").show()
+      return
+
+    if($(this).attr('disabled') && $(this).attr('disabled') == 'disabled')
+      return
+
+    element = $('.voice .span12-omega')
+
+    url = $(this).attr('href')
+    $.ajax
+      url: url
+      type: "POST"
+      data: {
+        phone: $("#reg_identifier").val().trim()
+      }
+    .success (json)->
+      if(json.ret_code == 0)
+        #TODO
+
+        intervalId
+        count = 60
+        button = $("#button-get-validate-modal")
+
+        button.attr 'disabled', 'disabled'
+        button.addClass 'button-gray'
+
+        $('.voice').addClass 'tip'
+        timerFunction = ()->
+          if count >= 1
+            count--
+            element.text('语音验证码已经发送，请注意接听。（' + count + '）')
+          else
+            clearInterval(intervalId)
+            element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code" class="voice-validate">语音验证</a>')
+            element.removeAttr 'disabled'
+            button.removeAttr 'disabled'
+            button.addClass 'button-red'
+            button.removeClass 'button-gray'
+            $('.voice').removeClass 'tip'
+
+        # Fire now and future
+        timerFunction()
+        intervalId = setInterval timerFunction, 1000
+      else
+        #TODO
+        element.html('系统繁忙请尝试短信验证码')
