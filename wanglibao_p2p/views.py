@@ -489,7 +489,7 @@ class P2PListAPI(APIView):
                 "fld_finendtime": timezone.localtime(p2p.end_time).strftime("%Y-%m-%d %H:%M:%S"),
                 "fld_total_finance": p2p.total_amount,
                 "fld_lend_period": p2p.period * 30,
-                "fld_interest_year": p2p.expected_earning_rate - p2p.excess_earning_rate,
+                "fld_interest_year": p2p.expected_earning_rate,
                 "fld_guarantee_org": p2p.warrant_company.name,
                 "fld_mininvest": 100.0,
                 "fld_awards": 1 if p2p.activity else 0,
