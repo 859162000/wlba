@@ -149,33 +149,6 @@ class RegisterAPIView(APIView):
             "mtype":"activityintro"
         })
 
-        """
-        now = timezone.now()
-        with transaction.atomic():
-            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-                try:
-                    reward = Reward.objects.select_for_update()\
-                        .filter(is_used=False, type=u'三天迅雷会员').first()
-                    reward.is_used = True
-                    reward.save()
-                    RewardRecord.objects.create(user=user, reward=reward,
-                                                description=u'新用户注册赠送三天迅雷会员')
-                    send_messages.apply_async(kwargs={
-                            "phones": [identifier],
-                            "messages": [messages.reg_reward_message(reward.content)]
-                    })
-                    title, content = messages.msg_register_authok(reward.content)
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id":user.id,
-                        "title":title,
-                        "content":content,
-                        "mtype":"activity"
-                    })
-                except Exception,e:
-                    import traceback
-                    print(traceback.format_exc())
-		"""
-
         return Response({"ret_code":0, "message":"注册成功"})
 
 #wechat register
@@ -244,20 +217,18 @@ class ClientUpdateAPIView(APIView):
         except Exception, e:
             return Response({"ret_code":30103, "message":"This is no update"})
 
-"""
 class PushTestView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        push_user_id = request.GET.get("push_user_id", "761084096993596699")
-        push_channel_id = request.GET.get("push_channel_id", "5381965014230748586")
+        push_user_id = request.GET.get("push_user_id", "921913645184221981")
+        push_channel_id = request.GET.get("push_channel_id", "4922700431463139292")
         from wanglibao_sms import bae_channel
         channel = bae_channel.BaeChannel()
         message = {"message":"push Test"}
         msg_key = "wanglibao_staging"
         res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
         return Response({"ret_code":0, "message":cont})
-"""
 
 class IdValidateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
