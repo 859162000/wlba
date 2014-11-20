@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 from marketing.models import NewsAndReport, SiteData
 from wanglibao_p2p.models import P2PProduct, P2PRecord
-from wanglibao_banner.models import Banner
+from wanglibao_banner.models import Banner, Partner
 from itertools import chain
 from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
 
@@ -38,6 +38,7 @@ class IndexView(TemplateView):
         banners = Banner.objects.filter(device=Banner.PC_2)
         news_and_reports = NewsAndReport.objects.all().order_by("-score")[:5]
         site_data = SiteData.objects.all().first()
+        partners = Partner.objects.filter(type='partner')
 
         return {
             "p2p_products": p2p_products,
@@ -47,8 +48,21 @@ class IndexView(TemplateView):
             'site_data': site_data,
             'getmore': getmore,
             'announcements': AnnouncementHomepage,
-            'announcements_p2p': AnnouncementP2PNew
+            'announcements_p2p': AnnouncementP2PNew,
+            'partners': partners
         }
+
+
+class PartnerView(TemplateView):
+    template_name = 'partner.jade'
+
+    def get_context_data(self, **kwargs):
+        partners = Partner.objects.filter(type='partner')
+
+        return {
+            'partners': partners
+        }
+
 
 
 class SecurityView(TemplateView):
