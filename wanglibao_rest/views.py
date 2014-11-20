@@ -1,5 +1,6 @@
 # encoding:utf-8
 
+import re
 import json
 import logging
 from django.contrib.auth.models import User
@@ -68,7 +69,7 @@ class SendRegisterValidationCodeView(APIView):
     The phone validate view which accept a post request and send a validate code to the phone
     """
     permission_classes = ()
-    #throttle_classes = (UserRateThrottle,)
+    throttle_classes = (UserRateThrottle,)
 
     def post(self, request, phone, format=None):
         phone_number = phone.strip()
@@ -217,20 +218,18 @@ class ClientUpdateAPIView(APIView):
         except Exception, e:
             return Response({"ret_code":30103, "message":"This is no update"})
 
-"""
 class PushTestView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        push_user_id = request.GET.get("push_user_id", "761084096993596699")
-        push_channel_id = request.GET.get("push_channel_id", "5381965014230748586")
+        push_user_id = request.GET.get("push_user_id", "921913645184221981")
+        push_channel_id = request.GET.get("push_channel_id", "4922700431463139292")
         from wanglibao_sms import bae_channel
         channel = bae_channel.BaeChannel()
         message = {"message":"push Test"}
         msg_key = "wanglibao_staging"
         res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
         return Response({"ret_code":0, "message":cont})
-"""
 
 class IdValidateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -301,9 +300,12 @@ class SendVoiceCodeAPIView(APIView):
         if not phone_number or not phone_number.isdigit():
             return Response({"ret_code":30111, "message": u"信息输入不完整"})
 
-        phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
-        if phone_check:
-            return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
+        if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
+            return Response({"ret_code":30112, "message": u"手机号输入有误"})
+
+        #phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
+        #if phone_check:
+        #    return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
 
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
         if phone_validate_code_item:
@@ -326,6 +328,41 @@ class SendVoiceCodeAPIView(APIView):
 
         status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
         logger.info("voice_code: %s" % cont)
+        return Response({"ret_code":0, "message":"ok"})
+
+class SendVoiceCodeTwoAPIView(APIView):
+    permission_classes = ()
+    throttle_classes = (UserRateThrottle,)
+
+    def post(self, request):
+        phone_number = request.DATA.get("phone", "").strip()
+        if not phone_number or not phone_number.isdigit():
+            return Response({"ret_code":30121, "message": u"信息输入不完整"})
+
+        if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
+            return Response({"ret_code":30122, "message": u"手机号输入有误"})
+
+        user = User.objects.filter(wanglibaouserprofile__phone=phone_number).first()
+        if not user:
+            return Response({"ret_code":30123, "message": u"手机号不存在"})
+
+        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        if phone_validate_code_item:
+            phone_validate_code_item.code_send_count += 1
+            phone_validate_code_item.save()
+        else:
+            now = timezone.now()
+            phone_validate_code_item = PhoneValidateCode()
+            validate_code = generate_validate_code()
+            phone_validate_code_item.validate_code = validate_code
+            phone_validate_code_item.phone = phone_number
+            phone_validate_code_item.last_send_time = now
+            phone_validate_code_item.code_send_count = 1
+            phone_validate_code_item.is_validated = False
+            phone_validate_code_item.save()
+
+        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
+        logger.info("voice_code2: %s" % cont)
         return Response({"ret_code":0, "message":"ok"})
 
 #云通讯语音验证码回调
