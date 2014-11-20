@@ -76,17 +76,67 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
     count = 60
 
     $(element).attr 'disabled', 'disabled'
+    $(element).addClass('disabled')
+    $('.voice-validate').attr 'disabled', 'disabled'
     timerFunction = ()->
       if count >= 1
         count--
         $(element).text('重新获取(' + count + ')')
-        $(element).addClass('disabled')
       else
         clearInterval(intervalId)
         $(element).text('重新获取')
         $(element).removeAttr 'disabled'
         $(element).removeClass('disabled')
+        $('.voice').removeClass('hidden')
+        $('.voice-validate').removeAttr 'disabled'
 
    # Fire now and future
     timerFunction()
     intervalId = setInterval timerFunction, 1000
+
+  $(".voice").on 'click', '.voice-validate', (e)->
+    e.preventDefault()
+
+    if($(this).attr('disabled') && $(this).attr('disabled') == 'disabled')
+      return
+
+    element = $('.voice .span12-omega')
+
+    url = $(this).attr('href')
+    $.ajax
+      url: url
+      type: "POST"
+      data: {
+        phone: $("#button-get-validate-code").attr('data-phone').trim()
+      }
+    .success (json)->
+      if(json.ret_code == 0)
+        #TODO
+
+        intervalId
+        count = 60
+        button = $("#button-get-validate-code")
+
+        button.attr 'disabled', 'disabled'
+        button.addClass 'button-gray'
+
+        $('.voice').addClass 'tip'
+        timerFunction = ()->
+          if count >= 1
+            count--
+            element.text('语音验证码已经发送，请注意接听。（' + count + '）')
+          else
+            clearInterval(intervalId)
+            element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code" class="voice-validate">语音验证</a>')
+            element.removeAttr 'disabled'
+            button.removeAttr 'disabled'
+            button.addClass 'button-red'
+            button.removeClass 'button-gray'
+            $('.voice').removeClass 'tip'
+
+        # Fire now and future
+        timerFunction()
+        intervalId = setInterval timerFunction, 1000
+      else
+        #TODO
+        element.html('系统繁忙请尝试短信验证码')
