@@ -90,7 +90,6 @@ class P2PTrader(object):
                 except:
                     pass
 
-<<<<<<< HEAD
             if u"快盘" in activity.name:
                 try:
                     with transaction.atomic():
@@ -110,8 +109,6 @@ class P2PTrader(object):
                             })
                 except:
                     pass
-=======
->>>>>>> 24509fc92687e607a65ab0c8ff35b49b27258ad9
 
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
         #phone_verified 渠道客户判断
