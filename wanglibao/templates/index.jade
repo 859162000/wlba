@@ -272,40 +272,10 @@ html
         span.icon.icon-partner-title
         |合作伙伴
       ul.partner-logo
+        for partner in partners
           li
-            a.partner-idg(href="http://www.idgvc.com/",target="_blank", title="IDG资本")
-          li
-            a.partner-zdsd(href="http://www.zdcredit.com/",target="_blank",title="证大速贷")
-          li
-            a.partner-baidu(href="http://www.baidu.com/",target="_blank",title="百度")
-          li
-            a.partner-sina(href="http://www.sina.com.cn/",target="_blank",title="新浪")
-          li
-            a.partner-xunlei(href="http://www.kankan.com/",target="_blank",title="迅雷")
-          li
-            a.partner-minsheng(href="http://www.cmbc.com.cn/",target="_blank",title="中国民生银行")
-          li
-            a.partner-huifu(href="http://www.chinapnr.com/",target="_blank",title="汇付天下")
-          li
-            a.partner-ump(href="http://www.umpay.com/",target="_blank",title="联动优势")
-          li
-            a.partner-pingan(href="http://www.pingan.com/",target="_blank",title="中国平安")
-          li
-            a.partner-dongyuan(href="http://www.easternspringcapital.com/",target="_blank",title="东源")
-          li
-            a.partner-guoxin(href="http://www.szguoxin.com/",target="_blank",title="苏州国信集团")
-          li
-            a.partner-shumi(href="http://www.fund123.cn/",target="_blank",title="数米基金网")
-          li
-            a.partner-lianhe(href="http://www.lhcis.com/",target="_blank",title="联合信用管理有限公司")
-          li
-            a.partner-longan(href="http://www.longanlaw.com/",target="_blank",title="隆安律师事务所")
-          li
-            a.partner-wdzj(href="http://www.wangdaizhijia.com/",target="_blank",title="网袋之家")
-          li
-            a.partner-gqwy(href="http://www.gqwy666.com/",target="_blank",title="国强伟业")
-          li
-            a.partner-wdty(href="http://www.p2peye.com/",target="_blank",title="网贷天眼")
+            a(href="{{partner.link}}",target="_blank", title="{{partner.name}}")
+              img(src="/media/{{partner.image}}", alt="{{partner.name}}")
 
     - with 1 as no_margin
     include include/footer

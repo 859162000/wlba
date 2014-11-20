@@ -4,7 +4,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf import settings
 from django.views.generic import TemplateView, RedirectView
-from wanglibao.views import IndexView, SecurityView
+from wanglibao.views import IndexView, SecurityView, PartnerView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
@@ -53,7 +53,7 @@ urlpatterns = patterns(
     url(r'^hiring/', TemplateView.as_view(template_name="hiring.jade")),
     url(r'^about/', TemplateView.as_view(template_name="about.jade")),
     url(r'^team/', TemplateView.as_view(template_name="team.jade")),
-    url(r'^partner/', TemplateView.as_view(template_name="partner.jade")),
+    url(r'^partner/', PartnerView.as_view(), name="partner"),
     url(r'^milestone/', TemplateView.as_view(template_name="milestone.jade")),
     url(r'^responsibility/', TemplateView.as_view(template_name="responsibility.jade")),
     url(r'^contact_us/', TemplateView.as_view(template_name="contact_us.jade")),
