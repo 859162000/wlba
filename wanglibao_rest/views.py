@@ -68,7 +68,7 @@ class SendRegisterValidationCodeView(APIView):
     The phone validate view which accept a post request and send a validate code to the phone
     """
     permission_classes = ()
-    #throttle_classes = (UserRateThrottle,)
+    throttle_classes = (UserRateThrottle,)
 
     def post(self, request, phone, format=None):
         phone_number = phone.strip()
