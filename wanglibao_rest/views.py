@@ -34,7 +34,7 @@ from wanglibao_sms import messages, backends
 from django.utils import timezone
 from wanglibao_account import third_login, message as inside_message
 from misc.models import Misc
-
+from wanglibao_account.forms import IdVerificationForm
 
 logger = logging.getLogger(__name__)
 
@@ -371,70 +371,75 @@ class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        user = self.request.user
-        name = request.DATA.get("name", "")
-        id_number = request.DATA.get("id_number", "")
 
-        verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
+        form = IdVerificationForm(request, request.POST)
+        if form.is_valid():
+            user = self.request.user
+            name = request.DATA.get("name", "")
+            id_number = request.DATA.get("id_number", "")
 
-        if verify_counter.count >= 3:
-            return Response({
-                                "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066",
-                                "error_number": ErrorNumber.try_too_many_times
-                            }, status=400)
+            verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
+
+            if verify_counter.count >= 3:
+                return Response({
+                                    "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066",
+                                    "error_number": ErrorNumber.try_too_many_times
+                                }, status=400)
 
 
-        id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
-        if id_verify_count >= 1:
-            return Response({
+            id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
+            if id_verify_count >= 1:
+                return Response({
                                 "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066",
                                 "error_number": ErrorNumber.id_verify_times_error
                             }, status=400)
 
+            verify_record, error = verify_id(name, id_number)
 
-        verify_record, error = verify_id(name, id_number)
+            verify_counter.count = F('count') + 1
+            verify_counter.save()
 
-        verify_counter.count = F('count') + 1
-        verify_counter.save()
+            if error or not verify_record.is_valid:
+                return Response({
+                                    "message": u"验证失败，拨打客服电话进行人工验证",
+                                    "error_number": ErrorNumber.unknown_error
+                                }, status=400)
 
-        if error or not verify_record.is_valid:
+            user.wanglibaouserprofile.id_number = id_number
+            user.wanglibaouserprofile.name = name
+            user.wanglibaouserprofile.id_is_valid = True
+            user.wanglibaouserprofile.save()
+
+            now = timezone.now()
+            try:
+                with transaction.atomic():
+                    if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+
+                        reward = Reward.objects.select_for_update()\
+                            .filter(is_used=False, type=u'三天迅雷会员').first()
+                        reward.is_used = True
+                        reward.save()
+                        RewardRecord.objects.create(user=user, reward=reward,
+                                                    description=u'新用户注册赠送三天迅雷会员')
+
+                        title,content = messages.msg_validate_ok(reward.content)
+                        inside_message.send_one.apply_async(kwargs={
+                            "user_id":user.id,
+                            "title":title,
+                            "content":content,
+                            "mtype":"activity"
+                        })
+            except Exception, e:
+                print(e)
+
             return Response({
-                                "message": u"验证失败，拨打客服电话进行人工验证",
-                                "error_number": ErrorNumber.unknown_error
-                            }, status=400)
-
-        user.wanglibaouserprofile.id_number = id_number
-        user.wanglibaouserprofile.name = name
-        user.wanglibaouserprofile.id_is_valid = True
-        user.wanglibaouserprofile.save()
-
-
-        now = timezone.now()
-        try:
-            with transaction.atomic():
-                if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-
-                    reward = Reward.objects.select_for_update()\
-                        .filter(is_used=False, type=u'三天迅雷会员').first()
-                    reward.is_used = True
-                    reward.save()
-                    RewardRecord.objects.create(user=user, reward=reward,
-                                                description=u'新用户注册赠送三天迅雷会员')
-
-                    title,content = messages.msg_validate_ok(reward.content)
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id":user.id,
-                        "title":title,
-                        "content":content,
-                        "mtype":"activity"
-                    })
-        except Exception, e:
-            print(e)
-
-        return Response({
-                            "validate": True
-                        }, status=200)
-
+                                "validate": True
+                            }, status=200)
+        else:
+            return Response({
+                        "message": u"验证码错误",
+                        "error_number": ErrorNumber.unknown_error
+                    }, status=400)
 
 class AdminIdValidate(APIView):
     permission_classes = (IsAuthenticated,)

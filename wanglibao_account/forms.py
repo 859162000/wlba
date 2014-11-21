@@ -153,7 +153,7 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
     def get_user(self):
         return self.user_cache
 
-#class IdValidateForm(forms.Form):
+
 
 class ResetPasswordGetIdentifierForm(forms.Form):
     identifier = forms.CharField(max_length=254)
@@ -162,30 +162,9 @@ class ResetPasswordGetIdentifierForm(forms.Form):
 class IdVerificationForm(forms.Form):
     name = forms.CharField(max_length=32, label=u'姓名')
     id_number = forms.CharField(max_length=128, label=u'身份证号')
+    captcha = CaptchaField()
 
     def __init__(self, user=None, *args, **kwargs):
         super(IdVerificationForm, self).__init__(*args, **kwargs)
         self._user = user
 
-    def clean(self):
-        cleaned_data = super(IdVerificationForm, self).clean()
-
-        user = self._user
-
-        verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
-
-        if verify_counter.count >= 3:
-            raise ValidationError(u'验证次数超过三次，请联系客服进行人工验证')
-
-        name = cleaned_data.get('name')
-        id_number = cleaned_data.get('id_number')
-
-        verify_record, error = verify_id(name, id_number)
-
-        verify_counter.count = F('count') + 1
-        verify_counter.save()
-
-        if error or not verify_record.is_valid:
-            raise ValidationError(u'验证失败，拨打客服电话进行人工验证')
-
-        return cleaned_data
