@@ -21,6 +21,10 @@
     }, '请输入有效身份证');
     $('#validate_id_form').validate({
       rules: {
+        captcha_1: {
+          required: true,
+          minlength: 4
+        },
         name: {
           required: true
         },
@@ -32,6 +36,10 @@
       messages: {
         name: {
           required: '请输入姓名'
+        },
+        captcha_1: {
+          required: '请输入验证码',
+          minlength: $.format("验证码要输入4位")
         },
         id_number: {
           required: '请输入身份证',
