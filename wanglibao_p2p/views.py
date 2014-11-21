@@ -463,10 +463,14 @@ class P2PListAPI(APIView):
     def get(self, request):
 
         date = request.GET.get('date', '')
-        if not date:
-            return HttpResponse(renderers.JSONRenderer().render({'message': u'错误的date'}, 'application/json'))
+        if date:
+            try:
+                date = [int(i) for i in date.split('-')]
+            except:
+                return HttpResponse(renderers.JSONRenderer().render({'message': u'错误的date'}, 'application/json'))
+        else:
+            return HttpResponse(renderers.JSONRenderer().render({'message': u'date的必传'}, 'application/json'))
 
-        date = [int(i) for i in date.split('-')]
         start_time = timezone.datetime(*date)
 
         p2pproducts = P2PProduct.objects.filter(hide=False)\
