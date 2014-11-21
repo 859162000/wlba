@@ -32,6 +32,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, PushTestView,
                             SendVoiceCodeTwoAPIView)
 
+
 router = DefaultRouter()
 
 router.register(r'trusts', TrustViewSet)
