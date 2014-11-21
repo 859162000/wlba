@@ -39,6 +39,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
     submitHandler: (form)->
       name = $('#id_name').val()
       id_number = $('#id_id_number').val()
+      id_captcha_0 = $('#id_captcha_0').val()
+      id_captcha_1 = $('#id_captcha_1').val()
       if $("#validate_id_button").hasClass "disabled"
         return;
       $("#validate_id_button").addClass('disabled')
@@ -47,6 +49,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
         data: {
           name: name
           id_number: id_number
+          id_captcha_0: id_captcha_0
+          id_captcha_1: id_captcha_1
         }
         type: 'post'
       }

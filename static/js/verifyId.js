@@ -42,9 +42,11 @@
         return error.appendTo($(element).closest('.form-row').find('.form-row-error'));
       },
       submitHandler: function(form) {
-        var id_number, name;
+        var id_captcha_0, id_captcha_1, id_number, name;
         name = $('#id_name').val();
         id_number = $('#id_id_number').val();
+        id_captcha_0 = $('#id_captcha_0').val();
+        id_captcha_1 = $('#id_captcha_1').val();
         if ($("#validate_id_button").hasClass("disabled")) {
           return;
         }
@@ -53,7 +55,9 @@
           url: '/api/id_validate/',
           data: {
             name: name,
-            id_number: id_number
+            id_number: id_number,
+            id_captcha_0: id_captcha_0,
+            id_captcha_1: id_captcha_1
           },
           type: 'post'
         }).done(function() {
