@@ -75,6 +75,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
 
         $("#validate_id_button").removeClass "disabled"
         tool.modalAlert({title: '温馨提示', msg: result.message})
+        $('.captcha-refresh', '#validate_id_form').trigger('click')
 
 
 
