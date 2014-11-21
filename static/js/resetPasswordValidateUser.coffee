@@ -23,6 +23,7 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
         $(element).removeClass("disabled")
         $('.voice').removeClass('hidden')
         $('.voice-validate').removeAttr 'disabled'
+        $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>')
 
     # Fire now and future
     timerFunction()
@@ -89,10 +90,10 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
         timerFunction = ()->
           if count >= 1
             count--
-            element.text('语音验证码已经发送，请注意接听。（' + count + '）')
+            element.text('语音验证码已经发送，请注意接听（' + count + '）')
           else
             clearInterval(intervalId)
-            element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code" class="voice-validate">语音验证</a>')
+            element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>')
             element.removeAttr 'disabled'
             button.removeAttr 'disabled'
             button.addClass 'button-red'
