@@ -5,6 +5,7 @@ from models import Margin, MarginRecord
 class UserMarginAdmin(admin.ModelAdmin):
     list_display = ('user', 'margin', 'freeze', 'withdrawing', )
     search_fields = ('user__wanglibaouserprofile__phone',)
+    raw_id_fields = ('user', )
 
 
 class MarginRecordAdmin(admin.ModelAdmin):
