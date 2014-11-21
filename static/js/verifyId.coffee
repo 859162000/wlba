@@ -55,8 +55,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
         data: {
           name: name
           id_number: id_number
-          id_captcha_0: id_captcha_0
-          id_captcha_1: id_captcha_1
+          captcha_0: id_captcha_0
+          captcha_1: id_captcha_1
         }
         type: 'post'
       }

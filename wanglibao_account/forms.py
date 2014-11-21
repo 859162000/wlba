@@ -153,6 +153,7 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
     def get_user(self):
         return self.user_cache
 
+#class IdValidateForm(forms.Form):
 
 class ResetPasswordGetIdentifierForm(forms.Form):
     identifier = forms.CharField(max_length=254)
