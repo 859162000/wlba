@@ -50,7 +50,7 @@ class P2PTrader(object):
             now = timezone.now()
             # 快盘首次买就送
             #activity.name，包含快盘就送流量
-            if u"快盘" in activity.name:
+            if activity and u"快盘" in activity.name:
                 try:
                     with transaction.atomic():
                         if Reward.objects.filter(is_used=False, type=u'快盘随机容量', end_time__gte=now).exists():
@@ -71,7 +71,7 @@ class P2PTrader(object):
                     pass
 
             #activity.name 包含迅雷就送一个月迅雷会员
-            if u"迅雷" in activity.name:
+            if activity and u"迅雷" in activity.name:
                 try:
                     with transaction.atomic():
                         if Reward.objects.filter(is_used=False, type=u'一个月迅雷会员', end_time__gte=now).exists():
@@ -138,6 +138,7 @@ class P2PTrader(object):
 
         #投标成功发站内信
         pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
+
         title,content = messages.msg_bid_purchase(self.order_id, pname, amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id":self.user.id,

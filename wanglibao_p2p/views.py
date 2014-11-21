@@ -128,7 +128,6 @@ class PurchaseP2P(APIView):
             try:
                 trader = P2PTrader(product=p2p, user=request.user)
                 product_info, margin_info, equity_info = trader.purchase(amount)
-
                 return Response({
                     'data': product_info.amount
                 })
