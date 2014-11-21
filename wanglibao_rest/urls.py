@@ -1,9 +1,13 @@
+#!/usr/bin/env python
+# encoding:utf-8
+
 from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
-from wanglibao_account.views import UserViewSet, ResetPasswordAPI, FundInfoAPIView, \
-    AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI, AccountFundAssetAPI,\
-    P2PAmortizationAPI, UserProductContract
+from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIView,
+                            AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI, AccountFundAssetAPI,
+                            P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
+                            AdminSendMessageAPIView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -16,13 +20,16 @@ from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTr
     MobileHotFundViewSet, MobileMainPageViewSet, MobileMainPageP2PViewSet
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
     P2PProductDetailView, P2PProductListView
-from wanglibao_pay.views import CardViewSet, LianlianAppPayView, LianlianAppPayCallbackView
+from wanglibao_pay.views import (CardViewSet, LianlianAppPayView, LianlianAppPayCallbackView,
+                            BankCardAddView, BankCardListView, BankCardDelView, BankListAPIView,
+							LianlianWithdrawAPIView)
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
-            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
-            WeixinRegisterAPIView)
+                            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
+                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
+                            YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, PushTestView)
 
 router = DefaultRouter()
 
@@ -70,6 +77,7 @@ urlpatterns = patterns(
     '',
     url(r'^register/$', RegisterAPIView.as_view()),
     url(r'^register/wx/$', WeixinRegisterAPIView.as_view()),
+    url(r'^change_password/$', ChangePasswordAPIView.as_view()),
     url(r'^reset_password/$', ResetPasswordAPI.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
@@ -85,8 +93,16 @@ urlpatterns = patterns(
     url(r'^p2ps/(?P<pk>[0-9]+)/$', P2PProductDetailView.as_view()),
 
     url(r'', include(router.urls)),
+    #客户端使用,重写
+    url(r'^id_validation/$', IdValidateAPIView.as_view()),
+    url(r'^bank_card/add/$', BankCardAddView.as_view()),
+    url(r'^bank_card/list/$', BankCardListView.as_view()),
+    url(r'^bank_card/del/$', BankCardDelView.as_view()),
+    url(r'^bank/list/$', BankListAPIView.as_view()),
+
     url(r'^id_validate/', IdValidate.as_view()),
-    url(r'^admin_id_validate/', AdminIdValidate.as_view()),
+    url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
+    url(r'^admin_send_message/$', AdminSendMessageAPIView.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
     url(r'^home/p2precord', AccountP2PRecordAPI.as_view()),
@@ -98,6 +114,11 @@ urlpatterns = patterns(
     url(r'^p2p/contract/(?P<product_id>\d+)', UserProductContract.as_view()),
     url(r'^pay/lianlian/app/deposit/$', LianlianAppPayView.as_view(), name="lianlian-deposit-view"),
     url(r'^pay/lianlian/app/deposit/callback/$', LianlianAppPayCallbackView.as_view(), name="lianlian-deposit-view"),
+    url(r'^withdraw/$', LianlianWithdrawAPIView.as_view(), name="lianlian-withdraw-view"),
+    url(r'^client_update/$', ClientUpdateAPIView.as_view()),
+    url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
+    url(r'^ytx/send_voice_code', SendVoiceCodeAPIView.as_view()),
+    #url(r'^pushtest/$', PushTestView.as_view()),
 )
 
 urlpatterns += patterns('',

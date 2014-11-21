@@ -373,13 +373,19 @@ $add-icon-large-width: 8px
   background: url("/static/images/share_icons.png") no-repeat 0 -175px
 
 .top-invite-bar
-  height: 45px
-  padding-top: 3px
-  background: #fdf7e7
+  height: 48px
+  //padding-top: 3px
+  background: #fbf8e9
   text-align: center
+  clear: both
+  //overflow: hidden
 
   a
     display: block
+    width: 100%
+    height: 100%
+    background: url(/static/images/top_invite_bar.png) no-repeat center center
+
 
 .copyed-ok
   text-align: center
@@ -387,3 +393,71 @@ $add-icon-large-width: 8px
 
   p
     font-size: $font-m
+
+
+.p2p-xunlei-icon
+  background: url(/static/images/p2p_xunlei_icon.jpg) no-repeat
+  display: inline-block
+  width: 22px
+  height: 22px
+  vertical-align: bottom
+
+.message-table
+  @extend .table
+  font-size: $font-s
+  line-height: 28px
+
+  tr
+    border-bottom: dotted 1px #dddddd
+
+  tr:nth-child(even)
+    background-color: #ffffff
+
+  td
+    vertical-align: top
+
+    p
+      font-size: $font-s
+
+  .msg-id
+    cursor: pointer
+    word-break: break-all
+
+  .message-content
+    color: #999999
+    display: none
+    word-break: break-all
+
+    a
+      @extend .blue
+
+.icon-msg-arrow-up
+  @extend .icon
+  width: 13px
+  height: 7px
+  background: url("/static/images/icon-public.png") -420px -222px no-repeat
+
+.icon-msg-arrow-down
+  @extend .icon
+  width: 13px
+  height: 7px
+  background: url("/static/images/icon-public.png") -420px -229px no-repeat
+
+.message-tip
+  +inline-block
+  position: relative
+
+  .message-count
+    +inline-block
+    +border-radius(9px)
+    position: absolute
+    right: 0
+    top: 0
+    width: 18px
+    height: 18px
+    background: $color-pomegranate
+    color: $color-white
+    font-size: $font-xs
+    line-height: 18px
+    text-align: center
+    display: none

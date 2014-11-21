@@ -2,19 +2,27 @@
 from collections import OrderedDict
 from concurrency.admin import ConcurrentModelAdmin
 import datetime
-from django.contrib import admin
+from django.contrib import admin, messages
+from django import forms
 from django.utils import timezone
 from reversion.admin import VersionAdmin
-from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate
+from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from views import GenP2PUserProfileReport
+from wanglibao.admin import ReadPermissionModelAdmin
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (
         'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
     list_filter = ('confirm',)
+    search_fields = ('user__wanglibaouserprofile__phone',)
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
+            return [f.name for f in self.model._meta.fields]
+        return ()
 
 
 class AmortizationInline(admin.TabularInline):
@@ -163,12 +171,26 @@ class P2PProductResource(resources.ModelResource):
         instance.contract_template = ContractTemplate.objects.get(name='证大速贷')
 
 
-class P2PProductAdmin(ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
+class P2PProductForm(forms.ModelForm):
+    class Meta:
+        model = P2PProduct
+
+    def clean_status(self):
+        if self.cleaned_data['status'] == u'正在招标':
+
+            print self
+
+            pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
+            if not pa:
+                raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
+        return self.cleaned_data['status']
+
+class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
     ]
     list_display = ('id', 'name', 'short_name', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'priority')
-    list_editable = ('status', 'priority')
+    list_editable = ('priority',)
     list_filter = ('status',)
     search_fields = ('name',)
     readonly_fields = ('amortization_count',)
@@ -176,15 +198,32 @@ class P2PProductAdmin(ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'
 
+    form = P2PProductForm
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
+            return [f.name for f in self.model._meta.fields]
+        return ()
+
+    def save_model(self, request, obj, form, change):
+        if obj.status == u'正在招标':
+            pa = ProductAmortization.objects.filter(product=obj)
+            if not pa:
+                messages.error(request, u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
+                return
+        super(P2PProductAdmin, self).save_model(request, obj, form, change)
+
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
 
 class P2PRecordResource(resources.ModelResource):
-    user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name='姓名')
-    user_phone = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name='手机号')
-    product_name = fields.Field(attribute="product__name", column_name='产品名称')
+    user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name=u'姓名')
+    user_phone = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name=u'手机号')
+    product_name = fields.Field(attribute="product__name", column_name=u'产品名称')
+    product_id = fields.Field(attribute="product__id", column_name=u'产品ID')
 
     class Meta:
         model = P2PRecord
@@ -195,11 +234,15 @@ class P2PRecordResource(resources.ModelResource):
         return timezone.localtime(obj.create_time).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class P2PRecordAdmin(ImportExportModelAdmin):
+class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     list_display = (
         'catalog', 'order_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
     resource_class = P2PRecordResource
     change_list_template = 'admin/import_export/change_list_export.html'
+    search_fields = ('user__wanglibaouserprofile__phone',)
+
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
 
 
 class WarrantAdmin(admin.ModelAdmin):
@@ -209,18 +252,35 @@ class WarrantAdmin(admin.ModelAdmin):
 class AmortizationRecordAdmin(admin.ModelAdmin):
     list_display = (
         'catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
 
-class EquityRecordAdmin(admin.ModelAdmin):
+class EquityRecordAdmin(ReadPermissionModelAdmin):
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
+    search_fields = ('user__wanglibaouserprofile__phone',)
+
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
 
 
-class ProductAmortizationAdmin(admin.ModelAdmin):
+class ProductAmortizationAdmin(ReadPermissionModelAdmin):
     list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled',
                     'settlement_time', 'created_time', 'status', 'description', )
 
     def status(self, obj):
         return obj.product.status
+
+
+class EarningAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'product', 'amount', )
+    raw_id_fields = ('order', 'margin_record')
+    search_fields = ('user__wanglibaouserprofile__phone',)
+
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.has_perm('wanglibao_p2p.view_productamortization'):
+            return [f.name for f in self.model._meta.fields]
+        return ()
 
 
 admin.site.register(P2PProduct, P2PProductAdmin)
@@ -233,6 +293,7 @@ admin.site.register(P2PRecord, P2PRecordAdmin)
 admin.site.register(EquityRecord, EquityRecordAdmin)
 admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
 admin.site.register(ProductAmortization, ProductAmortizationAdmin)
+admin.site.register(Earning, EarningAdmin)
 
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(),name=u'生成p2p用户表')

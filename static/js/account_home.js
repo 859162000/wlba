@@ -5,12 +5,13 @@
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
       knockout: 'lib/knockout',
-      tools: 'lib/modal.tools'
+      tools: 'lib/modal.tools',
+      'jquery.modal': 'lib/jquery.modal.min'
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/jquery.number.min'], function($, _, ko, backend, templateLoader, portfolio, tool) {
-    var DataViewModel, viewModel;
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/jquery.number.min', 'lib/modal'], function($, _, ko, backend, templateLoader, portfolio, tool, modal) {
+    var DataViewModel, isXunleiBindSuccess, viewModel;
     DataViewModel = (function() {
       function DataViewModel() {
         var self;
@@ -87,7 +88,7 @@
     })();
     viewModel = new DataViewModel();
     ko.applyBindings(viewModel);
-    return backend.fundInfo().done(function(data) {
+    backend.fundInfo().done(function(data) {
       var totalAsset;
       totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"]);
       $("#total_asset").text($.number(totalAsset, 2));
@@ -105,6 +106,61 @@
         }
       });
     });
+    $(".xunlei-binding-modal").click(function() {
+      return $('#xunlei-binding-modal').modal();
+    });
+    isXunleiBindSuccess = function() {
+      var result;
+      result = backend.getRequest();
+      if (result['ret'] && result['ret'] > 0) {
+        tool.modalAlert({
+          title: '温馨提示',
+          msg: '迅雷帐号绑定失败'
+        });
+      }
+      if (!result['ret'] || !result['code'] || !result['state']) {
+        return;
+      }
+      return backend.registerXunlei({
+        "ret": result['ret'],
+        "code": result['code'],
+        "state": result['state']
+      }).done(function(data) {
+        if (data.ret_code === 0) {
+          if (data.isvip === 0) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: '抱歉您还不是迅雷付费会员，不能享受额外收益。<br/>请开通迅雷付费会员后，再绑定一次，即可享受额外收益。',
+              callback_ok: function() {
+                return window.location.href = "/accounts/home/";
+              }
+            });
+          } else {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: '恭喜！迅雷付费会员绑定成功，投资指定标的后可享受额外收益。',
+              callback_ok: function() {
+                return window.location.href = "/accounts/home/";
+              }
+            });
+          }
+        } else if (data.ret_code === 30035) {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: '绑定失败。你使用的迅雷帐号已被绑定，请换一个帐号再试。',
+            callback_ok: function() {
+              return window.location.href = "/accounts/home/";
+            }
+          });
+        } else {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: '迅雷帐号绑定失败，请再试一次'
+          });
+        }
+      });
+    };
+    return isXunleiBindSuccess();
   });
 
 }).call(this);

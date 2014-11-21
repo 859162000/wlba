@@ -19,6 +19,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
 
   $('#validate_id_form').validate
     rules:
+      captcha_1:
+        required: true
+        minlength: 4
       name:
         required: true
       id_number:
@@ -28,6 +31,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
     messages:
       name:
         required: '请输入姓名'
+      captcha_1:
+        required: '请输入验证码'
+        minlength: $.format("验证码要输入4位")
       id_number:
         required: '请输入身份证'
         idNumber: '请输入有效身份证'
@@ -39,6 +45,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
     submitHandler: (form)->
       name = $('#id_name').val()
       id_number = $('#id_id_number').val()
+      id_captcha_0 = $('#id_captcha_0').val()
+      id_captcha_1 = $('#id_captcha_1').val()
       if $("#validate_id_button").hasClass "disabled"
         return;
       $("#validate_id_button").addClass('disabled')
@@ -47,6 +55,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
         data: {
           name: name
           id_number: id_number
+          captcha_0: id_captcha_0
+          captcha_1: id_captcha_1
         }
         type: 'post'
       }
@@ -65,3 +75,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
 
         $("#validate_id_button").removeClass "disabled"
         tool.modalAlert({title: '温馨提示', msg: result.message})
+
+
+
+  (->
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
+    $.getJSON url, {}, (json)->
+      $('input[name="captcha_0"]').val(json.key)
+      $('img.captcha').attr('src', json.image_url)
+    return
+  )()

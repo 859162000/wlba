@@ -59,43 +59,12 @@ html
             else
               p.banner-form--row.font-s <span class="highlight">{{site_data.demand_rate_times}}</span>倍以上活期收益&nbsp;&nbsp;&nbsp;第三方本息担保
 
-            a.banner-form--button.full-width.register-modal(href="#login-modal") 免费注册
+            a.banner-form--button.full-width.register-modal(href="#login-modal") 注册领迅雷会员
             p.align-right.font-s
               span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
-    .space-vertical-xl
-    .full-container-white-no-border
-      .investment-process-container
-        .row
-          .step.first-step
-            span.icon.icon-first-step
-            .process-title 第一步&nbsp;免费注册
-            .process-content 30秒轻松免费注册成为会员
-          .step-arrow
-            ins
-          .step.second-step
-            span.icon.icon-second-step
-            .process-title 第二步&nbsp;进行认证
-            .process-content 完成实名认证
-          .step-arrow
-            ins
-          .step.third-step
-            span.icon.icon-third-step
-            .process-title 第三步&nbsp;充值账户
-            .process-content 在线充值，免收手续费
-          .step-arrow
-            ins
-          .step.fourth-step
-            span.icon.icon-fourth-step
-            .process-title 第四步&nbsp;成功投标
-            .process-content 按需筛选借款标并进行投标
-          .step-arrow
-            ins
-          .step.fifth-step
-            span.icon.icon-fifth-step
-            .process-title 第五步&nbsp;自动收款
-            .process-content 借款期满后自动回款
-
-
+    .space-vertical-s
+    include announcement_block
+    .space-vertical-s
     .container
       .row
         .span8
@@ -104,6 +73,13 @@ html
             status = product.display_status
             .panel-p2p-product
               .shadow-inner
+                if forloop.counter == 1
+                  .panel-announce-bar
+                    .panel-announce-bar-title 投资列表
+                    .panel-announce-bar-content
+                      for announce in announcements_p2p
+                        span.icon.icon-up-arrow
+                        a#p2p-new-announce(data-url="/announcement/detail/{{announce.id}}", href="javascript:viod(0);") {{announce.title}}
                 .panel-title-bar
                   if product.warrant_company
                     .warrant-icon 担
@@ -124,10 +100,14 @@ html
                     .span3.align-center
                       p
                         earning_rate = str(product.expected_earning_rate)
-                        if product.excess_earning_rate > 0
-                          earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
+                        //if product.excess_earning_rate > 0
+                        //  earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
                         em.highlight {{earning_rate}}
                         span.highlight.font-m %
+                        if product.activity
+                          em.highlight +
+                          span.xunlei-vip-rate(title="{{product.activity.name}}") {{product.activity.rule.percent_text}}%
+                            span.xunlei-vip-tip(title="{{product.activity.name}}") {{product.activity.name}}
                       p 年化收益
                     .span2.align-center
                       p
@@ -172,19 +152,22 @@ html
                         span.highlight &nbsp;&nbsp; {{percent | percentage}}
                       else
                         span &nbsp;&nbsp; {{percent | percentage}}
-                    .span4.align-left
+                    .span5.align-left
                       if product.category == '证大速贷'
                         span 本息保障: &nbsp;&nbsp;
                       else
                         span 担保机构: &nbsp;&nbsp;
 
                       span.d3-text {{product.warrant_company.name}}
-                    .span4-omega.align-right
+                    .span3-omega.align-right
                       span 还款方式: &nbsp;&nbsp;
                       span.d3-text {{product.display_payback_method}}
                 if status == '还款中' or status == '已完成'
-                  .panel-p2p-stamp
-            .space-vertical-xl
+                  if forloop.counter == 1
+                    .panel-p2p-stamp(style="top:55px")
+                  else
+                    .panel-p2p-stamp
+            .space-vertical-sm
           if True
             .row
               a.get-more(href="{% url 'p2p_list' %}" target="_blank") 查看更多
@@ -213,6 +196,10 @@ html
                 .panel-title 最新投资记录
               .panel-content-container
                 table.invest-history-table
+                  colgroup
+                    col(width="35%")
+                    col(width="30%")
+                    col(width="35%")
                   thead
                     tr
                       th 申购时间
@@ -230,7 +217,7 @@ html
                           em {{trade.user | safe_phone}}
                         td.invest-num
 
-                          span.money-highlight {{trade.amount}}
+                          span.money-highlight {{trade.amount|money_format_int}}
                           span 元
                     tbody(style="display:none")
                       for trade in rest
@@ -241,8 +228,40 @@ html
                           td
                             em {{trade.user | safe_phone}}
                           td.invest-num
-                            span.money-highlight {{trade.amount}}
+                            span.money-highlight {{trade.amount|money_format_int}}
                               span 元
+
+    .full-container-white-no-border
+      .investment-process-container
+        .row
+          .step.first-step
+            span.icon.icon-first-step
+            .process-title 第一步&nbsp;免费注册
+            .process-content 30秒轻松免费注册成为会员
+          .step-arrow
+            ins
+          .step.second-step
+            span.icon.icon-second-step
+            .process-title 第二步&nbsp;进行认证
+            .process-content 完成实名认证
+          .step-arrow
+            ins
+          .step.third-step
+            span.icon.icon-third-step
+            .process-title 第三步&nbsp;充值账户
+            .process-content 在线充值，免收手续费
+          .step-arrow
+            ins
+          .step.fourth-step
+            span.icon.icon-fourth-step
+            .process-title 第四步&nbsp;成功投标
+            .process-content 按需筛选借款标并进行投标
+          .step-arrow
+            ins
+          .step.fifth-step
+            span.icon.icon-fifth-step
+            .process-title 第五步&nbsp;自动收款
+            .process-content 借款期满后自动回款
 
     hr.bottom-hr
     script.
@@ -283,6 +302,10 @@ html
             a.partner-longan(href="http://www.longanlaw.com/",target="_blank",title="隆安律师事务所")
           li
             a.partner-wdzj(href="http://www.wangdaizhijia.com/",target="_blank",title="网袋之家")
+          li
+            a.partner-gqwy(href="http://www.gqwy666.com/",target="_blank",title="国强伟业")
+          li
+            a.partner-wdty(href="http://www.p2peye.com/",target="_blank",title="网贷天眼")
 
     - with 1 as no_margin
     include include/footer

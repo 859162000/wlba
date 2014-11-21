@@ -138,6 +138,8 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
 
 
   $("#register_submit").click (e)->
+
     if $(this).hasClass("disabled")
       e.preventDefault()
       return
+    $('#register_submit').submit()

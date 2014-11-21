@@ -1,12 +1,16 @@
+#!/usr/bin/env python
+# encoding:utf-8
+
 from django.conf import settings
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
-from views import RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome, \
-    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView, AccountTransactionDeposit, \
-    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract
+from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome,
+    				AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView, AccountTransactionDeposit,
+				    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
+					Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailView, MessageCountView, MessageListView)
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -31,18 +35,27 @@ urlpatterns = patterns(
     url(r'^setting/$', login_required(TemplateView.as_view(template_name='account_setting.jade'),
                                      login_url='/accounts/register/')),
     url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/register/')),
+    url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/register/')),
 
     url(r'^invite/$', login_required(TemplateView.as_view(template_name='invite.jade'), login_url='/accounts/login/')),
 
-    url(r'^login/ajax/', 'wanglibao_account.views.ajax_login'),
-    url(r'^login/', 'django.contrib.auth.views.login',
+    url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
+    url(r'^login/$', 'django.contrib.auth.views.login',
         {
             "template_name": "login.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
+    url(r'^login/callback/$', login_required(Third_login_back.as_view())),
+    url(r'^login/(?P<login_type>\w+)/$', login_required(Third_login.as_view())),
+
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
     url(r'^register/wap/$', TemplateView.as_view(template_name='register_wap.jade'), name='wap_register'),
     url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
+
+    url(r'^message/$', login_required(MessageView.as_view(), login_url='/accounts/login/')),
+    url(r'^message/list/$', MessageListView.as_view(), name='message_list_view'),
+    url(r'^message/count/$', MessageCountView.as_view(), name='message_count_view'),
+    url(r'^message/(?P<message_id>\d+)/$', MessageDetailView.as_view(), name='message_detail_view'),
     url(r'^email/sent/$', EmailSentView.as_view(), name='email_sent'),
 
     url(r'^password/change/$', "wanglibao_account.views.password_change", name='password_change'),

@@ -1,9 +1,10 @@
 # coding=utf-8
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from wanglibao_pay.util import get_a_uuid
 from django.db import transaction
+from decimal import *
 
 
 class NewsAndReport(models.Model):
@@ -18,6 +19,9 @@ class NewsAndReport(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        verbose_name_plural = u'新闻报道'
 
 
 class SiteData(models.Model):
@@ -42,6 +46,9 @@ class SiteData(models.Model):
     def one_year_times(self):
         return int(self.highest_earning_rate / self.one_year_interest_rate)
 
+    class Meta:
+        verbose_name_plural = u'网站数据'
+
 class InviteCode(models.Model):
     code = models.CharField(u'邀请码', max_length=6, db_index=True, unique=True)
     is_used = models.BooleanField(u'是否使用', default=False)
@@ -52,25 +59,35 @@ class InviteCode(models.Model):
     def __unicode__(self):
         return self.code
 
+    class Meta:
+        verbose_name_plural = u'原始邀请码'
+
 
 class PromotionToken(models.Model):
-    user = models.OneToOneField(get_user_model(), primary_key=True)
+    user = models.OneToOneField(User, primary_key=True)
     token = models.CharField(u'推广代码', max_length=64, db_index=True, default=get_a_uuid)
 
     def __unicode__(self):
         return self.token
 
+    class Meta:
+        verbose_name_plural = u'用户邀请码'
+
 
 class IntroducedBy(models.Model):
-    user = models.ForeignKey(get_user_model())
-    introduced_by = models.ForeignKey(get_user_model(), related_name='introduces')
+    user = models.ForeignKey(User)
+    introduced_by = models.ForeignKey(User, related_name='introduces')
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
-    bought_at = models.DateTimeField(u'第一次购买时间', null=True)
-    gift_send_at = models.DateTimeField(u'奖品发放时间', null=True)
+    bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
+    gift_send_at = models.DateTimeField(u'奖品发放时间', null=True, blank=True)
+    created_by = models.ForeignKey(User, null=True, blank=True, related_name='creator')
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = u'邀请关系'
 
 
 def generate_user_promo_token_and_invitecode(sender, instance, **kwargs):
-    print kwargs
     if kwargs["created"]:
         with transaction.atomic():
             invite_code = InviteCode.objects.select_for_update().filter(is_used=False).first()
@@ -90,8 +107,8 @@ def generate_user_promo_token(sender, instance, **kwargs):
         p.save()
 
 
-# post_save.connect(generate_user_promo_token, sender=get_user_model(), dispatch_uid="generate_promotion_token")
-post_save.connect(generate_user_promo_token_and_invitecode, sender=get_user_model(), dispatch_uid="generate_promotion_token")
+# post_save.connect(generate_user_promo_token, sender=User, dispatch_uid="generate_promotion_token")
+post_save.connect(generate_user_promo_token_and_invitecode, sender=User, dispatch_uid="generate_promotion_token")
 
 
 class TimelySiteData(models.Model):
@@ -102,6 +119,90 @@ class TimelySiteData(models.Model):
     total_amount = models.DecimalField(u'总额', max_digits=20, decimal_places=2, default=0)
     user_count = models.IntegerField(u'用户总数', default=0)
 
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = u'交易数据'
 
+class ActivityRule(models.Model):
+    """ author: hetao
+        datetime: 2014.10.27
+        description: 市场活动规则
+    """
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'返现活动规则'
+
+    name = models.CharField(u'规则名称', max_length=128)
+    description = models.TextField(u'规则描述')
+
+    rule_type = models.CharField(u'规则类型', max_length=50, null=False)
+    rule_amount = models.DecimalField(u'数额', max_digits=20, decimal_places=4, default=0)
+    create_time = models.DateTimeField(u'活动创建时间', auto_now_add=True)
+
+    @property
+    def percent_text(self):
+        return Decimal(self.rule_amount*100).quantize(Decimal('0.1'))
+
+    def get_earning(self, amount, months, type):
+         return Decimal(amount*self.rule_amount*(Decimal(months)/Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+
+    def __unicode__(self):
+        return u'<%s>' % self.name
+
+
+class Activity(models.Model):
+    """ author: hetao
+        datetime: 2014.10.27
+        description: 市场活动
+    """
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'返现活动'
+
+    name = models.CharField(u'活动名称', max_length=128)
+    description = models.TextField(u'活动描述')
+
+    rule = models.ForeignKey(ActivityRule, help_text=u'活动规则', null=True, on_delete=models.SET_NULL, blank=False)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    start_time = models.DateTimeField(u'开始时间')
+    end_time = models.DateTimeField(u'结束时间')
+
+    def __unicode__(self):
+        return u'<%s %s>' % (self.name, self.description)
+
+
+class Reward(models.Model):
+    """ 奖品存储
+    """
+
+    type = models.CharField(u'奖品类型', max_length=40)
+    description = models.TextField(u'奖品描述', null=True)
+    content = models.CharField(u'奖品内容', max_length=128)
+    is_used = models.BooleanField(u'是否使用', default=False)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    end_time = models.DateTimeField(u'结束时间', null=True, blank=True)
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'奖品'
+
+    def __unicode__(self):
+        return u'<%s>' % self.type
+
+
+class RewardRecord(models.Model):
+    """ 奖品发放流水
+    """
+    user = models.ForeignKey(User)
+    reward = models.ForeignKey(Reward)
+    description = models.TextField(u'发放奖品流水说明', null=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'奖品发放流水'
+
+    def __unicode__(self):
+        return u'<%s>' % self.user
 
 

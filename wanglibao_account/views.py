@@ -7,40 +7,49 @@ from django.contrib import auth
 from django.contrib.auth import login as auth_login
 from django.db.models import Q, Sum, F
 from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404, HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
+from marketing.models import IntroducedBy
 from marketing.utils import set_promo_user
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from wanglibao_account import third_login, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
-from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization
+from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from wanglibao_account.models import VerifyCounter
+from wanglibao_account.models import VerifyCounter, Binding
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
 from order.models import Order
-
+from wanglibao_announcement.utility import AnnouncementAccounts
+from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type
+from marketing.models import Reward, RewardRecord
+from django.template.defaulttags import register
+from django.db import transaction
+#from wanglibao_sms.tasks import send_messages
+from wanglibao_sms import messages
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +72,41 @@ class RegisterView (RegistrationView):
         set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
+
+        title,content = messages.msg_register()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":auth_user.id,
+            "title":title,
+            "content":content,
+            "mtype":"activityintro"
+        })
+        """
+        now = timezone.now()
+        with transaction.atomic():
+            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                try:
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=auth_user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+                    send_messages.apply_async(kwargs={
+                            "phones": [identifier],
+                            "messages": [messages.reg_reward_message(reward.content)]})
+
+                    title,content = messages.msg_register_authok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":auth_user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+                except Exception, e:
+                    print(e)
+                    pass
+        """
+
         return user
 
     def get_success_url(self, request=None, user=None):
@@ -247,6 +291,10 @@ class UserViewSet(PaginatedModelViewSet):
 class AccountHome(TemplateView):
     template_name = 'account_home.jade'
 
+    @register.filter(name="lookup")
+    def get_item(dictionary, key):
+        return dictionary.get(key)
+
     def get_context_data(self, **kwargs):
         message = ''
         user = self.request.user
@@ -265,6 +313,18 @@ class AccountHome(TemplateView):
             u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
 
+        #author: hetao; datetime: 2014.10.30; description: 加上活动所得收益
+        earnings = Earning.objects.select_related('product__activity').filter(user=user)
+
+        earning_map = {earning.product_id : earning for earning in earnings}
+        result = []
+        for equity in p2p_equities:
+            obj = {"equity": equity}
+            if earning_map.get(equity.product_id):
+                obj["earning"] = earning_map.get(equity.product_id)
+
+            result.append(obj)
+
         amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False).prefetch_related("subs")
 
         unpayed_principle = 0
@@ -281,10 +341,12 @@ class AccountHome(TemplateView):
 
         total_asset = p2p_total_asset
 
+        xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
+
         return {
             'message': message,
-
-            'p2p_equities': p2p_equities,
+            #'p2p_equities': p2p_equities,
+            'result': result,
             'amortizations': amortizations,
             'p2p_product_amortization': p2p_product_amortization,
             'p2p_unpay_principle': unpayed_principle,
@@ -293,8 +355,9 @@ class AccountHome(TemplateView):
             'fund_hold_info':fund_hold_info,
             'p2p_total_asset': p2p_total_asset,
             'total_asset': total_asset,
-
-            'mode': mode
+            'mode': mode,
+            'announcements': AnnouncementAccounts,
+            'xunlei_vip': xunlei_vip
         }
 
 
@@ -589,7 +652,8 @@ class AccountTransaction(TemplateView):
         transactions = pager.page(page)
         return {
             "transactions": transactions,
-            "message": message
+            "message": message,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -610,7 +674,8 @@ class AccountTransactionP2P(TemplateView):
             else:
                 t.status = status
         return {
-            "trade_records": trade_records
+            "trade_records": trade_records,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -625,7 +690,8 @@ class AccountTransactionDeposit(TemplateView):
             page = 1
         pay_records = pager.page(page)
         return {
-            "pay_records": pay_records
+            "pay_records": pay_records,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -640,7 +706,8 @@ class AccountTransactionWithdraw(TemplateView):
             page = 1
         pay_records = pager.page(page)
         return {
-            "pay_records": pay_records
+            "pay_records": pay_records,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -665,7 +732,8 @@ class AccountBankCard(TemplateView):
             'p2p_cards': p2p_cards,
             'banks': banks,
             'user_profile': self.request.user.wanglibaouserprofile,
-            "message": message
+            "message": message,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -702,6 +770,101 @@ class ResetPasswordAPI(APIView):
         else:
             return Response({'ret_code':30004, 'message':u'验证码验证失败'})
 
+
+class Third_login(View):
+    def get(self, request, login_type):
+        url = third_login.assem_params(login_type, request)
+        return HttpResponseRedirect(url)
+
+
+class Third_login_back(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        result = third_login.login_back(request)
+        return Response(result)
+        #return HttpResponseRedirect(result['url'])
+
+
+class ChangePasswordAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        new_password = request.DATA.get('new_password', "").strip()
+        old_password = request.DATA.get('old_password', "").strip()
+
+        if not old_password or not new_password:
+            return Response({'ret_code':30041, 'message':u'信息输入不完整'})
+
+        if not 6 <= len(new_password) <= 20:
+            return Response({'ret_code':30042, 'message':u'密码需要在6-20位之间'})
+
+        user = request.user
+        if not user.check_password(old_password):
+            return Response({'ret_code':30043, 'message':u'旧密码错误'})
+
+        user.set_password(new_password)
+        user.save()
+        return Response({'ret_code':0, 'message':u'修改成功'})
+
+
+class MessageView(TemplateView):
+    template_name = 'message.jade'
+
+    def get_context_data(self, **kwargs):
+        listtype = self.request.GET.get("listtype")
+
+        if not listtype or listtype not in ("read", "unread", "all"):
+            listtype = 'all'
+
+        if listtype == "unread":
+            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by('-message_text__created_at')
+        elif listtype == "read":
+            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by('-message_text__created_at')
+        else:
+            messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
+
+        messages_list = []
+        messages_list.extend(messages)
+
+        limit = 10
+        paginator = Paginator(messages_list, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            messages_list = paginator.page(page)
+        except PageNotAnInteger:
+            messages_list = paginator.page(1)
+        except Exception:
+            messages_list = paginator.page(paginator.num_pages)
+
+        return {
+            'messageList': messages_list
+        }
+
+
+class MessageListView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = inside_message.list_msg(request.DATA, request.user)
+        return Response(result)
+
+
+class MessageCountView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = inside_message.count_msg(request.DATA, request.user)
+        return Response(result)
+
+
+class MessageDetailView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, message_id):
+        result = inside_message.sign_read(request.user, message_id)
+        return Response(result)
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -753,10 +916,18 @@ def ajax_register(request):
                 invitecode = form.cleaned_data['invitecode']
 
                 user = create_user(identifier, password, nickname)
-                # set_promo_user(request, user)
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
+
+                title,content = messages.msg_register()
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":auth_user.id,
+                    "title":title,
+                    "content":content,
+                    "mtype":"activityintro"
+                })
+
                 return HttpResponse(messenger('done', user=request.user))
                 # return HttpResponseRedirect("/accounts/id_verify/")
             else:
@@ -781,7 +952,8 @@ class IdVerificationView(TemplateView):
 
         return {
             'user': self.request.user,
-            'counter': count
+            'counter': count,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -807,7 +979,8 @@ class P2PAmortizationView(TemplateView):
         amortizations = UserAmortization.objects.filter(user=self.request.user, product_amortization__product_id=product_id)
         return {
             'equity': equity,
-            'amortizations': amortizations
+            'amortizations': amortizations,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -872,7 +1045,7 @@ class UserProductContract(APIView):
 @login_required
 def test_contract(request, equity_id):
     equity = P2PEquity.objects.filter(id=equity_id).prefetch_related('product').first()
-    return HttpResponse(generate_contract(equity, 'hongmu_template.jade'))
+    return HttpResponse(generate_contract(equity, 'tongchenghuodi_template.jade'))
 
 
 class IdVerificationView(TemplateView):
@@ -905,7 +1078,33 @@ class IdVerificationView(TemplateView):
 class AdminIdVerificationView(TemplateView):
     template_name = 'admin_verify_id.jade'
 
+class AdminSendMessageView(TemplateView):
+    template_name = "admin_send_message.jade"
 
+class AdminSendMessageAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        phone = request.DATA.get("phone", "")
+        title = request.DATA.get("title", "")
+        content = request.DATA.get("content", "")
+        mtype = request.DATA.get("mtype", "")
+        if not phone or not title or not content or not mtype:
+            return Response({"ret_code":1, "message":"信息输入不完整"})
+        user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+        if not user:
+            return Response({"ret_code":1, "message":"没有此用户"})
+
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":user.id,
+            "title":title,
+            "content":content,
+            "mtype":mtype
+        })
+        return Response({"ret_code":0, "message":"发送成功"})
+
+
+"""
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kwargs):
@@ -939,6 +1138,79 @@ class IdValidate(APIView):
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
 
+        now = timezone.now()
+        with transaction.atomic():
+            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+                try:
+                    reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=u'三天迅雷会员').first()
+                    reward.is_used = True
+                    reward.save()
+                    RewardRecord.objects.create(user=user, reward=reward,
+                                                description=u'新用户注册赠送三天迅雷会员')
+
+                    title,content = messages.msg_validate_ok(reward.content)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id":user.id,
+                        "title":title,
+                        "content":content,
+                        "mtype":"activity"
+                    })
+                except Exception, e:
+                    print(e)
+                    pass
+
         return Response({
                             "validate": True
                         }, status=200)
+"""
+
+
+class IntroduceRelation(TemplateView):
+    template_name = 'introduce_add.jade'
+
+    def post(self, request):
+        user_phone = request.POST.get('user_phone', '').strip()
+        introduced_by_phone = request.POST.get('introduced_by_phone', '').strip()
+        bought_at = request.POST.get('bought_at', '').strip()
+        gift_send_at = request.POST.get('gift_send_at', '').strip()
+        try:
+            user = User.objects.get(wanglibaouserprofile__phone=user_phone)
+        except User.DoesNotExist:
+            return HttpResponse({
+                u"没有找到 %s 该记录" % user_phone
+            })
+        try:
+            introduced_by = User.objects.get(wanglibaouserprofile__phone=introduced_by_phone)
+        except User.DoesNotExist:
+            return HttpResponse({
+                u"没有找到 %s 该记录" % user_phone
+            })
+        try:
+            introduce = IntroducedBy.objects.get(user=user, introduced_by=introduced_by)
+        except IntroducedBy.DoesNotExist:
+            record = IntroducedBy()
+            record.introduced_by = introduced_by
+            record.user = user
+            if bought_at:
+                print(bought_at)
+                record.bought_at = bought_at
+            if gift_send_at:
+                print(gift_send_at)
+                record.gift_send_at = gift_send_at
+            record.created_by = request.user
+            record.save()
+            return HttpResponse({
+                u" %s与%s的邀请关系已经确定" % (user_phone, introduced_by)
+            })
+
+        return HttpResponse({
+            u" %s与%s的邀请关系已经存在" % (user_phone, introduced_by)
+        })
+
+    @method_decorator(permission_required('marketing.add_introducedby'))
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Only user with change payinfo permission can call this view
+        """
+        return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)

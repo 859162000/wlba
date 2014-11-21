@@ -13,11 +13,13 @@
 .footer-section--container
   @extend .row
   padding: 25px 0
-  height: 220px
+  height: 250px
   overflow: visible
 
   a
     +link-colors(darken(white, 40%), white)
+    &.qq-container
+      color: #fff
 
 
 .footer-section
@@ -102,11 +104,13 @@
   position: absolute
   bottom: 100%
   left: 66px
-  top: -140px
+  top: -150px
   z-index: 9
 
 .social-text
   margin-left: 10px
+  display: inline-block
+
   &.social-space
     margin-right: 20px
 .footer--phone
@@ -233,7 +237,7 @@
     margin-left: 10px
     margin-right: 10px
 
-.icon-auth-ssl
+.icon-auth-itrust
   width: 33px
   height: 33px
   background: url("/static/images/icon-auth-footer.png") 0 0 no-repeat
@@ -241,7 +245,7 @@
   &:hover
     background: url("/static/images/icon-auth-footer.png") 0 -34px no-repeat
 
-.icon-auth-itrust
+.icon-auth-ssl
   width: 46px
   height: 31px
   background: url("/static/images/icon-auth-footer.png") -37px 0 no-repeat

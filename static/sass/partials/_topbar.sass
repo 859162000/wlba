@@ -26,8 +26,8 @@ $logo-height: image-height('logo.png')
   +inline-block()
   background: image-url('logo.png')
   background-repeat: no-repeat
-  height: 37px
-  width: 128px
+  height: 58px
+  width: 350px
 
   .svg &
     background: image-url('logo.png') no-repeat center middle
@@ -167,6 +167,10 @@ a.topbar-anchor
 .icon-weibo
   background-position: 0 -152px
   top: -2px
+.weibo-container:hover
+  .icon-weibo
+    background-position: 0 -200px
+    background-color: #d94a39
 
 .icon-weibo:hover
   background-position: 0 -200px
@@ -179,6 +183,11 @@ a.topbar-anchor
 .icon-qq
   background-position: -102px -150px
   top: -2px
+
+.weixin-container:hover
+  .icon-weixin
+    background-position: -33px -200px
+    background-color: #0ca001
 
 .icon-weixin:hover
   background-position: -33px -200px

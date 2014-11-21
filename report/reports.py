@@ -9,8 +9,9 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import DefaultStorage
 from report.crypto import ReportCrypto
 from report.models import Report
-from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PEquity
+from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PRecord, Earning
 from wanglibao_pay.models import PayInfo
+from wanglibao_margin.models import MarginRecord
 from django.utils import timezone
 from wanglibao_pay.util import get_a_uuid
 
@@ -66,7 +67,7 @@ class ReportGeneratorBase(object):
     @classmethod
     def get_report_name(cls, start_time, end_time):
         if hasattr(cls, 'reportname_format'):
-            return cls.reportname_format % (start_time.strftime('%Y-%m-%d'), end_time.strftime('%Y-%m-%d'))
+            return cls.reportname_format % (start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
 
 
     @classmethod
@@ -98,7 +99,8 @@ class DepositReportGenerator(ReportGeneratorBase):
     def generate_report_content(cls, start_time, end_time):
 
         output = cStringIO.StringIO()
-        pay_infos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='D').select_related('user').select_related('user__wanglibaouserprofile').select_related('order')
+        pay_infos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='D')\
+            .select_related('user').select_related('user__wanglibaouserprofile').select_related('order')
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow(['Id', u'用户名', u'交易号', u'类型', u'充值银行', u'充值金额', u'充值手续费', u'实际到账金额',
                          u'状态', u'操作时间', u'操作ip', u'编号'])
@@ -114,11 +116,10 @@ class DepositReportGenerator(ReportGeneratorBase):
                 str(pay_info.fee),
                 str(pay_info.amount - pay_info.fee),
                 unicode(pay_info.status),
-                timezone.localtime(pay_info.create_time).strftime("%Y-%m-%d %H:%M"),
+                timezone.localtime(pay_info.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                 unicode(pay_info.request_ip),
                 unicode(pay_info.uuid)
             ])
-
         return output.getvalue()
 
 
@@ -128,7 +129,8 @@ class WithDrawReportGenerator(ReportGeneratorBase):
 
     @classmethod
     def generate_report_content(cls, start_time, end_time):
-        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W').prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
+        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W')\
+            .prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
 
         output = cStringIO.StringIO()
 
@@ -139,7 +141,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
         for payinfo in payinfos:
             confirm_time = ""
             if payinfo.confirm_time:
-                confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M")
+                confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
             writer.writerow([
                 str(payinfo.id),
                 payinfo.user.wanglibaouserprofile.phone,
@@ -153,11 +155,93 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 str(payinfo.total_amount),
                 str(payinfo.amount),
                 str(payinfo.fee),
-                timezone.localtime(payinfo.create_time).strftime("%Y-%m-%d %H:%M"),
+                timezone.localtime(payinfo.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                 str(payinfo.request_ip),
                 unicode(payinfo.status),
                 confirm_time,
                 unicode(payinfo.uuid)
+            ])
+        return output.getvalue()
+
+
+class WithDrawDetailReportGenerator(ReportGeneratorBase):
+    prefix = 'txxxjl'
+    reportname_format = u'提现详细记录 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+
+        # payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W')\
+        #     .prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
+
+        margins = MarginRecord.objects.filter(catalog__icontains=u'取款',
+                                              create_time__gte=start_time, create_time__lt=end_time)\
+            .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+
+        output = cStringIO.StringIO()
+
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号',
+                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'编号'])
+
+        for margin in margins:
+
+            writer.writerow([
+                str(margin.id),
+                margin.user.username,
+                margin.user.wanglibaouserprofile.name,
+                margin.user.wanglibaouserprofile.id_number,
+                margin.user.wanglibaouserprofile.phone,
+                margin.payinfo_set.all().first().bank.name,
+                '-',
+                '-',
+                margin.payinfo_set.first().card_no,
+                str(margin.payinfo_set.first().total_amount),
+                str(margin.payinfo_set.first().amount),
+                str(margin.payinfo_set.first().fee),
+                timezone.localtime(margin.payinfo_set.first().create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                str(margin.payinfo_set.first().request_ip),
+                unicode(margin.payinfo_set.first().status),
+                unicode(margin.payinfo_set.first().uuid)
+            ])
+
+
+        return output.getvalue()
+
+
+class ProductionRecordReportGenerator(ReportGeneratorBase):
+    prefix = 'cpls'
+    reportname_format = u'产品流水 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+
+        p2precords = P2PRecord.objects.filter(create_time__gte=start_time, create_time__lt=end_time)\
+            .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+
+        output = cStringIO.StringIO()
+
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'流水类型', u'关联订单号', u'p2p产品', u'购买者', u'购买者手机号',
+                         u'发生数', u'标后余额', u'发生时间', u'摘要', u'编号'])
+        name = ''
+        phone = ''
+        for index, p2precord in enumerate(p2precords):
+            if p2precord.user:
+                name = p2precord.user.wanglibaouserprofile.name
+                phoen = p2precord.user.wanglibaouserprofile.phone
+            writer.writerow([
+                str(index + 1),
+                p2precord.catalog,
+                unicode(p2precord.order_id),
+                p2precord.product.name,
+                name,
+                phone,
+                unicode(p2precord.amount),
+                unicode(p2precord.product_balance_after),
+                timezone.localtime(p2precord.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                p2precord.description,
+                unicode("wanglibao_cpls_" + str(p2precord.id))
             ])
         return output.getvalue()
 
@@ -185,14 +269,14 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 amortization.product_amortization.product.name,
                 u'第%d期' % amortization.term,
                 u'抵押标',
-                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),
                 str(amortization.principal + amortization.interest),
                 str(amortization.principal),
                 str(amortization.interest),
                 # u'待还',
                 amortization.product_amortization.product.status,
-                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
-                unicode(get_a_uuid())
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),
+                unicode("wanglibao_yhhkjl_" + str(amortization.id))
             ])
         return output.getvalue()
 
@@ -209,7 +293,7 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
                          u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号'])
 
         amortizations = ProductAmortization.objects.filter(
-            term_date__gte=start_time, product__status=u'还款中', settled=False)
+            term_date__gte=start_time, term_date__lt=end_time, product__status=u'还款中', settled=False)
 
         for index, amortization in enumerate(amortizations):
             writer.writerow([
@@ -219,12 +303,12 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
                 amortization.product.name,
                 u'第%d期' % amortization.term,
                 u'抵押标',
-                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d"),
+                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),
                 str(amortization.principal + amortization.interest),
                 str(amortization.principal),
                 str(amortization.interest),
                 u'待还',
-                unicode(get_a_uuid())
+                unicode("wanglibao_cphkjl_" + str(amortization.id))
             ])
         return output.getvalue()
 
@@ -250,10 +334,11 @@ class ProductionAmortizationsSettledReportGenerator(ReportGeneratorBase):
                 u'抵押标',
                 str(amortization.principal + amortization.interest),
                 u'成功',
-                timezone.localtime(amortization.settlement_time).strftime("%Y-%m-%d"),
-                unicode(get_a_uuid())
+                timezone.localtime(amortization.settlement_time).strftime("%Y-%m-%d %H:%M:%S"),
+                unicode("wanglibao_hkjijs_" + str(amortization.id))
             ])
         return output.getvalue()
+
 
 class P2PAuditReportGenerator(ReportGeneratorBase):
     prefix = 'p2p_audit'
@@ -299,6 +384,79 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
 
         return output.getvalue()
 
+
+class P2PstatusReportGenerator(ReportGeneratorBase):
+    prefix = 'mbztbh'
+    reportname_format = u'满标状态变化 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'贷款号', u'用户名称', u'借款标题', u'借款金额', u'已借金额', u'利率', u'借款期限', u'还款方式',
+                        u'投资次数', u'状态', u'满标时间', u'真实姓名', u'手机号', u'身份证', u'银行名', u'银行账号',
+                         u'银行卡类型', u'省份', u'地区', u'支行'])
+
+        p2precords = P2PRecord.objects.filter(catalog=u'状态变化', create_time__gte=start_time, create_time__lt=end_time)
+
+        for index, p2precord in enumerate(p2precords):
+            writer.writerow([
+                str(index + 1),
+                p2precord.product.serial_number,
+                '-',
+                unicode(p2precord.product.name),
+                str(p2precord.product.total_amount),
+                str(p2precord.product.ordered_amount),
+                str(p2precord.product.expected_earning_rate),
+                str(p2precord.product.period),
+                unicode(p2precord.product.pay_method),
+                str(len(p2precord.product.equities.all())),
+                unicode(p2precord.product.status),
+                (p2precord.product.soldout_time and timezone.localtime(p2precord.product.soldout_time).strftime("%Y-%m-%d %H:%M:%S")) or '-',
+                unicode(p2precord.product.borrower_name),
+                unicode(p2precord.product.borrower_phone),
+                unicode(p2precord.product.borrower_id_number),
+                unicode(p2precord.product.borrower_bankcard_bank_code),
+                unicode(p2precord.product.borrower_bankcard),
+                unicode(p2precord.product.borrower_bankcard_type),
+                unicode(p2precord.product.borrower_bankcard_bank_province),
+                unicode(p2precord.product.borrower_bankcard_bank_city),
+                unicode(p2precord.product.borrower_bankcard_bank_branch)
+            ])
+
+        return output.getvalue()
+
+
+class EearningReportGenerator(ReportGeneratorBase):
+    prefix = 'zsjljs'
+    reportname_format = u'赠送记录 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'用户姓名', u'用户手机号', u'p2p的id', u'p2p名',
+                         u'收益金额', u'订单号', u'交易流水id', u'是否打款', u'创建时间', u'更新时间', u'审核时间'])
+
+        earnings = Earning.objects.filter(create_time__gte=start_time, create_time__lt=end_time)
+
+        for index, earning in enumerate(earnings):
+            writer.writerow([
+                str(index + 1),
+                earning.user.wanglibaouserprofile.name,
+                earning.user.wanglibaouserprofile.phone,
+                str(earning.product_id),
+                earning.product.short_name,
+                str(earning.amount),
+                str(earning.order_id),
+                str(earning.margin_record_id),
+                str(earning.paid),
+                timezone.localtime(earning.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                timezone.localtime(earning.update_time).strftime("%Y-%m-%d %H:%M:%S"),
+                # timezone.localtime(earning.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
+            ])
+        return output.getvalue()
 
 class ReportGenerator(object):
 

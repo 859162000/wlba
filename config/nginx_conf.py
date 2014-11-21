@@ -62,6 +62,7 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
                 ['proxy_cache', 'static-cache'],
                 ['proxy_cache_valid', '200 302 60m'],
                 ['proxy_cache_valid', '404 1m'],
+                ['access_log', 'off'],
             ]],
 
             [['location', '/media'], [
@@ -69,6 +70,7 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
                 ['proxy_cache', 'static-cache'],
                 ['proxy_cache_valid', '200 302 60m'],
                 ['proxy_cache_valid', '404 1m'],
+                ['access_log', 'off'],
             ]],
         ]],
         [['upstream apps'], [('server', name + ':' + upstream_port) for name in apps]]

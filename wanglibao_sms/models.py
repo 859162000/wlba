@@ -50,6 +50,10 @@ class ShortMessage(models.Model):
         (u'失败', u'失败'),
     ), default=u'发送中')
     context = models.TextField(u'相关信息', blank=True)
+    channel = models.CharField(u'短信网关', max_length=10, choices=(
+        (u'慢道', u'慢道'),
+        (u'亿美', u'亿美'),
+    ), default=u'慢道')
     created_at = models.DateTimeField(u'发送时间', auto_now_add=True)
 
     class Meta:
@@ -62,10 +66,21 @@ class ShortMessage(models.Model):
 
 def send_manual_message(sender, instance, **kwargs):
     if instance.type == u'手动' and instance.status == u'发送中':
-        from celery.execute import send_task
-        send_task("wanglibao_sms.tasks.send_messages", kwargs={
+        #from celery.execute import send_task
+        from wanglibao_sms.tasks import send_messages
+        if instance.channel == u'慢道':
+            channel = 1
+        else:
+            channel = 2
+        #send_task("wanglibao_sms.tasks.send_messages", kwargs={
+        #    'phones': instance.phones.split(' '),
+        #    'messages': [instance.contents],
+        #    'channel': channel
+        #})
+        send_messages.apply_async(kwargs={
             'phones': instance.phones.split(' '),
-            'messages': [instance.contents]
+            'messages': [instance.contents],
+            'channel': channel
         })
         instance.status = u'成功'
         instance.save()

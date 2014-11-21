@@ -22,10 +22,10 @@ from order.models import Order
 from order.utils import OrderHelper
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_pay.models import Bank, Card, PayResult
+from wanglibao_pay.models import Bank, Card, PayResult, PayInfo
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay.lianlian_pay import LianlianPay
-from wanglibao_pay.models import PayInfo
+from wanglibao_pay import lianlian_pay
 from wanglibao_p2p.models import P2PRecord
 import decimal
 from wanglibao_pay.serializers import CardSerializer
@@ -33,9 +33,11 @@ from wanglibao_pay.util import get_client_ip
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
+from wanglibao_account import message as inside_message
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from django.conf import settings
+from wanglibao_announcement.utility import AnnouncementAccounts
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -51,7 +53,8 @@ class BankListView(TemplateView):
 
         context.update({
             'default_bank': default_bank,
-            'banks': Bank.get_deposit_banks()[:12]
+            'banks': Bank.get_deposit_banks()[:12],
+            'announcements': AnnouncementAccounts
         })
         return context
 
@@ -138,6 +141,20 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
+        title,content = messages.msg_pay_ok(amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":request.user.id,
+            "title":title,
+            "content":content,
+            "mtype":"activityintro"
+        })
+        #inside_message.send_one.apply_async(kwargs={
+        #    "user_id":request.user.id,
+        #    "title":"%s" % result,
+        #    "content":u"%s,%s元" % (result, amount),
+        #    "mtype":"pay"
+        #})
+
         return self.render_to_response({
             'result': result,
             'amount': amount
@@ -170,7 +187,8 @@ class WithdrawView(TemplateView):
             'banks': banks,
             'user_profile': self.request.user.wanglibaouserprofile,
             'margin': self.request.user.margin.margin,
-            'fee': HuifuPay.FEE
+            'fee': HuifuPay.FEE,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -224,6 +242,7 @@ class WithdrawCompleteView(TemplateView):
 
             order = OrderHelper.place_order(request.user, Order.WITHDRAW_ORDER, pay_info.status,
                                             pay_info=model_to_dict(pay_info))
+
             pay_info.order = order
             keeper = MarginKeeper(request.user, pay_info.order.pk)
             margin_record = keeper.withdraw_pre_freeze(amount)
@@ -234,6 +253,13 @@ class WithdrawCompleteView(TemplateView):
             send_messages.apply_async(kwargs={
                 'phones': [request.user.wanglibaouserprofile.phone],
                 'messages': [messages.withdraw_submitted(amount, timezone.now())]
+            })
+            title,content = messages.msg_withdraw(timezone.now(), amount)
+            inside_message.send_one.apply_async(kwargs={
+                "user_id":request.user.id,
+                "title":title,
+                "content":content,
+                "mtype":"withdraw"
             })
         except decimal.DecimalException:
             result = u'提款金额在0～50000之间'
@@ -344,6 +370,8 @@ class CardViewSet(ModelViewSet):
 
 
 class WithdrawTransactions(TemplateView):
+    """ for admin
+    """
     template_name = 'withdraw_transactions.jade'
 
     def post(self, request):
@@ -363,6 +391,7 @@ class WithdrawTransactions(TemplateView):
                 }
             )
         elif action == 'confirm':
+            total_amount = 0
             for payinfo in payinfos:
                 with transaction.atomic():
                     if payinfo.status != PayInfo.ACCEPTED and payinfo.status != PayInfo.PROCESSING:
@@ -371,10 +400,22 @@ class WithdrawTransactions(TemplateView):
 
                     marginKeeper = MarginKeeper(payinfo.user)
                     marginKeeper.withdraw_ack(payinfo.amount)
+
+                    total_amount += payinfo.amount
                     payinfo.status = PayInfo.SUCCESS
                     payinfo.confirm_time = timezone.now()
                     payinfo.save()
 
+            #发站内信
+            if total_amount:
+                user_id = payinfos[0].user.id
+                title,content = messages.msg_withdraw_success(timezone.now(), total_amount)
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":user_id,
+                    "title":title,
+                    "content":content,
+                    "mtype":"withdraw"
+                })
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
             })
@@ -410,6 +451,14 @@ class WithdrawRollback(TemplateView):
         send_messages.apply_async(kwargs={
             "phones": [payinfo.user.wanglibaouserprofile.phone],
             "messages": [messages.withdraw_failed(error_message)]
+        })
+
+        title,content = messages.msg_withdraw_fail(timezone.now(), payinfo.amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id":payinfo.user.id,
+            "title":title,
+            "content":content,
+            "mtype":"withdraw"
         })
 
         return HttpResponse({
@@ -563,7 +612,7 @@ class AdminTransactionDeposit(TemplateView):
 class LianlianAppPayView(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def POST(self, request):
+    def post(self, request):
         lianpay = LianlianPay()
         result = lianpay.ios_pay(request)
         return Response(result)
@@ -572,10 +621,51 @@ class LianlianAppPayView(APIView):
 class LianlianAppPayCallbackView(APIView):
     permission_classes = ()
 
-    def POST(self, request):
+    def post(self, request):
         lianpay = LianlianPay()
         result = lianpay.ios_pay_callback(request)
         if not result['ret_code']:
             result['ret_code'] = "0000"
             result['ret_msg'] = "SUCCESS"
+        return Response(result)
+
+class BankCardAddView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = lianlian_pay.add_bank_card(request)
+        return Response(result)
+
+class BankCardListView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = lianlian_pay.list_bank_card(request)
+        return Response(result)
+
+class BankCardDelView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = lianlian_pay.del_bank_card(request)
+        return Response(result)
+
+class BankListAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = lianlian_pay.list_bank(request)
+        return Response(result)
+
+class LianlianWithdrawAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        lianpay = LianlianPay()
+        result = lianpay.ios_withdraw(request)
+        if not result['ret_code']:
+            send_messages.apply_async(kwargs={
+                'phones': [result['phone']],
+                'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
+            })
         return Response(result)

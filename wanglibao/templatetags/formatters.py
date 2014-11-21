@@ -140,7 +140,7 @@ def safe_id(id_number):
     Show part of id_number
     """
 
-    result = id_number[:-4] + '*' * 4
+    result = id_number[:-12] + '*' * 12
 
     return result
 
@@ -160,6 +160,15 @@ def safe_name_last(name):
     """
 
     result = name[:1] + "*" * 3
+    return result
+
+@register.filter
+def safe_name_first(name):
+    """
+    Show last word
+    """
+
+    result = "*" * 2 + name[-1]
     return result
 
 @register.filter

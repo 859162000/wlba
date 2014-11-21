@@ -81,6 +81,7 @@ INSTALLED_APPS = (
 
     'trust',
     'wanglibao_account',
+    'wanglibao_announcement',
     'wanglibao_sms',
     'wanglibao_bank_financing',
     'wanglibao_fund',
@@ -105,6 +106,7 @@ INSTALLED_APPS = (
     'wanglibao_help',
 
     'report',
+    'misc',
 
     'provider',
     'provider.oauth2',
@@ -282,6 +284,12 @@ SMS_MANDAO_MD5_PWD = '4A4080BB5FCCC3422E14EA8247D1062C'
 
 SMS_BACKEND = 'wanglibao_sms.backends.ManDaoSMSBackEnd'
 
+
+SMS_EMAY_SN = "6SDK-EMY-6688-KEZSM"
+SMS_EMAY_KEY = "wanglibao"
+SMS_EMAY_PWD = "660687"
+SMS_EMAY_URL = "http://sdk4report.eucp.b2m.cn:8080/sdk/SDKService?wsdl"
+
 # Default login redirect url
 LOGIN_REDIRECT_URL = '/'
 
@@ -345,6 +353,10 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'p2p': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+        'rest': {
             'handlers': ['file'],
             'level': 'DEBUG',
         }
@@ -421,7 +433,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'report-generate': {
         'task': 'report.tasks.generate_report',
-        'schedule': crontab(minute=0, hour=15),
+        'schedule': crontab(minute=0, hour=16),
     },
     'generate_site_data': {
         'task': 'marketing.tasks.generate_site_data',
@@ -443,6 +455,12 @@ if ENV == ENV_PRODUCTION:
     PAY_URL = 'https://mas.chinapnr.com'
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
+    LIAN_MER_ID = ''
+    LIAN_PAY_SECRET_KEY = ''
+    LIAN_PAY_URL = ''
+
+    YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
+    YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 elif ENV == ENV_PREPRODUCTION:
     CALLBACK_HOST = 'https://pre.wanglibao.com'
     MER_ID = '872724'
@@ -452,6 +470,12 @@ elif ENV == ENV_PREPRODUCTION:
     PAY_URL = 'https://mas.chinapnr.com'
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
+    LIAN_MER_ID = ''
+    LIAN_PAY_SECRET_KEY = ''
+    LIAN_PAY_URL = ''
+
+    YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
+    YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
     MER_ID = '510672'
@@ -461,9 +485,23 @@ else:
     PAY_URL = 'http://test.chinapnr.com'
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
+    LIAN_MER_ID = '201408071000001543'
+    LIAN_PAY_SECRET_KEY = '201408071000001543test_20140812'
+    LIAN_PAY_URL = ''
+
+    YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
+    YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
+
 PAY_BACK_RETURN_URL = CALLBACK_HOST + '/pay/deposit/callback/'
 PAY_RET_URL = CALLBACK_HOST + '/pay/deposit/complete/'
 WITHDRAW_BACK_RETURN_URL = CALLBACK_HOST + '/pay/withdraw/callback/'
+
+LIAN_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/lianlian/app/deposit/complete/'
+LIAN_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/lianlian/app/deposit/callback/'
+
+YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
+YTX_TOKEN = "dbf6b3bf0d514c6fa21cd12d29930c18"
+YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 if ENV == ENV_DEV:
@@ -487,3 +525,19 @@ ADMIN_ADDRESS='AK7WtEQ4Q9KPs8Io_zOncw'
 # DATE_FORMAT='Y-m-d'
 
 # AUTH_PROFILE_MODULE = 'wanglibao_profile.WanglibaoUserProfile'
+CKEDITOR_CONFIGS = {
+    "default": {
+        'toolbar_custom': [
+            ['Source'],['Cut','Copy','Paste','PasteText','PasteFromWord'],
+            ['Styles','Format','Font','FontSize'],
+            ['-','Find','Replace','-','SelectAll','RemoveFormat'],
+            '/',
+            ['Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker','Undo','Redo'],
+            ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+            ['TextColor', 'BGColor'],['Link','Unlink','Anchor'],
+            ['Image', 'Flash', 'Table', 'HorizontalRule'],
+            ['Smiley', 'SpecialChar'],
+        ],
+        'toolbar': 'custom',
+    }
+}

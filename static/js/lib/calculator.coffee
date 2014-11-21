@@ -45,6 +45,7 @@ define ['jquery'], ($)->
     target = $(e.target)
     total_amount = parseFloat(target.attr 'data-total-amount')
     total_earning = parseFloat(target.attr 'data-total-earning')
+    fee_total_earning = parseFloat(target.attr 'total-fee-earning')
     existing = parseFloat(target.attr 'data-existing')
     amount = parseFloat(target.val()) || 0
 
@@ -55,15 +56,24 @@ define ['jquery'], ($)->
     amount = parseFloat(existing) + parseFloat(amount)
 
     earning = ((amount / total_amount) * total_earning).toFixed(2)
+    fee_earning = ((amount / total_amount) * fee_total_earning).toFixed(2)
 
     if earning < 0
       earning = 0
 
     earning_elements = (target.attr 'data-target').split(',')
+    fee_elements = (target.attr 'fee-target').split(',')
     for earning_element, i in earning_elements
       if earning and $.isNumeric(earning)
         $(earning_element).text earning
       else
         $(earning_element).text "0.00"
+
+    for fee_element, i in fee_elements
+      if fee_earning and $.isNumeric(fee_earning)
+        $(fee_element).text fee_earning
+      else
+        $(fee_element).text "0.00"
+
 
   $('input[data-role=p2p-calculator]').keyup()

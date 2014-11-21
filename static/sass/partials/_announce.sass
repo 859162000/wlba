@@ -1,0 +1,68 @@
+.announcement-block
+  background: #fafafa
+  padding: 5px 5px 5px 0
+  font-size: $font-s
+
+  .scrollText
+    height: 25px
+    overflow: hidden
+
+  .announcement-block-title
+    border-left: solid 2px $color-red
+
+    text-indent: 10px
+
+    li
+      line-height: 25px
+      height: 25px
+
+      a
+        &:hover
+          color: #1f8ccd
+
+      span
+        +inline-block
+        color: $color-text-d4
+        margin-left: 20px
+
+.panel-announce-bar-content
+  a
+    &:hover
+      color: #1f8ccd
+
+.announce-content-title
+  padding-top: $space-s
+  line-height: 50px
+  border-bottom: solid 1px #cccccc
+
+  .announce-date
+    text-align: center
+    font-size: $font-s
+    color: $color-text-d4
+
+.announce-content
+  font-size: $font-s
+  padding: $space-sm $space-s
+  overflow: hidden
+
+  p
+    font-size: $font-s
+    line-height: 30px
+    margin-bottom: 15px
+
+  strong
+    font-weight: 800
+
+  em
+    font-style: italic
+
+.announce-content-list
+
+  li
+    +clearfix
+    font-size: $font-s
+    line-height: 50px
+    border-bottom: dotted 1px #cccccc
+
+    &:hover
+      background: #f9f9f9

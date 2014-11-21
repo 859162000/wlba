@@ -5,14 +5,15 @@
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
       tools: 'lib/modal.tools',
-      "jquery.validate": 'lib/jquery.validate.min'
+      "jquery.validate": 'lib/jquery.validate.min',
+      'jquery.modal': 'lib/jquery.modal.min'
     },
     shims: {
       "jquery.validate": ['jquery']
     }
   });
 
-  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools'], function($, _, backend, calculator, countdown, tool) {
+  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal'], function($, _, backend, calculator, countdown, tool, modal) {
     var buildTable;
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0 && !/\./ig.test(value);
@@ -60,7 +61,7 @@
                 title: '温馨提示',
                 msg: '份额认购成功',
                 callback_ok: function() {
-                  return location.reload();
+                  return window.location.href = "/accounts/home";
                 }
               });
             }).fail(function(xhr) {
@@ -148,7 +149,7 @@
       }
       return html.join("");
     };
-    return $('.get-more').click(function(e) {
+    $('.get-more').click(function(e) {
       e.preventDefault();
       if (invest_result && invest_result.length > 0) {
         $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)));
@@ -159,8 +160,9 @@
         }
       }
     });
+    return $(".xunlei-binding-modal").click(function() {
+      return $('#xunlei-binding-modal').modal();
+    });
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_detail.map

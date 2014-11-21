@@ -55,3 +55,19 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
 
   $('#topNotice').click (e) ->
         $('.common-inform').toggleClass('off')
+
+  $('#p2p-new-announce').click (e)->
+    e.stopPropagation()
+    window.open($(this).attr('data-url'))
+
+  $(document).ready ->
+    setInterval (->
+      $("#announce-title-scroll").find("ul:first").animate
+        marginTop: "-25px"
+      , 500, ->
+        $(this).css(marginTop: "0px").find("li:first").appendTo this
+        return
+      return
+    ), 3000
+  return
+

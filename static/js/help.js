@@ -51,10 +51,10 @@
       tar = $('.help-menu li:eq(0)');
       tar.addClass('current');
       source = $('.help-box[data-source="' + tar.attr('data-target') + '"]');
-      return source.addClass('active');
+      if (!source.hasClass('active')) {
+        return source.addClass('active');
+      }
     });
   });
 
 }).call(this);
-
-//# sourceMappingURL=help.map

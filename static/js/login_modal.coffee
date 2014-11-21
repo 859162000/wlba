@@ -95,7 +95,12 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         type: "POST"
         data: $("#login-modal-form").serialize()
       .done (data,textStatus) ->
-        location.reload()
+        next_url = ''
+        if(window.location.search)
+          next_url = window.location.search.substring(6)
+          window.location.href = next_url
+        else
+          location.reload()
       .fail (xhr)->
         result = JSON.parse xhr.responseText
         message = result.message
@@ -145,7 +150,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         type: "POST"
         data: $(form).serialize()
       .done (data,textStatus) ->
-        location.reload()
+          location.reload()
       .fail (xhr)->
         result = JSON.parse xhr.responseText
         message = result.message
@@ -299,7 +304,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       window.location.href = $("#invite_top_bar").attr("data-url")
     .fail (xhr)->
       if xhr.status == 403
-        $('.login-modal').trigger('click')
+        window.location.href = '/activity/gold/'
         return
 
   $("#agreement").change (value)->
@@ -329,6 +334,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
     ), 100
     #return false
 
+  backend.loadMessageCount('unread')
+    .done (data)->
+      if data.count > 0
+        $('#message_count').show()
+        $('#message_count').html(data.count)
   #author: hetao; time: 2014.10.15
 #  $(window).load (e) ->
 #    $.getScript "http://wpa.b.qq.com/cgi/wpa.php", (data, textStatus, jqxhr) ->

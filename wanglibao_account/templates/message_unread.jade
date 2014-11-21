@@ -1,0 +1,19 @@
+extends account_home_base
+- load formatters
+- load mathfilters
+block head
+  - with '站内信' as title
+    include include/head
+block sidebar
+  - with '站内信' as activeItem
+    include include/user_center_sidebar
+block main
+  .panel
+    .account-home-panel--title-bar__product
+      ul.title-bar--tabs
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href="/accounts/message/") 全部
+        li.title-bar--tab.active
+          a.title-bar--tab--anchor(href='javascript:void(0)') 未读
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href='/accounts/message/read/') 已读

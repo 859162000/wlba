@@ -20,6 +20,12 @@ block main
       else
         span
           a(href="/accounts/id_verify/") 还未进行实名认证
+      //|&nbsp;&nbsp;&nbsp;
+      //if xunlei_vip.isvip == True
+      //  span.icon.xunlei-vip-yes(title="已绑定迅雷会员")
+      //else
+      //  a.xunlei-binding-modal(href="#xunlei-binding-modal")
+      //    span.icon.xunlei-vip-no(title="未绑定迅雷会员")
 
     .card-panel
       .total-asset-money-card
@@ -104,6 +110,14 @@ block main
                 span.big_number {{margin_withdrawing|money_format}}
               p.desc 提现中冻结金额
 
+        //.space-vertical-s
+        //.row
+        //  .xunlei-tip-container
+        //    span.p2p-xunlei-icon
+        //    if user.is_authenticated and xunlei_vip.isvip == True
+        //      您已是绑定迅雷会员，投资即可获额外收益。
+        //    else
+        //      只要在满标之前<a href="#xunlei-binding-modal" class="blue xunlei-binding-modal">绑定迅雷会员</a>，即可获额外收益。
         .space-vertical-s
 
         table.table
@@ -114,45 +128,59 @@ block main
               th 投资金额
               th 状态
               th 已收益/预期收益
+              th 活动收益
               th 还款计划
               th 借款合同
           tbody
-            if p2p_equities
-              each equity in p2p_equities
+            if result
+              for row in result
+
+                //equity = row.equity
+                //
+                //earning = row.earning
+                //term = equity.term
+                //total_income = equity.total_interest
                 tr
-                  term = equity.term
-                  total_income = equity.total_interest
-
-                  td {{equity.created_at | date:"Y-m-d H:i:s"}}
+                  td {{row.equity.created_at | date:"Y-m-d H:i:s"}}
                   td
-                    p <a href="/p2p/detail/{{equity.product.id}}/">{{equity.product.short_name}}</a>
-                    p 年化收益：{{equity.product.expected_earning_rate}}%
-                    p 期限：{{equity.product.period}}个月
-                  td {{equity.equity | money_format}}
+                    p
+                      //if row.equity.product.activity
+                      //  span.p2p-xunlei-icon
+                      a(href="/p2p/detail/{{row.equity.product.id}}/") {{row.equity.product.short_name}}
+                      //<a href="/p2p/detail/{{row.equity.product.id}}/">{{row.equity.product.short_name}}</a>
+                    p 年化收益：{{row.equity.product.expected_earning_rate}}%
+                    p 期限：{{row.equity.product.period}}个月
+                  td {{row.equity.equity | money_format}}
 
-                  status = equity.product.display_status
-
-                  if status != '还款中'
-                    td {{status}}
+                  if row.equity.product.display_status != '还款中'
+                    td {{row.equity.product.display_status}}
                   else
-                    td {{status}}{{term}}/{{equity.product.amortization_count}}
+                    td {{row.equity.product.display_status}}{{row.equity.term}}/{{row.equity.product.amortization_count}}
 
-                  if status == '还款中' or status == '已完成'
-                    td <span class="highlight">{{equity.paid_interest | money_format}}</span> / {{total_income | money_format}}
+                  if row.equity.product.display_status == '还款中' or row.equity.product.display_status == '已完成'
+                    td <span class="highlight">{{row.equity.paid_interest | money_format}}</span> / {{row.equity.total_interest | money_format}}
                   else
                     td -
 
-                  if status == '还款中' or status == '已完成'
+                  td
+                    if row.earning
+                      p.highlight {{row.earning.amount | money_format}}
+                      p {{row.earning.product.activity.name}}
+                      p 已发放
+                    else
+                      | -
+
+                  if row.equity.product.display_status == '还款中' or row.equity.product.display_status == '已完成'
                     td
-                      a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{equity.product.id}}/") 还款计划
+                      a.button.button-small.button-pink(href="/accounts/p2p/amortization/{{row.equity.product.id}}/") 还款计划
                     td
-                      a.button.button-small.button-pink(href="/accounts/p2p/contract/{{equity.product.id}}/" target="_blank") 合同
+                      a.button.button-small.button-pink(href="/accounts/p2p/contract/{{row.equity.product.id}}/" target="_blank") 合同
                   else
                     td -
                     td -
             else
               tr
-                td(colspan='7') 无持仓记录
+                td(colspan='8') 无持仓记录
 
         .space-vertical-m
 
@@ -210,6 +238,30 @@ block main
                 td(colspan='4') 无持仓记录
 
         .space-vertical-m
+
+  if not xunlei_vip.isvip
+        #xunlei-binding-modal(style="display:none;")
+          .modal-header
+            .modal-title-bar
+              .modal-title 绑定迅雷会员
+          .modal-body
+            .modal-content-padding
+              p.align-center
+                img(src="/static/images/activity/xunlei_wanglibao.png")
+              ul.clearfix
+                li &bull; 绑定迅雷会员后，投资指定P2P产品，即可额外获得
+                  span.blue 1%
+                  |年化收益！
+                li &bull; 奖励收益将在满标后2个工作日内发放。
+              .space-vertical-l
+              .row
+                .span7
+                  a.button.button-account(href='/accounts/login/xunlei', target="_blank")
+                    span.font-s.padding-l-r-m 立即绑定迅雷会员
+                .span5-omega.padding-top-xs.align-center.font-s
+                  span 我还不是会员，
+                  a.blue(href="http://pay.vip.xunlei.com/baijin.html?referfrom=wlb", target="_blank") 立即开通
+            .space-vertical-s
 
 block script
   script.
