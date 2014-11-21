@@ -467,9 +467,9 @@ class P2PListAPI(APIView):
             try:
                 date = [int(i) for i in date.split('-')]
             except:
-                return HttpResponse(renderers.JSONRenderer().render({'message': u'错误的date'}, 'application/json'))
+                return HttpResponse(renderers.JSONRenderer().render({'message': u'错误的date', 'code': -1}, 'application/json'))
         else:
-            return HttpResponse(renderers.JSONRenderer().render({'message': u'date的必传'}, 'application/json'))
+            return HttpResponse(renderers.JSONRenderer().render({'message': u'date的必传', 'code': -2}, 'application/json'))
 
         start_time = timezone.datetime(*date)
 
