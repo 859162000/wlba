@@ -65,3 +65,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
 
         $("#validate_id_button").removeClass "disabled"
         tool.modalAlert({title: '温馨提示', msg: result.message})
+
+
+
+  (->
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
+    $.getJSON url, {}, (json)->
+      $('input[name="captcha_0"]').val(json.key)
+      $('img.captcha').attr('src', json.image_url)
+    return
+  )()

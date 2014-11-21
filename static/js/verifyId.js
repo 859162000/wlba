@@ -19,7 +19,7 @@
       reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
       return reg.test(value);
     }, '请输入有效身份证');
-    return $('#validate_id_form').validate({
+    $('#validate_id_form').validate({
       rules: {
         name: {
           required: true
@@ -88,6 +88,14 @@
         });
       }
     });
+    return (function() {
+      var url;
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+      $.getJSON(url, {}, function(json) {
+        $('input[name="captcha_0"]').val(json.key);
+        return $('img.captcha').attr('src', json.image_url);
+      });
+    })();
   });
 
 }).call(this);
