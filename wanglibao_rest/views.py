@@ -414,8 +414,11 @@ class IdValidate(APIView):
         form = IdVerificationForm(request, request.POST)
         if form.is_valid():
             user = self.request.user
-            name = request.DATA.get("name", "")
-            id_number = request.DATA.get("id_number", "")
+            # name = request.DATA.get("name", "")
+            # id_number = request.DATA.get("id_number", "")
+
+            name = form.cleaned_data['name']
+            id_number = form.cleaned_data['id_number']
 
             verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
@@ -424,7 +427,6 @@ class IdValidate(APIView):
                                     "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066",
                                     "error_number": ErrorNumber.try_too_many_times
                                 }, status=400)
-
 
             id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
             if id_verify_count >= 1:
