@@ -74,6 +74,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
           $(element).removeClass 'button-gray'
           #author:hetao;datetime:2014.11.19;description: 增加语音验证链接（计时完成后）
           $('.voice').removeClass('hidden')
+          $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>')
           $('.voice-validate').removeAttr 'disabled'
 
       # Fire now and future
@@ -190,7 +191,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
             element.text('语音验证码已经发送，请注意接听（' + count + '）')
           else
             clearInterval(intervalId)
-            element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code" class="voice-validate">语音验证</a>')
+            element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>')
             element.removeAttr 'disabled'
             button.removeAttr 'disabled'
             button.addClass 'button-red'

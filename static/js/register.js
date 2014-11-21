@@ -80,6 +80,7 @@
             $(element).addClass('button-red');
             $(element).removeClass('button-gray');
             $('.voice').removeClass('hidden');
+            $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>');
             return $('.voice-validate').removeAttr('disabled');
           }
         };
@@ -204,7 +205,7 @@
               return element.text('语音验证码已经发送，请注意接听（' + count + '）');
             } else {
               clearInterval(intervalId);
-              element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code" class="voice-validate">语音验证</a>');
+              element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>');
               element.removeAttr('disabled');
               button.removeAttr('disabled');
               button.addClass('button-red');
