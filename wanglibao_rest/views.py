@@ -372,8 +372,6 @@ class UserExisting(APIView):
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @csrf_protect
-    @login_required(login_url='/accounts/register/')
     def post(self, request, *args, **kwargs):
 
         form = IdVerificationForm(request, request.POST)
