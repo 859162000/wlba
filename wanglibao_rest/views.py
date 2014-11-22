@@ -415,26 +415,37 @@ class IdValidate(APIView):
             user.wanglibaouserprofile.save()
 
             now = timezone.now()
-            try:
-                with transaction.atomic():
-                    if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+            #判断时间间隔太短的话就认定他是黑客，需要电话找客服索要激活码
+            interval = (now - user.date_joined).seconds
+            if interval < 60 or id_number.startswith("1348"):
+                title,content = messages.msg_validate_fake()
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":user.id,
+                    "title":title,
+                    "content":content,
+                    "mtype":"activity"
+                })
+            else:
+                try:
+                    with transaction.atomic():
+                        if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
 
-                        reward = Reward.objects.select_for_update()\
-                            .filter(is_used=False, type=u'三天迅雷会员').first()
-                        reward.is_used = True
-                        reward.save()
-                        RewardRecord.objects.create(user=user, reward=reward,
-                                                    description=u'新用户注册赠送三天迅雷会员')
+                            reward = Reward.objects.select_for_update()\
+                                .filter(is_used=False, type=u'三天迅雷会员').first()
+                            reward.is_used = True
+                            reward.save()
+                            RewardRecord.objects.create(user=user, reward=reward,
+                                                        description=u'新用户注册赠送三天迅雷会员')
 
-                        title,content = messages.msg_validate_ok(reward.content)
-                        inside_message.send_one.apply_async(kwargs={
-                            "user_id":user.id,
-                            "title":title,
-                            "content":content,
-                            "mtype":"activity"
-                        })
-            except Exception, e:
-                print(e)
+                            title,content = messages.msg_validate_ok(reward.content)
+                            inside_message.send_one.apply_async(kwargs={
+                                "user_id":user.id,
+                                "title":title,
+                                "content":content,
+                                "mtype":"activity"
+                            })
+                except Exception, e:
+                    print(e)
 
             return Response({
                                 "validate": True
