@@ -3,12 +3,14 @@
 import re
 import json
 import logging
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.core.urlresolvers import resolve
 from django.db.models import Q
 from django.db.models import F
 from django.http import QueryDict
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
@@ -409,6 +411,8 @@ class UserExisting(APIView):
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
+    @csrf_protect
+    @login_required(login_url='/accounts/register/')
     def post(self, request, *args, **kwargs):
 
         form = IdVerificationForm(request, request.POST)

@@ -510,7 +510,7 @@ if ENV == ENV_DEV:
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
 
-CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots', 'captcha.helpers.noise_arcs')
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ('127.0.0.1',)
