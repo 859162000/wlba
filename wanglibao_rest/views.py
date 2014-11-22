@@ -10,6 +10,7 @@ from django.core.urlresolvers import resolve
 from django.db.models import Q
 from django.db.models import F
 from django.http import QueryDict
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -411,8 +412,7 @@ class UserExisting(APIView):
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @csrf_protect
-    @login_required(login_url='/accounts/register/')
+    @method_decorator(csrf_protect)
     def post(self, request, *args, **kwargs):
 
         form = IdVerificationForm(request, request.POST)
