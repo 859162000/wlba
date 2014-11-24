@@ -411,7 +411,7 @@ class UserExisting(APIView):
 
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
-    
+
     @method_decorator(csrf_protect)
     def post(self, request, *args, **kwargs):
 
