@@ -1,5 +1,6 @@
 # encoding:utf-8
 
+import re
 import json
 import logging
 from django.contrib.auth.decorators import login_required
@@ -71,7 +72,7 @@ class SendRegisterValidationCodeView(APIView):
     The phone validate view which accept a post request and send a validate code to the phone
     """
     permission_classes = ()
-    #throttle_classes = (UserRateThrottle,)
+    throttle_classes = (UserRateThrottle,)
 
     def post(self, request, phone, format=None):
         phone_number = phone.strip()
@@ -302,9 +303,12 @@ class SendVoiceCodeAPIView(APIView):
         if not phone_number or not phone_number.isdigit():
             return Response({"ret_code":30111, "message": u"信息输入不完整"})
 
-        phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
-        if phone_check:
-            return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
+        if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
+            return Response({"ret_code":30112, "message": u"手机号输入有误"})
+
+        #phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
+        #if phone_check:
+        #    return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
 
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
         if phone_validate_code_item:
@@ -327,6 +331,41 @@ class SendVoiceCodeAPIView(APIView):
 
         status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
         logger.info("voice_code: %s" % cont)
+        return Response({"ret_code":0, "message":"ok"})
+
+class SendVoiceCodeTwoAPIView(APIView):
+    permission_classes = ()
+    throttle_classes = (UserRateThrottle,)
+
+    def post(self, request):
+        phone_number = request.DATA.get("phone", "").strip()
+        if not phone_number or not phone_number.isdigit():
+            return Response({"ret_code":30121, "message": u"信息输入不完整"})
+
+        if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
+            return Response({"ret_code":30122, "message": u"手机号输入有误"})
+
+        user = User.objects.filter(wanglibaouserprofile__phone=phone_number).first()
+        if not user:
+            return Response({"ret_code":30123, "message": u"手机号不存在"})
+
+        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        if phone_validate_code_item:
+            phone_validate_code_item.code_send_count += 1
+            phone_validate_code_item.save()
+        else:
+            now = timezone.now()
+            phone_validate_code_item = PhoneValidateCode()
+            validate_code = generate_validate_code()
+            phone_validate_code_item.validate_code = validate_code
+            phone_validate_code_item.phone = phone_number
+            phone_validate_code_item.last_send_time = now
+            phone_validate_code_item.code_send_count = 1
+            phone_validate_code_item.is_validated = False
+            phone_validate_code_item.save()
+
+        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
+        logger.info("voice_code2: %s" % cont)
         return Response({"ret_code":0, "message":"ok"})
 
 #云通讯语音验证码回调
@@ -379,8 +418,11 @@ class IdValidate(APIView):
         form = IdVerificationForm(request, request.POST)
         if form.is_valid():
             user = self.request.user
-            name = request.DATA.get("name", "")
-            id_number = request.DATA.get("id_number", "")
+            # name = request.DATA.get("name", "")
+            # id_number = request.DATA.get("id_number", "")
+
+            name = form.cleaned_data['name']
+            id_number = form.cleaned_data['id_number']
 
             verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
@@ -389,7 +431,6 @@ class IdValidate(APIView):
                                     "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066",
                                     "error_number": ErrorNumber.try_too_many_times
                                 }, status=400)
-
 
             id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
             if id_verify_count >= 1:
@@ -416,36 +457,36 @@ class IdValidate(APIView):
 
             now = timezone.now()
             #判断时间间隔太短的话就认定他是黑客，需要电话找客服索要激活码
-            interval = (now - user.date_joined).seconds
-            if interval < 60 or id_number.startswith("1348"):
-                title,content = messages.msg_validate_fake()
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id":user.id,
-                    "title":title,
-                    "content":content,
-                    "mtype":"activity"
-                })
-            else:
-                try:
-                    with transaction.atomic():
-                        if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
+            #interval = (now - user.date_joined).seconds
+            # if interval < 60 or id_number.startswith("1348"):
+            #     title,content = messages.msg_validate_fake()
+            #     inside_message.send_one.apply_async(kwargs={
+            #         "user_id":user.id,
+            #         "title":title,
+            #         "content":content,
+            #         "mtype":"activity"
+            #     })
+            # else:
+            try:
+                with transaction.atomic():
+                    if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
 
-                            reward = Reward.objects.select_for_update()\
-                                .filter(is_used=False, type=u'三天迅雷会员').first()
-                            reward.is_used = True
-                            reward.save()
-                            RewardRecord.objects.create(user=user, reward=reward,
-                                                        description=u'新用户注册赠送三天迅雷会员')
+                        reward = Reward.objects.select_for_update()\
+                            .filter(is_used=False, type=u'三天迅雷会员').first()
+                        reward.is_used = True
+                        reward.save()
+                        RewardRecord.objects.create(user=user, reward=reward,
+                                                    description=u'新用户注册赠送三天迅雷会员')
 
-                            title,content = messages.msg_validate_ok(reward.content)
-                            inside_message.send_one.apply_async(kwargs={
-                                "user_id":user.id,
-                                "title":title,
-                                "content":content,
-                                "mtype":"activity"
-                            })
-                except Exception, e:
-                    print(e)
+                        title,content = messages.msg_validate_ok(reward.content)
+                        inside_message.send_one.apply_async(kwargs={
+                            "user_id":user.id,
+                            "title":title,
+                            "content":content,
+                            "mtype":"activity"
+                        })
+            except Exception, e:
+                print(e)
 
             return Response({
                                 "validate": True

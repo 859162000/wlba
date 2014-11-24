@@ -683,7 +683,7 @@ class AccountTransactionDeposit(TemplateView):
     template_name = 'account_transaction_deposit.jade'
 
     def get_context_data(self, **kwargs):
-        pay_records = PayInfo.objects.filter(user=self.request.user, type=PayInfo.DEPOSIT)
+        pay_records = PayInfo.objects.filter(user=self.request.user, type=PayInfo.DEPOSIT).exclude(status=PayInfo.PROCESSING)
         pager = Paginator(pay_records, 20)
         page = self.request.GET.get('page')
         if not page:

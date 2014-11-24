@@ -93,7 +93,7 @@ def msg_register():
 
 def msg_register_authok(activation):
     title = u"注册成功"
-    content = u"感谢您注册网利宝。<br/>网利宝赠送您3天迅雷白金会员激活码，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/>立即兑换（<a href='http://pay.vip.xunlei.com/baijin.html' target='_blank'>http://pay.vip.xunlei.com/baijin.html</a>）<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"感谢您注册网利宝。<br/>网利宝赠送您3天迅雷白金会员激活码，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/>立即兑换（<a href='http://act.vip.xunlei.com/vip/2014/xlhyk/' target='_blank'>http://act.vip.xunlei.com/vip/2014/xlhyk/</a>）<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 def msg_validate_ok(activation):
@@ -109,7 +109,7 @@ def msg_validate_fake():
 #迅雷会员
 def msg_first_licai(activation):
     title = u"活动期首次理财成功"
-    content = u"感谢您在活动期间完成首次理财。<br/>网利宝赠送您1个月迅雷白金会员激活码，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/>立即兑换（<a href='http://pay.vip.xunlei.com/baijin.html' target='_blank'>http://pay.vip.xunlei.com/baijin.html</a>）<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"感谢您在活动期间完成首次理财。<br/>网利宝赠送您1个月迅雷白金会员激活码，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/>立即兑换（<a href='http://act.vip.xunlei.com/vip/2014/xlhyk/' target='_blank'>http://act.vip.xunlei.com/vip/2014/xlhyk/</a>）<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 #金山快盘

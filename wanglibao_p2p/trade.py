@@ -42,35 +42,36 @@ class P2PTrader(object):
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
         start_time = timezone.datetime(2014, 11, 12)
-        activity = self.product.activity
-        now = timezone.now()
-        # 快盘买就送
-        #activity.name，包含快盘就送流量
-        if u"快盘" in activity.name:
-            try:
-                with transaction.atomic():
-                    if Reward.objects.filter(is_used=False, type=u'快盘随机容量', end_time__gte=now).exists():
-                        reward = Reward.objects.select_for_update()\
-                            .filter(is_used=False, type=u'快盘随机容量').first()
-                        reward.is_used = True
-                        reward.save()
-                        RewardRecord.objects.create(user=self.user, reward=reward,
-                                                    description=u'首次购买快盘活动P2P产品赠送%s快盘容量' % reward.description)
-                        title,content = messages.msg_first_kuaipan(reward.description, reward.content)
-                        inside_message.send_one.apply_async(kwargs={
-                            "user_id":self.user.id,
-                            "title":title,
-                            "content":content,
-                            "mtype":"activity"
-                        })
-            except:
-                pass
 
         # 首次购买
         if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
 
+            activity = self.product.activity
+            now = timezone.now()
+            # 快盘首次买就送
+            #activity.name，包含快盘就送流量
+            if activity and u"快盘" in activity.name:
+                try:
+                    with transaction.atomic():
+                        if Reward.objects.filter(is_used=False, type=u'快盘随机容量', end_time__gte=now).exists():
+                            reward = Reward.objects.select_for_update()\
+                                .filter(is_used=False, type=u'快盘随机容量').first()
+                            reward.is_used = True
+                            reward.save()
+                            RewardRecord.objects.create(user=self.user, reward=reward,
+                                                        description=u'首次购买快盘活动P2P产品赠送%s快盘容量' % reward.description)
+                            title,content = messages.msg_first_kuaipan(reward.description, reward.content)
+                            inside_message.send_one.apply_async(kwargs={
+                                "user_id":self.user.id,
+                                "title":title,
+                                "content":content,
+                                "mtype":"activity"
+                            })
+                except:
+                    pass
+
             #activity.name 包含迅雷就送一个月迅雷会员
-            if u"迅雷" in activity.name:
+            if activity and u"迅雷" in activity.name:
                 try:
                     with transaction.atomic():
                         if Reward.objects.filter(is_used=False, type=u'一个月迅雷会员', end_time__gte=now).exists():
@@ -82,14 +83,13 @@ class P2PTrader(object):
                                                             description=u'首次购买迅雷活动P2P产品赠送一个月迅雷会员')
                                 title,content = messages.msg_first_licai(reward.content)
                                 inside_message.send_one.apply_async(kwargs={
-                                    "user_id":self.user.id,
-                                    "title":title,
-                                    "content":content,
-                                    "mtype":"activity"
+                                    "user_id": self.user.id,
+                                    "title": title,
+                                    "content": content,
+                                    "mtype": "activity"
                                 })
                 except:
                     pass
-
 
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
         #phone_verified 渠道客户判断
@@ -138,6 +138,7 @@ class P2PTrader(object):
 
         #投标成功发站内信
         pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
+
         title,content = messages.msg_bid_purchase(self.order_id, pname, amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id":self.user.id,
