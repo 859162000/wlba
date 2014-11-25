@@ -919,14 +919,14 @@ def ajax_register(request):
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
-
-                title,content = messages.msg_register()
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": auth_user.id,
-                    "title": title,
-                    "content": content,
-                    "mtype": "activityintro"
-                })
+                #
+                # title, content = messages.msg_register()
+                # inside_message.send_one.apply_async(kwargs={
+                #     "user_id": auth_user.id,
+                #     "title": title,
+                #     "content": content,
+                #     "mtype": "activityintro"
+                # })
 
                 return HttpResponse(messenger('done', user=request.user))
                 # return HttpResponseRedirect("/accounts/id_verify/")

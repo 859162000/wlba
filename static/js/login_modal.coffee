@@ -145,13 +145,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       error.appendTo $(element).parents('.form-row').children('.form-row-error')
 
     submitHandler: (form) ->
-      $.ajax
-        url: $(form).attr('action')
-        type: "POST"
-        data: $(form).serialize().replace(/MlGb=\w+(&|$)/ig,'')
-      .done (data,textStatus) ->
-        console.log(data)
-
 
       console.log($(form).serialize())
       $.ajax

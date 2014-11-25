@@ -90,9 +90,13 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
 
     def clean_MlGb(self):
         MlGb_src = self.cleaned_data.get('MlGb')
+
+        print 'MlGb_src:', MlGb_src
+
         if MlGb_src:
             phone = self.cleaned_data["identifier"]
             if mlgb_md5(phone, 'wang*@li&_!Bao') == MlGb_src:
+                print '_______________--', mlgb_md5(phone, 'wang*@li&_!Bao')
                 return MlGb_src
 
         raise forms.ValidationError(
