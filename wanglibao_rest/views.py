@@ -3,12 +3,15 @@
 import re
 import json
 import logging
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.core.urlresolvers import resolve
 from django.db.models import Q
 from django.db.models import F
 from django.http import QueryDict
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
@@ -525,6 +528,17 @@ class IdValidate(APIView):
             user.wanglibaouserprofile.save()
 
             now = timezone.now()
+            #判断时间间隔太短的话就认定他是黑客，需要电话找客服索要激活码
+            #interval = (now - user.date_joined).seconds
+            # if interval < 60 or id_number.startswith("1348"):
+            #     title,content = messages.msg_validate_fake()
+            #     inside_message.send_one.apply_async(kwargs={
+            #         "user_id":user.id,
+            #         "title":title,
+            #         "content":content,
+            #         "mtype":"activity"
+            #     })
+            # else:
             try:
                 with transaction.atomic():
                     if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():

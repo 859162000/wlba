@@ -101,6 +101,11 @@ def msg_validate_ok(activation):
     content = u"恭喜您完成实名认证，赠送给您的3天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
+def msg_validate_fake():
+    title = u"实名认证成功"
+    content = u"恭喜您完成实名认证，请您使用注册手机号码向客服索要3天迅雷白金会员激活码。<br/>参加精彩活动，享受1%%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
+    return title, content
+
 #迅雷会员
 def msg_first_licai(activation):
     title = u"活动期首次理财成功"
@@ -130,7 +135,7 @@ def msg_bid_success(product_name, date):
 
 def msg_pay_ok(amount):
     title = u"充值成功"
-    content = u"您的网利宝账户已成功充值￥%s元，请查收。<br/>活动期间：2014年11月1日-2014年12月31日<br/>活动1：投资不同产品，即送1个月迅雷白金会员或10G、50G、100G快盘网盘。<br/>活动2：参加精彩活动，额外获赠1%年化收益奖励。<br/>活动3：理财达到一定额度“迅雷白金会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/>活动4：邀请好友完成首次单笔1000元理财，双方共享60元话费，您再获赠好友首笔理财额度0.5%年化收益奖励。<br/><a href='/' target='_blank'>点击此处进行理财</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % amount
+    content = u"您的网利宝账户已成功充值￥%s元，请查收。<br/>活动期间：2014年11月1日-2014年12月31日<br/>活动1：投资不同产品，即送1个月迅雷白金会员或10G、50G、100G快盘网盘。<br/>活动2：参加精彩活动，额外获赠1%%年化收益奖励。<br/>活动3：理财达到一定额度“迅雷白金会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/>活动4：邀请好友完成首次单笔1000元理财，双方共享60元话费，您再获赠好友首笔理财额度0.5%%年化收益奖励。<br/><a href='/' target='_blank'>点击此处进行理财</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % amount
     return title, content
 
 def msg_withdraw(withtime, amount):
