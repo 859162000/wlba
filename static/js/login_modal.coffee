@@ -146,7 +146,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
 
     submitHandler: (form) ->
 
-      console.log($(form).serialize())
       $.ajax
         url: $(form).attr('action')
         type: "POST"
