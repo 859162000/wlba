@@ -922,10 +922,10 @@ def ajax_register(request):
 
                 title,content = messages.msg_register()
                 inside_message.send_one.apply_async(kwargs={
-                    "user_id":auth_user.id,
-                    "title":title,
-                    "content":content,
-                    "mtype":"activityintro"
+                    "user_id": auth_user.id,
+                    "title": title,
+                    "content": content,
+                    "mtype": "activityintro"
                 })
 
                 return HttpResponse(messenger('done', user=request.user))
