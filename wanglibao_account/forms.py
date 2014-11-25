@@ -33,7 +33,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
     invitecode = forms.CharField(label="Invitecode", required=False)
 
-    MlGb = forms.CharField(label='MlGb', required=True)
+    MlGb = forms.CharField(label='MlGb', required=False)
 
     error_messages = {
         'duplicate_username': u'该邮箱或手机号已经注册',
