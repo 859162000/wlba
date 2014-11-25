@@ -43,7 +43,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         'validate code not exist': u'没有发送验证码',
         'validate must not be null': u'验证码不能为空',
         'invite code not match': u'邀请码错误',
-        'mlgb error': u'非法请求'
+        'mlgb error': u'注册成功'
     }
 
     class Meta:
