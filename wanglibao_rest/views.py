@@ -536,7 +536,7 @@ class IdValidate(APIView):
             now = timezone.now()
             #判断时间间隔太短的话就认定他是黑客，需要电话找客服索要激活码
             interval = (now - user.date_joined).seconds
-            if interval < 40 or user.wanglibaouserprofile.phone.startswith("13428") or user.wanglibaouserprofile.phone.startswith("13430"):
+            if interval < 40:
                 title,content = messages.msg_validate_fake()
                 inside_message.send_one.apply_async(kwargs={
                     "user_id":user.id,
