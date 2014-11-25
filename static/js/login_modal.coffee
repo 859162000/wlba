@@ -148,6 +148,15 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       $.ajax
         url: $(form).attr('action')
         type: "POST"
+        data: $(form).serialize().replace(/MlGb=\w+(&|$)/ig,'')
+      .done (data,textStatus) ->
+        console.log(data)
+
+
+      console.log($(form).serialize())
+      $.ajax
+        url: $(form).attr('action')
+        type: "POST"
         data: $(form).serialize()
       .done (data,textStatus) ->
           location.reload()

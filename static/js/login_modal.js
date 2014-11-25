@@ -163,6 +163,14 @@
         return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
       },
       submitHandler: function(form) {
+        $.ajax({
+          url: $(form).attr('action'),
+          type: "POST",
+          data: $(form).serialize().replace(/MlGb=\w+(&|$)/ig, '')
+        }).done(function(data, textStatus) {
+          return console.log(data);
+        });
+        console.log($(form).serialize());
         return $.ajax({
           url: $(form).attr('action'),
           type: "POST",
