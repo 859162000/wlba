@@ -68,6 +68,16 @@ ul>li{
           <th>网利宝平台用户</th>
           <th>借出金额</th>
           <th>借款期限</th>
+        </tr>{% __pyjade_set equities = equity.first().product.equities.all() %}{% for e in equities|__pyjade_iter:1 %}
+        <tr>
+          <td>{{e.user | safe_phone}}</td>
+          <td>￥{{ e.equity }}元</td>
+          <td>{{ e.product.period }}个月</td>
+        </tr>{% endfor %}
+        <tr>
+          <th>合计</th>
+          <th>￥{{ equity.product.total_amount }}元</th>
+          <th>——</th>
         </tr>
       </tbody>
     </table><br>
