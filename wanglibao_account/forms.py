@@ -96,7 +96,6 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         if MlGb_src:
             phone = self.cleaned_data["identifier"]
             if mlgb_md5(phone, 'wang*@li&_!Bao') == MlGb_src:
-                print '_______________--', mlgb_md5(phone, 'wang*@li&_!Bao')
                 return MlGb_src
 
         raise forms.ValidationError(

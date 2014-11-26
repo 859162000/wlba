@@ -107,9 +107,7 @@
         },
         'validate_code': {
           required: true,
-          depends: function(e) {
-            return checkMobile($('#id_identifier').val());
-          }
+          depends: function(e) {}
         }
       },
       messages: {
@@ -164,12 +162,11 @@
       }
     });
     $("#register_submit").click(function(e) {
-      $('input[name="identifier"]').trigger('keyup');
-      if ($(this).hasClass("disabled")) {
-        e.preventDefault();
-        return;
+      e.preventDefault();
+      if (!$(this).hasClass("disabled")) {
+        $('input[name="identifier"]', $(this).parents('form')).trigger('keyup');
+        $('#register-form').submit();
       }
-      return $('#register_submit').submit();
     });
     return $(".voice").on('click', '.voice-validate', function(e) {
       var element, isMobile, url;
