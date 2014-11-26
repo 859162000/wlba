@@ -11,7 +11,6 @@ from marketing.models import RewardRecord, Reward
 from wanglibao_sms import messages
 from wanglibao_account import message as inside_message
 
-
 def collect_unvalid_user():
     """ 没有实名注册的用户,也没有发送激活码的用户,发送短信提示实名注册
     """
@@ -69,4 +68,102 @@ def send_message_about_code():
                     })
         except Exception, e:
             continue
+
+
+MESSAGE_TYPE = (
+    (u'三天迅雷会员', 0),
+    (u'七天迅雷会员', 1),
+    (u'一个月迅雷会员', 2),
+    (u'50G快盘容量', 3),
+    (u'100G快盘容量', 4),
+)
+
+class RewardStrategy():
+
+    def __init__(self, user):
+        self.user = user
+        self.reward = None
+        self.choice = {
+            u'三天迅雷会员': self._send_threeday_xunlei,
+            u'一个月迅雷会员': self._send_month_xunlei,
+            u'50G快盘容量': self._send_fifty_kuaipan,
+            u'100G快盘容量': self._send_hundred_kuaipan,
+        }
+
+    def reward_user(self, type):
+        """
+        type=u'三天迅雷会员'
+        """
+        now = timezone.now()
+
+        try:
+            with transaction.atomic():
+
+                if Reward.objects.filter(is_used=False, type=type, end_time__gte=now).exists():
+                    self.reward = Reward.objects.select_for_update()\
+                        .filter(is_used=False, type=type).first()
+                    self.reward.is_used = True
+                    self.reward.save()
+
+                    has_rewardrecord = self._keep_rewardrecord()
+
+                    if has_rewardrecord:
+                        self._send_reward_message(type)
+
+        except Exception, e:
+            raise e
+
+    def _keep_rewardrecord(self, description=''):
+        """
+        description=u'新用户注册赠送三天迅雷会员'
+        """
+
+        try:
+            RewardRecord.objects.create(user=self.user,
+                                        reward=self.reward,
+                                        description=description)
+
+
+
+            return True
+        except Exception, e:
+            return False
+
+    def _send_reward_message(self, type):
+        action = self.choice.get(type)
+        if action:
+            action()
+
+    def _send_threeday_xunlei(self):
+        """ 注册实名认证三天迅雷会员
+        """
+        title, content = messages.msg_validate_ok(self.reward.content)
+        self._send_message_template(title, content)
+
+    def _send_month_xunlei(self):
+        """ 首次理财,迅雷会员赠送一个月激活码
+        """
+        title, content = messages.msg_first_licai(self.reward.content)
+        self._send_message_template(title, content)
+
+    def _send_fifty_kuaipan(self):
+        """ 实名认证送快盘50G
+        """
+        title, content = messages.msg_validate_ok2(self.reward.content)
+        self._send_message_template(title, content)
+
+    def _send_hundred_kuaipan(self):
+        """ 首次理财送快盘100G
+        """
+        title, content = messages.msg_first_kuaipan(u'100G', self.reward.content)
+        self._send_message_template(title, content)
+
+
+    def _send_message_template(self, title, content):
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": self.user.id,
+            "title": title,
+            "content": content,
+            "mtype": "activity"
+        })
 
