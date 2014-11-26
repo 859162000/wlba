@@ -164,6 +164,7 @@
       }
     });
     $("#register_submit").click(function(e) {
+      $('input[name="identifier"]').trigger('keyup');
       if ($(this).hasClass("disabled")) {
         e.preventDefault();
         return;
