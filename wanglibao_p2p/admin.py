@@ -217,7 +217,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
     search_fields = ('user__wanglibaouserprofile__phone',)
-
+    raw_id_fields = ('product_amortization', 'user')
 
 class P2PRecordResource(resources.ModelResource):
     user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name=u'姓名')
