@@ -189,7 +189,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
     ]
-    list_display = ('id', 'name', 'short_name', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'priority')
+    list_display = ('id', 'name', 'short_name', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'preview_contract', 'priority')
     list_editable = ('priority',)
     list_filter = ('status',)
     search_fields = ('name',)
