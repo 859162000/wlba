@@ -146,7 +146,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
 
 
   $("#register_submit").click (e)->
-
+    $('input[name="identifier"]').trigger('keyup')
     if $(this).hasClass("disabled")
       e.preventDefault()
       return

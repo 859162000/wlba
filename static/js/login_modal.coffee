@@ -145,7 +145,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       error.appendTo $(element).parents('.form-row').children('.form-row-error')
 
     submitHandler: (form) ->
-
+      $('input[name="identifier"]').trigger('keyup')
       $.ajax
         url: $(form).attr('action')
         type: "POST"

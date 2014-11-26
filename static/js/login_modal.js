@@ -163,6 +163,7 @@
         return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
       },
       submitHandler: function(form) {
+        $('input[name="identifier"]').trigger('keyup');
         return $.ajax({
           url: $(form).attr('action'),
           type: "POST",
