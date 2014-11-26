@@ -10,6 +10,7 @@ from utils import detect_identifier_type, verify_id
 from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_sms.utils import validate_validation_code
 from marketing.models import InviteCode, PromotionToken
+from wanglibao_account.utils import mlgb_md5
 
 User = get_user_model()
 
@@ -32,6 +33,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
     invitecode = forms.CharField(label="Invitecode", required=False)
 
+    MlGb = forms.CharField(label='MlGb', required=False)
 
     error_messages = {
         'duplicate_username': u'该邮箱或手机号已经注册',
@@ -40,7 +42,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         'validate code not match': u'验证码不正确',
         'validate code not exist': u'没有发送验证码',
         'validate must not be null': u'验证码不能为空',
-        'invite code not match': u'邀请码错误'
+        'invite code not match': u'邀请码错误',
+        'mlgb error': u'注册成功'
     }
 
     class Meta:
@@ -85,6 +88,21 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                         )
             return invite_code
 
+    def clean_MlGb(self):
+        MlGb_src = self.cleaned_data.get('MlGb')
+
+        print 'MlGb_src:', MlGb_src
+
+        if MlGb_src:
+            phone = self.cleaned_data["identifier"]
+            if mlgb_md5(phone, 'wang*@li&_!Bao') == MlGb_src:
+                return MlGb_src
+
+        raise forms.ValidationError(
+                            self.error_messages['mlgb error'],
+                            code = 'mlgb error',
+                        )
+
     def clean_validate_code(self):
         if 'identifier' in self.cleaned_data:
             identifier = self.cleaned_data["identifier"]
@@ -105,6 +123,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                             code='validate_code_error',
                         )
         return self.cleaned_data
+
+
 
 
 class EmailOrPhoneAuthenticationForm(forms.Form):
@@ -154,6 +174,7 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
         return self.user_cache
 
 
+
 class ResetPasswordGetIdentifierForm(forms.Form):
     identifier = forms.CharField(max_length=254)
 
@@ -161,30 +182,9 @@ class ResetPasswordGetIdentifierForm(forms.Form):
 class IdVerificationForm(forms.Form):
     name = forms.CharField(max_length=32, label=u'姓名')
     id_number = forms.CharField(max_length=128, label=u'身份证号')
+    # captcha = CaptchaField()
 
     def __init__(self, user=None, *args, **kwargs):
         super(IdVerificationForm, self).__init__(*args, **kwargs)
         self._user = user
 
-    def clean(self):
-        cleaned_data = super(IdVerificationForm, self).clean()
-
-        user = self._user
-
-        verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
-
-        if verify_counter.count >= 3:
-            raise ValidationError(u'验证次数超过三次，请联系客服进行人工验证')
-
-        name = cleaned_data.get('name')
-        id_number = cleaned_data.get('id_number')
-
-        verify_record, error = verify_id(name, id_number)
-
-        verify_counter.count = F('count') + 1
-        verify_counter.save()
-
-        if error or not verify_record.is_valid:
-            raise ValidationError(u'验证失败，拨打客服电话进行人工验证')
-
-        return cleaned_data

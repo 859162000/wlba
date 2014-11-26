@@ -217,7 +217,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
     search_fields = ('user__wanglibaouserprofile__phone',)
-
+    raw_id_fields = ('product_amortization', 'user')
 
 class P2PRecordResource(resources.ModelResource):
     user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name=u'姓名')
@@ -236,13 +236,16 @@ class P2PRecordResource(resources.ModelResource):
 
 class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     list_display = (
-        'catalog', 'order_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
+        'catalog', 'order_id', 'product_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
     resource_class = P2PRecordResource
     change_list_template = 'admin/import_export/change_list_export.html'
     search_fields = ('user__wanglibaouserprofile__phone',)
 
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]
+
+    def product_id(self, obj):
+        return "%s" % obj.product.id
 
 
 class WarrantAdmin(admin.ModelAdmin):

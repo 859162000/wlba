@@ -68,7 +68,6 @@ class RegisterView (RegistrationView):
 
         user = create_user(identifier, password, nickname)
 
-        # set_promo_user(request, user)
         set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
@@ -80,32 +79,6 @@ class RegisterView (RegistrationView):
             "content":content,
             "mtype":"activityintro"
         })
-        """
-        now = timezone.now()
-        with transaction.atomic():
-            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-                try:
-                    reward = Reward.objects.select_for_update()\
-                        .filter(is_used=False, type=u'三天迅雷会员').first()
-                    reward.is_used = True
-                    reward.save()
-                    RewardRecord.objects.create(user=auth_user, reward=reward,
-                                                description=u'新用户注册赠送三天迅雷会员')
-                    send_messages.apply_async(kwargs={
-                            "phones": [identifier],
-                            "messages": [messages.reg_reward_message(reward.content)]})
-
-                    title,content = messages.msg_register_authok(reward.content)
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id":auth_user.id,
-                        "title":title,
-                        "content":content,
-                        "mtype":"activity"
-                    })
-                except Exception, e:
-                    print(e)
-                    pass
-        """
 
         return user
 
@@ -683,7 +656,7 @@ class AccountTransactionDeposit(TemplateView):
     template_name = 'account_transaction_deposit.jade'
 
     def get_context_data(self, **kwargs):
-        pay_records = PayInfo.objects.filter(user=self.request.user, type=PayInfo.DEPOSIT)
+        pay_records = PayInfo.objects.filter(user=self.request.user, type=PayInfo.DEPOSIT).exclude(status=PayInfo.PROCESSING)
         pager = Paginator(pay_records, 20)
         page = self.request.GET.get('page')
         if not page:
@@ -920,12 +893,12 @@ def ajax_register(request):
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
 
-                title,content = messages.msg_register()
+                title, content = messages.msg_register()
                 inside_message.send_one.apply_async(kwargs={
-                    "user_id":auth_user.id,
-                    "title":title,
-                    "content":content,
-                    "mtype":"activityintro"
+                    "user_id": auth_user.id,
+                    "title": title,
+                    "content": content,
+                    "mtype": "activityintro"
                 })
 
                 return HttpResponse(messenger('done', user=request.user))

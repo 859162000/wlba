@@ -11,6 +11,7 @@ from django.utils import timezone
 from registration.models import RegistrationProfile
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd
 import logging
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -130,3 +131,10 @@ def generate_contract(equity, template_name=None):
         template = Template(equity.product.contract_template.content)
 
     return template.render(context)
+
+
+def mlgb_md5(phone, flag):
+    new_str = '{}{}'.format(phone, flag)
+    m = hashlib.md5()
+    m.update(new_str)
+    return m.hexdigest()

@@ -81,10 +81,11 @@
             });
           }
           $("#validate_id_button").removeClass("disabled");
-          return tool.modalAlert({
+          tool.modalAlert({
             title: '温馨提示',
             msg: result.message
           });
+          return $('.captcha-refresh', '#validate_id_form').trigger('click');
         });
       }
     });

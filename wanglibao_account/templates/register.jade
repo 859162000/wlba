@@ -26,6 +26,9 @@ html
                 label.form-row-error.error
                   for error in form.identifier.errors
                     #{ error }
+            .form-row.voice.hidden
+              .span12-omega
+                没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
             #validate-code-container.form-row
               - render_field form.validate_code class+="ispan6 clear-margin" placeholder="* 请输入验证码" autocomplete='off' title="* 请输入验证码"
               if form.validate_code.errors
@@ -52,7 +55,7 @@ html
                   for error in form.invitecode.errors
                     #{ error }
             .form-row.form-bottom-bar
-              button#register_submit.button-red.button-middle.span12(type='submit') 注 册
+              button#register_submit.button-red.button-middle.span12(type='button') 注 册
               .agreement
                 label(for="agreement")
                 input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
