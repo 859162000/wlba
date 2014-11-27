@@ -8,7 +8,7 @@ def format_datetime(time, fmt):
 
 def suffix(f):
     def wrapper(*args, **kwargs):
-        return unicode(f(*args, **kwargs)) + u'回复TD退订 400-858-8066【网利宝】'
+        return unicode(f(*args, **kwargs)) + u'回复TD退订 4008-588-066【网利宝】'
     return wrapper
 
 @suffix
@@ -41,9 +41,7 @@ def product_failed(product):
 
 @suffix
 def product_amortize(product, amortize_time, amount):
-    return u'%s[%s]，于%s收到还款%s元。' % (product.short_name,
-                                    product.serial_number,
-                                    format_datetime(amortize_time, u'%Y年%m月%d日%H:%M'),
+    return u'您投资的%s项目收到还款%s元，已到帐。' % (product.short_name,
                                     str(amount))
 
 @suffix
@@ -69,8 +67,6 @@ def rand_pass(password):
 def earning_message(amount):
     return u'亲，您的投标奖励收益%s元，已赠送到您的网利宝账户，可用于理财投资。' % amount
 
-
-
 @suffix
 def product_full_message(name):
     return u'%s，满标了。' % name
@@ -88,7 +84,7 @@ def msg_bid_fail(product_name):
 
 def msg_register():
     title = u"注册成功"
-    content = u"感谢您注册网利宝。完成实名认证，免费领取3天迅雷会员激活码。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
+    content = u"感谢您注册网利宝。完成实名认证，免费领取3天迅雷会员激活码或50G快盘空间激活码。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
     return title, content
 
 def msg_register_authok(activation):
@@ -101,6 +97,11 @@ def msg_validate_ok(activation):
     content = u"恭喜您完成实名认证，赠送给您的3天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
+def msg_validate_ok2(activation):
+    title = u"实名认证成功"
+    content = u"恭喜您完成实名认证，赠送给您的50G快盘会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    return title, content
+
 def msg_validate_fake():
     title = u"实名认证成功"
     content = u"恭喜您完成实名认证，请您使用注册手机号码向客服索要3天迅雷白金会员激活码。<br/>参加精彩活动，享受1%%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
@@ -111,6 +112,7 @@ def msg_first_licai(activation):
     title = u"活动期首次理财成功"
     content = u"感谢您在活动期间完成首次理财。<br/>网利宝赠送您1个月迅雷白金会员激活码，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/>立即兑换（<a href='http://act.vip.xunlei.com/vip/2014/xlhyk/' target='_blank'>http://act.vip.xunlei.com/vip/2014/xlhyk/</a>）<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
+
 
 #金山快盘
 def msg_first_kuaipan(size, activation):

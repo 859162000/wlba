@@ -1,29 +1,25 @@
 # encoding:utf-8
-
+import json
+import decimal
 from datetime import date, timedelta, datetime
 from collections import defaultdict
 
-from django.views.generic import  TemplateView
-from django.db.models import Count, F, Sum
+from django.db.models import Count, Sum
 from django.contrib.auth.decorators import permission_required
 from django.utils.decorators import method_decorator
-
 from django.contrib.auth.models import User
 from wanglibao_p2p.models import P2PRecord
-
 from django.views.generic import TemplateView
 from django.http.response import HttpResponse
 from mock_generator import MockGenerator
 from django.conf import settings
-
-import json
-import decimal
 from django.db.models.base import ModelState
+
+
 
 # Create your views here.
 
 class MarketingView(TemplateView):
-
     template_name = 'diary.jade'
 
     def get_context_data(self, **kwargs):
@@ -37,14 +33,12 @@ class MarketingView(TemplateView):
             d0 = (datetime.now() - timedelta(days=7)).date()
             d1 = date.today()
 
-
-        users = User.objects.filter(date_joined__range=(d0, d1)).order_by('each_day')\
-            .extra({'each_day': 'date(date_joined)'}).values('each_day')\
+        users = User.objects.filter(date_joined__range=(d0, d1)).order_by('each_day') \
+            .extra({'each_day': 'date(date_joined)'}).values('each_day') \
             .annotate(joined_num=Count('id'))
 
-
-        trades = P2PRecord.objects.filter(create_time__range=(d0, d1),catalog='申购').order_by('each_day')\
-            .extra({'each_day': 'date(create_time)'}).values('each_day')\
+        trades = P2PRecord.objects.filter(create_time__range=(d0, d1), catalog='申购').order_by('each_day') \
+            .extra({'each_day': 'date(create_time)'}).values('each_day') \
             .annotate(trade_num=Count('id'), amount=Sum('amount'))
 
         d = defaultdict(dict)
@@ -60,14 +54,14 @@ class MarketingView(TemplateView):
 
         class DateTimeEncoder(json.JSONEncoder):
             def default(self, obj):
-               if hasattr(obj, 'isoformat'):
-                   return obj.isoformat()
-               elif isinstance(obj, decimal.Decimal):
-                   return float(obj)
-               elif isinstance(obj, ModelState):
-                   return None
-               else:
-                   return json.JSONEncoder.default(self, obj)
+                if hasattr(obj, 'isoformat'):
+                    return obj.isoformat()
+                elif isinstance(obj, decimal.Decimal):
+                    return float(obj)
+                elif isinstance(obj, ModelState):
+                    return None
+                else:
+                    return json.JSONEncoder.default(self, obj)
 
         json_re = json.dumps(result, cls=DateTimeEncoder)
 
@@ -78,6 +72,7 @@ class MarketingView(TemplateView):
             'start': d0.strftime('%Y-%m-%d'),
             'end': d1.strftime('%Y-%m-%d')
         }
+
     @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         return super(MarketingView, self).dispatch(request, *args, **kwargs)
