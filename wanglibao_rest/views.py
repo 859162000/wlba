@@ -479,10 +479,8 @@ class IdValidate(APIView):
             # else:
 
             # 实名认证 活动赠送
-            promo_token = request.session.get(settings.PROMO_TOKEN_USER_SESSION_KEY)
-            channel = which_channel(promo_token)
+            channel = which_channel(user)
             rs = RewardStrategy(user)
-
             if channel == Channel.KUAIPAN:
                 # 快盘来源
                 rs.reward_user(u'50G快盘容量')

@@ -41,20 +41,32 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-        start_time = timezone.datetime(2014, 11, 12)
-
         # 首次购买
-        if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
-            # 理财投资 活动赠送
-            promo_token = self.request.session.get(settings.PROMO_TOKEN_USER_SESSION_KEY)
-            channel = which_channel(promo_token)
-            rs = RewardStrategy(self.user)
-            if channel == Channel.KUAIPAN:
-                # 快盘来源
+        channel = which_channel(self.user)
+        rs = RewardStrategy(self.user)
+        if channel == Channel.KUAIPAN:
+            # 快盘来源
+            start_time = timezone.datetime(2014, 11, 26)
+            if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
                 rs.reward_user(u'100G快盘容量')
-            else:
-                # 非快盘来源
+        else:
+            # 非快盘来源
+            start_time = timezone.datetime(2014, 11, 12)
+            if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
                 rs.reward_user(u'一个月迅雷会员')
+
+
+
+        # if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
+        #     # 理财投资 活动赠送
+        #     channel = which_channel(self.user)
+        #     rs = RewardStrategy(self.user)
+        #     if channel == Channel.KUAIPAN:
+        #         # 快盘来源
+        #         rs.reward_user(u'100G快盘容量')
+        #     else:
+        #         # 非快盘来源
+        #         rs.reward_user(u'一个月迅雷会员')
 
             # activity = self.product.activity
             # now = timezone.now()

@@ -67,8 +67,6 @@ def rand_pass(password):
 def earning_message(amount):
     return u'亲，您的投标奖励收益%s元，已赠送到您的网利宝账户，可用于理财投资。' % amount
 
-
-
 @suffix
 def product_full_message(name):
     return u'%s，满标了。' % name
@@ -86,7 +84,7 @@ def msg_bid_fail(product_name):
 
 def msg_register():
     title = u"注册成功"
-    content = u"感谢您注册网利宝。完成实名认证，免费领取3天迅雷会员激活码。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
+    content = u"感谢您注册网利宝。完成实名认证，免费领取3天迅雷会员激活码或50G快盘空间激活码。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
     return title, content
 
 def msg_register_authok(activation):

@@ -6,7 +6,7 @@ __author__ = 'rsj217'
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
-from marketing.models import RewardRecord, Reward
+from marketing.models import RewardRecord, Reward, IntroducedBy
 from wanglibao_sms import messages
 from wanglibao_account import message as inside_message
 
@@ -133,6 +133,7 @@ class RewardStrategy():
         """ 注册实名认证三天迅雷会员
         """
         title, content = messages.msg_validate_ok(self.reward.content)
+
         self._send_message_template(title, content)
 
     def _send_month_xunlei(self):
@@ -162,18 +163,11 @@ class RewardStrategy():
         })
 
 
-KUAIPANS = ['g5qai4', 'jrvtc3', 'gqk3ts', '8e3t6y', 'ctj3dz', 'itqyv7',
-           's9k263', 'k7ep3v', '7rzgab', 'jpx489', '5txqhm', 'c4xqyf']
-
-XUNLEIS = ['xunlei']
-
-def which_channel(promo_token):
+def which_channel(user):
     """ 渠道判断 """
-    if promo_token:
-        if promo_token in XUNLEIS:
-            return Channel.XUNLEI
-        elif promo_token in KUAIPANS:
-            return Channel.KUAIPAN
+    ib = IntroducedBy.objects.filter(user=user).first()
+    if ib and ib.introduced_by.wanglibaouserprofile.phone.startswith('kuaipan'):
+        return Channel.KUAIPAN
     return Channel.WANGLIBAO
 
 
