@@ -35,7 +35,7 @@ from wanglibao_account import third_login, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
-from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning
+from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, AmortizationRecord
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding
@@ -683,6 +683,20 @@ class AccountTransactionWithdraw(TemplateView):
             'announcements': AnnouncementAccounts
         }
 
+class AccountRepayment(TemplateView):
+    template_name = 'account_repayment.jade'
+
+    def get_context_data(self, **kwargs):
+        repayment_records = AmortizationRecord.objects.select_related('amortization_product').filter(user=self.request.user)
+        pager = Paginator(repayment_records, 20)
+        page = self.request.GET.get('page')
+        if not page:
+            page = 1
+        repayment_records = pager.page(page)
+        return {
+            "repayment_records": repayment_records,
+            'announcements': AnnouncementAccounts
+        }
 
 class AccountBankCard(TemplateView):
     template_name = 'account_bankcard.jade'
