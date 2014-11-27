@@ -8,7 +8,7 @@ def format_datetime(time, fmt):
 
 def suffix(f):
     def wrapper(*args, **kwargs):
-        return unicode(f(*args, **kwargs)) + u'回复TD退订 400-858-8066【网利宝】'
+        return unicode(f(*args, **kwargs)) + u'回复TD退订 4008-588-066【网利宝】'
     return wrapper
 
 @suffix
@@ -41,9 +41,7 @@ def product_failed(product):
 
 @suffix
 def product_amortize(product, amortize_time, amount):
-    return u'%s[%s]，于%s收到还款%s元。' % (product.short_name,
-                                    product.serial_number,
-                                    format_datetime(amortize_time, u'%Y年%m月%d日%H:%M'),
+    return u'您投资的%s项目收到还款%s元，已到帐。' % (product.short_name,
                                     str(amount))
 
 @suffix
