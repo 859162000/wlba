@@ -98,10 +98,11 @@
           type: "POST",
           data: $("#login-modal-form").serialize()
         }).done(function(data, textStatus) {
-          var next_url;
+          var arr, next_url;
           next_url = '';
-          if (window.location.search) {
-            next_url = window.location.search.substring(6);
+          arr = /\?next=(\/.+)$/ig.exec(window.location);
+          if (arr && arr[1]) {
+            next_url = arr[1];
             return window.location.href = next_url;
           } else {
             return location.reload();
