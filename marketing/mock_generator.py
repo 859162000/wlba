@@ -1,7 +1,9 @@
 # coding=utf-8
+import string
+import random
+import logging
+
 from marketing.models import NewsAndReport
-from django.utils import timezone
-import string, random, logging
 from marketing.models import InviteCode, Reward
 
 
