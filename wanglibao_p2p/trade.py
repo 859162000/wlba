@@ -1,11 +1,11 @@
 # encoding: utf-8
 import logging
+
 from django.db import transaction
 from django.utils import timezone
 from marketing.models import IntroducedBy, Reward, RewardRecord
 from marketing.helper import RewardStrategy, Channel, which_channel
 from order.models import Order
-from wanglibao import settings
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
@@ -54,64 +54,6 @@ class P2PTrader(object):
             start_time = timezone.datetime(2014, 11, 12)
             if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
                 rs.reward_user(u'一个月迅雷会员')
-
-
-
-        # if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
-        #     # 理财投资 活动赠送
-        #     channel = which_channel(self.user)
-        #     rs = RewardStrategy(self.user)
-        #     if channel == Channel.KUAIPAN:
-        #         # 快盘来源
-        #         rs.reward_user(u'100G快盘容量')
-        #     else:
-        #         # 非快盘来源
-        #         rs.reward_user(u'一个月迅雷会员')
-
-            # activity = self.product.activity
-            # now = timezone.now()
-            # # 快盘首次买就送
-            # # activity.name，包含快盘就送流量
-            # if activity and u"快盘" in activity.name:
-            #     try:
-            #         with transaction.atomic():
-            #             if Reward.objects.filter(is_used=False, type=u'快盘随机容量', end_time__gte=now).exists():
-            #                 reward = Reward.objects.select_for_update() \
-            #                     .filter(is_used=False, type=u'快盘随机容量').first()
-            #                 reward.is_used = True
-            #                 reward.save()
-            #                 RewardRecord.objects.create(user=self.user, reward=reward,
-            #                                             description=u'首次购买快盘活动P2P产品赠送%s快盘容量' % reward.description)
-            #                 title, content = messages.msg_first_kuaipan(reward.description, reward.content)
-            #                 inside_message.send_one.apply_async(kwargs={
-            #                     "user_id": self.user.id,
-            #                     "title": title,
-            #                     "content": content,
-            #                     "mtype": "activity"
-            #                 })
-            #     except:
-            #         pass
-            #
-            # #activity.name 包含迅雷就送一个月迅雷会员
-            # if activity and u"迅雷" in activity.name:
-            #     try:
-            #         with transaction.atomic():
-            #             if Reward.objects.filter(is_used=False, type=u'一个月迅雷会员', end_time__gte=now).exists():
-            #                 reward = Reward.objects.select_for_update() \
-            #                     .filter(is_used=False, type=u'一个月迅雷会员').first()
-            #                 reward.is_used = True
-            #                 reward.save()
-            #                 RewardRecord.objects.create(user=self.user, reward=reward,
-            #                                             description=u'首次购买迅雷活动P2P产品赠送一个月迅雷会员')
-            #                 title, content = messages.msg_first_licai(reward.content)
-            #                 inside_message.send_one.apply_async(kwargs={
-            #                     "user_id": self.user.id,
-            #                     "title": title,
-            #                     "content": content,
-            #                     "mtype": "activity"
-            #                 })
-            #     except:
-            #         pass
 
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
         # phone_verified 渠道客户判断
@@ -257,10 +199,7 @@ class P2POperator(object):
             product.status = u'还款中'
             product.save()
 
-        # product = P2PProduct.objects.get(id=product.id)
-        #equitys = product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
-        #phones = [e.user.wanglibaouserprofile.phone for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
-        #user_ids = [e.user.id for e in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
+
         phones = {}.fromkeys(phones).keys()
         user_ids = {}.fromkeys(user_ids).keys()
 
@@ -296,8 +235,6 @@ class P2POperator(object):
                 phones.append(equity.user.wanglibaouserprofile.phone)
             ProductKeeper(product).fail()
 
-        # product = P2PProduct.objects.get(id=product.id)
-        #phones = [equity.user.wanglibaouserprofile.phone for equity in product.equities.all().prefetch_related('user').prefetch_related('user__wanglibaouserprofile')]
         phones = {}.fromkeys(phones).keys()
         user_ids = {}.fromkeys(user_ids).keys()
         if phones:
