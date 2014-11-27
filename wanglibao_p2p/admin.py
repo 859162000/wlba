@@ -179,6 +179,7 @@ class P2PProductForm(forms.ModelForm):
         if self.cleaned_data['status'] == u'正在招标':
 
             pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
+
             if not pa:
                 raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
 
