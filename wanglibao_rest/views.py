@@ -480,9 +480,9 @@ class IdValidate(APIView):
 
             # 实名认证 活动赠送
             promo_token = request.session.get(settings.PROMO_TOKEN_USER_SESSION_KEY)
-            channel, code = which_channel(promo_token)
+            channel = which_channel(promo_token)
             rs = RewardStrategy(user)
-            if code == Channel.KUAIPAN:
+            if channel == Channel.KUAIPAN:
                 # 快盘来源
                 rs._send_reward_message(u'50G快盘容量')
                 rs._send_reward_message(u'三天迅雷会员')
