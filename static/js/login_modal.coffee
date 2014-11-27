@@ -96,8 +96,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         data: $("#login-modal-form").serialize()
       .done (data,textStatus) ->
         next_url = ''
-        if(window.location.search)
-          next_url = window.location.search.substring(6)
+        arr = /\?next=(\/.+)$/ig.exec(window.location)
+        if(arr && arr[1])
+          next_url = arr[1]
           window.location.href = next_url
         else
           location.reload()
