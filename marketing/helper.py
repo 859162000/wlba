@@ -11,9 +11,15 @@ from wanglibao_sms import messages
 from wanglibao_account import message as inside_message
 
 
+class Channel():
+    """ 渠道结构 """
+    XUNLEI = 0
+    KUAIPAN = 1
+    WANGLIBAO = 3
+
+
 def collect_unvalid_user():
-    """ 没有实名注册的用户,也没有发送激活码的用户,发送短信提示实名注册
-    """
+    """ 没有实名注册的用户,也没有发送激活码的用户,发送短信提示实名注册 """
     joined_time = timezone.datetime(2014, 11, 14)
     users = User.objects.filter(wanglibaouserprofile__id_is_valid=False, date_joined__gte=joined_time)
     users_generate = (user for user in users if not RewardRecord.objects.filter(user=user,
@@ -23,8 +29,7 @@ def collect_unvalid_user():
 
 
 def collect_valided_user():
-    """ 已经实名认证，没有发送激活码的用户,发送激活码
-    """
+    """ 已经实名认证，没有发送激活码的用户,发送激活码 """
     joined_time = timezone.datetime(2014, 11, 14)
     users = User.objects.filter(wanglibaouserprofile__id_is_valid=True, date_joined__gte=joined_time)
     users_generate = (user for user in users if not RewardRecord.objects.filter(user=user,
@@ -34,8 +39,7 @@ def collect_valided_user():
 
 
 def send_message_about_id_valid():
-    """ 针对没有实名的用户发送站内信
-    """
+    """ 针对没有实名的用户发送站内信 """
     title, content = messages.msg_register()
     users_generate = collect_unvalid_user()
     for user in users_generate:
@@ -149,7 +153,6 @@ class RewardStrategy():
         title, content = messages.msg_first_kuaipan(u'100G', self.reward.content)
         self._send_message_template(title, content)
 
-
     def _send_message_template(self, title, content):
         inside_message.send_one.apply_async(kwargs={
             "user_id": self.user.id,
@@ -159,22 +162,19 @@ class RewardStrategy():
         })
 
 
-KUAIPAN = ['g5qai4', 'jrvtc3', 'gqk3ts', '8e3t6y', 'ctj3dz', 'itqyv7',
+KUAIPANS = ['g5qai4', 'jrvtc3', 'gqk3ts', '8e3t6y', 'ctj3dz', 'itqyv7',
            's9k263', 'k7ep3v', '7rzgab', 'jpx489', '5txqhm', 'c4xqyf']
 
+XUNLEIS = ['xunlei']
 
 def which_channel(promo_token):
-    """ 渠道判断
-    """
+    """ 渠道判断 """
     if promo_token:
-        if promo_token == 'xunlei':
-            return ('xunlei', 0)
-        elif promo_token in KUAIPAN:
-            return ('kuaipan', 1)
-
-    return ('wanglibao', 3)
-
-
+        if promo_token in XUNLEIS:
+            return Channel.XUNLEI
+        elif promo_token in KUAIPANS:
+            return Channel.KUAIPAN
+    return Channel.WANGLIBAO
 
 
 
