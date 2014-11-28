@@ -199,7 +199,6 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     list_editable = ('priority',)
     list_filter = ('status',)
     search_fields = ('name',)
-    readonly_fields = ('amortization_count',)
     resource_class = P2PProductResource
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'
@@ -209,7 +208,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
             return [f.name for f in self.model._meta.fields]
-        return ()
+        return ('amortization_count',)
 
     def save_model(self, request, obj, form, change):
         if obj.status == u'正在招标':
