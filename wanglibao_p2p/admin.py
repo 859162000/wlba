@@ -183,9 +183,9 @@ class P2PProductForm(forms.ModelForm):
             if not pa:
                 raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
 
-            # product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
-            # if pa.count() != product.period:
-            #     raise forms.ValidationError(u'产品还款计划错误')
+            product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
+            if pa.count() != product.amortization_count:
+                raise forms.ValidationError(u'产品还款计划错误')
 
         return self.cleaned_data['status']
 
