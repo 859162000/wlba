@@ -133,6 +133,30 @@ def generate_contract(equity, template_name=None):
     return template.render(context)
 
 
+def generate_contract_preview(equity, product):
+    """
+    Generate the contract file for the equity.
+
+    :param equity: Equity param, which links the product and user
+    :return: The string representation of the contract
+    """
+    context = Context({
+        'equity': equity,
+        'product': product,
+        'now': timezone.now()
+    })
+
+    # if template_name is not None:
+    #     template = get_template(template_name)
+    # elif product.contract_template is None:
+    #     template = get_template('contract_template.jade')
+    # else:
+    #     # Load the template from database
+    template = Template(product.contract_template.content_preview)
+
+    return template.render(context)
+
+
 def mlgb_md5(phone, flag):
     new_str = '{}{}'.format(phone, flag)
     m = hashlib.md5()

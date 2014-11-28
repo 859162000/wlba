@@ -18,7 +18,7 @@ from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao.const import ErrorNumber
@@ -30,6 +30,8 @@ from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_p2p.utility import strip_tags
 from wanglibao_announcement.utility import AnnouncementP2P
 from wanglibao_account.models import Binding
+from django.contrib.auth.decorators import login_required, permission_required
+from wanglibao_account.utils import generate_contract_preview
 
 REPAYMENTTYPEMAP = (
                 (u'到期还本付息', 1),
@@ -591,3 +593,14 @@ class AdminP2PUserRecord(TemplateView):
         }
 
 
+@login_required
+def preview_contract(request, id):
+    product = P2PProduct.objects.filter(id=id).first()
+    if product:
+        if product.status == u'录标' or product.status == u'录标完成':
+            return HttpResponse(u'<h3 style="color:red;">【录标完成】之后才能进行合同预览！</h3>')
+    else:
+        return HttpResponse(u'<h3 style="color:red;">没有该产品或产品信息错误！</h3>')
+
+    equity = ProductAmortization.objects.filter(product_id=id).prefetch_related('product')
+    return HttpResponse(generate_contract_preview(equity, product))
