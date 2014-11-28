@@ -466,32 +466,32 @@ class IdValidate(APIView):
             user.wanglibaouserprofile.save()
 
             now = timezone.now()
-            #判断时间间隔太短的话就认定他是黑客，需要电话找客服索要激活码
-            # interval = (now - user.date_joined).seconds
-            # if interval < 40:
-            #     title,content = messages.msg_validate_fake()
-            #     inside_message.send_one.apply_async(kwargs={
-            #         "user_id":user.id,
-            #         "title":title,
-            #         "content":content,
-            #         "mtype":"activity"
-            #     })
-            # else:
-
-            # 实名认证 活动赠送
-            channel = which_channel(user)
-            rs = RewardStrategy(user)
-            if channel == Channel.KUAIPAN:
-                # 快盘来源
-                rs.reward_user(u'50G快盘容量')
-                rs.reward_user(u'三天迅雷会员')
+            # 判断时间间隔太短的话就认定他是黑客，需要电话找客服索要激活码
+            interval = (now - user.date_joined).seconds
+            if interval < 10:
+                title,content = messages.msg_validate_fake()
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":user.id,
+                    "title":title,
+                    "content":content,
+                    "mtype":"activity"
+                })
             else:
-                # 非快盘
-                rs.reward_user(u'三天迅雷会员')
+
+                # 实名认证 活动赠送
+                channel = which_channel(user)
+                rs = RewardStrategy(user)
+                if channel == Channel.KUAIPAN:
+                    # 快盘来源
+                    rs.reward_user(u'50G快盘容量')
+                    rs.reward_user(u'三天迅雷会员')
+                else:
+                    # 非快盘
+                    rs.reward_user(u'三天迅雷会员')
 
             return Response({
-                                "validate": True
-                            }, status=200)
+                                    "validate": True
+                                }, status=200)
         else:
             return Response({
                                 "message": u"字段错误",
