@@ -421,13 +421,16 @@ class IdValidate(APIView):
 
         form = IdVerificationForm(request, request.POST)
         #黑客程序就成功
-        captcha = request.DATA.get("captcha_1", "")
-        if captcha:
+        user = self.request.user
+        now = timezone.now()
+
+        interval = (now - user.date_joined).seconds
+        if interval < 10:
             return Response({
                                 "message": u"认证成功"
                             }, status=200)
         if form.is_valid():
-            user = self.request.user
+
             # name = request.DATA.get("name", "")
             # id_number = request.DATA.get("id_number", "")
 
@@ -465,9 +468,7 @@ class IdValidate(APIView):
             user.wanglibaouserprofile.id_is_valid = True
             user.wanglibaouserprofile.save()
 
-            now = timezone.now()
             # 判断时间间隔太短的话就认定他是黑客，需要电话找客服索要激活码
-            interval = (now - user.date_joined).seconds
             if interval < 20:
                 title,content = messages.msg_validate_fake()
                 inside_message.send_one.apply_async(kwargs={
