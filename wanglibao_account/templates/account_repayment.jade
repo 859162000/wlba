@@ -29,7 +29,7 @@ block main
         thead
           tr
             th 流水号
-            th 产品
+            th 产品名称
             th 时间
             th 期数
             th 金额(元)
@@ -37,7 +37,7 @@ block main
           each repayment_record in repayment_records
             amount = repayment_record.principal + repayment_record.interest
             tr
-              td {{repayment_record.catalog}}
+              td {{repayment_record.order_id}}
               td
                 a(href="/p2p/detail/{{repayment_record.amortization.product.id}}/", target="_blank")
                   {{repayment_record.amortization.product.short_name}}
