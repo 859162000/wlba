@@ -35,14 +35,15 @@ block main
             th 金额(元)
         tbody
           each repayment_record in repayment_records
+            amount = repayment_record.principal + repayment_record.interest
             tr
               td {{repayment_record.catalog}}
               td
                 a(href="/p2p/detail/{{repayment_record.amortization.product.id}}/", target="_blank")
                   {{repayment_record.amortization.product.short_name}}
               td {{repayment_record.created_time | date:"Y-m-d H:i:s"}}
-              td {{repayment_record.term}}
-              td {{repayment_record.amount}}
+              td 第{{repayment_record.term}}期 </br> (共{{repayment_record.amortization.product.amortization_count}}期)
+              td {{amount}}
     - with data=repayment_records uri='/accounts/repayment/'
     include include/pager
     - endwith
