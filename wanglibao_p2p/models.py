@@ -237,7 +237,7 @@ class P2PProduct(ProductBase):
         u'满标已审核': u'满标审核',
         u'还款中': u'还款中',
         u'流标': u'流标',
-        u'已完成': u'已完成',
+        u'已完成': u'已还款',
     }
 
     @property

@@ -72,7 +72,7 @@ html
                             {{status}}
                         else
                           a.button-home-disabled(href="javascript:void(0)", disabled)
-                            if status == '已完成'
+                            if status == '已还款'
                               span.icon-p2p-home.finished
                             elif status == '还款中'
                               span.icon-p2p-home.payment
@@ -113,8 +113,10 @@ html
                     .span3-omega.align-right
                       span 还款方式: &nbsp;&nbsp;
                       span.d3-text {{product.display_payback_method}}
-                if status == '还款中' or status == '已完成'
+                if status == '还款中'
                   .panel-p2p-stamp
+                if status == '已还款'
+                  .panel-p2p-finished
             .space-vertical-sm
           .row
             - with data=p2p_products uri='/p2p/list/'
