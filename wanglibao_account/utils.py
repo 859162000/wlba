@@ -133,7 +133,7 @@ def generate_contract(equity, template_name=None):
     return template.render(context)
 
 
-def generate_contract_preview(equity, product):
+def generate_contract_preview(equity, product, template_name=None):
     """
     Generate the contract file for the equity.
 
@@ -146,13 +146,13 @@ def generate_contract_preview(equity, product):
         'now': timezone.now()
     })
 
-    # if template_name is not None:
-    #     template = get_template(template_name)
-    # elif product.contract_template is None:
-    #     template = get_template('contract_template.jade')
-    # else:
-    #     # Load the template from database
-    template = Template(product.contract_template.content_preview)
+    if template_name is not None:
+        template = get_template(template_name)
+    elif product.contract_template is None:
+        template = get_template('contract_template.jade')
+    else:
+        # Load the template from database
+        template = Template(product.contract_template.content_preview)
 
     return template.render(context)
 
