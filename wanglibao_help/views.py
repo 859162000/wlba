@@ -18,7 +18,7 @@ class HelpView(TemplateView):
         topics = Topic.objects.order_by("-id").all()
         #question field: title, answer, id
         questions = Question.objects.order_by("-sortord").all()
-        nav = [{"id":"0", "name":u'热门问题'}]
+        nav = [{"id":"0", "name":u'常见问题'}]
         result = {"0":[]}
         for x in topics:
             nav.append({"id":str(x.id), "name":x.name, "questions": x.question_set.get_queryset()})
@@ -32,6 +32,4 @@ class HelpView(TemplateView):
 
         map = dict((obj.get('id'), obj.get('name')) for obj in nav)
 
-        #nav struct [{"id":"", "name":""}, ]
-        #questions struct {"nav中的id":[{"id":"","title":"","answer":""}]}
         return {"nav":nav, "questions":result, 'map': map}

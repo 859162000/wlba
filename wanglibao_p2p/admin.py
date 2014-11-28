@@ -13,9 +13,11 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 from views import GenP2PUserProfileReport
 from wanglibao.admin import ReadPermissionModelAdmin
 
+
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (
-        'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest', 'penal_interest')
+        'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest',
+        'penal_interest')
     list_filter = ('confirm',)
     search_fields = ('user__wanglibaouserprofile__phone',)
 
@@ -31,7 +33,7 @@ class AmortizationInline(admin.TabularInline):
     exclude = ('version',)
     can_delete = False
     readonly_fields = (
-         'term', 'principal', 'interest', 'penal_interest', 'description')
+        'term', 'principal', 'interest', 'penal_interest', 'description')
 
 
 class WarrantInline(admin.TabularInline):
@@ -69,7 +71,7 @@ class P2PProductResource(resources.ModelResource):
         self.count += 1
         type = row[u'产品名称']
         # birthday = datetime.date(row[u'出生日期'])
-        #today = datetime.date.today()
+        # today = datetime.date.today()
         #age = today.year - birthday.year - ((today.month, today.day) < (birthday.month, birthday.day))
         instance.category = u"证大速贷"
         instance.serial_number = "E_ZDSD_%s%s" % (now, str(self.count).zfill(5))
@@ -89,8 +91,6 @@ class P2PProductResource(resources.ModelResource):
         instance.borrower_id_number = row[u'身份证号码']
         instance.borrower_bankcard = row[u'提现帐号']
         instance.borrower_bankcard_bank_name = row[u'开户行']
-
-
 
         for bank in P2PProduct.BANK_METHOD_CHOICES:
             if bank[0] in instance.borrower_bankcard_bank_name:
@@ -178,12 +178,17 @@ class P2PProductForm(forms.ModelForm):
     def clean_status(self):
         if self.cleaned_data['status'] == u'正在招标':
 
-            print self
-
             pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
+
             if not pa:
                 raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
+
+            product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
+            if pa.count() != product.amortization_count:
+                raise forms.ValidationError(u'产品还款计划错误')
+
         return self.cleaned_data['status']
+
 
 class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
     inlines = [
@@ -217,7 +222,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
     search_fields = ('user__wanglibaouserprofile__phone',)
-
+    raw_id_fields = ('product_amortization', 'user')
 
 class P2PRecordResource(resources.ModelResource):
     user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name=u'姓名')
@@ -236,7 +241,8 @@ class P2PRecordResource(resources.ModelResource):
 
 class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     list_display = (
-        'catalog', 'order_id', 'product_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time', 'description')
+        'catalog', 'order_id', 'product_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time',
+        'description')
     resource_class = P2PRecordResource
     change_list_template = 'admin/import_export/change_list_export.html'
     search_fields = ('user__wanglibaouserprofile__phone',)
@@ -298,5 +304,4 @@ admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
 admin.site.register(ProductAmortization, ProductAmortizationAdmin)
 admin.site.register(Earning, EarningAdmin)
 
-
-admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(),name=u'生成p2p用户表')
+admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')

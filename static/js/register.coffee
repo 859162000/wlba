@@ -99,7 +99,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       'validate_code':
         required: true
         depends: (e)->
-          checkMobile($('#id_identifier').val())
+          #checkMobile($('#id_identifier').val())
 
     messages:
       identifier:
@@ -146,11 +146,13 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
 
 
   $("#register_submit").click (e)->
-
-    if $(this).hasClass("disabled")
-      e.preventDefault()
+    e.preventDefault()
+    if !$(this).hasClass("disabled")
+      $('input[name="identifier"]', $(this).parents('form')).trigger('keyup')
+      $('#register-form').submit()
       return
-    $('#register_submit').submit()
+
+
 
 
   $(".voice").on 'click', '.voice-validate', (e)->
