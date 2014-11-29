@@ -1,8 +1,12 @@
 # encoding: utf8
 
 import hashlib
+
 from django.conf import settings
+from django.db.models import Q
 from django.utils import dateparse
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
 
 
 def checksum(hash_list):
@@ -33,7 +37,23 @@ def strip_tags(html):
     return "".join(result)
 
 
+def validate_status(request, result, field):
+    """验证接口请求状态参数  网贷天眼"""
+    status = request.GET.get(field)
+    if status in ["0", "1", "2"]:
+        if status == '0':
+            status_query = Q(status=u'正在招标')
+        elif status == '1':
+            status_query = Q(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'已完成'])
+        elif status == '2':
+            status_query = Q(status=u'流标')
+        return (status_query, status, result)
+    else:
+        result.update(result_code='-2', result_msg=u'{} 参数不存在或者格式错误'.format(field))
+        return (False, status, result)
+
 def validate_date(request, result, field):
+    """验证接口请求日期参数  网贷天眼"""
     time_from_args = request.GET.get(field)
     if not time_from_args:
         result.update(result_code='-2', result_msg=u'{} 参数不存'.format(field))
@@ -47,3 +67,20 @@ def validate_date(request, result, field):
         result.update(result_code='-3', result_msg=u'{} 格式错误'.format(field))
         return (False, result)
     return (time_from, result)
+
+def handler_paginator(request, objs, page_size=20, page_index=1):
+
+    # 分页处理
+    limit = request.GET.get('page_size', page_size)
+    paginator = Paginator(objs, limit)
+    page_index = request.GET.get('page_index')
+
+    try:
+        objs = paginator.page(page_index)
+    except PageNotAnInteger:
+        objs = paginator.page(1)
+    except Exception, e:
+        # p2pproducts = paginator.page(paginator.num_pages)
+        # return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+        return (False, paginator)
+    return (objs, paginator)

@@ -11,7 +11,7 @@ from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord, GetNoWProjectsAPI, GetProjectsByDateAPI, FinancesAPI, P2PListAPI, \
-    P2PEyeListAPIView
+    P2PEyeListAPIView, P2PEyeEquityAPIView
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -93,7 +93,8 @@ urlpatterns += patterns(
     url(r'^tdt/getProjectsByDate.json', GetProjectsByDateAPI.as_view()),
     url(r'^2345/finances.json', FinancesAPI.as_view()),
     url(r'^hexun/p2plist.json', P2PListAPI.as_view()),
-    url(r'^api/p2peye/p2ps/$', P2PEyeListAPIView.as_view()),
+    url(r'^api/loans/$', P2PEyeListAPIView.as_view()),
+    url(r'^api/data/$', P2PEyeEquityAPIView.as_view()),
 )
 
 if settings.DEBUG:
