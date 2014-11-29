@@ -646,6 +646,12 @@ class YeePayAppPayCallbackView(APIView):
         result = yeepay.pay_callback(request)
         return Response(result)
 
+    def post(self, request):
+        yeepay = third_pay.YeePay()
+        request.GET = request.DATA
+        result = yeepay.pay_callback(request)
+        return Response(result)
+
 #易宝支付同步回调
 class YeePayAppPayCompleteView(TemplateView):
     template_name = 'pay_complete.jade'
