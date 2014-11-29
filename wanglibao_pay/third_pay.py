@@ -143,7 +143,7 @@ class YeePay:
             return {"ret_code":20071, "message":"请先进行实名认证"}
 
         amount = request.DATA.get("amount", "").strip()
-        deviceid = request.DATA.get("deviceid", "").strip()
+        deviceid = request.DATA.get("device_id", "").strip()
 
         if not amount or not deviceid:
             return {"ret_code":20072, 'message':'信息输入不完整'}
