@@ -224,8 +224,8 @@ class YeePay:
 
     #@method_decorator(transaction.atomic)
     def pay_callback(self, request):
-        encryptkey = request.DATA.get("encryptkey", "")
-        data = request.DATA.get("data", "")
+        encryptkey = request.GET.get("encryptkey", "")
+        data = request.GET.get("data", "")
         logger.error("-" * 50)
         logger.error(encryptkey)
         logger.error("1")

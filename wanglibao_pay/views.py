@@ -641,7 +641,7 @@ class YeePayAppPayView(APIView):
 class YeePayAppPayCallbackView(APIView):
     permission_classes = ()
 
-    def post(self, request):
+    def get(self, request):
         yeepay = third_pay.YeePay()
         result = yeepay.pay_callback(request)
         return Response(result)
