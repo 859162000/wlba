@@ -168,7 +168,7 @@ class YeePay:
 
         card_id = request.DATA.get("card_id", "")
         user = request.user
-        amount = int(amount*100)
+        amount_sec = int(amount*100)
         useragent = request.META.get("HTTP_USER_AGENT", "noagent").strip()
 
         try:
@@ -194,12 +194,13 @@ class YeePay:
 
             profile = user.wanglibaouserprofile
             dic = {"merchantaccount":self.MER_ID, "orderid":str(order.id), "transtime":long(time.mktime(pay_info.create_time.timetuple())),
-                    "amount":amount, "productcatalog":"18", "productname":"网利宝-APP充值",
+                    "amount":amount_sec, "productcatalog":"18", "productname":"网利宝-APP充值",
                     "identityid":str(user.id), "identitytype":2, "terminaltype":terminaltype,
                     "terminalid":deviceid, "userip":pay_info.request_ip, "userua":useragent,
                     "callbackurl":self.PAY_BACK_RETURN_URL, "fcallbackurl":self.PAY_RETURN_URL,
                     "version":0, "paytypes":"1", "cardno":card_id, "orderexpdate":60}
             data, encryptkey = self._sign(dic)
+            print(dic)
 
             pay_info.request = str(dic)
             pay_info.status = PayInfo.PROCESSING
