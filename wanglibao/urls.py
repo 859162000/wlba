@@ -10,8 +10,8 @@ from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
-from wanglibao_p2p.views import AdminP2PUserRecord,GetNoWProjectsAPI, GetProjectsByDateAPI, FinancesAPI, P2PListAPI
-
+from wanglibao_p2p.views import AdminP2PUserRecord, GetNoWProjectsAPI, GetProjectsByDateAPI, FinancesAPI, P2PListAPI, \
+    P2PEyeListAPIView, P2PEyeEquityAPIView
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -42,14 +42,14 @@ urlpatterns = patterns(
     url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^api/', include('wanglibao_rest.urls')),
     url(r'^help/', include('wanglibao_help.urls')),
-    url(r'^'+settings.ADMIN_ADDRESS+'/', include(admin.site.urls)),
+    url(r'^' + settings.ADMIN_ADDRESS + '/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    #url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    # url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
     url(r'^shumi/', include('shumi_backend.urls')),
     url(r'^pay/', include('wanglibao_pay.urls')),
 
-    #url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
+    # url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', TemplateView.as_view(template_name="hiring.jade")),
     url(r'^about/', TemplateView.as_view(template_name="about.jade")),
     url(r'^team/', TemplateView.as_view(template_name="team.jade")),
@@ -58,8 +58,8 @@ urlpatterns = patterns(
     url(r'^responsibility/', TemplateView.as_view(template_name="responsibility.jade")),
     url(r'^contact_us/', TemplateView.as_view(template_name="contact_us.jade")),
     url(r'^news/', TemplateView.as_view(template_name="news.jade")),
-    #url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
-    #url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),
+    # url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
+    # url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),
     url(r'^agreement/', TemplateView.as_view(template_name="agreement.jade")),
     url(r'^mobile/agreement/', TemplateView.as_view(template_name="mobile_agreement.jade")),
     url(r'^mobile/about/', TemplateView.as_view(template_name="mobile_about.jade")),
@@ -93,11 +93,15 @@ urlpatterns += patterns(
     url(r'^tdt/getProjectsByDate.json', GetProjectsByDateAPI.as_view()),
     url(r'^2345/finances.json', FinancesAPI.as_view()),
     url(r'^hexun/p2plist.json', P2PListAPI.as_view()),
+    url(r'^api/loans/$', P2PEyeListAPIView.as_view()),
+    url(r'^api/data/$', P2PEyeEquityAPIView.as_view()),
 )
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns += patterns('',
+
+    urlpatterns += patterns(
+        '',
         url(r'^__debug__/', include(debug_toolbar.urls)),
     )
 
