@@ -646,6 +646,34 @@ class YeePayAppPayCallbackView(APIView):
         result = yeepay.pay_callback(request)
         return Response(result)
 
+#易宝支付同步回调
+class YeePayAppPayCompleteView(TemplateView):
+    template_name = 'pay_complete.jade'
+
+    def get(self, request, *args, **kwargs):
+        yeepay = third_pay.YeePay()
+        result = yeepay.pay_callback(request)
+
+        if result['ret_code']:
+            msg = u"充值失败"
+            amount = "None"
+        else:
+            msg = u"充值成功"
+            amount = result['amount']
+            if result['message'] == "success":
+                title,content = messages.msg_pay_ok(amount)
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":result['uid'],
+                    "title":title,
+                    "content":content,
+                    "mtype":"activityintro"
+                })
+
+        return self.render_to_response({
+            'result': msg,
+            'amount': amount
+        })
+
 class BankCardAddView(APIView):
     permission_classes = (IsAuthenticated, )
 

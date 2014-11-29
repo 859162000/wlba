@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 import hashlib
 import urllib
 import logging
@@ -222,18 +226,15 @@ class YeePay:
             logger.fatal('sign error! order id: ' + str(pay_info.pk) + ' ' + str(e))
             return {"ret_code":"20076", "message":message}
 
-    #@method_decorator(transaction.atomic)
+    @method_decorator(transaction.atomic)
     def pay_callback(self, request):
         encryptkey = request.GET.get("encryptkey", "")
         data = request.GET.get("data", "")
         logger.error("-" * 50)
-        logger.error(encryptkey)
-        logger.error("1")
 
         if not encryptkey or not data:
             return {"ret_code":20081, "message":"params invalid"}
 
-        logger.error("2")
         try:
             ybaeskey = self.rsa_base64_decrypt(encryptkey, self.PRIV_KEY)
             params = json.loads(self.aes_base64_decrypt(data, ybaeskey))
@@ -241,32 +242,34 @@ class YeePay:
             logger.error(traceback.format_exc())
             return {"ret_code":20088, "message":"data decrypt error"}
 
-        logger.error("3")
+        logger.error("%s" % params)
+
+        amount = util.fmt_two_amount(params['amount']) / 100
 
         if "sign" not in params:
             return {"ret_code":20082, "message":"params sign not exist"}
-        logger.error("4")
         sign = params.pop("sign")
         if not self._verify(params, sign):
             return {"ret_code":20083, "message":"params sign invalid"}
-        logger.error("5")
 
         if params['merchantaccount'] != self.MER_ID:
             return {"ret_code":20084, "message":"params merhantaccount invalid"}
-        logger.error("6")
 
         orderId = params['orderid']
         pay_info = PayInfo.objects.filter(order_id=orderId).first()
         if not pay_info:
             return {"ret_code":20085, "message":"order not exist"}
-        logger.error("7")
         if pay_info.status == PayInfo.SUCCESS:
-            return {"ret_code":0, "message":"deposit success"}
+            return {"ret_code":0, "message":PayResult.DEPOSIT_SUCCESS, "amount":amount}
         
-        amount = util.fmt_two_amount(params['amount']) / 100
         pay_info.error_message = str(params['status'])
         pay_info.response = "%s" % params
         pay_info.response_ip = util.get_client_ip(request)
+
+        if not pay_info.bank and "bank" in params:
+            bank = Bank.objects.filter(name=params['bank']).first()
+            if bank:
+                pay_info.bank = bank
 
         if pay_info.amount != amount:
             pay_info.status = PayInfo.FAIL
@@ -281,7 +284,7 @@ class YeePay:
                 pay_info.margin_record = margin_record
                 pay_info.status = PayInfo.SUCCESS
                 logger.error("orderId:%s yeepay response status:%s" % (orderId, params['status']))
-                rs = {"ret_code":0, "message":PayResult.DEPOSIT_SUCCESS}
+                rs = {"ret_code":0, "message":"success", "amount":amount, "uid":pay_info.user.id}
             else:
                 pay_info.status = PayInfo.FAIL
                 logger.error("orderId:%s yeepay response status: %s" % (orderId, params['status']))

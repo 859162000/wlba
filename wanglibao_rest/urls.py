@@ -22,7 +22,8 @@ from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSe
     P2PProductDetailView
 from wanglibao_pay.views import (CardViewSet, LianlianAppPayView, LianlianAppPayCallbackView,
                             BankCardAddView, BankCardListView, BankCardDelView, BankListAPIView,
-							LianlianWithdrawAPIView, YeePayAppPayView, YeePayAppPayCallbackView)
+							LianlianWithdrawAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
+							YeePayAppPayCompleteView)
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
@@ -120,7 +121,7 @@ urlpatterns = patterns(
 
     url(r'^pay/yee/app/deposit/$', YeePayAppPayView.as_view(), name="yee-deposit-view"),
     url(r'^pay/yee/app/deposit/callback/$', YeePayAppPayCallbackView.as_view(), name="yee-deposit-callback"),
-    url(r'^pay/yee/app/deposit/complete/$', YeePayAppPayCallbackView.as_view(), name="yee-deposit-fcallback"),
+    url(r'^pay/yee/app/deposit/complete/$', YeePayAppPayCompleteView.as_view(), name="yee-deposit-fcallback"),
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
     url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
