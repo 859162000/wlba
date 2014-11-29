@@ -517,8 +517,8 @@ YEE_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/yee/app/deposit/callback/'
 #YEE_PUB_KEY = RSA.importKey(open("yeepay_pub_key.pem", "r").read())
 
 YEE_MER_ID = "YB01000000144"
-YEE_MER_PRIV_KEY = RSA.importKey(open('pkcs8_rsa_private_key144.pem','r').read())
-YEE_PUB_KEY = RSA.importKey(open("rsa_public_key144.pem", "r").read())
+YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'pkcs8_rsa_private_key144.pem'),'r').read())
+YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "rsa_public_key144.pem"), "r").read())
 YEE_MER_SECRET_KEY = "418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8"
 
 #语音验证码参数
