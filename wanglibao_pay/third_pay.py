@@ -204,7 +204,7 @@ class YeePay:
                     "callbackurl":self.PAY_BACK_RETURN_URL, "fcallbackurl":self.PAY_RETURN_URL,
                     "version":0, "paytypes":"1", "cardno":card_id, "orderexpdate":60}
             data, encryptkey = self._sign(dic)
-            print(dic)
+            logger.error("%s" % dic)
 
             pay_info.request = str(dic)
             pay_info.status = PayInfo.PROCESSING
@@ -214,7 +214,7 @@ class YeePay:
 
             params = {"data":data, "encryptkey":encryptkey, "merchantaccount":self.MER_ID}
             url = "%s?%s" % (self.PAY_URL, urllib.urlencode(params))
-            print(url)
+            logger.error(url)
             return {"ret_code":0, "url":url}
         except Exception, e:
             logger.error(traceback.format_exc())
@@ -230,7 +230,6 @@ class YeePay:
     def pay_callback(self, request):
         encryptkey = request.GET.get("encryptkey", "")
         data = request.GET.get("data", "")
-        logger.error("-" * 50)
 
         if not encryptkey or not data:
             return {"ret_code":20081, "message":"params invalid"}
