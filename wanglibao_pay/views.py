@@ -24,8 +24,7 @@ from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import Bank, Card, PayResult, PayInfo
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
-from wanglibao_pay.lianlian_pay import LianlianPay
-from wanglibao_pay import lianlian_pay
+from wanglibao_pay import third_pay
 from wanglibao_p2p.models import P2PRecord
 import decimal
 from wanglibao_pay.serializers import CardSerializer
@@ -613,7 +612,7 @@ class LianlianAppPayView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        lianpay = LianlianPay()
+        lianpay = third_pay.LianlianPay()
         result = lianpay.ios_pay(request)
         return Response(result)
 
@@ -622,46 +621,64 @@ class LianlianAppPayCallbackView(APIView):
     permission_classes = ()
 
     def post(self, request):
-        lianpay = LianlianPay()
+        lianpay = third_pay.LianlianPay()
         result = lianpay.ios_pay_callback(request)
         if not result['ret_code']:
             result['ret_code'] = "0000"
             result['ret_msg'] = "SUCCESS"
         return Response(result)
 
+#易宝支付创建订单接口
+class YeePayAppPayView(APIView):
+    permission_classes = (IsAuthenticated, )
+    
+    def post(self, request):
+        yeepay = third_pay.YeePay()
+        result = yeepay.app_pay(request)
+        return Response(result)
+
+#易宝支付回调
+class YeePayAppPayCallbackView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        yeepay = third_pay.YeePay()
+        result = yeepay.pay_callback(request)
+        return Response(result)
+
 class BankCardAddView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        result = lianlian_pay.add_bank_card(request)
+        result = third_pay.add_bank_card(request)
         return Response(result)
 
 class BankCardListView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        result = lianlian_pay.list_bank_card(request)
+        result = third_pay.list_bank_card(request)
         return Response(result)
 
 class BankCardDelView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        result = lianlian_pay.del_bank_card(request)
+        result = third_pay.del_bank_card(request)
         return Response(result)
 
 class BankListAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        result = lianlian_pay.list_bank(request)
+        result = third_pay.list_bank(request)
         return Response(result)
 
 class LianlianWithdrawAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        lianpay = LianlianPay()
+        lianpay = third_pay.LianlianPay()
         result = lianpay.ios_withdraw(request)
         if not result['ret_code']:
             send_messages.apply_async(kwargs={
