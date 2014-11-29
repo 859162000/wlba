@@ -173,7 +173,8 @@ html
               td 【{{now|date:"d日"}}】
             tr
               td 总还款本息
-              total = reduce(lambda v, i: v + i, [amort.principal + amort.interest for amort in product.amortizations.all()])
+              if equity
+                total = reduce(lambda v, i: v + i, [amort.principal + amort.interest for amort in equity.all()])
               td 【￥{{total}}】元
 
     h3 第三条  借款支付
