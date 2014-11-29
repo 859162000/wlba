@@ -221,14 +221,18 @@ class YeePay:
             logger.fatal('sign error! order id: ' + str(pay_info.pk) + ' ' + str(e))
             return {"ret_code":"20076", "message":message}
 
-    @method_decorator(transaction.atomic)
+    #@method_decorator(transaction.atomic)
     def pay_callback(self, request):
         encryptkey = request.DATA.get("encryptkey", "")
         data = request.DATA.get("data", "")
+        logger.error("-" * 50)
+        logger.error(encryptkey)
+        logger.error("1")
 
         if not encryptkey or not data:
             return {"ret_code":20081, "message":"params invalid"}
 
+        logger.error("2")
         try:
             ybaeskey = self.rsa_base64_decrypt(encryptkey, self.PRIV_KEY)
             params = json.loads(self.aes_base64_decrypt(data, ybaeskey))
@@ -236,19 +240,25 @@ class YeePay:
             logger.error(traceback.format_exc())
             return {"ret_code":20088, "message":"data decrypt error"}
 
+        logger.error("3")
+
         if "sign" not in params:
             return {"ret_code":20082, "message":"params sign not exist"}
+        logger.error("4")
         sign = params.pop("sign")
         if not self._verify(params, sign):
             return {"ret_code":20083, "message":"params sign invalid"}
+        logger.error("5")
 
         if params['merchantaccount'] != self.MER_ID:
             return {"ret_code":20084, "message":"params merhantaccount invalid"}
+        logger.error("6")
 
         orderId = params['orderid']
         pay_info = PayInfo.objects.filter(order_id=orderId).first()
         if not pay_info:
             return {"ret_code":20085, "message":"order not exist"}
+        logger.error("7")
         if pay_info.status == PayInfo.SUCCESS:
             return {"ret_code":0, "message":"deposit success"}
         
