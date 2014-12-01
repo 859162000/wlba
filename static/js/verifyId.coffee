@@ -21,7 +21,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
     rules:
       captcha_1:
         required: true
-        minlength: 4
+        minlength: 1
       name:
         required: true
       id_number:
