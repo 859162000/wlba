@@ -4,6 +4,7 @@ import base64
 import uuid
 import decimal
 import time
+import random
 
 
 def get_client_ip(request):
@@ -31,3 +32,7 @@ def fmt_dt_14(dt):
 
 def fmt_time_14(t):
     return time.strftime("%Y%m%d%H%M%S", time.localtime(t))
+
+def randstr(length=16):
+    sampleStr = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789'
+    return ''.join(random.sample(sampleStr, length))

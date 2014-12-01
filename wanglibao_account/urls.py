@@ -10,7 +10,7 @@ from forms import EmailOrPhoneAuthenticationForm
 from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome,
     				AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView, AccountTransactionDeposit,
 				    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
-					Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailView, MessageCountView, MessageListView)
+					Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailView, MessageCountView, MessageListView, AccountRepayment)
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -25,6 +25,7 @@ urlpatterns = patterns(
     url(r'^transaction/fund/$', login_required(AccountTransaction.as_view(),
                                  login_url='/accounts/login/')),
     url(r'^transaction/p2p/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/login/')),
+    url(r'^repayment/$', login_required(AccountRepayment.as_view(), login_url='/accounts/login/')),
     url(r'^transaction/deposit/$', login_required(AccountTransactionDeposit.as_view(),
                                                   login_url='/accounts/login/')),
     url(r'^transaction/withdraw/$', login_required(AccountTransactionWithdraw.as_view(),

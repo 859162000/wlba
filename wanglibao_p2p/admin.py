@@ -183,9 +183,9 @@ class P2PProductForm(forms.ModelForm):
             if not pa:
                 raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
 
-            # product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
-            # if pa.count() != product.period:
-            #     raise forms.ValidationError(u'产品还款计划错误')
+            product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
+            if pa.count() != product.amortization_count:
+                raise forms.ValidationError(u'产品还款计划错误')
 
         return self.cleaned_data['status']
 
@@ -194,12 +194,10 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     inlines = [
         WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
     ]
-    list_display = (
-    'id', 'name', 'short_name', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'priority')
+    list_display = ('id', 'name', 'short_name', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'preview_contract', 'priority')
     list_editable = ('priority',)
     list_filter = ('status',)
     search_fields = ('name',)
-    readonly_fields = ('amortization_count',)
     resource_class = P2PProductResource
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'
@@ -209,7 +207,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
             return [f.name for f in self.model._meta.fields]
-        return ()
+        return ('amortization_count',)
 
     def save_model(self, request, obj, form, change):
         if obj.status == u'正在招标':

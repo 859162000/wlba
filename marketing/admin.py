@@ -114,7 +114,7 @@ class RewardResource(resources.ModelResource):
 
 class RewardAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('id', 'type', 'content', 'description', 'is_used', 'end_time', 'create_time')
-    search_fields = ('type', )
+    search_fields = ('type', 'content')
     list_filter = ('is_used', 'type')
     resource_class = RewardResource
 

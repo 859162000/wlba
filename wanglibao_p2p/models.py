@@ -35,7 +35,13 @@ class WarrantCompany(models.Model):
 
 class ContractTemplate(models.Model):
     name = models.CharField(u'名字', max_length=32)
-    content = models.TextField(u'模板内容', default='')
+    content = models.TextField(u'模板内容（真实合同）', default='')
+    content_preview = models.TextField(verbose_name=u'模板内容（预览合同）', default='')
+    party_c = models.CharField(verbose_name=u'丙方（推荐方/服务方/代偿方）', max_length=128, help_text=u'丙方（推荐方/服务方/代偿方）', default='')
+    party_c_name = models.CharField(verbose_name=u'法定代表人', max_length=32, help_text=u'法定代表人', default='')
+    party_c_addr = models.CharField(verbose_name=u'地址', max_length=128, help_text=u'地址', default='')
+    available_bank = models.CharField(verbose_name=u'支持开户行', max_length=1128, help_text=u'支持开户行', default='')
+
 
     class Meta:
         verbose_name = u'借款合同'
@@ -167,7 +173,7 @@ class P2PProduct(ProductBase):
     usage = models.TextField(blank=False, verbose_name=u'借款用途(合同用)*')
     short_usage = models.TextField(blank=False, verbose_name=u'借款用途*')
 
-    contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True ,blank=False)
+    contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True, blank=False)
 
     #author: hetao; datetime: 2014.10.27; description: 活动是否参加活动
     activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True, verbose_name=u'返现活动')
@@ -231,7 +237,7 @@ class P2PProduct(ProductBase):
         u'满标已审核': u'满标审核',
         u'还款中': u'还款中',
         u'流标': u'流标',
-        u'已完成': u'已完成',
+        u'已完成': u'已还款',
     }
 
     @property
@@ -253,6 +259,10 @@ class P2PProduct(ProductBase):
             return self.display_payback_mapping[self.pay_method]
         return self.pay_method
 
+    def preview_contract(self):
+        return u'<a href="/p2p/contract_preview/%s" target="_blank">合同预览</a>' % str(self.id)
+    preview_contract.short_description = u'合同预览'
+    preview_contract.allow_tags = True
 
 reversion.register(P2PProduct)
 
@@ -321,6 +331,10 @@ class ProductAmortization(models.Model):
     @property
     def total(self):
         return self.principal + self.interest + self.penal_interest
+
+    # @property
+    # def amortizations(self):
+    #     return self.objects.filter(product=self.product)
 
     def __unicode__(self):
         return u'产品%s: 第 %s 期' % (str(self.product_id), self.term)

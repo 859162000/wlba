@@ -72,7 +72,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         maxlength: 20
       captcha_1:
         required: true
-        minlength: 4
+        minlength: 1
 
     messages:
       identifier:
@@ -84,7 +84,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         maxlength: '密码不能超过20位'
       captcha_1:
         required: '不能为空'
-        minlength: $.format("验证码要输入4位")
+        minlength: $.format("验证码至少输入1位")
 
     errorPlacement: (error, element) ->
         error.appendTo $(element).parents('.form-row').children('.form-row-error')

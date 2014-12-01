@@ -1,0 +1,49 @@
+extends account_home_base
+
+-load formatters
+
+block head
+  - with 'P2P交易记录' as title
+    include include/head
+
+block sidebar
+  - with '交易记录' as activeItem
+    - with 'P2P交易记录' as activeSubItem
+      include include/user_center_sidebar
+
+block main
+  .panel.p2p-record
+    h1 P2P交易记录
+    .account-home-panel--title-bar__product
+      ul.title-bar--tabs
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href="/accounts/transaction/p2p/") 投资记录
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href='/accounts/transaction/deposit/') 充值记录
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href='/accounts/transaction/withdraw/') 提现记录
+        li.title-bar--tab.active
+          a.title-bar--tab--anchor(href='javascript:void(0)') 还款记录
+    .panel-container.padding-l-r-xl
+      table.table
+        thead
+          tr
+            th 流水号
+            th 产品名称
+            th 时间
+            th 期数
+            th 金额(元)
+        tbody
+          each repayment_record in repayment_records
+            amount = repayment_record.principal + repayment_record.interest
+            tr
+              td {{repayment_record.order_id}}
+              td
+                a(href="/p2p/detail/{{repayment_record.amortization.product.id}}/", target="_blank")
+                  {{repayment_record.amortization.product.short_name}}
+              td {{repayment_record.created_time | date:"Y-m-d H:i:s"}}
+              td 第{{repayment_record.term}}期 </br> (共{{repayment_record.amortization.product.amortization_count}}期)
+              td {{amount}}
+    - with data=repayment_records uri='/accounts/repayment/'
+    include include/pager
+    - endwith

@@ -12,15 +12,18 @@ block sidebar
       include include/user_center_sidebar
 
 block main
-  .panel
-    .account-home-panel--title-bar__product.padding-l-r-xl
+  .panel.p2p-record
+    h1 P2P交易记录
+    .account-home-panel--title-bar__product
       ul.title-bar--tabs
         li.title-bar--tab.active
-          a.title-bar--tab--anchor(href="javascript:void(0)") 交易记录
+          a.title-bar--tab--anchor(href="javascript:void(0)") 投资记录
         li.title-bar--tab
           a.title-bar--tab--anchor(href='/accounts/transaction/deposit/') 充值记录
         li.title-bar--tab
           a.title-bar--tab--anchor(href='/accounts/transaction/withdraw/') 提现记录
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href='/accounts/repayment/') 还款记录
     .panel-container.padding-l-r-xl
       table.table
         thead
@@ -29,7 +32,6 @@ block main
             th 产品
             th 时间
             th 金额(元)
-            th 交易类型
             th 状态
         tbody
           each trade_record in trade_records
@@ -40,7 +42,6 @@ block main
                   {{trade_record.product.short_name}}
               td {{trade_record.create_time | date:"Y-m-d H:i:s"}}
               td {{trade_record.amount}}
-              td {{trade_record.catalog}}
               td {{trade_record.status}}
     - with data=trade_records uri='/accounts/transaction/p2p/'
     include include/pager

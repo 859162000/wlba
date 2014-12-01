@@ -1,13 +1,16 @@
 # encoding: utf8
+from operator import attrgetter
+from decimal import Decimal
+from hashlib import md5
+
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Q, Sum
+from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.utils import timezone
+from django.utils import timezone, dateparse
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from rest_framework import status
-from rest_framework import mixins
 from rest_framework import generics
 from rest_framework import renderers
 from rest_framework.response import Response
@@ -18,25 +21,25 @@ from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
+from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
 from wanglibao.const import ErrorNumber
-from operator import attrgetter
 from django.conf import settings
-from decimal import Decimal
-from hashlib import md5
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao_p2p.utility import strip_tags
 from wanglibao_announcement.utility import AnnouncementP2P
 from wanglibao_account.models import Binding
+from django.contrib.auth.decorators import login_required
+from wanglibao_account.utils import generate_contract_preview
+
 
 REPAYMENTTYPEMAP = (
-                (u'到期还本付息', 1),
-                (u'等额本息', 2),
-                (u'按月付息', 5),
-                (u'按季度付息', 7)
-            )
+    (u'到期还本付息', 1),
+    (u'等额本息', 2),
+    (u'按月付息', 5),
+    (u'按季度付息', 7)
+)
 
 
 class P2PDetailView(TemplateView):
@@ -57,7 +60,7 @@ class P2PDetailView(TemplateView):
             raise Http404(u'您查找的产品不存在')
 
         terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
-                                                               p2p.expected_earning_rate/100,
+                                                               p2p.expected_earning_rate / 100,
                                                                p2p.amortization_count,
                                                                p2p.period)
         total_earning = terms.get("total") - p2p.total_amount
@@ -65,7 +68,9 @@ class P2PDetailView(TemplateView):
         total_fee_earning = 0
 
         if p2p.activity:
-            total_fee_earning = Decimal(p2p.total_amount*p2p.activity.rule.rule_amount*(Decimal(p2p.period)/Decimal(12))).quantize(Decimal('0.01'))
+            total_fee_earning = Decimal(
+                p2p.total_amount * p2p.activity.rule.rule_amount * (Decimal(p2p.period) / Decimal(12))).quantize(
+                Decimal('0.01'))
 
         user = self.request.user
         current_equity = 0
@@ -79,7 +84,6 @@ class P2PDetailView(TemplateView):
             context.update({
                 'xunlei_vip': xunlei_vip
             })
-
 
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
 
@@ -111,14 +115,14 @@ class PurchaseP2P(APIView):
     def post(self, request):
         if not request.user.is_authenticated():
             return Response({
-                'message': u'请登录',
-                'error_number': ErrorNumber.unauthorized
-            }, status=status.HTTP_403_FORBIDDEN)
+                                'message': u'请登录',
+                                'error_number': ErrorNumber.unauthorized
+                            }, status=status.HTTP_403_FORBIDDEN)
         if not request.user.wanglibaouserprofile.id_is_valid:
             return Response({
-                'message': u'请先进行实名认证',
-                'error_number': ErrorNumber.need_authentication
-            }, status=status.HTTP_400_BAD_REQUEST)
+                                'message': u'请先进行实名认证',
+                                'error_number': ErrorNumber.need_authentication
+                            }, status=status.HTTP_400_BAD_REQUEST)
         form = PurchaseForm(request.DATA)
 
         if form.is_valid():
@@ -133,14 +137,14 @@ class PurchaseP2P(APIView):
                 })
             except Exception, e:
                 return Response({
-                    'message': e.message,
-                    'error_number': ErrorNumber.unknown_error
-                }, status=status.HTTP_400_BAD_REQUEST)
+                                    'message': e.message,
+                                    'error_number': ErrorNumber.unknown_error
+                                }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({
-                "message": form.errors,
-                'error_number': ErrorNumber.form_error
-            }, status=status.HTTP_400_BAD_REQUEST)
+                                "message": form.errors,
+                                'error_number': ErrorNumber.form_error
+                            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PurchaseP2PMobile(APIView):
@@ -154,14 +158,14 @@ class PurchaseP2PMobile(APIView):
 
         if not request.user.is_authenticated():
             return Response({
-                'message': u'请登录',
-                'error_number': ErrorNumber.unauthorized
-            }, status=status.HTTP_200_OK)
+                                'message': u'请登录',
+                                'error_number': ErrorNumber.unauthorized
+                            }, status=status.HTTP_200_OK)
         if not request.user.wanglibaouserprofile.id_is_valid:
             return Response({
-                'message': u'请先进行实名认证',
-                'error_number': ErrorNumber.need_authentication
-            }, status=status.HTTP_200_OK)
+                                'message': u'请先进行实名认证',
+                                'error_number': ErrorNumber.need_authentication
+                            }, status=status.HTTP_200_OK)
         form = PurchaseForm(request.DATA)
         phone = request.user.wanglibaouserprofile.phone
         if form.is_valid():
@@ -176,14 +180,14 @@ class PurchaseP2PMobile(APIView):
                 })
             except Exception, e:
                 return Response({
-                    'message': e.message,
-                    'error_number': ErrorNumber.unknown_error
-                }, status=status.HTTP_200_OK)
+                                    'message': e.message,
+                                    'error_number': ErrorNumber.unknown_error
+                                }, status=status.HTTP_200_OK)
         else:
             return Response({
-                "message": form.errors,
-                'error_number': ErrorNumber.form_error
-            }, status=status.HTTP_200_OK)
+                                "message": form.errors,
+                                'error_number': ErrorNumber.form_error
+                            }, status=status.HTTP_200_OK)
 
 
 class AuditProductView(TemplateView):
@@ -206,14 +210,13 @@ class AuditProductView(TemplateView):
         ProductKeeper(p2p).audit(request.user)
 
         if p2p.activity:
-
             from celery.execute import send_task
+
             send_task("wanglibao_p2p.tasks.build_earning", kwargs={
                 "product_id": pk
             })
 
-
-        return HttpResponseRedirect('/'+settings.ADMIN_ADDRESS+'/wanglibao_p2p/p2pproduct/')
+        return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/p2pproduct/')
 
 
 audit_product_view = staff_member_required(AuditProductView.as_view())
@@ -239,44 +242,168 @@ class P2PProductViewSet(PaginatedModelViewSet):
 
         if pager:
             return qs.filter(hide=False).filter(status__in=[
-                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-                ]).filter(pager).order_by('-priority')
+                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+            ]).filter(pager).order_by('-priority')
         else:
             return qs.filter(hide=False).filter(status__in=[
-                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-                ]).order_by('-priority')
+                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+            ]).order_by('-priority')
 
 
-class P2PProductListView(generics.ListCreateAPIView):
+P2PEYE_PAY_WAY = {
+    u'等额本息': 1,
+    u'按月付息': 2,
+    u'到期还本付息': 4,
+    u'按季度付息': 5,
+}
 
-    model = P2PProduct
-    permission_classes = IsAdminUserOrReadOnly,
-    serializer_class = P2PProductSerializer
 
+class P2PEyeListAPIView(APIView):
+    """ 网贷天眼 API
+    """
+    permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
+    def get(self, request):
 
-        maxid = self.request.QUERY_PARAMS.get('maxid', '')
-        minid = self.request.QUERY_PARAMS.get('minid', '')
+        result = {
+            "result_code": -1,
+            "result_msg": u"未授权的访问!",
+            "page_count": "null",
+            "page_index": "null",
+            "loans": "null"
+        }
 
-        pager = None
-        if maxid and not minid:
-            pager = Q(id__gt=maxid)
-        if minid and not maxid:
-            pager = Q(id__lt=minid)
+        # 验证状态
+        status_query, status, result = validate_status(request, result, 'status')
+        if not status_query:
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
-        if pager:
-            return  P2PProduct.objects.filter(hide=False).filter(status__in=[
-                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-                ]).filter(pager).order_by('-priority')
+        # 验证日期
+        time_from, result = validate_date(request, result, 'time_from')
+        if not time_from:
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+        time_to, result = validate_date(request, result, 'time_to')
+        if not time_to:
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+        # 构造日期查询语句
+        publish_query = Q(publish_time__range=(time_from, time_to))
+
+        p2pproducts = P2PProduct.objects.select_related('activity').filter(hide=False).filter(status_query).filter(
+            publish_query)
+
+        # 分页处理
+        p2pproducts, paginator = handler_paginator(request, p2pproducts)
+        if not p2pproducts:
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+        if p2pproducts:
+            loans = []
+            for p2pproduct in p2pproducts:
+                # 进度
+                amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
+                percent = p2pproduct.ordered_amount / amount * 100
+                process = percent.quantize(Decimal('0.0'), 'ROUND_DOWN')
+
+                reward = 0
+                if p2pproduct.activity:
+                    reward = p2pproduct.activity.rule.rule_amount
+                rate = p2pproduct.excess_earning_rate + reward
+                obj = {
+                    "id": str(p2pproduct.id),
+                    "platform_name": u"网利宝",
+                    "url": "https://www.wanglibao.com/p2p/detail/%s" % p2pproduct.id,
+                    "title": p2pproduct.name,
+                    "username": p2pproduct.borrower_name,
+                    "status": status,
+                    "userid": md5(p2pproduct.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
+                    "c_type": u"抵押标" if p2pproduct.category == u'证大速贷' else u"信用标",
+                    "amount": str(p2pproduct.total_amount),
+                    "rate": str(rate),
+                    "period": u'{}个月'.format(p2pproduct.period),
+                    "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0)),
+                    "process": process,
+                    "reward": str(reward),
+                    "guarantee": "0",
+                    "start_time": time_from,
+                    "end_time": timezone.localtime(p2pproduct.end_time).strftime("%Y-%m-%d %H:%M:%S"),
+                    "invest_num": str(p2pproduct.equities.count()),
+                    "c_reward": "0"
+                }
+                loans.append(obj)
+            result.update(loans=loans, page_count=paginator.count, page_index=p2pproducts.number, result_msg=u'获取数据成功!')
         else:
-            return P2PProduct.objects.filter(hide=False).filter(status__in=[
-                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-                ]).order_by('-priority')
+            result.update(result_code='-1', result_msg=u'未授权的访问!')
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+
+class P2PEyeEquityAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        result = {
+            "result_code": "-1",
+            "result_msg": u"未授权的访问!",
+            "page_count": "null",
+            "page_index": "null",
+            "data": "null"
+        }
+        try:
+            id = int(request.GET.get('id'))
+
+            id_query = Q(id=id)
+        except:
+            result.update(result_code=-2, result_msg=u'id参数不存在或者格式错误')
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+        # 验证日期
+        time_from, result = validate_date(request, result, 'time_from')
+        if not time_from:
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+        time_to, result = validate_date(request, result, 'time_to')
+        if not time_to:
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+        # 构造日期查询语句
+        publish_query = Q(publish_time__range=(time_from, time_to))
+
+        try:
+            p2pproduct = P2PProduct.objects.filter(hide=False).filter(status__in=[
+                u'正在招标', u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+            ]).filter(publish_query).get(id_query)
+        except:
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+        p2pequities = p2pproduct.equities.all()
+
+        if not p2pequities:
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+        # 分页处理
+        equities, paginator = handler_paginator(request, p2pequities)
+        if not equities:
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+        data = []
+        for eq in equities:
+            obj = {
+                "id": str(p2pproduct.id),
+                "link": "https://www.wanglibao.com/p2p/detail/%s" % p2pproduct.id,
+                "useraddress": "null",
+                "username": eq.user.wanglibaouserprofile.name,
+                "userid": str(eq.user.id),
+                "type": u"手动",
+                "money": str(eq.equity),
+                "account": str(eq.equity),
+                "status": u"成功" if eq.confirm else u"失败",
+                "add_time": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+            }
+            data.append(obj)
+        result.update(data=data, page_count=str(paginator.count), page_index=str(equities.number), result_code="1", result_msg=u'获取数据成功!')
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
 class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-
     model = P2PProduct
     permission_classes = IsAdminUserOrReadOnly,
     serializer_class = P2PProductSerializer
@@ -317,7 +444,6 @@ class GetNoWProjectsAPI(APIView):
             p2pequities = p2p.equities.all()
             subscribes = []
             for eq in p2pequities:
-
                 temp_eq = {
                     "subscribeUserName": eq.user.username,
                     "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
@@ -369,7 +495,7 @@ class GetProjectsByDateAPI(APIView):
         end_time = start_time + timezone.timedelta(days=1)
 
         p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
-             u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'已完成'
+            u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'已完成'
         ]).filter(soldout_time__range=(start_time, end_time))
 
         p2p_list = []
@@ -382,7 +508,6 @@ class GetProjectsByDateAPI(APIView):
             if p2p.category == u'证大速贷':
                 type = u"信用标"
             type = u"抵押标"
-
 
             for pay_method, value in REPAYMENTTYPEMAP:
                 if pay_method == p2p.pay_method:
@@ -426,6 +551,8 @@ class GetProjectsByDateAPI(APIView):
 
 
 class FinancesAPI(APIView):
+    """ 2345 API
+    """
     permission_classes = (IsAdminUserOrReadOnly,)
 
     def get(self, request):
@@ -444,7 +571,8 @@ class FinancesAPI(APIView):
 
             temp_p2p = {
                 "logo": "https://{}/static/images/wlblogo.png".format(self.request.get_host()),
-                "link": "https://{}/p2p/detail/{}/?promo_token=TL86KmhJShuqyBO0ZxR17A".format(self.request.get_host(), p2p.id),
+                "link": "https://{}/p2p/detail/{}/?promo_token=TL86KmhJShuqyBO0ZxR17A".format(self.request.get_host(),
+                                                                                              p2p.id),
                 "chanpin": p2p.name,
                 "serial": "WLB{}{}".format(timezone.localtime(p2p.publish_time).strftime("%Y%m%d%H%M%S"), p2p.id),
                 "xinyong": u'全额本息担保',
@@ -458,27 +586,31 @@ class FinancesAPI(APIView):
 
 
 class P2PListAPI(APIView):
+    """ 和讯网 API
+    """
     permission_classes = (IsAdminUserOrReadOnly, )
 
     def get(self, request):
 
-        date = request.GET.get('date', '')
-        if date:
-            try:
-                date = [int(i) for i in date.split('-')]
-            except:
-                return HttpResponse(renderers.JSONRenderer().render({'message': u'错误的date', 'code': -1}, 'application/json'))
-        else:
-            return HttpResponse(renderers.JSONRenderer().render({'message': u'date的必传', 'code': -2}, 'application/json'))
+        date_args = request.GET.get('date', '')
+        if not date_args:
+            return HttpResponse(
+                renderers.JSONRenderer().render({'message': u'date必传', 'code': -2}, 'application/json'))
+        try:
+            start_time = dateparse.parse_date(date_args)
 
-        start_time = timezone.datetime(*date)
+            if not start_time:
+                return HttpResponse(
+                    renderers.JSONRenderer().render({'message': u'错误的date', 'code': -1}, 'application/json'))
+        except:
+            return HttpResponse(
+                renderers.JSONRenderer().render({'message': u'错误的date', 'code': -1}, 'application/json'))
 
-        p2pproducts = P2PProduct.objects.filter(hide=False)\
+        p2pproducts = P2PProduct.objects.filter(hide=False) \
             .filter(status=u'正在招标').filter(publish_time__gte=start_time)
 
         p2p_list = []
         for p2p in p2pproducts:
-
             amount = Decimal.from_float(p2p.total_amount).quantize(Decimal('0.00'))
             percent = p2p.ordered_amount / amount * 100
             fld_lend_progress = percent.quantize(Decimal('0.0'), 'ROUND_DOWN')
@@ -516,13 +648,14 @@ class RecordView(APIView):
                 status=404
             )
 
-        equities = product.p2precord_set.filter(catalog=u'申购').prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+        equities = product.p2precord_set.filter(catalog=u'申购').prefetch_related('user').prefetch_related(
+            'user__wanglibaouserprofile')
 
         record = [{
-           "amount": float(eq.amount),
-            "user": eq.user.wanglibaouserprofile.phone,
-            "create_time": timezone.localtime(eq.create_time).strftime("%Y-%m-%d %H:%M:%S")
-        } for eq in equities]
+                      "amount": float(eq.amount),
+                      "user": eq.user.wanglibaouserprofile.phone,
+                      "create_time": timezone.localtime(eq.create_time).strftime("%Y-%m-%d %H:%M:%S")
+                  } for eq in equities]
 
         return Response(record)
 
@@ -532,12 +665,14 @@ class P2PListView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status= u'正在招标').order_by('-publish_time')
+        p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
+            Q(publish_time__lte=timezone.now())) \
+            .filter(status=u'正在招标').order_by('-publish_time')
 
-        p2p_others = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now())).filter(
+        p2p_others = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
+            Q(publish_time__lte=timezone.now())).filter(
             status__in=[
-                u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
             ]).order_by('-soldout_time')
 
         show_slider = False
@@ -563,7 +698,6 @@ class P2PListView(TemplateView):
             p2p_products = paginator.page(1)
         except Exception:
             p2p_products = paginator.page(paginator.num_pages)
-
 
         return {
             'p2p_products': p2p_products,
@@ -591,3 +725,14 @@ class AdminP2PUserRecord(TemplateView):
         }
 
 
+@login_required
+def preview_contract(request, id):
+    product = P2PProduct.objects.filter(id=id).first()
+    if not product:
+    #     if product.status == u'录标' or product.status == u'录标完成':
+    #         return HttpResponse(u'<h3 style="color:red;">【录标完成】之后才能进行合同预览！</h3>')
+    # else:
+        return HttpResponse(u'<h3 style="color:red;">没有该产品或产品信息错误！</h3>')
+
+    equity = ProductAmortization.objects.filter(product_id=id).prefetch_related('product')
+    return HttpResponse(generate_contract_preview(equity, product))
