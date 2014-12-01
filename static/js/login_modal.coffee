@@ -72,7 +72,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         maxlength: 20
       captcha_1:
         required: true
-        minlength: 4
+        minlength: 1
 
     messages:
       identifier:
