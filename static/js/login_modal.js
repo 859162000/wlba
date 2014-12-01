@@ -71,7 +71,7 @@
         },
         captcha_1: {
           required: true,
-          minlength: 4
+          minlength: 1
         }
       },
       messages: {
@@ -86,7 +86,7 @@
         },
         captcha_1: {
           required: '不能为空',
-          minlength: $.format("验证码要输入4位")
+          minlength: $.format("验证码至少输入1位")
         }
       },
       errorPlacement: function(error, element) {
@@ -436,5 +436,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=login_modal.map
