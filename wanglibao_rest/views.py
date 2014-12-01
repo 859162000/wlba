@@ -424,11 +424,12 @@ class IdValidate(APIView):
         user = self.request.user
         now = timezone.now()
 
-        interval = (now - user.date_joined).seconds
-        if interval < 40:
-            return Response({
-                                "message": u"认证成功"
-                            }, status=200)
+        # interval = (now - user.date_joined).seconds
+        # if interval < 40:
+        #     return Response({
+        #                         "message": u"认证成功"
+        #                     }, status=200)
+
         if form.is_valid():
 
             # name = request.DATA.get("name", "")
@@ -469,33 +470,33 @@ class IdValidate(APIView):
             user.wanglibaouserprofile.save()
 
             # 判断时间间隔太短的话就认定他是黑客，需要电话找客服索要激活码
-            if interval < 60:
-                title,content = messages.msg_validate_fake()
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id":user.id,
-                    "title":title,
-                    "content":content,
-                    "mtype":"activity"
-                })
-            else:
+            # if interval < 60:
+            #     title,content = messages.msg_validate_fake()
+            #     inside_message.send_one.apply_async(kwargs={
+            #         "user_id":user.id,
+            #         "title":title,
+            #         "content":content,
+            #         "mtype":"activity"
+            #     })
+            # else:
 
-                # 实名认证 活动赠送
-                channel = which_channel(user)
-                rs = RewardStrategy(user)
-                if channel == Channel.KUAIPAN:
-                    # 快盘来源
-                    rs.reward_user(u'50G快盘容量')
-                    rs.reward_user(u'三天迅雷会员')
-                else:
-                    # 非快盘
-                    rs.reward_user(u'三天迅雷会员')
+            # 实名认证 活动赠送
+            channel = which_channel(user)
+            rs = RewardStrategy(user)
+            if channel == Channel.KUAIPAN:
+                # 快盘来源
+                rs.reward_user(u'50G快盘容量')
+                rs.reward_user(u'三天迅雷会员')
+            else:
+                # 非快盘
+                rs.reward_user(u'三天迅雷会员')
 
             return Response({
-                                    "validate": True
-                                }, status=200)
+                                "validate": True
+                            }, status=200)
         else:
             return Response({
-                                "message": u"字段错误",
+                                "message": u"验证码错误",
                                 "error_number": ErrorNumber.unknown_error
                             }, status=400)
 
