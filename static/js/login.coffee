@@ -33,10 +33,10 @@ require ['jquery', 'jquery.validate', 'lib/backend', 'jquery.placeholder'], ($, 
         required: '不能为空'
         minlength: $.format("密码需要最少{0}位")
 
-  $('.captcha-refresh').click ->
-    $form = $(this).parents('form')
-    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/"
-
-    $.getJSON url, {}, (json)->
-      $form.find('input[name="captcha_0"]').val(json.key)
-      $form.find('img.captcha').attr('src', json.image_url)
+#  $('.captcha-refresh').click ->
+#    $form = $(this).parents('form')
+#    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/"
+#
+#    $.getJSON url, {}, (json)->
+#      $form.find('input[name="captcha_0"]').val(json.key)
+#      $form.find('img.captcha').attr('src', json.image_url)

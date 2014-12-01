@@ -17,7 +17,7 @@
     $.validator.addMethod("emailOrPhone", function(value, element) {
       return backend.checkEmail(value) || backend.checkMobile(value);
     });
-    $('#login-form').validate({
+    return $('#login-form').validate({
       rules: {
         identifier: {
           required: true,
@@ -38,15 +38,6 @@
           minlength: $.format("密码需要最少{0}位")
         }
       }
-    });
-    return $('.captcha-refresh').click(function() {
-      var $form, url;
-      $form = $(this).parents('form');
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/";
-      return $.getJSON(url, {}, function(json) {
-        $form.find('input[name="captcha_0"]').val(json.key);
-        return $form.find('img.captcha').attr('src', json.image_url);
-      });
     });
   });
 
