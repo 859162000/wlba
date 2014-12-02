@@ -20,10 +20,9 @@ from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTr
     MobileHotFundViewSet, MobileMainPageViewSet, MobileMainPageP2PViewSet
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
     P2PProductDetailView
-from wanglibao_pay.views import (CardViewSet, LianlianAppPayView, LianlianAppPayCallbackView,
-                            BankCardAddView, BankCardListView, BankCardDelView, BankListAPIView,
-							LianlianWithdrawAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
-							YeePayAppPayCompleteView)
+from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
+                            BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
+                            YeePayAppPayCompleteView)
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView

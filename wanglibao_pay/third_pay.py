@@ -24,7 +24,7 @@ from wanglibao_sms.utils import validate_validation_code
 
 from Crypto import Random
 from Crypto.Hash import SHA
-from Crypto.PublicKey import RSA
+#from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5 as pk
 from Crypto.Cipher import PKCS1_v1_5, AES
 import base64
