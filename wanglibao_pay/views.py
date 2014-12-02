@@ -708,6 +708,19 @@ class BankListAPIView(APIView):
         result = third_pay.list_bank(request)
         return Response(result)
 
+class WithdrawAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.withdraw(request)
+        if not result['ret_code']:
+            send_messages.apply_async(kwargs={
+                'phones': [result['phone']],
+                'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
+            })
+        return Response(result)
+
+"""
 class LianlianWithdrawAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -720,3 +733,4 @@ class LianlianWithdrawAPIView(APIView):
                 'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
             })
         return Response(result)
+"""
