@@ -112,4 +112,5 @@ else
     +innerFooter()
 
 script.
-  require(['/static/js/hover.js','/static/js/login_modal.js'])
+  var v = new Date().getTime()
+  require(['/static/js/hover.js','/static/js/login_modal.js?v='+v])
