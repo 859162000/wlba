@@ -294,7 +294,7 @@ class IdValidateAPIView(APIView):
         except Exception, e:
             print(e)
 
-        return Response({"ret_code": 0, "message": "验证成功"})
+        return Response({"ret_code": 0, "message": u"验证成功"})
 
 
 class SendVoiceCodeAPIView(APIView):

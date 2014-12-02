@@ -550,41 +550,6 @@ class GetProjectsByDateAPI(APIView):
         return HttpResponse(renderers.JSONRenderer().render(p2p_list, 'application/json'))
 
 
-class FinancesAPI(APIView):
-    """ 2345 API
-    """
-    permission_classes = (IsAdminUserOrReadOnly,)
-
-    def get(self, request):
-
-        p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
-            u'正在招标', u'还款中', u'已完成'
-        ]).order_by("-priority")
-
-        p2p_list = []
-
-        for p2p in p2pproducts:
-            status = 0
-            shouyi = "{}%".format(p2p.expected_earning_rate)
-            if p2p.status == u'正在招标':
-                status = 1
-
-            temp_p2p = {
-                "logo": "https://{}/static/images/wlblogo.png".format(self.request.get_host()),
-                "link": "https://{}/p2p/detail/{}/?promo_token=TL86KmhJShuqyBO0ZxR17A".format(self.request.get_host(),
-                                                                                              p2p.id),
-                "chanpin": p2p.name,
-                "serial": "WLB{}{}".format(timezone.localtime(p2p.publish_time).strftime("%Y%m%d%H%M%S"), p2p.id),
-                "xinyong": u'全额本息担保',
-                "touzi": "{}元".format(p2p.total_amount),
-                "shouyi": shouyi,
-                "touzi_time": "{}月".format(p2p.period),
-                "status": status
-            }
-            p2p_list.append(temp_p2p)
-        return HttpResponse(renderers.JSONRenderer().render(p2p_list, 'application/json'))
-
-
 class P2PListAPI(APIView):
     """ 和讯网 API
     """

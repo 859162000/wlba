@@ -158,10 +158,10 @@ class YeePay:
             return {"ret_code":20073, 'message':'金额格式错误'}
 
         amount = util.fmt_two_amount(amount)
-        #if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
-        #    return {"ret_code":20074, 'message':'金额格式错误，大于100元且为100倍数'}
-        if str(amount) != "0.02":
-            return {"ret_code":20074, 'message':'金额只能为2分钱'}
+        if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
+            return {"ret_code":20074, 'message':'金额格式错误，大于100元且为100倍数'}
+        #if str(amount) != "0.02":
+        #    return {"ret_code":20074, 'message':'金额只能为2分钱'}
 
         terminal = deviceid.split(":")
         deviceid = terminal[-1]
