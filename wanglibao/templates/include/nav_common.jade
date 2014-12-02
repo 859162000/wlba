@@ -14,12 +14,9 @@
 
     +nav-item('P2P理财', '/', '', '')
     +nav-item('基金', '/fund/products', '', '')
-    +nav-item('信托', '/trust/home', '', '')
 
     +nav-item('安全保障', '/security', 'left-line', '')
-    +nav-item('帮助中心', '/help', 'right-line', '')
-    //author: hetao; datetime: 2014.10.27; description: 去掉free icon,"定制个人理财方案“ to "定制理财方案”
-    +nav-item('定制理财方案', '/portfolio', '', '')
+    +nav-item('帮助中心', '/help', '', '')
 
     if user.is_authenticated
       +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav')

@@ -503,16 +503,16 @@ else:
     LIAN_PAY_SECRET_KEY = '201408071000001543test_20140812'
     LIAN_PAY_URL = ''
 
-    #YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
-    #YEE_MER_ID = "YB01000000144"
-    #YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'pkcs8_rsa_private_key144.pem'),'r').read())
-    #YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "rsa_public_key144.pem"), "r").read())
+    YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
+    YEE_MER_ID = "YB01000000144"
+    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'pkcs8_rsa_private_key144.pem'),'r').read())
+    YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "rsa_public_key144.pem"), "r").read())
 
-    YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
-    YEE_MER_ID = "10012413099"
-    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pri_key.pem'),'r').read())
-    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'),'r').read())
-    YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
+    #YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
+    #YEE_MER_ID = "10012413099"
+    #YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pri_key.pem'),'r').read())
+    #YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'),'r').read())
+    #YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
