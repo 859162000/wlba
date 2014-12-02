@@ -24,7 +24,7 @@ class ProfileView(APIView):
         profile = user.wanglibaouserprofile
         dic = {
             "user":profile.user_id,
-            "frozen":profile.forzen,
+            "frozen":profile.frozen,
             "nick_name":profile.nick_name,
             "phone":profile.phone,
             "phone_verified":profile.phone_verified,
