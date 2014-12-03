@@ -24,7 +24,7 @@ from wanglibao_sms.utils import validate_validation_code
 
 from Crypto import Random
 from Crypto.Hash import SHA
-from Crypto.PublicKey import RSA
+#from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5 as pk
 from Crypto.Cipher import PKCS1_v1_5, AES
 import base64
@@ -605,3 +605,65 @@ def list_bank(request):
     if not rs:
         return {"ret_code":20051, "message":"没有可选择的银行"}
     return {"ret_code":0, "message":"ok", "banks":rs}
+
+@method_decorator(transaction.atomic)
+def withdraw(request):
+    amount = request.DATA.get("amount", "").strip()
+    card_id = request.DATA.get("card_id", "").strip()
+    vcode = request.DATA.get("validate_code", "").strip()
+    if not amount or not card_id :
+        return {"ret_code":20061, "message":u"信息输入不完整"}
+
+    user = request.user
+    if not user.wanglibaouserprofile.id_is_valid:
+        return {"ret_code":20062, "message":u"请先进行实名认证"}
+
+    try:
+        float(amount)
+    except:
+        return {"ret_code":20063, 'message':u'金额格式错误'}
+    amount = util.fmt_two_amount(amount)
+    if not 0 <= amount <= 50000:
+        return {"ret_code":20064, 'message':u'提款金额在0～50000之间'}
+    margin = user.margin.margin
+    if amount > margin:
+        return {"ret_code":20065, 'message':u'余额不足'}
+
+    phone = user.wanglibaouserprofile.phone
+    status, message = validate_validation_code(phone, vcode)
+    if status != 200:
+        return {"ret_code":20066, "message":u"验证码输入错误"}
+    fee = amount * LianlianPay.FEE
+    #实际提现金额
+    actual_amount = amount - fee
+    card = Card.objects.filter(pk=card_id).first()
+    if not card or card.user != user:
+        return {"ret_code":20067, "message":u"请选择有效的银行卡"}
+
+    pay_info = PayInfo()
+    pay_info.amount = actual_amount
+    pay_info.fee = fee
+    pay_info.total_amount = amount
+    pay_info.type = PayInfo.WITHDRAW
+    pay_info.user = user
+    pay_info.card_no = card.no
+    pay_info.account_name = user.wanglibaouserprofile.name
+    pay_info.bank = card.bank
+    pay_info.request_ip = util.get_client_ip(request)
+    pay_info.status = PayInfo.ACCEPTED
+
+    try:
+        order = OrderHelper.place_order(user, Order.WITHDRAW_ORDER, pay_info.status,
+                                        pay_info=model_to_dict(pay_info))
+        pay_info.order = order
+        keeper = MarginKeeper(user, pay_info.order.pk)
+        margin_record = keeper.withdraw_pre_freeze(amount)
+        pay_info.margin_record = margin_record
+
+        pay_info.save()
+        return {"ret_code":0, 'message':u'提现成功', "amount":amount, "phone":phone}
+    except Exception, e:
+        pay_info.error_message = str(e)
+        pay_info.status = PayInfo.FAIL
+        pay_info.save()
+        return {"ret_code":20065, 'message':u'余额不足'}
