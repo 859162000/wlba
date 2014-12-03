@@ -17,6 +17,17 @@
       $('.list-item').removeClass('active');
       item.addClass('active');
     });
+    $('.list-container').on('click', '.anchor', function(e) {
+      var item;
+      e.stopPropagation();
+      item = $(this).parents('.list-item');
+      if (item.hasClass('active')) {
+        location.hash = '#' + item.attr('data-source');
+        return;
+      }
+      $('.list-item').removeClass('active');
+      item.addClass('active');
+    });
     $('.help-menu').on('click', 'li', function(e) {
       var source, tar;
       e.preventDefault();
@@ -47,12 +58,24 @@
       return item.addClass('active');
     });
     return $(window).load(function(e) {
-      var source, tar;
-      tar = $('.help-menu li:eq(0)');
-      tar.addClass('current');
-      source = $('.help-box[data-source="' + tar.attr('data-target') + '"]');
-      if (!source.hasClass('active')) {
-        return source.addClass('active');
+      var anchor, item, menu, pattern, source, tar;
+      pattern = /#([^#]+)$/ig.exec(location.hash);
+      if (pattern && pattern[1]) {
+        anchor = pattern[1];
+      }
+      if (anchor && $('div[data-source=' + anchor + ']').size() > 0) {
+        item = $('div[data-source=' + anchor + ']');
+        $('.hot-items.active').removeClass('active');
+        menu = $('.help-menu li[data-target=' + item.parents('.list-items').addClass('active').attr('data-source') + ']');
+        menu.addClass('current');
+        return item.addClass('active');
+      } else {
+        tar = $('.help-menu li:eq(0)');
+        tar.addClass('current');
+        source = $('.help-box[data-source="' + tar.attr('data-target') + '"]');
+        if (!source.hasClass('active')) {
+          return source.addClass('active');
+        }
       }
     });
   });
