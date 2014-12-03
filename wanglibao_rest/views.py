@@ -560,4 +560,9 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class Statistics(APIView):
+
+    def post(self, request, *args, **kwargs):
+        return {'hello', 'yi'}
+
 obtain_auth_token = ObtainAuthTokenCustomized.as_view()
