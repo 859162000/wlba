@@ -15,8 +15,7 @@ require ['jquery'], ($) ->
     return
 
   #查看锚点
-  $('.list-container').on 'click', '.anchor', (e) ->
-    e.stopPropagation()
+  $('.list-container').on 'click', '.list-item-title', (e) ->
     item = $(this).parents('.list-item')
     if(item.hasClass('active'))
       location.hash = '#' + item.attr('data-source')

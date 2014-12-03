@@ -17,9 +17,8 @@
       $('.list-item').removeClass('active');
       item.addClass('active');
     });
-    $('.list-container').on('click', '.anchor', function(e) {
+    $('.list-container').on('click', '.list-item-title', function(e) {
       var item;
-      e.stopPropagation();
       item = $(this).parents('.list-item');
       if (item.hasClass('active')) {
         location.hash = '#' + item.attr('data-source');
