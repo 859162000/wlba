@@ -260,7 +260,10 @@ class IdValidateAPIView(APIView):
         if id_verify_count >= 1:
             return Response({"ret_code": 30053, "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066"})
 
-        verify_record, error = verify_id(name, id_number)
+        try:
+            verify_record, error = verify_id(name, id_number)
+        except:
+            return Response({"ret_code": 30054, "message": u"验证失败，拨打客服电话进行人工验证"})
 
         verify_counter.count = F('count') + 1
         verify_counter.save()
