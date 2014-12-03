@@ -35,6 +35,8 @@ from wanglibao_account import message as inside_message
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm
 from marketing.helper import RewardStrategy, which_channel, Channel
+from wanglibao_rest.utils import search
+from django.http import HttpResponseRedirect
 
 logger = logging.getLogger(__name__)
 
@@ -561,3 +563,19 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
 
 
 obtain_auth_token = ObtainAuthTokenCustomized.as_view()
+
+
+class MobileDownloadAPIView(APIView):
+
+    permission_classes = ()
+
+    def get(self, request):
+        useragent = request.META['HTTP_USER_AGENT']
+
+        if search('iPhone', useragent):
+            return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
+        elif search('iPad', useragent):
+            return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
+        elif search('Android', useragent):
+            return HttpResponseRedirect('https://{}/static/wanglibao.apk'.format(request.META['HTTP_HOST']))
+        return Response({'client': 'unkonw'}, status=200)

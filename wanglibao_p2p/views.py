@@ -679,6 +679,7 @@ class GenP2PUserProfileReport(TemplateView):
 
 
 class AdminP2PUserRecord(TemplateView):
+
     template_name = 'p2p_user_record.jade'
 
     def get_context_data(self, **kwargs):
