@@ -14,6 +14,18 @@ require ['jquery'], ($) ->
     item.addClass('active')
     return
 
+  #查看锚点
+  $('.list-container').on 'click', '.anchor', (e) ->
+    e.stopPropagation()
+    item = $(this).parents('.list-item')
+    if(item.hasClass('active'))
+      location.hash = '#' + item.attr('data-source')
+      return
+
+    $('.list-item').removeClass('active')
+    item.addClass('active')
+    return
+
   $('.help-menu').on 'click', 'li', (e) ->
     e.preventDefault()
     #1.1 判断是否是active状态
@@ -53,9 +65,21 @@ require ['jquery'], ($) ->
     item.addClass('active')
 
   $(window).load (e)->
-    tar = $('.help-menu li:eq(0)')
-    tar.addClass('current')
-    source = $('.help-box[data-source="' + tar.attr('data-target') + '"]')
-    if !source.hasClass('active')
-      source.addClass('active')
-    #$('.list-item:eq(0)', source).addClass('active')
+    pattern = /#([^#]+)$/ig.exec(location.hash)
+    if(pattern && pattern[1])
+      anchor =  pattern[1]
+
+    if(anchor && $('div[data-source='+anchor+']').size() > 0)
+      item = $('div[data-source='+anchor+']')
+      $('.hot-items.active').removeClass('active')
+      menu = $('.help-menu li[data-target='+item.parents('.list-items').addClass('active').attr('data-source') + ']')
+      menu.addClass('current')
+      item.addClass('active')
+
+    else
+      tar = $('.help-menu li:eq(0)')
+      tar.addClass('current')
+      source = $('.help-box[data-source="' + tar.attr('data-target') + '"]')
+      if !source.hasClass('active')
+        source.addClass('active')
+      #$('.list-item:eq(0)', source).addClass('active')

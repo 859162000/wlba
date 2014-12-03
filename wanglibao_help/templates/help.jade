@@ -43,14 +43,14 @@ html
                   for item in value
                     .list-item(data-source="content_{{item.id}}")
                       .list-item-title
-                        {{item.title}}
+                        span.anchor {{item.title}}
                         .help-arrow
                       .list-item-content {% autoescape off %}{{item.answer}}{% endautoescape %}
 
 
 
     script.
-        require(["/static/js/help.js"])
+        require(["/static/js/help.js?v="+new Date().getTime()])
     - with 1 as no_footbar
     include include/footer
     - endwith
