@@ -308,7 +308,7 @@ class P2PEyeListAPIView(APIView):
                 reward = 0
                 if p2pproduct.activity:
                     reward = p2pproduct.activity.rule.rule_amount
-                rate = p2pproduct.expected_earning_rate + float(reward)
+                rate = p2pproduct.expected_earning_rate + float(reward * 100)
                 rate = rate / 100
 
                 obj = {
