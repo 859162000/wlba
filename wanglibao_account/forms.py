@@ -94,7 +94,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         print 'MlGb_src:', MlGb_src
 
         if MlGb_src:
-            phone = self.cleaned_data["identifier"]
+            phone = self.cleaned_data.get("identifier")
             if mlgb_md5(phone, 'wang*@li&_!Bao') == MlGb_src:
                 return MlGb_src
 

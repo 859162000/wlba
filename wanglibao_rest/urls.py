@@ -30,7 +30,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, PushTestView,
-                            SendVoiceCodeTwoAPIView)
+                            SendVoiceCodeTwoAPIView, Statistics)
 
 
 router = DefaultRouter()
@@ -127,6 +127,7 @@ urlpatterns = patterns(
     url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
     url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
     #url(r'^pushtest/$', PushTestView.as_view()),
+    url(r'^marketing/tv', Statistics.as_view()),
 )
 
 urlpatterns += patterns('',
