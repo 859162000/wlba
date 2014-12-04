@@ -303,7 +303,7 @@ class P2PEyeListAPIView(APIView):
                 # 进度
                 amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
                 percent = p2pproduct.ordered_amount / amount
-                process = percent.quantize(Decimal('0.0'), 'ROUND_DOWN')
+                # process = percent.quantize(Decimal('0.0'), 'ROUND_DOWN')
 
                 reward = 0
                 if p2pproduct.activity:
@@ -324,7 +324,7 @@ class P2PEyeListAPIView(APIView):
                     "rate": str(rate),
                     "period": u'{}个月'.format(p2pproduct.period),
                     "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0)),
-                    "process": process,
+                    "process": percent,
                     "reward": str(reward),
                     "guarantee": "null",
                     "start_time": time_from.strftime("%Y-%m-%d %H:%M:%S"),
@@ -398,7 +398,7 @@ class P2PEyeEquityAPIView(APIView):
                 "type": u"手动",
                 "money": str(eq.equity),
                 "account": str(eq.equity),
-                "status": u"成功" if eq.confirm else u"失败",
+                "status": u"成功",
                 "add_time": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             }
             data.append(obj)
