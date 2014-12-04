@@ -261,7 +261,7 @@ P2PEYE_PAY_WAY = {
 class P2PEyeListAPIView(APIView):
     """ 网贷天眼 API
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUserOrReadOnly, )
 
     def get(self, request):
 
@@ -338,7 +338,7 @@ class P2PEyeListAPIView(APIView):
 
 
 class P2PEyeEquityAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUserOrReadOnly, )
 
     def get(self, request):
         result = {
