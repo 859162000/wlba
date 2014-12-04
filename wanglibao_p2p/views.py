@@ -331,7 +331,8 @@ class P2PEyeListAPIView(APIView):
                     "c_reward": "0"
                 }
                 loans.append(obj)
-            result.update(loans=loans, page_count=paginator.num_pages, page_index=p2pproducts.number, result_msg=u'获取数据成功!')
+            result.update(loans=loans, page_count=paginator.num_pages, page_index=p2pproducts.number, result_code="1",
+                          result_msg=u'获取数据成功!')
         else:
             result.update(result_code='-1', result_msg=u'未授权的访问!')
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
@@ -399,7 +400,8 @@ class P2PEyeEquityAPIView(APIView):
                 "add_time": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             }
             data.append(obj)
-        result.update(data=data, page_count=str(paginator.num_pages), page_index=str(equities.number), result_code="1", result_msg=u'获取数据成功!')
+        result.update(data=data, page_count=str(paginator.num_pages), page_index=str(equities.number), result_code="1",
+                      result_msg=u'获取数据成功!')
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
@@ -679,7 +681,6 @@ class GenP2PUserProfileReport(TemplateView):
 
 
 class AdminP2PUserRecord(TemplateView):
-
     template_name = 'p2p_user_record.jade'
 
     def get_context_data(self, **kwargs):
@@ -695,9 +696,9 @@ class AdminP2PUserRecord(TemplateView):
 def preview_contract(request, id):
     product = P2PProduct.objects.filter(id=id).first()
     if not product:
-    #     if product.status == u'录标' or product.status == u'录标完成':
-    #         return HttpResponse(u'<h3 style="color:red;">【录标完成】之后才能进行合同预览！</h3>')
-    # else:
+        # if product.status == u'录标' or product.status == u'录标完成':
+        #         return HttpResponse(u'<h3 style="color:red;">【录标完成】之后才能进行合同预览！</h3>')
+        # else:
         return HttpResponse(u'<h3 style="color:red;">没有该产品或产品信息错误！</h3>')
 
     equity = ProductAmortization.objects.filter(product_id=id).prefetch_related('product')
