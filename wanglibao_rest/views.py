@@ -3,7 +3,7 @@
 import json
 import logging
 import re
-from datetime import date, timedelta, datetime, time
+from datetime import  timedelta, datetime, time
 from django.db.models import Count, Sum
 
 from wanglibao import settings
