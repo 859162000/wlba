@@ -393,7 +393,7 @@ class P2PEyeEquityAPIView(APIView):
                 "id": str(p2pproduct.id),
                 "link": "https://www.wanglibao.com/p2p/detail/%s" % p2pproduct.id,
                 "useraddress": "null",
-                "username": eq.user.wanglibaouserprofile.name,
+                "username": eq.user.username,
                 "userid": str(eq.user.id),
                 "type": u"手动",
                 "money": str(eq.equity),
