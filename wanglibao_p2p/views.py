@@ -316,7 +316,7 @@ class P2PEyeListAPIView(APIView):
                     "platform_name": u"网利宝",
                     "url": "https://www.wanglibao.com/p2p/detail/%s" % p2pproduct.id,
                     "title": p2pproduct.name,
-                    "username": p2pproduct.borrower_name,
+                    "username": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
                     "status": status,
                     "userid": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
                     "c_type": u"抵押标" if p2pproduct.category == u'证大速贷' else u"信用标",
