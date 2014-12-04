@@ -308,7 +308,7 @@ class P2PEyeListAPIView(APIView):
                 reward = 0
                 if p2pproduct.activity:
                     reward = p2pproduct.activity.rule.rule_amount
-                rate = p2pproduct.excess_earning_rate + reward
+                rate = p2pproduct.expected_earning_rate + float(reward)
                 obj = {
                     "id": str(p2pproduct.id),
                     "platform_name": u"网利宝",
@@ -325,7 +325,7 @@ class P2PEyeListAPIView(APIView):
                     "process": process,
                     "reward": str(reward),
                     "guarantee": "0",
-                    "start_time": time_from,
+                    "start_time": time_from.strftime("%Y-%m-%d %H:%M:%S"),
                     "end_time": timezone.localtime(p2pproduct.end_time).strftime("%Y-%m-%d %H:%M:%S"),
                     "invest_num": str(p2pproduct.equities.count()),
                     "c_reward": "0"
