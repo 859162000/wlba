@@ -23,14 +23,15 @@ from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSe
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView)
+
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
-                            YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, PushTestView,
-                            SendVoiceCodeTwoAPIView, Statistics)
+                            YTXVoiceCallbackAPIView, SendVoiceCodeAPIView,
+                            SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics)
 
 
 router = DefaultRouter()
@@ -128,6 +129,7 @@ urlpatterns = patterns(
     url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
     #url(r'^pushtest/$', PushTestView.as_view()),
     url(r'^marketing/tv', Statistics.as_view()),
+    url(r'^mobiledownload/$', MobileDownloadAPIView.as_view())
 )
 
 urlpatterns += patterns('',

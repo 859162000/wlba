@@ -77,7 +77,7 @@ urlpatterns += patterns(
 )
 
 
-# the admin router about transaciton infomation
+# the admin router about transaciton infdomation
 urlpatterns += patterns(
     '',
     url(r'transaction/p2p', AdminTransactionP2P.as_view(), name='transaction_p2p'),
