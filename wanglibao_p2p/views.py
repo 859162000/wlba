@@ -331,7 +331,7 @@ class P2PEyeListAPIView(APIView):
                     "c_reward": "0"
                 }
                 loans.append(obj)
-            result.update(loans=loans, page_count=paginator.count, page_index=p2pproducts.number, result_msg=u'获取数据成功!')
+            result.update(loans=loans, page_count=paginator.num_pages, page_index=p2pproducts.number, result_msg=u'获取数据成功!')
         else:
             result.update(result_code='-1', result_msg=u'未授权的访问!')
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
@@ -399,7 +399,7 @@ class P2PEyeEquityAPIView(APIView):
                 "add_time": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             }
             data.append(obj)
-        result.update(data=data, page_count=str(paginator.count), page_index=str(equities.number), result_code="1", result_msg=u'获取数据成功!')
+        result.update(data=data, page_count=str(paginator.num_pages), page_index=str(equities.number), result_code="1", result_msg=u'获取数据成功!')
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
