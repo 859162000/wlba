@@ -13,36 +13,37 @@ html
     link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", media="screen, projection", rel="stylesheet", type="text/css")
     link(href="/static/css/tv/tv.css", media="screen, projection", rel="stylesheet", type="text/css")
     script(src="https://code.jquery.com/jquery-1.11.1.min.js", data-main="/static/js/header")
+    script(src="/static/js/lib/jquery.animateNumber.min.js")
 
   body
     .tv
         .container
             .row.tv-row
-                .col-md-4
-                    .number 451,233
+                .col-xs-6.col-sm-4
+                    .number.today_user 451,233
                     .desc 今日注册数
-                .col-md-4
-                    .number 451,233
+                .col-xs-6.col-sm-4
+                    .number.today_num 451,233
                     .desc 今日交易数
-                .col-md-4
-                    .number 451,233
+                .col-xs-6.col-sm-4
+                    .number.today_amount 451,233
                     .desc 今日交易金额
             .row.tv-row
-                .col-md-4
-                    .number 451,233
+                .col-xs-6.col-sm-4
+                    .number.all_user 451,233
                     .desc 累计注册数
-                .col-md-4
-                    .number 451,233
+                .col-xs-6.col-sm-4
+                    .number.all_num 451,233
                     .desc 累计交易数
-                .col-md-4
-                    .number 451,233
+                .col-xs-6.col-sm-4
+                    .number.all_amount 451,233
                     .desc 累计交易金额
 
 
     script
         $(function() {
 
-          var checkMobile, container, csrfSafeMethod, getCookie, sameOrigin, _showModal;
+          var getNum, container, csrfSafeMethod, getCookie, sameOrigin, _showModal;
             getCookie = function(name) {
               var cookie, cookieValue, cookies, i;
               cookieValue = null;
@@ -71,6 +72,25 @@ html
                 origin = protocol + sr_origin;
                 return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
             };
+            getNum = function() {
+
+              $.post('/api/marketing/tv/', function(json) {
+                  var data = {};
+                  for(var key in json) {
+                      $().html(json[key]);
+                      data[key] = $.trim($('.' + key).html());
+
+                      $('.' + key).prop('number', data[key])
+                          .animateNumber(
+                          {
+                          number: json[key]
+                          },
+                          2000
+                          );
+
+                  }
+              });
+            };
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
                     if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
@@ -78,8 +98,7 @@ html
                     }
                     }
             });
-            console.log('hello');
-            $.post('/api/marketing/tv/', function(json) {
-                console.log(json);
-            });
+
+            getNum();
+            setInterval(getNum, 6000);
         });

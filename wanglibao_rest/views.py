@@ -3,6 +3,9 @@
 import json
 import logging
 import re
+from datetime import date, timedelta, datetime, time
+from django.db.models import Count, Sum
+
 from wanglibao import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model, authenticate, login as auth_login
@@ -27,6 +30,7 @@ from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
+from wanglibao_p2p.models import P2PRecord
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from django.db import transaction
 from wanglibao_sms import messages, backends
@@ -110,6 +114,7 @@ class RegisterAPIView(APIView):
         identifier = identifier.strip()
         password = password.strip()
         validate_code = validate_code.strip()
+
 
         if not identifier or not password or not validate_code:
             return Response({"ret_code": 30011, "message": "信息输入不完整"})
@@ -561,8 +566,39 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
 
 
 class Statistics(APIView):
+    permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-        return {'hello', 'yi'}
+
+        today = datetime.now().date()
+        tomorrow = today + timedelta(1)
+        today_start = datetime.combine(today, time())
+        today_end = datetime.combine(tomorrow, time())
+
+        today_user = User.objects.filter(date_joined__range=(today_start, today_end)).aggregate(Count('id'))
+        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(Sum('amount'))
+        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(Count('id'))
+
+        all_user = User.objects.all().aggregate(Count('id'))
+        all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
+        all_num = P2PRecord.objects.filter(catalog='申购').aggregate(Count('id'))
+
+
+        print today_user, today_num['id__count'], today_amount
+
+        print all_user, all_amount, all_num
+
+        data = {
+            'today_num': today_num['id__count'],
+            'today_user': today_user['id__count'],
+            'today_amount': today_amount['amount__sum'],
+
+            'all_num': all_num['id__count'],
+            'all_user': all_user['id__count'],
+            'all_amount': all_amount['amount__sum'],
+        }
+
+
+        return Response(data, status=status.HTTP_200_OK)
 
 obtain_auth_token = ObtainAuthTokenCustomized.as_view()
