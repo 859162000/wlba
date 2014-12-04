@@ -1,0 +1,104 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    title 网利宝网站数据
+    meta(http-equiv="content-type", content="text/html; charset=utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="baidu-site-verification", content="iBKXouRC1a")
+    meta(name="keywords", content="网利宝网站数据")
+    meta(name="description", content="网利宝网站数据")
+    link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/tv/tv.css", media="screen, projection", rel="stylesheet", type="text/css")
+    script(src="https://code.jquery.com/jquery-1.11.1.min.js", data-main="/static/js/header")
+    script(src="/static/js/lib/jquery.animateNumber.min.js")
+
+  body
+    .tv
+        .container
+            .row.tv-row
+                .col-xs-6.col-sm-4
+                    .number.today_user 451,233
+                    .desc 今日注册数
+                .col-xs-6.col-sm-4
+                    .number.today_num 451,233
+                    .desc 今日交易数
+                .col-xs-6.col-sm-4
+                    .number.today_amount 451,233
+                    .desc 今日交易金额
+            .row.tv-row
+                .col-xs-6.col-sm-4
+                    .number.all_user 451,233
+                    .desc 累计注册数
+                .col-xs-6.col-sm-4
+                    .number.all_num 451,233
+                    .desc 累计交易数
+                .col-xs-6.col-sm-4
+                    .number.all_amount 451,233
+                    .desc 累计交易金额
+
+
+    script
+        $(function() {
+
+          var getNum, container, csrfSafeMethod, getCookie, sameOrigin, _showModal;
+            getCookie = function(name) {
+              var cookie, cookieValue, cookies, i;
+              cookieValue = null;
+              if (document.cookie && document.cookie !== "") {
+                  cookies = document.cookie.split(";");
+                  i = 0;
+                while (i < cookies.length) {
+                    cookie = $.trim(cookies[i]);
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+                }
+                i++;
+                }
+                }
+                return cookieValue;
+                };
+                csrfSafeMethod = function(method) {
+                return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+            };
+            sameOrigin = function(url) {
+                var host, origin, protocol, sr_origin;
+                host = document.location.host;
+                protocol = document.location.protocol;
+                sr_origin = "//" + host;
+                origin = protocol + sr_origin;
+                return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+            };
+            getNum = function() {
+
+              $.post('/api/marketing/tv/', function(json) {
+                  var data = {};
+                  for(var key in json) {
+                      $().html(json[key]);
+                      data[key] = $.trim($('.' + key).html());
+
+                      $('.' + key).prop('number', data[key])
+                          .animateNumber(
+                          {
+                          number: json[key]
+                          },
+                          2000
+                          );
+
+                  }
+              });
+            };
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                        xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+                    }
+                    }
+            });
+
+            getNum();
+            setInterval(getNum, 6000);
+        });
