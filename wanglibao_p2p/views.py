@@ -316,7 +316,7 @@ class P2PEyeListAPIView(APIView):
                     "title": p2pproduct.name,
                     "username": p2pproduct.borrower_name,
                     "status": status,
-                    "userid": md5(p2pproduct.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
+                    "userid": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
                     "c_type": u"抵押标" if p2pproduct.category == u'证大速贷' else u"信用标",
                     "amount": str(p2pproduct.total_amount),
                     "rate": str(rate),
