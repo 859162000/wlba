@@ -302,13 +302,15 @@ class P2PEyeListAPIView(APIView):
             for p2pproduct in p2pproducts:
                 # 进度
                 amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
-                percent = p2pproduct.ordered_amount / amount * 100
+                percent = p2pproduct.ordered_amount / amount
                 process = percent.quantize(Decimal('0.0'), 'ROUND_DOWN')
 
                 reward = 0
                 if p2pproduct.activity:
                     reward = p2pproduct.activity.rule.rule_amount
                 rate = p2pproduct.expected_earning_rate + float(reward)
+                rate = rate / 100
+
                 obj = {
                     "id": str(p2pproduct.id),
                     "platform_name": u"网利宝",
@@ -324,7 +326,7 @@ class P2PEyeListAPIView(APIView):
                     "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0)),
                     "process": process,
                     "reward": str(reward),
-                    "guarantee": "0",
+                    "guarantee": "null",
                     "start_time": time_from.strftime("%Y-%m-%d %H:%M:%S"),
                     "end_time": timezone.localtime(p2pproduct.end_time).strftime("%Y-%m-%d %H:%M:%S"),
                     "invest_num": str(p2pproduct.equities.count()),
