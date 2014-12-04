@@ -589,10 +589,6 @@ class Statistics(APIView):
         all_num = P2PRecord.objects.filter(catalog='申购').aggregate(Count('id'))
 
 
-        print today_user, today_num['id__count'], today_amount
-
-        print all_user, all_amount, all_num
-
         data = {
             'today_num': today_num['id__count'],
             'today_user': today_user['id__count'],
