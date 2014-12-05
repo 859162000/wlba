@@ -22,7 +22,7 @@ from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSe
     P2PProductDetailView
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
-                            YeePayAppPayCompleteView, WithdrawAPIView)
+                            YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -118,6 +118,7 @@ urlpatterns = patterns(
     #url(r'^pay/lianlian/app/deposit/$', LianlianAppPayView.as_view(), name="lianlian-deposit-view"),
     #url(r'^pay/lianlian/app/deposit/callback/$', LianlianAppPayCallbackView.as_view(), name="lianlian-deposit-view"),
     url(r'^withdraw/$', WithdrawAPIView.as_view(), name="withdraw-api-view"),
+    url(r'^fee/$', FEEAPIView.as_view(), name="withdraw-api-view"),
 
     url(r'^pay/yee/app/deposit/$', YeePayAppPayView.as_view(), name="yee-deposit-view"),
     url(r'^pay/yee/app/deposit/callback/$', YeePayAppPayCallbackView.as_view(), name="yee-deposit-callback"),

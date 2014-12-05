@@ -602,6 +602,7 @@ class AdminTransactionDeposit(TemplateView):
         return super(AdminTransactionDeposit, self).dispatch(request, *args, **kwargs)
 
 
+"""
 #连连支付IOS生成订单
 class LianlianAppPayView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -622,6 +623,7 @@ class LianlianAppPayCallbackView(APIView):
             result['ret_code'] = "0000"
             result['ret_msg'] = "SUCCESS"
         return Response(result)
+"""
 
 #易宝支付创建订单接口
 class YeePayAppPayView(APIView):
@@ -702,6 +704,12 @@ class BankListAPIView(APIView):
     def post(self, request):
         result = third_pay.list_bank(request)
         return Response(result)
+
+class FEEAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        return {"ret_code":0, "fee":0}
 
 class WithdrawAPIView(APIView):
     permission_classes = (IsAuthenticated, )
