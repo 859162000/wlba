@@ -638,15 +638,21 @@ class YeePayAppPayView(APIView):
 class YeePayAppPayCallbackView(APIView):
     permission_classes = ()
 
-    def get(self, request):
-        yeepay = third_pay.YeePay()
-        result = yeepay.pay_callback(request)
-        return Response(result)
-
     def post(self, request):
         yeepay = third_pay.YeePay()
         request.GET = request.DATA
         result = yeepay.pay_callback(request)
+
+        if not result['ret_code']:
+            amount = result['amount']
+            if result['message'] == "success":
+                title,content = messages.msg_pay_ok(amount)
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":result['uid'],
+                    "title":title,
+                    "content":content,
+                    "mtype":"activityintro"
+                })
         return Response(result)
 
 #易宝支付同步回调
