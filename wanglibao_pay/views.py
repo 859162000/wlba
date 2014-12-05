@@ -709,7 +709,7 @@ class FEEAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        return {"ret_code":0, "fee":0}
+        return Response({"ret_code":0, "fee":0})
 
 class WithdrawAPIView(APIView):
     permission_classes = (IsAuthenticated, )
