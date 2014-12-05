@@ -19,7 +19,7 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder', 'underscore'], function($, modal, backend, validate, tool, complexify, placeholder, _) {
-    var checkMobile, container, csrfSafeMethod, getCookie, sameOrigin, _showModal;
+    var checkMobile, container, csrfSafeMethod, getCookie, msg_count, sameOrigin, _showModal;
     getCookie = function(name) {
       var cookie, cookieValue, cookies, i;
       cookieValue = null;
@@ -344,7 +344,7 @@
         return window.location.href = $("#invite_top_bar").attr("data-url");
       }).fail(function(xhr) {
         if (xhr.status === 403) {
-          window.location.href = '/activity/gold/';
+          window.open('/activity/gold/');
         }
       });
     });
@@ -377,12 +377,15 @@
         }
       }), 100);
     });
-    backend.loadMessageCount('unread').done(function(data) {
-      if (data.count > 0) {
-        $('#message_count').show();
-        return $('#message_count').html(data.count);
-      }
-    });
+    msg_count = $('#message_count').val();
+    if (msg_count > 0) {
+      backend.loadMessageCount('unread').done(function(data) {
+        if (data.count > 0) {
+          $('#message_count').show();
+          return $('#message_count').html(data.count);
+        }
+      });
+    }
     return $(".voice").on('click', '.voice-validate', function(e) {
       var element, isMobile, url;
       e.preventDefault();
