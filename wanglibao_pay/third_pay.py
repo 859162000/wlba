@@ -203,7 +203,7 @@ class YeePay:
                     "amount":amount_sec, "productcatalog":"18", "productname":"网利宝-APP充值",
                     "identityid":str(user.id), "identitytype":2, "terminaltype":terminaltype,
                     "terminalid":deviceid, "userip":pay_info.request_ip, "userua":useragent,
-                    "callbackurl":self.PAY_BACK_RETURN_URL, #"fcallbackurl":self.PAY_RETURN_URL,
+                    "callbackurl":self.PAY_BACK_RETURN_URL, "fcallbackurl":self.PAY_RETURN_URL,
                     "version":0, "paytypes":"1", "cardno":card_id, "orderexpdate":60}
             data, encryptkey = self._sign(dic)
             logger.error("%s" % dic)
