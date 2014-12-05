@@ -621,10 +621,9 @@ class MobileDownloadAPIView(APIView):
         elif search('iPad', useragent):
             return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
         elif search('Android', useragent):
-
-            return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
-            # return HttpResponseRedirect('https://{}/static/wanglibao.apk'.format(request.META['HTTP_HOST']))
-        return Response({'client': 'unkonw'}, status=200)
+            # return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
+            return HttpResponseRedirect('https://{}/static/wanglibao.apk'.format(request.META['HTTP_HOST']))
+        return HttpResponseRedirect('https://{}/static/wanglibao.apk'.format(request.META['HTTP_HOST']))
 
 
 class KuaipanPurchaseListAPIView(APIView):
