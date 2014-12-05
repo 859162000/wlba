@@ -271,7 +271,6 @@ html
     hr.bottom-hr
     script.
       require(["/static/js/index.js"])
-
     .partner-container
       .title
         span.icon.icon-partner-title
@@ -281,7 +280,6 @@ html
           li
             a(href="{{partner.link}}",target="_blank", title="{{partner.name}}")
               img(src="/media/{{partner.image}}", alt="{{partner.name}}")
-
     - with 1 as no_margin
     include include/footer
     - endwith
