@@ -715,6 +715,18 @@ class FEEAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
+        amount = request.DATA.get("amount","").strip()
+        if not amount:
+            return Response({"ret_code":30131, "message":"请输入金额"})
+
+        try:
+            float(amount)
+        except:
+            return {"ret_code":30132, 'message':'金额格式错误'}
+
+        amount = util.fmt_two_amount(amount)
+        #计算费率
+
         return Response({"ret_code":0, "fee":0})
 
 class WithdrawAPIView(APIView):
