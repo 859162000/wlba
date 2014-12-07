@@ -161,7 +161,7 @@ class YeePay:
         if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
             return {"ret_code":20074, 'message':'金额格式错误，大于100元且为100倍数'}
         if amount > 20000:
-            return {"ret_code":20077, 'message':'单笔充值不超过2万，单月不超过5万。如需充值更多金额可以云网站完成。'}
+            return {"ret_code":20077, 'message':'单笔充值不超过2万，单月不超过5万。如需充值更多金额可以去网站完成。'}
 
         terminal = deviceid.split(":")
         deviceid = terminal[-1]
