@@ -108,12 +108,17 @@ class DepositReportGenerator(ReportGeneratorBase):
                          u'状态', u'操作时间', u'操作ip', u'编号'])
 
         for pay_info in pay_infos:
+
+            bank_name = ''
+            if pay_info.bank:
+                bank_name = pay_info.bank.name
+
             writer.writerow([
                 str(pay_info.id),
                 pay_info.user.wanglibaouserprofile.phone,
                 str(pay_info.order.id),
                 u'线上充值',
-                unicode(pay_info.bank.name),
+                unicode(bank_name),
                 str(pay_info.amount),
                 str(pay_info.fee),
                 str(pay_info.amount - pay_info.fee),
@@ -144,13 +149,18 @@ class WithDrawReportGenerator(ReportGeneratorBase):
             confirm_time = ""
             if payinfo.confirm_time:
                 confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
+
+            bank_name = ''
+            if payinfo.bank:
+                bank_name = payinfo.bank.name
+
             writer.writerow([
                 str(payinfo.id),
                 payinfo.user.wanglibaouserprofile.phone,
                 payinfo.account_name,
                 payinfo.user.wanglibaouserprofile.id_number,
                 payinfo.user.wanglibaouserprofile.phone,
-                payinfo.bank.name,
+                bank_name,
                 '-',
                 '-',
                 payinfo.card_no,
@@ -188,13 +198,17 @@ class WithDrawDetailReportGenerator(ReportGeneratorBase):
 
         for margin in margins:
 
+            bank_name = ''
+            if margin.payinfo_set.all().first().bank:
+                bank_name = margin.payinfo_set.all().first().bank.name
+
             writer.writerow([
                 str(margin.id),
                 margin.user.username,
                 margin.user.wanglibaouserprofile.name,
                 margin.user.wanglibaouserprofile.id_number,
                 margin.user.wanglibaouserprofile.phone,
-                margin.payinfo_set.all().first().bank.name,
+                bank_name,
                 '-',
                 '-',
                 margin.payinfo_set.first().card_no,
