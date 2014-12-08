@@ -20,29 +20,29 @@ html
         .container
             .row.tv-row
                 .col-xs-6.col-sm-4
-                    .number.today_user 451,233
+                    .number.today_user 0
                     .desc 今日注册数
                 .col-xs-6.col-sm-4
-                    .number.today_num 451,233
+                    .number.today_num 0
                     .desc 今日交易数
                 .col-xs-6.col-sm-4
-                    .number.today_amount 451,233
+                    .number.today_amount 0
                     .desc 今日交易金额
             .row.tv-row
                 .col-xs-6.col-sm-4
-                    .number.all_user 451,233
+                    .number.all_user 0
                     .desc 累计注册数
                 .col-xs-6.col-sm-4
-                    .number.all_num 451,233
+                    .number.all_num 0
                     .desc 累计交易数
                 .col-xs-6.col-sm-4
-                    .number.all_amount 451,233
+                    .number.all_amount 0
                     .desc 累计交易金额
 
 
     script
         $(function() {
-
+          var comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',');
           var getNum, container, csrfSafeMethod, getCookie, sameOrigin, _showModal;
             getCookie = function(name) {
               var cookie, cookieValue, cookies, i;
@@ -80,10 +80,11 @@ html
                       $().html(json[key]);
                       data[key] = $.trim($('.' + key).html());
 
-                      $('.' + key).prop('number', data[key])
+                      $('.' + key).prop('number', parseFloat(data[key]))
                           .animateNumber(
                           {
-                          number: json[key]
+                          number: json[key],
+                          numberStep: comma_separator_number_step
                           },
                           2000
                           );
