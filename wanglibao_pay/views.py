@@ -148,9 +148,12 @@ class PayCompleteView(TemplateView):
             "content": content,
             "mtype": "activityintro"
         })
+        # 迅雷活动, 12.8 首次充值
+        start_time = timezone.datetime(2014, 12, 8)
+        if PayInfo.objects.filter(type='D', create_time=start_time).count() == 1:
+            rs = RewardStrategy(request.user)
+            rs.reward_user(u'三天迅雷会员')
 
-        rs = RewardStrategy(request.user)
-        rs.reward_user(u'三天迅雷会员')
 
         return self.render_to_response({
             'result': result,

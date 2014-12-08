@@ -502,20 +502,6 @@ class IdValidate(APIView):
                                 "validate": True
                             }, status=200)
 
-            # channel = which_channel(user)
-            # rs = RewardStrategy(user)
-            # if channel == Channel.KUAIPAN:
-            #     # 快盘来源
-            #     rs.reward_user(u'50G快盘容量')
-            #     rs.reward_user(u'三天迅雷会员')
-            # else:
-            #     # 非快盘
-            #     rs.reward_user(u'三天迅雷会员')
-            #
-            # return Response({
-            #                     "validate": True
-            #                 }, status=200)
-
         else:
             return Response({
                                 "message": u"验证码错误",
