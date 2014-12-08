@@ -37,10 +37,6 @@
         name: {
           required: '请输入姓名'
         },
-        captcha_1: {
-          required: '请输入验证码',
-          minlength: $.format("验证码要输入4位")
-        },
         id_number: {
           required: '请输入身份证',
           idNumber: '请输入有效身份证'
@@ -50,11 +46,9 @@
         return error.appendTo($(element).closest('.form-row').find('.form-row-error'));
       },
       submitHandler: function(form) {
-        var id_captcha_0, id_captcha_1, id_number, name;
+        var id_number, name;
         name = $('#id_name').val();
         id_number = $('#id_id_number').val();
-        id_captcha_0 = $('#id_captcha_0').val();
-        id_captcha_1 = $('#id_captcha_1').val();
         if ($("#validate_id_button").hasClass("disabled")) {
           return;
         }
@@ -63,9 +57,7 @@
           url: '/api/id_validate/',
           data: {
             name: name,
-            id_number: id_number,
-            captcha_0: id_captcha_0,
-            captcha_1: id_captcha_1
+            id_number: id_number
           },
           type: 'post'
         }).done(function() {
