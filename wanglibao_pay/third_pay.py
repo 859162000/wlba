@@ -184,6 +184,7 @@ class YeePay:
             pay_info.type = PayInfo.DEPOSIT
             pay_info.status = PayInfo.INITIAL
             pay_info.user = user
+            pay_info.channel = "yeepay"
 
             if card_id:
                 card =  Card.objects.filter(id=card_id, user=user).first()
