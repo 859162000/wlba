@@ -497,14 +497,25 @@ class IdValidate(APIView):
             if channel == Channel.KUAIPAN:
                 # 快盘来源
                 rs.reward_user(u'50G快盘容量')
-                rs.reward_user(u'三天迅雷会员')
-            else:
-                # 非快盘
-                rs.reward_user(u'三天迅雷会员')
 
             return Response({
                                 "validate": True
                             }, status=200)
+
+            # channel = which_channel(user)
+            # rs = RewardStrategy(user)
+            # if channel == Channel.KUAIPAN:
+            #     # 快盘来源
+            #     rs.reward_user(u'50G快盘容量')
+            #     rs.reward_user(u'三天迅雷会员')
+            # else:
+            #     # 非快盘
+            #     rs.reward_user(u'三天迅雷会员')
+            #
+            # return Response({
+            #                     "validate": True
+            #                 }, status=200)
+
         else:
             return Response({
                                 "message": u"验证码错误",
@@ -589,10 +600,6 @@ class Statistics(APIView):
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
         all_num = P2PRecord.objects.filter(catalog='申购').aggregate(Count('id'))
-
-        print today_user, today_num['id__count'], today_amount
-
-        print all_user, all_amount, all_num
 
         data = {
             'today_num': today_num['id__count'],
