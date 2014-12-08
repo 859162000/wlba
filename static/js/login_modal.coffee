@@ -340,7 +340,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
     ), 100
     #return false
 
-  msg_count = $('#message_count').val()
+  msg_count = $('#message_count').html()
   if msg_count > 0
     backend.loadMessageCount('unread')
       .done (data)->

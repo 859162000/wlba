@@ -377,7 +377,7 @@
         }
       }), 100);
     });
-    msg_count = $('#message_count').val();
+    msg_count = $('#message_count').html();
     if (msg_count > 0) {
       backend.loadMessageCount('unread').done(function(data) {
         if (data.count > 0) {
