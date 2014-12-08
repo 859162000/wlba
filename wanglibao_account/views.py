@@ -3,9 +3,10 @@ import datetime
 import logging
 import json
 import math
+
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
-from django.db.models import Q, Sum, F
+from django.db.models import Sum
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
@@ -16,10 +17,11 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllo
 from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
+from marketing.helper import which_channel, Channel
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -41,13 +43,12 @@ from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
+
 #from wanglibao_account.utils import verify_id
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
 from wanglibao_account.models import Message
-from marketing.models import Reward, RewardRecord
 from django.template.defaulttags import register
-from django.db import transaction
 #from wanglibao_sms.tasks import send_messages
 from wanglibao_sms import messages
 

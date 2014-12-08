@@ -132,7 +132,7 @@ class RewardStrategy():
     def _send_threeday_xunlei(self):
         """ 注册实名认证并充值三天迅雷会员
         """
-        title, content = messages.msg_validate_ok(self.reward.content)
+        title, content = messages.msg_despoit_ok(self.reward.content)
 
         self._send_message_template(title, content)
 
