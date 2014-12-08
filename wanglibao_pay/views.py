@@ -154,7 +154,6 @@ class PayCompleteView(TemplateView):
             rs = RewardStrategy(request.user)
             rs.reward_user(u'三天迅雷会员')
 
-
         return self.render_to_response({
             'result': result,
             'amount': amount
