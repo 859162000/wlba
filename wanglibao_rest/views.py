@@ -3,15 +3,15 @@
 import json
 import logging
 import re
-from datetime import  timedelta, datetime, time
+from datetime import timedelta, datetime, time
 from django.db.models import Count, Sum
 
-from wanglibao import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.db.models import Q
 from django.db.models import F
-from rest_framework import generics
+from rest_framework import generics, renderers
+from django.http import HttpResponse
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework import status
@@ -41,6 +41,8 @@ from wanglibao_account.forms import IdVerificationForm
 from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import search
 from django.http import HttpResponseRedirect
+from wanglibao.templatetags.formatters import safe_phone_str
+
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +119,6 @@ class RegisterAPIView(APIView):
         password = password.strip()
         validate_code = validate_code.strip()
 
-
         if not identifier or not password or not validate_code:
             return Response({"ret_code": 30011, "message": "信息输入不完整"})
 
@@ -143,7 +144,7 @@ class RegisterAPIView(APIView):
             except:
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
 
-        #user = create_user(serializer.object['identifier'], serializer.object['password'], "")
+        # user = create_user(serializer.object['identifier'], serializer.object['password'], "")
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
@@ -159,7 +160,7 @@ class RegisterAPIView(APIView):
         return Response({"ret_code": 0, "message": "注册成功"})
 
 
-#wechat register
+# wechat register
 class WeixinRegisterAPIView(APIView):
     permission_classes = ()
 
@@ -190,7 +191,7 @@ class WeixinRegisterAPIView(APIView):
                 return Response({"ret_code": 30025, "message": "邀请码错误"})
 
         password = generate_validate_code()
-        #password = random.randint(100000, 999999)
+        # password = random.randint(100000, 999999)
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
@@ -208,7 +209,7 @@ class WeixinRegisterAPIView(APIView):
         return Response({"ret_code": 0, "message": "注册成功"})
 
 
-#客户端升级
+# 客户端升级
 class ClientUpdateAPIView(APIView):
     permission_classes = ()
 
@@ -574,20 +575,20 @@ class Statistics(APIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-
         today = datetime.now().date()
         tomorrow = today + timedelta(1)
         today_start = datetime.combine(today, time())
         today_end = datetime.combine(tomorrow, time())
 
         today_user = User.objects.filter(date_joined__range=(today_start, today_end)).aggregate(Count('id'))
-        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(Sum('amount'))
-        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(Count('id'))
+        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
+            Sum('amount'))
+        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
+            Count('id'))
 
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
         all_num = P2PRecord.objects.filter(catalog='申购').aggregate(Count('id'))
-
 
         print today_user, today_num['id__count'], today_amount
 
@@ -603,25 +604,40 @@ class Statistics(APIView):
             'all_amount': all_amount['amount__sum'],
         }
 
-
         return Response(data, status=status.HTTP_200_OK)
+
 
 obtain_auth_token = ObtainAuthTokenCustomized.as_view()
 
 
 class MobileDownloadAPIView(APIView):
-
     permission_classes = ()
 
     def get(self, request):
         useragent = request.META['HTTP_USER_AGENT']
+
+        print useragent
 
         if search('iPhone', useragent):
             return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
         elif search('iPad', useragent):
             return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
         elif search('Android', useragent):
-
             return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
-            # return HttpResponseRedirect('https://{}/static/wanglibao.apk'.format(request.META['HTTP_HOST']))
-        return Response({'client': 'unkonw'}, status=200)
+            # return HttpResponseRedirect('http://192.168.1.200:8000/static/wanglibao.apk')
+        return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
+
+
+class KuaipanPurchaseListAPIView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related(
+            'user__wanglibaouserprofile')[:100]
+
+        result = [{'purchase_time': timezone.localtime(trade_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                   'userid': safe_phone_str(trade_record.user.wanglibaouserprofile.phone),
+                   'amount': trade_record.amount
+                  } for trade_record in trade_records]
+
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))

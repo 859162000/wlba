@@ -602,6 +602,7 @@ class AdminTransactionDeposit(TemplateView):
         return super(AdminTransactionDeposit, self).dispatch(request, *args, **kwargs)
 
 
+"""
 #连连支付IOS生成订单
 class LianlianAppPayView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -622,6 +623,7 @@ class LianlianAppPayCallbackView(APIView):
             result['ret_code'] = "0000"
             result['ret_msg'] = "SUCCESS"
         return Response(result)
+"""
 
 #易宝支付创建订单接口
 class YeePayAppPayView(APIView):
@@ -636,15 +638,21 @@ class YeePayAppPayView(APIView):
 class YeePayAppPayCallbackView(APIView):
     permission_classes = ()
 
-    def get(self, request):
-        yeepay = third_pay.YeePay()
-        result = yeepay.pay_callback(request)
-        return Response(result)
-
     def post(self, request):
         yeepay = third_pay.YeePay()
         request.GET = request.DATA
         result = yeepay.pay_callback(request)
+
+        if not result['ret_code']:
+            amount = result['amount']
+            if result['message'] == "success":
+                title,content = messages.msg_pay_ok(amount)
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":result['uid'],
+                    "title":title,
+                    "content":content,
+                    "mtype":"activityintro"
+                })
         return Response(result)
 
 #易宝支付同步回调
@@ -702,6 +710,24 @@ class BankListAPIView(APIView):
     def post(self, request):
         result = third_pay.list_bank(request)
         return Response(result)
+
+class FEEAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        amount = request.DATA.get("amount","").strip()
+        if not amount:
+            return Response({"ret_code":30131, "message":"请输入金额"})
+
+        try:
+            float(amount)
+        except:
+            return {"ret_code":30132, 'message':'金额格式错误'}
+
+        amount = util.fmt_two_amount(amount)
+        #计算费率
+
+        return Response({"ret_code":0, "fee":0})
 
 class WithdrawAPIView(APIView):
     permission_classes = (IsAuthenticated, )

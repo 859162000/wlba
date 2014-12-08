@@ -41,10 +41,10 @@ from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
-from wanglibao_account.utils import verify_id
+#from wanglibao_account.utils import verify_id
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
-from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type
+from wanglibao_account.models import Message
 from marketing.models import Reward, RewardRecord
 from django.template.defaulttags import register
 from django.db import transaction
@@ -770,7 +770,6 @@ class Third_login_back(APIView):
     def get(self, request):
         result = third_login.login_back(request)
         return Response(result)
-        #return HttpResponseRedirect(result['url'])
 
 
 class ChangePasswordAPIView(APIView):
@@ -779,8 +778,9 @@ class ChangePasswordAPIView(APIView):
     def post(self, request):
         new_password = request.DATA.get('new_password', "").strip()
         old_password = request.DATA.get('old_password', "").strip()
+        validate_code = request.DATA.get('validate_code', "").strip()
 
-        if not old_password or not new_password:
+        if not old_password or not new_password or not validate_code:
             return Response({'ret_code':30041, 'message':u'信息输入不完整'})
 
         if not 6 <= len(new_password) <= 20:
@@ -788,7 +788,11 @@ class ChangePasswordAPIView(APIView):
 
         user = request.user
         if not user.check_password(old_password):
-            return Response({'ret_code':30043, 'message':u'旧密码错误'})
+            return Response({'ret_code':30043, 'message':u'原密码错误'})
+
+        status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
+        if status != 200:
+            return Response({"ret_code": 30044, "message": u"验证码输入错误"})
 
         user.set_password(new_password)
         user.save()
@@ -925,36 +929,6 @@ def ajax_register(request):
         return HttpResponseNotAllowed()
 
 
-class IdVerificationView(TemplateView):
-    template_name = 'verify_id.jade'
-    form_class = IdVerificationForm
-    success_url = '/accounts/id_verify/'
-
-    def get_context_data(self, **kwargs):
-        counter = VerifyCounter.objects.filter(user=self.request.user).first()
-        count = 0
-
-        if counter:
-            count = counter.count
-
-        return {
-            'user': self.request.user,
-            'counter': count,
-            'announcements': AnnouncementAccounts
-        }
-
-
-    def form_valid(self, form):
-        user = self.request.user
-
-        user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number')
-        user.wanglibaouserprofile.name = form.cleaned_data.get('name')
-        user.wanglibaouserprofile.id_is_valid = True
-        user.wanglibaouserprofile.save()
-
-        return super(IdVerificationView, self).form_valid(form)
-
-
 class P2PAmortizationView(TemplateView):
     template_name = 'p2p_amortization_plan.jade'
 
@@ -1049,7 +1023,6 @@ class IdVerificationView(TemplateView):
             'user': self.request.user,
             'counter': count
         }
-
 
     def form_valid(self, form):
         user = self.request.user

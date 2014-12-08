@@ -24,8 +24,8 @@ def get_a_uuid():
 TWO_PLACES = decimal.Decimal(10) ** -2
 #format amount two places
 def fmt_two_amount(value):
-	amount = decimal.Decimal(value).quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
-	return amount
+    amount = decimal.Decimal(value).quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
+    return amount
 
 def fmt_dt_14(dt):
     return dt.strftime("%Y%m%d%H%M%S")
