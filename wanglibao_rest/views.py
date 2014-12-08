@@ -607,7 +607,7 @@ obtain_auth_token = ObtainAuthTokenCustomized.as_view()
 
 class MobileDownloadAPIView(APIView):
 
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         useragent = request.META['HTTP_USER_AGENT']
