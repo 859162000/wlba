@@ -151,8 +151,8 @@ class PayCompleteView(TemplateView):
             "mtype": "activityintro"
         })
         # 迅雷活动, 12.8 首次充值
-        start_time = timezone.datetime(2014, 12, 8)
-        if PayInfo.objects.filter(user=request.user, type='D', create_time=start_time).count() == 1:
+        start_time = timezone.datetime(2014, 12, 7)
+        if PayInfo.objects.filter(user=request.user, type='D', create_time__gt=start_time).count() == 1:
             rs = RewardStrategy(request.user)
             rs.reward_user(u'三天迅雷会员')
 
@@ -658,8 +658,8 @@ class YeePayAppPayCallbackView(APIView):
                 user = User.objects.filter(id=result['uid']).first()
 
                 # 迅雷活动, 12.8 首次充值
-                start_time = timezone.datetime(2014, 12, 8)
-                if PayInfo.objects.filter(user=user, type='D', create_time=start_time).count() == 1:
+                start_time = timezone.datetime(2014, 12, 7)
+                if PayInfo.objects.filter(user=user, type='D', create_time__gt=start_time).count() == 1:
                     rs = RewardStrategy(user)
                     rs.reward_user(u'三天迅雷会员')
 
