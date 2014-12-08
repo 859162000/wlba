@@ -284,27 +284,6 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
 
-        now = timezone.now()
-        try:
-            with transaction.atomic():
-                if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-                    reward = Reward.objects.select_for_update() \
-                        .filter(is_used=False, type=u'三天迅雷会员').first()
-                    reward.is_used = True
-                    reward.save()
-                    RewardRecord.objects.create(user=user, reward=reward,
-                                                description=u'新用户注册赠送三天迅雷会员')
-
-                    title, content = messages.msg_validate_ok(reward.content)
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id": user.id,
-                        "title": title,
-                        "content": content,
-                        "mtype": "activity"
-                    })
-        except Exception, e:
-            print(e)
-
         return Response({"ret_code": 0, "message": u"验证成功"})
 
 
@@ -497,14 +476,11 @@ class IdValidate(APIView):
             if channel == Channel.KUAIPAN:
                 # 快盘来源
                 rs.reward_user(u'50G快盘容量')
-                rs.reward_user(u'三天迅雷会员')
-            else:
-                # 非快盘
-                rs.reward_user(u'三天迅雷会员')
 
             return Response({
                                 "validate": True
                             }, status=200)
+
         else:
             return Response({
                                 "message": u"验证码错误",
@@ -589,10 +565,6 @@ class Statistics(APIView):
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
         all_num = P2PRecord.objects.filter(catalog='申购').aggregate(Count('id'))
-
-        print today_user, today_num['id__count'], today_amount
-
-        print all_user, all_amount, all_num
 
         data = {
             'today_num': today_num['id__count'],

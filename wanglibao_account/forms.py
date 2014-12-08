@@ -182,7 +182,7 @@ class ResetPasswordGetIdentifierForm(forms.Form):
 class IdVerificationForm(forms.Form):
     name = forms.CharField(max_length=32, label=u'姓名')
     id_number = forms.CharField(max_length=128, label=u'身份证号')
-    captcha = CaptchaField()
+    # captcha = CaptchaField()
 
     def __init__(self, user=None, *args, **kwargs):
         super(IdVerificationForm, self).__init__(*args, **kwargs)

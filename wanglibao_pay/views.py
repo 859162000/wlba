@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import logging
+from marketing.helper import RewardStrategy
 import re
 import socket
-import datetime
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.forms import model_to_dict
 from django.http import HttpResponse
@@ -29,6 +30,7 @@ from wanglibao_p2p.models import P2PRecord
 import decimal
 from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip
+from wanglibao_pay import util
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
@@ -91,6 +93,7 @@ class PayView(TemplateView):
             pay_info.status = PayInfo.INITIAL
             pay_info.user = request.user
             pay_info.bank = bank
+            pay_info.channel = "huifu"
             pay_info.request_ip = get_client_ip(request)
 
             order = OrderHelper.place_order(request.user, Order.PAY_ORDER, pay_info.status,
@@ -140,19 +143,18 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
-        title,content = messages.msg_pay_ok(amount)
+        title, content = messages.msg_pay_ok(amount)
         inside_message.send_one.apply_async(kwargs={
-            "user_id":request.user.id,
-            "title":title,
-            "content":content,
-            "mtype":"activityintro"
+            "user_id": request.user.id,
+            "title": title,
+            "content": content,
+            "mtype": "activityintro"
         })
-        #inside_message.send_one.apply_async(kwargs={
-        #    "user_id":request.user.id,
-        #    "title":"%s" % result,
-        #    "content":u"%s,%s元" % (result, amount),
-        #    "mtype":"pay"
-        #})
+        # 迅雷活动, 12.8 首次充值
+        start_time = timezone.datetime(2014, 12, 8)
+        if PayInfo.objects.filter(type='D', create_time=start_time).count() == 1:
+            rs = RewardStrategy(request.user)
+            rs.reward_user(u'三天迅雷会员')
 
         return self.render_to_response({
             'result': result,
@@ -653,6 +655,14 @@ class YeePayAppPayCallbackView(APIView):
                     "content":content,
                     "mtype":"activityintro"
                 })
+                user = User.objects.filter(id=result['uid']).first()
+
+                # 迅雷活动, 12.8 首次充值
+                start_time = timezone.datetime(2014, 12, 8)
+                if PayInfo.objects.filter(type='D', create_time=start_time).count() == 1:
+                    rs = RewardStrategy(user)
+                    rs.reward_user(u'三天迅雷会员')
+
         return Response(result)
 
 #易宝支付同步回调
@@ -715,6 +725,18 @@ class FEEAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
+        amount = request.DATA.get("amount","").strip()
+        if not amount:
+            return Response({"ret_code":30131, "message":"请输入金额"})
+
+        try:
+            float(amount)
+        except:
+            return {"ret_code":30132, 'message':'金额格式错误'}
+
+        amount = util.fmt_two_amount(amount)
+        #计算费率
+
         return Response({"ret_code":0, "fee":0})
 
 class WithdrawAPIView(APIView):

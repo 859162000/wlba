@@ -788,7 +788,7 @@ class ChangePasswordAPIView(APIView):
 
         user = request.user
         if not user.check_password(old_password):
-            return Response({'ret_code':30043, 'message':u'旧密码错误'})
+            return Response({'ret_code':30043, 'message':u'原密码错误'})
 
         status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
         if status != 200:

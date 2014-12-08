@@ -83,6 +83,10 @@ class PayInfo(models.Model):
     bank = models.ForeignKey(Bank, blank=True, null=True, on_delete=models.PROTECT, verbose_name=u'银行')
     account_name = models.CharField(u'姓名', max_length=12, blank=True, null=True)
     card_no = models.CharField(u'卡号', max_length=25, blank=True, null=True)
+    channel = models.CharField(u'支付通道', max_length=20, blank=True, null=True, choices=(
+        ("huifu", "Huifu"),
+        ("yeepay", "Yeepay")
+    ))
 
     def __unicode__(self):
         return u'%s' % self.pk
