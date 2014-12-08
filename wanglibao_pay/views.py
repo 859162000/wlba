@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+from marketing.helper import RewardStrategy
 import re
 import socket
 import datetime
@@ -140,19 +141,16 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
-        title,content = messages.msg_pay_ok(amount)
+        title, content = messages.msg_pay_ok(amount)
         inside_message.send_one.apply_async(kwargs={
-            "user_id":request.user.id,
-            "title":title,
-            "content":content,
-            "mtype":"activityintro"
+            "user_id": request.user.id,
+            "title": title,
+            "content": content,
+            "mtype": "activityintro"
         })
-        #inside_message.send_one.apply_async(kwargs={
-        #    "user_id":request.user.id,
-        #    "title":"%s" % result,
-        #    "content":u"%s,%s元" % (result, amount),
-        #    "mtype":"pay"
-        #})
+
+        rs = RewardStrategy(request.user)
+        rs.reward_user(u'三天迅雷会员')
 
         return self.render_to_response({
             'result': result,
