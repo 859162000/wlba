@@ -152,7 +152,7 @@ class PayCompleteView(TemplateView):
         })
         # 迅雷活动, 12.8 首次充值
         start_time = timezone.datetime(2014, 12, 8)
-        if PayInfo.objects.filter(type='D', create_time=start_time).count() == 1:
+        if PayInfo.objects.filter(user=request.user, type='D', create_time=start_time).count() == 1:
             rs = RewardStrategy(request.user)
             rs.reward_user(u'三天迅雷会员')
 
@@ -648,18 +648,18 @@ class YeePayAppPayCallbackView(APIView):
         if not result['ret_code']:
             amount = result['amount']
             if result['message'] == "success":
-                title,content = messages.msg_pay_ok(amount)
+                title, content = messages.msg_pay_ok(amount)
                 inside_message.send_one.apply_async(kwargs={
-                    "user_id":result['uid'],
-                    "title":title,
-                    "content":content,
-                    "mtype":"activityintro"
+                    "user_id": result['uid'],
+                    "title": title,
+                    "content": content,
+                    "mtype": "activityintro"
                 })
                 user = User.objects.filter(id=result['uid']).first()
 
                 # 迅雷活动, 12.8 首次充值
                 start_time = timezone.datetime(2014, 12, 8)
-                if PayInfo.objects.filter(type='D', create_time=start_time).count() == 1:
+                if PayInfo.objects.filter(user=user, type='D', create_time=start_time).count() == 1:
                     rs = RewardStrategy(user)
                     rs.reward_user(u'三天迅雷会员')
 
