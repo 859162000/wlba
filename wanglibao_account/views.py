@@ -44,13 +44,12 @@ from wanglibao.const import ErrorNumber
 #from wanglibao_account.utils import verify_id
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
-from wanglibao_account.models import Message, MessageText, MessageNoticeSet
+from wanglibao_account.models import Message
 from marketing.models import Reward, RewardRecord
 from django.template.defaulttags import register
 from django.db import transaction
 #from wanglibao_sms.tasks import send_messages
 from wanglibao_sms import messages
-from captcha.models import CaptchaStore
 
 logger = logging.getLogger(__name__)
 
@@ -771,7 +770,6 @@ class Third_login_back(APIView):
     def get(self, request):
         result = third_login.login_back(request)
         return Response(result)
-        #return HttpResponseRedirect(result['url'])
 
 
 class ChangePasswordAPIView(APIView):
@@ -780,26 +778,24 @@ class ChangePasswordAPIView(APIView):
     def post(self, request):
         new_password = request.DATA.get('new_password', "").strip()
         old_password = request.DATA.get('old_password', "").strip()
-        captcha_0 = request.DATA.get("captcha_0", "").strip()
-        captcha_1 = request.DATA.get("captcha_1", "").strip()
+        validate_code = request.DATA.get('validate_code', "").strip()
 
-        if not old_password or not new_password or not captcha_0 or not captcha_1:
+        if not old_password or not new_password or not validate_code:
             return Response({'ret_code':30041, 'message':u'信息输入不完整'})
 
         if not 6 <= len(new_password) <= 20:
             return Response({'ret_code':30042, 'message':u'密码需要在6-20位之间'})
 
-        cpta = CaptchaStore.objects.filter(hashkey=captcha_0).first()
-        if not cpta or cpta.response != captcha_1:
-            return Response({'ret_code':30044, 'message':u'验证码错误'})
-
         user = request.user
         if not user.check_password(old_password):
-            return Response({'ret_code':30043, 'message':u'旧密码错误'})
+            return Response({'ret_code':30043, 'message':u'原密码错误'})
+
+        status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
+        if status != 200:
+            return Response({"ret_code": 30044, "message": u"验证码输入错误"})
 
         user.set_password(new_password)
         user.save()
-        cpta.delete()
         return Response({'ret_code':0, 'message':u'修改成功'})
 
 

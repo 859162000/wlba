@@ -160,8 +160,8 @@ class YeePay:
         amount = util.fmt_two_amount(amount)
         if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
             return {"ret_code":20074, 'message':'金额格式错误，大于100元且为100倍数'}
-        #if str(amount) != "0.02":
-        #    return {"ret_code":20074, 'message':'金额只能为2分钱'}
+        if amount > 20000:
+            return {"ret_code":20077, 'message':'单笔充值不超过2万，单月不超过5万。如需充值更多金额可以去网站完成。'}
 
         terminal = deviceid.split(":")
         deviceid = terminal[-1]
@@ -203,7 +203,7 @@ class YeePay:
                     "amount":amount_sec, "productcatalog":"18", "productname":"网利宝-APP充值",
                     "identityid":str(user.id), "identitytype":2, "terminaltype":terminaltype,
                     "terminalid":deviceid, "userip":pay_info.request_ip, "userua":useragent,
-                    "callbackurl":self.PAY_BACK_RETURN_URL, #"fcallbackurl":self.PAY_RETURN_URL,
+                    "callbackurl":self.PAY_BACK_RETURN_URL, "fcallbackurl":self.PAY_RETURN_URL,
                     "version":0, "paytypes":"1", "cardno":card_id, "orderexpdate":60}
             data, encryptkey = self._sign(dic)
             logger.error("%s" % dic)
