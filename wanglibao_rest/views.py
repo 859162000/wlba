@@ -548,7 +548,7 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
 
 
 class Statistics(APIView):
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         today = datetime.now().date()
