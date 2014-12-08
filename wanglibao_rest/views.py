@@ -425,6 +425,12 @@ class IdValidate(APIView):
             # name = request.DATA.get("name", "")
             # id_number = request.DATA.get("id_number", "")
 
+            if request.DATA.get("captcha_1"):
+                return Response({
+                                    "message": u"实名认证成功..",
+                                    "error_number": ErrorNumber.id_verify_times_error
+                                }, status=200)
+
             name = form.cleaned_data['name']
             id_number = form.cleaned_data['id_number']
 
