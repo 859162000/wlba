@@ -4,7 +4,7 @@
   ul
     if data.has_previous
       li.pager-prev
-        a.pager-anchor(href='{{uri}}?page={{data.previous_page_number}}') <
+        a.pager-anchor(href='{{uri}}&page={{data.previous_page_number}}') <
     else
       li.pager-prev.disabled
         a.pager-anchor(href='javascript:void(0)') <
@@ -14,17 +14,17 @@
       - for index in 1|get_range:num_pages
         if data.number == index
           li.pager-page-number.active
-            a.pager-anchor(href='{{uri}}?page={{index}}') {{index}}
+            a.pager-anchor(href='{{uri}}&page={{index}}') {{index}}
         else
           li.pager-page-number
-            a.pager-anchor(href='{{uri}}?page={{index}}') {{index}}
+            a.pager-anchor(href='{{uri}}&page={{index}}') {{index}}
     else
       if data.number == 1
         li.pager-page-number.active
-          a.pager-anchor(href='{{uri}}?page=1') 1
+          a.pager-anchor(href='{{uri}}&page=1') 1
       else
         li.pager-page-number
-          a.pager-anchor(href='{{uri}}?page=1') 1
+          a.pager-anchor(href='{{uri}}&page=1') 1
 
       if data.number >= 5
         span ...
@@ -42,10 +42,10 @@
       - for index in number_minus|get_range:number_add
         if data.number == index
           li.pager-page-number.active
-            a.pager-anchor(href='{{uri}}?page={{index}}') {{index}}
+            a.pager-anchor(href='{{uri}}&page={{index}}') {{index}}
         else
           li.pager-page-number
-            a.pager-anchor(href='{{uri}}?page={{index}}') {{index}}
+            a.pager-anchor(href='{{uri}}&page={{index}}') {{index}}
 
       ellipsis = data.paginator.num_pages - data.number
       if ellipsis >= 4
@@ -53,14 +53,14 @@
 
       if data.number == data.paginator.num_pages
         li.pager-page-number.active
-          a.pager-anchor(href='{{uri}}?page={{data.paginator.num_pages}}') {{data.paginator.num_pages}}
+          a.pager-anchor(href='{{uri}}&page={{data.paginator.num_pages}}') {{data.paginator.num_pages}}
       else
         li.pager-page-number
-          a.pager-anchor(href='{{uri}}?page={{data.paginator.num_pages}}') {{data.paginator.num_pages}}
+          a.pager-anchor(href='{{uri}}&page={{data.paginator.num_pages}}') {{data.paginator.num_pages}}
 
     if data.has_next
       li.pager-next
-        a.pager-anchor(href='{{uri}}?page={{data.next_page_number}}') >
+        a.pager-anchor(href='{{uri}}&page={{data.next_page_number}}') >
     else
       li.pager-next.disabled
         a.pager-anchor(href='javascript:void(0)') >
