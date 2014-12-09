@@ -270,7 +270,7 @@ class CopyProductView(TemplateView):
         new_p2p.extra_data = p2p.extra_data
         new_p2p.publish_time = timezone.now()
         new_p2p.end_time = timezone.now() + timezone.timedelta(days=7)
-        new_p2p.limit_per_user = p2p.limit_amount_per_user
+        new_p2p.limit_per_user = p2p.limit_per_user
         new_p2p.warrant_company = p2p.warrant_company
         new_p2p.usage = p2p.usage
         new_p2p.short_usage = p2p.short_usage
