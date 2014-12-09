@@ -42,11 +42,16 @@ mixin innerFooter()
             a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
             a.social-text(href="javascript:void(0)", data-role="hover", data-target="#qrcode") 微信
 
-
-
         a#qrweibo.footer--weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
           img(src="/static/images/weibo-qr.png")
         img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none", data-name="hoverbox")
+
+        .mobile-app-bottom
+          span.icon.icon-mobile-app
+          span 手机版网利宝
+          .mobile-app-bottom-prompt
+            a.mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+            a.mobile-app-android(href="https://www.wanglibao.com/static/wanglibao.apk", title="Android版")
 
       dl.footer-section
         //.icon-phone-footer.font-xxxl

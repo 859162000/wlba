@@ -18,3 +18,20 @@ require ['jquery'], ->
     ).bind('mouseleave', (e)->
       $(this).hide()
     )
+
+    $('.mobile-app-top').bind('mouseenter',(e)->
+      $('.mobile-app-top-prompt').show()
+    )
+
+    $('.mobile-app-top-prompt').bind('mouseleave',(e)->
+      $(this).hide()
+    )
+
+
+    $('.mobile-app-bottom').bind('mouseenter',(e)->
+      $('.mobile-app-bottom-prompt').show()
+    )
+
+    $('.mobile-app-bottom-prompt').bind('mouseleave',(e)->
+      $(this).hide()
+    )
