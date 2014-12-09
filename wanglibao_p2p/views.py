@@ -1,4 +1,5 @@
 # encoding: utf8
+from copy import deepcopy
 from operator import attrgetter
 from decimal import Decimal
 from hashlib import md5
@@ -21,7 +22,7 @@ from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
 from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization
+from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
@@ -32,6 +33,7 @@ from wanglibao_announcement.utility import AnnouncementP2P
 from wanglibao_account.models import Binding
 from django.contrib.auth.decorators import login_required
 from wanglibao_account.utils import generate_contract_preview
+from wanglibao_pay.util import get_a_uuid
 
 
 REPAYMENTTYPEMAP = (
@@ -220,6 +222,73 @@ class AuditProductView(TemplateView):
 
 
 audit_product_view = staff_member_required(AuditProductView.as_view())
+
+
+class CopyProductView(TemplateView):
+    template_name = 'copy_p2p.jade'
+
+    def get_context_data(self, **kwargs):
+        pk = kwargs['id']
+        p2p = P2PProduct.objects.get(pk=pk)
+
+
+        return {
+            "p2p": p2p
+        }
+
+    def post(self, request, **kwargs):
+        pk = kwargs['id']
+        p2p = P2PProduct.objects.get(pk=pk)
+        # new_p2p = deepcopy(p2p)
+        new_p2p = P2PProduct()
+        new_p2p.id = None
+        new_p2p.name = p2p.name + u"复制"+ get_a_uuid()
+        new_p2p.short_name = p2p.short_name + u"复制"+ get_a_uuid()
+        new_p2p.serial_number = p2p.serial_number + u"复制"+ get_a_uuid()
+        new_p2p.contract_serial_number = p2p.contract_serial_number + u"复制"+ get_a_uuid()
+        new_p2p.status = u"录标"
+        new_p2p.period = p2p.period
+        new_p2p.priority = 0
+        new_p2p.expected_earning_rate = p2p.expected_earning_rate
+        new_p2p.pay_method = p2p.pay_method
+        new_p2p.repaying_source = p2p.repaying_source
+        new_p2p.baoli_original_contract_number = p2p.baoli_original_contract_number
+        new_p2p.baoli_original_contract_name = p2p.baoli_original_contract_name
+        new_p2p.baoli_trade_relation = p2p.baoli_trade_relation
+        new_p2p.borrower_name = p2p.borrower_name
+        new_p2p.borrower_phone = p2p.borrower_phone
+        new_p2p.borrower_address = p2p.borrower_address
+        new_p2p.borrower_id_number = p2p.borrower_id_number
+        new_p2p.borrower_bankcard = p2p.borrower_bankcard
+        new_p2p.borrower_bankcard_type = p2p.borrower_bankcard_type
+        new_p2p.borrower_bankcard_bank_name = p2p.borrower_bankcard_bank_name
+        new_p2p.borrower_bankcard_bank_code = p2p.borrower_bankcard_bank_code
+        new_p2p.borrower_bankcard_bank_province = p2p.borrower_bankcard_bank_province
+        new_p2p.borrower_bankcard_bank_city = p2p.borrower_bankcard_bank_city
+        new_p2p.borrower_bankcard_bank_branch = p2p.borrower_bankcard_bank_branch
+        new_p2p.total_amount = p2p.total_amount
+        new_p2p.extra_data = p2p.extra_data
+        new_p2p.publish_time = timezone.now()
+        new_p2p.end_time = timezone.now() + timezone.timedelta(days=7)
+        new_p2p.limit_per_user = p2p.limit_amount_per_user
+        new_p2p.warrant_company = p2p.warrant_company
+        new_p2p.usage = p2p.usage
+        new_p2p.short_usage = p2p.short_usage
+        new_p2p.contract_template = p2p.contract_template
+        new_p2p.activity = p2p.activity
+        # new_p2p.warrant_set = p2p.warrant_set
+        new_p2p.save()
+        warrants = Warrant.objects.filter(product=p2p)
+        for warrant in warrants:
+            new_warrant = Warrant()
+            new_warrant.name = warrant.name
+            new_warrant.product = new_p2p
+            new_warrant.save()
+
+        return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/p2pproduct/')
+
+
+copy_product_view = staff_member_required(CopyProductView.as_view())
 
 
 class P2PProductViewSet(PaginatedModelViewSet):
