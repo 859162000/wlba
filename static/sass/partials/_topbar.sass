@@ -86,7 +86,7 @@ a.header-button
 .user-div
   float: left
   position: relative
-  width: 550px
+  width: 700px
   vertical-align: middle
 
 .user-info
@@ -227,4 +227,44 @@ a.topbar-anchor
   width: 164px
   height: 223px
   padding-top: 15px
-  
+
+.mobile-app-top
+  margin-left: 20px
+
+  .icon-mobile-app
+    background: url("/static/images/icon-public.png") no-repeat -250px -160px
+    height: 22px
+    width: 13px
+    margin-right: 8px
+    margin-top: -5px
+    +transition(all .2s ease-in-out)
+
+  .mobile-app-top-prompt
+    width: 320px
+    height: 200px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -5px -197px
+    position: absolute
+    top: 32px
+    right: -80px
+    z-index: 999
+    display: none
+
+  .mobile-app-apple
+    width: 130px
+    height: 40px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -157px -400px
+    display: block
+    margin-top: 30px
+    margin-left: 160px
+    margin-bottom: 10px
+
+  .mobile-app-android
+    width: 130px
+    height: 40px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -16px -400px
+    display: block
+    margin-left: 160px
+
+  &:hover
+    .icon-mobile-app
+      background-position: -250px -190px

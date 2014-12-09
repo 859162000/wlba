@@ -538,3 +538,39 @@ a.hot-item-title-link
 .bottom-hr
   border: none
   border-top: 1px solid #ccc
+
+.high-bigger
+  margin-top: 20px
+  span
+    float: left
+    width: 50px
+    height: 54px
+    margin-top: 5px
+    margin-left: 25px
+    overflow: hidden
+    background: url("/static/images/icon-public.png") no-repeat
+    +transition(all .3s ease-in-out)
+
+  .icon-trust
+    background-position: -492px 0
+    &:hover
+      background-position: -492px -100px
+
+  .icon-authority
+    background-position: -566px 0
+    &:hover
+      background-position: -566px -100px
+  .icon-security
+    background-position: -647px 0
+    &:hover
+      background-position: -647px -100px
+  .icon-high-income
+    background-position: -724px 0
+    &:hover
+      background-position: -724px -100px
+  .high-bigger-text
+    float: left
+    margin-left: 20px
+    line-height: normal
+    h3
+      color: $color-text-d2

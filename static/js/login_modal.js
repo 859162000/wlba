@@ -93,6 +93,10 @@
         return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
       },
       submitHandler: function(form) {
+        if ($('#login_submit').hasClass('disabled')) {
+          return;
+        }
+        $('#login_submit').addClass('disabled');
         return $.ajax({
           url: $('#login-modal-form').attr('action'),
           type: "POST",
@@ -103,10 +107,11 @@
           arr = /\?next=(\/.+)$/ig.exec(window.location);
           if (arr && arr[1]) {
             next_url = arr[1];
-            return window.location.href = next_url;
+            window.location.href = next_url;
           } else {
-            return location.reload();
+            location.reload();
           }
+          return $('#login_submit').removeClass('disabled');
         }).fail(function(xhr) {
           var error_message, message, result;
           result = JSON.parse(xhr.responseText);
@@ -115,7 +120,8 @@
             return e[1];
           }).flatten().value();
           $('.captcha-refresh', '#login-modal-form').trigger('click');
-          return alert(error_message);
+          alert(error_message);
+          return $('#login_submit').removeClass('disabled');
         });
       }
     });
