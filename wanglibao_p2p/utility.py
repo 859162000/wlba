@@ -40,13 +40,11 @@ def strip_tags(html):
 def validate_status(request, result, field):
     """验证接口请求状态参数  网贷天眼"""
     status = request.GET.get(field)
-    if status in ["0", "1", "2"]:
+    if status in ["0", "1"]:
         if status == '0':
             status_query = Q(status=u'正在招标')
         elif status == '1':
-            status_query = Q(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'已完成'])
-        elif status == '2':
-            status_query = Q(status=u'流标')
+            status_query = Q(status__in=[u'还款中', u'已完成'])
         return (status_query, status, result)
     else:
         result.update(result_code='-2', result_msg=u'{} 参数不存在或者格式错误'.format(field))
