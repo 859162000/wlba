@@ -1,7 +1,6 @@
 # encoding: utf8
 
 import time
-from copy import deepcopy
 from operator import attrgetter
 from decimal import Decimal
 from hashlib import md5
@@ -233,7 +232,6 @@ class CopyProductView(TemplateView):
         pk = kwargs['id']
         p2p = P2PProduct.objects.get(pk=pk)
 
-
         return {
             "p2p": p2p
         }
@@ -244,10 +242,10 @@ class CopyProductView(TemplateView):
         # new_p2p = deepcopy(p2p)
         new_p2p = P2PProduct()
         new_p2p.id = None
-        new_p2p.name = p2p.name + u"复制"+ get_a_uuid()
-        new_p2p.short_name = p2p.short_name + u"复制"+ get_a_uuid()
-        new_p2p.serial_number = p2p.serial_number + u"复制"+ get_a_uuid()
-        new_p2p.contract_serial_number = p2p.contract_serial_number + u"复制"+ get_a_uuid()
+        new_p2p.name = p2p.name + u"复制" + get_a_uuid()
+        new_p2p.short_name = p2p.short_name + u"复制" + get_a_uuid()
+        new_p2p.serial_number = p2p.serial_number + u"复制" + get_a_uuid()
+        new_p2p.contract_serial_number = p2p.contract_serial_number + u"复制" + get_a_uuid()
         new_p2p.status = u"录标"
         new_p2p.period = p2p.period
         new_p2p.priority = 0
@@ -540,7 +538,7 @@ class XunleiP2PbyUser(APIView):
         my_project = []
 
         p2p_equities = P2PEquity.objects.filter(user__id=uid).filter(product__status__in=[
-            u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
 
         income_all = 0
