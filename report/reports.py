@@ -69,7 +69,8 @@ class ReportGeneratorBase(object):
     @classmethod
     def get_report_name(cls, start_time, end_time):
         if hasattr(cls, 'reportname_format'):
-            return cls.reportname_format % (start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
+            return cls.reportname_format % (
+            start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
 
 
     @classmethod
@@ -77,8 +78,8 @@ class ReportGeneratorBase(object):
         if end_time is None:
             end_time = start_time + timedelta(days=1)
 
-        assert(isinstance(start_time, datetime))
-        assert(isinstance(start_time, datetime))
+        assert (isinstance(start_time, datetime))
+        assert (isinstance(start_time, datetime))
 
         path = cls.get_file_path(start_time, end_time)
 
@@ -99,16 +100,14 @@ class DepositReportGenerator(ReportGeneratorBase):
 
     @classmethod
     def generate_report_content(cls, start_time, end_time):
-
         output = cStringIO.StringIO()
-        pay_infos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='D')\
+        pay_infos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='D') \
             .select_related('user').select_related('user__wanglibaouserprofile').select_related('order')
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow(['Id', u'用户名', u'交易号', u'类型', u'充值银行', u'充值金额', u'充值手续费', u'实际到账金额',
                          u'状态', u'操作时间', u'操作ip', u'编号'])
 
         for pay_info in pay_infos:
-
             bank_name = pay_info.bank.name if pay_info.bank else ''
 
             writer.writerow([
@@ -134,7 +133,8 @@ class WithDrawReportGenerator(ReportGeneratorBase):
 
     @classmethod
     def generate_report_content(cls, start_time, end_time):
-        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W')\
+        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W',
+                                          status__in=[PayInfo.SUCCESS, PayInfo.ACCEPTED]) \
             .prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
 
         output = cStringIO.StringIO()
@@ -147,7 +147,6 @@ class WithDrawReportGenerator(ReportGeneratorBase):
             confirm_time = ""
             if payinfo.confirm_time:
                 confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
-
 
             bank_name = payinfo.bank.name if payinfo.bank else ''
 
@@ -179,9 +178,8 @@ class WithDrawDetailReportGenerator(ReportGeneratorBase):
 
     @classmethod
     def generate_report_content(cls, start_time, end_time):
-
         margins = MarginRecord.objects.filter(catalog__icontains=u'取款',
-                                              create_time__gte=start_time, create_time__lt=end_time)\
+                                              create_time__gte=start_time, create_time__lt=end_time) \
             .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
         output = cStringIO.StringIO()
@@ -191,7 +189,6 @@ class WithDrawDetailReportGenerator(ReportGeneratorBase):
                          u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'编号'])
 
         for margin in margins:
-
             payinfo = margin.payinfo_set.all().first()
             bank_name = payinfo.bank.name if payinfo.bank else ''
 
@@ -224,7 +221,7 @@ class ProductionRecordReportGenerator(ReportGeneratorBase):
     @classmethod
     def generate_report_content(cls, start_time, end_time):
 
-        p2precords = P2PRecord.objects.filter(create_time__gte=start_time, create_time__lt=end_time)\
+        p2precords = P2PRecord.objects.filter(create_time__gte=start_time, create_time__lt=end_time) \
             .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
         output = cStringIO.StringIO()
@@ -265,8 +262,8 @@ class PaybackReportGenerator(ReportGeneratorBase):
         writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
                          u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号'])
 
-        amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time)\
-            .prefetch_related('product_amortization').prefetch_related('product_amortization__product')\
+        amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time) \
+            .prefetch_related('product_amortization').prefetch_related('product_amortization__product') \
             .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
         for index, amortization in enumerate(amortizations):
@@ -331,7 +328,7 @@ class ProductionAmortizationsSettledReportGenerator(ReportGeneratorBase):
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'贷款号', u'借款人', u'借款类型', u'还款金额', u'状态', u'操作时间', u'编号'])
 
-        amortizations = ProductAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time)\
+        amortizations = ProductAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time) \
             .filter(settled=True)
 
         for index, amortization in enumerate(amortizations):
@@ -375,10 +372,11 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
                 str(product.expected_earning_rate),
                 str(product.period),
                 unicode(product.pay_method),
-                u'抵押标', # Hard code this since it is not used anywhere except this table
+                u'抵押标',  # Hard code this since it is not used anywhere except this table
                 str(len(product.equities.all())),
                 unicode(product.status),
-                (product.soldout_time and timezone.localtime(product.soldout_time).strftime("%Y-%m-%d %H:%M:%S")) or '-',
+                (
+                product.soldout_time and timezone.localtime(product.soldout_time).strftime("%Y-%m-%d %H:%M:%S")) or '-',
                 unicode(product.borrower_name),
                 unicode(product.borrower_phone),
                 unicode(product.borrower_id_number),
@@ -403,7 +401,7 @@ class P2PstatusReportGenerator(ReportGeneratorBase):
 
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'贷款号', u'用户名称', u'借款标题', u'借款金额', u'已借金额', u'利率', u'借款期限', u'还款方式',
-                        u'投资次数', u'状态', u'满标时间', u'真实姓名', u'手机号', u'身份证', u'银行名', u'银行账号',
+                         u'投资次数', u'状态', u'满标时间', u'真实姓名', u'手机号', u'身份证', u'银行名', u'银行账号',
                          u'银行卡类型', u'省份', u'地区', u'支行'])
 
         p2precords = P2PRecord.objects.filter(catalog=u'状态变化', create_time__gte=start_time, create_time__lt=end_time)
@@ -421,7 +419,8 @@ class P2PstatusReportGenerator(ReportGeneratorBase):
                 unicode(p2precord.product.pay_method),
                 str(len(p2precord.product.equities.all())),
                 unicode(p2precord.product.status),
-                (p2precord.product.soldout_time and timezone.localtime(p2precord.product.soldout_time).strftime("%Y-%m-%d %H:%M:%S")) or '-',
+                (p2precord.product.soldout_time and timezone.localtime(p2precord.product.soldout_time).strftime(
+                    "%Y-%m-%d %H:%M:%S")) or '-',
                 unicode(p2precord.product.borrower_name),
                 unicode(p2precord.product.borrower_phone),
                 unicode(p2precord.product.borrower_id_number),
@@ -475,7 +474,7 @@ class UserReportGenerator(ReportGeneratorBase):
     def generate_report_content(cls, start_time, end_time):
         output = cStringIO.StringIO()
         writer = UnicodeWriter(output, delimiter='\t')
-        writer.writerow([u'序号', u'用户姓名', u'用户手机号', u'账户余额', u'加入日期',u'邀请人姓名', u'邀请人电话'])
+        writer.writerow([u'序号', u'用户姓名', u'用户手机号', u'账户余额', u'加入日期', u'邀请人姓名', u'邀请人电话'])
 
         users = User.objects.filter(date_joined__gte=start_time, date_joined__lt=end_time)
 
@@ -510,8 +509,8 @@ class UserReportGenerator(ReportGeneratorBase):
         if end_time is None:
             end_time = start_time + timedelta(days=1)
 
-        assert(isinstance(start_time, datetime))
-        assert(isinstance(start_time, datetime))
+        assert (isinstance(start_time, datetime))
+        assert (isinstance(start_time, datetime))
 
         path = cls.get_file_path(start_time, end_time)
 
@@ -524,8 +523,8 @@ class UserReportGenerator(ReportGeneratorBase):
         report.save()
         return report
 
-class ReportGenerator(object):
 
+class ReportGenerator(object):
     @classmethod
     def generate_reports(cls, start_time, end_time=None):
         DepositReportGenerator.generate_report(start_time=start_time, end_time=end_time)
