@@ -6,6 +6,7 @@ from decimal import Decimal
 from hashlib import md5
 
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone, dateparse
@@ -484,10 +485,10 @@ class XunleiP2PListAPIView(APIView):
         project_list = []
 
         result = {
-            'timestamp': str(now),
+            'timestamp': now,
             'project_list': project_list
         }
-        p2pproducts = P2PProduct.objects.filter(hide=False).filter(status=u'正在招标')[0:5]
+        p2pproducts = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(status=u'正在招标')[0:5]
 
         for p2pproduct in p2pproducts:
             income = Decimal('0')
@@ -495,30 +496,31 @@ class XunleiP2PListAPIView(APIView):
             for amort in amorts:
                 income += amort.interest
             income = income / 10000
-            income = income.quantize(Decimal('0.00'))
+            income = float(income.quantize(Decimal('0.00')))
 
             # 进度
             amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
             percent = (p2pproduct.ordered_amount / amount) * 100
             percent = percent.quantize(Decimal('0.00'))
 
+
             obj = {
-                'id': str(p2pproduct.id),
+                'id': p2pproduct.id,
                 'title': p2pproduct.name,
                 'title_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
-                'rate_year': str(p2pproduct.expected_earning_rate),
-                'rate_vip': str(1),
-                'income': str(income),
-                'finance': str(p2pproduct.total_amount),
-                'min_invest': str(p2pproduct.limit_amount_per_user),
-                'guarantor': str(p2pproduct.warrant_company.name),
-                'finance_progress': str(percent),
-                'finance_left': str(p2pproduct.remain),
-                'repayment_period': str(p2pproduct.period * 30),
-                'repayment_type': str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0)),
+                'rate_year': p2pproduct.expected_earning_rate,
+                'rate_vip': float(p2pproduct.activity.rule.rule_amount * 100) if p2pproduct.activity else 0,
+                'income': income,
+                'finance': float(p2pproduct.total_amount),
+                'min_invest': float(p2pproduct.limit_amount_per_user),
+                'guarantor': p2pproduct.warrant_company.name,
+                'finance_progress': float(percent),
+                'finance_left': float(p2pproduct.remain),
+                'repayment_period': p2pproduct.period * 30,
+                'repayment_type': P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0),
                 'buy_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
-                'finance_start_time': str(time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple())),
-                'finance_end_time': str(time.mktime(timezone.localtime(p2pproduct.end_time).timetuple())),
+                'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
+                'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
                 # 'repayment_time': time.mktime(timezone.localtime(amorts.first().term_date).timetuple()),
                 'status': p2pproduct.status
             }
@@ -535,9 +537,14 @@ class XunleiP2PbyUser(APIView):
         if not uid:
             return HttpResponse(
                 renderers.JSONRenderer().render({'code': -1, 'message': u'xluid错误'}, 'application/json'))
-        my_project = []
+        try:
+            user = User.objects.get(binding__bid=uid)
+        except:
+            return HttpResponse(
+                renderers.JSONRenderer().render({'code': -1,
+                                                 'message': u'该用户没有绑定wanglibao用户'}, 'application/json'))
 
-        p2p_equities = P2PEquity.objects.filter(user__id=uid).filter(product__status__in=[
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
 
@@ -546,6 +553,8 @@ class XunleiP2PbyUser(APIView):
             if equity.confirm:
                 income_all += equity.total_interest
 
+
+        my_project = []
         result = {
             'income_all': income_all,
             'my_project': my_project
@@ -562,13 +571,13 @@ class XunleiP2PbyUser(APIView):
             percent = percent.quantize(Decimal('0.00'))
 
             obj = {
-                'id': str(p2pproduct.id),
+                'id': p2pproduct.id,
                 'title': p2pproduct.name,
                 'title_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
-                'finance_start_time': str(time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple())),
-                'finance_end_time': str(time.mktime(timezone.localtime(p2pproduct.end_time).timetuple())),
-                'cur_income': '0',
-                'investment': str(p2pequity.equity),
+                'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
+                'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
+                'expected_income': float(p2pequity.unpaid_interest),
+                'investment': float(p2pequity.equity),
                 'repayment_progress': percent,
             }
             my_project.append(obj)

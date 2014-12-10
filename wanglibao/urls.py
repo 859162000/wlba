@@ -94,8 +94,8 @@ urlpatterns += patterns(
     url(r'^hexun/p2plist.json', P2PListAPI.as_view()),
     url(r'^api/loans/$', P2PEyeListAPIView.as_view()),
     url(r'^api/data/$', P2PEyeEquityAPIView.as_view()),
-    url(r'^api/xunlei/projectlist/$', XunleiP2PListAPIView.as_view()),
-    url(r'^api/xunlei/projectbyuser/$', XunleiP2PbyUser.as_view()),
+    url(r'^api/xunlei/Getproject/$', XunleiP2PListAPIView.as_view()),
+    url(r'^api/xunlei/getXLUserInvestInfo/$', XunleiP2PbyUser.as_view()),
 )
 
 if settings.DEBUG:
