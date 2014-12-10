@@ -128,7 +128,7 @@ class P2PProduct(ProductBase):
 
     priority = models.IntegerField(verbose_name=u'优先级*', help_text=u'越大越优先', blank=False)
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月)*', blank=False)
-    brief = models.TextField(blank=True, verbose_name=u'产品点评')
+    brief = models.TextField(blank=True, verbose_name=u'产品备注')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
     excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)*')
     excess_earning_description = models.CharField(u'超额收益描述', max_length=100, blank=True, null=True)
@@ -163,7 +163,7 @@ class P2PProduct(ProductBase):
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
     publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间*', blank=False)
-    end_time = models.DateTimeField(default=timezone.now, verbose_name=u'终止时间*', blank=False)
+    end_time = models.DateTimeField(default=lambda :timezone.now() + timezone.timedelta(days=7), verbose_name=u'终止时间*', blank=False)
     soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True)
 
     limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)*', default=1)
@@ -224,6 +224,11 @@ class P2PProduct(ProductBase):
         return u'<a href="/p2p/detail/%s" target="_blank">预览</a>' % str(self.id)
     preview_link.short_description = u'预览'
     preview_link.allow_tags = True
+
+    def copy_link(self):
+        return u'<a href="/p2p/copy/%s" target="_blank">复制</a>' % str(self.id)
+    copy_link.short_description = u'复制'
+    copy_link.allow_tags = True
 
     display_status_mapping = {
         u'录标': u'录标',

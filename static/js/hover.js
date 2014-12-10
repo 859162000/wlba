@@ -19,7 +19,27 @@
         target = $(e.target).attr('data-target');
         return $(target).hide();
       });
-      return $('[data-name=hoverbox]').bind('mouseenter', function(e) {
+      $('[data-name=hoverbox]').bind('mouseenter', function(e) {
+        return $(this).show();
+      }).bind('mouseleave', function(e) {
+        return $(this).hide();
+      });
+      $('.mobile-app-top').bind('mouseenter', function(e) {
+        return $('.mobile-app-top-prompt').show();
+      }).bind('mouseleave', function(e) {
+        return $('.mobile-app-top-prompt').hide();
+      });
+      $('.mobile-app-top-prompt').bind('mouseenter', function(e) {
+        return $(this).show();
+      }).bind('mouseleave', function(e) {
+        return $(this).hide();
+      });
+      $('.mobile-app-bottom').bind('mouseenter', function(e) {
+        return $('.mobile-app-bottom-prompt').show();
+      }).bind('mouseleave', function(e) {
+        return $('.mobile-app-bottom-prompt').hide();
+      });
+      return $('.mobile-app-bottom-prompt').bind('mouseenter', function(e) {
         return $(this).show();
       }).bind('mouseleave', function(e) {
         return $(this).hide();

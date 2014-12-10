@@ -90,6 +90,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         error.appendTo $(element).parents('.form-row').children('.form-row-error')
 
     submitHandler: (form) ->
+      if $('#login_submit').hasClass('disabled')
+        return
+      $('#login_submit').addClass('disabled')
       $.ajax
         url: $('#login-modal-form').attr('action')
         type: "POST"
@@ -102,12 +105,16 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
           window.location.href = next_url
         else
           location.reload()
+
+		
+        $('#login_submit').removeClass('disabled')
       .fail (xhr)->
         result = JSON.parse xhr.responseText
         message = result.message
         error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
         $('.captcha-refresh', '#login-modal-form').trigger('click')
         alert error_message
+        $('#login_submit').removeClass('disabled')
 
   $('#register-modal-form').validate
     rules:

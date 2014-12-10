@@ -252,3 +252,45 @@
 
   &:hover
     background: url("/static/images/icon-auth-footer.png") -37px -33px no-repeat
+
+.mobile-app-bottom
+  margin-top: 20px
+  margin-left: 5px
+
+  .icon-mobile-app
+    background: url("/static/images/icon-public.png") no-repeat -250px -160px
+    height: 22px
+    width: 13px
+    margin-right: 8px
+    margin-top: -5px
+    +transition(all .2s ease-in-out)
+
+  .mobile-app-bottom-prompt
+    width: 320px
+    height: 200px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -5px 0
+    position: absolute
+    top: -100px
+    right: -80px
+    z-index: 999
+    display: none
+
+  .mobile-app-apple
+    width: 130px
+    height: 40px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -157px -400px
+    display: block
+    margin-top: 50px
+    margin-left: 166px
+    margin-bottom: 10px
+
+  .mobile-app-android
+    width: 130px
+    height: 40px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -16px -400px
+    display: block
+    margin-left: 166px
+
+  &:hover
+    .icon-mobile-app
+      background-position: -250px -190px
