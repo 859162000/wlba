@@ -402,12 +402,14 @@ class P2PEyeListAPIView(APIView):
                     "reward": reward,
                     "guarantee": "null",
                     "start_time": time_from.strftime("%Y-%m-%d %H:%M:%S"),
-                    "end_time": timezone.localtime(p2pproduct.soldout_time).strftime("%Y-%m-%d %H:%M:%S") if p2pproduct.soldout_time else 'null',
+                    "end_time": timezone.localtime(p2pproduct.soldout_time).strftime(
+                        "%Y-%m-%d %H:%M:%S") if p2pproduct.soldout_time else 'null',
                     "invest_num": str(p2pproduct.equities.count()),
                     "c_reward": "null"
                 }
                 loans.append(obj)
-            result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(p2pproducts.number), result_code="1",
+            result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(p2pproducts.number),
+                          result_code="1",
                           result_msg=u'获取数据成功!')
         else:
             result.update(result_code='-1', result_msg=u'未授权的访问!')
@@ -478,7 +480,8 @@ class P2PEyeEquityAPIView(APIView):
                 "add_time": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             }
             loans.append(obj)
-        result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(equities.number), result_code="1",
+        result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(equities.number),
+                      result_code="1",
                       result_msg=u'获取数据成功!')
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
@@ -495,7 +498,8 @@ class XunleiP2PListAPIView(APIView):
             'timestamp': now,
             'project_list': project_list
         }
-        p2pproducts = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(status=u'正在招标')[0:5]
+        p2pproducts = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
+            status=u'正在招标').filter('-priority')[0:5]
 
         for p2pproduct in p2pproducts:
             income = Decimal('0')
@@ -509,7 +513,6 @@ class XunleiP2PListAPIView(APIView):
             amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
             percent = (p2pproduct.ordered_amount / amount) * 100
             percent = percent.quantize(Decimal('0.00'))
-
 
             obj = {
                 'id': p2pproduct.id,
