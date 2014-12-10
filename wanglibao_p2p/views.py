@@ -578,7 +578,7 @@ class XunleiP2PbyUser(APIView):
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
                 'expected_income': float(p2pequity.unpaid_interest),
                 'investment': float(p2pequity.equity),
-                'repayment_progress': percent,
+                'repayment_progress': float(percent),
             }
             my_project.append(obj)
         result.update(my_project=my_project)
