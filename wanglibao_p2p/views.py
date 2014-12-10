@@ -373,13 +373,14 @@ class P2PEyeListAPIView(APIView):
                 # 进度
                 amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
                 percent = p2pproduct.ordered_amount / amount
-                # process = percent.quantize(Decimal('0.0'), 'ROUND_DOWN')
+                process = percent.quantize(Decimal('0.00'), 'ROUND_DOWN')
 
-                reward = 0
+                reward = Decimal.from_float(0).quantize(Decimal('0.00'), 'ROUND_DOWN')
                 if p2pproduct.activity:
-                    reward = p2pproduct.activity.rule.rule_amount
+                    reward = Decimal.from_float(p2pproduct.activity.rule.rule_amount).quantize(Decimal('0.00'), 'ROUND_DOWN')
+
                 rate = p2pproduct.expected_earning_rate + float(reward * 100)
-                rate = rate / 100
+                rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'), 'ROUND_DOWN')
 
                 obj = {
                     "id": str(p2pproduct.id),
@@ -390,17 +391,17 @@ class P2PEyeListAPIView(APIView):
                     "status": status,
                     "userid": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
                     "c_type": u"抵押标" if p2pproduct.category == u'证大速贷' else u"信用标",
-                    "amount": str(p2pproduct.total_amount),
-                    "rate": str(rate),
+                    "amount": amount,
+                    "rate": rate,
                     "period": u'{}个月'.format(p2pproduct.period),
                     "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0)),
-                    "process": percent,
-                    "reward": str(reward),
+                    "process": process,
+                    "reward": reward,
                     "guarantee": "null",
                     "start_time": time_from.strftime("%Y-%m-%d %H:%M:%S"),
                     "end_time": timezone.localtime(p2pproduct.end_time).strftime("%Y-%m-%d %H:%M:%S"),
                     "invest_num": str(p2pproduct.equities.count()),
-                    "c_reward": "0"
+                    "c_reward": "null"
                 }
                 loans.append(obj)
             result.update(loans=loans, page_count=paginator.num_pages, page_index=p2pproducts.number, result_code="1",
@@ -419,7 +420,7 @@ class P2PEyeEquityAPIView(APIView):
             "result_msg": u"未授权的访问!",
             "page_count": "null",
             "page_index": "null",
-            "data": "null"
+            "loans": "null"
         }
         try:
             id = int(request.GET.get('id'))
@@ -456,7 +457,7 @@ class P2PEyeEquityAPIView(APIView):
         if not equities:
             return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
-        data = []
+        loans = []
         for eq in equities:
             obj = {
                 "id": str(p2pproduct.id),
@@ -470,8 +471,8 @@ class P2PEyeEquityAPIView(APIView):
                 "status": u"成功",
                 "add_time": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             }
-            data.append(obj)
-        result.update(data=data, page_count=str(paginator.num_pages), page_index=str(equities.number), result_code="1",
+            loans.append(obj)
+        result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(equities.number), result_code="1",
                       result_msg=u'获取数据成功!')
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
