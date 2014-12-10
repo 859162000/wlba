@@ -431,21 +431,25 @@ class P2PEyeEquityAPIView(APIView):
 
         # 验证日期
         time_from, result = validate_date(request, result, 'time_from')
-        if not time_from:
-            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
         time_to, result = validate_date(request, result, 'time_to')
-        if not time_to:
-            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
-        # 构造日期查询语句
-        publish_query = Q(publish_time__range=(time_from, time_to))
 
-        try:
-            p2pproduct = P2PProduct.objects.filter(hide=False).filter(status__in=[
-                u'正在招标', u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
-            ]).filter(publish_query).get(id_query)
-        except:
-            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+        # 构造日期查询语句
+        if time_from and time_to:
+            publish_query = Q(publish_time__range=(time_from, time_to))
+            try:
+                p2pproduct = P2PProduct.objects.filter(hide=False).filter(status__in=[
+                    u'正在招标', u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+                ]).filter(publish_query).get(id_query)
+            except:
+                return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+        else:
+            try:
+                p2pproduct = P2PProduct.objects.filter(hide=False).filter(status__in=[
+                    u'正在招标', u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+                ]).get(id_query)
+            except:
+                return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
         p2pequities = p2pproduct.equities.all()
 
