@@ -4,6 +4,7 @@ import time
 from operator import attrgetter
 from decimal import Decimal
 from hashlib import md5
+import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
@@ -336,7 +337,7 @@ class P2PEyeListAPIView(APIView):
     def get(self, request):
 
         result = {
-            "result_code": -1,
+            "result_code": "-1",
             "result_msg": u"未授权的访问!",
             "page_count": "null",
             "page_index": "null",
@@ -356,6 +357,7 @@ class P2PEyeListAPIView(APIView):
         time_to, result = validate_date(request, result, 'time_to')
         if not time_to:
             return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
         # 构造日期查询语句
         publish_query = Q(publish_time__range=(time_from, time_to))
 
@@ -375,12 +377,13 @@ class P2PEyeListAPIView(APIView):
                 percent = p2pproduct.ordered_amount / amount
                 process = percent.quantize(Decimal('0.00'), 'ROUND_DOWN')
 
-                reward = Decimal.from_float(0).quantize(Decimal('0.00'), 'ROUND_DOWN')
+                reward = Decimal.from_float(0).quantize(Decimal('0.0000'), 'ROUND_DOWN')
                 if p2pproduct.activity:
-                    reward = Decimal.from_float(p2pproduct.activity.rule.rule_amount).quantize(Decimal('0.00'), 'ROUND_DOWN')
+                    reward = p2pproduct.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
 
                 rate = p2pproduct.expected_earning_rate + float(reward * 100)
-                rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'), 'ROUND_DOWN')
+
+                rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'))
 
                 obj = {
                     "id": str(p2pproduct.id),
@@ -399,12 +402,14 @@ class P2PEyeListAPIView(APIView):
                     "reward": reward,
                     "guarantee": "null",
                     "start_time": time_from.strftime("%Y-%m-%d %H:%M:%S"),
-                    "end_time": timezone.localtime(p2pproduct.end_time).strftime("%Y-%m-%d %H:%M:%S"),
+                    "end_time": timezone.localtime(p2pproduct.soldout_time).strftime(
+                        "%Y-%m-%d %H:%M:%S") if p2pproduct.soldout_time else 'null',
                     "invest_num": str(p2pproduct.equities.count()),
                     "c_reward": "null"
                 }
                 loans.append(obj)
-            result.update(loans=loans, page_count=paginator.num_pages, page_index=p2pproducts.number, result_code="1",
+            result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(p2pproducts.number),
+                          result_code="1",
                           result_msg=u'获取数据成功!')
         else:
             result.update(result_code='-1', result_msg=u'未授权的访问!')
@@ -475,7 +480,8 @@ class P2PEyeEquityAPIView(APIView):
                 "add_time": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             }
             loans.append(obj)
-        result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(equities.number), result_code="1",
+        result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(equities.number),
+                      result_code="1",
                       result_msg=u'获取数据成功!')
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
@@ -484,7 +490,7 @@ class XunleiP2PListAPIView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        now = time.mktime(timezone.now().timetuple())
+        now = time.mktime(datetime.datetime.now().timetuple())
         uid = request.GET.get('xluid')
         project_list = []
 
@@ -492,7 +498,8 @@ class XunleiP2PListAPIView(APIView):
             'timestamp': now,
             'project_list': project_list
         }
-        p2pproducts = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(status=u'正在招标')[0:5]
+        p2pproducts = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
+            status=u'正在招标').filter('-priority')[0:5]
 
         for p2pproduct in p2pproducts:
             income = Decimal('0')
@@ -507,7 +514,6 @@ class XunleiP2PListAPIView(APIView):
             percent = (p2pproduct.ordered_amount / amount) * 100
             percent = percent.quantize(Decimal('0.00'))
 
-
             obj = {
                 'id': p2pproduct.id,
                 'title': p2pproduct.name,
@@ -516,7 +522,7 @@ class XunleiP2PListAPIView(APIView):
                 'rate_vip': float(p2pproduct.activity.rule.rule_amount * 100) if p2pproduct.activity else 0,
                 'income': income,
                 'finance': float(p2pproduct.total_amount),
-                'min_invest': float(p2pproduct.limit_amount_per_user),
+                'min_invest': float(100.00),
                 'guarantor': p2pproduct.warrant_company.name,
                 'finance_progress': float(percent),
                 'finance_left': float(p2pproduct.remain),
@@ -557,7 +563,6 @@ class XunleiP2PbyUser(APIView):
             if equity.confirm:
                 income_all += equity.total_interest
 
-
         my_project = []
         result = {
             'income_all': income_all,
@@ -580,7 +585,7 @@ class XunleiP2PbyUser(APIView):
                 'title_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
-                'expected_income': float(p2pequity.unpaid_interest),
+                'expected_income': float(p2pequity.paid_interest),
                 'investment': float(p2pequity.equity),
                 'repayment_progress': float(percent),
             }

@@ -309,17 +309,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       $("#login-modal-form").hide()
       $("#register-modal-form").show()
 
-  $("#invite_top_bar").click () ->
-    backend.userProfile {
-
-    }
-    .done ->
-      window.location.href = $("#invite_top_bar").attr("data-url")
-    .fail (xhr)->
-      if xhr.status == 403
-        window.open('/activity/gold/')
-        return
-
   $("#agreement").change (value)->
     if $(this).attr "checked"
       $("#register_submit").addClass("disabled")
