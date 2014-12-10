@@ -336,7 +336,7 @@ class P2PEyeListAPIView(APIView):
     def get(self, request):
 
         result = {
-            "result_code": -1,
+            "result_code": "-1",
             "result_msg": u"未授权的访问!",
             "page_count": "null",
             "page_index": "null",
@@ -376,12 +376,13 @@ class P2PEyeListAPIView(APIView):
                 percent = p2pproduct.ordered_amount / amount
                 process = percent.quantize(Decimal('0.00'), 'ROUND_DOWN')
 
-                reward = Decimal.from_float(0).quantize(Decimal('0.00'), 'ROUND_DOWN')
+                reward = Decimal.from_float(0).quantize(Decimal('0.0000'), 'ROUND_DOWN')
                 if p2pproduct.activity:
-                    reward = p2pproduct.activity.rule.rule_amount.quantize(Decimal('0.00'), 'ROUND_DOWN')
+                    reward = p2pproduct.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
 
                 rate = p2pproduct.expected_earning_rate + float(reward * 100)
-                rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'), 'ROUND_DOWN')
+
+                rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'))
 
                 obj = {
                     "id": str(p2pproduct.id),
@@ -400,12 +401,12 @@ class P2PEyeListAPIView(APIView):
                     "reward": reward,
                     "guarantee": "null",
                     "start_time": time_from.strftime("%Y-%m-%d %H:%M:%S"),
-                    "end_time": timezone.localtime(p2pproduct.end_time).strftime("%Y-%m-%d %H:%M:%S"),
+                    "end_time": timezone.localtime(p2pproduct.soldout_time).strftime("%Y-%m-%d %H:%M:%S") if p2pproduct.soldout_time else 'null',
                     "invest_num": str(p2pproduct.equities.count()),
                     "c_reward": "null"
                 }
                 loans.append(obj)
-            result.update(loans=loans, page_count=paginator.num_pages, page_index=p2pproducts.number, result_code="1",
+            result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(p2pproducts.number), result_code="1",
                           result_msg=u'获取数据成功!')
         else:
             result.update(result_code='-1', result_msg=u'未授权的访问!')
