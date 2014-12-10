@@ -345,15 +345,6 @@
         return $("#register-modal-form").show();
       }
     });
-    $("#invite_top_bar").click(function() {
-      return backend.userProfile({}).done(function() {
-        return window.location.href = $("#invite_top_bar").attr("data-url");
-      }).fail(function(xhr) {
-        if (xhr.status === 403) {
-          window.open('/activity/gold/');
-        }
-      });
-    });
     $("#agreement").change(function(value) {
       if ($(this).attr("checked")) {
         $("#register_submit").addClass("disabled");
