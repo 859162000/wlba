@@ -2,14 +2,13 @@
 import collections
 import logging
 from decimal import Decimal
+import reversion
 from concurrency.fields import IntegerVersionField
 from django.db import models
-from django.db.models import F, Sum, SET_NULL
+from django.db.models import Sum, SET_NULL
 from django.db.models.signals import post_save
 from django.utils import timezone
-#from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-import reversion
 from order.models import Order
 from wanglibao.fields import JSONFieldUtf8
 from wanglibao.models import ProductBase
@@ -17,7 +16,7 @@ from utility import gen_hash_list
 from wanglibao_margin.models import MarginRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from marketing.models import Activity
-from wanglibao_pay.util import get_a_uuid
+
 
 logger = logging.getLogger(__name__)
 

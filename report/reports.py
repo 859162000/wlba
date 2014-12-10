@@ -109,9 +109,7 @@ class DepositReportGenerator(ReportGeneratorBase):
 
         for pay_info in pay_infos:
 
-            bank_name = ''
-            if pay_info.bank:
-                bank_name = pay_info.bank.name
+            bank_name = pay_info.bank.name if pay_info.bank else ''
 
             writer.writerow([
                 str(pay_info.id),
@@ -150,9 +148,8 @@ class WithDrawReportGenerator(ReportGeneratorBase):
             if payinfo.confirm_time:
                 confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
 
-            bank_name = ''
-            if payinfo.bank:
-                bank_name = payinfo.bank.name
+
+            bank_name = payinfo.bank.name if payinfo.bank else ''
 
             writer.writerow([
                 str(payinfo.id),
@@ -183,9 +180,6 @@ class WithDrawDetailReportGenerator(ReportGeneratorBase):
     @classmethod
     def generate_report_content(cls, start_time, end_time):
 
-        # payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W')\
-        #     .prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
-
         margins = MarginRecord.objects.filter(catalog__icontains=u'取款',
                                               create_time__gte=start_time, create_time__lt=end_time)\
             .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
@@ -198,9 +192,8 @@ class WithDrawDetailReportGenerator(ReportGeneratorBase):
 
         for margin in margins:
 
-            bank_name = ''
-            if margin.payinfo_set.all().first().bank:
-                bank_name = margin.payinfo_set.all().first().bank.name
+            payinfo = margin.payinfo_set.all().first()
+            bank_name = payinfo.bank.name if payinfo.bank else ''
 
             writer.writerow([
                 str(margin.id),
@@ -220,7 +213,6 @@ class WithDrawDetailReportGenerator(ReportGeneratorBase):
                 unicode(margin.payinfo_set.first().status),
                 unicode(margin.payinfo_set.first().uuid)
             ])
-
 
         return output.getvalue()
 

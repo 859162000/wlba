@@ -1,10 +1,12 @@
 # encoding: utf8
-from copy import deepcopy
+
+import time
 from operator import attrgetter
 from decimal import Decimal
 from hashlib import md5
 
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone, dateparse
@@ -231,7 +233,6 @@ class CopyProductView(TemplateView):
         pk = kwargs['id']
         p2p = P2PProduct.objects.get(pk=pk)
 
-
         return {
             "p2p": p2p
         }
@@ -242,10 +243,10 @@ class CopyProductView(TemplateView):
         # new_p2p = deepcopy(p2p)
         new_p2p = P2PProduct()
         new_p2p.id = None
-        new_p2p.name = p2p.name + u"复制"+ get_a_uuid()
-        new_p2p.short_name = p2p.short_name + u"复制"+ get_a_uuid()
-        new_p2p.serial_number = p2p.serial_number + u"复制"+ get_a_uuid()
-        new_p2p.contract_serial_number = p2p.contract_serial_number + u"复制"+ get_a_uuid()
+        new_p2p.name = p2p.name + u"复制" + get_a_uuid()
+        new_p2p.short_name = p2p.short_name + u"复制" + get_a_uuid()
+        new_p2p.serial_number = p2p.serial_number + u"复制" + get_a_uuid()
+        new_p2p.contract_serial_number = p2p.contract_serial_number + u"复制" + get_a_uuid()
         new_p2p.status = u"录标"
         new_p2p.period = p2p.period
         new_p2p.priority = 0
@@ -372,13 +373,14 @@ class P2PEyeListAPIView(APIView):
                 # 进度
                 amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
                 percent = p2pproduct.ordered_amount / amount
-                # process = percent.quantize(Decimal('0.0'), 'ROUND_DOWN')
+                process = percent.quantize(Decimal('0.00'), 'ROUND_DOWN')
 
-                reward = 0
+                reward = Decimal.from_float(0).quantize(Decimal('0.00'), 'ROUND_DOWN')
                 if p2pproduct.activity:
-                    reward = p2pproduct.activity.rule.rule_amount
+                    reward = Decimal.from_float(p2pproduct.activity.rule.rule_amount).quantize(Decimal('0.00'), 'ROUND_DOWN')
+
                 rate = p2pproduct.expected_earning_rate + float(reward * 100)
-                rate = rate / 100
+                rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'), 'ROUND_DOWN')
 
                 obj = {
                     "id": str(p2pproduct.id),
@@ -389,17 +391,17 @@ class P2PEyeListAPIView(APIView):
                     "status": status,
                     "userid": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
                     "c_type": u"抵押标" if p2pproduct.category == u'证大速贷' else u"信用标",
-                    "amount": str(p2pproduct.total_amount),
-                    "rate": str(rate),
+                    "amount": amount,
+                    "rate": rate,
                     "period": u'{}个月'.format(p2pproduct.period),
                     "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0)),
-                    "process": percent,
-                    "reward": str(reward),
+                    "process": process,
+                    "reward": reward,
                     "guarantee": "null",
                     "start_time": time_from.strftime("%Y-%m-%d %H:%M:%S"),
                     "end_time": timezone.localtime(p2pproduct.end_time).strftime("%Y-%m-%d %H:%M:%S"),
                     "invest_num": str(p2pproduct.equities.count()),
-                    "c_reward": "0"
+                    "c_reward": "null"
                 }
                 loans.append(obj)
             result.update(loans=loans, page_count=paginator.num_pages, page_index=p2pproducts.number, result_code="1",
@@ -418,11 +420,10 @@ class P2PEyeEquityAPIView(APIView):
             "result_msg": u"未授权的访问!",
             "page_count": "null",
             "page_index": "null",
-            "data": "null"
+            "loans": "null"
         }
         try:
             id = int(request.GET.get('id'))
-
             id_query = Q(id=id)
         except:
             result.update(result_code=-2, result_msg=u'id参数不存在或者格式错误')
@@ -456,7 +457,7 @@ class P2PEyeEquityAPIView(APIView):
         if not equities:
             return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
-        data = []
+        loans = []
         for eq in equities:
             obj = {
                 "id": str(p2pproduct.id),
@@ -470,9 +471,118 @@ class P2PEyeEquityAPIView(APIView):
                 "status": u"成功",
                 "add_time": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             }
-            data.append(obj)
-        result.update(data=data, page_count=str(paginator.num_pages), page_index=str(equities.number), result_code="1",
+            loans.append(obj)
+        result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(equities.number), result_code="1",
                       result_msg=u'获取数据成功!')
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+
+class XunleiP2PListAPIView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        now = time.mktime(timezone.now().timetuple())
+        uid = request.GET.get('xluid')
+        project_list = []
+
+        result = {
+            'timestamp': now,
+            'project_list': project_list
+        }
+        p2pproducts = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(status=u'正在招标')[0:5]
+
+        for p2pproduct in p2pproducts:
+            income = Decimal('0')
+            amorts = p2pproduct.amortizations.all()
+            for amort in amorts:
+                income += amort.interest
+            income = income / 10000
+            income = float(income.quantize(Decimal('0.00')))
+
+            # 进度
+            amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
+            percent = (p2pproduct.ordered_amount / amount) * 100
+            percent = percent.quantize(Decimal('0.00'))
+
+
+            obj = {
+                'id': p2pproduct.id,
+                'title': p2pproduct.name,
+                'title_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
+                'rate_year': p2pproduct.expected_earning_rate,
+                'rate_vip': float(p2pproduct.activity.rule.rule_amount * 100) if p2pproduct.activity else 0,
+                'income': income,
+                'finance': float(p2pproduct.total_amount),
+                'min_invest': float(p2pproduct.limit_amount_per_user),
+                'guarantor': p2pproduct.warrant_company.name,
+                'finance_progress': float(percent),
+                'finance_left': float(p2pproduct.remain),
+                'repayment_period': p2pproduct.period * 30,
+                'repayment_type': P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0),
+                'buy_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
+                'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
+                'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
+                # 'repayment_time': time.mktime(timezone.localtime(amorts.first().term_date).timetuple()),
+                'status': p2pproduct.status
+            }
+            project_list.append(obj)
+        result.update(project_list=project_list)
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+
+class XunleiP2PbyUser(APIView):
+    permission_classes = ()
+
+    def get(self, reqeust):
+        uid = reqeust.GET.get('xluid')
+        if not uid:
+            return HttpResponse(
+                renderers.JSONRenderer().render({'code': -1, 'message': u'xluid错误'}, 'application/json'))
+        try:
+            user = User.objects.get(binding__bid=uid)
+        except:
+            return HttpResponse(
+                renderers.JSONRenderer().render({'code': -1,
+                                                 'message': u'该用户没有绑定wanglibao用户'}, 'application/json'))
+
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+        ]).select_related('product')
+
+        income_all = 0
+        for equity in p2p_equities:
+            if equity.confirm:
+                income_all += equity.total_interest
+
+
+        my_project = []
+        result = {
+            'income_all': income_all,
+            'my_project': my_project
+        }
+
+        p2pequities = p2p_equities.filter(product__status=u'正在招标')
+
+        for p2pequity in p2pequities:
+            p2pproduct = p2pequity.product
+
+            # 进度
+            amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
+            percent = (p2pproduct.ordered_amount / amount) * 100
+            percent = percent.quantize(Decimal('0.00'))
+
+            obj = {
+                'id': p2pproduct.id,
+                'title': p2pproduct.name,
+                'title_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
+                'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
+                'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
+                'expected_income': float(p2pequity.unpaid_interest),
+                'investment': float(p2pequity.equity),
+                'repayment_progress': float(percent),
+            }
+            my_project.append(obj)
+        result.update(my_project=my_project)
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
@@ -768,7 +878,7 @@ def preview_contract(request, id):
     product = P2PProduct.objects.filter(id=id).first()
     if not product:
         # if product.status == u'录标' or product.status == u'录标完成':
-        #         return HttpResponse(u'<h3 style="color:red;">【录标完成】之后才能进行合同预览！</h3>')
+        # return HttpResponse(u'<h3 style="color:red;">【录标完成】之后才能进行合同预览！</h3>')
         # else:
         return HttpResponse(u'<h3 style="color:red;">没有该产品或产品信息错误！</h3>')
 

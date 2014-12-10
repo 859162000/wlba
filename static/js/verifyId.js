@@ -21,10 +21,6 @@
     }, '请输入有效身份证');
     $('#validate_id_form').validate({
       rules: {
-        captcha_1: {
-          required: true,
-          minlength: 1
-        },
         name: {
           required: true
         },

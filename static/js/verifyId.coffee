@@ -19,9 +19,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', 'tools'], ($, 
 
   $('#validate_id_form').validate
     rules:
-      captcha_1:
-        required: true
-        minlength: 1
+#      captcha_1:
+#        required: true
+#        minlength: 1
       name:
         required: true
       id_number:
