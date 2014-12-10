@@ -519,7 +519,7 @@ class XunleiP2PListAPIView(APIView):
                 'rate_vip': float(p2pproduct.activity.rule.rule_amount * 100) if p2pproduct.activity else 0,
                 'income': income,
                 'finance': float(p2pproduct.total_amount),
-                'min_invest': float(p2pproduct.limit_amount_per_user),
+                'min_invest': float(100.00),
                 'guarantor': p2pproduct.warrant_company.name,
                 'finance_progress': float(percent),
                 'finance_left': float(p2pproduct.remain),
@@ -559,7 +559,6 @@ class XunleiP2PbyUser(APIView):
         for equity in p2p_equities:
             if equity.confirm:
                 income_all += equity.total_interest
-
 
         my_project = []
         result = {
