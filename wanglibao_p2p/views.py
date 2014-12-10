@@ -431,7 +431,6 @@ class P2PEyeEquityAPIView(APIView):
 
         # 验证日期
         time_from, result = validate_date(request, result, 'time_from')
-
         time_to, result = validate_date(request, result, 'time_to')
 
         # 构造日期查询语句
