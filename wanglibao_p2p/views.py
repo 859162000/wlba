@@ -356,6 +356,7 @@ class P2PEyeListAPIView(APIView):
         time_to, result = validate_date(request, result, 'time_to')
         if not time_to:
             return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
         # 构造日期查询语句
         publish_query = Q(publish_time__range=(time_from, time_to))
 
@@ -377,7 +378,7 @@ class P2PEyeListAPIView(APIView):
 
                 reward = Decimal.from_float(0).quantize(Decimal('0.00'), 'ROUND_DOWN')
                 if p2pproduct.activity:
-                    reward = Decimal.from_float(p2pproduct.activity.rule.rule_amount).quantize(Decimal('0.00'), 'ROUND_DOWN')
+                    reward = p2pproduct.activity.rule.rule_amount.quantize(Decimal('0.00'), 'ROUND_DOWN')
 
                 rate = p2pproduct.expected_earning_rate + float(reward * 100)
                 rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'), 'ROUND_DOWN')
