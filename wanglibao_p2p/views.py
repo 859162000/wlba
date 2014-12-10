@@ -4,6 +4,7 @@ import time
 from operator import attrgetter
 from decimal import Decimal
 from hashlib import md5
+import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
@@ -486,7 +487,7 @@ class XunleiP2PListAPIView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        now = time.mktime(timezone.now().timetuple())
+        now = time.mktime(datetime.datetime.now().timetuple())
         uid = request.GET.get('xluid')
         project_list = []
 
