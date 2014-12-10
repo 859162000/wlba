@@ -582,7 +582,7 @@ class XunleiP2PbyUser(APIView):
                 'title_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
-                'expected_income': float(p2pequity.unpaid_interest),
+                'expected_income': float(p2pequity.paid_interest),
                 'investment': float(p2pequity.equity),
                 'repayment_progress': float(percent),
             }
