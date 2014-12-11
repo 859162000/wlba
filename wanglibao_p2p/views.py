@@ -499,7 +499,7 @@ class XunleiP2PListAPIView(APIView):
             'project_list': project_list
         }
         p2pproducts = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
-            status=u'正在招标').filter('-priority')[0:5]
+            status=u'正在招标').order_by('-priority')[0:5]
 
         for p2pproduct in p2pproducts:
             income = Decimal('0')
