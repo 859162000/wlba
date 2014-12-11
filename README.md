@@ -71,6 +71,18 @@ Deploy
 	Fast deploy, add one parameter fast=true
     $ staging: fab deploy --set group=staging,fast=true
 
+    deploy new
+    $ cd deploy
+
+    deploy all
+    $ fab -f depoly.py depoly_www
+    deploy static
+    $ fab -f depoly.py depoly_static
+    deploy web
+    $ fab -f depoly.py depoly_web
+    deploy mq
+    $ fab -f depoly.py depoly_mq
+
 Query example
 -------------------
 log in to web server through ssh, then run
