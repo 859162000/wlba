@@ -502,11 +502,11 @@ class XunleiP2PListAPIView(APIView):
             status=u'正在招标').order_by('-priority')[0:5]
 
         for p2pproduct in p2pproducts:
-            income = Decimal('0')
-            amorts = p2pproduct.amortizations.all()
-            for amort in amorts:
-                income += amort.interest
-            income = income / 10000
+
+            rate_vip = p2pproduct.activity.rule.rule_amount * 100 if p2pproduct.activity else 0
+            rate_total = Decimal.from_float(p2pproduct.expected_earning_rate) + rate_vip
+
+            income = 10000 * rate_total * Decimal(p2pproduct.period) / (12 * 100)
             income = float(income.quantize(Decimal('0.00')))
 
             # 进度
@@ -519,7 +519,7 @@ class XunleiP2PListAPIView(APIView):
                 'title': p2pproduct.name,
                 'title_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
                 'rate_year': p2pproduct.expected_earning_rate,
-                'rate_vip': float(p2pproduct.activity.rule.rule_amount * 100) if p2pproduct.activity else 0,
+                'rate_vip': float(rate_vip),
                 'income': income,
                 'finance': float(p2pproduct.total_amount),
                 'min_invest': float(100.00),
