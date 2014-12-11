@@ -574,11 +574,6 @@ class XunleiP2PbyUser(APIView):
         for p2pequity in p2pequities:
             p2pproduct = p2pequity.product
 
-            # 进度
-            amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
-            percent = (p2pproduct.ordered_amount / amount) * 100
-            percent = percent.quantize(Decimal('0.00'))
-
             obj = {
                 'id': p2pproduct.id,
                 'title': p2pproduct.name,
@@ -587,7 +582,6 @@ class XunleiP2PbyUser(APIView):
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
                 'expected_income': float(p2pequity.paid_interest),
                 'investment': float(p2pequity.equity),
-                'repayment_progress': float(percent),
             }
             my_project.append(obj)
         result.update(my_project=my_project)
