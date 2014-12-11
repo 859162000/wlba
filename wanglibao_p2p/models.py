@@ -36,10 +36,10 @@ class ContractTemplate(models.Model):
     name = models.CharField(u'名字', max_length=32)
     content = models.TextField(u'模板内容（真实合同）', default='')
     content_preview = models.TextField(verbose_name=u'模板内容（预览合同）', default='')
-    party_c = models.CharField(verbose_name=u'丙方（推荐方/服务方/代偿方）', max_length=128, help_text=u'丙方（推荐方/服务方/代偿方）', default='')
-    party_c_name = models.CharField(verbose_name=u'法定代表人', max_length=32, help_text=u'法定代表人', default='')
-    party_c_addr = models.CharField(verbose_name=u'地址', max_length=128, help_text=u'地址', default='')
-    available_bank = models.CharField(verbose_name=u'支持开户行', max_length=1128, help_text=u'支持开户行', default='')
+    party_c = models.CharField(verbose_name=u'丙方（推荐方/服务方/代偿方）', blank=True, max_length=128, help_text=u'丙方（推荐方/服务方/代偿方）', default='')
+    party_c_name = models.CharField(verbose_name=u'法定代表人', blank=True, max_length=32, help_text=u'法定代表人', default='')
+    party_c_addr = models.CharField(verbose_name=u'地址', blank=True, max_length=128, help_text=u'地址', default='')
+    available_bank = models.CharField(verbose_name=u'支持开户行', blank=True, max_length=1128, help_text=u'支持开户行', default='')
 
 
     class Meta:
