@@ -144,6 +144,12 @@ def depoly_static_action():
             else:
                 run('git checkout %s' % env.branch)
                 run('git pull origin %s' % env.branch)
+    with settings(warn_only=True):
+        rs = run("ps aux|grep nginx|grep -v 'grep'")
+        print yellow("check nginx daemon")
+        if rs.return_code >= 0:
+            sudo("sudo /usr/local/nginx/sbin/nginx")
+            run("ps aux|grep nginx")
 
 @roles("mq")
 def depoly_mq_action():
@@ -181,6 +187,52 @@ def depoly_mq_action():
         else:
             sudo("supervisord -c /etc/supervisord.conf")
             run("ps aux|grep python")
+    print yellow("update crontab job")
+    with cd("/var/www/wanglibao"):
+        fund, income, info, cmd = config_crontab()
+        put(StringIO(fund), 'scrawl_job')
+        put(StringIO(income), 'sync_sm_income')
+        put(StringIO(info), 'sync_sm_info')
+        put(StringIO(cmd), '/tmp/tmp_tab')
+        run("chmod +x scrawl_job")
+        run("chmod +x sync_sm_income")
+        run("chmod +x sync_sm_info")
+        run("crontab /tmp/tmp_tab")
+
+def config_crontab():
+    cron_str = """
+#!/bin/bash
+cd /var/www/wanglibao/
+source virt-wanglibao/bin/activate
+cd wanglibao-backend
+"""
+    fund_str = cron_str + """
+#update fund
+date >> /var/log/wanglibao/scrawl.log
+python manage.py run_robot &>> /var/log/wanglibao/scrawl.log
+python manage.py scrawl_fund &>> /var/log/wanglibao/scrawl.log
+date >> /var/log/wanglibao/scrawl.log
+"""
+    income_str = cron_str + """
+#update shumi income
+date >> /var/log/wanglibao/sync_sm.log
+python manage.py syncsm -i &>> /var/log/wanglibao/sync_sm.log
+date >> /var/log/wanglibao/sync_sm.log
+"""
+    info_str = cron_str + """
+#update shumi info
+date >> /var/log/wanglibao/sync_sm.log
+python manage.py syncsm -f &>> /var/log/wanglibao/sync_sm.log
+python manage.py syncsm -m &>> /var/log/wanglibao/sync_sm.log
+date >> /var/log/wanglibao/sync_sm.log
+"""
+    cron_command = """
+SHELL=/bin/bash
+0 0 * * * /var/www/wanglibao/scrawl_job
+0 */1 * * * /var/www/wanglibao/sync_sm_info >/dev/null 2>&1
+0 18-23/1 * * * /var/www/wanglibao/sync_sm_income >/dev/null 2>&1
+"""
+    return fund_str, income_str, info_str, cron_command
 
 #更新消息队列
 def depoly_mq():
