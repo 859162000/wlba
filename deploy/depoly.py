@@ -147,7 +147,7 @@ def depoly_static_action():
     with settings(warn_only=True):
         rs = run("ps aux|grep nginx|grep -v 'grep'")
         print yellow("check nginx daemon")
-        if rs.return_code >= 0:
+        if rs.return_code == 0:
             sudo("sudo /usr/local/nginx/sbin/nginx")
             run("ps aux|grep nginx")
 
