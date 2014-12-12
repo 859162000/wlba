@@ -50,7 +50,8 @@ class BankListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(BankListView, self).get_context_data(**kwargs)
 
-        default_bank = Bank.get_deposit_banks().filter(name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
+        default_bank = Bank.get_deposit_banks().filter(
+            name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
 
         context.update({
             'default_bank': default_bank,
@@ -72,7 +73,7 @@ class PayView(TemplateView):
         message = ''
         try:
             amount_str = request.POST.get('amount', '')
-            amount = decimal.Decimal(amount_str).\
+            amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             amount_str = str(amount)
             if amount <= 0:
@@ -152,7 +153,8 @@ class PayCompleteView(TemplateView):
         })
         # 迅雷活动, 12.8 首次充值
         start_time = timezone.datetime(2014, 12, 7)
-        if PayInfo.objects.filter(user=request.user, type='D', create_time__gt=start_time, status=PayInfo.SUCCESS).count() == 1:
+        if PayInfo.objects.filter(user=request.user, type='D', create_time__gt=start_time,
+                                  status=PayInfo.SUCCESS).count() == 1:
             rs = RewardStrategy(request.user)
             rs.reward_user(u'三天迅雷会员')
 
@@ -255,12 +257,12 @@ class WithdrawCompleteView(TemplateView):
                 'phones': [request.user.wanglibaouserprofile.phone],
                 'messages': [messages.withdraw_submitted(amount, timezone.now())]
             })
-            title,content = messages.msg_withdraw(timezone.now(), amount)
+            title, content = messages.msg_withdraw(timezone.now(), amount)
             inside_message.send_one.apply_async(kwargs={
-                "user_id":request.user.id,
-                "title":title,
-                "content":content,
-                "mtype":"withdraw"
+                "user_id": request.user.id,
+                "title": title,
+                "content": content,
+                "mtype": "withdraw"
             })
         except decimal.DecimalException:
             result = u'提款金额在0～50000之间'
@@ -306,9 +308,9 @@ class CardViewSet(ModelViewSet):
             card.no = no
         else:
             return Response({
-                "message": u"银行账号不能为空",
-                'error_number': ErrorNumber.card_number_error
-            }, status=status.HTTP_400_BAD_REQUEST)
+                                "message": u"银行账号不能为空",
+                                'error_number': ErrorNumber.card_number_error
+                            }, status=status.HTTP_400_BAD_REQUEST)
 
         is_default = request.DATA.get('is_default', False)
 
@@ -318,33 +320,32 @@ class CardViewSet(ModelViewSet):
             card.is_default = False
         else:
             return Response({
-                "message": u"设置是否默认银行卡错误",
-                'error_number': ErrorNumber.card_isdefault_error
-            }, status=status.HTTP_400_BAD_REQUEST)
-
+                                "message": u"设置是否默认银行卡错误",
+                                'error_number': ErrorNumber.card_isdefault_error
+                            }, status=status.HTTP_400_BAD_REQUEST)
 
         if not re.match('^[\d]{0,25}$', card.no):
             return Response({
-                "message": u"银行账号超过长度",
-                'error_number': ErrorNumber.form_error
-            }, status=status.HTTP_400_BAD_REQUEST)
+                                "message": u"银行账号超过长度",
+                                'error_number': ErrorNumber.form_error
+                            }, status=status.HTTP_400_BAD_REQUEST)
 
         bank_id = request.DATA.get('bank', '')
 
         exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
         if exist_cards:
             return Response({
-                "message": u"该银行卡已经存在",
-                'error_number': ErrorNumber.duplicate
-            }, status=status.HTTP_400_BAD_REQUEST)
+                                "message": u"该银行卡已经存在",
+                                'error_number': ErrorNumber.duplicate
+                            }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             card.bank = Bank.objects.get(pk=bank_id)
         except:
             return Response({
-                "message": u"没有找到该银行",
-                'error_number': ErrorNumber.not_find
-            }, status=status.HTTP_400_BAD_REQUEST)
+                                "message": u"没有找到该银行",
+                                'error_number': ErrorNumber.not_find
+                            }, status=status.HTTP_400_BAD_REQUEST)
 
         card.save()
 
@@ -361,13 +362,13 @@ class CardViewSet(ModelViewSet):
         if card:
             card.delete()
             return Response({
-            'id': card_id
-             })
+                'id': card_id
+            })
         else:
             return Response({
-                "message": u"查不到银行卡，请联系管理员",
-                'error_number': ErrorNumber.duplicate
-            }, status=status.HTTP_400_BAD_REQUEST)
+                                "message": u"查不到银行卡，请联系管理员",
+                                'error_number': ErrorNumber.duplicate
+                            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class WithdrawTransactions(TemplateView):
@@ -395,7 +396,8 @@ class WithdrawTransactions(TemplateView):
             for payinfo in payinfos:
                 with transaction.atomic():
                     if payinfo.status != PayInfo.ACCEPTED and payinfo.status != PayInfo.PROCESSING:
-                        logger.info("The withdraw status [%s] not in %s or %s, ignore it" % (payinfo.status, PayInfo.ACCEPTED, PayInfo.PROCESSING))
+                        logger.info("The withdraw status [%s] not in %s or %s, ignore it" % (
+                        payinfo.status, PayInfo.ACCEPTED, PayInfo.PROCESSING))
                         continue
 
                     marginKeeper = MarginKeeper(payinfo.user)
@@ -404,13 +406,13 @@ class WithdrawTransactions(TemplateView):
                     payinfo.status = PayInfo.SUCCESS
                     payinfo.confirm_time = timezone.now()
                     payinfo.save()
-                    #发站内信
-                    title,content = messages.msg_withdraw_success(timezone.now(), payinfo.amount)
+                    # 发站内信
+                    title, content = messages.msg_withdraw_success(timezone.now(), payinfo.amount)
                     inside_message.send_one.apply_async(kwargs={
-                        "user_id":payinfo.user_id,
-                        "title":title,
-                        "content":content,
-                        "mtype":"withdraw"
+                        "user_id": payinfo.user_id,
+                        "title": title,
+                        "content": content,
+                        "mtype": "withdraw"
                     })
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
@@ -438,7 +440,7 @@ class WithdrawRollback(TemplateView):
             })
 
         marginKeeper = MarginKeeper(payinfo.user)
-        marginKeeper.withdraw_rollback(payinfo.amount,error_message)
+        marginKeeper.withdraw_rollback(payinfo.amount, error_message)
         payinfo.status = PayInfo.FAIL
         payinfo.error_message = error_message
         payinfo.confirm_time = None
@@ -449,12 +451,12 @@ class WithdrawRollback(TemplateView):
             "messages": [messages.withdraw_failed(error_message)]
         })
 
-        title,content = messages.msg_withdraw_fail(timezone.now(), payinfo.amount)
+        title, content = messages.msg_withdraw_fail(timezone.now(), payinfo.amount)
         inside_message.send_one.apply_async(kwargs={
-            "user_id":payinfo.user.id,
-            "title":title,
-            "content":content,
-            "mtype":"withdraw"
+            "user_id": payinfo.user.id,
+            "title": title,
+            "content": content,
+            "mtype": "withdraw"
         })
 
         return HttpResponse({
@@ -467,6 +469,7 @@ class WithdrawRollback(TemplateView):
         Only user with change payinfo permission can call this view
         """
         return super(WithdrawRollback, self).dispatch(request, *args, **kwargs)
+
 
 class AdminTransaction(TemplateView):
     template_name = 'admin_transaction.jade'
@@ -497,7 +500,6 @@ class AdminTransactionP2P(TemplateView):
                 page = 1
             trade_records = pager.page(page)
 
-
             return {
                 "pay_records": trade_records,
                 "phone": phone
@@ -517,7 +519,6 @@ class AdminTransactionP2P(TemplateView):
 
 
 class AdminTransactionWithdraw(TemplateView):
-
     template_name = 'admin_transaction_withdraw.jade'
 
 
@@ -562,7 +563,6 @@ class AdminTransactionWithdraw(TemplateView):
 
 
 class AdminTransactionDeposit(TemplateView):
-
     template_name = 'admin_transaction_deposit.jade'
 
     def get_context_data(self, **kwargs):
@@ -627,14 +627,15 @@ class LianlianAppPayCallbackView(APIView):
         return Response(result)
 """
 
-#易宝支付创建订单接口
+# 易宝支付创建订单接口
 class YeePayAppPayView(APIView):
     permission_classes = (IsAuthenticated, )
-    
+
     def post(self, request):
         yeepay = third_pay.YeePay()
         result = yeepay.app_pay(request)
         return Response(result)
+
 
 #易宝支付回调
 class YeePayAppPayCallbackView(APIView):
@@ -659,11 +660,12 @@ class YeePayAppPayCallbackView(APIView):
 
                 # 迅雷活动, 12.8 首次充值
                 start_time = timezone.datetime(2014, 12, 7)
-                if PayInfo.objects.filter(user=user, type='D', create_time__gt=start_time, status=PayInfo.SUCCESS).count() == 1:
+                if PayInfo.objects.filter(user=user, type='D', create_time__gt=start_time,
+                                          status=PayInfo.SUCCESS).count() == 1:
                     rs = RewardStrategy(user)
                     rs.reward_user(u'三天迅雷会员')
-
         return Response(result)
+
 
 #易宝支付同步回调
 class YeePayAppPayCompleteView(TemplateView):
@@ -680,18 +682,19 @@ class YeePayAppPayCompleteView(TemplateView):
             msg = u"充值成功"
             amount = result['amount']
             if result['message'] == "success":
-                title,content = messages.msg_pay_ok(amount)
+                title, content = messages.msg_pay_ok(amount)
                 inside_message.send_one.apply_async(kwargs={
-                    "user_id":result['uid'],
-                    "title":title,
-                    "content":content,
-                    "mtype":"activityintro"
+                    "user_id": result['uid'],
+                    "title": title,
+                    "content": content,
+                    "mtype": "activityintro"
                 })
 
         return self.render_to_response({
             'result': msg,
             'amount': amount
         })
+
 
 class BankCardAddView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -700,12 +703,14 @@ class BankCardAddView(APIView):
         result = third_pay.add_bank_card(request)
         return Response(result)
 
+
 class BankCardListView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
         result = third_pay.list_bank_card(request)
         return Response(result)
+
 
 class BankCardDelView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -714,6 +719,7 @@ class BankCardDelView(APIView):
         result = third_pay.del_bank_card(request)
         return Response(result)
 
+
 class BankListAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -721,23 +727,25 @@ class BankListAPIView(APIView):
         result = third_pay.list_bank(request)
         return Response(result)
 
+
 class FEEAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        amount = request.DATA.get("amount","").strip()
+        amount = request.DATA.get("amount", "").strip()
         if not amount:
-            return Response({"ret_code":30131, "message":"请输入金额"})
+            return Response({"ret_code": 30131, "message": "请输入金额"})
 
         try:
             float(amount)
         except:
-            return {"ret_code":30132, 'message':'金额格式错误'}
+            return {"ret_code": 30132, 'message': '金额格式错误'}
 
         amount = util.fmt_two_amount(amount)
         #计算费率
 
-        return Response({"ret_code":0, "fee":0})
+        return Response({"ret_code": 0, "fee": 0})
+
 
 class WithdrawAPIView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -750,6 +758,7 @@ class WithdrawAPIView(APIView):
                 'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
             })
         return Response(result)
+
 
 """
 class LianlianWithdrawAPIView(APIView):
