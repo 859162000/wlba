@@ -151,12 +151,9 @@ class PayCompleteView(TemplateView):
             "content": content,
             "mtype": "activityintro"
         })
-        # 迅雷活动, 12.8 首次充值
-        start_time = timezone.datetime(2014, 12, 7)
-        if PayInfo.objects.filter(user=request.user, type='D', create_time__gt=start_time,
-                                  status=PayInfo.SUCCESS).count() == 1:
-            rs = RewardStrategy(request.user)
-            rs.reward_user(u'三天迅雷会员')
+
+
+
 
         return self.render_to_response({
             'result': result,
@@ -172,6 +169,7 @@ class PayCallback(View):
     def post(self, request, *args, **kwargs):
         HuifuPay.handle_pay_result(request)
         order_id = request.POST.get('OrdId', '')
+
         return HttpResponse('RECV_ORD_ID_' + order_id)
 
     @method_decorator(csrf_exempt)
