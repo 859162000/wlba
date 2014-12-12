@@ -13,7 +13,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal'], function($, _, backend, calculator, countdown, tool, modal) {
+  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate"], function($, _, backend, calculator, countdown, tool, modal) {
     var buildTable;
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0 && !/\./ig.test(value);
@@ -166,3 +166,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=p2p_detail.map

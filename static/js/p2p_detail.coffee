@@ -9,7 +9,7 @@ require.config
   shims:
     "jquery.validate": ['jquery']
 
-require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal'], ($, _, backend, calculator, countdown, tool, modal)->
+require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate"], ($, _, backend, calculator, countdown, tool, modal)->
 
   $.validator.addMethod 'dividableBy100', (value, element)->
     return value % 100 == 0 && !/\./ig.test(value)
