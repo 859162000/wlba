@@ -574,13 +574,17 @@ class XunleiP2PbyUser(APIView):
         for p2pequity in p2pequities:
             p2pproduct = p2pequity.product
 
+            rate_vip = p2pproduct.activity.rule.rule_amount * 100 if p2pproduct.activity else 0
+            rate_total = Decimal.from_float(p2pproduct.expected_earning_rate) + rate_vip
+            expected_income = p2pequity.equity * rate_total * p2pproduct.period / (12 * 100)
+
             obj = {
                 'id': p2pproduct.id,
                 'title': p2pproduct.name,
                 'title_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
-                'expected_income': float(p2pequity.paid_interest),
+                'expected_income': float(expected_income),
                 'investment': float(p2pequity.equity),
             }
             my_project.append(obj)
