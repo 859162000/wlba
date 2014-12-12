@@ -7,7 +7,7 @@ require.config
     'jquery.modal': 'lib/jquery.modal.min'
 
   shims:
-    "jquery.validate": ['jquery']
+    "jquery.validate": ['jquery.validate']
 
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate"], ($, _, backend, calculator, countdown, tool, modal)->
 

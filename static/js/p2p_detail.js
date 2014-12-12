@@ -9,7 +9,7 @@
       'jquery.modal': 'lib/jquery.modal.min'
     },
     shims: {
-      "jquery.validate": ['jquery']
+      "jquery.validate": ['jquery.validate']
     }
   });
 
