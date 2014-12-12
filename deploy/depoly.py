@@ -217,14 +217,14 @@ date >> /var/log/wanglibao/scrawl.log
 #update shumi income
 date >> /var/log/wanglibao/sync_sm.log
 python manage.py syncsm -i &>> /var/log/wanglibao/sync_sm.log
-date >> /var/log/wanglibao/sync_sm.log
+date >> /var/log/wanglibao/sync_sm_i.log
 """
     info_str = cron_str + """
 #update shumi info
 date >> /var/log/wanglibao/sync_sm.log
 python manage.py syncsm -f &>> /var/log/wanglibao/sync_sm.log
 python manage.py syncsm -m &>> /var/log/wanglibao/sync_sm.log
-date >> /var/log/wanglibao/sync_sm.log
+date >> /var/log/wanglibao/sync_sm_fm.log
 """
     cron_command = """
 SHELL=/bin/bash
