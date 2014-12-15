@@ -49,7 +49,7 @@ class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin, ImportExportModelAdm
     list_display = ('id', 'username', 'phone', 'name', 'utype', 'id_num', 'is_active', 'date_joined', 'is_staff')
     list_display_links = ('id', 'username', 'phone')
     list_filter = ('wanglibaouserprofile__utype', 'is_staff', 'is_superuser', 'is_active', 'groups')
-    search_fields = ['wanglibaouserprofile__phone', 'wanglibaouserprofile__id_number', 'wanglibaouserprofile__name']
+    search_fields = ['username', 'wanglibaouserprofile__phone', 'wanglibaouserprofile__id_number', 'wanglibaouserprofile__name']
     resource_class = UserResource
 
 
