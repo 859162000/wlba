@@ -119,7 +119,7 @@ class P2PTrader(object):
                     "messages": [messages.jiuxian_invited(money=30)]
                 })
 
-                title, content = messages.msg_jiuxian(invited_phone)
+                title, content = messages.msg_jiuxian()
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": jiuxian_introduce.user.id,
                     "title": title,
