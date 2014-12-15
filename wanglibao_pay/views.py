@@ -144,17 +144,6 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
-        title, content = messages.msg_pay_ok(amount)
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": request.user.id,
-            "title": title,
-            "content": content,
-            "mtype": "activityintro"
-        })
-
-
-
-
         return self.render_to_response({
             'result': result,
             'amount': amount
@@ -762,6 +751,14 @@ class WithdrawAPIView(APIView):
             send_messages.apply_async(kwargs={
                 'phones': [result['phone']],
                 'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
+            })
+
+            title, content = messages.msg_withdraw(timezone.now(), result['amount'])
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": title,
+                "content": content,
+                "mtype": "withdraw"
             })
         return Response(result)
 
