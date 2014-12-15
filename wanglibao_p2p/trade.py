@@ -55,6 +55,8 @@ class P2PTrader(object):
             if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
                 rs.reward_user(u'一个月迅雷会员')
 
+        # todo: merger the code about activity,remove the rubbish code
+
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
 
         # phone_verified 渠道客户判断
