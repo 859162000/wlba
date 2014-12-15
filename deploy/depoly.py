@@ -124,7 +124,11 @@ def depoly_web_action():
             sudo("supervisorctl restart all")
         else:
             sudo("supervisord -c /etc/supervisord.conf")
-            run("ps aux|grep python")
+        rs = run("ps aux|grep wanglibao|grep -v 'grep'")
+        if rs.return_code >= 0:
+            put("supervisord.conf", "~/supervisord.conf")
+            sudo("cp ~/supervisord.conf /etc/supervisord.conf")
+            sudo("supervisorctl reload")
 
 @roles("lb")
 def depoly_static_action():
@@ -147,9 +151,22 @@ def depoly_static_action():
     with settings(warn_only=True):
         rs = run("ps aux|grep nginx|grep -v 'grep'")
         print yellow("check nginx daemon")
-        if rs.return_code >= 0:
+        if rs.return_code > 0:
             sudo("sudo /usr/local/nginx/sbin/nginx")
             run("ps aux|grep nginx")
+
+@roles("lb")
+def depoly_restart_nginx():
+    put("www.wanglibao.com", "~/www.wanglibao.com")
+    sudo("cp ~/www.wanglibao.com /usr/local/nginx/sites-enabled/www.wanglibao.com")
+    with settings(warn_only=True):
+        rs = run("ps aux|grep nginx|grep -v 'grep'")
+        print yellow("check nginx daemon")
+        if rs.return_code > 0:
+            sudo("sudo /usr/local/nginx/sbin/nginx")
+        else:
+            sudo("sudo /usr/local/nginx/sbin/nginx -s reload")
+        run("ps aux|grep nginx")
 
 @roles("mq")
 def depoly_mq_action():

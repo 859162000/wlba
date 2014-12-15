@@ -19,7 +19,7 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder', 'underscore'], function($, modal, backend, validate, tool, complexify, placeholder, _) {
-    var checkMobile, container, csrfSafeMethod, getCookie, msg_count, sameOrigin, _showModal;
+    var checkMobile, container, csrfSafeMethod, getCookie, sameOrigin, url, _showModal;
     getCookie = function(name) {
       var cookie, cookieValue, cookies, i;
       cookieValue = null;
@@ -58,7 +58,7 @@
     $.validator.addMethod("emailOrPhone", function(value, element) {
       return backend.checkEmail(value) || backend.checkMobile(value);
     });
-    $('#login-modal-form').validate({
+    $('#login-cjdao-form').validate({
       rules: {
         identifier: {
           required: true,
@@ -98,9 +98,9 @@
         }
         $('#login_submit').addClass('disabled');
         return $.ajax({
-          url: $('#login-modal-form').attr('action'),
+          url: $('#login-cjdao-form').attr('action'),
           type: "POST",
-          data: $("#login-modal-form").serialize()
+          data: $("#login-cjdao-form").serialize()
         }).done(function(data, textStatus) {
           var arr, next_url;
           next_url = '';
@@ -119,13 +119,13 @@
           error_message = _.chain(message).pairs().map(function(e) {
             return e[1];
           }).flatten().value();
-          $('.captcha-refresh', '#login-modal-form').trigger('click');
+          $('.captcha-refresh', '#login-cjdao-form').trigger('click');
           alert(error_message);
           return $('#login_submit').removeClass('disabled');
         });
       }
     });
-    $('#register-modal-form').validate({
+    $('#register-cjdao-form').validate({
       rules: {
         identifier: {
           required: true,
@@ -297,36 +297,13 @@
         return container.addClass('strong');
       }
     });
-    $('.login-modal').click(function(e) {
-      var url;
-      $("#tab-login").addClass('active');
-      $("#tab-register").removeClass('active');
-      $("#login-modal-form").show();
-      $("#register-modal-form").hide();
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
-      $.getJSON(url, {}, function(json) {
-        $('input[name="captcha_0"]').val(json.key);
-        return $('img.captcha').attr('src', json.image_url);
-      });
-      e.preventDefault();
-      return $(this).modal();
-    });
-    $('.register-modal').click(function(m) {
-      var url;
-      $("#tab-login").removeClass('active');
-      $("#tab-register").addClass('active');
-      $("#login-modal-form").hide();
-      $("#register-modal-form").show();
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
-      $.getJSON(url, {}, function(json) {
-        $('input[name="captcha_0"]').val(json.key);
-        return $('img.captcha').attr('src', json.image_url);
-      });
-      m.preventDefault();
-      return $(this).modal();
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+    $.getJSON(url, {}, function(json) {
+      $('input[name="captcha_0"]').val(json.key);
+      return $('img.captcha').attr('src', json.image_url);
     });
     $('.captcha-refresh').click(function() {
-      var $form, url;
+      var $form;
       $form = $(this).parents('form');
       url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
       return $.getJSON(url, {}, function(json) {
@@ -334,57 +311,8 @@
         return $form.find('img.captcha').attr('src', json.image_url);
       });
     });
-    $('.login-modal-tab>li').click(function(e) {
-      $('.login-modal-tab>li').removeClass('active');
-      $(this).addClass('active');
-      if ($("#tab-login").attr('class') === 'active') {
-        $("#login-modal-form").show();
-        return $("#register-modal-form").hide();
-      } else {
-        $("#login-modal-form").hide();
-        return $("#register-modal-form").show();
-      }
-    });
-    $("#agreement").change(function(value) {
-      if ($(this).attr("checked")) {
-        $("#register_submit").addClass("disabled");
-        return $(this).removeAttr("checked");
-      } else {
-        $("#register_submit").removeClass("disabled");
-        return $(this).attr("checked", "checked");
-      }
-    });
-    $("#register_submit").click(function(e) {
-      if ($(this).hasClass("disabled")) {
-        e.preventDefault();
-      }
-    });
-    $('.nologin').click(function(e) {
-      e.preventDefault();
-      return $('.login-modal').trigger('click');
-    });
-    $("input:password").bind("copy cut paste", function(e) {
-      var element;
-      element = this;
-      return setTimeout((function() {
-        var text;
-        text = $(element).val();
-        if (!/[^\u4e00-\u9fa5]+/ig.test(text) || /\s+/ig.test(text)) {
-          $(element).val('');
-        }
-      }), 100);
-    });
-    msg_count = $('#message_count').html();
-    if (msg_count > 0) {
-      backend.loadMessageCount('unread').done(function(data) {
-        if (data.count > 0) {
-          $('#message_count').show();
-          return $('#message_count').html(data.count);
-        }
-      });
-    }
     return $(".voice").on('click', '.voice-validate', function(e) {
-      var element, isMobile, url;
+      var element, isMobile;
       e.preventDefault();
       isMobile = checkMobile($("#reg_identifier").val().trim());
       if (!isMobile) {
@@ -436,5 +364,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=login_modal.map

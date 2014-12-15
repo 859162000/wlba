@@ -4,6 +4,7 @@ import decimal
 import logging
 from django.forms import model_to_dict
 from django.utils.decorators import method_decorator
+from marketing.helper import RewardStrategy
 import requests
 from order.utils import OrderHelper
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -16,7 +17,7 @@ from wanglibao_pay.util import get_client_ip
 from wanglibao_pay.views import PayResult
 import xml.etree.ElementTree as ET
 from wanglibao_sms import messages
-#from wanglibao_sms.tasks import send_messages
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -214,6 +215,8 @@ class HuifuPay(Pay):
     def handle_pay_result(cls, request):
         # TODO Add a log
 
+        flag = False
+
         order_id = request.POST.get('OrdId', '')
         try:
             pay_info = PayInfo.objects.select_for_update().get(pk=order_id)
@@ -250,10 +253,8 @@ class HuifuPay(Pay):
                         pay_info.status = PayInfo.SUCCESS
                         result = PayResult.DEPOSIT_SUCCESS
                         phone = pay_info.user.wanglibaouserprofile.phone
-                        #send_messages.apply_async(kwargs={
-                        #    "phones": [phone],
-                        #    "messages": [messages.deposit_succeed(amount)]
-                        #})
+
+                        flag = True
                     else:
                         pay_info.status = PayInfo.FAIL
                         result = PayResult.DEPOSIT_FAIL
@@ -269,5 +270,15 @@ class HuifuPay(Pay):
             result = PayResult.EXCEPTION
 
         pay_info.save()
+
+
+        if flag:
+            # 迅雷活动, 12.8 首次充值
+            start_time = timezone.datetime(2014, 12, 7)
+            if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
+                                      status=PayInfo.SUCCESS).count() == 1:
+                rs = RewardStrategy(pay_info.user)
+                rs.reward_user(u'三天迅雷会员')
+
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return result

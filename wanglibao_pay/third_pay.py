@@ -652,6 +652,7 @@ def withdraw(request):
     pay_info.bank = card.bank
     pay_info.request_ip = util.get_client_ip(request)
     pay_info.status = PayInfo.ACCEPTED
+    pay_info.channel = "app"
 
     try:
         order = OrderHelper.place_order(user, Order.WITHDRAW_ORDER, pay_info.status,
