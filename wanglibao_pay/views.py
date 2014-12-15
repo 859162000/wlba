@@ -144,17 +144,6 @@ class PayCompleteView(TemplateView):
         result = HuifuPay.handle_pay_result(request)
         amount = request.POST.get('OrdAmt', '')
 
-        title, content = messages.msg_pay_ok(amount)
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": request.user.id,
-            "title": title,
-            "content": content,
-            "mtype": "activityintro"
-        })
-
-
-
-
         return self.render_to_response({
             'result': result,
             'amount': amount
@@ -441,8 +430,9 @@ class WithdrawRollback(TemplateView):
         if not payinfo:
             return HttpResponse({u"没有找到 %s 该记录" % uuid})
 
-        if payinfo.status == PayInfo.FAIL:
-            return HttpResponse({u"该%s请求已经处理过" % uuid})
+        if payinfo.status == PayInfo.FAIL or payinfo.status == PayInfo.SUCCESS:
+            logger.info("The withdraw status [%s] already process , ignore it" % uuid)
+            return HttpResponse({u"该%s 请求已经处理过,请勿重复处理" % uuid})
 
         marginKeeper = MarginKeeper(payinfo.user)
         marginKeeper.withdraw_rollback(payinfo.amount, error_message)
@@ -761,6 +751,14 @@ class WithdrawAPIView(APIView):
             send_messages.apply_async(kwargs={
                 'phones': [result['phone']],
                 'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
+            })
+
+            title, content = messages.msg_withdraw(timezone.now(), result['amount'])
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": title,
+                "content": content,
+                "mtype": "withdraw"
             })
         return Response(result)
 

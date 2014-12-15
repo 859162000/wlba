@@ -18,6 +18,7 @@ from wanglibao_pay.views import PayResult
 import xml.etree.ElementTree as ET
 from wanglibao_sms import messages
 from django.utils import timezone
+from wanglibao_account import message as inside_message
 
 logger = logging.getLogger(__name__)
 
@@ -279,6 +280,15 @@ class HuifuPay(Pay):
                                       status=PayInfo.SUCCESS).count() == 1:
                 rs = RewardStrategy(pay_info.user)
                 rs.reward_user(u'三天迅雷会员')
+
+
+            title, content = messages.msg_pay_ok(amount)
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": pay_info.user.id,
+                "title": title,
+                "content": content,
+                "mtype": "activityintro"
+            })
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return result
