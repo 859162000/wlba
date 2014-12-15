@@ -26,8 +26,8 @@ env.activate = "source %s/bin/activate" % env.depoly_virt_path
 env.pip_install = "pip install -r %s/requirements.txt" % env.depoly_path
 env.branch = "production4.0"
 
-#env.environment = 'ENV_PRODUCTION'
-env.environment = 'ENV_STAGING'
+env.environment = 'ENV_PRODUCTION'
+#env.environment = 'ENV_STAGING'
 
 @roles('mq', 'pre')
 def install_rabbitmq():
@@ -125,7 +125,7 @@ def depoly_web_action():
         else:
             sudo("supervisord -c /etc/supervisord.conf")
         rs = run("ps aux|grep wanglibao|grep -v 'grep'")
-        if rs.return_code >= 0:
+        if rs.return_code > 0:
             put("supervisord.conf", "~/supervisord.conf")
             sudo("cp ~/supervisord.conf /etc/supervisord.conf")
             sudo("supervisorctl reload")
