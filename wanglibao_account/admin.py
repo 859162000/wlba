@@ -46,10 +46,12 @@ class UserResource(resources.ModelResource):
 
 class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin, ImportExportModelAdmin):
     inlines = [ProfileInline, MarginInline, PromotionTokenInline, P2PEquityInline]
-    list_display = ('id', 'username', 'phone', 'name', 'id_num', 'is_active', 'date_joined', 'is_staff')
+    list_display = ('id', 'username', 'phone', 'name', 'utype', 'id_num', 'is_active', 'date_joined', 'is_staff')
     list_display_links = ('id', 'username', 'phone')
-    search_fields = ['wanglibaouserprofile__phone', 'wanglibaouserprofile__id_number', 'wanglibaouserprofile__name']
+    list_filter = ('wanglibaouserprofile__utype', 'is_staff', 'is_superuser', 'is_active', 'groups')
+    search_fields = ['username', 'wanglibaouserprofile__phone', 'wanglibaouserprofile__id_number', 'wanglibaouserprofile__name']
     resource_class = UserResource
+
 
     def phone(self, obj):
         return "%s" % obj.wanglibaouserprofile.phone
@@ -62,6 +64,10 @@ class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin, ImportExportModelAdm
     def id_num(self, obj):
         return obj.wanglibaouserprofile.id_number
     id_num.short_description = u'身份证'
+
+    def utype(self, obj):
+        return obj.wanglibaouserprofile.utype
+    utype.short_description = u'用户类型'
 
     def get_export_queryset(self, request):
         qs = super(UserProfileAdmin, self).get_queryset(request)

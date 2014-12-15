@@ -3,6 +3,10 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
 
+USER_TYPE = (
+    ('0', u'正常用户'),
+    ('1', u'渠道用户'),
+)
 
 class WanglibaoUserProfile(models.Model):
     user = models.OneToOneField(get_user_model(), primary_key=True)
@@ -27,6 +31,8 @@ class WanglibaoUserProfile(models.Model):
     investment_period = models.IntegerField(help_text=u'可投资期限(月)', default=3)
 
     deposit_default_bank_name = models.CharField(u'默认充值银行', max_length=32, blank=True)
+
+    utype = models.CharField(u'用户类型', max_length=10, default='0', choices=USER_TYPE)
 
     def __unicode__(self):
         return "phone: %s nickname: %s  %s" % (self.phone, self.nick_name, self.user.username)

@@ -75,6 +75,9 @@ class PromotionToken(models.Model):
 
 
 class IntroducedBy(models.Model):
+    """ user: 被邀请人
+        introduced_by: 邀请人
+    """
     user = models.ForeignKey(User)
     introduced_by = models.ForeignKey(User, related_name='introduces')
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)

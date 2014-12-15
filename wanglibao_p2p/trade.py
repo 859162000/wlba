@@ -55,7 +55,10 @@ class P2PTrader(object):
             if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
                 rs.reward_user(u'一个月迅雷会员')
 
+        # todo: merger the code about activity,remove the rubbish code
+
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
+
         # phone_verified 渠道客户判断
         if introduced_by and introduced_by.bought_at is None:
             introduced_by.bought_at = timezone.now()
@@ -76,7 +79,7 @@ class P2PTrader(object):
                         "messages": [messages.gift_inviter(invited_phone=invited_phone, money=30),
                                      messages.gift_invited(inviter_phone=inviter_phone, money=30)]
                     })
-                    #发站内信
+                    # 发站内信
                     title, content = messages.msg_invite_major(inviter_phone, invited_phone)
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": inviter_id,
@@ -101,7 +104,40 @@ class P2PTrader(object):
                         except Exception, e:
                             print(e)
 
-        #投标成功发站内信
+        # 酒仙网邀请
+        jiuxian_introduce = IntroducedBy.objects.filter(user=self.user,
+                                                        introduced_by__promotiontoken__token='9xianw').first()
+        if jiuxian_introduce and jiuxian_introduce.bought_at is None:
+
+            jiuxian_introduce.bought_at = timezone.now()
+            jiuxian_introduce.save()
+
+            if amount >= 500:
+                invited_phone = safe_phone_str(jiuxian_introduce.user.wanglibaouserprofile.phone)
+                send_messages.apply_async(kwargs={
+                    "phones": [invited_phone],
+                    "messages": [messages.jiuxian_invited(money=30)]
+                })
+
+                title, content = messages.msg_jiuxian()
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": jiuxian_introduce.user.id,
+                    "title": title,
+                    "content": content,
+                    "mtype": "activity"
+                })
+
+                rwd = Reward.objects.filter(type=u'30元话费').first()
+                if rwd:
+                    try:
+                        RewardRecord.objects.create(user=jiuxian_introduce.user, reward=rwd,
+                                                    description=content)
+                    except Exception, e:
+                        print(e)
+
+
+
+        # 投标成功发站内信
         pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
 
         title, content = messages.msg_bid_purchase(self.order_id, pname, amount)
@@ -111,12 +147,10 @@ class P2PTrader(object):
             "content": content,
             "mtype": "purchase"
         })
-        #满标给管理员发短信
+        # 满标给管理员发短信
         if product_record.product_balance_after <= 0:
             from wanglibao_p2p.tasks import full_send_message
-
             full_send_message.apply_async(kwargs={"product_name": self.product.name})
-
         return product_record, margin_record, equity
 
 
@@ -198,7 +232,6 @@ class P2POperator(object):
                 phones.append(equity.user.wanglibaouserprofile.phone)
             product.status = u'还款中'
             product.save()
-
 
         phones = {}.fromkeys(phones).keys()
         user_ids = {}.fromkeys(user_ids).keys()

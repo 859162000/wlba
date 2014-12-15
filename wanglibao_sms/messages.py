@@ -8,7 +8,7 @@ def format_datetime(time, fmt):
 
 def suffix(f):
     def wrapper(*args, **kwargs):
-        return unicode(f(*args, **kwargs)) + u'回复TD退订 4008-588-066【网利宝】'
+        return u'[网利宝]' + unicode(f(*args, **kwargs)) + u'回复TD退订 4008-588-066【网利宝】'
     return wrapper
 
 @suffix
@@ -54,10 +54,16 @@ def gift_inviter(invited_phone, money):
     return u'用户%s已接受你的邀请注册网利宝并购买成功！网利宝将奖励你%s元手机话费，5个工作日内将直接充值到你的注册手机号。' \
            % (invited_phone, str(money))
 
+
 @suffix
 def gift_invited(inviter_phone, money):
     return u'感谢你接受用户%s的邀请注册网利宝并成功购买理财产品！网利宝将奖励你%s元手机话费，5个工作日内将直接充值到你的注册手机号。' \
            % (inviter_phone, str(money))
+
+@suffix
+def jiuxian_invited(money):
+    return u'感谢您在网利宝完成首次理财！您的注册手机号将于3个工作日内收到%s元话费，请查收。回复TD退订 4008-588-066' \
+           % money
 
 @suffix
 def rand_pass(password):
@@ -134,6 +140,11 @@ def msg_invite_major(inviter, invited):
 def msg_invite_are(inviter, invited):
     title = u"邀请好友送话费"
     content = u"您已和您的好友%s成功建立邀请关系，您和您好友将共享60元话费,您的30元话费将于3个工作日内充值至您的手机号%s，请注意查收。<br/>感谢您对我们的支持与关注！<br/>网利宝" % (inviter, invited)
+    return title, content
+
+def msg_jiuxian():
+    title = u"邀请好友送话费"
+    content =  u'亲爱的您好：<br>感谢您在网利宝完成首次理财！您的注册手机号将于3个工作日内收到30元话费，请查收。<br/>感谢您对我们的支持与关注！网利宝'
     return title, content
 
 def msg_bid_success(product_name, date):
