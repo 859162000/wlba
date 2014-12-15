@@ -101,11 +101,16 @@ class P2PTrader(object):
                             RewardRecord.objects.create(user=introduced_by.user, reward=rwd, description=content2)
                         except Exception, e:
                             print(e)
+
         # 酒仙网邀请
         jiuxian_introduce = IntroducedBy.objects.filter(user=self.user,
                                                         introduced_by__promotiontoken__token='9xianw').first()
         if jiuxian_introduce and jiuxian_introduce.bought_at is None:
-            if amount >= 1000:
+
+            jiuxian_introduce.bought_at = timezone.now()
+            jiuxian_introduce.save()
+
+            if amount >= 500:
                 invited_phone = safe_phone_str(jiuxian_introduce.user.wanglibaouserprofile.phone)
                 send_messages.apply_async(kwargs={
                     "phones": [invited_phone],
