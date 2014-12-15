@@ -85,6 +85,10 @@ urlpatterns = patterns(
         },
         name='auth_password_reset_confirm'),
     url(r'', include('registration.backends.default.urls')),
+    url(r'^cjdao_login/$', TemplateView.as_view(template_name='cjdao_login.jade')),
+    url(r'^cjdao_register/$', TemplateView.as_view(template_name='cjdao_register.jade')),
+    url(r'^cjdao_login_product/$', TemplateView.as_view(template_name='cjdao_login_product.jade')),
+    url(r'^cjdao_register_product/$', TemplateView.as_view(template_name='cjdao_register_product.jade')),
 )
 
 if settings.DEBUG:
