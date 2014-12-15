@@ -441,8 +441,9 @@ class WithdrawRollback(TemplateView):
         if not payinfo:
             return HttpResponse({u"没有找到 %s 该记录" % uuid})
 
-        if payinfo.status == PayInfo.FAIL:
-            return HttpResponse({u"该%s请求已经处理过" % uuid})
+        if payinfo.status == PayInfo.FAIL or payinfo.status == PayInfo.SUCCESS:
+            logger.info("The withdraw status [%s] already process , ignore it" % uuid)
+            return HttpResponse({u"该%s 请求已经处理过,请勿重复处理" % uuid})
 
         marginKeeper = MarginKeeper(payinfo.user)
         marginKeeper.withdraw_rollback(payinfo.amount, error_message)
