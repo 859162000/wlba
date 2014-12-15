@@ -430,12 +430,19 @@ class WithdrawRollback(TemplateView):
     def post(self, request):
         uuid = request.POST.get('uuid', '')
         error_message = request.POST.get('error_message', '')
-        try:
-            payinfo = PayInfo.objects.get(uuid=uuid, type='W')
-        except PayInfo.DoesNotExist:
-            return HttpResponse({
-                u"没有找到 %s 该记录" % uuid
-            })
+        #try:
+        #    payinfo = PayInfo.objects.get(uuid=uuid, type='W')
+        #except PayInfo.DoesNotExist:
+        #    return HttpResponse({
+        #        u"没有找到 %s 该记录" % uuid
+        #    })
+
+        payinfo = PayInfo.objects.filter(uuid=uuid, type='W').first()
+        if not payinfo:
+            return HttpResponse({u"没有找到 %s 该记录" % uuid})
+
+        if payinfo.status == PayInfo.FAIL:
+            return HttpResponse({u"该%s请求已经处理过" % uuid})
 
         marginKeeper = MarginKeeper(payinfo.user)
         marginKeeper.withdraw_rollback(payinfo.amount, error_message)
