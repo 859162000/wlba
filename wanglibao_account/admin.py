@@ -122,6 +122,9 @@ class MessageAdmin(admin.ModelAdmin):
 
 class MessageTextAdmin(admin.ModelAdmin):
     list_display = ("id", "mtype", "title", "content")
+    list_filter = ('mtype', )
+    # search_fields = ('content', )
+
 
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
