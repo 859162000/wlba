@@ -91,6 +91,7 @@ def depoly_web_action():
     run("cp -r %s %s-back" % (env.depoly_path, env.depoly_path))
     print yellow("update web code")
     with cd(env.depoly_path):
+        run("git checkout wanglibao/settings.py")
         with settings(warn_only=True):
             result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
             if result.return_code > 0:
@@ -177,6 +178,7 @@ def depoly_mq_action():
     run("rm -rf %s-back" % env.depoly_path)
     run("cp -r %s %s-back" % (env.depoly_path, env.depoly_path))
     with cd(env.depoly_path):
+        run("git checkout wanglibao/settings.py")
         with settings(warn_only=True):
             result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
             if result.return_code > 0:

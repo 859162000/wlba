@@ -75,11 +75,6 @@ class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin, ImportExportModelAdm
         return qs
 
 
-class IdVerificationAdmin(ReadPermissionModelAdmin):
-    list_display = ("id_number", "name", "is_valid", "created_at")
-
-
-
 def user_unicode(self):
     if hasattr(self, 'wanglibaouserprofile'):
         return u'[%s] %s %s ' % (str(self.id), self.wanglibaouserprofile.name, self.wanglibaouserprofile.phone)
@@ -91,6 +86,8 @@ User.__unicode__ = user_unicode
 
 class IdVerificationAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'id_number', 'is_valid', 'created_at')
+    search_fields = ('name', 'id_number')
+    list_filter = ('is_valid', )
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_account.view_idverification'):
@@ -107,10 +104,12 @@ class VerifyCounterAdmin(admin.ModelAdmin):
 
 class UserPushIdAdmin(admin.ModelAdmin):
     list_display = ("user", "device_type", "push_user_id", "push_channel_id")
+    raw_id_fields = ('user', )
 
 class BindingAdmin(admin.ModelAdmin):
     list_display = ("user", "bid", "btype", "isvip")
     search_fields = ('user__wanglibaouserprofile__phone',)
+    raw_id_fields = ('user', )
 
 class MessageAdmin(admin.ModelAdmin):
     list_display = ("id", "target_user", "message_text", "read_status", "format_read_at")
