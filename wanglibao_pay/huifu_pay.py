@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import sys
-
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
 import decimal
 import logging
 from django.forms import model_to_dict
