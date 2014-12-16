@@ -867,6 +867,10 @@ class GenP2PUserProfileReport(TemplateView):
     template_name = 'gen_p2p_user_profile_report.jade'
 
 
+class AdminAmortization(TemplateView):
+    template_name = 'admin_amortization.jade'
+
+
 class AdminP2PUserRecord(TemplateView):
     template_name = 'p2p_user_record.jade'
 
