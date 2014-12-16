@@ -18,7 +18,6 @@ class Migration(SchemaMigration):
         # Deleting field 'Reward.end_time'
         db.delete_column(u'marketing_reward', 'end_time')
 
-
     models = {
         u'auth.group': {
             'Meta': {'object_name': 'Group'},
