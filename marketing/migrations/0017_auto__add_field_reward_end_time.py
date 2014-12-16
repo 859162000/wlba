@@ -5,40 +5,18 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 
-
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'RewardRecord'
-        db.create_table(u'marketing_rewardrecord', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('reward', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.Reward'])),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True)),
-            ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'marketing', ['RewardRecord'])
-
-        # Adding model 'Reward'
-        db.create_table(u'marketing_reward', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('type', self.gf('django.db.models.fields.CharField')(max_length=40)),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True)),
-            ('content', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('is_used', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('end_time', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'marketing', ['Reward'])
+        # Adding field 'Reward.end_time'
+        db.add_column(u'marketing_reward', 'end_time',
+                      self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'RewardRecord'
-        db.delete_table(u'marketing_rewardrecord')
-
-        # Deleting model 'Reward'
-        db.delete_table(u'marketing_reward')
-
+        # Deleting field 'Reward.end_time'
+        db.delete_column(u'marketing_reward', 'end_time')
 
     models = {
         u'auth.group': {
@@ -123,7 +101,7 @@ class Migration(SchemaMigration):
         },
         u'marketing.promotiontoken': {
             'Meta': {'object_name': 'PromotionToken'},
-            'token': ('django.db.models.fields.CharField', [], {'default': "'jcF5P1o9TTy2pfQhyTFgzw'", 'max_length': '64', 'db_index': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'PONiqzqXRpeAynIek0SnXw'", 'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         u'marketing.reward': {
