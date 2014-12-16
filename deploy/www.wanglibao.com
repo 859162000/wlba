@@ -18,11 +18,11 @@ server {
     ssl_ciphers RC4:HIGH:!aNULL:!MD5;
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
-    return 301 https://staging.wanglibao.com$request_uri;
+    return 301 https://www.wanglibao.com$request_uri;
 }
 server {
     listen 443 ssl spdy;
-    server_name pre.wanglibao.com staging.wanglibao.com;
+    server_name www.wanglibao.com staging.wanglibao.com;
     ssl_certificate /usr/local/nginx/ssl/wanglibao.crt;
     ssl_certificate_key /usr/local/nginx/ssl/wanglibao.key;
     ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
@@ -64,7 +64,7 @@ server {
         deny all;
     }
 
-    location ~ ^/static/admin/.*\.(css|js|html|htm|jpg|jpeg|gif|png|ico|pdf|doc|swf|zip|htc|xls|apk|properties|exe|ttf|woff|map){
+    location ~ ^/static/admin/.*\.(css|js|html|htm|jpg|jpeg|gif|png|ico|pdf|doc|swf|zip|htc|xls|apk|properties|exe|ttf|woff|map|svg|eot){
         root /var/www/wanglibao/virt-wanglibao/lib/python2.7/site-packages/django/contrib/admin/;
         access_log off;
         if (-f $request_filename) {
@@ -73,7 +73,7 @@ server {
         }
     }
 
-    location ~ ^/static/.*\.(css|js|html|htm|jpg|jpeg|gif|png|ico|pdf|doc|swf|zip|htc|xls|apk|properties|exe|ttf|woff|map){
+    location ~ ^/static/.*\.(css|js|html|htm|jpg|jpeg|gif|png|ico|pdf|doc|swf|zip|htc|xls|apk|properties|exe|ttf|woff|map|svg|eot){
         root /var/www/wanglibao/wanglibao-backend;
         access_log off;
         if (-f $request_filename) {
