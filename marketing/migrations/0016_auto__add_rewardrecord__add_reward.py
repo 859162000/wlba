@@ -26,6 +26,7 @@ class Migration(SchemaMigration):
             ('content', self.gf('django.db.models.fields.CharField')(max_length=128)),
             ('is_used', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('end_time', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
         ))
         db.send_create_signal(u'marketing', ['Reward'])
 
@@ -95,7 +96,7 @@ class Migration(SchemaMigration):
             'rule_type': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         u'marketing.introducedby': {
-            'Meta': {'object_name': 'IntroducedBy'},
+            'Meta': {'ordering': "['-created_at']", 'object_name': 'IntroducedBy'},
             'bought_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'created_by': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'creator'", 'null': 'True', 'to': u"orm['auth.User']"}),
@@ -105,13 +106,13 @@ class Migration(SchemaMigration):
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'marketing.invitecode': {
-            'Meta': {'ordering': "['id']", 'object_name': 'InviteCode'},
+            'Meta': {'object_name': 'InviteCode'},
             'code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '6', 'db_index': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_used': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         u'marketing.newsandreport': {
-            'Meta': {'ordering': "['-score']", 'object_name': 'NewsAndReport'},
+            'Meta': {'object_name': 'NewsAndReport'},
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
@@ -121,20 +122,21 @@ class Migration(SchemaMigration):
         },
         u'marketing.promotiontoken': {
             'Meta': {'object_name': 'PromotionToken'},
-            'token': ('django.db.models.fields.CharField', [], {'default': "'EAWbXODxTcuch4chX93xrg'", 'max_length': '64', 'db_index': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'jcF5P1o9TTy2pfQhyTFgzw'", 'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         u'marketing.reward': {
-            'Meta': {'object_name': 'Reward'},
+            'Meta': {'ordering': "['-create_time']", 'object_name': 'Reward'},
             'content': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'null': 'True'}),
+            'end_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_used': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
         },
         u'marketing.rewardrecord': {
-            'Meta': {'object_name': 'RewardRecord'},
+            'Meta': {'ordering': "['-create_time']", 'object_name': 'RewardRecord'},
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -155,7 +157,7 @@ class Migration(SchemaMigration):
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         u'marketing.timelysitedata': {
-            'Meta': {'object_name': 'TimelySiteData'},
+            'Meta': {'ordering': "['-created_at']", 'object_name': 'TimelySiteData'},
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'freeze_amount': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '20', 'decimal_places': '2'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
