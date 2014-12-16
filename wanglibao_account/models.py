@@ -20,8 +20,12 @@ class IdVerification(models.Model):
     is_valid = models.BooleanField(u"验证结果", default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name_plural = u'实名认证记录'
+
     def __unicode__(self):
         return u'%s %s %d' % (self.id_number, self.name, self.is_valid)
+
 
 
 class VerifyCounter(models.Model):
@@ -31,6 +35,9 @@ class VerifyCounter(models.Model):
 
     user = models.OneToOneField(User)
     count = models.IntegerField(u'尝试认证次数', default=0)
+
+    class Meta:
+        verbose_name_plural = u'实名认证次数'
 
     def __unicode__(self):
         return u'%s: %d' % (self.user.wanglibaouserprofile.phone, self.count)
@@ -72,6 +79,9 @@ class Binding(models.Model):
     access_token = models.CharField(max_length=100, blank=True)
     refresh_token = models.CharField(max_length=100, blank=True)
     created_at = models.BigIntegerField(default=0, verbose_name=u'创建时间', blank=True)
+
+    class Meta:
+        verbose_name_plural = u'用户绑定'
 
 message_type = (
     ("withdraw", "提现通知"),
