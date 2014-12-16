@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils import dateparse
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
+from decimal import Decimal
 
 
 def checksum(hash_list):
@@ -82,3 +83,75 @@ def handler_paginator(request, objs, page_size=20, page_index=1):
         # return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
         return (False, paginator)
     return (objs, paginator)
+
+
+class AmortizationCalculator():
+
+
+    def __init__(self, paymethod, amount, year_rate, period):
+        self.paymethod = paymethod
+        self.amount = amount
+        self.year_rate = float(year_rate)
+        self.period = int(period)
+        self.choice = {
+            '1': self.debxmethod,
+            '2': self.dqhbfxmethod,
+        }
+
+    def generate(self):
+        action = self.choice.get(self.paymethod)
+        if action:
+            return action()
+
+
+    def debxmethod(self):
+        amount = Decimal(self.amount)
+        month_rate = self.year_rate / 12
+        month_rate = Decimal(month_rate).quantize(Decimal('0.000000000000000000001'))
+
+        term_amount = amount * (month_rate * pow(1 + month_rate, self.period)) / (pow(1 + month_rate, self.period) - 1)
+        term_amount = Decimal(term_amount).quantize(Decimal('.01'))
+
+        total = self.period * term_amount
+
+        result = []
+        principal_left = amount
+        for i in xrange(0, self.period - 1):
+            interest = principal_left * month_rate
+            interest = interest.quantize(Decimal('.01'), 'ROUND_UP')
+
+            principal = term_amount - interest
+            principal = principal.quantize(Decimal('.01'), 'ROUND_UP')
+
+            principal_left -= principal
+
+            result.append((term_amount, principal, interest, principal_left, term_amount * (self.period - i - 1)))
+
+        result.append((term_amount, principal_left, term_amount - principal_left, Decimal(0), Decimal(0)))
+
+        return {
+            "terms": result,
+            "total": total
+        }
+
+
+    def dqhbfxmethod(self, amount, year_rate, term, period=None):
+        if period is None:
+            return {
+                "terms": [],
+                "total": 0
+            }
+        amount = Decimal(amount)
+        year_rate = Decimal(year_rate)
+
+        month_rate = year_rate / 12
+        month_rate = Decimal(month_rate).quantize(Decimal('0.000000001'))
+        month_interest = amount * month_rate
+        month_interest = month_interest.quantize(Decimal('.01'))
+
+        total = amount + month_interest * period
+        result = [(total, amount, total - amount, Decimal(0), Decimal(0))]
+        return {
+            "terms": result,
+            "total": total
+        }

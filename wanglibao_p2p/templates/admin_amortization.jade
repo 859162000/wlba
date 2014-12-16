@@ -19,14 +19,17 @@ head
                     .row
                         form.form.span5(method="GET" action='')
                             .form-row
+                                .span9-omega
+                                  input(type="hidden", name="query", value="true")
+                            .form-row
                                 .span3(style="line-height:40px")
                                   label 还款方式
                                 .span9-omega
                                   select(name="paymethod")
-                                    option(value=0) 等额本息
-                                    option(value=1) 按月付息到期还本
-                                    option(value=2) 到期还本付息
-                                    option(value=3) 按季度付息
+                                    option(value=1) 等额本息
+                                    option(value=2) 按月付息到期还本
+                                    option(value=3) 到期还本付息
+                                    option(value=4) 按季度付息
                             .form-row
                                 .span3(style="line-height:40px")
                                   label 借款总额
@@ -41,6 +44,6 @@ head
                                 .span3(style="line-height:40px")
                                   label 年化率
                                 .span9-omega
-                                  input(type="text", name="period", placeholder="请输入年化率（13 表示13%）")
+                                  input(type="text", name="year_rate", placeholder="请输入年化率（13 表示13%）")
                             .form-row
                                 button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 查询

@@ -28,7 +28,7 @@ from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
-from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
+from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
 from wanglibao.const import ErrorNumber
 from django.conf import settings
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
@@ -869,6 +869,20 @@ class GenP2PUserProfileReport(TemplateView):
 
 class AdminAmortization(TemplateView):
     template_name = 'admin_amortization.jade'
+
+    def get_context_data(self, **kwargs):
+        query = bool(self.request.GET.get('query', False))
+        if query:
+            amount = self.request.GET.get('amount')
+            period = self.request.GET.get('period')
+            year_rate = self.request.GET.get('year_rate')
+            paymethod = self.request.GET.get('paymethod')
+
+            ac = AmortizationCalculator(paymethod, amount, period, year_rate)
+            result = ac.generate()
+            print 'result', result
+        else:
+            pass
 
 
 class AdminP2PUserRecord(TemplateView):
