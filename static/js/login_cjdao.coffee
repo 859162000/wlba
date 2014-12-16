@@ -150,7 +150,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
 
 
     errorPlacement: (error, element) ->
-      error.appendTo $(element).parents('.form-row').children('.form-row-error')
+      error.appendTo $(element).parents('.form-row').find('.form-row-error')
 
     submitHandler: (form) ->
       $('input[name="identifier"]').trigger('keyup')
@@ -187,7 +187,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
   _showModal = ()->
     $('#login-modal').modal()
 
-  $("#button-get-validate-code-modal").click (e) ->
+  $("#button-get-validate-code").click (e) ->
       e.preventDefault()
       element = this
       phoneNumber = $.trim($("#reg_identifier").val())

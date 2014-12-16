@@ -167,7 +167,7 @@
         }
       },
       errorPlacement: function(error, element) {
-        return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
+        return error.appendTo($(element).parents('.form-row').find('.form-row-error'));
       },
       submitHandler: function(form) {
         $('input[name="identifier"]').trigger('keyup');
@@ -210,7 +210,7 @@
     _showModal = function() {
       return $('#login-modal').modal();
     };
-    $("#button-get-validate-code-modal").click(function(e) {
+    $("#button-get-validate-code").click(function(e) {
       var count, element, intervalId, phoneNumber, timerFunction;
       e.preventDefault();
       element = this;
