@@ -20,6 +20,7 @@ class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
         'penal_interest')
     list_filter = ('confirm',)
     search_fields = ('user__wanglibaouserprofile__phone',)
+    raw_id_fields = ('user', 'product')
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
@@ -51,6 +52,7 @@ class P2PEquityInline(admin.TabularInline):
     exclude = ('version',)
     extra = 0
     can_delete = False
+
 
     def get_queryset(self, request):
         return super(P2PEquityInline, self).get_queryset(request).select_related('user').select_related(
@@ -223,6 +225,7 @@ class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('product_amortization', 'user')
 
+
 class P2PRecordResource(resources.ModelResource):
     user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name=u'姓名')
     user_phone = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name=u'手机号')
@@ -261,6 +264,7 @@ class AmortizationRecordAdmin(admin.ModelAdmin):
     list_display = (
         'catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
     search_fields = ('user__wanglibaouserprofile__phone',)
+    raw_id_fields = ('amortization', 'user')
 
 
 class EquityRecordAdmin(ReadPermissionModelAdmin):
@@ -281,8 +285,9 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
 
 class EarningAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'product', 'amount', )
-    raw_id_fields = ('order', 'margin_record')
+    raw_id_fields = ('order', 'margin_record', 'user', 'product',)
     search_fields = ('user__wanglibaouserprofile__phone',)
+
 
 
     def get_readonly_fields(self, request, obj=None):

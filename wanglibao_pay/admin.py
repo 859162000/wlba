@@ -30,6 +30,7 @@ class BankAdmin(admin.ModelAdmin):
 class CardAdmin(admin.ModelAdmin):
     list_display = ('get_phone', 'no', 'bank')
     search_fields = ['user__wanglibaouserprofile__phone', 'no']
+    raw_id_fields = ('user', 'bank')
 
     def get_phone(self, obj):
         return obj.user.wanglibaouserprofile.phone
