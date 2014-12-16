@@ -90,7 +90,7 @@
         }
       },
       errorPlacement: function(error, element) {
-        return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
+        return error.appendTo($(element).parents('.form-row').find('.form-row-error'));
       },
       submitHandler: function(form) {
         if ($('#login_submit').hasClass('disabled')) {
@@ -364,5 +364,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=login_cjdao.map

@@ -87,7 +87,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         minlength: $.format("验证码至少输入1位")
 
     errorPlacement: (error, element) ->
-        error.appendTo $(element).parents('.form-row').children('.form-row-error')
+      error.appendTo $(element).parents('.form-row').find('.form-row-error')
 
     submitHandler: (form) ->
       if $('#login_submit').hasClass('disabled')
