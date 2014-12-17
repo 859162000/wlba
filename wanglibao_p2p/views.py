@@ -873,11 +873,14 @@ class AdminAmortization(TemplateView):
     template_name = 'admin_amortization.jade'
 
     def post(self, request, **kwargs):
-
-        paymethod = request.POST.get('paymethod')
-        amount = request.POST.get('amount')
-        year_rate = float(request.POST.get('year_rate')) / 100
-        period = int(request.POST.get('period'))
+        try:
+            paymethod = request.POST.get('paymethod')
+            amount = request.POST.get('amount')
+            year_rate = float(request.POST.get('year_rate')) / 100
+            period = int(request.POST.get('period'))
+        except:
+            messages.warning(request, u'输入错误, 请重新检测')
+            return redirect('./amortization')
 
         if amount and year_rate and period:
             ac = AmortizationCalculator(paymethod, amount, year_rate, period)
