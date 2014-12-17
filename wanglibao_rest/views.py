@@ -379,10 +379,11 @@ class YTXVoiceCallbackAPIView(APIView):
         return Response({"statuscode": "000000"})
 
 class LatestDataAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     def post(self, request):
-        today = datetime.combine(datetime.now(), time())
+        now = datetime.now()
+        today = datetime(now.year, now.month, now.day, 23, 59, 59)
         start = today-timedelta(30)
         ams = ProductAmortization.objects.filter(settlement_time__range=(start, today), settled=True)
         if not ams:
