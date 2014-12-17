@@ -453,7 +453,7 @@ if ENV == ENV_PRODUCTION:
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
     #SIGN_HOST = '115.28.151.49'
-    SIGN_HOST = '112.124.9.35'
+    SIGN_HOST = '10.160.18.243'
     SIGN_PORT = 8733
     PAY_URL = 'https://mas.chinapnr.com'
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
