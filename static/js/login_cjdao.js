@@ -215,6 +215,7 @@
       e.preventDefault();
       element = this;
       phoneNumber = $.trim($("#reg_identifier").val());
+      console.log(phoneNumber);
       if (checkMobile(phoneNumber)) {
         if (typeof console !== "undefined" && console !== null) {
           console.log("Phone number checked, now send the valdiation code");

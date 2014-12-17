@@ -41,7 +41,7 @@ html
                       earning_rate = str(p2p.expected_earning_rate)
                       .span9-omega {{earning_rate}}%
         .span5-omega
-          form#register-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/register/?next={{next}}')
+          form#register-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/register/ajax/')
             - csrf_token
             .form-login-title
               span.cjdao-form-item 注册
@@ -53,7 +53,7 @@ html
             .form-row
               .span1.align-right 手机号
               .span7
-                input#login_identifier(type="text", name="identifier", placeholder="* 请输入手机号", autocomplete='off', title="* 请输入手机号",style="width:130px;margin-right:10px")
+                input#reg_identifier(type="text", name="identifier", placeholder="* 请输入手机号", autocomplete='off', title="* 请输入手机号",style="width:118px;margin-right:10px")
                 button#button-get-validate-code.button-orange.button-large(type='button') 获取验证码
                 .form-row-error.error
 
@@ -65,7 +65,7 @@ html
             .form-row
               .span1.align-right 输入密码
               .span7
-                input(type="password", name="password", placeholder="请输入6-20位密码，建议英文、数字组合", autocomplete='off', title="请输入密码")
+                input#reg_password(type="password", name="password", placeholder="请输入6-20位密码，建议英文、数字组合", autocomplete='off', title="请输入密码")
                 .form-row-error
             .form-row
               .span1.align-right 确认密码
@@ -75,7 +75,7 @@ html
             .form-row
               .span1.align-right &nbsp;
               .span7
-                button#register_submit.button.button-account.span12(type='button') 立即注册
+                button#register_submit.button.button-account.span12(type='submit') 立即注册
                 .agreement
                   label(for="agreement")
                   input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")

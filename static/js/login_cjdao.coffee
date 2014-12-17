@@ -191,6 +191,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       e.preventDefault()
       element = this
       phoneNumber = $.trim($("#reg_identifier").val())
+      console.log(phoneNumber)
       if checkMobile(phoneNumber)
         if console?
           console.log "Phone number checked, now send the valdiation code"

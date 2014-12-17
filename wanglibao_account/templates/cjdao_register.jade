@@ -13,7 +13,7 @@ html
           img(src="/static/images/cjdao.png")
           h3 投资预约
           p 您在财经道填写的信息已提交至网利宝，请继续完善信息，以便顺利投资网利宝优质项目。
-        form#register-cjdao-form.cjdao-form(method='post', action='/accounts/register/?next={{next}}')
+        form#register-cjdao-form.cjdao-form(method='post', action='/accounts/register/ajax/')
             - csrf_token
             .form-login-title
               span.cjdao-form-item 注册
@@ -36,7 +36,7 @@ html
             .form-row
               .span1.align-right 输入密码
               .span5
-                input(type="password", name="password", placeholder="请输入6-20位密码，建议英文、数字的组合", autocomplete='off', title="请输入密码")
+                input#reg_password(type="password", name="password", placeholder="请输入6-20位密码，建议英文、数字的组合", autocomplete='off', title="请输入密码")
                 .form-row-error
             .form-row
               .span1.align-right 确认密码
@@ -46,7 +46,7 @@ html
             .form-row
               .span1.align-right &nbsp;
               .span5
-                button#register_submit.button.button-account.span12(type='button') 立即注册
+                button#register_submit.button.button-account.span12(type='submit') 立即注册
                 .agreement
                   label(for="agreement")
                   input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
