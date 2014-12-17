@@ -1,0 +1,71 @@
+- load formatters
+doctype html
+head
+  - with '还款计划计算器' as title
+  include include/common_head
+  - endwith
+  body
+    .panel
+      .well
+        .panel-title-bar__no-border
+          .panel-title 还款计划计算器
+        .space-vertical-s
+        .panel-content.padding-l-r-sm
+          .space-vertical-l
+          a(href='/{{ "" | admin_address}}')
+            button.button-home-action(type='submit') 返回
+          .space-vertical-l
+          .space-vertical-l
+          if messages
+            for message in messages
+              h3(style="text-align: center; color: red;") {{ message }}
+          .row
+            form.form.span5(method="POST" action='')
+              - csrf_token
+              .form-row
+                .span3(style="line-height:40px")
+                  label 还款方式
+                .span9-omega
+                  select(name="paymethod")
+                    option(value=1) 等额本息
+                    option(value=2) 按月付息到期还本
+                    option(value=3) 到期还本付息
+                    option(value=4) 按季度付息
+              .form-row
+                .span3(style="line-height:40px")
+                  label 借款总额
+                .span9-omega
+                  input(type="text", name="amount", placeholder="请输入借款总额")
+              .form-row
+                .span3(style="line-height:40px")
+                  label 还款期限
+                .span9-omega
+                  input(type="text", name="period", placeholder="请输入还款期数")
+              .form-row
+                .span3(style="line-height:40px")
+                  label 年化率
+                .span9-omega
+                  input(type="text", name="year_rate", placeholder="请输入年化率（13 表示13%）")
+              .form-row
+                button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 查询
+          .row
+            if newterms
+              h3(style="margin: 50px;") 还款总额 {{ total }} 元
+              table.table
+                thead
+                  tr
+                    th 期数
+                    th 偿还本息
+                    th 偿还本金
+                    th 偿还利息
+                    th 剩余本金
+                tbody
+                term = 0
+                for newterm in newterms
+                  term = term + 1
+                  tr
+                    td 第{{ term }}期
+                    td {{ newterm.term_amount }}
+                    td {{ newterm.interest }}
+                    td {{ newterm.principal }}
+                    td {{ newterm.principal_left }}
