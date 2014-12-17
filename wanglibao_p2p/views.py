@@ -37,6 +37,8 @@ from wanglibao_account.models import Binding
 from django.contrib.auth.decorators import login_required
 from wanglibao_account.utils import generate_contract_preview
 from wanglibao_pay.util import get_a_uuid
+from django.contrib import messages
+from django.shortcuts import redirect, render_to_response
 
 
 REPAYMENTTYPEMAP = (
@@ -870,19 +872,24 @@ class GenP2PUserProfileReport(TemplateView):
 class AdminAmortization(TemplateView):
     template_name = 'admin_amortization.jade'
 
-    def get_context_data(self, **kwargs):
-        query = bool(self.request.GET.get('query', False))
-        if query:
-            amount = self.request.GET.get('amount')
-            period = self.request.GET.get('period')
-            year_rate = self.request.GET.get('year_rate')
-            paymethod = self.request.GET.get('paymethod')
+    def post(self, request, **kwargs):
 
-            ac = AmortizationCalculator(paymethod, amount, period, year_rate)
-            result = ac.generate()
-            print 'result', result
+        paymethod = request.POST.get('paymethod')
+        amount = request.POST.get('amount')
+        year_rate = float(request.POST.get('year_rate')) / 100
+        period = int(request.POST.get('period'))
+
+        if amount and year_rate and period:
+            ac = AmortizationCalculator(paymethod, amount, year_rate, period)
+            acs = ac.generate()
+            total = acs['total']
+            terms = acs['terms']
+            key = ('term_amount', 'principal', 'interest', 'principal_left')
+            newterms = [dict(zip(key, term)) for term in terms]
+            return render_to_response('admin_amortization.jade', {'total':total, 'newterms': newterms})
         else:
-            pass
+            messages.warning(request, u'查询错误')
+            return redirect('./amortization')
 
 
 class AdminP2PUserRecord(TemplateView):

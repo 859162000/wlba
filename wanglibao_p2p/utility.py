@@ -7,8 +7,7 @@ from django.db.models import Q
 from django.utils import dateparse
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
-from decimal import Decimal
-import math
+from amortization_plan import MatchingPrincipalAndInterest, MonthlyInterest, QuarterlyInterest, DisposablePayOff
 
 
 def checksum(hash_list):
@@ -88,12 +87,11 @@ def handler_paginator(request, objs, page_size=20, page_index=1):
 
 class AmortizationCalculator():
 
-
     def __init__(self, paymethod, amount, year_rate, period):
         self.paymethod = paymethod
         self.amount = amount
-        self.year_rate = float(year_rate)
-        self.period = int(period)
+        self.year_rate = year_rate
+        self.period = period
         self.choice = {
             '1': self.debxmethod,
             '2': self.ayfxdqhbfxmethod,
@@ -109,107 +107,17 @@ class AmortizationCalculator():
 
     def debxmethod(self):
         """ 等额本息 """
-        amount = Decimal(self.amount)
-        month_rate = self.year_rate / 12
-        month_rate = Decimal(month_rate).quantize(Decimal('0.000000000000000000001'))
-
-        term_amount = amount * (month_rate * pow(1 + month_rate, self.period)) / (pow(1 + month_rate, self.period) - 1)
-        term_amount = Decimal(term_amount).quantize(Decimal('.01'))
-
-        total = self.period * term_amount
-
-        result = []
-        principal_left = amount
-        for i in xrange(0, self.period - 1):
-            interest = principal_left * month_rate
-            interest = interest.quantize(Decimal('.01'), 'ROUND_UP')
-
-            principal = term_amount - interest
-            principal = principal.quantize(Decimal('.01'), 'ROUND_UP')
-
-            principal_left -= principal
-
-            result.append((term_amount, principal, interest, principal_left, term_amount * (self.period - i - 1)))
-
-        result.append((term_amount, principal_left, term_amount - principal_left, Decimal(0), Decimal(0)))
-
-        return {
-            "terms": result,
-            "total": total
-        }
-
+        return MatchingPrincipalAndInterest.generate(self.amount, self.year_rate, term=None, period=self.period)
 
     def ayfxdqhbfxmethod(self):
         """ 按月付息到期还本 """
-        if self.period is None:
-            return {
-                "terms": [],
-                "total": 0
-            }
-        amount = Decimal(self.amount)
-        year_rate = Decimal(self.year_rate)
+        return MonthlyInterest.generate(self.amount, self.year_rate, term=None, period=self.period)
 
-        month_rate = year_rate / 12
-        month_rate = Decimal(month_rate).quantize(Decimal('0.000000001'))
-        month_interest = amount * month_rate
-        month_interest = month_interest.quantize(Decimal('.01'))
-
-        total = amount + month_interest * self.period
-        result = [(total, amount, total - amount, Decimal(0), Decimal(0))]
-        return {
-            "terms": result,
-            "total": total
-        }
+    def dqhbfxmethod(self):
+        """ 到期还本付息 """
+        return DisposablePayOff.generate(self.amount, self.year_rate, term=None, period=self.period)
 
     def ajdfxmethod(self):
 
         """ 按季度付息 """
-        assert(self.period is not None)
-
-        amount = Decimal(self.amount)
-        year_rate = Decimal(self.year_rate)
-        quarter_rate = year_rate / 4
-
-        quarter_interest = amount * quarter_rate
-        quarter_interest = quarter_interest.quantize(Decimal('.01'), 'ROUND_UP')
-
-        term_count = int(math.ceil(self.period / 3.0))
-
-        total_interest = year_rate / 12 * self.period * amount
-        total = amount + total_interest
-
-        result = []
-        paid_interest = Decimal(0)
-        for i in xrange(0, term_count - 1):
-            result.append((quarter_interest, Decimal(0), quarter_interest, amount, total - quarter_interest * (i + 1)))
-            paid_interest = paid_interest + quarter_interest
-
-        result.append((total - quarter_interest * (term_count - 1), amount, total_interest - paid_interest, Decimal(0), Decimal(0)))
-
-        return {
-            "terms": result,
-            "total": total
-        }
-
-
-    def dqhbfxmethod(self):
-        """ 到期还本付息 """
-        if self.period is None:
-            return {
-                "terms": [],
-                "total": 0
-            }
-        amount = Decimal(self.amount)
-        year_rate = Decimal(self.year_rate)
-
-        month_rate = year_rate / 12
-        month_rate = Decimal(month_rate).quantize(Decimal('0.000000001'))
-        month_interest = amount * month_rate
-        month_interest = month_interest.quantize(Decimal('.01'))
-
-        total = amount + month_interest * self.period
-        result = [(total, amount, total - amount, Decimal(0), Decimal(0))]
-        return {
-            "terms": result,
-            "total": total
-        }
+        return QuarterlyInterest.generate(self.amount, self.year_rate, term=None, period=self.period)
