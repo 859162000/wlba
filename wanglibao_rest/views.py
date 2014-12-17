@@ -30,7 +30,7 @@ from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
-from wanglibao_p2p.models import P2PRecord
+from wanglibao_p2p.models import P2PRecord, ProductAmortization
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from django.db import transaction
 from wanglibao_sms import messages, backends
@@ -378,6 +378,20 @@ class YTXVoiceCallbackAPIView(APIView):
 
         return Response({"statuscode": "000000"})
 
+class LatestDataAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        today = datetime.combine(datetime.now(), time())
+        start = today-timedelta(30)
+        ams = ProductAmortization.objects.filter(settlement_time__range=(start, today))
+        if not ams:
+            return Response({"ret_code": 0, "message": "ok", "p2p_nums":0, "amorization_amount":0})
+        else:
+            amount = 0
+            for x in ams:
+                amount += x.principal + x.interest + x.penal_interest
+            return Response({"ret_code": 0, "message": "ok", "p2p_nums":len(ams), "amorization_amount":amount})
 
 class UserExisting(APIView):
     permission_classes = ()

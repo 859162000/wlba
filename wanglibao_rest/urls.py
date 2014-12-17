@@ -31,7 +31,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView,
-                            SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView)
+                            SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
+                            LatestDataAPIView)
 
 
 router = DefaultRouter()
@@ -132,6 +133,7 @@ urlpatterns = patterns(
     url(r'^marketing/tv', Statistics.as_view()),
     url(r'^mobiledownload/$', MobileDownloadAPIView.as_view()),
     url(r'^kuaipan/purchaselist/$', KuaipanPurchaseListAPIView.as_view()),
+    url(r'^platform/latestdata/$', LatestDataAPIView.as_view()),
 )
 
 urlpatterns += patterns('',
