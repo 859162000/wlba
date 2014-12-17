@@ -405,6 +405,8 @@ class ShareUrlAPIView(APIView):
             body = json.loads(rs.value)
         except:
             return Response({"ret_code": 30142, "message":u"没有分享数据"})
+        if type(body) != dict:
+            body = {}
         return Response({"ret_code": 0, "message":"ok", "data":body})
 
 class UserExisting(APIView):
