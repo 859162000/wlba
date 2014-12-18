@@ -1222,3 +1222,32 @@ class CjdaoApiView(APIView):
 
                 return render_to_response('cjdao_register.jade')
 
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def ajax_login_cjdao(request, authentication_form=EmailOrPhoneAuthenticationForm):
+    def messenger(message, user=None):
+        res = dict()
+        if user:
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
+        res['message'] = message
+        return json.dumps(res)
+
+    if request.method == "POST":
+        if request.is_ajax():
+            form = authentication_form(request, data=request.POST)
+            if form.is_valid():
+                auth_login(request, form.get_user())
+                if request.POST.has_key('remember_me'):
+                    request.session.set_expiry(604800)
+                else:
+                    request.session.set_expiry(1800)
+                return HttpResponse(messenger('done', user=request.user))
+            else:
+                return HttpResponseForbidden(messenger(form.errors))
+        else:
+            return HttpResponseForbidden('not valid ajax request')
+    else:
+        return HttpResponseNotAllowed()
+
