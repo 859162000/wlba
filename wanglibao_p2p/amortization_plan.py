@@ -124,7 +124,8 @@ class DisposablePayOff(AmortizationPlan):
         year_rate = Decimal(year_rate)
 
         month_rate = year_rate / 12
-        month_rate = Decimal(month_rate).quantize(Decimal('0.000000001'))
+        month_rate = Decimal(month_rate).quantize(Decimal('0.00000000000000000000000001'))
+
         month_interest = amount * month_rate
         month_interest = month_interest.quantize(Decimal('.01'))
 
