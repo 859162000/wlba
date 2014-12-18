@@ -4,6 +4,7 @@ import uuid
 import re
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.template import Context, Template, add_to_builtins
 from django.template.loader import render_to_string, get_template
@@ -162,3 +163,12 @@ def mlgb_md5(phone, flag):
     m = hashlib.md5()
     m.update(new_str)
     return m.hexdigest()
+
+
+def get_wluser_by_phone(phone):
+    """
+
+    :param phone:
+    :return:
+    """
+    return User.objects.filter(wanglibaouserprofile__phone=phone).first()
