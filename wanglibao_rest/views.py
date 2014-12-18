@@ -379,12 +379,13 @@ class YTXVoiceCallbackAPIView(APIView):
         return Response({"statuscode": "000000"})
 
 class LatestDataAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     def post(self, request):
-        today = datetime.combine(datetime.now(), time())
+        now = datetime.now()
+        today = datetime(now.year, now.month, now.day, 23, 59, 59)
         start = today-timedelta(30)
-        ams = ProductAmortization.objects.filter(settlement_time__range=(start, today))
+        ams = ProductAmortization.objects.filter(settlement_time__range=(start, today), settled=True)
         if not ams:
             return Response({"ret_code": 0, "message": "ok", "p2p_nums":0, "amorization_amount":0})
         else:
@@ -392,6 +393,21 @@ class LatestDataAPIView(APIView):
             for x in ams:
                 amount += x.principal + x.interest + x.penal_interest
             return Response({"ret_code": 0, "message": "ok", "p2p_nums":len(ams), "amorization_amount":amount})
+
+class ShareUrlAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def post(self, request):
+        rs = Misc.objects.filter(key="app_share_url").first()
+        if not rs:
+            return Response({"ret_code": 30141, "message":u"没有分享数据"})
+        try:
+            body = json.loads(rs.value)
+        except:
+            return Response({"ret_code": 30142, "message":u"没有分享数据"})
+        if type(body) != dict:
+            body = {}
+        return Response({"ret_code": 0, "message":"ok", "data":body})
 
 class UserExisting(APIView):
     permission_classes = ()
