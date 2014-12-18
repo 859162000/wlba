@@ -895,6 +895,7 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
         return json.dumps(res)
 
     if request.method == "POST":
+
         if request.is_ajax():
             form = authentication_form(request, data=request.POST)
             if form.is_valid():
@@ -1223,25 +1224,31 @@ class CjdaoApiView(APIView):
 @never_cache
 def ajax_login_cjdao(request):
 
+    def messenger(message, user=None):
+        res = dict()
+        res['message'] = message
+        return json.dumps(res)
+
     if request.method == "POST":
-
-        print 'dsadasda'
-
         if request.is_ajax():
-            identifier = request.GET.get('identifier')
-            password = request.GET.get('password')
-            user = authenticate(identifier=identifier, password=password)
-            auth_login(request, user)
 
-            uaccount = request.GET.get('uaccount')
-            companyid = request.GET.get('companyid')
-            md5_value = request.GET.get('md5_value')
+            form = EmailOrPhoneAuthenticationForm(request, data=request.POST)
+            if form.is_valid():
+                identifier = form.cleaned_data.get('identifier')
+                password = form.cleaned_data.get('password')
+                user = authenticate(identifier=identifier, password=password)
+                auth_login(request, user)
 
-            print uaccount, companyid, md5_value
+                uaccount = request.POST.get('uaccount')
+                companyid = request.POST.get('companyid')
+                md5_value = request.POST.get('md5_value')
 
-            # todo request to cjdao
+                # todo request to cjdao
+                #
+                return HttpResponseRedirect('/')
+            else:
+                return HttpResponse(messenger("form unvalid"))
 
-            return HttpResponseRedirect('/')
         else:
             return HttpResponseForbidden('not valid ajax request')
     else:

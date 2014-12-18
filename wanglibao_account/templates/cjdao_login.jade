@@ -13,7 +13,7 @@ html
           img(src="/static/images/cjdao.png")
           h3 投资预约
           p 您在财经道填写的信息已提交至网利宝，请继续完善信息，以便顺利投资网利宝优质项目。
-        form#login-cjdao-form.cjdao-form(method='post', action='/accounts/login/ajax/cjdao/')
+        form#login-cjdao-form.cjdao-form(method='POST', action='/accounts/login/ajax/cjdao/')
           - csrf_token
           input(type="hidden", name="uaccount", value="{{ uaccount }}")
           input(type="hidden", name="companyid", value="{{ companyid }}")
@@ -27,9 +27,8 @@ html
           .form-row
             .span1.align-right 用户名
             .span5
-              input#login_identifier(type="text", name="identifier", placeholder="* 请输入用户名", autocomplete='off', title="* 请输入用户名", value="{{ phone }}")
+              input#login_identifier(type="text", name="identifier", placeholder="* 请输入用户名", autocomplete='off', title="* 请输入用户名", readonly="readonly", value="{{ phone }}")
               .form-row-error.error
-
           .form-row
             .span1.align-right 密码
             .span5

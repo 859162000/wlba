@@ -44,6 +44,7 @@ urlpatterns = patterns(
 
     url(r'^invite/$', login_required(TemplateView.as_view(template_name='invite.jade'), login_url='/accounts/login/')),
 
+    url(r'^login/ajax/cjdao/$', 'wanglibao_account.views.ajax_login_cjdao'),
     url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
 
 
@@ -100,7 +101,7 @@ urlpatterns = patterns(
         name="cjdao_register_product"),
 
     url(r'cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
-    url(r'^login/ajax/cjdao/$', 'wanglibao_account.views.ajax_login_cjdao'),
+
 )
 
 if settings.DEBUG:
