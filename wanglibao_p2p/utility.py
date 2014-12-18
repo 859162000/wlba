@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils import dateparse
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
+from amortization_plan import MatchingPrincipalAndInterest, MonthlyInterest, QuarterlyInterest, DisposablePayOff
 
 
 def checksum(hash_list):
@@ -82,3 +83,41 @@ def handler_paginator(request, objs, page_size=20, page_index=1):
         # return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
         return (False, paginator)
     return (objs, paginator)
+
+
+class AmortizationCalculator():
+
+    def __init__(self, paymethod, amount, year_rate, period):
+        self.paymethod = paymethod
+        self.amount = amount
+        self.year_rate = year_rate
+        self.period = period
+        self.choice = {
+            '1': self.debxmethod,
+            '2': self.ayfxdqhbfxmethod,
+            '3': self.dqhbfxmethod,
+            '4': self.ajdfxmethod
+        }
+
+    def generate(self):
+        action = self.choice.get(self.paymethod)
+        if action:
+            return action()
+
+
+    def debxmethod(self):
+        """ 等额本息 """
+        return MatchingPrincipalAndInterest.generate(self.amount, self.year_rate, term=None, period=self.period)
+
+    def ayfxdqhbfxmethod(self):
+        """ 按月付息到期还本 """
+        return MonthlyInterest.generate(self.amount, self.year_rate, term=None, period=self.period)
+
+    def dqhbfxmethod(self):
+        """ 到期还本付息 """
+        return DisposablePayOff.generate(self.amount, self.year_rate, term=None, period=self.period)
+
+    def ajdfxmethod(self):
+
+        """ 按季度付息 """
+        return QuarterlyInterest.generate(self.amount, self.year_rate, term=None, period=self.period)

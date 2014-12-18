@@ -90,7 +90,7 @@
         }
       },
       errorPlacement: function(error, element) {
-        return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
+        return error.appendTo($(element).parents('.form-row').find('.form-row-error'));
       },
       submitHandler: function(form) {
         if ($('#login_submit').hasClass('disabled')) {
@@ -167,7 +167,7 @@
         }
       },
       errorPlacement: function(error, element) {
-        return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
+        return error.appendTo($(element).parents('.form-row').find('.form-row-error'));
       },
       submitHandler: function(form) {
         $('input[name="identifier"]').trigger('keyup');
@@ -210,11 +210,12 @@
     _showModal = function() {
       return $('#login-modal').modal();
     };
-    $("#button-get-validate-code-modal").click(function(e) {
+    $("#button-get-validate-code").click(function(e) {
       var count, element, intervalId, phoneNumber, timerFunction;
       e.preventDefault();
       element = this;
       phoneNumber = $.trim($("#reg_identifier").val());
+      console.log(phoneNumber);
       if (checkMobile(phoneNumber)) {
         if (typeof console !== "undefined" && console !== null) {
           console.log("Phone number checked, now send the valdiation code");

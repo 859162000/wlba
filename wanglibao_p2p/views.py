@@ -28,7 +28,7 @@ from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
-from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
+from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
 from wanglibao.const import ErrorNumber
 from django.conf import settings
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
@@ -37,6 +37,8 @@ from wanglibao_account.models import Binding
 from django.contrib.auth.decorators import login_required
 from wanglibao_account.utils import generate_contract_preview
 from wanglibao_pay.util import get_a_uuid
+from django.contrib import messages
+from django.shortcuts import redirect, render_to_response
 
 
 REPAYMENTTYPEMAP = (
@@ -865,6 +867,32 @@ class P2PListView(TemplateView):
 
 class GenP2PUserProfileReport(TemplateView):
     template_name = 'gen_p2p_user_profile_report.jade'
+
+
+class AdminAmortization(TemplateView):
+    template_name = 'admin_amortization.jade'
+
+    def post(self, request, **kwargs):
+        try:
+            paymethod = request.POST.get('paymethod')
+            amount = request.POST.get('amount')
+            year_rate = float(request.POST.get('year_rate')) / 100
+            period = int(request.POST.get('period'))
+        except:
+            messages.warning(request, u'输入错误, 请重新检测')
+            return redirect('./amortization')
+
+        if amount and year_rate and period:
+            ac = AmortizationCalculator(paymethod, amount, year_rate, period)
+            acs = ac.generate()
+            total = acs['total']
+            terms = acs['terms']
+            key = ('term_amount', 'principal', 'interest', 'principal_left')
+            newterms = [dict(zip(key, term)) for term in terms]
+            return render_to_response('admin_amortization.jade', {'total':total, 'newterms': newterms})
+        else:
+            messages.warning(request, u'查询错误')
+            return redirect('./amortization')
 
 
 class AdminP2PUserRecord(TemplateView):

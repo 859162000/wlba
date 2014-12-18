@@ -48,5 +48,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=hover.map

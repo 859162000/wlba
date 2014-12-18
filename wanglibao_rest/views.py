@@ -30,7 +30,7 @@ from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
-from wanglibao_p2p.models import P2PRecord
+from wanglibao_p2p.models import P2PRecord, ProductAmortization
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from django.db import transaction
 from wanglibao_sms import messages, backends
@@ -378,6 +378,36 @@ class YTXVoiceCallbackAPIView(APIView):
 
         return Response({"statuscode": "000000"})
 
+class LatestDataAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        now = datetime.now()
+        today = datetime(now.year, now.month, now.day, 23, 59, 59)
+        start = today-timedelta(30)
+        ams = ProductAmortization.objects.filter(settlement_time__range=(start, today), settled=True)
+        if not ams:
+            return Response({"ret_code": 0, "message": "ok", "p2p_nums":0, "amorization_amount":0})
+        else:
+            amount = 0
+            for x in ams:
+                amount += x.principal + x.interest + x.penal_interest
+            return Response({"ret_code": 0, "message": "ok", "p2p_nums":len(ams), "amorization_amount":amount})
+
+class ShareUrlAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def post(self, request):
+        rs = Misc.objects.filter(key="app_share_url").first()
+        if not rs:
+            return Response({"ret_code": 30141, "message":u"没有分享数据"})
+        try:
+            body = json.loads(rs.value)
+        except:
+            return Response({"ret_code": 30142, "message":u"没有分享数据"})
+        if type(body) != dict:
+            body = {}
+        return Response({"ret_code": 0, "message":"ok", "data":body})
 
 class UserExisting(APIView):
     permission_classes = ()
@@ -563,21 +593,22 @@ class Statistics(APIView):
         today_end = datetime.combine(tomorrow, time())
 
         today_user = User.objects.filter(date_joined__range=(today_start, today_end)).aggregate(Count('id'))
-        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
-            Sum('amount'))
-        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
-            Count('id'))
+        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate( Sum('amount'))
+
+        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购')\
+            .values('id').count()
 
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
-        all_num = P2PRecord.objects.filter(catalog='申购').aggregate(Count('id'))
+        all_num = P2PRecord.objects.filter(catalog='申购').values('id').count()
+
 
         data = {
-            'today_num': today_num['id__count'],
+            'today_num': today_num,
             'today_user': today_user['id__count'],
             'today_amount': today_amount['amount__sum'],
 
-            'all_num': all_num['id__count'],
+            'all_num': all_num,
             'all_user': all_user['id__count'],
             'all_amount': all_amount['amount__sum'],
         }

@@ -40,6 +40,7 @@
           line-height: normal
 
       .form-row
+        position: relative
         .span1
           font-size: $font-s
           width: 110px
@@ -49,17 +50,17 @@
           +border-radius(5px)
 
         .form-row-error
-          padding: 8px 0 0 10px
+          padding: 8px 0 0 0px
           color: #999999
 
         .error
-          padding: 8px 0 0 10px
+          //padding: 8px 0 0 10px
           color: $color-red
 
       .forget-password
-        position: relative
-        right: -450px
-        top: -30px
+        position: absolute
+        left: 600px
+        top: 20px
 
     .form-left-line
       background: url("/static/images/cjdao_line.png") no-repeat left 0

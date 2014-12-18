@@ -48,6 +48,7 @@ from wanglibao.const import ErrorNumber
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
 from wanglibao_account.models import Message
+from wanglibao_p2p.models import P2PProduct
 from django.template.defaulttags import register
 #from wanglibao_sms.tasks import send_messages
 from wanglibao_sms import messages
@@ -1175,3 +1176,37 @@ class IntroduceRelation(TemplateView):
         Only user with change payinfo permission can call this view
         """
         return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)
+
+class P2PDetailOfLoginForCjdView(TemplateView):
+    template_name = "cjdao_login_product.jade"
+
+    def get_context_data(self, id, **kwargs):
+        context = super(P2PDetailOfLoginForCjdView, self).get_context_data(**kwargs)
+
+        try:
+            p2p = P2PProduct.objects.select_related('activity').get(pk=id, hide=False)
+        except P2PProduct.DoesNotExist:
+            raise Http404(u'您查找的产品不存在')
+
+        context.update({
+            'p2p': p2p
+        })
+
+        return context
+
+class P2PDetailOfRegisterForCjdView(TemplateView):
+    template_name = "cjdao_register_product.jade"
+
+    def get_context_data(self, id, **kwargs):
+        context = super(P2PDetailOfRegisterForCjdView, self).get_context_data(**kwargs)
+
+        try:
+            p2p = P2PProduct.objects.select_related('activity').get(pk=id, hide=False)
+        except P2PProduct.DoesNotExist:
+            raise Http404(u'您查找的产品不存在')
+
+        context.update({
+            'p2p': p2p
+        })
+
+        return context
