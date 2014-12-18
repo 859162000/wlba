@@ -13,39 +13,41 @@ html
           img(src="/static/images/cjdao.png")
           h3 投资预约
           p 您在财经道填写的信息已提交至网利宝，请继续完善信息，以便顺利投资网利宝优质项目。
-        form#login-cjdao-form.cjdao-form(method='post', action='/accounts/login/ajax/')
-            - csrf_token
-            input#login_identifier(type="text", name="uaccount", value="{{  }}")
-            .form-login-title
-              span.cjdao-form-item 登陆信息
-              span.login-now
-                | 还不是会员
-                br
-                a.blue(href="") 现在就去注册>>
-            .form-row
-              .span1.align-right 用户名
-              .span5
-                input#login_identifier(type="text", name="identifier", placeholder="* 请输入用户名", autocomplete='off', title="* 请输入用户名")
-                .form-row-error.error
+        form#login-cjdao-form.cjdao-form(method='post', action='/accounts/login/ajax/cjdao/')
+          - csrf_token
+          input(type="hidden", name="uaccount", value="{{ uaccount }}")
+          input(type="hidden", name="companyid", value="{{ companyid }}")
+          input(type="hidden", name="md5_value", value="{{ md5_value }}")
+          .form-login-title
+            span.cjdao-form-item 登陆信息
+            span.login-now
+              | 还不是会员
+              br
+              a.blue(href="") 现在就去注册>>
+          .form-row
+            .span1.align-right 用户名
+            .span5
+              input#login_identifier(type="text", name="identifier", placeholder="* 请输入用户名", autocomplete='off', title="* 请输入用户名", value="{{ phone }}")
+              .form-row-error.error
 
-            .form-row
-              .span1.align-right 密码
-              .span5
-                input(type="password", name="password", placeholder="请输入6-20位密码，建议英文、数字的组合", autocomplete='off', title="请输入密码")
-                a.forget-password.blue(href="", target="_blank") 忘记密码？
-                .form-row-error
-            .form-row
-              .span1.align-right 验证码
-              .span5
-                input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-                input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入答案", maxlength="4")
-                img.captcha.captcha-img(alt="captcha", src="", style="width:100px;height:40px")
-                a.captcha-refresh(type="button", title="点击刷新验证码")
-                .form-row-error
-            .form-row
-              .span1.align-right &nbsp;
-              .span5
-                button#login_submit.button.button-account.span12(type='submit') 立即登陆
+          .form-row
+            .span1.align-right 密码
+            .span5
+              input(type="password", name="password", placeholder="请输入6-20位密码，建议英文、数字的组合", autocomplete='off', title="请输入密码")
+              a.forget-password.blue(href="", target="_blank") 忘记密码？
+              .form-row-error
+          .form-row
+            .span1.align-right 验证码
+            .span5
+              input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+              input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入答案", maxlength="4")
+              img.captcha.captcha-img(alt="captcha", src="", style="width:100px;height:40px")
+              a.captcha-refresh(type="button", title="点击刷新验证码")
+              .form-row-error
+          .form-row
+            .span1.align-right &nbsp;
+            .span5
+              button#login_submit.button.button-account.span12(type='submit') 立即登陆
                 
     script.
       require(["/static/js/login_cjdao.js"])

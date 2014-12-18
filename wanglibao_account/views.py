@@ -1193,7 +1193,6 @@ class CjdaoApiView(APIView):
         thirdproductid = request.GET.get('thirdproductid')
         user = CjdaoUtils.get_wluser_by_phone(phone)
 
-
         if thirdproductid:
             productid = request.GET.get('productid')
             money = request.GET.get('money')
@@ -1211,10 +1210,12 @@ class CjdaoApiView(APIView):
         else:
 
             if user:
-                return render_to_response('cjdao_login.jade')
+                return render_to_response('cjdao_login.jade',
+                                          {'uaccount': uaccount, 'companyid': companyid, 'md5_value': md5_value,
+                                           'phone': phone})
             else:
-
-                return render_to_response('cjdao_register.jade')
+                return render_to_response('cjdao_register.jade',
+                                          {'uaccount': uaccount, 'companyid': companyid, 'md5_value': md5_value})
 
 
 @sensitive_post_parameters()
@@ -1223,13 +1224,24 @@ class CjdaoApiView(APIView):
 def ajax_login_cjdao(request):
 
     if request.method == "POST":
+
+        print 'dsadasda'
+
         if request.is_ajax():
             identifier = request.GET.get('identifier')
             password = request.GET.get('password')
             user = authenticate(identifier=identifier, password=password)
             auth_login(request, user)
+
+            uaccount = request.GET.get('uaccount')
+            companyid = request.GET.get('companyid')
+            md5_value = request.GET.get('md5_value')
+
+            print uaccount, companyid, md5_value
+
             # todo request to cjdao
-            # return redirect
+
+            return HttpResponseRedirect('/')
         else:
             return HttpResponseForbidden('not valid ajax request')
     else:
