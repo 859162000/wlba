@@ -165,10 +165,34 @@ def mlgb_md5(phone, flag):
     return m.hexdigest()
 
 
-def get_wluser_by_phone(phone):
-    """
+class CjdaoUtils():
 
-    :param phone:
-    :return:
-    """
-    return User.objects.filter(wanglibaouserprofile__phone=phone).first()
+
+    @classmethod
+    def get_wluser_by_phone(cls, phone):
+        """
+
+        :param phone:
+        :return:
+        """
+        if phone:
+            return User.objects.filter(wanglibaouserprofile__phone=phone).first()
+
+    @classmethod
+    def quick_md5_value(cls, uaccount, phone, companyid, key):
+        data_string = '{}{}{}{}'.format(uaccount, phone, companyid, key)
+        return cls.md5str(data_string)
+
+    @classmethod
+    def md5_value(cls, *args):
+        data_string = ''.join(args)
+        m = hashlib.md5()
+        m.update(data_string)
+        return m.hexdigest()
+
+    @classmethod
+    def valid_md5(cls, str, *args):
+        data_string = ''.join(args)
+        m = hashlib.md5()
+        m.update(data_string)
+        return str == m.hexdigest()

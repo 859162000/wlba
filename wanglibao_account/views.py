@@ -14,7 +14,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404, HttpResponseRedirect
-from django.shortcuts import resolve_url
+from django.shortcuts import resolve_url, render_to_response
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
@@ -30,7 +30,7 @@ from marketing.models import IntroducedBy
 from marketing.utils import set_promo_user
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
-from utils import detect_identifier_type, create_user, generate_contract
+from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, CjdaoUtils
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
@@ -45,7 +45,6 @@ from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
-from wanglibao_account.utils import get_wluser_by_phone
 from wanglibao_p2p.models import P2PProduct
 from django.template.defaulttags import register
 from wanglibao_sms import messages
@@ -321,7 +320,7 @@ class AccountHome(TemplateView):
 
         return {
             'message': message,
-            #'p2p_equities': p2p_equities,
+            # 'p2p_equities': p2p_equities,
             'result': result,
             'amortizations': amortizations,
             'p2p_product_amortization': p2p_product_amortization,
@@ -947,7 +946,6 @@ def ajax_register(request):
                 })
 
                 return HttpResponse(messenger('done', user=request.user))
-                # return HttpResponseRedirect("/accounts/id_verify/")
             else:
                 return HttpResponseForbidden(messenger(form.errors))
         else:
@@ -1181,38 +1179,46 @@ class P2PDetailOfRegisterForCjdView(TemplateView):
         return context
 
 
-class CjdaoApiView(APIView):
+CJDAOKEY = '1234'
 
+
+class CjdaoApiView(APIView):
     permission_classes = ()
 
     def get(self, request):
         uaccount = request.GET.get('uaccount')
         phone = request.GET.get('phone')
         companyid = request.GET.get('companyid')
+        md5_value = request.GET.get('md5_value')
+        productid = request.GET.get('productid')
 
-        user = get_wluser_by_phone(phone)
-        if user:
+        user = CjdaoUtils.get_wluser_by_phone(phone)
+
+
+        if productid:
+            thirdproductid = request.GET.get('thirdproductid')
             productid = request.GET.get('productid')
-            if productid:
-                thirdproductid = request.GET.get('thirdproductid')
-                productid = request.GET.get('productid')
-                money = request.GET.get('money')
-                usertarget = request.GET.get('usertarget')
-                md5_value = request.GET.get('md5_value')
+            money = request.GET.get('money')
+            usertarget = request.GET.get('usertarget')
 
-                return 'productid'
+            # if CjdaoUtils.valid_md5(md5_value, uaccount, phone, companyid, thirdproductid, productid, money, usertarget,
+            #                         CJDAOKEY):
+            #     pass
+
+            if user:
+                return 'login_product'
             else:
-                return 'no productid'
-
-            return 'login'
+                return 'register_product'
         else:
-            return 'register'
+            # if CjdaoUtils.valid_md5(md5_value, uaccount, phone, companyid, CJDAOKEY):
+            #     pass
+
+            if user:
 
 
 
+                return render_to_response('cjdao_login.jade')
+            else:
 
+                return render_to_response('cjdao_register.jade')
 
-
-
-
-        return HttpResponse('cjdao')
