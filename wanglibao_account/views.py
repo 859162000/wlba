@@ -1190,13 +1190,11 @@ class CjdaoApiView(APIView):
         phone = request.GET.get('phone')
         companyid = request.GET.get('companyid')
         md5_value = request.GET.get('md5_value')
-        productid = request.GET.get('productid')
-
+        thirdproductid = request.GET.get('thirdproductid')
         user = CjdaoUtils.get_wluser_by_phone(phone)
 
 
-        if productid:
-            thirdproductid = request.GET.get('thirdproductid')
+        if thirdproductid:
             productid = request.GET.get('productid')
             money = request.GET.get('money')
             usertarget = request.GET.get('usertarget')
@@ -1205,18 +1203,20 @@ class CjdaoApiView(APIView):
             #                         CJDAOKEY):
             #     pass
 
+            try:
+                p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
+            except P2PProduct.DoesNotExist:
+                raise Http404(u'您查找的产品不存在')
+
             if user:
-                return 'login_product'
+                return render_to_response('cjdao_login_product.jade', {'p2p': p2p})
             else:
-                return 'register_product'
+                return render_to_response('cjdao_register_product.jade', {'p2p': p2p})
         else:
             # if CjdaoUtils.valid_md5(md5_value, uaccount, phone, companyid, CJDAOKEY):
             #     pass
 
             if user:
-
-
-
                 return render_to_response('cjdao_login.jade')
             else:
 
@@ -1226,26 +1226,16 @@ class CjdaoApiView(APIView):
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def ajax_login_cjdao(request, authentication_form=EmailOrPhoneAuthenticationForm):
-    def messenger(message, user=None):
-        res = dict()
-        if user:
-            res['nick_name'] = user.wanglibaouserprofile.nick_name
-        res['message'] = message
-        return json.dumps(res)
+def ajax_login_cjdao(request):
 
     if request.method == "POST":
         if request.is_ajax():
-            form = authentication_form(request, data=request.POST)
-            if form.is_valid():
-                auth_login(request, form.get_user())
-                if request.POST.has_key('remember_me'):
-                    request.session.set_expiry(604800)
-                else:
-                    request.session.set_expiry(1800)
-                return HttpResponse(messenger('done', user=request.user))
-            else:
-                return HttpResponseForbidden(messenger(form.errors))
+            identifier = request.GET.get('identifier')
+            password = request.GET.get('password')
+            user = authenticate(identifier=identifier, password=password)
+            auth_login(request, user)
+            # todo request to cjdao
+            # return redirect
         else:
             return HttpResponseForbidden('not valid ajax request')
     else:
