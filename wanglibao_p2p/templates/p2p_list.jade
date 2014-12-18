@@ -144,7 +144,12 @@ html
 
                         .row.p2pinfo-list
                           .span4.p2pinfo-ceil
-                            em.p2pinfo-active.highlight.font-weight  {{ p2p.expected_earning_rate }}%
+                            if p2p.activity
+                              activity_earning = p2p.activity.rule.percent_text
+                            else
+                              activity_earning = 0
+                            earning_total = p2p.expected_earning_rate + float(activity_earning)
+                            em.p2pinfo-active.highlight.font-weight  {{ earning_total }}%
                             | &nbsp;收益
                           .span3.p2pinfo-ceil
                             em.font-weight {{ p2p.period }}
@@ -205,7 +210,12 @@ html
 
                         .row.p2pinfo-list
                           .span4.p2pinfo-ceil
-                            em.font-weight  {{ p2p.expected_earning_rate }}%
+                            if p2p.activity
+                              activity_earning = p2p.activity.rule.percent_text
+                            else
+                              activity_earning = 0
+                            earning_total = p2p.expected_earning_rate + float(activity_earning)
+                            em.font-weight  {{ earning_total }}%
                             | &nbsp;收益
                           .span3.p2pinfo-ceil
                             em.p2pinfo-active.highlight.font-weight {{ p2p.period }}
@@ -264,7 +274,12 @@ html
                               a(href="/p2p/detail/{{p2p.id}}") {{ p2p.short_name }}
                         .row.p2pinfo-list
                           .span4.p2pinfo-ceil
-                            em.font-weight  {{ p2p.expected_earning_rate }}%
+                            if p2p.activity
+                              activity_earning = p2p.activity.rule.percent_text
+                            else
+                              activity_earning = 0
+                            earning_total = p2p.expected_earning_rate + float(activity_earning)
+                            em.font-weight  {{ earning_total }}%
                             | &nbsp;收益
                           .span3.p2pinfo-ceil
                             em.font-weight {{ p2p.period }}
