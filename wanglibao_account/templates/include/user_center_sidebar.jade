@@ -14,13 +14,16 @@ ul.sidebar
   +sidebar-item('提现', '/pay/withdraw/')
 
   - var classes = ['sidebar-item']
-  if activeItem == '交易记录'
+  if activeItem == '交易记录' or activeItem == '货基交易记录'
     classes = ['sidebar-item', 'active']
-  li(class=classes)
+  li(class=classes)#sidebar-second
     a(href='/accounts/transaction/p2p/') 交易记录
-    ul.sidebar-secondary
-      +sidebar-item('P2P交易记录', '/accounts/transaction/p2p/')
-      +sidebar-item('货基交易记录', '/accounts/transaction/fund/')
+  - var didplay = 'display:none'
+  if activeItem == '交易记录' or activeItem == '货基交易记录'
+      display = 'display:block'
+  ul.sidebar-secondary(style=display)
+    +sidebar-item('P2P交易记录', '/accounts/transaction/p2p/')
+    +sidebar-item('货基交易记录', '/accounts/transaction/fund/')
 
   +sidebar-item('银行卡', '/accounts/bankcard/')
 

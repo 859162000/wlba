@@ -593,21 +593,22 @@ class Statistics(APIView):
         today_end = datetime.combine(tomorrow, time())
 
         today_user = User.objects.filter(date_joined__range=(today_start, today_end)).aggregate(Count('id'))
-        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
-            Sum('amount'))
-        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
-            Count('id'))
+        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate( Sum('amount'))
+
+        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购')\
+            .values('id').count()
 
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
-        all_num = P2PRecord.objects.filter(catalog='申购').aggregate(Count('id'))
+        all_num = P2PRecord.objects.filter(catalog='申购').values('id').count()
+
 
         data = {
-            'today_num': today_num['id__count'],
+            'today_num': today_num,
             'today_user': today_user['id__count'],
             'today_amount': today_amount['amount__sum'],
 
-            'all_num': all_num['id__count'],
+            'all_num': all_num,
             'all_user': all_user['id__count'],
             'all_amount': all_amount['amount__sum'],
         }
