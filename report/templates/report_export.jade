@@ -18,6 +18,22 @@ head
                     a(href='/{{ "" | admin_address}}')
                         button.button-home-action(type='submit') 返回
                     .space-vertical-l
+                    .row
+                        .span3
+                            label 用户余额
+                        .span9-omega
+                            h3 {{ margin }}
+                    .row
+                        .span3
+                            label 冻结金额
+                        .span9-omega
+                            h3 {{ freeze }}
+                    .row
+                        .span3
+                            label 提款中金额
+                        .span9-omega
+                            h3 {{ withdrawing }}
+                    .space-vertical-l
                     .space-vertical-l
                     for typename, value in type
                         .space-vertical-l
