@@ -15,6 +15,7 @@ html
           p 您在财经道填写的信息已提交至网利宝，请继续完善信息，以便顺利投资网利宝优质项目。
         form#login-cjdao-form.cjdao-form(method='post', action='/accounts/login/ajax/')
             - csrf_token
+            input#login_identifier(type="text", name="uaccount", value="{{  }}")
             .form-login-title
               span.cjdao-form-item 登陆信息
               span.login-now

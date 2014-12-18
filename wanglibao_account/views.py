@@ -1199,10 +1199,6 @@ class CjdaoApiView(APIView):
             money = request.GET.get('money')
             usertarget = request.GET.get('usertarget')
 
-            # if CjdaoUtils.valid_md5(md5_value, uaccount, phone, companyid, thirdproductid, productid, money, usertarget,
-            #                         CJDAOKEY):
-            #     pass
-
             try:
                 p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
             except P2PProduct.DoesNotExist:
@@ -1213,8 +1209,6 @@ class CjdaoApiView(APIView):
             else:
                 return render_to_response('cjdao_register_product.jade', {'p2p': p2p})
         else:
-            # if CjdaoUtils.valid_md5(md5_value, uaccount, phone, companyid, CJDAOKEY):
-            #     pass
 
             if user:
                 return render_to_response('cjdao_login.jade')
