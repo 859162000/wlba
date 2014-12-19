@@ -53,7 +53,7 @@ html
             .form-row
               .span1.align-right 用户名
               .span7
-                input#login_identifier(type="text", name="identifier", placeholder="* 请输入用户名", autocomplete='off', title="* 请输入用户名")
+                input#login_identifier(type="text", name="identifier", placeholder="* 请输入用户名", autocomplete='off', title="* 请输入用户名", readonly="readonly", value="{{ phone }}")
                 .form-row-error.error
 
             .form-row

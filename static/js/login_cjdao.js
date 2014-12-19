@@ -102,14 +102,12 @@
           type: "POST",
           data: $("#login-cjdao-form").serialize()
         }).done(function(data, textStatus) {
-          var arr, next_url;
-          next_url = '';
-          arr = /\?next=(\/.+)$/ig.exec(window.location);
+          var arr;
+          arr = /thirdproductid=(\d+)/ig.exec(window.location);
           if (arr && arr[1]) {
-            next_url = arr[1];
-            window.location.href = next_url;
+            window.location.href = '/p2p/detail/' + arr[1];
           } else {
-            location.reload();
+            window.location.href = '/';
           }
           return $('#login_submit').removeClass('disabled');
         }).fail(function(xhr) {
@@ -176,7 +174,13 @@
           type: "POST",
           data: $(form).serialize()
         }).done(function(data, textStatus) {
-          return location.reload();
+          var arr;
+          arr = /thirdproductid=(\d+)/ig.exec(window.location);
+          if (arr && arr[1]) {
+            return window.location.href = '/p2p/detail/' + arr[1];
+          } else {
+            return window.location.href = '/';
+          }
         }).fail(function(xhr) {
           var error_message, message, result;
           result = JSON.parse(xhr.responseText);
