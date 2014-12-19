@@ -30,7 +30,7 @@
           password1: password1,
           password2: password2
         }).done(function() {
-          return location.href = '/accounts/password/reset/done/';
+          return location.href = '/accounts/password/reset/done/?next=/accounts/home/';
         }).fail(function() {
           return tool.modalAlert({
             title: '温馨提示',
