@@ -87,9 +87,9 @@ def _send(target_user, msgTxt):
     msg.message_text = msgTxt
     mset = MessageNoticeSet.objects.filter(user=target_user, mtype=msgTxt.mtype).first()
     notice = True
-    if mset:
-        notice = mset.notice
-        #发推送,先按设置推，有需求再做判断
+    #不管有没有设置，默认都发推送
+    if mset or not mset:
+        #notice = mset.notice
         devices = UserPushId.objects.filter(user=target_user)
         if devices:
             channel = bae_channel.BaeChannel()
