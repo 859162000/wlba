@@ -820,7 +820,7 @@ class MessageView(TemplateView):
         messages_list = []
         messages_list.extend(messages)
 
-        limit = 10
+        limit = 2
         paginator = Paginator(messages_list, limit)
         page = self.request.GET.get('page')
 
@@ -832,7 +832,8 @@ class MessageView(TemplateView):
             messages_list = paginator.page(paginator.num_pages)
 
         return {
-            'messageList': messages_list
+            'messageList': messages_list,
+            'list_type': listtype
         }
 
 
