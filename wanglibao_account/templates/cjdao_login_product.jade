@@ -41,7 +41,7 @@ html
                 earning_rate = str(p2p.expected_earning_rate)
                 .span9-omega {{earning_rate}}%
         .span5-omega
-          form#login-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/login/ajax/')
+          form#login-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/login/ajax/cjdao/')
             - csrf_token
             .form-login-title
               span.cjdao-form-item 登陆信息
@@ -53,7 +53,7 @@ html
             .form-row
               .span1.align-right 用户名
               .span7
-                input#login_identifier(type="text", name="identifier", placeholder="* 请输入用户名", autocomplete='off', title="* 请输入用户名")
+                input#login_identifier(type="text", name="identifier", readonly="readonly", value="{{ phone }}", autocomplete='off', title="* 请输入用户名" )
                 .form-row-error.error
 
             .form-row

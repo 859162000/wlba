@@ -1205,7 +1205,12 @@ class CjdaoApiView(APIView):
                 raise Http404(u'您查找的产品不存在')
 
             if user:
-                return render_to_response('cjdao_login_product.jade', {'p2p': p2p})
+                return render_to_response('cjdao_login_product.jade', {
+                    'p2p': p2p,
+                    'uaccount': uaccount,
+                    'companyid': companyid,
+                    'md5_value': md5_value,
+                    'phone': phone})
             else:
                 return render_to_response('cjdao_register_product.jade', {'p2p': p2p})
         else:
@@ -1223,7 +1228,6 @@ class CjdaoApiView(APIView):
 @csrf_protect
 @never_cache
 def ajax_login_cjdao(request):
-
     def messenger(message, user=None):
         res = dict()
         res['message'] = message
@@ -1231,7 +1235,6 @@ def ajax_login_cjdao(request):
 
     if request.method == "POST":
         if request.is_ajax():
-
             form = EmailOrPhoneAuthenticationForm(request, data=request.POST)
             if form.is_valid():
                 identifier = form.cleaned_data.get('identifier')
@@ -1243,9 +1246,6 @@ def ajax_login_cjdao(request):
                 companyid = request.POST.get('companyid')
                 md5_value = request.POST.get('md5_value')
 
-                # todo request to cjdao
-                #
-                return HttpResponseRedirect('/')
             else:
                 return HttpResponse(messenger("form unvalid"))
 

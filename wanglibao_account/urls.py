@@ -94,6 +94,7 @@ urlpatterns = patterns(
         name='auth_password_reset_confirm'),
     url(r'', include('registration.backends.default.urls')),
 
+
     url(r'^cjdao_login/$', TemplateView.as_view(template_name='cjdao_login.jade')),
     url(r'^cjdao_register/$', TemplateView.as_view(template_name='cjdao_register.jade')),
     url(r'^cjdao_login_product/(?P<id>\w+)$', P2PDetailOfLoginForCjdView.as_view(), name="cjdao_login_product"),
