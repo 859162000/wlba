@@ -21,6 +21,7 @@ from order.utils import OrderHelper
 from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_sms.utils import validate_validation_code
+from marketing import tools
 
 from Crypto import Random
 from Crypto.Hash import SHA
@@ -293,6 +294,9 @@ class YeePay:
                 rs = {"ret_code":20087, "message":PayResult.DEPOSIT_FAIL}
 
         pay_info.save()
+        if rs['ret_code'] == 0:
+            tools.xunlei_3_vip(pay_info)
+            tools.fengxing_7_vip(pay_info)
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
