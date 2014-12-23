@@ -4,6 +4,7 @@ import logging
 import json
 import math
 
+import requests
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
 from django.db.models import Sum
@@ -1210,6 +1211,7 @@ class CjdaoApiView(APIView):
                     'p2p': p2p,
                     'uaccount': uaccount,
                     'companyid': companyid,
+                    'productid': productid,
                     'md5_value': md5_value,
                     'phone': phone})
             else:
@@ -1223,8 +1225,11 @@ class CjdaoApiView(APIView):
                                           {'uaccount': uaccount, 'companyid': companyid, 'md5_value': md5_value,
                                            'phone': phone})
             else:
+
+
                 return render_to_response('cjdao_register.jade',
-                                          {'uaccount': uaccount, 'companyid': companyid, 'md5_value': md5_value})
+                                          {'uaccount': uaccount, 'companyid': companyid, 'md5_value': md5_value,
+                                           'phone': phone})
 
 
 @sensitive_post_parameters()
@@ -1244,10 +1249,13 @@ def ajax_login_cjdao(request):
                 password = form.cleaned_data.get('password')
                 user = authenticate(identifier=identifier, password=password)
                 auth_login(request, user)
-                # todo save the cjdao info to session
-                uaccount = request.POST.get('uaccount')
-                companyid = request.POST.get('companyid')
-                md5_value = request.POST.get('md5_value')
+                cjdaoinfo = {
+                    'uaccount': request.POST.get('uaccount'),
+                    'companyid': request.POST.get('companyid'),
+                    'productid': request.POST.get('productid'),
+                    'md5_value': request.POST.get('md5_value')
+                }
+                request.session['cjdaoinfo'] = cjdaoinfo
                 return HttpResponse(messenger("success"))
             else:
                 return HttpResponse(messenger("form unvalid"))
@@ -1257,3 +1265,57 @@ def ajax_login_cjdao(request):
     else:
         return HttpResponseNotAllowed()
 
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def ajax_register_cjdao(request):
+    def messenger(message, user=None):
+        res = dict()
+        if user:
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
+        res['message'] = message
+        return json.dumps(res)
+
+    if request.method == "POST":
+        if request.is_ajax():
+            form = EmailOrPhoneRegisterForm(request.POST)
+            if form.is_valid():
+                nickname = form.cleaned_data['nickname']
+                password = form.cleaned_data['password']
+                identifier = form.cleaned_data['identifier']
+                invitecode = form.cleaned_data['invitecode']
+
+
+
+                user = create_user(identifier, password, nickname)
+                set_promo_user(request, user, invitecode=invitecode)
+                auth_user = authenticate(identifier=identifier, password=password)
+                auth.login(request, auth_user)
+
+                cjdaoinfo = {
+                    'uaccount': request.POST.get('uaccount'),
+                    'companyid': request.POST.get('companyid'),
+                    'productid': request.POST.get('productid'),
+                }
+                request.session['cjdaoinfo'] = cjdaoinfo
+
+                url = "http://ceshi.cjdao.com/productbuy/reginfo"
+                p = {
+                    'phone': identifier,
+                    'usertype': 0,
+                    'uaccount': request.POST.get('uaccount'),
+                    'companyid': request.POST.get('companyid'),
+                    'accountbalance': float(auth_user.margin.margin),
+                    'md5_value': CjdaoUtils.md5_value(*(identifier, '0', 'uaccount', 'companyid', 'accountbalance'))
+                }
+
+                r = requests.get(url, params=cjdaoinfo)
+
+                return HttpResponse(messenger('done', user=request.user))
+            else:
+                return HttpResponseForbidden(messenger(form.errors))
+        else:
+            return HttpResponseForbidden('not valid ajax request')
+    else:
+        return HttpResponseNotAllowed()
