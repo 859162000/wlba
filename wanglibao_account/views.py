@@ -1215,9 +1215,10 @@ class CjdaoApiView(APIView):
                     'md5_value': md5_value,
                     'phone': phone})
             else:
+
                 return render_to_response('cjdao_register_product.jade',
                                           {'p2p': p2p, 'uaccount': uaccount, 'companyid': companyid,
-                                           'md5_value': md5_value})
+                                           'md5_value': md5_value, 'phone': phone})
         else:
 
             if user:

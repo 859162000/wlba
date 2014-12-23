@@ -42,8 +42,11 @@ html
                         earning_rate = str(p2p.expected_earning_rate)
                         .span9-omega {{earning_rate}}%
         .span5-omega
-          form#register-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/register/ajax/')
+          form#register-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/register/ajax/cjdao/')
             - csrf_token
+            input(type="hidden", name="uaccount", value="{{ uaccount }}")
+            input(type="hidden", name="companyid", value="{{ companyid }}")
+            input(type="hidden", name="md5_value", value="{{ md5_value }}")
             .form-login-title
               span.cjdao-form-item 注册
               span.login-now
@@ -54,7 +57,7 @@ html
             .form-row
               .span1.align-right 手机号
               .span7
-                input#reg_identifier(type="text", name="identifier", placeholder="* 请输入手机号", autocomplete='off', title="* 请输入手机号",style="width:118px;margin-right:10px")
+                input#reg_identifier(type="text", name="identifier", value="{{ phone }}", readonly="readonly", autocomplete='off', style="width:118px;margin-right:10px")
                 button#button-get-validate-code.button-orange.button-large(type='button') 获取验证码
                 .form-row-error.error
 
