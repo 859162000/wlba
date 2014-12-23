@@ -42,7 +42,7 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-        tools.decide_first.apply_async(kwargs={"user":self.user})
+        tools.decide_first.apply_async(kwargs={"user":self.user.id})
 
         """
         # 首次购买

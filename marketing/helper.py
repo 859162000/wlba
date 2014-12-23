@@ -158,10 +158,9 @@ class RewardStrategy():
         self._send_message_template(title, content)
 
     def _send_sevenday_fengxing(self):
-        """ 首次充值,风行会员赠送七天激活码
+        """ 首次充值,风行会员赠送七天激活码,不在此发送
         """
-        title, content = messages.msg_despoit_ok_f(self.reward.content)
-        self._send_message_template(title, content)
+        pass
 
     def _send_month_fengxing(self):
         """ 首次理财,风行会员赠送一个月激活码
