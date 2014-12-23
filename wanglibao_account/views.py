@@ -1213,7 +1213,9 @@ class CjdaoApiView(APIView):
                     'md5_value': md5_value,
                     'phone': phone})
             else:
-                return render_to_response('cjdao_register_product.jade', {'p2p': p2p})
+                return render_to_response('cjdao_register_product.jade',
+                                          {'p2p': p2p, 'uaccount': uaccount, 'companyid': companyid,
+                                           'md5_value': md5_value})
         else:
 
             if user:
@@ -1242,11 +1244,11 @@ def ajax_login_cjdao(request):
                 password = form.cleaned_data.get('password')
                 user = authenticate(identifier=identifier, password=password)
                 auth_login(request, user)
-
+                # todo save the cjdao info to session
                 uaccount = request.POST.get('uaccount')
                 companyid = request.POST.get('companyid')
                 md5_value = request.POST.get('md5_value')
-
+                return HttpResponse(messenger("success"))
             else:
                 return HttpResponse(messenger("form unvalid"))
 
