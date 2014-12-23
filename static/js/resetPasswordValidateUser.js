@@ -28,7 +28,7 @@
           $(element).removeClass("disabled");
           $('.voice').removeClass('hidden');
           $('.voice-validate').removeAttr('disabled');
-          return $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>');
+          return $('.voice  .reset-inner').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>');
         }
       };
       timerFunction();

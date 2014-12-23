@@ -17,6 +17,6 @@ require ['jquery', 'tools'], ($, tool)->
     else
       $.post '/accounts/password/reset/set_password/', { password1: password1 ,password2: password2}
       .done ->
-        location.href = '/accounts/password/reset/done/'
+        location.href = '/accounts/password/reset/done/?next=/accounts/home/'
       .fail ->
         tool.modalAlert({title: '温馨提示', msg: '更改密码失败 请重试'})
