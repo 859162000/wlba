@@ -295,8 +295,7 @@ class YeePay:
 
         pay_info.save()
         if rs['ret_code'] == 0:
-            tools.xunlei_3_vip(pay_info)
-            tools.fengxing_7_vip(pay_info)
+            tools.despoit_ok(pay_info)
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 

@@ -275,8 +275,7 @@ class HuifuPay(Pay):
         pay_info.save()
 
         if flag:
-            tools.xunlei_3_vip(pay_info)
-            tools.fengxing_7_vip(pay_info)
+            tools.despoit_ok(pay_info)
             """
             # 迅雷活动, 12.8 首次充值
             start_time = timezone.datetime(2014, 12, 7)
