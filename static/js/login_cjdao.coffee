@@ -106,7 +106,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         else
           location.reload()
 
-		
         $('#login_submit').removeClass('disabled')
       .fail (xhr)->
         result = JSON.parse xhr.responseText
