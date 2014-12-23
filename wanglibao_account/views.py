@@ -1285,9 +1285,6 @@ def ajax_register_cjdao(request):
                 password = form.cleaned_data['password']
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
-
-
-
                 user = create_user(identifier, password, nickname)
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
@@ -1299,7 +1296,7 @@ def ajax_register_cjdao(request):
                     'productid': request.POST.get('productid'),
                 }
                 request.session['cjdaoinfo'] = cjdaoinfo
-
+                # todo move to celery task
                 url = "http://ceshi.cjdao.com/productbuy/reginfo"
                 p = {
                     'phone': identifier,
@@ -1309,8 +1306,9 @@ def ajax_register_cjdao(request):
                     'accountbalance': float(auth_user.margin.margin),
                     'md5_value': CjdaoUtils.md5_value(*(identifier, '0', 'uaccount', 'companyid', 'accountbalance'))
                 }
-
-                r = requests.get(url, params=cjdaoinfo)
+                r = requests.get(url, params=p)
+                print r.url
+                print r.status_code
 
                 return HttpResponse(messenger('done', user=request.user))
             else:
