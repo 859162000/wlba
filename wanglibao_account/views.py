@@ -855,7 +855,8 @@ class MessageView(TemplateView):
             messages_list = paginator.page(paginator.num_pages)
 
         return {
-            'messageList': messages_list
+            'messageList': messages_list,
+            'list_type': listtype
         }
 
 

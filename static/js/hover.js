@@ -39,10 +39,22 @@
       }).bind('mouseleave', function(e) {
         return $('.mobile-app-bottom-prompt').hide();
       });
-      return $('.mobile-app-bottom-prompt').bind('mouseenter', function(e) {
+      $('.mobile-app-bottom-prompt').bind('mouseenter', function(e) {
         return $(this).show();
       }).bind('mouseleave', function(e) {
         return $(this).hide();
+      });
+      $('#sidebar-second').bind('mouseenter', function(e) {
+        if ($('.sidebar-secondary').attr('style') !== 'display:block') {
+          return $('.sidebar-secondary').slideDown();
+        }
+      });
+      return $('.sidebar-secondary').bind('mouseenter', function(e) {
+        return $(this).show();
+      }).bind('mouseleave', function(e) {
+        if ($('.sidebar-secondary').attr('style') !== 'display:block') {
+          return $(this).slideUp();
+        }
       });
     });
   });
