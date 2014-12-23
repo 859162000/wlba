@@ -571,7 +571,9 @@ class XunleiP2PbyUser(APIView):
             'my_project': my_project
         }
 
-        p2pequities = p2p_equities.filter(product__status=u'正在招标')
+        p2pequities = p2p_equities.filter(product__status__in=[
+            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+        ])
 
         for p2pequity in p2pequities:
             p2pproduct = p2pequity.product
