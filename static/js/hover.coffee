@@ -42,3 +42,16 @@ require ['jquery'], ->
     ).bind('mouseleave',(e)->
       $(this).hide()
     )
+
+    $('#sidebar-second').bind('mouseenter',(e)->
+      if($('.sidebar-secondary').attr('style') !='display:block')
+        $('.sidebar-secondary').slideDown()
+    )
+
+    $('.sidebar-secondary').bind('mouseenter',(e)->
+      $(this).show()
+    ).bind('mouseleave', (e)->
+      if($('.sidebar-secondary').attr('style') !='display:block')
+        $(this).slideUp()
+    )
+

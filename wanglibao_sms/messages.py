@@ -103,6 +103,12 @@ def msg_despoit_ok(activation):
     content = u"恭喜您充值成功成功，赠送给您的3天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/' target='_blank'>立即购买赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
+def msg_despoit_ok_f(activation):
+    #风行会员
+    title = u"充值成功"
+    content = u"恭喜您充值成功成功，赠送给您的7天风行会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/' target='_blank'>立即购买赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    return title, content
+
 def msg_validate_ok(activation):
     title = u"实名认证成功"
     content = u"恭喜您完成实名认证，赠送给您的3天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
@@ -130,6 +136,12 @@ def msg_first_licai(activation):
 def msg_first_kuaipan(size, activation):
     title = u"活动期理财成功"
     content = u"感谢您在活动期间完成首次理财。<br/>网利宝赠送您%s快盘网盘，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/><a href='http://www.kuaipan.cn/n/user/records/lottery' target='_blank'>立即兑换</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % (size, activation)
+    return title, content
+
+#风行会员
+def msg_first_fengxing(activation):
+    title = u"活动期首次理财成功"
+    content = u"恭喜您在活动期间完成首次理财，赠送给您的一个月风行会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/' target='_blank'>立即购买赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 def msg_invite_major(inviter, invited):

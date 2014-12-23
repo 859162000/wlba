@@ -11,19 +11,19 @@ block main
   .panel
     .account-home-panel--title-bar__product
       ul.title-bar--tabs
-        if request.GET.listtype == 'all' or not request.GET.listtype
+        if list_type == 'all' or not list_type
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="/accounts/message/?listtype=all") 全部
         else
           li.title-bar--tab
             a.title-bar--tab--anchor(href="/accounts/message/?listtype=all") 全部
-        if request.GET.listtype == 'unread'
+        if list_type == 'unread'
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href='/accounts/message/?listtype=unread') 未读
         else
           li.title-bar--tab
             a.title-bar--tab--anchor(href='/accounts/message/?listtype=unread') 未读
-        if request.GET.listtype == 'read'
+        if list_type == 'read'
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href='/accounts/message/?listtype=read') 已读
         else
@@ -56,8 +56,8 @@ block main
                 span.icon-msg-arrow-down(id="icon_msg_{{msg.id}}")
       .space-vertical-l
       .row
-
-        - with data=messageList uri='/accounts/message/?listtype=list_type'
+        - var uri = '/accounts/message/?listtype=' + list_type
+        - with data=messageList uri=uri
         include include/pager_other
         - endwith
 

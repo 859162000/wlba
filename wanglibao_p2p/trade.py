@@ -3,6 +3,7 @@ import logging
 
 from django.db import transaction
 from django.utils import timezone
+from marketing import tools
 from marketing.models import IntroducedBy, Reward, RewardRecord
 from marketing.helper import RewardStrategy, Channel, which_channel
 from order.models import Order
@@ -41,6 +42,9 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
+        tools.decide_first.apply_async(kwargs={"user":self.user})
+
+        """
         # 首次购买
         channel = which_channel(self.user)
         rs = RewardStrategy(self.user)
@@ -49,11 +53,17 @@ class P2PTrader(object):
             start_time = timezone.datetime(2014, 11, 26)
             if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
                 rs.reward_user(u'100G快盘容量')
+        elif channel == Channel.FENGXING:
+            #风行
+            start_time = timezone.datetime(2014, 12, 18)
+            if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
+                rs.reward_user(u'一个月风行会员')
         else:
             # 非快盘来源
             start_time = timezone.datetime(2014, 11, 12)
             if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
                 rs.reward_user(u'一个月迅雷会员')
+        """
 
         # todo: merger the code about activity,remove the rubbish code
 
