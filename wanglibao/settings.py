@@ -163,7 +163,7 @@ LOCAL_MYSQL = ENV == ENV_DEV or ENV == ENV_STAGING
 if LOCAL_MYSQL:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'wanglibao_rule',
+        'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
     }
