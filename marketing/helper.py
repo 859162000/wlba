@@ -16,6 +16,7 @@ class Channel():
     XUNLEI = 0
     KUAIPAN = 1
     WANGLIBAO = 3
+    FENGXING = 4
 
 
 def collect_unvalid_user():
@@ -85,6 +86,8 @@ class RewardStrategy():
             u'一个月迅雷会员': self._send_month_xunlei,
             u'50G快盘容量': self._send_fifty_kuaipan,
             u'100G快盘容量': self._send_hundred_kuaipan,
+            u'七天风行会员': self._send_sevenday_fengxing,
+            u'一个月风行会员': self._send_month_fengxing,
         }
 
     def reward_user(self, type):
@@ -154,6 +157,17 @@ class RewardStrategy():
         title, content = messages.msg_first_kuaipan(u'100G', self.reward.content)
         self._send_message_template(title, content)
 
+    def _send_sevenday_fengxing(self):
+        """ 首次充值,风行会员赠送七天激活码,不在此发送
+        """
+        pass
+
+    def _send_month_fengxing(self):
+        """ 首次理财,风行会员赠送一个月激活码
+        """
+        title, content = messages.msg_first_fengxing(self.reward.content)
+        self._send_message_template(title, content)
+
     def _send_message_template(self, title, content):
         inside_message.send_one.apply_async(kwargs={
             "user_id": self.user.id,
@@ -166,8 +180,12 @@ class RewardStrategy():
 def which_channel(user):
     """ 渠道判断 """
     ib = IntroducedBy.objects.filter(user=user).first()
-    if ib and ib.introduced_by.wanglibaouserprofile.phone.startswith('kuaipan'):
-        return Channel.KUAIPAN
+    if ib:
+        phone = ib.introduced_by.wanglibaouserprofile.phone.lower()
+        if phone.startswith('kuaipan'):
+            return Channel.KUAIPAN
+        elif phone.startswith('fengxing'):
+            return Channel.FENGXING
     return Channel.WANGLIBAO
 
 

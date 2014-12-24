@@ -390,7 +390,7 @@ class P2PEyeListAPIView(APIView):
                 obj = {
                     "id": str(p2pproduct.id),
                     "platform_name": u"网利宝",
-                    "url": "https://www.wanglibao.com/p2p/detail/%s" % p2pproduct.id,
+                    "url": "https://{}/p2p/detail/{}".format(request.get_host(), p2pproduct.id),
                     "title": p2pproduct.name,
                     "username": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
                     "status": status,
@@ -399,11 +399,12 @@ class P2PEyeListAPIView(APIView):
                     "amount": amount,
                     "rate": rate,
                     "period": u'{}个月'.format(p2pproduct.period),
-                    "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0)),
+                    "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6)),
                     "process": process,
                     "reward": reward,
                     "guarantee": "null",
-                    "start_time": time_from.strftime("%Y-%m-%d %H:%M:%S"),
+                    "start_time": timezone.localtime(p2pproduct.publish_time).strftime(
+                        "%Y-%m-%d %H:%M:%S"),
                     "end_time": timezone.localtime(p2pproduct.soldout_time).strftime(
                         "%Y-%m-%d %H:%M:%S") if p2pproduct.soldout_time else 'null',
                     "invest_num": str(p2pproduct.equities.count()),
@@ -471,7 +472,7 @@ class P2PEyeEquityAPIView(APIView):
         for eq in equities:
             obj = {
                 "id": str(p2pproduct.id),
-                "link": "https://www.wanglibao.com/p2p/detail/%s" % p2pproduct.id,
+                "link": "https://{}/p2p/detail/{}".format(request.get_host(), p2pproduct.id),
                 "useraddress": "null",
                 "username": eq.user.username,
                 "userid": str(eq.user.id),
@@ -504,7 +505,6 @@ class XunleiP2PListAPIView(APIView):
             status=u'正在招标').order_by('-priority')[0:5]
 
         for p2pproduct in p2pproducts:
-
             rate_vip = p2pproduct.activity.rule.rule_amount * 100 if p2pproduct.activity else 0
             rate_total = Decimal.from_float(p2pproduct.expected_earning_rate) + rate_vip
 
@@ -519,7 +519,7 @@ class XunleiP2PListAPIView(APIView):
             obj = {
                 'id': p2pproduct.id,
                 'title': p2pproduct.name,
-                'title_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
+                'title_url': 'https://{}/p2p/detail/{}?xluid={}'.format(request.get_host(), p2pproduct.id, uid),
                 'rate_year': p2pproduct.expected_earning_rate,
                 'rate_vip': float(rate_vip),
                 'income': income,
@@ -530,7 +530,7 @@ class XunleiP2PListAPIView(APIView):
                 'finance_left': float(p2pproduct.remain),
                 'repayment_period': p2pproduct.period * 30,
                 'repayment_type': P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0),
-                'buy_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
+                'buy_url': 'https://{}/p2p/detail/{}?xluid={}'.format(request.get_host(), p2pproduct.id, uid),
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
                 # 'repayment_time': time.mktime(timezone.localtime(amorts.first().term_date).timetuple()),
@@ -571,7 +571,9 @@ class XunleiP2PbyUser(APIView):
             'my_project': my_project
         }
 
-        p2pequities = p2p_equities.filter(product__status=u'正在招标')
+        p2pequities = p2p_equities.filter(product__status__in=[
+            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+        ])
 
         for p2pequity in p2pequities:
             p2pproduct = p2pequity.product
@@ -583,7 +585,7 @@ class XunleiP2PbyUser(APIView):
             obj = {
                 'id': p2pproduct.id,
                 'title': p2pproduct.name,
-                'title_url': 'https://www.wanglibao.com/p2p/detail/%s?xluid=%s' % (p2pproduct.id, uid),
+                'title_url': 'https://{}/p2p/detail/{}?xluid={}'.format(reqeust.get_host(), p2pproduct.id, uid),
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
                 'expected_income': float(expected_income),
@@ -659,7 +661,7 @@ class GetNoWProjectsAPI(APIView):
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
                 "amountUsedDesc": strip_tags(p2p.short_usage),
-                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s" % p2p.id,
+                "loanUrl": "https://{}/p2p/detail/{}".format(request.get_host(), p2p.id),
                 # "successTime": p2p.soldout_time,
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
@@ -732,7 +734,7 @@ class GetProjectsByDateAPI(APIView):
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
                 "amountUsedDesc": strip_tags(p2p.short_usage),
-                "loanUrl": "https://www.wanglibao.com/p2p/detail/%s" % p2p.id,
+                "loanUrl": "https://{}/p2p/detail/{}".format(request.get_host(), p2p.id),
                 "successTime": timezone.localtime(p2p.soldout_time).strftime("%Y-%m-%d %H:%M:%S"),
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
@@ -889,7 +891,7 @@ class AdminAmortization(TemplateView):
             terms = acs['terms']
             key = ('term_amount', 'principal', 'interest', 'principal_left')
             newterms = [dict(zip(key, term)) for term in terms]
-            return render_to_response('admin_amortization.jade', {'total':total, 'newterms': newterms})
+            return render_to_response('admin_amortization.jade', {'total': total, 'newterms': newterms})
         else:
             messages.warning(request, u'查询错误')
             return redirect('./amortization')

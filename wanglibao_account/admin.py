@@ -22,6 +22,7 @@ class ProfileInline(admin.StackedInline):
 
 class MarginInline(admin.StackedInline):
     model = Margin
+    readonly_fields = ('margin', 'freeze', 'withdrawing')
 
 
 class P2PEquityInline(admin.StackedInline):

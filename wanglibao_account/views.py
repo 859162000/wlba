@@ -29,6 +29,7 @@ from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
 from marketing.models import IntroducedBy
 from marketing.utils import set_promo_user
+from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from utils import detect_identifier_type, create_user, generate_contract
@@ -74,13 +75,7 @@ class RegisterView (RegistrationView):
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
 
-        title,content = messages.msg_register()
-        inside_message.send_one.apply_async(kwargs={
-            "user_id":auth_user.id,
-            "title":title,
-            "content":content,
-            "mtype":"activityintro"
-        })
+        tools.register_ok.apply_async(kwargs={"user_id":auth_user.id})
 
         return user
 
@@ -832,7 +827,8 @@ class MessageView(TemplateView):
             messages_list = paginator.page(paginator.num_pages)
 
         return {
-            'messageList': messages_list
+            'messageList': messages_list,
+            'list_type': listtype
         }
 
 
@@ -913,13 +909,7 @@ def ajax_register(request):
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
 
-                title, content = messages.msg_register()
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": auth_user.id,
-                    "title": title,
-                    "content": content,
-                    "mtype": "activityintro"
-                })
+                tools.register_ok.apply_async(kwargs={"user_id":auth_user.id})
 
                 return HttpResponse(messenger('done', user=request.user))
                 # return HttpResponseRedirect("/accounts/id_verify/")

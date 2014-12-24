@@ -5,10 +5,11 @@ from django.utils import timezone
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.contrib import messages
+from django.db.models import Sum
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
     PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator,\
     EearningReportGenerator, WithDrawDetailReportGenerator, P2PstatusReportGenerator
-import logging
+from wanglibao_margin.models import Margin
 
 type = (
     (u'充值', 0),
@@ -28,10 +29,18 @@ class AdminReportExport(TemplateView):
     def get_context_data(self, **kwargs):
         today = timezone.datetime.today()
         yestoday = timezone.datetime.today() - timezone.timedelta(days=2)
+
+        margin = Margin.objects.all().aggregate(Sum('margin'))['margin__sum']
+        freeze = Margin.objects.all().aggregate(Sum('freeze'))['freeze__sum']
+        withdrawing = Margin.objects.all().aggregate(Sum('withdrawing'))['withdrawing__sum']
+
         return {
             'yestoday': yestoday.strftime("%Y-%m-%d %H:%M:%S"),
             'today': today.strftime("%Y-%m-%d %H:%M:%S"),
-            'type': type
+            'type': type,
+            'margin': margin,
+            'freeze': freeze,
+            'withdrawing': withdrawing
         }
 
     def post(self,request, **kwargs):
