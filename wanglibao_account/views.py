@@ -1215,7 +1215,6 @@ class CjdaoApiView(APIView):
                     'md5_value': md5_value,
                     'phone': phone})
             else:
-
                 return render_to_response('cjdao_register_product.jade',
                                           {'p2p': p2p, 'uaccount': uaccount, 'companyid': companyid,
                                            'md5_value': md5_value, 'phone': phone})
@@ -1226,8 +1225,6 @@ class CjdaoApiView(APIView):
                                           {'uaccount': uaccount, 'companyid': companyid, 'md5_value': md5_value,
                                            'phone': phone})
             else:
-
-
                 return render_to_response('cjdao_register.jade',
                                           {'uaccount': uaccount, 'companyid': companyid, 'md5_value': md5_value,
                                            'phone': phone})
@@ -1254,7 +1251,7 @@ def ajax_login_cjdao(request):
                     'uaccount': request.POST.get('uaccount'),
                     'companyid': request.POST.get('companyid'),
                     'productid': request.POST.get('productid'),
-                    'md5_value': request.POST.get('md5_value')
+                    'usertype': 1,
                 }
                 request.session['cjdaoinfo'] = cjdaoinfo
                 return HttpResponse(messenger("success"))
@@ -1291,10 +1288,12 @@ def ajax_register_cjdao(request):
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
 
+
                 cjdaoinfo = {
                     'uaccount': request.POST.get('uaccount'),
                     'companyid': request.POST.get('companyid'),
                     'productid': request.POST.get('productid'),
+                    'usertype': 0,
                 }
                 request.session['cjdaoinfo'] = cjdaoinfo
                 # todo move to celery task
