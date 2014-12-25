@@ -5,17 +5,19 @@ from django.db import transaction
 from django.utils import timezone
 from marketing import tools
 from marketing.models import IntroducedBy, Reward, RewardRecord
-from marketing.helper import RewardStrategy, Channel, which_channel
 from order.models import Order
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
 from exceptions import P2PException
-from wanglibao_p2p.models import P2PProduct, P2PRecord
+from wanglibao_p2p.models import P2PProduct
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
+from wanglibao_account.utils import CjdaoUtils
+from wanglibao.settings import CJDAOKEY
+
 
 
 class P2PTrader(object):
@@ -44,29 +46,7 @@ class P2PTrader(object):
 
         tools.decide_first.apply_async(kwargs={"user_id":self.user.id})
 
-        """
-        # 首次购买
-        channel = which_channel(self.user)
-        rs = RewardStrategy(self.user)
-        if channel == Channel.KUAIPAN:
-            # 快盘来源
-            start_time = timezone.datetime(2014, 11, 26)
-            if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
-                rs.reward_user(u'100G快盘容量')
-        elif channel == Channel.FENGXING:
-            #风行
-            start_time = timezone.datetime(2014, 12, 18)
-            if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
-                rs.reward_user(u'一个月风行会员')
-        else:
-            # 非快盘来源
-            start_time = timezone.datetime(2014, 11, 12)
-            if P2PRecord.objects.filter(user=self.user, create_time__gt=start_time).count() == 1:
-                rs.reward_user(u'一个月迅雷会员')
-        """
-
         # todo: merger the code about activity,remove the rubbish code
-
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
 
         # phone_verified 渠道客户判断
@@ -157,6 +137,13 @@ class P2PTrader(object):
             "content": content,
             "mtype": "purchase"
         })
+
+        # 财经道购买回调
+        # todo move to celery task
+        cjdaoinfo = self.request.session.get('cjdaoinfo')
+        if cjdaoinfo:
+            CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
+
         # 满标给管理员发短信
         if product_record.product_balance_after <= 0:
             from wanglibao_p2p.tasks import full_send_message

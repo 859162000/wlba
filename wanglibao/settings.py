@@ -576,3 +576,5 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'custom',
     }
 }
+
+CJDAOKEY = '1234'

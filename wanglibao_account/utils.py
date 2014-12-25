@@ -14,6 +14,7 @@ from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBa
 import logging
 import hashlib
 import requests
+from decimal import Decimal
 
 
 logger = logging.getLogger(__name__)
@@ -199,18 +200,43 @@ class CjdaoUtils():
         return str == m.hexdigest()
 
     @classmethod
-    def return_register(cls, phone, cjdaoinfo, margin):
+    def return_register(cls, cjdaoinfo, user, key):
         url = "http://ceshi.cjdao.com/productbuy/reginfo"
-        p = {
-            'phone': phone,
-            'usertype': cjdaoinfo.get('usertype'),
-            'uaccount': cjdaoinfo.get('uaccount'),
-            'companyid': cjdaoinfo.get('companyid'),
-            'accountbalance': margin,
-            'md5_value': cls.md5_value(*(
-            phone, cjdaoinfo.get('usertype'), cjdaoinfo.get('uaccount'), cjdaoinfo.get('companyid'),
-            cjdaoinfo.get('accountbalance')))
-        }
+
+        k = ('phone', 'usertype', 'uaccount', 'companyid', 'accountbalance')
+
+        v = (user.wanglibaouserprofile.phone, cjdaoinfo.get('usertype'), cjdaoinfo.get('uaccount'),
+             cjdaoinfo.get('companyid'), user.margin.margin, key)
+
+        p = dict(zip(k, v))
+        p.update(md5_value=cls.md5_value(*v))
         r = requests.get(url, params=p)
+        print r.url
+        print r.status_code
+
+
+    @classmethod
+    def return_purchase(cls, cjdaoinfo, user, margin_record, p2p, key):
+
+        url = "http://ceshi.cjdao.com/productbuy/saveproduct"
+        reward = Decimal.from_float(0).quantize(Decimal('0.0'), 'ROUND_DOWN')
+        if p2p.activity:
+            reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0'), 'ROUND_DOWN')
+        expectedrate = p2p.expected_earning_rate + float(reward * 100)
+
+        realincome = expectedrate * float(margin_record.amount) * p2p.period / 12
+
+        k = ('uaccount', 'phone', 'usertype', 'companyid', 'thirdproductid',
+             'productname', 'buytime', 'money', 'expectedrate', 'realincome',
+             'ordercode', 'accountbalance', )
+
+        v = (cjdaoinfo.get('uaccount'), user.wanglibaouserprofile.phone, cjdaoinfo.get('usertype'),
+             cjdaoinfo.get('companyid'), p2p.id, p2p.name, timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
+             float(margin_record.amount), expectedrate, realincome, margin_record.order_id, float(margin_record.margin_current), key)
+
+        p = dict(zip(k, v))
+        p.update(md5_value=cls.md5_value(*v))
+        r = requests.get(url, params=p)
+
         print r.url
         print r.status_code

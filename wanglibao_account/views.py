@@ -4,7 +4,7 @@ import logging
 import json
 import math
 
-import requests
+from wanglibao.settings import CJDAOKEY
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
 from django.db.models import Sum
@@ -939,8 +939,7 @@ def ajax_register(request):
                 # todo move to celery task
                 cjdaoinfo = request.session.get('cjdaoinfo')
                 if cjdaoinfo:
-                    CjdaoUtils.return_register(identifier, cjdaoinfo, float(auth_user.margin.margin))
-
+                    CjdaoUtils.return_register(cjdaoinfo, auth_user, CJDAOKEY)
 
                 return HttpResponse(messenger('done', user=request.user))
             else:
@@ -1176,9 +1175,6 @@ class P2PDetailOfRegisterForCjdView(TemplateView):
         return context
 
 
-CJDAOKEY = '1234'
-
-
 class CjdaoApiView(APIView):
     permission_classes = ()
 
@@ -1187,14 +1183,11 @@ class CjdaoApiView(APIView):
         phone = request.GET.get('phone')
         companyid = request.GET.get('companyid')
         thirdproductid = request.GET.get('thirdproductid')
-        productid = request.GET.get('productid')
         user = CjdaoUtils.get_wluser_by_phone(phone)
 
         cjdaoinfo = {
             'uaccount': uaccount,
             'companyid': companyid,
-            'productid': productid,
-            'thirdproductid': thirdproductid,
             'usertype': 0,
         }
         request.session['cjdaoinfo'] = cjdaoinfo
