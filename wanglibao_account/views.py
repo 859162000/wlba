@@ -4,6 +4,7 @@ import logging
 import json
 import math
 
+from wanglibao.settings import CJDAOKEY
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
 from django.db.models import Sum
@@ -14,14 +15,13 @@ from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404, HttpResponseRedirect
-from django.shortcuts import resolve_url
+from django.shortcuts import resolve_url, render_to_response
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
-from marketing.helper import which_channel, Channel
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -32,34 +32,32 @@ from marketing.utils import set_promo_user
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
-from utils import detect_identifier_type, create_user, generate_contract
+from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, CjdaoUtils
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
-from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, AmortizationRecord
+from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
+    AmortizationRecord
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from wanglibao_account.models import VerifyCounter, Binding
+from wanglibao_account.models import VerifyCounter, Binding, Message
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
-
-#from wanglibao_account.utils import verify_id
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
-from wanglibao_account.models import Message
 from wanglibao_p2p.models import P2PProduct
 from django.template.defaulttags import register
-#from wanglibao_sms.tasks import send_messages
 from wanglibao_sms import messages
+
 
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
 
-class RegisterView (RegistrationView):
+class RegisterView(RegistrationView):
     template_name = "register.jade"
     form_class = EmailOrPhoneRegisterForm
 
@@ -74,9 +72,7 @@ class RegisterView (RegistrationView):
         set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
-
-        tools.register_ok.apply_async(kwargs={"user_id":auth_user.id})
-
+        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
         return user
 
     def get_success_url(self, request=None, user=None):
@@ -149,7 +145,8 @@ class PasswordResetGetIdentifierView(TemplateView):
             if identifier_type == 'email':
                 users = User.objects.filter(email=identifier, is_active=True)
             elif identifier_type == 'phone':
-                users = User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True)
+                users = User.objects.filter(wanglibaouserprofile__phone=identifier,
+                                            wanglibaouserprofile__phone_verified=True)
 
             # There should be at most one user found
             assert len(users) <= 1
@@ -179,13 +176,13 @@ def send_validation_mail(request, **kwargs):
     user_email = get_user_model().objects.get(pk=user_id).email
 
     form = PasswordResetForm(data={
-                'email': user_email
-            })
+        'email': user_email
+    })
 
     if form.is_valid():
         form.save(request=request,
-             subject_template_name='registration/password_reset_subject.txt',
-             email_template_name='password_reset_email.html')
+                  subject_template_name='registration/password_reset_subject.txt',
+                  email_template_name='password_reset_email.html')
         return HttpResponse(u'验证邮件已发送，请您登录邮箱完成验证')
     else:
         return HttpResponse(u'没有有效的邮箱地址', status=500)
@@ -212,7 +209,8 @@ def validate_phone_code(request):
     status, message = validate_validation_code(phone_number, validate_code)
     if status == 200:
         logger.debug("Phone code validated")
-        request.session['phone_validated_time'] = (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds()
+        request.session['phone_validated_time'] = (
+            datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds()
         return HttpResponse('validate code succeeded', status=200)
 
     logger.debug("Phone code not valid")
@@ -239,9 +237,9 @@ class ResetPassword(TemplateView):
         user_id = request.session['user_to_reset']
         user = get_user_model().objects.get(pk=user_id)
 
-        assert('phone_validated_time' in request.session)
+        assert ('phone_validated_time' in request.session)
         last_validated_time = request.session['phone_validated_time']
-        assert(last_validated_time != 0)
+        assert (last_validated_time != 0)
 
         if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 30 * 60:
             user.set_password(password1)
@@ -280,13 +278,13 @@ class AccountHome(TemplateView):
         # p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
 
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
-            u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
 
-        #author: hetao; datetime: 2014.10.30; description: 加上活动所得收益
+        # author: hetao; datetime: 2014.10.30; description: 加上活动所得收益
         earnings = Earning.objects.select_related('product__activity').filter(user=user)
 
-        earning_map = {earning.product_id : earning for earning in earnings}
+        earning_map = {earning.product_id: earning for earning in earnings}
         result = []
         for equity in p2p_equities:
             obj = {"equity": equity}
@@ -295,7 +293,8 @@ class AccountHome(TemplateView):
 
             result.append(obj)
 
-        amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities], settled=False).prefetch_related("subs")
+        amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities],
+                                                           settled=False).prefetch_related("subs")
 
         unpayed_principle = 0
         for equity in p2p_equities:
@@ -315,14 +314,14 @@ class AccountHome(TemplateView):
 
         return {
             'message': message,
-            #'p2p_equities': p2p_equities,
+            # 'p2p_equities': p2p_equities,
             'result': result,
             'amortizations': amortizations,
             'p2p_product_amortization': p2p_product_amortization,
             'p2p_unpay_principle': unpayed_principle,
             'margin_withdrawing': user.margin.withdrawing,
             'margin_freeze': user.margin.freeze,
-            'fund_hold_info':fund_hold_info,
+            'fund_hold_info': fund_hold_info,
             'p2p_total_asset': p2p_total_asset,
             'total_asset': total_asset,
             'mode': mode,
@@ -335,13 +334,11 @@ class AccountHomeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, format=None):
-        user=request.user
+        user = request.user
 
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
-            u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
-
-
 
         unpayed_principle = 0
         p2p_total_paid_interest = 0
@@ -349,15 +346,15 @@ class AccountHomeAPIView(APIView):
         p2p_total_interest = 0
         for equity in p2p_equities:
             if equity.confirm:
-                unpayed_principle += equity.unpaid_principal        # 待收本金
-                p2p_total_paid_interest += equity.paid_interest     # 累积收益
-                p2p_total_unpaid_interest += equity.unpaid_interest # 待收益
-                p2p_total_interest += equity.total_interest         # 总收益
+                unpayed_principle += equity.unpaid_principal  # 待收本金
+                p2p_total_paid_interest += equity.paid_interest  # 累积收益
+                p2p_total_unpaid_interest += equity.unpaid_interest  # 待收益
+                p2p_total_interest += equity.total_interest  # 总收益
 
-        p2p_margin = user.margin.margin             # P2P余额
-        p2p_freeze = user.margin.freeze             # P2P投资中冻结金额
-        p2p_withdrawing = user.margin.withdrawing   # P2P提现中冻结金额
-        p2p_unpayed_principle = unpayed_principle   # P2P待收本金
+        p2p_margin = user.margin.margin  # P2P余额
+        p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
+        p2p_withdrawing = user.margin.withdrawing  # P2P提现中冻结金额
+        p2p_unpayed_principle = unpayed_principle  # P2P待收本金
 
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
@@ -369,24 +366,30 @@ class AccountHomeAPIView(APIView):
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = \
+            DailyIncome.objects.filter(user=user, date__gt=today + datetime.timedelta(days=-8)).aggregate(
+                Sum('income'))[
+                'income__sum'] or 0
+        fund_income_month = \
+            DailyIncome.objects.filter(user=user, date__gt=today + datetime.timedelta(days=-31)).aggregate(
+                Sum('income'))[
+                'income__sum'] or 0
 
         res = {
-            'total_asset': float(p2p_total_asset + fund_total_asset),      # 总资产
-            'p2p_total_asset': float(p2p_total_asset),                    # p2p总资产
-            'p2p_margin': float(p2p_margin),                              # P2P余额
-            'p2p_freeze': float(p2p_freeze),                              # P2P投资中冻结金额
-            'p2p_withdrawing': float(p2p_withdrawing),                   # P2P提现中冻结金额
-            'p2p_unpayed_principle': float(p2p_unpayed_principle),        # P2P待收本金
+            'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
+            'p2p_total_asset': float(p2p_total_asset),  # p2p总资产
+            'p2p_margin': float(p2p_margin),  # P2P余额
+            'p2p_freeze': float(p2p_freeze),  # P2P投资中冻结金额
+            'p2p_withdrawing': float(p2p_withdrawing),  # P2P提现中冻结金额
+            'p2p_unpayed_principle': float(p2p_unpayed_principle),  # P2P待收本金
             'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest),  # p2p总待收益
-            'p2p_total_paid_interest': float(p2p_total_paid_interest),    # P2P总累积收益
-            'p2p_total_interest': float(p2p_total_interest),              # P2P总收益
+            'p2p_total_paid_interest': float(p2p_total_paid_interest),  # P2P总累积收益
+            'p2p_total_interest': float(p2p_total_interest),  # P2P总收益
 
-            'fund_total_asset': float(fund_total_asset),                   # 基金总资产
-            'fund_total_income': float(total_income),                     # 基金累积收益
-            'fund_income_week': float(fund_income_week),                   # 基金近一周收益(元)
-            'fund_income_month': float(fund_income_month),                 # 基金近一月收益(元)
+            'fund_total_asset': float(fund_total_asset),  # 基金总资产
+            'fund_total_income': float(total_income),  # 基金累积收益
+            'fund_income_week': float(fund_income_week),  # 基金近一周收益(元)
+            'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
 
         }
 
@@ -397,19 +400,19 @@ class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, format=None):
-        user=request.user
+        user = request.user
         # p2p_equities = P2PEquity.objects.filter(user=user).all().select_related('product')
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
-            u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
 
         page = request.GET.get('page', 0)
         try:
             page = int(page)
             if page < 0:
-                return Response({ "detail": "Query String must be a number." }, status=404)
+                return Response({"detail": "Query String must be a number."}, status=404)
         except:
-            return Response({ "detail": "Query String must be a number." }, status=404)
+            return Response({"detail": "Query String must be a number."}, status=404)
 
         if page != 0:
 
@@ -424,27 +427,30 @@ class AccountP2PRecordAPI(APIView):
                 p2p_equities = paginator.page(paginator.num_pages)
 
         p2p_records = [{
-                    'equity_created_at':  timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),          # 投标时间
-                    'equity_product_short_name': equity.product.short_name,                                             # 产品名称
-                    'equity_product_expected_earning_rate': equity.product.expected_earning_rate,                       # 年化收益(%)
-                    'equity_product_period': equity.product.period,                                                     # 产品期限(月)*
-                    'equity_equity': float(equity.equity),                                                                     # 用户所持份额(投资金额)
-                    'equity_product_display_status': equity.product.display_status,                                     # 状态
-                    'equity_term': equity.term,                                                                         # 还款期
-                    'equity_product_amortization_count': equity.product.amortization_count,                             # 还款期数
-                    'equity_paid_interest': float(equity.paid_interest),                                                       # 单个已经收益
-                    'equity_total_interest': float(equity.total_interest),                                                     # 单个预期收益
-                    'equity_contract': 'https://%s/api/p2p/contract/%s/' % (request.get_host(), equity.product.id), # 合同
-                    'product_id': equity.product_id
-            } for equity in p2p_equities]
+                           'equity_created_at': timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                           # 投标时间
+                           'equity_product_short_name': equity.product.short_name,  # 产品名称
+                           'equity_product_expected_earning_rate': equity.product.expected_earning_rate,  # 年化收益(%)
+                           'equity_product_period': equity.product.period,  # 产品期限(月)*
+                           'equity_equity': float(equity.equity),  # 用户所持份额(投资金额)
+                           'equity_product_display_status': equity.product.display_status,  # 状态
+                           'equity_term': equity.term,  # 还款期
+                           'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
+                           'equity_paid_interest': float(equity.paid_interest),  # 单个已经收益
+                           'equity_total_interest': float(equity.total_interest),  # 单个预期收益
+                           'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
+                               request.get_host(), equity.product.id),  # 合同
+                           'product_id': equity.product_id
+                       } for equity in p2p_equities]
 
         if int(page) != 0:
             res = {
-                'total_counts': p2p_equities.paginator.count,                                               # 总条目数
-                'total_page': int(math.ceil(p2p_equities.paginator.count / float(p2p_equities.paginator.per_page))),        # 总页数
-                'per_page_number': p2p_equities.paginator.per_page,                                         # 每页显示条数
-                'pre_page': p2p_equities.previous_page_number() if p2p_equities.has_previous() else None,   # 前一页页码
-                'next_page': p2p_equities.next_page_number() if p2p_equities.has_next() else None,          # 后一页页码
+                'total_counts': p2p_equities.paginator.count,  # 总条目数
+                'total_page': int(math.ceil(p2p_equities.paginator.count / float(p2p_equities.paginator.per_page))),
+                # 总页数
+                'per_page_number': p2p_equities.paginator.per_page,  # 每页显示条数
+                'pre_page': p2p_equities.previous_page_number() if p2p_equities.has_previous() else None,  # 前一页页码
+                'next_page': p2p_equities.next_page_number() if p2p_equities.has_next() else None,  # 后一页页码
                 'p2p_records': p2p_records,
             }
         else:
@@ -456,7 +462,7 @@ class AccountFundRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, format=None):
-        user=request.user
+        user = request.user
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
 
         limit = 20
@@ -471,11 +477,11 @@ class AccountFundRecordAPI(APIView):
             fund_hold_info = paginator.page(paginator.num_pages)
 
         fund_records = [{
-                'fund_fund_name': fund.fund_name,                               # 基金产品名称
-                'fund_current_remain_share': float(fund.current_remain_share),         # 当前份额余额
-                'fund_unpaid_income': float(fund.unpaid_income),                       # 未付收益
-                'fund_code': fund.fund_code,                                    # 基金代码
-            } for fund in fund_hold_info]
+                            'fund_fund_name': fund.fund_name,  # 基金产品名称
+                            'fund_current_remain_share': float(fund.current_remain_share),  # 当前份额余额
+                            'fund_unpaid_income': float(fund.unpaid_income),  # 未付收益
+                            'fund_code': fund.fund_code,  # 基金代码
+                        } for fund in fund_hold_info]
 
         res = {
             'total_counts': fund_hold_info.paginator.count,
@@ -492,10 +498,10 @@ class AccountP2PAssetAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, format=None):
-        user=request.user
+        user = request.user
 
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
-            u'已完成', u'满标待打款',u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
 
         unpayed_principle = 0
@@ -518,14 +524,14 @@ class AccountP2PAssetAPI(APIView):
 
         res = {
 
-            'p2p_total_asset': float(p2p_total_asset),                     # 总资产
-            'p2p_margin': float(p2p_margin),                               # P2P余额
-            'p2p_freeze': float(p2p_freeze),                               # P2P投资中冻结金额
-            'p2p_withdrawing': float(p2p_withdrawing),                     # P2P提现中冻结金额
-            'p2p_unpayed_principle': float(p2p_unpayed_principle),         # P2P待收本金
-            'p2p_total_unpaid_interest':float(p2p_total_unpaid_interest),  # p2p总待收益
-            'p2p_total_paid_interest': float(p2p_total_paid_interest),     # P2P总累积收益
-            'p2p_total_interest': float(p2p_total_interest),               # P2P总收益
+            'p2p_total_asset': float(p2p_total_asset),  # 总资产
+            'p2p_margin': float(p2p_margin),  # P2P余额
+            'p2p_freeze': float(p2p_freeze),  # P2P投资中冻结金额
+            'p2p_withdrawing': float(p2p_withdrawing),  # P2P提现中冻结金额
+            'p2p_unpayed_principle': float(p2p_unpayed_principle),  # P2P待收本金
+            'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest),  # p2p总待收益
+            'p2p_total_paid_interest': float(p2p_total_paid_interest),  # P2P总累积收益
+            'p2p_total_interest': float(p2p_total_interest),  # P2P总收益
 
         }
         return Response(res)
@@ -542,18 +548,23 @@ class AccountFundAssetAPI(APIView):
             for hold_info in fund_hold_info:
                 fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
 
-
         today = timezone.datetime.today()
 
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = \
+            DailyIncome.objects.filter(user=user, date__gt=today + datetime.timedelta(days=-8)).aggregate(
+                Sum('income'))[
+                'income__sum'] or 0
+        fund_income_month = \
+            DailyIncome.objects.filter(user=user, date__gt=today + datetime.timedelta(days=-31)).aggregate(
+                Sum('income'))[
+                'income__sum'] or 0
 
         res = {
-            'fund_total_asset': float(fund_total_asset),                   # 基金总资产
-            'fund_total_income': float(total_income),                      # 基金累积收益
-            'fund_income_week': float(fund_income_week),                   # 基金近一周收益(元)
-            'fund_income_month': float(fund_income_month),                 # 基金近一月收益(元)
+            'fund_total_asset': float(fund_total_asset),  # 基金总资产
+            'fund_total_income': float(total_income),  # 基金累积收益
+            'fund_income_week': float(fund_income_week),  # 基金近一周收益(元)
+            'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
         }
         return Response(res)
 
@@ -564,7 +575,6 @@ class FundInfoAPIView(APIView):
     def get(self, request):
 
         user = self.request.user
-
 
         try:
             fetcher = UserInfoFetcher(user)
@@ -586,8 +596,14 @@ class FundInfoAPIView(APIView):
         today = timezone.datetime.today()
 
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user, date__gt=today+datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = \
+            DailyIncome.objects.filter(user=user, date__gt=today + datetime.timedelta(days=-8)).aggregate(
+                Sum('income'))[
+                'income__sum'] or 0
+        fund_income_month = \
+            DailyIncome.objects.filter(user=user, date__gt=today + datetime.timedelta(days=-31)).aggregate(
+                Sum('income'))[
+                'income__sum'] or 0
 
         if fund_total_asset != 0:
             income_rate = total_income / fund_total_asset
@@ -653,7 +669,8 @@ class AccountTransactionDeposit(TemplateView):
     template_name = 'account_transaction_deposit.jade'
 
     def get_context_data(self, **kwargs):
-        pay_records = PayInfo.objects.filter(user=self.request.user, type=PayInfo.DEPOSIT).exclude(status=PayInfo.PROCESSING)
+        pay_records = PayInfo.objects.filter(user=self.request.user, type=PayInfo.DEPOSIT).exclude(
+            status=PayInfo.PROCESSING)
         pager = Paginator(pay_records, 20)
         page = self.request.GET.get('page')
         if not page:
@@ -680,11 +697,13 @@ class AccountTransactionWithdraw(TemplateView):
             'announcements': AnnouncementAccounts
         }
 
+
 class AccountRepayment(TemplateView):
     template_name = 'account_repayment.jade'
 
     def get_context_data(self, **kwargs):
-        repayment_records = AmortizationRecord.objects.select_related('amortization_product').filter(user=self.request.user)
+        repayment_records = AmortizationRecord.objects.select_related('amortization_product').filter(
+            user=self.request.user)
         pager = Paginator(repayment_records, 20)
         page = self.request.GET.get('page')
         if not page:
@@ -694,6 +713,7 @@ class AccountRepayment(TemplateView):
             "repayment_records": repayment_records,
             'announcements': AnnouncementAccounts
         }
+
 
 class AccountBankCard(TemplateView):
     template_name = 'account_bankcard.jade'
@@ -734,25 +754,25 @@ class ResetPasswordAPI(APIView):
         validate_code = validate_code.strip()
 
         if not password or not identifier or not validate_code:
-            return Response({'ret_code':30002, 'message':u'信息输入不完整'})
+            return Response({'ret_code': 30002, 'message': u'信息输入不完整'})
 
         if not 6 <= len(password) <= 20:
-            return Response({'ret_code':30001, 'message':u'密码需要在6-20位之间'})
+            return Response({'ret_code': 30001, 'message': u'密码需要在6-20位之间'})
 
         identifier_type = detect_identifier_type(identifier)
 
         if identifier_type == 'phone':
             user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
         else:
-            return Response({'ret_code':30003, 'message': u'请输入手机号码'})
+            return Response({'ret_code': 30003, 'message': u'请输入手机号码'})
 
         status, message = validate_validation_code(identifier, validate_code)
         if status == 200:
             user.set_password(password)
             user.save()
-            return Response({'ret_code':0, 'message':u'修改成功'})
+            return Response({'ret_code': 0, 'message': u'修改成功'})
         else:
-            return Response({'ret_code':30004, 'message':u'验证码验证失败'})
+            return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
 
 
 class Third_login(View):
@@ -778,14 +798,14 @@ class ChangePasswordAPIView(APIView):
         validate_code = request.DATA.get('validate_code', "").strip()
 
         if not old_password or not new_password or not validate_code:
-            return Response({'ret_code':30041, 'message':u'信息输入不完整'})
+            return Response({'ret_code': 30041, 'message': u'信息输入不完整'})
 
         if not 6 <= len(new_password) <= 20:
-            return Response({'ret_code':30042, 'message':u'密码需要在6-20位之间'})
+            return Response({'ret_code': 30042, 'message': u'密码需要在6-20位之间'})
 
         user = request.user
         if not user.check_password(old_password):
-            return Response({'ret_code':30043, 'message':u'原密码错误'})
+            return Response({'ret_code': 30043, 'message': u'原密码错误'})
 
         status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
         if status != 200:
@@ -793,7 +813,7 @@ class ChangePasswordAPIView(APIView):
 
         user.set_password(new_password)
         user.save()
-        return Response({'ret_code':0, 'message':u'修改成功'})
+        return Response({'ret_code': 0, 'message': u'修改成功'})
 
 
 class MessageView(TemplateView):
@@ -806,9 +826,11 @@ class MessageView(TemplateView):
             listtype = 'all'
 
         if listtype == "unread":
-            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by('-message_text__created_at')
+            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by(
+                '-message_text__created_at')
         elif listtype == "read":
-            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by('-message_text__created_at')
+            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by(
+                '-message_text__created_at')
         else:
             messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
 
@@ -855,6 +877,7 @@ class MessageDetailView(APIView):
         result = inside_message.sign_read(request.user, message_id)
         return Response(result)
 
+
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
@@ -867,6 +890,7 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
         return json.dumps(res)
 
     if request.method == "POST":
+
         if request.is_ajax():
             form = authentication_form(request, data=request.POST)
             if form.is_valid():
@@ -909,10 +933,15 @@ def ajax_register(request):
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
 
-                tools.register_ok.apply_async(kwargs={"user_id":auth_user.id})
+                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
+
+
+                # todo move to celery task
+                cjdaoinfo = request.session.get('cjdaoinfo')
+                if cjdaoinfo:
+                    CjdaoUtils.return_register(cjdaoinfo, auth_user, CJDAOKEY)
 
                 return HttpResponse(messenger('done', user=request.user))
-                # return HttpResponseRedirect("/accounts/id_verify/")
             else:
                 return HttpResponseForbidden(messenger(form.errors))
         else:
@@ -927,9 +956,11 @@ class P2PAmortizationView(TemplateView):
     def get_context_data(self, **kwargs):
         product_id = kwargs['product_id']
 
-        equity = P2PEquity.objects.filter(user=self.request.user, product_id=product_id).prefetch_related('product').first()
+        equity = P2PEquity.objects.filter(user=self.request.user, product_id=product_id).prefetch_related(
+            'product').first()
 
-        amortizations = UserAmortization.objects.filter(user=self.request.user, product_amortization__product_id=product_id)
+        amortizations = UserAmortization.objects.filter(user=self.request.user,
+                                                        product_amortization__product_id=product_id)
         return {
             'equity': equity,
             'amortizations': amortizations,
@@ -944,18 +975,20 @@ class P2PAmortizationAPI(APIView):
         user = request.user
         product_id = kwargs['product_id']
         equity = P2PEquity.objects.filter(user=user, product_id=product_id).prefetch_related('product').first()
-        amortizations = UserAmortization.objects.filter(user=self.request.user, product_amortization__product_id=product_id)
+        amortizations = UserAmortization.objects.filter(user=self.request.user,
+                                                        product_amortization__product_id=product_id)
 
         amortization_record = [{
-                'amortization_term_date': timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),                       # 还款时间
-                'amortization_principal': float(amortization.principal),                      # 本金
-                'amortization_amount_interest': float(amortization.interest),                 # 利息
-                'amortization_amount': float(amortization.principal + amortization.interest), # 总记
-            } for amortization in amortizations ]
+                                   'amortization_term_date': timezone.localtime(amortization.term_date).strftime(
+                                       "%Y-%m-%d %H:%M:%S"),  # 还款时间
+                                   'amortization_principal': float(amortization.principal),  # 本金
+                                   'amortization_amount_interest': float(amortization.interest),  # 利息
+                                   'amortization_amount': float(amortization.principal + amortization.interest),  # 总记
+                               } for amortization in amortizations]
 
         res = {
-            'equity_product_short_name': equity.product.short_name,                     # 还款标题
-            'equity_product_serial_number': equity.product.serial_number,               # 还款计划编号
+            'equity_product_short_name': equity.product.short_name,  # 还款标题
+            'equity_product_serial_number': equity.product.serial_number,  # 还款计划编号
             'amortization_record': amortization_record
 
         }
@@ -976,7 +1009,6 @@ def user_product_contract(request, product_id):
 
 
 class UserProductContract(APIView):
-
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, product_id):
@@ -992,7 +1024,6 @@ class UserProductContract(APIView):
                 'message': u'合同没有找到',
                 'error_number': ErrorNumber.contract_not_found
             })
-
 
 
 @login_required
@@ -1030,8 +1061,10 @@ class IdVerificationView(TemplateView):
 class AdminIdVerificationView(TemplateView):
     template_name = 'admin_verify_id.jade'
 
+
 class AdminSendMessageView(TemplateView):
     template_name = "admin_send_message.jade"
+
 
 class AdminSendMessageAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -1042,80 +1075,18 @@ class AdminSendMessageAPIView(APIView):
         content = request.DATA.get("content", "")
         mtype = request.DATA.get("mtype", "")
         if not phone or not title or not content or not mtype:
-            return Response({"ret_code":1, "message":"信息输入不完整"})
+            return Response({"ret_code": 1, "message": "信息输入不完整"})
         user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
         if not user:
-            return Response({"ret_code":1, "message":"没有此用户"})
+            return Response({"ret_code": 1, "message": "没有此用户"})
 
         inside_message.send_one.apply_async(kwargs={
-            "user_id":user.id,
-            "title":title,
-            "content":content,
-            "mtype":mtype
+            "user_id": user.id,
+            "title": title,
+            "content": content,
+            "mtype": mtype
         })
-        return Response({"ret_code":0, "message":"发送成功"})
-
-
-"""
-class IdValidate(APIView):
-    permission_classes = (IsAuthenticated,)
-    def get(self, request, *args, **kwargs):
-        pass
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        name = request.DATA.get("name", "")
-        id_number = request.DATA.get("id_number", "")
-        verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
-
-        if verify_counter.count >= 3:
-            return Response({
-                                "message": u"验证次数超过三次，请联系客服进行人工验证",
-                                "error_number": ErrorNumber.try_too_many_times
-                            }, status=400)
-
-        verify_record, error = verify_id(name, id_number)
-
-        verify_counter.count = F('count') + 1
-        verify_counter.save()
-
-        if error or not verify_record.is_valid:
-            return Response({
-                                "message": u"验证失败，拨打客服电话进行人工验证",
-                                "error_number": ErrorNumber.unknown_error
-                            }, status=400)
-
-        user.wanglibaouserprofile.id_number = id_number
-        user.wanglibaouserprofile.name = name
-        user.wanglibaouserprofile.id_is_valid = True
-        user.wanglibaouserprofile.save()
-
-        now = timezone.now()
-        with transaction.atomic():
-            if Reward.objects.filter(is_used=False, type=u'三天迅雷会员', end_time__gte=now).exists():
-                try:
-                    reward = Reward.objects.select_for_update()\
-                        .filter(is_used=False, type=u'三天迅雷会员').first()
-                    reward.is_used = True
-                    reward.save()
-                    RewardRecord.objects.create(user=user, reward=reward,
-                                                description=u'新用户注册赠送三天迅雷会员')
-
-                    title,content = messages.msg_validate_ok(reward.content)
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id":user.id,
-                        "title":title,
-                        "content":content,
-                        "mtype":"activity"
-                    })
-                except Exception, e:
-                    print(e)
-                    pass
-
-        return Response({
-                            "validate": True
-                        }, status=200)
-"""
+        return Response({"ret_code": 0, "message": "发送成功"})
 
 
 class IntroduceRelation(TemplateView):
@@ -1167,6 +1138,7 @@ class IntroduceRelation(TemplateView):
         """
         return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)
 
+
 class P2PDetailOfLoginForCjdView(TemplateView):
     template_name = "cjdao_login_product.jade"
 
@@ -1184,6 +1156,7 @@ class P2PDetailOfLoginForCjdView(TemplateView):
 
         return context
 
+
 class P2PDetailOfRegisterForCjdView(TemplateView):
     template_name = "cjdao_register_product.jade"
 
@@ -1200,3 +1173,51 @@ class P2PDetailOfRegisterForCjdView(TemplateView):
         })
 
         return context
+
+
+class CjdaoApiView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        uaccount = request.GET.get('uaccount')
+        phone = request.GET.get('phone')
+        companyid = request.GET.get('companyid')
+        thirdproductid = request.GET.get('thirdproductid')
+        user = CjdaoUtils.get_wluser_by_phone(phone)
+
+        cjdaoinfo = {
+            'uaccount': uaccount,
+            'companyid': companyid,
+            'usertype': 0,
+        }
+        request.session['cjdaoinfo'] = cjdaoinfo
+
+        if thirdproductid:
+            try:
+                p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
+            except P2PProduct.DoesNotExist:
+                raise Http404(u'您查找的产品不存在')
+
+            if user:
+                request.session.get('cjdaoinfo').update(usertype=1)
+                return render_to_response('cjdao_login_product.jade', {'p2p': p2p, 'phone': phone})
+            else:
+                return render_to_response('cjdao_register_product.jade', {'p2p': p2p, 'phone': phone})
+        else:
+
+            if user:
+                request.session.get('cjdaoinfo').update(usertype=1)
+                return render_to_response('cjdao_login.jade', {'uaccount': uaccount, 'phone': phone})
+            else:
+                return render_to_response('cjdao_register.jade', {'uaccount': uaccount, 'phone': phone})
+
+
+
+
+
+
+
+
+
+
+

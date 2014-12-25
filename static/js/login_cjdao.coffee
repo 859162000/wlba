@@ -98,15 +98,12 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         type: "POST"
         data: $("#login-cjdao-form").serialize()
       .done (data,textStatus) ->
-        next_url = ''
-        arr = /\?next=(\/.+)$/ig.exec(window.location)
+        arr = /thirdproductid=(\d+)/ig.exec(window.location)
         if(arr && arr[1])
-          next_url = arr[1]
-          window.location.href = next_url
+          window.location.href = '/p2p/detail/' + arr[1]
         else
-          location.reload()
+          window.location.href = '/'
 
-		
         $('#login_submit').removeClass('disabled')
       .fail (xhr)->
         result = JSON.parse xhr.responseText
@@ -159,7 +156,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         type: "POST"
         data: $(form).serialize()
       .done (data,textStatus) ->
-          location.reload()
+        arr = /thirdproductid=(\d+)/ig.exec(window.location)
+        if(arr && arr[1])
+          window.location.href = '/p2p/detail/' + arr[1]
+        else
+          window.location.href = '/'
       .fail (xhr)->
         result = JSON.parse xhr.responseText
         message = result.message
