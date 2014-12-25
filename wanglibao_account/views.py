@@ -935,6 +935,13 @@ def ajax_register(request):
 
                 tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
 
+
+                # todo move to celery task
+                cjdaoinfo = request.session.get('cjdaoinfo')
+                if cjdaoinfo:
+                    CjdaoUtils.return_register(identifier, cjdaoinfo, float(auth_user.margin.margin))
+
+
                 return HttpResponse(messenger('done', user=request.user))
             else:
                 return HttpResponseForbidden(messenger(form.errors))
@@ -1210,45 +1217,6 @@ class CjdaoApiView(APIView):
                 return render_to_response('cjdao_login.jade', {'uaccount': uaccount, 'phone': phone})
             else:
                 return render_to_response('cjdao_register.jade', {'uaccount': uaccount, 'phone': phone})
-
-
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-def ajax_register_cjdao(request):
-    def messenger(message, user=None):
-        res = dict()
-        if user:
-            res['nick_name'] = user.wanglibaouserprofile.nick_name
-        res['message'] = message
-        return json.dumps(res)
-
-    if request.method == "POST":
-        if request.is_ajax():
-            form = EmailOrPhoneRegisterForm(request.POST)
-            if form.is_valid():
-                nickname = form.cleaned_data['nickname']
-                password = form.cleaned_data['password']
-                identifier = form.cleaned_data['identifier']
-                invitecode = form.cleaned_data['invitecode']
-                user = create_user(identifier, password, nickname)
-                set_promo_user(request, user, invitecode=invitecode)
-                auth_user = authenticate(identifier=identifier, password=password)
-                auth.login(request, auth_user)
-                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
-
-                # todo move to celery task
-                cjdaoinfo = request.session.get('cjdaoinfo')
-                if cjdaoinfo:
-                    CjdaoUtils.return_register(identifier, cjdaoinfo, float(auth_user.margin.margin))
-
-                return HttpResponse(messenger('done', user=request.user))
-            else:
-                return HttpResponseForbidden(messenger(form.errors))
-        else:
-            return HttpResponseForbidden('not valid ajax request')
-    else:
-        return HttpResponseNotAllowed()
 
 
 

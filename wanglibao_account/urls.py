@@ -46,7 +46,6 @@ urlpatterns = patterns(
 
     url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
 
-
     url(r'^login/$', 'django.contrib.auth.views.login',
         {
             "template_name": "login.jade",
@@ -57,7 +56,6 @@ urlpatterns = patterns(
 
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
     url(r'^register/wap/$', TemplateView.as_view(template_name='register_wap.jade'), name='wap_register'),
-    url(r'^register/ajax/cjdao/$', 'wanglibao_account.views.ajax_register_cjdao'),
     url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
 
     url(r'^message/$', login_required(MessageView.as_view(), login_url='/accounts/login/')),
