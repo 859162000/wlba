@@ -96,7 +96,7 @@ def msg_register():
 #风行过来的注册成功
 def msg_register_f():
     title = u"注册成功"
-    content = u"感谢您注册网利宝。 完成实名认证并充值，免费领取7天风行VIP会员。<br/> <a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a></br/> 感谢您对我们的信任与支持。<br/> 网利宝"
+    content = u"感谢您注册网利宝。 完成实名认证并充值成功，免费领取7天风行VIP会员。<br/> <a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a></br/> 感谢您对我们的信任与支持。<br/> 网利宝"
     return title, content
 
 def msg_register_authok(activation):
@@ -171,7 +171,7 @@ def msg_pay_ok(amount):
 
 def msg_pay_ok_f(amount, activation):
     title = u"充值成功"
-    content = u"恭喜您完成充值，您的网利宝账户已成功充值￥%s元，请查收。网利宝赠送给您的7天风行VIP会员：%s，有效期至2015年12月31日。<a href='http://www.fun.tv/vip/pay/v?from=viphome&block=btn&mid=' target='_blank'>激活会员</a><br/> 活动期间：即日起-2015年1月31日<br/> 活动1：首次投资任意P2P产品，即送礼包。<br/> 活动2：参加精彩活动，额外获赠1%年化收益奖励。<br/> 活动3：理财达到一定额度“风行VIP会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/> 活动4：邀请好友完成首次单笔1000元理财，双方共享60元话费，您再获赠好友首笔理财额度0.5%年化收益奖励。<br/> <a href='/' target='_blank'>立即投资</a><br/> 感谢您对我们的信任与支持。<br/> 网利宝" % (amount, activation)
+    content = u"恭喜您完成充值，您的网利宝账户已成功充值￥%s元，请查收。网利宝赠送给您的7天风行VIP会员：%s，有效期至2015年12月31日。<a href='http://www.fun.tv/vip/pay/v?from=viphome&block=btn&mid=' target='_blank'>激活会员</a><br/> 活动期间：即日起-2015年1月31日<br/> 活动1：首次投资任意P2P产品，即送礼包。<br/> 活动2：参加精彩活动，额外获赠1%%年化收益奖励。<br/> 活动3：理财达到一定额度“风行VIP会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/> 活动4：邀请好友完成首次单笔1000元理财，双方共享60元话费，您再获赠好友首笔理财额度0.5%%年化收益奖励。<br/> <a href='/' target='_blank'>立即投资</a><br/> 感谢您对我们的信任与支持。<br/> 网利宝" % (amount, activation)
     return title, content
 
 def msg_withdraw(withtime, amount):

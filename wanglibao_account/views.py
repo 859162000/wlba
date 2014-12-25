@@ -75,7 +75,7 @@ class RegisterView (RegistrationView):
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
 
-        tools.register_ok.apply_async(kwargs={"user":auth_user.id})
+        tools.register_ok.apply_async(kwargs={"user_id":auth_user.id})
 
         return user
 
@@ -909,7 +909,7 @@ def ajax_register(request):
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
 
-                tools.register_ok.apply_async(kwargs={"user":auth_user.id})
+                tools.register_ok.apply_async(kwargs={"user_id":auth_user.id})
 
                 return HttpResponse(messenger('done', user=request.user))
                 # return HttpResponseRedirect("/accounts/id_verify/")
