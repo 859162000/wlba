@@ -14,13 +14,11 @@ class NewsAndReport(models.Model):
     created_at = models.DateTimeField(u'添加时间', auto_now_add=True)
     image = models.ImageField(u'图片', null=True, upload_to='news', blank=True)
 
-    class Meta:
-        ordering = ['-score']
-
     def __unicode__(self):
         return self.name
 
     class Meta:
+        ordering = ['-score']
         verbose_name_plural = u'新闻报道'
 
 
@@ -53,13 +51,11 @@ class InviteCode(models.Model):
     code = models.CharField(u'邀请码', max_length=6, db_index=True, unique=True)
     is_used = models.BooleanField(u'是否使用', default=False)
 
-    class Meta:
-        ordering = ['id']
-
     def __unicode__(self):
         return self.code
 
     class Meta:
+        ordering = ['id']
         verbose_name_plural = u'原始邀请码'
 
 

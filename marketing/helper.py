@@ -187,7 +187,3 @@ def which_channel(user):
         elif phone.startswith('fengxing'):
             return Channel.FENGXING
     return Channel.WANGLIBAO
-
-
-
-

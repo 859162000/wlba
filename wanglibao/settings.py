@@ -493,9 +493,9 @@ elif ENV == ENV_PREPRODUCTION:
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
-    MER_ID = '510672'
+    MER_ID = '510743'
     CUSTOM_ID = '000010124821'
-    SIGN_HOST = 'staging.wanglibao.com'
+    SIGN_HOST = '127.0.0.1'
     SIGN_PORT = 8733
     PAY_URL = 'http://test.chinapnr.com'
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
@@ -508,12 +508,6 @@ else:
     YEE_MER_ID = "YB01000000144"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'pkcs8_rsa_private_key144.pem'),'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "rsa_public_key144.pem"), "r").read())
-
-    #YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
-    #YEE_MER_ID = "10012413099"
-    #YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pri_key.pem'),'r').read())
-    #YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'),'r').read())
-    #YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
