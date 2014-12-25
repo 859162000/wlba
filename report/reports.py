@@ -458,7 +458,7 @@ class EearningReportGenerator(ReportGeneratorBase):
                 str(earning.amount),
                 str(earning.order_id),
                 str(earning.margin_record_id),
-                str(type),
+                str(earning.type),
                 str(earning.paid),
                 timezone.localtime(earning.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                 timezone.localtime(earning.update_time).strftime("%Y-%m-%d %H:%M:%S"),
