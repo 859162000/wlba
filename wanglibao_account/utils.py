@@ -13,6 +13,8 @@ from registration.models import RegistrationProfile
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd
 import logging
 import hashlib
+import requests
+
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +59,7 @@ def detect_identifier_type(identifier):
         return 'email'
 
     return 'unknown'
+
 
 User = get_user_model()
 
@@ -166,8 +169,6 @@ def mlgb_md5(phone, flag):
 
 
 class CjdaoUtils():
-
-
     @classmethod
     def get_wluser_by_phone(cls, phone):
         """
@@ -197,5 +198,19 @@ class CjdaoUtils():
         m.update(data_string)
         return str == m.hexdigest()
 
-    # @classmethod
-    # def is_product(cls, ):
+    @classmethod
+    def return_register(cls, phone, cjdaoinfo, margin):
+        url = "http://ceshi.cjdao.com/productbuy/reginfo"
+        p = {
+            'phone': phone,
+            'usertype': cjdaoinfo.get('usertype'),
+            'uaccount': cjdaoinfo.get('uaccount'),
+            'companyid': cjdaoinfo.get('companyid'),
+            'accountbalance': margin,
+            'md5_value': cls.md5_value(*(
+            phone, cjdaoinfo.get('usertype'), cjdaoinfo.get('uaccount'), cjdaoinfo.get('companyid'),
+            cjdaoinfo.get('accountbalance')))
+        }
+        r = requests.get(url, params=p)
+        print r.url
+        print r.status_code

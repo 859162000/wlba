@@ -1197,12 +1197,12 @@ class CjdaoApiView(APIView):
         user = CjdaoUtils.get_wluser_by_phone(phone)
 
         cjdaoinfo = {
-                    'uaccount': uaccount,
-                    'companyid': companyid,
-                    'productid': productid,
-                    'thirdproductid': thirdproductid,
-                    'usertype': 0,
-                }
+            'uaccount': uaccount,
+            'companyid': companyid,
+            'productid': productid,
+            'thirdproductid': thirdproductid,
+            'usertype': 0,
+        }
         request.session['cjdaoinfo'] = cjdaoinfo
 
         if thirdproductid:
@@ -1277,18 +1277,9 @@ def ajax_register_cjdao(request):
                 auth.login(request, auth_user)
 
                 # todo move to celery task
-                url = "http://ceshi.cjdao.com/productbuy/reginfo"
-                p = {
-                    'phone': identifier,
-                    'usertype': 0,
-                    'uaccount': request.POST.get('uaccount'),
-                    'companyid': request.POST.get('companyid'),
-                    'accountbalance': float(auth_user.margin.margin),
-                    'md5_value': CjdaoUtils.md5_value(*(identifier, '0', 'uaccount', 'companyid', 'accountbalance'))
-                }
-                r = requests.get(url, params=p)
-                print r.url
-                print r.status_code
+                cjdaoinfo = request.session.get('cjdaoinfo')
+                if cjdaoinfo:
+                    CjdaoUtils.return_register(identifier, cjdaoinfo, float(auth_user.margin.margin))
 
                 return HttpResponse(messenger('done', user=request.user))
             else:
