@@ -99,3 +99,14 @@ class TvView(TemplateView):
     template_name = 'tv.jade'
     def get_context_data(self, **kwargs):
         return {}
+
+
+class AppShareView(TemplateView):
+    template_name = 'app_share.jade'
+
+    def get_context_data(self, **kwargs):
+        identifier = kwargs['identifier']
+
+        return {
+            'identifier': u'1533333333'
+        }
