@@ -43,9 +43,6 @@ html
         .span5-omega
           form#login-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/login/ajax/cjdao/')
             - csrf_token
-            input(type="hidden", name="uaccount", value="{{ uaccount }}")
-            input(type="hidden", name="companyid", value="{{ companyid }}")
-            input(type="hidden", name="productid", value="{{ productid }}")
             .form-login-title
               span.cjdao-form-item 登陆信息
               span.login-now

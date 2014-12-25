@@ -1192,42 +1192,37 @@ class CjdaoApiView(APIView):
         uaccount = request.GET.get('uaccount')
         phone = request.GET.get('phone')
         companyid = request.GET.get('companyid')
-        md5_value = request.GET.get('md5_value')
         thirdproductid = request.GET.get('thirdproductid')
+        productid = request.GET.get('productid')
         user = CjdaoUtils.get_wluser_by_phone(phone)
 
-        if thirdproductid:
-            productid = request.GET.get('productid')
-            money = request.GET.get('money')
-            usertarget = request.GET.get('usertarget')
+        cjdaoinfo = {
+                    'uaccount': uaccount,
+                    'companyid': companyid,
+                    'productid': productid,
+                    'thirdproductid': thirdproductid,
+                    'usertype': 0,
+                }
+        request.session['cjdaoinfo'] = cjdaoinfo
 
+        if thirdproductid:
             try:
                 p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
             except P2PProduct.DoesNotExist:
                 raise Http404(u'您查找的产品不存在')
 
             if user:
-                return render_to_response('cjdao_login_product.jade', {
-                    'p2p': p2p,
-                    'uaccount': uaccount,
-                    'companyid': companyid,
-                    'productid': productid,
-                    'md5_value': md5_value,
-                    'phone': phone})
+                request.session.get('cjdaoinfo').update(usertype=1)
+                return render_to_response('cjdao_login_product.jade', {'p2p': p2p, 'phone': phone})
             else:
-                return render_to_response('cjdao_register_product.jade',
-                                          {'p2p': p2p, 'uaccount': uaccount, 'companyid': companyid,
-                                           'md5_value': md5_value, 'phone': phone})
+                return render_to_response('cjdao_register_product.jade', {'p2p': p2p, 'phone': phone})
         else:
 
             if user:
-                return render_to_response('cjdao_login.jade',
-                                          {'uaccount': uaccount, 'companyid': companyid, 'md5_value': md5_value,
-                                           'phone': phone})
+                request.session.get('cjdaoinfo').update(usertype=1)
+                return render_to_response('cjdao_login.jade', {'uaccount': uaccount, 'phone': phone})
             else:
-                return render_to_response('cjdao_register.jade',
-                                          {'uaccount': uaccount, 'companyid': companyid, 'md5_value': md5_value,
-                                           'phone': phone})
+                return render_to_response('cjdao_register.jade', {'uaccount': uaccount, 'phone': phone})
 
 
 @sensitive_post_parameters()
@@ -1247,13 +1242,6 @@ def ajax_login_cjdao(request):
                 password = form.cleaned_data.get('password')
                 user = authenticate(identifier=identifier, password=password)
                 auth_login(request, user)
-                cjdaoinfo = {
-                    'uaccount': request.POST.get('uaccount'),
-                    'companyid': request.POST.get('companyid'),
-                    'productid': request.POST.get('productid'),
-                    'usertype': 1,
-                }
-                request.session['cjdaoinfo'] = cjdaoinfo
                 return HttpResponse(messenger("success"))
             else:
                 return HttpResponse(messenger("form unvalid"))
@@ -1288,14 +1276,6 @@ def ajax_register_cjdao(request):
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
 
-
-                cjdaoinfo = {
-                    'uaccount': request.POST.get('uaccount'),
-                    'companyid': request.POST.get('companyid'),
-                    'productid': request.POST.get('productid'),
-                    'usertype': 0,
-                }
-                request.session['cjdaoinfo'] = cjdaoinfo
                 # todo move to celery task
                 url = "http://ceshi.cjdao.com/productbuy/reginfo"
                 p = {
@@ -1317,3 +1297,14 @@ def ajax_register_cjdao(request):
             return HttpResponseForbidden('not valid ajax request')
     else:
         return HttpResponseNotAllowed()
+
+
+
+
+
+
+
+
+
+
+

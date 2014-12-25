@@ -196,3 +196,6 @@ class CjdaoUtils():
         m = hashlib.md5()
         m.update(data_string)
         return str == m.hexdigest()
+
+    # @classmethod
+    # def is_product(cls, ):
