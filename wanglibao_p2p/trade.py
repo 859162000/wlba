@@ -138,6 +138,7 @@ class P2PTrader(object):
             "mtype": "purchase"
         })
 
+
         # 财经道购买回调
         # todo move to celery task
         cjdaoinfo = self.request.session.get('cjdaoinfo')

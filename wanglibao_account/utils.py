@@ -228,7 +228,7 @@ class CjdaoUtils():
 
         k = ('uaccount', 'phone', 'usertype', 'companyid', 'thirdproductid',
              'productname', 'buytime', 'money', 'expectedrate', 'realincome',
-             'ordercode', 'accountbalance', )
+             'ordercode', 'accountbalance')
 
         v = (cjdaoinfo.get('uaccount'), user.wanglibaouserprofile.phone, cjdaoinfo.get('usertype'),
              cjdaoinfo.get('companyid'), p2p.id, p2p.name, timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
