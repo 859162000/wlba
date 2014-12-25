@@ -495,7 +495,7 @@ else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
     MER_ID = '510743'
     CUSTOM_ID = '000010124821'
-    SIGN_HOST = 'staging.wanglibao.com'
+    SIGN_HOST = '127.0.0.1'
     SIGN_PORT = 8733
     PAY_URL = 'http://test.chinapnr.com'
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
