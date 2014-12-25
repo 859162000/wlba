@@ -12,5 +12,6 @@ urlpatterns = patterns(
     url(r'^wap/02/$', TemplateView.as_view(template_name="xunlei_02.jade")),
     url(r'^wap/03/$', TemplateView.as_view(template_name="xunlei_03.jade")),
     url(r'^kuaipan/$', TemplateView.as_view(template_name="kuaipan.jade")),
+    url(r'^fengxing/$', TemplateView.as_view(template_name="fengxing.jade")),
     #url(r'^wlbtvsstsiis/tv/$', TemplateView.as_view(template_name="tv.jade")),
 )

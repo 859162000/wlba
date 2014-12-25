@@ -41,7 +41,7 @@ html
                 earning_rate = str(p2p.expected_earning_rate)
                 .span9-omega {{earning_rate}}%
         .span5-omega
-          form#login-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/login/ajax/cjdao/')
+          form#login-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/login/ajax/')
             - csrf_token
             .form-login-title
               span.cjdao-form-item 登陆信息

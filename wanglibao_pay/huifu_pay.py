@@ -5,7 +5,7 @@ import decimal
 import logging
 from django.forms import model_to_dict
 from django.utils.decorators import method_decorator
-from marketing.helper import RewardStrategy
+#from marketing.helper import RewardStrategy
 import requests
 from order.utils import OrderHelper
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -16,10 +16,11 @@ from django.conf import settings
 from django.db import transaction
 from wanglibao_pay.util import get_client_ip
 from wanglibao_pay.views import PayResult
+from marketing import tools
 import xml.etree.ElementTree as ET
-from wanglibao_sms import messages
-from django.utils import timezone
-from wanglibao_account import message as inside_message
+#from wanglibao_sms import messages
+#from django.utils import timezone
+#from wanglibao_account import message as inside_message
 
 logger = logging.getLogger(__name__)
 
@@ -273,8 +274,9 @@ class HuifuPay(Pay):
 
         pay_info.save()
 
-
         if flag:
+            tools.despoit_ok(pay_info)
+            """
             # 迅雷活动, 12.8 首次充值
             start_time = timezone.datetime(2014, 12, 7)
             if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
@@ -290,6 +292,7 @@ class HuifuPay(Pay):
                 "content": content,
                 "mtype": "activityintro"
             })
+            """
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return result

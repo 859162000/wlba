@@ -93,6 +93,12 @@ def msg_register():
     content = u"感谢您注册网利宝。 完成实名认证并充值，免费领取3天迅雷会员激活码。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
     return title, content
 
+#风行过来的注册成功
+def msg_register_f():
+    title = u"注册成功"
+    content = u"感谢您注册网利宝。 完成实名认证并充值成功，免费领取7天风行VIP会员。<br/> <a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a></br/> 感谢您对我们的信任与支持。<br/> 网利宝"
+    return title, content
+
 def msg_register_authok(activation):
     title = u"注册成功"
     content = u"感谢您注册网利宝。<br/>网利宝赠送您3天迅雷白金会员激活码，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/>立即兑换（<a href='http://act.vip.xunlei.com/vip/2014/xlhyk/' target='_blank'>http://act.vip.xunlei.com/vip/2014/xlhyk/</a>）<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
@@ -132,6 +138,12 @@ def msg_first_kuaipan(size, activation):
     content = u"感谢您在活动期间完成首次理财。<br/>网利宝赠送您%s快盘网盘，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/><a href='http://www.kuaipan.cn/n/user/records/lottery' target='_blank'>立即兑换</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % (size, activation)
     return title, content
 
+#风行会员
+def msg_first_fengxing(activation):
+    title = u"活动期首次理财成功"
+    content = u"感谢您在活动期间完成首次理财。<br/> 网利宝赠送您1个月风行VIP会员，请您查收！<br/> 激活码：%s，有效期至2015年12月31日。<br/> <a href='http://www.fun.tv/vip/pay/v?from=viphome&block=btn&mid=' target='_blank'>激活会员</a><br/> 感谢您对我们的信任与支持。<br/> 网利宝" % activation
+    return title, content
+
 def msg_invite_major(inviter, invited):
     title = u"邀请好友送话费"
     content = u"您的好友%s已通过您的邀请完成网利宝投资，您和您好友将共享60元话费,您的30元话费将于3个工作日内充值至您的手机号%s，请注意查收。<br/>感谢您对我们的支持与关注！<br/>网利宝" % (invited, inviter)
@@ -155,6 +167,11 @@ def msg_bid_success(product_name, date):
 def msg_pay_ok(amount):
     title = u"充值成功"
     content = u"您的网利宝账户已成功充值￥%s元，请查收。<br/>活动期间：2014年11月1日-2014年12月31日<br/>活动1：投资不同产品，即送1个月迅雷白金会员或10G、50G、100G快盘网盘。<br/>活动2：参加精彩活动，额外获赠1%%年化收益奖励。<br/>活动3：理财达到一定额度“迅雷白金会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/>活动4：邀请好友完成首次单笔1000元理财，双方共享60元话费，您再获赠好友首笔理财额度0.5%%年化收益奖励。<br/><a href='/' target='_blank'>点击此处进行理财</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % amount
+    return title, content
+
+def msg_pay_ok_f(amount, activation):
+    title = u"充值成功"
+    content = u"恭喜您完成充值，您的网利宝账户已成功充值￥%s元，请查收。网利宝赠送给您的7天风行VIP会员：%s，有效期至2015年12月31日。<a href='http://www.fun.tv/vip/pay/v?from=viphome&block=btn&mid=' target='_blank'>激活会员</a><br/> 活动期间：即日起-2015年1月31日<br/> 活动1：首次投资任意P2P产品，即送礼包。<br/> 活动2：参加精彩活动，额外获赠1%%年化收益奖励。<br/> 活动3：理财达到一定额度“风行VIP会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/> 活动4：邀请好友完成首次单笔1000元理财，双方共享60元话费，您再获赠好友首笔理财额度0.5%%年化收益奖励。<br/> <a href='/' target='_blank'>立即投资</a><br/> 感谢您对我们的信任与支持。<br/> 网利宝" % (amount, activation)
     return title, content
 
 def msg_withdraw(withtime, amount):

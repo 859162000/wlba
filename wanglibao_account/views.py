@@ -29,6 +29,7 @@ from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
 from marketing.models import IntroducedBy
 from marketing.utils import set_promo_user
+from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, CjdaoUtils
@@ -71,15 +72,7 @@ class RegisterView(RegistrationView):
         set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
-
-        title, content = messages.msg_register()
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": auth_user.id,
-            "title": title,
-            "content": content,
-            "mtype": "activityintro"
-        })
-
+        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
         return user
 
     def get_success_url(self, request=None, user=None):
@@ -940,13 +933,7 @@ def ajax_register(request):
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
 
-                title, content = messages.msg_register()
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": auth_user.id,
-                    "title": title,
-                    "content": content,
-                    "mtype": "activityintro"
-                })
+                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
 
                 return HttpResponse(messenger('done', user=request.user))
             else:
@@ -1228,33 +1215,6 @@ class CjdaoApiView(APIView):
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def ajax_login_cjdao(request):
-    def messenger(message, user=None):
-        res = dict()
-        res['message'] = message
-        return json.dumps(res)
-
-    if request.method == "POST":
-        if request.is_ajax():
-            form = EmailOrPhoneAuthenticationForm(request, data=request.POST)
-            if form.is_valid():
-                identifier = form.cleaned_data.get('identifier')
-                password = form.cleaned_data.get('password')
-                user = authenticate(identifier=identifier, password=password)
-                auth_login(request, user)
-                return HttpResponse(messenger("success"))
-            else:
-                return HttpResponse(messenger("form unvalid"))
-
-        else:
-            return HttpResponseForbidden('not valid ajax request')
-    else:
-        return HttpResponseNotAllowed()
-
-
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
 def ajax_register_cjdao(request):
     def messenger(message, user=None):
         res = dict()
@@ -1275,6 +1235,7 @@ def ajax_register_cjdao(request):
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
                 auth.login(request, auth_user)
+                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
 
                 # todo move to celery task
                 cjdaoinfo = request.session.get('cjdaoinfo')

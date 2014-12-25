@@ -52,6 +52,7 @@ urlpatterns = patterns(
     # url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', TemplateView.as_view(template_name="hiring.jade")),
     url(r'^about/', TemplateView.as_view(template_name="about.jade")),
+    url(r'^company/', TemplateView.as_view(template_name="company.jade")),
     url(r'^team/', TemplateView.as_view(template_name="team.jade")),
     url(r'^partner/', PartnerView.as_view(), name="partner"),
     url(r'^milestone/', TemplateView.as_view(template_name="milestone.jade")),

@@ -444,7 +444,7 @@ class EearningReportGenerator(ReportGeneratorBase):
         output = cStringIO.StringIO()
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'用户姓名', u'用户手机号', u'p2p的id', u'p2p名',
-                         u'收益金额', u'订单号', u'交易流水id', u'是否打款', u'创建时间', u'更新时间', u'审核时间'])
+                         u'收益金额', u'订单号', u'交易流水id', u'是否打款', u'类型', u'创建时间', u'更新时间', u'审核时间'])
 
         earnings = Earning.objects.filter(create_time__gte=start_time, create_time__lt=end_time)
 
@@ -458,6 +458,7 @@ class EearningReportGenerator(ReportGeneratorBase):
                 str(earning.amount),
                 str(earning.order_id),
                 str(earning.margin_record_id),
+                str(earning.type),
                 str(earning.paid),
                 timezone.localtime(earning.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                 timezone.localtime(earning.update_time).strftime("%Y-%m-%d %H:%M:%S"),
