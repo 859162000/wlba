@@ -230,9 +230,9 @@ class CjdaoUtils():
              'productname', 'buytime', 'money', 'expectedrate', 'realincome',
              'ordercode', 'accountbalance')
 
-        v = (cjdaoinfo.get('uaccount'), user.wanglibaouserprofile.phone, cjdaoinfo.get('usertype'),
-             cjdaoinfo.get('companyid'), p2p.id, p2p.name, timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
-             float(margin_record.amount), expectedrate, realincome, margin_record.order_id, float(margin_record.margin_current), key)
+        v = (cjdaoinfo.get('uaccount'), user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')),
+             cjdaoinfo.get('companyid'), str(p2p.id), p2p.name, timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
+             str(float(margin_record.amount)), str(expectedrate), str(realincome), str(margin_record.order_id), str(float(margin_record.margin_current)), key)
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
