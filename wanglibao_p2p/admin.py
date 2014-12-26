@@ -177,7 +177,32 @@ class P2PProductForm(forms.ModelForm):
     class Meta:
         model = P2PProduct
 
-    def clean_status(self):
+    # def clean_status(self):
+    #     if self.cleaned_data['status'] == u'正在招标':
+    #
+    #         pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
+    #
+    #         if not pa:
+    #             raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
+    #
+    #         product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
+    #         if pa.count() != product.amortization_count:
+    #             raise forms.ValidationError(u'产品还款计划错误')
+    #
+    #         print self.cleaned_data
+    #
+    #         # amort_principal = 0
+    #         # for a in pa:
+    #         #     amort_principal += a.principal
+    #         #
+    #         # print amort_principal, self.cleaned_data['total_amount']
+    #         #
+    #         # if amort_principal != self.cleaned_data['total_amount']:
+    #         #     raise forms.ValidationError(u'还款计划本金之和与募集金额不相等，请检查')
+    #
+    #     return self.cleaned_data['status']
+
+    def clean(self):
         if self.cleaned_data['status'] == u'正在招标':
 
             pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
@@ -189,7 +214,15 @@ class P2PProductForm(forms.ModelForm):
             if pa.count() != product.amortization_count:
                 raise forms.ValidationError(u'产品还款计划错误')
 
-        return self.cleaned_data['status']
+            amort_principal = 0
+            for a in pa:
+                amort_principal += a.principal
+
+            print amort_principal, self.cleaned_data['total_amount']
+
+            if amort_principal != self.cleaned_data['total_amount']:
+                raise forms.ValidationError(u'还款计划本金之和与募集金额不相等，请检查')
+        return self.cleaned_data
 
 
 class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
