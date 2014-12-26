@@ -15,7 +15,7 @@ import logging
 import hashlib
 import requests
 from decimal import Decimal
-
+from wanglibao.settings import POST_PRODUCT_URL
 
 logger = logging.getLogger(__name__)
 
@@ -169,6 +169,14 @@ def mlgb_md5(phone, flag):
     return m.hexdigest()
 
 
+PAY_METHOD = {
+    u'等额本息': 1,
+    u'按月付息': 3,
+    u'到期还本付息': 4,
+    u'先息后本': 2
+}
+
+
 class CjdaoUtils():
     @classmethod
     def get_wluser_by_phone(cls, phone):
@@ -231,8 +239,10 @@ class CjdaoUtils():
              'ordercode', 'accountbalance')
 
         v = (cjdaoinfo.get('uaccount'), user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')),
-             cjdaoinfo.get('companyid'), str(p2p.id), p2p.name, timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
-             str(float(margin_record.amount)), str(expectedrate), str(realincome), str(margin_record.order_id), str(float(margin_record.margin_current)), key)
+             cjdaoinfo.get('companyid'), str(p2p.id), p2p.name,
+             timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
+             str(float(margin_record.amount)), str(expectedrate), str(realincome), str(margin_record.order_id),
+             str(float(margin_record.margin_current)), key)
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
@@ -240,3 +250,30 @@ class CjdaoUtils():
 
         print r.url
         print r.status_code
+
+
+    @classmethod
+    def post_product(cls, p2p):
+        url = POST_PRODUCT_URL
+        k = (
+        'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney', 'loandeadline',
+        'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment')
+
+        incomeway = PAY_METHOD.get(p2p.pay_method, 0)
+        reward = 0
+        if p2p.activity:
+            reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
+        expectedrate = p2p.expected_earning_rate + float(reward * 100)
+
+        v = (
+        str(p2p.id), p2p.name, u'网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
+        str(expectedrate), '1', incomeway, 'a', '1', '1', '1')
+
+        p = dict(zip(k, v))
+        p.update(md5_value=cls.md5_value(*v))
+        r = requests.get(url, params=p)
+
+        print r.url
+        print r.status_code
+
+
