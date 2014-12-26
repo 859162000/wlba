@@ -4,6 +4,7 @@ import uuid
 import re
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.template import Context, Template, add_to_builtins
 from django.template.loader import render_to_string, get_template
@@ -12,6 +13,9 @@ from registration.models import RegistrationProfile
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd
 import logging
 import hashlib
+import requests
+from decimal import Decimal
+
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +60,7 @@ def detect_identifier_type(identifier):
         return 'email'
 
     return 'unknown'
+
 
 User = get_user_model()
 
@@ -162,3 +167,76 @@ def mlgb_md5(phone, flag):
     m = hashlib.md5()
     m.update(new_str)
     return m.hexdigest()
+
+
+class CjdaoUtils():
+    @classmethod
+    def get_wluser_by_phone(cls, phone):
+        """
+
+        :param phone:
+        :return:
+        """
+        if phone:
+            return User.objects.filter(wanglibaouserprofile__phone=phone).first()
+
+    @classmethod
+    def quick_md5_value(cls, uaccount, phone, companyid, key):
+        data_string = '{}{}{}{}'.format(uaccount, phone, companyid, key)
+        return cls.md5str(data_string)
+
+    @classmethod
+    def md5_value(cls, *args):
+        data_string = ''.join(args)
+        m = hashlib.md5()
+        m.update(data_string)
+        return m.hexdigest()
+
+    @classmethod
+    def valid_md5(cls, str, *args):
+        data_string = ''.join(args)
+        m = hashlib.md5()
+        m.update(data_string)
+        return str == m.hexdigest()
+
+    @classmethod
+    def return_register(cls, cjdaoinfo, user, key):
+        url = "http://ceshi.cjdao.com/productbuy/reginfo"
+
+        k = ('phone', 'usertype', 'uaccount', 'companyid', 'accountbalance')
+
+        v = (user.wanglibaouserprofile.phone, cjdaoinfo.get('usertype'), cjdaoinfo.get('uaccount'),
+             cjdaoinfo.get('companyid'), user.margin.margin, key)
+
+        p = dict(zip(k, v))
+        p.update(md5_value=cls.md5_value(*v))
+        r = requests.get(url, params=p)
+        print r.url
+        print r.status_code
+
+
+    @classmethod
+    def return_purchase(cls, cjdaoinfo, user, margin_record, p2p, key):
+
+        url = "http://ceshi.cjdao.com/productbuy/saveproduct"
+        reward = Decimal.from_float(0).quantize(Decimal('0.0'), 'ROUND_DOWN')
+        if p2p.activity:
+            reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0'), 'ROUND_DOWN')
+        expectedrate = p2p.expected_earning_rate + float(reward * 100)
+
+        realincome = expectedrate * float(margin_record.amount) * p2p.period / 12
+
+        k = ('uaccount', 'phone', 'usertype', 'companyid', 'thirdproductid',
+             'productname', 'buytime', 'money', 'expectedrate', 'realincome',
+             'ordercode', 'accountbalance')
+
+        v = (cjdaoinfo.get('uaccount'), user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')),
+             cjdaoinfo.get('companyid'), str(p2p.id), p2p.name, timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
+             str(float(margin_record.amount)), str(expectedrate), str(realincome), str(margin_record.order_id), str(float(margin_record.margin_current)), key)
+
+        p = dict(zip(k, v))
+        p.update(md5_value=cls.md5_value(*v))
+        r = requests.get(url, params=p)
+
+        print r.url
+        print r.status_code

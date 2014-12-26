@@ -63,12 +63,20 @@ def despoit_ok(pay_info):
                 status=PayInfo.SUCCESS).count() == 1:
             rs = RewardStrategy(pay_info.user)
             rs.reward_user(u'七天风行会员')
-        title, content = messages.msg_pay_ok_f(pay_info.amount, rs.reward.content)
+            title, content = messages.msg_pay_ok_f(pay_info.amount, rs.reward.content)
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": pay_info.user.id,
+                "title": title,
+                "content": content,
+                "mtype": "activity"
+            })
+        #第二次以后充值
+        title, content = messages.msg_pay_ok_f_2(pay_info.amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id": pay_info.user.id,
             "title": title,
             "content": content,
-            "mtype": "activity"
+            "mtype": "pay"
         })
     else:
         # 迅雷活动, 12.8 首次充值

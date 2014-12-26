@@ -14,32 +14,33 @@ html
             img(src="/static/images/cjdao.png")
             h3 投资预约
             p 您在财经道填写的信息已提交至网利宝，请继续完善信息，以便顺利投资网利宝优质项目。
-            .cjdao-product-info
-                h3 预约信息
-                .row
-                    .span3.align-right 产品名称：
-                    .span9-omega {{p2p.name}}
-                .row
-                    .span3.align-right 发行机构：
-                    .span9-omega 网利科技有限公司
-                .row
-                    .span3.align-right 借款期限：
-                    .span9-omega {{p2p.period}}
-                .row
-                    .span3.align-right 起投金额：
-                    .span9-omega 100(元)
-                .row
-                    .span3.align-right 还款方式：
-                    .span9-omega {{p2p.display_payback_method}}
-                .row
-                    .span3.align-right 年化收益率：
-                    if p2p.activity
-                      rate_result = p2p
-                      earning_rate = str(p2p.expected_earning_rate + float(p2p.activity.rule.rule_amount*100))
-                      .span9-omega {{earning_rate}}%
-                    else
-                      earning_rate = str(p2p.expected_earning_rate)
-                      .span9-omega {{earning_rate}}%
+            if p2p
+              .cjdao-product-info
+                  h3 预约信息
+                  .row
+                      .span3.align-right 产品名称：
+                      .span9-omega {{p2p.name}}
+                  .row
+                      .span3.align-right 发行机构：
+                      .span9-omega 网利科技有限公司
+                  .row
+                      .span3.align-right 借款期限：
+                      .span9-omega {{p2p.period}}
+                  .row
+                      .span3.align-right 起投金额：
+                      .span9-omega 100(元)
+                  .row
+                      .span3.align-right 还款方式：
+                      .span9-omega {{p2p.display_payback_method}}
+                  .row
+                      .span3.align-right 年化收益率：
+                      if p2p.activity
+                        rate_result = p2p
+                        earning_rate = str(p2p.expected_earning_rate + float(p2p.activity.rule.rule_amount*100))
+                        .span9-omega {{earning_rate}}%
+                      else
+                        earning_rate = str(p2p.expected_earning_rate)
+                        .span9-omega {{earning_rate}}%
         .span5-omega
           form#register-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/register/ajax/')
             - csrf_token
@@ -53,7 +54,7 @@ html
             .form-row
               .span1.align-right 手机号
               .span7
-                input#reg_identifier(type="text", name="identifier", placeholder="* 请输入手机号", autocomplete='off', title="* 请输入手机号",style="width:118px;margin-right:10px")
+                input#reg_identifier(type="text", name="identifier", value="{{ phone }}", readonly="readonly", autocomplete='off', style="width:118px;margin-right:10px")
                 button#button-get-validate-code.button-orange.button-large(type='button') 获取验证码
                 .form-row-error.error
 

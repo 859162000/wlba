@@ -106,6 +106,7 @@ class VerifyCounterAdmin(admin.ModelAdmin):
 class UserPushIdAdmin(admin.ModelAdmin):
     list_display = ("user", "device_type", "push_user_id", "push_channel_id")
     raw_id_fields = ('user', )
+    search_fields = ('user__wanglibaouserprofile__phone',)
 
 class BindingAdmin(admin.ModelAdmin):
     list_display = ("user", "bid", "btype", "isvip")

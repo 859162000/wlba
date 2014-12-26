@@ -8,22 +8,25 @@ from django.views.generic import TemplateView
 from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
 from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome,
-    				AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView, AccountTransactionDeposit,
-				    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract, P2PDetailOfLoginForCjdView, P2PDetailOfRegisterForCjdView,
-					Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailView, MessageCountView, MessageListView, AccountRepayment)
+                   AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView,
+                   AccountTransactionDeposit,
+                   AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
+                   P2PDetailOfLoginForCjdView, P2PDetailOfRegisterForCjdView,
+                   Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailView, MessageCountView,
+                   MessageListView, AccountRepayment, CjdaoApiView)
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
     '',
     url(r'^home/$', login_required(AccountHome.as_view(),
-                                 login_url='/accounts/login/')),
+                                   login_url='/accounts/login/')),
     url(r'^home/fund/$', login_required(AccountHome.as_view(),
-                                 login_url='/accounts/login/')),
+                                        login_url='/accounts/login/')),
     url(r'^p2p/amortization/(?P<product_id>\d+)', login_required(P2PAmortizationView.as_view(),
                                                                  login_url='/accounts/login/')),
     url(r'^p2p/contract/(?P<product_id>\d+)', user_product_contract),
     url(r'^transaction/fund/$', login_required(AccountTransaction.as_view(),
-                                 login_url='/accounts/login/')),
+                                               login_url='/accounts/login/')),
     url(r'^transaction/p2p/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/login/')),
     url(r'^repayment/$', login_required(AccountRepayment.as_view(), login_url='/accounts/login/')),
     url(r'^transaction/deposit/$', login_required(AccountTransactionDeposit.as_view(),
@@ -31,17 +34,18 @@ urlpatterns = patterns(
     url(r'^transaction/withdraw/$', login_required(AccountTransactionWithdraw.as_view(),
                                                    login_url='/accounts/login/')),
     url(r'^bankcard/$', login_required(AccountBankCard.as_view(),
-                                 login_url='/accounts/login/')),
+                                       login_url='/accounts/login/')),
     url(r'^favorite/$', login_required(TemplateView.as_view(template_name='account_favorite.jade'),
-                                      login_url='/accounts/login/')),
+                                       login_url='/accounts/login/')),
     url(r'^setting/$', login_required(TemplateView.as_view(template_name='account_setting.jade'),
-                                     login_url='/accounts/login/')),
+                                      login_url='/accounts/login/')),
     url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/login/')),
     url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
 
     url(r'^invite/$', login_required(TemplateView.as_view(template_name='invite.jade'), login_url='/accounts/login/')),
 
     url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
+
     url(r'^login/$', 'django.contrib.auth.views.login',
         {
             "template_name": "login.jade",
@@ -67,16 +71,18 @@ urlpatterns = patterns(
         TemplateView.as_view(template_name='activation_complete.jade'),
         name='registration_activation_complete'),
     url(r'^activate/(?P<activation_key>\w+)/$',
-                           ActivationView.as_view(template_name="activate.jade"),
-                           name='registration_activate'),
+        ActivationView.as_view(template_name="activate.jade"),
+        name='registration_activate'),
 
     url(r'^password/reset/identifier/', PasswordResetGetIdentifierView.as_view(), name="password_reset"),
     url(r'^password/reset/validate/', PasswordResetGetIdentifierView.as_view(), name="password_reset_validate"),
     url(r'^password/reset/send_mail/', "wanglibao_account.views.send_validation_mail", name="send_validation_mail"),
-    url(r'^password/reset/send_validate_code/', "wanglibao_account.views.send_validation_phone_code", name="send_validation_phone_code"),
+    url(r'^password/reset/send_validate_code/', "wanglibao_account.views.send_validation_phone_code",
+        name="send_validation_phone_code"),
     url(r'^password/reset/validate_phone_code/', "wanglibao_account.views.validate_phone_code"),
     url(r'^password/reset/set_password/', ResetPassword.as_view(), name="password_reset_set_password"),
-    url(r'^password/reset/done/', TemplateView.as_view(template_name="password_reset_done.jade"), name="password_reset_done"),
+    url(r'^password/reset/done/', TemplateView.as_view(template_name="password_reset_done.jade"),
+        name="password_reset_done"),
     url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
         auth_views.password_reset_confirm,
         {
@@ -85,10 +91,16 @@ urlpatterns = patterns(
         },
         name='auth_password_reset_confirm'),
     url(r'', include('registration.backends.default.urls')),
+
+
     url(r'^cjdao_login/$', TemplateView.as_view(template_name='cjdao_login.jade')),
     url(r'^cjdao_register/$', TemplateView.as_view(template_name='cjdao_register.jade')),
     url(r'^cjdao_login_product/(?P<id>\w+)$', P2PDetailOfLoginForCjdView.as_view(), name="cjdao_login_product"),
-    url(r'^cjdao_register_product/(?P<id>\w+)$', P2PDetailOfRegisterForCjdView.as_view(), name="cjdao_register_product"),
+    url(r'^cjdao_register_product/(?P<id>\w+)$', P2PDetailOfRegisterForCjdView.as_view(),
+        name="cjdao_register_product"),
+
+    url(r'cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
+
 )
 
 if settings.DEBUG:
