@@ -97,7 +97,8 @@ html body div.ui-slider-track.ui-body-a .ui-btn-active
     text-align: center;
 }
 .margin-auto {
-    margin: 15px auto;
+    margin: 15px auto 0 auto;
+    width: 66px;
 }
 .content,
 .download-content {

@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
-from marketing.views import AppShareView
+from marketing.views import AppShareView, AppShareRegView
 
 
 urlpatterns = patterns(
@@ -15,5 +15,5 @@ urlpatterns = patterns(
     url(r'^kuaipan/$', TemplateView.as_view(template_name="kuaipan.jade")),
     #url(r'^wlbtvsstsiis/tv/$', TemplateView.as_view(template_name="tv.jade")),
     url(r'^app_share/(?P<identifier>\d+)/$', AppShareView.as_view(), name="app_share"),
-    url(r'^app_share_reg/(?P<identifier>\d+)/$', TemplateView.as_view(template_name="app_share_reg.jade")),
+    url(r'^app_share_reg/$', AppShareRegView.as_view(), name="app_share_reg")
 )

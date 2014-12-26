@@ -121,9 +121,11 @@ def safe_mail(user):
 def safe_phone_str(phone):
     return phone[:3] + '*' * (len(phone) - 2 - 3) + phone[-2:]
 
+
 @register.filter
 def safe_phone_new(phone):
     return phone[:3] + '*' * (len(phone) - 2 - 3) + phone[-2:]
+
 
 @register.filter
 def safe_phone(user):
