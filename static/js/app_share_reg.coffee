@@ -70,7 +70,7 @@ require ['jquery', 'lib/backend', 'jquerymobile'], ($, backend, mobile)->
         $(element).removeClass 'disable'
         $(".error-message").text(data.message)
       else
-        window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y#stepDownloadNew"
+        window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y#stepDownload"
     .fail (xhr)->
       $(".error-message").text("注册失败")
 
