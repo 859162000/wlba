@@ -316,11 +316,11 @@ class P2PProductViewSet(PaginatedModelViewSet):
         if pager:
             return qs.filter(hide=False).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).filter(pager).order_by('-priority')
+            ]).filter(pager).order_by('-priority', '-publish_time')
         else:
             return qs.filter(hide=False).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).order_by('-priority')
+            ]).order_by('-priority', '-publish_time')
 
 
 P2PEYE_PAY_WAY = {
