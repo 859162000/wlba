@@ -76,7 +76,7 @@
           $(element).removeClass('disable');
           return $(".error-message").text(data.message);
         } else {
-          return window.location.href = "/activity/app_share/" + identifier(+"/?reg=y#stepDownloadNew");
+          return window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y#stepDownloadNew";
         }
       }).fail(function(xhr) {
         return $(".error-message").text("注册失败");

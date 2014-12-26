@@ -35,13 +35,13 @@ require ['jquery', 'lib/backend', 'jquerymobile'], ($, backend, mobile)->
           $(".popup-message").text("您输入的手机号已注册过网利宝！")
           $("#popupDialog").popup('open')
           $("#popupDialog").on "popupafterclose", ()->
-            window.location.href = "/activity/app_share/" + identifier + "/?reg=n#stepDownload"
+            window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=n#stepDownload"
             return true
         .fail ->
           $(".popup-message").text("验证码已发送至您手机，请注意查收。")
           $("#popupDialog").popup('open')
           $("#popupDialog").on "popupafterclose", ()->
-            window.location.href = "/activity/app_share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier
+            window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier
             return true
     else
       $(".error-message").text("手机号输入错误")
