@@ -14,6 +14,9 @@ from django.http.response import HttpResponse
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
+from django.shortcuts import redirect, render_to_response
+from wanglibao_sms.utils import validate_validation_code, send_validation_code
+from marketing.models import PromotionToken
 
 
 
@@ -99,3 +102,38 @@ class TvView(TemplateView):
     template_name = 'tv.jade'
     def get_context_data(self, **kwargs):
         return {}
+
+
+class AppShareView(TemplateView):
+    template_name = 'app_share.jade'
+
+    def get_context_data(self, **kwargs):
+        identifier = kwargs['identifier']
+        reg = self.request.GET.get('reg')
+
+        return {
+            'identifier': identifier,
+            'reg': reg
+        }
+
+
+class AppShareRegView(TemplateView):
+    template_name = 'app_share_reg.jade'
+
+    def get_context_data(self, **kwargs):
+        identifier = self.request.GET.get('identifier')
+        friend_identifier = self.request.GET.get('friend_identifier')
+
+        if friend_identifier:
+            user = User.objects.get(wanglibaouserprofile__phone=friend_identifier)
+            promo_token = PromotionToken.objects.get(user=user)
+            invitecode = promo_token.token
+        else:
+            invitecode = ''
+
+        send_validation_code(identifier)
+        return {
+            'identifier': identifier,
+            'invitecode': invitecode
+        }
+

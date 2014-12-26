@@ -431,7 +431,7 @@ class UserExisting(APIView):
         except get_user_model().DoesNotExist:
             return Response({
                                 "existing": False
-                            }, status=200)
+                            }, status=400)
 
 
 class IdValidate(APIView):

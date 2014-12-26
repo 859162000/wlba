@@ -259,6 +259,9 @@ define ['jquery'], ($)->
   registerWap = (data)->
     $.post '/api/register/wx/', data
 
+  registerShare = (data)->
+    $.post '/api/register/', data
+
   registerXunlei = (data)->
     $.get '/accounts/login/callback/', data
 
@@ -326,4 +329,5 @@ define ['jquery'], ($)->
     loadMessage: loadMessage
     loadMessageCount: loadMessageCount
     readMessage: readMessage
+    registerShare: registerShare
   }

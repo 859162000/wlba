@@ -1,0 +1,40 @@
+- load formatters
+doctype html
+html
+  head
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet",href="/static/css/wap/jquery.mobile.min.css")
+    link(rel="stylesheet",href="/static/css/wap/share_app.css")
+    script(src="/static/js/require.js", data-main="/static/js/header")
+    script.
+      require(["/static/js/app_share_reg.js"])
+
+  body
+    div.content
+      div(data-role="content")
+        h2 请设置登陆密码完成注册
+        h2 账号：
+          span.re_identifier {{ identifier }}
+        form#register-form(method='post', action='/accounts/register/ajax/')
+          - csrf_token
+          .form-row
+            .span8
+              input#reg_identifier(type="hidden", name="identifier", value="{{identifier}}")
+              input#reg_validate_code(type="number", data-clear-btn="false", name="validate_code", pattern="[0-9]{6}", placeholder="请输入验证码", id="number-2", value="")
+              input#reg_invitecode(type="hidden", name="invitecode", value="{{ invitecode }}")
+            .span4-omega
+              button#sendValidateCodeButton.send-validate-button(type="button", data-url="/api/phone_validation_code/register/{{ identifier }}/") 获取验证码
+          .form-row
+            input#reg_password(type="password", name="password", id="password", value="", autocomplete="off", placeholder="请设置您的登陆密码", style="height:42px; background-color:#f9f9f9")
+          button#register_submit.download-btn(type="button",style="background-color:#ff4c2e;color:#ffffff") 注 册
+          .error-message
+
+      div(data-role="content").align-center
+        div(data-role="popup", id="popupDialog", data-dismissible="false", style="width:auto;")
+          div(data-role="content").ui-content
+            .popup-message
+            .margin-auto
+              a.ui-btn.ui-corner-all.ui-shadow.ui-btn-inline.ui-btn-a#okButton(href="#",data-rel="back", data-transition="flow") 好的
+
+
+
