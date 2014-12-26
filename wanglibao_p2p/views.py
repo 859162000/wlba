@@ -330,6 +330,12 @@ P2PEYE_PAY_WAY = {
     u'按季度付息': 5,
 }
 
+XUNLEI_PAY_WAY = {
+    u'等额本息': 3,
+    u'按月付息': 1,
+    u'到期还本付息': 2,
+    u'按季度付息': 4,
+}
 
 class P2PEyeListAPIView(APIView):
     """ 网贷天眼 API
@@ -519,7 +525,7 @@ class XunleiP2PListAPIView(APIView):
             obj = {
                 'id': p2pproduct.id,
                 'title': p2pproduct.name,
-                'title_url': 'https://{}/p2p/detail/{}?xluid={}'.format(request.get_host(), p2pproduct.id, uid),
+                'title_url': 'https://{}/p2p/detail/{}'.format(request.get_host(), p2pproduct.id),
                 'rate_year': p2pproduct.expected_earning_rate,
                 'rate_vip': float(rate_vip),
                 'income': income,
@@ -529,11 +535,10 @@ class XunleiP2PListAPIView(APIView):
                 'finance_progress': float(percent),
                 'finance_left': float(p2pproduct.remain),
                 'repayment_period': p2pproduct.period * 30,
-                'repayment_type': P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0),
-                'buy_url': 'https://{}/p2p/detail/{}?xluid={}'.format(request.get_host(), p2pproduct.id, uid),
+                'repayment_type': XUNLEI_PAY_WAY.get(p2pproduct.pay_method, 0),
+                'buy_url': 'https://{}/p2p/detail/{}'.format(request.get_host(), p2pproduct.id),
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
-                # 'repayment_time': time.mktime(timezone.localtime(amorts.first().term_date).timetuple()),
                 'status': p2pproduct.status
             }
             project_list.append(obj)
