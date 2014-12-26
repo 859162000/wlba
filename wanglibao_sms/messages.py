@@ -141,7 +141,7 @@ def msg_first_kuaipan(size, activation):
 #风行会员
 def msg_first_fengxing(activation):
     title = u"活动期首次理财成功"
-    content = u"感谢您在活动期间完成首次理财。<br/> 网利宝赠送您1个月风行VIP会员，请您查收！<br/> 激活码：%s，有效期至2015年12月31日。<br/> <a href='http://www.fun.tv/vip/pay/v?from=viphome&block=btn&mid=' target='_blank'>激活会员</a><br/> 感谢您对我们的信任与支持。<br/> 网利宝" % activation
+    content = u"感谢您在活动期间完成首次理财。<br/> 网利宝赠送您1个月风行VIP会员，请您查收！<br/> 激活码：%s，有效期至2015年12月31日。<br/> <a href='http://www.fun.tv/vip/pay/v/coupon' target='_blank'>激活会员</a><br/> 感谢您对我们的信任与支持。<br/> 网利宝" % activation
     return title, content
 
 def msg_invite_major(inviter, invited):
