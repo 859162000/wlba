@@ -18,5 +18,5 @@ urlpatterns = patterns(
     url(r'^wap/share$', AppShareView.as_view(), name="app_share"),
     url(r'^wap/share_reg/$', AppShareRegView.as_view(), name="app_share_reg"),
     url(r'^share/test/$', TemplateView.as_view(template_name="app_share_test.jade")),
-    url(r'^share/test/1/$', TemplateView.as_view(template_name="xunlei_01.jade")),
+    url(r'^lili/lili/$', TemplateView.as_view(template_name="xunlei_01.jade")),
 )
