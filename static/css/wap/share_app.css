@@ -1,10 +1,194 @@
+html {
+  font-family: Helvetica, Arial, "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+  -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 1em;
+  color: #333
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+main,
+nav,
+section,
+summary {
+  display: block;
+}
+audio,
+canvas,
+progress,
+video {
+  display: inline-block;
+  vertical-align: baseline;
+}
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+[hidden],
+template {
+  display: none;
+}
+a {
+  background: transparent;
+}
+a:active,
+a:hover {
+  outline: 0;
+}
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+b,
+strong {
+  font-weight: bold;
+}
+dfn {
+  font-style: italic;
+}
+h1 {
+  margin: .67em 0;
+  font-size: 2em;
+}
+img {
+  border: 0;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  margin: 0;
+  font: inherit;
+  color: inherit;
+}
+button {
+  overflow: visible;
+}
+button,
+select {
+  text-transform: none;
+}
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+input {
+  line-height: normal;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 0;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+input[type="search"] {
+  -webkit-box-sizing: content-box;
+     -moz-box-sizing: content-box;
+          box-sizing: content-box;
+  -webkit-appearance: textfield;
+}
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+ul,ol,li,dl,dt,dd {list-style: none; padding: 0; margin: 0;}
+
+input[type="checkbox"].css-checkbox {
+	position:absolute;
+  z-index:-1000;
+  left:-1000px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height:1px;
+  width:1px;
+  margin:-1px;
+  padding:0;
+  border:0;
+}
+input[type="checkbox"].css-checkbox + label.css-label {
+	padding-left: 20px;
+	height: 15px;
+	display: inline-block;
+  background-repeat: no-repeat;
+  background-position: -505px -160px;
+  font-size: 12px;
+  line-height: 16px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+input[type="checkbox"].css-checkbox:checked + label.css-label {
+	background-position: -505px -195px;
+}
+label.css-label {
+	background-image:url("/static/images/icon-public.png");
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+input[type="text"],
+input[type="number"],
+input[type="password"],
+button[type="button"] {
+  border: solid 1px #e3e3e3;
+  background: #F9F9F9;
+  border-radius: 5px;
+  height: 40px;
+  width: 96%;
+  padding: 0 5px;
+}
+.clearfix {
+  overflow: auto;
+  zoom: 1;
+}
+body {
+  max-width: 414px;
+  text-align: center;
+  background-color: #fdfbef;
+}
+h1 {
+    padding: 1em 0em 1em;
+    font-size: 1.2em;
+    color: #b01d15;
+    border-bottom: 1px solid #e0e0e0;
+    margin: 0;
+    text-align: center;
+}
 header {
   background: #ffffff url("/static/images/wap/share_header_bg.png") no-repeat left top;
   background-size: 100% 100%;
-}
-.why-select {
-    background: #F6F6F6 url("/static/images/wap/content_bg.png") no-repeat left top;
-    background-size: 100% 100%;
 }
 .download-image {
     background: url("/static/images/wap/download_bg.png") no-repeat center;
@@ -15,19 +199,13 @@ header {
   header {
     height: 13em;
   }
-  .why-select {
-    height: 23em;
-  }
   .download-image {
     height: 13.5em;
   }
 }
 @media screen and (min-width: 360px) {
   header {
-    height: 15em;
-  }
-  .why-select {
-    height: 26em;
+    height: 15.3em;
   }
   .download-image {
     height: 15.5em;
@@ -35,10 +213,7 @@ header {
 }
 @media screen and (min-width: 414px) {
   header {
-    height: 17em;
-  }
-  .why-select {
-    height: 29em;
+    height: 17.3em;
   }
   .download-image {
     height: 17.5em;
@@ -50,91 +225,149 @@ footer {
   height: 4em;
 }
 .red {
-    color: red;
+  color: red;
 }
 .form-row {
-    height: auto;
-    min-height: 4em;
+  clear: both;
+  height: 40px;
+  padding: 0 0 10px 0;
 }
 .form-row .span8 {
-    float: left;
-    width: 58%;
-}
-.form-row .span8 input {
-    height: 42px;
-    background: #F2F2F2;
+  float: left;
+  width: 56%;
 }
 .form-row .span4-omega {
-    float: right;
-    width: 40%;
+  float: right;
+  width: 40%;
 }
-.form-row .span4-omega button,
-.download-btn {
-    background-color: #ff8c2f;
-    color: #ffffff;
-    font-weight: normal;
+.form-row .span4-omega button {
+  background-color: #ff8c2f;
+  color: #ffffff;
+  font-weight: normal;
+  width: 100%;
+  height: 42px;
+  border: solid 1px #ff8c2f;
 }
-.form-row .span4-omega button:focus,
-.download-btn:focus {
-    background-color: #ff4c2e;
-    color: #ffffff;
+.form-row .span4-omega button:focus {
+  background-color: #ff4c2e;
+  color: #ffffff;
+  border: solid 1px #ff8c2f;
+}
+.form-row .span4-omega button:disabled {
+  background-color: #eeeeee;
+  color: #999999;
+  border: solid 1px #eeeeee;
+}
+button[type="button"].download-btn {
+  background-color:#ff4c2e;
+  color:#ffffff;
+  font-size: 1.2em;
+  height: 2.5em;
+  line-height: 2.5em;
 }
 .space-s {
-    background: #F6F6F6;
-    height: 3em;
+  height: .8em;
 }
-
-.ui-page-theme-a .ui-checkbox-on:after,
-html body div.ui-slider-track.ui-body-a .ui-btn-active
-{
-    background-color: #ff4c2e;
-    border-color: #ff4c2e;
+.why-select {
+  background: #F6F6F6;
+}
+.why-select h1 {
+  color: #333;
+}
+.why-select-row {
+  padding: 1.2em 0;
+}
+.why-span-icon {
+  float: left;
+  width: 38%;
+  text-align: center;
+}
+.icon {
+  display: inline-block;
+  position: relative;
+  margin: 0 auto;
+  top: 5px;
+  left: 10px;
+}
+.icon-why-1 {
+  width: 50px;
+  height: 50px;
+  background: url("/static/images/icon-public.png") no-repeat -492px -100px;
+}
+.icon-why-2 {
+  width: 50px;
+  height: 50px;
+  background: url("/static/images/icon-public.png") no-repeat -724px -100px;
+}
+.icon-why-3 {
+  width: 50px;
+  height: 53px;
+  background: url("/static/images/icon-public.png") no-repeat -566px -100px;
+}
+.icon-why-4 {
+  width: 50px;
+  height: 50px;
+  background: url("/static/images/icon-public.png") no-repeat -647px -100px;
+}
+.why-select-row dl {
+  float: left;
+}
+.why-select-row dl dt {
+  font-size: 1.2em;
+  font-weight: 800;
+  color: #FA6048;
 }
 .error-message {
-    color: red;
+  color: red;
+  padding-bottom: 10px;
 }
 .align-center {
-    text-align: center;
+  text-align: center;
 }
 .margin-auto {
-    margin: 15px auto 0 auto;
-    width: 66px;
+  margin: 15px auto 0 auto;
+  width: 66px;
 }
 .content,
 .download-content {
-    background-color: #fdfbef;
-    height: 100%;
+  height: 100%;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin: 0 auto;
+  text-align: left;
 }
 .download-content h3 {
-    margin-top: 1.2em;
-    text-align: center;
-    font-size: 1.5em;
-    font-weight: normal;
-    line-height: 1.5em;
+  margin-top: 1.2em;
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: normal;
+  line-height: 1.5em;
 }
-.download-btn {
-    font-size: 1.3em;
-}
+
 .download-image-container {
-    width: 60%;
-    margin: 1em auto 1.5em auto;
+  width: 60%;
+  margin: 1em auto 1.5em auto;
 }
 .content h2 {
-    font-weight: normal;
-    line-height: 1.3em;
+  font-weight: normal;
+  line-height: 1.3em;
 }
 .padding-l-r-s {
-    padding: 0 1em;
+  padding: 0 1em;
+  text-align: left;
 }
 .gray {
-    color: #999999;
+  color: #999999;
+}
+.blue {
+  color: #008DE3;
 }
 .icon-register-ok {
-    display: inline-block;
-    position: relative;
-    top: 14px;
-    width: 41px;
-    height: 41px;
-    background: url("/static/images/wap/reg_ok.png") no-repeat;
-    background-size: 85% 85%;
+  display: inline-block;
+  position: relative;
+  top: 17px;
+  width: 41px;
+  height: 41px;
+  background: url("/static/images/wap/reg_ok.png") no-repeat;
+  background-size: 80% 80%;
 }

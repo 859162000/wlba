@@ -3,15 +3,13 @@ doctype html
 html
   head
     meta(name="viewport", content="width=device-width, initial-scale=1")
-    link(rel="stylesheet",href="/static/css/wap/jquery.mobile.min.css")
     link(rel="stylesheet",href="/static/css/wap/share_app.css")
     script(src="/static/js/require.js", data-main="/static/js/header")
 
   body
-    div(data-role="page",id="step1")
+    if not reg
       header
-
-      div(data-role="content")
+      div.content
         p 你的朋友
           span.red {{ identifier|safe_phone_new }}
           | 邀请你使用网利宝理财，首次体验可获赠
@@ -27,21 +25,43 @@ html
               button#button-get-validate-code-modal(type="button") 获取验证码
           .error-message
           .form-row
-            label(for="agree")
+            input.css-checkbox(type="checkbox",id="agree",checked="true")
+            label.css-label(for="agree")
               | 我同意
-              a(href="#agreement") 《网利宝用户注册协议》
-              input(type="checkbox",id="agree",checked="true")
+              span.blue 《网利宝用户注册协议》
       .why-select
-      .space-s
-      div(data-role="content").align-center
-        div(data-role="popup", id="popupDialog", data-dismissible="false", style="width:auto;")
-          div(data-role="content").ui-content
-            .popup-message
-            .margin-auto
-              a.ui-btn.ui-corner-all.ui-shadow.ui-btn-inline.ui-btn-a#okButton(href="#",data-rel="back", data-transition="flow") 好的
+        h1 为什么选择网利宝？
+        .why-select-row.clearfix
+          .why-span-icon
+            .icon.icon-why-1
+          dl
+            dt 信赖
+            dd IDG资本投资
+            dd 100%本息保障
+        .why-select-row.clearfix
+          .why-span-icon
+            .icon.icon-why-2
+          dl
+            dt 权威
+            dd 洛克菲勒家族
+            dd 全方位战略合作
+        .why-select-row.clearfix
+          .why-span-icon
+            .icon.icon-why-3
+          dl
+            dt 高收益
+            dd 30倍银行活期收益
+            dd 100元起投 0手续费
+        .why-select-row.clearfix
+          .why-span-icon
+            .icon.icon-why-4
+          dl
+            dt 安全
+            dd 招商银行全程监管
+            dd 平安保险全额承保
       footer
-
-    div.download-content(data-role="page",id="stepDownload")
+    else
+      div.content
       if reg == "y"
         h3
           span.icon-register-ok
@@ -53,7 +73,7 @@ html
           | 投资更方便
       div.download-image-container
         .download-image
-      button.downloadApp.download-btn(type="button",style="background-color:#ff4c2e;color:#ffffff") 点击下载APP软件
+      button.downloadApp.download-btn(type="button"") 点击下载APP软件
       if reg == "y"
         p.padding-l-r-s
           | 完成首次单笔
@@ -62,13 +82,6 @@ html
           span.red 30元
           | 话费。
         p.padding-l-r-s.gray 话费将在3个工作日内发放至您的注册手机号。
-
-      div(data-role="content").align-center
-        div(data-role="popup", id="popupDialogDown", data-dismissible="false", style="width:auto;")
-          div(data-role="content").ui-content
-            .popup-message
-            .margin-auto
-              a.ui-btn.ui-corner-all.ui-shadow.ui-btn-inline.ui-btn-a#okButton(href="#",data-rel="back", data-transition="flow") 好的
 
     script.
       require(["/static/js/app_share.js"])
