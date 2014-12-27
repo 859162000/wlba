@@ -1,58 +1,29 @@
 doctype html
 html
   head
-    meta(name="viewport", content="width=device-width, initial-scale=1")
-
+    title 迅雷活动页
+    meta(name="viewport" content="width=device-width,initial-scale=1")
+    meta(name="keywords", content="迅雷,网利宝,狂欢节")
+    meta(name="description", content="8月20日至9月5日，迅雷+网利宝狂欢节，错过绝对会后悔”")
+    link(href="/static/css/wap/activity.css", rel="stylesheet", type="text/css")
   body
-      header
-      div.content
-        p 你的朋友
-          span.red
-          | 邀请你使用网利宝理财，首次体验可获赠
-          span.red 30元
-          | 话费。
-        form#validate-modal-form(method='post', action='/activity/app_share_reg/')
-          .form-row
-            .span8
-              input#friend_identifier(type="hidden", name="friend_identifier", value="")
-              input#my_identifier(type="number", data-clear-btn="false", name="identifier", pattern="[0-9]{*}", placeholder="请输入手机号", id="number-1", value="")
-            .span4-omega
-              button#button-get-validate-code-modal(type="button") 获取验证码
-          .error-message
-          .form-row
-            input.css-checkbox(type="checkbox",id="agree",checked="true")
-            label.css-label(for="agree")
-              | 我同意
-              span.blue 《网利宝用户注册协议》
-      .why-select
-        h1 为什么选择网利宝？
-        .why-select-row.clearfix
-          .why-span-icon
-            .icon.icon-why-1
-          dl
-            dt 信赖
-            dd IDG资本投资
-            dd 100%本息保障
-        .why-select-row.clearfix
-          .why-span-icon
-            .icon.icon-why-2
-          dl
-            dt 权威
-            dd 洛克菲勒家族
-            dd 全方位战略合作
-        .why-select-row.clearfix
-          .why-span-icon
-            .icon.icon-why-3
-          dl
-            dt 高收益
-            dd 30倍银行活期收益
-            dd 100元起投 0手续费
-        .why-select-row.clearfix
-          .why-span-icon
-            .icon.icon-why-4
-          dl
-            dt 安全
-            dd 招商银行全程监管
-            dd 平安保险全额承保
-      footer
+    header
+    main
+      h1 活动时间：2014年11月1日-2014年12月31日
 
+      dl.list
+        dt 01
+        dd &gt;&nbsp;迅雷会员理财，额外享最多1%年化收益奖励;
+      dl.list
+        dt 02
+        dd &gt;&nbsp;理财100-999元，获赠1个月迅雷白金会员;
+        dd &gt;&nbsp;理财1000-49999元，获赠6个月迅雷白金会员;
+        dd &gt;&nbsp;理财50000元以上，获赠1年迅雷白金会员;
+
+      dl
+        dt.note 活动说明：
+        dd 1、将于2015年1月12日前发放至您的网利宝账户。
+
+      footer
+        详请关注网利宝官网：
+        a(href="https://www.wanglibao.com") www.wanglibao.com
