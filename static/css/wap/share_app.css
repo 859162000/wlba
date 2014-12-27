@@ -270,6 +270,7 @@ button[type="button"].download-btn {
 }
 .why-select {
   background: #F6F6F6;
+  text-align: left;
 }
 .why-select h1 {
   color: #333;
