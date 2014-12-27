@@ -265,6 +265,9 @@ button[type="button"].download-btn {
   height: 2.5em;
   line-height: 2.5em;
 }
+button[type="button"].download-btn:focus {
+  background-color:#cc0000;
+}
 .space-s {
   height: .8em;
 }
