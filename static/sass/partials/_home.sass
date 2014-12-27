@@ -492,6 +492,63 @@ a.hot-item-title-link
   border: 1px solid #e8e8e8
   padding-bottom: 0px
 
+.tops-container
+  border: 1px solid #e8e8e8
+  padding-bottom: 0px
+
+  .tabs
+    display: block !important
+
+  .tabs-nav
+    padding: 15px 0
+    overflow: hidden
+    border-bottom: 1px solid #dcdcdc
+    ul
+      li
+        float: left
+        margin-left: 20px
+        a
+          display: inline-block
+          height: 30px
+          line-height: 30px
+          padding: 0px 20px
+          font-size: 14px
+          +border-radius(5px)
+          &.active
+            background-color: red
+            color: #fff
+  .tabs-content
+    padding: 15px 15px 15px
+    .tab-content
+      display: none
+    table
+      width: 100%
+      tr
+        td
+          text-align: center
+          line-height: 30px
+          font-size: 14px
+          padding-left: 20px
+          padding-bottom: 10px
+          .amount-sum
+            color: #ff9003
+
+          .order
+            background-image: url(/static/images/icon-public.png)
+            background-repeat: no-repeat
+            background-position: -465px -190px
+            width: 30px
+            height: 30px
+            color: #fff
+          .phone
+            padding-left: 0px
+            margin-left: 0px
+        &.tops-three
+          td
+            .order
+              background-position: -464px -153px
+
+
 .media-item
   padding: 5px 0
   font-size: $font-m

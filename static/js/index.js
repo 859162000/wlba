@@ -12,7 +12,7 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], function($, _, backend, modal, countdown) {
-    var anchors, bannerCount, banners, currentBanner, switchBanner, timer;
+    var anchors, bannerCount, banners, currentBanner, switchBanner, timer, tops;
     $('.portfolio-submit').click(function() {
       var asset, period;
       asset = $('#portfolio-asset')[0].value;
@@ -66,8 +66,47 @@
       e.stopPropagation();
       return window.open($(this).attr('data-url'));
     });
+    tops = function() {
+      var index, self, tabs, topTimer;
+      tabs = ['day', 'week', 'month'];
+      index = 0;
+      topTimer = null;
+      self = this;
+      return {
+        switchTab: function(tabIndex) {
+          var id;
+          id = ($.isNumeric(tabIndex) ? '#' + tabs[tabIndex] : tabIndex);
+          $('.tabs a').removeClass('active');
+          $('.tabs-nav a[href="' + id + '"]').addClass('active');
+          $('.tab-content').hide();
+          $(id).show();
+          return index = tabIndex;
+        },
+        nextTab: function() {
+          if (index = tabs.length - 1) {
+            index = 0;
+            return index;
+          }
+          return index++;
+        },
+        startScroll: function() {
+          console.log(self);
+          return topTimer = setTimeout(function() {
+            return console.log('hello', self);
+          }, 2000);
+        },
+        stopScroll: function() {
+          return clearTimeout(topTimer);
+        },
+        scrollTab: function() {
+          console.log('next to met');
+          self.switchTab(self.nextTab());
+          return topTimer = setTimeout(self.scrollTab, 2000);
+        }
+      };
+    };
     $(document).ready(function() {
-      return setInterval((function() {
+      setInterval((function() {
         $("#announce-title-scroll").find("ul:first").animate({
           marginTop: "-25px"
         }, 500, function() {
@@ -76,6 +115,12 @@
           }).find("li:first").appendTo(this);
         });
       }), 3000);
+      tops = tops();
+      tops.switchTab(0);
+      tops.startScroll();
+      return $('.tabs a').mouseenter(function(e) {
+        return tops.switchTab($(this).attr('href'));
+      });
     });
   });
 

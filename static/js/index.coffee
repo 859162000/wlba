@@ -60,6 +60,47 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
     e.stopPropagation()
     window.open($(this).attr('data-url'))
 
+  tops = () ->
+    tabs = ['day', 'week', 'month']
+    index = 0
+    topTimer = null
+    self = this
+
+    return {
+      switchTab: (tabIndex) ->
+        id = (if $.isNumeric(tabIndex) then '#'+tabs[tabIndex] else tabIndex)
+        $('.tabs a').removeClass('active')
+        $('.tabs-nav a[href="' + id + '"]').addClass('active')
+
+        $('.tab-content').hide()
+        $(id).show()
+
+        index = tabIndex
+
+      nextTab: () ->
+        if index = tabs.length - 1
+          index = 0
+          return index
+
+        return index++
+
+      startScroll: () ->
+#        topTimer = setTimeout(self.scrollTab, 2000)
+        console.log(self)
+        topTimer = setTimeout(->
+          console.log('hello', self)
+        , 2000)
+
+      stopScroll: () ->
+        #topTimer = null
+        clearTimeout(topTimer)
+
+      scrollTab: () ->
+        console.log('next to met')
+        self.switchTab(self.nextTab())
+        topTimer = setTimeout(self.scrollTab, 2000)
+    }
+
   $(document).ready ->
     setInterval (->
       $("#announce-title-scroll").find("ul:first").animate
@@ -69,5 +110,15 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
         return
       return
     ), 3000
+
+    tops = tops()
+
+    tops.switchTab(0)
+    tops.startScroll()
+
+    $('.tabs a').mouseenter (e) ->
+      tops.switchTab($(this).attr('href'))
+
+
   return
 
