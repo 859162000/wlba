@@ -416,8 +416,11 @@ class TopsOfDayView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        print 'hello'
-        return Response({"ret_code": 0, "message":"ok"})
+        sql = '''select * from wanglibao_p2p_p2precord'''
+        p2p_records = P2PRecord.objects.raw(sql)
+        for record in p2p_records:
+            print record, '---------##########'
+        return Response({"ret_code": 0, "records": "nna"})
 
 class TopsOfWeekView(APIView):
     """
@@ -427,7 +430,7 @@ class TopsOfWeekView(APIView):
 
     def post(self, request):
         print 'hello'
-        return Response({"ret_code": 0, "message":"ok"})
+        return Response({"ret_code": 0, "records": 'nono'})
 
 class TopsOfMonthView(APIView):
     """
