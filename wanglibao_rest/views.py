@@ -419,7 +419,11 @@ class TopsOfDayView(APIView):
 
     def post(self, request):
         start = Activity.objects.filter()
-        p2p_records = P2PRecord.objects.filter(create_time__gte=datetime())
+        p2p_records = P2PRecord.objects.filter(create_time__gte=datetime(2014, 9, 12))
+        for record in p2p_records:
+            print(record)
+
+        print p2p_records
         return Response({"ret_code": 0, "records": "nna"})
 
 class TopsOfWeekView(APIView):
