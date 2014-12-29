@@ -178,6 +178,7 @@ PAY_METHOD = {
 
 
 class CjdaoUtils():
+
     @classmethod
     def get_wluser_by_phone(cls, phone):
         """
