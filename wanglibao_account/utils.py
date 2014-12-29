@@ -15,7 +15,7 @@ import logging
 import hashlib
 import requests
 from decimal import Decimal
-from wanglibao.settings import POST_PRODUCT_URL
+
 
 logger = logging.getLogger(__name__)
 
@@ -252,8 +252,8 @@ class CjdaoUtils():
 
 
     @classmethod
-    def post_product(cls, p2p):
-        url = POST_PRODUCT_URL
+    def post_product(cls, url, p2p):
+
         k = (
         'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney', 'loandeadline',
         'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment')
@@ -266,7 +266,7 @@ class CjdaoUtils():
 
         v = (
         str(p2p.id), p2p.name, u'网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
-        str(expectedrate), '1', incomeway, 'a', '1', '1', '1')
+        str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1')
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
