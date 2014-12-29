@@ -54,10 +54,10 @@ require ['jquery', 'lib/backend'], ($, backend)->
       $(".error-message").text("请输入密码")
       return
 
-    $(element).addClass 'disabled'
-    $(element).prop 'disabled', true
-    ajax_url = $("#register-form").attr('action')
-    console.log ajax_url
+#    $(element).addClass 'disabled'
+#    $(element).prop 'disabled', true
+#    ajax_url = $("#register-form").attr('action')
+#    console.log ajax_url
     backend.registerShare {
         identifier: identifier
         password: reg_password
@@ -66,9 +66,10 @@ require ['jquery', 'lib/backend'], ($, backend)->
       }
     .done (data,textStatus) ->
       if data.ret_code > 0
-        $(element).removeClass 'disabled'
-        $(element).prop 'disabled', false
+#        $(element).removeClass 'disabled'
+#        $(element).prop 'disabled', false
         $(".error-message").text(data.message)
+        return
       else
         window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y"
     .fail (xhr)->

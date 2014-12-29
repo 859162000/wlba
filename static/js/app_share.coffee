@@ -25,6 +25,11 @@ require ['jquery', 'lib/backend'], ($, backend)->
     identifier = $("#my_identifier").val().trim()
     if !identifier
       $(".error-message").text("请输入手机号")
+      return
+    agreement = $("#agree").prop("checked")
+    if !agreement
+      $(".error-message").text("请勾选注册协议")
+      return
     if checkMobile(identifier)
       if identifier == $("#friend_identifier").val()
         $(".error-message").text("自己不能邀请自己")
