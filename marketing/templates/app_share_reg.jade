@@ -3,15 +3,16 @@ doctype html
 html
   head
     meta(name="viewport" content="width=device-width, initial-scale=1")
+    title 邀请好友理财送话费
     link(rel="stylesheet",href="/static/css/wap/share_app.css")
     script(src="/static/js/require.js", data-main="/static/js/header")
 
   body
     div.content
-        h2 请设置登陆密码完成注册
+        h2 请设置登录密码完成注册
         h2 账号：
           span.re_identifier {{ identifier }}
-        form#register-form(method='post', action='/accounts/register/ajax/')
+        form#register-form(method='post', action='')
           - csrf_token
           .form-row
             .span8

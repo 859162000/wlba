@@ -39,6 +39,8 @@ template {
 }
 a {
   background: transparent;
+  color: #333333;
+  text-decoration: none;
 }
 a:active,
 a:hover {
@@ -354,7 +356,9 @@ button[type="button"].download-btn:focus {
 }
 .content h2 {
   font-weight: normal;
-  line-height: 1.3em;
+  line-height: 1em;
+  font-size: 1em;
+  padding-top: 10px;
 }
 .padding-l-r-s {
   padding: 0 1em;

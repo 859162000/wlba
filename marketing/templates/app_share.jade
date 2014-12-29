@@ -3,6 +3,7 @@ doctype html
 html
   head
     meta(name="viewport" content="width=device-width, initial-scale=1")
+    title 邀请好友理财送话费
     link(rel="stylesheet",href="/static/css/wap/share_app.css")
     script(src="/static/js/require.js", data-main="/static/js/header")
 
@@ -15,7 +16,7 @@ html
           | 邀请你使用网利宝理财，首次体验可获赠
           span.red 30元
           | 话费。
-        form#validate-modal-form(method='post', action='/activity/app_share_reg/')
+        form#validate-modal-form(method='post', action='')
           - csrf_token
           .form-row
             .span8
@@ -28,7 +29,7 @@ html
             input.css-checkbox(type="checkbox",id="agree",checked="true")
             label.css-label(for="agree")
               | 我同意
-              span.blue 《网利宝用户注册协议》
+              a(href="/activity/wap/agreement/", target="_blank") 《网利宝用户注册协议》
       .why-select
         h1 为什么选择网利宝？
         .why-select-row.clearfix
