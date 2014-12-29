@@ -43,7 +43,7 @@
             return true;
           }).fail(function() {
             alert("验证码已发送至您手机，请注意查收。");
-            window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier;
+            window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier + "&userDevice=h5";
             return true;
           });
         }
