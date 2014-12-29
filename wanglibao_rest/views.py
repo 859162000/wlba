@@ -31,6 +31,7 @@ from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization
+from marketing.models import Activity
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from django.db import transaction
 from wanglibao_sms import messages, backends
@@ -409,6 +410,7 @@ class ShareUrlAPIView(APIView):
             body = {}
         return Response({"ret_code": 0, "message":"ok", "data":body})
 
+
 class TopsOfDayView(APIView):
     """
     得到某一天的排行榜
@@ -416,10 +418,8 @@ class TopsOfDayView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        sql = '''select * from wanglibao_p2p_p2precord'''
-        p2p_records = P2PRecord.objects.raw(sql)
-        for record in p2p_records:
-            print record, '---------##########'
+        start = Activity.objects.filter()
+        p2p_records = P2PRecord.objects.filter(create_time__gte=datetime())
         return Response({"ret_code": 0, "records": "nna"})
 
 class TopsOfWeekView(APIView):
