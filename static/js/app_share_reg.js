@@ -2,12 +2,11 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'lib/jquery.min',
-      jquerymobile: 'lib/jquery.mobile.custom.min'
+      jquery: 'lib/jquery.min'
     }
   });
 
-  require(['jquery', 'lib/backend', 'jquerymobile'], function($, backend, mobile) {
+  require(['jquery', 'lib/backend'], function($, backend) {
     var _countDown;
     _countDown = function() {
       var count, element, intervalId, timerFunction;
@@ -76,10 +75,11 @@
           $(element).removeClass('disable');
           return $(".error-message").text(data.message);
         } else {
-          return window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y#stepDownload";
+          return window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y";
         }
       }).fail(function(xhr) {
-        return $(".error-message").text("注册失败");
+        alert("注册失败。\n您可以去网利宝网站（www.wanglibao.com）试试。");
+        return window.location.href = "/";
       });
     });
   });

@@ -70,7 +70,7 @@ class ReportGeneratorBase(object):
     def get_report_name(cls, start_time, end_time):
         if hasattr(cls, 'reportname_format'):
             return cls.reportname_format % (
-            start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
+                start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
 
 
     @classmethod
@@ -376,7 +376,8 @@ class P2PAuditReportGenerator(ReportGeneratorBase):
                 str(len(product.equities.all())),
                 unicode(product.status),
                 (
-                product.soldout_time and timezone.localtime(product.soldout_time).strftime("%Y-%m-%d %H:%M:%S")) or '-',
+                    product.soldout_time and timezone.localtime(product.soldout_time).strftime(
+                        "%Y-%m-%d %H:%M:%S")) or '-',
                 unicode(product.borrower_name),
                 unicode(product.borrower_phone),
                 unicode(product.borrower_id_number),
@@ -449,6 +450,9 @@ class EearningReportGenerator(ReportGeneratorBase):
         earnings = Earning.objects.filter(create_time__gte=start_time, create_time__lt=end_time)
 
         for index, earning in enumerate(earnings):
+            confirm_time = timezone.localtime(earning.confirm_time).strftime(
+                "%Y-%m-%d %H:%M:%S") if earning.confirm_time else ''
+
             writer.writerow([
                 str(index + 1),
                 earning.user.wanglibaouserprofile.name,
@@ -462,7 +466,7 @@ class EearningReportGenerator(ReportGeneratorBase):
                 str(earning.paid),
                 timezone.localtime(earning.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                 timezone.localtime(earning.update_time).strftime("%Y-%m-%d %H:%M:%S"),
-                # timezone.localtime(earning.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
+                confirm_time
             ])
         return output.getvalue()
 

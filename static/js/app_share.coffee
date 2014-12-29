@@ -1,9 +1,8 @@
 require.config
   paths:
     jquery: 'lib/jquery.min'
-    jquerymobile: 'lib/jquery.mobile.custom.min'
 
-require ['jquery', 'lib/backend', 'jquerymobile'], ($, backend, mobile)->
+require ['jquery', 'lib/backend'], ($, backend)->
 
   Request = new Object()
   Request = backend.getRequest();
@@ -32,17 +31,13 @@ require ['jquery', 'lib/backend', 'jquerymobile'], ($, backend, mobile)->
       else
         backend.userExists identifier
         .done ->
-          $(".popup-message").text("您输入的手机号已注册过网利宝！")
-          $("#popupDialog").popup('open')
-          $("#popupDialog").on "popupafterclose", ()->
-            window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=n#stepDownload"
-            return true
+          alert "您输入的手机号已注册过网利宝！"
+          window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=n"
+          return true
         .fail ->
-          $(".popup-message").text("验证码已发送至您手机，请注意查收。")
-          $("#popupDialog").popup('open')
-          $("#popupDialog").on "popupafterclose", ()->
-            window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier
-            return true
+          alert "验证码已发送至您手机，请注意查收。"
+          window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier
+          return true
     else
       $(".error-message").text("手机号输入错误")
 
@@ -57,10 +52,8 @@ require ['jquery', 'lib/backend', 'jquerymobile'], ($, backend, mobile)->
       window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao#opened"
       return true
     else
-      $(".popup-message").text("抱歉当前移动平台只支持 iOS 和安卓客户端。您可以去网利宝网站（www.wanglibao.com）进行投资。")
-      $("#popupDialogDown").popup('open')
-      $("#popupDialogDown").on "popupafterclose", ()->
-        window.location.href = "/"
-        return true
+      alert("抱歉当前移动平台只支持 iOS 和安卓客户端。您可以去网利宝网站（www.wanglibao.com）进行投资。")
+      window.location.href = "/"
+      return true
 
 

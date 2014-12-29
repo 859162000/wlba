@@ -1,9 +1,8 @@
 require.config
   paths:
     jquery: 'lib/jquery.min'
-    jquerymobile: 'lib/jquery.mobile.custom.min'
 
-require ['jquery', 'lib/backend', 'jquerymobile'], ($, backend, mobile)->
+require ['jquery', 'lib/backend'], ($, backend)->
   _countDown = ()->
     element = $('#sendValidateCodeButton')
 
@@ -70,7 +69,8 @@ require ['jquery', 'lib/backend', 'jquerymobile'], ($, backend, mobile)->
         $(element).removeClass 'disable'
         $(".error-message").text(data.message)
       else
-        window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y#stepDownload"
+        window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y"
     .fail (xhr)->
-      $(".error-message").text("注册失败")
+      alert("注册失败。\n您可以去网利宝网站（www.wanglibao.com）试试。")
+      window.location.href = "/"
 
