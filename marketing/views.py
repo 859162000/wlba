@@ -125,9 +125,12 @@ class AppShareRegView(TemplateView):
         friend_identifier = self.request.GET.get('friend_identifier')
 
         if friend_identifier:
-            user = User.objects.get(wanglibaouserprofile__phone=friend_identifier)
-            promo_token = PromotionToken.objects.get(user=user)
-            invitecode = promo_token.token
+            try:
+                user = User.objects.get(wanglibaouserprofile__phone=friend_identifier)
+                promo_token = PromotionToken.objects.get(user=user)
+                invitecode = promo_token.token
+            except:
+                invitecode = ''
         else:
             invitecode = ''
 
