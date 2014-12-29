@@ -64,9 +64,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
     tabs = ['day', 'week', 'month']
     index = 0
     topTimer = null
-    self = this
+    timeStep = 4000
 
-    return {
+    topsFunc =
       switchTab: (tabIndex) ->
         id = (if $.isNumeric(tabIndex) then '#'+tabs[tabIndex] else tabIndex)
         $('.tabs a').removeClass('active')
@@ -75,31 +75,33 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
         $('.tab-content').hide()
         $(id).show()
 
-        index = tabIndex
+        index = (if $.isNumeric(tabIndex) then tabIndex else tabs.indexOf(tabIndex))
 
       nextTab: () ->
-        if index = tabs.length - 1
+        if index == tabs.length - 1
           index = 0
           return index
 
-        return index++
+        return ++index
+
+      setIndex: (tabIndex) ->
+        index = tabIndex
+
+      getIndex: () ->
+        return index
 
       startScroll: () ->
-#        topTimer = setTimeout(self.scrollTab, 2000)
-        console.log(self)
-        topTimer = setTimeout(->
-          console.log('hello', self)
-        , 2000)
+        topTimer = setTimeout(topsFunc.scrollTab, timeStep)
 
-      stopScroll: () ->
-        #topTimer = null
+      stopScroll: (id) ->
+        topsFunc.setIndex(tabs.indexOf(id.split('#')[1]))
         clearTimeout(topTimer)
 
       scrollTab: () ->
-        console.log('next to met')
-        self.switchTab(self.nextTab())
-        topTimer = setTimeout(self.scrollTab, 2000)
-    }
+        topsFunc.switchTab(topsFunc.nextTab())
+        topTimer = setTimeout(topsFunc.scrollTab, timeStep)
+
+    return topsFunc
 
   $(document).ready ->
     setInterval (->
@@ -117,8 +119,21 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
     tops.startScroll()
 
     $('.tabs a').mouseenter (e) ->
+      tops.stopScroll($(this).attr('href'))
       tops.switchTab($(this).attr('href'))
 
+    $('.tabs a').mouseleave (e) ->
+      tops.startScroll()
+
+    $('.tabs a').click (e) ->
+      e.preventDefault()
+
+    $.ajax
+      url: '/api/gettopofday/'
+      type: "POST"
+      data: {name: 'hetao'}
+    .done (data,textStatus) ->
+      console.log(data, '999')
 
   return
 

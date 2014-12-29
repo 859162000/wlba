@@ -409,6 +409,36 @@ class ShareUrlAPIView(APIView):
             body = {}
         return Response({"ret_code": 0, "message":"ok", "data":body})
 
+class TopsOfDayView(APIView):
+    """
+    得到某一天的排行榜
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        print 'hello'
+        return Response({"ret_code": 0, "message":"ok"})
+
+class TopsOfWeekView(APIView):
+    """
+    得到某一周的排行榜
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        print 'hello'
+        return Response({"ret_code": 0, "message":"ok"})
+
+class TopsOfMonthView(APIView):
+    """
+    得到某一月的排行榜
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        print 'hello'
+        return Response({"ret_code": 0, "message":"ok"})
+
 class UserExisting(APIView):
     permission_classes = ()
 

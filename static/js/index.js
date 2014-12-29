@@ -67,12 +67,12 @@
       return window.open($(this).attr('data-url'));
     });
     tops = function() {
-      var index, self, tabs, topTimer;
+      var index, tabs, timeStep, topTimer, topsFunc;
       tabs = ['day', 'week', 'month'];
       index = 0;
       topTimer = null;
-      self = this;
-      return {
+      timeStep = 4000;
+      topsFunc = {
         switchTab: function(tabIndex) {
           var id;
           id = ($.isNumeric(tabIndex) ? '#' + tabs[tabIndex] : tabIndex);
@@ -80,30 +80,34 @@
           $('.tabs-nav a[href="' + id + '"]').addClass('active');
           $('.tab-content').hide();
           $(id).show();
-          return index = tabIndex;
+          return index = ($.isNumeric(tabIndex) ? tabIndex : tabs.indexOf(tabIndex));
         },
         nextTab: function() {
-          if (index = tabs.length - 1) {
+          if (index === tabs.length - 1) {
             index = 0;
             return index;
           }
-          return index++;
+          return ++index;
+        },
+        setIndex: function(tabIndex) {
+          return index = tabIndex;
+        },
+        getIndex: function() {
+          return index;
         },
         startScroll: function() {
-          console.log(self);
-          return topTimer = setTimeout(function() {
-            return console.log('hello', self);
-          }, 2000);
+          return topTimer = setTimeout(topsFunc.scrollTab, timeStep);
         },
-        stopScroll: function() {
+        stopScroll: function(id) {
+          topsFunc.setIndex(tabs.indexOf(id.split('#')[1]));
           return clearTimeout(topTimer);
         },
         scrollTab: function() {
-          console.log('next to met');
-          self.switchTab(self.nextTab());
-          return topTimer = setTimeout(self.scrollTab, 2000);
+          topsFunc.switchTab(topsFunc.nextTab());
+          return topTimer = setTimeout(topsFunc.scrollTab, timeStep);
         }
       };
+      return topsFunc;
     };
     $(document).ready(function() {
       setInterval((function() {
@@ -118,8 +122,24 @@
       tops = tops();
       tops.switchTab(0);
       tops.startScroll();
-      return $('.tabs a').mouseenter(function(e) {
+      $('.tabs a').mouseenter(function(e) {
+        tops.stopScroll($(this).attr('href'));
         return tops.switchTab($(this).attr('href'));
+      });
+      $('.tabs a').mouseleave(function(e) {
+        return tops.startScroll();
+      });
+      $('.tabs a').click(function(e) {
+        return e.preventDefault();
+      });
+      return $.ajax({
+        url: '/api/gettopofday/',
+        type: "POST",
+        data: {
+          name: 'hetao'
+        }
+      }).done(function(data, textStatus) {
+        return console.log(data, '999');
       });
     });
   });
