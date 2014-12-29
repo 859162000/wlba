@@ -573,5 +573,6 @@ CKEDITOR_CONFIGS = {
 
 ISCJDAO = False
 CJDAOKEY = '1234'
+RETURN_REGISTER = "http://ceshi.cjdao.com/productbuy/reginfo"
+RETURN_PURCHARSE_URL = "http://ceshi.cjdao.com/productbuy/saveproduct"
 POST_PRODUCT_URL = "http://ceshi.cjdao.com/p2p/saveproduct"
-POST_PURCHARSE_URL = "http://ceshi.cjdao.com/productbuy/saveproduct"

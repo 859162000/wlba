@@ -16,8 +16,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_account.utils import CjdaoUtils
-from wanglibao.settings import CJDAOKEY, POST_PURCHARSE_URL
-
+from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 
 
 class P2PTrader(object):
@@ -44,7 +43,7 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-        tools.decide_first.apply_async(kwargs={"user_id":self.user.id})
+        tools.decide_first.apply_async(kwargs={"user_id": self.user.id})
 
         # todo: merger the code about activity,remove the rubbish code
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
@@ -144,11 +143,13 @@ class P2PTrader(object):
         cjdaoinfo = self.request.session.get('cjdaoinfo')
 
         if cjdaoinfo:
-            CjdaoUtils.return_purchase(POST_PURCHARSE_URL, cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
+            CjdaoUtils.return_purchase(RETURN_PURCHARSE_URL, cjdaoinfo, self.user, margin_record, equity.product,
+                                       CJDAOKEY)
 
         # 满标给管理员发短信
         if product_record.product_balance_after <= 0:
             from wanglibao_p2p.tasks import full_send_message
+
             full_send_message.apply_async(kwargs={"product_name": self.product.name})
         return product_record, margin_record, equity
 

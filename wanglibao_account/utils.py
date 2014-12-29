@@ -208,9 +208,8 @@ class CjdaoUtils():
         return str == m.hexdigest()
 
     @classmethod
-    def return_register(cls, cjdaoinfo, user, key):
-        url = "http://ceshi.cjdao.com/productbuy/reginfo"
-
+    def return_register(cls, url, cjdaoinfo, user, key):
+        
         k = ('phone', 'usertype', 'uaccount', 'companyid', 'accountbalance')
 
         v = (user.wanglibaouserprofile.phone, cjdaoinfo.get('usertype'), cjdaoinfo.get('uaccount'),
