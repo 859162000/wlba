@@ -781,6 +781,7 @@ class P2PListAPI(APIView):
             p2pequity_count = p2p.equities.all().count()
 
             temp_p2p = {
+                'fld_proid': p2p.id,
                 "fld_proname": p2p.name,
                 "fld_name": u'网利宝',
                 "fld_finstarttime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S"),
@@ -788,6 +789,7 @@ class P2PListAPI(APIView):
                 "fld_total_finance": p2p.total_amount,
                 "fld_lend_period": p2p.period * 30,
                 "fld_interest_year": p2p.expected_earning_rate,
+                "fld_refundmode": p2p.pay_method,
                 "fld_guarantee_org": p2p.warrant_company.name,
                 "fld_mininvest": 100.0,
                 "fld_awards": 1 if p2p.activity else 0,

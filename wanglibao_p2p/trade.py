@@ -16,8 +16,8 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_account.utils import CjdaoUtils
-from wanglibao.settings import CJDAOKEY
-
+from wanglibao_account.tasks import cjdao_callback
+from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 
 
 class P2PTrader(object):
@@ -44,7 +44,7 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-        tools.decide_first.apply_async(kwargs={"user_id":self.user.id})
+        tools.decide_first.apply_async(kwargs={"user_id": self.user.id})
 
         # todo: merger the code about activity,remove the rubbish code
         introduced_by = IntroducedBy.objects.filter(user=self.user).first()
@@ -140,14 +140,20 @@ class P2PTrader(object):
 
 
         # 财经道购买回调
-        # todo move to celery task
-        # cjdaoinfo = self.request.session.get('cjdaoinfo')
-        # if cjdaoinfo:
-        #     CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
+        # todo remove the try
+        try:
+            cjdaoinfo = self.request.session.get('cjdaoinfo')
+            if cjdaoinfo:
+                params = CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
+                cjdao_callback.apply_async(kwargs={'url': RETURN_PURCHARSE_URL, 'params': params})
+        except:
+            pass
+
 
         # 满标给管理员发短信
         if product_record.product_balance_after <= 0:
             from wanglibao_p2p.tasks import full_send_message
+
             full_send_message.apply_async(kwargs={"product_name": self.product.name})
         return product_record, margin_record, equity
 

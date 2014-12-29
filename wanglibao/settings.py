@@ -571,4 +571,8 @@ CKEDITOR_CONFIGS = {
     }
 }
 
+ISCJDAO = False
 CJDAOKEY = '1234'
+RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
+RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
+POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
