@@ -49,6 +49,7 @@ from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
 from wanglibao_p2p.models import P2PProduct
 from django.template.defaulttags import register
+from wanglibao_account.tasks import cjdao_reg
 from wanglibao.settings import RETURN_REGISTER
 
 
@@ -935,11 +936,10 @@ def ajax_register(request):
 
                 tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
 
-
-                # todo move to celery task
                 cjdaoinfo = request.session.get('cjdaoinfo')
                 if cjdaoinfo:
-                    CjdaoUtils.return_register(RETURN_REGISTER, cjdaoinfo, auth_user, CJDAOKEY)
+                    params = CjdaoUtils.return_register(cjdaoinfo, auth_user, CJDAOKEY)
+                    cjdao_reg.apply_async(kwargs={'url': RETURN_REGISTER, 'params': params})
 
                 return HttpResponse(messenger('done', user=request.user))
             else:

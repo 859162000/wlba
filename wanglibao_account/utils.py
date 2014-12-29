@@ -208,22 +208,20 @@ class CjdaoUtils():
         return str == m.hexdigest()
 
     @classmethod
-    def return_register(cls, url, cjdaoinfo, user, key):
-        
+    def return_register(cls, cjdaoinfo, user, key):
+
         k = ('phone', 'usertype', 'uaccount', 'companyid', 'accountbalance')
 
-        v = (user.wanglibaouserprofile.phone, cjdaoinfo.get('usertype'), cjdaoinfo.get('uaccount'),
-             cjdaoinfo.get('companyid'), user.margin.margin, key)
+        v = (user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')), str(cjdaoinfo.get('uaccount')),
+             str(cjdaoinfo.get('companyid')), str(user.margin.margin), key)
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
-        r = requests.get(url, params=p)
-        print r.url
-        print r.status_code
+        return p
 
 
     @classmethod
-    def return_purchase(cls, url, cjdaoinfo, user, margin_record, p2p, key):
+    def return_purchase(cls, cjdaoinfo, user, margin_record, p2p, key):
 
         reward = Decimal.from_float(0).quantize(Decimal('0.0'), 'ROUND_DOWN')
         if p2p.activity:
@@ -244,18 +242,16 @@ class CjdaoUtils():
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
-        r = requests.get(url, params=p)
 
-        print r.url
-        print r.status_code
-
+        return p
 
     @classmethod
-    def post_product(cls, url, p2p):
+    def post_product(cls, p2p):
 
         k = (
-        'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney', 'loandeadline',
-        'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment')
+            'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney',
+            'loandeadline',
+            'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment')
 
         incomeway = PAY_METHOD.get(p2p.pay_method, 0)
         reward = 0
@@ -264,14 +260,12 @@ class CjdaoUtils():
         expectedrate = p2p.expected_earning_rate + float(reward * 100)
 
         v = (
-        str(p2p.id), p2p.name, u'网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
-        str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1')
+            str(p2p.id), p2p.name, u'网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
+            str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1')
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
-        r = requests.get(url, params=p)
+        return p
 
-        print r.url
-        print r.status_code
 
 
