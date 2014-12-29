@@ -23,11 +23,12 @@ html
               button#sendValidateCodeButton.send-validate-button(type="button", data-url="/api/phone_validation_code/register/{{ identifier }}/") 获取验证码
           .space-s
           .form-row
-            input#reg_password(type="password", name="password", id="password", value="", autocomplete="off", placeholder="请设置您的登陆密码")
+            input#reg_password(type="password", name="password", id="password", value="", autocomplete="off", placeholder="请设置您的登录密码")
           .space-s
           .form-row
             button#register_submit.download-btn(type="button",style="width:100%") 注 册
           .error-message
 
     script.
-      require(["/static/js/app_share_reg.js"])
+      var v = new Date().getTime()
+      require(["/static/js/app_share_reg.js?v="+v])
