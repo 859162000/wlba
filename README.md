@@ -104,3 +104,15 @@ New Contract Template
     3. Copy the generated html
     4. Open /admin, under p2p contract, create a new contract, give it a name and paste the generated html into content
 
+Recreate Contract
+-----------------
+
+    from wanglibao_p2p.models import P2PProduct, P2PEquity
+    from order.utils import OrderHelper
+    from wanglibao_p2p.keeper import EquityKeeper
+    
+    product = P2PProduct.objects.get(id=216)
+    order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
+    
+    for equity in product.equities.all():
+        EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
