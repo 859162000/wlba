@@ -18,6 +18,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 
 
+
 @app.task
 def p2p_watchdog():
     P2POperator().watchdog()
@@ -93,3 +94,4 @@ def build_earning(product_id):
                         "phones": [user.wanglibaouserprofile.phone],
                         "messages": [messages.earning_message(amount)]
                     })
+
