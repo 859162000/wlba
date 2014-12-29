@@ -66,7 +66,8 @@ require ['jquery', 'lib/backend'], ($, backend)->
       }
     .done (data,textStatus) ->
       if data.ret_code > 0
-        $(element).removeClass 'disable'
+        $(element).removeClass 'disabled'
+        $(element).prop 'disabled', false
         $(".error-message").text(data.message)
       else
         window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y"

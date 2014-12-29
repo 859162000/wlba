@@ -72,7 +72,8 @@
         invite_code: invite_code
       }).done(function(data, textStatus) {
         if (data.ret_code > 0) {
-          $(element).removeClass('disable');
+          $(element).removeClass('disabled');
+          $(element).prop('disabled', false);
           return $(".error-message").text(data.message);
         } else {
           return window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y";
