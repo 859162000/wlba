@@ -224,9 +224,8 @@ class CjdaoUtils():
 
 
     @classmethod
-    def return_purchase(cls, cjdaoinfo, user, margin_record, p2p, key):
+    def return_purchase(cls, url, cjdaoinfo, user, margin_record, p2p, key):
 
-        url = "http://ceshi.cjdao.com/productbuy/saveproduct"
         reward = Decimal.from_float(0).quantize(Decimal('0.0'), 'ROUND_DOWN')
         if p2p.activity:
             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0'), 'ROUND_DOWN')

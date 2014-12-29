@@ -16,7 +16,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_account.utils import CjdaoUtils
-from wanglibao.settings import CJDAOKEY
+from wanglibao.settings import CJDAOKEY, POST_PURCHARSE_URL
 
 
 
@@ -143,9 +143,8 @@ class P2PTrader(object):
         # todo move to celery task
         cjdaoinfo = self.request.session.get('cjdaoinfo')
 
-        print cjdaoinfo
         if cjdaoinfo:
-            CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
+            CjdaoUtils.return_purchase(POST_PURCHARSE_URL, cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
 
         # 满标给管理员发短信
         if product_record.product_balance_after <= 0:

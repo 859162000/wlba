@@ -574,4 +574,4 @@ CKEDITOR_CONFIGS = {
 ISCJDAO = False
 CJDAOKEY = '1234'
 POST_PRODUCT_URL = "http://service.cjdao.com/p2p/saveproduct"
-
+POST_PURCHARSE_URL = "http://ceshi.cjdao.com/productbuy/saveproduct"
