@@ -85,4 +85,5 @@ html
         p.padding-l-r-s.gray 话费将在3个工作日内发放至您的注册手机号。
 
     script.
-      require(["/static/js/app_share.js"])
+      var v = new Date().getTime()
+      require(["/static/js/app_share.js?v="+v])
