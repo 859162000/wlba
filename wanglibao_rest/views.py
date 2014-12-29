@@ -418,8 +418,11 @@ class TopsOfDayView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        start = Activity.objects.filter()
-        p2p_records = P2PRecord.objects.filter(create_time__gte=datetime(2014, 9, 12))
+        activity = Activity.objects.filter(description__regex="%_tops_%")
+        print activity, '----'
+        start = activity.start_time
+        print start
+        p2p_records = P2PRecord.objects.filter(create_time__gte=start)
         for record in p2p_records:
             print(record)
 
