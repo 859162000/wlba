@@ -43,7 +43,7 @@
       return _countDown();
     });
     return $("#register_submit").click(function(e) {
-      var ajax_url, element, identifier, invite_code, reg_password, validate_code;
+      var element, identifier, invite_code, reg_password, validate_code;
       element = this;
       if ($(element).hasClass("disabled")) {
         return;
@@ -61,10 +61,6 @@
         $(".error-message").text("请输入密码");
         return;
       }
-      $(element).addClass('disabled');
-      $(element).prop('disabled', true);
-      ajax_url = $("#register-form").attr('action');
-      console.log(ajax_url);
       return backend.registerShare({
         identifier: identifier,
         password: reg_password,
@@ -72,9 +68,7 @@
         invite_code: invite_code
       }).done(function(data, textStatus) {
         if (data.ret_code > 0) {
-          $(element).removeClass('disabled');
-          $(element).prop('disabled', false);
-          return $(".error-message").text(data.message);
+          $(".error-message").text(data.message);
         } else {
           return window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y";
         }

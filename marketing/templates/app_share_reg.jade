@@ -9,10 +9,10 @@ html
 
   body
     div.content
-        h2 请设置登陆密码完成注册
+        h2 请设置登录密码完成注册
         h2 账号：
           span.re_identifier {{ identifier }}
-        form#register-form(method='post', action='/accounts/register/ajax/')
+        form#register-form(method='post', action='')
           - csrf_token
           .form-row
             .span8
