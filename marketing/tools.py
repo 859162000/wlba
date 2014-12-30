@@ -80,11 +80,11 @@ def despoit_ok(pay_info):
         })
     else:
         # 迅雷活动, 12.8 首次充值
-        start_time = timezone.datetime(2014, 12, 7)
+        start_time = timezone.datetime(2014, 12, 30)
         if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
                 status=PayInfo.SUCCESS).count() == 1:
             rs = RewardStrategy(pay_info.user)
-            rs.reward_user(u'三天迅雷会员')
+            rs.reward_user(u'七天迅雷会员')
         title, content = messages.msg_pay_ok(pay_info.amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id": pay_info.user.id,
@@ -92,22 +92,3 @@ def despoit_ok(pay_info):
             "content": content,
             "mtype": "activityintro"
         })
-
-
-
-#充值送迅雷3天VIP会员
-def xunlei_3_vip(pay_info):
-    # 迅雷活动, 12.8 首次充值
-    start_time = timezone.datetime(2014, 12, 7)
-    if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
-            status=PayInfo.SUCCESS).count() == 1:
-        rs = RewardStrategy(pay_info.user)
-        rs.reward_user(u'三天迅雷会员')
-
-    #title, content = messages.msg_pay_ok(pay_info.amount)
-    #inside_message.send_one.apply_async(kwargs={
-    #    "user_id": pay_info.user.id,
-    #    "title": title,
-    #    "content": content,
-    #    "mtype": "activityintro"
-    #})
