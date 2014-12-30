@@ -16,7 +16,7 @@ from utility import gen_hash_list
 from wanglibao_margin.models import MarginRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from marketing.models import Activity
-from wanglibao_account.utils import CjdaoUtils
+# from wanglibao_account.utils import CjdaoUtils
 from wanglibao.settings import POST_PRODUCT_URL
 from wanglibao_account.tasks import cjdao_callback
 
@@ -571,13 +571,13 @@ def post_save_process(sender, instance, **kwargs):
 
 
     # todo remove the try except
-    if instance.status == u'正在招标':
-        try:
-            # 财经道购买回调
-            params = CjdaoUtils.post_product(instance)
-            cjdao_callback.apply_async(kwargs={'url': POST_PRODUCT_URL, 'params': params})
-        except:
-            pass
+    # if instance.status == u'正在招标':
+    #     try:
+    #         # 财经道购买回调
+    #         params = CjdaoUtils.post_product(instance)
+    #         cjdao_callback.apply_async(kwargs={'url': POST_PRODUCT_URL, 'params': params})
+    #     except:
+    #         pass
 
 post_save.connect(post_save_process, sender=P2PProduct, dispatch_uid="generate_amortization_plan")
 

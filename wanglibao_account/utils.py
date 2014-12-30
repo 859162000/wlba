@@ -178,7 +178,6 @@ PAY_METHOD = {
 
 
 class CjdaoUtils():
-
     @classmethod
     def get_wluser_by_phone(cls, phone):
         """
@@ -227,7 +226,7 @@ class CjdaoUtils():
         reward = Decimal.from_float(0).quantize(Decimal('0.0'), 'ROUND_DOWN')
         if p2p.activity:
             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0'), 'ROUND_DOWN')
-        expectedrate = p2p.expected_earning_rate + float(reward * 100)
+        expectedrate = float(p2p.expected_earning_rate / 100) + float(reward)
 
         realincome = expectedrate * float(margin_record.amount) * p2p.period / 12
 
@@ -235,8 +234,8 @@ class CjdaoUtils():
              'productname', 'buytime', 'money', 'expectedrate', 'realincome',
              'ordercode', 'accountbalance')
 
-        v = (cjdaoinfo.get('uaccount'), user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')),
-             cjdaoinfo.get('companyid'), str(p2p.id), p2p.name,
+        v = (cjdaoinfo.get('uaccount'), str(user.wanglibaouserprofile.phone), str(cjdaoinfo.get('usertype')),
+             cjdaoinfo.get('companyid'), str(p2p.id), str(p2p.name),
              timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
              str(float(margin_record.amount)), str(expectedrate), str(realincome), str(margin_record.order_id),
              str(float(margin_record.margin_current)), key)
@@ -247,7 +246,7 @@ class CjdaoUtils():
         return p
 
     @classmethod
-    def post_product(cls, p2p):
+    def post_product(cls, p2p, key):
 
         k = (
             'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney',
@@ -261,8 +260,8 @@ class CjdaoUtils():
         expectedrate = p2p.expected_earning_rate + float(reward * 100)
 
         v = (
-            str(p2p.id), p2p.name, u'网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
-            str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1')
+            str(p2p.id), p2p.name, '网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
+            str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
