@@ -235,7 +235,7 @@ class CjdaoUtils():
              'ordercode', 'accountbalance')
 
         v = (cjdaoinfo.get('uaccount'), str(user.wanglibaouserprofile.phone), str(cjdaoinfo.get('usertype')),
-             cjdaoinfo.get('companyid'), str(p2p.id), str(p2p.name),
+             cjdaoinfo.get('companyid'), str(p2p.id), p2p.name.encode('urf-8'),
              timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
              str(float(margin_record.amount)), str(expectedrate), str(realincome), str(margin_record.order_id),
              str(float(margin_record.margin_current)), key)
