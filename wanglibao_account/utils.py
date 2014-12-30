@@ -178,7 +178,6 @@ PAY_METHOD = {
 
 
 class CjdaoUtils():
-
     @classmethod
     def get_wluser_by_phone(cls, phone):
         """
@@ -235,7 +234,7 @@ class CjdaoUtils():
              'productname', 'buytime', 'money', 'expectedrate', 'realincome',
              'ordercode', 'accountbalance')
 
-        v = (cjdaoinfo.get('uaccount'), user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')),
+        v = (cjdaoinfo.get('uaccount'), str(user.wanglibaouserprofile.phone), str(cjdaoinfo.get('usertype')),
              cjdaoinfo.get('companyid'), str(p2p.id), str(p2p.name),
              timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
              str(float(margin_record.amount)), str(expectedrate), str(realincome), str(margin_record.order_id),
@@ -247,7 +246,7 @@ class CjdaoUtils():
         return p
 
     @classmethod
-    def post_product(cls, p2p):
+    def post_product(cls, p2p, key):
 
         k = (
             'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney',
@@ -262,7 +261,7 @@ class CjdaoUtils():
 
         v = (
             str(p2p.id), p2p.name, '网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
-            str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1')
+            str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
