@@ -1,10 +1,16 @@
-from marketing.models import Reward, RewardRecord
-from wanglibao_p2p.models import P2PRecord
+from decimal import Decimal, ROUND_DOWN
+from django.forms import model_to_dict
+from marketing.models import Reward, RewardRecord, IntroducedBy
+from order.models import Order
+from order.utils import OrderHelper
+from wanglibao_margin.marginkeeper import MarginKeeper
+from wanglibao_p2p.models import P2PRecord, Earning
 from django.utils import timezone
 from django.db.models import Sum
 from django.contrib.auth.models import User
 from wanglibao_account import message as inside_message
 from wanglibao_sms.tasks import send_messages
+from wanglibao.templatetags.formatters import safe_phone_str
 
 def send_award():
 
@@ -62,6 +68,18 @@ def send_award():
             reward_user_apple(record["user"],u"满就送iphone",u"iPhone 6 Plus(16G 5.5英寸)")
             iphone_6_plus += 1
             print u"发放iphone6 plus第%s个" % iphone_6_plus
+
+    new_user = IntroducedBy.objects.filter(bought_at__range=(start,end)).exclude(introduced_by__username__startswith="channel").exclude(introduced_by__wanglibaouserprofile__utype__gt= 0)
+    amount_05 = 0
+    for first_user in new_user:
+        first_record = P2PRecord.objects.filter(user=first_user.user,create_time__range=(start, end), catalog='申购').earliest("create_time")
+        if first_record.amount >= 1000:
+            amount_05_one = Decimal(Decimal(first_record.amount)*Decimal(0.005)*(Decimal(first_record.product.period)/Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+            reward_user_5(first_user.user,first_user.introduced_by,u"邀请送收益",amount_05_one,first_record.product)
+            print u"%s邀请了%s，活动期间首笔交易%s元，%s获得%s元奖金" % (first_user.introduced_by.wanglibaouserprofile.name,first_user.user.wanglibaouserprofile.name,first_record.amount,first_user.introduced_by.wanglibaouserprofile.name,amount_05_one)
+            amount_05 += amount_05_one
+
+
     print "*********************************"
     print "*********************************"
     print "*************Done****************"
@@ -76,6 +94,7 @@ def send_award():
     print u"发放ipad air %s个" % ipad_air
     print u"发放iphone6%s个" % iphone_6
     print u"发放iphone6 plus%s个" % iphone_6_plus
+    print u"发放邀请送千5活动，送出%s元" % amount_05
     print "*********************************"
     print "*********************************"
     print "*************Done****************"
@@ -248,3 +267,40 @@ def reward_user_apple(user_id,reward_type,amount,apple):
                         "messages": [text_content]
                     })
     RewardRecord.objects.create(user=user, reward=reward,description=message_content)
+
+def reward_user_5(user,introduced_by,reward_type,got_amount,product):
+    reward = Reward.objects.filter(is_used=False, type=reward_type).first()
+
+    text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
+    send_messages.apply_async(kwargs={
+                        "phones": [user.wanglibaouserprofile.phone],
+                        "messages": [text_content]
+                    })
+
+    earning = Earning()
+    earning.amount = got_amount
+    earning.type = 'I'
+    earning.product = product
+    order = OrderHelper.place_order(introduced_by, Order.ACTIVITY, u"邀请送收益活动赠送",
+                                        earning = model_to_dict(earning))
+    earning.order = order
+    keeper = MarginKeeper(introduced_by, order.pk)
+
+    #赠送活动描述
+    desc = u'%s,邀请好友首次理财活动中，活赠%s元' % (introduced_by.wanglibaouserprofile.name,got_amount)
+    earning.margin_record = keeper.deposit(got_amount,description=desc)
+    earning.user = introduced_by
+    earning.save()
+
+    message_content = u"亲爱的%s您好：<br/> 您在邀请好友送收益的活动中，您的好友%s在活动期间完成首次投资，根据活动规则，您获得%s元收益。<br/>\
+                      <a href = 'https://www.wanglibao.com/accounts/home/'>查看账户余额</a><br/>\
+                      感谢您对我们的支持与关注。<br/>\
+                      网利宝" % (introduced_by.wanglibaouserprofile.name,safe_phone_str(user.wanglibaouserprofile.phone), got_amount)
+    RewardRecord.objects.create(user=introduced_by, reward=reward,description=message_content)
+
+    inside_message.send_one.apply_async(kwargs={
+            "user_id": introduced_by.id,
+            "title": u"邀请送收益活动",
+            "content": message_content,
+            "mtype": "activity"
+        })
