@@ -1,0 +1,17 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    - with '送，就要壕爽！' as title
+      include include/common_head
+      meta(name="description", content="天天送不停，周周都有新花样！送，就要壕爽！")
+
+  body
+    .full-container
+      .container.activite-nav
+        a(href="/", target="_blank") 网利宝官网
+        a(href="/", target="_blank") 下载APP
+        a(href="/") 注册
+    include include/tracking
