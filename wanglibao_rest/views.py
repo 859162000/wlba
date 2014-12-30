@@ -418,15 +418,14 @@ class TopsOfDayView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        activity = Activity.objects.filter(description__regex="%_tops_%")
-        print activity, '----'
-        start = activity.start_time
-        print start
-        p2p_records = P2PRecord.objects.filter(create_time__gte=start)
-        for record in p2p_records:
-            print(record)
+        activity = Activity.objects.filter(description__endswith="_tops_")
+        if activity.count() == 0:
+            return Response({"ret_code": 0, "records": "nna"})
+        start = activity[0].start_time
+        p2p_records = P2PRecord.objects.filter(create_time__gte=start).values('user')
 
-        print p2p_records
+        import django.core.serializers as serializers
+        print serializers.serialize('json', p2p_records), 'hello, world'
         return Response({"ret_code": 0, "records": "nna"})
 
 class TopsOfWeekView(APIView):
