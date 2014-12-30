@@ -33,7 +33,7 @@ from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization
 from marketing.models import Activity
 from wanglibao_account.utils import verify_id, detect_identifier_type
-from django.db import transaction
+from django.db import transaction, connection
 from wanglibao_sms import messages, backends
 from django.utils import timezone
 from wanglibao_account import message as inside_message
@@ -422,10 +422,25 @@ class TopsOfDayView(APIView):
         if activity.count() == 0:
             return Response({"ret_code": 0, "records": "nna"})
         start = activity[0].start_time
-        p2p_records = P2PRecord.objects.filter(create_time__gte=start).values('user')
+        # p2p_records = P2PRecord.objects \
+        #     .extra({'each_day': 'date(create_time)'}) \
+        #     .values('user', 'each_day') \
+        #     .annotate(amount_sum=Sum('amount')) \
+        #     .filter(create_time__gte=start)
 
-        import django.core.serializers as serializers
-        print serializers.serialize('json', p2p_records), 'hello, world'
+        print start, '开始日期'
+
+        p2p_records = P2PRecord.objects.filter(create_time__gte=start)
+
+
+        # print start, '日期和日间', start.strftime('%Y-%m-%d')
+        # p2p_records = P2PRecord.objects.raw('select id, user_id, date(CONVERT_TZ(create_time, "UTC", "GMT")) as each_day, sum(amount) from wanglibao_p2p_p2precord where date(CONVERT_TZ(create_time, "UTC", "GMT")) >= %s group by each_day, user_id', [start.strftime('%Y-%m-%d')])
+
+        for record in p2p_records:
+            print '#######', record['each_day'], '----------', record['amount_sum']
+
+        #import django.core.serializers as serializers
+        #print serializers.serialize('json', p2p_records), 'hello, world'
         return Response({"ret_code": 0, "records": "nna"})
 
 class TopsOfWeekView(APIView):

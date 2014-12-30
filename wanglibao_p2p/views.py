@@ -337,6 +337,7 @@ XUNLEI_PAY_WAY = {
     u'按季度付息': 4,
 }
 
+
 class P2PEyeListAPIView(APIView):
     """ 网贷天眼 API
     """
@@ -781,6 +782,7 @@ class P2PListAPI(APIView):
             p2pequity_count = p2p.equities.all().count()
 
             temp_p2p = {
+                'fld_proid': p2p.id,
                 "fld_proname": p2p.name,
                 "fld_name": u'网利宝',
                 "fld_finstarttime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S"),
@@ -788,16 +790,31 @@ class P2PListAPI(APIView):
                 "fld_total_finance": p2p.total_amount,
                 "fld_lend_period": p2p.period * 30,
                 "fld_interest_year": p2p.expected_earning_rate,
+                "fld_refundmode": p2p.pay_method,
+                "fld_loantype_name": u'第三方担保',
                 "fld_guarantee_org": p2p.warrant_company.name,
+                "fld_securitymode_name": u'本息保障',
                 "fld_mininvest": 100.0,
                 "fld_awards": 1 if p2p.activity else 0,
                 "fld_lend_progress": fld_lend_progress,
                 "fld_invest_number": p2pequity_count,
-                "fld_finance_left": p2p.total_amount - p2p.ordered_amount
+                "fld_finance_left": p2p.total_amount - p2p.ordered_amount,
+                "fld_lendname": p2p.borrower_name,
+                "fld_lendway": p2p.short_usage,
+                "fld_netaddress": 'https://{}/p2p/detail/{}'.format(request.get_host(), p2p.id),
+                "fld_status": 1,
+                "fld_status_name": u'筹款中'
             }
             p2p_list.append(temp_p2p)
-
-        return HttpResponse(renderers.JSONRenderer().render(p2p_list, 'application/json'))
+        result = {
+            "data": {
+                "list": p2p_list,
+                "version": "",
+                "status": "",
+                "msg": ""
+            }
+        }
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
 class RecordView(APIView):

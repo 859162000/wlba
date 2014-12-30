@@ -22,7 +22,7 @@
       return re.test(identifier);
     };
     $("#button-get-validate-code-modal").click(function(e) {
-      var element, friend_identifier, identifier;
+      var agreement, element, friend_identifier, identifier;
       element = this;
       if ($(element).hasClass('disable')) {
         return;
@@ -32,6 +32,12 @@
       identifier = $("#my_identifier").val().trim();
       if (!identifier) {
         $(".error-message").text("请输入手机号");
+        return;
+      }
+      agreement = $("#agree").prop("checked");
+      if (!agreement) {
+        $(".error-message").text("请勾选注册协议");
+        return;
       }
       if (checkMobile(identifier)) {
         if (identifier === $("#friend_identifier").val()) {
@@ -43,7 +49,7 @@
             return true;
           }).fail(function() {
             alert("验证码已发送至您手机，请注意查收。");
-            window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier;
+            window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier + "&userDevice=h5";
             return true;
           });
         }
@@ -71,3 +77,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=app_share.map

@@ -177,31 +177,6 @@ class P2PProductForm(forms.ModelForm):
     class Meta:
         model = P2PProduct
 
-    # def clean_status(self):
-    #     if self.cleaned_data['status'] == u'正在招标':
-    #
-    #         pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
-    #
-    #         if not pa:
-    #             raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
-    #
-    #         product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
-    #         if pa.count() != product.amortization_count:
-    #             raise forms.ValidationError(u'产品还款计划错误')
-    #
-    #         print self.cleaned_data
-    #
-    #         # amort_principal = 0
-    #         # for a in pa:
-    #         #     amort_principal += a.principal
-    #         #
-    #         # print amort_principal, self.cleaned_data['total_amount']
-    #         #
-    #         # if amort_principal != self.cleaned_data['total_amount']:
-    #         #     raise forms.ValidationError(u'还款计划本金之和与募集金额不相等，请检查')
-    #
-    #     return self.cleaned_data['status']
-
     def clean(self):
         if self.cleaned_data['status'] == u'正在招标':
 
@@ -231,7 +206,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     ]
     list_display = ('id', 'name', 'total_amount', 'brief', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'preview_contract', 'copy_link', 'priority')
     list_editable = ('priority',)
-    list_filter = ('status',)
+    list_filter = ('status', )
     search_fields = ('name',)
     resource_class = P2PProductResource
     change_list_template = 'change_list.html'
@@ -281,6 +256,7 @@ class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     resource_class = P2PRecordResource
     change_list_template = 'admin/import_export/change_list_export.html'
     search_fields = ('user__wanglibaouserprofile__phone',)
+    list_filter = ('catalog', )
 
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]
