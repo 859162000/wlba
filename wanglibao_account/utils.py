@@ -231,13 +231,17 @@ class CjdaoUtils():
         realincome = expectedrate * float(margin_record.amount) * p2p.period / 12
 
         k = ('uaccount', 'phone', 'usertype', 'companyid', 'thirdproductid',
-             'productname', 'buytime', 'money', 'expectedrate', 'realincome',
+             'productname', 'buytime', 'money', 'expectedrate', 'realincome', 'transactionstatus',
              'ordercode', 'accountbalance')
 
+
+        p2pname = p2p.name
+        productname = p2pname.encode('utf-8')
+
         v = (cjdaoinfo.get('uaccount'), str(user.wanglibaouserprofile.phone), str(cjdaoinfo.get('usertype')),
-             cjdaoinfo.get('companyid'), str(p2p.id), p2p.name.encode('urf-8'),
+             cjdaoinfo.get('companyid'), str(p2p.id), productname,
              timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
-             str(float(margin_record.amount)), str(expectedrate), str(realincome), str(margin_record.order_id),
+             str(float(margin_record.amount)), str(expectedrate), str(realincome), '2', str(margin_record.order_id),
              str(float(margin_record.margin_current)), key)
 
         p = dict(zip(k, v))
