@@ -213,7 +213,7 @@ class CjdaoUtils():
         k = ('phone', 'usertype', 'uaccount', 'companyid', 'accountbalance')
 
         v = (user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')), str(cjdaoinfo.get('uaccount')),
-             str(cjdaoinfo.get('companyid')), str(user.margin.margin), key)
+             str(cjdaoinfo.get('companyid')), str(float(user.margin.margin)), key)
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
