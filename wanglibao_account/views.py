@@ -932,9 +932,6 @@ def ajax_register(request):
                 user = create_user(identifier, password, nickname)
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
-                auth.login(request, auth_user)
-
-                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
 
                 # todo remove the try
                 try:
@@ -944,6 +941,14 @@ def ajax_register(request):
                         cjdao_callback.apply_async(kwargs={'url': RETURN_REGISTER, 'params': params})
                 except:
                     pass
+
+                auth.login(request, auth_user)
+
+                # session lost, but I don't know why, rewrite the session
+                if cjdaoinfo:
+                    request.session['cjdaoinfo'] = cjdaoinfo
+
+                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
 
                 return HttpResponse(messenger('done', user=request.user))
             else:
@@ -1194,7 +1199,10 @@ class CjdaoApiView(APIView):
             'companyid': companyid,
             'usertype': 0,
         }
+
         request.session['cjdaoinfo'] = cjdaoinfo
+
+        print request.session['cjdaoinfo']
 
         if thirdproductid:
             try:
