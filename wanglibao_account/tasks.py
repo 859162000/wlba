@@ -32,18 +32,19 @@ def cjdao_callback(url, params):
 
 @app.task
 def post_product_half_hour():
-    p2p = P2PProduct.objects.filter(hide=False).filter(status__in=[u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核'])
-    p = CjdaoUtils.post_product(p2p, CJDAOKEY)
+    p2ps = P2PProduct.objects.filter(hide=False).filter(status__in=[u'正在招标', u'满标待打款', u'满标待审核'])
 
-    r = requests.get(POST_PRODUCT_URL, params=p)
+    for p2p in p2ps:
+        p = CjdaoUtils.post_product(p2p, CJDAOKEY)
+        r = requests.get(POST_PRODUCT_URL, params=p)
 
-    print('#' * 80)
-    print(r.url)
-    print(r.status_code)
-    print(r.text)
+        print('#' * 80)
+        print(r.url)
+        print(r.status_code)
+        print(r.text)
 
-    logger.debug(r)
-    logger.debug('#' * 80)
-    logger.debug(r.url)
-    logger.debug(r.status_code)
-    logger.debug(r.text)
+        logger.debug(r)
+        logger.debug('#' * 80)
+        logger.debug(r.url)
+        logger.debug(r.status_code)
+        logger.debug(r.text)

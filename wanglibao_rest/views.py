@@ -156,12 +156,16 @@ class RegisterAPIView(APIView):
             "content": content,
             "mtype": "activityintro"
         })
-
+        # todo save client info
         return Response({"ret_code": 0, "message": "注册成功"})
 
 
-# wechat register
+
 class WeixinRegisterAPIView(APIView):
+
+    """
+        wechat register
+    """
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
