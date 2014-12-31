@@ -261,7 +261,7 @@ class CjdaoUtils():
         reward = 0
         if p2p.activity:
             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
-        expectedrate = p2p.expected_earning_rate + float(reward * 100)
+        expectedrate = float(p2p.expected_earning_rate / 100) + float(reward)
 
         v = (
             str(p2p.id), p2p.name, '网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),

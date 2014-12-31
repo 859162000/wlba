@@ -7,8 +7,8 @@ from django.views.generic import TemplateView
 from django.contrib import messages
 from django.db.models import Sum
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
-    PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator,\
-    EearningReportGenerator, WithDrawDetailReportGenerator, P2PstatusReportGenerator
+    PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator, \
+    EearningReportGenerator, WithDrawDetailReportGenerator, P2PstatusReportGenerator, MarginReportGenerator
 from wanglibao_margin.models import Margin
 
 type = (
@@ -20,8 +20,9 @@ type = (
     (u'满标复审', 5),
     (u'赠送记录', 6),
     (u'提现详细记录', 7),
-    (u'满标状态变化', 8)
+    (u'满标状态变化', 8),
 )
+
 
 class AdminReportExport(TemplateView):
     template_name = 'report_export.jade'
@@ -43,7 +44,7 @@ class AdminReportExport(TemplateView):
             'withdrawing': withdrawing
         }
 
-    def post(self,request, **kwargs):
+    def post(self, request, **kwargs):
         start_time = self._timeformat(request.POST.get('start_time'))
         end_time = self._timeformat(request.POST.get('end_time'))
         type = request.POST.get('type')
