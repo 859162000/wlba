@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 USER_TYPE = (
     ('0', u'正常用户'),
     ('1', u'渠道用户'),
+    ('2', u'经纪人')
 )
 
 class WanglibaoUserProfile(models.Model):

@@ -15,6 +15,11 @@ logger = logging.getLogger('p2p')
 def cjdao_callback(url, params):
     r = requests.get(url, params=params)
 
+    print('#'*80)
+    print(r.url)
+    print(r.status_code)
+    print(r.text)
+
 
     logger.debug(params)
     logger.debug('#'*80)
