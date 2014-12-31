@@ -221,16 +221,16 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
             return [f.name for f in self.model._meta.fields]
         return ('amortization_count',)
 
-    def save_model(self, request, obj, form, change):
-        if obj.status == u'正在招标':
-            # todo remove the try except
-            try:
-                # 财经道购买回调
-                params = CjdaoUtils.post_product(obj, CJDAOKEY)
-                cjdao_callback.apply_async(kwargs={'url': POST_PRODUCT_URL, 'params': params})
-            except:
-                pass
-        super(P2PProductAdmin, self).save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     if obj.status == u'正在招标':
+    #         # todo remove the try except
+    #         try:
+    #             # 财经道购买回调
+    #             params = CjdaoUtils.post_product(obj, CJDAOKEY)
+    #             cjdao_callback.apply_async(kwargs={'url': POST_PRODUCT_URL, 'params': params})
+    #         except:
+    #             pass
+    #     super(P2PProductAdmin, self).save_model(request, obj, form, change)
 
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
