@@ -43,6 +43,7 @@ from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import search
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
+from marketing.tops import Top
 
 
 logger = logging.getLogger(__name__)
@@ -434,7 +435,10 @@ class TopsOfDayView(APIView):
         dt = datetime.strptime("2012-04-06 10:00:00", fmt)
         am_dt = amsterdam.localize(dt)
 
-        print am_dt.astimezone(utc).strftime(fmt)
+        #print am_dt.astimezone(utc).strftime(fmt)
+        print 'test start..'
+        Top().day_tops()
+        print 'test end..'
 
         print start, '开始日期', local_time, datetime.now(), start - timedelta(days=26)
 
