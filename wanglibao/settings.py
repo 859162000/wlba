@@ -1,4 +1,4 @@
-#encoding:utf-8
+# encoding:utf-8
 """
 Django settings for wanglibao project.
 
@@ -119,7 +119,7 @@ INSTALLED_APPS = (
     'raven.contrib.django.raven_compat',
     'ckeditor',
     'captcha',
-    'djcelery', # Use django orm as the backend
+    'djcelery',  # Use django orm as the backend
     'djsupervisor',
     'adminplus',
     'file_storage'
@@ -169,6 +169,7 @@ if LOCAL_MYSQL:
     }
 
 import sys
+
 if 'test' in sys.argv:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -200,7 +201,7 @@ AUTHENTICATION_BACKENDS = (
 
 # Template loader
 TEMPLATE_LOADERS = (
-    ('pyjade.ext.django.Loader',(
+    ('pyjade.ext.django.Loader', (
         'django.template.loaders.filesystem.Loader',
         'django.template.loaders.app_directories.Loader',
     )),
@@ -286,7 +287,6 @@ SMS_MANDAO_MD5_PWD = '4A4080BB5FCCC3422E14EA8247D1062C'
 
 SMS_BACKEND = 'wanglibao_sms.backends.ManDaoSMSBackEnd'
 
-
 SMS_EMAY_SN = "6SDK-EMY-6688-KEZSM"
 SMS_EMAY_KEY = "wanglibao"
 SMS_EMAY_PWD = "660687"
@@ -308,6 +308,7 @@ if ENV != ENV_PRODUCTION:
     RAVEN_CONFIG = {}
 
 import mimetypes
+
 mimetypes.add_type("text/x-component", ".htc")
 
 # Logger
@@ -316,8 +317,8 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt' : "%d/%b/%Y %H:%M:%S"
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S"
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
@@ -399,16 +400,16 @@ SM_FUND_ALL = 'http://jrsj1.data.fund123.cn/ShumiData/FundNav.ashx?applyrecordno
 
 # rest api document swagger settings
 SWAGGER_SETTINGS = {
-    "exclude_namespaces": [], # List URL namespaces to ignore
+    "exclude_namespaces": [],  # List URL namespaces to ignore
     "api_version": '1.0',  # Specify your API's version
     "enabled_methods": [  # Specify which methods to enable in Swagger UI
-        'get',
-        'post',
-        'put',
-        'patch',
-        'delete'
+                          'get',
+                          'post',
+                          'put',
+                          'patch',
+                          'delete'
     ],
-    "api_key": '', # An API key
+    "api_key": '',  # An API key
     "is_authenticated": False,  # Set to True to enforce user authentication,
     "is_superuser": False,  # Set to True to enforce admin only access
 }
@@ -440,7 +441,11 @@ CELERYBEAT_SCHEDULE = {
     'generate_site_data': {
         'task': 'marketing.tasks.generate_site_data',
         'schedule': crontab(minute=15, hour=16)
-    }
+    },
+    # 'post_product_cjdao': {
+    #     'task': 'wanglibao_account.tasks.post_product_half_hour',
+    #     'schedule': timedelta(minutes=30)
+    # }
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -464,8 +469,8 @@ if ENV == ENV_PRODUCTION:
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
-    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pri_key.pem'),'r').read())
-    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'),'r').read())
+    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
+    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
 
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
@@ -485,8 +490,8 @@ elif ENV == ENV_PREPRODUCTION:
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
-    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pri_key.pem'),'r').read())
-    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'),'r').read())
+    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
+    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
 
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
@@ -506,7 +511,7 @@ else:
 
     YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "YB01000000144"
-    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'pkcs8_rsa_private_key144.pem'),'r').read())
+    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'pkcs8_rsa_private_key144.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "rsa_public_key144.pem"), "r").read())
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
@@ -540,30 +545,28 @@ PROMO_TOKEN_QUERY_STRING = 'promo_token'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 
-
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ('127.0.0.1',)
 DEBUG_TOOLBAR_CONFIG = {
     'JQUERY_URL': '/static/js/lib/jquery.min.js'
 }
 
-
-USE_L10N=False
-DATETIME_FORMAT='Y-m-d H:i:s'
-ADMIN_ADDRESS='AK7WtEQ4Q9KPs8Io_zOncw'
+USE_L10N = False
+DATETIME_FORMAT = 'Y-m-d H:i:s'
+ADMIN_ADDRESS = 'AK7WtEQ4Q9KPs8Io_zOncw'
 # DATE_FORMAT='Y-m-d'
 
 # AUTH_PROFILE_MODULE = 'wanglibao_profile.WanglibaoUserProfile'
 CKEDITOR_CONFIGS = {
     "default": {
         'toolbar_custom': [
-            ['Source'],['Cut','Copy','Paste','PasteText','PasteFromWord'],
-            ['Styles','Format','Font','FontSize'],
-            ['-','Find','Replace','-','SelectAll','RemoveFormat'],
+            ['Source'], ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord'],
+            ['Styles', 'Format', 'Font', 'FontSize'],
+            ['-', 'Find', 'Replace', '-', 'SelectAll', 'RemoveFormat'],
             '/',
-            ['Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker','Undo','Redo'],
-            ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-            ['TextColor', 'BGColor'],['Link','Unlink','Anchor'],
+            ['Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker', 'Undo', 'Redo'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['TextColor', 'BGColor'], ['Link', 'Unlink', 'Anchor'],
             ['Image', 'Flash', 'Table', 'HorizontalRule'],
             ['Smiley', 'SpecialChar'],
         ],
