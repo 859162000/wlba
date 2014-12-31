@@ -442,10 +442,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tasks.generate_site_data',
         'schedule': crontab(minute=15, hour=16)
     },
-    # 'post_product_cjdao': {
-    #     'task': 'wanglibao_account.tasks.post_product_half_hour',
-    #     'schedule': timedelta(minutes=30)
-    # }
+    'post_product_cjdao': {
+        'task': 'wanglibao_account.tasks.post_product_half_hour',
+        'schedule': timedelta(minutes=1)
+    }
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
