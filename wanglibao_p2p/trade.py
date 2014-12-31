@@ -144,8 +144,9 @@ class P2PTrader(object):
         try:
             cjdaoinfo = self.request.session.get('cjdaoinfo')
             if cjdaoinfo:
-                params = CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
-                cjdao_callback.apply_async(kwargs={'url': RETURN_PURCHARSE_URL, 'params': params})
+                if cjdaoinfo.get('thirdproductid') == equity.product.id:
+                    params = CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
+                    cjdao_callback.apply_async(kwargs={'url': RETURN_PURCHARSE_URL, 'params': params})
         except:
             pass
 
