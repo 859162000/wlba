@@ -416,7 +416,7 @@ class TopsOfDayView(APIView):
     """
     得到某一天的排行榜
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     def post(self, request):
         activity = Activity.objects.filter(description__endswith="_tops_")
@@ -427,42 +427,12 @@ class TopsOfDayView(APIView):
 
         local_time = timezone.localtime(start)
 
-        import pytz
-        utc = pytz.utc
-        fmt = '%Y-%m-%d %H:%M:%S'
-        amsterdam = pytz.timezone('Asia/Shanghai')
+        #print Top().day_tops(local_time)
+        #print Top().allday_tops(local_time)
 
-        dt = datetime.strptime("2012-04-06 10:00:00", fmt)
-        am_dt = amsterdam.localize(dt)
+        print Top().all_tops()
 
-        #print am_dt.astimezone(utc).strftime(fmt)
-        print 'test start..'
-        Top().day_tops()
-        print 'test end..'
 
-        print start, '开始日期', local_time, datetime.now(), start - timedelta(days=26)
-
-        def extract_date(p2p_record):
-            return timezone.localtime(p2p_record.create_time).date()
-
-        def extract_user(p2p_record):
-            return p2p_record.user
-
-        p2p_records = P2PRecord.objects.filter(create_time__gte=start)
-
-        from itertools import groupby
-
-        user_list = []
-
-        for each_day, group in groupby(p2p_records, key=extract_date):
-            for user, group_inner in groupby(list(group), key=extract_user):
-                amount_sum = 0
-                for record in group_inner:
-                    amount_sum += record.amount
-
-                user_list.append({'each_day': each_day, 'user': user.wanglibaouserprofile.phone, 'amount_sum': amount_sum})
-
-        print each_day, user_list, '----------dadssf'
 
         return Response({"ret_code": 0, "records": "nna"})
 
