@@ -15,7 +15,8 @@ from wanglibao_pay.models import PayInfo
 from wanglibao_margin.models import MarginRecord
 from django.utils import timezone
 from django.contrib.auth.models import User
-from wanglibao_pay.util import get_a_uuid
+from wanglibao_margin.models import Margin
+from django.db.models import Sum
 
 
 logger = logging.getLogger(__name__)
@@ -471,6 +472,29 @@ class EearningReportGenerator(ReportGeneratorBase):
         return output.getvalue()
 
 
+class MarginReportGenerator(ReportGeneratorBase):
+    prefix = 'yhje'
+    reportname_format = u'用户金额 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'用户余额', u'冻结金额', u'提款中金额'])
+
+        margin = Margin.objects.all().aggregate(Sum('margin'))['margin__sum']
+        freeze = Margin.objects.all().aggregate(Sum('freeze'))['freeze__sum']
+        withdrawing = Margin.objects.all().aggregate(Sum('withdrawing'))['withdrawing__sum']
+
+
+        writer.writerow([
+            str(margin),
+            str(freeze),
+            str(withdrawing)
+        ])
+        return output.getvalue()
+
+
 class UserReportGenerator(ReportGeneratorBase):
     prefix = 'user'
     reportname_format = u'用户记录 %s--%s'
@@ -537,6 +561,9 @@ class ReportGenerator(object):
         PaybackReportGenerator.generate_report(start_time=start_time, end_time=end_time)
         P2PAuditReportGenerator.generate_report(start_time=start_time, end_time=end_time)
         ProductionAmortizationsReportGenerator.generate_report(start_time=start_time, end_time=end_time)
+        MarginReportGenerator.generate_report(start_time=start_time, end_time=end_time)
+
+
 
 
 
