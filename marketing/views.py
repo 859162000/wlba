@@ -140,3 +140,10 @@ class AppShareRegView(TemplateView):
             'invitecode': invitecode
         }
 
+
+class NewYearView(TemplateView):
+    template_name = 'newyear.jade'
+
+    def get_context_data(self, **kwargs):
+        return {}
+

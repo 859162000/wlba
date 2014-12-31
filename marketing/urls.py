@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
-from marketing.views import AppShareView, AppShareRegView
+from marketing.views import AppShareView, AppShareRegView, NewYearView
 
 
 urlpatterns = patterns(
@@ -18,4 +18,5 @@ urlpatterns = patterns(
     url(r'^wap/share$', AppShareView.as_view(), name="app_share"),
     url(r'^wap/share_reg/$', AppShareRegView.as_view(), name="app_share_reg"),
     url(r'^wap/agreement/$', TemplateView.as_view(template_name="app_agreement.jade")),
+    url(r'^newyear/$', NewYearView.as_view(), name="new year"),
 )
