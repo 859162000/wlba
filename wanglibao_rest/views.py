@@ -421,27 +421,47 @@ class TopsOfDayView(APIView):
         activity = Activity.objects.filter(description__endswith="_tops_")
         if activity.count() == 0:
             return Response({"ret_code": 0, "records": "nna"})
-        start = activity[0].start_time
-        # p2p_records = P2PRecord.objects \
-        #     .extra({'each_day': 'date(create_time)'}) \
-        #     .values('user', 'each_day') \
-        #     .annotate(amount_sum=Sum('amount')) \
-        #     .filter(create_time__gte=start)
 
-        print start, '开始日期'
+        start = activity[0].start_time
+
+        local_time = timezone.localtime(start)
+
+        import pytz
+        utc = pytz.utc
+        fmt = '%Y-%m-%d %H:%M:%S'
+        amsterdam = pytz.timezone('Asia/Shanghai')
+
+        dt = datetime.strptime("2012-04-06 10:00:00", fmt)
+        am_dt = amsterdam.localize(dt)
+
+        print am_dt.astimezone(utc).strftime(fmt)
+
+        print start, '开始日期', local_time, datetime.now(), start - timedelta(days=26)
+
+        def extract_date(p2p_record):
+            return timezone.localtime(p2p_record.create_time).date()
+
+        def extract_user(p2p_record):
+            return p2p_record.user
 
         p2p_records = P2PRecord.objects.filter(create_time__gte=start)
 
+        from itertools import groupby
 
-        # print start, '日期和日间', start.strftime('%Y-%m-%d')
-        # p2p_records = P2PRecord.objects.raw('select id, user_id, date(CONVERT_TZ(create_time, "UTC", "GMT")) as each_day, sum(amount) from wanglibao_p2p_p2precord where date(CONVERT_TZ(create_time, "UTC", "GMT")) >= %s group by each_day, user_id', [start.strftime('%Y-%m-%d')])
+        user_list = []
 
-        for record in p2p_records:
-            print '#######', record['each_day'], '----------', record['amount_sum']
+        for each_day, group in groupby(p2p_records, key=extract_date):
+            for user, group_inner in groupby(list(group), key=extract_user):
+                amount_sum = 0
+                for record in group_inner:
+                    amount_sum += record.amount
 
-        #import django.core.serializers as serializers
-        #print serializers.serialize('json', p2p_records), 'hello, world'
+                user_list.append({'each_day': each_day, 'user': user.wanglibaouserprofile.phone, 'amount_sum': amount_sum})
+
+        print each_day, user_list, '----------dadssf'
+
         return Response({"ret_code": 0, "records": "nna"})
+
 
 class TopsOfWeekView(APIView):
     """
