@@ -444,7 +444,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'post_product_cjdao': {
         'task': 'wanglibao_account.tasks.post_product_half_hour',
-        'schedule': timedelta(minutes=1)
+        'schedule': timedelta(minutes=30)
     }
 }
 
