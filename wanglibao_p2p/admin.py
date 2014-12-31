@@ -12,6 +12,9 @@ from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization
 from wanglibao.admin import ReadPermissionModelAdmin
+from wanglibao_account.tasks import cjdao_callback
+from wanglibao_account.utils import CjdaoUtils
+from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
 
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
@@ -193,10 +196,9 @@ class P2PProductForm(forms.ModelForm):
             for a in pa:
                 amort_principal += a.principal
 
-            print amort_principal, self.cleaned_data['total_amount']
-
             if amort_principal != self.cleaned_data['total_amount']:
                 raise forms.ValidationError(u'还款计划本金之和与募集金额不相等，请检查')
+
         return self.cleaned_data
 
 
@@ -219,13 +221,16 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
             return [f.name for f in self.model._meta.fields]
         return ('amortization_count',)
 
-    def save_model(self, request, obj, form, change):
-        if obj.status == u'正在招标':
-            pa = ProductAmortization.objects.filter(product=obj)
-            if not pa:
-                messages.error(request, u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
-                return
-        super(P2PProductAdmin, self).save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     if obj.status == u'正在招标':
+    #         # todo remove the try except
+    #         try:
+    #             # 财经道购买回调
+    #             params = CjdaoUtils.post_product(obj, CJDAOKEY)
+    #             cjdao_callback.apply_async(kwargs={'url': POST_PRODUCT_URL, 'params': params})
+    #         except:
+    #             pass
+    #     super(P2PProductAdmin, self).save_model(request, obj, form, change)
 
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
