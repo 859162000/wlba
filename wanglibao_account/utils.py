@@ -169,6 +169,14 @@ def mlgb_md5(phone, flag):
     return m.hexdigest()
 
 
+PAY_METHOD = {
+    u'等额本息': 1,
+    u'按月付息': 3,
+    u'到期还本付息': 4,
+    u'先息后本': 2
+}
+
+
 class CjdaoUtils():
     @classmethod
     def get_wluser_by_phone(cls, phone):
@@ -201,42 +209,67 @@ class CjdaoUtils():
 
     @classmethod
     def return_register(cls, cjdaoinfo, user, key):
-        url = "http://ceshi.cjdao.com/productbuy/reginfo"
 
         k = ('phone', 'usertype', 'uaccount', 'companyid', 'accountbalance')
 
-        v = (user.wanglibaouserprofile.phone, cjdaoinfo.get('usertype'), cjdaoinfo.get('uaccount'),
-             cjdaoinfo.get('companyid'), user.margin.margin, key)
+        v = (user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')), str(cjdaoinfo.get('uaccount')),
+             str(cjdaoinfo.get('companyid')), str(float(user.margin.margin)), key)
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
-        r = requests.get(url, params=p)
-        print r.url
-        print r.status_code
+        return p
 
 
     @classmethod
     def return_purchase(cls, cjdaoinfo, user, margin_record, p2p, key):
 
-        url = "http://ceshi.cjdao.com/productbuy/saveproduct"
         reward = Decimal.from_float(0).quantize(Decimal('0.0'), 'ROUND_DOWN')
         if p2p.activity:
             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0'), 'ROUND_DOWN')
-        expectedrate = p2p.expected_earning_rate + float(reward * 100)
+        expectedrate = float(p2p.expected_earning_rate / 100) + float(reward)
 
         realincome = expectedrate * float(margin_record.amount) * p2p.period / 12
 
         k = ('uaccount', 'phone', 'usertype', 'companyid', 'thirdproductid',
-             'productname', 'buytime', 'money', 'expectedrate', 'realincome',
+             'productname', 'buytime', 'money', 'expectedrate', 'realincome', 'transactionstatus',
              'ordercode', 'accountbalance')
 
-        v = (cjdaoinfo.get('uaccount'), user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')),
-             cjdaoinfo.get('companyid'), str(p2p.id), p2p.name, timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
-             str(float(margin_record.amount)), str(expectedrate), str(realincome), str(margin_record.order_id), str(float(margin_record.margin_current)), key)
+
+        p2pname = p2p.name
+        productname = p2pname.encode('utf-8')
+
+        v = (cjdaoinfo.get('uaccount'), str(user.wanglibaouserprofile.phone), str(cjdaoinfo.get('usertype')),
+             cjdaoinfo.get('companyid'), str(p2p.id), productname,
+             timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
+             str(float(margin_record.amount)), str(expectedrate), str(realincome), '2', str(margin_record.order_id),
+             str(float(margin_record.margin_current)), key)
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
-        r = requests.get(url, params=p)
 
-        print r.url
-        print r.status_code
+        return p
+
+    @classmethod
+    def post_product(cls, p2p, key):
+
+        k = (
+            'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney',
+            'loandeadline',
+            'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment')
+
+        incomeway = PAY_METHOD.get(p2p.pay_method, 0)
+        reward = 0
+        if p2p.activity:
+            reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
+        expectedrate = p2p.expected_earning_rate + float(reward * 100)
+
+        v = (
+            str(p2p.id), p2p.name, '网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
+            str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
+
+        p = dict(zip(k, v))
+        p.update(md5_value=cls.md5_value(*v))
+        return p
+
+
+
