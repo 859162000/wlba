@@ -1,52 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+    第三方合作 API
+"""
+
 __author__ = 'rsj217'
 
-
 import time
-from operator import attrgetter
 from decimal import Decimal
 from hashlib import md5
 import datetime
 
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.utils import timezone, dateparse
-from django.views.generic import TemplateView
-from django.core.paginator import Paginator
-from django.core.paginator import PageNotAnInteger
-from rest_framework import status
-from rest_framework import generics
 from rest_framework import renderers
-from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from marketing.models import SiteData, ClientData
 from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao_p2p.amortization_plan import get_amortization_plan
-from wanglibao_p2p.forms import PurchaseForm
-from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant
-from wanglibao_p2p.serializers import P2PProductSerializer
-from wanglibao_p2p.trade import P2PTrader
-from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
-from wanglibao.const import ErrorNumber
-from django.conf import settings
-from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao_announcement.utility import AnnouncementP2P
-from wanglibao_account.models import Binding
-from django.contrib.auth.decorators import login_required
-from wanglibao_account.utils import generate_contract_preview
-from wanglibao_pay.util import get_a_uuid
-from django.contrib import messages
-from django.shortcuts import redirect, render_to_response
+from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
 
 
 class HeXunListAPI(APIView):
-    """ 和讯网 API
+    """ 和讯网 API， 获取 P2P 列表数据
     """
     permission_classes = (IsAdminUserOrReadOnly, )
 
@@ -122,7 +100,7 @@ WANGDAI = (
 
 class WangDaiListAPI(APIView):
     """
-    网贷之家数据接口， 获取正在招标的数据
+    网贷之家数据接口， 获取正在招标的列表数据
     """
     # todo 合并代码
     permission_classes = (IsAdminUserOrReadOnly,)
@@ -133,15 +111,10 @@ class WangDaiListAPI(APIView):
 
         p2p_list = []
         for p2p in p2pproducts:
-
+            # 计算进度
             amount = Decimal.from_float(p2p.total_amount).quantize(Decimal('0.00'))
             percent = p2p.ordered_amount / amount * 100
-            # percent = 1499900 / Decimal.from_float(1500000) * 100
             schedule = '{}%'.format(percent.quantize(Decimal('0.0'), 'ROUND_DOWN'))
-
-            if p2p.category == u'证大速贷':
-                type = u"信用标"
-            type = u"抵押标"
 
             for pay_method, value in WANGDAI:
                 if pay_method == p2p.pay_method:
@@ -149,17 +122,14 @@ class WangDaiListAPI(APIView):
                     break
 
             p2pequities = p2p.equities.all()
-            subscribes = []
-            for eq in p2pequities:
-                temp_eq = {
-                    "subscribeUserName": eq.user.username,
-                    "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
-                    "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
-                    "addDate": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                    "status": "1",
-                    "type": "0"
-                }
-                subscribes.append(temp_eq)
+            subscribes = [{
+                              "subscribeUserName": eq.user.username,
+                              "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+                              "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+                              "addDate": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                              "status": "1",
+                              "type": "0"
+                          } for eq in p2pequities]
 
             temp_p2p = {
                 "projectId": str(p2p.pk),
@@ -170,13 +140,12 @@ class WangDaiListAPI(APIView):
                 "deadline": str(p2p.period),
                 "deadlineUnit": u"月",
                 "reward": '{}%'.format(p2p.excess_earning_rate),
-                "type": type,
+                "type": u"信用标" if p2p.category == u'证大速贷'else u"抵押标",
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
                 "amountUsedDesc": strip_tags(p2p.short_usage),
                 "loanUrl": "https://{}/p2p/detail/{}".format(request.get_host(), p2p.id),
-                # "successTime": p2p.soldout_time,
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
             p2p_list.append(temp_p2p)
@@ -186,7 +155,7 @@ class WangDaiListAPI(APIView):
 
 class WangDaiByDateAPI(APIView):
     """
-    网贷之家数据接口， 获取已经完成的数据
+    网贷之家数据接口， 获取已经完成的列表数据
     """
 
     permission_classes = (IsAdminUserOrReadOnly,)
@@ -212,27 +181,20 @@ class WangDaiByDateAPI(APIView):
             percent = p2p.ordered_amount / amount * 100
             schedule = '{}%'.format(percent.quantize(Decimal('0.0'), 'ROUND_DOWN'))
 
-            if p2p.category == u'证大速贷':
-                type = u"信用标"
-            type = u"抵押标"
-
             for pay_method, value in WANGDAI:
                 if pay_method == p2p.pay_method:
                     repaymentType = value
                     break
 
             p2pequities = p2p.equities.all()
-            subscribes = []
-            for eq in p2pequities:
-                temp_eq = {
+            subscribes = [{
                     "subscribeUserName": eq.user.username,
                     "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
                     "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
                     "addDate": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
                     "status": "1",
                     "type": "0"
-                }
-                subscribes.append(temp_eq)
+                } for eq in p2pequities]
 
             temp_p2p = {
                 "projectId": str(p2p.pk),
@@ -243,7 +205,7 @@ class WangDaiByDateAPI(APIView):
                 "deadline": str(p2p.period),
                 "deadlineUnit": u"月",
                 "reward": '{}%'.format(p2p.excess_earning_rate),
-                "type": type,
+                "type": u"信用标" if p2p.category == u'证大速贷'else u"抵押标",
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
@@ -353,6 +315,10 @@ class WangdaiEyeListAPIView(APIView):
 
 
 class WangdaiEyeEquityAPIView(APIView):
+    """
+        网贷天眼，用户购买持仓
+    """
+
     permission_classes = (IsAdminUserOrReadOnly, )
 
     def get(self, request):
@@ -431,11 +397,11 @@ XUNLEI_PAY_WAY = {
 
 
 class XunleiP2PListAPIView(APIView):
+    """ 迅雷 p2p 列表 API"""
     permission_classes = ()
 
     def get(self, request):
         now = time.mktime(datetime.datetime.now().timetuple())
-        uid = request.GET.get('xluid')
         project_list = []
 
         result = {
@@ -482,6 +448,8 @@ class XunleiP2PListAPIView(APIView):
 
 
 class XunleiP2PbyUser(APIView):
+    """ 迅雷用户持仓 API """
+
     permission_classes = ()
 
     def get(self, reqeust):
@@ -534,3 +502,4 @@ class XunleiP2PbyUser(APIView):
             my_project.append(obj)
         result.update(my_project=my_project)
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+

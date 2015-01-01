@@ -41,14 +41,6 @@ from django.contrib import messages
 from django.shortcuts import redirect, render_to_response
 
 
-REPAYMENTTYPEMAP = (
-    (u'到期还本付息', 1),
-    (u'等额本息', 2),
-    (u'按月付息', 5),
-    (u'按季度付息', 7)
-)
-
-
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
 
