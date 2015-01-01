@@ -42,6 +42,7 @@ from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import search
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
+from marketing.models import ClientData
 
 
 logger = logging.getLogger(__name__)
@@ -157,12 +158,19 @@ class RegisterAPIView(APIView):
             "mtype": "activityintro"
         })
         # todo save client info
-        return Response({"ret_code": 0, "message": "注册成功"})
+        version = request.DATA.get('version', '')
+        userdevice = request.DATA.get('userDevice', '')
+        network = request.DATA.get('network', '')
+        channelid = request.DATA.get('channelId', '')
 
+        c = ClientData(version=version, userdevice=userdevice, network=network, channelid=channelid, phone=identifier,
+                       action=0)
+        c.save()
+
+        return Response({"ret_code": 0, "message": u"注册成功"})
 
 
 class WeixinRegisterAPIView(APIView):
-
     """
         wechat register
     """
@@ -302,7 +310,7 @@ class SendVoiceCodeAPIView(APIView):
         if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
             return Response({"ret_code": 30112, "message": u"手机号输入有误"})
 
-        #phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
+        # phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
         #if phone_check:
         #    return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
 
@@ -366,7 +374,7 @@ class SendVoiceCodeTwoAPIView(APIView):
         return Response({"ret_code": 0, "message": "ok"})
 
 
-#云通讯语音验证码回调
+# 云通讯语音验证码回调
 class YTXVoiceCallbackAPIView(APIView):
     permission_classes = ()
 
@@ -382,36 +390,39 @@ class YTXVoiceCallbackAPIView(APIView):
 
         return Response({"statuscode": "000000"})
 
+
 class LatestDataAPIView(APIView):
     permission_classes = ()
 
     def post(self, request):
         now = datetime.now()
         today = datetime(now.year, now.month, now.day, 23, 59, 59)
-        start = today-timedelta(30)
+        start = today - timedelta(30)
         ams = ProductAmortization.objects.filter(settlement_time__range=(start, today), settled=True)
         if not ams:
-            return Response({"ret_code": 0, "message": "ok", "p2p_nums":0, "amorization_amount":0})
+            return Response({"ret_code": 0, "message": "ok", "p2p_nums": 0, "amorization_amount": 0})
         else:
             amount = 0
             for x in ams:
                 amount += x.principal + x.interest + x.penal_interest
-            return Response({"ret_code": 0, "message": "ok", "p2p_nums":len(ams), "amorization_amount":amount})
+            return Response({"ret_code": 0, "message": "ok", "p2p_nums": len(ams), "amorization_amount": amount})
+
 
 class ShareUrlAPIView(APIView):
     permission_classes = (IsAuthenticated,)
-    
+
     def post(self, request):
         rs = Misc.objects.filter(key="app_share_url").first()
         if not rs:
-            return Response({"ret_code": 30141, "message":u"没有分享数据"})
+            return Response({"ret_code": 30141, "message": u"没有分享数据"})
         try:
             body = json.loads(rs.value)
         except:
-            return Response({"ret_code": 30142, "message":u"没有分享数据"})
+            return Response({"ret_code": 30142, "message": u"没有分享数据"})
         if type(body) != dict:
             body = {}
-        return Response({"ret_code": 0, "message":"ok", "data":body})
+        return Response({"ret_code": 0, "message": "ok", "data": body})
+
 
 class UserExisting(APIView):
     permission_classes = ()
@@ -597,15 +608,15 @@ class Statistics(APIView):
         today_end = datetime.combine(tomorrow, time())
 
         today_user = User.objects.filter(date_joined__range=(today_start, today_end)).aggregate(Count('id'))
-        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate( Sum('amount'))
+        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
+            Sum('amount'))
 
-        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购')\
+        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购') \
             .values('id').count()
 
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
         all_num = P2PRecord.objects.filter(catalog='申购').values('id').count()
-
 
         data = {
             'today_num': today_num,

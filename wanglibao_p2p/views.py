@@ -20,7 +20,7 @@ from rest_framework import renderers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import SiteData
+from marketing.models import SiteData, ClientData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm
@@ -182,6 +182,17 @@ class PurchaseP2PMobile(APIView):
             try:
                 trader = P2PTrader(product=p2p, user=request.user)
                 product_info, margin_info, equity_info = trader.purchase(amount)
+
+
+                # todo save client info
+                version = request.DATA.get('version', '')
+                userdevice = request.DATA.get('userDevice', '')
+                network = request.DATA.get('network', '')
+                channelid = request.DATA.get('channelId', '')
+                c = ClientData(version=version, userdevice=userdevice, network=network, channelid=channelid,
+                               phone=phone, action=0)
+                c.save()
+
                 return Response({
                     'data': product_info.amount
                 })
