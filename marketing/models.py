@@ -205,3 +205,25 @@ class RewardRecord(models.Model):
         return u'<%s>' % self.user
 
 
+class ClientData(models.Model):
+    """ 统计客户端信息 """
+    ACTION = (
+        (0, u'注册'),
+        (1, u'购买'),
+    )
+    version = models.CharField(max_length=40)
+    userdevice = models.CharField(max_length=120)
+    network = models.CharField(max_length=30)
+    channelid = models.CharField(max_length=120)
+    phone = models.CharField(max_length=20)
+    action = models.IntegerField(max_length=2, choices=ACTION)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'客户端信息'
+
+
+    def __unicode__(self):
+        return u'<%s>' % self.userdevice

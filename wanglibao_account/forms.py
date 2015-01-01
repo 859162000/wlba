@@ -107,7 +107,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             identifier_type = detect_identifier_type(identifier)
             if identifier_type == 'phone':
                 phone = identifier
-                validate_code =  self.cleaned_data.get('validate_code', '')
+                validate_code = self.cleaned_data.get('validate_code', '')
                 if validate_code:
                     status, message = validate_validation_code(phone, validate_code)
                     if status != 200:
