@@ -55,7 +55,7 @@ class Top(object):
 
     def day_tops(self, day=datetime.now()):
 
-        if self.activity_start_local is None:
+        if self.activity_start is None:
             return []
 
         amsterdam = self.timezone_util
@@ -75,7 +75,7 @@ class Top(object):
 
     def allday_tops(self, start=datetime.now()):
 
-        if self.activity_start_local is None:
+        if self.activity_start is None:
             return []
 
         amsterdam = self.timezone_util
@@ -106,7 +106,7 @@ class Top(object):
         :param start: 某天, 默认为当天
         :return: 某周的投资排行榜
         """
-        if self.activity_start_local is None:
+        if self.activity_start is None:
             return []
         amsterdam = self.timezone_util
 
@@ -130,7 +130,7 @@ class Top(object):
         return self.extract_user_list(p2p_records)
 
     def allweek_tops(self):
-        if self.activity_start_local is None:
+        if self.activity_start is None:
             return []
         start = timezone.localtime(self.activity_start)
         weeks = []
@@ -140,7 +140,7 @@ class Top(object):
         return weeks
 
     def all_tops(self):
-        if self.activity_start_local is None:
+        if self.activity_start is None:
             return []
 
         amsterdam = self.timezone_util
