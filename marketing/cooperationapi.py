@@ -151,7 +151,7 @@ class WangDaiListAPI(APIView):
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
                 "amountUsedDesc": strip_tags(p2p.short_usage),
-                "loanUrl": "https://{}/p2p/detail/{}".format(request.get_host(), p2p.id),
+                "loanUrl": "https://{}/p2p/detail/{}?promo_token=da57ku".format(request.get_host(), p2p.id),
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
             p2p_list.append(temp_p2p)
@@ -218,7 +218,7 @@ class WangDaiByDateAPI(APIView):
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
                 "amountUsedDesc": strip_tags(p2p.short_usage),
-                "loanUrl": "https://{}/p2p/detail/{}".format(request.get_host(), p2p.id),
+                "loanUrl": "https://{}/p2p/detail/{}?promo_token=da57ku".format(request.get_host(), p2p.id),
                 "successTime": timezone.localtime(p2p.soldout_time).strftime("%Y-%m-%d %H:%M:%S"),
                 "publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
             }
