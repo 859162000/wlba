@@ -7,7 +7,7 @@ from datetime import timedelta, datetime, time
 from django.db.models import Count, Sum
 
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model, authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login
 from django.db.models import Q
 from django.db.models import F
 from rest_framework import generics, renderers
@@ -436,17 +436,22 @@ class UserExisting(APIView):
                 | \
                 (Q(wanglibaouserprofile__phone=identifier) &
                  Q(wanglibaouserprofile__phone_verified=True))
+        user = User.objects.filter(query).first()
+        if user:
+            return Response({"existing":True})
+        else:
+            return Response({"existing":False})
 
-        try:
-            get_user_model().objects.get(query)
-
-            return Response({
-                                "existing": True
-                            }, status=200)
-        except get_user_model().DoesNotExist:
-            return Response({
-                                "existing": False
-                            }, status=400)
+        #try:
+        #    User.objects.get(query)
+        #
+        #    return Response({
+        #                        "existing": True
+        #                    }, status=200)
+        #except User.DoesNotExist:
+        #    return Response({
+        #                        "existing": False
+        #                    }, status=400)
 
 
 class IdValidate(APIView):
@@ -555,7 +560,8 @@ class AdminIdValidate(APIView):
                                 "error_number": ErrorNumber.unknown_error
                             }, status=400)
 
-        user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
+        #user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
+        user = User.objects.get(wanglibaouserprofile__phone=phone)
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
         user.wanglibaouserprofile.id_is_valid = True
