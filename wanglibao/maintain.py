@@ -1,3 +1,4 @@
+# coding=utf-8
 from decimal import Decimal, ROUND_DOWN
 from django.forms import model_to_dict
 from marketing.models import Reward, RewardRecord, IntroducedBy
