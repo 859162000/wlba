@@ -51,10 +51,10 @@ require ['jquery', 'lib/backend'], ($, backend)->
     iphone = /iphone/i.test navigator.userAgent.toLowerCase()
     android = /android/i.test navigator.userAgent.toLowerCase()
     if iphone
-      window.location.href = "https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8"
+      window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao"
       return true
     else if android
-      window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao#opened"
+      window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao"
       return true
     else
       alert("抱歉当前移动平台只支持 iOS 和安卓客户端。您可以去网利宝网站（www.wanglibao.com）进行投资。")
