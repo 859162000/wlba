@@ -67,6 +67,9 @@ class Top(object):
 
         return self.extract_user_list(records)
 
+    def lastday_tops(self):
+        return self.day_tops(datetime.now()-timedelta(days=1))
+
     def allday_tops(self, start=datetime.now()):
 
         amsterdam = self.timezone_util

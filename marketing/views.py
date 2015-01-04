@@ -14,7 +14,7 @@ from django.http.response import HttpResponse
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
-from django.shortcuts import redirect, render_to_response
+from marketing.tops import Top
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from marketing.models import PromotionToken
 
@@ -145,5 +145,14 @@ class NewYearView(TemplateView):
     template_name = 'newyear.jade'
 
     def get_context_data(self, **kwargs):
-        return {}
+        day_tops = Top().day_tops()
+        lastday_tops = Top().lastday_tops()
+        week_tops = Top().week_tops()
+        all_tops = Top().all_tops()
+        return {
+            'day_tops': day_tops,
+            'lastday_tops': lastday_tops,
+            'week_tops': week_tops,
+            'month_tops': all_tops,
+        }
 

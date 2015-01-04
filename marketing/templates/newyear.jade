@@ -64,41 +64,34 @@ html
                   th(width="45%") 用户
                   th(width="45%") 理财金额
               tbody
-                tr.color-orange
-                  td
-                    .table-top-list-bg.table-top-list-bg1
-                      span.icon.icon-day-top1
-                      span.top-num 1
-                  td 135*****345
-                  td 55,300元
-                tr.color-orange
-                  td
-                    .table-top-list-bg.table-top-list-bg2
-                      span.icon.icon-day-top2
-                      span.top-num 2
-                  td 135*****345
-                  td 44,300元
-                tr.color-orange
-                  td
-                    .table-top-list-bg.table-top-list-bg3
-                      span.icon.icon-day-top3
-                      span.top-num 3
-                  td 135*****345
-                  td 33,300元
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top-arr
-                      span.top-num 4
-                  td 135*****345
-                  td 33,300元
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top-arr
-                      span.top-num 5
-                  td 135*****345
-                  td 33,300元
+                for day in day_tops
+                  if forloop.counter < 4
+                    tr.color-orange
+                      td
+                        if forloop.counter == 1
+                          .table-top-list-bg.table-top-list-bg1
+                            span.icon.icon-day-top1
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 2
+                          .table-top-list-bg.table-top-list-bg2
+                            span.icon.icon-day-top2
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 3
+                          .table-top-list-bg.table-top-list-bg3
+                            span.icon.icon-day-top3
+                            span.top-num {{forloop.counter}}
+
+                      td {{day.phone | safe_phone_new}}
+                      td {{day.amount_sum}}元
+                  else
+                    tr
+                      td
+                        .table-top-list-bg
+                          span.icon.icon-day-top-arr
+                          span.top-num {{forloop.counter}}
+                      td {{day.phone | safe_phone_new}}
+                      td {{day.amount_sum}}
+
             table.trophy-table(cellspacing="1")
               thead
                 tr
@@ -106,6 +99,33 @@ html
                   th 用户
                   th 理财金额
               tbody
+                for lastday in lastday_tops
+                  if forloop.counter < 4
+                    tr.color-orange
+                      td
+                        if forloop.counter == 1
+                          .table-top-list-bg
+                            span.icon.icon-day-top1
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 2
+                          .table-top-list-bg
+                            span.icon.icon-day-top2
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 3
+                          .table-top-list-bg
+                            span.icon.icon-day-top3
+                            span.top-num {{forloop.counter}}
+
+                      td {{lastday.phone | safe_phone_new}}
+                      td {{lastday.amount_sum}}元
+                  else
+                    tr
+                      td
+                        .table-top-list-bg
+                          span.icon.icon-day-top-arr
+                          span.top-num {{forloop.counter}}
+                      td {{lastday.phone | safe_phone_new}}
+                      td {{lastday.amount_sum}}
                 tr
                   td
                     .table-top-list-bg
@@ -149,7 +169,46 @@ html
                   p.highlight 价格：￥2888
             .space-vertical-l
 
-          .span6-omega
+          .span6-omega.purple-bg
+            .day-box-item
+              span.font-xxl 周榜：
+              | 每周统计一次投资金额，前3名有奖，下周清零.
+            table.trophy-table(cellspacing="1")
+              thead
+                tr
+                  th(width="10%").font-xl 一周榜单
+                  th(width="45%") 用户
+                  th(width="45%") 理财金额
+              tbody
+                for week in week_tops
+                  if forloop.counter < 4
+                    tr
+                      td
+                        if forloop.counter == 1
+                          .table-top-list-bg
+                            span.icon.icon-week-top1
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 2
+                          .table-top-list-bg
+                            span.icon.icon-week-top2
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 3
+                          .table-top-list-bg
+                            span.icon.icon-week-top3
+                            span.top-num {{forloop.counter}}
+
+                      td {{week.phone | safe_phone_new}}
+                      td {{week.amount_sum}}元
+                  else
+                    tr
+                      td
+                        .table-top-list-bg
+                          span.icon.icon-day-top-arr
+                          span.top-num {{forloop.counter}}
+                      td {{week.phone | safe_phone_new}}
+                      td {{week.amount_sum}}
+
+
 
         .space-vertical-xl
         .row.relative-top
@@ -173,5 +232,55 @@ html
                   p.highlight 价格：￥2888
             .space-vertical-l
 
-          .span6-omega
+          .span6-omega.purple-bg
+            .day-box-item
+              span.font-xxl 总榜：
+              | 在活动期间内，在活动期间按照投资额排序，前3名有奖
+            table.trophy-table(cellspacing="1")
+              thead
+                tr
+                  th(width="10%").font-xl 一周榜单
+                  th(width="45%") 用户
+                  th(width="45%") 理财金额
+              tbody
+                for month in month_tops
+                  if forloop.counter < 4
+                    tr
+                      td
+                        if forloop.counter == 1
+                          .table-top-list-bg
+                            span.icon.icon-week-top1
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 2
+                          .table-top-list-bg
+                            span.icon.icon-week-top2
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 3
+                          .table-top-list-bg
+                            span.icon.icon-week-top3
+                            span.top-num {{forloop.counter}}
+
+                      td {{month.phone | safe_phone_new}}
+                      td {{month.amount_sum}}元
+                  else
+                    tr
+                      td
+                        .table-top-list-bg
+                          span.icon.icon-day-top-arr
+                          span.top-num {{forloop.counter}}
+                      td {{month.phone | safe_phone_new}}
+                      td {{month.amount_sum}}
+
+        .space-vertical-xl
+        .row.history-top
+
+          .history-top-bar
+            获奖用户
+            .top-bar-icon
+
+          .history-top-week
+            .history-week-label 第一周
+            .history-week-days
+
+
     include include/tracking
