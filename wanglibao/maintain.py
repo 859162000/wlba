@@ -23,6 +23,7 @@ def send_award():
     ban_nian_xunlei = 0
     yi_nian_xunlei = 0
     huafei = 0
+    huafei_count = 0
     jd_500 = 0
     jd_1000 = 0
     ipad_mini = 0
@@ -40,10 +41,11 @@ def send_award():
             yi_nian_xunlei += 1
             print u"发放一年迅雷会员第%s个" % yi_nian_xunlei
         if 10000 <= record["dsum"] < 100000:
+            huafei_50 = int(int(record["dsum"]) / 10000) * 50
             reward_user_hua_fei(record["user"], u"理财送话费", record["dsum"], huafei_50)
-            huafei_50 = record["dsum"] / 10000
-            print u"发放话费%s元" % huafei_50 * 50
-            huafei += huafei_50 * 50
+            print u"发放话费%s元" % huafei_50
+            huafei += huafei_50
+            huafei_count += 1
         if 100000 <= record["dsum"] < 200000:
             reward_user_jd_500(record["user"], u"500元京东卡", record["dsum"])
             jd_500 += 1
@@ -92,6 +94,7 @@ def send_award():
     print u"发放半年迅雷会员%s个" % ban_nian_xunlei
     print u"发放一年迅雷会员第%s个" % yi_nian_xunlei
     print u"发放话费%s元" % huafei
+    print u"发放人数%s" % huafei_count
     print u"发放500元京东卡%s个" % jd_500
     print u"发放1000元京东卡%s个" % jd_1000
     print u"发放ipad mini %s个" % ipad_mini
