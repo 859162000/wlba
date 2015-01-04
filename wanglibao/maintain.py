@@ -15,10 +15,10 @@ from wanglibao.templatetags.formatters import safe_phone_str
 
 
 def send_award(only_show=True):
-    # start = timezone.datetime(2014, 11, 1, 0, 00, 00)
-    # end = timezone.datetime(2014, 12, 31, 23, 59, 59)
-    start = timezone.datetime(2015, 1, 1, 0, 00, 00)
-    end = timezone.datetime(2015, 1, 5, 23, 59, 59)
+    start = timezone.datetime(2014, 11, 1, 0, 00, 00)
+    end = timezone.datetime(2014, 12, 31, 23, 59, 59)
+    # start = timezone.datetime(2015, 1, 1, 0, 00, 00)
+    # end = timezone.datetime(2015, 1, 5, 23, 59, 59)
 
     p2p_records = P2PRecord.objects.filter(create_time__range=(start, end), catalog='申购').values("user").annotate(
         dsum=Sum('amount'))
@@ -80,7 +80,7 @@ def send_award(only_show=True):
     for first_user in new_user:
         first_record = P2PRecord.objects.filter(user=first_user.user, create_time__range=(start, end),
                                                 catalog='申购').earliest("create_time")
-        print "邀请人%s投资金额%s" %(first_user.user.wanglibaouserprofile.name,first_record.amount)
+        print u"邀请人%s投资金额%s" %(first_user.user.wanglibaouserprofile.name,first_record.amount)
         if first_record.amount >= 1000:
             amount_05_one = Decimal(Decimal(first_record.amount) * Decimal(0.005) * (Decimal(first_record.product.period) / Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
             reward_user_5(first_user.user, first_user.introduced_by, u"邀请送收益", amount_05_one, first_record.product,only_show)
@@ -184,13 +184,13 @@ def reward_user_hua_fei(user_id, reward_type, amount, huafei,only_show):
                       3个工作日内充值至您的注册手机号码，请注意查收！<br/>\
                       感谢您对我们的支持与关注。<br/>\
                       网利宝" % (user.wanglibaouserprofile.name, amount, huafei)
-
-    inside_message.send_one.apply_async(kwargs={
-        "user_id": user_id,
-        "title": u"满额送活动",
-        "content": message_content,
-        "mtype": "activity"
-    })
+    if only_show is not True:
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": user_id,
+            "title": u"满额送活动",
+            "content": message_content,
+            "mtype": "activity"
+        })
     text_content = u"【网利宝】您在“满额就送”活动期间，获得%s元话费奖励。话费将于3个工作日内充值至您的注册手机号码，请注意查收！回复TD退订4008-588-066【网利宝】" % huafei
 
     if only_show is not True:

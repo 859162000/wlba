@@ -55,6 +55,9 @@ class Top(object):
 
     def day_tops(self, day=datetime.now()):
 
+        if self.activity_start_local is None:
+            return []
+
         amsterdam = self.timezone_util
 
         begin = amsterdam.localize(datetime.combine(day.date(), day.min.time()))
@@ -71,6 +74,9 @@ class Top(object):
         return self.day_tops(datetime.now()-timedelta(days=1))
 
     def allday_tops(self, start=datetime.now()):
+
+        if self.activity_start_local is None:
+            return []
 
         amsterdam = self.timezone_util
         begin = amsterdam.localize(datetime.combine(start.date(), start.min.time()))
@@ -100,9 +106,8 @@ class Top(object):
         :param start: 某天, 默认为当天
         :return: 某周的投资排行榜
         """
-
-        print self.num_limit, '$$$$$$$$$$$$'
-
+        if self.activity_start_local is None:
+            return []
         amsterdam = self.timezone_util
 
         # 用utc时间算出当前的日期是属于活动的第几周
@@ -125,6 +130,8 @@ class Top(object):
         return self.extract_user_list(p2p_records)
 
     def allweek_tops(self):
+        if self.activity_start_local is None:
+            return []
         start = timezone.localtime(self.activity_start)
         weeks = []
         for i in range(0, 4):
