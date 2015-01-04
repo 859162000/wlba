@@ -19,14 +19,16 @@
         });
         return;
       }
-      return backend.userExists(identifier).done(function() {
-        $('form#identifier').submit();
-        return true;
-      }).fail(function() {
-        return tool.modalAlert({
-          title: '温馨提示',
-          msg: '该用户不存在'
-        });
+      return backend.userExists(identifier).done(function(exist) {
+        if (exist.existing) {
+          $('form#identifier').submit();
+          return true;
+        } else {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: '该用户不存在'
+          });
+        }
       });
     };
     $('#submitButton').click(function(e) {
