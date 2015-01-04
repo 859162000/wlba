@@ -43,14 +43,16 @@
         if (identifier === $("#friend_identifier").val()) {
           return $(".error-message").text("自己不能邀请自己");
         } else {
-          return backend.userExists(identifier).done(function() {
-            alert("您输入的手机号已注册过网利宝！");
-            window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=n";
-            return true;
-          }).fail(function() {
-            alert("验证码已发送至您手机，请注意查收。");
-            window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier + "&userDevice=h5";
-            return true;
+          return backend.userExists(identifier).done(function(exist) {
+            if (exist.existing) {
+              alert("您输入的手机号已注册过网利宝！");
+              window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=n";
+              return true;
+            } else {
+              alert("验证码已发送至您手机，请注意查收。");
+              window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier + "&userDevice=h5";
+              return true;
+            }
           });
         }
       } else {
@@ -63,10 +65,10 @@
       iphone = /iphone/i.test(navigator.userAgent.toLowerCase());
       android = /android/i.test(navigator.userAgent.toLowerCase());
       if (iphone) {
-        window.location.href = "https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8";
+        window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao";
         return true;
       } else if (android) {
-        window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao#opened";
+        window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao";
         return true;
       } else {
         alert("抱歉当前移动平台只支持 iOS 和安卓客户端。您可以去网利宝网站（www.wanglibao.com）进行投资。");

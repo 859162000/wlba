@@ -2,10 +2,10 @@
 
 import json
 import logging
-import re
 from datetime import timedelta, datetime, time
-from django.db.models import Count, Sum
 
+import re
+from django.db.models import Count, Sum
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login
 from django.db.models import Q
@@ -19,7 +19,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import PromotionToken, Reward, RewardRecord
+from marketing.models import PromotionToken
 from marketing.utils import set_promo_user
 from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
@@ -32,7 +32,6 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization
 from wanglibao_account.utils import verify_id, detect_identifier_type
-from django.db import transaction
 from wanglibao_sms import messages, backends
 from django.utils import timezone
 from wanglibao_account import message as inside_message
@@ -42,7 +41,7 @@ from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import search
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
-from marketing.models import ClientData
+from marketing.utils import save_client
 
 
 logger = logging.getLogger(__name__)
@@ -145,7 +144,6 @@ class RegisterAPIView(APIView):
             except:
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
 
-        # user = create_user(serializer.object['identifier'], serializer.object['password'], "")
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
@@ -157,15 +155,9 @@ class RegisterAPIView(APIView):
             "content": content,
             "mtype": "activityintro"
         })
-        # todo save client info
-        version = request.DATA.get('version', '')
-        userdevice = request.DATA.get('userDevice', '')
-        network = request.DATA.get('network', '')
-        channelid = request.DATA.get('channelId', '')
+        # save client info
+        save_client(request, phone=identifier, action=0)
 
-        c = ClientData(version=version, userdevice=userdevice, network=network, channelid=channelid, phone=identifier,
-                       action=0)
-        c.save()
 
         return Response({"ret_code": 0, "message": u"注册成功"})
 
@@ -311,7 +303,7 @@ class SendVoiceCodeAPIView(APIView):
             return Response({"ret_code": 30112, "message": u"手机号输入有误"})
 
         # phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
-        #if phone_check:
+        # if phone_check:
         #    return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
 
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
@@ -460,7 +452,7 @@ class IdValidate(APIView):
     def post(self, request, *args, **kwargs):
 
         form = IdVerificationForm(request, request.POST)
-        #黑客程序就成功
+        # 黑客程序就成功
         user = self.request.user
         now = timezone.now()
 
@@ -581,7 +573,7 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
         if serializer.is_valid():
             push_user_id = request.DATA.get("user_id", "")
             push_channel_id = request.DATA.get("channel_id", "")
-            #设备类型，默认为IOS
+            # 设备类型，默认为IOS
             device_type = request.DATA.get("device_type", "ios")
             if device_type not in ("ios", "android"):
                 return Response({'message': "device_type error"}, status=status.HTTP_200_OK)

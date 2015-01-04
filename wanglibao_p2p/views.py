@@ -39,7 +39,7 @@ from wanglibao_account.utils import generate_contract_preview
 from wanglibao_pay.util import get_a_uuid
 from django.contrib import messages
 from django.shortcuts import redirect, render_to_response
-
+from marketing.utils import save_client
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -175,15 +175,8 @@ class PurchaseP2PMobile(APIView):
                 trader = P2PTrader(product=p2p, user=request.user)
                 product_info, margin_info, equity_info = trader.purchase(amount)
 
-
-                # todo save client info
-                version = request.DATA.get('version', '')
-                userdevice = request.DATA.get('userDevice', '')
-                network = request.DATA.get('network', '')
-                channelid = request.DATA.get('channelId', '')
-                c = ClientData(version=version, userdevice=userdevice, network=network, channelid=channelid,
-                               phone=phone, action=0)
-                c.save()
+                # save client info
+                save_client(request, phone=phone, action=1)
 
                 return Response({
                     'data': product_info.amount

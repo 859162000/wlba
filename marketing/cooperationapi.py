@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    第三方合作 API
+    第三方合作 API, 主要都是 P2P 列表，和 P2P 购买用户的持仓信息
 """
-
-__author__ = 'rsj217'
 
 import time
 from decimal import Decimal
@@ -53,6 +51,12 @@ class HeXunListAPI(APIView):
             percent = p2p.ordered_amount / amount * 100
             fld_lend_progress = percent.quantize(Decimal('0.0'), 'ROUND_DOWN')
 
+            fld_awards = 0
+            fld_interest_year = Decimal.from_float(p2p.expected_earning_rate)
+            if p2p.activity:
+                fld_awards = 1
+                fld_interest_year += p2p.activity.rule.rule_amount * 100
+
             p2pequity_count = p2p.equities.all().count()
 
             temp_p2p = {
@@ -63,13 +67,13 @@ class HeXunListAPI(APIView):
                 "fld_finendtime": timezone.localtime(p2p.end_time).strftime("%Y-%m-%d %H:%M:%S"),
                 "fld_total_finance": p2p.total_amount,
                 "fld_lend_period": p2p.period * 30,
-                "fld_interest_year": p2p.expected_earning_rate,
+                "fld_interest_year": float(fld_interest_year.quantize(Decimal('0.0'))),
                 "fld_refundmode": p2p.pay_method,
                 "fld_loantype_name": u'第三方担保',
                 "fld_guarantee_org": p2p.warrant_company.name,
                 "fld_securitymode_name": u'本息保障',
                 "fld_mininvest": 100.0,
-                "fld_awards": 1 if p2p.activity else 0,
+                "fld_awards": fld_awards,
                 "fld_lend_progress": fld_lend_progress,
                 "fld_invest_number": p2pequity_count,
                 "fld_finance_left": p2p.total_amount - p2p.ordered_amount,
@@ -131,15 +135,17 @@ class WangDaiListAPI(APIView):
                               "type": "0"
                           } for eq in p2pequities]
 
+            reward = (p2p.activity.rule.rule_amount * 100).quantize(Decimal('0.0')) if p2p.activity else 0
+
             temp_p2p = {
                 "projectId": str(p2p.pk),
                 "title": p2p.name,
                 "amount": amount,
                 "schedule": schedule,
-                "interestRate": '{}%'.format(p2p.expected_earning_rate - p2p.excess_earning_rate),
+                "interestRate": '{}%'.format(p2p.expected_earning_rate),
                 "deadline": str(p2p.period),
                 "deadlineUnit": u"月",
-                "reward": '{}%'.format(p2p.excess_earning_rate),
+                "reward": '{}%'.format(reward),
                 "type": u"信用标" if p2p.category == u'证大速贷'else u"抵押标",
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
@@ -196,15 +202,17 @@ class WangDaiByDateAPI(APIView):
                     "type": "0"
                 } for eq in p2pequities]
 
+            reward = p2p.activity.rule.rule_amount * 100 if p2p.activity else 0
+
             temp_p2p = {
                 "projectId": str(p2p.pk),
                 "title": p2p.name,
                 "amount": amount,
                 "schedule": schedule,
-                "interestRate": '{}%'.format(p2p.expected_earning_rate - p2p.excess_earning_rate),
+                "interestRate": '{}%'.format(p2p.expected_earning_rate),
                 "deadline": str(p2p.period),
                 "deadlineUnit": u"月",
-                "reward": '{}%'.format(p2p.excess_earning_rate),
+                "reward": '{}%'.format(reward),
                 "type": u"信用标" if p2p.category == u'证大速贷'else u"抵押标",
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
