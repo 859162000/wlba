@@ -80,7 +80,7 @@ def send_award(only_show=True):
     for first_user in new_user:
         first_record = P2PRecord.objects.filter(user=first_user.user, create_time__range=(start, end),
                                                 catalog='申购').earliest("create_time")
-        print "邀请人%s投资金额%s" %(first_user.user.wanglibaouserprofile.name,first_record.amount)
+        print u"邀请人%s投资金额%s" %(first_user.user.wanglibaouserprofile.name,first_record.amount)
         if first_record.amount >= 1000:
             amount_05_one = Decimal(Decimal(first_record.amount) * Decimal(0.005) * (Decimal(first_record.product.period) / Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
             reward_user_5(first_user.user, first_user.introduced_by, u"邀请送收益", amount_05_one, first_record.product,only_show)
