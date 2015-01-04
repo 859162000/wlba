@@ -33,10 +33,6 @@ from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization
 from marketing.models import Activity
 from wanglibao_account.utils import verify_id, detect_identifier_type
-<<<<<<< HEAD
-=======
-from django.db import transaction, connection
->>>>>>> tops
 from wanglibao_sms import messages, backends
 from django.utils import timezone
 from wanglibao_account import message as inside_message
@@ -46,12 +42,8 @@ from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import search
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
-<<<<<<< HEAD
 from marketing.utils import save_client
-=======
 from marketing.tops import Top
-from marketing.models import ClientData
->>>>>>> tops
 
 
 logger = logging.getLogger(__name__)
