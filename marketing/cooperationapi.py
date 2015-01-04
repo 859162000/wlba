@@ -53,6 +53,12 @@ class HeXunListAPI(APIView):
             percent = p2p.ordered_amount / amount * 100
             fld_lend_progress = percent.quantize(Decimal('0.0'), 'ROUND_DOWN')
 
+            fld_awards = 0
+            fld_interest_year = Decimal.from_float(p2p.expected_earning_rate)
+            if p2p.activity:
+                fld_awards = 1
+                fld_interest_year += p2p.activity.rule.rule_amount * 100
+
             p2pequity_count = p2p.equities.all().count()
 
             temp_p2p = {
@@ -63,13 +69,13 @@ class HeXunListAPI(APIView):
                 "fld_finendtime": timezone.localtime(p2p.end_time).strftime("%Y-%m-%d %H:%M:%S"),
                 "fld_total_finance": p2p.total_amount,
                 "fld_lend_period": p2p.period * 30,
-                "fld_interest_year": p2p.expected_earning_rate,
+                "fld_interest_year": float(fld_interest_year.quantize(Decimal('0.0'))),
                 "fld_refundmode": p2p.pay_method,
                 "fld_loantype_name": u'第三方担保',
                 "fld_guarantee_org": p2p.warrant_company.name,
                 "fld_securitymode_name": u'本息保障',
                 "fld_mininvest": 100.0,
-                "fld_awards": 1 if p2p.activity else 0,
+                "fld_awards": fld_awards,
                 "fld_lend_progress": fld_lend_progress,
                 "fld_invest_number": p2pequity_count,
                 "fld_finance_left": p2p.total_amount - p2p.ordered_amount,
