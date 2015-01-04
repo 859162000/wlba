@@ -103,9 +103,9 @@ def send_award():
     print u"发放1000元京东卡%s个" % jd_1000
     print u"发放ipad mini %s个" % ipad_mini
     print u"发放ipad air %s个" % ipad_air
-    print u"发放iphone6%s个" % iphone_6
-    print u"发放iphone6 plus%s个" % iphone_6_plus
-    print u"发放邀请送千5活动，送出%s元" % amount_05
+    print u"发放iphone6 %s个" % iphone_6
+    print u"发放iphone6 plus %s个" % iphone_6_plus
+    print u"发放邀请送千5活动，送出 %s元" % amount_05
     print "*********************************"
     print "*********************************"
     print "*************Done****************"
@@ -200,7 +200,7 @@ def reward_user_hua_fei(user_id, reward_type, amount, huafei):
         "content": message_content,
         "mtype": "activity"
     })
-    text_content = u"【网利宝】您在“满额就送”活动期间，获得s%元话费奖励。话费将于3个工作日内充值至您的注册手机号码，请注意查收！回复TD退订4008-588-066【网利宝】" % huafei
+    text_content = u"【网利宝】您在“满额就送”活动期间，获得%s元话费奖励。话费将于3个工作日内充值至您的注册手机号码，请注意查收！回复TD退订4008-588-066【网利宝】" % huafei
     send_messages.apply_async(kwargs={
         "phones": [user.wanglibaouserprofile.phone],
         "messages": [text_content]
