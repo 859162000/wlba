@@ -63,11 +63,11 @@ def send_award():
             ipad_air += 1
             print u"发放ipad air 第%s个" % ipad_air
         if 1000000 <= record["dsum"] < 1200000:
-            reward_user_apple(record["user"], u"满就送iphone", u"iPhone 6 (16G 4.7英寸)")
+            reward_user_apple(record["user"], u"满就送iphone6", u"iPhone 6 (16G 4.7英寸)")
             iphone_6 += 1
             print u"发放iphone6第%s个" % iphone_6
         if record["dsum"] > 1200000:
-            reward_user_apple(record["user"], u"满就送iphone", u"iPhone 6 Plus(16G 5.5英寸)")
+            reward_user_apple(record["user"], u"满就送iphone6 plus", u"iPhone 6 Plus(16G 5.5英寸)")
             iphone_6_plus += 1
             print u"发放iphone6 plus第%s个" % iphone_6_plus
 
