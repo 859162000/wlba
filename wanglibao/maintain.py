@@ -14,8 +14,10 @@ from wanglibao.templatetags.formatters import safe_phone_str
 
 
 def send_award():
-    start = timezone.datetime(2014, 11, 1, 0, 00, 00)
-    end = timezone.datetime(2014, 12, 31, 23, 59, 59)
+    # start = timezone.datetime(2014, 11, 1, 0, 00, 00)
+    # end = timezone.datetime(2014, 12, 31, 23, 59, 59)
+    start = timezone.datetime(2015, 1, 1, 0, 00, 00)
+    end = timezone.datetime(2015, 1, 5, 23, 59, 59)
 
     p2p_records = P2PRecord.objects.filter(create_time__range=(start, end), catalog='申购').values("user").annotate(
         dsum=Sum('amount'))
@@ -66,7 +68,7 @@ def send_award():
             reward_user_apple(record["user"], u"满就送iphone6", u"iPhone 6 (16G 4.7英寸)")
             iphone_6 += 1
             print u"发放iphone6第%s个" % iphone_6
-        if record["dsum"] > 1200000:
+        if record["dsum"] >= 1200000:
             reward_user_apple(record["user"], u"满就送iphone6 plus", u"iPhone 6 Plus(16G 5.5英寸)")
             iphone_6_plus += 1
             print u"发放iphone6 plus第%s个" % iphone_6_plus
@@ -81,9 +83,10 @@ def send_award():
             amount_05_one = Decimal(Decimal(first_record.amount) * Decimal(0.005) * (
             Decimal(first_record.product.period) / Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
             reward_user_5(first_user.user, first_user.introduced_by, u"邀请送收益", amount_05_one, first_record.product)
-            print u"%s邀请了%s，活动期间首笔交易%s元，%s获得%s元奖金" % (
-            first_user.introduced_by.wanglibaouserprofile.name, first_user.user.wanglibaouserprofile.name,
-            first_record.amount, first_user.introduced_by.wanglibaouserprofile.name, amount_05_one)
+            if first_user.introduced_by is not None and first_user.introduced_by.wanglibaouserprofile is not None and first_user.introduced_by is not None and first_user.introduced_by.wanglibaouserprofile is not None:
+                print u"%s邀请了%s，活动期间首笔交易%s元，%s获得%s元奖金" % (
+                first_user.introduced_by.wanglibaouserprofile.name, first_user.user.wanglibaouserprofile.name,
+                first_record.amount, first_user.introduced_by.wanglibaouserprofile.name, amount_05_one)
             amount_05 += amount_05_one
 
     print "*********************************"
