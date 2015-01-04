@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from adminplus.sites import AdminSitePlus
 from django.conf.urls import patterns, include, url
 
@@ -11,6 +13,7 @@ from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
+from wanglibao_account.views import CjdaoApiView
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
@@ -92,13 +95,19 @@ urlpatterns += patterns(
 # the other Platform API
 urlpatterns += patterns(
     '',
+    # 网贷之家
     url(r'^tdt/getNowProjects.json', WangDaiListAPI.as_view()),
     url(r'^tdt/getProjectsByDate.json', WangDaiByDateAPI.as_view()),
+    # 和讯网
     url(r'^hexun/p2plist.json', HeXunListAPI.as_view()),
+    # 网贷天眼
     url(r'^api/loans/$', WangdaiEyeListAPIView.as_view()),
     url(r'^api/data/$', WangdaiEyeEquityAPIView.as_view()),
+    # 迅雷
     url(r'^api/xunlei/getProjectList/$', XunleiP2PListAPIView.as_view()),
     url(r'^api/xunlei/getXLUserInvestInfo/$', XunleiP2PbyUser.as_view()),
+    # 财经道
+    url(r'^accounts/cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
 )
 
 if settings.DEBUG:
