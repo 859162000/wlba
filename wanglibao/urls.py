@@ -10,8 +10,10 @@ from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
-from wanglibao_p2p.views import AdminP2PUserRecord, GetNoWProjectsAPI, GetProjectsByDateAPI, P2PListAPI, \
-    P2PEyeListAPIView, P2PEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
+from wanglibao_p2p.views import AdminP2PUserRecord
+
+from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
+    WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -90,11 +92,11 @@ urlpatterns += patterns(
 # the other Platform API
 urlpatterns += patterns(
     '',
-    url(r'^tdt/getNowProjects.json', GetNoWProjectsAPI.as_view()),
-    url(r'^tdt/getProjectsByDate.json', GetProjectsByDateAPI.as_view()),
-    url(r'^hexun/p2plist.json', P2PListAPI.as_view()),
-    url(r'^api/loans/$', P2PEyeListAPIView.as_view()),
-    url(r'^api/data/$', P2PEyeEquityAPIView.as_view()),
+    url(r'^tdt/getNowProjects.json', WangDaiListAPI.as_view()),
+    url(r'^tdt/getProjectsByDate.json', WangDaiByDateAPI.as_view()),
+    url(r'^hexun/p2plist.json', HeXunListAPI.as_view()),
+    url(r'^api/loans/$', WangdaiEyeListAPIView.as_view()),
+    url(r'^api/data/$', WangdaiEyeEquityAPIView.as_view()),
     url(r'^api/xunlei/getProjectList/$', XunleiP2PListAPIView.as_view()),
     url(r'^api/xunlei/getXLUserInvestInfo/$', XunleiP2PbyUser.as_view()),
 )

@@ -7,7 +7,7 @@ from datetime import timedelta, datetime, time
 from django.db.models import Count, Sum
 
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model, authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login
 from django.db.models import Q
 from django.db.models import F
 from rest_framework import generics, renderers
@@ -43,7 +43,11 @@ from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import search
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
+<<<<<<< HEAD
 from marketing.tops import Top
+=======
+from marketing.models import ClientData
+>>>>>>> master
 
 
 logger = logging.getLogger(__name__)
@@ -158,12 +162,23 @@ class RegisterAPIView(APIView):
             "content": content,
             "mtype": "activityintro"
         })
+        # todo save client info
+        version = request.DATA.get('version', '')
+        userdevice = request.DATA.get('userDevice', '')
+        network = request.DATA.get('network', '')
+        channelid = request.DATA.get('channelId', '')
 
-        return Response({"ret_code": 0, "message": "注册成功"})
+        c = ClientData(version=version, userdevice=userdevice, network=network, channelid=channelid, phone=identifier,
+                       action=0)
+        c.save()
+
+        return Response({"ret_code": 0, "message": u"注册成功"})
 
 
-# wechat register
 class WeixinRegisterAPIView(APIView):
+    """
+        wechat register
+    """
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
@@ -300,7 +315,7 @@ class SendVoiceCodeAPIView(APIView):
         if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
             return Response({"ret_code": 30112, "message": u"手机号输入有误"})
 
-        #phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
+        # phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
         #if phone_check:
         #    return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
 
@@ -364,7 +379,7 @@ class SendVoiceCodeTwoAPIView(APIView):
         return Response({"ret_code": 0, "message": "ok"})
 
 
-#云通讯语音验证码回调
+# 云通讯语音验证码回调
 class YTXVoiceCallbackAPIView(APIView):
     permission_classes = ()
 
@@ -380,36 +395,39 @@ class YTXVoiceCallbackAPIView(APIView):
 
         return Response({"statuscode": "000000"})
 
+
 class LatestDataAPIView(APIView):
     permission_classes = ()
 
     def post(self, request):
         now = datetime.now()
         today = datetime(now.year, now.month, now.day, 23, 59, 59)
-        start = today-timedelta(30)
+        start = today - timedelta(30)
         ams = ProductAmortization.objects.filter(settlement_time__range=(start, today), settled=True)
         if not ams:
-            return Response({"ret_code": 0, "message": "ok", "p2p_nums":0, "amorization_amount":0})
+            return Response({"ret_code": 0, "message": "ok", "p2p_nums": 0, "amorization_amount": 0})
         else:
             amount = 0
             for x in ams:
                 amount += x.principal + x.interest + x.penal_interest
-            return Response({"ret_code": 0, "message": "ok", "p2p_nums":len(ams), "amorization_amount":amount})
+            return Response({"ret_code": 0, "message": "ok", "p2p_nums": len(ams), "amorization_amount": amount})
+
 
 class ShareUrlAPIView(APIView):
     permission_classes = (IsAuthenticated,)
-    
+
     def post(self, request):
         rs = Misc.objects.filter(key="app_share_url").first()
         if not rs:
-            return Response({"ret_code": 30141, "message":u"没有分享数据"})
+            return Response({"ret_code": 30141, "message": u"没有分享数据"})
         try:
             body = json.loads(rs.value)
         except:
-            return Response({"ret_code": 30142, "message":u"没有分享数据"})
+            return Response({"ret_code": 30142, "message": u"没有分享数据"})
         if type(body) != dict:
             body = {}
-        return Response({"ret_code": 0, "message":"ok", "data":body})
+        return Response({"ret_code": 0, "message": "ok", "data": body})
+
 
 
 class TopsOfDayView(APIView):
@@ -471,17 +489,22 @@ class UserExisting(APIView):
                 | \
                 (Q(wanglibaouserprofile__phone=identifier) &
                  Q(wanglibaouserprofile__phone_verified=True))
+        user = User.objects.filter(query).first()
+        if user:
+            return Response({"existing":True})
+        else:
+            return Response({"existing":False})
 
-        try:
-            get_user_model().objects.get(query)
-
-            return Response({
-                                "existing": True
-                            }, status=200)
-        except get_user_model().DoesNotExist:
-            return Response({
-                                "existing": False
-                            }, status=400)
+        #try:
+        #    User.objects.get(query)
+        #
+        #    return Response({
+        #                        "existing": True
+        #                    }, status=200)
+        #except User.DoesNotExist:
+        #    return Response({
+        #                        "existing": False
+        #                    }, status=400)
 
 
 class IdValidate(APIView):
@@ -590,7 +613,8 @@ class AdminIdValidate(APIView):
                                 "error_number": ErrorNumber.unknown_error
                             }, status=400)
 
-        user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
+        #user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
+        user = User.objects.get(wanglibaouserprofile__phone=phone)
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
         user.wanglibaouserprofile.id_is_valid = True
@@ -643,15 +667,15 @@ class Statistics(APIView):
         today_end = datetime.combine(tomorrow, time())
 
         today_user = User.objects.filter(date_joined__range=(today_start, today_end)).aggregate(Count('id'))
-        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate( Sum('amount'))
+        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
+            Sum('amount'))
 
-        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购')\
+        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购') \
             .values('id').count()
 
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
         all_num = P2PRecord.objects.filter(catalog='申购').values('id').count()
-
 
         data = {
             'today_num': today_num,

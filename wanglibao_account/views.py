@@ -933,7 +933,7 @@ def ajax_register(request):
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
 
-                # todo remove the try
+                # todo remove the try about cjdao callback
                 try:
                     cjdaoinfo = request.session.get('cjdaoinfo')
                     if cjdaoinfo:
@@ -1202,13 +1202,13 @@ class CjdaoApiView(APIView):
 
         request.session['cjdaoinfo'] = cjdaoinfo
 
-        print request.session['cjdaoinfo']
-
         if thirdproductid:
             try:
                 p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
             except P2PProduct.DoesNotExist:
                 raise Http404(u'您查找的产品不存在')
+
+            request.session.get('cjdaoinfo').update(thirdproductid=int(thirdproductid))
 
             if user:
                 request.session.get('cjdaoinfo').update(usertype=1)

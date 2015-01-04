@@ -171,13 +171,13 @@ def mlgb_md5(phone, flag):
 
 PAY_METHOD = {
     u'等额本息': 1,
-    u'按月付息': 3,
-    u'到期还本付息': 4,
-    u'先息后本': 2
+    u'按月付息': 2,
+    u'到期还本付息': 4
 }
 
 
 class CjdaoUtils():
+
     @classmethod
     def get_wluser_by_phone(cls, phone):
         """
@@ -261,10 +261,13 @@ class CjdaoUtils():
         reward = 0
         if p2p.activity:
             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
-        expectedrate = p2p.expected_earning_rate + float(reward * 100)
+        expectedrate = float(p2p.expected_earning_rate / 100) + float(reward)
+
+        p2pname = p2p.name
+        productname = p2pname.encode('utf-8')
 
         v = (
-            str(p2p.id), p2p.name, '网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
+            str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
             str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
 
         p = dict(zip(k, v))

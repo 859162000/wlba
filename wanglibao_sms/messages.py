@@ -90,7 +90,7 @@ def msg_bid_fail(product_name):
 
 def msg_register():
     title = u"注册成功"
-    content = u"感谢您注册网利宝。 完成实名认证并充值，免费领取3天迅雷会员激活码。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
+    content = u"感谢您注册网利宝。 完成实名认证并充值，免费领取7天迅雷会员激活码。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
     return title, content
 
 #风行过来的注册成功
@@ -122,12 +122,12 @@ def msg_validate_ok(activation):
 
 def msg_validate_ok2(activation):
     title = u"实名认证成功"
-    content = u"恭喜您完成实名认证，赠送给您的50G快盘会员激活码：%s，有效期至2015年12月31日。<a href='http://www.kuaipan.cn/n/user/records/lottery'>兑换快盘激活码</a><br/><a href='/pay/banks/' target='_blank'>立即充值</a>免费领取3天迅雷白金会员激活码。<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"恭喜您完成实名认证，赠送给您的50G快盘会员激活码：%s，有效期至2015年12月31日。<a href='http://www.kuaipan.cn/n/user/records/lottery'>兑换快盘激活码</a><br/><a href='/pay/banks/' target='_blank'>立即充值</a>免费领取7天迅雷白金会员激活码。<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 def msg_validate_fake():
     title = u"实名认证成功"
-    content = u"恭喜您完成实名认证，请您使用注册手机号码向客服索要3天迅雷白金会员激活码。<br/>参加精彩活动，享受1%%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
+    content = u"恭喜您完成实名认证，请您使用注册手机号码向客服索要7天迅雷白金会员激活码。<br/>参加精彩活动，享受1%%额外收益，<a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
     return title, content
 
 #迅雷会员
