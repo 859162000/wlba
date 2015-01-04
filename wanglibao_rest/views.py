@@ -144,7 +144,6 @@ class RegisterAPIView(APIView):
             except:
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
 
-        # user = create_user(serializer.object['identifier'], serializer.object['password'], "")
         user = create_user(identifier, password, "")
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
@@ -156,8 +155,7 @@ class RegisterAPIView(APIView):
             "content": content,
             "mtype": "activityintro"
         })
-        # todo save client info
-
+        # save client info
         save_client(request, phone=identifier, action=0)
 
 
