@@ -38,41 +38,41 @@ def send_award():
         if 1000 <= record["dsum"] < 50000:
             reward_user_ban_nian_xunlei(record["user"], u"半年迅雷会员", record["dsum"])
             ban_nian_xunlei += 1
-            print u"发放半年迅雷会员第%s个" % ban_nian_xunlei
+            print u"给用户%s发放半年迅雷会员第%s个,因为他投资了%s" % (record["user"],ban_nian_xunlei, record["dsum"])
         if record["dsum"] >= 50000:
             reward_user_yi_nian_xunlei(record["user"], u"一年迅雷会员", record["dsum"])
             yi_nian_xunlei += 1
-            print u"发放一年迅雷会员第%s个" % yi_nian_xunlei
+            print u"给用户%s发放一年迅雷会员第%s个,因为他投资了%s" % (record["user"],yi_nian_xunlei, record["dsum"])
         if 10000 <= record["dsum"] < 100000:
             huafei_50 = int(int(record["dsum"]) / 10000) * 50
             reward_user_hua_fei(record["user"], u"理财送话费", record["dsum"], huafei_50)
-            print u"发放话费%s元" % huafei_50
+            print u"给用户%s发放话费%s元,因为他投资了%s" % (record["user"],huafei_50, record["dsum"])
             huafei += huafei_50
             huafei_count += 1
         if 100000 <= record["dsum"] < 200000:
             reward_user_jd_500(record["user"], u"500元京东卡", record["dsum"])
             jd_500 += 1
-            print u"发放500元京东卡第%s个" % jd_500
+            print u"给用户%s发放500元京东卡第%s个,因为他投资了%s" % (record["user"],jd_500, record["dsum"])
         if 200000 <= record["dsum"] < 400000:
             reward_user_jd_1000(record["user"], u"1000元京东卡", record["dsum"])
             jd_1000 += 1
-            print u"发放1000元京东卡第%s个" % jd_1000
+            print u"给用户%s发放1000元京东卡第%s个,因为他投资了%s" % (record["user"],jd_1000, record["dsum"])
         if 400000 <= record["dsum"] < 500000:
             reward_user_apple(record["user"], u"满就送ipad mini",record["dsum"], "iPad mini 3(16G WLAN)")
             ipad_mini += 1
-            print u"发放ipad mini 第%s个" % ipad_mini
+            print u"给用户%s发放ipad mini 第%s个,因为他投资了%s" % (record["user"],ipad_mini, record["dsum"])
         if 500000 <= record["dsum"] < 1000000:
             reward_user_apple(record["user"], u"满就送ipad air",record["dsum"], "iPad Air 2(16G WLAN)")
             ipad_air += 1
-            print u"发放ipad air 第%s个" % ipad_air
+            print u"给用户%s发放ipad air 第%s个,因为他投资了%s" % (record["user"],ipad_air, record["dsum"])
         if 1000000 <= record["dsum"] < 1200000:
             reward_user_apple(record["user"], u"满就送iphone6",record["dsum"], u"iPhone 6 (16G 4.7英寸)")
             iphone_6 += 1
-            print u"发放iphone6第%s个" % iphone_6
+            print u"给用户%s发放iphone6 第%s个,因为他投资了%s" % (record["user"],iphone_6, record["dsum"])
         if record["dsum"] >= 1200000:
             reward_user_apple(record["user"], u"满就送iphone6 plus",record["dsum"], u"iPhone 6 Plus(16G 5.5英寸)")
             iphone_6_plus += 1
-            print u"发放iphone6 plus第%s个" % iphone_6_plus
+            print u"给用户%s发放iphone6 plus 第%s个,因为他投资了%s" % (record["user"],iphone_6_plus, record["dsum"])
 
     new_user = IntroducedBy.objects.filter(bought_at__range=(start, end)).exclude(
         introduced_by__username__startswith="channel").exclude(introduced_by__wanglibaouserprofile__utype__gt=0)
@@ -80,14 +80,11 @@ def send_award():
     for first_user in new_user:
         first_record = P2PRecord.objects.filter(user=first_user.user, create_time__range=(start, end),
                                                 catalog='申购').earliest("create_time")
+        print "邀请人%s投资金额%s" %(first_user.user.wanglibaouserprofile.name,first_record.amount)
         if first_record.amount >= 1000:
-            amount_05_one = Decimal(Decimal(first_record.amount) * Decimal(0.005) * (
-            Decimal(first_record.product.period) / Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+            amount_05_one = Decimal(Decimal(first_record.amount) * Decimal(0.005) * (Decimal(first_record.product.period) / Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
             reward_user_5(first_user.user, first_user.introduced_by, u"邀请送收益", amount_05_one, first_record.product)
-            if first_user.introduced_by is not None and first_user.introduced_by.wanglibaouserprofile is not None and first_user.introduced_by is not None and first_user.introduced_by.wanglibaouserprofile is not None:
-                print u"%s邀请了%s，活动期间首笔交易%s元，%s获得%s元奖金" % (
-                first_user.introduced_by.wanglibaouserprofile.name, first_user.user.wanglibaouserprofile.name,
-                first_record.amount, first_user.introduced_by.wanglibaouserprofile.name, amount_05_one)
+            print u"%s邀请了%s，活动期间首笔交易%s元，%s获得%s元奖金" % (first_user.introduced_by.wanglibaouserprofile.name, first_user.user.wanglibaouserprofile.name,first_record.amount, first_user.introduced_by.wanglibaouserprofile.name, amount_05_one)
             amount_05 += amount_05_one
 
     print "*********************************"
