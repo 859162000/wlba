@@ -1,3 +1,4 @@
+# coding=utf-8
 from decimal import Decimal, ROUND_DOWN
 from django.forms import model_to_dict
 from marketing.models import Reward, RewardRecord, IntroducedBy
@@ -14,8 +15,10 @@ from wanglibao.templatetags.formatters import safe_phone_str
 
 
 def send_award():
-    start = timezone.datetime(2014, 11, 1, 0, 00, 00)
-    end = timezone.datetime(2014, 12, 31, 23, 59, 59)
+    # start = timezone.datetime(2014, 11, 1, 0, 00, 00)
+    # end = timezone.datetime(2014, 12, 31, 23, 59, 59)
+    start = timezone.datetime(2015, 1, 1, 0, 00, 00)
+    end = timezone.datetime(2015, 1, 5, 23, 59, 59)
 
     p2p_records = P2PRecord.objects.filter(create_time__range=(start, end), catalog='申购').values("user").annotate(
         dsum=Sum('amount'))
@@ -55,19 +58,19 @@ def send_award():
             jd_1000 += 1
             print u"发放1000元京东卡第%s个" % jd_1000
         if 400000 <= record["dsum"] < 500000:
-            reward_user_apple(record["user"], u"满就送ipad mini", "iPad mini 3(16G WLAN)")
+            reward_user_apple(record["user"], u"满就送ipad mini",record["dsum"], "iPad mini 3(16G WLAN)")
             ipad_mini += 1
             print u"发放ipad mini 第%s个" % ipad_mini
         if 500000 <= record["dsum"] < 1000000:
-            reward_user_apple(record["user"], u"满就送ipad air", "iPad Air 2(16G WLAN)")
+            reward_user_apple(record["user"], u"满就送ipad air",record["dsum"], "iPad Air 2(16G WLAN)")
             ipad_air += 1
             print u"发放ipad air 第%s个" % ipad_air
         if 1000000 <= record["dsum"] < 1200000:
-            reward_user_apple(record["user"], u"满就送iphone", u"iPhone 6 (16G 4.7英寸)")
+            reward_user_apple(record["user"], u"满就送iphone6",record["dsum"], u"iPhone 6 (16G 4.7英寸)")
             iphone_6 += 1
             print u"发放iphone6第%s个" % iphone_6
-        if record["dsum"] > 1200000:
-            reward_user_apple(record["user"], u"满就送iphone", u"iPhone 6 Plus(16G 5.5英寸)")
+        if record["dsum"] >= 1200000:
+            reward_user_apple(record["user"], u"满就送iphone6 plus",record["dsum"], u"iPhone 6 Plus(16G 5.5英寸)")
             iphone_6_plus += 1
             print u"发放iphone6 plus第%s个" % iphone_6_plus
 
@@ -81,9 +84,10 @@ def send_award():
             amount_05_one = Decimal(Decimal(first_record.amount) * Decimal(0.005) * (
             Decimal(first_record.product.period) / Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
             reward_user_5(first_user.user, first_user.introduced_by, u"邀请送收益", amount_05_one, first_record.product)
-            print u"%s邀请了%s，活动期间首笔交易%s元，%s获得%s元奖金" % (
-            first_user.introduced_by.wanglibaouserprofile.name, first_user.user.wanglibaouserprofile.name,
-            first_record.amount, first_user.introduced_by.wanglibaouserprofile.name, amount_05_one)
+            if first_user.introduced_by is not None and first_user.introduced_by.wanglibaouserprofile is not None and first_user.introduced_by is not None and first_user.introduced_by.wanglibaouserprofile is not None:
+                print u"%s邀请了%s，活动期间首笔交易%s元，%s获得%s元奖金" % (
+                first_user.introduced_by.wanglibaouserprofile.name, first_user.user.wanglibaouserprofile.name,
+                first_record.amount, first_user.introduced_by.wanglibaouserprofile.name, amount_05_one)
             amount_05 += amount_05_one
 
     print "*********************************"
@@ -99,9 +103,9 @@ def send_award():
     print u"发放1000元京东卡%s个" % jd_1000
     print u"发放ipad mini %s个" % ipad_mini
     print u"发放ipad air %s个" % ipad_air
-    print u"发放iphone6%s个" % iphone_6
-    print u"发放iphone6 plus%s个" % iphone_6_plus
-    print u"发放邀请送千5活动，送出%s元" % amount_05
+    print u"发放iphone6 %s个" % iphone_6
+    print u"发放iphone6 plus %s个" % iphone_6_plus
+    print u"发放邀请送千5活动，送出 %s元" % amount_05
     print "*********************************"
     print "*********************************"
     print "*************Done****************"
@@ -196,7 +200,7 @@ def reward_user_hua_fei(user_id, reward_type, amount, huafei):
         "content": message_content,
         "mtype": "activity"
     })
-    text_content = u"【网利宝】您在“满额就送”活动期间，获得s%元话费奖励。话费将于3个工作日内充值至您的注册手机号码，请注意查收！回复TD退订4008-588-066【网利宝】" % huafei
+    text_content = u"【网利宝】您在“满额就送”活动期间，获得%s元话费奖励。话费将于3个工作日内充值至您的注册手机号码，请注意查收！回复TD退订4008-588-066【网利宝】" % huafei
     send_messages.apply_async(kwargs={
         "phones": [user.wanglibaouserprofile.phone],
         "messages": [text_content]
