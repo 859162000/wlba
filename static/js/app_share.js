@@ -43,14 +43,16 @@
         if (identifier === $("#friend_identifier").val()) {
           return $(".error-message").text("自己不能邀请自己");
         } else {
-          return backend.userExists(identifier).done(function() {
-            alert("您输入的手机号已注册过网利宝！");
-            window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=n";
-            return true;
-          }).fail(function() {
-            alert("验证码已发送至您手机，请注意查收。");
-            window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier + "&userDevice=h5";
-            return true;
+          return backend.userExists(identifier).done(function(exist) {
+            if (exist.existing) {
+              alert("您输入的手机号已注册过网利宝！");
+              window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=n";
+              return true;
+            } else {
+              alert("验证码已发送至您手机，请注意查收。");
+              window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier + "&userDevice=h5";
+              return true;
+            }
           });
         }
       } else {
@@ -77,3 +79,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=app_share.map

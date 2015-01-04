@@ -5,6 +5,7 @@ from django.template import loader, Context
 from django.utils import timezone
 from django.views.generic import TemplateView
 from marketing.models import NewsAndReport, SiteData
+from marketing.tops import Top
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
@@ -40,6 +41,12 @@ class IndexView(TemplateView):
         site_data = SiteData.objects.all().first()
         partners = Partner.objects.filter(type='partner')
 
+        #排行榜
+
+        day_tops = Top().day_tops()
+        week_tops = Top().week_tops()
+        all_tops = Top().all_tops()
+
         return {
             "p2p_products": p2p_products,
             "trade_records": trade_records,
@@ -49,7 +56,10 @@ class IndexView(TemplateView):
             'getmore': getmore,
             'announcements': AnnouncementHomepage,
             'announcements_p2p': AnnouncementP2PNew,
-            'partners': partners
+            'partners': partners,
+            'day_tops': day_tops,
+            'week_tops': week_tops,
+            'all_tops': all_tops
         }
 
 
