@@ -129,17 +129,8 @@
       $('.tabs a').mouseleave(function(e) {
         return tops.startScroll();
       });
-      $('.tabs a').click(function(e) {
+      return $('.tabs a').click(function(e) {
         return e.preventDefault();
-      });
-      return $.ajax({
-        url: '/api/gettopofday/',
-        type: "POST",
-        data: {
-          name: 'hetao'
-        }
-      }).done(function(data, textStatus) {
-        return console.log(data, '999');
       });
     });
   });

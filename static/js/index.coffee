@@ -128,12 +128,5 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
     $('.tabs a').click (e) ->
       e.preventDefault()
 
-    $.ajax
-      url: '/api/gettopofday/'
-      type: "POST"
-      data: {name: 'hetao'}
-    .done (data,textStatus) ->
-      console.log(data, '999')
-
   return
 

@@ -429,8 +429,10 @@ class TopsOfDayView(APIView):
 
         #print Top().day_tops(local_time)
         #print Top().allday_tops(local_time)
-
         print Top().all_tops()
+
+        #print Top().week_tops(datetime(2014, 12, 25))
+        #print Top().allweek_tops()
 
 
 

@@ -223,28 +223,15 @@ html
                     .tab-content#day
 
                       table
-                        tr.tops-three
-                          td
-                            .order 1
-                          td
-                            .phone 138******30
-                          td
-                            .amount-sum ￥26,547,557.0
+                        for day in day_tops
+                          tr.tops-three
+                            td
+                              .order 1
+                            td
+                              .phone {{day.user | safe_phone}}
+                            td
+                              .amount-sum ￥26,547,557.0
 
-                        tr.tops-three
-                          td
-                            .order 2
-                          td
-                            .phone 138******30
-                          td
-                            .amount-sum ￥26,547,557.0
-                        tr.tops-three
-                          td
-                            .order 3
-                          td
-                            .phone 138******30
-                          td
-                            .amount-sum ￥26,547,557.0
 
                         tr
                           td
@@ -256,13 +243,14 @@ html
 
                     .tab-content#week
                       table
-                        tr.tops-three
-                          td
-                            .order 1
-                          td
-                            .phone 138******31
-                          td
-                            .amount-sum ￥26,547,557.0
+                        for week in week_tops
+                          tr.tops-three
+                            td
+                              .order 1
+                            td
+                              .phone {{week.phone}}
+                            td
+                              .amount-sum ￥26,547,557.0
 
                         tr.tops-three
                           td
