@@ -5,7 +5,7 @@ from django.utils import timezone
 from views import MarketingView, TvView
 
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
-    Activity, ActivityRule, Reward, RewardRecord
+    Activity, ActivityRule, Reward, RewardRecord, ClientData
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -123,6 +123,12 @@ class RewardRecordAdmin(admin.ModelAdmin):
     search_fields = ('user__wanglibaouserprofile__phone', 'description', "reward__type")
 
 
+class ClientDataAdmin(admin.ModelAdmin):
+
+    list_display = ('id', 'version', 'userdevice', 'network', 'channelid', 'phone', 'action', 'create_time')
+    search_fields = ('phone', )
+    list_filter = ('network', 'action')
+
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
@@ -133,6 +139,7 @@ admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ActivityRule, ActivityRuleAdmin)
 admin.site.register(Reward, RewardAdmin)
 admin.site.register(RewardRecord, RewardRecordAdmin)
+admin.site.register(ClientData, ClientDataAdmin)
 
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
 admin.site.register_view('statistics/tv', view=TvView.as_view(), name=u'统计数据汇总')

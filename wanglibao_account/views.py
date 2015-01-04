@@ -933,7 +933,7 @@ def ajax_register(request):
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
 
-                # todo remove the try
+                # todo remove the try about cjdao callback
                 try:
                     cjdaoinfo = request.session.get('cjdaoinfo')
                     if cjdaoinfo:

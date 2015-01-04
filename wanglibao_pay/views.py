@@ -640,25 +640,6 @@ class YeePayAppPayCallbackView(APIView):
         yeepay = third_pay.YeePay()
         request.GET = request.DATA
         result = yeepay.pay_callback(request)
-
-        #if not result['ret_code']:
-        #    amount = result['amount']
-        #    if result['message'] == "success":
-        #        title, content = messages.msg_pay_ok(amount)
-        #        inside_message.send_one.apply_async(kwargs={
-        #            "user_id": result['uid'],
-        #            "title": title,
-        #            "content": content,
-        #            "mtype": "activityintro"
-        #        })
-        #        user = User.objects.filter(id=result['uid']).first()
-        #
-        #        # 迅雷活动, 12.8 首次充值
-        #        start_time = timezone.datetime(2014, 12, 7)
-        #        if PayInfo.objects.filter(user=user, type='D', create_time__gt=start_time,
-        #                                  status=PayInfo.SUCCESS).count() == 1:
-        #            rs = RewardStrategy(user)
-        #            rs.reward_user(u'三天迅雷会员')
         return Response(result)
 
 
