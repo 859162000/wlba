@@ -11,7 +11,6 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView,
                    AccountTransactionDeposit,
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
-                   P2PDetailOfLoginForCjdView, P2PDetailOfRegisterForCjdView,
                    Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailView, MessageCountView,
                    MessageListView, AccountRepayment, CjdaoApiView)
 from django.contrib.auth import views as auth_views
@@ -91,15 +90,6 @@ urlpatterns = patterns(
         },
         name='auth_password_reset_confirm'),
     url(r'', include('registration.backends.default.urls')),
-
-
-    url(r'^cjdao_login/$', TemplateView.as_view(template_name='cjdao_login.jade')),
-    url(r'^cjdao_register/$', TemplateView.as_view(template_name='cjdao_register.jade')),
-    url(r'^cjdao_login_product/(?P<id>\w+)$', P2PDetailOfLoginForCjdView.as_view(), name="cjdao_login_product"),
-    url(r'^cjdao_register_product/(?P<id>\w+)$', P2PDetailOfRegisterForCjdView.as_view(),
-        name="cjdao_register_product"),
-
-    url(r'cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
 
 )
 

@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-    第三方合作 API
+    第三方合作 API, 主要都是 P2P 列表，和 P2P 购买用户的持仓信息
 """
-
-__author__ = 'rsj217'
 
 import time
 from decimal import Decimal
