@@ -61,11 +61,11 @@ class Hiring(models.Model):
         ordering = ['-priority', '-last_updated']
 
     name = models.CharField(max_length=30, verbose_name=u'岗位名称', help_text=u'岗位名称')
-    duties = models.TextField(blank=True, verbose_name=u'岗位职责', help_text=u'岗位职责')
-    requirements = models.TextField(blank=True, verbose_name=u'任职要求', help_text=u'任职要求')
+    duties = RichTextField(verbose_name=u'岗位职责')
+    requirements = RichTextField(verbose_name=u'任职要求')
     is_urgent = models.BooleanField(verbose_name=u'是否紧急', default=False)
     is_hide = models.BooleanField(verbose_name=u'是否隐藏', default=False)
-    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先')
+    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先', default=0)
     last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'更新时间')
 
     def __unicode__(self):
