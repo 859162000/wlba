@@ -43,11 +43,8 @@ from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import search
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
-<<<<<<< HEAD
 from marketing.tops import Top
-=======
 from marketing.models import ClientData
->>>>>>> master
 
 
 logger = logging.getLogger(__name__)
