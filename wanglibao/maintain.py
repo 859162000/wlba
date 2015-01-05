@@ -200,7 +200,6 @@ def reward_user_ban_nian_xunlei(user_id, reward_type, amount,only_show):
         print user.wanglibaouserprofile.phone
         print user.wanglibaouserprofile.name
         return
->>>>>>> production4.0
         reward.is_used = True
         reward.save()
 
@@ -232,14 +231,10 @@ def reward_user_ban_nian_xunlei(user_id, reward_type, amount,only_show):
 def reward_user_yi_nian_xunlei(user_id, reward_type, amount,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
-<<<<<<< HEAD
-    if only_show is not True:
-=======
     if only_show is not True and reward is None:
         print user.wanglibaouserprofile.phone
         print user.wanglibaouserprofile.name
         return
->>>>>>> production4.0
         reward.is_used = True
         reward.save()
 
@@ -286,20 +281,6 @@ def reward_user_hua_fei(user_id, reward_type, amount, huafei,only_show):
             "mtype": "activity"
         })
     text_content = u"【网利宝】您在“满额就送”活动期间，获得%s元话费奖励。话费将于3个工作日内充值至您的注册手机号码，请注意查收！回复TD退订4008-588-066【网利宝】" % huafei
-<<<<<<< HEAD
-=======
-
-    if only_show is not True:
-        send_messages.apply_async(kwargs={
-            "phones": [user.wanglibaouserprofile.phone],
-            "messages": [text_content]
-        })
-        RewardRecord.objects.create(user=user, reward=reward, description=message_content)
-    else:
-        print message_content
-        print text_content
-        print user.wanglibaouserprofile.phone
->>>>>>> production4.0
 
     if only_show is not True:
         send_messages.apply_async(kwargs={
@@ -312,13 +293,7 @@ def reward_user_hua_fei(user_id, reward_type, amount, huafei,only_show):
         print text_content
         print user.wanglibaouserprofile.phone
 
-<<<<<<< HEAD
 
-def reward_user_jd_500(user_id, reward_type, amount,only_show):
-    user = User.objects.get(pk=user_id)
-    reward = Reward.objects.filter(is_used=False, type=reward_type).first()
-    if only_show is not True:
-=======
 def reward_user_jd_500(user_id, reward_type, amount,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
@@ -326,7 +301,6 @@ def reward_user_jd_500(user_id, reward_type, amount,only_show):
         print user.wanglibaouserprofile.phone
         print user.wanglibaouserprofile.name
         return
->>>>>>> production4.0
         reward.is_used = True
         reward.save()
 
@@ -358,14 +332,10 @@ def reward_user_jd_500(user_id, reward_type, amount,only_show):
 def reward_user_jd_1000(user_id, reward_type, amount,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
-<<<<<<< HEAD
-    if only_show is not True:
-=======
     if only_show is not True and reward is None:
         print user.wanglibaouserprofile.phone
         print user.wanglibaouserprofile.name
         return
->>>>>>> production4.0
         reward.is_used = True
         reward.save()
 
