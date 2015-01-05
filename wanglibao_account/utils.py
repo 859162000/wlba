@@ -258,7 +258,7 @@ class CjdaoUtils():
             'loandeadline',
             'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment')
 
-        incomeway = PAY_METHOD.get(p2p.pay_method, 0)
+
         reward = 0
         if p2p.activity:
             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
@@ -267,9 +267,16 @@ class CjdaoUtils():
         p2pname = p2p.name
         productname = p2pname.encode('utf-8')
 
-        v = (
-            str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
-            str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
+
+        incomeway = PAY_METHOD.get(p2p.pay_method, 0)
+        if incomeway:
+            v = (
+                str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
+                str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
+        else:
+            v = (
+                str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
+                str(expectedrate), '1', 'a', '1', '1', '1', key)
 
         p = dict(zip(k, v))
         p.update(md5_value=cls.md5_value(*v))
