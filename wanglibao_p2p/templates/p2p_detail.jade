@@ -190,6 +190,80 @@ html
                   h2 {{attachment.name}}
 
         .span4-omega.border-left.clearfix
+          .panel.tops-container.border-no-l-r
+              .panel-title-bar__border-gray
+                .panel-title 网利榜
+              .panel-content-container
+                .tabs
+                  .tabs-nav
+                    ul
+                      li
+                        a(href="#day") 日排行
+                      li
+                        a(href="#week").active 周排行
+                      li
+                        a(href="#month") 总排行
+                  .tabs-content
+                    .tab-content#day
+
+                      table
+                        for day in day_tops
+                          if forloop.counter < 4
+                            tr.tops-three
+                              td
+                                .order {{forloop.counter}}
+                              td
+                                .phone {{day.phone | safe_phone_new}}
+                              td
+                                .amount-sum {{day.amount_sum}}
+                          else
+                            tr
+                              td
+                                .order {{forloop.counter}}
+                              td
+                                .phone {{day.phone | safe_phone_new}}
+                              td
+                                .amount-sum {{day.amount_sum}}
+
+                    .tab-content#week
+                      table
+                        for week in week_tops
+                          if forloop.counter < 4
+                            tr.tops-three
+                              td
+                                .order {{forloop.counter}}
+                              td
+                                .phone {{week.phone | safe_phone_new}}
+                              td
+                                .amount-sum {{week.amount_sum}}
+                          else
+                            tr
+                              td
+                                .order {{forloop.counter}}
+                              td
+                                .phone {{week.phone | safe_phone_new}}
+                              td
+                                .amount-sum {{week.amount_sum}}
+
+                    .tab-content#month
+                      table
+                        for month in all_tops
+                          if forloop.counter < 4
+                            tr.tops-three
+                              td
+                                .order {{forloop.counter}}
+                              td
+                                .phone {{month.phone | safe_phone_new}}
+                              td
+                                .amount-sum {{month.amount_sum}}
+                          else
+                            tr
+                              td
+                                .order {{forloop.counter}}
+                              td
+                                .phone {{month.phone | safe_phone_new}}
+                              td
+                                .amount-sum {{month.amount_sum}}
           .p2p-detail-container.guarantee-company
             h1 担保机构审核清单
             table
@@ -304,7 +378,7 @@ html
 
     script.
       var v = new Date().getTime()
-      require(['/static/js/p2p_detail.js?v='+v])
+      require(['/static/js/p2p_detail.js?v='+v, '/static/js/index.js?v='+v])
     include include/footer
     include include/tracking
     include include/verify
