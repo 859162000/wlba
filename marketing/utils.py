@@ -51,4 +51,4 @@ def save_client(request, phone, action):
                        phone=phone, action=action)
         c.save()
     except:
-        logger.error(u"注册记录客户端信息失败，请检查参数")
+        logger.error(u"客户端信息失败，请检查参数")
