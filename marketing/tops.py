@@ -58,8 +58,6 @@ class Top(object):
         if self.activity_start is None:
             return []
 
-        print self.activity_start, '#########'
-
         amsterdam = self.timezone_util
 
         begin = amsterdam.localize(datetime.combine(day.date(), day.min.time()))
@@ -70,9 +68,13 @@ class Top(object):
             .annotate(amount_sum=Sum('amount')) \
             .order_by('-amount_sum')[:self.num_limit]
 
-        print self.activity_start, '#########'
-
         return self.extract_user_list(records)
+
+    def certain_day(self, days):
+        if days < 1 or days > 28:
+            return []
+
+        return self.day_tops(self.activity_start_local+timedelta(days-1))
 
     def lastday_tops(self):
         amsterdam = self.timezone_util
@@ -106,6 +108,13 @@ class Top(object):
                         {'each_day': each_day, 'user': user.wanglibaouserprofile.phone, 'amount_sum': amount_sum})
 
         return user_list
+
+    def certain_week(self, week):
+
+        if week < 1 or week > 4:
+            return []
+
+        return self.day_tops(self.activity_start_local+timedelta(weeks=week-1))
 
 
     def week_tops(self, start=datetime.now()):
