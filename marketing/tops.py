@@ -174,3 +174,22 @@ class Top(object):
 
         return self.extract_user_list(records)
 
+    def top_prize(self):
+       weeks = [
+           {
+               "day": [
+                   {"name": "松下-F-PDF35C-G-空气净化器", "price": 699},
+                   {"name": "法国拉玛特雄狮堡干红葡萄酒", "price": 498},
+                   {"name": "小米移动电源", "price": 79},
+               ],
+               "week": [
+                   {"name": "松下-F-PDF35C-G-空气净化器", "price": 699},
+                   {"name": "松下-F-PDF35C-G-空气净化器", "price": 699},
+                   {"name": "松下-F-PDF35C-G-空气净化器", "price": 699},
+               ]
+           },
+       ]
+
+       pass
+
+
