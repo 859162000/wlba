@@ -58,6 +58,8 @@ class Top(object):
         if self.activity_start is None:
             return []
 
+        print self.activity_start, '#########'
+
         amsterdam = self.timezone_util
 
         begin = amsterdam.localize(datetime.combine(day.date(), day.min.time()))
@@ -68,9 +70,14 @@ class Top(object):
             .annotate(amount_sum=Sum('amount')) \
             .order_by('-amount_sum')[:self.num_limit]
 
+        print self.activity_start, '#########'
+
         return self.extract_user_list(records)
 
     def lastday_tops(self):
+        amsterdam = self.timezone_util
+        if ((amsterdam.localize(datetime.now())-self.activity_start_local).days == 0):
+            return []
         return self.day_tops(datetime.now()-timedelta(days=1))
 
     def allday_tops(self, start=datetime.now()):
