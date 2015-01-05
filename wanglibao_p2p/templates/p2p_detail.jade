@@ -215,7 +215,7 @@ html
                               td
                                 .phone {{day.phone | safe_phone_new}}
                               td
-                                .amount-sum {{day.amount_sum}}
+                                .amount-sum ￥{{day.amount_sum|money_format_int}}
                           else
                             tr
                               td
@@ -223,7 +223,7 @@ html
                               td
                                 .phone {{day.phone | safe_phone_new}}
                               td
-                                .amount-sum {{day.amount_sum}}
+                                .amount-sum ￥{{day.amount_sum|money_format_int}}
 
                     .tab-content#week
                       table
@@ -235,7 +235,7 @@ html
                               td
                                 .phone {{week.phone | safe_phone_new}}
                               td
-                                .amount-sum {{week.amount_sum}}
+                                .amount-sum ￥{{week.amount_sum|money_format_int}}
                           else
                             tr
                               td
@@ -243,7 +243,7 @@ html
                               td
                                 .phone {{week.phone | safe_phone_new}}
                               td
-                                .amount-sum {{week.amount_sum}}
+                                .amount-sum ￥{{week.amount_sum|money_format_int}}
 
                     .tab-content#month
                       table
@@ -255,7 +255,7 @@ html
                               td
                                 .phone {{month.phone | safe_phone_new}}
                               td
-                                .amount-sum {{month.amount_sum}}
+                                .amount-sum ￥{{month.amount_sum|money_format_int}}
                           else
                             tr
                               td
@@ -263,7 +263,7 @@ html
                               td
                                 .phone {{month.phone | safe_phone_new}}
                               td
-                                .amount-sum {{month.amount_sum}}
+                                .amount-sum ￥{{month.amount_sum|money_format_int}}
           .p2p-detail-container.guarantee-company
             h1 担保机构审核清单
             table
