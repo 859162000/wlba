@@ -1,5 +1,6 @@
 # encoding: utf-8
 from django.db import models
+from ckeditor.fields import RichTextField
 
 
 class Banner(models.Model):
@@ -49,6 +50,23 @@ class Partner(models.Model):
     alt = models.TextField(blank=True, verbose_name=u'图片说明', help_text=u'图片说明')
     priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先')
     last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'上次更新时间')
+
+    def __unicode__(self):
+        return "%s" % self.name
+
+
+class Hiring(models.Model):
+    class Meta:
+        verbose_name_plural = u'招贤纳士'
+        ordering = ['-priority', '-last_updated']
+
+    name = models.CharField(max_length=30, verbose_name=u'岗位名称', help_text=u'岗位名称')
+    duties = RichTextField(verbose_name=u'岗位职责')
+    requirements = RichTextField(verbose_name=u'任职要求')
+    is_urgent = models.BooleanField(verbose_name=u'是否紧急', default=False)
+    is_hide = models.BooleanField(verbose_name=u'是否隐藏', default=False)
+    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先', default=0)
+    last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'更新时间')
 
     def __unicode__(self):
         return "%s" % self.name

@@ -8,7 +8,7 @@ html
       include include/common_head
       meta(name="description", content="天天送不停，周周都有新花样！送，就要壕爽！")
 
-  body
+  body.body-newyear
     .full-container
       .new-year-head
         .container.activite-nav
@@ -126,27 +126,6 @@ html
                           span.top-num {{forloop.counter}}
                       td {{lastday.phone | safe_phone_new}}
                       td {{lastday.amount_sum}}
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top1
-                      span.top-num 1
-                  td 135*****345
-                  td 55,300元
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top2
-                      span.top-num 2
-                  td 135*****345
-                  td 44,300元
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top3
-                      span.top-num 3
-                  td 135*****345
-                  td 33,300元
         .space-vertical-xl
         .row.relative-top
           .span6.purple-bg
@@ -239,7 +218,7 @@ html
             table.trophy-table(cellspacing="1")
               thead
                 tr
-                  th(width="10%").font-xl 一周榜单
+                  th(width="10%").font-xl 月总榜单
                   th(width="45%") 用户
                   th(width="45%") 理财金额
               tbody
@@ -282,5 +261,38 @@ html
             .history-week-label 第一周
             .history-week-days
 
+              .days-container
+
+                .day-top
+                  .day-dot
+                  .day-label 星期一
+
+                .day-top
+                  .day-dot
+                  .day-label 星期二
+
+                .day-top
+                  .day-dot
+                  .day-label 星期三
+
+                .day-top
+                  .day-dot
+                  .day-label 星期四
+
+                .day-top
+                  .day-dot
+                  .day-label 星期五
+
+                .day-top
+                  .day-dot
+                  .day-label 星期六
+
+                .day-top
+                  .day-dot
+                  .day-label 星期日
+
 
     include include/tracking
+
+    script(src="/static/js/lib/jquery.min.js")
+    script(src="/static/js/tops.js")

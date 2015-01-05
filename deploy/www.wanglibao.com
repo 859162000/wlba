@@ -82,6 +82,15 @@ server {
         }
     }
 
+    location ~ ^/static/ckeditor/.*\.(css|js|html|htm|jpg|jpeg|gif|png|ico|pdf|doc|swf|zip|htc|xls|apk|properties|exe|ttf|woff|map|svg|eot){
+        root /var/www/wanglibao/virt-wanglibao/lib/python2.7/site-packages/ckeditor;
+        access_log off;
+        if (-f $request_filename) {
+            expires 30d;
+            break;
+        }
+    }
+
     location ~ ^/static/.*\.(css|js|html|htm|jpg|jpeg|gif|png|ico|pdf|doc|swf|zip|htc|xls|apk|properties|exe|ttf|woff|map|svg|eot){
         root /var/www/wanglibao/wanglibao-backend;
         access_log off;
