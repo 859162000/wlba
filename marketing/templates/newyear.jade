@@ -22,36 +22,17 @@ html
             .new-year-list-item
               span.icon.icon-big-trophy
               | 日榜奖品
-            .day-trophy-list
-              .day-tropht-image
-                img(src="/static/images/newyear/trophy_001.jpg")
-                span.day-trophy-num 01
-              ul
-                li 贵州茅台
-                li.highlight
-                  span.font-s 价格：￥
-                  span.font-xxll 868
-            .space-vertical-l
-            .day-trophy-list
-              .day-tropht-image
-                img(src="/static/images/newyear/trophy_001.jpg")
-                span.day-trophy-num 02
-              ul
-                li 贵州茅台
-                li.highlight
-                  span.font-s 价格：￥
-                  span.font-xxll 868
-            .space-vertical-l
-            .day-trophy-list
-              .day-tropht-image
-                img(src="/static/images/newyear/trophy_001.jpg")
-                span.day-trophy-num 03
-              ul
-                li 贵州茅台
-                li.highlight
-                  span.font-s 价格：￥
-                  span.font-xxll 868
-            .space-vertical-l
+            for prize in prizes.day
+              .day-trophy-list
+                .day-tropht-image
+                  img(src="{{prize.src}}")
+                  span.day-trophy-num 0{{forloop.counter}}
+                ul
+                  li {{prize.name}}
+                  li.highlight
+                    span.font-s 价格：￥
+                    span.font-xxll {{prize.price}}
+              .space-vertical-l
 
           .span6-omega.purple-bg
             .day-box-item
@@ -134,18 +115,25 @@ html
               | 周榜奖品
             .week-trophy-list
               .row
-                .span4
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
-                .span4
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
-                .span4-omega
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
+                for week_prize in prizes.week
+                  if forloop.counter < 3
+                    .span4
+                      img(src="{{week_prize.src}}")
+                      p {{week_prize.name}}
+                      p.highlight 价格：￥{{week_prize.price}}
+                  else
+                    .span4-omega
+                      img(src="{{week_prize.src}}")
+                      p {{week_prize.name}}
+                      p.highlight 价格：￥{{week_prize.price}}
+                //.span4
+                //  img(src="/static/images/newyear/trophy_week_001.jpg")
+                //  p ipad air 1
+                //  p.highlight 价格：￥2888
+                //.span4-omega
+                //  img(src="/static/images/newyear/trophy_week_001.jpg")
+                //  p ipad air 1
+                //  p.highlight 价格：￥2888
             .space-vertical-l
 
           .span6-omega.purple-bg
@@ -198,17 +186,17 @@ html
             .week-trophy-list
               .row
                 .span4
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
+                  img(src="/static/images/newyear/prize/month_1.jpg")
+                  p MacBook Pro Retina
+                  p.highlight 价格：￥9288
                 .span4
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
+                  img(src="/static/images/newyear/prize/month_2.jpg")
+                  p iphone6 plus 16G
+                  p.highlight 价格：￥6088
                 .span4-omega
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
+                  img(src="/static/images/newyear/prize/month_3.jpg")
+                  p 华为mate7 4G版手机
+                  p.highlight 价格：￥3800
             .space-vertical-l
 
           .span6-omega.purple-bg
@@ -291,6 +279,107 @@ html
                   .day-dot(data-day="7")
                   .day-label 星期日
 
+          .history-top-week
+            .history-week-label(data-week="2") 第二周
+            .history-week-days
+
+              .days-container
+
+                .day-top
+                  .day-dot(data-day="8")
+                  .day-label 星期一
+
+                .day-top
+                  .day-dot(data-day="9")
+                  .day-label 星期二
+
+                .day-top
+                  .day-dot(data-day="10")
+                  .day-label 星期三
+
+                .day-top
+                  .day-dot(data-day="11")
+                  .day-label 星期四
+
+                .day-top
+                  .day-dot(data-day="12")
+                  .day-label 星期五
+
+                .day-top
+                  .day-dot(data-day="13")
+                  .day-label 星期六
+
+                .day-top
+                  .day-dot(data-day="14")
+                  .day-label 星期日
+          .history-top-week
+            .history-week-label(data-week="3") 第三周
+            .history-week-days
+
+              .days-container
+
+                .day-top
+                  .day-dot(data-day="15")
+                  .day-label 星期一
+
+                .day-top
+                  .day-dot(data-day="16")
+                  .day-label 星期二
+
+                .day-top
+                  .day-dot(data-day="17")
+                  .day-label 星期三
+
+                .day-top
+                  .day-dot(data-day="18")
+                  .day-label 星期四
+
+                .day-top
+                  .day-dot(data-day="19")
+                  .day-label 星期五
+
+                .day-top
+                  .day-dot(data-day="20")
+                  .day-label 星期六
+
+                .day-top
+                  .day-dot(data-day="21")
+                  .day-label 星期日
+
+          .history-top-week
+            .history-week-label(data-week="4") 第四周
+            .history-week-days
+
+              .days-container
+
+                .day-top
+                  .day-dot(data-day="22")
+                  .day-label 星期一
+
+                .day-top
+                  .day-dot(data-day="23")
+                  .day-label 星期二
+
+                .day-top
+                  .day-dot(data-day="24")
+                  .day-label 星期三
+
+                .day-top
+                  .day-dot(data-day="25")
+                  .day-label 星期四
+
+                .day-top
+                  .day-dot(data-day="26")
+                  .day-label 星期五
+
+                .day-top
+                  .day-dot(data-day="27")
+                  .day-label 星期六
+
+                .day-top
+                  .day-dot(data-day="28")
+                  .day-label 星期日
+
       .container
         .activity-rules
           dl
@@ -331,11 +420,9 @@ html
               .footer-qr
                 img(src="/static/images/qr_only.jpg")
                 p 手机扫一下也许就能赚钱
-
     include include/tracking
 
     #future_modal.future.day-modal
-
 
     #top_modal.top-modal.day-modal
 

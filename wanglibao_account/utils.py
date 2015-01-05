@@ -253,10 +253,10 @@ class CjdaoUtils():
     @classmethod
     def post_product(cls, p2p, key):
 
-        k = (
+        k = [
             'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney',
             'loandeadline',
-            'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment')
+            'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment']
 
 
         reward = 0
@@ -274,6 +274,7 @@ class CjdaoUtils():
                 str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
                 str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
         else:
+            k.remove('incomeway')
             v = (
                 str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
                 str(expectedrate), '1', 'a', '1', '1', '1', key)
