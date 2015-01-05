@@ -418,7 +418,6 @@ class ShareUrlAPIView(APIView):
         return Response({"ret_code": 0, "message": "ok", "data": body})
 
 
-
 class TopsOfDayView(APIView):
     """
     得到某一天的排行榜
@@ -426,35 +425,42 @@ class TopsOfDayView(APIView):
     permission_classes = ()
 
     def post(self, request):
-        activity = Activity.objects.filter(description__endswith="_tops_")
-        if activity.count() == 0:
-            return Response({"ret_code": 0, "records": "nna"})
 
-        start = activity[0].start_time
+        try:
+            day = request.DATA.get('day', "")
+            top = Top()
+            records = top.certain_day(int(day))
+            isvalid = 1
+            if len(records) == 0 and (datetime.utcnow().date() - top.activity_start.date()).days > int(day):
+                isvalid = 0
+                pass
+        except Exception, e:
+            print e
+            return Response({"ret_code": -1, "records": list()})
 
-        local_time = timezone.localtime(start)
-
-        #print Top().day_tops(local_time)
-        #print Top().allday_tops(local_time)
-        print Top().all_tops()
-
-        #print Top().week_tops(datetime(2014, 12, 25))
-        #print Top().allweek_tops()
-
-
-
-        return Response({"ret_code": 0, "records": "nna"})
+        return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
 
 
 class TopsOfWeekView(APIView):
     """
     得到某一周的排行榜
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     def post(self, request):
-        print 'hello'
-        return Response({"ret_code": 0, "records": 'nono'})
+        try:
+            week = request.DATA.get('day', "")
+            top = Top()
+            records = top.certain_week(int(week))
+            isvalid = 1
+            if len(records) == 0 and (datetime.utcnow().date() - top.activity_start.date()).days > int(week):
+                isvalid = 0
+                pass
+        except Exception, e:
+            print e
+            return Response({"ret_code": -1, "records": list()})
+
+        return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
 
 class TopsOfMonthView(APIView):
     """
