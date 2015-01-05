@@ -3,10 +3,10 @@
   padding-top: 5px
 
 .job-item
-  @extend .span3
+  @extend .span4
   color: black
   font-size: $font-s
-  margin: 5px 0
+  margin: 5px 4px
 
   &:before
     content: " "
@@ -43,5 +43,8 @@
 .hiring-requirement
   @extend .hiring-position
 
-  li
+.hiring-content
+  color: lighten(black, 20%)
+  p
     color: lighten(black, 20%)
+    font-size: $font-s
