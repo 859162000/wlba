@@ -267,7 +267,7 @@ class CjdaoUtils():
         productname = p2pname.encode('utf-8')
 
         v = (
-            str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.amortization_count),
+            str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
             str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
 
         p = dict(zip(k, v))
