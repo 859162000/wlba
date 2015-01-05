@@ -22,36 +22,17 @@ html
             .new-year-list-item
               span.icon.icon-big-trophy
               | 日榜奖品
-            .day-trophy-list
-              .day-tropht-image
-                img(src="/static/images/newyear/trophy_001.jpg")
-                span.day-trophy-num 01
-              ul
-                li 贵州茅台
-                li.highlight
-                  span.font-s 价格：￥
-                  span.font-xxll 868
-            .space-vertical-l
-            .day-trophy-list
-              .day-tropht-image
-                img(src="/static/images/newyear/trophy_001.jpg")
-                span.day-trophy-num 02
-              ul
-                li 贵州茅台
-                li.highlight
-                  span.font-s 价格：￥
-                  span.font-xxll 868
-            .space-vertical-l
-            .day-trophy-list
-              .day-tropht-image
-                img(src="/static/images/newyear/trophy_001.jpg")
-                span.day-trophy-num 03
-              ul
-                li 贵州茅台
-                li.highlight
-                  span.font-s 价格：￥
-                  span.font-xxll 868
-            .space-vertical-l
+            for prize in prizes.day
+              .day-trophy-list
+                .day-tropht-image
+                  img(src="{{prize.src}}")
+                  span.day-trophy-num 0{{forloop.counter}}
+                ul
+                  li {{prize.name}}
+                  li.highlight
+                    span.font-s 价格：￥
+                    span.font-xxll {{prize.price}}
+              .space-vertical-l
 
           .span6-omega.purple-bg
             .day-box-item
@@ -126,27 +107,6 @@ html
                           span.top-num {{forloop.counter}}
                       td {{lastday.phone | safe_phone_new}}
                       td {{lastday.amount_sum}}
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top1
-                      span.top-num 1
-                  td 135*****345
-                  td 55,300元
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top2
-                      span.top-num 2
-                  td 135*****345
-                  td 44,300元
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top3
-                      span.top-num 3
-                  td 135*****345
-                  td 33,300元
         .space-vertical-xl
         .row.relative-top
           .span6.purple-bg
@@ -155,18 +115,25 @@ html
               | 周榜奖品
             .week-trophy-list
               .row
-                .span4
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
-                .span4
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
-                .span4-omega
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
+                for week_prize in prizes.week
+                  if forloop.counter < 3
+                    .span4
+                      img(src="{{week_prize.src}}")
+                      p {{week_prize.name}}
+                      p.highlight 价格：￥{{week_prize.price}}
+                  else
+                    .span4-omega
+                      img(src="{{week_prize.src}}")
+                      p {{week_prize.name}}
+                      p.highlight 价格：￥{{week_prize.price}}
+                //.span4
+                //  img(src="/static/images/newyear/trophy_week_001.jpg")
+                //  p ipad air 1
+                //  p.highlight 价格：￥2888
+                //.span4-omega
+                //  img(src="/static/images/newyear/trophy_week_001.jpg")
+                //  p ipad air 1
+                //  p.highlight 价格：￥2888
             .space-vertical-l
 
           .span6-omega.purple-bg
@@ -219,17 +186,17 @@ html
             .week-trophy-list
               .row
                 .span4
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
+                  img(src="/static/images/newyear/prize/month_1.jpg")
+                  p MacBook Pro Retina
+                  p.highlight 价格：￥9288
                 .span4
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
+                  img(src="/static/images/newyear/prize/month_2.jpg")
+                  p iphone6 plus 16G
+                  p.highlight 价格：￥6088
                 .span4-omega
-                  img(src="/static/images/newyear/trophy_week_001.jpg")
-                  p ipad air 1
-                  p.highlight 价格：￥2888
+                  img(src="/static/images/newyear/prize/month_3.jpg")
+                  p 华为mate7 4G版手机
+                  p.highlight 价格：￥3800
             .space-vertical-l
 
           .span6-omega.purple-bg
@@ -279,17 +246,58 @@ html
             .top-bar-icon
 
           .history-top-week
-            .history-week-label 第一周
+            .history-week-label(data-week="1") 第一周
             .history-week-days
 
               .days-container
 
                 .day-top
-                  .day-dot
+                  .day-dot(data-day="1")
                   .day-label 星期一
 
                 .day-top
-                  .day-dot
+                  .day-dot(data-day="2")
                   .day-label 星期二
 
+                .day-top
+                  .day-dot(data-day="3")
+                  .day-label 星期三
+
+                .day-top
+                  .day-dot(data-day="4")
+                  .day-label 星期四
+
+                .day-top
+                  .day-dot(data-day="5")
+                  .day-label 星期五
+
+                .day-top
+                  .day-dot(data-day="6")
+                  .day-label 星期六
+
+                .day-top
+                  .day-dot(data-day="7")
+                  .day-label 星期日
+
+
     include include/tracking
+
+    #future_modal.future.day-modal
+
+
+    #top_modal.top-modal.day-modal
+
+      .top-modal-content
+        table
+          colgroup
+            col.order(style="width:20%")
+            col.phone(style="width:40%")
+            col(style="width:40%")
+          thead
+            tr
+              th(colspan="3").title 日排行
+          tbody
+
+
+    script(src="/static/js/lib/jquery.min.js")
+    script(src="/static/js/tops.js")

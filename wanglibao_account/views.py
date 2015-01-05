@@ -1149,6 +1149,11 @@ class IntroduceRelation(TemplateView):
 
 
 class CjdaoApiView(APIView):
+
+    """
+        财经道入口
+    """
+
     permission_classes = ()
 
     def get(self, request):
@@ -1156,6 +1161,7 @@ class CjdaoApiView(APIView):
         phone = request.GET.get('phone')
         companyid = request.GET.get('companyid')
         thirdproductid = request.GET.get('thirdproductid')
+
         user = CjdaoUtils.get_wluser_by_phone(phone)
 
         cjdaoinfo = {
@@ -1163,7 +1169,7 @@ class CjdaoApiView(APIView):
             'companyid': companyid,
             'usertype': 0,
         }
-
+        # 保存到 session
         request.session['cjdaoinfo'] = cjdaoinfo
 
         if thirdproductid:

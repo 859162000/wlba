@@ -70,7 +70,16 @@ class Top(object):
 
         return self.extract_user_list(records)
 
+    def certain_day(self, days):
+        if days < 1 or days > 28:
+            return []
+
+        return self.day_tops(self.activity_start_local+timedelta(days-1))
+
     def lastday_tops(self):
+        amsterdam = self.timezone_util
+        if ((amsterdam.localize(datetime.now())-self.activity_start_local).days == 0):
+            return []
         return self.day_tops(datetime.now()-timedelta(days=1))
 
     def allday_tops(self, start=datetime.now()):
@@ -99,6 +108,13 @@ class Top(object):
                         {'each_day': each_day, 'user': user.wanglibaouserprofile.phone, 'amount_sum': amount_sum})
 
         return user_list
+
+    def certain_week(self, week):
+
+        if week < 1 or week > 4:
+            return []
+
+        return self.day_tops(self.activity_start_local+timedelta(weeks=week-1))
 
 
     def week_tops(self, start=datetime.now()):
@@ -157,4 +173,67 @@ class Top(object):
             .order_by('-amount_sum')[:self.num_limit]
 
         return self.extract_user_list(records)
+
+    def certain_prize(self):
+        week = (datetime.now().date()-self.activity_start_local.date()).days / 7
+
+        print 'week', week, '$$$$$$$$'
+
+        return self.top_prize(week)
+
+    def top_prize(self, index):
+        weeks = [
+            {
+                "day": [
+                    {"name": "松下-F-PDF35C-G-空气净化器", "price": 699, "src": "/static/images/newyear/prize/day_1_1.jpg"},
+                    {"name": "法国拉玛特雄狮堡干红葡萄酒", "price": 498, "src": "/static/images/newyear/prize/day_1_2.jpg"},
+                    {"name": "小米移动电源", "price": 79, "src": "/static/images/newyear/prize/day_1_3.jpg"},
+                ],
+                "week": [
+                    {"name": "乐视电视-40寸", "price": 2400, "src": "/static/images/newyear/prize/week_1_1.jpg"},
+                    {"name": "Kindle-Paperwhite", "price": 899, "src": "/static/images/newyear/prize/week_1_2.jpg"},
+                    {"name": "500元京东卡", "price": 500, "src": "/static/images/newyear/prize/week_1_3.jpg"},
+                ]
+            },
+            {
+                "day": [
+                    {"name": "53°贵州茅台", "price": 868, "src": "/static/images/newyear/prize/day_2_1.jpg"},
+                    {"name": "300元京东卡", "price": 300, "src": "/static/images/newyear/prize/day_2_2.jpg"},
+                    {"name": "法国梅多克中级庄 干红葡萄酒", "price": 89, "src": "/static/images/newyear/prize/day_2_3.jpg"},
+                ],
+                "week": [
+                    {"name": "ipad-air-1", "price": 2400, "src": "/static/images/newyear/prize/week_2_1.jpg"},
+                    {"name": "Kindle-Paperwhite", "price": 899, "src": "/static/images/newyear/prize/week_2_2.jpg"},
+                    {"name": "500元京东卡", "price": 500, "src": "/static/images/newyear/prize/week_2_3.jpg"},
+                ]
+            },
+            {
+                "day": [
+                    {"name": "松下-F-PDF35C-G-空气净化器", "price": 699, "src": "/static/images/newyear/prize/day_3_1.jpg"},
+                    {"name": "法国拉玛特雄狮堡干红葡萄酒", "price": 498, "src": "/static/images/newyear/prize/day_3_2.jpg"},
+                    {"name": "小米移动电源", "price": 79, "src": "/static/images/newyear/prize/day_3_3.jpg"},
+                ],
+                "week": [
+                    {"name": "乐视电视-40寸", "price": 2400, "src": "/static/images/newyear/prize/week_3_1.jpg"},
+                    {"name": "Kindle-Paperwhite", "price": 899, "src": "/static/images/newyear/prize/week_3_2.jpg"},
+                    {"name": "500元京东卡", "price": 500, "src": "/static/images/newyear/prize/week_3_3.jpg"},
+                ]
+            },
+            {
+                "day": [
+                    {"name": "53°贵州茅台", "price": 868, "src": "/static/images/newyear/prize/day_4_1.jpg"},
+                    {"name": "300元京东卡", "price": 300, "src": "/static/images/newyear/prize/day_4_2.jpg"},
+                    {"name": "法国梅多克中级庄 干红葡萄酒", "price": 89, "src": "/static/images/newyear/prize/day_4_3.jpg"},
+                ],
+                "week": [
+                    {"name": "乐视电视-40寸", "price": 2400, "src": "/static/images/newyear/prize/week_4_1.jpg"},
+                    {"name": "Kindle-Paperwhite", "price": 899, "src": "/static/images/newyear/prize/week_4_2.jpg"},
+                    {"name": "500元京东卡", "price": 500, "src": "/static/images/newyear/prize/week_4_3.jpg"},
+                ]
+            },
+        ]
+
+
+        return weeks[index]
+
 

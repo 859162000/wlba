@@ -17,7 +17,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from wanglibao_margin.models import Margin
 from django.db.models import Sum
-
+from marketing.models import ClientData
 
 logger = logging.getLogger(__name__)
 storage = DefaultStorage()
@@ -486,7 +486,6 @@ class MarginReportGenerator(ReportGeneratorBase):
         freeze = Margin.objects.all().aggregate(Sum('freeze'))['freeze__sum']
         withdrawing = Margin.objects.all().aggregate(Sum('withdrawing'))['withdrawing__sum']
 
-
         writer.writerow([
             str(margin),
             str(freeze),
@@ -551,6 +550,32 @@ class UserReportGenerator(ReportGeneratorBase):
         report.content = content
         report.save()
         return report
+
+
+class ClientInfoGenerator(ReportGeneratorBase):
+    prefix = 'khdxx'
+    reportname_format = u'客户端信息 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'id', u'版本', u'设备', u'网络', u'渠道', u'手机号', u'动作', u'时间'])
+
+        clientdatas = ClientData.objects.filter(create_time__gte=start_time, create_time__lt=end_time)
+
+        for index, clientinfo in enumerate(clientdatas):
+            writer.writerow([
+                str(index + 1),
+                str(clientinfo.version),
+                str(clientinfo.userdevice),
+                str(clientinfo.network),
+                str(clientinfo.channelid),
+                str(clientinfo.phone),
+                str(clientinfo.action),
+                timezone.localtime(clientinfo.create_time).strftime("%Y-%m-%d %H:%M:%S")
+            ])
+            return output.getvalue()
 
 
 class ReportGenerator(object):
