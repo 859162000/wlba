@@ -126,27 +126,6 @@ html
                           span.top-num {{forloop.counter}}
                       td {{lastday.phone | safe_phone_new}}
                       td {{lastday.amount_sum}}
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top1
-                      span.top-num 1
-                  td 135*****345
-                  td 55,300元
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top2
-                      span.top-num 2
-                  td 135*****345
-                  td 44,300元
-                tr
-                  td
-                    .table-top-list-bg
-                      span.icon.icon-day-top3
-                      span.top-num 3
-                  td 135*****345
-                  td 33,300元
         .space-vertical-xl
         .row.relative-top
           .span6.purple-bg
@@ -292,4 +271,28 @@ html
                   .day-dot
                   .day-label 星期二
 
+                .day-top
+                  .day-dot
+                  .day-label 星期三
+
+                .day-top
+                  .day-dot
+                  .day-label 星期四
+
+                .day-top
+                  .day-dot
+                  .day-label 星期五
+
+                .day-top
+                  .day-dot
+                  .day-label 星期六
+
+                .day-top
+                  .day-dot
+                  .day-label 星期日
+
+
     include include/tracking
+
+    script(src="/static/js/lib/jquery.min.js")
+    script(src="/static/js/tops.js")
