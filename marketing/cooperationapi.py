@@ -79,7 +79,7 @@ class HeXunListAPI(APIView):
                 "fld_finance_left": p2p.total_amount - p2p.ordered_amount,
                 "fld_lendname": p2p.borrower_name,
                 "fld_lendway": p2p.short_usage,
-                "fld_netaddress": 'https://{}/p2p/detail/{}'.format(request.get_host(), p2p.id),
+                "fld_netaddress": 'https://{}/p2p/detail/{}?promo_token=hexunw'.format(request.get_host(), p2p.id),
                 "fld_status": 1,
                 "fld_status_name": u'筹款中'
             }
@@ -293,7 +293,7 @@ class WangdaiEyeListAPIView(APIView):
                 obj = {
                     "id": str(p2pproduct.id),
                     "platform_name": u"网利宝",
-                    "url": "https://{}/p2p/detail/{}".format(request.get_host(), p2pproduct.id),
+                    "url": "https://{}/p2p/detail/{}?promo_token=da57ku".format(request.get_host(), p2pproduct.id),
                     "title": p2pproduct.name,
                     "username": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
                     "status": status,
@@ -379,7 +379,7 @@ class WangdaiEyeEquityAPIView(APIView):
         for eq in equities:
             obj = {
                 "id": str(p2pproduct.id),
-                "link": "https://{}/p2p/detail/{}".format(request.get_host(), p2pproduct.id),
+                "link": "https://{}/p2p/detail/{}?promo_token=da57ku".format(request.get_host(), p2pproduct.id),
                 "useraddress": "null",
                 "username": eq.user.username,
                 "userid": str(eq.user.id),
@@ -445,7 +445,7 @@ class XunleiP2PListAPIView(APIView):
                 'finance_left': float(p2pproduct.remain),
                 'repayment_period': p2pproduct.period * 30,
                 'repayment_type': XUNLEI_PAY_WAY.get(p2pproduct.pay_method, 0),
-                'buy_url': 'https://{}/p2p/detail/{}'.format(request.get_host(), p2pproduct.id),
+                'buy_url': 'https://{}/p2p/detail/{}?promo_token=xunlei'.format(request.get_host(), p2pproduct.id),
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
                 'status': p2pproduct.status
@@ -501,7 +501,7 @@ class XunleiP2PbyUser(APIView):
             obj = {
                 'id': p2pproduct.id,
                 'title': p2pproduct.name,
-                'title_url': 'https://{}/p2p/detail/{}?xluid={}'.format(reqeust.get_host(), p2pproduct.id, uid),
+                'title_url': 'https://{}/p2p/detail/{}?xluid={}&promo_token=xunlei'.format(reqeust.get_host(), p2pproduct.id, uid),
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
                 'expected_income': float(expected_income),

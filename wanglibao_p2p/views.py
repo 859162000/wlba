@@ -40,6 +40,7 @@ from wanglibao_pay.util import get_a_uuid
 from django.contrib import messages
 from django.shortcuts import redirect, render_to_response
 from marketing.utils import save_client
+from marketing.tops import Top
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -87,6 +88,11 @@ class P2PDetailView(TemplateView):
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
 
         site_data = SiteData.objects.all()[0]
+        #排行榜
+
+        day_tops = Top().day_tops()
+        week_tops = Top().week_tops()
+        all_tops = Top().all_tops()
 
         context.update({
             'p2p': p2p,
@@ -98,7 +104,10 @@ class P2PDetailView(TemplateView):
             'site_data': site_data,
             'attachments': p2p.attachment_set.all(),
             'announcements': AnnouncementP2P,
-            'total_fee_earning': total_fee_earning
+            'total_fee_earning': total_fee_earning,
+            'day_tops': day_tops,
+            'week_tops': week_tops,
+            'all_tops': all_tops
         })
 
         return context

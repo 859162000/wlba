@@ -14,6 +14,7 @@ from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
 from wanglibao_account.views import CjdaoApiView
+from wanglibao_banner.views import HiringView
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
@@ -55,7 +56,7 @@ urlpatterns = patterns(
     url(r'^pay/', include('wanglibao_pay.urls')),
 
     # url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
-    url(r'^hiring/', TemplateView.as_view(template_name="hiring.jade")),
+    url(r'^hiring/', HiringView.as_view(), name="hiring"),
     url(r'^about/', TemplateView.as_view(template_name="about.jade")),
     url(r'^company/', TemplateView.as_view(template_name="company.jade")),
     url(r'^team/', TemplateView.as_view(template_name="team.jade")),

@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.db.models import Sum
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
     PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator, \
-    EearningReportGenerator, WithDrawDetailReportGenerator, P2PstatusReportGenerator, MarginReportGenerator
+    EearningReportGenerator, WithDrawDetailReportGenerator, P2PstatusReportGenerator, ClientInfoGenerator
 from wanglibao_margin.models import Margin
 
 type = (
@@ -21,6 +21,7 @@ type = (
     (u'赠送记录', 6),
     (u'提现详细记录', 7),
     (u'满标状态变化', 8),
+    (u'客户端信息', 9),
 )
 
 
@@ -67,6 +68,8 @@ class AdminReportExport(TemplateView):
             self._generate_withdrawdetail(request, start_time, end_time)
         if type == '8':
             self._generate_p2pstatus(request, start_time, end_time)
+        if type == '9':
+            self._generate_clientinfo(request, start_time, end_time)
 
         return HttpResponseRedirect('export')
 
@@ -96,6 +99,9 @@ class AdminReportExport(TemplateView):
 
     def _generate_p2pstatus(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, P2PstatusReportGenerator, u'满标状态变化')
+
+    def _generate_clientinfo(self, request, start_time, end_time):
+        self._apply_generate(request, start_time, end_time, ClientInfoGenerator, u'客户端信息')
 
     def _apply_generate(self, request, start_time, end_time, cls, message=''):
         try:
