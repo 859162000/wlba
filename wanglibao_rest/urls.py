@@ -32,7 +32,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
-                            LatestDataAPIView, ShareUrlAPIView)
+                            LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView)
 
 
 router = DefaultRouter()
@@ -134,6 +134,8 @@ urlpatterns = patterns(
     url(r'^kuaipan/purchaselist/$', KuaipanPurchaseListAPIView.as_view()),
     url(r'^platform/latestdata/$', LatestDataAPIView.as_view()),
     url(r'^shareurl/$', ShareUrlAPIView.as_view()),
+    url(r'^gettopofday/$', TopsOfDayView.as_view()),
+    url(r'^gettopofweek/$', TopsOfWeekView.as_view()),
 )
 
 urlpatterns += patterns('',

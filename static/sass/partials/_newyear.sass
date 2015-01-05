@@ -1,0 +1,356 @@
+.body-newyear
+  background: url("/static/images/newyear/body_bg.jpg") repeat
+
+.activite-nav
+  position: relative
+  top: 10px
+  font-size: $font-s
+  text-align: right
+
+  a
+    +inline-block
+    padding: 0 15px
+    color: $color-white
+
+.new-year-head
+  height: 800px
+  background: url("/static/images/newyear/head_bg.jpg") no-repeat center top
+
+.new-year-time
+  position: relative
+  top: -100px
+  height: 220px
+  background: #532399 url("/static/images/newyear/activity_time.png") no-repeat left top
+
+.relative-top
+  position: relative
+  top: -50px
+.purple-bg
+  background: #532399
+
+.new-year-list-item
+  font-size: $font-xll
+  padding: 0 $space-sm
+  color: $color-white
+
+.icon-big-trophy
+  width: 60px
+  height: 75px
+  top: -20px
+  background: url("/static/images/newyear/icons.png") no-repeat 0 0
+
+.day-trophy-list
+  +clearfix
+  border-top: solid 1px #654990
+  margin: 0 30px
+  padding-bottom: 5px
+
+  .day-tropht-image
+    position: relative
+    width: 190px
+    height: 130px
+    float: left
+
+    .day-trophy-num
+      position: absolute
+      top: 0
+      left: 0
+      background: $color-red
+      color: $color-white
+      width: 20px
+      height: 20px
+      text-align: center
+      font-weight: 800
+
+  ul
+    float: left
+    padding-top: 20px
+    padding-left: 30px
+    color: $color-white
+    font-size: $font-l
+    line-height: 40px
+
+.week-trophy-list
+  +clearfix
+  margin: 0 30px
+  text-align: center
+  color: $color-white
+  p
+    font-size: $font-s
+
+.day-box-item
+  color: $color-white
+  padding: 10px 20px
+
+table.trophy-table
+  width: 100%
+  font-size: 14px
+  color: $color-white
+  border-top: solid 1px #654990
+  border-bottom: solid 2px #2b006a
+  position: relative
+  th,td
+    text-align: center
+  thead
+    color: $color-orange
+    line-height: 50px
+    background: #532399
+    tr
+      th
+        border-left: solid 1px #654990
+        border-bottom: solid 1px #654990
+        &:first-child
+          border-left: 0
+  tbody
+    tr
+      background: #6e48a4
+      line-height: 50px
+      height: 50px
+      td
+        border-left: solid 1px #5f349c
+        border-bottom: solid 1px #5f349c
+        position: relative
+    .color-orange
+      td
+        color: $color-orange
+
+
+.table-top-list-bg
+  position: relative
+  z-index: 9
+  width: 138px
+  height: 50px
+  overflow: hidden
+
+  .top-num
+    color: $color-orange
+    font-size: $font-l
+
+.table-top-list-bg1
+  position: relative
+  z-index: 99
+  background: url("/static/images/newyear/icons.png") no-repeat -180px 0
+.table-top-list-bg2
+  position: relative
+  z-index: 99
+  background: url("/static/images/newyear/icons.png") no-repeat -180px -50px
+.table-top-list-bg3
+  position: relative
+  z-index: 99
+  background: url("/static/images/newyear/icons.png") no-repeat -180px -100px
+
+.icon-day-top1
+  width: 36px
+  height: 38px
+  left: -15px
+  margin-right: 5px
+  background: url("/static/images/newyear/icons.png") no-repeat -70px 0px
+
+.icon-day-top2
+  width: 36px
+  height: 38px
+  left: -15px
+  margin-right: 5px
+  background: url("/static/images/newyear/icons.png") no-repeat -70px -50px
+.icon-day-top3
+  width: 36px
+  height: 38px
+  left: -15px
+  margin-right: 5px
+  background: url("/static/images/newyear/icons.png") no-repeat -70px -100px
+
+.icon-day-top-arr
+  width: 36px
+  height: 38px
+  left: -15px
+  margin-right: 5px
+  background: url("/static/images/newyear/icons.png") no-repeat 6px -97px
+
+.icon-week-top1
+  width: 36px
+  height: 38px
+  left: -15px
+  margin-right: 5px
+  background: url("/static/images/newyear/icons.png") no-repeat -121px 0px
+
+.icon-week-top2
+  width: 36px
+  height: 38px
+  left: -15px
+  margin-right: 5px
+  background: url("/static/images/newyear/icons.png") no-repeat -121px -50px
+.icon-week-top3
+  width: 36px
+  height: 38px
+  left: -15px
+  margin-right: 5px
+  background: url("/static/images/newyear/icons.png") no-repeat -121px -100px
+
+
+.history-top
+  padding-bottom: 40px
+
+.history-top-bar
+  background: #8658bb
+  height: 60px
+  line-height: 60px
+  border-bottom: 3px solid #7442bb
+  padding-left: 20px
+  font-size: 20px
+  color: #fff
+  position: relative
+  margin-bottom: 40px
+
+  .top-bar-icon
+    width: 480px
+    height: 119px
+    background: url('/static/images/newyear/icons.png') no-repeat -3px -154px
+    position: absolute
+    top: -61px
+    left: 260px
+
+
+.history-top-week
+  background: #b090dc
+  height: 100px
+  border-top: 1px solid #7442bb
+  margin-bottom: 20px
+  .history-week-label
+    background: #532399
+    font-size: 28px
+    line-height: 100px
+    color: #f6c928
+    width: 120px
+    text-align: center
+    float: left
+    cursor: pointer
+
+  .history-week-days
+    overflow: hidden
+    zoom: 1
+
+  .days-container
+    border-top: 5px solid #532399
+    width: 850px
+    height: 30px
+    margin-top: 46px
+
+    .day-top
+      float: left
+      margin-left: 35px
+      color: #532399
+      margin-top: -12px
+      width: 80px
+
+      .day-dot
+        background-color: #532399
+        width: 20px
+        height: 20px
+        margin: 0px auto
+        @include border-radius(10px)
+        cursor: pointer
+
+
+      .day-label
+        text-align: center
+        margin-top: 10px
+
+
+.top-modal
+  position: absolute
+  width: 300px
+  background-color: #dac0ff
+  border: 1px solid #2b006b
+  display: none
+  table
+    width: 100%
+    thead
+      tr
+        th
+          background-color: #532399
+          height: 40px
+          line-height: 40px
+          color: #fb5360
+          font-size: 14px
+          padding-left: 20px
+    tbody
+      tr
+        td
+          height: 40px
+          line-height: 40px
+          color: #532399
+          text-align: center
+          border-right: 1px solid #b898e1
+          border-bottom: 1px solid #b898e1
+
+
+.future
+  background: url("/static/images/newyear/future.jpg") no-repeat center center
+  width: 160px
+  height: 160px
+  border: 1px solid #532399
+  position: absolute
+  display: none
+
+.activity-rules
+  background: #532399
+  padding-bottom: 20px
+  dl
+    color: #DDDDDD
+    dt
+      font-size: $font-xl
+      font-weight: 800
+      padding: 15px 40px
+      border-bottom: solid 1px #654990
+      margin-bottom: 20px
+    dd
+      padding: 0 40px
+      line-height: 26px
+      font-size: $font-s
+.new-year-footer
+  background: #532399
+  padding: 40px 0
+  color: #DDDDDD
+
+.footer-logo
+  background: url("/static/images/logo-footer.png") no-repeat
+  height: 60px
+  margin-bottom: 40px
+
+.icon-weixin-white
+  width: 28px
+  height: 23px
+  margin-right: 5px
+  top: -5px
+  background: url("/static/images/icon-public.png") no-repeat -564px -160px
+.icon-qq-white
+  width: 17px
+  height: 20px
+  margin-right: 5px
+  top: -3px
+  background: url("/static/images/icon-public.png") no-repeat -538px -160px
+.icon-tel-white
+  width: 13px
+  height: 20px
+  margin-right: 5px
+  top: -4px
+  background: url("/static/images/icon-public.png") no-repeat -539px -192px
+.icon-itrust
+  width: 45px
+  height: 45px
+  background: url("/static/images/icon-auth-footer.png") no-repeat 0 -75px
+.icon-comodo
+  width: 70px
+  height: 45px
+  top: -2px
+  margin-left: 20px
+  background: url("/static/images/icon-auth-footer.png") no-repeat 0 -125px
+.new-year-copyright
+  padding-top: 10px
+
+.footer-qr
+  position: relative
+  top: -10px
+  text-align: center
+  p
+    padding-top: 5px

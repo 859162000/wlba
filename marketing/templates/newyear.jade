@@ -1,0 +1,455 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    - with '送，就要壕爽！' as title
+      include include/common_head
+      meta(name="description", content="天天送不停，周周都有新花样！送，就要壕爽！")
+
+  body.body-newyear
+    .full-container
+      .new-year-head
+        .container.activite-nav
+          if user.is_authenticated
+            a(href="/accounts/home") {{user | display_name}} 的账户
+            a.logout(href="/accounts/logout?next={{ request.path }}") 退出
+          else
+            a(href="/accounts/login/?next=/activity/newyear/", target="_blank") 登录
+            a(href="/accounts/register/?next=/activity/newyear/", target="_blank") 注册
+          span.mobile-app-top
+            a(href="/", target="_blank") 下载APP
+            .mobile-app-top-prompt
+              div(style="height:30px; top:-20px; position:relative;")
+              a.mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+              a.mobile-app-android(href="https://www.wanglibao.com/static/wanglibao.apk", title="Android版")
+          a(href="/", target="_blank") 网利宝官网
+      .container
+        .new-year-time
+        .row.relative-top
+          .span6.purple-bg
+            .new-year-list-item
+              span.icon.icon-big-trophy
+              | 日榜奖品
+            for prize in prizes.day
+              .day-trophy-list
+                .day-tropht-image
+                  img(src="{{prize.src}}")
+                  span.day-trophy-num 0{{forloop.counter}}
+                ul
+                  li {{prize.name}}
+                  li.highlight
+                    span.font-s 价格：￥
+                    span.font-xxll {{prize.price}}
+              .space-vertical-l
+
+          .span6-omega.purple-bg
+            .day-box-item
+              span.font-xxl 日榜：
+              | 每天统计一次投资金额，及时更新；前3名有奖；次日清零
+            table.trophy-table(cellspacing="1")
+              thead
+                tr
+                  th(width="10%").font-xl 今日榜单
+                  th(width="45%") 用户
+                  th(width="45%") 理财金额
+              tbody
+                for day in day_tops
+                  if forloop.counter < 4
+                    tr.color-orange
+                      td
+                        if forloop.counter == 1
+                          .table-top-list-bg.table-top-list-bg1
+                            span.icon.icon-day-top1
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 2
+                          .table-top-list-bg.table-top-list-bg2
+                            span.icon.icon-day-top2
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 3
+                          .table-top-list-bg.table-top-list-bg3
+                            span.icon.icon-day-top3
+                            span.top-num {{forloop.counter}}
+
+                      td {{day.phone | safe_phone_new}}
+                      td {{day.amount_sum}}元
+                  else
+                    tr
+                      td
+                        .table-top-list-bg
+                          span.icon.icon-day-top-arr
+                          span.top-num {{forloop.counter}}
+                      td {{day.phone | safe_phone_new}}
+                      td {{day.amount_sum}}
+
+            table.trophy-table(cellspacing="1")
+              thead
+                tr
+                  th(width="100").font-xl 昨日榜单
+                  th 用户
+                  th 理财金额
+              tbody
+                for lastday in lastday_tops
+                  if forloop.counter < 4
+                    tr.color-orange
+                      td
+                        if forloop.counter == 1
+                          .table-top-list-bg
+                            span.icon.icon-day-top1
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 2
+                          .table-top-list-bg
+                            span.icon.icon-day-top2
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 3
+                          .table-top-list-bg
+                            span.icon.icon-day-top3
+                            span.top-num {{forloop.counter}}
+
+                      td {{lastday.phone | safe_phone_new}}
+                      td {{lastday.amount_sum}}元
+                  else
+                    tr
+                      td
+                        .table-top-list-bg
+                          span.icon.icon-day-top-arr
+                          span.top-num {{forloop.counter}}
+                      td {{lastday.phone | safe_phone_new}}
+                      td {{lastday.amount_sum}}
+        .space-vertical-xl
+        .row.relative-top
+          .span6.purple-bg
+            .new-year-list-item
+              span.icon.icon-big-trophy
+              | 周榜奖品
+            .week-trophy-list
+              .row
+                for week_prize in prizes.week
+                  if forloop.counter < 3
+                    .span4
+                      img(src="{{week_prize.src}}")
+                      p {{week_prize.name}}
+                      p.highlight 价格：￥{{week_prize.price}}
+                  else
+                    .span4-omega
+                      img(src="{{week_prize.src}}")
+                      p {{week_prize.name}}
+                      p.highlight 价格：￥{{week_prize.price}}
+                //.span4
+                //  img(src="/static/images/newyear/trophy_week_001.jpg")
+                //  p ipad air 1
+                //  p.highlight 价格：￥2888
+                //.span4-omega
+                //  img(src="/static/images/newyear/trophy_week_001.jpg")
+                //  p ipad air 1
+                //  p.highlight 价格：￥2888
+            .space-vertical-l
+
+          .span6-omega.purple-bg
+            .day-box-item
+              span.font-xxl 周榜：
+              | 每周统计一次投资金额，前3名有奖，下周清零
+            table.trophy-table(cellspacing="1")
+              thead
+                tr
+                  th(width="10%").font-xl 一周榜单
+                  th(width="45%") 用户
+                  th(width="45%") 理财金额
+              tbody
+                for week in week_tops
+                  if forloop.counter < 4
+                    tr
+                      td
+                        if forloop.counter == 1
+                          .table-top-list-bg
+                            span.icon.icon-week-top1
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 2
+                          .table-top-list-bg
+                            span.icon.icon-week-top2
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 3
+                          .table-top-list-bg
+                            span.icon.icon-week-top3
+                            span.top-num {{forloop.counter}}
+
+                      td {{week.phone | safe_phone_new}}
+                      td {{week.amount_sum}}元
+                  else
+                    tr
+                      td
+                        .table-top-list-bg
+                          span.icon.icon-day-top-arr
+                          span.top-num {{forloop.counter}}
+                      td {{week.phone | safe_phone_new}}
+                      td {{week.amount_sum}}
+
+
+
+        .space-vertical-xl
+        .row.relative-top
+          .span6.purple-bg
+            .new-year-list-item
+              span.icon.icon-big-trophy
+              | 总榜奖品
+            .week-trophy-list
+              .row
+                .span4
+                  img(src="/static/images/newyear/prize/month_1.jpg")
+                  p MacBook Pro Retina
+                  p.highlight 价格：￥9288
+                .span4
+                  img(src="/static/images/newyear/prize/month_2.jpg")
+                  p iphone6 plus 16G
+                  p.highlight 价格：￥6088
+                .span4-omega
+                  img(src="/static/images/newyear/prize/month_3.jpg")
+                  p 华为mate7 4G版手机
+                  p.highlight 价格：￥3800
+            .space-vertical-l
+
+          .span6-omega.purple-bg
+            .day-box-item
+              span.font-xxl 总榜：
+              | 在活动期间内，在活动期间按照投资额排序，前3名有奖
+            table.trophy-table(cellspacing="1")
+              thead
+                tr
+                  th(width="10%").font-xl 月总榜单
+                  th(width="45%") 用户
+                  th(width="45%") 理财金额
+              tbody
+                for month in month_tops
+                  if forloop.counter < 4
+                    tr
+                      td
+                        if forloop.counter == 1
+                          .table-top-list-bg
+                            span.icon.icon-week-top1
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 2
+                          .table-top-list-bg
+                            span.icon.icon-week-top2
+                            span.top-num {{forloop.counter}}
+                        elif forloop.counter == 3
+                          .table-top-list-bg
+                            span.icon.icon-week-top3
+                            span.top-num {{forloop.counter}}
+
+                      td {{month.phone | safe_phone_new}}
+                      td {{month.amount_sum}}元
+                  else
+                    tr
+                      td
+                        .table-top-list-bg
+                          span.icon.icon-day-top-arr
+                          span.top-num {{forloop.counter}}
+                      td {{month.phone | safe_phone_new}}
+                      td {{month.amount_sum}}
+
+        .space-vertical-xl
+        .row.history-top
+
+          .history-top-bar
+            获奖用户
+            .top-bar-icon
+
+          .history-top-week
+            .history-week-label(data-week="1") 第一周
+            .history-week-days
+
+              .days-container
+
+                .day-top
+                  .day-dot(data-day="1")
+                  .day-label 星期一
+
+                .day-top
+                  .day-dot(data-day="2")
+                  .day-label 星期二
+
+                .day-top
+                  .day-dot(data-day="3")
+                  .day-label 星期三
+
+                .day-top
+                  .day-dot(data-day="4")
+                  .day-label 星期四
+
+                .day-top
+                  .day-dot(data-day="5")
+                  .day-label 星期五
+
+                .day-top
+                  .day-dot(data-day="6")
+                  .day-label 星期六
+
+                .day-top
+                  .day-dot(data-day="7")
+                  .day-label 星期日
+
+          .history-top-week
+            .history-week-label(data-week="2") 第二周
+            .history-week-days
+
+              .days-container
+
+                .day-top
+                  .day-dot(data-day="8")
+                  .day-label 星期一
+
+                .day-top
+                  .day-dot(data-day="9")
+                  .day-label 星期二
+
+                .day-top
+                  .day-dot(data-day="10")
+                  .day-label 星期三
+
+                .day-top
+                  .day-dot(data-day="11")
+                  .day-label 星期四
+
+                .day-top
+                  .day-dot(data-day="12")
+                  .day-label 星期五
+
+                .day-top
+                  .day-dot(data-day="13")
+                  .day-label 星期六
+
+                .day-top
+                  .day-dot(data-day="14")
+                  .day-label 星期日
+          .history-top-week
+            .history-week-label(data-week="3") 第三周
+            .history-week-days
+
+              .days-container
+
+                .day-top
+                  .day-dot(data-day="15")
+                  .day-label 星期一
+
+                .day-top
+                  .day-dot(data-day="16")
+                  .day-label 星期二
+
+                .day-top
+                  .day-dot(data-day="17")
+                  .day-label 星期三
+
+                .day-top
+                  .day-dot(data-day="18")
+                  .day-label 星期四
+
+                .day-top
+                  .day-dot(data-day="19")
+                  .day-label 星期五
+
+                .day-top
+                  .day-dot(data-day="20")
+                  .day-label 星期六
+
+                .day-top
+                  .day-dot(data-day="21")
+                  .day-label 星期日
+
+          .history-top-week
+            .history-week-label(data-week="4") 第四周
+            .history-week-days
+
+              .days-container
+
+                .day-top
+                  .day-dot(data-day="22")
+                  .day-label 星期一
+
+                .day-top
+                  .day-dot(data-day="23")
+                  .day-label 星期二
+
+                .day-top
+                  .day-dot(data-day="24")
+                  .day-label 星期三
+
+                .day-top
+                  .day-dot(data-day="25")
+                  .day-label 星期四
+
+                .day-top
+                  .day-dot(data-day="26")
+                  .day-label 星期五
+
+                .day-top
+                  .day-dot(data-day="27")
+                  .day-label 星期六
+
+                .day-top
+                  .day-dot(data-day="28")
+                  .day-label 星期日
+
+      .container
+        .activity-rules
+          dl
+            dt 活动规则
+            dd 1、奖品统一于活动结束后7个工作日（2015年2月10日）内开始发放；
+            dd 2、由于实物奖品快递需要，获奖用户请提交真实 “姓名、手机号、身份证、通讯地址” 至
+              span.orange-text  kefu@wanglibank.com
+              |；
+            dd 3、本活动不收取任何费用，谨防上当受骗；
+            dd 4、网利宝对此活动享有最终解释权。
+      .space-vertical-l
+      .full-container.new-year-footer
+        .container
+          .row
+            .span10
+              .footer-logo
+                a(href="/")
+              .row
+                .span9
+                  .row.font-s
+                    .span4
+                      span.icon.icon-weixin-white
+                      | 官方微信：
+                      span.font-weight iwanglibao
+                    .span4
+                      span.icon.icon-qq-white
+                      | 在线客服：
+                      span.font-weight 4008 588 066
+                    .span4-omega
+                      span.icon.icon-tel-white
+                      | 客服电话：
+                      span.font-weight 4008 588 066
+                  .new-year-copyright Copyright&copy;2014-2015 wanglibao.com Inc. All Rigth Reserved. 北京网利科技有限公司 此次活动解释权归网利宝官方网站所有
+                .span3-omega
+                  span.icon.icon-itrust
+                  span.icon.icon-comodo
+            .span2-omega
+              .footer-qr
+                img(src="/static/images/qr_only.jpg")
+                p 手机扫一下也许就能赚钱
+    include include/tracking
+
+    #future_modal.future.day-modal
+
+    #top_modal.top-modal.day-modal
+
+      .top-modal-content
+        table
+          colgroup
+            col.order(style="width:20%")
+            col.phone(style="width:40%")
+            col(style="width:40%")
+          thead
+            tr
+              th(colspan="3").title 日排行
+          tbody
+
+
+    script(src="/static/js/lib/jquery.min.js")
+    script(src="/static/js/tops.js")
+    script.
+      var v = new Date().getTime()
+      require(['/static/js/hover.js?v='+v])

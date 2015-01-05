@@ -31,6 +31,7 @@ from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization
+from marketing.models import Activity
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from wanglibao_sms import messages, backends
 from django.utils import timezone
@@ -42,6 +43,7 @@ from wanglibao_rest.utils import search
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
 from marketing.utils import save_client
+from marketing.tops import Top
 
 
 logger = logging.getLogger(__name__)
@@ -415,6 +417,60 @@ class ShareUrlAPIView(APIView):
             body = {}
         return Response({"ret_code": 0, "message": "ok", "data": body})
 
+
+class TopsOfDayView(APIView):
+    """
+    得到某一天的排行榜
+    """
+    permission_classes = ()
+
+    def post(self, request):
+
+        try:
+            day = request.DATA.get('day', "")
+            top = Top()
+            records = top.certain_day(int(day))
+            isvalid = 1
+            if len(records) == 0 and (datetime.utcnow().date() - top.activity_start.date()).days > int(day):
+                isvalid = 0
+                pass
+        except Exception, e:
+            print e
+            return Response({"ret_code": -1, "records": list()})
+
+        return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
+
+
+class TopsOfWeekView(APIView):
+    """
+    得到某一周的排行榜
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        try:
+            week = request.DATA.get('day', "")
+            top = Top()
+            records = top.certain_week(int(week))
+            isvalid = 1
+            if len(records) == 0 and (datetime.utcnow().date() - top.activity_start.date()).days > int(week):
+                isvalid = 0
+                pass
+        except Exception, e:
+            print e
+            return Response({"ret_code": -1, "records": list()})
+
+        return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
+
+class TopsOfMonthView(APIView):
+    """
+    得到某一月的排行榜
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        print 'hello'
+        return Response({"ret_code": 0, "message":"ok"})
 
 class UserExisting(APIView):
     permission_classes = ()
