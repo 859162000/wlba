@@ -57,14 +57,6 @@ class Top(object):
 
         return user_list
 
-        # user_list = [{
-        #         'id': record['user'],
-        #         'amount_sum': record['amount_sum'],
-        #         'phone': record.user.wanglibaouserprofile.phone
-        #     } for record in p2p_records]
-        # return user_list
-
-
 
     def day_tops(self, day):
 
@@ -182,8 +174,9 @@ class Top(object):
 
         begin = amsterdam.localize(
             datetime.combine(self.activity_start_local.date(), self.activity_start_local.min.time()))
-        end = amsterdam.localize(datetime.combine((self.activity_start_local + timedelta(days=28)).date(),
-                                                  self.activity_start_local.min.time()))
+        end_local = self.activity_start_local + timedelta(days=27)
+        end = amsterdam.localize(datetime.combine(end_local.date(),
+                                                  end_local.max.time()))
 
         records = P2PRecord.objects.filter(create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
                                            , catalog='申购') \
@@ -195,8 +188,6 @@ class Top(object):
 
     def certain_prize(self):
         week = (datetime.now().date()-self.activity_start_local.date()).days / 7
-
-        print 'week', week, '$$$$$$$$'
 
         return self.top_prize(week)
 

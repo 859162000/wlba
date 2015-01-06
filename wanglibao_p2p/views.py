@@ -90,8 +90,9 @@ class P2PDetailView(TemplateView):
         site_data = SiteData.objects.all()[0]
         #排行榜
 
-        day_tops = Top().day_tops()
-        week_tops = Top().week_tops()
+        top = Top()
+        day_tops = top.day_tops(datetime.datetime.now())
+        week_tops = Top().week_tops(datetime.datetime.now())
         all_tops = Top().all_tops()
 
         context.update({
