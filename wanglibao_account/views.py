@@ -897,9 +897,6 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
             if form.is_valid():
                 auth_login(request, form.get_user())
 
-                print '*****************', request.session.get('cjdaoinfo')
-
-
                 if request.POST.has_key('remember_me'):
                     request.session.set_expiry(604800)
                 else:
@@ -940,17 +937,22 @@ def ajax_register(request):
                 # todo remove the try about cjdao callback
                 try:
                     cjdaoinfo = request.session.get('cjdaoinfo')
+
                     if cjdaoinfo:
                         params = CjdaoUtils.return_register(cjdaoinfo, auth_user, CJDAOKEY)
                         cjdao_callback.apply_async(kwargs={'url': RETURN_REGISTER, 'params': params})
-                except:
-                    pass
+                except Exception, e:
+                    print e
 
                 auth.login(request, auth_user)
 
                 # session lost, but I don't know why, rewrite the session
                 if cjdaoinfo:
                     request.session['cjdaoinfo'] = cjdaoinfo
+
+                    print '注册 *****************', request.session.get('cjdaoinfo')
+
+
                 tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
 
                 return HttpResponse(messenger('done', user=request.user))
