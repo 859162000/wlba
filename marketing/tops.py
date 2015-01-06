@@ -57,14 +57,6 @@ class Top(object):
 
         return user_list
 
-        # user_list = [{
-        #         'id': record['user'],
-        #         'amount_sum': record['amount_sum'],
-        #         'phone': record.user.wanglibaouserprofile.phone
-        #     } for record in p2p_records]
-        # return user_list
-
-
 
     def day_tops(self, day):
 
