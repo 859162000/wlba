@@ -50,11 +50,11 @@ def send_award(only_show=True):
             huafei += huafei_50
             huafei_count += 1
         if 100000 <= record["dsum"] < 200000:
-            reward_user_jd_500(record["user"], u"500元京东卡", record["dsum"],only_show)
+            reward_user_jd_500_2(record["user"], u"500元京东卡", record["dsum"],only_show)
             jd_500 += 1
             print u"给用户%s发放500元京东卡第%s个,因为他投资了%s" % (record["user"],jd_500, record["dsum"])
         if 200000 <= record["dsum"] < 400000:
-            reward_user_jd_1000(record["user"], u"1000元京东卡", record["dsum"],only_show)
+            reward_user_jd_1000_2(record["user"], u"1000元京东卡", record["dsum"],only_show)
             jd_1000 += 1
             print u"给用户%s发放1000元京东卡第%s个,因为他投资了%s" % (record["user"],jd_1000, record["dsum"])
         if 400000 <= record["dsum"] < 500000:
@@ -327,6 +327,61 @@ def reward_user_jd_500(user_id, reward_type, amount,only_show):
         print message_content
         print text_content
         print user.wanglibaouserprofile.phone
+
+def reward_user_jd_500_2(user_id, reward_type, amount,only_show):
+    user = User.objects.get(pk=user_id)
+    reward = Reward.objects.filter(is_used=False, type=reward_type).first()
+
+    message_content = u"亲爱的%s您好：<br/> 您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得500元京东礼品卡。<br/>\
+                      京东卡密码将于三个工作日内，以站内信形式给您发放，请注意查收。<br/>\
+                      感谢您对我们的支持与关注。<br/>\
+                      网利宝" % (user.wanglibaouserprofile.name, amount)
+    if only_show is not True:
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": user_id,
+            "title": u"满额送活动",
+            "content": message_content,
+            "mtype": "activity"
+        })
+    text_content = u"【网利宝】您在“满额就送”活动期间，获得500元京东礼品卡。京东卡3个工作日内发出。回复TD退订4008-588-066【网利宝】" % reward.content
+    if only_show is not True:
+        send_messages.apply_async(kwargs={
+            "phones": [user.wanglibaouserprofile.phone],
+            "messages": [text_content]
+        })
+        RewardRecord.objects.create(user=user, reward=reward, description=message_content)
+    else:
+        print message_content
+        print text_content
+        print user.wanglibaouserprofile.phone
+
+def reward_user_jd_1000_2(user_id, reward_type, amount,only_show):
+    user = User.objects.get(pk=user_id)
+    reward = Reward.objects.filter(is_used=False, type=reward_type).first()
+
+    message_content = u"亲爱的%s您好：<br/> 您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得1000元京东礼品卡。<br/>\
+                      京东卡密码将于三个工作日内，以站内信形式给您发放，请注意查收。<br/>\
+                      感谢您对我们的支持与关注。<br/>\
+                      网利宝" % (user.wanglibaouserprofile.name, amount)
+    if only_show is not True:
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": user_id,
+            "title": u"满额送活动",
+            "content": message_content,
+            "mtype": "activity"
+        })
+    text_content = u"【网利宝】您在“满额就送”活动期间，获得1000元京东礼品卡。京东卡3个工作日内发出。回复TD退订4008-588-066【网利宝】" % reward.content
+    if only_show is not True:
+        send_messages.apply_async(kwargs={
+            "phones": [user.wanglibaouserprofile.phone],
+            "messages": [text_content]
+        })
+        RewardRecord.objects.create(user=user, reward=reward, description=message_content)
+    else:
+        print message_content
+        print text_content
+        print user.wanglibaouserprofile.phone
+
 
 
 def reward_user_jd_1000(user_id, reward_type, amount,only_show):
