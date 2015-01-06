@@ -232,7 +232,6 @@ def reward_user_ban_nian_xunlei(user_id, reward_type, amount,only_show):
     if only_show is not True:
         print user.wanglibaouserprofile.phone
         print user.wanglibaouserprofile.name
-        return
         reward.is_used = True
         reward.save()
 
@@ -267,7 +266,6 @@ def reward_user_yi_nian_xunlei(user_id, reward_type, amount,only_show):
     if only_show is not True:
         print user.wanglibaouserprofile.phone
         print user.wanglibaouserprofile.name
-        return
         reward.is_used = True
         reward.save()
 
