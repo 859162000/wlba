@@ -80,6 +80,13 @@ class MarketingView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         return super(MarketingView, self).dispatch(request, *args, **kwargs)
 
+class StastisticsOfTopView(TemplateView):
+
+    template_name = 'diary.jade'
+
+    def get_context_data(self, **kwargs):
+
+        start = self.request.GET.get('start', '')
 
 class GennaeratorCode(TemplateView):
     template_name = 'gennerator_code.jade'
