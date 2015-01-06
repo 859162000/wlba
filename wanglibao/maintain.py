@@ -343,7 +343,7 @@ def reward_user_jd_500_2(user_id, reward_type, amount,only_show):
             "content": message_content,
             "mtype": "activity"
         })
-    text_content = u"【网利宝】您在“满额就送”活动期间，获得500元京东礼品卡。京东卡3个工作日内发出。回复TD退订4008-588-066【网利宝】" % reward.content
+    text_content = u"【网利宝】您在“满额就送”活动期间，获得500元京东礼品卡。京东卡3个工作日内发出。回复TD退订4008-588-066【网利宝】"
     if only_show is not True:
         send_messages.apply_async(kwargs={
             "phones": [user.wanglibaouserprofile.phone],
@@ -370,7 +370,7 @@ def reward_user_jd_1000_2(user_id, reward_type, amount,only_show):
             "content": message_content,
             "mtype": "activity"
         })
-    text_content = u"【网利宝】您在“满额就送”活动期间，获得1000元京东礼品卡。京东卡3个工作日内发出。回复TD退订4008-588-066【网利宝】" % reward.content
+    text_content = u"【网利宝】您在“满额就送”活动期间，获得1000元京东礼品卡。京东卡3个工作日内发出。回复TD退订4008-588-066【网利宝】"
     if only_show is not True:
         send_messages.apply_async(kwargs={
             "phones": [user.wanglibaouserprofile.phone],
