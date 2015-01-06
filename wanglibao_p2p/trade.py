@@ -143,15 +143,12 @@ class P2PTrader(object):
         # todo remove the try
         try:
             cjdaoinfo = self.request.session.get('cjdaoinfo')
-
-            print cjdaoinfo
-
             if cjdaoinfo:
                 if cjdaoinfo.get('thirdproductid') == equity.product.id:
                     params = CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
                     cjdao_callback.apply_async(kwargs={'url': RETURN_PURCHARSE_URL, 'params': params})
-        except:
-            pass
+        except Exception, e:
+            print e
 
 
         # 满标给管理员发短信
