@@ -143,6 +143,9 @@ class P2PTrader(object):
         # todo remove the try
         try:
             cjdaoinfo = self.request.session.get('cjdaoinfo')
+
+            print cjdaoinfo
+
             if cjdaoinfo:
                 if cjdaoinfo.get('thirdproductid') == equity.product.id:
                     params = CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
