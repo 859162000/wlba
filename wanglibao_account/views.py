@@ -949,10 +949,6 @@ def ajax_register(request):
                 # session lost, but I don't know why, rewrite the session
                 if cjdaoinfo:
                     request.session['cjdaoinfo'] = cjdaoinfo
-
-                    print '注册 *****************', request.session.get('cjdaoinfo')
-
-
                 tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
 
                 return HttpResponse(messenger('done', user=request.user))

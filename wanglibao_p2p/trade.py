@@ -145,14 +145,14 @@ class P2PTrader(object):
         try:
             cjdaoinfo = self.request.session.get('cjdaoinfo')
 
-            logger.debug('购买' + cjdaoinfo)
+            logger.debug('购买购买购买购买购买购买购买 session' + cjdaoinfo)
 
             if cjdaoinfo:
                 if cjdaoinfo.get('thirdproductid') == equity.product.id:
                     params = CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
                     cjdao_callback.apply_async(kwargs={'url': RETURN_PURCHARSE_URL, 'params': params})
         except Exception, e:
-
+            print e
             logger.debug(e)
 
 
