@@ -34,6 +34,11 @@ class Top(object):
 
         return activity[0].start_time
 
+        #
+        # if activity.count() != 0:
+        #     return activity[0].start_time
+
+
     @property
     def activity_start_local(self):
         return timezone.localtime(self.activity_start)
@@ -53,10 +58,12 @@ class Top(object):
         return user_list
 
 
-    def day_tops(self, day=datetime.now()):
+    def day_tops(self, day):
 
         if self.activity_start is None:
             return []
+        if not day:
+            day = datetime.now()
 
         amsterdam = self.timezone_util
 
@@ -82,10 +89,12 @@ class Top(object):
             return []
         return self.day_tops(datetime.now()-timedelta(days=1))
 
-    def allday_tops(self, start=datetime.now()):
+    def allday_tops(self, start):
 
         if self.activity_start is None:
             return []
+        if not start:
+            start = datetime.now()
 
         amsterdam = self.timezone_util
         begin = amsterdam.localize(datetime.combine(start.date(), start.min.time()))
@@ -117,7 +126,7 @@ class Top(object):
         return self.day_tops(self.activity_start_local+timedelta(weeks=week-1))
 
 
-    def week_tops(self, start=datetime.now()):
+    def week_tops(self, start):
         """
         :param start: 某天, 默认为当天
         :return: 某周的投资排行榜
@@ -125,6 +134,8 @@ class Top(object):
         if self.activity_start is None:
             return []
         amsterdam = self.timezone_util
+        if not start:
+            start = datetime.now()
 
         # 用utc时间算出当前的日期是属于活动的第几周
         if start.tzinfo == None:
@@ -163,8 +174,9 @@ class Top(object):
 
         begin = amsterdam.localize(
             datetime.combine(self.activity_start_local.date(), self.activity_start_local.min.time()))
-        end = amsterdam.localize(datetime.combine((self.activity_start_local + timedelta(days=28)).date(),
-                                                  self.activity_start_local.min.time()))
+        end_local = self.activity_start_local + timedelta(days=27)
+        end = amsterdam.localize(datetime.combine(end_local.date(),
+                                                  end_local.max.time()))
 
         records = P2PRecord.objects.filter(create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
                                            , catalog='申购') \
