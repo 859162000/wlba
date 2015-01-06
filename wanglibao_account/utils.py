@@ -227,7 +227,7 @@ class CjdaoUtils():
         if p2p.activity:
             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
         expectedrate = Decimal.from_float(p2p.expected_earning_rate) / 100 + reward
-        expectedrate = float(expectedrate.quantize(Decimal('0.0'), 'ROUND_DOWN'))
+        expectedrate = float(expectedrate.quantize(Decimal('0.000'), 'ROUND_DOWN'))
 
         realincome = expectedrate * float(margin_record.amount) * p2p.period / 12
 
