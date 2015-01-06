@@ -73,7 +73,7 @@ html
                             span.top-num {{forloop.counter}}
 
                       td {{day.phone | safe_phone_new}}
-                      td {{day.amount_sum}}元
+                      td {{day.amount_sum|money_format_int}}元
                   else
                     tr
                       td
@@ -81,7 +81,7 @@ html
                           span.icon.icon-day-top-arr
                           span.top-num {{forloop.counter}}
                       td {{day.phone | safe_phone_new}}
-                      td {{day.amount_sum}}
+                      td {{day.amount_sum|money_format_int}}元
 
             table.trophy-table(cellspacing="1")
               thead
@@ -108,7 +108,7 @@ html
                             span.top-num {{forloop.counter}}
 
                       td {{lastday.phone | safe_phone_new}}
-                      td {{lastday.amount_sum}}元
+                      td {{lastday.amount_sum|money_format_int}}元
                   else
                     tr
                       td
@@ -116,7 +116,7 @@ html
                           span.icon.icon-day-top-arr
                           span.top-num {{forloop.counter}}
                       td {{lastday.phone | safe_phone_new}}
-                      td {{lastday.amount_sum}}
+                      td {{lastday.amount_sum|money_format_int}}元
         .space-vertical-xl
         .row.relative-top
           .span6.purple-bg
@@ -175,7 +175,7 @@ html
                             span.top-num {{forloop.counter}}
 
                       td {{week.phone | safe_phone_new}}
-                      td {{week.amount_sum}}元
+                      td {{week.amount_sum|money_format_int}}元
                   else
                     tr
                       td
@@ -183,7 +183,7 @@ html
                           span.icon.icon-day-top-arr
                           span.top-num {{forloop.counter}}
                       td {{week.phone | safe_phone_new}}
-                      td {{week.amount_sum}}
+                      td {{week.amount_sum|money_format_int}}元
 
 
 
@@ -238,7 +238,7 @@ html
                             span.top-num {{forloop.counter}}
 
                       td {{month.phone | safe_phone_new}}
-                      td {{month.amount_sum}}元
+                      td {{month.amount_sum|money_format_int}}元
                   else
                     tr
                       td
@@ -246,7 +246,7 @@ html
                           span.icon.icon-day-top-arr
                           span.top-num {{forloop.counter}}
                       td {{month.phone | safe_phone_new}}
-                      td {{month.amount_sum}}
+                      td {{month.amount_sum|money_format_int}}元
 
         .space-vertical-xl
         .row.history-top
