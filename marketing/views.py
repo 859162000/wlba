@@ -146,9 +146,9 @@ class NewYearView(TemplateView):
 
     def get_context_data(self, **kwargs):
         top = Top()
-        day_tops = top.day_tops()
+        day_tops = top.day_tops(datetime.now())
         lastday_tops = top.lastday_tops()
-        week_tops = top.week_tops()
+        week_tops = top.week_tops(datetime.now())
         all_tops = top.all_tops()
         prizes = top.certain_prize()
         return {

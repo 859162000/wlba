@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.template import loader, Context
 from django.utils import timezone
 from django.views.generic import TemplateView
+from datetime import datetime
 from marketing.models import NewsAndReport, SiteData
 from marketing.tops import Top
 from wanglibao_p2p.models import P2PProduct, P2PRecord
@@ -43,8 +44,8 @@ class IndexView(TemplateView):
 
         #排行榜
 
-        day_tops = Top().day_tops()
-        week_tops = Top().week_tops()
+        day_tops = Top().day_tops(datetime.now())
+        week_tops = Top().week_tops(datetime.now())
         all_tops = Top().all_tops()
 
         return {
