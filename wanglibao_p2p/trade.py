@@ -153,7 +153,7 @@ class P2PTrader(object):
                     cjdao_callback.apply_async(kwargs={'url': RETURN_PURCHARSE_URL, 'params': params})
         except Exception, e:
             print e
-            logger.debug(e)
+            logger.debug('购买异常' + e)
 
 
         # 满标给管理员发短信
