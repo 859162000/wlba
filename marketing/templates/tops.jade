@@ -1,0 +1,74 @@
+//
+   Created by taohe on 14-9-22.
+-load formatters
+doctype html
+html
+  head
+    meta(name="viewport",content="width=device-width,initial-scale=1")
+    - with '日数据明细 ' as title
+    - endwith
+    link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/metisMenu/metisMenu.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/sb-admin-2.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/datepicker3.css", media="screen, projection", rel="stylesheet", type="text/css")
+
+    script(src="/static/js/require.js", data-main="/static/js/header")
+    script(src="https://code.jquery.com/jquery-1.11.1.min.js", data-main="/static/js/header")
+    script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js", data-main="/static/js/header")
+    script(src="/static/js/lib/bootstrap-datepicker.js", data-main="/static/js/header")
+
+  body(role="document")
+
+    include include/admin_menu
+    #wrapper
+      nav.navbar.navbar-default.navbar-static-top(role="navigation", style="margin-bottom:0px")
+        .navbar-header
+          a.navbar-brand(href="?") 网利宝统计数据
+
+        - with '日周月榜名单' as activeItem
+        include include/admin_menu
+        - endwith
+
+      #page-wrapper
+
+        .row
+          .col-lg-12
+            h1.page-header 日周月榜名单
+
+        .row
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading 日榜名单
+
+              .panel-body
+                .row
+
+                  form
+                    .col-lg-6
+                      .form-group
+                        .input-daterange.input-group#datepicker
+                          input(type="text",name="start",value="{{start}}").input-sm.form-control
+                          span.input-group-addon to
+                          input(type="text",name="end",value="{{end}}").input-sm.form-control
+                    .col-lg-6
+                      .form-group
+                        button(type="submit").btn.btn-default 查询
+
+                .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 日期
+                        th(rowspan="1") 电话号
+                        th(rowspan="1", colspan="1") 购买额度
+                    tbody
+                      for l in result
+                        tr
+                          td {{ l.each_day}}
+                          td {{ l.user }}
+                          td {{ l.amount_sum }}
+
+
+                .chart
+                  #container
+

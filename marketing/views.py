@@ -17,7 +17,7 @@ from django.db.models.base import ModelState
 from marketing.tops import Top
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from marketing.models import PromotionToken
-
+from marketing.tops import Top
 
 
 # Create your views here.
@@ -80,13 +80,17 @@ class MarketingView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         return super(MarketingView, self).dispatch(request, *args, **kwargs)
 
-class StastisticsOfTopView(TemplateView):
+class TopsView(TemplateView):
 
-    template_name = 'diary.jade'
+    template_name = 'tops.jade'
 
     def get_context_data(self, **kwargs):
+        top = Top()
+        result = top.allday_tops()
+        return {
+            'result': result
+        }
 
-        start = self.request.GET.get('start', '')
 
 class GennaeratorCode(TemplateView):
     template_name = 'gennerator_code.jade'
