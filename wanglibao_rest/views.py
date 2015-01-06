@@ -239,8 +239,11 @@ class PushTestView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        push_user_id = request.GET.get("push_user_id", "921913645184221981")
-        push_channel_id = request.GET.get("push_channel_id", "4922700431463139292")
+        #push_user_id = request.GET.get("push_user_id", "921913645184221981")
+        #push_channel_id = request.GET.get("push_channel_id", "4922700431463139292")
+
+        push_user_id = request.GET.get("push_user_id", "781430269530794382")
+        push_channel_id = request.GET.get("push_channel_id", "5422135652350005874")
         from wanglibao_sms import bae_channel
 
         channel = bae_channel.BaeChannel()
