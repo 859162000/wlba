@@ -24,14 +24,17 @@ html
         .navbar-header
           a.navbar-brand(href="?") 网利宝统计数据
 
-        .navbar-default.sidebar(role="navigation")
-          .sidebar-nav.navbar-collapse
-            ul.nav#side-menu
-              li
-                a.active
-                  i.fa.fa-table.fa-fw
-                  日数据明细
+        //.navbar-default.sidebar(role="navigation")
+        //  .sidebar-nav.navbar-collapse
+        //    ul.nav#side-menu
+        //      li
+        //        a.active
+        //          i.fa.fa-table.fa-fw
+        //          日数据明细
 
+        - with '日数据明细' as activeItem
+        include include/admin_menu
+        - endwith
       #page-wrapper
 
         .row
