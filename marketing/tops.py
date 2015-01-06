@@ -174,8 +174,9 @@ class Top(object):
 
         begin = amsterdam.localize(
             datetime.combine(self.activity_start_local.date(), self.activity_start_local.min.time()))
-        end = amsterdam.localize(datetime.combine((self.activity_start_local + timedelta(days=28)).date(),
-                                                  self.activity_start_local.min.time()))
+        end_local = self.activity_start_local + timedelta(days=27)
+        end = amsterdam.localize(datetime.combine(end_local.date(),
+                                                  end_local.max.time()))
 
         records = P2PRecord.objects.filter(create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
                                            , catalog='申购') \
