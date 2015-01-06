@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.utils import timezone
-from views import MarketingView, TvView
+from views import MarketingView, TvView, TopsView
 
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
     Activity, ActivityRule, Reward, RewardRecord, ClientData
@@ -121,7 +121,7 @@ class RewardAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 class RewardRecordAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'reward', 'description', 'create_time')
     search_fields = ('user__wanglibaouserprofile__phone', 'description', "reward__type")
-
+    raw_id_fields = ('user', 'reward')
 
 class ClientDataAdmin(admin.ModelAdmin):
 
@@ -142,6 +142,7 @@ admin.site.register(RewardRecord, RewardRecordAdmin)
 admin.site.register(ClientData, ClientDataAdmin)
 
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
+admin.site.register_view('statistics/tops', view=TopsView.as_view(), name=u'日周月榜名单')
 admin.site.register_view('statistics/tv', view=TvView.as_view(), name=u'统计数据汇总')
 admin.site.register(InviteCode, InviteCodeAdmin)
 

@@ -89,17 +89,21 @@ class Top(object):
             return []
         return self.day_tops(datetime.now()-timedelta(days=1))
 
-    def allday_tops(self, start):
+    def allday_tops(self):
 
         if self.activity_start is None:
             return []
-        if not start:
-            start = datetime.now()
 
         amsterdam = self.timezone_util
-        begin = amsterdam.localize(datetime.combine(start.date(), start.min.time()))
 
-        p2p_records = P2PRecord.objects.filter(create_time__gte=begin.astimezone(pytz.utc), catalog='申购') \
+        begin = amsterdam.localize(
+            datetime.combine(self.activity_start_local.date(), self.activity_start_local.min.time()))
+        end_local = self.activity_start_local + timedelta(days=27)
+        end = amsterdam.localize(datetime.combine(end_local.date(),
+                                                  end_local.max.time()))
+
+        p2p_records = P2PRecord.objects.filter(
+            create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc)), catalog='申购') \
             .select_related('user__wanglibaouserprofile')
 
         user_list = []
@@ -174,8 +178,9 @@ class Top(object):
 
         begin = amsterdam.localize(
             datetime.combine(self.activity_start_local.date(), self.activity_start_local.min.time()))
-        end = amsterdam.localize(datetime.combine((self.activity_start_local + timedelta(days=28)).date(),
-                                                  self.activity_start_local.min.time()))
+        end_local = self.activity_start_local + timedelta(days=27)
+        end = amsterdam.localize(datetime.combine(end_local.date(),
+                                                  end_local.max.time()))
 
         records = P2PRecord.objects.filter(create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
                                            , catalog='申购') \
@@ -187,8 +192,6 @@ class Top(object):
 
     def certain_prize(self):
         week = (datetime.now().date()-self.activity_start_local.date()).days / 7
-
-        print 'week', week, '$$$$$$$$'
 
         return self.top_prize(week)
 

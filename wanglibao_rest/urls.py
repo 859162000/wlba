@@ -30,7 +30,7 @@ from wanglibao_profile.views import ProfileView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
-                            YTXVoiceCallbackAPIView, SendVoiceCodeAPIView,
+                            YTXVoiceCallbackAPIView, SendVoiceCodeAPIView,PushTestView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView)
 
@@ -126,6 +126,7 @@ urlpatterns = patterns(
     url(r'^pay/yee/app/deposit/complete/$', YeePayAppPayCompleteView.as_view(), name="yee-deposit-fcallback"),
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
+    #url(r'^pushtest/$', PushTestView.as_view()),
     url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
     url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
     url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
