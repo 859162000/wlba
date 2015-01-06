@@ -34,6 +34,11 @@ class Top(object):
 
         return activity[0].start_time
 
+        #
+        # if activity.count() != 0:
+        #     return activity[0].start_time
+
+
     @property
     def activity_start_local(self):
         return timezone.localtime(self.activity_start)
@@ -51,6 +56,14 @@ class Top(object):
             })
 
         return user_list
+
+        # user_list = [{
+        #         'id': record['user'],
+        #         'amount_sum': record['amount_sum'],
+        #         'phone': record.user.wanglibaouserprofile.phone
+        #     } for record in p2p_records]
+        # return user_list
+
 
 
     def day_tops(self, day=datetime.now()):
