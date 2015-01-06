@@ -189,8 +189,6 @@ class Top(object):
     def certain_prize(self):
         week = (datetime.now().date()-self.activity_start_local.date()).days / 7
 
-        print 'week', week, '$$$$$$$$'
-
         return self.top_prize(week)
 
     def top_prize(self, index):
