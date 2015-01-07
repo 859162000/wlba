@@ -109,6 +109,39 @@ def send_award(only_show=True):
     print "*********************************"
     print "*********************************"
 
+def send_xunlei(only_show=True):
+    start = timezone.datetime(2014, 11, 1, 0, 00, 00)
+    end = timezone.datetime(2014, 12, 31, 23, 59, 59)
+
+    p2p_records = P2PRecord.objects.filter(create_time__range=(start, end), catalog=u'申购').values("user").annotate(
+        dsum=Sum('amount'))
+
+    ban_nian_xunlei = 0
+    yi_nian_xunlei = 0
+
+    for record in p2p_records:
+        if 1000 <= record["dsum"] < 50000:
+            reward_user_ban_nian_xunlei(record["user"], u"半年迅雷会员", record["dsum"],only_show)
+            ban_nian_xunlei += 1
+            print u"给用户%s发放半年迅雷会员第%s个,因为他投资了%s" % (record["user"],ban_nian_xunlei, record["dsum"])
+        if record["dsum"] >= 50000:
+            reward_user_yi_nian_xunlei(record["user"], u"一年迅雷会员", record["dsum"],only_show)
+            yi_nian_xunlei += 1
+            print u"给用户%s发放一年迅雷会员第%s个,因为他投资了%s" % (record["user"],yi_nian_xunlei, record["dsum"])
+    print "*********************************"
+    print "*********************************"
+    print "*************Done****************"
+    print "*********************************"
+    print "*********************************"
+    print u"发放半年迅雷会员%s个" % ban_nian_xunlei
+    print u"发放一年迅雷会员第%s个" % yi_nian_xunlei
+    print "*********************************"
+    print "*********************************"
+    print "*************Done****************"
+    print "*********************************"
+    print "*********************************"
+
+
 def show_reward():
     start = timezone.datetime(2014, 11, 1, 0, 00, 00)
     end = timezone.datetime(2014, 12, 31, 23, 59, 59)
@@ -196,18 +229,17 @@ def show_reward():
 def reward_user_ban_nian_xunlei(user_id, reward_type, amount,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
-    if only_show is not True and reward is None:
+    if only_show is not True:
         print user.wanglibaouserprofile.phone
         print user.wanglibaouserprofile.name
-        return
         reward.is_used = True
         reward.save()
 
-    message_content = u"亲爱的%s您好：<br/> 您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得半年迅雷白金会员奖励。<br/>\
+    message_content = u"您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得半年迅雷白金会员奖励。<br/>\
                       激活码：%s，有效期至2015年12月31日。<br/>\
                       <a href = 'http://pay.vip.xunlei.com/baijin.html'>立即兑换</a><br/>\
                       感谢您对我们的支持与关注。<br/>\
-                      网利宝" % (user.wanglibaouserprofile.name, amount, reward.content)
+                      网利宝" % (amount, reward.content)
     if only_show is not True:
         inside_message.send_one.apply_async(kwargs={
             "user_id": user_id,
@@ -231,18 +263,17 @@ def reward_user_ban_nian_xunlei(user_id, reward_type, amount,only_show):
 def reward_user_yi_nian_xunlei(user_id, reward_type, amount,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
-    if only_show is not True and reward is None:
+    if only_show is not True:
         print user.wanglibaouserprofile.phone
         print user.wanglibaouserprofile.name
-        return
         reward.is_used = True
         reward.save()
 
-    message_content = u"亲爱的%s您好：<br/> 您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得一年迅雷白金会员奖励。<br/>\
+    message_content = u"您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得一年迅雷白金会员奖励。<br/>\
                       激活码：%s，有效期至2015年12月31日。<br/>\
                       <a href = 'http://pay.vip.xunlei.com/baijin.html'>立即兑换</a><br/>\
                       感谢您对我们的支持与关注。<br/>\
-                      网利宝" % (user.wanglibaouserprofile.name, amount, reward.content)
+                      网利宝" % (amount, reward.content)
 
     if only_show is not True:
         inside_message.send_one.apply_async(kwargs={
@@ -269,10 +300,10 @@ def reward_user_hua_fei(user_id, reward_type, amount, huafei,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
 
-    message_content = u"亲爱的%s您好：<br/> 您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得%s元话费奖励。<br/>\
+    message_content = u"您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得%s元话费奖励。<br/>\
                       3个工作日内充值至您的注册手机号码，请注意查收！<br/>\
                       感谢您对我们的支持与关注。<br/>\
-                      网利宝" % (user.wanglibaouserprofile.name, amount, huafei)
+                      网利宝" % (amount, huafei)
     if only_show is not True:
         inside_message.send_one.apply_async(kwargs={
             "user_id": user_id,
@@ -304,11 +335,11 @@ def reward_user_jd_500(user_id, reward_type, amount,only_show):
         reward.is_used = True
         reward.save()
 
-    message_content = u"亲爱的%s您好：<br/> 您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得500元京东礼品卡。<br/>\
+    message_content = u"您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得500元京东礼品卡。<br/>\
                       京东卡密为：%s，有效期至2015年12月31日。<br/>\
                       <a href = 'http://www.jd.com'>立即使用</a><br/>\
                       感谢您对我们的支持与关注。<br/>\
-                      网利宝" % (user.wanglibaouserprofile.name, amount, reward.content)
+                      网利宝" % (amount, reward.content)
     if only_show is not True:
         inside_message.send_one.apply_async(kwargs={
             "user_id": user_id,
@@ -332,10 +363,10 @@ def reward_user_jd_500_2(user_id, reward_type, amount,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
 
-    message_content = u"亲爱的%s您好：<br/> 您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得500元京东礼品卡。<br/>\
+    message_content = u"您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得500元京东礼品卡。<br/>\
                       京东卡密码将于三个工作日内，以站内信形式给您发放，请注意查收。<br/>\
                       感谢您对我们的支持与关注。<br/>\
-                      网利宝" % (user.wanglibaouserprofile.name, amount)
+                      网利宝" % amount
     if only_show is not True:
         inside_message.send_one.apply_async(kwargs={
             "user_id": user_id,
@@ -343,7 +374,7 @@ def reward_user_jd_500_2(user_id, reward_type, amount,only_show):
             "content": message_content,
             "mtype": "activity"
         })
-    text_content = u"【网利宝】您在“满额就送”活动期间，获得500元京东礼品卡。京东卡3个工作日内发出。回复TD退订4008-588-066【网利宝】" % reward.content
+    text_content = u"【网利宝】您在“满额就送”活动期间，获得500元京东礼品卡。京东卡3个工作日内发出。回复TD退订4008-588-066【网利宝】"
     if only_show is not True:
         send_messages.apply_async(kwargs={
             "phones": [user.wanglibaouserprofile.phone],
@@ -359,10 +390,10 @@ def reward_user_jd_1000_2(user_id, reward_type, amount,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
 
-    message_content = u"亲爱的%s您好：<br/> 您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得1000元京东礼品卡。<br/>\
+    message_content = u"您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得1000元京东礼品卡。<br/>\
                       京东卡密码将于三个工作日内，以站内信形式给您发放，请注意查收。<br/>\
                       感谢您对我们的支持与关注。<br/>\
-                      网利宝" % (user.wanglibaouserprofile.name, amount)
+                      网利宝" % amount
     if only_show is not True:
         inside_message.send_one.apply_async(kwargs={
             "user_id": user_id,
@@ -370,7 +401,7 @@ def reward_user_jd_1000_2(user_id, reward_type, amount,only_show):
             "content": message_content,
             "mtype": "activity"
         })
-    text_content = u"【网利宝】您在“满额就送”活动期间，获得1000元京东礼品卡。京东卡3个工作日内发出。回复TD退订4008-588-066【网利宝】" % reward.content
+    text_content = u"【网利宝】您在“满额就送”活动期间，获得1000元京东礼品卡。京东卡3个工作日内发出。回复TD退订4008-588-066【网利宝】"
     if only_show is not True:
         send_messages.apply_async(kwargs={
             "phones": [user.wanglibaouserprofile.phone],
@@ -394,11 +425,11 @@ def reward_user_jd_1000(user_id, reward_type, amount,only_show):
         reward.is_used = True
         reward.save()
 
-    message_content = u"亲爱的%s您好：<br/> 您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得1000元京东礼品卡。<br/>\
+    message_content = u"您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得1000元京东礼品卡。<br/>\
                       京东卡密为：%s，有效期至2015年12月31日。<br/>\
                       <a href = 'http://www.jd.com'>立即使用</a><br/>\
                       感谢您对我们的支持与关注。<br/>\
-                      网利宝" % (user.wanglibaouserprofile.name, amount, reward.content)
+                      网利宝" % (amount, reward.content)
     if only_show is not True:
         inside_message.send_one.apply_async(kwargs={
             "user_id": user_id,
@@ -423,10 +454,10 @@ def reward_user_apple(user_id, reward_type, amount, apple,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
 
-    message_content = u"亲爱的%s您好：<br/> 您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得%s。<br/>\
+    message_content = u"您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得%s。<br/>\
                       奖品将于7个工作日内为您寄出，请注意查收。<br/>\
                       感谢您对我们的支持与关注。<br/>\
-                      网利宝" % (user.wanglibaouserprofile.name, amount, apple)
+                      网利宝" % (amount, apple)
     if only_show is not True:
         inside_message.send_one.apply_async(kwargs={
             "user_id": user_id,
@@ -472,11 +503,10 @@ def reward_user_5(user, introduced_by, reward_type, got_amount, product,only_sho
         earning.user = introduced_by
         earning.save()
 
-    message_content = u"亲爱的%s您好：<br/> 您在邀请好友送收益的活动中，您的好友%s在活动期间完成首次投资，根据活动规则，您获得%s元收益。<br/>\
+    message_content = u"您在邀请好友送收益的活动中，您的好友%s在活动期间完成首次投资，根据活动规则，您获得%s元收益。<br/>\
                       <a href = 'https://www.wanglibao.com/accounts/home/'>查看账户余额</a><br/>\
                       感谢您对我们的支持与关注。<br/>\
-                      网利宝" % (
-    introduced_by.wanglibaouserprofile.name, safe_phone_str(user.wanglibaouserprofile.phone), got_amount)
+                      网利宝" % (safe_phone_str(user.wanglibaouserprofile.phone), got_amount)
 
 
 
