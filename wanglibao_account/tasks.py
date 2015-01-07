@@ -35,7 +35,7 @@ def post_product_half_hour():
     p2ps = P2PProduct.objects.filter(hide=False).filter(status__in=[u'正在招标', u'满标待打款', u'满标待审核'])
 
 
-    logger.debug('p2p的产品数目%s' % p2ps.count())
+    logger.debug('p2p的产品数目 %s' % p2ps.count())
 
     for p2p in p2ps:
         p = CjdaoUtils.post_product(p2p, CJDAOKEY)
