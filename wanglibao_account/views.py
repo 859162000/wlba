@@ -274,10 +274,6 @@ class AccountHome(TemplateView):
             mode = 'fund'
             fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
 
-
-        # Followings for p2p
-        # p2p_equities = P2PEquity.objects.filter(user=user).filter(~Q(product__status=u"已完成")).select_related('product')
-
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
@@ -313,9 +309,10 @@ class AccountHome(TemplateView):
 
         xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
 
+
+
         return {
             'message': message,
-            # 'p2p_equities': p2p_equities,
             'result': result,
             'amortizations': amortizations,
             'p2p_product_amortization': p2p_product_amortization,
