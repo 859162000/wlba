@@ -14,7 +14,6 @@ from django.http.response import HttpResponse
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
-from marketing.tops import Top
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from marketing.models import PromotionToken
 from marketing.tops import Top
@@ -85,10 +84,31 @@ class TopsView(TemplateView):
     template_name = 'tops.jade'
 
     def get_context_data(self, **kwargs):
+        day = self.request.GET.get('today', '')
+        week = self.request.GET.get('week', 1)
+        if day == '':
+            today = datetime.now()
+        else:
+            today = datetime.strptime(day, '%Y-%m-%d')
+        #end = self.request.GET.get('end', '')
+        # if start and end:
+        #     d0 = datetime.strptime(start, '%Y-%m-%d').date()
+        #     d1 = datetime.strptime(end, '%Y-%m-%d').date()
+        # else:
+        #     d0 = (datetime.now() - timedelta(days=7)).date()
+        #     d1 = date.today()
         top = Top()
-        result = top.allday_tops()
+        result = top.day_tops(today)
+        all = top.all_tops()
+        week_tops = top.certain_week(week)
+        #result = []
+        print result
         return {
-            'result': result
+            'result': result,
+            'week_tops': week_tops,
+            'all_tops': all,
+            'today': today.strftime('%Y-%m-%d'),
+            'week': week
         }
 
 
