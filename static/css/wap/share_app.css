@@ -201,6 +201,9 @@ header {
   height: 13.5em;
   background-size: 100% 100%;
 }
+.activity-app-content h2 {
+  font-size: 100%;
+}
 @media screen and (max-width: 320px) {
   header {
     height: 13em;
@@ -210,6 +213,9 @@ header {
   }
   .download-image {
     height: 13.5em;
+  }
+  .activity-app-content h2 {
+    font-size: 110%;
   }
 }
 @media screen and (min-width: 360px) {
@@ -222,6 +228,9 @@ header {
   .download-image {
     height: 15.5em;
   }
+  .activity-app-content h2 {
+    font-size: 130%;
+  }
 }
 @media screen and (min-width: 414px) {
   header {
@@ -232,6 +241,9 @@ header {
   }
   .download-image {
     height: 17.5em;
+  }
+  .activity-app-content h2 {
+    font-size: 140%;
   }
 }
 footer {
@@ -401,6 +413,13 @@ button[type="button"].download-btn:focus {
   line-height: 1.9em;
 }
 .activity-app-content h2 {
+  background: #2b0364;
+  margin: 0 0 20px 0;
+  padding: 5px 0;
+  text-align: center;
+  color: #fcc92f;
+}
+.activity-app-content h3 {
   font-size: 1.4em;
   font-weight: normal;
   margin-top: 0;
