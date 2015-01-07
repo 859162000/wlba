@@ -15,6 +15,7 @@ urlpatterns = patterns(
     url(r'^kuaipan/$', TemplateView.as_view(template_name="kuaipan.jade")),
     url(r'^fengxing/$', TemplateView.as_view(template_name="fengxing.jade")),
     #url(r'^wlbtvsstsiis/tv/$', TemplateView.as_view(template_name="tv.jade")),
+    url(r'^app_share/$', TemplateView.as_view(template_name="activity_app_share.jade")),
     url(r'^wap/share$', AppShareView.as_view(), name="app_share"),
     url(r'^wap/share_reg/$', AppShareRegView.as_view(), name="app_share_reg"),
     url(r'^wap/agreement/$', TemplateView.as_view(template_name="app_agreement.jade")),
