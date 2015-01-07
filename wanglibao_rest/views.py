@@ -652,8 +652,8 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
             token, created = Token.objects.get_or_create(user=serializer.object['user'])
             return Response({'token': token.key}, status=status.HTTP_200_OK)
         else:
-            return Response({'token': "false"}, status=status.HTTP_200_OK)
-            #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # return Response({'token': "false"}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Statistics(APIView):
