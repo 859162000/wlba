@@ -237,7 +237,7 @@ class CjdaoUtils():
         total_earning = terms.get("total") - p2p.total_amount
 
         realincome = (margin_record.amount / p2p.total_amount ) * total_earning
-
+        realincome = Decimal.from_float(realincome).quantize(Decimal('0.00'), 'ROUND_DOWN')
 
         k = ('uaccount', 'phone', 'usertype', 'companyid', 'thirdproductid',
              'productname', 'buytime', 'money', 'expectedrate', 'realincome', 'transactionstatus',
