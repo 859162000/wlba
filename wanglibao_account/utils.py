@@ -15,6 +15,7 @@ import logging
 import hashlib
 import requests
 from decimal import Decimal
+from wanglibao_p2p.amortization_plan import get_amortization_plan
 
 
 logger = logging.getLogger(__name__)
@@ -227,9 +228,16 @@ class CjdaoUtils():
         if p2p.activity:
             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
         expectedrate = Decimal.from_float(p2p.expected_earning_rate) / 100 + reward
-        expectedrate = float(expectedrate.quantize(Decimal('0.0'), 'ROUND_DOWN'))
+        expectedrate = float(expectedrate.quantize(Decimal('0.000'), 'ROUND_DOWN'))
 
-        realincome = expectedrate * float(margin_record.amount) * p2p.period / 12
+        terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
+                                                               p2p.expected_earning_rate / 100,
+                                                               p2p.amortization_count,
+                                                               p2p.period)
+        total_earning = terms.get("total") - p2p.total_amount
+
+        realincome = (margin_record.amount / p2p.total_amount ) * total_earning
+
 
         k = ('uaccount', 'phone', 'usertype', 'companyid', 'thirdproductid',
              'productname', 'buytime', 'money', 'expectedrate', 'realincome', 'transactionstatus',
