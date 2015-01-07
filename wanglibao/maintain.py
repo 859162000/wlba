@@ -109,6 +109,39 @@ def send_award(only_show=True):
     print "*********************************"
     print "*********************************"
 
+def send_xunlei(only_show=True):
+    start = timezone.datetime(2014, 11, 1, 0, 00, 00)
+    end = timezone.datetime(2014, 12, 31, 23, 59, 59)
+
+    p2p_records = P2PRecord.objects.filter(create_time__range=(start, end), catalog=u'申购').values("user").annotate(
+        dsum=Sum('amount'))
+
+    ban_nian_xunlei = 0
+    yi_nian_xunlei = 0
+
+    for record in p2p_records:
+        if 1000 <= record["dsum"] < 50000:
+            reward_user_ban_nian_xunlei(record["user"], u"半年迅雷会员", record["dsum"],only_show)
+            ban_nian_xunlei += 1
+            print u"给用户%s发放半年迅雷会员第%s个,因为他投资了%s" % (record["user"],ban_nian_xunlei, record["dsum"])
+        if record["dsum"] >= 50000:
+            reward_user_yi_nian_xunlei(record["user"], u"一年迅雷会员", record["dsum"],only_show)
+            yi_nian_xunlei += 1
+            print u"给用户%s发放一年迅雷会员第%s个,因为他投资了%s" % (record["user"],yi_nian_xunlei, record["dsum"])
+    print "*********************************"
+    print "*********************************"
+    print "*************Done****************"
+    print "*********************************"
+    print "*********************************"
+    print u"发放半年迅雷会员%s个" % ban_nian_xunlei
+    print u"发放一年迅雷会员第%s个" % yi_nian_xunlei
+    print "*********************************"
+    print "*********************************"
+    print "*************Done****************"
+    print "*********************************"
+    print "*********************************"
+
+
 def show_reward():
     start = timezone.datetime(2014, 11, 1, 0, 00, 00)
     end = timezone.datetime(2014, 12, 31, 23, 59, 59)
@@ -196,10 +229,9 @@ def show_reward():
 def reward_user_ban_nian_xunlei(user_id, reward_type, amount,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
-    if only_show is not True and reward is None:
+    if only_show is not True:
         print user.wanglibaouserprofile.phone
         print user.wanglibaouserprofile.name
-        return
         reward.is_used = True
         reward.save()
 
@@ -231,10 +263,9 @@ def reward_user_ban_nian_xunlei(user_id, reward_type, amount,only_show):
 def reward_user_yi_nian_xunlei(user_id, reward_type, amount,only_show):
     user = User.objects.get(pk=user_id)
     reward = Reward.objects.filter(is_used=False, type=reward_type).first()
-    if only_show is not True and reward is None:
+    if only_show is not True:
         print user.wanglibaouserprofile.phone
         print user.wanglibaouserprofile.name
-        return
         reward.is_used = True
         reward.save()
 

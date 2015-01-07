@@ -14,10 +14,9 @@ from django.http.response import HttpResponse
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
-from marketing.tops import Top
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from marketing.models import PromotionToken
-
+from marketing.tops import Top
 
 
 # Create your views here.
@@ -79,6 +78,38 @@ class MarketingView(TemplateView):
     @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         return super(MarketingView, self).dispatch(request, *args, **kwargs)
+
+class TopsView(TemplateView):
+
+    template_name = 'tops.jade'
+
+    def get_context_data(self, **kwargs):
+        day = self.request.GET.get('today', '')
+        week = self.request.GET.get('week', 1)
+        if day == '':
+            today = datetime.now()
+        else:
+            today = datetime.strptime(day, '%Y-%m-%d')
+        #end = self.request.GET.get('end', '')
+        # if start and end:
+        #     d0 = datetime.strptime(start, '%Y-%m-%d').date()
+        #     d1 = datetime.strptime(end, '%Y-%m-%d').date()
+        # else:
+        #     d0 = (datetime.now() - timedelta(days=7)).date()
+        #     d1 = date.today()
+        top = Top()
+        result = top.day_tops(today)
+        all = top.all_tops()
+        week_tops = top.certain_week(week)
+        #result = []
+        print result
+        return {
+            'result': result,
+            'week_tops': week_tops,
+            'all_tops': all,
+            'today': today.strftime('%Y-%m-%d'),
+            'week': week
+        }
 
 
 class GennaeratorCode(TemplateView):

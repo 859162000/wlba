@@ -141,14 +141,20 @@ class P2PTrader(object):
 
         # 财经道购买回调
         # todo remove the try
+        logger = logging.getLogger('p2p')
         try:
             cjdaoinfo = self.request.session.get('cjdaoinfo')
+
+            logger.debug('购买购买购买购买购买购买购买 session %s' % cjdaoinfo)
+
             if cjdaoinfo:
                 if cjdaoinfo.get('thirdproductid') == equity.product.id:
                     params = CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
                     cjdao_callback.apply_async(kwargs={'url': RETURN_PURCHARSE_URL, 'params': params})
-        except:
-            pass
+        except Exception, e:
+            print e
+            logger.debug('购买异常')
+            logger.debug(e)
 
 
         # 满标给管理员发短信

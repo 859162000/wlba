@@ -181,44 +181,69 @@ body {
   background-color: #fdfbef;
 }
 h1 {
-    padding: 1em 0em 1em;
-    font-size: 1.2em;
-    color: #b01d15;
-    border-bottom: 1px solid #e0e0e0;
-    margin: 0;
-    text-align: center;
+  padding: 1em 0em 1em;
+  font-size: 1.2em;
+  color: #b01d15;
+  border-bottom: 1px solid #e0e0e0;
+  margin: 0;
+  text-align: center;
 }
 header {
   background: #ffffff url("/static/images/wap/share_header_bg.png") no-repeat left top;
   background-size: 100% 100%;
 }
+.activity-app-header {
+  background: url("/static/images/wap/activity_header.jpg") no-repeat left top;
+  background-size: 100% 100%;
+}
 .download-image {
-    background: url("/static/images/wap/download_bg.png") no-repeat center;
-    height: 13.5em;
-    background-size: 100% 100%;
+  background: url("/static/images/wap/download_bg.png") no-repeat center;
+  height: 13.5em;
+  background-size: 100% 100%;
+}
+.activity-app-content h2 {
+  font-size: 100%;
 }
 @media screen and (max-width: 320px) {
   header {
     height: 13em;
   }
+  .activity-app-header {
+    height: 14.3em;
+  }
   .download-image {
     height: 13.5em;
+  }
+  .activity-app-content h2 {
+    font-size: 110%;
   }
 }
 @media screen and (min-width: 360px) {
   header {
     height: 15.3em;
   }
+  .activity-app-header {
+    height: 15.8em;
+  }
   .download-image {
     height: 15.5em;
+  }
+  .activity-app-content h2 {
+    font-size: 125%;
   }
 }
 @media screen and (min-width: 414px) {
   header {
     height: 17.3em;
   }
+  .activity-app-header {
+    height: 18.5em;
+  }
   .download-image {
     height: 17.5em;
+  }
+  .activity-app-content h2 {
+    font-size: 140%;
   }
 }
 footer {
@@ -378,4 +403,42 @@ button[type="button"].download-btn:focus {
   height: 41px;
   background: url("/static/images/wap/reg_ok.png") no-repeat;
   background-size: 80% 80%;
+}
+.activity-app-content {
+  background: #532399;
+  color: #fbfefc;
+  padding: 20px;
+  text-align: left;
+  font-size: 0.86em;
+  line-height: 1.9em;
+}
+.activity-app-content h2 {
+  background: #2b0364;
+  margin: 0 0 20px 0;
+  padding: 5px 0;
+  text-align: center;
+  color: #fcc92f;
+}
+.activity-app-content h3 {
+  font-size: 1.4em;
+  font-weight: normal;
+  margin-top: 0;
+}
+.activity-app-content p {
+  margin: 0;
+  padding: 0;
+}
+.space-line {
+  border-top: solid 1px #7851BC;
+  background: #260E40;
+  height: 1px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+.activity-app-footer {
+  color: #ffc619;
+  padding: 20px 0;
+  text-align: center;
+
 }
