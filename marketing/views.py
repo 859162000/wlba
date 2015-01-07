@@ -14,7 +14,6 @@ from django.http.response import HttpResponse
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
-from marketing.tops import Top
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from marketing.models import PromotionToken
 from marketing.tops import Top
