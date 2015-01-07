@@ -100,7 +100,7 @@ class TopsView(TemplateView):
         top = Top()
         result = top.day_tops(today)
         all = top.all_tops()
-        week_tops = top.certain_week(week)
+        week_tops = top.certain_week(int(week))
         #result = []
         print result
         return {
