@@ -4,11 +4,11 @@ import logging
 import json
 import math
 
-from wanglibao.settings import CJDAOKEY
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
 from django.db.models import Sum
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
@@ -32,7 +32,7 @@ from marketing.utils import set_promo_user
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
-from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, CjdaoUtils
+from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract#, CjdaoUtils
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
@@ -49,13 +49,14 @@ from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
 from wanglibao_p2p.models import P2PProduct
 from django.template.defaulttags import register
-from wanglibao_account.tasks import cjdao_callback
-from wanglibao.settings import RETURN_REGISTER
+# from wanglibao.settings import CJDAOKEY
+# from wanglibao_account.tasks import cjdao_callback
+# from wanglibao.settings import RETURN_REGISTER
 
 
 logger = logging.getLogger(__name__)
 
-User = get_user_model()
+#User = get_user_model()
 
 
 class RegisterView(RegistrationView):
@@ -179,7 +180,8 @@ class PasswordResetGetIdentifierView(TemplateView):
 
 def send_validation_mail(request, **kwargs):
     user_id = request.session['user_to_reset']
-    user_email = get_user_model().objects.get(pk=user_id).email
+    #user_email = get_user_model().objects.get(pk=user_id).email
+    user_email = User.objects.get(pk=user_id).email
 
     form = PasswordResetForm(data={
         'email': user_email
@@ -196,7 +198,8 @@ def send_validation_mail(request, **kwargs):
 
 def send_validation_phone_code(request, **kwargs):
     user_id = request.session['user_to_reset']
-    user_phone = get_user_model().objects.get(pk=user_id).wanglibaouserprofile.phone
+    #user_phone = get_user_model().objects.get(pk=user_id).wanglibaouserprofile.phone
+    user_phone = User.objects.get(pk=user_id).wanglibaouserprofile.phone
     phone_number = user_phone.strip()
 
     status, message = send_validation_code(phone_number)
@@ -209,7 +212,8 @@ def validate_phone_code(request):
     logger.info("Enter validate_phone_code")
     validate_code = request.POST['validate_code']
     user_id = request.session['user_to_reset']
-    user_phone = get_user_model().objects.get(pk=user_id).wanglibaouserprofile.phone
+    #user_phone = get_user_model().objects.get(pk=user_id).wanglibaouserprofile.phone
+    user_phone = User.objects.get(pk=user_id).wanglibaouserprofile.phone
     phone_number = user_phone.strip()
 
     status, message = validate_validation_code(phone_number, validate_code)
@@ -241,7 +245,8 @@ class ResetPassword(TemplateView):
             return HttpResponse(u'没有用户信息', status=500)
 
         user_id = request.session['user_to_reset']
-        user = get_user_model().objects.get(pk=user_id)
+        #user = get_user_model().objects.get(pk=user_id)
+        user = User.objects.get(pk=user_id)
 
         assert ('phone_validated_time' in request.session)
         last_validated_time = request.session['phone_validated_time']
@@ -257,7 +262,8 @@ class ResetPassword(TemplateView):
 
 
 class UserViewSet(PaginatedModelViewSet):
-    model = get_user_model()
+    #model = get_user_model()
+    model = User
     serializer_class = UserSerializer
     permission_classes = IsAdminUser,
 
@@ -765,7 +771,8 @@ class ResetPasswordAPI(APIView):
         identifier_type = detect_identifier_type(identifier)
 
         if identifier_type == 'phone':
-            user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
+            #user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
+            user = User.objects.get(wanglibaouserprofile__phone=identifier)
         else:
             return Response({'ret_code': 30003, 'message': u'请输入手机号码'})
 
@@ -942,21 +949,21 @@ def ajax_register(request):
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
 
-                # todo remove the try about cjdao callback
-                try:
-                    cjdaoinfo = request.session.get('cjdaoinfo')
-
-                    if cjdaoinfo:
-                        params = CjdaoUtils.return_register(cjdaoinfo, auth_user, CJDAOKEY)
-                        cjdao_callback.apply_async(kwargs={'url': RETURN_REGISTER, 'params': params})
-                except Exception, e:
-                    print e
+                # # todo remove the try about cjdao callback
+                # try:
+                #     cjdaoinfo = request.session.get('cjdaoinfo')
+                #
+                #     if cjdaoinfo:
+                #         params = CjdaoUtils.return_register(cjdaoinfo, auth_user, CJDAOKEY)
+                #         cjdao_callback.apply_async(kwargs={'url': RETURN_REGISTER, 'params': params})
+                # except Exception, e:
+                #     print e
 
                 auth.login(request, auth_user)
 
                 # session lost, but I don't know why, rewrite the session
-                if cjdaoinfo:
-                    request.session['cjdaoinfo'] = cjdaoinfo
+                # if cjdaoinfo:
+                #     request.session['cjdaoinfo'] = cjdaoinfo
                 tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
 
                 return HttpResponse(messenger('done', user=request.user))
@@ -1157,58 +1164,58 @@ class IntroduceRelation(TemplateView):
         return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)
 
 
-class CjdaoApiView(APIView):
-
-    """
-        财经道入口
-    """
-
-    permission_classes = ()
-
-    def get(self, request):
-        uaccount = request.GET.get('uaccount')
-        phone = request.GET.get('phone')
-        companyid = request.GET.get('companyid')
-        thirdproductid = request.GET.get('thirdproductid')
-
-        user = CjdaoUtils.get_wluser_by_phone(phone)
-
-        cjdaoinfo = {
-            'uaccount': uaccount,
-            'companyid': companyid,
-            'usertype': 0,
-        }
-        # 保存到 session
-        request.session['cjdaoinfo'] = cjdaoinfo
-
-        if thirdproductid:
-            try:
-                p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
-            except P2PProduct.DoesNotExist:
-                raise Http404(u'您查找的产品不存在')
-
-            request.session.get('cjdaoinfo').update(thirdproductid=int(thirdproductid))
-
-            if user:
-                request.session.get('cjdaoinfo').update(usertype=1)
-                return render_to_response('cjdao_login_product.jade', {'p2p': p2p, 'phone': phone})
-            else:
-                return render_to_response('cjdao_register_product.jade', {'p2p': p2p, 'phone': phone})
-        else:
-
-            if user:
-                request.session.get('cjdaoinfo').update(usertype=1)
-                return render_to_response('cjdao_login.jade', {'uaccount': uaccount, 'phone': phone})
-            else:
-                return render_to_response('cjdao_register.jade', {'uaccount': uaccount, 'phone': phone})
-
-
-
-
-
-
-
-
-
-
+# class CjdaoApiView(APIView):
+#
+#     """
+#         财经道入口
+#     """
+#
+#     permission_classes = ()
+#
+#     def get(self, request):
+#         uaccount = request.GET.get('uaccount')
+#         phone = request.GET.get('phone')
+#         companyid = request.GET.get('companyid')
+#         thirdproductid = request.GET.get('thirdproductid')
+#
+#         user = CjdaoUtils.get_wluser_by_phone(phone)
+#
+#         cjdaoinfo = {
+#             'uaccount': uaccount,
+#             'companyid': companyid,
+#             'usertype': 0,
+#         }
+#         # 保存到 session
+#         request.session['cjdaoinfo'] = cjdaoinfo
+#
+#         if thirdproductid:
+#             try:
+#                 p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
+#             except P2PProduct.DoesNotExist:
+#                 raise Http404(u'您查找的产品不存在')
+#
+#             request.session.get('cjdaoinfo').update(thirdproductid=int(thirdproductid))
+#
+#             if user:
+#                 request.session.get('cjdaoinfo').update(usertype=1)
+#                 return render_to_response('cjdao_login_product.jade', {'p2p': p2p, 'phone': phone})
+#             else:
+#                 return render_to_response('cjdao_register_product.jade', {'p2p': p2p, 'phone': phone})
+#         else:
+#
+#             if user:
+#                 request.session.get('cjdaoinfo').update(usertype=1)
+#                 return render_to_response('cjdao_login.jade', {'uaccount': uaccount, 'phone': phone})
+#             else:
+#                 return render_to_response('cjdao_register.jade', {'uaccount': uaccount, 'phone': phone})
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 

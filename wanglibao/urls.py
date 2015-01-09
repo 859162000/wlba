@@ -13,7 +13,7 @@ from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
-from wanglibao_account.views import CjdaoApiView
+# from wanglibao_account.views import CjdaoApiView
 from wanglibao_banner.views import HiringView
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
@@ -108,7 +108,7 @@ urlpatterns += patterns(
     url(r'^api/xunlei/getProjectList/$', XunleiP2PListAPIView.as_view()),
     url(r'^api/xunlei/getXLUserInvestInfo/$', XunleiP2PbyUser.as_view()),
     # 财经道
-    url(r'^accounts/cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
+    # url(r'^accounts/cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
 )
 
 if settings.DEBUG:

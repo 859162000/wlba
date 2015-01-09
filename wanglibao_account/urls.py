@@ -12,7 +12,7 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransactionDeposit,
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
                    Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailView, MessageCountView,
-                   MessageListView, AccountRepayment, CjdaoApiView)
+                   MessageListView, AccountRepayment)#, CjdaoApiView)
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
