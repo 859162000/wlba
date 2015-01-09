@@ -4,7 +4,6 @@ import logging
 import json
 import math
 
-from wanglibao.settings import CJDAOKEY
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
 from django.db.models import Sum
@@ -32,7 +31,7 @@ from marketing.utils import set_promo_user
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
-from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, CjdaoUtils
+from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract#, CjdaoUtils
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
@@ -49,8 +48,9 @@ from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
 from wanglibao_p2p.models import P2PProduct
 from django.template.defaulttags import register
-from wanglibao_account.tasks import cjdao_callback
-from wanglibao.settings import RETURN_REGISTER
+# from wanglibao.settings import CJDAOKEY
+# from wanglibao_account.tasks import cjdao_callback
+# from wanglibao.settings import RETURN_REGISTER
 
 
 logger = logging.getLogger(__name__)
@@ -931,21 +931,21 @@ def ajax_register(request):
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
 
-                # todo remove the try about cjdao callback
-                try:
-                    cjdaoinfo = request.session.get('cjdaoinfo')
-
-                    if cjdaoinfo:
-                        params = CjdaoUtils.return_register(cjdaoinfo, auth_user, CJDAOKEY)
-                        cjdao_callback.apply_async(kwargs={'url': RETURN_REGISTER, 'params': params})
-                except Exception, e:
-                    print e
+                # # todo remove the try about cjdao callback
+                # try:
+                #     cjdaoinfo = request.session.get('cjdaoinfo')
+                #
+                #     if cjdaoinfo:
+                #         params = CjdaoUtils.return_register(cjdaoinfo, auth_user, CJDAOKEY)
+                #         cjdao_callback.apply_async(kwargs={'url': RETURN_REGISTER, 'params': params})
+                # except Exception, e:
+                #     print e
 
                 auth.login(request, auth_user)
 
                 # session lost, but I don't know why, rewrite the session
-                if cjdaoinfo:
-                    request.session['cjdaoinfo'] = cjdaoinfo
+                # if cjdaoinfo:
+                #     request.session['cjdaoinfo'] = cjdaoinfo
                 tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
 
                 return HttpResponse(messenger('done', user=request.user))
@@ -1146,58 +1146,58 @@ class IntroduceRelation(TemplateView):
         return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)
 
 
-class CjdaoApiView(APIView):
-
-    """
-        财经道入口
-    """
-
-    permission_classes = ()
-
-    def get(self, request):
-        uaccount = request.GET.get('uaccount')
-        phone = request.GET.get('phone')
-        companyid = request.GET.get('companyid')
-        thirdproductid = request.GET.get('thirdproductid')
-
-        user = CjdaoUtils.get_wluser_by_phone(phone)
-
-        cjdaoinfo = {
-            'uaccount': uaccount,
-            'companyid': companyid,
-            'usertype': 0,
-        }
-        # 保存到 session
-        request.session['cjdaoinfo'] = cjdaoinfo
-
-        if thirdproductid:
-            try:
-                p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
-            except P2PProduct.DoesNotExist:
-                raise Http404(u'您查找的产品不存在')
-
-            request.session.get('cjdaoinfo').update(thirdproductid=int(thirdproductid))
-
-            if user:
-                request.session.get('cjdaoinfo').update(usertype=1)
-                return render_to_response('cjdao_login_product.jade', {'p2p': p2p, 'phone': phone})
-            else:
-                return render_to_response('cjdao_register_product.jade', {'p2p': p2p, 'phone': phone})
-        else:
-
-            if user:
-                request.session.get('cjdaoinfo').update(usertype=1)
-                return render_to_response('cjdao_login.jade', {'uaccount': uaccount, 'phone': phone})
-            else:
-                return render_to_response('cjdao_register.jade', {'uaccount': uaccount, 'phone': phone})
-
-
-
-
-
-
-
-
-
-
+# class CjdaoApiView(APIView):
+#
+#     """
+#         财经道入口
+#     """
+#
+#     permission_classes = ()
+#
+#     def get(self, request):
+#         uaccount = request.GET.get('uaccount')
+#         phone = request.GET.get('phone')
+#         companyid = request.GET.get('companyid')
+#         thirdproductid = request.GET.get('thirdproductid')
+#
+#         user = CjdaoUtils.get_wluser_by_phone(phone)
+#
+#         cjdaoinfo = {
+#             'uaccount': uaccount,
+#             'companyid': companyid,
+#             'usertype': 0,
+#         }
+#         # 保存到 session
+#         request.session['cjdaoinfo'] = cjdaoinfo
+#
+#         if thirdproductid:
+#             try:
+#                 p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
+#             except P2PProduct.DoesNotExist:
+#                 raise Http404(u'您查找的产品不存在')
+#
+#             request.session.get('cjdaoinfo').update(thirdproductid=int(thirdproductid))
+#
+#             if user:
+#                 request.session.get('cjdaoinfo').update(usertype=1)
+#                 return render_to_response('cjdao_login_product.jade', {'p2p': p2p, 'phone': phone})
+#             else:
+#                 return render_to_response('cjdao_register_product.jade', {'p2p': p2p, 'phone': phone})
+#         else:
+#
+#             if user:
+#                 request.session.get('cjdaoinfo').update(usertype=1)
+#                 return render_to_response('cjdao_login.jade', {'uaccount': uaccount, 'phone': phone})
+#             else:
+#                 return render_to_response('cjdao_register.jade', {'uaccount': uaccount, 'phone': phone})
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 

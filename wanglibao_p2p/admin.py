@@ -12,9 +12,9 @@ from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_account.tasks import cjdao_callback
-from wanglibao_account.utils import CjdaoUtils
-from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
+# from wanglibao_account.tasks import cjdao_callback
+# from wanglibao_account.utils import CjdaoUtils
+# from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
 
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
@@ -223,14 +223,14 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
         return ('amortization_count',)
 
     def save_model(self, request, obj, form, change):
-        if obj.status == u'正在招标':
-            # todo remove the try except
-            try:
-                # 财经道购买回调
-                params = CjdaoUtils.post_product(obj, CJDAOKEY)
-                cjdao_callback.apply_async(kwargs={'url': POST_PRODUCT_URL, 'params': params})
-            except:
-                pass
+        # if obj.status == u'正在招标':
+        #     # todo remove the try except
+        #     try:
+        #         # 财经道购买回调
+        #         params = CjdaoUtils.post_product(obj, CJDAOKEY)
+        #         cjdao_callback.apply_async(kwargs={'url': POST_PRODUCT_URL, 'params': params})
+        #     except:
+        #         pass
         super(P2PProductAdmin, self).save_model(request, obj, form, change)
 
 

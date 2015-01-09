@@ -177,120 +177,120 @@ PAY_METHOD = {
 }
 
 
-class CjdaoUtils():
-
-    @classmethod
-    def get_wluser_by_phone(cls, phone):
-        """
-
-        :param phone:
-        :return:
-        """
-        if phone:
-            return User.objects.filter(wanglibaouserprofile__phone=phone).first()
-
-    @classmethod
-    def quick_md5_value(cls, uaccount, phone, companyid, key):
-        data_string = '{}{}{}{}'.format(uaccount, phone, companyid, key)
-        return cls.md5str(data_string)
-
-    @classmethod
-    def md5_value(cls, *args):
-        data_string = ''.join(args)
-        m = hashlib.md5()
-        m.update(data_string)
-        return m.hexdigest()
-
-    @classmethod
-    def valid_md5(cls, str, *args):
-        data_string = ''.join(args)
-        m = hashlib.md5()
-        m.update(data_string)
-        return str == m.hexdigest()
-
-    @classmethod
-    def return_register(cls, cjdaoinfo, user, key):
-
-        k = ('phone', 'usertype', 'uaccount', 'companyid', 'accountbalance')
-
-        v = (user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')), str(cjdaoinfo.get('uaccount')),
-             str(cjdaoinfo.get('companyid')), str(float(user.margin.margin)), key)
-
-        p = dict(zip(k, v))
-        p.update(md5_value=cls.md5_value(*v))
-        return p
-
-
-    @classmethod
-    def return_purchase(cls, cjdaoinfo, user, margin_record, p2p, key):
-
-        reward = Decimal.from_float(0).quantize(Decimal('0.0000'), 'ROUND_DOWN')
-        if p2p.activity:
-            reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
-        expectedrate = Decimal.from_float(p2p.expected_earning_rate) / 100 + reward
-        expectedrate = float(expectedrate.quantize(Decimal('0.000'), 'ROUND_DOWN'))
-
-        terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
-                                                               p2p.expected_earning_rate / 100,
-                                                               p2p.amortization_count,
-                                                               p2p.period)
-        total_earning = terms.get("total") - p2p.total_amount
-
-        realincome = (margin_record.amount / p2p.total_amount ) * total_earning
-        realincome = realincome.quantize(Decimal('0.00'), 'ROUND_DOWN')
-
-        print realincome
-
-        k = ('uaccount', 'phone', 'usertype', 'companyid', 'thirdproductid',
-             'productname', 'buytime', 'money', 'expectedrate', 'realincome', 'transactionstatus',
-             'ordercode', 'accountbalance')
-
-
-        p2pname = p2p.name
-        productname = p2pname.encode('utf-8')
-
-        v = (cjdaoinfo.get('uaccount'), str(user.wanglibaouserprofile.phone), str(cjdaoinfo.get('usertype')),
-             cjdaoinfo.get('companyid'), str(p2p.id), productname,
-             timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
-             str(float(margin_record.amount)), str(expectedrate), str(realincome), '2', str(margin_record.order_id),
-             str(float(margin_record.margin_current)), key)
-
-        p = dict(zip(k, v))
-        p.update(md5_value=cls.md5_value(*v))
-
-        return p
-
-    @classmethod
-    def post_product(cls, p2p, key):
-
-        k = [
-            'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney',
-            'loandeadline',
-            'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment']
-
-
-        reward = 0
-        if p2p.activity:
-            reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
-        expectedrate = float(p2p.expected_earning_rate / 100) + float(reward)
-
-        p2pname = p2p.name
-        productname = p2pname.encode('utf-8')
-
-        incomeway = PAY_METHOD.get(p2p.pay_method, 0)
-        if incomeway:
-            v = (
-                str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
-                str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
-        else:
-            k.remove('incomeway')
-            v = (
-                str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
-                str(expectedrate), '1', 'a', '1', '1', '1', key)
-
-        p = dict(zip(k, v))
-        p.update(md5_value=cls.md5_value(*v))
-        return p
-
-
+# class CjdaoUtils():
+#
+#     @classmethod
+#     def get_wluser_by_phone(cls, phone):
+#         """
+#
+#         :param phone:
+#         :return:
+#         """
+#         if phone:
+#             return User.objects.filter(wanglibaouserprofile__phone=phone).first()
+#
+#     @classmethod
+#     def quick_md5_value(cls, uaccount, phone, companyid, key):
+#         data_string = '{}{}{}{}'.format(uaccount, phone, companyid, key)
+#         return cls.md5str(data_string)
+#
+#     @classmethod
+#     def md5_value(cls, *args):
+#         data_string = ''.join(args)
+#         m = hashlib.md5()
+#         m.update(data_string)
+#         return m.hexdigest()
+#
+#     @classmethod
+#     def valid_md5(cls, str, *args):
+#         data_string = ''.join(args)
+#         m = hashlib.md5()
+#         m.update(data_string)
+#         return str == m.hexdigest()
+#
+#     @classmethod
+#     def return_register(cls, cjdaoinfo, user, key):
+#
+#         k = ('phone', 'usertype', 'uaccount', 'companyid', 'accountbalance')
+#
+#         v = (user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')), str(cjdaoinfo.get('uaccount')),
+#              str(cjdaoinfo.get('companyid')), str(float(user.margin.margin)), key)
+#
+#         p = dict(zip(k, v))
+#         p.update(md5_value=cls.md5_value(*v))
+#         return p
+#
+#
+#     @classmethod
+#     def return_purchase(cls, cjdaoinfo, user, margin_record, p2p, key):
+#
+#         reward = Decimal.from_float(0).quantize(Decimal('0.0000'), 'ROUND_DOWN')
+#         if p2p.activity:
+#             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
+#         expectedrate = Decimal.from_float(p2p.expected_earning_rate) / 100 + reward
+#         expectedrate = float(expectedrate.quantize(Decimal('0.000'), 'ROUND_DOWN'))
+#
+#         terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
+#                                                                p2p.expected_earning_rate / 100,
+#                                                                p2p.amortization_count,
+#                                                                p2p.period)
+#         total_earning = terms.get("total") - p2p.total_amount
+#
+#         realincome = (margin_record.amount / p2p.total_amount ) * total_earning
+#         realincome = realincome.quantize(Decimal('0.00'), 'ROUND_DOWN')
+#
+#         print realincome
+#
+#         k = ('uaccount', 'phone', 'usertype', 'companyid', 'thirdproductid',
+#              'productname', 'buytime', 'money', 'expectedrate', 'realincome', 'transactionstatus',
+#              'ordercode', 'accountbalance')
+#
+#
+#         p2pname = p2p.name
+#         productname = p2pname.encode('utf-8')
+#
+#         v = (cjdaoinfo.get('uaccount'), str(user.wanglibaouserprofile.phone), str(cjdaoinfo.get('usertype')),
+#              cjdaoinfo.get('companyid'), str(p2p.id), productname,
+#              timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
+#              str(float(margin_record.amount)), str(expectedrate), str(realincome), '2', str(margin_record.order_id),
+#              str(float(margin_record.margin_current)), key)
+#
+#         p = dict(zip(k, v))
+#         p.update(md5_value=cls.md5_value(*v))
+#
+#         return p
+#
+#     @classmethod
+#     def post_product(cls, p2p, key):
+#
+#         k = [
+#             'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney',
+#             'loandeadline',
+#             'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment']
+#
+#
+#         reward = 0
+#         if p2p.activity:
+#             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
+#         expectedrate = float(p2p.expected_earning_rate / 100) + float(reward)
+#
+#         p2pname = p2p.name
+#         productname = p2pname.encode('utf-8')
+#
+#         incomeway = PAY_METHOD.get(p2p.pay_method, 0)
+#         if incomeway:
+#             v = (
+#                 str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
+#                 str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
+#         else:
+#             k.remove('incomeway')
+#             v = (
+#                 str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
+#                 str(expectedrate), '1', 'a', '1', '1', '1', key)
+#
+#         p = dict(zip(k, v))
+#         p.update(md5_value=cls.md5_value(*v))
+#         return p
+#
+#
 

@@ -108,7 +108,7 @@ urlpatterns += patterns(
     url(r'^api/xunlei/getProjectList/$', XunleiP2PListAPIView.as_view()),
     url(r'^api/xunlei/getXLUserInvestInfo/$', XunleiP2PbyUser.as_view()),
     # 财经道
-    url(r'^accounts/cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
+    # url(r'^accounts/cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
 )
 
 if settings.DEBUG:
