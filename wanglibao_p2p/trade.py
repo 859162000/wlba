@@ -93,17 +93,8 @@ class P2PTrader(object):
                             RewardRecord.objects.create(user=introduced_by.user, reward=rwd, description=content2)
                         except Exception, e:
                             print(e)
-
-        # 酒仙网邀请
-        jiuxian_introduce = IntroducedBy.objects.filter(user=self.user,
-                                                        introduced_by__promotiontoken__token='9xianw').first()
-        if jiuxian_introduce and jiuxian_introduce.bought_at is None:
-
-            jiuxian_introduce.bought_at = timezone.now()
-            jiuxian_introduce.save()
-
-            if amount >= 100:
-                invited_phone = safe_phone_str(jiuxian_introduce.user.wanglibaouserprofile.phone)
+            #酒仙网
+            if introduced_by.introduced_by.promotiontoken.token == "9xianw":
                 send_messages.apply_async(kwargs={
                     "phones": [invited_phone],
                     "messages": [messages.jiuxian_invited(money=30)]
@@ -111,19 +102,50 @@ class P2PTrader(object):
 
                 title, content = messages.msg_jiuxian()
                 inside_message.send_one.apply_async(kwargs={
-                    "user_id": jiuxian_introduce.user.id,
+                    "user_id": introduced_by.user.id,
                     "title": title,
                     "content": content,
                     "mtype": "activity"
                 })
-
                 rwd = Reward.objects.filter(type=u'30元话费').first()
                 if rwd:
                     try:
-                        RewardRecord.objects.create(user=jiuxian_introduce.user, reward=rwd,
+                        RewardRecord.objects.create(user=introduced_by.user, reward=rwd,
                                                     description=content)
                     except Exception, e:
                         print(e)
+
+
+        # 酒仙网邀请
+        #jiuxian_introduce = IntroducedBy.objects.filter(user=self.user,
+        #                                                introduced_by__promotiontoken__token='9xianw').first()
+        #if jiuxian_introduce and jiuxian_introduce.bought_at is None:
+        #
+        #    jiuxian_introduce.bought_at = timezone.now()
+        #    jiuxian_introduce.save()
+        #
+        #    if amount >= 100:
+        #        invited_phone = safe_phone_str(jiuxian_introduce.user.wanglibaouserprofile.phone)
+        #        send_messages.apply_async(kwargs={
+        #            "phones": [invited_phone],
+        #            "messages": [messages.jiuxian_invited(money=30)]
+        #        })
+        #
+        #        title, content = messages.msg_jiuxian()
+        #        inside_message.send_one.apply_async(kwargs={
+        #            "user_id": jiuxian_introduce.user.id,
+        #            "title": title,
+        #            "content": content,
+        #            "mtype": "activity"
+        #        })
+        #
+        #        rwd = Reward.objects.filter(type=u'30元话费').first()
+        #        if rwd:
+        #            try:
+        #                RewardRecord.objects.create(user=jiuxian_introduce.user, reward=rwd,
+        #                                            description=content)
+        #            except Exception, e:
+        #                print(e)
 
 
 
