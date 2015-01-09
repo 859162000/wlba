@@ -45,10 +45,6 @@ html
             - csrf_token
             .form-login-title
               span.cjdao-form-item 登录信息
-              span.login-now
-                | 还不是会员
-                br
-                a.blue(href="") 现在就去注册>>
             .space-vertical-l
             .form-row
               .span1.align-right 用户名
@@ -74,7 +70,7 @@ html
               .span7
                 button#login_submit.button.button-account.span12(type='submit') 立即登录
                 p.align-right
-                  a.blue(href="", target="_blank") 忘记密码？
+                  a.blue(href="/accounts/password/reset/identifier/") 忘记密码？
 
     script.
       require(["/static/js/login_cjdao.js"])

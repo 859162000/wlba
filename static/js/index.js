@@ -129,8 +129,11 @@
       $('.tabs a').mouseleave(function(e) {
         return tops.startScroll();
       });
-      return $('.tabs a').click(function(e) {
+      $('.tabs a').click(function(e) {
         return e.preventDefault();
+      });
+      return $('.panel-title-bar__tops').click(function(e) {
+        return location.href = '/activity/newyear';
       });
     });
   });
