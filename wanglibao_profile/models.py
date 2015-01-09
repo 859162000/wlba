@@ -1,5 +1,6 @@
 # encoding: utf-8
-from django.contrib.auth import get_user_model
+#from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 
@@ -10,7 +11,8 @@ USER_TYPE = (
 )
 
 class WanglibaoUserProfile(models.Model):
-    user = models.OneToOneField(get_user_model(), primary_key=True)
+    #user = models.OneToOneField(get_user_model(), primary_key=True)
+    user = models.OneToOneField(User, primary_key=True)
 
     frozen = models.BooleanField(u'冻结状态', default=False)
     nick_name = models.CharField(max_length=32, blank=True, help_text=u'昵称')
@@ -48,4 +50,5 @@ def create_profile(sender, **kw):
         profile = WanglibaoUserProfile(user=user)
         profile.save()
 
-post_save.connect(create_profile, sender=get_user_model(), dispatch_uid="users-profile-creation-signal")
+#post_save.connect(create_profile, sender=get_user_model(), dispatch_uid="users-profile-creation-signal")
+post_save.connect(create_profile, sender=User, dispatch_uid="users-profile-creation-signal")

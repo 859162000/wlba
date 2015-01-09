@@ -69,6 +69,8 @@ class RegisterView(RegistrationView):
         invitecode = cleaned_data['invitecode']
 
         user = create_user(identifier, password, nickname)
+        if not user:
+            return None
 
         set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
@@ -928,6 +930,9 @@ def ajax_register(request):
                 invitecode = form.cleaned_data['invitecode']
 
                 user = create_user(identifier, password, nickname)
+                if not user:
+                    return HttpResponse(messenger('error'))
+
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
 

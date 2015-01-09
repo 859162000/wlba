@@ -3,7 +3,7 @@ import string
 import uuid
 import re
 from django.conf import settings
-from django.contrib.auth import get_user_model
+#from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.template import Context, Template, add_to_builtins
@@ -13,7 +13,6 @@ from registration.models import RegistrationProfile
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd
 import logging
 import hashlib
-import requests
 from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 
@@ -63,12 +62,14 @@ def detect_identifier_type(identifier):
     return 'unknown'
 
 
-User = get_user_model()
+#User = get_user_model()
 
 
 def create_user(identifier, password, nickname):
     username = generate_username(identifier)
     identifier_type = detect_identifier_type(identifier)
+    if identifier_type =="unknown":
+        return None
 
     user = User(username=username)
     user.set_password(password)
