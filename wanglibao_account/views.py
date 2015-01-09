@@ -68,6 +68,9 @@ class RegisterView(RegistrationView):
         identifier = cleaned_data['identifier']
         invitecode = cleaned_data['invitecode']
 
+        if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
+            return None
+
         user = create_user(identifier, password, nickname)
         if not user:
             return None
@@ -928,6 +931,9 @@ def ajax_register(request):
                 password = form.cleaned_data['password']
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
+
+                if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
+                    return HttpResponse(messenger('error'))
 
                 user = create_user(identifier, password, nickname)
                 if not user:
