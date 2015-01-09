@@ -134,8 +134,9 @@ class RegisterAPIView(APIView):
         if status != 200:
             return Response({"ret_code": 30014, "message": u"验证码输入错误"})
 
-        if User.objects.filter(wanglibaouserprofile__phone=identifier,
-                               wanglibaouserprofile__phone_verified=True).exists():
+        #if User.objects.filter(wanglibaouserprofile__phone=identifier,
+        #                       wanglibaouserprofile__phone_verified=True).exists():
+        if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30015, "message": u"该手机号已经注册"})
 
         invite_code = request.DATA.get('invite_code', "")
@@ -187,8 +188,9 @@ class WeixinRegisterAPIView(APIView):
         if status != 200:
             return Response({"ret_code": 30023, "message": "验证码输入错误"})
 
-        if User.objects.filter(wanglibaouserprofile__phone=identifier,
-                               wanglibaouserprofile__phone_verified=True).exists():
+        #if User.objects.filter(wanglibaouserprofile__phone=identifier,
+        #                       wanglibaouserprofile__phone_verified=True).exists():
+        if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30024, "message": "该手机号已经注册"})
 
         invite_code = request.DATA.get('invite_code', "").strip()
@@ -488,11 +490,11 @@ class UserExisting(APIView):
         Get whether the user existing
         """
 
-        query = Q(email=identifier) \
-                | \
-                (Q(wanglibaouserprofile__phone=identifier) &
-                 Q(wanglibaouserprofile__phone_verified=True))
-        user = User.objects.filter(query).first()
+        #query = Q(email=identifier) \
+        #        | \
+        #        (Q(wanglibaouserprofile__phone=identifier) &
+        #         Q(wanglibaouserprofile__phone_verified=True))
+        user = User.objects.filter(wanglibaouserprofile__phone=identifier).first()
         if user:
             return Response({"existing":True})
         else:
