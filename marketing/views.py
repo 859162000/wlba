@@ -90,18 +90,10 @@ class TopsView(TemplateView):
             today = datetime.now()
         else:
             today = datetime.strptime(day, '%Y-%m-%d')
-        #end = self.request.GET.get('end', '')
-        # if start and end:
-        #     d0 = datetime.strptime(start, '%Y-%m-%d').date()
-        #     d1 = datetime.strptime(end, '%Y-%m-%d').date()
-        # else:
-        #     d0 = (datetime.now() - timedelta(days=7)).date()
-        #     d1 = date.today()
         top = Top()
         result = top.day_tops(today)
         all = top.all_tops()
-        week_tops = top.certain_week(week)
-        #result = []
+        week_tops = top.certain_week(int(week))
         print result
         return {
             'result': result,
