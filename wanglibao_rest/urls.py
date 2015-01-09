@@ -22,9 +22,9 @@ from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSe
     P2PProductDetailView
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
-                            YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
-                            KuaiPayAppPayView, KuaiPayAppPayCallbackView, KuaiPayQueryView,
-                            KuaiPayDelView, KuaiPayDynNumView)
+                            YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,)
+                            #KuaiPayAppPayView, KuaiPayAppPayCallbackView, KuaiPayQueryView,
+                            #KuaiPayDelView, KuaiPayDynNumView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
