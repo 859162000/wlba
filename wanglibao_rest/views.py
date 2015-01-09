@@ -8,7 +8,7 @@ import re
 from django.db.models import Count, Sum
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login
-from django.db.models import Q
+#from django.db.models import Q
 from django.db.models import F
 from rest_framework import generics, renderers
 from django.http import HttpResponse
