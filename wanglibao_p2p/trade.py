@@ -15,9 +15,9 @@ from wanglibao_p2p.models import P2PProduct
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
-from wanglibao_account.utils import CjdaoUtils
-from wanglibao_account.tasks import cjdao_callback
-from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
+# from wanglibao_account.utils import CjdaoUtils
+# from wanglibao_account.tasks import cjdao_callback
+# from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 
 
 class P2PTrader(object):
@@ -60,7 +60,7 @@ class P2PTrader(object):
 
                 inviter_id = introduced_by.introduced_by.id
                 invited_id = introduced_by.user.id
-                if amount >= 1000:
+                if amount >= 100:
                     inviter_phone = safe_phone_str(inviter_phone)
                     invited_phone = safe_phone_str(invited_phone)
 
@@ -102,7 +102,7 @@ class P2PTrader(object):
             jiuxian_introduce.bought_at = timezone.now()
             jiuxian_introduce.save()
 
-            if amount >= 500:
+            if amount >= 100:
                 invited_phone = safe_phone_str(jiuxian_introduce.user.wanglibaouserprofile.phone)
                 send_messages.apply_async(kwargs={
                     "phones": [invited_phone],
@@ -139,22 +139,22 @@ class P2PTrader(object):
         })
 
 
-        # 财经道购买回调
-        # todo remove the try
-        logger = logging.getLogger('p2p')
-        try:
-            cjdaoinfo = self.request.session.get('cjdaoinfo')
-
-            logger.debug('购买购买购买购买购买购买购买 session %s' % cjdaoinfo)
-
-            if cjdaoinfo:
-                if cjdaoinfo.get('thirdproductid') == equity.product.id:
-                    params = CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
-                    cjdao_callback.apply_async(kwargs={'url': RETURN_PURCHARSE_URL, 'params': params})
-        except Exception, e:
-            print e
-            logger.debug('购买异常')
-            logger.debug(e)
+        # # 财经道购买回调
+        # # todo remove the try
+        # logger = logging.getLogger('p2p')
+        # try:
+        #     cjdaoinfo = self.request.session.get('cjdaoinfo')
+        #
+        #     logger.debug('购买购买购买购买购买购买购买 session %s' % cjdaoinfo)
+        #
+        #     if cjdaoinfo:
+        #         if cjdaoinfo.get('thirdproductid') == equity.product.id:
+        #             params = CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
+        #             cjdao_callback.apply_async(kwargs={'url': RETURN_PURCHARSE_URL, 'params': params})
+        # except Exception, e:
+        #     print e
+        #     logger.debug('购买异常')
+        #     logger.debug(e)
 
 
         # 满标给管理员发短信
