@@ -60,7 +60,7 @@ class P2PTrader(object):
 
                 inviter_id = introduced_by.introduced_by.id
                 invited_id = introduced_by.user.id
-                if amount >= 1000:
+                if amount >= 100:
                     inviter_phone = safe_phone_str(inviter_phone)
                     invited_phone = safe_phone_str(invited_phone)
 
@@ -102,7 +102,7 @@ class P2PTrader(object):
             jiuxian_introduce.bought_at = timezone.now()
             jiuxian_introduce.save()
 
-            if amount >= 500:
+            if amount >= 100:
                 invited_phone = safe_phone_str(jiuxian_introduce.user.wanglibaouserprofile.phone)
                 send_messages.apply_async(kwargs={
                     "phones": [invited_phone],
