@@ -95,6 +95,7 @@ class P2PTrader(object):
                             print(e)
             #酒仙网
             if introduced_by.introduced_by.promotiontoken.token == "9xianw":
+                invited_phone = introduced_by.user.wanglibaouserprofile.phone
                 send_messages.apply_async(kwargs={
                     "phones": [invited_phone],
                     "messages": [messages.jiuxian_invited(money=30)]
