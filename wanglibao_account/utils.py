@@ -4,6 +4,8 @@ import uuid
 import re
 from django.conf import settings
 #from django.contrib.auth import get_user_model
+from django.db import transaction
+from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.template import Context, Template, add_to_builtins
@@ -65,6 +67,7 @@ def detect_identifier_type(identifier):
 #User = get_user_model()
 
 
+@method_decorator(transaction.atomic)
 def create_user(identifier, password, nickname):
     username = generate_username(identifier)
     identifier_type = detect_identifier_type(identifier)
