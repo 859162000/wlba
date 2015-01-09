@@ -31,7 +31,6 @@ from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization
-from marketing.models import Activity
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from wanglibao_sms import messages, backends
 from django.utils import timezone
@@ -147,6 +146,9 @@ class RegisterAPIView(APIView):
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
 
         user = create_user(identifier, password, "")
+        if not user:
+            return Response({"ret_code": 30014, "message": u"注册失败"})
+
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
@@ -199,6 +201,9 @@ class WeixinRegisterAPIView(APIView):
         password = generate_validate_code()
         # password = random.randint(100000, 999999)
         user = create_user(identifier, password, "")
+        if not user:
+            return Response({"ret_code": 30025, "message": u"注册失败"})
+
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
         auth_user = authenticate(identifier=identifier, password=password)
