@@ -127,7 +127,7 @@ class Top(object):
         if week < 1 or week > 4:
             return []
 
-        return self.day_tops(self.activity_start_local+timedelta(weeks=week-1))
+        return self.week_tops(self.activity_start_local+timedelta(weeks=week-1))
 
 
     def week_tops(self, start):
