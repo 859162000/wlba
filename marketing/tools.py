@@ -114,7 +114,13 @@ def decide_first(user_id, amount):
 @app.task
 def register_ok(user_id):
     user = User.objects.filter(id=user_id).first()
-    channel = helper.which_channel(user)
+
+    introduced_by = IntroducedBy.objects.filter(user=user).first()
+    channel = helper.which_channel(user, intro=introduced_by)
+
+    if "channel" not in introduced_by.introduced_by.username:
+        return
+
     if channel == helper.Channel.FENGXING:
         title, content = messages.msg_register_f()
     else:
