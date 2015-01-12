@@ -26,7 +26,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         required: true
         number: true
         positiveNumber: true
-        dividableBy100: true
+        #dividableBy100: true
 
     messages:
       amount:

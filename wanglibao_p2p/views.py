@@ -23,7 +23,7 @@ from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData, ClientData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
-from wanglibao_p2p.forms import PurchaseForm
+from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant
 from wanglibao_p2p.serializers import P2PProductSerializer
@@ -132,7 +132,8 @@ class PurchaseP2P(APIView):
                                 'message': u'请先进行实名认证',
                                 'error_number': ErrorNumber.need_authentication
                             }, status=status.HTTP_400_BAD_REQUEST)
-        form = PurchaseForm(request.DATA)
+        #form = PurchaseForm(request.DATA)
+        form = BillForm(request.DATA)
 
         if form.is_valid():
             p2p = form.cleaned_data['product']

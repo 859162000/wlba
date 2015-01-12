@@ -26,8 +26,7 @@
         amount: {
           required: true,
           number: true,
-          positiveNumber: true,
-          dividableBy100: true
+          positiveNumber: true
         }
       },
       messages: {
