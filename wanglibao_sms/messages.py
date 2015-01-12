@@ -90,7 +90,7 @@ def msg_bid_fail(product_name):
 
 def msg_register():
     title = u"注册成功"
-    content = u"感谢您注册网利宝。 完成实名认证并充值，免费领取7天迅雷会员激活码。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
+    content = u"感谢您注册网利宝。 完成实名认证并充值。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
     return title, content
 
 #风行过来的注册成功
