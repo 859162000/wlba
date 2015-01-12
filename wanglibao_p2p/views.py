@@ -121,6 +121,16 @@ class PurchaseP2P(APIView):
     def allowed_methods(self):
         return ['POST']
 
+    def p2p_form(self, request):
+        p2p_id = request.DATA.get("product", "").strip()
+        category = P2PProduct.objects.filter(pk=p2p_id)[0].category
+        if category and category == '票据':
+            form = BillForm(request.DATA)
+        else:
+            form = PurchaseForm(request.DATA)
+
+        return form
+
     def post(self, request):
         if not request.user.is_authenticated():
             return Response({
@@ -132,8 +142,15 @@ class PurchaseP2P(APIView):
                                 'message': u'请先进行实名认证',
                                 'error_number': ErrorNumber.need_authentication
                             }, status=status.HTTP_400_BAD_REQUEST)
-        #form = PurchaseForm(request.DATA)
-        form = BillForm(request.DATA)
+
+        # p2p_id = request.DATA.get("product", "").strip()
+        # category = P2PProduct.objects.filter(pk=p2p_id)[0].category
+        # if category and category == '票据':
+        #     form = BillForm(request.DATA)
+        # else:
+        #     form = PurchaseForm(request.DATA)
+
+        form = self.p2p_form(request)
 
         if form.is_valid():
             p2p = form.cleaned_data['product']

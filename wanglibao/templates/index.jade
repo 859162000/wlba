@@ -107,7 +107,9 @@ html
                         span.icon.icon-up-arrow
                         a#p2p-new-announce(data-url="/announcement/detail/{{announce.id}}", href="javascript:viod(0);") {{announce.title}}
                 .panel-title-bar
-                  if product.warrant_company
+                  if product.category == '票据'
+                    .bill-icon 票
+                  elif product.warrant_company
                     .warrant-icon 担
                   a(href="/p2p/detail/{{product.id}}") {{product.name}}
                   if product.category == '证大速贷'

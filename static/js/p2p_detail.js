@@ -14,20 +14,36 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate"], function($, _, backend, calculator, countdown, tool, modal) {
-    var buildTable;
+    var buildTable, opt;
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0 && !/\./ig.test(value);
     }, '请输入100的整数倍');
+    $.validator.addMethod('integer', function(value, element) {
+      var notInteger;
+      notInteger = /\.\d*[^0]+\d*$/ig.test(value);
+      return !($.isNumeric(value) && notInteger);
+    }, '请输入整数');
     $.validator.addMethod('positiveNumber', function(value, element) {
       return Number(value) > 0;
     }, '请输入有效金额');
+    if ($('#id_amount').attr('p2p-type') === '票据') {
+      opt = {
+        required: true,
+        number: true,
+        positiveNumber: true,
+        integer: true
+      };
+    } else {
+      opt = {
+        required: true,
+        number: true,
+        positiveNumber: true,
+        dividableBy100: true
+      };
+    }
     $('#purchase-form').validate({
       rules: {
-        amount: {
-          required: true,
-          number: true,
-          positiveNumber: true
-        }
+        amount: opt
       },
       messages: {
         amount: {

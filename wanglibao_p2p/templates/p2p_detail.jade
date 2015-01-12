@@ -108,7 +108,7 @@ html
                     .row
                       period = p2p.period * 30
                       user_limit = u"100的整数倍"
-                      -render_field form.amount class+="span12" type="text" placeholder=user_limit data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
+                      -render_field form.amount class+="span12" type="text" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
                     .form-row-error
                 .row
                   span.span4 预期收益
