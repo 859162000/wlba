@@ -143,4 +143,6 @@ def which_channel(user, intro=None):
             return Channel.FENGXING
         elif phone.startswith('jiuxian'):
             return Channel.JIUXIAN
+        elif phone.startswith('xunlei'):
+            return Channel.XUNLEI
     return Channel.WANGLIBAO
