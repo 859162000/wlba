@@ -2,6 +2,7 @@
 # encoding:utf-8
 
 import json
+import datetime
 from StringIO import StringIO
 from fabric.api import env, run, task, roles, cd, sudo, execute, parallel, prompt, prefix, put, hide, settings
 from contextlib import contextmanager
@@ -270,7 +271,12 @@ def depoly_static():
 
 #更新所有
 def depoly_www():
+    start = datetime.datetime.now()
     execute(check_out)
     execute(depoly_static_action)
     execute(depoly_web_action)
     execute(depoly_mq_action)
+    end = datetime.datetime.now()
+    print green("success in %s" % str(end-start).split(".")[0])
+    print green("%s" % str(end).split(".")[0])
+

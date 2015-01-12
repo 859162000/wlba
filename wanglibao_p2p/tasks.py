@@ -8,10 +8,8 @@ from order.utils import OrderHelper
 from wanglibao.celery import app
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning
-from wanglibao_account.models import Binding
 from wanglibao_p2p.trade import P2POperator
-from django.db.models import Sum, connection
-from datetime import datetime
+from django.db.models import Sum
 from django.contrib.auth.models import User
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
