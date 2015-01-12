@@ -16,6 +16,7 @@ from wanglibao.admin import ReadPermissionModelAdmin
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
 
+forms.DEFAULT_MAX_NUM = 2000
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (
