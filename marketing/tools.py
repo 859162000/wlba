@@ -25,15 +25,15 @@ def decide_first(user_id, amount):
     amount = long(amount)
 
     introduced_by = IntroducedBy.objects.filter(user=user).first()
+    if introduced_by and introduced_by.bought_at is not None:
+        return
+
     introduced_by.bought_at = timezone.now()
     introduced_by.save()
 
     channel = helper.which_channel(user, intro=introduced_by)
 
     if "channel" not in introduced_by.introduced_by.username:
-        if introduced_by and introduced_by.bought_at is not None:
-            return
-
         inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
         invited_phone = introduced_by.user.wanglibaouserprofile.phone
 
