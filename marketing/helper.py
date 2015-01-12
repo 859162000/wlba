@@ -17,6 +17,7 @@ class Channel():
     KUAIPAN = 1
     WANGLIBAO = 3
     FENGXING = 4
+    JIUXIAN = 5
 
 
 
@@ -128,13 +129,18 @@ class RewardStrategy():
         })
 
 
-def which_channel(user):
+def which_channel(user, intro=None):
     """ 渠道判断 """
-    ib = IntroducedBy.objects.filter(user=user).first()
+    if not intro:
+        ib = IntroducedBy.objects.filter(user=user).first()
+    else:
+        ib = intro
     if ib:
         phone = ib.introduced_by.wanglibaouserprofile.phone.lower()
         if phone.startswith('kuaipan'):
             return Channel.KUAIPAN
         elif phone.startswith('fengxing'):
             return Channel.FENGXING
+        elif phone.startswith('jiuxian'):
+            return Channel.JIUXIAN
     return Channel.WANGLIBAO
