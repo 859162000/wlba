@@ -5,9 +5,9 @@ import logging
 from django.db import transaction
 from django.utils import timezone
 from marketing import tools
-from marketing.models import IntroducedBy, Reward, RewardRecord
+#from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
-from wanglibao.templatetags.formatters import safe_phone_str
+#from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
