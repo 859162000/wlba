@@ -31,12 +31,15 @@ def decide_first(user_id, amount):
     channel = helper.which_channel(user, intro=introduced_by)
 
     if "channel" not in introduced_by.introduced_by.username:
+        if introduced_by and introduced_by.bought_at is not None:
+            return
+
         inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
         invited_phone = introduced_by.user.wanglibaouserprofile.phone
 
         inviter_id = introduced_by.introduced_by.id
         invited_id = introduced_by.user.id
-        if amount >= 100:
+        if amount >= 500:
             inviter_phone = safe_phone_str(inviter_phone)
             invited_phone = safe_phone_str(invited_phone)
 
