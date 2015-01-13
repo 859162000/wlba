@@ -116,6 +116,7 @@ class BindingAdmin(admin.ModelAdmin):
 class MessageAdmin(admin.ModelAdmin):
     list_display = ("id", "target_user", "message_text", "read_status", "format_read_at")
     raw_id_fields = ('target_user', 'message_text')
+    search_fields = ('target_user__wanglibaouserprofile__phone',)
 
     def format_read_at(self, obj):
         return datetime.datetime.fromtimestamp(obj.read_at)

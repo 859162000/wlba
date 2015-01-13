@@ -916,7 +916,7 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
         else:
             return HttpResponseForbidden('not valid ajax request')
     else:
-        return HttpResponseNotAllowed()
+        return HttpResponseNotAllowed(["GET"])
 
 
 @sensitive_post_parameters()
@@ -972,7 +972,7 @@ def ajax_register(request):
         else:
             return HttpResponseForbidden('not valid ajax request')
     else:
-        return HttpResponseNotAllowed()
+        return HttpResponseNotAllowed(["GET"])
 
 
 class P2PAmortizationView(TemplateView):
