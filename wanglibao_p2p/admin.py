@@ -4,6 +4,7 @@ from concurrency.admin import ConcurrentModelAdmin
 import datetime
 from django.contrib import admin, messages
 from django import forms
+from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning
@@ -16,7 +17,7 @@ from wanglibao.admin import ReadPermissionModelAdmin
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
 
-forms.DEFAULT_MAX_NUM = 2000
+formsets.DEFAULT_MAX_NUM = 2000
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (

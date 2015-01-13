@@ -1,12 +1,13 @@
+#!/usr/bin/env python
 # encoding: utf-8
 import logging
 
 from django.db import transaction
 from django.utils import timezone
 from marketing import tools
-from marketing.models import IntroducedBy, Reward, RewardRecord
+#from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
-from wanglibao.templatetags.formatters import safe_phone_str
+#from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
@@ -44,111 +45,79 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-        tools.decide_first.apply_async(kwargs={"user_id": self.user.id})
+        tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount})
 
         # todo: merger the code about activity,remove the rubbish code
-        introduced_by = IntroducedBy.objects.filter(user=self.user).first()
+        #introduced_by = IntroducedBy.objects.filter(user=self.user).first()
 
         # phone_verified 渠道客户判断
-        if introduced_by and introduced_by.bought_at is None:
-            introduced_by.bought_at = timezone.now()
-            introduced_by.save()
-
-            if "channel" not in introduced_by.introduced_by.username:
-                inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
-                invited_phone = introduced_by.user.wanglibaouserprofile.phone
-
-                inviter_id = introduced_by.introduced_by.id
-                invited_id = introduced_by.user.id
-                if amount >= 100:
-                    inviter_phone = safe_phone_str(inviter_phone)
-                    invited_phone = safe_phone_str(invited_phone)
-
-                    send_messages.apply_async(kwargs={
-                        "phones": [inviter_phone, invited_phone],
-                        "messages": [messages.gift_inviter(invited_phone=invited_phone, money=30),
-                                     messages.gift_invited(inviter_phone=inviter_phone, money=30)]
-                    })
-                    # 发站内信
-                    title, content = messages.msg_invite_major(inviter_phone, invited_phone)
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id": inviter_id,
-                        "title": title,
-                        "content": content,
-                        "mtype": "activity"
-                    })
-                    title2, content2 = messages.msg_invite_are(inviter_phone, invited_phone)
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id": invited_id,
-                        "title": title2,
-                        "content": content2,
-                        "mtype": "activity"
-                    })
-
-                    rwd = Reward.objects.filter(type=u'30元话费').first()
-                    if rwd:
-                        try:
-                            RewardRecord.objects.create(user=introduced_by.introduced_by, reward=rwd,
-                                                        description=content)
-                            RewardRecord.objects.create(user=introduced_by.user, reward=rwd, description=content2)
-                        except Exception, e:
-                            print(e)
-            #酒仙网
-            if introduced_by.introduced_by.promotiontoken.token == "9xianw":
-                invited_phone = introduced_by.user.wanglibaouserprofile.phone
-                send_messages.apply_async(kwargs={
-                    "phones": [invited_phone],
-                    "messages": [messages.jiuxian_invited(money=30)]
-                })
-
-                title, content = messages.msg_jiuxian()
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": introduced_by.user.id,
-                    "title": title,
-                    "content": content,
-                    "mtype": "activity"
-                })
-                rwd = Reward.objects.filter(type=u'30元话费').first()
-                if rwd:
-                    try:
-                        RewardRecord.objects.create(user=introduced_by.user, reward=rwd,
-                                                    description=content)
-                    except Exception, e:
-                        print(e)
-
-
-        # 酒仙网邀请
-        #jiuxian_introduce = IntroducedBy.objects.filter(user=self.user,
-        #                                                introduced_by__promotiontoken__token='9xianw').first()
-        #if jiuxian_introduce and jiuxian_introduce.bought_at is None:
+        #if introduced_by and introduced_by.bought_at is None:
+        #    introduced_by.bought_at = timezone.now()
+        #    introduced_by.save()
         #
-        #    jiuxian_introduce.bought_at = timezone.now()
-        #    jiuxian_introduce.save()
+        #    if "channel" not in introduced_by.introduced_by.username:
+        #        inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
+        #        invited_phone = introduced_by.user.wanglibaouserprofile.phone
         #
-        #    if amount >= 100:
-        #        invited_phone = safe_phone_str(jiuxian_introduce.user.wanglibaouserprofile.phone)
-        #        send_messages.apply_async(kwargs={
-        #            "phones": [invited_phone],
-        #            "messages": [messages.jiuxian_invited(money=30)]
-        #        })
+        #        inviter_id = introduced_by.introduced_by.id
+        #        invited_id = introduced_by.user.id
+        #        if amount >= 100:
+        #            inviter_phone = safe_phone_str(inviter_phone)
+        #            invited_phone = safe_phone_str(invited_phone)
         #
-        #        title, content = messages.msg_jiuxian()
-        #        inside_message.send_one.apply_async(kwargs={
-        #            "user_id": jiuxian_introduce.user.id,
-        #            "title": title,
-        #            "content": content,
-        #            "mtype": "activity"
-        #        })
+        #            send_messages.apply_async(kwargs={
+        #                "phones": [inviter_phone, invited_phone],
+        #                "messages": [messages.gift_inviter(invited_phone=invited_phone, money=30),
+        #                             messages.gift_invited(inviter_phone=inviter_phone, money=30)]
+        #            })
+        #            # 发站内信
+        #            title, content = messages.msg_invite_major(inviter_phone, invited_phone)
+        #            inside_message.send_one.apply_async(kwargs={
+        #                "user_id": inviter_id,
+        #                "title": title,
+        #                "content": content,
+        #                "mtype": "activity"
+        #            })
+        #            title2, content2 = messages.msg_invite_are(inviter_phone, invited_phone)
+        #            inside_message.send_one.apply_async(kwargs={
+        #                "user_id": invited_id,
+        #                "title": title2,
+        #                "content": content2,
+        #                "mtype": "activity"
+        #            })
         #
-        #        rwd = Reward.objects.filter(type=u'30元话费').first()
-        #        if rwd:
-        #            try:
-        #                RewardRecord.objects.create(user=jiuxian_introduce.user, reward=rwd,
-        #                                            description=content)
-        #            except Exception, e:
-        #                print(e)
-
-
+        #            rwd = Reward.objects.filter(type=u'30元话费').first()
+        #            if rwd:
+        #                try:
+        #                    RewardRecord.objects.create(user=introduced_by.introduced_by, reward=rwd,
+        #                                                description=content)
+        #                    RewardRecord.objects.create(user=introduced_by.user, reward=rwd, description=content2)
+        #                except Exception, e:
+        #                    print(e)
+        #
+        #    #酒仙网
+        #    if introduced_by.introduced_by.promotiontoken.token == "9xianw":
+        #        if amount >= 500:
+        #            invited_phone = introduced_by.user.wanglibaouserprofile.phone
+        #            send_messages.apply_async(kwargs={
+        #                "phones": [invited_phone],
+        #                "messages": [messages.jiuxian_invited(money=30)]
+        #            })
+        #            
+        #            title, content = messages.msg_jiuxian()
+        #            inside_message.send_one.apply_async(kwargs={
+        #                "user_id": introduced_by.user.id,
+        #                "title": title,
+        #                "content": content,
+        #                "mtype": "activity"
+        #            })
+        #            rwd = Reward.objects.filter(type=u'30元话费').first()
+        #            if rwd:
+        #                try:
+        #                    RewardRecord.objects.create(user=introduced_by.user, reward=rwd,
+        #                                                description=content)
+        #                except Exception, e:
+        #                    print(e)
 
         # 投标成功发站内信
         pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
