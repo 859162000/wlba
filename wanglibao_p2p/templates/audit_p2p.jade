@@ -26,64 +26,6 @@ html
               td {{p2p.total_amount}}
               td {{p2p.ordered_amount}}
 
-    //
-      .panel
-        .panel-title-bar
-          .panel-title 用户持仓情况
-
-        equities = p2p.equities.all()
-        table.table
-          thead
-            tr
-              th 用户id
-              th 用户手机号
-              th 用户姓名
-              th 身份证
-              th 认购份额
-              th 合同
-
-          tbody
-            for equity in equities
-              tr
-                td {{equity.user.id}}
-                td {{equity.user.wanglibaouserprofile.phone}}
-                td {{equity.user.wanglibaouserprofile.name}}
-                td {{equity.user.wanglibaouserprofile.id_number}}
-                td {{equity.equity}}
-                if equity.contract
-                  td
-                    a(href="/media/{{equity.contract}}") 借款合同
-                else
-                  td 合同未生成
-
-      .panel
-        .panel-title-bar
-          .panel-title 用户还款计划
-        product_amortizations = p2p.amortizations.all()
-        for amort in product_amortizations
-          h2 {{amort.term_date | date:"Y-m-d"}}
-          table.table
-            thead
-              tr
-                th 用户id
-                th 用户手机号
-                th 姓名
-                th 身份证
-                th 本金
-                th 利息
-                th 罚息
-            tbody
-              user_amorts = amort.subs.all()
-              for user_amort in user_amorts
-                tr
-                  td {{user_amort.user.id}}
-                  td {{user_amort.user.wanglibaouserprofile.phone}}
-                  td {{user_amort.user.wanglibaouserprofile.name}}
-                  td {{user_amort.user.wanglibaouserprofile.id_number}}
-                  td {{user_amort.principal}}
-                  td {{user_amort.interest}}
-                  td {{user_amort.penal_interest}}
-
     .panel
       .panel-title-bar
         .panel-title 动作
