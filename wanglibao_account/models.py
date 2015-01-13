@@ -110,7 +110,7 @@ class MessageText(models.Model):
     created_at = models.BigIntegerField(default=timestamp, verbose_name=u"时间戳", blank=True)
 
     def __unicode__(self):
-        return u'%s type:%s' % (self.title, self.mtype)
+        return u'type:%s|%s|%s' % (self.mtype, self.title, self.content)
 
     class Meta:
         verbose_name = u"站内信内容"
