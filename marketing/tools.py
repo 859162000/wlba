@@ -25,7 +25,7 @@ def decide_first(user_id, amount):
     amount = long(amount)
 
     introduced_by = IntroducedBy.objects.filter(user=user).first()
-    if introduced_by and introduced_by.bought_at is not None:
+    if not introduced_by or introduced_by.bought_at is not None:
         return
 
     introduced_by.bought_at = timezone.now()
