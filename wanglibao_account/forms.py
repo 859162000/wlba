@@ -62,7 +62,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         if identifier_type == 'email':
             users = User.objects.filter(email=identifier, is_active=True)
         elif identifier_type == 'phone':
-            users = User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True)
+            #users = User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True)
+            users = User.objects.filter(wanglibaouserprofile__phone=identifier)
         else:
             raise forms.ValidationError(
                 self.error_messages['invalid_identifier_type'],

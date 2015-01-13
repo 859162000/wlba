@@ -8,7 +8,7 @@ import re
 from django.db.models import Count, Sum
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login
-from django.db.models import Q
+#from django.db.models import Q
 from django.db.models import F
 from rest_framework import generics, renderers
 from django.http import HttpResponse
@@ -31,7 +31,6 @@ from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization
-from marketing.models import Activity
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from wanglibao_sms import messages, backends
 from django.utils import timezone
@@ -135,8 +134,9 @@ class RegisterAPIView(APIView):
         if status != 200:
             return Response({"ret_code": 30014, "message": u"验证码输入错误"})
 
-        if User.objects.filter(wanglibaouserprofile__phone=identifier,
-                               wanglibaouserprofile__phone_verified=True).exists():
+        #if User.objects.filter(wanglibaouserprofile__phone=identifier,
+        #                       wanglibaouserprofile__phone_verified=True).exists():
+        if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30015, "message": u"该手机号已经注册"})
 
         invite_code = request.DATA.get('invite_code', "")
@@ -147,6 +147,9 @@ class RegisterAPIView(APIView):
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
 
         user = create_user(identifier, password, "")
+        if not user:
+            return Response({"ret_code": 30014, "message": u"注册失败"})
+
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
@@ -185,8 +188,9 @@ class WeixinRegisterAPIView(APIView):
         if status != 200:
             return Response({"ret_code": 30023, "message": "验证码输入错误"})
 
-        if User.objects.filter(wanglibaouserprofile__phone=identifier,
-                               wanglibaouserprofile__phone_verified=True).exists():
+        #if User.objects.filter(wanglibaouserprofile__phone=identifier,
+        #                       wanglibaouserprofile__phone_verified=True).exists():
+        if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30024, "message": "该手机号已经注册"})
 
         invite_code = request.DATA.get('invite_code', "").strip()
@@ -199,6 +203,9 @@ class WeixinRegisterAPIView(APIView):
         password = generate_validate_code()
         # password = random.randint(100000, 999999)
         user = create_user(identifier, password, "")
+        if not user:
+            return Response({"ret_code": 30025, "message": u"注册失败"})
+
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
         auth_user = authenticate(identifier=identifier, password=password)
@@ -483,11 +490,11 @@ class UserExisting(APIView):
         Get whether the user existing
         """
 
-        query = Q(email=identifier) \
-                | \
-                (Q(wanglibaouserprofile__phone=identifier) &
-                 Q(wanglibaouserprofile__phone_verified=True))
-        user = User.objects.filter(query).first()
+        #query = Q(email=identifier) \
+        #        | \
+        #        (Q(wanglibaouserprofile__phone=identifier) &
+        #         Q(wanglibaouserprofile__phone_verified=True))
+        user = User.objects.filter(wanglibaouserprofile__phone=identifier).first()
         if user:
             return Response({"existing":True})
         else:

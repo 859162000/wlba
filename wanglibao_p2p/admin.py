@@ -4,6 +4,7 @@ from concurrency.admin import ConcurrentModelAdmin
 import datetime
 from django.contrib import admin, messages
 from django import forms
+from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning
@@ -12,10 +13,11 @@ from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_account.tasks import cjdao_callback
-from wanglibao_account.utils import CjdaoUtils
-from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
+# from wanglibao_account.tasks import cjdao_callback
+# from wanglibao_account.utils import CjdaoUtils
+# from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
 
+formsets.DEFAULT_MAX_NUM = 2000
 
 class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = (
@@ -223,14 +225,14 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
         return ('amortization_count',)
 
     def save_model(self, request, obj, form, change):
-        if obj.status == u'正在招标':
-            # todo remove the try except
-            try:
-                # 财经道购买回调
-                params = CjdaoUtils.post_product(obj, CJDAOKEY)
-                cjdao_callback.apply_async(kwargs={'url': POST_PRODUCT_URL, 'params': params})
-            except:
-                pass
+        # if obj.status == u'正在招标':
+        #     # todo remove the try except
+        #     try:
+        #         # 财经道购买回调
+        #         params = CjdaoUtils.post_product(obj, CJDAOKEY)
+        #         cjdao_callback.apply_async(kwargs={'url': POST_PRODUCT_URL, 'params': params})
+        #     except:
+        #         pass
         super(P2PProductAdmin, self).save_model(request, obj, form, change)
 
 

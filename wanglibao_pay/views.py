@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
-from marketing.helper import RewardStrategy
 import re
 import socket
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator
-from django.contrib.auth.models import User
 from django.db import transaction
 from django.forms import model_to_dict
 from django.http import HttpResponse
@@ -599,28 +597,6 @@ class AdminTransactionDeposit(TemplateView):
         return super(AdminTransactionDeposit, self).dispatch(request, *args, **kwargs)
 
 
-"""
-#连连支付IOS生成订单
-class LianlianAppPayView(APIView):
-    permission_classes = (IsAuthenticated, )
-
-    def post(self, request):
-        lianpay = third_pay.LianlianPay()
-        result = lianpay.ios_pay(request)
-        return Response(result)
-
-#连连支付IOS支付成功回调
-class LianlianAppPayCallbackView(APIView):
-    permission_classes = ()
-
-    def post(self, request):
-        lianpay = third_pay.LianlianPay()
-        result = lianpay.ios_pay_callback(request)
-        if not result['ret_code']:
-            result['ret_code'] = "0000"
-            result['ret_msg'] = "SUCCESS"
-        return Response(result)
-"""
 
 # 易宝支付创建订单接口
 class YeePayAppPayView(APIView):
@@ -742,19 +718,3 @@ class WithdrawAPIView(APIView):
                 "mtype": "withdraw"
             })
         return Response(result)
-
-
-"""
-class LianlianWithdrawAPIView(APIView):
-    permission_classes = (IsAuthenticated, )
-
-    def post(self, request):
-        lianpay = third_pay.LianlianPay()
-        result = lianpay.ios_withdraw(request)
-        if not result['ret_code']:
-            send_messages.apply_async(kwargs={
-                'phones': [result['phone']],
-                'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
-            })
-        return Response(result)
-"""
