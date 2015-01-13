@@ -84,12 +84,12 @@ html
                   td {{user_amort.interest}}
                   td {{user_amort.penal_interest}}
 
-  .panel
-    .panel-title-bar
-      .panel-title 动作
-    .well
-      form(method="POST", action="{{request.url}}").pull-left
-        -csrf_token
-        button.button-primary(type="submit") 审核通过
+    .panel
+      .panel-title-bar
+        .panel-title 动作
+      .well
+        form(method="POST", action="{{request.url}}").pull-left
+          -csrf_token
+          button.button-primary(type="submit") 审核通过
 
-      a.button-primary.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/p2pproduct/') 返回
+        a.button-primary.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/p2pproduct/') 返回

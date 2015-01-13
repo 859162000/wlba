@@ -122,7 +122,7 @@ def msg_validate_ok(activation):
 
 def msg_validate_ok2(activation):
     title = u"实名认证成功"
-    content = u"恭喜您完成实名认证，赠送给您的50G快盘会员激活码：%s，有效期至2015年12月31日。<a href='http://www.kuaipan.cn/n/user/records/lottery'>兑换快盘激活码</a><br/><a href='/pay/banks/' target='_blank'>立即充值</a>免费领取7天迅雷白金会员激活码。<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"恭喜您完成实名认证，赠送给您的50G快盘会员激活码：%s，有效期至2015年12月31日。<a href='http://www.kuaipan.cn/n/user/records/lottery'>兑换快盘激活码</a><br/><a href='/pay/banks/' target='_blank'>立即充值</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 def msg_validate_fake():
