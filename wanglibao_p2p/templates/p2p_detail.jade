@@ -29,13 +29,9 @@ html
                   span.tip 满标后持满180天即可债权转让
               .span3-omega
                 div.pull-right.p2p-warrant-way
-                  //author: hetao; datetime: 2014.10.27; description: 统一改为第三方本息保障
-                  //if p2p.category == '证大速贷'
-                  span.icon-check-shield
-                  a(href="/security/", target="_blank") 第三方本息保障
-                  //else
+                  if p2p.category != '票据'
                     span.icon-check-shield
-                    a(href="/security/", target="_blank") 第三方本息担保
+                    a(href="/security/", target="_blank") 第三方本息保障
           .p2p-detail-content
             .row
               .span4
