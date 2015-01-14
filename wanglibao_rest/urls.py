@@ -32,7 +32,7 @@ from wanglibao_profile.views import ProfileView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
-                            YTXVoiceCallbackAPIView, SendVoiceCodeAPIView,
+                            YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView)
 
@@ -88,6 +88,9 @@ urlpatterns = patterns(
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
+
+    url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),
+
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^profile/', ProfileView.as_view()),
     url(r'^total_income', TotalIncome.as_view()),
