@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # encoding:utf-8
 
 import json
@@ -72,6 +73,30 @@ class SendValidationCodeView(APIView):
                         }, status=status)
 
 
+class TestSendRegisterValidationCodeView(APIView):
+    permission_classes = ()
+
+    def post(self, request, phone):
+        phone = phone.strip()
+        user = WanglibaoUserProfile.objects.filter(phone=phone).first()
+        print(user)
+        if user:
+            return Response({"ret_code":-1, "message":"手机号已经注册"})
+
+        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone).first()
+        print(phone_validate_code_item)
+
+        if phone_validate_code_item:
+            phone_validate_code_item.code_send_count += 1
+        else:
+            phone_validate_code_item = PhoneValidateCode()
+            phone_validate_code_item.phone = phone
+        phone_validate_code_item.validate_code = generate_validate_code()
+        phone_validate_code_item.last_send_time = timezone.now()
+        phone_validate_code_item.is_validated = False
+        phone_validate_code_item.save()
+        return Response({"ret_code":0, "message":"ok", "vcode":phone_validate_code_item.validate_code})
+
 class SendRegisterValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone
@@ -81,7 +106,8 @@ class SendRegisterValidationCodeView(APIView):
 
     def post(self, request, phone, format=None):
         phone_number = phone.strip()
-        phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
+        #phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
+        phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
             return Response({
                                 "message": u"该手机号已经被注册，不能重复注册",
