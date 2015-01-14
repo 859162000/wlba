@@ -39,7 +39,7 @@ block main
           a(href="/accounts/home/")
             p.align-center
               span.big_number {{p2p_total_asset|money_format}}
-            p.align-center P2P资产(元)
+            p.align-center 理财专区(元)
         .sign-money-card
           +
       else
@@ -47,7 +47,7 @@ block main
           a(href="/accounts/home/")
             p.align-center
               span.big_number {{p2p_total_asset|money_format}}
-            p.align-center P2P资产(元)
+            p.align-center 理财专区(元)
         .sign-money-card
           +
       if mode == 'p2p'
@@ -68,7 +68,7 @@ block main
       .account-home-panel--title-bar__product
         ul.title-bar--tabs
           li.title-bar--tab.active
-            a.title-bar--tab--anchor(href="javascript:void(0)") P2P
+            a.title-bar--tab--anchor(href="javascript:void(0)") 理财专区
           li.title-bar--tab
             a.title-bar--tab--anchor(href="/accounts/home/fund/") 货币基金
         a.pull-right.align-right.detail-view(href='/accounts/transaction/p2p/') 查看交易记录
@@ -81,7 +81,7 @@ block main
           .total-asset-money-card
             p.align-center
               span.big_number {{p2p_total_asset|money_format}}
-            p.align-center.desc P2P资产(元)
+            p.align-center.desc 理财专区资产(元)
 
           .sign-money-card
             =
@@ -90,7 +90,7 @@ block main
             .p2p-asset--detail
               p
                 span.big_number {{user.margin.margin | money_format}}
-              p.desc P2P余额
+              p.desc 余额
             .sign-money-card
               +
             .p2p-asset--detail
