@@ -157,12 +157,13 @@ def despoit_ok(pay_info):
             "content": content,
             "mtype": "pay"
         })
-    else:
+    elif channel == helper.Channel.XUNLEI:
         start_time = timezone.datetime(2014, 12, 30)
         if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
                 status=PayInfo.SUCCESS).count() == 1:
             rs = RewardStrategy(pay_info.user)
             rs.reward_user(u'七天迅雷会员')
+    else:
         title, content = messages.msg_pay_ok(pay_info.amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id": pay_info.user.id,
