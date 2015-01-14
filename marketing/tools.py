@@ -157,7 +157,7 @@ def despoit_ok(pay_info):
             "content": content,
             "mtype": "pay"
         })
-    elif channel == helper.Channel.XUNLEI:
+    else:
         start_time = timezone.datetime(2014, 12, 30)
         if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
                 status=PayInfo.SUCCESS).count() == 1:
