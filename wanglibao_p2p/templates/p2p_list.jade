@@ -25,7 +25,9 @@ html
             .panel-p2p-product
               .shadow-inner
                 .panel-title-bar
-                  if product.warrant_company
+                  if product.category == '票据'
+                    .bill-icon 票
+                  elif product.warrant_company
                     .warrant-icon 担
                   a(href="/p2p/detail/{{product.id}}") {{product.name}}
                   if product.category == '证大速贷'
@@ -100,10 +102,14 @@ html
                     .span5.align-left
                       if product.category == '证大速贷'
                         span 本息保障: &nbsp;&nbsp;
+                      elif product.category == '票据'
+                        span 承兑行: &nbsp;&nbsp;
                       else
                         span 担保机构: &nbsp;&nbsp;
 
                       span.d3-text {{product.warrant_company.name}}
+                      if product.category == '票据'
+                        span &nbsp;&nbsp;无条件兑付
                     .span3-omega.align-right
                       span 还款方式: &nbsp;&nbsp;
                       span.d3-text {{product.display_payback_method}}
