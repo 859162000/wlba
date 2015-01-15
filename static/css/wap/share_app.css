@@ -201,12 +201,20 @@ header {
   height: 13.5em;
   background-size: 100% 100%;
 }
+.crazy-feast-header {
+  background: url("/static/images/wap/crazy_h5.jpg") no-repeat center;
+  height: 13.5em;
+  background-size: 100% 100%;
+}
 .activity-app-content h2 {
   font-size: 100%;
 }
 @media screen and (max-width: 320px) {
   header {
     height: 13em;
+  }
+  .crazy-feast-header {
+    height: 10.7em;
   }
   .activity-app-header {
     height: 14.3em;
@@ -215,12 +223,15 @@ header {
     height: 13.5em;
   }
   .activity-app-content h2 {
-    font-size: 110%;
+    font-size: 100%;
   }
 }
 @media screen and (min-width: 360px) {
   header {
     height: 15.3em;
+  }
+  .crazy-feast-header {
+    height: 12.4em;
   }
   .activity-app-header {
     height: 15.8em;
@@ -229,12 +240,15 @@ header {
     height: 15.5em;
   }
   .activity-app-content h2 {
-    font-size: 125%;
+    font-size: 115%;
   }
 }
 @media screen and (min-width: 414px) {
   header {
     height: 17.3em;
+  }
+  .crazy-feast-header {
+    height: 13.9em;
   }
   .activity-app-header {
     height: 18.5em;
