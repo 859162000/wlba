@@ -163,8 +163,8 @@ class PasswordResetGetIdentifierView(TemplateView):
             else:
                 view = PasswordResetValidateView()
                 view.request = request
-                if identifier_type == 'phone':
-                    send_validation_code(identifier)
+                # if identifier_type == 'phone':
+                #     send_validation_code(identifier)
                 request.session['user_to_reset'] = users[0].id
                 return view.render_to_response({
                     'user_to_reset': users[0]

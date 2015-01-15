@@ -68,7 +68,6 @@
       e.preventDefault();
       return $('#nextStep').click();
     });
-    _countDown();
     return $(".voice").on('click', '.voice-validate', function(e) {
       var element, url;
       e.preventDefault();

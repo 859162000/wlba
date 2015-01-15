@@ -59,7 +59,7 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
   $('#validate_form').on 'submit', (e) ->
     e.preventDefault()
     $('#nextStep').click()
-  _countDown()
+#  _countDown()
 
   $(".voice").on 'click', '.voice-validate', (e)->
     e.preventDefault()
