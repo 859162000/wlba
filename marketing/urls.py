@@ -22,4 +22,5 @@ urlpatterns = patterns(
     url(r'^newyear/$', NewYearView.as_view(), name="new year"),
     url(r'^shengyan/$', TemplateView.as_view(template_name="shengyan.jade")),
     url(r'^app_shengyan/$', TemplateView.as_view(template_name="shengyan_h5.jade")),
+    url(r'^xunleidenglu/$', TemplateView.as_view(template_name="xunleidenglu.jade")),
 )
