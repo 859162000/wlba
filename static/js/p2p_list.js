@@ -9,7 +9,7 @@
     }
   });
 
-  require(['jquery'], function($) {
+  require(['jquery', 'lib/countdown'], function($, countdown) {
     $('.container').on('click', '.panel-p2p-product', function() {
       var url;
       url = $('.panel-title-bar a', $(this)).attr('href');

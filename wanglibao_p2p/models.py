@@ -68,7 +68,8 @@ class P2PProduct(ProductBase):
 
     CATEGORY_CHOICES = (
         (u'普通', u'普通'),
-        (u'证大速贷', u'证大速贷')
+        (u'证大速贷', u'证大速贷'),
+        (u'票据', u'票据'),
     )
 
     PAY_METHOD_CHOICES = (

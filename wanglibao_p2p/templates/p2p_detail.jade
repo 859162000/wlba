@@ -29,13 +29,9 @@ html
                   span.tip 满标后持满180天即可债权转让
               .span3-omega
                 div.pull-right.p2p-warrant-way
-                  //author: hetao; datetime: 2014.10.27; description: 统一改为第三方本息保障
-                  //if p2p.category == '证大速贷'
-                  span.icon-check-shield
-                  a(href="/security/", target="_blank") 第三方本息保障
-                  //else
+                  if p2p.category != '票据'
                     span.icon-check-shield
-                    a(href="/security/", target="_blank") 第三方本息担保
+                    a(href="/security/", target="_blank") 第三方本息保障
           .p2p-detail-content
             .row
               .span4
@@ -107,8 +103,11 @@ html
                   span.span8-omega
                     .row
                       period = p2p.period * 30
-                      user_limit = u"100的整数倍"
-                      -render_field form.amount class+="span12" type="text" placeholder=user_limit data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
+                      if p2p.category == '票据'
+                        user_limit = u"1元起投"
+                      else
+                        user_limit = u"100的整数倍"
+                      -render_field form.amount class+="span12" type="text" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
                     .form-row-error
                 .row
                   span.span4 预期收益
@@ -188,6 +187,8 @@ html
                 .img-container
                   img(src="/media/{{attachment.file}}")
                   h2 {{attachment.name}}
+
+          include include/bill_note
 
         .span4-omega.border-left.clearfix
           .tops-container.border-no

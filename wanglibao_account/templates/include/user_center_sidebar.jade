@@ -22,7 +22,7 @@ ul.sidebar
   if activeItem == '交易记录' or activeItem == '货基交易记录'
       display = 'display:block'
   ul.sidebar-secondary(style=display)
-    +sidebar-item('P2P交易记录', '/accounts/transaction/p2p/')
+    +sidebar-item('理财交易记录', '/accounts/transaction/p2p/')
     +sidebar-item('货基交易记录', '/accounts/transaction/fund/')
 
   +sidebar-item('银行卡', '/accounts/bankcard/')

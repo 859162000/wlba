@@ -10,7 +10,7 @@ html
     meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
   body.white-background
     include include/header
-    - with 'P2P理财' as activeItem
+    - with '理财专区' as activeItem
     include include/navigation
     - endwith
 
@@ -25,7 +25,9 @@ html
             .panel-p2p-product
               .shadow-inner
                 .panel-title-bar
-                  if product.warrant_company
+                  if product.category == '票据'
+                    .bill-icon 票
+                  elif product.warrant_company
                     .warrant-icon 担
                   a(href="/p2p/detail/{{product.id}}") {{product.name}}
                   if product.category == '证大速贷'
@@ -100,10 +102,15 @@ html
                     .span5.align-left
                       if product.category == '证大速贷'
                         span 本息保障: &nbsp;&nbsp;
+                        span.d3-text {{product.warrant_company.name}}
+                      elif product.category == '票据'
+                        span 承兑行: &nbsp;&nbsp;
+                        span.red-text {{product.warrant_company.name}}
+                        span &nbsp;&nbsp;无条件兑付
                       else
                         span 担保机构: &nbsp;&nbsp;
+                        span.d3-text {{product.warrant_company.name}}
 
-                      span.d3-text {{product.warrant_company.name}}
                     .span3-omega.align-right
                       span 还款方式: &nbsp;&nbsp;
                       span.d3-text {{product.display_payback_method}}

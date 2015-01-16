@@ -3,17 +3,17 @@ extends account_home_base
 -load formatters
 
 block head
-  - with 'P2P交易记录' as title
+  - with '理财交易记录' as title
     include include/head
 
 block sidebar
   - with '交易记录' as activeItem
-    - with 'P2P交易记录' as activeSubItem
+    - with '理财交易记录' as activeSubItem
       include include/user_center_sidebar
 
 block main
   .panel.p2p-record
-    h1 P2P交易记录
+    h1 理财交易记录
     .account-home-panel--title-bar__product
       ul.title-bar--tabs
         li.title-bar--tab.active

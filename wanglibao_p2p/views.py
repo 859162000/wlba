@@ -23,7 +23,7 @@ from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData, ClientData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
-from wanglibao_p2p.forms import PurchaseForm
+from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant
 from wanglibao_p2p.serializers import P2PProductSerializer
@@ -121,6 +121,16 @@ class PurchaseP2P(APIView):
     def allowed_methods(self):
         return ['POST']
 
+    def p2p_form(self, request):
+        p2p_id = request.DATA.get("product", "").strip()
+        category = P2PProduct.objects.filter(pk=p2p_id)[0].category
+        if category and category == '票据':
+            form = BillForm(request.DATA)
+        else:
+            form = PurchaseForm(request.DATA)
+
+        return form
+
     def post(self, request):
         if not request.user.is_authenticated():
             return Response({
@@ -132,7 +142,15 @@ class PurchaseP2P(APIView):
                                 'message': u'请先进行实名认证',
                                 'error_number': ErrorNumber.need_authentication
                             }, status=status.HTTP_400_BAD_REQUEST)
-        form = PurchaseForm(request.DATA)
+
+        # p2p_id = request.DATA.get("product", "").strip()
+        # category = P2PProduct.objects.filter(pk=p2p_id)[0].category
+        # if category and category == '票据':
+        #     form = BillForm(request.DATA)
+        # else:
+        #     form = PurchaseForm(request.DATA)
+
+        form = self.p2p_form(request)
 
         if form.is_valid():
             p2p = form.cleaned_data['product']
@@ -322,11 +340,11 @@ class P2PProductViewSet(PaginatedModelViewSet):
         if pager:
             return qs.filter(hide=False).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).filter(pager).order_by('-priority', '-publish_time')
+            ]).filter(~Q(category=u'票据')).filter(pager).order_by('-priority', '-publish_time')
         else:
             return qs.filter(hide=False).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).order_by('-priority', '-publish_time')
+            ]).filter(~Q(category=u'票据')).order_by('-priority', '-publish_time')
 
 
 class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
