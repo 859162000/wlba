@@ -67,6 +67,38 @@ class ProductKeeper(KeeperBaseMixin):
         return trace
 
 
+class EquityKeeperDecorator():
+
+    def __init__(self, product, order_id=None):
+        self.product = product
+        self.order_id = order_id
+        pass
+
+    @transaction.commit_manually
+    def generate_contract(self, savepoint=True):
+
+        with transaction.atomic(savepoint=savepoint):
+            equity_list = list()
+            for p2p_equity in self.product.equities.all():
+                #EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
+
+                product = p2p_equity.product
+                user = p2p_equity.user
+                equity_query = P2PEquity.objects.filter(user=user, product=product)
+                if (not equity_query.exists()) or (len(equity_query) != 1):
+                    raise P2PException('can not get equity info.')
+
+                equity = equity_query.first()
+                contract_string = generate_contract(equity)
+                equity.contract.save(str(equity.id)+'.html', ContentFile(contract_string))
+                equity_list.append(equity)
+                equity.save()
+
+            #P2PEquity.objects.bulk_create(equity_list)
+            transaction.commit()
+
+
+
 class EquityKeeper(KeeperBaseMixin):
 
     def __init__(self, user, product, order_id=None):
@@ -181,12 +213,14 @@ class AmortizationKeeper(KeeperBaseMixin):
             for equity in equities:
                 self.__dispatch(equity)
 
+    @transaction.commit_manually
     def __dispatch(self, equity):
         total_principal = equity.equity
         total_interest = self.product_interest * equity.ratio
         paid_principal = Decimal('0')
         paid_interest = Decimal('0')
         count = len(self.amortizations)
+        user_amos = list()
         for i, amo in enumerate(self.amortizations):
             if i+1 != count:
                 principal = equity.ratio * amo.principal
@@ -203,7 +237,15 @@ class AmortizationKeeper(KeeperBaseMixin):
                 product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
                 principal=principal, interest=interest
             )
+            user_amos.append(user_amo)
             user_amo.save()
+
+        print '#####', user_amos, '----------'
+
+        #UserAmortization.objects.bulk_create(user_amos)
+        transaction.commit()
+
+
 
     @classmethod
     def get_ready_for_settle(self):

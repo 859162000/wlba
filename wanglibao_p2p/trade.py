@@ -10,7 +10,7 @@ from order.models import Order
 #from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
-from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
+from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper, EquityKeeperDecorator
 from exceptions import P2PException
 from wanglibao_p2p.models import P2PProduct
 from wanglibao_sms import messages
@@ -210,8 +210,9 @@ class P2POperator(object):
             amo_keeper = AmortizationKeeper(product, order_id=order.id)
             amo_keeper.generate_amortization_plan(savepoint=False)
 
-            for equity in product.equities.all():
-                EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
+            # for equity in product.equities.all():
+            #     EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
+            EquityKeeperDecorator(product, order.id).generate_contract(savepoint=False)
 
             product = P2PProduct.objects.get(pk=product.id)
             product.status = u'满标待审核'
