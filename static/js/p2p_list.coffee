@@ -5,7 +5,7 @@ require.config
   shim:
     'jquery.modal': ['jquery']
 
-require ['jquery'], ($)->
+require ['jquery', 'lib/countdown'], ($, countdown)->
 
   $('.container').on 'click', '.panel-p2p-product', ->
     url = $('.panel-title-bar a', $(this)).attr('href')
