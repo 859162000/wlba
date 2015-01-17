@@ -197,9 +197,11 @@ class P2POperator(object):
                 cls.logger.error(u'%s, %s' % (amortization, e.message))
 
     @classmethod
+    #@transaction.commit_manually
     def preprocess_for_settle(cls, product):
         cls.logger.info('Enter pre process for settle for product: %d: %s', product.id, product.name)
 
+        import os
         # Create an order to link all changes
         order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
 

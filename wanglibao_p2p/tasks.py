@@ -24,7 +24,10 @@ def p2p_watchdog():
 
 @app.task
 def process_paid_product(product_id):
+    import os
+    os.system('touch /Users/wlb/enter')
     P2POperator.preprocess_for_settle(P2PProduct.objects.get(pk=product_id))
+    print 'hello'
 
 @app.task
 def full_send_message(product_name):

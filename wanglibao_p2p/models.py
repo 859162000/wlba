@@ -388,6 +388,13 @@ class P2PEquity(models.Model):
         ordering = ('-created_at',)
 
     @property
+    def latest_contract(self):
+        if self.contract:
+            return self.contract
+        else:
+            return self.equity_contract
+
+    @property
     def related_orders(self):
         records = list()
         return records
@@ -595,3 +602,12 @@ class Earning(models.Model):
     update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
     confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
 
+
+class Contract(models.Model):
+
+    class Meta:
+        ordering = ['-created_at']
+
+    contract = models.FileField(u'合同文件', null=True, blank=True, upload_to='contracts')
+    equity = models.OneToOneField(P2PEquity, null=True, blank=False, related_name="equity_contract")
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True, null=True)
