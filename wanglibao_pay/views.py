@@ -6,7 +6,9 @@ from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.forms import model_to_dict
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template.loader import get_template
+from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -259,9 +261,19 @@ class WithdrawCompleteView(TemplateView):
             pay_info.status = PayInfo.FAIL
             pay_info.save()
 
-        return self.render_to_response({
-            'result': result
-        })
+        # return self.render_to_response({
+        #     'result': result
+        # })
+        return HttpResponseRedirect(reverse('withdraw-complete-result', kwargs={'result': result}))
+
+
+class WithdrawRedirectView(TemplateView):
+    template_name = 'withdraw_complete.jade'
+
+    def get_context_data(self, result, **kwargs):
+        return {
+            "result": result
+        }
 
 
 class WithdrawCallback(View):
