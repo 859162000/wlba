@@ -1,6 +1,5 @@
 # encoding: utf8
 
-import time
 from operator import attrgetter
 from decimal import Decimal
 from hashlib import md5
@@ -49,7 +48,7 @@ class P2PDetailView(TemplateView):
         context = super(P2PDetailView, self).get_context_data(**kwargs)
 
         try:
-            p2p = P2PProduct.objects.select_related('activity').get(pk=id, hide=False)
+            p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').get(pk=id, hide=False)
             form = PurchaseForm(initial={'product': p2p})
 
             if p2p.soldout_time:
