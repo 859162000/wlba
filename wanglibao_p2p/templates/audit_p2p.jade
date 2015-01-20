@@ -49,9 +49,9 @@ html
                 td {{equity.user.wanglibaouserprofile.name}}
                 td {{equity.user.wanglibaouserprofile.id_number}}
                 td {{equity.equity}}
-                if equity.contract
+                if equity.latest_contract
                   td
-                    a(href="/media/{{equity.contract}}") 借款合同
+                    a(href="/media/{{equity.latest_contract}}") 借款合同
                 else
                   td 合同未生成
 
