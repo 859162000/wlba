@@ -10,7 +10,7 @@ from order.mixins import KeeperBaseMixin
 from wanglibao_account.utils import generate_contract
 from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
-    UserAmortization, Contract
+    UserAmortization, P2PContract
 from exceptions import ProductLack, P2PException
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_sms import messages
@@ -74,31 +74,31 @@ class EquityKeeperDecorator():
         self.order_id = order_id
         pass
 
-    #@transaction.commit_manually
     def generate_contract(self, savepoint=True):
 
         with transaction.atomic(savepoint=savepoint):
             contract_list = list()
-            for p2p_equity in self.product.equities.all():
+            #p2p_quities = self.product.equities.select_related('user', 'product').all()
+            p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
+            for p2p_equity in p2p_equities:
                 #EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
 
-                product = p2p_equity.product
-                user = p2p_equity.user
-                equity_query = P2PEquity.objects.filter(user=user, product=product)
-                if (not equity_query.exists()) or (len(equity_query) != 1):
-                    raise P2PException('can not get equity info.')
+                # product = p2p_equity.product
+                # user = p2p_equity.user
+                # equity_query = P2PEquity.objects.filter(user=user, product=product)
+                # if (not equity_query.exists()) or (len(equity_query) != 1):
+                #     raise P2PException('can not get equity info.')
+                #
+                # equity = equity_query.first()
+                contract_string = generate_contract(p2p_equity, None, p2p_equities)
+                print p2p_equity.user.wanglibaouserprofile.phone
 
-                equity = equity_query.first()
-                contract_string = generate_contract(equity)
-
-                contract = Contract()
-                contract.contract.save(str(equity.id)+'.html', ContentFile(contract_string))
-                contract.equity = equity
+                contract = P2PContract()
+                contract.contract_path.save(str(p2p_equity.id)+'.html', ContentFile(contract_string), False)
+                contract.equity = p2p_equity
                 contract_list.append(contract)
-                print contract
 
-            #IntegrityError: (1062, "Duplicate entry '23' for key 'PRIMARY'")
-            Contract.objects.bulk_create(contract_list)
+            P2PContract.objects.bulk_create(contract_list)
 
 
 
@@ -201,13 +201,11 @@ class AmortizationKeeper(KeeperBaseMixin):
         self.product = product
 
     def generate_amortization_plan(self, savepoint=True):
-        import os
-        os.system('touch ~/docs/hello1')
         if self.product.status != u'满标已打款':
             raise P2PException('invalid product status.')
         self.amortizations = self.product.amortizations.all()
         self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
-        equities = self.product.equities.all()
+        equities = self.product.equities.select_related('user').all()
 
         get_amortization_plan(self.product.pay_method).calculate_term_date(self.product)
         # Delete all old user amortizations

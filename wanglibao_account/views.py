@@ -1025,7 +1025,8 @@ def user_product_contract(request, product_id):
     equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
 
     try:
-        f = equity.contract
+        #f = equity.contract
+        f = equity.latest_contract
         lines = f.readlines()
         f.close()
         return HttpResponse("\n".join(lines))
@@ -1040,7 +1041,8 @@ class UserProductContract(APIView):
         equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
 
         try:
-            f = equity.contract
+            #f = equity.contract
+            f = equity.latest_contract
             lines = f.readlines()
             f.close()
             return HttpResponse("\n".join(lines))
