@@ -10,7 +10,7 @@ from order.mixins import KeeperBaseMixin
 from wanglibao_account.utils import generate_contract
 from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
-    UserAmortization
+    UserAmortization, P2PContract
 from exceptions import ProductLack, P2PException
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_sms import messages
@@ -65,6 +65,41 @@ class ProductKeeper(KeeperBaseMixin):
                           description=description, order_id=self.order_id, product=self.product)
         trace.save()
         return trace
+
+
+class EquityKeeperDecorator():
+
+    def __init__(self, product, order_id=None):
+        self.product = product
+        self.order_id = order_id
+        pass
+
+    def generate_contract(self, savepoint=True):
+
+        with transaction.atomic(savepoint=savepoint):
+            contract_list = list()
+            #p2p_quities = self.product.equities.select_related('user', 'product').all()
+            p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
+            for p2p_equity in p2p_equities:
+                #EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
+
+                # product = p2p_equity.product
+                # user = p2p_equity.user
+                # equity_query = P2PEquity.objects.filter(user=user, product=product)
+                # if (not equity_query.exists()) or (len(equity_query) != 1):
+                #     raise P2PException('can not get equity info.')
+                #
+                # equity = equity_query.first()
+                contract_string = generate_contract(p2p_equity, None, p2p_equities)
+                print p2p_equity.user.wanglibaouserprofile.phone
+
+                contract = P2PContract()
+                contract.contract_path.save(str(p2p_equity.id)+'.html', ContentFile(contract_string), False)
+                contract.equity = p2p_equity
+                contract_list.append(contract)
+
+            P2PContract.objects.bulk_create(contract_list)
+
 
 
 class EquityKeeper(KeeperBaseMixin):
@@ -170,16 +205,50 @@ class AmortizationKeeper(KeeperBaseMixin):
             raise P2PException('invalid product status.')
         self.amortizations = self.product.amortizations.all()
         self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
-        equities = self.product.equities.all()
+        equities = self.product.equities.select_related('user').all()
 
         get_amortization_plan(self.product.pay_method).calculate_term_date(self.product)
         # Delete all old user amortizations
         with transaction.atomic(savepoint=savepoint):
             UserAmortization.objects.filter(product_amortization__in=self.amortizations).delete()
 
+
             ProductAmortization.objects.select_for_update().filter(product=self.product)
-            for equity in equities:
-                self.__dispatch(equity)
+            # for equity in equities:
+            #     self.__dispatch(equity)
+            self.__generate_useramortization(equities)
+
+    def __generate_useramortization(self, equities):
+        """
+        :param equities: 批量生成用户还款计划提高数据库存储性能
+        :return:
+        """
+        user_amos = list()
+        for equity in equities:
+            total_principal = equity.equity
+            total_interest = self.product_interest * equity.ratio
+            paid_principal = Decimal('0')
+            paid_interest = Decimal('0')
+            count = len(self.amortizations)
+            for i, amo in enumerate(self.amortizations):
+                if i+1 != count:
+                    principal = equity.ratio * amo.principal
+                    interest = equity.ratio * amo.interest
+                    principal = principal.quantize(Decimal('.01'))
+                    interest = interest.quantize(Decimal('.01'))
+                    paid_interest += interest
+                    paid_principal += principal
+                else:
+                    principal = total_principal - paid_principal
+                    interest = total_interest - paid_interest
+
+                user_amo = UserAmortization(
+                    product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
+                    principal=principal, interest=interest
+                )
+                user_amos.append(user_amo)
+
+        UserAmortization.objects.bulk_create(user_amos)
 
     def __dispatch(self, equity):
         total_principal = equity.equity
@@ -187,6 +256,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         paid_principal = Decimal('0')
         paid_interest = Decimal('0')
         count = len(self.amortizations)
+        user_amos = list()
         for i, amo in enumerate(self.amortizations):
             if i+1 != count:
                 principal = equity.ratio * amo.principal
@@ -203,7 +273,13 @@ class AmortizationKeeper(KeeperBaseMixin):
                 product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
                 principal=principal, interest=interest
             )
-            user_amo.save()
+            user_amos.append(user_amo)
+            #user_amo.save()
+
+
+        UserAmortization.objects.bulk_create(user_amos)
+
+
 
     @classmethod
     def get_ready_for_settle(self):

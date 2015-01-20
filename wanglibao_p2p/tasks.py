@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
+import time
 
 
 
@@ -24,7 +25,9 @@ def p2p_watchdog():
 
 @app.task
 def process_paid_product(product_id):
-    P2POperator.preprocess_for_settle(P2PProduct.objects.get(pk=product_id))
+    time.sleep(2)
+    p2p = P2PProduct.objects.select_related('user').get(pk=product_id)
+    P2POperator.preprocess_for_settle(p2p)
 
 @app.task
 def full_send_message(product_name):
