@@ -141,8 +141,8 @@ class PayCompleteView(TemplateView):
     template_name = 'pay_complete.jade'
 
     def post(self, request, *args, **kwargs):
-        # result = HuifuPay.handle_pay_result(request)
-        # amount = request.POST.get('OrdAmt', '')
+        result = HuifuPay.handle_pay_result(request)
+        amount = request.POST.get('OrdAmt', '')
 
         return self.render_to_response({
             'result': result,
