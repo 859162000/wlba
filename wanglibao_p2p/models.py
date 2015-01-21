@@ -566,8 +566,6 @@ def generate_amortization_plan(sender, instance, **kwargs):
 def process_after_money_paided(product):
     if product.status == u'满标已打款':
         from celery.execute import send_task
-        p2p = P2PProduct.objects.get(pk=product.id)
-        print p2p.status, 'models'
         send_task("wanglibao_p2p.tasks.process_paid_product", kwargs={
             'product_id': product.id
         })
