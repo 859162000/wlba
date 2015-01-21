@@ -25,7 +25,7 @@ from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant
+from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
@@ -228,11 +228,16 @@ class AuditProductView(TemplateView):
         pk = kwargs['id']
         p2p = P2PProduct.objects.get(pk=pk)
 
+        equities = p2p.equities.all()[:20]
+        amortizations_plan = p2p.amortizations.all()
+
         if p2p.status != u'满标待审核':
             return HttpResponse(u'产品状态不是满标待审核')
 
         return {
-            "p2p": p2p
+            "p2p": p2p,
+            "equities": equities,
+            "product_amortizations": amortizations_plan,
         }
 
     def post(self, request, **kwargs):
@@ -250,7 +255,40 @@ class AuditProductView(TemplateView):
         return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/p2pproduct/')
 
 
+class AuditAmortizationView(TemplateView):
+    template_name = 'audit_amortization.jade'
+
+    def get_context_data(self, **kwargs):
+        pk = kwargs['id']
+        p2p_amortization = ProductAmortization.objects.filter(pk=pk).first()
+        user_amortizations = p2p_amortization.subs.all().select_related('user__wanglibaouserprofile')
+
+        return {
+            "p2p_amortization": p2p_amortization,
+            "user_amortizations": user_amortizations
+            }
+
+
+class AuditEquityView(TemplateView):
+    template_name = 'audit_equity.jade'
+
+    def get_context_data(self, **kwargs):
+        pk = kwargs['id']
+
+        p2p = P2PProduct.objects.filter(pk=pk).first()
+
+        equities = p2p.equities.all()
+
+        if p2p.status != u'满标待审核':
+            return HttpResponse(u'产品状态不是满标待审核')
+
+        return {
+            "equities": equities
+            }
+
 audit_product_view = staff_member_required(AuditProductView.as_view())
+audit_equity_view = staff_member_required(AuditEquityView.as_view())
+audit_amortization_view = staff_member_required(AuditAmortizationView.as_view())
 
 
 class CopyProductView(TemplateView):
