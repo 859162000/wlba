@@ -91,7 +91,6 @@ class EquityKeeperDecorator():
                 #
                 # equity = equity_query.first()
                 contract_string = generate_contract(p2p_equity, None, p2p_equities)
-                print p2p_equity.user.wanglibaouserprofile.phone
 
                 contract = P2PContract()
                 contract.contract_path.save(str(p2p_equity.id)+'.html', ContentFile(contract_string), False)
