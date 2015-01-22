@@ -14,7 +14,7 @@ class Rule(models.Model):
                 ("direct", "直抵红包"),
                 ("fullcut", "满减红包/最低投资额"),
                 ("percent", "投资百分比红包"),))
-    value = models.IntegerField(null=False, default=0, verbose_name=u'红包在不同类型大小')
+    amount = models.IntegerField(null=False, default=0, verbose_name=u'红包在不同类型大小')
     extra = models.CharField(max_length=30, verbose_name=u'扩展', null=False, default="")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
 
@@ -23,6 +23,7 @@ class Rule(models.Model):
 
 
 
+#发放方式
 give_type = (
     ("nil", "零门槛"),
     ("register", "注册"),
@@ -35,7 +36,6 @@ give_type = (
 class RedPackEvent(models.Model):
     """
         根据红包规则创建不同的派发红包活动，创建有/无兑换码的活动
-        自动派发的红包最后是普通的，创建一条，不再派发设为used即可
         兑换码红包不搞自动派发，如果是自动派发兑换码红包，需要更多的考虑(如前几名有红包，派发完就没有了)
     """
     name = models.CharField(max_length=20, verbose_name=u'活动名字')
@@ -47,6 +47,7 @@ class RedPackEvent(models.Model):
     available_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"生效时间")
     unavailable_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"失效时间")
     change_end_at = models.DateTimeField(null=True, verbose_name=u"兑换截止时间")
+    available = models.BooleanField(default=False, verbose_name=u"是否可用")
     extra = models.CharField(max_length=20, verbose_name=u"扩展字段", default="")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
 
@@ -66,6 +67,7 @@ class RedPack(models.Model):
 
 class RedPackRecord(models.Model):
     PLATFORM = (
+        ("", ""),
         ("ios", "ios"),
         ("android", "android"),
         ("pc", "pc"),
@@ -74,12 +76,14 @@ class RedPackRecord(models.Model):
     user = models.ForeignKey(User)
     #关联规则，减少查询
     rule = models.ForeignKey(Rule)
-    change_platform = models.CharField(max_length=20, null=False, default="pc", choices=PLATFORM, verbose_name=u"兑换平台")
-    apply_platform = models.CharField(max_length=20, null=False, default="pc", choices=PLATFORM, verbose_name=u"使用平台")
+    redpack_name = models.CharField(max_length=20, verbose_name=u'活动名字')
+    change_platform = models.CharField(max_length=20, null=False, default="", choices=PLATFORM, verbose_name=u"兑换平台")
+    apply_platform = models.CharField(max_length=20, null=False, default="", choices=PLATFORM, verbose_name=u"使用平台")
+    available_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"生效时间")
+    unavailable_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"失效时间")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
     apply_at = models.DateTimeField(verbose_name=u'使用时间', null=True)
-    order_id = models.IntegerField(verbose_name=u'投资标的', null=True)
-    available = models.BooleanField(default=False, verbose_name=u"是否可用")
+    order_id = models.IntegerField(verbose_name=u'关联订单', null=True)
 
     class Meta:
         verbose_name = u"红包流水"

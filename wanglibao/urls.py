@@ -75,6 +75,7 @@ urlpatterns = patterns(
     url(r'^preorder/', include('wanglibao_preorder.urls')),
     url(r'^activity/', include('marketing.urls')),
     url(r'^announcement/', include('wanglibao_announcement.urls')),
+    url(r'^redpacket/', include('wanglibao_redpack.urls')),
 )
 
 urlpatterns += patterns(

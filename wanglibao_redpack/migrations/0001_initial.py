@@ -13,7 +13,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=20)),
             ('rtype', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('value', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('amount', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('extra', self.gf('django.db.models.fields.CharField')(default='', max_length=30)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
@@ -31,6 +31,7 @@ class Migration(SchemaMigration):
             ('available_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('unavailable_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('change_end_at', self.gf('django.db.models.fields.DateTimeField')(null=True)),
+            ('available', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('extra', self.gf('django.db.models.fields.CharField')(default='', max_length=20)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
@@ -51,12 +52,14 @@ class Migration(SchemaMigration):
             ('redpack', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_redpack.RedPack'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('rule', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_redpack.Rule'])),
+            ('redpack_name', self.gf('django.db.models.fields.CharField')(max_length=20)),
             ('change_platform', self.gf('django.db.models.fields.CharField')(default='pc', max_length=20)),
             ('apply_platform', self.gf('django.db.models.fields.CharField')(default='pc', max_length=20)),
+            ('available_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('unavailable_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('apply_at', self.gf('django.db.models.fields.DateTimeField')(null=True)),
             ('order_id', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('available', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal(u'wanglibao_redpack', ['RedPackRecord'])
 
@@ -121,6 +124,7 @@ class Migration(SchemaMigration):
         },
         u'wanglibao_redpack.redpackevent': {
             'Meta': {'object_name': 'RedPackEvent'},
+            'available': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'available_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'change_end_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -138,23 +142,25 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'RedPackRecord'},
             'apply_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'apply_platform': ('django.db.models.fields.CharField', [], {'default': "'pc'", 'max_length': '20'}),
-            'available': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'available_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'change_platform': ('django.db.models.fields.CharField', [], {'default': "'pc'", 'max_length': '20'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'redpack': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_redpack.RedPack']"}),
+            'redpack_name': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
             'rule': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_redpack.Rule']"}),
+            'unavailable_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'wanglibao_redpack.rule': {
             'Meta': {'object_name': 'Rule'},
+            'amount': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'extra': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '30'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
-            'rtype': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'value': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+            'rtype': ('django.db.models.fields.CharField', [], {'max_length': '30'})
         }
     }
 
