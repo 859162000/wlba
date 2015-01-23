@@ -618,7 +618,7 @@ class InterestPrecisionBalance(models.Model):
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
     def __unicode__(self):
-        return u'%s %s %s %s' % (self.equity, self.equity.user, self.equity.product)
+        return u'%s %s %s' % (self.equity, self.equity.user, self.equity.product)
 
 class P2PContract(models.Model):
 

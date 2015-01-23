@@ -326,9 +326,22 @@ class P2PProductContractAdmin(admin.ModelAdmin):
 
 
 class InterestPrecisionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'equity', 'principal', 'interest_receivable', 'interest_actual', 'interest_precision_balance' )
+    list_display = ('id', 'equity_product', 'equity_phone', 'equity_name', 'equity_number',
+                    'principal', 'interest_receivable', 'interest_actual', 'interest_precision_balance',)
     raw_id_fields = ('equity',)
-    search_fields = ('user__wanglibaouserprofile__phone',)
+    search_fields = ('equity__user__wanglibaouserprofile__phone',)
+
+    def equity_phone(self, instance):
+        return instance.equity.user.wanglibaouserprofile.phone
+
+    def equity_product(self, instance):
+        return instance.equity.product.name
+
+    def equity_name(self, instance):
+        return instance.equity.user.wanglibaouserprofile.name
+
+    def equity_number(self, instance):
+        return instance.equity.user.wanglibaouserprofile.id_number
 
 
 admin.site.register(P2PProduct, P2PProductAdmin)
