@@ -1,6 +1,7 @@
 # coding=utf-8
 from captcha.fields import CaptchaField
 import django.forms as forms
+from django.forms.models import BaseInlineFormSet
 from wanglibao_p2p.models import P2PProduct
 
 
@@ -33,3 +34,17 @@ class BillForm(forms.Form):
             raise forms.ValidationError(u'购买金额不能为负数')
 
         return amount
+
+
+class RequiredInlineFormSet(BaseInlineFormSet):
+    """
+    Generates an inline formset that is required
+    """
+
+    def _construct_form(self, i, **kwargs):
+        """
+        Override the method to change the form attribute empty_permitted
+        """
+        form = super(RequiredInlineFormSet, self)._construct_form(i, **kwargs)
+        form.empty_permitted = False
+        return form
