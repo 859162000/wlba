@@ -21,7 +21,7 @@ class RedPacketView(TemplateView):
     def post(self, request):
         pass
 
-class RedPacketChangeAPIVIew(APIView):
+class RedPacketChangeAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
@@ -39,18 +39,3 @@ class RedPacketListAPIView(APIView):
         user = request.user
         result = backends.list_redpack(user, status)
         return Response(result)
-
-class AdminCreateRule(TemplateView):
-    #创建红包规则
-    template_name = ""
-
-    def get_context_data(self, request, **kwargs):
-        pass
-
-class AdminCreateEvent(TemplateView):
-    #创建红包活动
-    template_name = ""
-
-    def get_context_data(self, request, **kwargs):
-        pass
-

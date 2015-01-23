@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 
 
 class Rule(models.Model):
@@ -15,11 +17,20 @@ class Rule(models.Model):
                 ("fullcut", "满减红包/最低投资额"),
                 ("percent", "投资百分比红包"),))
     amount = models.IntegerField(null=False, default=0, verbose_name=u'红包在不同类型大小')
-    extra = models.CharField(max_length=30, verbose_name=u'扩展', null=False, default="")
+    extra = models.CharField(max_length=30, verbose_name=u'扩展', default="", blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
 
     class Meta:
         verbose_name = u"红包规则"
+        verbose_name_plural = u"红包规则"
+
+    def __unicode__(self):
+        if self.rtype == "direct":
+            return u'<%s> 直抵' % self.name
+        elif self.rtype == "fullcut":
+            return u'<%s> 满减' % self.name
+        else:
+            return u'<%s> 百分比' % self.name
 
 
 
@@ -40,19 +51,24 @@ class RedPackEvent(models.Model):
     """
     name = models.CharField(max_length=20, verbose_name=u'活动名字')
     rule = models.ForeignKey(Rule)
+    value = models.IntegerField(null=False, default=1, verbose_name=u"红包个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
     give_mode = models.CharField(max_length=20, verbose_name=u"发放方式", default="", choices=give_type, db_index=True)
-    give_start_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"发放开始时间")
-    give_end_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"发放结束时间")
-    available_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"生效时间")
-    unavailable_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"失效时间")
+    give_start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放开始时间")
+    give_end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放结束时间")
+    available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")
+    unavailable_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"失效时间")
     #change_end_at = models.DateTimeField(null=True, verbose_name=u"兑换截止时间")
     available = models.BooleanField(default=False, verbose_name=u"是否可用")
-    extra = models.CharField(max_length=20, verbose_name=u"扩展字段", default="")
+    extra = models.CharField(max_length=20, verbose_name=u"扩展字段", default="", blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
 
     class Meta:
         verbose_name = u"红包活动"
+        verbose_name_plural = u"红包活动"
+
+    def __unicode__(self):
+        return u'<%s>' % self.name
 
 class RedPack(models.Model):
     """
@@ -60,10 +76,17 @@ class RedPack(models.Model):
     """
     event = models.ForeignKey(RedPackEvent)
     token = models.CharField(max_length=20, verbose_name=u"兑换码", null=False, default="", db_index=True)
-    status = models.CharField(max_length=20, verbose_name=u"状态", choices=(
+    status = models.CharField(max_length=20, verbose_name=u"兑换状态", choices=(
                                 ("invalid", "作废"),
-                                ("used", "已用"),
-                                ("unused", "未使用"),), default="unused")
+                                ("used", "已兑换"),
+                                ("unused", "未兑换"),), default="unused")
+
+    class Meta:
+        verbose_name = u"红包列表"
+        verbose_name_plural = u"红包列表"
+
+    def __unicode__(self):
+        return u'%s<%s>' % (self.id, self.event.name)
 
 class RedPackRecord(models.Model):
     PLATFORM = (
@@ -72,18 +95,30 @@ class RedPackRecord(models.Model):
         ("android", "android"),
         ("pc", "pc"),
     )
-    redpack = models.ForeignKey(RedPack)
-    user = models.ForeignKey(User)
+    redpack = models.ForeignKey(RedPack, verbose_name=u"红包")
+    user = models.ForeignKey(User, verbose_name=u"用户")
     #关联规则，减少查询
-    rule = models.ForeignKey(Rule)
+    rule = models.ForeignKey(Rule, verbose_name=u"规则")
     redpack_name = models.CharField(max_length=20, verbose_name=u'活动名字')
     change_platform = models.CharField(max_length=20, null=False, default="", choices=PLATFORM, verbose_name=u"兑换平台")
     apply_platform = models.CharField(max_length=20, null=False, default="", choices=PLATFORM, verbose_name=u"使用平台")
-    available_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"生效时间")
-    unavailable_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"失效时间")
+    available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")
+    unavailable_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"失效时间")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
     apply_at = models.DateTimeField(verbose_name=u'使用时间', null=True)
     order_id = models.IntegerField(verbose_name=u'关联订单', null=True)
 
     class Meta:
         verbose_name = u"红包流水"
+        verbose_name_plural = u"红包流水"
+
+
+
+#创建红包列表
+def create_redpack(sender, instance, **kwargs):
+    from wanglibao_redpack import tasks
+    tasks.create_update_redpack.apply_async(kwargs={
+        "event_id": instance.id
+    })
+
+post_save.connect(create_redpack, sender=RedPackEvent)

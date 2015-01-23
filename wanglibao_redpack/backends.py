@@ -8,56 +8,41 @@ from wanglibao_p2p.models import P2PRecord
 
 
 def list_redpack(user, status):
-    if status not in ("all", "expires", "unused", "used"):
+    if status not in ("all", "available"):
         return {"ret_code":-1, "message":"参数错误"}
 
-    if status == "unused":
-        packages = {"unused":[]}
+    if status == "available":
+        packages = {"available":[]}
         records = RedPackRecord.objects.filter(user=user, redpack__status="unused")
         for x in records:
             obj = {"name":x.redpack_name, "receive_at":x.created_at,
                     "type":x.rule.rtype, "amount":x.rule.amount}
             if x.available_at < timezone.now() < x.unavailable_at:
-                packages['unused'].append(obj)
-    elif status == "used":
-        packages = {"used":[]}
-        records = RedPackRecord.objects.filter(user=user, redpack__status="used")
-        for x in records:
-            obj = {"name":x.redpack_name, "receive_at":x.created_at}
-            if x.order_id:
-                product = P2PRecord.objects.filter(order_id=x.order_id).values("product").first()
-                packages['used'].append({"name":x.redpack_name, "product":product.name,
-                                        "apply_at":x.apply_at, "receive_at":x.created_at,
-                                        "apply_platform":x.apply_platform})
-    elif status == "expires":
-        packages = {"expires":[]}
-        records = RedPackRecord.objects.filter(user=user, redpack__status="unused")
-        for x in records:
-            obj = {"name":x.redpack_name, "receive_at":x.created_at}
-            if not x.order_id:
-                if not x.available_at < timezone.now() < x.unavailable_at:
-                    packages['expires'].append(obj)
+                packages['available'].append(obj)
     else:
         packages = {"used":[], "unused":[], "expires":[], "invalid":[]}
         records = RedPackRecord.objects.filter(user=user)
         for x in records:
-            obj = {"name":x.redpack_name, "receive_at":x.created_at}
+            obj = {"name":x.redpack_name, "receive_at":x.created_at,
+                    "available_at":x.available_at, "unavailable_at":x.unavailable_at}
+            print(obj)
             if x.order_id:
                 product = P2PRecord.objects.filter(order_id=x.order_id).values("product").first()
-                packages['used'].append({"name":x.redpack_name, "product":product.name,
-                                        "apply_at":x.apply_at, "receive_at":x.created_at,
-                                        "apply_platform":x.apply_platform})
+                obj.update({"name":x.redpack_name, "product":product.name,
+                            "apply_at":x.apply_at, "receive_at":x.created_at,
+                            "apply_platform":x.apply_platform})
+                packages['used'].append(obj)
             else:
                 if x.redpack.status == "invalid":
                     packages['invalid'].append(obj)
-                elif x.redpack.status == "unused":
-                    if not x.available_at < timezone.now() < x.unavailable_at:
+                else:
+                    if x.unavailable_at < timezone.now():
                         packages['expires'].append(obj)
                     else:
                         packages['unused'].append(obj)
     return {"ret_code":0, "packages":packages}
 
-def exchnage_redpack(token, device_type, user):
+def exchange_redpack(token, device_type, user):
     if token == "":
         return {"ret_code":-1, "message":"请输入兑换码"}
     redpack = RedPack.objects.filter(token=token).first()
@@ -68,8 +53,12 @@ def exchnage_redpack(token, device_type, user):
     elif redpack.status == "invalid":
         return {"ret_code":-1, "message":"请输入有效的兑换码"}
     event = redpack.event
-    if event.change_end_at < timezone.now():
-        return {"ret_code":-1, "message":"请在%s之前兑换" % event.change_end_at}
+    now = timezone.now()
+    if event.give_start_at > now:
+        return {"ret_code":-1, "message":"请在%s之后兑换" % event.give_start_at}
+    elif event.give_end_at < now:
+        return {"ret_code":-1, "message":"请输入有效的兑换码1"}
+
     record = RedPackRecord()
     record.user = user
     record.redpack = redpack
