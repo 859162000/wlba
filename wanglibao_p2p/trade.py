@@ -10,7 +10,7 @@ from order.models import Order
 #from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
-from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
+from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper, EquityKeeperDecorator
 from exceptions import P2PException
 from wanglibao_p2p.models import P2PProduct
 from wanglibao_sms import messages
@@ -197,21 +197,25 @@ class P2POperator(object):
                 cls.logger.error(u'%s, %s' % (amortization, e.message))
 
     @classmethod
+    #@transaction.commit_manually
     def preprocess_for_settle(cls, product):
         cls.logger.info('Enter pre process for settle for product: %d: %s', product.id, product.name)
 
         # Create an order to link all changes
         order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
-
+        print product.status
         if product.status != u'满标已打款':
+            print 'hello, status'
             raise P2PException(u'产品状态(%s)不是(满标已打款)' % product.status)
         with transaction.atomic():
             # Generate the amotization plan and contract for each equity(user)
             amo_keeper = AmortizationKeeper(product, order_id=order.id)
+
             amo_keeper.generate_amortization_plan(savepoint=False)
 
-            for equity in product.equities.all():
-                EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
+            # for equity in product.equities.all():
+            #     EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
+            EquityKeeperDecorator(product, order.id).generate_contract(savepoint=False)
 
             product = P2PProduct.objects.get(pk=product.id)
             product.status = u'满标待审核'

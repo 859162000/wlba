@@ -388,6 +388,13 @@ class P2PEquity(models.Model):
         ordering = ('-created_at',)
 
     @property
+    def latest_contract(self):
+        if self.contract:
+            return self.contract
+        else:
+            return self.equity_contract.contract_path
+
+    @property
     def related_orders(self):
         records = list()
         return records
@@ -559,6 +566,8 @@ def generate_amortization_plan(sender, instance, **kwargs):
 def process_after_money_paided(product):
     if product.status == u'满标已打款':
         from celery.execute import send_task
+        p2p = P2PProduct.objects.get(pk=product.id)
+        print p2p.status, 'models'
         send_task("wanglibao_p2p.tasks.process_paid_product", kwargs={
             'product_id': product.id
         })
@@ -595,3 +604,12 @@ class Earning(models.Model):
     update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
     confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
 
+
+class P2PContract(models.Model):
+
+    class Meta:
+        ordering = ['-created_at']
+
+    contract_path = models.FileField(u'合同文件', null=True, blank=True, upload_to='contracts')
+    equity = models.OneToOneField(P2PEquity, null=True, blank=False, related_name="equity_contract")
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True, null=True)

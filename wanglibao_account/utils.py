@@ -120,7 +120,7 @@ def verify_id(name, id_number):
         raise NameError("The specific backend not implemented")
 
 
-def generate_contract(equity, template_name=None):
+def generate_contract(equity, template_name=None, equities=None):
     """
     Generate the contract file for the equity.
 
@@ -129,6 +129,7 @@ def generate_contract(equity, template_name=None):
     """
     context = Context({
         'equity': equity,
+        'equities': equities,
         'now': timezone.now()
     })
 
@@ -139,6 +140,9 @@ def generate_contract(equity, template_name=None):
     else:
         # Load the template from database
         template = Template(equity.product.contract_template.content)
+        print equity.product.contract_template.content[:100]
+
+    print '#############'
 
     return template.render(context)
 

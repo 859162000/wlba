@@ -98,7 +98,8 @@ def validate_validation_code(phone, code):
         if phone_validate_item.validate_code == code:
             if (now - phone_validate_item.last_send_time) >= datetime.timedelta(minutes=30):
                 status_code, message = 410, 'The code is expired'
-
+            elif phone_validate_item.is_validated == True:
+                status_code, message = 410, 'The code is validated'
             else:
                 phone_validate_item.is_validated = True
                 phone_validate_item.save()

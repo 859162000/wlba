@@ -130,5 +130,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/modal', 'lib/countdown'], (
 
     $('.panel-title-bar__tops').click (e) ->
       location.href = '/activity/newyear'
+
   return
 
