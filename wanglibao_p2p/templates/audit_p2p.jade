@@ -28,9 +28,11 @@ html
 
       .panel
         .panel-title-bar
-          .panel-title 用户持仓情况
+          .panel-title
+            用户持仓情况
+            a(href="/p2p/equitydetail/{{p2p.id}}") 查看详情
 
-        equities = p2p.equities.all()
+        //equities = p2p.equities.all()
         table.table
           thead
             tr
@@ -60,7 +62,8 @@ html
           .panel-title 用户还款计划
         product_amortizations = p2p.amortizations.all()
         for amort in product_amortizations
-          h2 {{amort.term_date | date:"Y-m-d"}}
+          h2 {{amort.term_date | date:"Y-m-d"}} &nbsp;&nbsp;
+            a(href="/p2p/amortizationdetail/{{amort.id}}") 查看详情
           table.table
             thead
               tr
@@ -72,7 +75,7 @@ html
                 th 利息
                 th 罚息
             tbody
-              user_amorts = amort.subs.all()
+              user_amorts = amort.subs.all()[:20]
               for user_amort in user_amorts
                 tr
                   td {{user_amort.user.id}}
