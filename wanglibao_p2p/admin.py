@@ -7,16 +7,14 @@ from django import forms
 from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
-from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning, P2PProductContract
+from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning,\
+    P2PProductContract, InterestPrecisionBalance
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization
 from wanglibao.admin import ReadPermissionModelAdmin
 from wanglibao_p2p.forms import RequiredInlineFormSet
-# from wanglibao_account.tasks import cjdao_callback
-# from wanglibao_account.utils import CjdaoUtils
-# from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
 
 formsets.DEFAULT_MAX_NUM = 2000
 
@@ -326,6 +324,13 @@ class P2PProductContractAdmin(admin.ModelAdmin):
                     'party_c_id_number', 'party_c_address', 'bill_drawer_bank', 'bill_accepting_bank',
                     'bill_number', 'bill_amount', 'bill_due_date')
 
+
+class InterestPrecisionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'equity', 'principal', 'interest_receivable', 'interest_actual', 'interest_precision_balance' )
+    raw_id_fields = ('equity',)
+    search_fields = ('user__wanglibaouserprofile__phone',)
+
+
 admin.site.register(P2PProduct, P2PProductAdmin)
 admin.site.register(Warrant, WarrantAdmin)
 admin.site.register(P2PEquity, UserEquityAdmin)
@@ -338,6 +343,7 @@ admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
 admin.site.register(ProductAmortization, ProductAmortizationAdmin)
 admin.site.register(Earning, EarningAdmin)
 admin.site.register(P2PProductContract, P2PProductContractAdmin)
+admin.site.register(InterestPrecisionBalance, InterestPrecisionAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')

@@ -617,6 +617,8 @@ class InterestPrecisionBalance(models.Model):
     interest_precision_balance = models.DecimalField(u'精度利息差额', max_digits=20, decimal_places=8)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
+    def __unicode__(self):
+        return u'%s %s %s %s' % (self.equity, self.equity.user, self.equity.product)
 
 class P2PContract(models.Model):
 
