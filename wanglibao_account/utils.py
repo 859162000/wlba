@@ -140,9 +140,9 @@ def generate_contract(equity, template_name=None, equities=None):
     else:
         # Load the template from database
         template = Template(equity.product.contract_template.content)
-        print equity.product.contract_template.content[:100]
+        # print equity.product.contract_template.content[:100]
 
-    print '#############'
+    # print '#############'
 
     return template.render(context)
 

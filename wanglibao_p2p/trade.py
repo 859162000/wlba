@@ -219,6 +219,7 @@ class P2POperator(object):
 
             product = P2PProduct.objects.get(pk=product.id)
             product.status = u'满标待审核'
+            product.make_loans_time = timezone.now()
             product.save()
 
     @classmethod

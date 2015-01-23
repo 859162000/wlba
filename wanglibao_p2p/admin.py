@@ -7,12 +7,13 @@ from django import forms
 from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
-from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning
+from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning, P2PProductContract
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization
 from wanglibao.admin import ReadPermissionModelAdmin
+from wanglibao_p2p.forms import RequiredInlineFormSet
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
@@ -44,6 +45,13 @@ class AmortizationInline(admin.TabularInline):
 
 class WarrantInline(admin.TabularInline):
     model = Warrant
+
+
+class P2PProductContractInline(admin.StackedInline):
+    model = P2PProductContract
+    extra = 1
+    max_num = 1
+    formset = RequiredInlineFormSet
 
 
 class AttachementInline(admin.TabularInline):
@@ -206,7 +214,7 @@ class P2PProductForm(forms.ModelForm):
 
 class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
     inlines = [
-        WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
+        P2PProductContractInline, WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
     ]
     list_display = ('id', 'name', 'total_amount', 'brief', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'preview_contract', 'copy_link', 'priority')
     list_editable = ('priority',)
@@ -313,6 +321,11 @@ class EarningAdmin(admin.ModelAdmin):
         return ()
 
 
+class P2PProductContractAdmin(admin.ModelAdmin):
+    list_display = ('id', 'signing_date', 'party_b', 'party_b_name', 'party_c', 'party_c_name',
+                    'party_c_id_number', 'party_c_address', 'bill_drawer_bank', 'bill_accepting_bank',
+                    'bill_number', 'bill_amount', 'bill_due_date')
+
 admin.site.register(P2PProduct, P2PProductAdmin)
 admin.site.register(Warrant, WarrantAdmin)
 admin.site.register(P2PEquity, UserEquityAdmin)
@@ -324,6 +337,7 @@ admin.site.register(EquityRecord, EquityRecordAdmin)
 admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
 admin.site.register(ProductAmortization, ProductAmortizationAdmin)
 admin.site.register(Earning, EarningAdmin)
+admin.site.register(P2PProductContract, P2PProductContractAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')

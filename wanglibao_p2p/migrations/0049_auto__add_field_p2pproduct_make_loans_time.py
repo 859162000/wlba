@@ -8,23 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Contract.contract'
-        db.delete_column(u'wanglibao_p2p_contract', 'contract')
-
-        # Adding field 'Contract.contract_path'
-        db.add_column(u'wanglibao_p2p_contract', 'contract_path',
-                      self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True, blank=True),
+        # Adding field 'P2PProduct.make_loans_time'
+        db.add_column(u'wanglibao_p2p_p2pproduct', 'make_loans_time',
+                      self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Adding field 'Contract.contract'
-        db.add_column(u'wanglibao_p2p_contract', 'contract',
-                      self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True, blank=True),
-                      keep_default=False)
-
-        # Deleting field 'Contract.contract_path'
-        db.delete_column(u'wanglibao_p2p_contract', 'contract_path')
+        # Deleting field 'P2PProduct.make_loans_time'
+        db.delete_column(u'wanglibao_p2p_p2pproduct', 'make_loans_time')
 
 
     models = {
@@ -127,23 +119,12 @@ class Migration(SchemaMigration):
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']"}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
         },
-        u'wanglibao_p2p.contract': {
-            'Meta': {'ordering': "['-created_at']", 'object_name': 'Contract'},
-            'contract_path': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
-            'equity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'equity_contract'", 'unique': 'True', 'null': 'True', 'to': u"orm['wanglibao_p2p.P2PEquity']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
         u'wanglibao_p2p.contracttemplate': {
             'Meta': {'object_name': 'ContractTemplate'},
-            'available_bank': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1128', 'blank': 'True'}),
             'content': ('django.db.models.fields.TextField', [], {'default': "''"}),
             'content_preview': ('django.db.models.fields.TextField', [], {'default': "''"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
-            'party_c': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '128', 'blank': 'True'}),
-            'party_c_addr': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '128', 'blank': 'True'}),
-            'party_c_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '32', 'blank': 'True'})
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '32'})
         },
         u'wanglibao_p2p.earning': {
             'Meta': {'ordering': "['-create_time']", 'object_name': 'Earning'},
@@ -169,6 +150,13 @@ class Migration(SchemaMigration):
             'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
+        },
+        u'wanglibao_p2p.p2pcontract': {
+            'Meta': {'ordering': "['-created_at']", 'object_name': 'P2PContract'},
+            'contract_path': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
+            'equity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'equity_contract'", 'unique': 'True', 'null': 'True', 'to': u"orm['wanglibao_p2p.P2PEquity']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         u'wanglibao_p2p.p2pequity': {
             'Meta': {'ordering': "('-created_at',)", 'unique_together': "(('user', 'product'),)", 'object_name': 'P2PEquity'},
@@ -209,7 +197,7 @@ class Migration(SchemaMigration):
             'category': ('django.db.models.fields.CharField', [], {'default': "u'\\u666e\\u901a'", 'max_length': '16'}),
             'contract_serial_number': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             'contract_template': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.ContractTemplate']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 1, 26, 0, 0)'}),
+            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 1, 30, 0, 0)'}),
             'excess_earning_description': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'excess_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'expected_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
@@ -217,6 +205,7 @@ class Migration(SchemaMigration):
             'hide': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'limit_per_user': ('django.db.models.fields.FloatField', [], {'default': '1'}),
+            'make_loans_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
             'ordered_amount': ('django.db.models.fields.BigIntegerField', [], {'default': '0'}),
             'pay_method': ('django.db.models.fields.CharField', [], {'default': "u'\\u7b49\\u989d\\u672c\\u606f'", 'max_length': '32'}),
@@ -233,6 +222,24 @@ class Migration(SchemaMigration):
             'usage': ('django.db.models.fields.TextField', [], {}),
             'version': ('concurrency.fields.IntegerVersionField', [], {'name': "'version'", 'db_tablespace': "''"}),
             'warrant_company': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.WarrantCompany']"})
+        },
+        u'wanglibao_p2p.p2pproductcontract': {
+            'Meta': {'ordering': "['-id']", 'object_name': 'P2PProductContract'},
+            'bill_accepting_bank': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
+            'bill_amount': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
+            'bill_drawer_bank': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
+            'bill_due_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now_add': 'True', 'blank': 'True'}),
+            'bill_number': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'party_b': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'party_b_name': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'party_c': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '128'}),
+            'party_c_address': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '128'}),
+            'party_c_id_number': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
+            'party_c_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '32'}),
+            'product': ('django.db.models.fields.related.OneToOneField', [], {'default': "''", 'to': u"orm['wanglibao_p2p.P2PProduct']", 'unique': 'True'}),
+            'signing_date': ('django.db.models.fields.DateField', [], {})
         },
         u'wanglibao_p2p.p2precord': {
             'Meta': {'ordering': "['-create_time']", 'object_name': 'P2PRecord'},
