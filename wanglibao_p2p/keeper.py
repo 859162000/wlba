@@ -226,23 +226,23 @@ class AmortizationKeeper(KeeperBaseMixin):
         interest_precisions = list()
         exp = Decimal('0.00000001')
         for equity in equities:
-            # total_principal = equity.equity
+            total_principal = equity.equity
             # total_interest = self.product_interest * equity.ratio
-            # paid_principal = Decimal('0')
+            paid_principal = Decimal('0')
             # paid_interest = Decimal('0')
-            # count = len(self.amortizations)
+            count = len(self.amortizations)
             for i, amo in enumerate(self.amortizations):
-                # if i+1 != count:
-                principal = equity.ratio * amo.principal
-                interest = equity.ratio * amo.interest
-                principal_actual = principal.quantize(Decimal('.01'))
-                interest_actual = interest.quantize(Decimal('.01'))
+                if i+1 != count:
+                    principal = equity.ratio * amo.principal
+                    interest = equity.ratio * amo.interest
+                    principal_actual = principal.quantize(Decimal('.01'))
+                    interest_actual = interest.quantize(Decimal('.01'))
 
                 # paid_interest += interest
-                # paid_principal += principal
-                # else:
-                #     principal = total_principal - paid_principal
-                #     interest = total_interest - paid_interest
+                    paid_principal += principal
+                else:
+                    principal = total_principal - paid_principal
+                    # interest = total_interest - paid_interest
 
                 user_amo = UserAmortization(
                     product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
