@@ -10,7 +10,7 @@ from order.mixins import KeeperBaseMixin
 from wanglibao_account.utils import generate_contract
 from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
-    UserAmortization, P2PContract
+    UserAmortization, P2PContract, InterestPrecisionBalance
 from exceptions import ProductLack, P2PException
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_sms import messages
@@ -223,31 +223,44 @@ class AmortizationKeeper(KeeperBaseMixin):
         :return:
         """
         user_amos = list()
+        interest_precisions = list()
+        exp = Decimal('0.00000001')
         for equity in equities:
-            total_principal = equity.equity
-            total_interest = self.product_interest * equity.ratio
-            paid_principal = Decimal('0')
-            paid_interest = Decimal('0')
-            count = len(self.amortizations)
+            # total_principal = equity.equity
+            # total_interest = self.product_interest * equity.ratio
+            # paid_principal = Decimal('0')
+            # paid_interest = Decimal('0')
+            # count = len(self.amortizations)
             for i, amo in enumerate(self.amortizations):
-                if i+1 != count:
-                    principal = equity.ratio * amo.principal
-                    interest = equity.ratio * amo.interest
-                    principal = principal.quantize(Decimal('.01'))
-                    interest = interest.quantize(Decimal('.01'))
-                    paid_interest += interest
-                    paid_principal += principal
-                else:
-                    principal = total_principal - paid_principal
-                    interest = total_interest - paid_interest
+                # if i+1 != count:
+                principal = equity.ratio * amo.principal
+                interest = equity.ratio * amo.interest
+                principal_actual = principal.quantize(Decimal('.01'))
+                interest_actual = interest.quantize(Decimal('.01'))
+
+                # paid_interest += interest
+                # paid_principal += principal
+                # else:
+                #     principal = total_principal - paid_principal
+                #     interest = total_interest - paid_interest
 
                 user_amo = UserAmortization(
                     product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
-                    principal=principal, interest=interest
+                    principal=principal_actual, interest=interest_actual
                 )
+
+                interest_precision = InterestPrecisionBalance(
+                    equity=equity, principal=principal.quantize(exp),
+                    interest_actual=interest_actual, interest_receivable=interest,
+                    interest_precision_balance=(interest-interest_actual).quantize(exp)
+                )
+
                 user_amos.append(user_amo)
+                interest_precisions.append(interest_precision)
 
         UserAmortization.objects.bulk_create(user_amos)
+        InterestPrecisionBalance.objects.bulk_create(interest_precisions)
+
 
     def __dispatch(self, equity):
         total_principal = equity.equity

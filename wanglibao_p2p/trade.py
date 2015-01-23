@@ -203,9 +203,7 @@ class P2POperator(object):
 
         # Create an order to link all changes
         order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
-        print product.status
         if product.status != u'满标已打款':
-            print 'hello, status'
             raise P2PException(u'产品状态(%s)不是(满标已打款)' % product.status)
         with transaction.atomic():
             # Generate the amotization plan and contract for each equity(user)
