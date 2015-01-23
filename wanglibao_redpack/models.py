@@ -46,7 +46,7 @@ class RedPackEvent(models.Model):
     give_end_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"发放结束时间")
     available_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"生效时间")
     unavailable_at = models.DateTimeField(auto_now_add=True, null=False, verbose_name=u"失效时间")
-    change_end_at = models.DateTimeField(null=True, verbose_name=u"兑换截止时间")
+    #change_end_at = models.DateTimeField(null=True, verbose_name=u"兑换截止时间")
     available = models.BooleanField(default=False, verbose_name=u"是否可用")
     extra = models.CharField(max_length=20, verbose_name=u"扩展字段", default="")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
