@@ -149,7 +149,7 @@ urlpatterns = patterns(
     url(r'^gettopofweek/$', TopsOfWeekView.as_view()),
 
     url(r'^redpacket/$', RedPacketListAPIView.as_view()),
-    url(r'^redpacket/exchange$', RedPacketChangeAPIView.as_view()),
+    url(r'^redpacket/exchange/$', RedPacketChangeAPIView.as_view()),
 )
 
 urlpatterns += patterns('',

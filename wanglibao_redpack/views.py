@@ -26,7 +26,7 @@ class RedPacketChangeAPIView(APIView):
 
     def post(self, request):
         token = request.DATA.get("token", "")
-        device_type = request.DATA.get("device_type", "")
+        device_type = request.DATA.get("channelId", "")
         user = request.user
         result = backends.exchange_redpack(token, device_type, user)
         return Response(result)
