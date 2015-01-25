@@ -564,8 +564,6 @@ def generate_amortization_plan(sender, instance, **kwargs):
 def process_after_money_paided(product):
     if product.status == u'满标已打款':
         from celery.execute import send_task
-        p2p = P2PProduct.objects.get(pk=product.id)
-        print p2p.status, 'models'
         send_task("wanglibao_p2p.tasks.process_paid_product", kwargs={
             'product_id': product.id
         })
@@ -602,6 +600,25 @@ class Earning(models.Model):
     update_time = models.DateTimeField(u'更新时间', auto_now=True, null=True)
     confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
 
+
+class InterestPrecisionBalance(models.Model):
+    """
+    每个持仓精度计算造成的差额: interest_receivable - interest_actual = interest_balance_precision
+    """
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'利息计算精度差额'
+
+    equity = models.OneToOneField(P2PEquity, null=True, blank=False, related_name="interest_precision_balance")
+    principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
+    interest_receivable = models.DecimalField(u'应收利息', max_digits=20, decimal_places=8)
+    interest_actual = models.DecimalField(u'实收利息', max_digits=20, decimal_places=2)
+    interest_precision_balance = models.DecimalField(u'精度利息差额', max_digits=20, decimal_places=8)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    def __unicode__(self):
+        return u'%s %s %s' % (self.equity, self.equity.user, self.equity.product)
 
 class P2PContract(models.Model):
 
