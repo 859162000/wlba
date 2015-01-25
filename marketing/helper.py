@@ -13,11 +13,11 @@ from wanglibao_account import message as inside_message
 
 class Channel():
     """ 渠道结构 """
-    XUNLEI = 0
-    KUAIPAN = 1
-    WANGLIBAO = 3
-    FENGXING = 4
-    JIUXIAN = 5
+    XUNLEI = "xunlei"
+    KUAIPAN = "kuaipan"
+    WANGLIBAO = "wanglibao"
+    FENGXING = "fengxing"
+    JIUXIAN = "jiuxian"
 
 
 

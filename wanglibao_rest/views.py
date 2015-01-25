@@ -44,6 +44,7 @@ from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
 from marketing.utils import save_client
 from marketing.tops import Top
+from marketing import tools
 
 
 logger = logging.getLogger(__name__)
@@ -141,6 +142,7 @@ class RegisterAPIView(APIView):
         identifier = request.DATA.get('identifier', "")
         password = request.DATA.get('password', "")
         validate_code = request.DATA.get('validate_code', "")
+        device_type = request.DATA.get("channelId", "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -179,13 +181,14 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
-        title, content = messages.msg_register()
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": user.id,
-            "title": title,
-            "content": content,
-            "mtype": "activityintro"
-        })
+        #title, content = messages.msg_register()
+        #inside_message.send_one.apply_async(kwargs={
+        #    "user_id": user.id,
+        #    "title": title,
+        #    "content": content,
+        #    "mtype": "activityintro"
+        #})
+        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device_type":device_type})
         # save client info
         save_client(request, phone=identifier, action=0)
 
