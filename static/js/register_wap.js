@@ -7,7 +7,42 @@
   });
 
   require(['jquery', 'lib/backend'], function($, backend) {
-    var Request, checkMobile, promo_token;
+    var Request, checkMobile, csrfSafeMethod, getCookie, promo_token, sameOrigin;
+    getCookie = function(name) {
+      var cookie, cookieValue, cookies, i;
+      cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        cookies = document.cookie.split(";");
+        i = 0;
+        while (i < cookies.length) {
+          cookie = $.trim(cookies[i]);
+          if (cookie.substring(0, name.length + 1) === (name + "=")) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+          i++;
+        }
+      }
+      return cookieValue;
+    };
+    csrfSafeMethod = function(method) {
+      return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+    };
+    sameOrigin = function(url) {
+      var host, origin, protocol, sr_origin;
+      host = document.location.host;
+      protocol = document.location.protocol;
+      sr_origin = "//" + host;
+      origin = protocol + sr_origin;
+      return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+    };
+    $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+          xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+        }
+      }
+    });
     Request = new Object();
     Request = backend.getRequest();
     promo_token = Request['promo_token'];
@@ -23,7 +58,7 @@
     $("#button-get-validate-code-modal").click(function(e) {
       var count, element, intervalId, phoneNumber, timerFunction;
       element = this;
-      if ($(element).hasClass('disable')) {
+      if ($(element).hasClass('disabled')) {
         return;
       }
       $(".error-message").text("");
@@ -36,13 +71,14 @@
           var result;
           clearInterval(intervalId);
           $(element).text('重新获取');
-          $(element).removeClass('disable');
+          $(element).removeClass('disabled');
           result = JSON.parse(xhr.responseText);
           return $(".error-message").text(result.message);
         });
         intervalId;
         count = 60;
-        $(element).addClass('disable');
+        $(element).addClass('disabled');
+        $(element).attr('disabled', 'disabled');
         timerFunction = function() {
           if (count >= 1) {
             count--;
