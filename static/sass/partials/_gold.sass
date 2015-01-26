@@ -6,25 +6,55 @@ body
     background: #e3e3e3 url("/static/images/gold/gold_bg.png") center repeat-y
     width: 1130px
     margin: 0 auto
+  .huoqu-ma
+    padding: 10px
+    border: none
+    color: #fff
+    background: #ff461f
+    border-radius: 5px
+  .huoqu-ma-gray
+    background: #cccccc
+  .dale
+    width: 276px
+  .xun-zhuce
+    padding: 10px 10px
+    border: none
+    color: #fff
+    background: #ff461f
+    border-radius: 5px
+    margin-left: 23px
+
   .wrap
     height: 664px
     background:  #397ee9 url(/static/images/xunlei-denglu/xunlei-banner.jpg) no-repeat
     background-position: -356px 0px
+
     .denelu-form
       width: 316px
-      height: 420px
       background: #fff
       position: absolute
       top: 200px
       left: 1110px
       border-radius: 5px
       padding: 0 20px
+      .dale
+        .form-row
+          .com-tu
+            background: url(/static/images/xunlei-denglu/xunlei-denglu-tu.png) no-repeat
+            padding-left: 30px
+          .tu1
+            background-position: 0 -73px
+          .tu2
+            background-position: 0 5px
+          .tu3
+            background-position: 0 -32px
       .biaoti
         color: red
         line-height: 50px
         text-align: center
       .xun-p
         text-align: center
+        margin-bottom: 10px
         a
           color: #3ea7e9
           text-decoration: underline
@@ -32,25 +62,14 @@ body
         .dl-com
           li
             margin-bottom: 10px
-
-            .com-tu
-              background: url(/static/images/xunlei-denglu/xunlei-denglu-tu.png) no-repeat
-              padding-left: 30px
-            .tu1
-              background-position: 0 -73px
-            .tu2
-              background-position: 0 5px
-            .tu3
-              background-position: 0 -32px
+            span
+              color: #ff0419
+              display: inline-block
+              margin-top: 5px
+              display: none
             .yanzheng
               width: 170px
               margin-right: 10px
-            .huoqu-ma
-              padding: 10px
-              border: none
-              color: #fff
-              background: #ff461f
-              border-radius: 5px
             .inp-che
               width: 20px
               height: 20px
@@ -61,14 +80,8 @@ body
               position: relative
               top: -6px
               font-size: 14px
-              i
+              a
                 color: #3ea7e9
-            .xun-zhuce
-              padding: 10px 111px
-              border: none
-              color: #fff
-              background: #ff461f
-              border-radius: 5px
   .warp-footer
     height: 340px
     background: url(/static/images/xunlei-denglu/ditu.png) no-repeat
@@ -84,8 +97,9 @@ body
       color: red
     .tete
       position: absolute
-      top: 1560px
-      right: -363px
+      top: 1590px
+      left: 0
+      width: 100%
 
     .container-title
       .black

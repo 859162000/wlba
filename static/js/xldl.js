@@ -8,10 +8,9 @@
       'jquery': 'lib/jquery.min'
     }
   });
-
   require(['jquery'], function($) {
-    var high=document.body.scrollHeight;
     //立即注册
+    var high=document.body.scrollHeight;
     $('#top-zc').on('click',function(){
      pageScroll();
     });
@@ -24,6 +23,30 @@
       //判断当页面到达顶部
       if(sTop==0) clearTimeout(scrolldelay);
     }
+
+    //文本框的得到和失去光标
+    var zhi;
+    $('.com-tu').on("focus",function(){
+      if($(this).attr('placeholder')){
+        zhi=$(this).attr('placeholder');
+      }
+      $(this).attr('placeholder','');
+    });
+
+    $('.com-tu').on('blur',function(){
+      $(this).attr('placeholder',zhi)
+    })
+
+    $('#button-get-validate-code-modal').on('click',function(){
+      $(this).addClass('huoqu-ma-gray');
+      setTimeout(function(){
+        $('#button-get-validate-code-modal').css({'background':'#ff461f'});
+      },60000)
+    });
+
+
+
+
 
   });
 }).call(this);
