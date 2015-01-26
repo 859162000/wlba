@@ -16,6 +16,7 @@ from wanglibao_p2p.models import P2PProduct
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
+from wanglibao_redpack import backends as redpack_backends
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
@@ -33,14 +34,26 @@ class P2PTrader(object):
         self.margin_keeper = MarginKeeper(user=user, order_id=self.order_id)
         self.product_keeper = ProductKeeper(product, order_id=self.order_id)
         self.equity_keeper = EquityKeeper(user=user, product=product, order_id=self.order_id)
+        if request:
+            self.device_type = request.DATA.get("channelId", "")
+        else:
+            self.device_type = ""
 
-    def purchase(self, amount):
+    def purchase(self, amount, redpack=0):
         description = u'购买P2P产品 %s %s 份' % (self.product.short_name, amount)
         if self.user.wanglibaouserprofile.frozen:
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
+            actual_amount = amount
+            if redpack:
+                result = redpack_backends.consume(redpack,amount, self.user, self.order_id, self.device_type)
+                if result['ret_code'] != 0:
+                    raise Exception,result['message']
+                actual_amount = result['actual_amount']
+
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False)
-            margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
+            #margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
+            margin_record = self.margin_keeper.freeze(actual_amount, description=description, savepoint=False)
             equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
@@ -203,9 +216,7 @@ class P2POperator(object):
 
         # Create an order to link all changes
         order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
-        print product.status
         if product.status != u'满标已打款':
-            print 'hello, status'
             raise P2PException(u'产品状态(%s)不是(满标已打款)' % product.status)
         with transaction.atomic():
             # Generate the amotization plan and contract for each equity(user)

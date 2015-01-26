@@ -81,7 +81,7 @@ class RegisterView(RegistrationView):
         set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
-        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
+        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device_type":"pc"})
         return user
 
     def get_success_url(self, request=None, user=None):
@@ -966,7 +966,7 @@ def ajax_register(request):
                 # session lost, but I don't know why, rewrite the session
                 # if cjdaoinfo:
                 #     request.session['cjdaoinfo'] = cjdaoinfo
-                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id})
+                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device_type":"pc"})
 
                 return HttpResponse(messenger('done', user=request.user))
             else:
