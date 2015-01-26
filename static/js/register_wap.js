@@ -98,7 +98,7 @@
     return $("#register_submit").click(function(e) {
       var element, identifier, invite_code, validate_code;
       element = this;
-      if ($(element).hasClass("disabled")) {
+      if ($(element).hasClass("disable")) {
         return;
       }
       $(".error-message").text("");
@@ -117,15 +117,14 @@
         $(".error-message").text("请输入6位邀请码");
         return;
       }
-      $(element).addClass('disabled');
-      $(element).attr('disabled':'disabled')
+      $(element).addClass('disable');
       return backend.registerWap({
         identifier: identifier,
         validate_code: validate_code,
         invite_code: invite_code
       }).done(function(data) {
         if (data.ret_code > 0) {
-          $(element).removeClass('disabled');
+          $(element).removeClass('disable');
           return $(".error-message").text(data.message);
         } else {
           return window.location.href = '/';
@@ -137,3 +136,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=register_wap.js.map
