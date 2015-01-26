@@ -23,7 +23,7 @@ from marketing.models import SiteData, ClientData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm, BillForm
-from wanglibao_p2p.keeper import ProductKeeper
+from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
@@ -40,6 +40,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render_to_response
 from marketing.utils import save_client
 from marketing.tops import Top
+from order.utils import OrderHelper
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -531,3 +532,23 @@ def preview_contract(request, id):
 
     equity = ProductAmortization.objects.filter(product_id=id).prefetch_related('product')
     return HttpResponse(generate_contract_preview(equity, product))
+
+
+def AuditEquityCreateContract(request, equity_id):
+    equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
+    product = equity.product
+    order = OrderHelper.place_order(order_type=u'生成合同文件', status=u'开始', equity_id=equity_id, product_id=product.id)
+
+    if not equity.latest_contract:
+        #create contract file
+        EquityKeeperDecorator(product, order.id).generate_contract_one(equity_id=equity_id, savepoint=False)
+
+    equity_new = P2PEquity.objects.filter(id=equity_id).first()
+    try:
+        f = equity_new.latest_contract
+        lines = f.readlines()
+        f.close()
+        return HttpResponse("\n".join(lines))
+    except ValueError, e:
+        raise Http404
+

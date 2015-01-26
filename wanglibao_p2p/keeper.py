@@ -99,6 +99,19 @@ class EquityKeeperDecorator():
 
             P2PContract.objects.bulk_create(contract_list)
 
+    def generate_contract_one(self, equity_id, savepoint=True):
+
+        with transaction.atomic(savepoint=savepoint):
+            p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
+            p2p_equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
+            contract_string = generate_contract(p2p_equity, None, p2p_equities)
+
+            contract = P2PContract()
+            contract.contract_path.save(str(p2p_equity.id)+'.html', ContentFile(contract_string), False)
+            contract.equity = p2p_equity
+            contract.save()
+
+
 
 
 class EquityKeeper(KeeperBaseMixin):
