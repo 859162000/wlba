@@ -67,7 +67,7 @@ class P2PEquityInline(admin.TabularInline):
 
     def get_queryset(self, request):
         return super(P2PEquityInline, self).get_queryset(request).select_related('user').select_related(
-            'user__wanglibaouserprofile')
+            'user__wanglibaouserprofile')[:200]
 
 
 class P2PProductResource(resources.ModelResource):
