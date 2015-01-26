@@ -2,6 +2,7 @@
 # encoding:utf-8
 
 
+import time
 from django.utils import timezone
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
 from wanglibao_p2p.models import P2PRecord
@@ -13,6 +14,9 @@ REDPACK_RULE = {"direct":"-", "fullcut":"-", "percent":"*"}
 
 def local_datetime(dt):
     return timezone.get_current_timezone().normalize(dt)
+
+def stamp(dt):
+    return time.mktime(dt.timetuple())
 
 def list_redpack(user, status):
     if status not in ("all", "available"):
@@ -27,7 +31,7 @@ def list_redpack(user, status):
             event = x.redpack.event
             obj = {"name":event.name, "method":REDPACK_RULE[event.rtype], "amount":event.amount,
                     "id":x.id, "invest_amount":event.invest_amount,
-                    "unavailable_at":local_datetime(event.unavailable_at).strftime("%Y年%m月%d日")}
+                    "unavailable_at":stamp(event.unavailable_at)}
             if event.available_at < timezone.now() < event.unavailable_at:
                 if obj['method'] == REDPACK_RULE['percent']:
                     obj['amount'] = "%.2f" % (obj['amount']/100.0)
@@ -37,12 +41,12 @@ def list_redpack(user, status):
         records = RedPackRecord.objects.filter(user=user)
         for x in records:
             event = x.redpack.event
-            obj = {"name":event.name, "receive_at":local_datetime(x.created_at),
-                    "available_at":local_datetime(event.available_at), "unavailable_at":local_datetime(event.unavailable_at),
+            obj = {"name":event.name, "receive_at":stamp(x.created_at),
+                    "available_at":stamp(event.available_at), "unavailable_at":stamp(event.unavailable_at),
                     "id":x.id, "invest_amount":event.invest_amount, "amount":event.amount}
             if x.order_id:
                 pr = P2PRecord.objects.filter(order_id=x.order_id).first()
-                obj.update({"product":pr.product.name, "apply_at":local_datetime(x.apply_at),
+                obj.update({"product":pr.product.name, "apply_at":stamp(x.apply_at),
                             "apply_platform":x.apply_platform})
                 packages['used'].append(obj)
             else:
