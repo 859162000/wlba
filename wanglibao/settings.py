@@ -105,6 +105,7 @@ INSTALLED_APPS = (
     'wanglibao_pay',
     'order',
     'wanglibao_margin',
+    'wanglibao_redpack',
     'wanglibao_help',
 
     'report',

@@ -17,6 +17,7 @@ from marketing import helper
 from marketing.models import IntroducedBy, Reward, RewardRecord
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
+from wanglibao_redpack import backends as redpack_backends
 
 #判断是否首次
 @app.task
@@ -115,7 +116,7 @@ def decide_first(user_id, amount):
 
 #注册成功
 @app.task
-def register_ok(user_id):
+def register_ok(user_id, device_type):
     user = User.objects.filter(id=user_id).first()
 
     introduced_by = IntroducedBy.objects.filter(user=user).first()
@@ -132,6 +133,8 @@ def register_ok(user_id):
         "content": content,
         "mtype": "activityintro"
     })
+    #注册红包
+    redpack_backends.give_register_redpack(user, device_type)
 
 #充值成功
 def despoit_ok(pay_info):

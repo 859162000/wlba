@@ -35,6 +35,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView)
+from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView
 
 
 router = DefaultRouter()
@@ -146,6 +147,9 @@ urlpatterns = patterns(
     url(r'^shareurl/$', ShareUrlAPIView.as_view()),
     url(r'^gettopofday/$', TopsOfDayView.as_view()),
     url(r'^gettopofweek/$', TopsOfWeekView.as_view()),
+
+    url(r'^redpacket/$', RedPacketListAPIView.as_view()),
+    url(r'^redpacket/exchange/$', RedPacketChangeAPIView.as_view()),
 )
 
 urlpatterns += patterns('',

@@ -197,10 +197,22 @@ class PurchaseP2PMobile(APIView):
         if form.is_valid():
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
+            redpack = request.DATA.get("redpack", "")
+            if not redpack:
+                if amount % 100 != 0:
+                    return Response({
+                                        'message': u'购买金额必须为100的整数倍',
+                                        'error_number': ErrorNumber.need_authentication
+                                    }, status=status.HTTP_200_OK)
+            elif not redpack.isdigit():
+                return Response({
+                                    'message': u'请输入有效红包',
+                                    'error_number': ErrorNumber.need_authentication
+                                }, status=status.HTTP_200_OK)
 
             try:
-                trader = P2PTrader(product=p2p, user=request.user)
-                product_info, margin_info, equity_info = trader.purchase(amount)
+                trader = P2PTrader(product=p2p, user=request.user, request=request)
+                product_info, margin_info, equity_info = trader.purchase(amount, redpack)
 
                 # save client info
                 save_client(request, phone=phone, action=1)

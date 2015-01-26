@@ -14,8 +14,8 @@ class PurchaseForm(forms.Form):
 
     def clean_amount(self):
         amount = self.cleaned_data['amount']
-        if amount % 100 != 0:
-            raise forms.ValidationError(u'购买金额必须为100的整数倍')
+        #if amount % 100 != 0:
+        #    raise forms.ValidationError(u'购买金额必须为100的整数倍')
         if amount <= 0:
             raise forms.ValidationError(u'购买金额不能为负数')
 
