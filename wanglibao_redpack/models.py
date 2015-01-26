@@ -70,7 +70,7 @@ class RedPackEvent(models.Model):
         verbose_name_plural = u"红包活动"
 
     def __unicode__(self):
-        return u'<%s>' % self.name
+        return u'%s <%s>' % (self.id, self.name)
 
 class RedPack(models.Model):
     """
