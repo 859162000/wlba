@@ -7,42 +7,76 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    title 迅雷会员登录
     meta(http-equiv="content-type", content="text/html; charset=utf-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     meta(name="baidu-site-verification", content="iBKXouRC1a")
-    meta(name="keywords", content="迅雷,网利宝,狂欢节")
-    meta(name="description", content="迅雷+网利宝狂欢节，错过绝对会后悔”")
     link(href="/static/stylesheets/screen.css", media="screen, projection", rel="stylesheet", type="text/css")
 
-  body(style='background:#fff')
+  body(style="background:#fff")
     include include/header
     - with '首页' as activeItem
     include include/navigation
     - endwith
 
     .wrap
+
       .denelu-form
         h1.biaoti 轻松拿70元话费
-        form
+        //form#register-modal-form.login-form(method='post', action='/accounts/register/ajax/')
+          - csrf_token
+          .form-row
+            .form-control-group
+              .span7
+                input#reg_identifier(type="text", name="identifier", placeholder="请输入手机号")
+              .span5-omega
+                button#button-get-validate-code-modal.button-orange.button-large(type='button',style="top:-2px") 获取验证码
+            .form-row-error
+          .form-row.voice.hidden
+            .span12-omega
+              没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+          #validate-code-container.form-row
+            input#id_validate_code(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+            .form-row-error
+          .form-row
+            input#reg_password.full-width(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+            .password-strength-container
+              span.password-strength-1 低
+              span.password-strength-2 中
+              span.password-strength-3 高
+            .form-row-error
+          .form-row
+            input#reg_password2(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+            .form-row-error
+          .form-row
+            input#reg_password2(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
+            .form-row-error
+          .form-row.form-bottom-bar
+            button#register_submit.button-account.span12(type='submit') 注 册
+            .agreement
+              label(for="agreement")
+                input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
+              | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+              .form-row-error
+          .space-vertical-s
+        form#register-modal-form(method='post', action='/accounts/register/ajax/')
           ul.dl-com
             li
-              input.com-tu.tu1(type="text" placeholder="手机号码" )
+              input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="手机号码" )
             li
-              input.com-tu.tu2.yanzheng(type="text" placeholder="手机验证码" )
-              input(type="button" value="获取验证码" ).huoqu-ma
+              input#id_validate_code.com-tu.tu2.yanzheng(type="text", name="validate_code", placeholder="手机验证码", autocomplete='off', title="手机验证码")
+              input(type="button" value="获取验证码" )#button-get-validate-code-modal.huoqu-ma
             li
-              input.com-tu.tu3(type="text" placeholder="密码" )
+              input#reg_password.com-tu.tu3(type="password", name="password", placeholder="密码", autocomplete="off")
             li
-              input.com-tu.tu3(type="text" placeholder="确认密码" )
+              input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="确认密码", autocomplete='off', title="请确认密码",)
             li
-              input.com-tu.tu1(type="text" placeholder="邀请码(选填)" )
+              input#reg_password2.com-tu.tu1(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
             li
-              input(type="checkbox").inp-che
-              b.i-do  我同意
-                i  《网利宝注册协议》
+              input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree").inp-che
+              b.i-do
+                |我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
             li
-              input(type="button" value="立即注册").xun-zhuce
+              input(type="submit" value="立即注册")#register_submit.xun-zhuce
         p.xun-p 已有账号,
           a(href="#") 立即登录
       .container.high-bigger.high-bigger2
@@ -70,6 +104,7 @@ html
                p 全方位战略合作
 
     .gold(style='margin-top:20px;background:#fff')
+      img(src="/static/images/xunlei-denglu/xunlei-jiang-beijing.png").tete
       a(href="/#p2p")
             //.get-money
             //  h2 立即赚钱
@@ -126,11 +161,11 @@ html
       .content-title
           h2.h2-da 没心，没肺，没节操的送！
             p 活动期间，每个账户投资额达到以下额度，可获得相应奖品
-      .content-desc(style="margin-top:40px")
+      .content-desc(style="margin-top:40px;position:relative;z-index:2;background:#fff")
         .space-vertical-s
         .row.gold-row
            .span6
-             img(src="/static/images/gold/awards_bg.jpg").gold-jiangli
+             img(src="/static/images/gold/awards_bg.jpg")
            .span6-omega
              ul.font-m.li-linghight
                li 1、 累计购买满130万
@@ -216,8 +251,11 @@ html
               span.icon.icon-fifth-step
               .process-title 获得投资和奖励
       .invite-container.row
-          a(href="/accounts/invite/").invite-btn 立即注册
+          a.invite-btn#top-zc 立即注册
 
     .warp-footer
 
       include include/tracking
+
+      script.
+          require(["/static/js/xldl.js"])
