@@ -39,7 +39,7 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
-    AmortizationRecord
+    AmortizationRecord, P2PProductContract
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding, Message
@@ -1071,9 +1071,10 @@ class UserProductContract(APIView):
 
 @login_required
 def test_contract(request, equity_id):
-    # equity = P2PEquity.objects.filter(id=equity_id).prefetch_related('product').first()
-    p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
     p2p_equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
+    p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=p2p_equity.product)
+    contract_info = P2PProductContract.objects.filter(product=p2p_equity.product).first()
+    p2p_equity.contract_info = contract_info
     return HttpResponse(generate_contract(p2p_equity, 'tongchenghuodi_template.jade', p2p_equities))
 
 

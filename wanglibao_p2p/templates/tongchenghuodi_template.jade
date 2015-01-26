@@ -1,6 +1,7 @@
 -load formatters
 
 product = equity.product
+contract = equity.contract_info
 
 doctype html
 html
@@ -100,9 +101,9 @@ html
     p 网利宝平台用户名：
     br
 
-    p.bold 丙方（推荐方/服务方/代偿方）：东莞市同城货的有限公司
-    p 法定代表人：陈国利
-    p 地址：东莞市寮步镇寮城中路陈家埔路段15号
+    p.bold 丙方（推荐方/服务方/代偿方）：【{{contract.party_c}}】
+    p 法定代表人：【{{contract.party_c_name}}】
+    p 地址：【{{contract.party_c_address}}】
     br
 
     p.bold 丁方（见证方/服务方）：北京网利科技有限公司
