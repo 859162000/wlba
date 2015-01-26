@@ -22,9 +22,9 @@ def list_redpack(user, status):
             if x.order_id:
                 continue
             event = x.redpack.event
-            obj = {"name":event.name, "receive_at":x.created_at,
-                    "method":REDPACK_RULE[event.rtype], "amount":event.amount,
-                    "id":x.id, "invest_amount":event.invest_amount}
+            obj = {"name":event.name, "method":REDPACK_RULE[event.rtype], "amount":event.amount,
+                    "id":x.id, "invest_amount":event.invest_amount,
+                    "unavailable_at":timezone.get_current_timezone().normalize(event.unavailable_at).strftime("%Y年%m月%d日")}
             if event.available_at < timezone.now() < event.unavailable_at:
                 if obj['method'] == REDPACK_RULE['percent']:
                     obj['amount'] = "%.2f" % (obj['amount']/100.0)
