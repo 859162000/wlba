@@ -17,7 +17,7 @@ def list_redpack(user, status):
 
     if status == "available":
         packages = {"available":[]}
-        records = RedPackRecord.objects.filter(user=user)
+        records = RedPackRecord.objects.filter(user=user, order_id=None)
         for x in records:
             if x.order_id:
                 continue
