@@ -387,10 +387,14 @@ class P2PEquity(models.Model):
 
     @property
     def latest_contract(self):
-        if self.contract:
-            return self.contract
-        else:
-            return self.equity_contract.contract_path
+        try:
+            if self.contract:
+                return self.contract
+            elif self.equity_contract:
+                return self.equity_contract.contract_path
+        except Exception:
+            return None
+
 
     @property
     def related_orders(self):

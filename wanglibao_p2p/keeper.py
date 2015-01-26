@@ -1,6 +1,6 @@
 # encoding: utf-8
 from datetime import *
-from decimal import Decimal
+from decimal import *
 from dateutil.relativedelta import relativedelta
 from django.core.files.base import ContentFile
 from django.db import transaction
@@ -98,6 +98,19 @@ class EquityKeeperDecorator():
                 contract_list.append(contract)
 
             P2PContract.objects.bulk_create(contract_list)
+
+    def generate_contract_one(self, equity_id, savepoint=True):
+
+        with transaction.atomic(savepoint=savepoint):
+            p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
+            p2p_equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
+            contract_string = generate_contract(p2p_equity, None, p2p_equities)
+
+            contract = P2PContract()
+            contract.contract_path.save(str(p2p_equity.id)+'.html', ContentFile(contract_string), False)
+            contract.equity = p2p_equity
+            contract.save()
+
 
 
 
@@ -243,7 +256,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
                 interest = equity.ratio * amo.interest
                 principal_actual = principal.quantize(Decimal('.01'))
-                interest_actual = interest.quantize(Decimal('.01'))
+                interest_actual = interest.quantize(Decimal('.01'), ROUND_DOWN)
 
                 user_amo = UserAmortization(
                     product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
