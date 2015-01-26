@@ -11,6 +11,9 @@ from marketing import  helper
 
 REDPACK_RULE = {"direct":"-", "fullcut":"-", "percent":"*"}
 
+def local_datetime(dt):
+    return timezone.get_current_timezone().normalize(dt)
+
 def list_redpack(user, status):
     if status not in ("all", "available"):
         return {"ret_code":30151, "message":"参数错误"}
@@ -24,7 +27,7 @@ def list_redpack(user, status):
             event = x.redpack.event
             obj = {"name":event.name, "method":REDPACK_RULE[event.rtype], "amount":event.amount,
                     "id":x.id, "invest_amount":event.invest_amount,
-                    "unavailable_at":timezone.get_current_timezone().normalize(event.unavailable_at).strftime("%Y年%m月%d日")}
+                    "unavailable_at":local_datetime(event.unavailable_at).strftime("%Y年%m月%d日")}
             if event.available_at < timezone.now() < event.unavailable_at:
                 if obj['method'] == REDPACK_RULE['percent']:
                     obj['amount'] = "%.2f" % (obj['amount']/100.0)
@@ -34,12 +37,12 @@ def list_redpack(user, status):
         records = RedPackRecord.objects.filter(user=user)
         for x in records:
             event = x.redpack.event
-            obj = {"name":event.name, "receive_at":x.created_at,
-                    "available_at":event.available_at, "unavailable_at":event.unavailable_at,
+            obj = {"name":event.name, "receive_at":local_datetime(x.created_at),
+                    "available_at":local_datetime(event.available_at), "unavailable_at":local_datetime(event.unavailable_at),
                     "id":x.id, "invest_amount":event.invest_amount, "amount":event.amount}
             if x.order_id:
                 pr = P2PRecord.objects.filter(order_id=x.order_id).first()
-                obj.update({"product":pr.product.name, "apply_at":x.apply_at,
+                obj.update({"product":pr.product.name, "apply_at":local_datetime(x.apply_at),
                             "apply_platform":x.apply_platform})
                 packages['used'].append(obj)
             else:
@@ -65,7 +68,7 @@ def exchange_redpack(token, device_type, user):
     event = redpack.event
     now = timezone.now()
     if event.give_start_at > now:
-        return {"ret_code":30165, "message":"请在%s之后兑换" % event.give_start_at}
+        return {"ret_code":30165, "message":"请在%s之后兑换" % local_datetime(event.give_start_at)}
     elif event.give_end_at < now:
         return {"ret_code":30166, "message":"请输入有效的兑换码1"}
     if event.target_channel != "":
