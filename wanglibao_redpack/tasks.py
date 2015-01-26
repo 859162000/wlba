@@ -34,7 +34,8 @@ def create_update_redpack(event_id):
                         rp = RedPack()
                         rp.event = event
                         rp.token = token
-                        if not event.available:
+                        #如果作废
+                        if event.invalid:
                             rp.status = "invalid"
                         else:
                             rp.status = "unused"
@@ -42,7 +43,7 @@ def create_update_redpack(event_id):
             except:
                 logger.debug("redpackevent %s to create list error." % event_id)
     else:
-        if not event.available:
+        if event.invalid:
             rplist.update(status="invalid")
         else:
             try:
