@@ -1031,7 +1031,7 @@ def user_product_contract(request, product_id):
 
     if not equity.latest_contract:
         #create contract file
-        EquityKeeperDecorator(product, order.id).generate_contract_one(savepoint=False)
+        EquityKeeperDecorator(product, order.id).generate_contract_one(equity_id=equity.id, savepoint=False)
 
     equity_new = P2PEquity.objects.filter(id=equity.id).first()
     try:
@@ -1071,8 +1071,10 @@ class UserProductContract(APIView):
 
 @login_required
 def test_contract(request, equity_id):
-    equity = P2PEquity.objects.filter(id=equity_id).prefetch_related('product').first()
-    return HttpResponse(generate_contract(equity, 'kendeji_template.jade'))
+    # equity = P2PEquity.objects.filter(id=equity_id).prefetch_related('product').first()
+    p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
+    p2p_equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
+    return HttpResponse(generate_contract(p2p_equity, 'tongchenghuodi_template.jade', p2p_equities))
 
 
 class IdVerificationView(TemplateView):
