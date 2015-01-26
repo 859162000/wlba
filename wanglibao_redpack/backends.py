@@ -17,8 +17,10 @@ def list_redpack(user, status):
 
     if status == "available":
         packages = {"available":[]}
-        records = RedPackRecord.objects.filter(user=user, redpack__status="unused")
+        records = RedPackRecord.objects.filter(user=user)
         for x in records:
+            if x.order_id:
+                continue
             event = x.redpack.event
             obj = {"name":event.name, "receive_at":x.created_at,
                     "method":REDPACK_RULE[event.rtype], "amount":event.amount,
@@ -146,7 +148,10 @@ def consume(redpack, amount, user, order_id, device_type):
         rule_value = float("%.2f" % (rule_value/100.0))
         actual_amount = amount + amount * rule_value
     elif REDPACK_RULE[rtype] == "-":
-        actual_amount = amount - rule_value
+        if amount <= rule_value:
+            actual_amount = amount
+        else:
+            actual_amount = amount - rule_value
     elif REDPACK_RULE[rtype] == "+":
         actual_amount = amount + rule_value
 
