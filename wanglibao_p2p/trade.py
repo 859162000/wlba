@@ -215,7 +215,7 @@ class P2POperator(object):
 
             # for equity in product.equities.all():
             #     EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
-            EquityKeeperDecorator(product, order.id).generate_contract(savepoint=False)
+            # EquityKeeperDecorator(product, order.id).generate_contract(savepoint=False)
 
             product = P2PProduct.objects.get(pk=product.id)
             product.status = u'满标待审核'
