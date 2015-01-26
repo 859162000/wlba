@@ -39,7 +39,7 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
-    AmortizationRecord
+    AmortizationRecord, P2PProductContract
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding, Message
@@ -49,6 +49,8 @@ from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
 from wanglibao_p2p.models import P2PProduct
 from django.template.defaulttags import register
+from wanglibao_p2p.keeper import EquityKeeperDecorator
+from order.utils import OrderHelper
 # from wanglibao.settings import CJDAOKEY
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import RETURN_REGISTER
@@ -1024,9 +1026,16 @@ class P2PAmortizationAPI(APIView):
 def user_product_contract(request, product_id):
     equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
 
+    product = equity.product
+    order = OrderHelper.place_order(order_type=u'生成合同文件', status=u'开始', equity_id=equity.id, product_id=product.id)
+
+    if not equity.latest_contract:
+        #create contract file
+        EquityKeeperDecorator(product, order.id).generate_contract_one(equity_id=equity.id, savepoint=False)
+
+    equity_new = P2PEquity.objects.filter(id=equity.id).first()
     try:
-        #f = equity.contract
-        f = equity.latest_contract
+        f = equity_new.latest_contract
         lines = f.readlines()
         f.close()
         return HttpResponse("\n".join(lines))
@@ -1039,10 +1048,17 @@ class UserProductContract(APIView):
 
     def get(self, request, product_id):
         equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
+        product = equity.product
+        order = OrderHelper.place_order(order_type=u'生成合同文件', status=u'开始', equity_id=equity.id, product_id=product.id)
+
+        if not equity.latest_contract:
+            #create contract file
+            EquityKeeperDecorator(product, order.id).generate_contract_one(savepoint=False)
+
+        equity_new = P2PEquity.objects.filter(id=equity.id).first()
 
         try:
-            #f = equity.contract
-            f = equity.latest_contract
+            f = equity_new.latest_contract
             lines = f.readlines()
             f.close()
             return HttpResponse("\n".join(lines))
@@ -1055,8 +1071,11 @@ class UserProductContract(APIView):
 
 @login_required
 def test_contract(request, equity_id):
-    equity = P2PEquity.objects.filter(id=equity_id).prefetch_related('product').first()
-    return HttpResponse(generate_contract(equity, 'kendeji_template.jade'))
+    p2p_equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
+    p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=p2p_equity.product)
+    contract_info = P2PProductContract.objects.filter(product=p2p_equity.product).first()
+    p2p_equity.contract_info = contract_info
+    return HttpResponse(generate_contract(p2p_equity, 'tongchenghuodi_template.jade', p2p_equities))
 
 
 class IdVerificationView(TemplateView):

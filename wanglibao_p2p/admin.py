@@ -63,7 +63,7 @@ class P2PEquityInline(admin.TabularInline):
     exclude = ('version',)
     extra = 0
     can_delete = False
-
+    list_max_show_all = 1
 
     def get_queryset(self, request):
         return super(P2PEquityInline, self).get_queryset(request).select_related('user').select_related(
@@ -212,7 +212,7 @@ class P2PProductForm(forms.ModelForm):
 
 class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
     inlines = [
-        P2PProductContractInline, WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
+        P2PProductContractInline, WarrantInline, AttachementInline, AmortizationInline#, P2PEquityInline
     ]
     list_display = ('id', 'name', 'total_amount', 'brief', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'preview_contract', 'copy_link', 'priority')
     list_editable = ('priority',)
@@ -329,7 +329,7 @@ class InterestPrecisionAdmin(admin.ModelAdmin):
     list_display = ('id', 'equity_product', 'equity_phone', 'equity_name', 'equity_number',
                     'principal', 'interest_receivable', 'interest_actual', 'interest_precision_balance',)
     raw_id_fields = ('equity',)
-    search_fields = ('equity__user__wanglibaouserprofile__phone',)
+    search_fields = ('equity__product__id', 'equity__user__wanglibaouserprofile__phone',)
 
     def equity_phone(self, instance):
         return instance.equity.user.wanglibaouserprofile.phone

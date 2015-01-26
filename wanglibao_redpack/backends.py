@@ -2,6 +2,7 @@
 # encoding:utf-8
 
 
+import time
 from django.utils import timezone
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
 from wanglibao_p2p.models import P2PRecord
@@ -11,18 +12,26 @@ from marketing import  helper
 
 REDPACK_RULE = {"direct":"-", "fullcut":"-", "percent":"*"}
 
+def local_datetime(dt):
+    return timezone.get_current_timezone().normalize(dt)
+
+def stamp(dt):
+    return long(time.mktime(dt.timetuple()))
+
 def list_redpack(user, status):
     if status not in ("all", "available"):
         return {"ret_code":30151, "message":"参数错误"}
 
     if status == "available":
         packages = {"available":[]}
-        records = RedPackRecord.objects.filter(user=user, redpack__status="unused")
+        records = RedPackRecord.objects.filter(user=user, order_id=None)
         for x in records:
+            if x.order_id:
+                continue
             event = x.redpack.event
-            obj = {"name":event.name, "receive_at":x.created_at,
-                    "method":REDPACK_RULE[event.rtype], "amount":event.amount,
-                    "id":x.id, "invest_amount":event.invest_amount}
+            obj = {"name":event.name, "method":REDPACK_RULE[event.rtype], "amount":event.amount,
+                    "id":x.id, "invest_amount":event.invest_amount,
+                    "unavailable_at":stamp(event.unavailable_at)}
             if event.available_at < timezone.now() < event.unavailable_at:
                 if obj['method'] == REDPACK_RULE['percent']:
                     obj['amount'] = "%.2f" % (obj['amount']/100.0)
@@ -32,12 +41,12 @@ def list_redpack(user, status):
         records = RedPackRecord.objects.filter(user=user)
         for x in records:
             event = x.redpack.event
-            obj = {"name":event.name, "receive_at":x.created_at,
-                    "available_at":event.available_at, "unavailable_at":event.unavailable_at,
+            obj = {"name":event.name, "receive_at":stamp(x.created_at),
+                    "available_at":stamp(event.available_at), "unavailable_at":stamp(event.unavailable_at),
                     "id":x.id, "invest_amount":event.invest_amount, "amount":event.amount}
             if x.order_id:
                 pr = P2PRecord.objects.filter(order_id=x.order_id).first()
-                obj.update({"product":pr.product.name, "apply_at":x.apply_at,
+                obj.update({"product":pr.product.name, "apply_at":stamp(x.apply_at),
                             "apply_platform":x.apply_platform})
                 packages['used'].append(obj)
             else:
@@ -63,7 +72,7 @@ def exchange_redpack(token, device_type, user):
     event = redpack.event
     now = timezone.now()
     if event.give_start_at > now:
-        return {"ret_code":30165, "message":"请在%s之后兑换" % event.give_start_at}
+        return {"ret_code":30165, "message":"请在%s之后兑换" % local_datetime(event.give_start_at)}
     elif event.give_end_at < now:
         return {"ret_code":30166, "message":"请输入有效的兑换码1"}
     if event.target_channel != "":
@@ -146,7 +155,10 @@ def consume(redpack, amount, user, order_id, device_type):
         rule_value = float("%.2f" % (rule_value/100.0))
         actual_amount = amount + amount * rule_value
     elif REDPACK_RULE[rtype] == "-":
-        actual_amount = amount - rule_value
+        if amount <= rule_value:
+            actual_amount = amount
+        else:
+            actual_amount = amount - rule_value
     elif REDPACK_RULE[rtype] == "+":
         actual_amount = amount + rule_value
 

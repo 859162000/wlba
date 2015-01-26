@@ -387,10 +387,14 @@ class P2PEquity(models.Model):
 
     @property
     def latest_contract(self):
-        if self.contract:
-            return self.contract
-        else:
-            return self.equity_contract.contract_path
+        try:
+            if self.contract:
+                return self.contract
+            elif self.equity_contract:
+                return self.equity_contract.contract_path
+        except Exception:
+            return None
+
 
     @property
     def related_orders(self):
@@ -610,7 +614,7 @@ class InterestPrecisionBalance(models.Model):
         ordering = ['-create_time']
         verbose_name_plural = u'利息计算精度差额'
 
-    equity = models.OneToOneField(P2PEquity, null=True, blank=False, related_name="interest_precision_balance")
+    equity = models.ForeignKey(P2PEquity, null=True, blank=False, related_name="interest_precision_balance")
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
     interest_receivable = models.DecimalField(u'应收利息', max_digits=20, decimal_places=8)
     interest_actual = models.DecimalField(u'实收利息', max_digits=20, decimal_places=2)
