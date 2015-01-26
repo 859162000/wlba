@@ -44,8 +44,8 @@ class RedPackEvent(models.Model):
     #rule = models.ForeignKey(Rule)
     rtype = models.CharField(max_length=20, verbose_name=u'红包类型', choices=(
                             ("direct", "直抵红包"),
-                            ("fullcut", "满减红包/最低投资额"),
-                            ("percent", "投资百分比红包"),))
+                            ("fullcut", "满减红包/最低投资额"),))
+                            #("percent", "投资百分比红包"),))
     amount = models.IntegerField(null=False, default=0, verbose_name=u'红包金额(百分比也为整数0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
     value = models.IntegerField(null=False, default=1, verbose_name=u"红包个数(不生成兑换码无需修改)")
@@ -70,7 +70,7 @@ class RedPackEvent(models.Model):
         verbose_name_plural = u"红包活动"
 
     def __unicode__(self):
-        return u'<%s>' % self.name
+        return u'%s <%s>' % (self.id, self.name)
 
 class RedPack(models.Model):
     """
