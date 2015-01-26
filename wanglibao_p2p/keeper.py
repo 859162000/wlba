@@ -1,6 +1,6 @@
 # encoding: utf-8
 from datetime import *
-from decimal import Decimal
+from decimal import *
 from dateutil.relativedelta import relativedelta
 from django.core.files.base import ContentFile
 from django.db import transaction
@@ -243,7 +243,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
                 interest = equity.ratio * amo.interest
                 principal_actual = principal.quantize(Decimal('.01'))
-                interest_actual = interest.quantize(Decimal('.01'))
+                interest_actual = interest.quantize(Decimal('.01'), ROUND_DOWN)
 
                 user_amo = UserAmortization(
                     product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
