@@ -105,8 +105,10 @@ class EquityKeeperDecorator():
             # p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
             p2p_equity = P2PEquity.objects.select_related('user__wanglibaouserprofile', \
                                                           'product__contract_template').select_related('product').filter(id=equity_id).first()
+            amortizations = UserAmortization.objects.filter(user=p2p_equity.user, product_amortization__product=p2p_equity.product)
             contract_info = P2PProductContract.objects.filter(product=p2p_equity.product).first()
             p2p_equity.contract_info = contract_info
+            p2p_equity.amortizations_all = amortizations
             contract_string = generate_contract(p2p_equity, None, None)
 
             contract = P2PContract()
