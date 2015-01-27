@@ -151,17 +151,20 @@ def consume(redpack, amount, user, order_id, device_type):
 
     rtype = event.rtype
     rule_value = event.amount
+    deduct = event.amount
     if REDPACK_RULE[rtype] == "*":
         return {"ret_code":30176, "message":"目前不支付百分比红包"}
 
         rule_value = float("%.2f" % (rule_value/100.0))
         actual_amount = amount + amount * rule_value
+        deduct = round(amount * rule_value)
     elif REDPACK_RULE[rtype] == "-":
         if amount <= rule_value:
             actual_amount = amount
+            deduct = amount
         else:
             actual_amount = amount - rule_value
     elif REDPACK_RULE[rtype] == "+":
         actual_amount = amount + rule_value
 
-    return {"ret_code":0, "message":"ok", "actual_amount":actual_amount}
+    return {"ret_code":0, "message":"ok", "actual_amount":actual_amount, "deduct":deduct}
