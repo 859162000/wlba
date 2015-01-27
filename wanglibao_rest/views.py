@@ -738,13 +738,15 @@ class InvestRecord(APIView):
         if p2p == "" or page == "":
             return []
 
+        print p2p, page, '####'
+
         product = P2PProduct.objects.filter(pk=p2p).first()
 
         records = P2PRecord.objects.filter(product=product, catalog=u'申购').select_related('user__wanglibaouserprofile')
 
         limit = 30
         paginator = Paginator(records, limit)
-        page = self.request.GET.get('page')
+        #page = self.request.GET.get('page')
 
         try:
             p2p_records = paginator.page(page)
