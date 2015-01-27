@@ -3,11 +3,11 @@
 
 
 import time
+import StringIO
 from django.utils import timezone
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
 from wanglibao_p2p.models import P2PRecord
 from marketing import  helper
-
 
 
 REDPACK_RULE = {"direct":"-", "fullcut":"-", "percent":"*"}
@@ -152,6 +152,8 @@ def consume(redpack, amount, user, order_id, device_type):
     rtype = event.rtype
     rule_value = event.amount
     if REDPACK_RULE[rtype] == "*":
+        return {"ret_code":30176, "message":"目前不支付百分比红包"}
+
         rule_value = float("%.2f" % (rule_value/100.0))
         actual_amount = amount + amount * rule_value
     elif REDPACK_RULE[rtype] == "-":

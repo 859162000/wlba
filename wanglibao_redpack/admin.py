@@ -3,6 +3,8 @@
 
 from django.contrib import admin
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
+from import_export import resources
+from import_export.admin import ExportMixin
 
 
 
@@ -11,9 +13,17 @@ class RedPackEventAdmin(admin.ModelAdmin):
                     "available_at", "unavailable_at", "invalid", "created_at")
     search_fields = ("name", "give_mode")
 
-class RedPackAdmin(admin.ModelAdmin):
+
+class RedPackResource(resources.ModelResource):
+
+    class Meta:
+        model = RedPack
+        fields = ('token',)
+
+class RedPackAdmin(ExportMixin, admin.ModelAdmin):
     list_display = ("id", "event", "token", "status")
-    search_fields = ("token",)
+    search_fields = ("token", "event__id")
+    resource_class = RedPackResource
 
 class RedPackRecordAdmin(admin.ModelAdmin):
     list_display = ("id", "redpack", "user", "change_platform", "apply_platform", "created_at", "apply_at", "order_id")

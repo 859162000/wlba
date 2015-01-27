@@ -10,7 +10,7 @@ from order.mixins import KeeperBaseMixin
 from wanglibao_account.utils import generate_contract
 from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
-    UserAmortization, P2PContract, InterestPrecisionBalance
+    UserAmortization, P2PContract, InterestPrecisionBalance, P2PProductContract
 from exceptions import ProductLack, P2PException
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_sms import messages
@@ -104,6 +104,8 @@ class EquityKeeperDecorator():
         with transaction.atomic(savepoint=savepoint):
             p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
             p2p_equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
+            contract_info = P2PProductContract.objects.filter(product=p2p_equity.product).first()
+            p2p_equity.contract_info = contract_info
             contract_string = generate_contract(p2p_equity, None, p2p_equities)
 
             contract = P2PContract()
