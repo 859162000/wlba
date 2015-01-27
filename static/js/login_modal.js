@@ -109,7 +109,7 @@
             next_url = arr[1];
             window.location.href = next_url;
           } else {
-            location.reload();
+            window.location.href = next_url;
           }
           return $('#login_submit').removeClass('disabled');
         }).fail(function(xhr) {
@@ -436,3 +436,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=login_modal.js.map
