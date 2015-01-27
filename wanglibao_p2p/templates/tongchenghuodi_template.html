@@ -1,4 +1,4 @@
-{% load formatters %}{% __pyjade_set product = equity.product %}<!DOCTYPE html>
+{% load formatters %}{% __pyjade_set product = equity.product %}{% __pyjade_set contract = equity.contract_info %}<!DOCTYPE html>
 <html>
   <head lang="en">
     <meta charset="UTF-8">
@@ -57,7 +57,7 @@ ul>li{
   </head>
   <body>
     <h2>借款协议</h2><!--.align-right 协议编号：<span class="border-bot">{{product.contract_serial_number}}</span>号-->
-    <p>本协议由以下各方于<span class="border-bot">{{now|date:"Y"}}</span>年<span class="border-bot">{{now|date:"m"}}</span>月<span class="border-bot">{{now|date:"d"}}</span>日签订：
+    <p>本协议由以下各方于<span class="border-bot">{{product.make_loans_time|date:"Y"}}</span>年<span class="border-bot">{{product.make_loans_time|date:"m"}}</span>月<span class="border-bot">{{product.make_loans_time|date:"d"}}</span>日签订：
     </p><br>
     <p class="bold">甲方（出借方）：</p>
     <table>
@@ -66,7 +66,8 @@ ul>li{
           <th>网利宝平台用户</th>
           <th>借出金额</th>
           <th>借款期限</th>
-        </tr>{% __pyjade_set equities = equity.product.equities.all() %}{% for e in equities|__pyjade_iter:1 %}
+        </tr>
+        <!--equities = equity.product.equities.all()-->{% for e in equities|__pyjade_iter:1 %}
         <tr>{% if  e.user.id == equity.user.id %}
           <td>{{e.user.wanglibaouserprofile.phone}}</td>{% else %}
           <td>{{e.user | safe_phone}}</td>{% endif %}
@@ -84,9 +85,9 @@ ul>li{
     <p>身份证号/法定代表人：{{ product.borrower_id_number|safe_name_last}}</p>
     <p>地址：{{ product.borrower_address|safe_address }}</p>
     <p>网利宝平台用户名：</p><br>
-    <p class="bold">丙方（推荐方/服务方/代偿方）：东莞市同城货的有限公司</p>
-    <p>法定代表人：陈国利</p>
-    <p>地址：东莞市寮步镇寮城中路陈家埔路段15号</p><br>
+    <p class="bold">丙方（推荐方/服务方/代偿方）：【{{contract.party_c}}】</p>
+    <p>法定代表人：【{{contract.party_c_name}}】</p>
+    <p>地址：【{{contract.party_c_address}}】</p><br>
     <p class="bold">丁方（见证方/服务方）：北京网利科技有限公司</p>
     <p>法定代表人：杨华</p>
     <p>地址：北京市海淀区花园路5号2幢二层215室 </p><br>

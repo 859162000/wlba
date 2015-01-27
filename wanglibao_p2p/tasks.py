@@ -20,6 +20,8 @@ import time
 
 @app.task
 def p2p_watchdog():
+    import os
+    os.system('touch ~/docs/test_watchdog')
     P2POperator().watchdog()
 
 

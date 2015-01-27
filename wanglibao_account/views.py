@@ -1053,7 +1053,7 @@ class UserProductContract(APIView):
 
         if not equity.latest_contract:
             #create contract file
-            EquityKeeperDecorator(product, order.id).generate_contract_one(savepoint=False)
+            EquityKeeperDecorator(product, order.id).generate_contract_one(equity_id=equity.id, savepoint=False)
 
         equity_new = P2PEquity.objects.filter(id=equity.id).first()
 

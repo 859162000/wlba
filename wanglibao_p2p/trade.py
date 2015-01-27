@@ -261,6 +261,7 @@ class P2POperator(object):
             "messages": [messages.product_settled(product, timezone.now())]
         })
 
+
         pname = u"%s,期限%s个月" % (product.name, product.period)
         title, content = messages.msg_bid_success(pname, timezone.now())
         inside_message.send_batch.apply_async(kwargs={

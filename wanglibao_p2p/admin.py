@@ -23,7 +23,7 @@ class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
         'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest',
         'penal_interest')
     list_filter = ('confirm',)
-    search_fields = ('user__wanglibaouserprofile__phone',)
+    search_fields = ('product__name', 'user__wanglibaouserprofile__phone')
     raw_id_fields = ('user', 'product')
 
     def get_readonly_fields(self, request, obj=None):
