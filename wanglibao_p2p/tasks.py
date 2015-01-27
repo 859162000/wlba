@@ -100,7 +100,7 @@ def build_earning(product_id):
 
 
         earning_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
-        title, content = messages.msg_bid_earning(user.wanglibaouserprofile.phone, p2p.name, p2p.activity.name,
+        title, content = messages.msg_bid_earning(p2p.name, p2p.activity.name,
                                                   p2p.period, earning_time, rule.percent_text, amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id": obj.get('user'),
