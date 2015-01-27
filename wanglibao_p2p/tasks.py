@@ -2,6 +2,7 @@
 # encoding:utf-8
 
 from django.forms import model_to_dict
+from django.utils import timezone
 from order.models import Order
 from order.utils import OrderHelper
 
@@ -66,6 +67,7 @@ def build_earning(product_id):
     earning = P2PRecord.objects.values('user').annotate(sum_amount=Sum('amount')).filter(product=p2p, catalog=u'申购')
 
     phone_list = []
+    earning_list = []
     rule = p2p.activity.rule
 
     #把收益数据插入earning表内
@@ -90,11 +92,29 @@ def build_earning(product_id):
         desc = u'%s,%s赠送%s%s' % (p2p.name, p2p.activity.name, p2p.activity.rule.rule_amount*100, '%')
         earning.margin_record = keeper.deposit(amount,description=desc)
         earning.user = user
-        earning.save()
 
-        #发送活动赠送短信
-        send_messages.apply_async(kwargs={
-                        "phones": [user.wanglibaouserprofile.phone],
-                        "messages": [messages.earning_message(amount)]
-                    })
+        #earning.save()
+
+        earning_list.append(earning)
+        phone_list.append(user.wanglibaouserprofile.phone)
+
+
+        earning_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
+        title, content = messages.msg_bid_earning(user.wanglibaouserprofile.phone, p2p.name, p2p.activity.name,
+                                                  p2p.period, earning_time, rule.percent_text, amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": obj.get('user'),
+            "title": title,
+            "content": content,
+            "mtype": "activity"
+        })
+
+    #发送活动赠送短信
+    send_messages.apply_async(kwargs={
+                    "phones": phone_list,
+                    "messages": [messages.earning_message(rule.percent_text)]
+                })
+
+
+    Earning.objects.bulk_create(earning_list)
 

@@ -106,7 +106,7 @@ def _send(target_user, msgTxt):
     return True
 
 def _send_batch(user_objs, msgTxt):
-    notice_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype).first()
+    notice_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype)
     msg_list = list()
     for notice_obj in notice_list:
 

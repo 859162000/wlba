@@ -71,7 +71,7 @@ def rand_pass(password):
 
 @suffix
 def earning_message(amount):
-    return u'亲，您的投标奖励收益%s元，已赠送到您的网利宝账户，可用于理财投资。' % amount
+    return u'亲，您的投标奖励%s收益，已赠送到您的网利宝账户，可用于理财投资。详情请登陆网利宝查看站内信。' % amount
 
 @suffix
 def product_full_message(name):
@@ -81,6 +81,12 @@ def product_full_message(name):
 def msg_bid_purchase(order_id, product_name, amount):
     title = u"投标通知"
     content = u"感谢您投资订单号【%s】借款项目“%s”￥%s元，该项目正在招标中，您的投标资金暂时被冻结，满标后将放款计息。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (order_id, product_name, amount)
+    return title, content
+
+def msg_bid_earning(phone, product_name, activity_name, term, time, earning_percent, earning_aoumnt):
+    title = u"活动收益"
+    #content = u"感谢您投资订单号【%s】借款项目“%s”￥%s元，该项目正在招标中，您的投标资金暂时被冻结，满标后将放款计息。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (order_id, product_name, amount)
+    content = u"亲爱的%s您好： 借款项目“%s(%s）,期限%s个月”于%s赠送【%s%s】活动收益【%s】元，请注意查收。 查看账户余额 感谢您对我们的支持与关注。" % (phone, product_name, activity_name, term, time, earning_percent, u"%", earning_aoumnt)
     return title, content
 
 def msg_bid_fail(product_name):
