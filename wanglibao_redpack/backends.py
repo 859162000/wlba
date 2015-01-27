@@ -3,7 +3,6 @@
 
 
 import time
-import StringIO
 from django.utils import timezone
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
 from wanglibao_p2p.models import P2PRecord
@@ -18,10 +17,11 @@ def local_datetime(dt):
 def stamp(dt):
     return long(time.mktime(dt.timetuple()))
 
-def list_redpack(user, status):
+def list_redpack(user, status, device_type):
     if status not in ("all", "available"):
         return {"ret_code":30151, "message":"参数错误"}
 
+    device_type = _decide_device(device_type)
     if status == "available":
         packages = {"available":[]}
         records = RedPackRecord.objects.filter(user=user, order_id=None)
@@ -33,9 +33,10 @@ def list_redpack(user, status):
                     "id":x.id, "invest_amount":event.invest_amount,
                     "unavailable_at":stamp(event.unavailable_at)}
             if event.available_at < timezone.now() < event.unavailable_at:
-                if obj['method'] == REDPACK_RULE['percent']:
-                    obj['amount'] = "%.2f" % (obj['amount']/100.0)
-                packages['available'].append(obj)
+                if event.apply_platform == "" and event.apply_platform == device_type:
+                    if obj['method'] == REDPACK_RULE['percent']:
+                        obj['amount'] = "%.2f" % (obj['amount']/100.0)
+                    packages['available'].append(obj)
     else:
         packages = {"used":[], "unused":[], "expires":[], "invalid":[]}
         records = RedPackRecord.objects.filter(user=user)
@@ -63,6 +64,7 @@ def exchange_redpack(token, device_type, user):
     if token == "":
         return {"ret_code":30161, "message":"请输入兑换码"}
     redpack = RedPack.objects.filter(token=token).first()
+    device_type = _decide_device(device_type)
     if not redpack:
         return {"ret_code":30162, "message":"请输入正确的兑换码"}
     if redpack.status == "used":
@@ -79,11 +81,13 @@ def exchange_redpack(token, device_type, user):
         ch = helper.which_channel(user)
         if ch != event.target_channel:
             return {"ret_code":30167, "message":"不符合领取条件"}
+    if event.give_platform != "" and event.give_platform != device_type:
+        return {"ret_code":30168, "message":"不符合领取条件"}
 
     record = RedPackRecord()
     record.user = user
     record.redpack = redpack
-    record.change_platform = _decide_device(device_type)
+    record.change_platform = device_type
     redpack.status = "used"
     redpack.save()
     record.save()
@@ -113,27 +117,30 @@ def give_first_buy_redpack(user, device_type):
 def _give_redpack(user, rtype, device_type):
     now = timezone.now()
     user_ch = helper.which_channel(user)
+    device_type = _decide_device(device_type)
     rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
     for x in rps:
         if x.target_channel != "" and user_ch != x.target_channel:
             continue
         redpack = RedPack.objects.filter(event=x, status="unused").first()
-        if not redpack:
-            continue
-        if redpack.token != "":
-            redpack.status = "used"
-            redpack.save()
-        record = RedPackRecord()
-        record.user = user
-        record.redpack = redpack
-        record.change_platform = _decide_device(device_type)
-        record.save()
+        if redpack:
+            give_pf = redpack.event.give_platform
+            if give_pf == "" or give_pf == device_type:
+                if redpack.token != "":
+                    redpack.status = "used"
+                    redpack.save()
+                record = RedPackRecord()
+                record.user = user
+                record.redpack = redpack
+                record.change_platform = device_type
+                record.save()
 
 
 def consume(redpack, amount, user, order_id, device_type):
     record = RedPackRecord.objects.filter(user=user, id=redpack).first()
     redpack = record.redpack
     event = redpack.event
+    device_type = _decide_device(device_type)
     if not record:
         return {"ret_code":30171, "message":"红包不存在"}
     if record.order_id:
@@ -144,8 +151,11 @@ def consume(redpack, amount, user, order_id, device_type):
         return {"ret_code":30174, "message":"红包不可使用"}
     if amount < event.invest_amount:
         return {"ret_code":30175, "message":"投资金额不满足红包规则%s" % event.invest_amount}
+    if event.apply_platform != "" and event.apply_platform != device_type:
+        return {"ret_code":30176, "message":"此红包只能在%s平台使用" % event.apply_platform}
+
     record.order_id = order_id
-    record.apply_platform = _decide_device(device_type)
+    record.apply_platform = device_type
     record.apply_at = timezone.now()
     record.save()
 
