@@ -531,7 +531,7 @@ def preview_contract(request, id):
         return HttpResponse(u'<h3 style="color:red;">没有该产品或产品信息错误！</h3>')
 
     equity = ProductAmortization.objects.filter(product_id=id).select_related('product')
-    contract_info = P2PProductContract.objects.filter(product=equity.product).first()
+    contract_info = P2PProductContract.objects.filter(product=product).first()
     equity.contract_info = contract_info
     return HttpResponse(generate_contract_preview(equity, product))
 
