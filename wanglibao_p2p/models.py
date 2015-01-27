@@ -643,9 +643,16 @@ class P2PProductContract(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.id
+    PARTY_CHOICES = (
+        (u'企业', u'企业'),
+        (u'个人', u'个人'),
+    )
 
     product = models.OneToOneField(P2PProduct, verbose_name=u'P2P产品', blank=False, default='')
     signing_date = models.DateField(verbose_name=u'合同签订日期', auto_now_add=False, blank=False)
+    party_b_type = models.CharField(max_length=16, default=u'企业',
+                              choices=PARTY_CHOICES,
+                              verbose_name=u'乙方（借款方）类型*')
     party_b = models.CharField(verbose_name=u'乙方(借款方)*', max_length=32, blank=False)
     party_b_name = models.CharField(verbose_name=u'乙方法人代表', max_length=32, blank=False)
     party_c = models.CharField(verbose_name=u'丙方(推荐方/服务方/代偿方)', blank=False, max_length=128, help_text=u'丙方（推荐方/服务方/代偿方）', default='')
@@ -656,6 +663,6 @@ class P2PProductContract(models.Model):
     bill_accepting_bank = models.CharField(verbose_name=u'(票据)承兑银行', max_length=32, blank=True)
     bill_number = models.CharField(verbose_name=u'(票据)承兑汇票票号', max_length=32, blank=True)
     bill_amount = models.CharField(verbose_name=u'(票据)票面金额', max_length=32, blank=True)
-    bill_due_date = models.DateTimeField(default=timezone.now, blank=True, verbose_name=u'(票据)到期日', auto_now_add=True)
+    bill_due_date = models.DateField(blank=True, verbose_name=u'(票据)到期日', auto_now_add=False)
     created_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间', auto_now_add=True)
 
