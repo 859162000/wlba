@@ -151,7 +151,7 @@ def consume(redpack, amount, user, order_id, device_type):
         return {"ret_code":30174, "message":"红包不可使用"}
     if amount < event.invest_amount:
         return {"ret_code":30175, "message":"投资金额不满足红包规则%s" % event.invest_amount}
-    if event.apply_platform != "" and event.apply_platform != device_type:
+    if event.apply_platform != "" or event.apply_platform != device_type:
         return {"ret_code":30176, "message":"此红包只能在%s平台使用" % event.apply_platform}
 
     record.order_id = order_id
