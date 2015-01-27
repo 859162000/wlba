@@ -49,11 +49,12 @@ class P2PTrader(object):
                 result = redpack_backends.consume(redpack,amount, self.user, self.order_id, self.device_type)
                 if result['ret_code'] != 0:
                     raise Exception,result['message']
-                actual_amount = result['actual_amount']
+                #actual_amount = result['actual_amount']
+                red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'], savepoint=False)
 
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False)
-            #margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
-            margin_record = self.margin_keeper.freeze(actual_amount, description=description, savepoint=False)
+            margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
+            #margin_record = self.margin_keeper.freeze(actual_amount, description=description, savepoint=False)
             equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
