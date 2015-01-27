@@ -33,7 +33,7 @@ def list_redpack(user, status, device_type):
                     "id":x.id, "invest_amount":event.invest_amount,
                     "unavailable_at":stamp(event.unavailable_at)}
             if event.available_at < timezone.now() < event.unavailable_at:
-                if event.apply_platform == "" and event.apply_platform == device_type:
+                if event.apply_platform == "" or event.apply_platform == device_type:
                     if obj['method'] == REDPACK_RULE['percent']:
                         obj['amount'] = "%.2f" % (obj['amount']/100.0)
                     packages['available'].append(obj)
