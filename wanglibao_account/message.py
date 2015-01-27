@@ -105,6 +105,41 @@ def _send(target_user, msgTxt):
     msg.save()
     return True
 
+def _send_batch(user_objs, msgTxt):
+    notice_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype).first()
+    for notice_obj in notice_list:
+
+        msg = Message()
+        msg.target_user = notice_obj.user
+        msg.message_text = msgTxt
+
+        msg.notice = True
+
+    # msg.save()
+
+    # message_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype).first()
+    devices = UserPushId.objects.filter(user__in=user_objs)
+
+    channel = bae_channel.BaeChannel()
+    msg_key = "wanglibao_%s" % time.time()
+    message = {"message": msgTxt.content}
+
+    for device in devices:
+        # notice = True
+        #不管有没有设置，默认都发推送
+        # if mset or not mset:
+            #notice = mset.notice
+
+        # if devices:
+        #     for d in devices:
+
+        if device.device_type in ("ios", "iPhone", "iPad"):
+            res, cont = channel.pushIosMessage(device.push_user_id, device.push_channel_id, message, msg_key)
+        elif device.device_type == "android":
+            res, cont = channel.pushAndroidMessage(device.push_user_id, device.push_channel_id, message, msg_key)
+
+    return True
+
 def notice_set(params, user):
     """
         设置消息通知
@@ -179,9 +214,13 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None):
         if not msgTxt:
             return False
 
-    for user_id in users:
-        user = User.objects.filter(pk=user_id).first()
-        if not user:
-            continue
-        _send(user, msgTxt)
+    user_objs = User.objects.in_bulk(users)
+
+    # for user_id in users:
+    #     user = User.objects.filter(pk=user_id).first()
+    #     if not user:
+    #         continue
+    #     _send(user, msgTxt)
+
+    _send_batch(user_objs, msgTxt)
     return True

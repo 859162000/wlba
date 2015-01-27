@@ -240,8 +240,6 @@ class P2POperator(object):
         if product.status != u'满标已审核':
             raise P2PException(u'产品状态(%s)不是(满标已审核)' % product.status)
 
-        from datetime import datetime
-        print 'keeper start at:', datetime.now()
         phones = []
         user_ids = []
         with transaction.atomic():
@@ -254,9 +252,6 @@ class P2POperator(object):
             product.status = u'还款中'
             product.save()
 
-        print 'keeper end at:', datetime.now()
-        print 'phone message start at:', datetime.now()
-
         phones = {}.fromkeys(phones).keys()
         user_ids = {}.fromkeys(user_ids).keys()
 
@@ -265,9 +260,7 @@ class P2POperator(object):
             "messages": [messages.product_settled(product, timezone.now())]
         })
 
-        print 'phone message end at:', datetime.now()
 
-        print 'inside message start at:', datetime.now()
         pname = u"%s,期限%s个月" % (product.name, product.period)
         title, content = messages.msg_bid_success(pname, timezone.now())
         inside_message.send_batch.apply_async(kwargs={
@@ -276,7 +269,6 @@ class P2POperator(object):
             "content": content,
             "mtype": "loaned"
         })
-        print 'inside message end at:', datetime.now()
 
     @classmethod
     def fail(cls, product):
