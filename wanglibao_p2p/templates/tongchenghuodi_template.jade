@@ -80,19 +80,13 @@ html
           th 网利宝平台用户
           th 借出金额
           th 借款期限
-        //equities = equity.product.equities.all()
-        for e in equities
-          tr
-            if e.user.id == equity.user.id
-              td {{e.user.wanglibaouserprofile.phone}}
-            else
-              td {{e.user | safe_phone}}
-
-            td ￥{{ e.equity }}元
-            td {{ e.product.period }}个月
+        tr
+          td {{equity.user.wanglibaouserprofile.phone}}
+          td {{equity.equity}}
+          td {{equity.product.period}}
         tr
           th 合计
-          th ￥{{ equity.product.total_amount }}元
+          th ￥{{ equity.equity }}元
           th ——
     br
     p.bold 乙方（借款方）：【{{ product.borrower_name|safe_name_last }}】
