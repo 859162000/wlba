@@ -164,9 +164,18 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 #      else
 #        $('.get-more').hide()
 
-
+  page = 1
   $('.get-more').click (e) ->
     e.preventDefault()
+    id = $(this).attr('data-product')
+    $.post(
+      url: '/api/p2p/investrecord'
+      data:
+        id: id
+        page: page
+      ).done (data) ->
+        console.log(data)
+
     if(invest_result && invest_result.length > 0)
       $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
       if(invest_result.length > 0)

@@ -315,15 +315,8 @@ html
                 var invest_result = [];
 
               h1 投资记录
-                trade_records = p2p.p2precord_set.filter(catalog=u'申购')
-                more_list = trade_records[30:]
-                for trade in more_list
-                  script.
-                    invest_result.push({
-                      create_time: '{{trade.create_time | date:"Y-m-d"}}',
-                      user: '{{trade.user | safe_phone}}',
-                      amount: '{{trade.amount|money_format_int}}'
-                    });
+                trade_records = p2p.p2precord_set.filter(catalog=u'申购')[0:30]
+                all_len = p2p.p2precord_set.filter(catalog=u'申购').count()
               table.invest-history-table
                 colgroup
                   col(width="35%")
@@ -335,7 +328,7 @@ html
                     th 投资人
                     th 金额
                 tbody
-                  show_list = trade_records[0:30]
+                  show_list = trade_records
                   for trade in show_list
                     tr
                       td
@@ -347,9 +340,9 @@ html
                           span 元
 
 
-              if trade_records.count > 30
+              if all_len > 30
                 .row
-                  a.get-more(href="#") 查看更多
+                  a.get-more(href="#", data-product="{{p2p.id}}") 查看更多
 
     .space-vertical-sm
     if p2p.activity
