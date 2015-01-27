@@ -107,6 +107,7 @@ def _send(target_user, msgTxt):
 
 def _send_batch(user_objs, msgTxt):
     notice_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype).first()
+    msg_list = list()
     for notice_obj in notice_list:
 
         msg = Message()
@@ -115,7 +116,11 @@ def _send_batch(user_objs, msgTxt):
 
         msg.notice = True
 
+        msg_list.append(msg)
+
     # msg.save()
+
+    MessageNoticeSet.objects.bulk_create(msg_list)
 
     # message_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype).first()
     devices = UserPushId.objects.filter(user__in=user_objs)
