@@ -14,7 +14,7 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate"], function($, _, backend, calculator, countdown, tool, modal) {
-    var buildTable, opt;
+    var buildTable, opt, page;
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0 && !/\./ig.test(value);
     }, '请输入100的整数倍');
@@ -159,21 +159,39 @@
       i = 0;
       len = list.length;
       while (i < len) {
+        console.log(list[i].create_time);
         html.push(["<tr>", "<td><p>", list[i].create_time, "</p></td>", "<td><em>", list[i].user, "</em></td>", "<td><span class='money-highlight'>", list[i].amount, "</span><span>元</span></td>", "</tr>"].join(""));
         i++;
       }
       return html.join("");
     };
+    page = 2;
     $('.get-more').click(function(e) {
+      var id;
       e.preventDefault();
-      if (invest_result && invest_result.length > 0) {
-        $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)));
-        if (invest_result.length > 0) {
-          return $('.get-more').show();
-        } else {
-          return $('.get-more').hide();
+      id = $(this).attr('data-product');
+      return $.post('/api/p2p/investrecord', {
+        p2p: id,
+        page: page
+      }).done(function(data) {
+        var invest_result;
+        try {
+          invest_result = $.parseJSON(data);
+          if (invest_result && invest_result.length > 0) {
+            if (invest_result.length > 0) {
+              $('.invest-history-table tbody').append(buildTable(invest_result));
+              $('.get-more').show();
+              page++;
+            } else {
+              $('.get-more').hide();
+            }
+            console.log(invest_result);
+          }
+        } catch (_error) {
+          e = _error;
+          $('.get-more').hide();
         }
-      }
+      });
     });
     return $(".xunlei-binding-modal").click(function() {
       return $('#xunlei-binding-modal').modal();

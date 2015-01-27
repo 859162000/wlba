@@ -740,7 +740,7 @@ class InvestRecord(APIView):
 
         product = P2PProduct.objects.filter(pk=p2p).first()
 
-        records = P2PRecord.objects.filter(product=product)
+        records = P2PRecord.objects.filter(product=product, catalog=u'申购').select_related('user__wanglibaouserprofile')
 
         limit = 30
         paginator = Paginator(records, limit)
@@ -753,9 +753,12 @@ class InvestRecord(APIView):
         except Exception:
             p2p_records = paginator.page(paginator.num_pages)
 
-        return {
-            'p2p_records': p2p_records
-        }
+        result = [{'create_time': timezone.localtime(trade_record.create_time).strftime("%Y-%m-%d"),
+                   'user': safe_phone_str(trade_record.user.wanglibaouserprofile.phone),
+                   'amount': trade_record.amount
+                  } for trade_record in p2p_records]
+        #return Response(p2p_records, status=status.HTTP_200_OK)
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 obtain_auth_token = ObtainAuthTokenCustomized.as_view()
 
