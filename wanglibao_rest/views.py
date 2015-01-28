@@ -496,7 +496,6 @@ class TopsOfWeekView(APIView):
             isvalid = 1
             if len(records) == 0 and (datetime.utcnow().date() - top.activity_start.date()).days > int(week):
                 isvalid = 0
-                pass
         except Exception, e:
             print e
             return Response({"ret_code": -1, "records": list()})
@@ -510,7 +509,6 @@ class TopsOfMonthView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        print 'hello'
         return Response({"ret_code": 0, "message":"ok"})
 
 class UserExisting(APIView):
@@ -738,15 +736,11 @@ class InvestRecord(APIView):
         if p2p == "" or page == "":
             return []
 
-        print p2p, page, '####'
-
         product = P2PProduct.objects.filter(pk=p2p).first()
-
         records = P2PRecord.objects.filter(product=product, catalog=u'申购').select_related('user__wanglibaouserprofile')
 
         limit = 30
         paginator = Paginator(records, limit)
-        #page = self.request.GET.get('page')
 
         try:
             p2p_records = paginator.page(page)
@@ -759,7 +753,6 @@ class InvestRecord(APIView):
                    'user': safe_phone_str(trade_record.user.wanglibaouserprofile.phone),
                    'amount': trade_record.amount
                   } for trade_record in p2p_records]
-        #return Response(p2p_records, status=status.HTTP_200_OK)
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 obtain_auth_token = ObtainAuthTokenCustomized.as_view()
