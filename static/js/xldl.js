@@ -56,6 +56,7 @@
         setTimeout(function () {
           $('#button-get-validate-code-modal').css({'background': '#ff461f'});
           $('#button-get-validate-code-modal').disabled = true;
+          $('.show').removeClass('hidden');
         }, 60000)
       });
     }
