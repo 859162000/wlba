@@ -71,7 +71,7 @@ def rand_pass(password):
 
 @suffix
 def earning_message(amount):
-    return u'亲，您的投标奖励%s收益，已赠送到您的网利宝账户，可用于理财投资。详情请登陆网利宝查看站内信。' % amount
+    return u'亲，您的投标奖励%s%s收益，已赠送到您的网利宝账户，可用于理财投资。详情请登陆网利宝查看站内信。' % (amount, u'%')
 
 @suffix
 def product_full_message(name):

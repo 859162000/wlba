@@ -106,23 +106,21 @@ def _send(target_user, msgTxt):
     return True
 
 def _send_batch(user_objs, msgTxt):
-    notice_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype)
+    #notice_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype)
     msg_list = list()
-    for notice_obj in notice_list:
+    for user_obj in user_objs:
 
         msg = Message()
-        msg.target_user = notice_obj.user
+        print '-----', user_objs[user_obj], '#####'
+        msg.target_user = user_objs[user_obj]
         msg.message_text = msgTxt
 
         msg.notice = True
 
         msg_list.append(msg)
 
-    # msg.save()
+    Message.objects.bulk_create(msg_list)
 
-    MessageNoticeSet.objects.bulk_create(msg_list)
-
-    # message_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype).first()
     devices = UserPushId.objects.filter(user__in=user_objs)
 
     channel = bae_channel.BaeChannel()
@@ -132,11 +130,6 @@ def _send_batch(user_objs, msgTxt):
     for device in devices:
         # notice = True
         #不管有没有设置，默认都发推送
-        # if mset or not mset:
-            #notice = mset.notice
-
-        # if devices:
-        #     for d in devices:
 
         if device.device_type in ("ios", "iPhone", "iPad"):
             res, cont = channel.pushIosMessage(device.push_user_id, device.push_channel_id, message, msg_key)
