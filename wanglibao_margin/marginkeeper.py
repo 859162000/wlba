@@ -136,6 +136,17 @@ class MarginKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
+    def redpack_return(self, amount, description=u'', savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            margin.margin -= amount
+            margin.save()
+            catalog = u'红包退回'
+            record = self.__tracer(catalog, amount, margin.margin, description)
+            return record
+
     def __tracer(self, catalog, amount, margin_current, description=u''):
         trace = MarginRecord(catalog=catalog, amount=amount, margin_current=margin_current, description=description,
                              order_id=self.order_id, user=self.user)

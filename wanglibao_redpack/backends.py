@@ -3,11 +3,13 @@
 
 
 import time
+import logging
 from django.utils import timezone
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
 from wanglibao_p2p.models import P2PRecord
 from marketing import  helper
 
+logger = logging.getLogger(__name__)
 
 REDPACK_RULE = {"direct":"-", "fullcut":"-", "percent":"*"}
 
@@ -27,6 +29,9 @@ def list_redpack(user, status, device_type):
         records = RedPackRecord.objects.filter(user=user, order_id=None)
         for x in records:
             if x.order_id:
+                continue
+            redpack = x.redpack
+            if redpack.status == "invalid":
                 continue
             event = x.redpack.event
             obj = {"name":event.name, "method":REDPACK_RULE[event.rtype], "amount":event.amount,
@@ -178,3 +183,36 @@ def consume(redpack, amount, user, order_id, device_type):
         actual_amount = amount + rule_value
 
     return {"ret_code":0, "message":"ok", "actual_amount":actual_amount, "deduct":deduct}
+
+def _calc_deduct():
+    pass
+
+def restore(order_id, amount, user):
+    record = RedPackRecord.objects.filter(user=user, order_id=order_id).first()
+    if not record:
+        return {"ret_code":-1, "message":"redpack not exists"}
+    record.apply_platform = ""
+    record.apply_at = None
+    record.order_id = None
+    record.save()
+
+    event = record.redpack.event
+    rtype = event.rtype
+    rule_value = event.amount
+    deduct = event.amount
+    if REDPACK_RULE[rtype] == "*":
+        return {"ret_code":30176, "message":"目前不支付百分比红包"}
+
+        rule_value = float("%.2f" % (rule_value/100.0))
+        actual_amount = amount + amount * rule_value
+        deduct = round(amount * rule_value)
+    elif REDPACK_RULE[rtype] == "-":
+        if amount <= rule_value:
+            actual_amount = amount
+            deduct = amount
+        else:
+            actual_amount = amount - rule_value
+    elif REDPACK_RULE[rtype] == "+":
+        actual_amount = amount + rule_value
+    logger.info("%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
+    return {"ret_code":0, "deduct":deduct}
