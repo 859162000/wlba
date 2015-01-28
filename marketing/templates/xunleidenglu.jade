@@ -7,99 +7,196 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    title 迅雷会员登录
     meta(http-equiv="content-type", content="text/html; charset=utf-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     meta(name="baidu-site-verification", content="iBKXouRC1a")
-    meta(name="keywords", content="迅雷,网利宝,狂欢节")
-    meta(name="description", content="迅雷+网利宝狂欢节，错过绝对会后悔”")
     link(href="/static/stylesheets/screen.css", media="screen, projection", rel="stylesheet", type="text/css")
 
-  body
-    include include/header
-    - with '首页' as activeItem
-    include include/navigation
-    - endwith
-    .gold
+  body(style="background:#fff")
+    .full-container
+      .topbar
+        .container.row
+          .user-div
+            i.icon-phone.font-l &nbsp;
+            span 客服热线：
+            span 4008-588-066
+
+            span.margin-left-m 在线客服：
+            a.topbar-anchor.icon.icon-qq#top-qq(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", data-role="hover", target="_blank")
+
+            span.margin-left-m 关注我们：
+            a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
+            a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
+            a#qrweibo-top.weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
+              img(src="/static/images/weibo-nqr.png")
+            img#qrcode-top.icon.weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none", data-name="hoverbox")
+            span.mobile-app-top
+              span.icon.icon-mobile-app
+              span 手机网利宝
+              .mobile-app-top-prompt
+                div(style="height:30px; top:-20px; position:relative;")
+                a.mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+                a.mobile-app-android(href="https://www.wanglibao.com/static/wanglibao.apk", title="Android版")
+
+    .full-container-white.fudong
+      .container-navigation
+        .row
+          .span2
+            a(href='/')
+              .logo
+          .span10
+            .nav-items.xiao-nav
+              ul
+                mixin nav-item(name, link, new_class, free)
+                  if activeItem == name
+                    li.nav-item.active
+                      a.nav-item-anchor(href=link, class=new_class)= name
+                      if free == 'yes'
+                        span.icon.icon-free 免费
+                  else
+                    li.nav-item
+                      a.nav-item-anchor(href=link, class=new_class)= name
+                      if free == 'yes'
+                        span.icon.icon-free 免费
+
+                +nav-item('首页', '/', '', '')
+                +nav-item('理财专区', '/p2p/list/', '', '')
+                +nav-item('基金', '/fund/products', '', '')
+
+                +nav-item('安全保障', '/security', 'left-line', '')
+                +nav-item('帮助中心', '/help', '', '')
+    .wrap
+      .denelu-form
+        h1.biaoti 轻松拿70元话费
+        form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
+          - csrf_token
+          .form-row
+              .span12
+                input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+              .form-row-error
+          .form-row.voice.hidden
+            .span12-omega
+              没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+          .form-row
+            .form-control-group
+              .span7
+                input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+              .span5-omega
+                button#button-get-validate-code-modal.huoqu-ma(type='button',style="top:-2px") 获取验证码
+            .form-row-error
+          .form-row
+            .span12
+              input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+            .password-strength-container
+              span.password-strength-1 低
+              span.password-strength-2 中
+              span.password-strength-3 高
+            .form-row-error
+          .form-row
+            .span12
+              input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+            .form-row-error
+          .form-row
+            .span12
+              input#reg_password2.com-tu.tu1(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
+            .form-row-error
+          .form-row.form-bottom-bar
+            button#register_submit.button-account.span10.xun-zhuce(type='submit') 立即注册
+            .agreement
+              label(for="agreement")
+                input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
+              | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+              .form-row-error
+          .space-vertical-s
+        p.xun-p 已有账号,
+          a(href="/accounts/login/") 立即登录
+      .container.high-bigger.high-bigger2
+        .row.gold-dl-row
+          .span4
+            dl
+             dt.com.com-trust
+             dd.te-zi
+               h3 信赖
+               p IDG资本投资
+               p 第三方100%本息保障
+          .span4
+            dl
+             dt.com.com-security
+             dd.te-zi
+               h3 安全
+               p 招商银行全程监管
+               p 账户资金安全由平安保险承保
+          .span4
+            dl
+             dt.com.com-authority
+             dd.te-zi
+               h3 权威
+               p 洛克菲勒家族
+               p 全方位战略合作
+
+    .gold(style='margin-top:20px;background:#fff')
+      img(src="/static/images/xunlei-denglu/beibei.png").tete
       a(href="/#p2p")
-        .banner
-          .row.inner
             //.get-money
             //  h2 立即赚钱
             //  span 100元起投
-      .space-vertical-l
-      .high-bigger.high-bigger2
-        .row.gold-dl-row
-          .span3
-            span.icon.icon-trust
-            .high-bigger-text
-              h3 信赖
-              p IDG资本投资
-              p 第三方100%本息保障
-          .span3
-            span.icon.icon-authority
-            .high-bigger-text
-              h3 权威
-              p 洛克菲勒家族
-              p 全方位战略合作
-          .span3
-            span.icon.icon-security
-            .high-bigger-text
-              h3 安全
-              p 招商银行全程监管
-              p 账户资金安全由平安保险承保
-          .span3-omega
-            span.icon.icon-high-income
-            .high-bigger-text
-              h3 高收益
-              p 30倍银行活期收益
-              p 100元起投 0手续费
-
-      .investment-process-container.investment-process-container2
-        .content-title
-          p.dl-tz 投资流程
-        .row
-          .step.first-step
-            span.icon.icon-first-step
-            .process-title 第一步&nbsp;免费注册
-            .process-content 30秒轻松免费注册成为会员
-          .step-arrow
-            ins
-          .step.second-step
-            span.icon.icon-second-step
-            .process-title 第二步&nbsp;进行认证
-            .process-content 完成实名认证
-          .step-arrow
-            ins
-          .step.third-step
-            span.icon.icon-third-step
-            .process-title 第三步&nbsp;充值账户
-            .process-content 在线充值，免收手续费
-          .step-arrow
-            ins
-          .step.fourth-step
-            span.icon.icon-fourth-step
-            .process-title 第四步&nbsp;成功投标
-            .process-content 按需筛选借款标并进行投标
-          .step-arrow
-            ins
-          .step.fifth-step
-            span.icon.icon-fifth-step
-            .process-title 第五步&nbsp;自动收款
-            .process-content 借款期满后自动回款
-
-
-      .content-title
-        .title-inner-line
-          h2.note 没心，没肺，没节操的送！
+      .container-title
+          h2.black 高收益
       .content-desc
-        p
-          span.note 奖励计划第二波：
-          | 活动期间，每个账户投资额达到以下额度，可获得相应奖品
+        .row
+          .span12
+             img(src="/static/images/xunlei-denglu/xunlei-hight-gaoshouyi.png")
+      .space-vertical-l
+      .container-title
+          h2.black 多种选择
+          .space-vertical-s
+          .row.xun-select
+            .span4
+              h3
+               img(src="/static/images/xunlei-denglu/xunlei-gaoshouyi.jpg")
+              div.shouyi-tu
+                img(src="/static/images/xunlei-denglu/xunlei-gaoshouyi-tu.png").wai.zheng
+                p
+                  span
+                    img(src="/static/images/xunlei-denglu/xunlei-anquan.png").tu-zi
+                  |100%本息保障
+            .span4
+              h3
+               img(src="/static/images/xunlei-denglu/xunlei-zhouqiduan.jpg")
+              div.shouyi-tu
+                img(src="/static/images/xunlei-denglu/zhou1.png").zheng
+                p
+                  span
+                    img(src="/static/images/xunlei-denglu/xunlei-anquan.png").tu-zi
+                  |100%本息保障
+            .span4
+              h3
+               img(src="/static/images/xunlei-denglu/xunlei=-huiben.jpg")
+              div.shouyi-tu
+                img(src="/static/images/xunlei-denglu/hui-tu.png")
+                p
+                  span
+                    img(src="/static/images/xunlei-denglu/xunlei-anquan.png").tu-zi
+                  |100%本息保障
+            .span4
+              h3
+               img(src="/static/images/xunlei-denglu/xunlei-dimenkan.jpg")
+              div.shouyi-tu
+                img(src="/static/images/xunlei-denglu/men-tu.png")
+                p
+                  span
+                    img(src="/static/images/xunlei-denglu/xunlei-anquan.png").tu-zi
+                  |100%本息保障
+      .space-vertical-l
+      .space-vertical-s
+      .content-title
+          h2.h2-da 没心，没肺，没节操的送！
+            p 活动期间，每个账户投资额达到以下额度，可获得相应奖品
+      .content-desc(style="margin-top:40px;position:relative;z-index:2;background:#fff")
         .space-vertical-s
         .row.gold-row
            .span6
-             img(src="/static/images/gold/awards_bg.jpg").gold-jiangli
+             img(src="/static/images/gold/awards_bg.jpg").gold-jiangli2
            .span6-omega
              ul.font-m.li-linghight
                li 1、 累计购买满130万
@@ -137,34 +234,62 @@ html
                   span.highlight 送
                   |30元话费
       .space-vertical-l
-      .content-title
-        .title-inner-line
-          h2.note 有钱一起赚，别怪我没喊你来！
-
-      .content-desc
-        p
-          span.note 奖励计划第三波：
-          | 邀请好友，好友首次理财超过500元，奖励：
-        p 双方各得30元话费。邀请人还可以获得好友首次理财额度0.5%的年化收益奖励，多邀多送不封顶！
-
-      .xunlei-02
-
-      .invite-container.row
-        a(href="/accounts/invite/").invite-btn
-          邀请好友
-
-      .gold-footer
-        .gold-declare
-          dl
-            dt 奖品发放说明
+      .gold-footer(style="background:#fff;padding-left:0")
+        .gold-declare(style="border-bottom:none;padding-left:0")
+          dl.beijing
+            dt.hei 奖品发放说明
             dd 1.网利宝账户以身份证号为唯一识别标识。
             dd 2.P2P理财年化收益活动奖励将随P2P理财项目还款发放。
-            dd 3.京东礼品卡密码、迅雷会员激活码和话费均发送到交易手机号。(迅雷会员卡的激活有效期：2015年12月31日)
+            dd 3.京东礼品卡密码、迅雷会员激活码和话费均发送到交易手机号。
             dd 4.奖品统一于活动结束后7个工作日内开始发放。
-            dd 5.由于实物奖品快递需要，满额度用户请提交真实“姓名、手机、身份证、通讯地址”至 <a href="mailto:kefu@wanglibank.com">kefu@wanglibank.com</a>
+            dd 5.由于实物奖品快递需要，满额度用户请提交真实“姓名、手机、身份证、通讯地址”至
+               b.note <a href="mailto:kefu@wanglibank.com">kefu@wanglibank.com</a>
+            dd 6.此次活动的最终解释权归网利宝官方所有
 
-        .gold-version
+      .content-title
+          h2.hei(style="font-size:24px") 投资流程
+        .investment-process-container
+          .row
+            .step.first-step
+              span.icon.icon-first-step
+              .process-title 免费注册账号
+            .step-arrow
+              ins
+            .step.second-step
+              span.icon.icon-second-step
+              .process-title 实名认证
+            .step-arrow
+              ins
+            .step.third-step
+              span.icon.icon-third-step
+              .process-title 充值
+              .process-content 送
+                 b.note  10元
+                 |话费 +
+                 b.note 7天
+                 |迅雷会员
+            .step-arrow
+              ins
+            .step.fourth-step
+              span.icon.icon-fourth-step
+              .process-title 投资
+              .process-content 送
+                b.note 30元
+                |话费
+            .step-arrow
+              ins
+            .step.fifth-step
+              span.icon.icon-fifth-step
+              .process-title 获得投资和奖励
+      .invite-container.row
+          a.invite-btn#top-zc 立即注册
 
-
+    .warp-footer
 
       include include/tracking
+
+      script.
+          require(["/static/js/xldl.js"])
+          var v = new Date().getTime()
+          require(['/static/js/hover.js','/static/js/login_modal.js?v='+v])
+          require(["/static/js/register_wap.js"])

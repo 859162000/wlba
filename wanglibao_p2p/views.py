@@ -7,7 +7,7 @@ import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone, dateparse
 from django.views.generic import TemplateView
@@ -23,8 +23,9 @@ from marketing.models import SiteData, ClientData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm, BillForm
-from wanglibao_p2p.keeper import ProductKeeper
-from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant
+from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
+from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, \
+    P2PProductContract, InterestPrecisionBalance
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
@@ -40,6 +41,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render_to_response
 from marketing.utils import save_client
 from marketing.tops import Top
+from order.utils import OrderHelper
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -197,10 +199,16 @@ class PurchaseP2PMobile(APIView):
         if form.is_valid():
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
+            redpack = request.DATA.get("redpack", "")
+            if redpack and not redpack.isdigit():
+                return Response({
+                                    'message': u'请输入有效红包',
+                                    'error_number': ErrorNumber.need_authentication
+                                }, status=status.HTTP_200_OK)
 
             try:
-                trader = P2PTrader(product=p2p, user=request.user)
-                product_info, margin_info, equity_info = trader.purchase(amount)
+                trader = P2PTrader(product=p2p, user=request.user, request=request)
+                product_info, margin_info, equity_info = trader.purchase(amount, redpack)
 
                 # save client info
                 save_client(request, phone=phone, action=1)
@@ -227,11 +235,16 @@ class AuditProductView(TemplateView):
         pk = kwargs['id']
         p2p = P2PProduct.objects.get(pk=pk)
 
+        equities = p2p.equities.all()[:20]
+        amortizations_plan = p2p.amortizations.all()
+
         if p2p.status != u'满标待审核':
             return HttpResponse(u'产品状态不是满标待审核')
 
         return {
-            "p2p": p2p
+            "p2p": p2p,
+            "equities": equities,
+            "product_amortizations": amortizations_plan,
         }
 
     def post(self, request, **kwargs):
@@ -249,7 +262,68 @@ class AuditProductView(TemplateView):
         return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/p2pproduct/')
 
 
+class AuditAmortizationView(TemplateView):
+    template_name = 'audit_amortization.jade'
+
+    def get_context_data(self, **kwargs):
+        pk = kwargs['id']
+        #page = kwargs.get('page', 1)
+        page = self.request.GET.get('page', 1)
+
+        print page, '###--', pk
+        p2p_amortization = ProductAmortization.objects.filter(pk=pk).first()
+        user_amortizations = p2p_amortization.subs.all().select_related('user__wanglibaouserprofile')
+
+        limit = 30
+        paginator = Paginator(user_amortizations, limit)
+
+        try:
+            user_amortizations = paginator.page(page)
+        except PageNotAnInteger:
+            user_amortizations = paginator.page(1)
+        except Exception:
+            user_amortizations = paginator.page(paginator.num_pages)
+
+        return {
+            "p2p_amortization": p2p_amortization,
+            "user_amortizations": user_amortizations
+            }
+
+
+class AuditEquityView(TemplateView):
+    template_name = 'audit_equity.jade'
+
+    def get_context_data(self, **kwargs):
+        pk = kwargs['id']
+        #page = kwargs.get('page', 1)
+        page = self.request.GET.get('page', 1)
+
+        p2p = P2PProduct.objects.filter(pk=pk).first()
+
+        equities = p2p.equities.all()
+
+        limit = 30
+        paginator = Paginator(equities, limit)
+
+        try:
+            equities = paginator.page(page)
+        except PageNotAnInteger:
+            equities = paginator.page(1)
+        except Exception:
+            equities = paginator.page(paginator.num_pages)
+
+        if p2p.status != u'满标待审核':
+            return HttpResponse(u'产品状态不是满标待审核')
+
+        return {
+            "equities": equities,
+            "p2p": p2p
+            }
+
+
 audit_product_view = staff_member_required(AuditProductView.as_view())
+audit_equity_view = staff_member_required(AuditEquityView.as_view())
+audit_amortization_view = staff_member_required(AuditAmortizationView.as_view())
 
 
 class CopyProductView(TemplateView):
@@ -478,6 +552,33 @@ def preview_contract(request, id):
         # return HttpResponse(u'<h3 style="color:red;">【录标完成】之后才能进行合同预览！</h3>')
         # else:
         return HttpResponse(u'<h3 style="color:red;">没有该产品或产品信息错误！</h3>')
+    equity_all = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template') \
+        .select_related('product').filter(product=product).all()
+    productAmortizations = ProductAmortization.objects.filter(product_id=id).select_related('product').all()
+    contract_info = P2PProductContract.objects.filter(product=product).first()
+    product.contract_info = contract_info
+    product.equity_all = equity_all
+    product.total_interest_actual = InterestPrecisionBalance.objects.filter(equity__product=product) \
+        .aggregate(actual_sum=Sum('interest_actual'))
 
-    equity = ProductAmortization.objects.filter(product_id=id).prefetch_related('product')
-    return HttpResponse(generate_contract_preview(equity, product))
+    return HttpResponse(generate_contract_preview(productAmortizations, product))
+
+
+def AuditEquityCreateContract(request, equity_id):
+    equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
+    product = equity.product
+    order = OrderHelper.place_order(order_type=u'生成合同文件', status=u'开始', equity_id=equity_id, product_id=product.id)
+
+    if not equity.latest_contract:
+        #create contract file
+        EquityKeeperDecorator(product, order.id).generate_contract_one(equity_id=equity_id, savepoint=False)
+
+    equity_new = P2PEquity.objects.filter(id=equity_id).first()
+    try:
+        f = equity_new.latest_contract
+        lines = f.readlines()
+        f.close()
+        return HttpResponse("\n".join(lines))
+    except ValueError, e:
+        raise Http404
+

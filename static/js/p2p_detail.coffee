@@ -140,6 +140,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     len = list.length
 
     while i < len
+      console.log(list[i].create_time)
       html.push [
         "<tr>"
         "<td><p>"
@@ -164,15 +165,29 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 #      else
 #        $('.get-more').hide()
 
-
+  page = 2
   $('.get-more').click (e) ->
     e.preventDefault()
-    if(invest_result && invest_result.length > 0)
-      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
-      if(invest_result.length > 0)
-        $('.get-more').show()
-      else
+    id = $(this).attr('data-product')
+    $.post('/api/p2p/investrecord'
+      p2p: id
+      page: page
+    ).done (data) ->
+      try
+        invest_result = $.parseJSON(data)
+        if(invest_result && invest_result.length > 0)
+          if(invest_result.length > 0)
+            $('.invest-history-table tbody').append(buildTable(invest_result))
+            $('.get-more').show()
+            page++
+          else
+            $('.get-more').hide()
+
+          console.log(invest_result)
+      catch e
         $('.get-more').hide()
+      return
+
 
   $(".xunlei-binding-modal").click () ->
     $('#xunlei-binding-modal').modal()

@@ -37,10 +37,6 @@ class ContractTemplate(models.Model):
     name = models.CharField(u'名字', max_length=32)
     content = models.TextField(u'模板内容（真实合同）', default='')
     content_preview = models.TextField(verbose_name=u'模板内容（预览合同）', default='')
-    party_c = models.CharField(verbose_name=u'丙方（推荐方/服务方/代偿方）', blank=True, max_length=128, help_text=u'丙方（推荐方/服务方/代偿方）', default='')
-    party_c_name = models.CharField(verbose_name=u'法定代表人', blank=True, max_length=32, help_text=u'法定代表人', default='')
-    party_c_addr = models.CharField(verbose_name=u'地址', blank=True, max_length=128, help_text=u'地址', default='')
-    available_bank = models.CharField(verbose_name=u'支持开户行', blank=True, max_length=1128, help_text=u'支持开户行', default='')
 
 
     class Meta:
@@ -145,10 +141,10 @@ class P2PProduct(ProductBase):
     baoli_trade_relation = models.CharField(u'(保理)交易关系', max_length=128, blank=True)
 
     # pay info for the borrower
-    borrower_name = models.CharField(verbose_name=u'借债人姓名*', max_length=32, blank=False)
+    borrower_name = models.CharField(verbose_name=u'借债人姓名(银行户名)*', max_length=32, blank=False)
     borrower_phone = models.CharField(verbose_name=u'借债人手机号*', max_length=32, blank=False)
     borrower_address = models.CharField(verbose_name=u'借债人地址*', max_length=128, blank=False)
-    borrower_id_number = models.CharField(verbose_name=u'借债人身份证号/法定代表人*', max_length=32, blank=False)
+    borrower_id_number = models.CharField(verbose_name=u'借债人身份证号(营业执照号)*', max_length=32, blank=False)
     borrower_bankcard = models.CharField(verbose_name=u'借债人银行卡号*', max_length=64, blank=False)
     borrower_bankcard_type = models.CharField(verbose_name=u'借款人银行卡类型*',max_length=20, choices=BANK_TYPE_CHOICES, blank=False)
     borrower_bankcard_bank_name = models.CharField(verbose_name=u'开户行*', max_length=64, blank=False)
@@ -168,13 +164,15 @@ class P2PProduct(ProductBase):
     end_time = models.DateTimeField(default=lambda :timezone.now() + timezone.timedelta(days=7), verbose_name=u'终止时间*', blank=False)
     soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True)
 
+    make_loans_time = models.DateTimeField(u'放款时间', null=True, blank=True)
+
     limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)*', default=1)
 
-    warrant_company = models.ForeignKey(WarrantCompany,blank=False)
+    warrant_company = models.ForeignKey(WarrantCompany, verbose_name=u'担保公司', blank=False)
     usage = models.TextField(blank=False, verbose_name=u'借款用途(合同用)*')
     short_usage = models.TextField(blank=False, verbose_name=u'借款用途*')
 
-    contract_template = models.ForeignKey(ContractTemplate, on_delete=SET_NULL, null=True, blank=False)
+    contract_template = models.ForeignKey(ContractTemplate, verbose_name=u'合同模板*', on_delete=SET_NULL, null=True, blank=False)
 
     #author: hetao; datetime: 2014.10.27; description: 活动是否参加活动
     activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True, verbose_name=u'返现活动')
@@ -389,10 +387,14 @@ class P2PEquity(models.Model):
 
     @property
     def latest_contract(self):
-        if self.contract:
-            return self.contract
-        else:
-            return self.equity_contract.contract_path
+        try:
+            if self.contract:
+                return self.contract
+            elif self.equity_contract:
+                return self.equity_contract.contract_path
+        except Exception:
+            return None
+
 
     @property
     def related_orders(self):
@@ -566,8 +568,6 @@ def generate_amortization_plan(sender, instance, **kwargs):
 def process_after_money_paided(product):
     if product.status == u'满标已打款':
         from celery.execute import send_task
-        p2p = P2PProduct.objects.get(pk=product.id)
-        print p2p.status, 'models'
         send_task("wanglibao_p2p.tasks.process_paid_product", kwargs={
             'product_id': product.id
         })
@@ -605,6 +605,25 @@ class Earning(models.Model):
     confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
 
 
+class InterestPrecisionBalance(models.Model):
+    """
+    每个持仓精度计算造成的差额: interest_receivable - interest_actual = interest_balance_precision
+    """
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'利息计算精度差额'
+
+    equity = models.ForeignKey(P2PEquity, null=True, blank=False, related_name="interest_precision_balance")
+    principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
+    interest_receivable = models.DecimalField(u'应收利息', max_digits=20, decimal_places=8)
+    interest_actual = models.DecimalField(u'实收利息', max_digits=20, decimal_places=2)
+    interest_precision_balance = models.DecimalField(u'精度利息差额', max_digits=20, decimal_places=8)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    def __unicode__(self):
+        return u'%s %s %s' % (self.equity, self.equity.user, self.equity.product)
+
 class P2PContract(models.Model):
 
     class Meta:
@@ -613,3 +632,36 @@ class P2PContract(models.Model):
     contract_path = models.FileField(u'合同文件', null=True, blank=True, upload_to='contracts')
     equity = models.OneToOneField(P2PEquity, null=True, blank=False, related_name="equity_contract")
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True, null=True)
+
+
+class P2PProductContract(models.Model):
+
+    class Meta:
+        ordering = ['-id']
+        verbose_name = u'合同细节'
+        verbose_name_plural = u'合同细节'
+
+    def __unicode__(self):
+        return u'%s' % self.id
+    PARTY_CHOICES = (
+        (u'企业', u'企业'),
+        (u'个人', u'个人'),
+    )
+
+    product = models.OneToOneField(P2PProduct, verbose_name=u'P2P产品', blank=False, default='')
+    signing_date = models.DateField(verbose_name=u'合同签订日期', auto_now_add=False, blank=False)
+    party_b_type = models.CharField(max_length=16, default=u'企业',
+                              choices=PARTY_CHOICES,
+                              verbose_name=u'乙方（借款方）类型*')
+    party_b = models.CharField(verbose_name=u'乙方(借款方)*', max_length=32, blank=False)
+    party_b_name = models.CharField(verbose_name=u'乙方法人代表', max_length=32, blank=False)
+    party_c = models.CharField(verbose_name=u'丙方(推荐方/服务方/代偿方)', blank=False, max_length=128, default='')
+    party_c_name = models.CharField(verbose_name=u'丙方法定代表人', blank=False, max_length=32, default='')
+    party_c_id_number = models.CharField(verbose_name=u'丙方身份证号(营业执照号)*', max_length=32, blank=True)
+    party_c_address = models.CharField(verbose_name=u'丙方地址', blank=False, max_length=128, default='')
+    bill_drawer_bank = models.CharField(verbose_name=u'(票据)出票银行', max_length=32, blank=True)
+    bill_accepting_bank = models.CharField(verbose_name=u'(票据)承兑银行', max_length=32, blank=True)
+    bill_number = models.CharField(verbose_name=u'(票据)承兑汇票票号', max_length=32, blank=True)
+    bill_amount = models.CharField(verbose_name=u'(票据)票面金额', max_length=32, blank=True)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间', auto_now_add=True)
+    bill_due_date = models.DateField(blank=True, null=True, verbose_name=u'(票据)到期日')

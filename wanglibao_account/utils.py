@@ -140,14 +140,12 @@ def generate_contract(equity, template_name=None, equities=None):
     else:
         # Load the template from database
         template = Template(equity.product.contract_template.content)
-        print equity.product.contract_template.content[:100]
-
-    print '#############'
+        # print equity.product.contract_template.content[:100]
 
     return template.render(context)
 
 
-def generate_contract_preview(equity, product, template_name=None):
+def generate_contract_preview(productAmortizations, product, template_name=None):
     """
     Generate the contract file for the equity.
 
@@ -155,7 +153,7 @@ def generate_contract_preview(equity, product, template_name=None):
     :return: The string representation of the contract
     """
     context = Context({
-        'equity': equity,
+        'productAmortizations': productAmortizations,
         'product': product,
         'now': timezone.now()
     })

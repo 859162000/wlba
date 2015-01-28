@@ -1,18 +1,141 @@
+
 body
   background: #e3e3e3
-
   .kuaipan-container
     background: #e3e3e3 url("/static/images/gold/gold_bg.png") center repeat-y
     width: 1130px
+    margin: 0 auto
+  .fudong
+    clear: both
+    margin: 10px 0
+    border: none
+  .huoqu-ma
+    padding: 10px
+    border: none
+    color: #fff
+    background: #ff461f
+    border-radius: 5px
+  .huoqu-ma-gray
+    background: #cccccc
+  .dale
+    width: 276px
+  .xun-zhuce
+    padding: 10px 10px
+    border: none
+    color: #fff
+    background: #ff461f
+    border-radius: 5px
+    margin-left: 23px
+
+  .wrap
+    height: 664px
+    background:  #397ee9 url(/static/images/xunlei-denglu/xunlei-banner.jpg) no-repeat
+    background-position: -356px 0px
+
+    .denelu-form
+      width: 316px
+      background: #fff
+      position: absolute
+      top: 160px
+      left: 1110px
+      border-radius: 5px
+      padding: 0 20px
+      .dale
+        .form-row
+          .com-tu
+            background: url(/static/images/xunlei-denglu/xunlei-denglu-tu.png) no-repeat
+            padding-left: 30px
+          .tu1
+            background-position: 0 -73px
+          .tu2
+            background-position: 0 5px
+          .tu3
+            background-position: 0 -32px
+      .biaoti
+        color: red
+        line-height: 50px
+        text-align: center
+      .xun-p
+        text-align: center
+        margin-bottom: 10px
+        a
+          color: #3ea7e9
+          text-decoration: underline
+      form
+        .dl-com
+          li
+            margin-bottom: 10px
+            span
+              color: #ff0419
+              display: inline-block
+              margin-top: 5px
+              display: none
+            .yanzheng
+              width: 170px
+              margin-right: 10px
+            .inp-che
+              width: 20px
+              height: 20px
+              border: none
+              border: 1px solid #a9a9a9
+              background: #fff
+            .i-do
+              position: relative
+              top: -6px
+              font-size: 14px
+              a
+                color: #3ea7e9
+  .warp-footer
+    height: 340px
+    background: url(/static/images/xunlei-denglu/ditu.png) no-repeat
+    background-position: -400px
+  .xiao-nav
+    width: 1000px
     margin: 0 auto
   .gold
     background-color: #f1f1f1
     max-width: 1100px
     min-width: 1100px
     margin: 0px auto
-
+    .hei
+      color: #000
     .note
       color: red
+    .tete
+      position: absolute
+      top: 1590px
+      left: 0
+      width: 100%
+    .gold-jiangli2
+      margin-left: 20px
+
+    .container-title
+      .black
+        color: #000
+
+      .xun-select
+        .span4
+          width: 250px
+          margin-right: 20px
+        .shouyi-tu
+          width: 260px
+          border: 1px solid #ccc
+          position: relative
+          top: -8px
+          border-radius: 0 0 5px 5px
+          border-top: none
+          .wai
+            margin-left: 15px
+            margin-top: 13px
+          .zheng
+            margin-top: 30px
+          p
+            border-top: 1px solid #ccc
+            padding: 10px 0
+            font-size: 14px
+            .tu-zi
+              margin-right: 3px
+              margin-left: 78px
 
     .banner
       height: 550px
@@ -60,6 +183,9 @@ body
       background: url(/static/images/gold/fengxing_banner.jpg) left center no-repeat
     .banner-shengyan
       background: url(/static/images/gold/crazy_feast.jpg) left center no-repeat
+    .banner-xun-dl
+      background: none
+
 
     h1
       color: #ff5d33
@@ -71,6 +197,18 @@ body
     .content-title
       height: 50px
       line-height: 50px
+      .h2-da
+        font-size: 24px
+        color: #000
+        background: url(/static/images/xunlei-denglu/xunlei-jiang-zi.png) right bottom no-repeat
+        position: relative
+        z-index: 3
+        p
+          font-size: 16px
+          color: #737373
+          position: relative
+          top: -10px
+          font-weight: normal
       .title-inner-line
         height: 25px
         overflow: visible
@@ -84,6 +222,7 @@ body
           width: 400px
           margin: 0px auto
           font-weight: normal
+
 
     .content-desc
       p
@@ -190,21 +329,59 @@ body
             line-height: 30px
             font-size: 14px
 
+        .beijing
+          background: url(/static/images/xunlei-denglu/xunlei-cart.jpg) right top no-repeat
+          dd
+            line-height: 40px
+            font-size: 16px
+
+
       .gold-version
 
         background: url(/static/images/gold/xunlei_footer.jpg) left top no-repeat
         height: 230px
-.gold
+  .wrap
+    .gold-dl-row
+      max-width: 950px
+      padding-top: 20px
+      .span4
+        width: 300px
 
-  .gold-dl-row
-    max-width: 950px
-    padding-top: 20px
 
-    .span3
-      width: 245px
-  .high-bigger2
-    border: 1px solid #000033
-    border-bottom: none
-    margin-top: 0
-    padding-bottom: 20px
+    .high-bigger2
+      margin-top: 0
+      padding-bottom: 20px
+      position: relative
+      top: 500px
+
+      dl
+        margin: 0 auto
+
+        .te-zi
+          h3
+            text-align: center
+            color: #fff
+          p
+            text-align: center
+            color: #fff
+        .com
+          width: 60px
+          height: 54px
+          margin-top: 5px
+          overflow: hidden
+          background: url("/static/images/xunlei-denglu/toumingxiaobiao.png") no-repeat
+          +transition(all .3s ease-in-out)
+          margin: 0 auto
+
+        .com-trust
+          background-position: -242px -45px
+
+        .com-authority
+          background-position: -154px -52px
+
+
+        .com-security
+          background-position: -67px -45px
+
+
 

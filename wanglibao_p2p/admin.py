@@ -7,15 +7,14 @@ from django import forms
 from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
-from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning
+from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning,\
+    P2PProductContract, InterestPrecisionBalance
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization
 from wanglibao.admin import ReadPermissionModelAdmin
-# from wanglibao_account.tasks import cjdao_callback
-# from wanglibao_account.utils import CjdaoUtils
-# from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
+from wanglibao_p2p.forms import RequiredInlineFormSet
 
 formsets.DEFAULT_MAX_NUM = 2000
 
@@ -24,7 +23,7 @@ class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
         'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest',
         'penal_interest')
     list_filter = ('confirm',)
-    search_fields = ('user__wanglibaouserprofile__phone',)
+    search_fields = ('product__name', 'user__wanglibaouserprofile__phone')
     raw_id_fields = ('user', 'product')
 
     def get_readonly_fields(self, request, obj=None):
@@ -46,6 +45,13 @@ class WarrantInline(admin.TabularInline):
     model = Warrant
 
 
+class P2PProductContractInline(admin.StackedInline):
+    model = P2PProductContract
+    extra = 1
+    max_num = 1
+    formset = RequiredInlineFormSet
+
+
 class AttachementInline(admin.TabularInline):
     model = Attachment
 
@@ -57,7 +63,7 @@ class P2PEquityInline(admin.TabularInline):
     exclude = ('version',)
     extra = 0
     can_delete = False
-
+    list_max_show_all = 1
 
     def get_queryset(self, request):
         return super(P2PEquityInline, self).get_queryset(request).select_related('user').select_related(
@@ -206,7 +212,7 @@ class P2PProductForm(forms.ModelForm):
 
 class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
     inlines = [
-        WarrantInline, AttachementInline, AmortizationInline, P2PEquityInline
+        P2PProductContractInline, WarrantInline, AttachementInline, AmortizationInline#, P2PEquityInline
     ]
     list_display = ('id', 'name', 'total_amount', 'brief', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'preview_contract', 'copy_link', 'priority')
     list_editable = ('priority',)
@@ -313,6 +319,31 @@ class EarningAdmin(admin.ModelAdmin):
         return ()
 
 
+class P2PProductContractAdmin(admin.ModelAdmin):
+    list_display = ('id', 'signing_date', 'party_b', 'party_b_name', 'party_c', 'party_c_name',
+                    'party_c_id_number', 'party_c_address', 'bill_drawer_bank', 'bill_accepting_bank',
+                    'bill_number', 'bill_amount', 'bill_due_date')
+
+
+class InterestPrecisionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'equity_product', 'equity_phone', 'equity_name', 'equity_number',
+                    'principal', 'interest_receivable', 'interest_actual', 'interest_precision_balance',)
+    raw_id_fields = ('equity',)
+    search_fields = ('equity__product__id', 'equity__user__wanglibaouserprofile__phone',)
+
+    def equity_phone(self, instance):
+        return instance.equity.user.wanglibaouserprofile.phone
+
+    def equity_product(self, instance):
+        return instance.equity.product.name
+
+    def equity_name(self, instance):
+        return instance.equity.user.wanglibaouserprofile.name
+
+    def equity_number(self, instance):
+        return instance.equity.user.wanglibaouserprofile.id_number
+
+
 admin.site.register(P2PProduct, P2PProductAdmin)
 admin.site.register(Warrant, WarrantAdmin)
 admin.site.register(P2PEquity, UserEquityAdmin)
@@ -324,6 +355,8 @@ admin.site.register(EquityRecord, EquityRecordAdmin)
 admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
 admin.site.register(ProductAmortization, ProductAmortizationAdmin)
 admin.site.register(Earning, EarningAdmin)
+admin.site.register(P2PProductContract, P2PProductContractAdmin)
+admin.site.register(InterestPrecisionBalance, InterestPrecisionAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')

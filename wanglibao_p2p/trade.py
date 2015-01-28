@@ -16,6 +16,7 @@ from wanglibao_p2p.models import P2PProduct
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
+from wanglibao_redpack import backends as redpack_backends
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
@@ -33,12 +34,24 @@ class P2PTrader(object):
         self.margin_keeper = MarginKeeper(user=user, order_id=self.order_id)
         self.product_keeper = ProductKeeper(product, order_id=self.order_id)
         self.equity_keeper = EquityKeeper(user=user, product=product, order_id=self.order_id)
+        if request:
+            self.device_type = request.DATA.get("channelId", "")
+        else:
+            self.device_type = ""
 
-    def purchase(self, amount):
+    def purchase(self, amount, redpack=0):
         description = u'购买P2P产品 %s %s 份' % (self.product.short_name, amount)
         if self.user.wanglibaouserprofile.frozen:
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
+            actual_amount = amount
+            if redpack:
+                result = redpack_backends.consume(redpack,amount, self.user, self.order_id, self.device_type)
+                if result['ret_code'] != 0:
+                    raise Exception,result['message']
+                #actual_amount = result['actual_amount']
+                red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'], savepoint=False)
+
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False)
             margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
             equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
@@ -46,78 +59,6 @@ class P2PTrader(object):
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
         tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount})
-
-        # todo: merger the code about activity,remove the rubbish code
-        #introduced_by = IntroducedBy.objects.filter(user=self.user).first()
-
-        # phone_verified 渠道客户判断
-        #if introduced_by and introduced_by.bought_at is None:
-        #    introduced_by.bought_at = timezone.now()
-        #    introduced_by.save()
-        #
-        #    if "channel" not in introduced_by.introduced_by.username:
-        #        inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
-        #        invited_phone = introduced_by.user.wanglibaouserprofile.phone
-        #
-        #        inviter_id = introduced_by.introduced_by.id
-        #        invited_id = introduced_by.user.id
-        #        if amount >= 100:
-        #            inviter_phone = safe_phone_str(inviter_phone)
-        #            invited_phone = safe_phone_str(invited_phone)
-        #
-        #            send_messages.apply_async(kwargs={
-        #                "phones": [inviter_phone, invited_phone],
-        #                "messages": [messages.gift_inviter(invited_phone=invited_phone, money=30),
-        #                             messages.gift_invited(inviter_phone=inviter_phone, money=30)]
-        #            })
-        #            # 发站内信
-        #            title, content = messages.msg_invite_major(inviter_phone, invited_phone)
-        #            inside_message.send_one.apply_async(kwargs={
-        #                "user_id": inviter_id,
-        #                "title": title,
-        #                "content": content,
-        #                "mtype": "activity"
-        #            })
-        #            title2, content2 = messages.msg_invite_are(inviter_phone, invited_phone)
-        #            inside_message.send_one.apply_async(kwargs={
-        #                "user_id": invited_id,
-        #                "title": title2,
-        #                "content": content2,
-        #                "mtype": "activity"
-        #            })
-        #
-        #            rwd = Reward.objects.filter(type=u'30元话费').first()
-        #            if rwd:
-        #                try:
-        #                    RewardRecord.objects.create(user=introduced_by.introduced_by, reward=rwd,
-        #                                                description=content)
-        #                    RewardRecord.objects.create(user=introduced_by.user, reward=rwd, description=content2)
-        #                except Exception, e:
-        #                    print(e)
-        #
-        #    #酒仙网
-        #    if introduced_by.introduced_by.promotiontoken.token == "9xianw":
-        #        if amount >= 500:
-        #            invited_phone = introduced_by.user.wanglibaouserprofile.phone
-        #            send_messages.apply_async(kwargs={
-        #                "phones": [invited_phone],
-        #                "messages": [messages.jiuxian_invited(money=30)]
-        #            })
-        #            
-        #            title, content = messages.msg_jiuxian()
-        #            inside_message.send_one.apply_async(kwargs={
-        #                "user_id": introduced_by.user.id,
-        #                "title": title,
-        #                "content": content,
-        #                "mtype": "activity"
-        #            })
-        #            rwd = Reward.objects.filter(type=u'30元话费').first()
-        #            if rwd:
-        #                try:
-        #                    RewardRecord.objects.create(user=introduced_by.user, reward=rwd,
-        #                                                description=content)
-        #                except Exception, e:
-        #                    print(e)
 
         # 投标成功发站内信
         pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
@@ -203,9 +144,7 @@ class P2POperator(object):
 
         # Create an order to link all changes
         order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
-        print product.status
         if product.status != u'满标已打款':
-            print 'hello, status'
             raise P2PException(u'产品状态(%s)不是(满标已打款)' % product.status)
         with transaction.atomic():
             # Generate the amotization plan and contract for each equity(user)
@@ -215,10 +154,11 @@ class P2POperator(object):
 
             # for equity in product.equities.all():
             #     EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
-            EquityKeeperDecorator(product, order.id).generate_contract(savepoint=False)
+            # EquityKeeperDecorator(product, order.id).generate_contract(savepoint=False)
 
             product = P2PProduct.objects.get(pk=product.id)
             product.status = u'满标待审核'
+            product.make_loans_time = timezone.now()
             product.save()
 
     @classmethod
@@ -247,6 +187,7 @@ class P2POperator(object):
             "phones": phones,
             "messages": [messages.product_settled(product, timezone.now())]
         })
+
 
         pname = u"%s,期限%s个月" % (product.name, product.period)
         title, content = messages.msg_bid_success(pname, timezone.now())
