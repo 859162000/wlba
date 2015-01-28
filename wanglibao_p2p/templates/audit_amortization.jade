@@ -14,6 +14,9 @@ html
         .panel-title-bar
           .panel-title 用户还款计划详情
           h2 {{p2p_amortization.term_date | date:"Y-m-d"}} &nbsp;&nbsp;
+          url = '/p2p/amortizationdetail/%s/' % p2p_amortization.id
+
+          .test {{id}}
         table.table
           thead
             tr
@@ -35,3 +38,7 @@ html
                 td {{user_amort.interest}}
                 td {{user_amort.penal_interest}}
 
+
+      - with data=user_amortizations uri=url
+      include include/pager
+      - endwith

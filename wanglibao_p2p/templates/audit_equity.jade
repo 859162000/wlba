@@ -14,6 +14,8 @@ html
         .panel-title-bar
           .panel-title 用户持仓情况
 
+          url = '/p2p/equitydetail/%s/' % p2p.id
+
         table.table
           thead
             tr
@@ -37,4 +39,8 @@ html
                     a(href="/media/{{equity.latest_contract}}") 借款合同
                 else
                   td 合同未生成
+
+    - with data=equities uri=url
+    include include/pager
+    - endwith
 
