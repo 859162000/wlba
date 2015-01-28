@@ -199,13 +199,7 @@ class PurchaseP2PMobile(APIView):
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
             redpack = request.DATA.get("redpack", "")
-            if not redpack:
-                if amount % 100 != 0:
-                    return Response({
-                                        'message': u'购买金额必须为100的整数倍',
-                                        'error_number': ErrorNumber.need_authentication
-                                    }, status=status.HTTP_200_OK)
-            elif not redpack.isdigit():
+            if redpack and not redpack.isdigit():
                 return Response({
                                     'message': u'请输入有效红包',
                                     'error_number': ErrorNumber.need_authentication

@@ -36,6 +36,7 @@ class RedPacketListAPIView(APIView):
 
     def post(self, request):
         status = request.DATA.get("status", "")
+        device_type = request.DATA.get("channelId", "")
         user = request.user
-        result = backends.list_redpack(user, status)
+        result = backends.list_redpack(user, status, device_type)
         return Response(result)
