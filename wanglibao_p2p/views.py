@@ -534,11 +534,13 @@ def preview_contract(request, id):
         # return HttpResponse(u'<h3 style="color:red;">【录标完成】之后才能进行合同预览！</h3>')
         # else:
         return HttpResponse(u'<h3 style="color:red;">没有该产品或产品信息错误！</h3>')
-
-    equity = ProductAmortization.objects.filter(product_id=id).select_related('product')
+    equity_all = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template') \
+        .select_related('product').filter(product=product).all()
+    productAmortizations = ProductAmortization.objects.filter(product_id=id).select_related('product').all()
     contract_info = P2PProductContract.objects.filter(product=product).first()
-    equity.contract_info = contract_info
-    return HttpResponse(generate_contract_preview(equity, product))
+    product.contract_info = contract_info
+    product.equity_all = equity_all
+    return HttpResponse(generate_contract_preview(productAmortizations, product))
 
 
 def AuditEquityCreateContract(request, equity_id):
