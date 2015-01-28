@@ -266,8 +266,22 @@ class AuditAmortizationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         pk = kwargs['id']
+        #page = kwargs.get('page', 1)
+        page = self.request.GET.get('page', 1)
+
+        print page, '###--', pk
         p2p_amortization = ProductAmortization.objects.filter(pk=pk).first()
         user_amortizations = p2p_amortization.subs.all().select_related('user__wanglibaouserprofile')
+
+        limit = 30
+        paginator = Paginator(user_amortizations, limit)
+
+        try:
+            user_amortizations = paginator.page(page)
+        except PageNotAnInteger:
+            user_amortizations = paginator.page(1)
+        except Exception:
+            user_amortizations = paginator.page(paginator.num_pages)
 
         return {
             "p2p_amortization": p2p_amortization,
@@ -280,17 +294,31 @@ class AuditEquityView(TemplateView):
 
     def get_context_data(self, **kwargs):
         pk = kwargs['id']
+        #page = kwargs.get('page', 1)
+        page = self.request.GET.get('page', 1)
 
         p2p = P2PProduct.objects.filter(pk=pk).first()
 
         equities = p2p.equities.all()
 
+        limit = 30
+        paginator = Paginator(equities, limit)
+
+        try:
+            equities = paginator.page(page)
+        except PageNotAnInteger:
+            equities = paginator.page(1)
+        except Exception:
+            equities = paginator.page(paginator.num_pages)
+
         if p2p.status != u'满标待审核':
             return HttpResponse(u'产品状态不是满标待审核')
 
         return {
-            "equities": equities
+            "equities": equities,
+            "p2p": p2p
             }
+
 
 audit_product_view = staff_member_required(AuditProductView.as_view())
 audit_equity_view = staff_member_required(AuditEquityView.as_view())
