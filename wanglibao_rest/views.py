@@ -9,6 +9,8 @@ import re
 from django.db.models import Count, Sum
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
 #from django.db.models import Q
 from django.db.models import F
 from rest_framework import generics, renderers
@@ -31,7 +33,7 @@ from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
-from wanglibao_p2p.models import P2PRecord, ProductAmortization
+from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from wanglibao_sms import messages, backends
 from django.utils import timezone
@@ -494,7 +496,6 @@ class TopsOfWeekView(APIView):
             isvalid = 1
             if len(records) == 0 and (datetime.utcnow().date() - top.activity_start.date()).days > int(week):
                 isvalid = 0
-                pass
         except Exception, e:
             print e
             return Response({"ret_code": -1, "records": list()})
@@ -508,7 +509,6 @@ class TopsOfMonthView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        print 'hello'
         return Response({"ret_code": 0, "message":"ok"})
 
 class UserExisting(APIView):
@@ -726,6 +726,34 @@ class Statistics(APIView):
 
         return Response(data, status=status.HTTP_200_OK)
 
+
+class InvestRecord(APIView):
+    permission_classes = ()
+
+    def post(self, request, *args, **kwargs):
+        p2p = request.DATA.get("p2p", "")
+        page = request.DATA.get("page", "")
+        if p2p == "" or page == "":
+            return []
+
+        product = P2PProduct.objects.filter(pk=p2p).first()
+        records = P2PRecord.objects.filter(product=product, catalog=u'申购').select_related('user__wanglibaouserprofile')
+
+        limit = 30
+        paginator = Paginator(records, limit)
+
+        try:
+            p2p_records = paginator.page(page)
+        except PageNotAnInteger:
+            p2p_records = paginator.page(1)
+        except Exception:
+            p2p_records = paginator.page(paginator.num_pages)
+
+        result = [{'create_time': timezone.localtime(trade_record.create_time).strftime("%Y-%m-%d"),
+                   'user': safe_phone_str(trade_record.user.wanglibaouserprofile.phone),
+                   'amount': trade_record.amount
+                  } for trade_record in p2p_records]
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 obtain_auth_token = ObtainAuthTokenCustomized.as_view()
 

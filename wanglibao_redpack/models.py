@@ -34,6 +34,12 @@ from django.db.models.signals import post_save
 #            return u'<%s> 百分比' % self.name
 
 
+PLATFORM = (
+    ("", "全平台"),
+    ("ios", "ios"),
+    ("android", "android"),
+    ("pc", "pc"),
+)
 
 class RedPackEvent(models.Model):
     """
@@ -56,6 +62,8 @@ class RedPackEvent(models.Model):
                                 ("validation", "实名认证"),
                                 ("first_buy", "首次投资"),
                                 ("first_pay", "首次充值"),))
+    give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", blank=True, default="", choices=PLATFORM)
+    apply_platform = models.CharField(max_length=10, verbose_name=u"使用平台", blank=True, default="", choices=PLATFORM)
     target_channel = models.CharField(max_length=20, verbose_name=u"渠道", blank=True, default="")
     give_start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放开始时间")
     give_end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放结束时间")
@@ -91,12 +99,6 @@ class RedPack(models.Model):
         return u'%s<%s>' % (self.id, self.event.name)
 
 class RedPackRecord(models.Model):
-    PLATFORM = (
-        ("", ""),
-        ("ios", "ios"),
-        ("android", "android"),
-        ("pc", "pc"),
-    )
     redpack = models.ForeignKey(RedPack, verbose_name=u"红包")
     user = models.ForeignKey(User, verbose_name=u"用户")
     #rule = models.ForeignKey(Rule, verbose_name=u"规则")

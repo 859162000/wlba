@@ -663,6 +663,5 @@ class P2PProductContract(models.Model):
     bill_accepting_bank = models.CharField(verbose_name=u'(票据)承兑银行', max_length=32, blank=True)
     bill_number = models.CharField(verbose_name=u'(票据)承兑汇票票号', max_length=32, blank=True)
     bill_amount = models.CharField(verbose_name=u'(票据)票面金额', max_length=32, blank=True)
-    bill_due_date = models.DateField(blank=True, verbose_name=u'(票据)到期日', default='')
     created_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间', auto_now_add=True)
-
+    bill_due_date = models.DateField(blank=True, null=True, verbose_name=u'(票据)到期日')

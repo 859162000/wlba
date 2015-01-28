@@ -199,13 +199,7 @@ class PurchaseP2PMobile(APIView):
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
             redpack = request.DATA.get("redpack", "")
-            if not redpack:
-                if amount % 100 != 0:
-                    return Response({
-                                        'message': u'购买金额必须为100的整数倍',
-                                        'error_number': ErrorNumber.need_authentication
-                                    }, status=status.HTTP_200_OK)
-            elif not redpack.isdigit():
+            if redpack and not redpack.isdigit():
                 return Response({
                                     'message': u'请输入有效红包',
                                     'error_number': ErrorNumber.need_authentication
@@ -272,8 +266,22 @@ class AuditAmortizationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         pk = kwargs['id']
+        #page = kwargs.get('page', 1)
+        page = self.request.GET.get('page', 1)
+
+        print page, '###--', pk
         p2p_amortization = ProductAmortization.objects.filter(pk=pk).first()
         user_amortizations = p2p_amortization.subs.all().select_related('user__wanglibaouserprofile')
+
+        limit = 30
+        paginator = Paginator(user_amortizations, limit)
+
+        try:
+            user_amortizations = paginator.page(page)
+        except PageNotAnInteger:
+            user_amortizations = paginator.page(1)
+        except Exception:
+            user_amortizations = paginator.page(paginator.num_pages)
 
         return {
             "p2p_amortization": p2p_amortization,
@@ -286,17 +294,31 @@ class AuditEquityView(TemplateView):
 
     def get_context_data(self, **kwargs):
         pk = kwargs['id']
+        #page = kwargs.get('page', 1)
+        page = self.request.GET.get('page', 1)
 
         p2p = P2PProduct.objects.filter(pk=pk).first()
 
         equities = p2p.equities.all()
 
+        limit = 30
+        paginator = Paginator(equities, limit)
+
+        try:
+            equities = paginator.page(page)
+        except PageNotAnInteger:
+            equities = paginator.page(1)
+        except Exception:
+            equities = paginator.page(paginator.num_pages)
+
         if p2p.status != u'满标待审核':
             return HttpResponse(u'产品状态不是满标待审核')
 
         return {
-            "equities": equities
+            "equities": equities,
+            "p2p": p2p
             }
+
 
 audit_product_view = staff_member_required(AuditProductView.as_view())
 audit_equity_view = staff_member_required(AuditEquityView.as_view())
@@ -529,11 +551,13 @@ def preview_contract(request, id):
         # return HttpResponse(u'<h3 style="color:red;">【录标完成】之后才能进行合同预览！</h3>')
         # else:
         return HttpResponse(u'<h3 style="color:red;">没有该产品或产品信息错误！</h3>')
-
-    equity = ProductAmortization.objects.filter(product_id=id).select_related('product')
+    equity_all = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template') \
+        .select_related('product').filter(product=product).all()
+    productAmortizations = ProductAmortization.objects.filter(product_id=id).select_related('product').all()
     contract_info = P2PProductContract.objects.filter(product=product).first()
-    equity.contract_info = contract_info
-    return HttpResponse(generate_contract_preview(equity, product))
+    product.contract_info = contract_info
+    product.equity_all = equity_all
+    return HttpResponse(generate_contract_preview(productAmortizations, product))
 
 
 def AuditEquityCreateContract(request, equity_id):
