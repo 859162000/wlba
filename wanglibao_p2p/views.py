@@ -529,7 +529,7 @@ def preview_contract(request, id):
     contract_info = P2PProductContract.objects.filter(product=product).first()
     product.contract_info = contract_info
     product.equity_all = equity_all
-    return HttpResponse(generate_contract_preview(productAmortizations, product, template_name='contract_template_prev.jade'))
+    return HttpResponse(generate_contract_preview(productAmortizations, product))
 
 
 def AuditEquityCreateContract(request, equity_id):
