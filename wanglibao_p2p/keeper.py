@@ -16,6 +16,7 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
+from wanglibao_redpack import backends as redpack_backends
 
 
 class ProductKeeper(KeeperBaseMixin):
@@ -106,9 +107,11 @@ class EquityKeeperDecorator():
             p2p_equity = P2PEquity.objects.select_related('user__wanglibaouserprofile', \
                                                           'product__contract_template').select_related('product').filter(id=equity_id).first()
             amortizations = UserAmortization.objects.filter(user=p2p_equity.user, product_amortization__product=p2p_equity.product)
+            productAmortizations = ProductAmortization.objects.filter(product=p2p_equity.product).select_related('product').all()
             contract_info = P2PProductContract.objects.filter(product=p2p_equity.product).first()
             p2p_equity.contract_info = contract_info
             p2p_equity.amortizations_all = amortizations
+            p2p_equity.productAmortizations = productAmortizations
             contract_string = generate_contract(p2p_equity, None, None)
 
             contract = P2PContract()
@@ -161,6 +164,13 @@ class EquityKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount)
             user_margin_keeper = MarginKeeper(self.user, self.order_id)
             user_margin_keeper.unfreeze(amount, savepoint=False)
+            #流标要将红包退回账号
+            p2precord = P2PRecord.objects.filter(user=self.user, product=self.product, catalog=u"申购")
+            if p2precord:
+                for p2p in p2precord:
+                    result = redpack_backends.restore(p2p.order_id, p2p.amount, p2p.user)
+                    if result['ret_code'] == 0:
+                        user_margin_keeper.redpack_return(result['deduct'], description=u"%s 流标 红包退回%s元" % (self.product.short_name, result['deduct']))
             return record
 
     def settle(self, savepoint=True):
