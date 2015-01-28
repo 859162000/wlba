@@ -326,6 +326,9 @@ class AmortizationKeeper(KeeperBaseMixin):
             catalog = u'分期还款'
             product = amortization.product
             pname = u"%s,期限%s个月" % (product.name, product.period)
+
+            phone_list = list()
+            message_list = list()
             for sub_amo in sub_amortizations:
                 user_margin_keeper = MarginKeeper(sub_amo.user)
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest,
@@ -336,11 +339,10 @@ class AmortizationKeeper(KeeperBaseMixin):
                 sub_amo.save()
                 
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest
-                send_messages.apply_async(kwargs={
-                    "phones": [sub_amo.user.wanglibaouserprofile.phone],
-                    #"messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, sub_amo.principal + sub_amo.interest + sub_amo.penal_interest)]
-                    "messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, amo_amount)]
-                })
+
+                phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
+                message_list.append(messages.product_amortize(amortization.product, sub_amo.settlement_time, amo_amount))
+
 
                 title,content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
                 inside_message.send_one.apply_async(kwargs={
@@ -356,6 +358,13 @@ class AmortizationKeeper(KeeperBaseMixin):
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'
+
+            send_messages.apply_async(kwargs={
+                "phones": phone_list,
+                #"messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, sub_amo.principal + sub_amo.interest + sub_amo.penal_interest)]
+                "messages": message_list
+            })
+
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u''):
