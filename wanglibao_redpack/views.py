@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
 from wanglibao_redpack import backends
+from wanglibao_rest import utils
 
 
 class RedPacketView(TemplateView):
@@ -26,9 +27,9 @@ class RedPacketChangeAPIView(APIView):
 
     def post(self, request):
         token = request.DATA.get("token", "")
-        device_type = request.DATA.get("channelId", "")
+        device = utils.split_ua(request)
         user = request.user
-        result = backends.exchange_redpack(token, device_type, user)
+        result = backends.exchange_redpack(token, device['device_type'], user)
         return Response(result)
 
 class RedPacketListAPIView(APIView):
@@ -36,7 +37,7 @@ class RedPacketListAPIView(APIView):
 
     def post(self, request):
         status = request.DATA.get("status", "")
-        device_type = request.DATA.get("channelId", "")
+        device = utils.split_ua(request)
         user = request.user
-        result = backends.list_redpack(user, status, device_type)
+        result = backends.list_redpack(user, status, device['device_type'])
         return Response(result)
