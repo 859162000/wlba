@@ -253,6 +253,9 @@ class AmortizationKeeper(KeeperBaseMixin):
         user_amos = list()
         interest_precisions = list()
         exp = Decimal('0.00000001')
+
+        total_precisions = Decimal('0')
+
         for equity in equities:
             total_principal = equity.equity
             # total_interest = self.product_interest * equity.ratio
@@ -272,6 +275,8 @@ class AmortizationKeeper(KeeperBaseMixin):
                 interest = equity.ratio * amo.interest
                 principal_actual = principal.quantize(Decimal('.01'))
                 interest_actual = interest.quantize(Decimal('.01'), ROUND_DOWN)
+
+                total_precisions += principal_actual
 
                 user_amo = UserAmortization(
                     product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
