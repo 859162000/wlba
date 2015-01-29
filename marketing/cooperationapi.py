@@ -445,7 +445,8 @@ class XunleiP2PListAPIView(APIView):
                 'finance_left': float(p2pproduct.remain),
                 'repayment_period': p2pproduct.period * 30,
                 'repayment_type': XUNLEI_PAY_WAY.get(p2pproduct.pay_method, 0),
-                'buy_url': 'https://{}/p2p/detail/{}?promo_token=xunlei'.format(request.get_host(), p2pproduct.id),
+                #'buy_url': 'https://{}/p2p/detail/{}?promo_token=xunlei'.format(request.get_host(), p2pproduct.id),
+                'buy_url': 'https://www.wanglibao.com/activity/xunleidenglu/?promo_token=xunlei',
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
                 'status': p2pproduct.status
