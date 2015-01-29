@@ -64,6 +64,7 @@ html
     .wrap
       img(src="/static/images/xunlei-denglu/xun-banner5.png").te1
       .gold2
+         img(src="/static/images/xunlei-denglu/xun-wang.png").xun-wang
          .denelu-form
             h1.biaoti 轻松拿70元话费
             form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
@@ -291,7 +292,7 @@ html
       include include/tracking
 
       script.
-          require(["/static/js/xldl.js"])
+
           var v = new Date().getTime()
           require(['/static/js/hover.js','/static/js/xun-newzhuce.js?v='+v])
 

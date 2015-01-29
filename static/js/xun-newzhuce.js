@@ -162,7 +162,7 @@
           type: "POST"
         }).fail(function(xhr) {
           var result;
-          $.modal.close();
+          $.modal.close();$("#button-get-validate-code-modal")
           clearInterval(intervalId);
           $(element).text('重新获取');
           $(element).removeAttr('disabled');
@@ -321,56 +321,46 @@
         }
       });
     }
-    return $(".voice").on('click', '.voice-validate', function(e) {
-      var element, isMobile, url;
-      e.preventDefault();
-      isMobile = checkMobile($("#reg_identifier").val().trim());
-      if (!isMobile) {
-        $("#id_type").val("phone");
-        $("#validate-code-container").show();
-        return;
-      }
-      if ($(this).attr('disabled') && $(this).attr('disabled') === 'disabled') {
-        return;
-      }
-      element = $('.voice .span12-omega');
-      url = $(this).attr('href');
-      return $.ajax({
-        url: url,
-        type: "POST",
-        data: {
-          phone: $("#reg_identifier").val().trim()
-        }
-      }).success(function(json) {
-        var button, count, intervalId, timerFunction;
-        if (json.ret_code === 0) {
-          intervalId;
-          count = 60;
-          button = $("#button-get-validate-modal");
-          button.attr('disabled', 'disabled');
-          button.addClass('huoqu-ma-gray');
-          $('.voice').addClass('tip');
-          timerFunction = function() {
-            if (count >= 1) {
-              count--;
-              return element.text('语音验证码已经发送，请注意接听（' + count + '）');
-            } else {
-              clearInterval(intervalId);
-              element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>');
-              element.removeAttr('disabled');
-              button.removeAttr('disabled');
-              button.addClass('button-red');
-              button.removeClass('huoqu-ma-gray');
-              return $('.voice').removeClass('tip');
-            }
-          };
-          timerFunction();
-          return intervalId = setInterval(timerFunction, 1000);
-        } else {
-          return element.html('系统繁忙请尝试短信验证码');
-        }
+
+    myeven();
+    function myeven() {
+      var high = document.body.scrollHeight;
+      $('#top-zc').on('click', function () {
+        pageScroll();
       });
-    });
+
+      function pageScroll() {
+        //把内容滚动指定的像素数
+        window.scrollBy(0, -high);
+        //获取scrollTop值
+        var sTop = document.documentElement.scrollTop + document.body.scrollTop;
+        //判断当页面到达顶部
+        if (sTop == 0) clearTimeout(scrolldelay);
+      }
+
+      //文本框的得到和失去光标
+      var zhi;
+      $('.com-tu').on("focus", function () {
+        if ($(this).attr('placeholder')) {
+          zhi = $(this).attr('placeholder');
+        }
+        $(this).attr('placeholder', '');
+      });
+
+      $('.com-tu').on('blur', function () {
+        $(this).attr('placeholder', zhi)
+      })
+
+      $('#button-get-validate-code-modal').disabled=false;
+      $('#button-get-validate-code-modal').on('click', function () {
+        $(this).disabled = false;
+        setTimeout(function () {
+          $('#button-get-validate-code-modal').disabled = true;
+          $('.show').removeClass('hidden');
+        }, 60000)
+      });
+    }
+
   });
 
 }).call(this);
