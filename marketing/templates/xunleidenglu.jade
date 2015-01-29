@@ -7,10 +7,6 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    meta(http-equiv="content-type", content="text/html; charset=utf-8")
-    meta(http-equiv="X-UA-Compatible", content="IE=edge")
-    meta(name="baidu-site-verification", content="iBKXouRC1a")
-    link(href="/static/stylesheets/screen.css", media="screen, projection", rel="stylesheet", type="text/css")
 
   body(style="background:#fff")
     .full-container
@@ -66,76 +62,77 @@ html
                 +nav-item('安全保障', '/security', 'left-line', '')
                 +nav-item('帮助中心', '/help', '', '')
     .wrap
-      .denelu-form
-        h1.biaoti 轻松拿70元话费
-        form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
-          - csrf_token
-          .form-row
-              .span12
-                input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
-              .form-row-error
-          .form-row.voice.hidden
-            .span12-omega
-              没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
-          .form-row
-            .form-control-group
-              .span7
-                input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
-              .span5-omega
-                button#button-get-validate-code-modal.huoqu-ma(type='button',style="top:-2px") 获取验证码
-            .form-row-error
-          .form-row
-            .span12
-              input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
-            .password-strength-container
-              span.password-strength-1 低
-              span.password-strength-2 中
-              span.password-strength-3 高
-            .form-row-error
-          .form-row
-            .span12
-              input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
-            .form-row-error
-          .form-row
-            .span12
-              input#reg_password2.com-tu.tu1(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
-            .form-row-error
-          .form-row.form-bottom-bar
-            button#register_submit.button-account.span10.xun-zhuce(type='submit') 立即注册
-            .agreement
-              label(for="agreement")
-                input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
-              | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
-              .form-row-error
-          .space-vertical-s
-        p.xun-p 已有账号,
-          a(href="/accounts/login/") 立即登录
-      .container.high-bigger.high-bigger2
-        .row.gold-dl-row
-          .span4
-            dl
-             dt.com.com-trust
-             dd.te-zi
-               h3 信赖
-               p IDG资本投资
-               p 第三方100%本息保障
-          .span4
-            dl
-             dt.com.com-security
-             dd.te-zi
-               h3 安全
-               p 招商银行全程监管
-               p 账户资金安全由平安保险承保
-          .span4
-            dl
-             dt.com.com-authority
-             dd.te-zi
-               h3 权威
-               p 洛克菲勒家族
-               p 全方位战略合作
+      img(src="/static/images/xunlei-denglu/xun-banner5.png").te1
+      .gold2
+         .denelu-form
+            h1.biaoti 轻松拿70元话费
+            form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
+              - csrf_token
+              .form-row
+                .form-control-group
+                  .span12
+                    input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                .form-row-error
+              .form-row.voice
+                .span12-omega.hidden.show
+                  没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                .form-control-group
+                  .span6
+                     input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                  .span6-omega
+                     button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma(type='button',style="top:-2px") 获取验证码
+                .form-row-error
+
+              .form-row
+                input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                .password-strength-container
+                  span.password-strength-1
+                  span.password-strength-2
+                  span.password-strength-3
+                .form-row-error
+              .form-row
+                input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                .form-row-error
+              .form-row
+                input#id_invitecode.com-tu.tu1(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
+                .form-row-error
+              .form-row.form-bottom-bar
+                button#register_submit.button-account.span10.xun-zhuce(type='submit') 注 册
+                .agreement
+                  label(for="agreement")
+                    input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
+                  | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                  .form-row-error
+              .space-vertical-s
+
+            p.xun-p 已有账号,
+              a(href="/accounts/login/") 立即登录
+      .san
+        .container.high-bigger.high-bigger2
+          .row.gold-dl-row
+            .span4
+              dl
+               dt.com.com-trust
+               dd.te-zi
+                 h3 信赖
+                 p IDG资本投资
+                 p 第三方100%本息保障
+            .span4
+              dl
+               dt.com.com-security
+               dd.te-zi
+                 h3 安全
+                 p 招商银行全程监管
+                 p 账户资金安全由平安保险承保
+            .span4
+              dl
+               dt.com.com-authority
+               dd.te-zi
+                 h3 权威
+                 p 洛克菲勒家族
+                 p 全方位战略合作
 
     .gold(style='margin-top:20px;background:#fff')
-      img(src="/static/images/xunlei-denglu/beibei.png").tete
       a(href="/#p2p")
             //.get-money
             //  h2 立即赚钱
@@ -192,48 +189,51 @@ html
       .content-title
           h2.h2-da 没心，没肺，没节操的送！
             p 活动期间，每个账户投资额达到以下额度，可获得相应奖品
-      .content-desc(style="margin-top:40px;position:relative;z-index:2;background:#fff")
-        .space-vertical-s
-        .row.gold-row
-           .span6
-             img(src="/static/images/gold/awards_bg.jpg").gold-jiangli2
-           .span6-omega
-             ul.font-m.li-linghight
-               li 1、 累计购买满130万
+    .dingwei
+      img(src="/static/images/xunlei-denglu/beibei.png").tete
+      .content-desc(style="margin-top:40px;position:relative;z-index:2")
+        .xiangdui
+          .space-vertical-s
+          .row.gold-row
+            .span6
+              img(src="/static/images/xunlei-denglu/xinban.png").gold-jiangli2
+            .span6-omega
+              ul.font-m.li-linghight
+                li 1、 累计购买满130万
                   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                   span.highlight 送
                   |iPhone 6 Plus（16G 5.5英寸）
-               li 2、 累计购买满100万
+                li 2、 累计购买满100万
                   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                   span.highlight 送
                   |iPhone 6（16G 4.7英寸）
-               li 3、 累计购买满80万
+                li 3、 累计购买满80万
                   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                   span.highlight 送
                   |华为mate7 4G版手机（16G）
-               li 4、 累计购买满50万
+                li 4、 累计购买满50万
                   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                   span.highlight 送
                   |iPad Air 2（16G WLAN）
-               li 5、 累计购买满40万
+                li 5、 累计购买满40万
                   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                   span.highlight 送
                   |iPad mini3（16G WLAN）
-               li 6、 累计购买满30万
+                li 6、 累计购买满30万
                   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                   span.highlight 送
                   |1000元京东礼品卡
-               li 7、 累计购买满10万
+                li 7、 累计购买满10万
                   &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                   span.highlight 送
                   |300元京东礼品卡
-               li 8、 累计购买满1万-9万
+                li 8、 累计购买满1万-9万
                   &nbsp
                   |每满1万元
                   &nbsp
                   span.highlight 送
                   |30元话费
-      .space-vertical-l
+    .gold
       .gold-footer(style="background:#fff;padding-left:0")
         .gold-declare(style="border-bottom:none;padding-left:0")
           dl.beijing
@@ -246,7 +246,8 @@ html
                b.note <a href="mailto:kefu@wanglibank.com">kefu@wanglibank.com</a>
             dd 6.此次活动的最终解释权归网利宝官方所有
 
-      .content-title
+      .bai
+        .content-title
           h2.hei(style="font-size:24px") 投资流程
         .investment-process-container
           .row
@@ -281,15 +282,16 @@ html
             .step.fifth-step
               span.icon.icon-fifth-step
               .process-title 获得投资和奖励
-      .invite-container.row
-          a.invite-btn#top-zc 立即注册
+        .invite-container.row
+            a.invite-btn#top-zc 立即注册
 
     .warp-footer
+      img(src="/static/images/xunlei-denglu/ditu.jpg").foot-img
 
       include include/tracking
 
       script.
           require(["/static/js/xldl.js"])
           var v = new Date().getTime()
-          require(['/static/js/hover.js','/static/js/login_modal.js?v='+v])
-          require(["/static/js/register_wap.js"])
+          require(['/static/js/hover.js','/static/js/xun-newzhuce.js?v='+v])
+

@@ -42,6 +42,7 @@ def list_redpack(user, status, device_type):
                     if obj['method'] == REDPACK_RULE['percent']:
                         obj['amount'] = "%.2f" % (obj['amount']/100.0)
                     packages['available'].append(obj)
+        packages['available'].sort(key=lambda x:x['unavailable_at'])
     else:
         packages = {"used":[], "unused":[], "expires":[], "invalid":[]}
         records = RedPackRecord.objects.filter(user=user)

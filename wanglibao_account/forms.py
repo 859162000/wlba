@@ -100,7 +100,9 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         raise forms.ValidationError(
                             self.error_messages['mlgb error'],
                             code = 'mlgb error',
+
                         )
+
 
     def clean_validate_code(self):
         if 'identifier' in self.cleaned_data:
