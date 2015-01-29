@@ -10,7 +10,7 @@ from order.mixins import KeeperBaseMixin
 from wanglibao_account.utils import generate_contract
 from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
-    UserAmortization, P2PContract, InterestPrecisionBalance, P2PProductContract
+    UserAmortization, P2PContract, InterestPrecisionBalance, P2PProductContract, ProductInterestPrecision
 from exceptions import ProductLack, P2PException
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_sms import messages
@@ -254,7 +254,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         interest_precisions = list()
         exp = Decimal('0.00000001')
 
-        total_precisions = Decimal('0')
+        total_actual = Decimal('0')
 
         for equity in equities:
             total_principal = equity.equity
@@ -276,7 +276,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 principal_actual = principal.quantize(Decimal('.01'))
                 interest_actual = interest.quantize(Decimal('.01'), ROUND_DOWN)
 
-                total_precisions += principal_actual
+                total_actual += interest_actual
 
                 user_amo = UserAmortization(
                     product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
@@ -292,8 +292,34 @@ class AmortizationKeeper(KeeperBaseMixin):
                 user_amos.append(user_amo)
                 interest_precisions.append(interest_precision)
 
+        #记录某个标的总精度差额 author:hetao
+        self.__precision(total_actual)
+
         UserAmortization.objects.bulk_create(user_amos)
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
+
+
+    def __precision(self, interest_actual):
+        """
+        记录某个标的总精度差额 author:hetao
+        :param interest_actual: 实际支付利息
+        :return:
+        """
+
+        total_receivable = Decimal('0')
+        product_total_principal = Decimal('0')
+
+        for amortization in self.amortizations:
+            total_receivable += amortization.interest
+            product_total_principal += amortization.principal
+
+        total_precision = total_receivable - interest_actual
+        product_precision = ProductInterestPrecision(
+            product=self.product, principal=product_total_principal,
+            interest_actual=interest_actual, interest_receivable=total_receivable,
+            interest_precision_balance=total_precision
+        )
+        product_precision.save()
 
 
     def __dispatch(self, equity):

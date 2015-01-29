@@ -265,50 +265,51 @@ html
                                 .phone {{month.phone | safe_phone_new}}
                               td
                                 .amount-sum ￥{{month.amount_sum|money_format_int}}
-          .p2p-detail-container.guarantee-company
-            h1 担保机构审核清单
-            table
-              warrants = p2p.warrant_set.all()
-              length = len(warrants)
+            if p2p.category != "票据"
+              .p2p-detail-container.guarantee-company
+                h1 担保机构审核清单
+                table
+                  warrants = p2p.warrant_set.all()
+                  length = len(warrants)
 
-              if length > 0
-                caption {{p2p.warrant_company.name}}
-                tbody
-                    for warrant in warrants
-                      tr
-                        td {{warrant.name}}
-                        td
-                          span
-                          span.icon.icon-approve
-                          | 认证通过
-              else
-                caption.nowarrant {{p2p.warrant_company.name}}
-                if p2p.category == "证大速贷"
-                  tbody
-                    tr
-                      td 身份证
-                      td
-                        span
-                        span.icon.icon-approve
-                        | 认证通过
-                    tr
-                      td 信用报告
-                      td
-                        span
-                        span.icon.icon-approve
-                        | 认证通过
-                    tr
-                      td 工作证明
-                      td
-                        span
-                        span.icon.icon-approve
-                        | 认证通过
-                    tr
-                      td 收入证明
-                      td
-                        span
-                        span.icon.icon-approve
-                        | 认证通过
+                  if length > 0
+                    caption {{p2p.warrant_company.name}}
+                    tbody
+                        for warrant in warrants
+                          tr
+                            td {{warrant.name}}
+                            td
+                              span
+                              span.icon.icon-approve
+                              | 认证通过
+                  else
+                    caption.nowarrant {{p2p.warrant_company.name}}
+                    if p2p.category == "证大速贷"
+                      tbody
+                        tr
+                          td 身份证
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 认证通过
+                        tr
+                          td 信用报告
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 认证通过
+                        tr
+                          td 工作证明
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 认证通过
+                        tr
+                          td 收入证明
+                          td
+                            span
+                            span.icon.icon-approve
+                            | 认证通过
           .clearfix
             .p2p-detail-container
               script.
