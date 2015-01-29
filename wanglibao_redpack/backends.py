@@ -215,5 +215,5 @@ def restore(order_id, amount, user):
             actual_amount = amount - rule_value
     elif REDPACK_RULE[rtype] == "+":
         actual_amount = amount + rule_value
-    logger.info("%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
+    logger.info(u"%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
     return {"ret_code":0, "deduct":deduct}
