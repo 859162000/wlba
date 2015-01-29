@@ -7,7 +7,7 @@ import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone, dateparse
 from django.views.generic import TemplateView
@@ -24,7 +24,8 @@ from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
-from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, P2PProductContract
+from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, \
+    P2PProductContract, InterestPrecisionBalance
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
@@ -557,6 +558,9 @@ def preview_contract(request, id):
     contract_info = P2PProductContract.objects.filter(product=product).first()
     product.contract_info = contract_info
     product.equity_all = equity_all
+    product.total_interest_actual = InterestPrecisionBalance.objects.filter(equity__product=product) \
+        .aggregate(actual_sum=Sum('interest_actual'))
+
     return HttpResponse(generate_contract_preview(productAmortizations, product))
 
 

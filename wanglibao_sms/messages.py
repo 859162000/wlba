@@ -8,7 +8,7 @@ def format_datetime(time, fmt):
 
 def suffix(f):
     def wrapper(*args, **kwargs):
-        return u'[网利宝]' + unicode(f(*args, **kwargs)) + u'回复TD退订 4008-588-066【网利宝】'
+        return unicode(f(*args, **kwargs)) + u'回复TD退订 4008-588-066【网利宝】'
     return wrapper
 
 @suffix
