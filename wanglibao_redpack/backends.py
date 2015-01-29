@@ -17,7 +17,8 @@ def local_datetime(dt):
     return timezone.get_current_timezone().normalize(dt)
 
 def stamp(dt):
-    return long(time.mktime(dt.timetuple()))
+    return long(time.mktime(local_datetime(dt).timetuple()))
+    #return long(time.mktime(dt.timetuple()))
 
 def list_redpack(user, status, device_type):
     if status not in ("all", "available"):
