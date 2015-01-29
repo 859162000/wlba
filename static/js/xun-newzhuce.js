@@ -167,7 +167,7 @@
           $(element).text('重新获取');
           $(element).removeAttr('disabled');
           $(element).addClass('button-red');
-          $(element).removeClass('button-gray');
+          $(element).removeClass('huoqu-ma-gray');
           result = JSON.parse(xhr.responseText);
           if (xhr.status === 429) {
             return tool.modalAlert({
@@ -187,7 +187,7 @@
         count = 60;
         $(element).attr('disabled', 'disabled');
         $(element).removeClass('button-red');
-        $(element).addClass('button-gray');
+        $(element).addClass('huoqu-ma-gray');
         $('.voice-validate').attr('disabled', 'disabled');
         timerFunction = function() {
           if (count >= 1) {
@@ -198,7 +198,7 @@
             $(element).text('重新获取');
             $(element).removeAttr('disabled');
             $(element).addClass('button-red');
-            $(element).removeClass('button-gray');
+            $(element).removeClass('huoqu-ma-gray');
             $('.voice').removeClass('hidden');
             $('.voice-validate').removeAttr('disabled');
             return $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>');
@@ -348,7 +348,7 @@
           count = 60;
           button = $("#button-get-validate-modal");
           button.attr('disabled', 'disabled');
-          button.addClass('button-gray');
+          button.addClass('huoqu-ma-gray');
           $('.voice').addClass('tip');
           timerFunction = function() {
             if (count >= 1) {
@@ -360,7 +360,7 @@
               element.removeAttr('disabled');
               button.removeAttr('disabled');
               button.addClass('button-red');
-              button.removeClass('button-gray');
+              button.removeClass('huoqu-ma-gray');
               return $('.voice').removeClass('tip');
             }
           };

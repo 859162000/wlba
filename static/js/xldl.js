@@ -51,10 +51,8 @@
       })
 
       $('#button-get-validate-code-modal').on('click', function () {
-        $(this).addClass('huoqu-ma-gray');
         $(this).disabled = false;
         setTimeout(function () {
-          $('#button-get-validate-code-modal').css({'background': '#ff461f'});
           $('#button-get-validate-code-modal').disabled = true;
           $('.show').removeClass('hidden');
         }, 60000)
