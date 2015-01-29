@@ -162,7 +162,7 @@
           type: "POST"
         }).fail(function(xhr) {
           var result;
-          $.modal.close();
+          $.modal.close();$("#button-get-validate-code-modal")
           clearInterval(intervalId);
           $(element).text('重新获取');
           $(element).removeAttr('disabled');
@@ -321,6 +321,7 @@
         }
       });
     }
+     myeven();
     return $(".voice").on('click', '.voice-validate', function(e) {
       var element, isMobile, url;
       e.preventDefault();
@@ -348,7 +349,7 @@
           count = 60;
           button = $("#button-get-validate-modal");
           button.attr('disabled', 'disabled');
-          button.addClass('huoqu-ma-gray');
+          button.addClass('button-gray');
           $('.voice').addClass('tip');
           timerFunction = function() {
             if (count >= 1) {
@@ -360,7 +361,7 @@
               element.removeAttr('disabled');
               button.removeAttr('disabled');
               button.addClass('button-red');
-              button.removeClass('huoqu-ma-gray');
+              button.removeClass('button-gray');
               return $('.voice').removeClass('tip');
             }
           };
@@ -371,6 +372,46 @@
         }
       });
     });
+
+
+    function myeven() {
+      var high = document.body.scrollHeight;
+      $('#top-zc').on('click', function () {
+        pageScroll();
+      });
+
+      function pageScroll() {
+        //把内容滚动指定的像素数
+        window.scrollBy(0, -high);
+        //获取scrollTop值
+        var sTop = document.documentElement.scrollTop + document.body.scrollTop;
+        //判断当页面到达顶部
+        if (sTop == 0) clearTimeout(scrolldelay);
+      }
+
+      //文本框的得到和失去光标
+      var zhi;
+      $('.com-tu').on("focus", function () {
+        if ($(this).attr('placeholder')) {
+          zhi = $(this).attr('placeholder');
+        }
+        $(this).attr('placeholder', '');
+      });
+
+      $('.com-tu').on('blur', function () {
+        $(this).attr('placeholder', zhi)
+      })
+
+      $('#button-get-validate-code-modal').disabled=false;
+      $('#button-get-validate-code-modal').on('click', function () {
+        $(this).disabled = false;
+        setTimeout(function () {
+          $('#button-get-validate-code-modal').disabled = true;
+          $('.show').removeClass('hidden');
+        }, 60000)
+      });
+    }
+
   });
 
 }).call(this);

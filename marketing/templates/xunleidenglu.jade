@@ -62,8 +62,9 @@ html
                 +nav-item('安全保障', '/security', 'left-line', '')
                 +nav-item('帮助中心', '/help', '', '')
     .wrap
-      img(src="/static/images/xunlei-denglu/xun-banner5.png").te1
+      img(src="/static/images/xunlei-denglu/xun-banner5.jpg").te1
       .gold2
+         img(src="/static/images/xunlei-denglu/xun-wang.png").xun-wang
          .denelu-form
             h1.biaoti 轻松拿70元话费
             form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
@@ -190,7 +191,7 @@ html
           h2.h2-da 没心，没肺，没节操的送！
             p 活动期间，每个账户投资额达到以下额度，可获得相应奖品
     .dingwei
-      img(src="/static/images/xunlei-denglu/beibei.png").tete
+      img(src="/static/images/xunlei-denglu/beibei.jpg").tete
       .content-desc(style="margin-top:40px;position:relative;z-index:2")
         .xiangdui
           .space-vertical-s
@@ -291,7 +292,7 @@ html
       include include/tracking
 
       script.
-          require(["/static/js/xldl.js"])
+
           var v = new Date().getTime()
           require(['/static/js/hover.js','/static/js/xun-newzhuce.js?v='+v])
 
