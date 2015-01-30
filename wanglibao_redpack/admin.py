@@ -9,9 +9,17 @@ from import_export.admin import ExportMixin
 
 
 class RedPackEventAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "rtype", "amount", "invest_amount", "describe", "value", "give_mode", "give_start_at", "give_end_at",
+    list_display = ("id", "name", "rtype", "red_amount", "invest_amount", "describe", "red_num", "give_mode", "give_platform", "apply_platform", "give_start_at", "give_end_at",
                     "available_at", "unavailable_at", "invalid", "created_at")
     search_fields = ("name", "give_mode")
+
+    def red_num(self, obj):
+        return obj.value
+    red_num.short_description = u"红包个数"
+
+    def red_amount(self, obj):
+        return obj.amount
+    red_amount.short_description = u"红包金额"
 
 
 class RedPackResource(resources.ModelResource):
