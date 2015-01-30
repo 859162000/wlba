@@ -93,16 +93,18 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         MlGb_src = self.cleaned_data.get('MlGb')
 
         if MlGb_src:
-            phone = self.cleaned_data.get("identifier")
-            if mlgb_md5(phone, 'wang*@li&_!Bao') == MlGb_src:
-                return MlGb_src
-
+            try:
+                phone = self.cleaned_data.get("identifier")
+                if mlgb_md5(phone, 'wang*@li&_!Bao') == MlGb_src:
+                    return MlGb_src
+            except:
+                pass
+        """
         raise forms.ValidationError(
                             self.error_messages['mlgb error'],
                             code = 'mlgb error',
-
                         )
-
+        """
 
     def clean_validate_code(self):
         if 'identifier' in self.cleaned_data:

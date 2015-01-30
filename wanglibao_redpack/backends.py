@@ -17,7 +17,8 @@ def local_datetime(dt):
     return timezone.get_current_timezone().normalize(dt)
 
 def stamp(dt):
-    return long(time.mktime(dt.timetuple()))
+    return long(time.mktime(local_datetime(dt).timetuple()))
+    #return long(time.mktime(dt.timetuple()))
 
 def list_redpack(user, status, device_type):
     if status not in ("all", "available"):
@@ -215,5 +216,5 @@ def restore(order_id, amount, user):
             actual_amount = amount - rule_value
     elif REDPACK_RULE[rtype] == "+":
         actual_amount = amount + rule_value
-    logger.info("%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
+    logger.info(u"%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
     return {"ret_code":0, "deduct":deduct}
