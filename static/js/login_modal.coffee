@@ -412,3 +412,4 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       else
         #TODO
         element.html('系统繁忙请尝试短信验证码')
+

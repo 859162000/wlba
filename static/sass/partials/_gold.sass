@@ -10,15 +10,27 @@ body
     margin: 10px 0
     border: none
   .huoqu-ma
-    padding: 10px
+    padding: 0 10px
     border: none
     color: #fff
     background: #ff461f
     border-radius: 5px
+    margin-left: 20px
   .huoqu-ma-gray
     background: #cccccc
+    margin-left: 10px
+  .show
+    margin-bottom: 10px
   .dale
     width: 276px
+  .gold
+    .bai
+      .content-title
+        background: #fff
+      .investment-process-container
+        background: #fff
+      .invite-container.row
+        background: #fff
   .xun-zhuce
     padding: 10px 10px
     border: none
@@ -27,68 +39,101 @@ body
     border-radius: 5px
     margin-left: 23px
 
-  .wrap
-    height: 664px
-    background:  #397ee9 url(/static/images/xunlei-denglu/xunlei-banner.jpg) no-repeat
-    background-position: -356px 0px
-
-    .denelu-form
-      width: 316px
-      background: #fff
+  .dingwei
+    position: relative
+    height: 360px
+    .tete
       position: absolute
-      top: 160px
-      left: 1110px
-      border-radius: 5px
-      padding: 0 20px
-      .dale
-        .form-row
-          .com-tu
-            background: url(/static/images/xunlei-denglu/xunlei-denglu-tu.png) no-repeat
-            padding-left: 30px
-          .tu1
-            background-position: 0 -73px
-          .tu2
-            background-position: 0 5px
-          .tu3
-            background-position: 0 -32px
-      .biaoti
-        color: red
-        line-height: 50px
-        text-align: center
-      .xun-p
-        text-align: center
-        margin-bottom: 10px
-        a
-          color: #3ea7e9
-          text-decoration: underline
-      form
-        .dl-com
-          li
-            margin-bottom: 10px
-            span
-              color: #ff0419
-              display: inline-block
-              margin-top: 5px
-              display: none
-            .yanzheng
-              width: 170px
-              margin-right: 10px
-            .inp-che
-              width: 20px
-              height: 20px
-              border: none
-              border: 1px solid #a9a9a9
-              background: #fff
-            .i-do
-              position: relative
-              top: -6px
-              font-size: 14px
-              a
-                color: #3ea7e9
+      left: 0
+      width: 100%
+      bottom: 0
+    .xiangdui
+      position: relative
+      z-index: 2
+      background: #fff
+      max-width: 1100px
+      min-width: 1100px
+      margin: 0px auto
+
+  .wrap
+    position: relative
+    .te1
+      position: absolute
+      width: 100%
+      height: 500px
+    .san
+      width: 100%
+      background:   #397ee9
+      .high-bigger2
+        margin-top: 0
+        padding-bottom: 20px
+        position: relative
+    .gold2
+      max-width: 1100px
+      min-width: 1100px
+      height: 500px
+      margin: 0px auto
+      position: relative
+      .xun-wang
+        position: absolute
+        left: 30%
+
+      .denelu-form
+        width: 316px
+        background: #fff
+        position: absolute
+        top: 30px
+        right: 0
+        border-radius: 5px
+        padding: 0 20px
+        .dale
+          .form-row
+            .com-tu
+              background: url(/static/images/xunlei-denglu/xunlei-denglu-tu.png) no-repeat
+              padding-left: 30px
+            .tu1
+              background-position: 0 -73px
+            .tu2
+              background-position: 0 5px
+            .tu3
+              background-position: 0 -32px
+        .biaoti
+          color: red
+          line-height: 50px
+          text-align: center
+        .xun-p
+          text-align: center
+          margin-bottom: 10px
+          a
+            color: #3ea7e9
+            text-decoration: underline
+        form
+          .dl-com
+            li
+              margin-bottom: 10px
+              span
+                color: #ff0419
+                display: inline-block
+                margin-top: 5px
+                display: none
+              .yanzheng
+                width: 170px
+                margin-right: 10px
+              .inp-che
+                width: 20px
+                height: 20px
+                border: none
+                border: 1px solid #a9a9a9
+                background: #fff
+              .i-do
+                position: relative
+                top: -6px
+                font-size: 14px
+                a
+                  color: #3ea7e9
   .warp-footer
-    height: 340px
-    background: url(/static/images/xunlei-denglu/ditu.png) no-repeat
-    background-position: -400px
+    .foot-img
+      width: 100%
   .xiao-nav
     width: 1000px
     margin: 0 auto
@@ -101,11 +146,6 @@ body
       color: #000
     .note
       color: red
-    .tete
-      position: absolute
-      top: 1590px
-      left: 0
-      width: 100%
     .gold-jiangli2
       margin-left: 20px
 
@@ -352,7 +392,7 @@ body
       margin-top: 0
       padding-bottom: 20px
       position: relative
-      top: 500px
+      top: 12px
 
       dl
         margin: 0 auto

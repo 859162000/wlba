@@ -8,7 +8,7 @@ from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning,\
-    P2PProductContract, InterestPrecisionBalance
+    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
@@ -343,6 +343,14 @@ class InterestPrecisionAdmin(admin.ModelAdmin):
     def equity_number(self, instance):
         return instance.equity.user.wanglibaouserprofile.id_number
 
+class ProductInterestPrecisionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'product_name', 'principal', 'interest_receivable',
+                    'interest_actual', 'interest_precision_balance',)
+    search_fields = ('product__id',)
+
+    def product_name(self, instance):
+        return instance.product.name
+
 
 admin.site.register(P2PProduct, P2PProductAdmin)
 admin.site.register(Warrant, WarrantAdmin)
@@ -357,6 +365,7 @@ admin.site.register(ProductAmortization, ProductAmortizationAdmin)
 admin.site.register(Earning, EarningAdmin)
 admin.site.register(P2PProductContract, P2PProductContractAdmin)
 admin.site.register(InterestPrecisionBalance, InterestPrecisionAdmin)
+admin.site.register(ProductInterestPrecision, ProductInterestPrecisionAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')
