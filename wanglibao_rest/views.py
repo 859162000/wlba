@@ -41,7 +41,7 @@ from wanglibao_account import message as inside_message
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm
 from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import search
+from wanglibao_rest.utils import split_ua
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
 from marketing.utils import save_client
@@ -144,7 +144,6 @@ class RegisterAPIView(APIView):
         identifier = request.DATA.get('identifier', "")
         password = request.DATA.get('password', "")
         validate_code = request.DATA.get('validate_code', "")
-        device_type = request.DATA.get("channelId", "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -183,14 +182,8 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
-        #title, content = messages.msg_register()
-        #inside_message.send_one.apply_async(kwargs={
-        #    "user_id": user.id,
-        #    "title": title,
-        #    "content": content,
-        #    "mtype": "activityintro"
-        #})
-        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device_type":device_type})
+        device = split_ua(request)
+        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device_type":device['device_type']})
         # save client info
         save_client(request, phone=identifier, action=0)
 
@@ -232,7 +225,6 @@ class WeixinRegisterAPIView(APIView):
                 return Response({"ret_code": 30025, "message": "邀请码错误"})
 
         password = generate_validate_code()
-        # password = random.randint(100000, 999999)
         user = create_user(identifier, password, "")
         if not user:
             return Response({"ret_code": 30025, "message": u"注册失败"})
@@ -243,13 +235,15 @@ class WeixinRegisterAPIView(APIView):
         auth_login(request, auth_user)
         send_rand_pass(identifier, password)
 
-        title, content = messages.msg_register()
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": auth_user.id,
-            "title": title,
-            "content": content,
-            "mtype": "activityinfo"
-        })
+        device = split_ua(request)
+        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device_type":device['device_type']})
+        #title, content = messages.msg_register()
+        #inside_message.send_one.apply_async(kwargs={
+        #    "user_id": auth_user.id,
+        #    "title": title,
+        #    "content": content,
+        #    "mtype": "activityinfo"
+        #})
         return Response({"ret_code": 0, "message": "注册成功"})
 
 
@@ -762,19 +756,15 @@ class MobileDownloadAPIView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        useragent = request.META['HTTP_USER_AGENT']
-
-        print useragent
-
-        if search('iPhone', useragent):
-            return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
-        elif search('iPad', useragent):
-            return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
-        elif search('Android', useragent):
+        if "HTTP_USER_AGENT" not in request.META:
             return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
-            # return HttpResponseRedirect('http://192.168.1.200:8000/static/wanglibao.apk')
-        return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
 
+        useragent = request.META['HTTP_USER_AGENT'].lower()
+
+        if "iphone" in useragent or "ipad" in useragent:
+            return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
+        else:
+            return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
 
 class KuaipanPurchaseListAPIView(APIView):
     permission_classes = ()
