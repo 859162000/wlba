@@ -37,7 +37,7 @@ from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from wanglibao_sms import messages, backends
 from django.utils import timezone
-from wanglibao_account import message as inside_message
+#from wanglibao_account import message as inside_message
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm
 from marketing.helper import RewardStrategy, which_channel, Channel
