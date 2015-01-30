@@ -47,10 +47,10 @@ from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
-from wanglibao_p2p.models import P2PProduct
 from django.template.defaulttags import register
 from wanglibao_p2p.keeper import EquityKeeperDecorator
 from order.utils import OrderHelper
+
 # from wanglibao.settings import CJDAOKEY
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import RETURN_REGISTER

@@ -9,7 +9,7 @@ def search(client, string):
 
 
 def split_ua(request):
-    if "HTTP_USER_AGENT" in request.META:
+    if "HTTP_USER_AGENT" not in request.META:
         return {"device_type":"pc"}
     ua = request.META['HTTP_USER_AGENT']
     arr = ua.split("/")
