@@ -180,5 +180,6 @@ class NewYearView(TemplateView):
             'week_tops': week_tops,
             'month_tops': all_tops,
             'prizes': prizes,
+            'is_valid': top.is_valid()
         }
 

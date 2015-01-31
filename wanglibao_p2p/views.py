@@ -109,7 +109,8 @@ class P2PDetailView(TemplateView):
             'total_fee_earning': total_fee_earning,
             'day_tops': day_tops,
             'week_tops': week_tops,
-            'all_tops': all_tops
+            'all_tops': all_tops,
+            'is_valid': top.is_valid()
         })
 
         return context
