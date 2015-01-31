@@ -196,7 +196,7 @@ class Top(object):
         return self.top_prize(week)
 
     def is_valid(self):
-        return datetime.now() < datetime(year=2015, month=2, day=2, minute=0, second=0, microsecond=0)
+        return datetime.now() < datetime(year=2015, month=1, day=2, minute=0, second=0, microsecond=0)
 
     def top_prize(self, index):
         weeks = [

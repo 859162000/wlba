@@ -268,25 +268,25 @@ html
                                 td
                                   .amount-sum ￥{{week.amount_sum|money_format_int}}
 
-                    .tab-content#month
-                      table
-                        for month in all_tops
-                          if forloop.counter < 4
-                            tr.tops-three
-                              td
-                                .order {{forloop.counter}}
-                              td
-                                .phone {{month.phone | safe_phone_new}}
-                              td
-                                .amount-sum ￥{{month.amount_sum|money_format_int}}
-                          else
-                            tr
-                              td
-                                .order {{forloop.counter}}
-                              td
-                                .phone {{month.phone | safe_phone_new}}
-                              td
-                                .amount-sum ￥{{month.amount_sum|money_format_int}}
+                      .tab-content#month
+                        table
+                          for month in all_tops
+                            if forloop.counter < 4
+                              tr.tops-three
+                                td
+                                  .order {{forloop.counter}}
+                                td
+                                  .phone {{month.phone | safe_phone_new}}
+                                td
+                                  .amount-sum ￥{{month.amount_sum|money_format_int}}
+                            else
+                              tr
+                                td
+                                  .order {{forloop.counter}}
+                                td
+                                  .phone {{month.phone | safe_phone_new}}
+                                td
+                                  .amount-sum ￥{{month.amount_sum|money_format_int}}
             else
               .panel_top_finish
                 a(href="/activity/newyear")
