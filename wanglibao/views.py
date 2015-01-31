@@ -44,9 +44,10 @@ class IndexView(TemplateView):
 
         #排行榜
 
-        day_tops = Top().day_tops(datetime.now())
-        week_tops = Top().week_tops(datetime.now())
-        all_tops = Top().all_tops()
+        top = Top()
+        day_tops = top.day_tops(datetime.now())
+        week_tops = top.week_tops(datetime.now())
+        all_tops = top.all_tops()
 
         return {
             "p2p_products": p2p_products,
@@ -60,7 +61,8 @@ class IndexView(TemplateView):
             'partners': partners,
             'day_tops': day_tops,
             'week_tops': week_tops,
-            'all_tops': all_tops
+            'all_tops': all_tops,
+            'is_valid': top.is_valid()
         }
 
 
