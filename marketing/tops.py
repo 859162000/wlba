@@ -192,6 +192,8 @@ class Top(object):
 
     def certain_prize(self):
         week = (datetime.now().date()-self.activity_start_local.date()).days / 7
+        if week > 3:
+            week = 3
 
         return self.top_prize(week)
 
