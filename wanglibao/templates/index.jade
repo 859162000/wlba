@@ -110,7 +110,7 @@ html
                   if product.category == '票据'
                     .bill-icon 票
                   elif product.warrant_company
-                    .warrant-icon 担
+                    .warrant-icon.di 担
                   a(href="/p2p/detail/{{product.id}}") {{product.name}}
                   if product.category == '证大速贷'
                       span.tip 满标后持满180天即可债权转让
