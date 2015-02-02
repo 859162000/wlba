@@ -27,233 +27,281 @@ html
           a(href="/", target="_blank") 网利宝官网
       .container
         .new-year-time
-        .row.relative-top
-          .span6.purple-bg
-            .new-year-list-item
-              span.icon.icon-big-trophy
-              | 日榜奖品
-            for prize in prizes.day
-              .day-trophy-list
-                .day-tropht-image
-                  img(src="{{prize.src}}")
-                  span.day-trophy-num 0{{forloop.counter}}
-                ul
-                  li {{prize.name}}
-                  li.highlight
-                    span.font-s 价格：￥
-                    span.font-xxll {{prize.price}}
+
+        if is_valid
+          .row.relative-top
+            .span6.purple-bg
+              .new-year-list-item
+                span.icon.icon-big-trophy
+                | 日榜奖品
+              for prize in prizes.day
+                .day-trophy-list
+                  .day-tropht-image
+                    img(src="{{prize.src}}")
+                    span.day-trophy-num 0{{forloop.counter}}
+                  ul
+                    li {{prize.name}}
+                    li.highlight
+                      span.font-s 价格：￥
+                      span.font-xxll {{prize.price}}
+                .space-vertical-l
+
+            .span6-omega.purple-bg
+              .day-box-item
+                span.font-xxl 日榜：
+                | 每天统计一次投资金额，及时更新；前3名有奖，次日清零
+              table.trophy-table(cellspacing="1")
+                thead
+                  tr
+                    th(width="10%").font-xl 今日榜单
+                    th(width="45%") 用户
+                    th(width="45%") 理财金额
+                tbody
+                  for day in day_tops
+                    if forloop.counter < 4
+                      tr.color-orange
+                        td
+                          if forloop.counter == 1
+                            .table-top-list-bg.table-top-list-bg1
+                              span.icon.icon-day-top1
+                              span.top-num {{forloop.counter}}
+                          elif forloop.counter == 2
+                            .table-top-list-bg.table-top-list-bg2
+                              span.icon.icon-day-top2
+                              span.top-num {{forloop.counter}}
+                          elif forloop.counter == 3
+                            .table-top-list-bg.table-top-list-bg3
+                              span.icon.icon-day-top3
+                              span.top-num {{forloop.counter}}
+
+                        td {{day.phone | safe_phone_new}}
+                        td {{day.amount_sum|money_format_int}}元
+                    else
+                      tr
+                        td
+                          .table-top-list-bg
+                            span.icon.icon-day-top-arr
+                            span.top-num {{forloop.counter}}
+                        td {{day.phone | safe_phone_new}}
+                        td {{day.amount_sum|money_format_int}}元
+
+              table.trophy-table(cellspacing="1")
+                thead
+                  tr
+                    th(width="100").font-xl 昨日榜单
+                    th 用户
+                    th 理财金额
+                tbody
+                  for lastday in lastday_tops
+                    if forloop.counter < 4
+                      tr.color-orange
+                        td
+                          if forloop.counter == 1
+                            .table-top-list-bg
+                              span.icon.icon-day-top1
+                              span.top-num {{forloop.counter}}
+                          elif forloop.counter == 2
+                            .table-top-list-bg
+                              span.icon.icon-day-top2
+                              span.top-num {{forloop.counter}}
+                          elif forloop.counter == 3
+                            .table-top-list-bg
+                              span.icon.icon-day-top3
+                              span.top-num {{forloop.counter}}
+
+                        td {{lastday.phone | safe_phone_new}}
+                        td {{lastday.amount_sum|money_format_int}}元
+                    else
+                      tr
+                        td
+                          .table-top-list-bg
+                            span.icon.icon-day-top-arr
+                            span.top-num {{forloop.counter}}
+                        td {{lastday.phone | safe_phone_new}}
+                        td {{lastday.amount_sum|money_format_int}}元
+          .space-vertical-xl
+          .row.relative-top
+            .span6.purple-bg
+              .new-year-list-item
+                span.icon.icon-big-trophy
+                | 周榜奖品
+              .week-trophy-list
+                .row
+                  for week_prize in prizes.week
+                    if forloop.counter < 3
+                      .span4
+                        img(src="{{week_prize.src}}")
+                        p {{week_prize.name}}
+                        p.highlight 价格：￥{{week_prize.price}}
+                    else
+                      .span4-omega
+                        img(src="{{week_prize.src}}")
+                        p {{week_prize.name}}
+                        p.highlight 价格：￥{{week_prize.price}}
+                  //.span4
+                  //  img(src="/static/images/newyear/trophy_week_001.jpg")
+                  //  p ipad air 1
+                  //  p.highlight 价格：￥2888
+                  //.span4-omega
+                  //  img(src="/static/images/newyear/trophy_week_001.jpg")
+                  //  p ipad air 1
+                  //  p.highlight 价格：￥2888
               .space-vertical-l
 
-          .span6-omega.purple-bg
-            .day-box-item
-              span.font-xxl 日榜：
-              | 每天统计一次投资金额，及时更新；前3名有奖，次日清零
-            table.trophy-table(cellspacing="1")
-              thead
-                tr
-                  th(width="10%").font-xl 今日榜单
-                  th(width="45%") 用户
-                  th(width="45%") 理财金额
-              tbody
-                for day in day_tops
-                  if forloop.counter < 4
-                    tr.color-orange
-                      td
-                        if forloop.counter == 1
-                          .table-top-list-bg.table-top-list-bg1
-                            span.icon.icon-day-top1
-                            span.top-num {{forloop.counter}}
-                        elif forloop.counter == 2
-                          .table-top-list-bg.table-top-list-bg2
-                            span.icon.icon-day-top2
-                            span.top-num {{forloop.counter}}
-                        elif forloop.counter == 3
-                          .table-top-list-bg.table-top-list-bg3
-                            span.icon.icon-day-top3
-                            span.top-num {{forloop.counter}}
+            .span6-omega.purple-bg
+              .day-box-item
+                span.font-xxl 周榜：
+                | 每周统计一次投资金额，前3名有奖，下周清零
+              table.trophy-table(cellspacing="1")
+                thead
+                  tr
+                    th(width="10%").font-xl 一周榜单
+                    th(width="45%") 用户
+                    th(width="45%") 理财金额
+                tbody
+                  for week in week_tops
+                    if forloop.counter < 4
+                      tr
+                        td
+                          if forloop.counter == 1
+                            .table-top-list-bg
+                              span.icon.icon-week-top1
+                              span.top-num {{forloop.counter}}
+                          elif forloop.counter == 2
+                            .table-top-list-bg
+                              span.icon.icon-week-top2
+                              span.top-num {{forloop.counter}}
+                          elif forloop.counter == 3
+                            .table-top-list-bg
+                              span.icon.icon-week-top3
+                              span.top-num {{forloop.counter}}
 
-                      td {{day.phone | safe_phone_new}}
-                      td {{day.amount_sum|money_format_int}}元
-                  else
-                    tr
-                      td
-                        .table-top-list-bg
-                          span.icon.icon-day-top-arr
-                          span.top-num {{forloop.counter}}
-                      td {{day.phone | safe_phone_new}}
-                      td {{day.amount_sum|money_format_int}}元
-
-            table.trophy-table(cellspacing="1")
-              thead
-                tr
-                  th(width="100").font-xl 昨日榜单
-                  th 用户
-                  th 理财金额
-              tbody
-                for lastday in lastday_tops
-                  if forloop.counter < 4
-                    tr.color-orange
-                      td
-                        if forloop.counter == 1
+                        td {{week.phone | safe_phone_new}}
+                        td {{week.amount_sum|money_format_int}}元
+                    else
+                      tr
+                        td
                           .table-top-list-bg
-                            span.icon.icon-day-top1
+                            span.icon.icon-day-top-arr
                             span.top-num {{forloop.counter}}
-                        elif forloop.counter == 2
-                          .table-top-list-bg
-                            span.icon.icon-day-top2
-                            span.top-num {{forloop.counter}}
-                        elif forloop.counter == 3
-                          .table-top-list-bg
-                            span.icon.icon-day-top3
-                            span.top-num {{forloop.counter}}
-
-                      td {{lastday.phone | safe_phone_new}}
-                      td {{lastday.amount_sum|money_format_int}}元
-                  else
-                    tr
-                      td
-                        .table-top-list-bg
-                          span.icon.icon-day-top-arr
-                          span.top-num {{forloop.counter}}
-                      td {{lastday.phone | safe_phone_new}}
-                      td {{lastday.amount_sum|money_format_int}}元
-        .space-vertical-xl
-        .row.relative-top
-          .span6.purple-bg
-            .new-year-list-item
-              span.icon.icon-big-trophy
-              | 周榜奖品
-            .week-trophy-list
-              .row
-                for week_prize in prizes.week
-                  if forloop.counter < 3
-                    .span4
-                      img(src="{{week_prize.src}}")
-                      p {{week_prize.name}}
-                      p.highlight 价格：￥{{week_prize.price}}
-                  else
-                    .span4-omega
-                      img(src="{{week_prize.src}}")
-                      p {{week_prize.name}}
-                      p.highlight 价格：￥{{week_prize.price}}
-                //.span4
-                //  img(src="/static/images/newyear/trophy_week_001.jpg")
-                //  p ipad air 1
-                //  p.highlight 价格：￥2888
-                //.span4-omega
-                //  img(src="/static/images/newyear/trophy_week_001.jpg")
-                //  p ipad air 1
-                //  p.highlight 价格：￥2888
-            .space-vertical-l
-
-          .span6-omega.purple-bg
-            .day-box-item
-              span.font-xxl 周榜：
-              | 每周统计一次投资金额，前3名有奖，下周清零
-            table.trophy-table(cellspacing="1")
-              thead
-                tr
-                  th(width="10%").font-xl 一周榜单
-                  th(width="45%") 用户
-                  th(width="45%") 理财金额
-              tbody
-                for week in week_tops
-                  if forloop.counter < 4
-                    tr
-                      td
-                        if forloop.counter == 1
-                          .table-top-list-bg
-                            span.icon.icon-week-top1
-                            span.top-num {{forloop.counter}}
-                        elif forloop.counter == 2
-                          .table-top-list-bg
-                            span.icon.icon-week-top2
-                            span.top-num {{forloop.counter}}
-                        elif forloop.counter == 3
-                          .table-top-list-bg
-                            span.icon.icon-week-top3
-                            span.top-num {{forloop.counter}}
-
-                      td {{week.phone | safe_phone_new}}
-                      td {{week.amount_sum|money_format_int}}元
-                  else
-                    tr
-                      td
-                        .table-top-list-bg
-                          span.icon.icon-day-top-arr
-                          span.top-num {{forloop.counter}}
-                      td {{week.phone | safe_phone_new}}
-                      td {{week.amount_sum|money_format_int}}元
+                        td {{week.phone | safe_phone_new}}
+                        td {{week.amount_sum|money_format_int}}元
 
 
 
-        .space-vertical-xl
-        .row.relative-top
-          .span6.purple-bg
-            .new-year-list-item
-              span.icon.icon-big-trophy
-              | 月榜奖品
-            .week-trophy-list
-              .row
-                .span4
-                  img(src="/static/images/newyear/prize/month_1.jpg")
-                  p MacBook Pro Retina
-                  p.highlight 价格：￥9288
-                .span4
-                  img(src="/static/images/newyear/prize/month_2.jpg")
-                  p iphone6 plus 16G
-                  p.highlight 价格：￥6088
-                .span4-omega
-                  img(src="/static/images/newyear/prize/month_3.jpg")
-                  p 华为mate7 4G版手机
-                  p.highlight 价格：￥3800
-            .space-vertical-l
+          .space-vertical-xl
+          .row.relative-top
+            .span6.purple-bg
+              .new-year-list-item
+                span.icon.icon-big-trophy
+                | 月榜奖品
+              .week-trophy-list
+                .row
+                  .span4
+                    img(src="/static/images/newyear/prize/month_1.jpg")
+                    p MacBook Pro Retina
+                    p.highlight 价格：￥9288
+                  .span4
+                    img(src="/static/images/newyear/prize/month_2.jpg")
+                    p iphone6 plus 16G
+                    p.highlight 价格：￥6088
+                  .span4-omega
+                    img(src="/static/images/newyear/prize/month_3.jpg")
+                    p 华为mate7 4G版手机
+                    p.highlight 价格：￥3800
+              .space-vertical-l
 
-          .span6-omega.purple-bg
-            .day-box-item
-              span.font-xxl 月榜：
-              | 在活动期间按照投资额排序，前3名有奖
-            table.trophy-table(cellspacing="1")
-              thead
-                tr
-                  th(width="10%").font-xl 月榜单
-                  th(width="45%") 用户
-                  th(width="45%") 理财金额
-              tbody
-                for month in month_tops
-                  if forloop.counter < 4
-                    tr
-                      td
-                        if forloop.counter == 1
-                          .table-top-list-bg
-                            span.icon.icon-week-top1
-                            span.top-num {{forloop.counter}}
-                        elif forloop.counter == 2
-                          .table-top-list-bg
-                            span.icon.icon-week-top2
-                            span.top-num {{forloop.counter}}
-                        elif forloop.counter == 3
-                          .table-top-list-bg
-                            span.icon.icon-week-top3
-                            span.top-num {{forloop.counter}}
+            .span6-omega.purple-bg
+              .day-box-item
+                span.font-xxl 月榜：
+                | 在活动期间按照投资额排序，前3名有奖
+              table.trophy-table(cellspacing="1")
+                thead
+                  tr
+                    th(width="10%").font-xl 月榜单
+                    th(width="45%") 用户
+                    th(width="45%") 理财金额
+                tbody
+                  for month in month_tops
+                    if forloop.counter < 4
+                      tr
+                        td
+                          if forloop.counter == 1
+                            .table-top-list-bg
+                              span.icon.icon-week-top1
+                              span.top-num {{forloop.counter}}
+                          elif forloop.counter == 2
+                            .table-top-list-bg
+                              span.icon.icon-week-top2
+                              span.top-num {{forloop.counter}}
+                          elif forloop.counter == 3
+                            .table-top-list-bg
+                              span.icon.icon-week-top3
+                              span.top-num {{forloop.counter}}
 
-                      td {{month.phone | safe_phone_new}}
-                      td {{month.amount_sum|money_format_int}}元
-                  else
-                    tr
-                      td
-                        .table-top-list-bg
-                          span.icon.icon-day-top-arr
-                          span.top-num {{forloop.counter}}
-                      td {{month.phone | safe_phone_new}}
-                      td {{month.amount_sum|money_format_int}}元
+                        td {{month.phone | safe_phone_new}}
+                        td {{month.amount_sum|money_format_int}}元
+                    else
+                      tr
+                        td
+                          .table-top-list-bg
+                            span.icon.icon-day-top-arr
+                            span.top-num {{forloop.counter}}
+                        td {{month.phone | safe_phone_new}}
+                        td {{month.amount_sum|money_format_int}}元
 
         .space-vertical-xl
         .row.history-top
 
           .history-top-bar
-            获奖用户
+            一月获奖用户
             .top-bar-icon
+
+
+          if not is_valid
+            .space-vertical-xl
+
+            .row.relative-top.purple-bg
+
+              .day-box-item
+                span.font-xxl 一月月度榜单：
+                | 在活动期间按照投资额排序，前3名有奖
+              table.trophy-table(cellspacing="1")
+                thead
+                  tr
+                    th(width="20%").font-xl 榜单月度排名
+                    th(width="40%") 用户
+                    th(width="40%") 理财金额
+                tbody
+                  for month in month_tops
+                    if forloop.counter < 4
+                      tr
+                        td
+                          if forloop.counter == 1
+                            .table-top-list-bg
+                              span.icon.icon-week-top1
+                              span.top-num {{forloop.counter}}
+                          elif forloop.counter == 2
+                            .table-top-list-bg
+                              span.icon.icon-week-top2
+                              span.top-num {{forloop.counter}}
+                          elif forloop.counter == 3
+                            .table-top-list-bg
+                              span.icon.icon-week-top3
+                              span.top-num {{forloop.counter}}
+
+                        td {{month.phone | safe_phone_new}}
+                        td {{month.amount_sum|money_format_int}}元
+                    else
+                      tr
+                        td
+                          .table-top-list-bg
+                            span.icon.icon-day-top-arr
+                            span.top-num {{forloop.counter}}
+                        td {{month.phone | safe_phone_new}}
+                        td {{month.amount_sum|money_format_int}}元
+
+
 
           .history-top-week
             .history-week-label(data-week="1") 第一周

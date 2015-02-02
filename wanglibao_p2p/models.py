@@ -635,8 +635,8 @@ class ProductInterestPrecision(models.Model):
 
     product = models.ForeignKey(P2PProduct, null=True, blank=False, related_name="interest_precision_balance")
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
-    interest_receivable = models.DecimalField(u'应收利息', max_digits=20, decimal_places=8)
-    interest_actual = models.DecimalField(u'实收利息', max_digits=20, decimal_places=2)
+    interest_receivable = models.DecimalField(u'应付利息', max_digits=20, decimal_places=8)
+    interest_actual = models.DecimalField(u'实付利息', max_digits=20, decimal_places=2)
     interest_precision_balance = models.DecimalField(u'精度利息差额', max_digits=20, decimal_places=8)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
