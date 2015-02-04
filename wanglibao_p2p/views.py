@@ -158,9 +158,17 @@ class PurchaseP2P(APIView):
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
 
+            redpack = request.DATA.get("redpack", "")
+            if redpack and not redpack.isdigit():
+                return Response({
+                                    'message': u'请输入有效红包',
+                                    'error_number': ErrorNumber.unknown_error
+                                }, status=status.HTTP_400_BAD_REQUEST)
+
             try:
                 trader = P2PTrader(product=p2p, user=request.user, request=request)
-                product_info, margin_info, equity_info = trader.purchase(amount)
+                product_info, margin_info, equity_info = trader.purchase(amount, redpack)
+
                 return Response({
                     'data': product_info.amount
                 })
