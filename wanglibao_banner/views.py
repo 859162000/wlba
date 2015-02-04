@@ -32,11 +32,11 @@ class BannerViewSet(APIView):
         if device['device_type'] == "ios":
             dic = Misc.objects.filter(key="ios_hide_banner_version").first()
             try:
-                dataver = dic['value'].split(",")
+                dataver = dic.value.split(",")
                 appver = device['app_version']
                 if appver in dataver:
                     return Response({"ret_code":1, "results":result})
-            except:
+            except Exception, e:
                 pass
         elif device['device_type'] == "pc":
             device_t = "PC_2"
