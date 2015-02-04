@@ -50,6 +50,8 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 from django.template.defaulttags import register
 from wanglibao_p2p.keeper import EquityKeeperDecorator
 from order.utils import OrderHelper
+from wanglibao_redpack import backends
+from wanglibao_rest import utils
 
 # from wanglibao.settings import CJDAOKEY
 # from wanglibao_account.tasks import cjdao_callback
@@ -673,6 +675,25 @@ class AccountTransactionP2P(TemplateView):
         return {
             "trade_records": trade_records,
             'announcements': AnnouncementAccounts
+        }
+
+class AccountRedPacket(TemplateView):
+    template_name = 'redpacket_available.jade'
+
+    def get_context_data(self, **kwargs):
+
+        status = kwargs['status']
+        if status not in ('used', 'unused', 'expires'):
+            status = 'unused'
+
+        user = self.request.user
+        device = utils.split_ua(self.request)
+        result = backends.list_redpack(user, 'all', device['device_type'])
+        red_packets = result['packages'].get(status, [])
+
+        return {
+            "red_packets": red_packets,
+            "status": status
         }
 
 
