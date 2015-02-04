@@ -16,10 +16,10 @@ require ['jquery', 'tools'], ($, tool)->
 
   $('.exchange').click (e) ->
     e.preventDefault()
-    console.log('nothing')
-    if $.trim($('input[name="token"]').val()) != ''
+    token = $.trim($('input[name="token"]').val())
+    if token != ''
       $.post('/api/redpacket/exchange/'
-        token: '9MP4DFUM'
+        token: token
       ).done (data) ->
         console.log(data)
         if data.ret_code == 0

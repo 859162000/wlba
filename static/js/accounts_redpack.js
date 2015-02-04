@@ -16,11 +16,12 @@
   require(['jquery', 'tools'], function($, tool) {
     console.log('hello');
     return $('.exchange').click(function(e) {
+      var token;
       e.preventDefault();
-      console.log('nothing');
-      if ($.trim($('input[name="token"]').val()) !== '') {
+      token = $.trim($('input[name="token"]').val());
+      if (token !== '') {
         return $.post('/api/redpacket/exchange/', {
-          token: '9MP4DFUM'
+          token: token
         }).done(function(data) {
           console.log(data);
           if (data.ret_code === 0) {
