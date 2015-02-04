@@ -81,7 +81,7 @@ def exchange_redpack(token, device_type, user):
     event = redpack.event
     now = timezone.now()
     if event.give_start_at > now:
-        return {"ret_code":30165, "message":"请在%s之后兑换" % local_datetime(event.give_start_at)}
+        return {"ret_code":30165, "message":"请在%s之后兑换" % local_datetime(event.give_start_at).strftime("%Y-%m-%d %H:%M:%S")}
     elif event.give_end_at < now:
         return {"ret_code":30166, "message":"请输入有效的兑换码1"}
     if event.target_channel != "":
