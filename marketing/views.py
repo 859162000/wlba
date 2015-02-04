@@ -227,7 +227,7 @@ class AggregateView(TemplateView):
 
             result.append({
                 'phone': profile.wanglibaouserprofile.phone,
-                'user_name': profile.wanglibaouserprofile.user_id,
+                'user_name': profile.wanglibaouserprofile.name,
                 'amount': trade['amount_sum']
             })
 
