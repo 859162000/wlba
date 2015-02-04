@@ -1,0 +1,66 @@
+- load formatters
+doctype html
+html
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title 新手活动
+    link(rel="stylesheet",href="/static/css/wap/app_New_user.css")
+    script(src="/static/js/require.js", data-main="/static/js/header")
+  body
+    .wrap
+      .top
+        img(src="/static/images/app_img/app_ban.jpg").app_ban
+      .down
+        a#xiaz(target="_blank") 立 即 下 载 A P P
+        p 账户资金安全由平安保险全额承保
+
+      .jiang
+        dl
+          dt
+            img(src="/static/images/app_img/app_jiang.png").app_jiang
+          dd
+            p 充值100元送10元话费
+            p 投资100元送30元话费
+            p 邀请好友再共享60元话费
+
+      .zeng
+        h1 活动期间，每个账户投资额达到以下额度，可获得相应奖品
+        ul.zeng_ul
+          li 1.累计购买满130万送iPhone 6 Plus（16G 5.5英寸）
+          li 2.累计购买满100万送iPhone 6（16G 4.7英寸）
+          li 3.累计购买满80万送华为mate7 4G版手机（16G）
+          li 4.累计购买满50万送iPad Air 2（16G WLAN）
+          li 5.累计购买满40万送iPad mini3（16G WLAN）
+          li 6.累计购买满30万送1000元京东礼品卡
+          li 7.累计购买满10万送300元京东礼品卡
+          li 8.累计购买满1-9万每满1万元送30元话费
+      h2 活动详情
+      .huodong
+        h3 如何参加：
+        ul.huo_ul
+          li 1.点击“去下载”，或在各大应用商店搜索“网利宝”进行下载安装；
+          li 2.用手机号注册，充值100元成功后得10元话费，投资100元再送30元话费；
+          li 3.app端点击“红包”邀请好友成功后，好友首次理财超过500元（含），双方各得30元话费，邀请人还可以获得好友首次理财额度0.5%的年化收益奖励，多邀多送不封顶！
+        h3 活动规则
+        ul.huo_ul
+          li 1.手机号为网利宝唯一账号，每个身份证只可绑定一个网利宝账号；
+          li 2.登陆网利宝官网：
+            a(href="/") www.wanglibao.com，
+              |或者用app进行投资理财；
+          li 3.P2P年化收益奖励将随理财还款发放；
+          li 4.奖品信息将发送至您的网利宝站内信，话费将充值进您的交易手机号；
+          li 5.奖品统一于活动结束后7个工作日内开始发放；还可关注微信公众号：iwanglibao，最新理财资讯一手掌握；
+          li 6.由于实物奖品快递需要，满额度用户请提交真实“姓名、手机、身份证、通讯地址”至
+            a kefu@wanglibank.com；
+          li 7.本活动不收取任何费用，谨防上当受骗；
+          li 8.网利宝对此活动享有最终解释权。
+        p.footer(style="margin-top:1em") 官方客服电话：4008-588-066
+        p.footer.ye
+          a(href="https://www.wanglibao.com/", target="_blank") 详请关注网利宝官网： www.wanglibao.com
+
+  script.
+    var xz=document.getElementById("xiaz");
+      xz.onclick=function(){
+        xz.className='hight';
+        window.location.href="http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao";
+      }
