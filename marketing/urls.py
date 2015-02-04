@@ -23,4 +23,5 @@ urlpatterns = patterns(
     url(r'^shengyan/$', TemplateView.as_view(template_name="shengyan.jade")),
     url(r'^app_shengyan/$', TemplateView.as_view(template_name="shengyan_h5.jade")),
     url(r'^xunleidenglu/$', TemplateView.as_view(template_name="xunleidenglu.jade")),
+    url(r'^app_new/$', TemplateView.as_view(template_name="app_New_user.jade")),
 )

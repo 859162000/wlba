@@ -1,20 +1,51 @@
 # encoding:utf8
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_banner.filter import BannerFilterSet
 from wanglibao_banner.models import Banner, Hiring
 from wanglibao_banner.serializer import BannerSerializer
 from django.views.generic import TemplateView
+from wanglibao_rest import utils
+from misc.models import Misc
+from wanglibao_banner.models import Banner
 
 
-class BannerViewSet(PaginatedModelViewSet):
-    """
-    广告条
-    """
-    model = Banner
-    serializer_class = BannerSerializer
-    filter_class = BannerFilterSet
+#class BannerViewSet(PaginatedModelViewSet):
+#    """
+#    广告条
+#    """
+#    model = Banner
+#    serializer_class = BannerSerializer
+#    filter_class = BannerFilterSet
+#    permission_classes = (IsAdminUserOrReadOnly,)
+
+class BannerViewSet(APIView):
     permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get(self, request):
+        device = utils.split_ua(request)
+        result = []
+        device_t = "mobile"
+        if device['device_type'] == "ios":
+            dic = Misc.objects.filter(key="ios_hide_banner_version").first()
+            try:
+                dataver = dic.value.split(",")
+                appver = device['app_version']
+                if appver in dataver:
+                    return Response({"ret_code":1, "results":result})
+            except Exception, e:
+                pass
+        elif device['device_type'] == "pc":
+            device_t = "PC_2"
+        bans = Banner.objects.filter(device=device_t)
+        for x in bans:
+            result.append({"id":x.id, "image":str(x.image), "link":x.link, "name":x.name,
+                            "priority":x.priority, "type":x.type})
+        return Response({"ret_code":0, "results":result})
+            
 
 
 class HiringView(TemplateView):

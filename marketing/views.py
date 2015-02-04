@@ -1,6 +1,7 @@
 # encoding:utf-8
 import json
 import decimal
+import pytz
 from datetime import date, timedelta, datetime
 from collections import defaultdict
 
@@ -183,3 +184,71 @@ class NewYearView(TemplateView):
             'is_valid': top.is_valid()
         }
 
+
+class AggregateView(TemplateView):
+    """according the time and amount, filter the amount of user money
+    """
+    template_name = 'aggregate.jade'
+
+    DEFAULT_START = '2015-01-14'
+    DEFAULT_END = '2015-01-31'
+    DEFAULT_AMOUNT_MIN = '1300000'
+
+    @property
+    def timezone_util(self):
+        return pytz.timezone('Asia/Shanghai')
+
+    def get_context_data(self, **kwargs):
+
+        start = self.request.GET.get('start', '') or AggregateView.DEFAULT_START
+        end = self.request.GET.get('end', '') or AggregateView.DEFAULT_END
+        amount_min = self.request.GET.get('amount_min', '') or AggregateView.DEFAULT_AMOUNT_MIN
+        amount_max = self.request.GET.get('amount_max', '')
+
+        result = []
+
+        start = datetime.strptime(start, '%Y-%m-%d')
+        end = datetime.strptime(end, '%Y-%m-%d')
+
+        # 时间国际化
+        amsterdam = self.timezone_util
+        begin = amsterdam.localize(datetime.combine(start, start.min.time()))
+        end = amsterdam.localize(datetime.combine(end, end.max.time()))
+
+        trades = P2PRecord.objects.filter(create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))).values('user').annotate(amount_sum=Sum('amount'))
+        if amount_min:
+            trades = trades.filter(amount_sum__gte=amount_min)
+        if amount_max:
+            trades = trades.filter(amount_sum__lt=amount_max)
+
+        trades = trades.order_by('-amount_sum')
+        for trade in trades:
+            profile = User.objects.filter(pk=trade['user']).select_related('wanglibaouserprofile').first()
+
+            result.append({
+                'phone': profile.wanglibaouserprofile.phone,
+                'user_name': profile.wanglibaouserprofile.name,
+                'amount': trade['amount_sum']
+            })
+
+        class DateTimeEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if hasattr(obj, 'isoformat'):
+                    return obj.isoformat()
+                elif isinstance(obj, decimal.Decimal):
+                    return float(obj)
+                elif isinstance(obj, ModelState):
+                    return None
+                else:
+                    return json.JSONEncoder.default(self, obj)
+
+        json_re = json.dumps(result, cls=DateTimeEncoder)
+
+        return {
+            'result': result,
+            'json_re': json_re,
+            'start': start.strftime('%Y-%m-%d'),
+            'end': end.strftime('%Y-%m-%d'),
+            'amount_min': amount_min,
+            'amount_max': amount_max
+        }

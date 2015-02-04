@@ -32,6 +32,10 @@
       line-height: 55px
       width: 620px
       display: inline-block
+      overflow: hidden
+      white-space: nowrap
+      text-overflow: ellipsis
+      float: left
       &:hover
         color: #1f8ccd
 
@@ -349,10 +353,13 @@
   display: inline-block
   margin-right: 10px
   position: relative
-  top: -2px
+  //top: -2px
   background-color: $color-red
   +border-radius(8px)
+  float: left
 
+.di
+  top: 19px
 .bill-icon
   width: 18px
   height: 18px
@@ -363,9 +370,10 @@
   display: inline-block
   margin-right: 10px
   position: relative
-  top: -2px
+  //top: -2px
   background-color: $color-denim
   +border-radius(8px)
+  float: left
 
 .panel-p2p-stamp
   background: url("/static/images/stamp.png") no-repeat
