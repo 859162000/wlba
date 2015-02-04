@@ -65,16 +65,19 @@ html
                     tbody
                       {% for l in result %}
                       tr
-                        td {{ l.phone }}
-                        td {{ l.user_name }}
+                        td {{ l.user.wanglibaouserprofile.phone }}
+                        td {{ l.user.wanglibaouserprofile.name }}
                         td {{ l.amount }}
-
                       {% endfor %}
 
                 .chart
                   #container
 
-script.
-  var result = {{ json_re | safe }};
+    - with data=result uri='/activity/aggregate/'
+    include include/pager_aggregate
+    - endwith
+
+
 script.
   require(["/static/js/aggregate.js"])
+
