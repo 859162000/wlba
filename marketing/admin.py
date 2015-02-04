@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.utils import timezone
-from views import MarketingView, TvView, TopsView
+from views import AggregateView, MarketingView, TvView, TopsView
 
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
     Activity, ActivityRule, Reward, RewardRecord, ClientData
@@ -149,4 +149,5 @@ admin.site.register(InviteCode, InviteCodeAdmin)
 admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')
 
 
+admin.site.register_view('statistics/aggregate', view=AggregateView.as_view(), name=u'累计购买金额统计单')
 
