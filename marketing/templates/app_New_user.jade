@@ -11,7 +11,7 @@ html
       .top
         img(src="/static/images/app_img/app_ban.jpg").app_ban
       .down
-        a 立 即 下 载 A P P
+        a#xiaz(target="_blank") 立 即 下 载 A P P
         p 账户资金安全由平安保险全额承保
 
       .jiang
@@ -36,7 +36,7 @@ html
           li 8.累计购买满1-9万每满1万元送30元话费
       h2 活动详情
       .huodong
-        h3(style="padding-top:0") 如何参加：
+        h3 如何参加：
         ul.huo_ul
           li 1.点击“去下载”，或在各大应用商店搜索“网利宝”进行下载安装；
           li 2.用手机号注册，充值100元成功后得10元话费，投资100元再送30元话费；
@@ -51,6 +51,16 @@ html
           li 4.奖品信息将发送至您的网利宝站内信，话费将充值进您的交易手机号；
           li 5.奖品统一于活动结束后7个工作日内开始发放；还可关注微信公众号：iwanglibao，最新理财资讯一手掌握；
           li 6.由于实物奖品快递需要，满额度用户请提交真实“姓名、手机、身份证、通讯地址”至
-            a(href="kefu@wanglibank.com") kefu@wanglibank.com；
+            a kefu@wanglibank.com；
           li 7.本活动不收取任何费用，谨防上当受骗；
-          li 8.网利宝对此活动享有最终解释权，官方客服电话：4008-588-066。
+          li 8.网利宝对此活动享有最终解释权。
+        p.footer(style="margin-top:1em") 官方客服电话：4008-588-066
+        p.footer.ye
+          a(href="https://www.wanglibao.com/", target="_blank") 详请关注网利宝官网： www.wanglibao.com
+
+  script.
+    var xz=document.getElementById("xiaz");
+      xz.onclick=function(){
+        xz.className='hight';
+        window.location.href="http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao";
+      }

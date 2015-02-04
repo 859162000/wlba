@@ -70,6 +70,13 @@ a:hover{ text-decoration:none;}
     box-shadow: 1px 1px 10px 1px rgba(20%,20%,40%,0.4);
 }
 
+.down a.hight{
+    background:#ea274f url("/static/images/app_img/app_zhiw.png") no-repeat;
+    background-position: 3em 0;
+    background-size: 4em;
+
+}
+
 .down p{
     color: #ea274f;
     text-align: center;
@@ -112,11 +119,15 @@ a:hover{ text-decoration:none;}
 }
 .zeng h1{
     font-size: 1em;
-    line-height: 4em;
+    line-height: 2em;
+    padding:1em 0.5em;
+    /*text-align: center;*/
 }
 
 .zeng_ul li{
     line-height: 2em;
+    font-size: 1em;
+
 }
 
 .huodong{
@@ -127,10 +138,11 @@ h2{
     font-size: 2.5em;
     font-weight: bold;
     color: #fed350;
-    line-height: 3em;
+    line-height: 2.5em;
     background: url("/static/images/app_img/app_bj.jpg") repeat-x;
-    padding-left: 1em;
+    padding-left: 0.8em;
     margin-top: 1em;
+    height: 1.5em;
 }
 
 .huodong h3{
@@ -138,7 +150,7 @@ h2{
     color: #fed350;
     padding-left: 1em;
     line-height: 2em;
-    padding-top: 1em;
+    padding-top: 0.5em;
 }
 
 .huo_ul{
@@ -148,7 +160,26 @@ h2{
 
 .huo_ul li{
     line-height: 1.5em;
+    font-size: 1em;
 }
 .huo_ul li a{
     color: #fff;
+    font-size: 1em;
+}
+
+.footer{
+    font-size: 1em;
+    line-height: 1.8em;
+    text-align: center;
+    color: #fff;
+
+}
+
+.ye{
+    padding: 0 0 3em 0;
+    color: #fed350;
+}
+
+.ye a{
+    color: #fed350;
 }
