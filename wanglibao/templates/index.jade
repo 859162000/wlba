@@ -109,7 +109,6 @@ html
                 .panel-title-bar
                   if product.category == '票据'
                     .bill-icon.di 票
-
                   elif product.warrant_company
                     .warrant-icon.di 担
                   a(href="/p2p/detail/{{product.id}}") {{product.name}}

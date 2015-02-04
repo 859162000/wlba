@@ -5,13 +5,11 @@ require.config
     tools: 'lib/modal.tools'
     "jquery.validate": 'lib/jquery.validate.min'
     'jquery.modal': 'lib/jquery.modal.min'
-    ddslick: 'lib/jquery.ddslick'
 
   shims:
     "jquery.validate": ['jquery']
-    "ddslick": ['jquery']
 
-require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal)->
+require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate"], ($, _, backend, calculator, countdown, tool, modal)->
 
   $.validator.addMethod 'dividableBy100', (value, element)->
     return value % 100 == 0 && !/\./ig.test(value)
@@ -26,23 +24,12 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     return Number(value) > 0
   , '请输入有效金额'
 
-  $.validator.addMethod 'threshold', (value, element)->
-    for obj in ddData
-      if obj.value == $('.dd-selected-value').val()*1
-        selectedData = obj
-        break
-
-    return if selectedData then $('#id_amount').val() - selectedData.invest_amount > 0 else true
-    #return Number(value) > 0
-  , ''
-
   if $('#id_amount').attr('p2p-type') == '票据'
     opt =
       required: true
       number: true
       positiveNumber: true
       integer: true
-      threshold: true
 
   else
     opt =
@@ -50,7 +37,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       number: true
       positiveNumber: true
       dividableBy100: true
-      threshold: true
 
   $('#purchase-form').validate
     rules:
@@ -74,13 +60,11 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       tool.modalConfirm({title: '温馨提示', msg: tip, callback_ok: ()->
         product = $('input[name=product]').val()
         amount = $('input[name=amount]').val()
-        redpack_id = $('.dd-selected-value').val()
 #        validate_code = $('input[name=validate_code]').val()
 
         backend.purchaseP2P {
           product: product
           amount: amount
-          redpack: redpack_id
 #          validate_code: validate_code
         }
         .done (data)->
@@ -207,92 +191,3 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   $(".xunlei-binding-modal").click () ->
     $('#xunlei-binding-modal').modal()
-
-
-
-  ddData = []
-
-  if $('.red-pack').size() > 0
-
-#    $.post('/api/redpacket/exchange/'
-#      token: '9MP4DFUM'
-#    ).done (ddData) ->
-#      console.log(ddData)
-
-    $.post('/api/redpacket/'
-      status: 'available'
-    ).done (data) ->
-      console.log(data)
-      availables = data.packages.available
-
-      for obj in availables
-        desc = (if obj.invest_amount and obj.invest_amount > 0 then "投资" + obj.invest_amount + "元可用" else "无投资门槛")
-        datetime = new Date()
-        datetime.setTime(obj.unavailable_at*1000)
-        available_time = [datetime.getFullYear(), datetime.getMonth(), datetime.getDate()].join('-')
-        ddData.push(
-          text: obj.name
-          value: obj.id
-          selected: false
-          amount: obj.amount
-          invest_amount: obj.invest_amount
-          description: desc + ', ' + available_time + '过期'
-        )
-  #    ddData = [
-  #      {
-  #        text: '新手5元红包'
-  #        value: 1
-  #        selected: false
-  #        description: '无使用门槛，15年3月1日过期'
-  #  #      imageSrc: 'http://dl.dropbox.com/u/40036711/Images/facebook-icon-32.png'
-  #      }
-  #      {
-  #        text: '新手5元红包'
-  #        value: 2
-  #        selected: false
-  #        description: '抽资100元可用，15年5月12日过期'
-  #  #      imageSrc: 'http://dl.dropbox.com/u/40036711/Images/twitter-icon-32.png'
-  #      }
-  #    ]
-
-
-
-
-      $('.red-pack').ddslick
-        data: ddData
-        width: 194
-        imagePosition: "left"
-        selectText: "请选择红包"
-        onSelected: (data) ->
-          obj = data.selectedData
-          if $('#id_amount').val() - obj.invest_amount > 0
-            pay_amount = (if $('#id_amount').val() - obj.amount > 0 then $('#id_amount').val() - obj.amount else 0)
-            $('.payment').html(['实际支付', pay_amount, '元'].join(''))
-          else
-            $('.payment').html('投资金额未达到红包使用门槛').css(
-              color: 'red'
-            )
-          return
-
-      $('#id_amount').blur (e) ->
-
-        for obj in ddData
-          if obj.value == $('.dd-selected-value').val()*1
-            selectedData = obj
-            break
-
-        if selectedData
-          if $('#id_amount').val() - selectedData.invest_amount > 0
-            red_amount = if selectedData then selectedData.amount else 0
-            pay_amount = (if $('#id_amount').val() - red_amount > 0 then $('#id_amount').val() - red_amount else 0)
-            $('.payment').html(['实际支付', pay_amount, '元'].join(''))
-
-          else
-            $('.payment').html('投资金额未达到红包使用门槛').css(
-              color: 'red'
-            )
-
-
-      return
-
-
