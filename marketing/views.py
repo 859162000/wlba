@@ -200,20 +200,11 @@ class AggregateView(TemplateView):
         return pytz.timezone('Asia/Shanghai')
 
     def get_context_data(self, **kwargs):
-
         start = self.request.GET.get('start', '') or AggregateView.DEFAULT_START
         end = self.request.GET.get('end', '') or AggregateView.DEFAULT_END
         amount_min = self.request.GET.get('amount_min', '') or AggregateView.DEFAULT_AMOUNT_MIN
         amount_max = self.request.GET.get('amount_max', '')
-        print '==========================================='
-        print 'start>>>', start, self.request.GET.get('start', '')
-        print 'end>>>', end, self.request.GET.get('end', '')
-        print 'amount_min>>>', amount_min, self.request.GET.get('amount_min', '')
-        print 'amount_max>>>', amount_max, self.request.GET.get('amount_max', '')
-        print 'page>>>', self.request.GET.get('page', '')
-        print 'result>>>', self.request.GET.get('result', '')
-        print 'status__exact>>>', self.request.GET.get('status__exact', '')
-        print '==========================================='
+
         start = datetime.strptime(start, '%Y-%m-%d')
         end = datetime.strptime(end, '%Y-%m-%d')
 
@@ -223,19 +214,18 @@ class AggregateView(TemplateView):
         end = amsterdam.localize(datetime.combine(end, end.max.time()))
 
         trades = P2PRecord.objects.filter(
-            create_time__range=(
-                begin.astimezone(pytz.utc),
-                end.astimezone(pytz.utc))
+            create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
         ).annotate(amount_sum=Sum('amount'))
 
         if amount_min:
             trades = trades.filter(amount_sum__gte=amount_min)
         if amount_max:
             trades = trades.filter(amount_sum__lt=amount_max)
-        trades = trades.select_related('user').select_related('user__wanglibaouserprofile').order_by('-amount_sum')
+
+        trades = trades.select_related('user__wanglibaouserprofile').order_by('-amount_sum')
 
         # 增加分页查询机制
-        limit = 5
+        limit = 100
         paginator = Paginator(trades, limit)
         page = self.request.GET.get('page')
         try:
@@ -244,7 +234,6 @@ class AggregateView(TemplateView):
             result = paginator.page(1)
         except Exception:
             result = paginator.page(paginator.num_pages)
-
         return {
             'result': result,
             'start': start.strftime('%Y-%m-%d'),

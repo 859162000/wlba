@@ -60,7 +60,7 @@ html
                     thead
                       tr
                         th(rowspan="1") 电话号
-                        th(rowspan="1") 用户id
+                        th(rowspan="1") 姓名
                         th(rowspan="1") 金额总额
                     tbody
                       {% for l in result %}
@@ -73,10 +73,9 @@ html
                 .chart
                   #container
 
-    - with data=result uri='/activity/aggregate/?status__exact=还款中'
-    include include/pager
+    - with data=result uri='/activity/aggregate/'
+    include include/pager_aggregate
     - endwith
-
 
 
 script.
