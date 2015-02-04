@@ -38,6 +38,7 @@ a:hover{ text-decoration:none;}
 
 .wrap{
     width: 100%;
+    background: #fffafb;
 }
 
 .top{
@@ -138,11 +139,15 @@ h2{
     font-size: 2.5em;
     font-weight: bold;
     color: #fed350;
-    line-height: 2.5em;
-    background: url("/static/images/app_img/app_bj.jpg") repeat-x;
+    line-height: 2em;
+    background: #53aa3f;
     padding-left: 0.8em;
-    margin-top: 1em;
+
     height: 1.5em;
+}
+
+.ban{
+    margin-top: 1em;
 }
 
 .huodong h3{

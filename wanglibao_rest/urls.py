@@ -72,7 +72,7 @@ router.register(r'p2ps', P2PProductViewSet)
 router.register(r'pre_orders', PreOrderViewSet)
 router.register(r'feedbacks', FeedbackViewSet)
 router.register(r'trade_info', TradeInfoViewSet)
-router.register(r'banners', BannerViewSet)
+#router.register(r'banners', BannerViewSet)
 router.register(r'users', UserViewSet)
 
 router.register(r'daily_income', DailyIncomeViewSet)
@@ -82,6 +82,7 @@ router.register(r'card', CardViewSet)
 
 urlpatterns = patterns(
     '',
+    url(r'^banners/$', BannerViewSet.as_view()),
     url(r'^register/$', RegisterAPIView.as_view()),
     url(r'^register/wx/$', WeixinRegisterAPIView.as_view()),
     url(r'^change_password/$', ChangePasswordAPIView.as_view()),
