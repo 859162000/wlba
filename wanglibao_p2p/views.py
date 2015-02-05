@@ -42,6 +42,8 @@ from django.shortcuts import redirect, render_to_response
 from marketing.utils import save_client
 from marketing.tops import Top
 from order.utils import OrderHelper
+from wanglibao_redpack import backends
+from wanglibao_rest import utils
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -96,6 +98,12 @@ class P2PDetailView(TemplateView):
         week_tops = Top().week_tops(datetime.datetime.now())
         all_tops = Top().all_tops()
 
+        user = self.request.user
+        device = utils.split_ua(self.request)
+        red_packets = backends.list_redpack(user, 'available', device['device_type'])
+
+        print red_packets, '##########'
+
         context.update({
             'p2p': p2p,
             'form': form,
@@ -110,7 +118,8 @@ class P2PDetailView(TemplateView):
             'day_tops': day_tops,
             'week_tops': week_tops,
             'all_tops': all_tops,
-            'is_valid': top.is_valid()
+            'is_valid': top.is_valid(),
+            'red_packets': len(red_packets['packages']['available'])
         })
 
         return context
