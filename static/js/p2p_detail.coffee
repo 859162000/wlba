@@ -288,7 +288,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             red_amount = if selectedData then selectedData.amount else 0
             pay_amount = (if $('#id_amount').val() - red_amount > 0 then $('#id_amount').val() - red_amount else 0)
             $('.payment').html(['实际支付', pay_amount, '元'].join('')).css(
-              color: 'red'
+              color: '#999'
             )
 
           else

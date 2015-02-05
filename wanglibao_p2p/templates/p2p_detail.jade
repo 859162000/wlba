@@ -109,8 +109,15 @@ html
                         user_limit = u"100的整数倍"
                       -render_field form.amount class+="span12" type="text" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
                     .form-row-error
+
+                if user.is_authenticated and red_packets > 0
+                  .row
+                    span.span4 可用红包
+                    span.span8-omega
+                      .red-pack
+
                 .row
-                  span.span4 预期收益
+                  span.span4 预期收益{{red_packets}}
                   span.span8-omega
                     span.highlight.font-m.invest#expected_income 0.00
                     | 元
@@ -119,12 +126,6 @@ html
                         //if xunlei_vip.isvip == True
                         span.font-m +&nbsp;
                         span.blue.font-m#xunlei-vip-income-head 0.00
-
-                if user.is_authenticated and red_packets > 0
-                  .row
-                    span.span4 可用红包
-                    span.span8-omega
-                      .red-pack
 
                 .row
                   span.span4

@@ -274,7 +274,7 @@
               red_amount = selectedData ? selectedData.amount : 0;
               pay_amount = ($('#id_amount').val() - red_amount > 0 ? $('#id_amount').val() - red_amount : 0);
               return $('.payment').html(['实际支付', pay_amount, '元'].join('')).css({
-                color: 'red'
+                color: '#999'
               });
             } else {
               return $('.payment').html('投资金额未达到红包使用门槛').css({
