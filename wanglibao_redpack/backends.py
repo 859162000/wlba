@@ -24,6 +24,10 @@ def list_redpack(user, status, device_type):
     if status not in ("all", "available"):
         return {"ret_code":30151, "message":"参数错误"}
 
+    if not user.is_authenticated():
+        packages = {"available":[]}
+        return {"ret_code":0, "packages":packages}
+
     device_type = _decide_device(device_type)
     if status == "available":
         packages = {"available":[]}
