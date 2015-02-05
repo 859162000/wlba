@@ -35,7 +35,7 @@ from django.db.models.signals import post_save
 
 
 PLATFORM = (
-    ("", "全平台"),
+    ("all", "全平台"),
     ("ios", "ios"),
     ("android", "android"),
     ("pc", "pc"),
