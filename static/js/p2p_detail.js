@@ -38,7 +38,7 @@
         }
       }
       if (selectedData) {
-        return $('#id_amount').val() - selectedData.invest_amount > 0;
+        return $('#id_amount').val() - selectedData.invest_amount >= 0;
       } else {
         return true;
       }

@@ -32,7 +32,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         selectedData = obj
         break
 
-    return if selectedData then $('#id_amount').val() - selectedData.invest_amount > 0 else true
+    return if selectedData then $('#id_amount').val() - selectedData.invest_amount >= 0 else true
     #return Number(value) > 0
   , ''
 
