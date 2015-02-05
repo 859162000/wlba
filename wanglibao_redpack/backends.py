@@ -24,6 +24,10 @@ def list_redpack(user, status, device_type):
     if status not in ("all", "available"):
         return {"ret_code":30151, "message":"参数错误"}
 
+    if not user.is_authenticated():
+        packages = {"available":[]}
+        return {"ret_code":0, "packages":packages}
+
     device_type = _decide_device(device_type)
     if status == "available":
         packages = {"available":[]}
@@ -39,7 +43,7 @@ def list_redpack(user, status, device_type):
                     "id":x.id, "invest_amount":event.invest_amount,
                     "unavailable_at":stamp(event.unavailable_at)}
             if event.available_at < timezone.now() < event.unavailable_at:
-                if event.apply_platform == "" or event.apply_platform == device_type:
+                if event.apply_platform == "all" or event.apply_platform == device_type:
                     if obj['method'] == REDPACK_RULE['percent']:
                         obj['amount'] = "%.2f" % (obj['amount']/100.0)
                     packages['available'].append(obj)
@@ -88,7 +92,7 @@ def exchange_redpack(token, device_type, user):
         ch = helper.which_channel(user)
         if ch != event.target_channel:
             return {"ret_code":30167, "message":"不符合领取条件"}
-    if event.give_platform != "" and event.give_platform != device_type:
+    if event.give_platform != "all" and event.give_platform != device_type:
         return {"ret_code":30168, "message":"不符合领取条件"}
 
     record = RedPackRecord()
@@ -132,7 +136,7 @@ def _give_redpack(user, rtype, device_type):
         redpack = RedPack.objects.filter(event=x, status="unused").first()
         if redpack:
             give_pf = redpack.event.give_platform
-            if give_pf == "" or give_pf == device_type:
+            if give_pf == "all" or give_pf == device_type:
                 if redpack.token != "":
                     redpack.status = "used"
                     redpack.save()
@@ -158,7 +162,7 @@ def consume(redpack, amount, user, order_id, device_type):
         return {"ret_code":30174, "message":"红包不可使用"}
     if amount < event.invest_amount:
         return {"ret_code":30175, "message":"投资金额不满足红包规则%s" % event.invest_amount}
-    if event.apply_platform != "" and event.apply_platform != device_type:
+    if event.apply_platform != "all" and event.apply_platform != device_type:
         return {"ret_code":30176, "message":"此红包只能在%s平台使用" % event.apply_platform}
 
     record.order_id = order_id
