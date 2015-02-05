@@ -271,7 +271,7 @@ def timedelta_now_day(time):
 def milltime_format(time):
     from datetime import datetime
     format_time = datetime.fromtimestamp(time)
-    return format_time.strftime('%Y-%m-%d')
+    return format_time.strftime('%Y-%m-%d %H:%M:%S')
 
 
 @register.filter

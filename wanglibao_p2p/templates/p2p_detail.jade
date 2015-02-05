@@ -111,13 +111,13 @@ html
                     .form-row-error
 
                 if user.is_authenticated and red_packets > 0
-                  .row
+                  .row.margin-top-s
                     span.span4 可用红包
                     span.span8-omega
                       .red-pack
 
                 .row
-                  span.span4 预期收益{{red_packets}}
+                  span.span4 预期收益
                   span.span8-omega
                     span.highlight.font-m.invest#expected_income 0.00
                     | 元

@@ -98,8 +98,6 @@ class P2PDetailView(TemplateView):
         device = utils.split_ua(self.request)
         red_packets = backends.list_redpack(user, 'available', device['device_type'])
 
-        print red_packets, '####', device
-
         context.update({
             'p2p': p2p,
             'form': form,
