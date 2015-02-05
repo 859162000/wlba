@@ -265,9 +265,11 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         selectText: "请选择红包"
         onSelected: (data) ->
           obj = data.selectedData
-          if $('#id_amount').val() - obj.invest_amount > 0
+          if $('#id_amount').val() - obj.invest_amount >= 0
             pay_amount = (if $('#id_amount').val() - obj.amount > 0 then $('#id_amount').val() - obj.amount else 0)
-            $('.payment').html(['实际支付', pay_amount, '元'].join(''))
+            $('.payment').html(['实际支付', pay_amount, '元'].join('')).css(
+              color: '#999'
+            )
           else
             $('.payment').html('投资金额未达到红包使用门槛').css(
               color: 'red'
@@ -282,10 +284,12 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             break
 
         if selectedData
-          if $('#id_amount').val() - selectedData.invest_amount > 0
+          if $('#id_amount').val() - selectedData.invest_amount >= 0
             red_amount = if selectedData then selectedData.amount else 0
             pay_amount = (if $('#id_amount').val() - red_amount > 0 then $('#id_amount').val() - red_amount else 0)
-            $('.payment').html(['实际支付', pay_amount, '元'].join(''))
+            $('.payment').html(['实际支付', pay_amount, '元'].join('')).css(
+              color: 'red'
+            )
 
           else
             $('.payment').html('投资金额未达到红包使用门槛').css(

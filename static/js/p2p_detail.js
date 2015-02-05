@@ -248,9 +248,11 @@
           onSelected: function(data) {
             var pay_amount;
             obj = data.selectedData;
-            if ($('#id_amount').val() - obj.invest_amount > 0) {
+            if ($('#id_amount').val() - obj.invest_amount >= 0) {
               pay_amount = ($('#id_amount').val() - obj.amount > 0 ? $('#id_amount').val() - obj.amount : 0);
-              $('.payment').html(['实际支付', pay_amount, '元'].join(''));
+              $('.payment').html(['实际支付', pay_amount, '元'].join('')).css({
+                color: '#999'
+              });
             } else {
               $('.payment').html('投资金额未达到红包使用门槛').css({
                 color: 'red'
@@ -268,10 +270,12 @@
             }
           }
           if (selectedData) {
-            if ($('#id_amount').val() - selectedData.invest_amount > 0) {
+            if ($('#id_amount').val() - selectedData.invest_amount >= 0) {
               red_amount = selectedData ? selectedData.amount : 0;
               pay_amount = ($('#id_amount').val() - red_amount > 0 ? $('#id_amount').val() - red_amount : 0);
-              return $('.payment').html(['实际支付', pay_amount, '元'].join(''));
+              return $('.payment').html(['实际支付', pay_amount, '元'].join('')).css({
+                color: 'red'
+              });
             } else {
               return $('.payment').html('投资金额未达到红包使用门槛').css({
                 color: 'red'
