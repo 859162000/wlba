@@ -38,6 +38,10 @@ a:hover{ text-decoration:none;}
 
 .wrap{
     width: 100%;
+<<<<<<< HEAD
+=======
+    background: #fffafb;
+>>>>>>> 8dbfe507ad79978eea48083b82370f3727795285
 }
 
 .top{
@@ -138,6 +142,7 @@ h2{
     font-size: 2.5em;
     font-weight: bold;
     color: #fed350;
+<<<<<<< HEAD
     line-height: 2.5em;
     background: url("/static/images/app_img/app_bj.jpg") repeat-x;
     padding-left: 0.8em;
@@ -145,6 +150,19 @@ h2{
     height: 1.5em;
 }
 
+=======
+    line-height: 2em;
+    background: #53aa3f;
+    padding-left: 0.8em;
+
+    height: 1.5em;
+}
+
+.ban{
+    margin-top: 1em;
+}
+
+>>>>>>> 8dbfe507ad79978eea48083b82370f3727795285
 .huodong h3{
     font-size: 2em;
     color: #fed350;

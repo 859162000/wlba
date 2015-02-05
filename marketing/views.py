@@ -1,11 +1,13 @@
 # encoding:utf-8
 import json
 import decimal
+import pytz
 from datetime import date, timedelta, datetime
 from collections import defaultdict
 
 from django.db.models import Count, Sum
 from django.contrib.auth.decorators import permission_required
+from django.core.paginator import Paginator, PageNotAnInteger
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from wanglibao_p2p.models import P2PRecord
@@ -183,3 +185,63 @@ class NewYearView(TemplateView):
             'is_valid': top.is_valid()
         }
 
+
+class AggregateView(TemplateView):
+    """according the time and amount, filter the amount of user money
+    """
+    template_name = 'aggregate.jade'
+
+    DEFAULT_START = '2015-01-14'
+    DEFAULT_END = '2015-01-31'
+    DEFAULT_AMOUNT_MIN = '1300000'
+
+    @property
+    def timezone_util(self):
+        return pytz.timezone('Asia/Shanghai')
+
+    def get_context_data(self, **kwargs):
+        start = self.request.GET.get('start', '') or AggregateView.DEFAULT_START
+        end = self.request.GET.get('end', '') or AggregateView.DEFAULT_END
+        amount_min = self.request.GET.get('amount_min', '') or AggregateView.DEFAULT_AMOUNT_MIN
+        amount_max = self.request.GET.get('amount_max', '')
+
+        start = datetime.strptime(start, '%Y-%m-%d')
+        end = datetime.strptime(end, '%Y-%m-%d')
+
+        # 时间国际化
+        amsterdam = self.timezone_util
+        begin = amsterdam.localize(datetime.combine(start, start.min.time()))
+        end = amsterdam.localize(datetime.combine(end, end.max.time()))
+
+        trades = P2PRecord.objects.filter(
+            create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
+        ).annotate(amount_sum=Sum('amount'))
+
+        if amount_min:
+            trades = trades.filter(amount_sum__gte=amount_min)
+        if amount_max:
+            trades = trades.filter(amount_sum__lt=amount_max)
+
+        trades = trades.select_related('user__wanglibaouserprofile').order_by('-amount_sum')
+
+        # 增加分页查询机制
+        limit = 100
+        paginator = Paginator(trades, limit)
+        page = self.request.GET.get('page')
+        try:
+            result = paginator.page(page)
+        except PageNotAnInteger:
+            result = paginator.page(1)
+        except Exception:
+            result = paginator.page(paginator.num_pages)
+        return {
+            'result': result,
+            'start': start.strftime('%Y-%m-%d'),
+            'end': end.strftime('%Y-%m-%d'),
+            'amount_min': amount_min,
+            'amount_max': amount_max
+        }
+
+    @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
+    def dispatch(self, request, *args, **kwargs):
+        return super(AggregateView, self).dispatch(request, *args, **kwargs)

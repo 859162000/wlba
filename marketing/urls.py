@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
-from marketing.views import AppShareView, AppShareRegView, NewYearView
+from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView
 
 
 urlpatterns = patterns(
@@ -24,4 +24,12 @@ urlpatterns = patterns(
     url(r'^app_shengyan/$', TemplateView.as_view(template_name="shengyan_h5.jade")),
     url(r'^xunleidenglu/$', TemplateView.as_view(template_name="xunleidenglu.jade")),
     url(r'^app_new/$', TemplateView.as_view(template_name="app_New_user.jade")),
+<<<<<<< HEAD
+=======
+)
+
+urlpatterns += patterns(
+    '',
+    url(r'^aggregate/', AggregateView.as_view(template_name="aggregate.jade")),
+>>>>>>> 8dbfe507ad79978eea48083b82370f3727795285
 )
