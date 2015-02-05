@@ -241,3 +241,7 @@ class AggregateView(TemplateView):
             'amount_min': amount_min,
             'amount_max': amount_max
         }
+
+    @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
+    def dispatch(self, request, *args, **kwargs):
+        return super(AggregateView, self).dispatch(request, *args, **kwargs)
