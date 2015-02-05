@@ -40,6 +40,7 @@ class BannerViewSet(APIView):
                 pass
         elif device['device_type'] == "pc":
             device_t = "PC_2"
+        device_t = "mobile"
         bans = Banner.objects.filter(device=device_t)
         for x in bans:
             result.append({"id":x.id, "image":str(x.image), "link":x.link, "name":x.name,
