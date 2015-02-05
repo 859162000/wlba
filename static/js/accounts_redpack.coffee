@@ -12,7 +12,6 @@ require.config
 
 require ['jquery', 'tools'], ($, tool)->
 
-  console.log('hello')
 
   $('.exchange').click (e) ->
     e.preventDefault()
@@ -31,7 +30,7 @@ require ['jquery', 'tools'], ($, tool)->
           tool.modalAlert({btnText:"确认", title: '温馨提示', msg: data.message})
 
     else
-      console.log('hello')
+      tool.modalAlert({btnText:"确认", title: '温馨提示', msg: '兑换码不能为空'})
 
 
 

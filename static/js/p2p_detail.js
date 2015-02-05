@@ -180,7 +180,6 @@
       i = 0;
       len = list.length;
       while (i < len) {
-        console.log(list[i].create_time);
         html.push(["<tr>", "<td><p>", list[i].create_time, "</p></td>", "<td><em>", list[i].user, "</em></td>", "<td><span class='money-highlight'>", list[i].amount, "</span><span>元</span></td>", "</tr>"].join(""));
         i++;
       }
@@ -206,7 +205,6 @@
             } else {
               $('.get-more').hide();
             }
-            console.log(invest_result);
           }
         } catch (_error) {
           e = _error;
@@ -223,7 +221,6 @@
         status: 'available'
       }).done(function(data) {
         var available_time, availables, datetime, desc, obj, _i, _len;
-        console.log(data);
         availables = data.packages.available;
         for (_i = 0, _len = availables.length; _i < _len; _i++) {
           obj = availables[_i];
