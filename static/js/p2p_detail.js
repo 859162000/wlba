@@ -6,15 +6,17 @@
       underscore: 'lib/underscore-min',
       tools: 'lib/modal.tools',
       "jquery.validate": 'lib/jquery.validate.min',
-      'jquery.modal': 'lib/jquery.modal.min'
+      'jquery.modal': 'lib/jquery.modal.min',
+      ddslick: 'lib/jquery.ddslick'
     },
     shims: {
-      "jquery.validate": ['jquery']
+      "jquery.validate": ['jquery'],
+      "ddslick": ['jquery']
     }
   });
 
-  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate"], function($, _, backend, calculator, countdown, tool, modal) {
-    var buildTable, opt, page;
+  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
+    var buildTable, ddData, opt, page;
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0 && !/\./ig.test(value);
     }, '请输入100的整数倍');
@@ -26,19 +28,36 @@
     $.validator.addMethod('positiveNumber', function(value, element) {
       return Number(value) > 0;
     }, '请输入有效金额');
+    $.validator.addMethod('threshold', function(value, element) {
+      var obj, selectedData, _i, _len;
+      for (_i = 0, _len = ddData.length; _i < _len; _i++) {
+        obj = ddData[_i];
+        if (obj.value === $('.dd-selected-value').val() * 1) {
+          selectedData = obj;
+          break;
+        }
+      }
+      if (selectedData) {
+        return $('#id_amount').val() - selectedData.invest_amount >= 0;
+      } else {
+        return true;
+      }
+    }, '');
     if ($('#id_amount').attr('p2p-type') === '票据') {
       opt = {
         required: true,
         number: true,
         positiveNumber: true,
-        integer: true
+        integer: true,
+        threshold: true
       };
     } else {
       opt = {
         required: true,
         number: true,
         positiveNumber: true,
-        dividableBy100: true
+        dividableBy100: true,
+        threshold: true
       };
     }
     $('#purchase-form').validate({
@@ -65,12 +84,14 @@
           title: '温馨提示',
           msg: tip,
           callback_ok: function() {
-            var amount, product;
+            var amount, product, redpack_id;
             product = $('input[name=product]').val();
             amount = $('input[name=amount]').val();
+            redpack_id = $('.dd-selected-value').val();
             return backend.purchaseP2P({
               product: product,
-              amount: amount
+              amount: amount,
+              redpack: redpack_id
             }).done(function(data) {
               return tool.modalAlert({
                 title: '温馨提示',
@@ -159,7 +180,6 @@
       i = 0;
       len = list.length;
       while (i < len) {
-        console.log(list[i].create_time);
         html.push(["<tr>", "<td><p>", list[i].create_time, "</p></td>", "<td><em>", list[i].user, "</em></td>", "<td><span class='money-highlight'>", list[i].amount, "</span><span>元</span></td>", "</tr>"].join(""));
         i++;
       }
@@ -185,7 +205,6 @@
             } else {
               $('.get-more').hide();
             }
-            console.log(invest_result);
           }
         } catch (_error) {
           e = _error;
@@ -193,11 +212,76 @@
         }
       });
     });
-    return $(".xunlei-binding-modal").click(function() {
+    $(".xunlei-binding-modal").click(function() {
       return $('#xunlei-binding-modal').modal();
     });
+    ddData = [];
+    if ($('.red-pack').size() > 0) {
+      return $.post('/api/redpacket/', {
+        status: 'available'
+      }).done(function(data) {
+        var available_time, availables, datetime, desc, obj, _i, _len;
+        availables = data.packages.available;
+        for (_i = 0, _len = availables.length; _i < _len; _i++) {
+          obj = availables[_i];
+          desc = (obj.invest_amount && obj.invest_amount > 0 ? "投资" + obj.invest_amount + "元可用" : "无投资门槛");
+          datetime = new Date();
+          datetime.setTime(obj.unavailable_at * 1000);
+          available_time = [datetime.getFullYear(), datetime.getMonth(), datetime.getDate()].join('-');
+          ddData.push({
+            text: obj.name,
+            value: obj.id,
+            selected: false,
+            amount: obj.amount,
+            invest_amount: obj.invest_amount,
+            description: desc + ', ' + available_time + '过期'
+          });
+        }
+        $('.red-pack').ddslick({
+          data: ddData,
+          width: 194,
+          imagePosition: "left",
+          selectText: "请选择红包",
+          onSelected: function(data) {
+            var pay_amount;
+            obj = data.selectedData;
+            if ($('#id_amount').val() - obj.invest_amount >= 0) {
+              pay_amount = ($('#id_amount').val() - obj.amount > 0 ? $('#id_amount').val() - obj.amount : 0);
+              $('.payment').html(['实际支付', pay_amount, '元'].join('')).css({
+                color: '#999'
+              });
+            } else {
+              $('.payment').html('投资金额未达到红包使用门槛').css({
+                color: 'red'
+              });
+            }
+          }
+        });
+        $('#id_amount').keyup(function(e) {
+          var pay_amount, red_amount, selectedData, _j, _len1;
+          for (_j = 0, _len1 = ddData.length; _j < _len1; _j++) {
+            obj = ddData[_j];
+            if (obj.value === $('.dd-selected-value').val() * 1) {
+              selectedData = obj;
+              break;
+            }
+          }
+          if (selectedData) {
+            if ($('#id_amount').val() - selectedData.invest_amount >= 0) {
+              red_amount = selectedData ? selectedData.amount : 0;
+              pay_amount = ($('#id_amount').val() - red_amount > 0 ? $('#id_amount').val() - red_amount : 0);
+              return $('.payment').html(['实际支付', pay_amount, '元'].join('')).css({
+                color: '#999'
+              });
+            } else {
+              return $('.payment').html('投资金额未达到红包使用门槛').css({
+                color: 'red'
+              });
+            }
+          }
+        });
+      });
+    }
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_detail.js.map

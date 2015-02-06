@@ -63,7 +63,7 @@ class AdminReportExport(TemplateView):
         if type == '5':
             self._generate_p2paudit(request, start_time, end_time)
         if type == '6':
-            self._generate_earning(request, start_time, end_time)
+            self._generate_earning(request, start_time, end_time, request.POST.get('earning_type'))
         if type == '7':
             self._generate_withdrawdetail(request, start_time, end_time)
         if type == '8':
@@ -91,8 +91,9 @@ class AdminReportExport(TemplateView):
     def _generate_p2paudit(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, P2PAuditReportGenerator, u'满标复审')
 
-    def _generate_earning(self, request, start_time, end_time):
-        self._apply_generate(request, start_time, end_time, EearningReportGenerator, u'赠送记录')
+    def _generate_earning(self, request, start_time, end_time, type):
+        print type, 'type........'
+        self._apply_generate(request, start_time, end_time, EearningReportGenerator, u'赠送记录', type=type)
 
     def _generate_withdrawdetail(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, WithDrawDetailReportGenerator, u'提现详细记录')
@@ -103,9 +104,13 @@ class AdminReportExport(TemplateView):
     def _generate_clientinfo(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, ClientInfoGenerator, u'客户端信息')
 
-    def _apply_generate(self, request, start_time, end_time, cls, message=''):
+    def _apply_generate(self, request, start_time, end_time, cls, message='', type=None):
+        print type, 'type........'
         try:
-            cls.generate_report(start_time, end_time)
+            if type:
+                cls.generate_report(start_time, end_time, type=type)
+            else:
+                cls.generate_report(start_time, end_time)
             messages.info(
                 request, u'生成{}成功，请到'
                          u'<a href="/AK7WtEQ4Q9KPs8Io_zOncw/report/report" />导出表格处 </a> 查看'.format(message))

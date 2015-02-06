@@ -267,6 +267,18 @@ def timedelta_now_day(time):
     else:
         return ""
 
+@register.filter
+def milltime_format(time):
+    from datetime import datetime
+    format_time = datetime.fromtimestamp(time)
+    return format_time.strftime('%Y-%m-%d %H:%M:%S')
+
+@register.filter
+def milldate_format(time):
+    from datetime import datetime
+    format_time = datetime.fromtimestamp(time)
+    return format_time.strftime('%Y-%m-%d')
+
 
 @register.filter
 def card_info(card):

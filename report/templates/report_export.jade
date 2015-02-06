@@ -49,6 +49,8 @@ head
                                         span 2014-10-28 18:13:24
                                         input(type='text', name='start_time', min="2014-01-01", max="2020-01-01", value="{{ yestoday }}")
                                         input(type='text', name='end_time',  min="2014-01-01", max="2020-01-01", value="{{ today }}")
+                                        if value == 6
+                                          input(type='text', name='earning_type', value="I")
                                 .form-row
                                     button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 生成
 
