@@ -248,7 +248,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             )
           return
 
-      $('#id_amount').blur (e) ->
+      $('#id_amount').keyup (e) ->
 
         for obj in ddData
           if obj.value == $('.dd-selected-value').val()*1

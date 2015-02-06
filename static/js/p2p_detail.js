@@ -257,7 +257,7 @@
             }
           }
         });
-        $('#id_amount').blur(function(e) {
+        $('#id_amount').keyup(function(e) {
           var pay_amount, red_amount, selectedData, _j, _len1;
           for (_j = 0, _len1 = ddData.length; _j < _len1; _j++) {
             obj = ddData[_j];
