@@ -19,8 +19,7 @@ require ['jquery', 'tools'], ($, tool)->
     if token != ''
       $.post('/api/redpacket/exchange/'
         token: token
-      ).done (data) ->
-        console.log(data)
+      ).done( (data) ->
         if data.ret_code == 0
           tool.modalAlert({btnText:"确认", title: '温馨提示', msg: '兑换成功', callback_ok: ()->
             window.location.reload()
@@ -28,6 +27,8 @@ require ['jquery', 'tools'], ($, tool)->
 
         else
           tool.modalAlert({btnText:"确认", title: '温馨提示', msg: data.message})
+      ).fail (data)->
+        tool.modalAlert({btnText:"确认", title: '温馨提示', msg: '服务器忙，请稍后重试'})
 
     else
       tool.modalAlert({btnText:"确认", title: '温馨提示', msg: '兑换码不能为空'})
