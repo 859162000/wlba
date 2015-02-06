@@ -2,6 +2,7 @@
 
 .pager
   ul
+    - var my_color = "red"
     if data.has_previous
       li.pager-prev
         a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page={{data.previous_page_number}}') <
@@ -14,14 +15,16 @@
       - for index in 1|get_range:num_pages
         if data.number == index
           li.pager-page-number.active
-            a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page={{index}}') {{index}}
+            // a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page={{index}}', style="color:red") {{index}}
+            a.pager-anchor(href='javascript:void(0)', style="color:{{my_color}}") {{index}}
         else
           li.pager-page-number
             a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page={{index}}') {{index}}
     else
       if data.number == 1
         li.pager-page-number.active
-          a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page=1') 1
+          // a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page=1', style="color:red") 1
+          a.pager-anchor(href='javascript:void(0)', style="color:{{my_color}}") 1
       else
         li.pager-page-number
           a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page=1') 1
@@ -42,7 +45,8 @@
       - for index in number_minus|get_range:number_add
         if data.number == index
           li.pager-page-number.active
-            a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page={{index}}') {{index}}
+            // a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page={{index}}', style="color:red") {{index}}
+            a.pager-anchor(href='javascript:void(0)', style="color:{{my_color}}") {{index}}
         else
           li.pager-page-number
             a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page={{index}}') {{index}}
@@ -53,7 +57,8 @@
 
       if data.number == data.paginator.num_pages
         li.pager-page-number.active
-          a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page={{data.paginator.num_pages}}') {{data.paginator.num_pages}}
+          // a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page={{data.paginator.num_pages}}', style="color:red") {{data.paginator.num_pages}}
+          a.pager-anchor(href='javascript:void(0)', style="color:{{my_color}}") {{data.paginator.num_pages}}
       else
         li.pager-page-number
           a.pager-anchor(href='{{uri}}?start={{start}}&end={{end}}&amount_min={{amount_min}}&amount_max={{amount_max}}&page={{data.paginator.num_pages}}') {{data.paginator.num_pages}}

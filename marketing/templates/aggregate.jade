@@ -42,18 +42,22 @@ html
                     .col-lg-6
                       .form-group
                         .input-daterange.input-group#datepicker
-                          input(type="text",name="start",value="{{start}}").input-sm.form-control
+                          input(type="text",name="start",value="#{start}").input-sm.form-control
                           span.input-group-addon to
-                          input(type="text",name="end",value="{{end}}").input-sm.form-control
+                          input(type="text",name="end",value="#{end}").input-sm.form-control
                         .input-group
-                          查询最小金额（包含此金额）
-                          input(type="text",name="amount_min",value="{{amount_min}}").input-sm.form-control
+                          h4 查询最小金额（包含此金额）
+                          input(type="text",name="amount_min",value="#{amount_min}").input-sm.form-control
                         .input-group
-                          查询截止截止金额（不包含此金额）
-                          input(type="text",name="amount_max",value="{{amount_max}}").input-sm.form-control
+                          h4 查询截止截止金额（不包含此金额）
+                          input(type="text",name="amount_max",value="#{amount_max}").input-sm.form-control
                     .col-lg-6
                       .form-group
                         button(type="submit").btn.btn-default 查询
+                .row
+                  h4
+                    | &nbsp;&nbsp;&nbsp;&nbsp;
+                    | 统计总金额为： #{amount_all.amount_sum__sum}
 
                 .table-responsive
                   table.table.table-striped.table-bordered.table-hover
@@ -63,12 +67,12 @@ html
                         th(rowspan="1") 用户名
                         th(rowspan="1") 金额总额
                     tbody
-                      {% for l in result %}
-                      tr
-                        td {{ l.user.wanglibaouserprofile.phone }}
-                        td {{ l.user.wanglibaouserprofile.name }}
-                        td {{ l.amount }}
-                      {% endfor %}
+                      for l in result
+                        tr
+                          td #{l.user.wanglibaouserprofile.phone}
+                          td #{l.user.wanglibaouserprofile.name}
+                          td #{l.amount}
+
 
                 .chart
                   #container
