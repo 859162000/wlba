@@ -222,6 +222,9 @@ class AggregateView(TemplateView):
         if amount_max:
             trades = trades.filter(amount_sum__lt=amount_max)
 
+        # 总计所有符合条件的金额
+        amount_all = trades.aggregate(Sum('amount_sum'))
+        # 关联用户认证信息
         trades = trades.select_related('user__wanglibaouserprofile').order_by('-amount_sum')
 
         # 增加分页查询机制
@@ -239,7 +242,8 @@ class AggregateView(TemplateView):
             'start': start.strftime('%Y-%m-%d'),
             'end': end.strftime('%Y-%m-%d'),
             'amount_min': amount_min,
-            'amount_max': amount_max
+            'amount_max': amount_max,
+            'amount_all': amount_all
         }
 
     @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
