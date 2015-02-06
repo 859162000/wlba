@@ -14,7 +14,6 @@
   });
 
   require(['jquery', 'tools'], function($, tool) {
-    console.log('hello');
     return $('.exchange').click(function(e) {
       var token;
       e.preventDefault();
@@ -42,7 +41,11 @@
           }
         });
       } else {
-        return console.log('hello');
+        return tool.modalAlert({
+          btnText: "确认",
+          title: '温馨提示',
+          msg: '兑换码不能为空'
+        });
       }
     });
   });

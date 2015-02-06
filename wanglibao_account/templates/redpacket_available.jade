@@ -15,7 +15,7 @@ block main
   .account-home-panel
     h1(style="font-size:16px;margin-bottom:20px;") 兑换红包
     .row
-      input(type="text", placeholder="请输入兑换码", style="display:inline-block;width:240px", name="token")
+      input(type="text", placeholder="请输入兑换码", style="display:inline-block;width:240px", name="token", autocomplete="off")
       input(type="button", value="兑换", style="height:40px;margin-left:10px").submit-button.button-primary.button-middle.exchange
 
   .account-home-panel__no-padding
@@ -39,8 +39,12 @@ block main
         else
           li.title-bar--tab
             a.title-bar--tab--anchor(href='/accounts/redpacket/expires/') 已过期
-    .panel-container.padding-l-r-xl
+    .panel-container.padding-xl(style="padding-top:0px")
       table.table
+        col(width="20%")
+        col(width="10%")
+        col(width="35%")
+        col(width="35%")
         thead
           tr
             th 红包
@@ -51,8 +55,8 @@ block main
           each red_packet in red_packets
             tr
               td {{red_packet.name}}
-              td {{red_packet.amount}}
-              td {{red_packet.available_at | milltime_format }} 至 {{red_packet.unavailable_at | milltime_format }}
+              td {{red_packet.amount}} 元
+              td {{red_packet.available_at | milldate_format}} 至 {{red_packet.unavailable_at | milldate_format}}
               if status == 'used'
                 td {{red_packet.product}} <br/> {{red_packet.apply_at | milltime_format }}
               else

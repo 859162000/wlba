@@ -31,9 +31,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       if obj.value == $('.dd-selected-value').val()*1
         selectedData = obj
         break
-
-    return if selectedData then $('#id_amount').val() - selectedData.invest_amount > 0 else true
-    #return Number(value) > 0
+    return if selectedData then $('#id_amount').val() - selectedData.invest_amount >= 0 else true
   , ''
 
   if $('#id_amount').attr('p2p-type') == '票据'
@@ -156,7 +154,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     len = list.length
 
     while i < len
-      console.log(list[i].create_time)
       html.push [
         "<tr>"
         "<td><p>"
@@ -199,7 +196,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           else
             $('.get-more').hide()
 
-          console.log(invest_result)
       catch e
         $('.get-more').hide()
       return
@@ -214,15 +210,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   if $('.red-pack').size() > 0
 
-#    $.post('/api/redpacket/exchange/'
-#      token: '9MP4DFUM'
-#    ).done (ddData) ->
-#      console.log(ddData)
-
     $.post('/api/redpacket/'
       status: 'available'
     ).done (data) ->
-      console.log(data)
       availables = data.packages.available
 
       for obj in availables
@@ -238,24 +228,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           invest_amount: obj.invest_amount
           description: desc + ', ' + available_time + '过期'
         )
-  #    ddData = [
-  #      {
-  #        text: '新手5元红包'
-  #        value: 1
-  #        selected: false
-  #        description: '无使用门槛，15年3月1日过期'
-  #  #      imageSrc: 'http://dl.dropbox.com/u/40036711/Images/facebook-icon-32.png'
-  #      }
-  #      {
-  #        text: '新手5元红包'
-  #        value: 2
-  #        selected: false
-  #        description: '抽资100元可用，15年5月12日过期'
-  #  #      imageSrc: 'http://dl.dropbox.com/u/40036711/Images/twitter-icon-32.png'
-  #      }
-  #    ]
-
-
 
 
       $('.red-pack').ddslick
@@ -265,16 +237,18 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         selectText: "请选择红包"
         onSelected: (data) ->
           obj = data.selectedData
-          if $('#id_amount').val() - obj.invest_amount > 0
+          if $('#id_amount').val() - obj.invest_amount >= 0
             pay_amount = (if $('#id_amount').val() - obj.amount > 0 then $('#id_amount').val() - obj.amount else 0)
-            $('.payment').html(['实际支付', pay_amount, '元'].join(''))
+            $('.payment').html(['实际支付', pay_amount, '元'].join('')).css(
+              color: '#999'
+            )
           else
             $('.payment').html('投资金额未达到红包使用门槛').css(
               color: 'red'
             )
           return
 
-      $('#id_amount').blur (e) ->
+      $('#id_amount').keyup (e) ->
 
         for obj in ddData
           if obj.value == $('.dd-selected-value').val()*1
@@ -282,10 +256,12 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             break
 
         if selectedData
-          if $('#id_amount').val() - selectedData.invest_amount > 0
+          if $('#id_amount').val() - selectedData.invest_amount >= 0
             red_amount = if selectedData then selectedData.amount else 0
             pay_amount = (if $('#id_amount').val() - red_amount > 0 then $('#id_amount').val() - red_amount else 0)
-            $('.payment').html(['实际支付', pay_amount, '元'].join(''))
+            $('.payment').html(['实际支付', pay_amount, '元'].join('')).css(
+              color: '#999'
+            )
 
           else
             $('.payment').html('投资金额未达到红包使用门槛').css(

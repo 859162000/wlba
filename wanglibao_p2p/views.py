@@ -2,24 +2,22 @@
 
 from operator import attrgetter
 from decimal import Decimal
-from hashlib import md5
 import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.db.models import Q, Sum
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.utils import timezone, dateparse
+from django.utils import timezone
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from rest_framework import status
 from rest_framework import generics
-from rest_framework import renderers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import SiteData, ClientData
+from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.forms import PurchaseForm, BillForm
@@ -42,6 +40,8 @@ from django.shortcuts import redirect, render_to_response
 from marketing.utils import save_client
 from marketing.tops import Top
 from order.utils import OrderHelper
+from wanglibao_redpack import backends
+from wanglibao_rest import utils
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -65,7 +65,6 @@ class P2PDetailView(TemplateView):
                                                                p2p.amortization_count,
                                                                p2p.period)
         total_earning = terms.get("total") - p2p.total_amount
-
         total_fee_earning = 0
 
         if p2p.activity:
@@ -96,6 +95,9 @@ class P2PDetailView(TemplateView):
         week_tops = Top().week_tops(datetime.datetime.now())
         all_tops = Top().all_tops()
 
+        device = utils.split_ua(self.request)
+        red_packets = backends.list_redpack(user, 'available', device['device_type'])
+
         context.update({
             'p2p': p2p,
             'form': form,
@@ -110,7 +112,8 @@ class P2PDetailView(TemplateView):
             'day_tops': day_tops,
             'week_tops': week_tops,
             'all_tops': all_tops,
-            'is_valid': top.is_valid()
+            'is_valid': top.is_valid(),
+            'red_packets': len(red_packets['packages']['available'])
         })
 
         return context
@@ -279,7 +282,6 @@ class AuditAmortizationView(TemplateView):
         #page = kwargs.get('page', 1)
         page = self.request.GET.get('page', 1)
 
-        print page, '###--', pk
         p2p_amortization = ProductAmortization.objects.filter(pk=pk).first()
         user_amortizations = p2p_amortization.subs.all().select_related('user__wanglibaouserprofile')
 

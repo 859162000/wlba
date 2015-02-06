@@ -24,6 +24,10 @@ def list_redpack(user, status, device_type):
     if status not in ("all", "available"):
         return {"ret_code":30151, "message":"参数错误"}
 
+    if not user.is_authenticated():
+        packages = {"available":[]}
+        return {"ret_code":0, "packages":packages}
+
     device_type = _decide_device(device_type)
     if status == "available":
         packages = {"available":[]}
@@ -83,7 +87,7 @@ def exchange_redpack(token, device_type, user):
     if event.give_start_at > now:
         return {"ret_code":30165, "message":"请在%s之后兑换" % local_datetime(event.give_start_at).strftime("%Y-%m-%d %H:%M:%S")}
     elif event.give_end_at < now:
-        return {"ret_code":30166, "message":"请输入有效的兑换码1"}
+        return {"ret_code":30166, "message":"兑换码已过期"}
     if event.target_channel != "":
         ch = helper.which_channel(user)
         if ch != event.target_channel:
