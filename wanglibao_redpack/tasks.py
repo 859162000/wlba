@@ -59,6 +59,7 @@ def get_unused_token():
     while True:
         token = rand_str()
         one = RedPack.objects.filter(token=token).first()
+        #redpack = RedPack.objects.extra(where=["binary token='%s'" % token]).first()
         if not one:
             return token
 
