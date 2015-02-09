@@ -305,10 +305,15 @@
             });
           }
         });
+        $('#id_amount').blur(function(e) {
+          var lable;
+          lable = $('label[for="id_amount"]');
+          if ($.trim(lable.text()) === '') {
+            return $('label[for="id_amount"]').hide();
+          }
+        });
       });
     }
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_detail.js.map

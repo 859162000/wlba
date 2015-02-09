@@ -294,6 +294,11 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             color: '#999'
           )
 
+      #hide the empty error tip
+      $('#id_amount').blur (e) ->
+        lable = $('label[for="id_amount"]')
+        if $.trim(lable.text()) == ''
+          $('label[for="id_amount"]').hide()
 
 
       return
