@@ -21,6 +21,8 @@ from wanglibao_redpack import backends as redpack_backends
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 
+from wanglibao_rest.utils import split_ua
+
 
 class P2PTrader(object):
     def __init__(self, product, user, order_id=None, request=None):
@@ -35,7 +37,8 @@ class P2PTrader(object):
         self.product_keeper = ProductKeeper(product, order_id=self.order_id)
         self.equity_keeper = EquityKeeper(user=user, product=product, order_id=self.order_id)
         if request:
-            self.device_type = request.DATA.get("channelId", "")
+            device = split_ua(request)
+            self.device_type = device['device_type']
         else:
             self.device_type = ""
 
