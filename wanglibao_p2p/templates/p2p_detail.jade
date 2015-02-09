@@ -129,13 +129,17 @@ html
 
                 .row
                   span.span4
-                  span.span8-omega
                     //author: hetao; time: 2014.10.11 target: 用户未登陆时先弹出登陆框
-                    if user.is_authenticated
-                      if  red_packets > 0
+                  if user.is_authenticated
+                    if  red_packets > 0
+                      span.span8-omega(style="line-height:20px")
                         span.payment 实际支付0元
-                      a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                        a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
                     else
+                      span.span8-omega
+                        a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                  else
+                    span.span8-omega
                       a.submit-button.span12.button-primary.button-middle.invest.notlogin(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
           if status != '抢购中'
             .sold-out

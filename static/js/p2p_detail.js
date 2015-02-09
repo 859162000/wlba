@@ -222,6 +222,14 @@
       }).done(function(data) {
         var available_time, availables, datetime, desc, obj, _i, _len;
         availables = data.packages.available;
+        ddData.push({
+          text: '不使用红包',
+          value: '',
+          selected: true,
+          amount: 0,
+          invest_amount: 0,
+          description: '不使用红包'
+        });
         for (_i = 0, _len = availables.length; _i < _len; _i++) {
           obj = availables[_i];
           desc = (obj.invest_amount && obj.invest_amount > 0 ? "投资" + obj.invest_amount + "元可用" : "无投资门槛");
@@ -243,7 +251,7 @@
           imagePosition: "left",
           selectText: "请选择红包",
           onSelected: function(data) {
-            var pay_amount;
+            var lable, pay_amount;
             obj = data.selectedData;
             if ($('#id_amount').val() - obj.invest_amount >= 0) {
               pay_amount = ($('#id_amount').val() - obj.amount > 0 ? $('#id_amount').val() - obj.amount : 0);
@@ -254,11 +262,15 @@
               $('.payment').html('投资金额未达到红包使用门槛').css({
                 color: 'red'
               });
+              lable = $('label[for="id_amount"]');
+              if ($.trim(lable.text()) === '') {
+                $('label[for="id_amount"]').hide();
+              }
             }
           }
         });
         $('#id_amount').keyup(function(e) {
-          var pay_amount, red_amount, selectedData, _j, _len1;
+          var amount, lable, pay_amount, red_amount, selectedData, _j, _len1;
           for (_j = 0, _len1 = ddData.length; _j < _len1; _j++) {
             obj = ddData[_j];
             if (obj.value === $('.dd-selected-value').val() * 1) {
@@ -266,18 +278,38 @@
               break;
             }
           }
+          amount = $('#id_amount').val();
           if (selectedData) {
-            if ($('#id_amount').val() - selectedData.invest_amount >= 0) {
+            if (amount - selectedData.invest_amount >= 0) {
               red_amount = selectedData ? selectedData.amount : 0;
               pay_amount = ($('#id_amount').val() - red_amount > 0 ? $('#id_amount').val() - red_amount : 0);
               return $('.payment').html(['实际支付', pay_amount, '元'].join('')).css({
                 color: '#999'
               });
             } else {
-              return $('.payment').html('投资金额未达到红包使用门槛').css({
+              $('.payment').html('投资金额未达到红包使用门槛').css({
                 color: 'red'
               });
+              lable = $('label[for="id_amount"]');
+              if ($.trim(lable.text()) === '') {
+                return $('label[for="id_amount"]').hide();
+              }
             }
+          } else if ($.isNumeric(amount) && amount > 0) {
+            return $('.payment').html(['实际支付 ', amount, ' 元'].join('')).css({
+              color: '#999'
+            });
+          } else {
+            return $('.payment').html(['实际支付 0 元'].join('')).css({
+              color: '#999'
+            });
+          }
+        });
+        $('#id_amount').blur(function(e) {
+          var lable;
+          lable = $('label[for="id_amount"]');
+          if ($.trim(lable.text()) === '') {
+            return $('label[for="id_amount"]').hide();
           }
         });
       });

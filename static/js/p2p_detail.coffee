@@ -215,6 +215,16 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     ).done (data) ->
       availables = data.packages.available
 
+
+      ddData.push(
+        text: '不使用红包'
+        value: ''
+        selected: true
+        amount: 0
+        invest_amount: 0
+        description: '不使用红包'
+      )
+
       for obj in availables
         desc = (if obj.invest_amount and obj.invest_amount > 0 then "投资" + obj.invest_amount + "元可用" else "无投资门槛")
         datetime = new Date()
@@ -246,6 +256,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             $('.payment').html('投资金额未达到红包使用门槛').css(
               color: 'red'
             )
+            lable = $('label[for="id_amount"]')
+            if $.trim(lable.text()) == ''
+              $('label[for="id_amount"]').hide()
           return
 
       $('#id_amount').keyup (e) ->
@@ -255,8 +268,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             selectedData = obj
             break
 
+        amount = $('#id_amount').val()
         if selectedData
-          if $('#id_amount').val() - selectedData.invest_amount >= 0
+          if amount - selectedData.invest_amount >= 0
             red_amount = if selectedData then selectedData.amount else 0
             pay_amount = (if $('#id_amount').val() - red_amount > 0 then $('#id_amount').val() - red_amount else 0)
             $('.payment').html(['实际支付', pay_amount, '元'].join('')).css(
@@ -267,6 +281,24 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             $('.payment').html('投资金额未达到红包使用门槛').css(
               color: 'red'
             )
+            lable = $('label[for="id_amount"]')
+            if $.trim(lable.text()) == ''
+              $('label[for="id_amount"]').hide()
+
+        else if $.isNumeric(amount) and amount > 0
+          $('.payment').html(['实际支付 ', amount, ' 元'].join('')).css(
+            color: '#999'
+          )
+        else
+          $('.payment').html(['实际支付 0 元'].join('')).css(
+            color: '#999'
+          )
+
+      #hide the empty error tip
+      $('#id_amount').blur (e) ->
+        lable = $('label[for="id_amount"]')
+        if $.trim(lable.text()) == ''
+          $('label[for="id_amount"]').hide()
 
 
       return

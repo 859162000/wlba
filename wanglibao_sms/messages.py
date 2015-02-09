@@ -77,6 +77,10 @@ def earning_message(amount):
 def product_full_message(name):
     return u'%s，满标了。' % name
 
+@suffix
+def redpack_give(amount, name, dt):
+    return u'您的账户获得【%s】奖励【%s】元。有效期至%s。' % (name, amount, dt)
+
 #站内信模板
 def msg_bid_purchase(order_id, product_name, amount):
     title = u"投标通知"
@@ -214,3 +218,8 @@ def msg_invest_jdcard(total, nominal, activation):
     title = u"满额送京东卡"
     content = u"您在“满额就送”活动期间，累计投资%s元，根据活动规则，您获得%s元京东卡奖励。<br/>京东卡密码：%s,请注意查收。<br/>感谢您对我们的支持与关注！<br/>网利宝" % (total, nominal, activation)
     return title, content
+
+def msg_redpack_give(amount, name, dt):
+    title = u"参与活动送红包"
+    content = u"网利宝赠送的【%s】元【%s】已发放，请进入投资页面尽快投资赚收益吧！有效期至%s。<br/> <a href='/'>立即使用</a><br/>感谢您对我们的支持与关注。" % (amount, name, dt)
+    return title,content
