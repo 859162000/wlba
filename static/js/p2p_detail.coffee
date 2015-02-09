@@ -5,7 +5,7 @@ require.config
     tools: 'lib/modal.tools'
     "jquery.validate": 'lib/jquery.validate.min'
     'jquery.modal': 'lib/jquery.modal.min'
-    ddslick: 'lib/jquery.ddslick'
+    ddslick: 'lib/jquery.ddslick.min'
 
   shims:
     "jquery.validate": ['jquery']
