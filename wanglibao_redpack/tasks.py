@@ -20,7 +20,7 @@ def create_update_redpack(event_id):
         return
     rplist = RedPack.objects.filter(event=event)
     if not rplist.count():
-        if event.value == 1:
+        if event.value == 0:
             rp = RedPack()
             rp.event = event
             rp.status = "unused"
