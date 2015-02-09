@@ -17,6 +17,7 @@ env.roledefs = {
     'dbback': ["112.124.13.222"],
 
     'git_server': ["121.199.33.237"],
+    'webback':["118.193.12.139"],
 }
 env.user = "wangli"
 env.git_server_path = "~/wanglibao-backend"
@@ -218,6 +219,84 @@ def depoly_mq_action():
         run("chmod +x sync_sm_income")
         run("chmod +x sync_sm_info")
         run("crontab /tmp/tmp_tab")
+
+
+@roles("webback")
+def depoly_webback():
+    if not exists(env.git_server_path):
+        run("git clone git@github.com:wanglibao/wanglibao-backend.git")
+    else:
+        with cd("wanglibao-backend"):
+            run('git clean -f -d')
+            with settings(warn_only=True):
+                result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
+                if result.return_code > 0:
+                    run('git fetch origin %s:%s' % (env.branch, env.branch))
+                    run("git checkout %s" % env.branch)
+                else:
+                    run('git checkout %s' % env.branch)
+                    run('git pull origin %s' % env.branch)
+
+    if not exists(env.depoly_path):
+        with cd("/var/www/wanglibao"):
+            run("git clone ~/wanglibao-backend")
+    print yellow("backup last code")
+    run("rm -rf %s-back" % env.depoly_path)
+    run("cp -r %s %s-back" % (env.depoly_path, env.depoly_path))
+    with cd(env.depoly_path):
+        run("git checkout wanglibao/settings.py")
+        with settings(warn_only=True):
+            result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
+            if result.return_code > 0:
+                run('git fetch origin %s:%s' % (env.branch, env.branch))
+                run("git checkout %s" % env.branch)
+            else:
+                run('git checkout %s' % env.branch)
+                run('git pull origin %s' % env.branch)
+    if not exists(env.depoly_virt_path):
+        run("virtualenv %s" % env.depoly_virt_path)
+    with virtualenv():
+        with hide("output"):
+            run(env.pip_install)
+        with cd(env.depoly_path):
+            print yellow('Replacing wanglibao/settings.py ENV')
+            run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
+            run("""fab config:'wanglibao/settings.py',"SIGN_HOST \= '10.160.18.243'","SIGN_HOST \= '112.124.9.35'" """)
+            json_env = json.dumps({"BROKER_URL":"amqp://wanglibao:wanglibank@112.124.9.35/wanglibao"})
+            put(StringIO(json_env), 'env.json')
+    print yellow("restart webback server")
+    with settings(warn_only=True):
+        rs = run("ps aux|grep supervisord|grep -v 'grep'")
+        print yellow("view server process and check the process exists")
+        if rs.return_code == 0:
+            sudo("supervisorctl restart all")
+        else:
+            sudo("supervisord -c /etc/supervisord.conf")
+            run("ps aux|grep python")
+    with settings(warn_only=True):
+        rs = run("ps aux|grep nginx|grep -v 'grep'")
+        print yellow("check nginx daemon")
+        if rs.return_code > 0:
+            sudo("/usr/local/nginx/sbin/nginx")
+            run("ps aux|grep nginx")
+
+@roles("webback")
+def depoly_stop_webback():
+    print yellow("stop webback server")
+    with settings(warn_only=True):
+        rs = run("ps aux|grep supervisord|grep -v 'grep'")
+        print yellow("view server process and check the process exists")
+        if rs.return_code == 0:
+            sudo("supervisorctl stop all")
+            run("ps aux|grep python")
+    with settings(warn_only=True):
+        rs = run("ps aux|grep nginx|grep -v 'grep'")
+        print yellow("check nginx daemon")
+        if rs.return_code == 0:
+            sudo("/usr/local/nginx/sbin/nginx -s stop")
+            run("ps aux|grep nginx")
+
+
 
 def config_crontab():
     cron_str = """

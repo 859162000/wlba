@@ -74,7 +74,8 @@ def list_redpack(user, status, device_type):
 def exchange_redpack(token, device_type, user):
     if token == "":
         return {"ret_code":30161, "message":"请输入兑换码"}
-    redpack = RedPack.objects.filter(token=token).first()
+    #redpack = RedPack.objects.filter(token=token).first()
+    redpack = RedPack.objects.extra(where=["binary token='%s'" % token]).first()
     device_type = _decide_device(device_type)
     if not redpack:
         return {"ret_code":30162, "message":"请输入正确的兑换码"}
