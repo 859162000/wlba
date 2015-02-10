@@ -111,7 +111,6 @@ def _send_batch(user_objs, msgTxt):
     for user_obj in user_objs:
 
         msg = Message()
-        print '-----', user_objs[user_obj], '#####'
         msg.target_user = user_objs[user_obj]
         msg.message_text = msgTxt
 

@@ -40,7 +40,7 @@ def decide_first(user_id, amount):
 
         inviter_id = introduced_by.introduced_by.id
         invited_id = introduced_by.user.id
-        if amount >= 500:
+        if amount >= 200:
             inviter_phone = safe_phone_str(inviter_phone)
             invited_phone = safe_phone_str(invited_phone)
 
