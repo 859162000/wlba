@@ -54,14 +54,14 @@ class RedPackEvent(models.Model):
                             #("percent", "投资百分比红包"),))
     amount = models.IntegerField(null=False, default=0, verbose_name=u'红包金额(百分比也为整数0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
-    value = models.IntegerField(null=False, default=1, verbose_name=u"红包个数(不生成兑换码无需修改)")
+    value = models.IntegerField(null=False, default=0, verbose_name=u"红包个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
     give_mode = models.CharField(max_length=20, verbose_name=u"发放方式", db_index=True, choices=(
                                 ("nil", "零门槛"),
                                 ("register", "注册"),
                                 ("validation", "实名认证"),
                                 ("first_buy", "首次投资"),
-                                ("first_pay", "首次充值"),), default="零门槛")
+                                ("first_pay", "首次充值"),), default="注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default="全平台", choices=PLATFORM)
     apply_platform = models.CharField(max_length=10, verbose_name=u"使用平台", default="全平台", choices=PLATFORM)
     target_channel = models.CharField(max_length=20, verbose_name=u"渠道(非邀请码)", blank=True, default="")
