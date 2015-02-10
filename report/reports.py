@@ -75,7 +75,7 @@ class ReportGeneratorBase(object):
 
 
     @classmethod
-    def generate_report(cls, start_time, end_time=None):
+    def generate_report(cls, start_time, end_time=None, **kwargs):
         if end_time is None:
             end_time = start_time + timedelta(days=1)
 
@@ -84,7 +84,11 @@ class ReportGeneratorBase(object):
 
         path = cls.get_file_path(start_time, end_time)
 
-        content = cls.generate_report_content(start_time, end_time)
+        if kwargs.get('type'):
+            content = cls.generate_report_content(start_time, end_time, kwargs.get('type'))
+        else:
+            content = cls.generate_report_content(start_time, end_time)
+
         encrypted_content = ReportCrypto.encrypt_file(content)
         path = storage.save(path, ContentFile(encrypted_content))
 
@@ -442,13 +446,16 @@ class EearningReportGenerator(ReportGeneratorBase):
     reportname_format = u'赠送记录 %s--%s'
 
     @classmethod
-    def generate_report_content(cls, start_time, end_time):
+    def generate_report_content(cls, start_time, end_time, type=None):
         output = cStringIO.StringIO()
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'用户姓名', u'用户手机号', u'p2p的id', u'p2p名',
                          u'收益金额', u'订单号', u'交易流水id', u'是否打款', u'类型', u'创建时间', u'更新时间', u'审核时间'])
 
-        earnings = Earning.objects.filter(create_time__gte=start_time, create_time__lt=end_time)
+        if type:
+            earnings = Earning.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type=type)
+        else:
+            earnings = Earning.objects.filter(create_time__gte=start_time, create_time__lt=end_time)
 
         for index, earning in enumerate(earnings):
             confirm_time = timezone.localtime(earning.confirm_time).strftime(

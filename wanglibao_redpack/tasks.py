@@ -20,7 +20,7 @@ def create_update_redpack(event_id):
         return
     rplist = RedPack.objects.filter(event=event)
     if not rplist.count():
-        if event.value == 1:
+        if event.value == 0:
             rp = RedPack()
             rp.event = event
             rp.status = "unused"
@@ -59,8 +59,9 @@ def get_unused_token():
     while True:
         token = rand_str()
         one = RedPack.objects.filter(token=token).first()
+        #redpack = RedPack.objects.extra(where=["binary token='%s'" % token]).first()
         if not one:
             return token
 
-def rand_str(num=8):
-    return "".join(random.sample("ABCDEFGHJKLMNPQRSTUVWXY23456789ABCDEFGHJKLMNPQRSTUVWXY23456789ABCDEFGHJKLMNPQRSTUVWXY23456789ABCDEFGHJKLMNPQRSTUVWXY23456789ABCDEFGHJKLMNPQRSTUVWXY23456789", num))
+def rand_str(num=10):
+    return "".join(random.sample("ABCDEFGHJKLMNPQRSTUVWXY23456789ABCDEFGHJKLMNPQRSTUVWXY23456789ABCDEFGHJKLMNPQRSTUVWXY23456789ABCDEFGHJKLMNPQRSTUVWXY23456789ABCDEFGHJKLMNPQRSTUVWXY23456789abcdefghjkmnpqrstuvwxy23456789abcdefghjkmnpqrstuvwxy23456789abcdefghjkmnpqrstuvwxy23456789abcdefghjkmnpqrstuvwxy23456789abcdefghjkmnpqrstuvwxy23456789", num))

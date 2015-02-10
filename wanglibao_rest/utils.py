@@ -21,7 +21,7 @@ def split_ua(request):
     elif "iphone" in dt or "ipad" in dt:
         device_type = "ios"
     else:
-        device_type = "unknow"
+        device_type = "pc"
     return {"device_type":device_type, "app_version":arr[0],
             "channel_id":arr[2], "model":arr[1],
             "os_version":arr[3], "network":arr[4]}

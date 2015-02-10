@@ -92,12 +92,13 @@ a:hover{ text-decoration:none;}
 }
 
 .jiang dl{
+    width: 69%;
     display: -webkit-box;
     box-orient: horizontal;
 }
 
 .jiang dl dt{
-    width: 20%;
+    width: 39%;
     padding-right: 1em;
 }
 
@@ -107,8 +108,7 @@ a:hover{ text-decoration:none;}
 
 
 .jiang dl dd p{
-    font-size: 1.6em;
-    font-weight: bold;
+    font-size: 1em;
     color: #ea274f;
     line-height: 1.6em;
 }
@@ -139,12 +139,19 @@ h2{
     font-size: 2.5em;
     font-weight: bold;
     color: #fed350;
-    line-height: 2em;
-    background: #53aa3f;
+    line-height: 2.5em;
+    background: url("/static/images/app_img/app_bj.jpg") repeat-x;
     padding-left: 0.8em;
-
+    margin-top: 1em;
     height: 1.5em;
 }
+
+    /*line-height: 2em;*/
+    /*background: #53aa3f;*/
+    /*padding-left: 0.8em;*/
+
+    /*height: 1.5em;*/
+/*}*/
 
 .ban{
     margin-top: 1em;

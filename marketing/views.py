@@ -7,6 +7,7 @@ from collections import defaultdict
 
 from django.db.models import Count, Sum
 from django.contrib.auth.decorators import permission_required
+from django.core.paginator import Paginator, PageNotAnInteger
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from wanglibao_p2p.models import P2PRecord
@@ -199,13 +200,10 @@ class AggregateView(TemplateView):
         return pytz.timezone('Asia/Shanghai')
 
     def get_context_data(self, **kwargs):
-
         start = self.request.GET.get('start', '') or AggregateView.DEFAULT_START
         end = self.request.GET.get('end', '') or AggregateView.DEFAULT_END
         amount_min = self.request.GET.get('amount_min', '') or AggregateView.DEFAULT_AMOUNT_MIN
         amount_max = self.request.GET.get('amount_max', '')
-
-        result = []
 
         start = datetime.strptime(start, '%Y-%m-%d')
         end = datetime.strptime(end, '%Y-%m-%d')
@@ -215,40 +213,39 @@ class AggregateView(TemplateView):
         begin = amsterdam.localize(datetime.combine(start, start.min.time()))
         end = amsterdam.localize(datetime.combine(end, end.max.time()))
 
-        trades = P2PRecord.objects.filter(create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))).values('user').annotate(amount_sum=Sum('amount'))
+        trades = P2PRecord.objects.filter(
+            create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
+        ).annotate(amount_sum=Sum('amount'))
+
         if amount_min:
             trades = trades.filter(amount_sum__gte=amount_min)
         if amount_max:
             trades = trades.filter(amount_sum__lt=amount_max)
 
-        trades = trades.order_by('-amount_sum')
-        for trade in trades:
-            profile = User.objects.filter(pk=trade['user']).select_related('wanglibaouserprofile').first()
+        # 总计所有符合条件的金额
+        amount_all = trades.aggregate(Sum('amount_sum'))
+        # 关联用户认证信息
+        trades = trades.select_related('user__wanglibaouserprofile').order_by('-amount_sum')
 
-            result.append({
-                'phone': profile.wanglibaouserprofile.phone,
-                'user_name': profile.wanglibaouserprofile.name,
-                'amount': trade['amount_sum']
-            })
-
-        class DateTimeEncoder(json.JSONEncoder):
-            def default(self, obj):
-                if hasattr(obj, 'isoformat'):
-                    return obj.isoformat()
-                elif isinstance(obj, decimal.Decimal):
-                    return float(obj)
-                elif isinstance(obj, ModelState):
-                    return None
-                else:
-                    return json.JSONEncoder.default(self, obj)
-
-        json_re = json.dumps(result, cls=DateTimeEncoder)
-
+        # 增加分页查询机制
+        limit = 100
+        paginator = Paginator(trades, limit)
+        page = self.request.GET.get('page')
+        try:
+            result = paginator.page(page)
+        except PageNotAnInteger:
+            result = paginator.page(1)
+        except Exception:
+            result = paginator.page(paginator.num_pages)
         return {
             'result': result,
-            'json_re': json_re,
             'start': start.strftime('%Y-%m-%d'),
             'end': end.strftime('%Y-%m-%d'),
             'amount_min': amount_min,
-            'amount_max': amount_max
+            'amount_max': amount_max,
+            'amount_all': amount_all
         }
+
+    @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
+    def dispatch(self, request, *args, **kwargs):
+        return super(AggregateView, self).dispatch(request, *args, **kwargs)
