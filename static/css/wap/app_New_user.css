@@ -95,12 +95,13 @@ a:hover{ text-decoration:none;}
 }
 
 .jiang dl{
+    width: 69%;
     display: -webkit-box;
     box-orient: horizontal;
 }
 
 .jiang dl dt{
-    width: 20%;
+    width: 39%;
     padding-right: 1em;
 }
 
@@ -110,8 +111,7 @@ a:hover{ text-decoration:none;}
 
 
 .jiang dl dd p{
-    font-size: 1.6em;
-    font-weight: bold;
+    font-size: 1em;
     color: #ea274f;
     line-height: 1.6em;
 }
