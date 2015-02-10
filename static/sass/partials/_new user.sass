@@ -1,16 +1,14 @@
 body
-  background: url("/static/images/newUser/bg.jpg") no-repeat
-  height: 1290px
+  background: url("/static/images/newUser/bg.jpg") center top no-repeat
+  margin: 0
+  padding: 0
 
 .gold
   max-width: 1100px
   min-width: 1100px
   height: 1290px
   margin: 0 auto
-  //background: url("/static/images/newUser/bg.jpg") no-repeat
-  //background-size: 100% 100%
   padding-top: 260px
-  position: relative
   .red
     color: #ff6050
   .com
@@ -19,34 +17,34 @@ body
     background-position: -129px -7px
   .one
     background: -129px 100px
-  .two
+  #two
     background: url("/static/images/newUser/tubiao.png") no-repeat
-    background-position: 100px -63px
+    background-position: -128px -63px
 
   .xie
     position: absolute
-    top: 269px
-    left: 160px
+    top: -171px
+    left: 7%
     font-size: 40px
     color: #fff
     -webkit-transform: rotate(-4deg)
-    //-moz-transform: rotate(-4deg)
+    -moz-transform: rotate(-4deg)
     span
       color: #febd1b
   .lan
-    width: 222px
+    width: 262px
     height: 476px
-    background: url("/static/images/newUser/zuoce2.png") no-repeat
+    background: url("/static/images/newUser/zuoce.png") no-repeat
     position: absolute
     background-size: 100%
-    top: 425px
-    left: -67px
+    top: -5px
+    left: -18%
     color: #fff
     z-index: 3
     p
       line-height: 26px
       text-align: center
-      font-size: 20px
+      font-size: 22px
       span
         display: block
         font-size: 14px
@@ -57,6 +55,7 @@ body
         width: 30px
         height: 30px
         margin-right: 10px
+        margin-top: 10px
   .box
     width: 1000px
     height: auto
@@ -66,8 +65,21 @@ body
     top: 187px
 
     .small_box
-      margin-left: 75px
+      margin-left: 95px
       padding-top: 10px
+      position: relative
+      .sanjiao
+        display: inline-block
+        width: 0
+        height: 0
+        line-height: 0
+        font-size: 0
+        border-left: 25px solid #936a00
+        border-top: 15px solid transparent
+        position: absolute
+        top: 139px
+        left: 908px
+
 
       h2
         color: #fff
@@ -85,7 +97,7 @@ body
           left: 15px
           cursor: default
       .neir
-        width: 925px
+        width: 906px
         height: 205px
         background: #febd1b
         box-shadow: 1px 2px 14px #937C7A
@@ -156,6 +168,7 @@ body
 
     .zui
       position: relative
+      height: 453px
       h2
         a
           position: relative
@@ -182,23 +195,31 @@ body
 
 .footer
   width: 100%
-  height: 100px
-  background: #2a0306
+  height: 140px
   position: relative
+  top: 40px
   .jiao
     width: 100%
-    position: absolute
-    top: -57px
-  .zhong
-    width: 1100px
+    margin-bottom: -8px
+  .wang
+    width: 100%
     height: 100%
-    margin: 0 auto
-    .footer-logo
-      float: left
-    .ban
-      margin-left: 260px
-      text-align: left
-      height: 100px
-      color: #905456
+    background: #2a0306
+    position: relative
+    z-index: 4
+    padding-top: 20px
+    .zhong
+      width: 1000px
+      height: 100%
+      margin: 0 auto
+      .footer-logo
+        float: left
+      .ban
+        margin-left: 260px
+        text-align: left
+        height: 100px
+        color: #905456
+        position: absolute
+        top: 11px
 
 
