@@ -221,5 +221,5 @@ def msg_invest_jdcard(total, nominal, activation):
 
 def msg_redpack_give(amount, name, dt):
     title = u"参与活动送红包"
-    content = u"网利宝赠送的【%s】元【%s】已发放，请进入投资页面尽快投资赚收益吧！有效期至%s。<br/> <a href='/'>立即使用</a><br/>感谢您对我们的支持与关注。" % (amount, name, dt)
+    content = u"网利宝赠送的【%s】元【%s】已发放，请进入投资页面尽快投资赚收益吧！有效期至%s。<br/> <a href='/' target='_blank'>立即使用</a><br/>感谢您对我们的支持与关注。" % (amount, name, dt)
     return title,content
