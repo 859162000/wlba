@@ -18,7 +18,7 @@ html
 
     status = p2p.display_status
     .space-m
-    .full-container-home.clearfix
+    .full-container-home
       .p2p-container.dark-gray.border-all
         .span8.p2p-detail-container
           .p2p-detail-bar.clearfix
@@ -109,6 +109,13 @@ html
                         user_limit = u"100的整数倍"
                       -render_field form.amount class+="span12" type="text" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
                     .form-row-error
+
+                if user.is_authenticated and red_packets > 0
+                  .row.margin-top-s
+                    span.span4 可用红包
+                    span.span8-omega
+                      .red-pack
+
                 .row
                   span.span4 预期收益
                   span.span8-omega
@@ -116,30 +123,23 @@ html
                     | 元
                     if p2p.activity
                       if user.is_authenticated
-                        if xunlei_vip.isvip == True
-                          span.font-m +&nbsp;
-                          span.blue.font-m#xunlei-vip-income-head 0.00
-                          |元
-                //if p2p.activity
-                //  .row
-                //    span.span4
-                //    span.span8-omega.xunlei-vip-form-txt
-                //      if user.is_authenticated and xunlei_vip.isvip == True
-                //        span 您已绑定迅雷会员，投资后将在满标2个工作日内，一次性获得
-                //        span.blue.font-ss#xunlei-vip-income 0.00
-                //        |元。
-                //      else
-                //        span 投资后绑定迅雷会员，可额外享受
-                //        span.blue.font-ss#xunlei-vip-income 0.00
-                //        |元的收益
+                        //if xunlei_vip.isvip == True
+                        span.font-m +&nbsp;
+                        span.blue.font-m#xunlei-vip-income-head 0.00
 
-                .row.margin-top-s
+                .row
                   span.span4
-                  span.span8-omega
                     //author: hetao; time: 2014.10.11 target: 用户未登陆时先弹出登陆框
-                    if user.is_authenticated
-                      a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                  if user.is_authenticated
+                    if  red_packets > 0
+                      span.span8-omega(style="line-height:20px")
+                        span.payment 实际支付0元
+                        a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
                     else
+                      span.span8-omega
+                        a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                  else
+                    span.span8-omega
                       a.submit-button.span12.button-primary.button-middle.invest.notlogin(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
           if status != '抢购中'
             .sold-out
