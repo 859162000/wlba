@@ -236,7 +236,7 @@
             desc = (obj.invest_amount && obj.invest_amount > 0 ? "投资" + obj.invest_amount + "元可用" : "无投资门槛");
             datetime = new Date();
             datetime.setTime(obj.unavailable_at * 1000);
-            available_time = [datetime.getFullYear(), datetime.getMonth(), datetime.getDate()].join('-');
+            available_time = [datetime.getFullYear(), datetime.getMonth() + 1, datetime.getDate()].join('-');
             ddData.push({
               text: obj.name,
               value: obj.id,
@@ -319,5 +319,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_detail.js.map
