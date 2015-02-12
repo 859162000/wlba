@@ -12,6 +12,7 @@ class RedPackEventAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "rtype", "red_amount", "invest_amount", "describe", "red_num", "give_mode", "give_platform", "apply_platform", "give_start_at", "give_end_at",
                     "available_at", "unavailable_at", "invalid", "created_at")
     search_fields = ("name", "give_mode")
+    list_filter = ("give_mode","give_platform","apply_platform")
 
     def red_num(self, obj):
         return obj.value
@@ -30,13 +31,15 @@ class RedPackResource(resources.ModelResource):
 
 class RedPackAdmin(ExportMixin, admin.ModelAdmin):
     list_display = ("id", "event", "token", "status")
-    search_fields = ("token", "event__id")
+    search_fields = ("token","event__name")
+    list_filter = ("status",)
     resource_class = RedPackResource
 
 class RedPackRecordAdmin(admin.ModelAdmin):
     list_display = ("id", "redpack", "user", "change_platform", "apply_platform", "created_at", "apply_at", "order_id")
-    search_fields = ('user__wanglibaouserprofile__phone',)
+    search_fields = ('user__wanglibaouserprofile__phone','redpack__event__name')
     raw_id_fields = ('user', "redpack")
+    list_filter = ('change_platform','apply_platform')
 
 
 admin.site.register(RedPack, RedPackAdmin)
