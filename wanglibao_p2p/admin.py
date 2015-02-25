@@ -269,7 +269,7 @@ class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
         'description')
     resource_class = P2PRecordResource
     change_list_template = 'admin/import_export/change_list_export.html'
-    search_fields = ('user__wanglibaouserprofile__phone',)
+    search_fields = ('user__wanglibaouserprofile__phone','product__name')
     list_filter = ('catalog', )
 
     def get_readonly_fields(self, request, obj=None):
