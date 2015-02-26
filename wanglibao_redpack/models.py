@@ -50,8 +50,8 @@ class RedPackEvent(models.Model):
     #rule = models.ForeignKey(Rule)
     rtype = models.CharField(max_length=20, verbose_name=u'红包类型', choices=(
                             ("direct", "直抵红包"),
-                            ("fullcut", "满减红包/最低投资额"),), default="直抵红包")
-                            #("percent", "投资百分比红包"),))
+                            #("fullcut", "满减红包/最低投资额"),
+                            ("percent", "投资百分比红包"),), default="直抵红包")
     amount = models.IntegerField(null=False, default=0, verbose_name=u'红包金额(百分比也为整数0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
     value = models.IntegerField(null=False, default=0, verbose_name=u"红包个数(不生成兑换码无需修改)")
@@ -69,7 +69,6 @@ class RedPackEvent(models.Model):
     give_end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放/兑换结束时间")
     available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")
     unavailable_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"失效时间")
-    #change_end_at = models.DateTimeField(null=True, verbose_name=u"兑换截止时间")
     invalid = models.BooleanField(default=False, verbose_name=u"是否作废")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
 

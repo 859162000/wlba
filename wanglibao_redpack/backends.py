@@ -14,6 +14,7 @@ from marketing import  helper
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
+from wanglibao_pay.util import fmt_two_amount
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,8 @@ def list_redpack(user, status, device_type):
             if event.available_at < timezone.now() < event.unavailable_at:
                 if event.apply_platform == "all" or event.apply_platform == device_type:
                     if obj['method'] == REDPACK_RULE['percent']:
-                        obj['amount'] = "%.2f" % (obj['amount']/100.0)
+                        #obj['amount'] = "%.2f" % (obj['amount']/100.0)
+                        obj['amount'] = obj['amount']/100.0
                     packages['available'].append(obj)
         packages['available'].sort(key=lambda x:x['unavailable_at'])
     else:
@@ -200,11 +202,14 @@ def consume(redpack, amount, user, order_id, device_type):
     rule_value = event.amount
     deduct = event.amount
     if REDPACK_RULE[rtype] == "*":
-        return {"ret_code":30176, "message":"目前不支付百分比红包"}
+        #return {"ret_code":30176, "message":"目前不支付百分比红包"}
 
-        rule_value = float("%.2f" % (rule_value/100.0))
-        actual_amount = amount + amount * rule_value
-        deduct = round(amount * rule_value)
+        #rule_value = float("%.2f" % (rule_value/100.0))
+        #deduct = round(amount * rule_value)
+        #actual_amount = amount + amount * rule_value
+        rule_value = rule_value/100.0
+        deduct = fmt_two_amount(amount * rule_value)
+        actual_amount = amount + deduct
     elif REDPACK_RULE[rtype] == "-":
         if amount <= rule_value:
             actual_amount = amount
@@ -233,11 +238,14 @@ def restore(order_id, amount, user):
     rule_value = event.amount
     deduct = event.amount
     if REDPACK_RULE[rtype] == "*":
-        return {"ret_code":30176, "message":"目前不支付百分比红包"}
+        #return {"ret_code":30176, "message":"目前不支持百分比红包"}
 
-        rule_value = float("%.2f" % (rule_value/100.0))
-        actual_amount = amount + amount * rule_value
-        deduct = round(amount * rule_value)
+        #rule_value = float("%.2f" % (rule_value/100.0))
+        #actual_amount = amount + amount * rule_value
+        #deduct = round(amount * rule_value)
+        rule_value = rule_value/100.0
+        deduct = fmt_two_amount(amount * rule_value)
+        actual_amount = amount + deduct
     elif REDPACK_RULE[rtype] == "-":
         if amount <= rule_value:
             actual_amount = amount
