@@ -28,6 +28,10 @@ class P2PTrader(object):
     def __init__(self, product, user, order_id=None, request=None):
         self.user = user
         self.product = product
+        
+        if self.product.status != u"正在招标":
+            raise P2PException(u'购买的标不在招标状态')
+
         self.request = request
         if order_id is None:
             self.order_id = OrderHelper.place_order(user, order_type=u'产品申购', product_id=product.id, status=u'新建').id
