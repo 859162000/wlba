@@ -227,3 +227,29 @@ class ClientData(models.Model):
 
     def __unicode__(self):
         return u'<%s>' % self.userdevice
+
+
+class IntroducedByReward(models.Model):
+    """ 邀请奖励统计表"""
+    STATUS = (
+        (0, u'未审核'),
+        (1, u'审核通过发放奖励'),
+    )
+
+    user = models.ForeignKey(User)
+    introduced_by = models.ForeignKey(User, related_name='introduces')
+    first_bought_at = models.DateTimeField(u'首笔购买时间', null=False)
+    first_amount = models.DecimalField(u'首笔投资金额', max_digits=20, decimal_places=2, default=0)
+    first_reward = models.DecimalField(u'首笔投资收益', max_digits=20, decimal_places=2, default=0)
+    introduced_reward = models.DecimalField(u'首笔投资收益', max_digits=20, decimal_places=2, default=0)
+    activity_start_at = models.DateTimeField(u'活动统计开始时间', null=False)
+    activity_end_at = models.DateTimeField(u'活动统计截止时间', null=False)
+    activity_amount_min = models.DecimalField(u'活动统计首笔投资最小金额', max_digits=20, decimal_places=2, default=0)
+    percent_reward = models.DecimalField(u'活动奖励百分比奖励', max_digits=20, decimal_places=2, default=0)
+    created_at = models.DateTimeField(u'创建时间', null=False)
+    checked_status = models.IntegerField(u'审核状态', max_length=2, choices=STATUS)
+    checked_at = models.DateTimeField(u'审核时间', null=False)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = u'邀请奖励统计表'

@@ -4,6 +4,7 @@ import decimal
 import pytz
 from datetime import date, timedelta, datetime
 from collections import defaultdict
+from decimal import Decimal, ROUND_DOWN
 
 from django.db.models import Count, Sum
 from django.contrib.auth.decorators import permission_required
@@ -17,7 +18,7 @@ from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from marketing.models import PromotionToken
+from marketing.models import PromotionToken, IntroducedBy
 from marketing.tops import Top
 
 
@@ -249,3 +250,93 @@ class AggregateView(TemplateView):
     @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         return super(AggregateView, self).dispatch(request, *args, **kwargs)
+
+
+class IntroducedReward(TemplateView):
+    template_name = 'introduced_by.jade'
+
+
+class IntroduceAward(TemplateView):
+    """this class can used to query the introduced_by users and their first trade, according
+    the percent calculated the first trade earnings, add it into db and after checked, reward it
+    to their father
+    """
+    template_name = 'reward.jade'
+
+    @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
+    def dispatch(self, request, *args, **kwargs):
+        return super(IntroduceAward, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        start = self.request.GET.get('start', None)
+        end = self.request.GET.get('end', None)
+        percent = self.request.GET.get('percent', None)
+        amount_min = self.request.GET.get('amount_min', None)
+
+        if start and end and percent is not None and amount_min is not None:
+            try:
+                start = datetime.strptime(start, '%Y-%m-%d')
+                end = datetime.strptime(end, '%Y-%m-%d')
+                # local time convert to utc time
+                start_utc = local_to_utc(start, source_time='min')
+                end_utc = local_to_utc(end, source_time='max')
+            except Exception:
+                return {
+                    "message": u"输入日期格式有误！"
+                }
+        else:
+            return {
+                "message": u"统计条件数据不合法！"
+            }
+
+        # query all the user who bought the first trade between the date
+        new_user = IntroducedBy.objects.filter(
+            bought_at__range=(start_utc, end_utc)
+        ).exclude(
+            introduced_by__username__startswith="channel"
+        ).exclude(
+            introduced_by__wanglibaouserprofile__utype__gt=0
+        )
+
+        for first_user in new_user:
+            # everyone
+            first_record = P2PRecord.objects.filter(
+                user=first_user.user,
+                create_time__range=(start_utc, end_utc),
+                catalog='申购'
+            ).earliest("create_time")
+
+            # first trade min amount limit
+            if first_record.amount >= Decimal(amount_min):
+                amount_earning = Decimal(Decimal(first_record.amount) * Decimal(percent) * (Decimal(first_record.product.period) / Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+                print u"%s邀请了%s，首笔交易%s元，%s获得%s元奖金" % (first_user.introduced_by.wanglibaouserprofile.name, first_user.user.wanglibaouserprofile.name, first_record.amount, first_user.introduced_by.wanglibaouserprofile.name, amount_earning)
+
+            pass
+        pass
+    pass
+
+
+def local_to_utc(source_date, source_time='min'):
+    """To convert Local Date to UTC Date
+
+    Args:
+        source_date: the origin date
+        source_time: the origin time
+            if the source_time value is min, it means 00:00:00
+            if the source_time value is max, it means 23:59:59
+            others just convert the value time
+
+    return the utc time
+    """
+
+    # get the time zone
+    time_zone = pytz.timezone('Asia/Shanghai')
+
+    if source_time == 'min':
+        source_time = source_date.min.time()
+    elif source_time == 'max':
+        source_time = source_date.max.time()
+
+    # convert to utc time
+    new = time_zone.localize(datetime.combine(source_date, source_time))
+    return new.astimezone(pytz.utc)
