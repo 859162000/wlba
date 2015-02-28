@@ -52,7 +52,8 @@ class RedPackEvent(models.Model):
                             ("direct", "直抵红包"),
                             #("fullcut", "满减红包/最低投资额"),
                             ("percent", "投资百分比红包"),), default="直抵红包")
-    amount = models.IntegerField(null=False, default=0, verbose_name=u'红包金额(百分比也为整数0-100)')
+    #amount = models.IntegerField(null=False, default=0, verbose_name=u'红包金额(百分比也为整数0-100)')
+    amount = models.FloatField(null=False, default=0.0, verbose_name=u'红包金额(百分比也为0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
     value = models.IntegerField(null=False, default=0, verbose_name=u"红包个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
