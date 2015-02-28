@@ -18,9 +18,9 @@ from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from marketing.models import PromotionToken, IntroducedBy
+from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward
 from marketing.tops import Top
-
+from utils import local_to_utc
 
 # Create your views here.
 
@@ -252,22 +252,22 @@ class AggregateView(TemplateView):
         return super(AggregateView, self).dispatch(request, *args, **kwargs)
 
 
-class IntroducedReward(TemplateView):
+class IntroducedRewardTemplate(TemplateView):
     template_name = 'introduced_by.jade'
 
 
-class IntroduceAward(TemplateView):
+class IntroducedAward(TemplateView):
     """this class can used to query the introduced_by users and their first trade, according
     the percent calculated the first trade earnings, add it into db and after checked, reward it
     to their father
     """
-    template_name = 'reward.jade'
-
-    @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
-    def dispatch(self, request, *args, **kwargs):
-        return super(IntroduceAward, self).dispatch(request, *args, **kwargs)
+    template_name = 'introduced_by.jade'
 
     def get_context_data(self, **kwargs):
+        """ 根据条件查询邀请人收益统计表，管理员审核通过后系统会自动发放奖金到用户账户
+            1：表中不存在未审核记录，直接根据用户条件统计信息
+            2：表中存在未审核记录，提示用户需要先审核才允许再次统计
+        """
         start = self.request.GET.get('start', None)
         end = self.request.GET.get('end', None)
         percent = self.request.GET.get('percent', None)
@@ -289,54 +289,69 @@ class IntroduceAward(TemplateView):
                 "message": u"统计条件数据不合法！"
             }
 
-        # query all the user who bought the first trade between the date
-        new_user = IntroducedBy.objects.filter(
-            bought_at__range=(start_utc, end_utc)
-        ).exclude(
-            introduced_by__username__startswith="channel"
-        ).exclude(
-            introduced_by__wanglibaouserprofile__utype__gt=0
-        )
+        introduced_by_reward = IntroducedByReward()
+        # 如果存在未审核记录，将未审核记录和未审核记录的统计条件反馈给页面
+        if introduced_by_reward.objects.filter(checked_status=0).count() == 0:
+            # 不存在未审核记录，直接进行统计
+            # 查询复合条件的首次交易的被邀请人和邀请人信息
+            new_user = IntroducedBy.objects.filter(
+                bought_at__range=(start_utc, end_utc)
+            ).exclude(
+                introduced_by__username__startswith="channel"
+            ).exclude(
+                introduced_by__wanglibaouserprofile__utype__gt=0
+            )
 
-        for first_user in new_user:
-            # everyone
-            first_record = P2PRecord.objects.filter(
-                user=first_user.user,
-                create_time__range=(start_utc, end_utc),
-                catalog='申购'
-            ).earliest("create_time")
+            for first_user in new_user:
+                # everyone
+                first_record = P2PRecord.objects.filter(
+                    user=first_user.user,
+                    create_time__range=(start_utc, end_utc),
+                    catalog='申购'
+                ).earliest("create_time")
 
-            # first trade min amount limit
-            if first_record.amount >= Decimal(amount_min):
-                amount_earning = Decimal(Decimal(first_record.amount) * Decimal(percent) * (Decimal(first_record.product.period) / Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
-                print u"%s邀请了%s，首笔交易%s元，%s获得%s元奖金" % (first_user.introduced_by.wanglibaouserprofile.name, first_user.user.wanglibaouserprofile.name, first_record.amount, first_user.introduced_by.wanglibaouserprofile.name, amount_earning)
+                # first trade min amount limit
+                if first_record.amount >= Decimal(amount_min):
+                    # reward = IntroducedByReward()
+                    introduced_by_reward.user = first_user.user_id
+                    introduced_by_reward.introduced_by_person = first_user.introduced_by
+                    introduced_by_reward.first_bought_at = first_user.bought_at
+                    introduced_by_reward.first_amount = first_record.amount
 
-            pass
-        pass
-    pass
+                    # 计算被邀请人首笔投资总收益
+                    amount_earning = Decimal(Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+                    introduced_by_reward.first_reward = amount_earning
+                    # 邀请人活取被邀请人首笔投资收益
+                    introduced_by_reward.introduced_reward = Decimal(amount_earning * Decimal(percent)).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
+                    introduced_by_reward.activity_start_at = start_utc
+                    introduced_by_reward.activity_end_at = end_utc
+                    introduced_by_reward.activity_amount_min = Decimal(amount_min)
+                    introduced_by_reward.percent_reward = Decimal(percent)
+                    # introduced_by_reward.created_at = datetime.now()
+                    introduced_by_reward.checked_status = 0
+                    introduced_by_reward.save()
+                    # print u"%s邀请了%s，首笔交易%s元，%s获得%s元奖金" % (first_user.introduced_by.wanglibaouserprofile.name, first_user.user.wanglibaouserprofile.name, first_record.amount, first_user.introduced_by.wanglibaouserprofile.name, amount_earning)
 
-def local_to_utc(source_date, source_time='min'):
-    """To convert Local Date to UTC Date
+        introduced_by_reward = introduced_by_reward.objects.filter(checked_status=0)
+        return {
+            "message": u"存在未审核记录，请先进行审核操作",
+            "result_first": introduced_by_reward.first(),
+            "result": self.my_paginator(introduced_by_reward)
+        }
 
-    Args:
-        source_date: the origin date
-        source_time: the origin time
-            if the source_time value is min, it means 00:00:00
-            if the source_time value is max, it means 23:59:59
-            others just convert the value time
+    @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
+    def dispatch(self, request, *args, **kwargs):
+        return super(IntroducedAward, self).dispatch(request, *args, **kwargs)
 
-    return the utc time
-    """
-
-    # get the time zone
-    time_zone = pytz.timezone('Asia/Shanghai')
-
-    if source_time == 'min':
-        source_time = source_date.min.time()
-    elif source_time == 'max':
-        source_time = source_date.max.time()
-
-    # convert to utc time
-    new = time_zone.localize(datetime.combine(source_date, source_time))
-    return new.astimezone(pytz.utc)
+    def my_paginator(self, obj, limit=100):
+        # 增加分页查询机制
+        paginator = Paginator(obj, limit)
+        page = self.request.GET.get('page')
+        try:
+            obj = paginator.page(page)
+        except PageNotAnInteger:
+            obj = paginator.page(1)
+        except Exception:
+            obj = paginator.page(paginator.num_pages)
+        return obj

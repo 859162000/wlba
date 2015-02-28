@@ -1,3 +1,100 @@
 //
-   Created by ss on 15-2-27.
-
+                          Created by HeZhang on 15-2-3.
+-load formatters
+doctype html
+html
+  head
+    meta(name="viewport",content="width=device-width,initial-scale=1")
+    - with '累计购买金额统计单 ' as title
+    - endwith
+    link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/metisMenu/metisMenu.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/sb-admin-2.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/datepicker3.css", media="screen, projection", rel="stylesheet", type="text/css")
+    style
+      #Time {font-size:18px;background:none;border:none}
+      .zuo {float:left}.ju{margin-bottom:20px}
+      .btn-cha {padding:10px 40px;margin-top:20px}
+      .btn-cha2 {margin-left:400px;padding:10px 40px;margin-top:20px}
+      .bac { background:#fff}
+    script(src="/static/js/require.js", data-main="/static/js/header")
+    script(src="https://code.jquery.com/jquery-1.11.1.min.js", data-main="/static/js/header")
+    script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js", data-main="/static/js/header")
+    script(src="/static/js/lib/bootstrap-datepicker.js", data-main="/static/js/header")
+      body(role="document")
+    #wrapper
+      nav.navbar.navbar-default.navbar-static-top(role="navigation", style="margin-bottom:0px")
+        .navbar-header
+          a.navbar-brand(href="?") 网利宝统计数据
+        - with '邀请收益统计' as activeItem
+        include include/admin_menu
+        - endwith
+      #page-wrapper
+        .row
+          .col-lg-12
+            h1.page-header 邀请收益统计
+              .row
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading.bac(style="background:#fff")
+                .panel-body
+                .row
+                  form.form.span5(method="GET" action='/{{ "" | admin_address}}/introduced_by/query')
+                  .col-lg-8
+                    .form-group
+                      .liang.col-lg-7
+                        .input-group.ju
+                          span.input-group-addon#Time * 开始时间:
+                          input(type="text",name="start",value="#{start}").input-sm.form-control
+                        .input-group
+                          span.input-group-addon#Time * 首笔投资最低额(包含):
+                          input(type="text",name="start",value="#{start}").input-sm.form-control
+                      .liang.col-lg-5
+                        .input-group.ju
+                          span.input-group-addon#Time * 截止时间:
+                          input(type="text",name="start",value="#{start}").input-sm.form-control
+                        .input-group
+                          span.input-group-addon#Time * 收益百分比:
+                          input(type="text",name="start",value="#{start}").input-sm.form-control
+                  .col-lg-4
+                    .form-group
+                      button(type="submit").btn.btn-default.btn-cha 统计
+                .row
+                  h4
+                    | &nbsp;&nbsp;&nbsp;&nbsp;
+                    | 邀请人奖励总金额为： #{amount_all.amount_sum__sum}
+                    .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 用户id
+                        th(rowspan="1") 邀请人id
+                        th(rowspan="1") 首笔投资时间
+                        th(rowspan="1") 首笔投资金额
+                        th(rowspan="1") 首笔投资收益
+                        th(rowspan="1") 邀请人奖励
+                        th(rowspan="1") 开始日期
+                        th(rowspan="1") 截止日期
+                        th(rowspan="1") 首笔投资最低额
+                        th(rowspan="1") 收益百分比
+                        th(rowspan="1") 审核状态
+                        th(rowspan="1") 审核时间
+                    tbody
+                      if result
+                        for l in result
+                          tr
+                            td #{l.user.wanglibaouserprofile.phone}
+                            td #{l.user.wanglibaouserprofile.name}
+                            td #{l.amount}
+                              .chart
+                  form
+                    .form-group
+                      button(type="submit").btn.btn-default.btn-cha2 审核通过
+                      button(type="submit").btn.btn-default.btn-cha2 审核未通过
+                  #container
+                    - with data=result uri='/activity/aggregate/'
+    //include include/pager_aggregate
+    - endwith
+      script.
+        require(["/static/js/aggregate.js"])
+                                              

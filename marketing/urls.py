@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
-from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView
+from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedRewardTemplate, IntroducedAward
 
 
 urlpatterns = patterns(
@@ -30,4 +30,11 @@ urlpatterns += patterns(
     '',
     url(r'^aggregate/', AggregateView.as_view(template_name="aggregate.jade")),
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
+)
+
+urlpatterns += patterns(
+    '',
+    url(r'^introduced_by/', IntroducedRewardTemplate.as_view(template_name="introduced_by.jade")),
+    url(r'^introduced_by/query', IntroducedAward.as_view(template_name="introduced_by.jade")),
+
 )
