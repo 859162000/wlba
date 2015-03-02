@@ -248,12 +248,23 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           selectText: "请选择红包"
           onSelected: (data) ->
             obj = data.selectedData
-            if $('#id_amount').val() - obj.invest_amount >= 0
-              pay_amount = (if $('#id_amount').val() - obj.amount > 0 then $('#id_amount').val() - obj.amount else 0)
-              $('.payment').html(['实际支付', pay_amount, '元'].join('')).css(
-                color: '#999'
-              )
-            else
+            if obj.amount !=0
+#              pay_amount = (if $('#id_amount').val() - obj.amount > 0 then $('#id_amount').val() - obj.amount else 0)
+#              $('.payment').html(['实际支付', pay_amount, '元'].join('')).css(
+#                color: '#999'
+#              )
+              pay_touzi=$('#id_amount').val();
+              $.ajax {
+                  url: '/api/redpacket/deduct/'
+                  data:{
+                    amount: pay_touzi
+                    rpa: obj.amount
+                  }
+                  type: 'post'
+                }
+                .done (data)->
+                  $('.payment').html(['该红包您已使用',obj.amount,'元，','实际支付', pay_touzi-obj.amount, '元'].join('')).css(color:'#999')
+            if $('#id_amount').val() - obj.invest_amount < 0
               $('.payment').html('投资金额未达到红包使用门槛').css(
                 color: 'red'
               )
@@ -274,7 +285,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             if amount - selectedData.invest_amount >= 0
               red_amount = if selectedData then selectedData.amount else 0
               pay_amount = (if $('#id_amount').val() - red_amount > 0 then $('#id_amount').val() - red_amount else 0)
-              $('.payment').html(['实际支付', 10000, '元'].join('')).css(
+              $('.payment').html(['实际支付', pay_amount, '元'].join('')).css(
                 color: '#999'
               )
 
@@ -290,12 +301,17 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 #            $('.payment').html(['实际支付 ', amount, ' 元'].join('')).css(
 #              color: '#999'
 #            )
+            pay_touzi=$('#id_amount').val();
             $.ajax {
                 url: '/api/redpacket/deduct/'
+                data:{
+                  amount: pay_touzi
+                  rpa: 0
+                }
                 type: 'post'
               }
               .done (data)->
-                $('.payment').html(['实际支付', 10000, '元'].join('')).css(color:'#999')
+                $('.payment').html(['实际支付', pay_touzi, '元'].join('')).css(color:'#999')
           else
             $('.payment').html(['实际支付 0 元'].join('')).css(
               color: '#999'
