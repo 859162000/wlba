@@ -211,11 +211,19 @@ def consume(redpack, amount, user, order_id, device_type):
         deduct = fmt_two_amount(amount * rule_value)
         actual_amount = amount + deduct
     elif REDPACK_RULE[rtype] == "-":
-        if amount <= rule_value:
-            actual_amount = amount
-            deduct = amount
+        if event.id == 7:
+            t5 = amount * 0.005
+            if t5 >= rule_value:
+                deduct = rule_value
+            else:
+                deduct = t5
+            deduct = fmt_two_amount(deduct)
         else:
-            actual_amount = amount - rule_value
+            if amount <= rule_value:
+                actual_amount = amount
+                deduct = amount
+            else:
+                actual_amount = amount - rule_value
     elif REDPACK_RULE[rtype] == "+":
         actual_amount = amount + rule_value
 
@@ -247,13 +255,38 @@ def restore(order_id, amount, user):
         deduct = fmt_two_amount(amount * rule_value)
         actual_amount = amount + deduct
     elif REDPACK_RULE[rtype] == "-":
-        if amount <= rule_value:
-            actual_amount = amount
-            deduct = amount
+        if event.id == 7:
+            t5 = amount * 0.005
+            if t5 >= rule_value:
+                deduct = rule_value
+            else:
+                deduct = t5
+            deduct = fmt_two_amount(deduct)
         else:
-            actual_amount = amount - rule_value
+            if amount <= rule_value:
+                actual_amount = amount
+                deduct = amount
+            else:
+                actual_amount = amount - rule_value
     elif REDPACK_RULE[rtype] == "+":
         actual_amount = amount + rule_value
     logger.info(u"%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
     return {"ret_code":0, "deduct":deduct}
 
+def deduct_calc(amount, redpack_amount):
+    if not amount or not redpack_amount:
+        return {"ret_code":30181, "message":"金额错误"}
+    try:
+        amount = float(amount)
+        redpack_amount = float(redpack_amount)
+    except:
+        return {"ret_code":30182, "message":"金额格式不正确"}
+
+    t5 = amount * 0.005
+    real_deduct = 0
+    if t5 >= redpack_amount:
+        real_deduct = redpack_amount
+    else:
+        real_deduct = t5
+    real_deduct = fmt_two_amount(real_deduct)
+    return {"ret_code":0, "deduct":real_deduct}

@@ -43,3 +43,12 @@ class RedPacketListAPIView(APIView):
         user = request.user
         result = backends.list_redpack(user, status, device['device_type'])
         return Response(result)
+
+class RedPacketDeductAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        amount = request.DATA.get("amount", "").strip()
+        redpack_amount = request.DATA.get("rpa", "").strip()
+        result = backends.deduct_calc(amount, redpack_amount)
+        return Response(result)
