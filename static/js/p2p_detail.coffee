@@ -274,7 +274,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             if amount - selectedData.invest_amount >= 0
               red_amount = if selectedData then selectedData.amount else 0
               pay_amount = (if $('#id_amount').val() - red_amount > 0 then $('#id_amount').val() - red_amount else 0)
-              $('.payment').html(['实际支付', pay_amount, '元'].join('')).css(
+              $('.payment').html(['实际支付', 10000, '元'].join('')).css(
                 color: '#999'
               )
 
@@ -287,9 +287,15 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                 $('label[for="id_amount"]').hide()
 
           else if $.isNumeric(amount) and amount > 0
-            $('.payment').html(['实际支付 ', amount, ' 元'].join('')).css(
-              color: '#999'
-            )
+#            $('.payment').html(['实际支付 ', amount, ' 元'].join('')).css(
+#              color: '#999'
+#            )
+            $.ajax {
+                url: '/api/redpacket/deduct/'
+                type: 'post'
+              }
+              .done (data)->
+                $('.payment').html(['实际支付', 10000, '元'].join('')).css(color:'#999')
           else
             $('.payment').html(['实际支付 0 元'].join('')).css(
               color: '#999'

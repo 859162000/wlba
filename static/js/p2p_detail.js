@@ -284,7 +284,7 @@
               if (amount - selectedData.invest_amount >= 0) {
                 red_amount = selectedData ? selectedData.amount : 0;
                 pay_amount = ($('#id_amount').val() - red_amount > 0 ? $('#id_amount').val() - red_amount : 0);
-                return $('.payment').html(['实际支付', pay_amount, '元'].join('')).css({
+                return $('.payment').html(['实际支付', 10000, '元'].join('')).css({
                   color: '#999'
                 });
               } else {
@@ -297,8 +297,13 @@
                 }
               }
             } else if ($.isNumeric(amount) && amount > 0) {
-              return $('.payment').html(['实际支付 ', amount, ' 元'].join('')).css({
-                color: '#999'
+              return $.ajax({
+                url: '/api/redpacket/deduct/',
+                type: 'post'
+              }).done(function(data) {
+                return $('.payment').html(['实际支付', 10000, '元'].join('')).css({
+                  color: '#999'
+                });
               });
             } else {
               return $('.payment').html(['实际支付 0 元'].join('')).css({
