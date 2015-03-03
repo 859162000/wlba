@@ -18,9 +18,20 @@ from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward
+from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward, Reward
 from marketing.tops import Top
 from utils import local_to_utc
+
+# used for reward
+from django.forms import model_to_dict
+from marketing.models import RewardRecord
+from wanglibao_sms.tasks import send_messages
+from wanglibao_p2p.models import Earning
+from wanglibao_margin.marginkeeper import MarginKeeper
+from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao_account import message as inside_message
+from order.models import Order
+from order.utils import OrderHelper
 
 # Create your views here.
 
@@ -268,10 +279,16 @@ class IntroducedAward(TemplateView):
             1：表中不存在未审核记录，直接根据用户条件统计信息
             2：表中存在未审核记录，提示用户需要先审核才允许再次统计
         """
+        print 'start>>>>>>>>>>>>>>>>>>>>>>>>>>'
         start = self.request.GET.get('start', None)
         end = self.request.GET.get('end', None)
         percent = self.request.GET.get('percent', None)
         amount_min = self.request.GET.get('amount_min', None)
+
+        print 'start>', start
+        print 'end>', end
+        print 'percent>', percent
+        print 'amount_min>', amount_min
 
         if start and end and percent is not None and amount_min is not None:
             try:
@@ -289,9 +306,10 @@ class IntroducedAward(TemplateView):
                 "message": u"统计条件数据不合法！"
             }
 
-        introduced_by_reward = IntroducedByReward()
+        introduced_by_reward = IntroducedByReward.objects.filter(checked_status=0)
         # 如果存在未审核记录，将未审核记录和未审核记录的统计条件反馈给页面
-        if introduced_by_reward.objects.filter(checked_status=0).count() == 0:
+        print 'start>>>>>>>>>>>>>>>>>>>>>>>>>>2'
+        if introduced_by_reward.count() == 0:
             # 不存在未审核记录，直接进行统计
             # 查询复合条件的首次交易的被邀请人和邀请人信息
             new_user = IntroducedBy.objects.filter(
@@ -312,32 +330,44 @@ class IntroducedAward(TemplateView):
 
                 # first trade min amount limit
                 if first_record.amount >= Decimal(amount_min):
-                    # reward = IntroducedByReward()
-                    introduced_by_reward.user = first_user.user_id
-                    introduced_by_reward.introduced_by_person = first_user.introduced_by
-                    introduced_by_reward.first_bought_at = first_user.bought_at
-                    introduced_by_reward.first_amount = first_record.amount
+                    reward = IntroducedByReward()
+                    reward.user = first_user.user
+                    reward.introduced_by_person = first_user.introduced_by
+                    reward.product = first_record.product
+                    reward.first_bought_at = first_user.bought_at
+                    reward.first_amount = first_record.amount
 
                     # 计算被邀请人首笔投资总收益
                     amount_earning = Decimal(Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
-                    introduced_by_reward.first_reward = amount_earning
+                    reward.first_reward = amount_earning
                     # 邀请人活取被邀请人首笔投资收益
-                    introduced_by_reward.introduced_reward = Decimal(amount_earning * Decimal(percent)).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+                    reward.introduced_reward = Decimal(amount_earning * Decimal(percent)).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
-                    introduced_by_reward.activity_start_at = start_utc
-                    introduced_by_reward.activity_end_at = end_utc
-                    introduced_by_reward.activity_amount_min = Decimal(amount_min)
-                    introduced_by_reward.percent_reward = Decimal(percent)
-                    # introduced_by_reward.created_at = datetime.now()
-                    introduced_by_reward.checked_status = 0
-                    introduced_by_reward.save()
+                    reward.activity_start_at = datetime.combine(start, start.min.time())
+                    reward.activity_end_at = datetime.combine(end, end.max.time())
+                    # reward.activity_start_at = start_utc
+                    # reward.activity_end_at = end_utc
+                    reward.activity_amount_min = Decimal(amount_min)
+                    reward.percent_reward = Decimal(percent)
+                    reward.checked_status = 0
+                    reward.save()
                     # print u"%s邀请了%s，首笔交易%s元，%s获得%s元奖金" % (first_user.introduced_by.wanglibaouserprofile.name, first_user.user.wanglibaouserprofile.name, first_record.amount, first_user.introduced_by.wanglibaouserprofile.name, amount_earning)
 
-        introduced_by_reward = introduced_by_reward.objects.filter(checked_status=0)
+        introduced_result = IntroducedByReward.objects.filter(checked_status=0)
+        if introduced_by_reward.count() > 0:
+            result_first = introduced_result.first()
+            start = result_first.activity_start_at
+            end = result_first.activity_end_at
+            amount_min = result_first.activity_amount_min
+            percent = result_first.percent_reward
+
         return {
             "message": u"存在未审核记录，请先进行审核操作",
-            "result_first": introduced_by_reward.first(),
-            "result": self.my_paginator(introduced_by_reward)
+            "result": self.my_paginator(introduced_result),
+            "start": str(start.date()),
+            "end": str(end.date()),
+            "amount_min": str(amount_min),
+            "percent": str(percent)
         }
 
     @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
@@ -355,3 +385,86 @@ class IntroducedAward(TemplateView):
         except Exception:
             obj = paginator.page(paginator.num_pages)
         return obj
+
+    def post(self, request, **kwargs):
+        """ 发放红包 """
+        check = request.POST.get('check_ok', '') or request.POST.get('check_no', '')
+        if check == '1':
+            # 审核通过，给用户发放奖励
+            reward_type = u'邀请送收益'
+            # True 标识只将信息标准输出到终端上，不进行实际操作
+            # False 标识实际发送红包
+            only_show = True
+            # records = IntroducedByReward.objects.filter(checked_status=0)
+            # for record in records:
+            #     self.reward_user(
+            #         user=record.user,
+            #         introduced_by=record.introduced_by_person,
+            #         reward_type=reward_type,
+            #         got_amount=record.introduced_reward,
+            #         product=record.product,
+            #         only_show=only_show
+            #     )
+
+            message = u'审核通过成功，为用户发送收益成功！'
+
+        elif check == '2':
+            # 审核未通过，删除统计记录
+            # records = IntroducedByReward.objects.filter(checked_status=0)
+            # records.delete()
+            message = u'审核未通过成功，已经清除统计记录！'
+
+        else:
+            # 非法操作
+            message = u'非法操作！'
+            pass
+
+        context = {
+            "message": message if message else '1111'
+        }
+        return self.render_to_response(context)
+
+    def reward_user(self, user, introduced_by, reward_type, got_amount, product, only_show):
+        reward = Reward.objects.filter(is_used=False, type=reward_type).first()
+
+        text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
+        if only_show is not True:
+            send_messages.apply_async(kwargs={
+                "phones": [user.wanglibaouserprofile.phone],
+                "messages": [text_content]
+            })
+
+        if only_show is not True:
+            earning = Earning()
+            earning.amount = got_amount
+            earning.type = 'I'
+            earning.product = product
+            order = OrderHelper.place_order(introduced_by, Order.ACTIVITY, u"邀请送收益活动赠送",
+                                            earning=model_to_dict(earning))
+            earning.order = order
+            keeper = MarginKeeper(introduced_by, order.pk)
+
+            # 赠送活动描述
+            desc = u'%s,邀请好友首次理财活动中，活赠%s元' % (introduced_by.wanglibaouserprofile.name, got_amount)
+            earning.margin_record = keeper.deposit(got_amount, description=desc)
+            earning.user = introduced_by
+            earning.save()
+
+        message_content = u"您在邀请好友送收益的活动中，您的好友%s在活动期间完成首次投资，根据活动规则，您获得%s元收益。<br/>\
+                          <a href = 'https://www.wanglibao.com/accounts/home/'>查看账户余额</a><br/>\
+                          感谢您对我们的支持与关注。<br/>\
+                          网利宝" % (safe_phone_str(user.wanglibaouserprofile.phone), got_amount)
+
+        if only_show is not True:
+            RewardRecord.objects.create(user=introduced_by, reward=reward, description=message_content)
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": introduced_by.id,
+                "title": u"邀请送收益活动",
+                "content": message_content,
+                "mtype": "activity"
+            })
+        else:
+            print message_content
+            print introduced_by.wanglibaouserprofile.name
+            print safe_phone_str(user.wanglibaouserprofile.phone)
+            print text_content

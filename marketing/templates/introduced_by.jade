@@ -22,7 +22,7 @@ html
     script(src="https://code.jquery.com/jquery-1.11.1.min.js", data-main="/static/js/header")
     script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js", data-main="/static/js/header")
     script(src="/static/js/lib/bootstrap-datepicker.js", data-main="/static/js/header")
-      body(role="document")
+    body(role="document")
     #wrapper
       nav.navbar.navbar-default.navbar-static-top(role="navigation", style="margin-bottom:0px")
         .navbar-header
@@ -40,30 +40,30 @@ html
               .panel-heading.bac(style="background:#fff")
                 .panel-body
                 .row
-                  form.form.span5(method="GET" action='/{{ "" | admin_address}}/introduced_by/query')
-                  .col-lg-8
-                    .form-group
-                      .liang.col-lg-7
-                        .input-group.ju
-                          span.input-group-addon#Time * 开始时间:
-                          input(type="text",name="start",value="#{start}").input-sm.form-control
-                        .input-group
-                          span.input-group-addon#Time * 首笔投资最低额(包含):
-                          input(type="text",name="start",value="#{start}").input-sm.form-control
-                      .liang.col-lg-5
-                        .input-group.ju
-                          span.input-group-addon#Time * 截止时间:
-                          input(type="text",name="start",value="#{start}").input-sm.form-control
-                        .input-group
-                          span.input-group-addon#Time * 收益百分比:
-                          input(type="text",name="start",value="#{start}").input-sm.form-control
-                  .col-lg-4
-                    .form-group
-                      button(type="submit").btn.btn-default.btn-cha 统计
+                  form.form.span5(method="GET" action='/{{ "" | admin_address}}/statistics/introduced_by/query')
+                    .col-lg-8
+                      .form-group
+                        .liang.col-lg-7
+                          .input-group.ju
+                            span.input-group-addon#Time * 开始时间:
+                            input(type="text",name="start",value="#{start}").input-sm.form-control
+                          .input-group
+                            span.input-group-addon#Time * 首笔投资最低额(包含):
+                            input(type="text",name="amount_min",value="#{amount_min}").input-sm.form-control
+                        .liang.col-lg-5
+                          .input-group.ju
+                            span.input-group-addon#Time * 截止时间:
+                            input(type="text",name="end",value="#{end}").input-sm.form-control
+                          .input-group
+                            span.input-group-addon#Time * 收益百分比:
+                            input(type="text",name="percent",value="#{percent}").input-sm.form-control
+                    .col-lg-4
+                      .form-group
+                        button(type="submit").btn.btn-default.btn-cha 统计
                 .row
                   h4
                     | &nbsp;&nbsp;&nbsp;&nbsp;
-                    | 邀请人奖励总金额为： #{amount_all.amount_sum__sum}
+                    | 邀请人奖励总金额为：
                     .table-responsive
                   table.table.table-striped.table-bordered.table-hover
                     thead
@@ -84,18 +84,33 @@ html
                       if result
                         for l in result
                           tr
-                            td #{l.user.wanglibaouserprofile.phone}
-                            td #{l.user.wanglibaouserprofile.name}
-                            td #{l.amount}
+                            td #{l.user_id}
+                            td #{l.introduced_by_person}
+                            td #{l.first_bought_at}
+                            td #{l.first_amount}
+                            td #{l.first_reward}
+                            td #{l.introduced_reward}
+                            td #{l.activity_start_at}
+                            td #{l.activity_end_at}
+                            td #{l.activity_amount_min}
+                            td #{l.percent_reward}
+                            td #{l.created_status}
+                            td #{l.checked_at}
                               .chart
-                  form
+                  form.form.span5(method="POST" action='/{{ "" | admin_address}}/statistics/introduced_by/query')
+                    - csrf_token
                     .form-group
-                      button(type="submit").btn.btn-default.btn-cha2 审核通过
-                      button(type="submit").btn.btn-default.btn-cha2 审核未通过
+                      button(type="submit", name='check_ok', value='1').btn.btn-default.btn-cha2 审核通过
+                      button(type="submit", name='check_no', value='2').btn.btn-default.btn-cha2 审核未通过
+
                   #container
-                    - with data=result uri='/activity/aggregate/'
+                    //- with data=result uri='/activity/aggregate/'
+
+                if message
+                  .panel-content.padding-l-r-sm
+                    label.error {{ message }}
     //include include/pager_aggregate
-    - endwith
-      script.
-        require(["/static/js/aggregate.js"])
+    //- endwith
+      //script.
+        //require(["/static/js/aggregate.js"])
                                               
