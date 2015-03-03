@@ -215,17 +215,27 @@ class AggregateView(TemplateView):
 
         trades = P2PRecord.objects.filter(
             create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
-        ).annotate(amount_sum=Sum('amount'))
+        ).values('user').annotate(amount=Sum('amount'))
 
         if amount_min:
-            trades = trades.filter(amount_sum__gte=amount_min)
+            trades = trades.filter(amount__gte=amount_min)
         if amount_max:
-            trades = trades.filter(amount_sum__lt=amount_max)
+            trades = trades.filter(amount__lt=amount_max)
+
 
         # 总计所有符合条件的金额
-        amount_all = trades.aggregate(Sum('amount_sum'))
+        # amount_all = trades.aggregate(Sum('amount'))
+        amount_all = 0
+        for tr in trades:
+            amount_all += decimal.Decimal(tr['amount'])
+
         # 关联用户认证信息
-        trades = trades.select_related('user__wanglibaouserprofile').order_by('-amount_sum')
+        trades = trades.select_related('user__wanglibaouserprofile').values(
+            'user',
+            'amount',
+            'user__wanglibaouserprofile__phone',
+            'user__wanglibaouserprofile__name'
+        ).order_by('-amount')
 
         # 增加分页查询机制
         limit = 100
@@ -237,6 +247,7 @@ class AggregateView(TemplateView):
             result = paginator.page(1)
         except Exception:
             result = paginator.page(paginator.num_pages)
+
         return {
             'result': result,
             'start': start.strftime('%Y-%m-%d'),
