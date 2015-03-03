@@ -238,7 +238,7 @@ def _calc_deduct(amount, rtype, rule_value, event):
         if event.id == 7:
             t5 = amount * decimal.Decimal('0.005')
             if t5 >= rule_value:
-                deduct = rule_value
+                deduct = decimal.Decimal(str(rule_value))
             else:
                 deduct = t5
         else:
