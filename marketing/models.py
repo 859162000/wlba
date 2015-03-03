@@ -83,7 +83,7 @@ class IntroducedBy(models.Model):
     """
     user = models.ForeignKey(User)
     introduced_by = models.ForeignKey(User, related_name='introduces')
-    channel = models.ForeignKey(Channels, related_name='channels')
+    channel = models.ForeignKey(Channels, blank=True, null=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
     gift_send_at = models.DateTimeField(u'奖品发放时间', null=True, blank=True)
