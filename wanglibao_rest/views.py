@@ -608,15 +608,13 @@ class IdValidate(APIView):
             # else:
 
             # 实名认证 活动赠送
-            channel = which_channel(user)
-            rs = RewardStrategy(user)
-            if channel == Channel.KUAIPAN:
-                # 快盘来源
-                rs.reward_user(u'50G快盘容量')
+            tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id})
+            #channel = which_channel(user)
+            #rs = RewardStrategy(user)
+            #if channel == Channel.KUAIPAN:
+            #    rs.reward_user(u'50G快盘容量')
 
-            return Response({
-                                "validate": True
-                            }, status=200)
+            return Response({ "validate": True }, status=200)
 
         else:
             return Response({

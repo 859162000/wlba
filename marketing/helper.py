@@ -21,6 +21,7 @@ class Channel():
 
 
 
+
 class RewardStrategy():
     def __init__(self, user):
         self.user = user
@@ -128,21 +129,32 @@ class RewardStrategy():
             "mtype": "activity"
         })
 
-
 def which_channel(user, intro=None):
     """ 渠道判断 """
     if not intro:
         ib = IntroducedBy.objects.filter(user=user).first()
     else:
         ib = intro
-    if ib:
-        phone = ib.introduced_by.wanglibaouserprofile.phone.lower()
-        if phone.startswith('kuaipan'):
-            return Channel.KUAIPAN
-        elif phone.startswith('fengxing'):
-            return Channel.FENGXING
-        elif phone.startswith('jiuxian'):
-            return Channel.JIUXIAN
-        elif phone.startswith('xunlei'):
-            return Channel.XUNLEI
-    return Channel.WANGLIBAO
+    if not ib or not ib.channel:
+        return Channel.WANGLIBAO
+
+    name = ib.channel.name
+    return name
+
+#def which_channel2(user, intro=None):
+#    """ 渠道判断 """
+#    if not intro:
+#        ib = IntroducedBy.objects.filter(user=user).first()
+#    else:
+#        ib = intro
+#    if ib:
+#        phone = ib.introduced_by.wanglibaouserprofile.phone.lower()
+#        if phone.startswith('kuaipan'):
+#            return Channel.KUAIPAN
+#        elif phone.startswith('fengxing'):
+#            return Channel.FENGXING
+#        elif phone.startswith('jiuxian'):
+#            return Channel.JIUXIAN
+#        elif phone.startswith('xunlei'):
+#            return Channel.XUNLEI
+#    return Channel.WANGLIBAO

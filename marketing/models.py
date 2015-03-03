@@ -74,7 +74,8 @@ class Channels(models.Model):
         渠道信息
     """
     code = models.CharField(u'渠道代码', max_length=12, db_index=True, unique=True)
-    name = models.CharField(u'渠道名字', max_length=20, default="")
+    name = models.CharField(u'渠道名字(xunlei)', max_length=20, default="")
+    describe = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
 
 class IntroducedBy(models.Model):
@@ -82,7 +83,7 @@ class IntroducedBy(models.Model):
         introduced_by: 邀请人
     """
     user = models.ForeignKey(User)
-    introduced_by = models.ForeignKey(User, related_name='introduces')
+    introduced_by = models.ForeignKey(User, related_name='introduces', blank=True)
     channel = models.ForeignKey(Channels, blank=True, null=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
