@@ -1069,6 +1069,11 @@ class UserProductContract(APIView):
 
     def get(self, request, product_id):
         equity = P2PEquity.objects.filter(user=request.user, product_id=product_id).prefetch_related('product').first()
+        if not equity:
+            return Response({
+                'message': u'合同没有找到',
+                'error_number': ErrorNumber.contract_not_found
+            })
         product = equity.product
         order = OrderHelper.place_order(order_type=u'生成合同文件', status=u'开始', equity_id=equity.id, product_id=product.id)
 
