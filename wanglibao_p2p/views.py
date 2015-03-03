@@ -51,7 +51,7 @@ class P2PDetailView(TemplateView):
 
         try:
             #p2p = P2PProduct.objects.select_related('activity').get(pk=id, hide=False).exclude(status=u'流标')
-            p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标').exclude(status=u'待审核').get(pk=id, hide=False)
+            p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标').get(pk=id, hide=False)
             form = PurchaseForm(initial={'product': p2p})
 
             if p2p.soldout_time:
