@@ -78,6 +78,9 @@ class Channels(models.Model):
     describe = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
 
+    class Meta:
+        verbose_name_plural = u"渠道"
+
 class IntroducedBy(models.Model):
     """ user: 被邀请人
         introduced_by: 邀请人
