@@ -177,6 +177,7 @@ def _give_redpack(user, rtype, device_type):
 
 
 def consume(redpack, amount, user, order_id, device_type):
+    amount = fmt_two_amount(amount)
     record = RedPackRecord.objects.filter(user=user, id=redpack).first()
     redpack = record.redpack
     event = redpack.event
@@ -250,6 +251,8 @@ def _calc_deduct(amount, rtype, rule_value, event):
     return real_deduct
 
 def restore(order_id, amount, user):
+    if type(amount) != decimal.Decimal:
+        amount = fmt_two_amount(amount)
     record = RedPackRecord.objects.filter(user=user, order_id=order_id).first()
     if not record:
         return {"ret_code":-1, "message":"redpack not exists"}
