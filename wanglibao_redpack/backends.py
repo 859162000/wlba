@@ -202,7 +202,7 @@ def consume(redpack, amount, user, order_id, device_type):
     rtype = event.rtype
     rule_value = event.amount
     deduct = event.amount
-    deduct = _calc_deduct(amount, rtype, rule_value, event.id)
+    deduct = _calc_deduct(amount, rtype, rule_value, event)
    # if REDPACK_RULE[rtype] == "*":
    #     #return {"ret_code":30176, "message":"目前不支付百分比红包"}
    #     rule_value = rule_value/100.0
@@ -227,12 +227,15 @@ def consume(redpack, amount, user, order_id, device_type):
 
     return {"ret_code":0, "message":"ok", "deduct":deduct}
 
-def _calc_deduct(amount, rtype, rule_value, event_id):
+def _calc_deduct(amount, rtype, rule_value, event):
     if REDPACK_RULE[rtype] == "*":
         percent = decimal.Decimal(str(rule_value/100.0))
         deduct = amount * percent
+        if event.highest_amount > 0:
+            if deduct >= event.highest_amount:
+                deduct = decimal.Decimal(event.highest_amount)
     elif REDPACK_RULE[rtype] == "-":
-        if event_id == 7:
+        if event.id == 7:
             t5 = amount * decimal.Decimal('0.005')
             if t5 >= rule_value:
                 deduct = rule_value
@@ -259,7 +262,7 @@ def restore(order_id, amount, user):
     rtype = event.rtype
     rule_value = event.amount
     deduct = event.amount
-    deduct = _calc_deduct(amount, rtype, rule_value, event.id)
+    deduct = _calc_deduct(amount, rtype, rule_value, event)
    # if REDPACK_RULE[rtype] == "*":
    #     #return {"ret_code":30176, "message":"目前不支持百分比红包"}
 
