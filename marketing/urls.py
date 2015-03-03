@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
-from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedRewardTemplate, IntroducedAward
+from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate
 
 from django.contrib.auth.decorators import login_required
 
@@ -35,8 +35,5 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     '',
-    url(r'^introduced_by/$', IntroducedRewardTemplate.as_view(template_name="introduced_by.jade")),
-    # url(r'^query/$', login_required(IntroducedAward.as_view(template_name="introduced_by.jade"), login_url='/accounts/login/'), name='query'),
-    #url(r'^query/$', IntroducedAward.as_view(template_name="introduced_by.jade")),
-    #url(r'^introduced_by/query/$', IntroducedAward.as_view(template_name="introduced_by.jade")),
+    url(r'^introduced_by/$', IntroducedAwardTemplate.as_view(template_name="introduced_by.jade")),
 )

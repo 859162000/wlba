@@ -146,7 +146,7 @@ class Migration(SchemaMigration):
         },
         u'marketing.promotiontoken': {
             'Meta': {'object_name': 'PromotionToken'},
-            'token': ('django.db.models.fields.CharField', [], {'default': "'XJPXbI5sRE6NILl_7zlW3Q'", 'max_length': '64', 'db_index': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'gUY700eHRj-D93WGK50Q9A'", 'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         u'marketing.reward': {
