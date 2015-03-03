@@ -55,6 +55,7 @@ class RedPackEvent(models.Model):
     #amount = models.IntegerField(null=False, default=0, verbose_name=u'红包金额(百分比也为整数0-100)')
     amount = models.FloatField(null=False, default=0.0, verbose_name=u'红包金额(百分比也为0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
+    highest_amount = models.IntegerField(null=False, default=0, verbose_name=u"最高抵扣金额(百分比使用0无限制)")
     value = models.IntegerField(null=False, default=0, verbose_name=u"红包个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
     give_mode = models.CharField(max_length=20, verbose_name=u"发放方式", db_index=True, choices=(
