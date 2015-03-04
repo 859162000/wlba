@@ -51,12 +51,10 @@ class P2PTrader(object):
         if self.user.wanglibaouserprofile.frozen:
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
-            actual_amount = amount
             if redpack:
                 result = redpack_backends.consume(redpack,amount, self.user, self.order_id, self.device_type)
                 if result['ret_code'] != 0:
                     raise Exception,result['message']
-                #actual_amount = result['actual_amount']
                 red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'], savepoint=False)
 
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False)
