@@ -2,11 +2,7 @@
 
 from django.contrib import admin
 from django.utils import timezone
-<<<<<<< HEAD
-from views import AggregateView, MarketingView, TvView, TopsView, YaoView
-=======
 from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate
->>>>>>> c857c96e87985744b896e9c62e1272f931969ac3
 
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
     Activity, ActivityRule, Reward, RewardRecord, ClientData, Channels
