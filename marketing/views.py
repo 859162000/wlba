@@ -471,7 +471,9 @@ class IntroducedAwardTemplate(TemplateView):
                 )
 
             # self.reward_user_all()
+            IntroducedByReward.objects.filter(checked_status=0).update(checked_status=1)
             message = u'审核通过成功，为用户发送收益成功！'
+
 
         elif check == '2':
             # 审核未通过，删除统计记录
