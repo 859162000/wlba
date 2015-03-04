@@ -41,7 +41,7 @@ html
                   form
                     .col-lg-6
                       .form-group
-                        .input-daterange.input-group#datepicker
+                        .input-group.input-daterange#datepicker
                           input(type="text",name="start",value="#{start}").input-sm.form-control
                           span.input-group-addon to
                           input(type="text",name="end",value="#{end}").input-sm.form-control
@@ -84,4 +84,5 @@ html
 
 script.
   require(["/static/js/aggregate.js"])
+  require(["/static/js/tops_admin.js"])
 
