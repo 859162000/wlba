@@ -150,5 +150,4 @@ admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view
 
 
 admin.site.register_view('statistics/aggregate', view=AggregateView.as_view(), name=u'累计购买金额统计单')
-admin.site.register_view('statistics/yao', view=YaoView.as_view(), name=u'邀请收益统计')
 

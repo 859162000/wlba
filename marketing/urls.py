@@ -30,5 +30,4 @@ urlpatterns += patterns(
     '',
     url(r'^aggregate/', AggregateView.as_view(template_name="aggregate.jade")),
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
-    url(r'^yaoqing/', AggregateView.as_view(template_name="yaoqing.jade")),
 )

@@ -132,8 +132,12 @@ html
                     //author: hetao; time: 2014.10.11 target: 用户未登陆时先弹出登陆框
                   if user.is_authenticated
                     if  red_packets > 0
+                      span.span12
+                        span.payment2(style="margin-left:24px;display:inline-block;line-height:20px")
                       span.span8-omega(style="line-height:20px")
-                        span.payment 实际支付0元
+                        span.payment 实际支付
+                          i 0
+                          |元
                         a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
                     else
                       span.span8-omega
