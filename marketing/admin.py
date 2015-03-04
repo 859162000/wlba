@@ -130,7 +130,7 @@ class ClientDataAdmin(admin.ModelAdmin):
     list_filter = ('network', 'action')
 
 class ChannelsAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "name", "describe")
+    list_display = ("id", "code", "name", "description")
     search_fields = ("name",)
     list_filter = ("name",)
 
