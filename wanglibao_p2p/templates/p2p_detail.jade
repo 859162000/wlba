@@ -159,25 +159,11 @@ html
             for section_name, section_values in r
               .p2p-detail-list.clearfix
                 h1 {{section_name}}
-                if user.is_authenticated
-                  for item_name in section_values
-                    dl
-                      dt.span2.align-left {{item_name}}
-
-                      item_value = section_values[item_name]
-                      dd.span10-omega {{item_value|linebreaksbr}}
-                else
-                  .row
-                    .span2
-                      for item_name in section_values
-                        dt {{item_name}}
-
-                    .p2p-no-login
-                      li
-                        | 只有
-                        a.register-modal.blue(href="#login-modal") 注册用户
-                        |才能看到，现在
-                        a.login-modal.blue(href="#login-modal") 登录
+                for item_name in section_values
+                  dl
+                    dt.span2.align-left {{item_name}}
+                    item_value = section_values[item_name]
+                    dd.span10-omega {{item_value|linebreaksbr}}
 
           if attachments and user.is_authenticated
             .p2p-detail-list.clearfix
