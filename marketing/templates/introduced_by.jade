@@ -37,32 +37,33 @@ html
               .row
           .col-lg-12
             .panel.panel-default
-              .panel-heading.bac(style="background:#fff")
+              .panel-heading.bac(style="background:#fff;color:red")
+                if message
+                  .panel-content.padding-l-r-sm
+                  label.error {{ message }}
                 .panel-body
                 .row
                   form.form.span5(method="GET" action='/{{ "" | admin_address}}/statistics/introduced_by')
                     .col-lg-8
                       .form-group
-                        .liang.col-lg-7
-                          .input-group.ju
-                            span.input-group-addon#Time * 开始时间:
+                        .liang.col-lg-5
+                          .input-group.ju.input-daterange#datepicker
+                            span.input-group-addon * 开始时间:
                             input(type="text",name="start",value="{{start}}").input-sm.form-control
-                          .input-group
-                            span.input-group-addon#Time * 截止时间:
+                          .input-group.input-daterange#datepicker
+                            span.input-group-addon * 截止时间:
                             input(type="text",name="end",value="{{end}}").input-sm.form-control
                         .liang.col-lg-5
                           .input-group.ju
-                            span.input-group-addon#Time * 首笔投资最低额(包含):
+                            span.input-group-addon * 首笔投资最低额(包含):
                             input(type="text",name="amount_min",value="{{amount_min}}").input-sm.form-control
                           .input-group
-                            span.input-group-addon#Time * 收益百分比:
+                            span.input-group-addon * 收益百分比:
                             input(type="text",name="percent",value="{{percent}}").input-sm.form-control
                     .col-lg-4
                       .form-group
                         button(type="submit").btn.btn-default.btn-cha 统计
-                        if message
-                          .panel-content.padding-l-r-sm
-                          label.error {{ message }}
+
                 .row
 
                   h4
@@ -117,4 +118,5 @@ html
 
 script.
   require(["/static/js/aggregate.js"])
+  require(["/static/js/tops_admin.js"])
                                               
