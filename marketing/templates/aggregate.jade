@@ -74,15 +74,12 @@ html
                             td #{l.user__wanglibaouserprofile__name}
                             td #{l.amount}
 
-                .chart
-                  #container
     if result
       - with data=result uri='/activity/aggregate/'
       include include/pager_aggregate
       - endwith
 
-
-script.
-  require(["/static/js/aggregate.js"])
-  require(["/static/js/tops_admin.js"])
+if result
+  script.
+    require(["/static/js/tops_admin.js"])
 
