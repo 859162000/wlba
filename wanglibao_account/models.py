@@ -150,6 +150,22 @@ class MessageNoticeSet(models.Model):
     notice = models.BooleanField(default=True, verbose_name=u"是否通知")
 
 
+class UserAddress(models.Model):
+    """
+        user address setting
+    """
+    user = models.ForeignKey(User)
+    name = models.CharField(max_length=50, verbose_name=u"收件人姓名")
+    address = models.CharField(max_length=255, verbose_name=u"详细地址", blank=True)
+    province = models.CharField(max_length=50, verbose_name=u"省", blank=True)
+    city = models.CharField(max_length=50, verbose_name=u"市", blank=True)
+    area = models.CharField(max_length=50, verbose_name=u"县（区）", blank=True)
+    phone_number = models.CharField(max_length=100, verbose_name=u"联系电话")
+    postcode = models.CharField(max_length=6, verbose_name=u"邮政编码", blank=True)
+    is_default = models.BooleanField(default=False, verbose_name=u"是否为默认")
+
+
+
 #发给所有人
 def send_public_message(sender, instance, **kwargs):
     if instance.mtype == "public":

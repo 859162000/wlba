@@ -9,7 +9,7 @@ from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import DecimalWidget
 from marketing.models import PromotionToken, IntroducedBy
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_account.models import VerifyCounter, IdVerification, Binding, Message, MessageText, UserPushId
+from wanglibao_account.models import VerifyCounter, IdVerification, Binding, Message, MessageText, UserPushId, UserAddress
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -128,6 +128,10 @@ class MessageTextAdmin(admin.ModelAdmin):
     # search_fields = ('content', )
 
 
+class UserAddressAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "address", "province", "city", "area", "postcode", "is_default")
+
+
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(IdVerification, IdVerificationAdmin)
@@ -138,5 +142,6 @@ admin.site.register(Binding, BindingAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(MessageText, MessageTextAdmin)
 admin.site.register(UserPushId, UserPushIdAdmin)
+admin.site.register(UserAddress, UserAddressAdmin)
 
 admin.site.register_view('accounts/message/', view=AdminSendMessageView.as_view(), name=u'网利宝-发送站内信')
