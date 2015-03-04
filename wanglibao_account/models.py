@@ -156,7 +156,7 @@ class UserAddress(models.Model):
     """
     user = models.ForeignKey(User)
     name = models.CharField(max_length=50, verbose_name=u"收件人姓名")
-    address = models.CharField(max_length=255, verbose_name=u"详细地址", blank=True)
+    address = models.CharField(max_length=255, verbose_name=u"详细地址")
     province = models.CharField(max_length=50, verbose_name=u"省", blank=True)
     city = models.CharField(max_length=50, verbose_name=u"市", blank=True)
     area = models.CharField(max_length=50, verbose_name=u"县（区）", blank=True)
