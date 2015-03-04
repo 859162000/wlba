@@ -471,7 +471,9 @@ class IntroducedAwardTemplate(TemplateView):
                 )
 
             # self.reward_user_all()
+            IntroducedByReward.objects.filter(checked_status=0).update(checked_status=1)
             message = u'审核通过成功，为用户发送收益成功！'
+
 
         elif check == '2':
             # 审核未通过，删除统计记录
@@ -495,7 +497,7 @@ class IntroducedAwardTemplate(TemplateView):
         text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
         if only_show is not True:
             send_messages.apply_async(kwargs={
-                "phones": [user.wanglibaouserprofile.phone],
+                "phones": [introduced_by.wanglibaouserprofile.phone],
                 "messages": [text_content]
             })
 
