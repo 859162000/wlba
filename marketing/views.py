@@ -325,8 +325,8 @@ class IntroducedAwardTemplate(TemplateView):
                 end_utc = local_to_utc(end, source_time='max')
 
                 amount_min = Decimal(amount_min)
-                percent = Decimal(Decimal(percent) * 0.01)
-            except Exception:
+                percent = Decimal(percent)
+            except Exception, e:
                 return {
                     "message": u"查询条件数据不合法！",
                     "start": start.date().__str__() if isinstance(start, datetime) else start,
@@ -418,7 +418,7 @@ class IntroducedAwardTemplate(TemplateView):
                 reward.first_reward = amount_earning
                 # 邀请人活取被邀请人首笔投资收益
                 reward.introduced_reward = Decimal(
-                    amount_earning * Decimal(percent)
+                    amount_earning * Decimal(percent) * Decimal('0.01')
                 ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
                 reward.activity_start_at = start_utc
