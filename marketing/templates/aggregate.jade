@@ -37,27 +37,30 @@ html
 
               .panel-body
                 .row
-
+                  b(style="background:#fff;color:red")
+                    if message
+                      .panel-content.padding-l-r-sm
+                      label.error {{ message }}
                   form
                     .col-lg-6
                       .form-group
                         .input-daterange.input-group#datepicker
-                          input(type="text",name="start",value="#{start}").input-sm.form-control
+                          input(type="text",name="start",value="{{start}}").input-sm.form-control
                           span.input-group-addon to
-                          input(type="text",name="end",value="#{end}").input-sm.form-control
+                          input(type="text",name="end",value="{{end}}").input-sm.form-control
                         .input-group
                           h4 查询最小金额（包含此金额）
-                          input(type="text",name="amount_min",value="#{amount_min}").input-sm.form-control
+                          input(type="text",name="amount_min",value="{{amount_min}}").input-sm.form-control
                         .input-group
                           h4 查询截止截止金额（不包含此金额）
-                          input(type="text",name="amount_max",value="#{amount_max}").input-sm.form-control
+                          input(type="text",name="amount_max",value="{{amount_max}}").input-sm.form-control
                     .col-lg-6
                       .form-group
                         button(type="submit").btn.btn-default 查询
                 .row
                   h4
                     | &nbsp;&nbsp;&nbsp;&nbsp;
-                    | 统计总金额为： #{amount_all}
+                    | 统计总金额为： {{amount_all}}
 
                 .table-responsive
                   table.table.table-striped.table-bordered.table-hover
@@ -70,16 +73,15 @@ html
                       if result
                         for l in result
                           tr
-                            td #{l.user__wanglibaouserprofile__phone}
-                            td #{l.user__wanglibaouserprofile__name}
-                            td #{l.amount}
+                            td {{l.user__wanglibaouserprofile__phone}}
+                            td {{l.user__wanglibaouserprofile__name}}
+                            td {{l.amount}}
 
     if result
       - with data=result uri='/activity/aggregate/'
       include include/pager_aggregate
       - endwith
 
-if result
-  script.
-    require(["/static/js/tops_admin.js"])
+script.
+  require(["/static/js/tops_admin.js"])
 

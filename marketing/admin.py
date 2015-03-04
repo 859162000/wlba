@@ -5,9 +5,8 @@ from django.utils import timezone
 
 from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
 
-
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
-    Activity, ActivityRule, Reward, RewardRecord, ClientData
+    Activity, ActivityRule, Reward, RewardRecord, ClientData, Channels
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -131,6 +130,11 @@ class ClientDataAdmin(admin.ModelAdmin):
     search_fields = ('phone', )
     list_filter = ('network', 'action')
 
+class ChannelsAdmin(admin.ModelAdmin):
+    list_display = ("id", "code", "name", "description")
+    search_fields = ("name",)
+    list_filter = ("name",)
+
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
@@ -142,6 +146,7 @@ admin.site.register(ActivityRule, ActivityRuleAdmin)
 admin.site.register(Reward, RewardAdmin)
 admin.site.register(RewardRecord, RewardRecordAdmin)
 admin.site.register(ClientData, ClientDataAdmin)
+admin.site.register(Channels, ChannelsAdmin)
 
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
 admin.site.register_view('statistics/tops', view=TopsView.as_view(), name=u'日周月榜名单')

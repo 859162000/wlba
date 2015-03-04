@@ -69,13 +69,25 @@ class PromotionToken(models.Model):
     class Meta:
         verbose_name_plural = u'用户邀请码'
 
+class Channels(models.Model):
+    """
+        渠道信息
+    """
+    code = models.CharField(u'渠道代码', max_length=12, db_index=True, unique=True)
+    name = models.CharField(u'渠道名字(xunlei)', max_length=20, default="")
+    description = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = u"渠道"
 
 class IntroducedBy(models.Model):
     """ user: 被邀请人
         introduced_by: 邀请人
     """
     user = models.ForeignKey(User)
-    introduced_by = models.ForeignKey(User, related_name='introduces')
+    introduced_by = models.ForeignKey(User, related_name='introduces', blank=True)
+    channel = models.ForeignKey(Channels, blank=True, null=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
     gift_send_at = models.DateTimeField(u'奖品发放时间', null=True, blank=True)
