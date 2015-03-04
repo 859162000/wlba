@@ -345,7 +345,14 @@ class IntroducedAwardTemplate(TemplateView):
             first_record = P2PRecord.objects.filter(
                 user=first_user.user,
                 create_time__range=(start_utc, end_utc),
-                catalog='申购'
+                catalog='申购',
+                product__status__in=[
+                    u'满标待打款',
+                    u'满标已打款',
+                    u'满标待审核',
+                    u'满标已审核',
+                    u'还款中',
+                    u'已完成', ]
             ).earliest("create_time")
 
             # first trade min amount limit
