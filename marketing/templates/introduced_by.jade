@@ -12,7 +12,6 @@ html
     link(href="/static/css/sb-admin-2.css", media="screen, projection", rel="stylesheet", type="text/css")
     link(href="/static/css/plugins/datepicker3.css", media="screen, projection", rel="stylesheet", type="text/css")
     style
-      #Time {font-size:18px;background:none;border:none}
       .zuo {float:left}.ju{margin-bottom:20px}
       .btn-cha {padding:10px 40px;margin-top:20px}
       .btn-cha2 {margin-left:400px;padding:10px 40px;margin-top:20px}
@@ -37,10 +36,11 @@ html
               .row
           .col-lg-12
             .panel.panel-default
-              .panel-heading.bac(style="background:#fff;color:red")
-                if message
-                  .panel-content.padding-l-r-sm
-                  label.error {{ message }}
+              .panel-heading.bac(style="background:#fff;")
+                b(style="background:#fff;color:red")
+                    if message
+                      .panel-content.padding-l-r-sm
+                      label.error {{ message }}
                 .panel-body
                 .row
                   form.form.span5(method="GET" action='/{{ "" | admin_address}}/statistics/introduced_by')
@@ -117,6 +117,5 @@ html
       - endwith
 
 script.
-  require(["/static/js/aggregate.js"])
   require(["/static/js/tops_admin.js"])
                                               
