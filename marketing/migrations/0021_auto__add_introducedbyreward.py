@@ -90,6 +90,14 @@ class Migration(SchemaMigration):
             'rule_amount': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '20', 'decimal_places': '4'}),
             'rule_type': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
+        u'marketing.channels': {
+            'Meta': {'object_name': 'Channels'},
+            'code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '12', 'db_index': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20'})
+        },
         u'marketing.clientdata': {
             'Meta': {'ordering': "['-create_time']", 'object_name': 'ClientData'},
             'action': ('django.db.models.fields.IntegerField', [], {'max_length': '2'}),
@@ -104,11 +112,12 @@ class Migration(SchemaMigration):
         u'marketing.introducedby': {
             'Meta': {'ordering': "['-created_at']", 'object_name': 'IntroducedBy'},
             'bought_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'channel': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['marketing.Channels']", 'null': 'True', 'blank': 'True'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'created_by': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'creator'", 'null': 'True', 'to': u"orm['auth.User']"}),
             'gift_send_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'introduced_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'introduces'", 'to': u"orm['auth.User']"}),
+            'introduced_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'introduces'", 'blank': 'True', 'to': u"orm['auth.User']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'marketing.introducedbyreward': {
@@ -146,7 +155,7 @@ class Migration(SchemaMigration):
         },
         u'marketing.promotiontoken': {
             'Meta': {'object_name': 'PromotionToken'},
-            'token': ('django.db.models.fields.CharField', [], {'default': "'gUY700eHRj-D93WGK50Q9A'", 'max_length': '64', 'db_index': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'GJ9Ku93ATVGfwkRd4tUHpA'", 'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         u'marketing.reward': {
@@ -223,7 +232,7 @@ class Migration(SchemaMigration):
             'category': ('django.db.models.fields.CharField', [], {'default': "u'\\u666e\\u901a'", 'max_length': '16'}),
             'contract_serial_number': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             'contract_template': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.ContractTemplate']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 3, 10, 0, 0)'}),
+            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 3, 11, 0, 0)'}),
             'excess_earning_description': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'excess_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'expected_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
