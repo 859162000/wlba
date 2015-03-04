@@ -130,6 +130,7 @@ class MessageTextAdmin(admin.ModelAdmin):
 
 class UserAddressAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "address", "province", "city", "area", "postcode", "is_default")
+    raw_id_fields = ('user', )
 
 
 admin.site.unregister(User)
