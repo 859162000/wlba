@@ -57,7 +57,7 @@ html
                 .row
                   h4
                     | &nbsp;&nbsp;&nbsp;&nbsp;
-                    | 统计总金额为： #{amount_all.amount_sum__sum}
+                    | 统计总金额为： #{amount_all}
 
                 .table-responsive
                   table.table.table-striped.table-bordered.table-hover
@@ -67,21 +67,19 @@ html
                         th(rowspan="1") 用户id
                         th(rowspan="1") 金额总额
                     tbody
-                      for l in result
-                        tr
-                          td #{l.user.wanglibaouserprofile.phone}
-                          td #{l.user.wanglibaouserprofile.name}
-                          td #{l.amount}
+                      if result
+                        for l in result
+                          tr
+                            td #{l.user__wanglibaouserprofile__phone}
+                            td #{l.user__wanglibaouserprofile__name}
+                            td #{l.amount}
 
+    if result
+      - with data=result uri='/activity/aggregate/'
+      include include/pager_aggregate
+      - endwith
 
-                .chart
-                  #container
-
-    - with data=result uri='/activity/aggregate/'
-    include include/pager_aggregate
-    - endwith
-
-
-script.
-  require(["/static/js/aggregate.js"])
+if result
+  script.
+    require(["/static/js/tops_admin.js"])
 
