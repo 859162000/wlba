@@ -35,6 +35,9 @@ from order.utils import OrderHelper
 
 # Create your views here.
 
+class YaoView(TemplateView):
+    template_name = 'yaoqing.jade'
+
 class MarketingView(TemplateView):
     template_name = 'diary.jade'
 
