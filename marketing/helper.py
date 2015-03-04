@@ -18,7 +18,7 @@ class Channel():
     WANGLIBAO = "wanglibao"
     FENGXING = "fengxing"
     JIUXIAN = "jiuxian"
-    SOUGOUJINGJIA = "sougoujingjia"
+    SOUGOUJINGJIA = "sougou"
 
 
 
