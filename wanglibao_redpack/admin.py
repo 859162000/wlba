@@ -35,7 +35,7 @@ class RedPackAdmin(ExportMixin, admin.ModelAdmin):
     list_filter = ("status",)
     resource_class = RedPackResource
 
-class RedPackRecordAdmin(admin.ModelAdmin):
+class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
     list_display = ("id", "redpack", "user", "change_platform", "apply_platform", "created_at", "apply_at", "order_id")
     search_fields = ('user__wanglibaouserprofile__phone','redpack__event__name')
     raw_id_fields = ('user', "redpack")
