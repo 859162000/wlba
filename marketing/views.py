@@ -213,10 +213,6 @@ class AggregateView(TemplateView):
         begin = amsterdam.localize(datetime.combine(start, start.min.time()))
         end = amsterdam.localize(datetime.combine(end, end.max.time()))
 
-        # trades = P2PRecord.objects.filter(
-        #     create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
-        # ).select_related('p2pproduct').exclude(p2pproduct__status=u'还款中').values('user').annotate(amount=Sum('amount'))
-
         trades = P2PRecord.objects.filter(
             create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
         ).filter(product__status__in=[
