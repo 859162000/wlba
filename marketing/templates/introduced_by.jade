@@ -38,9 +38,9 @@ html
             .panel.panel-default
               .panel-heading.bac(style="background:#fff;")
                 b(style="background:#fff;color:red")
-                    if message
-                      .panel-content.padding-l-r-sm
-                      label.error {{ message }}
+                  if message
+                    .panel-content.padding-l-r-sm
+                    label.error {{ message }}
                 .panel-body
                 .row
                   form.form.span5(method="GET" action='/{{ "" | admin_address}}/statistics/introduced_by')
@@ -58,7 +58,7 @@ html
                             span.input-group-addon * 首笔投资最低额(包含):
                             input(type="text",name="amount_min",value="{{amount_min}}").input-sm.form-control
                           .input-group
-                            span.input-group-addon * 收益百分比:
+                            span.input-group-addon * 收益(%):
                             input(type="text",name="percent",value="{{percent}}").input-sm.form-control
                     .col-lg-4
                       .form-group
