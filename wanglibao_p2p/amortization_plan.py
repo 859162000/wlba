@@ -193,9 +193,37 @@ class QuarterlyInterest(AmortizationPlan):
         amortization.save()
 
 
+class DailyInterest(AmortizationPlan):
+    name = u'按日计息'
+
+    @classmethod
+    def generate(cls, amount, year_rate, term, period=None):
+        amount = Decimal(amount)
+
+        daily_rate = year_rate / 360
+        daily_rate = Decimal(daily_rate).quantize(Decimal('0.000000001'))
+        daily_interest = amount * daily_rate
+        daily_interest = daily_interest.quantize(Decimal('.01'))
+
+        total = month_interest * period + amount
+
+        result = []
+
+        #for i in xrange(0, period - 1):
+        #    result.append((month_interest, Decimal(0), month_interest, amount, total - month_interest * (i + 1)))
+
+        result.append((total + amount, amount, total, Decimal(0), Decimal(0)))
+
+        return {
+            "terms": result,
+            "total": total
+        }
+
+
 def get_amortization_plan(amortization_type):
     for plan in (MatchingPrincipalAndInterest,
                  MonthlyInterest,
+                 DailyInterest,
                  InterestFirstThenPrincipal,
                  DisposablePayOff,
                  QuarterlyInterest):
