@@ -22,7 +22,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import PromotionToken
+from marketing.models import PromotionToken, Channels
 from marketing.utils import set_promo_user
 from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
@@ -171,7 +171,11 @@ class RegisterAPIView(APIView):
         invite_code = request.DATA.get('invite_code', "")
         if invite_code:
             try:
-                PromotionToken.objects.get(token=invite_code)
+                record = Channels.objects.filter(code=invite_code).first()
+                if not record:
+                    p = PromotionToken.objects.filter(token=invite_code).first()
+                    if not p:
+                        raise
             except:
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
 

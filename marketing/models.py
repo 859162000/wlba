@@ -94,7 +94,7 @@ class IntroducedBy(models.Model):
         introduced_by: 邀请人
     """
     user = models.ForeignKey(User)
-    introduced_by = models.ForeignKey(User, related_name='introduces', blank=True)
+    introduced_by = models.ForeignKey(User, related_name='introduces', blank=True, null=True)
     channel = models.ForeignKey(Channels, blank=True, null=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
