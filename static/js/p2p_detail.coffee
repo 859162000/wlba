@@ -75,7 +75,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         amount = $('input[name=amount]').val()
         redpack_id = $('.dd-selected-value').val()
 #        validate_code = $('input[name=validate_code]').val()
-
         backend.purchaseP2P {
           product: product
           amount: amount
@@ -221,7 +220,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
         ddData.push(
           text: '不使用红包'
-          value: 'red'
+          value: ''
           selected: true
           amount: 0
           invest_amount: 0
@@ -249,7 +248,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           selectText: "请选择红包"
           onSelected: (data) ->
             obj = data.selectedData
-            if obj.value !='red'
+            if obj.value !=''
               if obj.amount !=0
                 pay_amount=$('#id_amount').val();
                 $.ajax {
