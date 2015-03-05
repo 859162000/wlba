@@ -16,7 +16,7 @@ from wanglibao.admin import ReadPermissionModelAdmin
 
 
 class NewsAndReportAdmin(admin.ModelAdmin):
-    list_display = ("name", "link", "score")
+    list_display = ("name", "description", "link", "score", "hits")
 
 
 class SiteDataAdmin(admin.ModelAdmin):
