@@ -61,17 +61,17 @@ class IntroducedByResource(resources.ModelResource):
 
 
 class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
-    list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
+    list_display = ("id", "user", "introduced_by", "channel", "created_at", "bought_at", "gift_send_at")
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
     raw_id_fields = ('user', 'introduced_by', 'created_by')
     resource_class = IntroducedByResource
 
-    def get_queryset(self, request):
-        qs = super(IntroducedByAdmin, self).get_queryset(request)
-        qs = qs.select_related('user').select_related('user__wanglibaouserprofile')\
-            .select_related('introduced_by').select_related('introduced_by__wanglibaouserprofile')
-        return qs
+   # def get_queryset(self, request):
+   #     qs = super(IntroducedByAdmin, self).get_queryset(request)
+   #     qs = qs.select_related('user').select_related('user__wanglibaouserprofile')\
+   #         .select_related('introduced_by').select_related('introduced_by__wanglibaouserprofile')
+   #     return qs
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('marketing.view_introducedby'):

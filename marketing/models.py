@@ -86,6 +86,9 @@ class Channels(models.Model):
     class Meta:
         verbose_name_plural = u"渠道"
 
+    def __unicode__(self):
+        return self.name
+
 class IntroducedBy(models.Model):
     """ user: 被邀请人
         introduced_by: 邀请人
