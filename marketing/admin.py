@@ -62,12 +62,18 @@ class IntroducedByResource(resources.ModelResource):
 
 #class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
 class IntroducedByAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "introduced_by", "channel", "created_at", "bought_at", "gift_send_at")
+    list_display = ("id", "user", "format_intro", "channel", "created_at", "bought_at", "gift_send_at")
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
     raw_id_fields = ('user', 'introduced_by', 'created_by')
     #resource_class = IntroducedByResource
 
+    def format_intro(self, obj):
+        if not obj.introduced_by:
+            return None
+        else:
+            return obj.introduced_by
+    format_intro.short_description = u"邀请人"
    # def get_queryset(self, request):
    #     qs = super(IntroducedByAdmin, self).get_queryset(request)
    #     qs = qs.select_related('user').select_related('user__wanglibaouserprofile')\
