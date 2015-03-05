@@ -356,7 +356,7 @@ class IntroducedAwardTemplate(TemplateView):
         else:
             message = u'存在未审核记录，请先进行审核操作！'
 
-        introduced_result = IntroducedByReward.objects.filter(checked_status=0)
+        introduced_result = IntroducedByReward.objects.filter(checked_status=0).order_by("first_bought_at")
         if introduced_by_reward and introduced_by_reward.count() > 0:
             time_zone = pytz.timezone('Asia/Shanghai')
             result_first = introduced_result.first()
@@ -413,12 +413,12 @@ class IntroducedAwardTemplate(TemplateView):
 
                 # 计算被邀请人首笔投资总收益
                 amount_earning = Decimal(
-                    Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12))
+                    Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12)) * Decimal(first_record.product.expected_earning_rate) * Decimal('0.01')
                 ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
                 reward.first_reward = amount_earning
                 # 邀请人活取被邀请人首笔投资收益
                 reward.introduced_reward = Decimal(
-                    amount_earning * Decimal(percent) * Decimal('0.01')
+                    Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12)) * Decimal(percent) * Decimal('0.01')
                 ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
                 reward.activity_start_at = start_utc
