@@ -40,7 +40,7 @@ from django.utils import timezone
 #from wanglibao_account import message as inside_message
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm
-from marketing.helper import RewardStrategy, which_channel, Channel
+#from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import split_ua
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
