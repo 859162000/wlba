@@ -7,6 +7,7 @@ sys.setdefaultencoding('utf8')
 
 import time
 import logging
+import decimal
 from django.utils import timezone
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
 from wanglibao_p2p.models import P2PRecord
@@ -48,7 +49,7 @@ def list_redpack(user, status, device_type):
             event = x.redpack.event
             obj = {"name":event.name, "method":REDPACK_RULE[event.rtype], "amount":event.amount,
                     "id":x.id, "invest_amount":event.invest_amount,
-                    "unavailable_at":stamp(event.unavailable_at)}
+                    "unavailable_at":stamp(event.unavailable_at), "event_id":event.id}
             if event.available_at < timezone.now() < event.unavailable_at:
                 if event.apply_platform == "all" or event.apply_platform == device_type:
                     if obj['method'] == REDPACK_RULE['percent']:
@@ -63,7 +64,7 @@ def list_redpack(user, status, device_type):
             event = x.redpack.event
             obj = {"name":event.name, "receive_at":stamp(x.created_at),
                     "available_at":stamp(event.available_at), "unavailable_at":stamp(event.unavailable_at),
-                    "id":x.id, "invest_amount":event.invest_amount, "amount":event.amount}
+                    "id":x.id, "invest_amount":event.invest_amount, "amount":event.amount, "event_id":event.id}
             if x.order_id:
                 pr = P2PRecord.objects.filter(order_id=x.order_id).first()
                 obj.update({"product":pr.product.name, "apply_at":stamp(x.apply_at),
@@ -176,6 +177,7 @@ def _give_redpack(user, rtype, device_type):
 
 
 def consume(redpack, amount, user, order_id, device_type):
+    amount = fmt_two_amount(amount)
     record = RedPackRecord.objects.filter(user=user, id=redpack).first()
     redpack = record.redpack
     event = redpack.event
@@ -201,38 +203,56 @@ def consume(redpack, amount, user, order_id, device_type):
     rtype = event.rtype
     rule_value = event.amount
     deduct = event.amount
-    if REDPACK_RULE[rtype] == "*":
-        #return {"ret_code":30176, "message":"目前不支付百分比红包"}
+    deduct = _calc_deduct(amount, rtype, rule_value, event)
+   # if REDPACK_RULE[rtype] == "*":
+   #     #return {"ret_code":30176, "message":"目前不支付百分比红包"}
+   #     rule_value = rule_value/100.0
+   #     deduct = fmt_two_amount(amount * rule_value)
+   #     actual_amount = amount + deduct
+   # elif REDPACK_RULE[rtype] == "-":
+   #     if event.id == 7:
+   #         t5 = amount * 0.005
+   #         if t5 >= rule_value:
+   #             deduct = rule_value
+   #         else:
+   #             deduct = t5
+   #         deduct = fmt_two_amount(deduct)
+   #     else:
+   #         if amount <= rule_value:
+   #             actual_amount = amount
+   #             deduct = amount
+   #         else:
+   #             actual_amount = amount - rule_value
+   # elif REDPACK_RULE[rtype] == "+":
+   #     actual_amount = amount + rule_value
 
-        #rule_value = float("%.2f" % (rule_value/100.0))
-        #deduct = round(amount * rule_value)
-        #actual_amount = amount + amount * rule_value
-        rule_value = rule_value/100.0
-        deduct = fmt_two_amount(amount * rule_value)
-        actual_amount = amount + deduct
+    return {"ret_code":0, "message":"ok", "deduct":deduct}
+
+def _calc_deduct(amount, rtype, rule_value, event):
+    if REDPACK_RULE[rtype] == "*":
+        percent = decimal.Decimal(str(rule_value/100.0))
+        deduct = amount * percent
+        if event.highest_amount > 0:
+            if deduct >= event.highest_amount:
+                deduct = decimal.Decimal(event.highest_amount)
     elif REDPACK_RULE[rtype] == "-":
         if event.id == 7:
-            t5 = amount * 0.005
+            t5 = amount * decimal.Decimal('0.005')
             if t5 >= rule_value:
-                deduct = rule_value
+                deduct = decimal.Decimal(str(rule_value))
             else:
                 deduct = t5
-            deduct = fmt_two_amount(deduct)
         else:
             if amount <= rule_value:
-                actual_amount = amount
                 deduct = amount
             else:
-                actual_amount = amount - rule_value
-    elif REDPACK_RULE[rtype] == "+":
-        actual_amount = amount + rule_value
-
-    return {"ret_code":0, "message":"ok", "actual_amount":actual_amount, "deduct":deduct}
-
-def _calc_deduct():
-    pass
+                deduct = decimal.Decimal(str(rule_value))
+    real_deduct = deduct.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
+    return real_deduct
 
 def restore(order_id, amount, user):
+    if type(amount) != decimal.Decimal:
+        amount = fmt_two_amount(amount)
     record = RedPackRecord.objects.filter(user=user, order_id=order_id).first()
     if not record:
         return {"ret_code":-1, "message":"redpack not exists"}
@@ -245,31 +265,32 @@ def restore(order_id, amount, user):
     rtype = event.rtype
     rule_value = event.amount
     deduct = event.amount
-    if REDPACK_RULE[rtype] == "*":
-        #return {"ret_code":30176, "message":"目前不支持百分比红包"}
+    deduct = _calc_deduct(amount, rtype, rule_value, event)
+   # if REDPACK_RULE[rtype] == "*":
+   #     #return {"ret_code":30176, "message":"目前不支持百分比红包"}
 
-        #rule_value = float("%.2f" % (rule_value/100.0))
-        #actual_amount = amount + amount * rule_value
-        #deduct = round(amount * rule_value)
-        rule_value = rule_value/100.0
-        deduct = fmt_two_amount(amount * rule_value)
-        actual_amount = amount + deduct
-    elif REDPACK_RULE[rtype] == "-":
-        if event.id == 7:
-            t5 = amount * 0.005
-            if t5 >= rule_value:
-                deduct = rule_value
-            else:
-                deduct = t5
-            deduct = fmt_two_amount(deduct)
-        else:
-            if amount <= rule_value:
-                actual_amount = amount
-                deduct = amount
-            else:
-                actual_amount = amount - rule_value
-    elif REDPACK_RULE[rtype] == "+":
-        actual_amount = amount + rule_value
+   #     #rule_value = float("%.2f" % (rule_value/100.0))
+   #     #actual_amount = amount + amount * rule_value
+   #     #deduct = round(amount * rule_value)
+   #     rule_value = rule_value/100.0
+   #     deduct = fmt_two_amount(amount * rule_value)
+   #     actual_amount = amount + deduct
+   # elif REDPACK_RULE[rtype] == "-":
+   #     if event.id == 7:
+   #         t5 = amount * 0.005
+   #         if t5 >= rule_value:
+   #             deduct = rule_value
+   #         else:
+   #             deduct = t5
+   #         deduct = fmt_two_amount(deduct)
+   #     else:
+   #         if amount <= rule_value:
+   #             actual_amount = amount
+   #             deduct = amount
+   #         else:
+   #             actual_amount = amount - rule_value
+   # elif REDPACK_RULE[rtype] == "+":
+   #     actual_amount = amount + rule_value
     logger.info(u"%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
     return {"ret_code":0, "deduct":deduct}
 
@@ -277,16 +298,17 @@ def deduct_calc(amount, redpack_amount):
     if not amount or not redpack_amount:
         return {"ret_code":30181, "message":"金额错误"}
     try:
-        amount = float(amount)
-        redpack_amount = float(redpack_amount)
+        float(amount)
+        float(redpack_amount)
     except:
         return {"ret_code":30182, "message":"金额格式不正确"}
 
-    t5 = amount * 0.005
-    real_deduct = 0
+    t5 = fmt_two_amount(amount) * decimal.Decimal('0.005')
+    redpack_amount = fmt_two_amount(redpack_amount)
+    real_deduct = fmt_two_amount(0)
     if t5 >= redpack_amount:
         real_deduct = redpack_amount
     else:
         real_deduct = t5
-    real_deduct = fmt_two_amount(real_deduct)
+    real_deduct = real_deduct.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
     return {"ret_code":0, "deduct":real_deduct}
