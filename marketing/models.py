@@ -69,13 +69,25 @@ class PromotionToken(models.Model):
     class Meta:
         verbose_name_plural = u'用户邀请码'
 
+class Channels(models.Model):
+    """
+        渠道信息
+    """
+    code = models.CharField(u'渠道代码', max_length=12, db_index=True, unique=True)
+    name = models.CharField(u'渠道名字(xunlei)', max_length=20, default="")
+    description = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = u"渠道"
 
 class IntroducedBy(models.Model):
     """ user: 被邀请人
         introduced_by: 邀请人
     """
     user = models.ForeignKey(User)
-    introduced_by = models.ForeignKey(User, related_name='introduces')
+    introduced_by = models.ForeignKey(User, related_name='introduces', blank=True)
+    channel = models.ForeignKey(Channels, blank=True, null=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
     gift_send_at = models.DateTimeField(u'奖品发放时间', null=True, blank=True)
@@ -227,3 +239,32 @@ class ClientData(models.Model):
 
     def __unicode__(self):
         return u'<%s>' % self.userdevice
+
+
+class IntroducedByReward(models.Model):
+    from wanglibao_p2p.models import P2PProduct
+
+    """ 邀请奖励统计表"""
+    STATUS = (
+        (0, u'未审核'),
+        (1, u'审核通过发放奖励'),
+    )
+
+    user = models.ForeignKey(User)
+    introduced_by_person = models.ForeignKey(User, related_name='introduced_person')
+    product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True, default=None)
+    first_bought_at = models.DateTimeField(u'首笔购买时间', null=False)
+    first_amount = models.DecimalField(u'首笔投资金额', max_digits=20, decimal_places=2, default=0)
+    first_reward = models.DecimalField(u'首笔投资收益', max_digits=20, decimal_places=2, default=0)
+    introduced_reward = models.DecimalField(u'邀请人奖励', max_digits=20, decimal_places=2, default=0)
+    activity_start_at = models.DateTimeField(u'活动统计开始时间', null=False)
+    activity_end_at = models.DateTimeField(u'活动统计截止时间', null=False)
+    activity_amount_min = models.DecimalField(u'活动统计首笔投资最小金额', max_digits=20, decimal_places=2, default=0)
+    percent_reward = models.DecimalField(u'活动奖励百分比奖励', max_digits=20, decimal_places=2, default=0)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+    checked_status = models.IntegerField(u'审核状态', max_length=2, choices=STATUS)
+    checked_at = models.DateTimeField(u'审核时间', null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = u'邀请奖励统计表'

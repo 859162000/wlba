@@ -1,0 +1,121 @@
+//
+                          Created by HeZhang on 15-2-3.
+-load formatters
+doctype html
+html
+  head
+    meta(name="viewport",content="width=device-width,initial-scale=1")
+    - with '累计购买金额统计单 ' as title
+    - endwith
+    link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/metisMenu/metisMenu.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/sb-admin-2.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/datepicker3.css", media="screen, projection", rel="stylesheet", type="text/css")
+    style
+      .zuo {float:left}.ju{margin-bottom:20px}
+      .btn-cha {padding:10px 40px;margin-top:20px}
+      .btn-cha2 {margin-left:400px;padding:10px 40px;margin-top:20px}
+      .bac { background:#fff}
+      .liang { margin-bottom:20px}
+    script(src="/static/js/require.js", data-main="/static/js/header")
+    script(src="https://code.jquery.com/jquery-1.11.1.min.js", data-main="/static/js/header")
+    script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js", data-main="/static/js/header")
+    script(src="/static/js/lib/bootstrap-datepicker.js", data-main="/static/js/header")
+    body(role="document")
+    #wrapper
+      nav.navbar.navbar-default.navbar-static-top(role="navigation", style="margin-bottom:0px")
+        .navbar-header
+          a.navbar-brand(href="?") 网利宝统计数据
+        - with '邀请收益统计' as activeItem
+        include include/admin_menu
+        - endwith
+      #page-wrapper
+        .row
+          .col-lg-12
+            h1.page-header 邀请收益统计
+              .row
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading.bac(style="background:#fff;")
+                b(style="background:#fff;color:red")
+                  if message
+                    .panel-content.padding-l-r-sm
+                    label.error {{ message }}
+                .panel-body
+                .row
+                  form.form.span5(method="GET" action='/{{ "" | admin_address}}/statistics/introduced_by')
+                    .col-lg-8
+                      .form-group
+                        .liang.col-lg-5
+                          .input-group.ju.input-daterange#datepicker
+                            span.input-group-addon * 开始时间:
+                            input(type="text",name="start",value="{{start}}").input-sm.form-control
+                          .input-group.input-daterange#datepicker
+                            span.input-group-addon * 截止时间:
+                            input(type="text",name="end",value="{{end}}").input-sm.form-control
+                        .liang.col-lg-5
+                          .input-group.ju
+                            span.input-group-addon * 首笔投资最低额(包含):
+                            input(type="text",name="amount_min",value="{{amount_min}}").input-sm.form-control
+                          .input-group
+                            span.input-group-addon * 收益(%):
+                            input(type="text",name="percent",value="{{percent}}").input-sm.form-control
+                    .col-lg-4
+                      .form-group
+                        button(type="submit").btn.btn-default.btn-cha 统计
+
+                .row
+
+                  h4
+                    | &nbsp;&nbsp;&nbsp;&nbsp;
+                    | 邀请人奖励总金额为： {{amount_all.sum_introduced_reward}}
+                    .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 用户id
+                        th(rowspan="1") 邀请人id
+                        th(rowspan="1") 首笔投资产品
+                        th(rowspan="1") 首笔投资时间
+                        th(rowspan="1") 首笔投资金额
+                        th(rowspan="1") 首笔投资收益
+                        th(rowspan="1") 邀请人奖励
+                        //th(rowspan="1") 开始日期
+                        //th(rowspan="1") 截止日期
+                        //th(rowspan="1") 首笔投资最低额
+                        //th(rowspan="1") 收益百分比
+                        //th(rowspan="1") 审核状态
+                        //th(rowspan="1") 审核时间
+                    tbody
+                      if result
+                        for l in result
+                          tr
+                            td {{l.user_id}}
+                            td {{l.introduced_by_person}}
+                            td {{l.product.name}}
+                            td {{l.first_bought_at}}
+                            td {{l.first_amount}}
+                            td {{l.first_reward}}
+                            td {{l.introduced_reward}}
+                            //td {{l.activity_start_at}}
+                            //td {{l.activity_end_at}}
+                            //td {{l.activity_amount_min}}
+                            //td {{l.percent_reward}}
+                            //td {{l.checked_status}}
+                            //td {{l.checked_at}}
+                              .chart
+                  form.form.span5(method="POST" action='/{{ "" | admin_address}}/statistics/introduced_by')
+                    - csrf_token
+                    .form-group
+                      button(type="submit", name='check_ok', value='1').btn.btn-default.btn-cha2 审核通过
+                      button(type="submit", name='check_no', value='2').btn.btn-default.btn-cha2 审核未通过
+
+    if result
+      //{{ "" | admin_address}}
+      - with data=result uri='/activity/introduced_by/'
+      include include/pager_introduced_reward
+      - endwith
+
+script.
+  require(["/static/js/tops_admin.js"])
+                                              

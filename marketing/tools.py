@@ -34,7 +34,8 @@ def decide_first(user_id, amount):
 
     channel = helper.which_channel(user, intro=introduced_by)
 
-    if "channel" not in introduced_by.introduced_by.username:
+    #if "channel" not in introduced_by.introduced_by.username:
+    if channel == helper.Channel.WANGLIBAO:
         inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
         invited_phone = introduced_by.user.wanglibaouserprofile.phone
 
@@ -135,6 +136,16 @@ def register_ok(user_id, device_type):
     })
     #注册红包
     redpack_backends.give_register_redpack(user, device_type)
+
+@app.task
+def idvalidate_ok(user_id):
+    user = User.objects.filter(id=user_id).first()
+    introduced_by = IntroducedBy.objects.filter(user=user).first()
+    channel = helper.which_channel(user, intro=introduced_by)
+
+    if channel == helper.Channel.KUAIPAN:
+        rs = RewardStrategy(user)
+        rs.reward_user(u'50G快盘容量')
 
 #充值成功
 def despoit_ok(pay_info):
