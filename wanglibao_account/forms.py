@@ -9,7 +9,7 @@ from django.db.models import F
 from utils import detect_identifier_type, verify_id
 from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_sms.utils import validate_validation_code
-from marketing.models import InviteCode, PromotionToken
+from marketing.models import InviteCode, PromotionToken, Channels
 from wanglibao_account.utils import mlgb_md5
 
 User = get_user_model()
@@ -81,8 +81,13 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
 
         if invite_code:
             try:
-                p = PromotionToken.objects.get(token=invite_code)
-            except:
+                record = Channels.objects.filter(code=invite_code).first()
+                if not record:
+                    #p = PromotionToken.objects.get(token=invite_code)
+                    p = PromotionToken.objects.filter(token=invite_code).first()
+                    if not p:
+                        raise
+            except Exception,e:
                 raise forms.ValidationError(
                             self.error_messages['invite code not match'],
                             code='invite code not match',
