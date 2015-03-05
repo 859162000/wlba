@@ -259,7 +259,7 @@ class IntroducedByReward(models.Model):
     )
 
     user = models.ForeignKey(User)
-    introduced_by_person = models.ForeignKey(User, related_name='introduced_person')
+    introduced_by_person = models.ForeignKey(User, related_name='introduced_person', blank=True, null=True)
     product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True, default=None)
     first_bought_at = models.DateTimeField(u'首笔购买时间', null=False)
     first_amount = models.DecimalField(u'首笔投资金额', max_digits=20, decimal_places=2, default=0)
