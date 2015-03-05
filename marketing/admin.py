@@ -60,12 +60,13 @@ class IntroducedByResource(resources.ModelResource):
             return timezone.localtime(obj.gift_send_at).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
+#class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
+class IntroducedByAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "introduced_by", "channel", "created_at", "bought_at", "gift_send_at")
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
     raw_id_fields = ('user', 'introduced_by', 'created_by')
-    resource_class = IntroducedByResource
+    #resource_class = IntroducedByResource
 
    # def get_queryset(self, request):
    #     qs = super(IntroducedByAdmin, self).get_queryset(request)
