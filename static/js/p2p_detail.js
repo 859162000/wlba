@@ -226,7 +226,7 @@
           availables = data.packages.available;
           ddData.push({
             text: '不使用红包',
-            value: 'red',
+            value: '',
             selected: true,
             amount: 0,
             invest_amount: 0,
@@ -255,7 +255,7 @@
             onSelected: function(data) {
               var lable, pay_amount;
               obj = data.selectedData;
-              if (obj.value !== 'red') {
+              if (obj.value !== '') {
                 if (obj.amount !== 0) {
                   pay_amount = $('#id_amount').val();
                   $.ajax({
