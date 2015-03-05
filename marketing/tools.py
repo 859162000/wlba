@@ -109,7 +109,7 @@ def decide_first(user_id, amount):
                                                 description=content)
                 except Exception, e:
                     print(e)
-    else:
+    elif channel == helper.Channel.XUNLEI:
         # 非快盘来源(需要确定到每个渠道)
         start_time = timezone.datetime(2014, 11, 12)
         if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
