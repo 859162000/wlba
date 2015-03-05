@@ -73,10 +73,10 @@ class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
    #         .select_related('introduced_by').select_related('introduced_by__wanglibaouserprofile')
    #     return qs
 
-    def get_readonly_fields(self, request, obj=None):
-        if not request.user.has_perm('marketing.view_introducedby'):
-            return ("bought_at", "user", "introduced_by")
-        return ()
+    #def get_readonly_fields(self, request, obj=None):
+    #    if not request.user.has_perm('marketing.view_introducedby'):
+    #        return ("bought_at", "user", "introduced_by")
+    #    return ()
 
 class TimelySitedataAdmin(admin.ModelAdmin):
     list_display = ("created_at", "p2p_margin", "freeze_amount", "total_amount", "user_count")
