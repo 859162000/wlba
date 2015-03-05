@@ -35,6 +35,9 @@ from order.utils import OrderHelper
 
 # Create your views here.
 
+class YaoView(TemplateView):
+    template_name = 'yaoqing.jade'
+
 class MarketingView(TemplateView):
     template_name = 'diary.jade'
 
@@ -212,21 +215,37 @@ class AggregateView(TemplateView):
         return pytz.timezone('Asia/Shanghai')
 
     def get_context_data(self, **kwargs):
-        start = self.request.GET.get('start', '') or AggregateView.DEFAULT_START
-        end = self.request.GET.get('end', '') or AggregateView.DEFAULT_END
-        amount_min = self.request.GET.get('amount_min', '') or AggregateView.DEFAULT_AMOUNT_MIN
+        start = self.request.GET.get('start', '')
+        end = self.request.GET.get('end', '')
+        amount_min = self.request.GET.get('amount_min', '')
         amount_max = self.request.GET.get('amount_max', '')
 
-        start = datetime.strptime(start, '%Y-%m-%d')
-        end = datetime.strptime(end, '%Y-%m-%d')
-
-        # 时间国际化
-        amsterdam = self.timezone_util
-        begin = amsterdam.localize(datetime.combine(start, start.min.time()))
-        end = amsterdam.localize(datetime.combine(end, end.max.time()))
+        if start and end and amount_min:
+            try:
+                start = datetime.strptime(start, '%Y-%m-%d')
+                end = datetime.strptime(end, '%Y-%m-%d')
+                amount_min = Decimal(amount_min)
+                if amount_max:
+                    amount_max = Decimal(amount_max)
+            except Exception:
+                return {
+                    "message": u'查询条件数据不合法！',
+                    'start': start.date().__str__() if isinstance(start, datetime) else start,
+                    'end': end.date().__str__() if isinstance(end, datetime) else end,
+                    'amount_min': amount_min,
+                    'amount_max': amount_max
+                }
+        else:
+            return {
+                "message": u'请输入查询条件！',
+                'start': start,
+                'end': end,
+                'amount_min': amount_min,
+                'amount_max': amount_max
+            }
 
         trades = P2PRecord.objects.filter(
-            create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc))
+            create_time__range=(local_to_utc(start, source_time='min'), local_to_utc(end, source_time='max'))
         ).filter(product__status__in=[
             u'满标待打款',
             u'满标已打款',
@@ -240,7 +259,6 @@ class AggregateView(TemplateView):
             trades = trades.filter(amount__gte=amount_min)
         if amount_max:
             trades = trades.filter(amount__lt=amount_max)
-
 
         # 总计所有符合条件的金额
         # amount_all = trades.aggregate(Sum('amount'))
@@ -293,25 +311,36 @@ class IntroducedAwardTemplate(TemplateView):
             1：表中不存在未审核记录，直接根据用户条件统计信息
             2：表中存在未审核记录，提示用户需要先审核才允许再次统计
         """
-        start = self.request.GET.get('start', None)
-        end = self.request.GET.get('end', None)
-        percent = self.request.GET.get('percent', None)
-        amount_min = self.request.GET.get('amount_min', None)
+        start = self.request.GET.get('start', '')
+        end = self.request.GET.get('end', '')
+        percent = self.request.GET.get('percent', '')
+        amount_min = self.request.GET.get('amount_min', '')
 
-        if start and end and percent is not None and amount_min is not None:
+        if start and end and percent and amount_min:
             try:
                 start = datetime.strptime(start, '%Y-%m-%d')
                 end = datetime.strptime(end, '%Y-%m-%d')
                 # local time convert to utc time
                 start_utc = local_to_utc(start, source_time='min')
                 end_utc = local_to_utc(end, source_time='max')
-            except Exception:
+
+                amount_min = Decimal(amount_min)
+                percent = Decimal(percent)
+            except Exception, e:
                 return {
-                    "message": u"输入日期格式有误！"
+                    "message": u"查询条件数据不合法！",
+                    "start": start.date().__str__() if isinstance(start, datetime) else start,
+                    "end": end.date().__str__() if isinstance(end, datetime) else end,
+                    "amount_min": amount_min,
+                    "percent": percent,
                 }
         else:
             return {
-                "message": u"请输入统计条件！"
+                "message": u"请输入统计条件！",
+                "start": start.date().__str__() if isinstance(start, datetime) else start,
+                "end": end.date().__str__() if isinstance(end, datetime) else end,
+                "amount_min": amount_min,
+                "percent": percent,
             }
 
         introduced_by_reward = IntroducedByReward.objects.filter(checked_status=0)
@@ -371,7 +400,7 @@ class IntroducedAwardTemplate(TemplateView):
                     u'满标已审核',
                     u'还款中',
                     u'已完成', ]
-            ).earliest("create_time")
+            ).order_by('create_time').first()
 
             # first trade min amount limit
             if first_record is not None and first_record.amount >= Decimal(amount_min):
@@ -389,7 +418,7 @@ class IntroducedAwardTemplate(TemplateView):
                 reward.first_reward = amount_earning
                 # 邀请人活取被邀请人首笔投资收益
                 reward.introduced_reward = Decimal(
-                    amount_earning * Decimal(percent)
+                    amount_earning * Decimal(percent) * Decimal('0.01')
                 ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
                 reward.activity_start_at = start_utc
@@ -442,7 +471,9 @@ class IntroducedAwardTemplate(TemplateView):
                 )
 
             # self.reward_user_all()
+            IntroducedByReward.objects.filter(checked_status=0).update(checked_status=1)
             message = u'审核通过成功，为用户发送收益成功！'
+
 
         elif check == '2':
             # 审核未通过，删除统计记录
@@ -466,7 +497,7 @@ class IntroducedAwardTemplate(TemplateView):
         text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
         if only_show is not True:
             send_messages.apply_async(kwargs={
-                "phones": [user.wanglibaouserprofile.phone],
+                "phones": [introduced_by.wanglibaouserprofile.phone],
                 "messages": [text_content]
             })
 
