@@ -61,7 +61,7 @@ class IntroducedByResource(resources.ModelResource):
 
 
 class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
-    list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
+    list_display = ("id", "user", "introduced_by", "channel", "created_at", "bought_at", "gift_send_at")
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
     raw_id_fields = ('user', 'introduced_by', 'created_by')

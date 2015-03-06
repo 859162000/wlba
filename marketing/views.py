@@ -413,12 +413,12 @@ class IntroducedAwardTemplate(TemplateView):
 
                 # 计算被邀请人首笔投资总收益
                 amount_earning = Decimal(
-                    Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12))
+                    Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12)) * Decimal(first_record.product.expected_earning_rate) * Decimal('0.01')
                 ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
                 reward.first_reward = amount_earning
                 # 邀请人活取被邀请人首笔投资收益
                 reward.introduced_reward = Decimal(
-                    amount_earning * Decimal(percent) * Decimal('0.01')
+                    Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12)) * Decimal(percent) * Decimal('0.01')
                 ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
                 reward.activity_start_at = start_utc

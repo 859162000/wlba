@@ -86,12 +86,15 @@ class Channels(models.Model):
     class Meta:
         verbose_name_plural = u"渠道"
 
+    def __unicode__(self):
+        return self.name
+
 class IntroducedBy(models.Model):
     """ user: 被邀请人
         introduced_by: 邀请人
     """
     user = models.ForeignKey(User)
-    introduced_by = models.ForeignKey(User, related_name='introduces', blank=True)
+    introduced_by = models.ForeignKey(User, related_name='introduces', blank=True, null=True)
     channel = models.ForeignKey(Channels, blank=True, null=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
@@ -256,7 +259,7 @@ class IntroducedByReward(models.Model):
     )
 
     user = models.ForeignKey(User)
-    introduced_by_person = models.ForeignKey(User, related_name='introduced_person')
+    introduced_by_person = models.ForeignKey(User, related_name='introduced_person', blank=True, null=True)
     product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True, default=None)
     first_bought_at = models.DateTimeField(u'首笔购买时间', null=False)
     first_amount = models.DecimalField(u'首笔投资金额', max_digits=20, decimal_places=2, default=0)
