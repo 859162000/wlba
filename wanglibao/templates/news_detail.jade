@@ -13,7 +13,7 @@ body
         h3 媒体报道
       .media-list-body
         h3.align-center {{news.name}}
-        .content {{news.content}}
+        .content {{news.content|safe}}
 
   include include/footer
   include include/tracking
