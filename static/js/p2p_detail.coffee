@@ -239,7 +239,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
               obj = data.selectedData
               if obj.value !=''
                 if $('#id_amount').val()
-
                   j=0
                   val_len=data2.packages.available.length
                   while j<val_len
@@ -376,10 +375,10 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                     lable = $('label[for="id_amount"]')
                     if $.trim(lable.text()) == ''
                       $('label[for="id_amount"]').hide()
-
                 else
                   if amount2
                     if amount2-obj.amount<0
+
                       $('.payment2').show();
                       $('.payment').hide();
                       $('.payment2').html(['红包使用<i>',amount2,'</i>元，','实际支付<i>', 0, '</i>元'].join('')).css(color:'#999')
@@ -388,6 +387,8 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                       )
 
                     else
+
+
                       amount3=$('#id_amount').val()
                       $('.invest').removeClass('notlogin')
                       if !isNaN(amount3-obj.amount)
@@ -420,10 +421,48 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                 k++
             else
               XMLHttpRequest. readyState=0;
-              $('.payment').html(['实际支付<i>',amount2,'</i>元，'].join('')).css(color:'#999')
-              $('.payment i').css(
-                  color: '#1A2CDB'
-                )
+              g=0
+              obj_val=data2.packages.available.length
+              while g<obj_val
+                if data2.packages.available[g].event_id ==7 and obj.value==data2.packages.available[g].id
+                  mes=obj.value
+                g++
+              if mes
+                pay_amount=$('#id_amount').val();
+                $.ajax {
+                  url: '/api/redpacket/deduct/'
+                  data:{
+                    amount: pay_amount
+                    rpa: obj.amount
+                  }
+                  type: 'post'
+                }
+                .done (data)->
+                  $('.payment2').show();
+                  $('.payment').hide();
+                  $('.payment2').html(['红包使用<i>',data.deduct,'</i>元，','实际支付<i>',pay_amount-data.deduct,'</i>元，'].join('')).css(
+                    color:'#999'
+                  )
+                  $('.payment2 i').css(
+                    color: '#1A2CDB'
+                  )
+
+              else
+                if amount2-obj.amount<0
+                  $('.payment').hide()
+                  $('.payment2').show()
+                  $('.payment2').html(['红包使用<i>',amount2,'</i>元，','实际支付<i>0</i>元，'].join('')).css(color:'#999')
+                  $('.payment2 i').css(
+                      color: '#1A2CDB'
+                  )
+                else
+                  $('.payment').hide()
+                  $('.payment2').show()
+                  $('.payment2').html(['红包使用<i>',obj.amount,'</i>元，','实际支付<i>',amount2-obj.amount,'</i>元，'].join('')).css(color:'#999')
+                  $('.payment2 i').css(
+                      color: '#1A2CDB'
+                  )
+
           else
             if !isNaN($('#id_amount').val())
               pay_amount=$('#id_amount').val();
