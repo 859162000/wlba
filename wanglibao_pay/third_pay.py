@@ -546,7 +546,8 @@ class KuaiPay:
     def delete_bind(self, request):
         user = request.user
 
-        card_no = request.DATA.get("card_no", "").strip()
+        #card_no = request.DATA.get("card_no", "").strip()
+        card_no = request.DATA.get("storable_no", "").strip()
         bank_id = request.DATA.get("bank_id", "").strip()
 
         dic = {"user_id":user.id, "bank_id":bank_id,
