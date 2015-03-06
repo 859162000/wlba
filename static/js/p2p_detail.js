@@ -298,19 +298,22 @@
                       $('.payment i').css({
                         color: '#1A2CDB'
                       });
-                      if (pay_now - obj.amount < 0) {
-                        $('.payment').show();
-                        $('.payment2').hide();
-                        $('.payment').html('投资金额未达到红包使用门槛').css({
-                          color: 'red'
-                        });
-                      } else {
-                        $('.payment').show();
-                        $('.payment2').hide();
-                        $('.payment').html(['实际支付<i>', pay_now - obj.amount, '</i>元，'].join('')).css({
+                      if (pay_now - obj.amount <= 0) {
+                        $('.payment2').show();
+                        $('.payment').hide();
+                        $('.payment2').html(['红包使用<i>', pay_now, '</i>元，', '实际支付<i>', 0, '</i>元'].join('')).css({
                           color: '#999'
                         });
-                        $('.payment i').css({
+                        $('.payment2 i').css({
+                          color: '#1A2CDB'
+                        });
+                      } else {
+                        $('.payment2').show();
+                        $('.payment').hide();
+                        $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', pay_now - obj.amount, '</i>元，'].join('')).css({
+                          color: '#999'
+                        });
+                        $('.payment2 i').css({
                           color: '#1A2CDB'
                         });
                       }
@@ -332,11 +335,11 @@
             }
           });
           $('#id_amount').keyup(function(e) {
-            var amount, amount2, k, lable, max_pay, pay_amount, selectedData, val_len2, _j, _len1, _results;
+            var amount, amount2, amount3, k, lable, max_pay, pay_amount, pay_now, selectedData, val_len2, _j, _len1, _results;
             max_pay = $('#id_amount').attr('data-max');
             amount2 = $('#id_amount').val();
             if (obj.value) {
-              if ($('#id_amount').val() < max_pay) {
+              if ($('#id_amount').val() <= max_pay) {
                 for (_j = 0, _len1 = ddData.length; _j < _len1; _j++) {
                   obj = ddData[_j];
                   if (obj.value === $('.dd-selected-value').val() * 1) {
@@ -376,25 +379,27 @@
                         url: '/api/redpacket/deduct/',
                         data: {
                           amount: pay_amount,
-                          rpa: 0
+                          rpa: obj.amount
                         },
                         type: 'post'
                       }).done(function(data) {
-                        console.log(333);
-                        if (pay_amount - obj.amount < 0) {
-                          $('.payment').show();
-                          $('.payment2').hide();
-                          $('.payment').html('投资金额未达到红包使用门槛').css({
-                            color: 'red'
-                          });
-                          $('.login-modal').trigger('click');
-                        } else {
-                          $('.payment').show();
-                          $('.payment2').hide();
-                          $('.payment').html(['实际支付<i>', pay_amount - obj.amount, '</i>元，'].join('')).css({
+                        if (pay_amount - obj.amount <= 0) {
+                          $('.payment2').show();
+                          $('.payment').hide();
+                          $('.payment2').html(['红包使用<i>', data.deduct, '</i>元，', '实际支付<i>', pay_amount - data.deduct, '</i>元'].join('')).css({
                             color: '#999'
                           });
-                          return $('.payment i').css({
+                          return $('.payment2 i').css({
+                            color: '#1A2CDB'
+                          });
+                        } else {
+                          console.log(444);
+                          $('.payment2').show();
+                          $('.payment').hide();
+                          $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', pay_amount - obj.amount, '</i>元，'].join('')).css({
+                            color: '#999'
+                          });
+                          return $('.payment2 i').css({
                             color: '#1A2CDB'
                           });
                         }
@@ -410,20 +415,26 @@
                     }
                   } else {
                     if (amount2 - obj.amount < 0) {
-                      $('.payment').show();
-                      $('.payment2').hide();
-                      $('.payment').html('投资金额未达到红包使用门槛').css({
-                        color: 'red'
-                      });
-                      $('.invest').addClass('notlogin');
-                    } else {
-                      $('.invest').removeClass('notlogin');
-                      $('.payment').show();
-                      $('.payment2').hide();
-                      $('.payment').html(['实际支付<i>', amount2 - obj.amount, '</i>元，'].join('')).css({
+                      console.log(777);
+                      $('.payment2').show();
+                      $('.payment').hide();
+                      $('.payment2').html(['红包使用<i>', amount2, '</i>元，', '实际支付<i>', 0, '</i>元'].join('')).css({
                         color: '#999'
                       });
-                      $('.payment i').css({
+                      $('.payment2 i').css({
+                        color: '#1A2CDB'
+                      });
+                    } else {
+                      console.log(888);
+                      amount3 = $('#id_amount').val();
+                      console.log($('#id_amount').val());
+                      $('.invest').removeClass('notlogin');
+                      $('.payment2').show();
+                      $('.payment').hide();
+                      $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', amount3 - obj.amount, '</i>元，'].join('')).css({
+                        color: '#999'
+                      });
+                      $('.payment2 i').css({
                         color: '#1A2CDB'
                       });
                     }
@@ -441,8 +452,14 @@
                 });
               }
             } else {
+              pay_amount = $('#id_amount').val();
+              pay_now = parseFloat(pay_amount);
+              pay_now = Math.round(pay_amount * 100) / 100;
+              $('.payment i').css({
+                color: '#1A2CDB'
+              });
               $('.payment2').hide();
-              $('.payment').html(['实际支付<i>', amount2, '</i>元，'].join('')).css({
+              $('.payment').html(['实际支付<i>', pay_now, '</i>元，'].join('')).css({
                 color: '#999'
               });
               return $('.payment i').css({
