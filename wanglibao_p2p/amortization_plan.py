@@ -203,16 +203,38 @@ class DailyInterest(AmortizationPlan):
         daily_rate = year_rate / 360
         daily_rate = Decimal(daily_rate).quantize(Decimal('0.000000001'))
         daily_interest = amount * daily_rate
-        daily_interest = daily_interest.quantize(Decimal('.01'))
 
-        total = month_interest * period + amount
+        total_interest = (daily_interest * period).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+
+        total = total_interest + amount
 
         result = []
 
-        #for i in xrange(0, period - 1):
-        #    result.append((month_interest, Decimal(0), month_interest, amount, total - month_interest * (i + 1)))
+        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0)))
 
-        result.append((total + amount, amount, total, Decimal(0), Decimal(0)))
+        return {
+            "terms": result,
+            "total": total
+        }
+
+class DailyInterestMonthly(AmortizationPlan):
+    name = u'按日计息按月付息'
+
+    @classmethod
+    def generate(cls, amount, year_rate, term, period=None, **kwargs):
+        amount = Decimal(amount)
+
+        daily_rate = year_rate / 360
+        daily_rate = Decimal(daily_rate).quantize(Decimal('0.000000001'))
+        daily_interest = amount * daily_rate
+
+        total_interest = (daily_interest * period).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+
+        total = total_interest + amount
+
+        result = []
+
+        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0)))
 
         return {
             "terms": result,

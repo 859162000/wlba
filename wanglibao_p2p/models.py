@@ -72,7 +72,7 @@ class P2PProduct(ProductBase):
         (u'等额本息', u'等额本息'),
         (u'先息后本', u'先息后本'),
         (u'按月付息', u'按月付息到期还本'),
-        (u'按日计息', u'期还本付息'),
+        (u'按日计息', u'按日计息到期还本付息'),
         (u'到期还本付息', u'到期还本付息'),
         (u'按季度付息', u'按季度付息'),
     )
@@ -126,7 +126,7 @@ class P2PProduct(ProductBase):
                               verbose_name=u'产品状态*')
 
     priority = models.IntegerField(verbose_name=u'优先级*', help_text=u'越大越优先', blank=False)
-    period = models.IntegerField(default=0, verbose_name=u'产品期限(月)*', blank=False)
+    period = models.IntegerField(default=0, verbose_name=u'产品期限(月/天)*', blank=False)
     brief = models.TextField(blank=True, verbose_name=u'产品备注')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
     excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)*')
