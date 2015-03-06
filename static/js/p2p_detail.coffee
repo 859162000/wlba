@@ -292,10 +292,10 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                         )
                     j++
                 else
-                  $('.form-row-error').show()
-                  $('.form-row-error').html('请输入投资金额').css(
-                    color: 'red'
-                  )
+#                  $('.form-row-error').show()
+#                  $('.form-row-error').html('请输入投资金额').css(
+#                    color: 'red'
+#                  )
 #                  alert('请输入投资金额')
 #                  window.location.href=''
               else if $('#id_amount').val()
@@ -311,7 +311,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         $('#id_amount').keyup (e) ->
           max_pay=$('#id_amount').attr('data-max')
           amount2=$('#id_amount').val()
-          $('.form-row-error').hide()
           if obj.value
             if $('#id_amount').val()<=max_pay
               for obj in ddData

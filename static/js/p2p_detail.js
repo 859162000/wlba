@@ -323,10 +323,7 @@
                   }
                   return _results;
                 } else {
-                  $('.form-row-error').show();
-                  return $('.form-row-error').html('请输入投资金额').css({
-                    color: 'red'
-                  });
+
                 }
               } else if ($('#id_amount').val()) {
                 pay_amount = $('#id_amount').val();
@@ -345,7 +342,6 @@
             var amount, amount2, amount3, g, k, lable, max_pay, mes, obj_val, pay_amount, pay_now, selectedData, val_len2, _j, _len1, _results;
             max_pay = $('#id_amount').attr('data-max');
             amount2 = $('#id_amount').val();
-            $('.form-row-error').hide();
             if (obj.value) {
               if ($('#id_amount').val() <= max_pay) {
                 for (_j = 0, _len1 = ddData.length; _j < _len1; _j++) {
