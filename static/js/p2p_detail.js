@@ -323,8 +323,10 @@
                   }
                   return _results;
                 } else {
-                  alert('请输入投资金额');
-                  return window.location.href = '';
+                  $('.form-row-error').show();
+                  return $('.form-row-error').html('请输入投资金额').css({
+                    color: 'red'
+                  });
                 }
               } else if ($('#id_amount').val()) {
                 pay_amount = $('#id_amount').val();
@@ -343,6 +345,7 @@
             var amount, amount2, amount3, k, lable, max_pay, pay_amount, pay_now, selectedData, val_len2, _j, _len1, _results;
             max_pay = $('#id_amount').attr('data-max');
             amount2 = $('#id_amount').val();
+            $('.form-row-error').hide();
             if (obj.value) {
               if ($('#id_amount').val() <= max_pay) {
                 for (_j = 0, _len1 = ddData.length; _j < _len1; _j++) {
@@ -418,37 +421,48 @@
                       }
                     }
                   } else {
-                    if (amount2 - obj.amount < 0) {
-                      $('.payment2').show();
-                      $('.payment').hide();
-                      $('.payment2').html(['红包使用<i>', amount2, '</i>元，', '实际支付<i>', 0, '</i>元'].join('')).css({
-                        color: '#999'
-                      });
-                      $('.payment2 i').css({
-                        color: '#1A2CDB'
-                      });
-                    } else {
-                      amount3 = $('#id_amount').val();
-                      $('.invest').removeClass('notlogin');
-                      if (!isNaN(amount3 - obj.amount)) {
+                    if (amount2) {
+                      if (amount2 - obj.amount < 0) {
                         $('.payment2').show();
                         $('.payment').hide();
-                        $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', amount3 - obj.amount, '</i>元，'].join('')).css({
+                        $('.payment2').html(['红包使用<i>', amount2, '</i>元，', '实际支付<i>', 0, '</i>元'].join('')).css({
                           color: '#999'
                         });
                         $('.payment2 i').css({
                           color: '#1A2CDB'
                         });
                       } else {
-                        $('.payment2').show();
-                        $('.payment').hide();
-                        $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>0</i>元，'].join('')).css({
-                          color: '#999'
-                        });
-                        $('.payment2 i').css({
-                          color: '#1A2CDB'
-                        });
+                        amount3 = $('#id_amount').val();
+                        $('.invest').removeClass('notlogin');
+                        if (!isNaN(amount3 - obj.amount)) {
+                          $('.payment2').show();
+                          $('.payment').hide();
+                          $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', amount3 - obj.amount, '</i>元，'].join('')).css({
+                            color: '#999'
+                          });
+                          $('.payment2 i').css({
+                            color: '#1A2CDB'
+                          });
+                        } else {
+                          $('.payment2').show();
+                          $('.payment').hide();
+                          $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>0</i>元，'].join('')).css({
+                            color: '#999'
+                          });
+                          $('.payment2 i').css({
+                            color: '#1A2CDB'
+                          });
+                        }
                       }
+                    } else {
+                      $('.payment2').show();
+                      $('.payment').hide();
+                      $('.payment2').html(['红包使用<i>0</i>元，', '实际支付<i>0</i>元，'].join('')).css({
+                        color: '#999'
+                      });
+                      $('.payment2 i').css({
+                        color: '#1A2CDB'
+                      });
                     }
                   }
                   _results.push(k++);

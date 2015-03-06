@@ -239,6 +239,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
               obj = data.selectedData
               if obj.value !=''
                 if $('#id_amount').val()
+
                   j=0
                   val_len=data2.packages.available.length
                   while j<val_len
@@ -292,8 +293,12 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                         )
                     j++
                 else
-                  alert('请输入投资金额')
-                  window.location.href=''
+                  $('.form-row-error').show()
+                  $('.form-row-error').html('请输入投资金额').css(
+                    color: 'red'
+                  )
+#                  alert('请输入投资金额')
+#                  window.location.href=''
               else if $('#id_amount').val()
                 pay_amount=$('#id_amount').val();
                 $('.payment').show();
@@ -307,6 +312,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         $('#id_amount').keyup (e) ->
           max_pay=$('#id_amount').attr('data-max')
           amount2=$('#id_amount').val()
+          $('.form-row-error').hide()
           if obj.value
             if $('#id_amount').val()<=max_pay
               for obj in ddData
@@ -372,35 +378,45 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                       $('label[for="id_amount"]').hide()
 
                 else
-                  if amount2-obj.amount<0
+                  if amount2
+                    if amount2-obj.amount<0
+                      $('.payment2').show();
+                      $('.payment').hide();
+                      $('.payment2').html(['红包使用<i>',amount2,'</i>元，','实际支付<i>', 0, '</i>元'].join('')).css(color:'#999')
+                      $('.payment2 i').css(
+                        color: '#1A2CDB'
+                      )
+
+                    else
+                      amount3=$('#id_amount').val()
+                      $('.invest').removeClass('notlogin')
+                      if !isNaN(amount3-obj.amount)
+                        $('.payment2').show();
+                        $('.payment').hide();
+                        $('.payment2').html(['红包使用<i>',obj.amount,'</i>元，','实际支付<i>',amount3-obj.amount,'</i>元，'].join('')).css(
+                          color:'#999'
+                        )
+                        $('.payment2 i').css(
+                          color: '#1A2CDB'
+                        )
+                      else
+                        $('.payment2').show();
+                        $('.payment').hide();
+                        $('.payment2').html(['红包使用<i>',obj.amount,'</i>元，','实际支付<i>0</i>元，'].join('')).css(
+                          color:'#999'
+                        )
+                        $('.payment2 i').css(
+                          color: '#1A2CDB'
+                        )
+                  else
                     $('.payment2').show();
                     $('.payment').hide();
-                    $('.payment2').html(['红包使用<i>',amount2,'</i>元，','实际支付<i>', 0, '</i>元'].join('')).css(color:'#999')
+                    $('.payment2').html(['红包使用<i>0</i>元，','实际支付<i>0</i>元，'].join('')).css(
+                      color:'#999'
+                    )
                     $('.payment2 i').css(
                       color: '#1A2CDB'
                     )
-
-                  else
-                    amount3=$('#id_amount').val()
-                    $('.invest').removeClass('notlogin')
-                    if !isNaN(amount3-obj.amount)
-                      $('.payment2').show();
-                      $('.payment').hide();
-                      $('.payment2').html(['红包使用<i>',obj.amount,'</i>元，','实际支付<i>',amount3-obj.amount,'</i>元，'].join('')).css(
-                        color:'#999'
-                      )
-                      $('.payment2 i').css(
-                        color: '#1A2CDB'
-                      )
-                    else
-                      $('.payment2').show();
-                      $('.payment').hide();
-                      $('.payment2').html(['红包使用<i>',obj.amount,'</i>元，','实际支付<i>0</i>元，'].join('')).css(
-                        color:'#999'
-                      )
-                      $('.payment2 i').css(
-                        color: '#1A2CDB'
-                      )
                 k++
             else
               XMLHttpRequest. readyState=0;
