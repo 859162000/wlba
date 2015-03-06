@@ -254,12 +254,13 @@
             imagePosition: "left",
             selectText: "请选择红包",
             onSelected: function(data) {
-              var j, lable, pay_amount, pay_now, val_len;
-              if ($('#id_amount').val()) {
-                obj = data.selectedData;
-                if (obj.value !== '') {
+              var j, lable, pay_amount, pay_now, val_len, _results;
+              obj = data.selectedData;
+              if (obj.value !== '') {
+                if ($('#id_amount').val()) {
                   j = 0;
                   val_len = data2.packages.available.length;
+                  _results = [];
                   while (j < val_len) {
                     if (data2.packages.available[j].event_id === 7 && obj.value === data2.packages.available[j].id) {
                       if (obj.amount !== 0) {
@@ -318,19 +319,23 @@
                         });
                       }
                     }
-                    j++;
+                    _results.push(j++);
                   }
-                } else if ($('#id_amount').val()) {
-                  pay_amount = $('#id_amount').val();
-                  $('.payment').show();
-                  $('.payment2').hide();
-                  $('.payment').html(['实际支付<i>', pay_amount, '</i>元，'].join('')).css({
-                    color: '#999'
-                  });
-                  $('.payment i').css({
-                    color: '#1A2CDB'
-                  });
+                  return _results;
+                } else {
+                  alert('请输入投资金额');
+                  return window.location.href = '';
                 }
+              } else if ($('#id_amount').val()) {
+                pay_amount = $('#id_amount').val();
+                $('.payment').show();
+                $('.payment2').hide();
+                $('.payment').html(['实际支付<i>', pay_amount, '</i>元，'].join('')).css({
+                  color: '#999'
+                });
+                return $('.payment i').css({
+                  color: '#1A2CDB'
+                });
               }
             }
           });
@@ -393,7 +398,6 @@
                             color: '#1A2CDB'
                           });
                         } else {
-                          console.log(444);
                           $('.payment2').show();
                           $('.payment').hide();
                           $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', pay_amount - obj.amount, '</i>元，'].join('')).css({
@@ -415,7 +419,6 @@
                     }
                   } else {
                     if (amount2 - obj.amount < 0) {
-                      console.log(777);
                       $('.payment2').show();
                       $('.payment').hide();
                       $('.payment2').html(['红包使用<i>', amount2, '</i>元，', '实际支付<i>', 0, '</i>元'].join('')).css({
@@ -425,18 +428,27 @@
                         color: '#1A2CDB'
                       });
                     } else {
-                      console.log(888);
                       amount3 = $('#id_amount').val();
-                      console.log($('#id_amount').val());
                       $('.invest').removeClass('notlogin');
-                      $('.payment2').show();
-                      $('.payment').hide();
-                      $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', amount3 - obj.amount, '</i>元，'].join('')).css({
-                        color: '#999'
-                      });
-                      $('.payment2 i').css({
-                        color: '#1A2CDB'
-                      });
+                      if (!isNaN(amount3 - obj.amount)) {
+                        $('.payment2').show();
+                        $('.payment').hide();
+                        $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', amount3 - obj.amount, '</i>元，'].join('')).css({
+                          color: '#999'
+                        });
+                        $('.payment2 i').css({
+                          color: '#1A2CDB'
+                        });
+                      } else {
+                        $('.payment2').show();
+                        $('.payment').hide();
+                        $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>0</i>元，'].join('')).css({
+                          color: '#999'
+                        });
+                        $('.payment2 i').css({
+                          color: '#1A2CDB'
+                        });
+                      }
                     }
                   }
                   _results.push(k++);
@@ -452,19 +464,29 @@
                 });
               }
             } else {
-              pay_amount = $('#id_amount').val();
-              pay_now = parseFloat(pay_amount);
-              pay_now = Math.round(pay_amount * 100) / 100;
-              $('.payment i').css({
-                color: '#1A2CDB'
-              });
-              $('.payment2').hide();
-              $('.payment').html(['实际支付<i>', pay_now, '</i>元，'].join('')).css({
-                color: '#999'
-              });
-              return $('.payment i').css({
-                color: '#1A2CDB'
-              });
+              if (!isNaN($('#id_amount').val())) {
+                pay_amount = $('#id_amount').val();
+                pay_now = parseFloat(pay_amount);
+                pay_now = Math.round(pay_amount * 100) / 100;
+                $('.payment i').css({
+                  color: '#1A2CDB'
+                });
+                $('.payment2').hide();
+                $('.payment').html(['实际支付<i>', pay_now, '</i>元，'].join('')).css({
+                  color: '#999'
+                });
+                return $('.payment i').css({
+                  color: '#1A2CDB'
+                });
+              } else {
+                $('.payment2').hide();
+                $('.payment').html(['实际支付<i>0</i>元，'].join('')).css({
+                  color: '#999'
+                });
+                return $('.payment i').css({
+                  color: '#1A2CDB'
+                });
+              }
             }
           });
           return $('#id_amount').blur(function(e) {
