@@ -54,11 +54,10 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $('#purchase-form').validate
     rules:
       amount: opt
-
     messages:
       amount:
-        required: ''
-        number: ''
+        required: '请输入投资金额'
+        number: '请输入数字'
 
     errorPlacement: (error, element) ->
       error.appendTo $(element).closest('.form-row__middle').find('.form-row-error')
@@ -292,7 +291,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                       $('.payment i').css(
                         color: '#1A2CDB'
                       )
-
                   j++
               else if $('#id_amount').val()
                 pay_amount=$('#id_amount').val();
@@ -348,6 +346,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                         type: 'post'
                       }
                       .done (data)->
+                        console.log(333)
                         if pay_amount-obj.amount<0
                           $('.payment').show();
                           $('.payment2').hide();
@@ -357,7 +356,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                           $('.login-modal').trigger('click')
                           return
                         else
-
                           $('.payment').show();
                           $('.payment2').hide();
                           $('.payment').html(['实际支付<i>',pay_amount-obj.amount,'</i>元，'].join('')).css(
@@ -410,18 +408,18 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 #          console.log($('.payment').text())
 
         #hide the empty error tip
-          if isNaN($('#id_amount').val())
-            $('.form-row-error').show()
-            $('.form-row-error').html('*请输入数字').css(
-               color: 'red'
-             )
-          else if $('.payment').text()=='投资金额未达到红包使用门槛'
-              $('.form-row-error').show()
-              $('.form-row-error').html('*请输入有效金额').css(
-                color: 'red'
-              )
-          else
-            $('.form-row-error').hide();
+#          if isNaN($('#id_amount').val())
+#            $('.form-row-error').show()
+#            $('.form-row-error').html('*请输入数字').css(
+#               color: 'red'
+#             )
+#          else if $('.payment').text()=='投资金额未达到红包使用门槛'
+#              $('.form-row-error').show()
+#              $('.form-row-error').html('*请输入有效金额').css(
+#                color: 'red'
+#              )
+#          else
+#            $('.form-row-error').hide();
 
         $('#id_amount').blur (e) ->
           lable = $('label[for="id_amount"]')

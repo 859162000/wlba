@@ -67,8 +67,8 @@
       },
       messages: {
         amount: {
-          required: '',
-          number: ''
+          required: '请输入投资金额',
+          number: '请输入数字'
         }
       },
       errorPlacement: function(error, element) {
@@ -332,7 +332,7 @@
             }
           });
           $('#id_amount').keyup(function(e) {
-            var amount, amount2, k, lable, max_pay, pay_amount, selectedData, val_len2, _j, _len1;
+            var amount, amount2, k, lable, max_pay, pay_amount, selectedData, val_len2, _j, _len1, _results;
             max_pay = $('#id_amount').attr('data-max');
             amount2 = $('#id_amount').val();
             if (obj.value) {
@@ -347,6 +347,7 @@
                 amount = $('#id_amount').val();
                 k = 0;
                 val_len2 = data2.packages.available.length;
+                _results = [];
                 while (k < val_len2) {
                   if (selectedData && data2.packages.available[k].event_id === 7 && obj.value === data2.packages.available[k].id) {
                     $('.payment2').show();
@@ -379,6 +380,7 @@
                         },
                         type: 'post'
                       }).done(function(data) {
+                        console.log(333);
                         if (pay_amount - obj.amount < 0) {
                           $('.payment').show();
                           $('.payment2').hide();
@@ -426,14 +428,15 @@
                       });
                     }
                   }
-                  k++;
+                  _results.push(k++);
                 }
+                return _results;
               } else {
                 XMLHttpRequest.readyState = 0;
                 $('.payment').html(['实际支付<i>', amount2, '</i>元，'].join('')).css({
                   color: '#999'
                 });
-                $('.payment i').css({
+                return $('.payment i').css({
                   color: '#1A2CDB'
                 });
               }
@@ -442,22 +445,9 @@
               $('.payment').html(['实际支付<i>', amount2, '</i>元，'].join('')).css({
                 color: '#999'
               });
-              $('.payment i').css({
+              return $('.payment i').css({
                 color: '#1A2CDB'
               });
-            }
-            if (isNaN($('#id_amount').val())) {
-              $('.form-row-error').show();
-              return $('.form-row-error').html('*请输入数字').css({
-                color: 'red'
-              });
-            } else if ($('.payment').text() === '投资金额未达到红包使用门槛') {
-              $('.form-row-error').show();
-              return $('.form-row-error').html('*请输入有效金额').css({
-                color: 'red'
-              });
-            } else {
-              return $('.form-row-error').hide();
             }
           });
           return $('#id_amount').blur(function(e) {
