@@ -22,7 +22,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import PromotionToken
+from marketing.models import PromotionToken, Channels
 from marketing.utils import set_promo_user
 from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
@@ -40,7 +40,7 @@ from django.utils import timezone
 #from wanglibao_account import message as inside_message
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm
-from marketing.helper import RewardStrategy, which_channel, Channel
+#from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import split_ua
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -171,7 +171,11 @@ class RegisterAPIView(APIView):
         invite_code = request.DATA.get('invite_code', "")
         if invite_code:
             try:
-                PromotionToken.objects.get(token=invite_code)
+                record = Channels.objects.filter(code=invite_code).first()
+                if not record:
+                    p = PromotionToken.objects.filter(token=invite_code).first()
+                    if not p:
+                        raise
             except:
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
 
@@ -608,15 +612,13 @@ class IdValidate(APIView):
             # else:
 
             # 实名认证 活动赠送
-            channel = which_channel(user)
-            rs = RewardStrategy(user)
-            if channel == Channel.KUAIPAN:
-                # 快盘来源
-                rs.reward_user(u'50G快盘容量')
+            tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id})
+            #channel = which_channel(user)
+            #rs = RewardStrategy(user)
+            #if channel == Channel.KUAIPAN:
+            #    rs.reward_user(u'50G快盘容量')
 
-            return Response({
-                                "validate": True
-                            }, status=200)
+            return Response({ "validate": True }, status=200)
 
         else:
             return Response({

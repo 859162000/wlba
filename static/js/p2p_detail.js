@@ -17,6 +17,7 @@
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
     var buildTable, ddData, opt, page;
+    $('.payment2').hide();
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0 && !/\./ig.test(value);
     }, '请输入100的整数倍');
@@ -67,7 +68,7 @@
       messages: {
         amount: {
           required: '请输入投资金额',
-          number: '请输入有效金额'
+          number: '请输入数字'
         }
       },
       errorPlacement: function(error, element) {
@@ -221,7 +222,8 @@
         $.post('/api/redpacket/', {
           status: 'available'
         }).done(function(data) {
-          var available_time, availables, datetime, desc, obj, _i, _len;
+          var available_time, availables, data2, datetime, desc, obj, _i, _len;
+          data2 = data;
           availables = data.packages.available;
           ddData.push({
             text: '不使用红包',
@@ -252,58 +254,291 @@
             imagePosition: "left",
             selectText: "请选择红包",
             onSelected: function(data) {
-              var lable, pay_amount;
+              var j, lable, pay_amount, pay_now, val_len, _results;
               obj = data.selectedData;
-              if ($('#id_amount').val() - obj.invest_amount >= 0) {
-                pay_amount = ($('#id_amount').val() - obj.amount > 0 ? $('#id_amount').val() - obj.amount : 0);
-                $('.payment').html(['实际支付', pay_amount, '元'].join('')).css({
+              if (obj.value !== '') {
+                if ($('#id_amount').val()) {
+                  j = 0;
+                  val_len = data2.packages.available.length;
+                  _results = [];
+                  while (j < val_len) {
+                    if (data2.packages.available[j].event_id === 7 && obj.value === data2.packages.available[j].id) {
+                      if (obj.amount !== 0) {
+                        pay_amount = $('#id_amount').val();
+                        $.ajax({
+                          url: '/api/redpacket/deduct/',
+                          data: {
+                            amount: pay_amount,
+                            rpa: obj.amount
+                          },
+                          type: 'post'
+                        }).done(function(data) {
+                          $('.payment2').show();
+                          $('.payment').hide();
+                          $('.payment2').html(['红包使用<i>', data.deduct, '</i>元，', '实际支付<i>', pay_amount - data.deduct, '</i>元'].join('')).css({
+                            color: '#999'
+                          });
+                          return $('.payment2 i').css({
+                            color: '#1A2CDB'
+                          });
+                        });
+                      }
+                      if ($('#id_amount').val() - obj.invest_amount < 0) {
+                        $('.payment2').html('投资金额未达到红包使用门槛').css({
+                          color: 'red'
+                        });
+                        lable = $('label[for="id_amount"]');
+                        if ($.trim(lable.text()) === '') {
+                          $('label[for="id_amount"]').hide();
+                        }
+                      }
+                    } else {
+                      pay_amount = $('#id_amount').val();
+                      pay_now = parseFloat(pay_amount);
+                      pay_now = Math.round(pay_amount * 100) / 100;
+                      $('.payment i').css({
+                        color: '#1A2CDB'
+                      });
+                      if (pay_now - obj.amount <= 0) {
+                        $('.payment2').show();
+                        $('.payment').hide();
+                        $('.payment2').html(['红包使用<i>', pay_now, '</i>元，', '实际支付<i>', 0, '</i>元'].join('')).css({
+                          color: '#999'
+                        });
+                        $('.payment2 i').css({
+                          color: '#1A2CDB'
+                        });
+                      } else {
+                        $('.payment2').show();
+                        $('.payment').hide();
+                        $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', pay_now - obj.amount, '</i>元，'].join('')).css({
+                          color: '#999'
+                        });
+                        $('.payment2 i').css({
+                          color: '#1A2CDB'
+                        });
+                      }
+                    }
+                    _results.push(j++);
+                  }
+                  return _results;
+                } else {
+
+                }
+              } else if ($('#id_amount').val()) {
+                pay_amount = $('#id_amount').val();
+                $('.payment').show();
+                $('.payment2').hide();
+                $('.payment').html(['实际支付<i>', pay_amount, '</i>元，'].join('')).css({
                   color: '#999'
                 });
-              } else {
-                $('.payment').html('投资金额未达到红包使用门槛').css({
-                  color: 'red'
+                return $('.payment i').css({
+                  color: '#1A2CDB'
                 });
-                lable = $('label[for="id_amount"]');
-                if ($.trim(lable.text()) === '') {
-                  $('label[for="id_amount"]').hide();
-                }
               }
             }
           });
           $('#id_amount').keyup(function(e) {
-            var amount, lable, pay_amount, red_amount, selectedData, _j, _len1;
-            for (_j = 0, _len1 = ddData.length; _j < _len1; _j++) {
-              obj = ddData[_j];
-              if (obj.value === $('.dd-selected-value').val() * 1) {
-                selectedData = obj;
-                break;
-              }
-            }
-            amount = $('#id_amount').val();
-            if (selectedData) {
-              if (amount - selectedData.invest_amount >= 0) {
-                red_amount = selectedData ? selectedData.amount : 0;
-                pay_amount = ($('#id_amount').val() - red_amount > 0 ? $('#id_amount').val() - red_amount : 0);
-                return $('.payment').html(['实际支付', pay_amount, '元'].join('')).css({
-                  color: '#999'
-                });
+            var amount, amount2, amount3, g, k, lable, max_pay, mes, obj_val, pay_amount, pay_now, selectedData, val_len2, _j, _len1, _results;
+            max_pay = $('#id_amount').attr('data-max');
+            amount2 = $('#id_amount').val();
+            if (obj.value) {
+              if ($('#id_amount').val() <= max_pay) {
+                for (_j = 0, _len1 = ddData.length; _j < _len1; _j++) {
+                  obj = ddData[_j];
+                  if (obj.value === $('.dd-selected-value').val() * 1) {
+                    selectedData = obj;
+                    break;
+                  }
+                }
+                amount = $('#id_amount').val();
+                k = 0;
+                val_len2 = data2.packages.available.length;
+                _results = [];
+                while (k < val_len2) {
+                  if (selectedData && data2.packages.available[k].event_id === 7 && obj.value === data2.packages.available[k].id) {
+                    $('.payment2').show();
+                    if (amount - selectedData.invest_amount >= 0) {
+                      pay_amount = $('#id_amount').val();
+                      $.ajax({
+                        url: '/api/redpacket/deduct/',
+                        data: {
+                          amount: pay_amount,
+                          rpa: obj.amount
+                        },
+                        type: 'post'
+                      }).done(function(data) {
+                        $('.payment2').show();
+                        $('.payment').hide();
+                        $('.payment2').html(['红包使用<i>', data.deduct, '</i>元，', '实际支付<i>', pay_amount - data.deduct, '</i>元'].join('')).css({
+                          color: '#999'
+                        });
+                        return $('.payment2 i').css({
+                          color: '#1A2CDB'
+                        });
+                      });
+                    } else if ($.isNumeric(amount) && amount > 0) {
+                      pay_amount = $('#id_amount').val();
+                      $.ajax({
+                        url: '/api/redpacket/deduct/',
+                        data: {
+                          amount: pay_amount,
+                          rpa: obj.amount
+                        },
+                        type: 'post'
+                      }).done(function(data) {
+                        if (pay_amount - obj.amount <= 0) {
+                          $('.payment2').show();
+                          $('.payment').hide();
+                          $('.payment2').html(['红包使用<i>', data.deduct, '</i>元，', '实际支付<i>', pay_amount - data.deduct, '</i>元'].join('')).css({
+                            color: '#999'
+                          });
+                          return $('.payment2 i').css({
+                            color: '#1A2CDB'
+                          });
+                        } else {
+                          $('.payment2').show();
+                          $('.payment').hide();
+                          $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', pay_amount - obj.amount, '</i>元，'].join('')).css({
+                            color: '#999'
+                          });
+                          return $('.payment2 i').css({
+                            color: '#1A2CDB'
+                          });
+                        }
+                      });
+                    } else {
+                      $('.payment2').html('投资金额未达到红包使用门槛').css({
+                        color: 'red'
+                      });
+                      lable = $('label[for="id_amount"]');
+                      if ($.trim(lable.text()) === '') {
+                        $('label[for="id_amount"]').hide();
+                      }
+                    }
+                  } else {
+                    if (amount2) {
+                      if (amount2 - obj.amount < 0) {
+                        $('.payment2').show();
+                        $('.payment').hide();
+                        $('.payment2').html(['红包使用<i>', amount2, '</i>元，', '实际支付<i>', 0, '</i>元'].join('')).css({
+                          color: '#999'
+                        });
+                        $('.payment2 i').css({
+                          color: '#1A2CDB'
+                        });
+                      } else {
+                        amount3 = $('#id_amount').val();
+                        $('.invest').removeClass('notlogin');
+                        if (!isNaN(amount3 - obj.amount)) {
+                          $('.payment2').show();
+                          $('.payment').hide();
+                          $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', amount3 - obj.amount, '</i>元，'].join('')).css({
+                            color: '#999'
+                          });
+                          $('.payment2 i').css({
+                            color: '#1A2CDB'
+                          });
+                        } else {
+                          $('.payment2').show();
+                          $('.payment').hide();
+                          $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>0</i>元，'].join('')).css({
+                            color: '#999'
+                          });
+                          $('.payment2 i').css({
+                            color: '#1A2CDB'
+                          });
+                        }
+                      }
+                    } else {
+                      $('.payment2').show();
+                      $('.payment').hide();
+                      $('.payment2').html(['红包使用<i>0</i>元，', '实际支付<i>0</i>元，'].join('')).css({
+                        color: '#999'
+                      });
+                      $('.payment2 i').css({
+                        color: '#1A2CDB'
+                      });
+                    }
+                  }
+                  _results.push(k++);
+                }
+                return _results;
               } else {
-                $('.payment').html('投资金额未达到红包使用门槛').css({
-                  color: 'red'
-                });
-                lable = $('label[for="id_amount"]');
-                if ($.trim(lable.text()) === '') {
-                  return $('label[for="id_amount"]').hide();
+                XMLHttpRequest.readyState = 0;
+                g = 0;
+                obj_val = data2.packages.available.length;
+                while (g < obj_val) {
+                  if (data2.packages.available[g].event_id === 7 && obj.value === data2.packages.available[g].id) {
+                    mes = obj.value;
+                  }
+                  g++;
+                }
+                if (mes) {
+                  pay_amount = $('#id_amount').val();
+                  return $.ajax({
+                    url: '/api/redpacket/deduct/',
+                    data: {
+                      amount: pay_amount,
+                      rpa: obj.amount
+                    },
+                    type: 'post'
+                  }).done(function(data) {
+                    $('.payment2').show();
+                    $('.payment').hide();
+                    $('.payment2').html(['红包使用<i>', data.deduct, '</i>元，', '实际支付<i>', pay_amount - data.deduct, '</i>元，'].join('')).css({
+                      color: '#999'
+                    });
+                    return $('.payment2 i').css({
+                      color: '#1A2CDB'
+                    });
+                  });
+                } else {
+                  if (amount2 - obj.amount < 0) {
+                    $('.payment').hide();
+                    $('.payment2').show();
+                    $('.payment2').html(['红包使用<i>', amount2, '</i>元，', '实际支付<i>0</i>元，'].join('')).css({
+                      color: '#999'
+                    });
+                    return $('.payment2 i').css({
+                      color: '#1A2CDB'
+                    });
+                  } else {
+                    $('.payment').hide();
+                    $('.payment2').show();
+                    $('.payment2').html(['红包使用<i>', obj.amount, '</i>元，', '实际支付<i>', amount2 - obj.amount, '</i>元，'].join('')).css({
+                      color: '#999'
+                    });
+                    return $('.payment2 i').css({
+                      color: '#1A2CDB'
+                    });
+                  }
                 }
               }
-            } else if ($.isNumeric(amount) && amount > 0) {
-              return $('.payment').html(['实际支付 ', amount, ' 元'].join('')).css({
-                color: '#999'
-              });
             } else {
-              return $('.payment').html(['实际支付 0 元'].join('')).css({
-                color: '#999'
-              });
+              if (!isNaN($('#id_amount').val())) {
+                pay_amount = $('#id_amount').val();
+                pay_now = parseFloat(pay_amount);
+                pay_now = Math.round(pay_amount * 100) / 100;
+                $('.payment i').css({
+                  color: '#1A2CDB'
+                });
+                $('.payment2').hide();
+                $('.payment').html(['实际支付<i>', pay_now, '</i>元，'].join('')).css({
+                  color: '#999'
+                });
+                return $('.payment i').css({
+                  color: '#1A2CDB'
+                });
+              } else {
+                $('.payment2').hide();
+                $('.payment').html(['实际支付<i>0</i>元，'].join('')).css({
+                  color: '#999'
+                });
+                return $('.payment i').css({
+                  color: '#1A2CDB'
+                });
+              }
             }
           });
           return $('#id_amount').blur(function(e) {

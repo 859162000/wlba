@@ -217,7 +217,7 @@ class WangDaiByDateAPI(APIView):
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
                 #"userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
-                "userName": md5(p2p.borrower_name.encode('utf-8')).hexdigest(),
+                "userName": md5(p2p.brief.encode('utf-8')).hexdigest(),
                 "amountUsedDesc": strip_tags(p2p.short_usage),
                 "loanUrl": "https://{}/p2p/detail/{}".format(request.get_host(), p2p.id),
                 "successTime": timezone.localtime(p2p.soldout_time).strftime("%Y-%m-%d %H:%M:%S"),

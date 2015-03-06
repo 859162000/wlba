@@ -2,10 +2,11 @@
 
 from django.contrib import admin
 from django.utils import timezone
-from views import AggregateView, MarketingView, TvView, TopsView
+
+from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
 
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
-    Activity, ActivityRule, Reward, RewardRecord, ClientData
+    Activity, ActivityRule, Reward, RewardRecord, ClientData, Channels
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -15,7 +16,7 @@ from wanglibao.admin import ReadPermissionModelAdmin
 
 
 class NewsAndReportAdmin(admin.ModelAdmin):
-    list_display = ("name", "link", "score")
+    list_display = ("name", "description", "link", "score", "hits")
 
 
 class SiteDataAdmin(admin.ModelAdmin):
@@ -60,7 +61,7 @@ class IntroducedByResource(resources.ModelResource):
 
 
 class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
-    list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
+    list_display = ("id", "user", "introduced_by", "channel", "created_at", "bought_at", "gift_send_at")
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
     raw_id_fields = ('user', 'introduced_by', 'created_by')
@@ -129,6 +130,11 @@ class ClientDataAdmin(admin.ModelAdmin):
     search_fields = ('phone', )
     list_filter = ('network', 'action')
 
+class ChannelsAdmin(admin.ModelAdmin):
+    list_display = ("id", "code", "name", "description")
+    search_fields = ("name",)
+    list_filter = ("name",)
+
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
@@ -140,6 +146,7 @@ admin.site.register(ActivityRule, ActivityRuleAdmin)
 admin.site.register(Reward, RewardAdmin)
 admin.site.register(RewardRecord, RewardRecordAdmin)
 admin.site.register(ClientData, ClientDataAdmin)
+admin.site.register(Channels, ChannelsAdmin)
 
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
 admin.site.register_view('statistics/tops', view=TopsView.as_view(), name=u'日周月榜名单')
@@ -150,4 +157,6 @@ admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view
 
 
 admin.site.register_view('statistics/aggregate', view=AggregateView.as_view(), name=u'累计购买金额统计单')
+
+admin.site.register_view('statistics/introduced_by', view=IntroducedAwardTemplate.as_view(), name=u'邀请收益统计')
 
