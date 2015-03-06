@@ -13,7 +13,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from wanglibao_p2p.models import P2PRecord
 from django.views.generic import TemplateView
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, Http404
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
@@ -24,7 +24,7 @@ from utils import local_to_utc
 
 # used for reward
 from django.forms import model_to_dict
-from marketing.models import RewardRecord
+from marketing.models import RewardRecord, NewsAndReport
 from wanglibao_sms.tasks import send_messages
 from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -654,3 +654,53 @@ class IntroducedAwardTemplate(TemplateView):
     #         "content": message_content,
     #         "mtype": "activity"
     #     })
+
+
+class NewsListView(TemplateView):
+    """ News and Report list page """
+
+    template_name = 'news.jade'
+
+    def get_context_data(self, **kwargs):
+        news = NewsAndReport.objects.filter().order_by('-created_at')
+
+        news_list = []
+        news_list.extend(news)
+
+        limit = 10
+        paginator = Paginator(news_list, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            news_list = paginator.page(page)
+        except PageNotAnInteger:
+            news_list = paginator.page(1)
+        except Exception:
+            news_list = paginator.page(paginator.num_pages)
+
+        return {
+            'news_list': news_list
+        }
+
+
+class NewsDetailView(TemplateView):
+    """ News detail page """
+
+    template_name = 'news_detail.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(NewsDetailView, self).get_context_data(**kwargs)
+
+        try:
+            news = NewsAndReport.objects.get(pk=id)
+
+        except NewsAndReport.DoesNotExist:
+            raise Http404(u'您查找的媒体报道不存在')
+
+        context.update({
+            'news': news,
+
+        })
+
+        return context
+
