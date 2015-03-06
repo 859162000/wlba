@@ -379,13 +379,22 @@ class IntroducedAwardTemplate(TemplateView):
     def add_introduced_award(start_utc, end_utc, amount_min, percent):
         # 不存在未审核记录，直接进行统计
         # 查询复合条件的首次交易的被邀请人和邀请人信息
+        # new_user = IntroducedBy.objects.filter(
+        #     bought_at__range=(start_utc, end_utc)
+        # ).exclude(
+        #     introduced_by__username__startswith="channel"
+        # ).exclude(
+        #     introduced_by__wanglibaouserprofile__utype__gt=0
+        # )
+
         new_user = IntroducedBy.objects.filter(
             bought_at__range=(start_utc, end_utc)
-        ).exclude(
-            introduced_by__username__startswith="channel"
+        ).filter(
+            introduced_by__isnull=False
         ).exclude(
             introduced_by__wanglibaouserprofile__utype__gt=0
         )
+
         query_set_list = []
         for first_user in new_user:
             # everyone
