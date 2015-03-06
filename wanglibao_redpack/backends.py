@@ -66,7 +66,11 @@ def list_redpack(user, status, device_type):
             obj = {"name":event.name, "receive_at":stamp(x.created_at),
                     "available_at":stamp(event.available_at), "unavailable_at":stamp(event.unavailable_at),
                     "id":x.id, "invest_amount":event.invest_amount, "amount":event.amount, "event_id":event.id,
-                    "highest_amount":event.highest_amount}
+                    "highest_amount":event.highest_amount,
+                    "method":REDPACK_RULE[event.rtype]}
+            if obj['method'] == REDPACK_RULE['percent']:
+                obj['amount'] = obj['amount']/100.0
+
             if x.order_id:
                 pr = P2PRecord.objects.filter(order_id=x.order_id).first()
                 obj.update({"product":pr.product.name, "apply_at":stamp(x.apply_at),
