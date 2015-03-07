@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from wanglibao_pay.util import get_a_uuid
 from django.db import transaction
 from decimal import *
+from ckeditor.fields import RichTextField
 
 
 class NewsAndReport(models.Model):
@@ -13,6 +14,10 @@ class NewsAndReport(models.Model):
     score = models.IntegerField(u'排名权重', default=0)
     created_at = models.DateTimeField(u'添加时间', auto_now_add=True)
     image = models.ImageField(u'图片', null=True, upload_to='news', blank=True)
+    keywords = models.CharField(u'关键字', max_length=200, null=True, blank=True, default='')
+    description = models.TextField(u'描述', null=True, blank=True, default='')
+    content = RichTextField(default='')
+    hits = models.IntegerField(u'点击次数', blank=True, default=0)
 
     def __unicode__(self):
         return self.name
@@ -81,12 +86,15 @@ class Channels(models.Model):
     class Meta:
         verbose_name_plural = u"渠道"
 
+    def __unicode__(self):
+        return self.name
+
 class IntroducedBy(models.Model):
     """ user: 被邀请人
         introduced_by: 邀请人
     """
     user = models.ForeignKey(User)
-    introduced_by = models.ForeignKey(User, related_name='introduces', blank=True)
+    introduced_by = models.ForeignKey(User, related_name='introduces', blank=True, null=True)
     channel = models.ForeignKey(Channels, blank=True, null=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
@@ -251,7 +259,7 @@ class IntroducedByReward(models.Model):
     )
 
     user = models.ForeignKey(User)
-    introduced_by_person = models.ForeignKey(User, related_name='introduced_person')
+    introduced_by_person = models.ForeignKey(User, related_name='introduced_person', blank=True, null=True)
     product = models.ForeignKey(P2PProduct, help_text=u'投资标的', blank=True, null=True, default=None)
     first_bought_at = models.DateTimeField(u'首笔购买时间', null=False)
     first_amount = models.DecimalField(u'首笔投资金额', max_digits=20, decimal_places=2, default=0)

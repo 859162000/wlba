@@ -3,8 +3,7 @@
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      'jquery.validate': 'lib/jquery.validate.min',
-      'jquery.modal': 'lib/jquery.modal.min'
+      'jquery.validate': 'lib/jquery.validate.min'
     },
     shim: {
       'jquery.validate': ['jquery']
@@ -66,3 +65,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=pay.js.map

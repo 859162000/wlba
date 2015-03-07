@@ -18,6 +18,7 @@ from wanglibao_banner.views import HiringView
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
+from marketing.views import NewsListView, NewsDetailView
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -64,7 +65,8 @@ urlpatterns = patterns(
     url(r'^milestone/', TemplateView.as_view(template_name="milestone.jade")),
     url(r'^responsibility/', TemplateView.as_view(template_name="responsibility.jade")),
     url(r'^contact_us/', TemplateView.as_view(template_name="contact_us.jade")),
-    url(r'^news/', TemplateView.as_view(template_name="news.jade")),
+    url(r'^news/list', NewsListView.as_view(), name="news_list"),
+    url(r'^news/detail/(?P<id>\d+)', NewsDetailView.as_view(), name="news_detail"),
     # url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
     # url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),
     url(r'^agreement/', TemplateView.as_view(template_name="agreement.jade")),

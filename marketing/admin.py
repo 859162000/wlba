@@ -2,7 +2,8 @@
 
 from django.contrib import admin
 from django.utils import timezone
-from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate
+
+from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
 
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
     Activity, ActivityRule, Reward, RewardRecord, ClientData, Channels
@@ -15,7 +16,7 @@ from wanglibao.admin import ReadPermissionModelAdmin
 
 
 class NewsAndReportAdmin(admin.ModelAdmin):
-    list_display = ("name", "link", "score")
+    list_display = ("name", "description", "link", "score", "hits")
 
 
 class SiteDataAdmin(admin.ModelAdmin):
@@ -60,7 +61,7 @@ class IntroducedByResource(resources.ModelResource):
 
 
 class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
-    list_display = ("id", "user", "introduced_by", "created_at", "bought_at", "gift_send_at")
+    list_display = ("id", "user", "introduced_by", "channel", "created_at", "bought_at", "gift_send_at")
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
     raw_id_fields = ('user', 'introduced_by', 'created_by')

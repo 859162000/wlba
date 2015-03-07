@@ -32,7 +32,8 @@ def decide_first(user_id, amount):
     introduced_by.bought_at = timezone.now()
     introduced_by.save()
 
-    channel = helper.which_channel(user, intro=introduced_by)
+    #channel = helper.which_channel(user, intro=introduced_by)
+    channel = helper.which_channel(user)
 
     #if "channel" not in introduced_by.introduced_by.username:
     if channel == helper.Channel.WANGLIBAO:
@@ -109,7 +110,7 @@ def decide_first(user_id, amount):
                                                 description=content)
                 except Exception, e:
                     print(e)
-    else:
+    elif channel == helper.Channel.XUNLEI:
         # 非快盘来源(需要确定到每个渠道)
         start_time = timezone.datetime(2014, 11, 12)
         if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
@@ -120,9 +121,9 @@ def decide_first(user_id, amount):
 def register_ok(user_id, device_type):
     user = User.objects.filter(id=user_id).first()
 
-    introduced_by = IntroducedBy.objects.filter(user=user).first()
+    #introduced_by = IntroducedBy.objects.filter(user=user).first()
 
-    channel = helper.which_channel(user, intro=introduced_by)
+    channel = helper.which_channel(user)
 
     if channel == helper.Channel.FENGXING:
         title, content = messages.msg_register_f()
@@ -140,8 +141,8 @@ def register_ok(user_id, device_type):
 @app.task
 def idvalidate_ok(user_id):
     user = User.objects.filter(id=user_id).first()
-    introduced_by = IntroducedBy.objects.filter(user=user).first()
-    channel = helper.which_channel(user, intro=introduced_by)
+    #introduced_by = IntroducedBy.objects.filter(user=user).first()
+    channel = helper.which_channel(user)
 
     if channel == helper.Channel.KUAIPAN:
         rs = RewardStrategy(user)

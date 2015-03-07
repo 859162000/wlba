@@ -310,7 +310,7 @@ class ProductAmortization(models.Model):
 
     version = IntegerVersionField()
 
-    product = models.ForeignKey(P2PProduct, related_name='amortizations')
+    product = models.ForeignKey(P2PProduct, related_name='amortizations', null=True)
 
     term = models.IntegerField(u'还款期数')
     term_date = models.DateTimeField(u'还款时间', null=True, blank=True)
@@ -546,6 +546,15 @@ class EquityRecord(models.Model):
 
 def generate_amortization_plan(sender, instance, **kwargs):
     if instance.status == u'录标完成':
+        product_amo = ProductAmortization.objects.filter(product_id=instance.pk).values('id')
+        if product_amo:
+            pa_list = [int(i['id']) for i in product_amo]
+            instance.amortizations.clear()
+            from celery.execute import send_task
+            send_task("wanglibao_p2p.tasks.delete_old_product_amortization", kwargs={
+                        'pa_list': pa_list,
+                })
+
         logger.info(u'The product status is 录标完成, start to generate amortization plan')
 
         terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, None, instance.period)

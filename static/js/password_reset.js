@@ -11,7 +11,7 @@
     var submit_form;
     submit_form = function() {
       var identifier;
-      identifier = $('input[name="identifier"]').val();
+      identifier = $('#id_identifier').val();
       if (!identifier) {
         tool.modalAlert({
           title: '温馨提示',
@@ -44,3 +44,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=password_reset.js.map
