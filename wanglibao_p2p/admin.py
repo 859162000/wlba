@@ -185,10 +185,34 @@ class P2PProductResource(resources.ModelResource):
 
 
 class P2PProductForm(forms.ModelForm):
+    serial_number = forms.CharField(label=u'产品编号*', required=True)
+
     class Meta:
         model = P2PProduct
+    
+    def clean_period(self):
+        period = self.cleaned_data.get('period')
+        if period == 0:
+            raise forms.ValidationError(u'产品期限(月)必须大于零')
+        return period    
+
+    def clean_serial_number(self):
+        serial_number = self.cleaned_data.get('serial_number')
+        p2p_product = P2PProduct.objects.filter(pk=self.instance.pk)
+        if p2p_product.exists(): # 校验已经存在的p2p产品, 先判断提交的表单数据中产品编号是否已修改
+            if serial_number and serial_number != p2p_product[0].serial_number:
+                if P2PProduct.objects.filter(serial_number=serial_number).exists():
+                    raise forms.ValidationError(u'产品编号已存在，请重新填写')
+        else: # 校验新添加的p2p产品
+            if P2PProduct.objects.filter(serial_number=serial_number).exists():
+                raise forms.ValidationError(u'产品编号已存在，请重新填写')
+        return serial_number
 
     def clean(self):
+        if self.cleaned_data.get('pay_method') == u'等额本息':
+            if self.cleaned_data.get('expected_earning_rate') == float(0):
+                raise forms.ValidationError(u'支付方式为等额本息时, 预期收益(%)必须大于零')
+
         if self.cleaned_data['status'] == u'正在招标':
 
             pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])

@@ -85,8 +85,9 @@ class PayInfo(models.Model):
     card_no = models.CharField(u'卡号', max_length=25, blank=True, null=True)
     channel = models.CharField(u'支付通道', max_length=20, blank=True, null=True, choices=(
         ("huifu", "Huifu"),
-        ("yeepay", "Yeepay"),
-        ("app", "App") #app取现使用
+        ("yeepay", "Yeepay"), #易宝
+        ("app", "App"), #app取现使用
+        ("kuaipay", "Kuaipay") #快钱
     ))
 
     def __unicode__(self):
