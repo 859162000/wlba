@@ -571,6 +571,7 @@ class KuaiPay:
 
         amount = request.DATA.get("amount", "").strip()
         card_no = request.DATA.get("card_no", "").strip()
+        input_phone = request.DATA.get("phone", "").strip()
 
         if not amount or not card_no:
             return {"ret_code":20112, 'message':'信息输入不完整'}
@@ -623,7 +624,7 @@ class KuaiPay:
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
             dic = {"user_id":user.id, "order_id":order.id, "id_number":profile.id_number,
-                    "phone":profile.phone, "name":profile.name, "amount":amount,
+                    "phone":input_phone, "name":profile.name, "amount":amount,
                     "card_no":pay_info.card_no}
 
             if len(card_no) == 10:
@@ -671,6 +672,7 @@ class KuaiPay:
         vcode = request.DATA.get("vcode", "").strip()
         order_id = request.DATA.get("order_id", "").strip()
         token = request.DATA.get("token", "").strip()
+        input_phone = request.DATA.get("phone", "").strip()
 
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info or pay_info.status == PayInfo.SUCCESS:
@@ -678,7 +680,7 @@ class KuaiPay:
         user = request.user
         profile = user.wanglibaouserprofile
         dic = {"user_id":user.id, "order_id":order_id, "id_number":profile.id_number,
-                "phone":profile.phone, "name":profile.name, "amount":pay_info.amount,
+                "phone":input_phone, "name":profile.name, "amount":pay_info.amount,
                 "time":pay_info.create_time.strftime("%Y%m%d%H%M%S"), "vcode":vcode,
                 "card_no":pay_info.card_no, "token":token}
         data = self._sp_bindpay_xml(dic)
