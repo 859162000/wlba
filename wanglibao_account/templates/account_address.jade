@@ -35,13 +35,15 @@ block main
                 if address.is_default == True
                   默认
               td
-                a#address_edit(address_id="{{address.id}}", href="javascript:;") 修改
-                a#address_delete(address_id="{{address.id}}", href="javascript:;") 删除
+                a.address_edit(data-id="{{address.id}}", href="javascript:;") 修改
+                | &nbsp;&nbsp;
+                a.address_delete.red(data-id="{{address.id}}", href="javascript:;") 删除
 block script
   form#add-address-form.add-address-form(method="post", style="display:none")
     .modal-title-bar
       span.modal-title 添加收货地址
     .modal-content-padding
+      input#address_id(type="hidden", name="address_id")
       .form-row
         input#address_name(type="text", name="address_name", placeholder="收货人姓名")
         .form-row-error
@@ -51,6 +53,8 @@ block script
       .form-row
         input#address_address(type="text", name="address_address", placeholder="详细地址")
         .form-row-error
+      .form-row
+        input#postcode(type="text", name="postcode", placeholder="邮政编码")
       .form-row
         .withdraw-checkbox
           input#default-checkbox(type='checkbox', name="default-checkbox", value='1')

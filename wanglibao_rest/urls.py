@@ -8,7 +8,8 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI,
                             AccountFundAssetAPI,
                             P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
-                            AdminSendMessageAPIView, AddressAddAPIView)
+                            AdminSendMessageAPIView, AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
+                            AddressGetAPIView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -155,7 +156,10 @@ urlpatterns = patterns(
     url(r'^redpacket/exchange/$', RedPacketChangeAPIView.as_view()),
     url(r'^redpacket/deduct/$', RedPacketDeductAPIView.as_view()),
 
-    url(r'^address/add/$', AddressAddAPIView.as_view()),
+    url(r'^address/$', AddressAPIView.as_view()),
+    url(r'^address/list/$', AddressListAPIView.as_view()),
+    url(r'^address/(?P<address_id>\d+)/$', AddressGetAPIView.as_view()),
+    url(r'^address/delete/$', AddressDeleteAPIView.as_view()),
 )
 
 urlpatterns += patterns('',
