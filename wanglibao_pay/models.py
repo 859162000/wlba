@@ -16,6 +16,7 @@ class Bank(models.Model):
     limit = models.TextField(blank=True, verbose_name=u'银行限额信息')
     logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'银行图标')
     sort_order = models.IntegerField(default=0, verbose_name=u'排序权值 从大到小')
+    kuai_code = models.CharField(max_length=16, verbose_name=u'快钱侧银行代码')
 
     class Meta:
         ordering = '-sort_order',
