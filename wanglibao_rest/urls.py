@@ -134,7 +134,7 @@ urlpatterns = patterns(
     url(r'^pay/cnp/delete/$', KuaiPayDelView.as_view()),
     url(r'^pay/cnp/dynnum/$', KuaiPayDynNumView.as_view()),
     url(r'^pay/deposit/$', KuaiPayView.as_view(), name="kuai-deposit-view"),
-    url(r'^pay/deposit/callback/$', KuaiPayAppPayCallbackView.as_view(), name="kuai-deposit-callback"),
+    url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
     #url(r'^pushtest/$', PushTestView.as_view()),
