@@ -36,7 +36,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
-                            LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord)
+                            LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
+                            DepositGateAPIView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 
@@ -128,6 +129,7 @@ urlpatterns = patterns(
     url(r'^withdraw/$', WithdrawAPIView.as_view(), name="withdraw-api-view"),
     url(r'^fee/$', FEEAPIView.as_view(), name="withdraw-api-view"),
 
+    url(r'^pay/gate/$', DepositGateAPIView.as_view(), name="pay-gate-api-view"),
     url(r'^pay/yee/app/deposit/$', YeePayAppPayView.as_view(), name="yee-deposit-view"),
     url(r'^pay/yee/app/deposit/callback/$', YeePayAppPayCallbackView.as_view(), name="yee-deposit-callback"),
     url(r'^pay/yee/app/deposit/complete/$', YeePayAppPayCompleteView.as_view(), name="yee-deposit-fcallback"),

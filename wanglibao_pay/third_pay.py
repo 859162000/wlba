@@ -357,6 +357,7 @@ class KuaiPay:
                     <externalRefNumber>%s</externalRefNumber>
                     <amount>%s</amount>
                     <pan>%s</pan>
+                    <bankId>%s</bankId>
                     <phoneNO>%s</phoneNO>
                     <cardHolderName>%s</cardHolderName>
                     <idType>0</idType>
@@ -364,7 +365,7 @@ class KuaiPay:
                 </GetDynNumContent>
             </MasMessage>
         """ % (self.MER_ID, dic['user_id'], dic['order_id'],
-                dic['amount'], dic['card_no'], dic['phone'],
+                dic['amount'], dic['card_no'], dic['bank_id'], dic['phone'],
                 dic['name'], dic['id_number']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
@@ -572,9 +573,13 @@ class KuaiPay:
         amount = request.DATA.get("amount", "").strip()
         card_no = request.DATA.get("card_no", "").strip()
         input_phone = request.DATA.get("phone", "").strip()
+        gate_id = request.DATA.get("gate_id","").strip()
 
         if not amount or not card_no:
             return {"ret_code":20112, 'message':'信息输入不完整'}
+        if len(card_no) > 10 and (not input_phone or not gate_id):
+            return {"ret_code":20112, 'message':'信息输入不完整'}
+
         if card_no[0] in ("3", "4", "5"):
             return {"ret_code":20113, "message":"不能使用信用卡"}
 
@@ -586,12 +591,16 @@ class KuaiPay:
         amount = util.fmt_two_amount(amount)
         if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
             return {"ret_code":20115, 'message':'金额格式错误，大于100元且为100倍数'}
-        if amount > 50000:
-            return {"ret_code":20116, 'message':'单笔充值不超过5万'}
+        #if amount > 50000:
+        #    return {"ret_code":20116, 'message':'单笔充值不超过5万'}
 
         user = request.user
         profile = user.wanglibaouserprofile
         card = None
+        if gate_id:
+            bank = Bank.objects.filter(gate_id=gate_id).first()
+            if not bank:
+                return {"ret_code":201151, "message":"不支持该银行"}
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
@@ -615,6 +624,7 @@ class KuaiPay:
                 pay_info.bank = card.bank
                 pay_info.card_no = card.no
             else:
+                pay_info.bank = bank
                 pay_info.card_no = card_no
 
             pay_info.request = ""
@@ -633,6 +643,7 @@ class KuaiPay:
                 data = self._sp_qpay_xml(dic)
                 url = self.PAY_URL
             else:
+                dic['bank_id'] = bank.kuai_code
                 data = self._sp_dynnum_xml(dic)
                 url = self.DYNNUM_URL
 
