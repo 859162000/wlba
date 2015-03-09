@@ -1323,7 +1323,7 @@ class AddressGetAPIView(APIView):
             return Response({'ret_code': 3003, 'message': u'地址不存在'})
         else:
             address = {
-                'id': address.id,
+                'address_id': address.id,
                 'name': address.name,
                 'phone_number': address.phone_number,
                 'address': address.address,
