@@ -42,7 +42,7 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
     AmortizationRecord, P2PProductContract
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from wanglibao_account.models import VerifyCounter, Binding, Message
+from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from order.models import Order
@@ -1209,6 +1209,45 @@ class IntroduceRelation(TemplateView):
         Only user with change payinfo permission can call this view
         """
         return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)
+
+
+class AddressView(TemplateView):
+    template_name = 'account_address.jade'
+
+    def get_context_data(self, **kwargs):
+
+        address_list = UserAddress.objects.filter(user=self.request.user)
+
+        return {
+            'address_list': address_list
+        }
+
+
+class AddressAddAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    print("@@@@@@@@@@@@@@@@")
+
+    def post(self, request):
+        address_name = request.DATA.get('address_name', "").strip()
+        phone_number = request.DATA.get('phone_number', "").strip()
+        address_address = request.DATA.get('address_address', "").strip()
+        postcode = request.DATA.get('postcode', "").strip()
+        is_default = request.DATA.get('is_default', False)
+
+        if not address_name or not phone_number or not address_address:
+            return Response({'error_code': 3001, 'message': u'信息输入不完整'})
+
+        print "##########################"
+        address = UserAddress()
+        address.user = request.user
+        address.name = address_name
+        address.address = address_address
+        address.phone_number = phone_number
+        address.postcode = postcode
+        address.is_default = is_default
+        address.save()
+        return Response({'error_code': 0, 'message': u'添加成功'})
 
 
 # class CjdaoApiView(APIView):

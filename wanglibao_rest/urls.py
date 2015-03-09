@@ -5,9 +5,10 @@ from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIView,
-                            AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI, AccountFundAssetAPI,
+                            AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI,
+                            AccountFundAssetAPI,
                             P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
-                            AdminSendMessageAPIView)
+                            AdminSendMessageAPIView, AddressAddAPIView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -153,6 +154,8 @@ urlpatterns = patterns(
     url(r'^redpacket/$', RedPacketListAPIView.as_view()),
     url(r'^redpacket/exchange/$', RedPacketChangeAPIView.as_view()),
     url(r'^redpacket/deduct/$', RedPacketDeductAPIView.as_view()),
+
+    url(r'^address/add/$', AddressAddAPIView.as_view()),
 )
 
 urlpatterns += patterns('',
