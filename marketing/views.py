@@ -13,7 +13,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from wanglibao_p2p.models import P2PRecord
 from django.views.generic import TemplateView
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, Http404
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
@@ -24,7 +24,7 @@ from utils import local_to_utc
 
 # used for reward
 from django.forms import model_to_dict
-from marketing.models import RewardRecord
+from marketing.models import RewardRecord, NewsAndReport
 from wanglibao_sms.tasks import send_messages
 from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -356,7 +356,7 @@ class IntroducedAwardTemplate(TemplateView):
         else:
             message = u'存在未审核记录，请先进行审核操作！'
 
-        introduced_result = IntroducedByReward.objects.filter(checked_status=0)
+        introduced_result = IntroducedByReward.objects.filter(checked_status=0).order_by("first_bought_at")
         if introduced_by_reward and introduced_by_reward.count() > 0:
             time_zone = pytz.timezone('Asia/Shanghai')
             result_first = introduced_result.first()
@@ -379,13 +379,22 @@ class IntroducedAwardTemplate(TemplateView):
     def add_introduced_award(start_utc, end_utc, amount_min, percent):
         # 不存在未审核记录，直接进行统计
         # 查询复合条件的首次交易的被邀请人和邀请人信息
+        # new_user = IntroducedBy.objects.filter(
+        #     bought_at__range=(start_utc, end_utc)
+        # ).exclude(
+        #     introduced_by__username__startswith="channel"
+        # ).exclude(
+        #     introduced_by__wanglibaouserprofile__utype__gt=0
+        # )
+
         new_user = IntroducedBy.objects.filter(
             bought_at__range=(start_utc, end_utc)
-        ).exclude(
-            introduced_by__username__startswith="channel"
+        ).filter(
+            introduced_by__isnull=False
         ).exclude(
             introduced_by__wanglibaouserprofile__utype__gt=0
         )
+
         query_set_list = []
         for first_user in new_user:
             # everyone
@@ -413,12 +422,12 @@ class IntroducedAwardTemplate(TemplateView):
 
                 # 计算被邀请人首笔投资总收益
                 amount_earning = Decimal(
-                    Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12))
+                    Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12)) * Decimal(first_record.product.expected_earning_rate) * Decimal('0.01')
                 ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
                 reward.first_reward = amount_earning
                 # 邀请人活取被邀请人首笔投资收益
                 reward.introduced_reward = Decimal(
-                    amount_earning * Decimal(percent) * Decimal('0.01')
+                    Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12)) * Decimal(percent) * Decimal('0.01')
                 ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
                 reward.activity_start_at = start_utc
@@ -645,3 +654,53 @@ class IntroducedAwardTemplate(TemplateView):
     #         "content": message_content,
     #         "mtype": "activity"
     #     })
+
+
+class NewsListView(TemplateView):
+    """ News and Report list page """
+
+    template_name = 'news.jade'
+
+    def get_context_data(self, **kwargs):
+        news = NewsAndReport.objects.filter().order_by('-created_at')
+
+        news_list = []
+        news_list.extend(news)
+
+        limit = 10
+        paginator = Paginator(news_list, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            news_list = paginator.page(page)
+        except PageNotAnInteger:
+            news_list = paginator.page(1)
+        except Exception:
+            news_list = paginator.page(paginator.num_pages)
+
+        return {
+            'news_list': news_list
+        }
+
+
+class NewsDetailView(TemplateView):
+    """ News detail page """
+
+    template_name = 'news_detail.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(NewsDetailView, self).get_context_data(**kwargs)
+
+        try:
+            news = NewsAndReport.objects.get(pk=id)
+
+        except NewsAndReport.DoesNotExist:
+            raise Http404(u'您查找的媒体报道不存在')
+
+        context.update({
+            'news': news,
+
+        })
+
+        return context
+

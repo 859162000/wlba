@@ -107,7 +107,7 @@ html
                         user_limit = u"1元起投"
                       else
                         user_limit = u"100的整数倍"
-                      -render_field form.amount class+="span12" type="text" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning
+                      -render_field form.amount class+="span12" type="text" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning maxlength="8"
                     .form-row-error
 
                 if user.is_authenticated and red_packets > 0
@@ -141,7 +141,7 @@ html
                         a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
                     else
                       span.span8-omega
-                        a.submit-button.span12.button-primary.button-middle.invest(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                        a.submit-button.span12.button-primary.button-middle.invest#stop(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
                   else
                     span.span8-omega
                       a.submit-button.span12.button-primary.button-middle.invest.notlogin(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购

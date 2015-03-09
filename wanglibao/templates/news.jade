@@ -12,52 +12,23 @@ body
       .media-list-title
         h3 媒体报道
       .media-list-body
-        .media-list-content
-          p
-            img(src="/static/images/media.jpg")
-          dl
-            dt
-              a(href="http://iof.hexun.com/2014-06-26/166073549.html",target="_blank") 网利金融在财经峰会上获奖 将专注互联网私人银行
-            dd 备受瞩目的第三届中国财经峰会于6月20日在北京圆满落幕。峰会由众多财经及大众媒体联袂打造，为中国经济领域最具影响力的思想交流平台之一。网利金融在此次峰会被评为2014年度最佳创新典范企业，网利金融CEO赵润龙荣获2014年度最佳青年榜样。中国建设银行(601939,股吧)、浦发银行(600000,股吧)、中国人寿、宜信、陆金所等企业，也在此次峰会上获奖。
-            dd
-              span.media-time 2014-06-26 15:51:48 &nbsp;&nbsp;来源：
-              span.media-from 和讯银行
-              a.media-more.pull-right(href="http://iof.hexun.com/2014-06-26/166073549.html",target="_blank") 详细介绍>>
-        .media-list-content
-          p
-            img(src="/static/images/media.jpg")
-          dl
-            dt
-              a(href="http://iof.hexun.com/2014-06-26/166073549.html",target="_blank") 网利金融在财经峰会上获奖 将专注互联网私人银行
-            dd 备受瞩目的第三届中国财经峰会于6月20日在北京圆满落幕。峰会由众多财经及大众媒体联袂打造，为中国经济领域最具影响力的思想交流平台之一。网利金融在此次峰会被评为2014年度最佳创新典范企业，网利金融CEO赵润龙荣获2014年度最佳青年榜样。中国建设银行(601939,股吧)、浦发银行(600000,股吧)、中国人寿、宜信、陆金所等企业，也在此次峰会上获奖。
-            dd
-              span.media-time 2014-06-26 15:51:48 &nbsp;&nbsp;来源：
-              span.media-from 和讯银行
-              a.media-more.pull-right(href="http://iof.hexun.com/2014-06-26/166073549.html",target="_blank") 详细介绍>>
-        .media-list-content
-          p
-            img(src="/static/images/media.jpg")
-          dl
-            dt
-              a(href="http://iof.hexun.com/2014-06-26/166073549.html",target="_blank") 网利金融在财经峰会上获奖 将专注互联网私人银行
-            dd 备受瞩目的第三届中国财经峰会于6月20日在北京圆满落幕。峰会由众多财经及大众媒体联袂打造，为中国经济领域最具影响力的思想交流平台之一。网利金融在此次峰会被评为2014年度最佳创新典范企业，网利金融CEO赵润龙荣获2014年度最佳青年榜样。中国建设银行(601939,股吧)、浦发银行(600000,股吧)、中国人寿、宜信、陆金所等企业，也在此次峰会上获奖。
-            dd
-              span.media-time 2014-06-26 15:51:48 &nbsp;&nbsp;来源：
-              span.media-from 和讯银行
-              a.media-more.pull-right(href="http://iof.hexun.com/2014-06-26/166073549.html",target="_blank") 详细介绍>>
-        .pager
-          ul
-            li.pager-prev
-              a.pager-anchor(href="#") <
-            li.pager-page-number.active
-              a.pager-anchor(href="#") 1
-            li.pager-page-number
-              a.pager-anchor(href="#") 2
-            li.pager-page-number
-              a.pager-anchor(href="#") 3
-            li.pager-next
-              a.pager-anchor(href="#") >
+        for news in news_list
+          .media-list-content
+            p
+              img(src="/media/{{news.image}}")
+            dl
+              dt
+                a(href="{{news.link}}",target="_blank") {{news.name}}
+              dd {{news.description}}
+              dd
+                span.media-time {{news.created_at|date:"Y-m-d H:i"}} &nbsp;&nbsp;
+                //span.media-from 来源：
+                a.media-more.pull-right(href="{{news.link}}",target="_blank") 详细介绍>>
 
+        .pager
+          - with data=news_list uri='/news/'
+          include include/pager
+          - endwith
 
   include include/footer
   include include/tracking

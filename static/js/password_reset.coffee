@@ -5,7 +5,7 @@ require.config
 
 require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
   submit_form = ()->
-    identifier = $('input[name="identifier"]').val()
+    identifier = $('#id_identifier').val()
     if !identifier
       tool.modalAlert({title: '温馨提示', msg: '请输入手机号'})
       return
