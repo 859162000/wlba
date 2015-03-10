@@ -743,6 +743,17 @@ class KuaiPay:
 
         pay_info.save()
         if rs['ret_code'] == 0:
+            #保存卡信息到个人名下
+            card_no = pay_info.card_no
+            if len(card_no) > 10:
+                exist_cards = Card.objects.filter(no=card_no, user=pay_info.user).first()
+                if not exist_cards:
+                    card = Card()
+                    card.bank = pay_info.bank
+                    card.no = card_no
+                    card.user = user
+                    card.is_default = False
+                    card.save()
             tools.despoit_ok(pay_info)
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
