@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import logging
 import re
 import socket
@@ -609,7 +611,6 @@ class AdminTransactionDeposit(TemplateView):
         return super(AdminTransactionDeposit, self).dispatch(request, *args, **kwargs)
 
 
-
 # 易宝支付创建订单接口
 class YeePayAppPayView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -618,7 +619,6 @@ class YeePayAppPayView(APIView):
         yeepay = third_pay.YeePay()
         result = yeepay.app_pay(request)
         return Response(result)
-
 
 #易宝支付回调
 class YeePayAppPayCallbackView(APIView):
@@ -629,7 +629,6 @@ class YeePayAppPayCallbackView(APIView):
         request.GET = request.DATA
         result = yeepay.pay_callback(request)
         return Response(result)
-
 
 #易宝支付同步回调
 class YeePayAppPayCompleteView(TemplateView):
@@ -645,19 +644,50 @@ class YeePayAppPayCompleteView(TemplateView):
         else:
             msg = u"充值成功"
             amount = result['amount']
-            #if result['message'] == "success":
-            #    title, content = messages.msg_pay_ok(amount)
-            #    inside_message.send_one.apply_async(kwargs={
-            #        "user_id": result['uid'],
-            #        "title": title,
-            #        "content": content,
-            #        "mtype": "activityintro"
-            #    })
-
         return self.render_to_response({
             'result': msg,
             'amount': amount
         })
+
+class KuaiPayQueryView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        pay = third_pay.KuaiPay()
+        result = pay.query_bind(request)
+        return Response(result)
+
+class KuaiPayDelView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        pay = third_pay.KuaiPay()
+        result = pay.delete_bind(request)
+        return Response(result)
+
+class KuaiPayView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        pay = third_pay.KuaiPay()
+        result = pay.pre_pay(request)
+        return Response(result)
+
+class KuaiPayCallbackView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        pay = third_pay.KuaiPay()
+        result = pay.pay_callback(request)
+        return Response(result)
+
+class KuaiPayDynNumView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        pay = third_pay.KuaiPay()
+        result = pay.dynnum_bind_pay(request)
+        return Response(result)
 
 
 class BankCardAddView(APIView):

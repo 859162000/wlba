@@ -5,9 +5,11 @@ from django.conf.urls import patterns, url, include
 from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIView,
-                            AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI, AccountFundAssetAPI,
+                            AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI,
+                            AccountFundAssetAPI,
                             P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
-                            AdminSendMessageAPIView)
+                            AdminSendMessageAPIView, AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
+                            AddressGetAPIView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -22,9 +24,9 @@ from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSe
     P2PProductDetailView
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
-                            YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,)
-                            #KuaiPayAppPayView, KuaiPayAppPayCallbackView, KuaiPayQueryView,
-                            #KuaiPayDelView, KuaiPayDynNumView)
+                            YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
+                            KuaiPayView, KuaiPayCallbackView, KuaiPayQueryView,
+                            KuaiPayDelView, KuaiPayDynNumView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -34,7 +36,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
-                            LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord)
+                            LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
+                            DepositGateAPIView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 
@@ -126,15 +129,16 @@ urlpatterns = patterns(
     url(r'^withdraw/$', WithdrawAPIView.as_view(), name="withdraw-api-view"),
     url(r'^fee/$', FEEAPIView.as_view(), name="withdraw-api-view"),
 
+    url(r'^pay/gate/$', DepositGateAPIView.as_view(), name="pay-gate-api-view"),
     url(r'^pay/yee/app/deposit/$', YeePayAppPayView.as_view(), name="yee-deposit-view"),
     url(r'^pay/yee/app/deposit/callback/$', YeePayAppPayCallbackView.as_view(), name="yee-deposit-callback"),
     url(r'^pay/yee/app/deposit/complete/$', YeePayAppPayCompleteView.as_view(), name="yee-deposit-fcallback"),
 
-    #url(r'^pay/cnp/list/$', KuaiPayQueryView.as_view()),
-    #url(r'^pay/cnp/delete/$', KuaiPayDelView.as_view()),
-    #url(r'^pay/cnp/dynnum/$', KuaiPayDynNumView.as_view()),
-    #url(r'^pay/deposit/$', KuaiPayAppPayView.as_view(), name="kuai-deposit-view"),
-    #url(r'^pay/deposit/callback/$', KuaiPayAppPayCallbackView.as_view(), name="kuai-deposit-callback"),
+    url(r'^pay/cnp/list/$', KuaiPayQueryView.as_view()),
+    url(r'^pay/cnp/delete/$', KuaiPayDelView.as_view()),
+    url(r'^pay/cnp/dynnum/$', KuaiPayDynNumView.as_view()),
+    url(r'^pay/deposit/$', KuaiPayView.as_view(), name="kuai-deposit-view"),
+    url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
     #url(r'^pushtest/$', PushTestView.as_view()),
@@ -153,6 +157,11 @@ urlpatterns = patterns(
     url(r'^redpacket/$', RedPacketListAPIView.as_view()),
     url(r'^redpacket/exchange/$', RedPacketChangeAPIView.as_view()),
     url(r'^redpacket/deduct/$', RedPacketDeductAPIView.as_view()),
+
+    url(r'^address/$', AddressAPIView.as_view()),
+    url(r'^address/list/$', AddressListAPIView.as_view()),
+    url(r'^address/(?P<address_id>\d+)/$', AddressGetAPIView.as_view()),
+    url(r'^address/delete/$', AddressDeleteAPIView.as_view()),
 )
 
 urlpatterns += patterns('',
