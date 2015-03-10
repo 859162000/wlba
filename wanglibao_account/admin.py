@@ -129,7 +129,8 @@ class MessageTextAdmin(admin.ModelAdmin):
 
 
 class UserAddressAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "address", "province", "city", "area", "postcode", "is_default")
+    list_display = ("id", "name", "phone_number", "address", "province", "city", "area", "postcode", "is_default")
+    search_fields = ('user__wanglibaouserprofile__phone', 'phone_number')
     raw_id_fields = ('user', )
 
 
