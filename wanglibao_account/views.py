@@ -1243,10 +1243,11 @@ class AddressListAPIView(APIView):
             } for address in address_list]
             return Response({
                 'ret_code': 0,
+                'message': 'ok',
                 'address': address_list
             })
         else:
-            return Response({'ret_code': 3009, 'message': u'无地址信息'})
+            return Response({'ret_code': 3000, 'message': u'没有收货地址'})
 
 
 class AddressAPIView(APIView):
@@ -1344,10 +1345,11 @@ class AddressGetAPIView(APIView):
                 }
                 return Response({
                     'ret_code': 0,
+                    'message': 'ok',
                     'address': address
                 })
             else:
-                return Response({'ret_code': 3009, 'message': u'无地址信息'})
+                return Response({'ret_code': 3000, 'message': u'没有收货地址'})
         except:
             return Response({'ret_code': 3003, 'message': u'地址不存在'})
 
