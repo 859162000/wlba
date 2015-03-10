@@ -1263,9 +1263,12 @@ class AddressAPIView(APIView):
         city = request.DATA.get('city', "").strip()
         area = request.DATA.get('area', "").strip()
         is_default = request.DATA.get('is_default', False)
+        is_default = True if is_default == 'true' else False
 
         if not address_name or not phone_number or not address_address:
             return Response({'ret_code': 3001, 'message': u'信息输入不完整'})
+        if len(phone_number) > 15:
+            return Response({'ret_code': 3004, 'message': u'联系电话不能超过15位'})
 
         if is_default:
             """ clear the exists is_default value """
