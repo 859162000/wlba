@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'Bank.kuai_limit'
         db.add_column(u'wanglibao_pay_bank', 'kuai_limit',
-                      self.gf('django.db.models.fields.TextField')(default='', blank=True),
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=500, blank=True),
                       keep_default=False)
 
 
@@ -82,7 +82,7 @@ class Migration(SchemaMigration):
             'gate_id': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kuai_code': ('django.db.models.fields.CharField', [], {'max_length': '16', 'null': 'True', 'blank': 'True'}),
-            'kuai_limit': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'kuai_limit': ('django.db.models.fields.CharField', [], {'max_length': '500', 'blank': 'True'}),
             'limit': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'logo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
@@ -121,7 +121,7 @@ class Migration(SchemaMigration):
             'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
             'update_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'on_delete': 'models.PROTECT'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'EfDHFegwQHai6ESCm56m2g'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'})
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'wtpKcAS6S1ex8cnwjIiiTQ'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'})
         }
     }
 
