@@ -469,14 +469,14 @@ class DepositGateAPIView(APIView):
         if "gate" in obj:
             if obj['gate'] == "kuai":
                 if "notice" in obj:
-                    return Response({"ret_code":0, "gate":"kuai" "notice":obj['notice']})
+                    return Response({"ret_code":0, "gate":"kuai", "notice":obj['notice']})
                 else:
-                    return Response({"ret_code":0, "gate":"kuai" "notice":""})
+                    return Response({"ret_code":0, "gate":"kuai", "notice":""})
             else:
                 if "notice" in obj:
-                    return Response({"ret_code":0, "gate":"yee" "notice":obj['notice']})
+                    return Response({"ret_code":0, "gate":"yee", "notice":obj['notice']})
                 else:
-                    return Response({"ret_code":0, "gate":"yee" "notice":""})
+                    return Response({"ret_code":0, "gate":"yee", "notice":""})
         else:
             return Response({"ret_code":0, "gate":"kuai"})
 
