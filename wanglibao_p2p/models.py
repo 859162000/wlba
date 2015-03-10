@@ -73,6 +73,7 @@ class P2PProduct(ProductBase):
         (u'先息后本', u'先息后本'),
         (u'按月付息', u'按月付息到期还本'),
         (u'按日计息', u'按日计息到期还本付息'),
+        (u'按日计息按月付息', u'按日计息按月付息'),
         (u'到期还本付息', u'到期还本付息'),
         (u'按季度付息', u'按季度付息'),
     )
@@ -565,6 +566,10 @@ def generate_amortization_plan(sender, instance, **kwargs):
             amortization.principal = term[1]
             amortization.interest = term[2]
             amortization.term = index + 1
+
+            if term[5]:
+                amortization.term_date = term[5]
+
             instance.amortizations.add(amortization)
             amortization.save()
 

@@ -1,6 +1,7 @@
 # coding=utf-8
 from decimal import *
 from dateutil.relativedelta import relativedelta
+from datetime import timedelta, datetime
 from django.utils import timezone
 import math
 
@@ -200,8 +201,7 @@ class DailyInterest(AmortizationPlan):
     def generate(cls, amount, year_rate, term, period=None):
         amount = Decimal(amount)
 
-        daily_rate = year_rate / 360
-        daily_rate = Decimal(daily_rate).quantize(Decimal('0.000000001'))
+        daily_rate = get_daily_interest(year_rate)
         daily_interest = amount * daily_rate
 
         total_interest = (daily_interest * period).quantize(Decimal('.01'), rounding=ROUND_DOWN)
@@ -224,17 +224,40 @@ class DailyInterestMonthly(AmortizationPlan):
     def generate(cls, amount, year_rate, term, period=None, **kwargs):
         amount = Decimal(amount)
 
-        daily_rate = year_rate / 360
-        daily_rate = Decimal(daily_rate).quantize(Decimal('0.000000001'))
+        interest_start = kwargs.get('start', datetime.now())
+        term_date = interest_start + timedelta(days=period)
+
+        term_dates = [interest_start]
+        daily_rate = get_daily_interest(year_rate)
         daily_interest = amount * daily_rate
 
-        total_interest = (daily_interest * period).quantize(Decimal('.01'), rounding=ROUND_DOWN)
-
-        total = total_interest + amount
-
         result = []
+        left_interest = Decimal(0)
 
-        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0)))
+        i = 0
+        while term_dates[i] < term_date:
+            i = i + 1
+
+            if interest_start + relativedelta(months=i) > term_date:
+                anchor = term_date
+                term_dates.append(anchor)
+                term_period = term_dates[i] - term_dates[i-1]
+                total_interest = daily_interest * period - left_interest
+                result.append((total_interest+amount, amount, total_interest, Decimal(0), Decimal(0), term_dates[i]))
+
+            else:
+                anchor = interest_start + relativedelta(months=i)
+                term_dates.append(anchor)
+                term_period = term_dates[i] - term_dates[i-1]
+                total_interest = (daily_interest * term_period.days).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+                left_interest += total_interest
+                result.append((total_interest, Decimal(0), total_interest, Decimal(0), Decimal(0), term_dates[i]))
+
+            print term_period, term_date, anchor
+        
+
+
+        total = daily_interest*period + amount
 
         return {
             "terms": result,
@@ -242,12 +265,20 @@ class DailyInterestMonthly(AmortizationPlan):
         }
 
 
+
 def get_amortization_plan(amortization_type):
     for plan in (MatchingPrincipalAndInterest,
                  MonthlyInterest,
                  DailyInterest,
+                 DailyInterestMonthly,
                  InterestFirstThenPrincipal,
                  DisposablePayOff,
                  QuarterlyInterest):
         if plan.name == amortization_type:
             return plan
+
+def get_format_decimal(decimal):
+    return Decimal(decimal).quantize(Decimal('0.000000000000000001'))
+
+def get_daily_interest(year_rate):
+    return get_format_decimal(year_rate)
