@@ -80,7 +80,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
     }
     .done (data)->
       $('#add-address-button').modal()
-      $('#address_id').val(data.id)
+      $('#address_id').val(data.address_id)
       $('#address_name').val(data.name)
       $('#phone_number').val(data.phone_number)
       $('#address_address').val(data.address)
