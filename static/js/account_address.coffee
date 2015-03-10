@@ -25,6 +25,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
     $('#postcode').val('')
     $('#default-checkbox').attr('checked', false)
     $('#add-address-submit').html('添加')
+    $('span.modal-title').html('添加收货地址')
 
   $('#add-address-form').validate
     rules:
@@ -81,6 +82,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
   $('.address_edit').click (e)->
     address_id = $(this).data("id")
     $('#add-address-submit').html('修改')
+    $('span.modal-title').html('修改收货地址')
     $.ajax {
       url: "/api/address/"+ address_id + '/'
     }

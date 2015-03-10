@@ -27,7 +27,8 @@
       $('#address_address').val('');
       $('#postcode').val('');
       $('#default-checkbox').attr('checked', false);
-      return $('#add-address-submit').html('添加');
+      $('#add-address-submit').html('添加');
+      return $('span.modal-title').html('添加收货地址');
     });
     $('#add-address-form').validate({
       rules: {
@@ -101,6 +102,7 @@
       var address_id;
       address_id = $(this).data("id");
       $('#add-address-submit').html('修改');
+      $('span.modal-title').html('修改收货地址');
       return $.ajax({
         url: "/api/address/" + address_id + '/'
       }).done(function(data) {
