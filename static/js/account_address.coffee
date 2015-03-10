@@ -75,7 +75,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
   $('.address_edit').click (e)->
     address_id = $(this).data("id")
     $('#add-address-submit').html('修改')
-    $.get("/api/address/"+ address_id)
+    $.ajax {
+      url: "/api/address/"+ address_id + '/'
+    }
     .done (data)->
       $('#add-address-button').modal()
       $('#address_id').val(data.id)

@@ -95,7 +95,9 @@
       var address_id;
       address_id = $(this).data("id");
       $('#add-address-submit').html('修改');
-      return $.get("/api/address/" + address_id).done(function(data) {
+      return $.ajax({
+        url: "/api/address/" + address_id + '/'
+      }).done(function(data) {
         $('#add-address-button').modal();
         $('#address_id').val(data.id);
         $('#address_name').val(data.name);
