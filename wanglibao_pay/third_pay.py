@@ -687,6 +687,9 @@ class KuaiPay:
         token = request.DATA.get("token", "").strip()
         input_phone = request.DATA.get("phone", "").strip()
 
+        if not order_id.isdigit():
+            return {"ret_code":20125, "message":"订单号错误"}
+
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info or pay_info.status == PayInfo.SUCCESS:
             return {"ret_code":20121, "message":"订单不存在或已支付成功"}
@@ -851,7 +854,8 @@ def del_bank_card(request):
     return {"ret_code":0, "message":"删除成功"}
 
 def list_bank(request):
-    banks = Bank.get_deposit_banks()
+    #banks = Bank.get_deposit_banks()
+    banks = Bank.get_kuai_deposit_banks()
     rs = []
     for x in banks:
         rs.append({"name":x.name, "gate_id":x.gate_id})
