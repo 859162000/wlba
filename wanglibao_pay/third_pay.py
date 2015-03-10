@@ -472,6 +472,8 @@ class KuaiPay:
                     for z in y['pciInfo']['value']:
                         if "bankId" in z:
                             card['bank_id'] = z['bankId']['value']
+                            bank = Bank.objects.filter(kuai_code=card['bank_id']).first()
+                            card['bank_name'] = bank.name
                         if "storablePan" in z:
                             card['storable_no'] = z["storablePan"]['value']
                     cards.append(card)

@@ -5,7 +5,9 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
+import pytz
 import time
+import json
 import logging
 import decimal
 from django.utils import timezone
@@ -16,6 +18,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_pay.util import fmt_two_amount
+from misc.models import Misc
 
 logger = logging.getLogger(__name__)
 
@@ -111,13 +114,44 @@ def exchange_redpack(token, device_type, user):
     if event.give_platform != "all" and event.give_platform != device_type:
         return {"ret_code":30168, "message":"不符合领取条件"}
 
-    record = RedPackRecord()
-    record.user = user
-    record.redpack = redpack
-    record.change_platform = device_type
-    redpack.status = "used"
-    redpack.save()
-    record.save()
+    if event.amount == 0:
+        #金额为0,为特殊红包
+        xle = Misc.objects.filter(key="xunlei_event").first()
+        if xle:
+            try:
+                obj = json.loads(xle.value)
+                if "event_id" not in obj or "event_new_id" not in obj or "event_old_id" not in obj:
+                    return {"ret_code":301691, "message":"服务器内部错误"}
+                register_time = timezone.datetime(2015, 03, 9, tzinfo=pytz.UTC)
+                if user.date_joined > register_time:
+                    event_on = RedPackEvent.objects.filter(id=obj['event_new_id'], invalid=False, value=0).first()
+                else:
+                    event_on = RedPackEvent.objects.filter(id=obj['evnet_old_id'], invalid=False, value=0).first()
+                
+                if not event_on:
+                    return {"ret_code":301692, "message":"没有此活动"}
+                redpack_on = RedPack.objects.filter(event=event_on, token="").first()
+                if not redpack_on:
+                    return {"ret_code":301693, "message":"兑换码无效"}
+                redpack.status = "used"
+                redpack.save()
+
+                record = RedPackRecord()
+                record.user = user
+                record.redpack = redpack_on
+                record.change_platform = device_type
+                record.save()
+            except Exception,e:
+                return {"ret_code":30169, "message":"服务器内部错误"}
+
+    else:
+        record = RedPackRecord()
+        record.user = user
+        record.redpack = redpack
+        record.change_platform = device_type
+        redpack.status = "used"
+        redpack.save()
+        record.save()
 
     _send_message(user, event)
     return {"ret_code":0, "message":"兑换成功"}
