@@ -18,6 +18,12 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
   $('#add-address-button').click (e)->
     e.preventDefault()
     $(this).modal()
+    $('#address_id').val('')
+    $('#address_name').val('')
+    $('#phone_number').val('')
+    $('#address_address').val('')
+    $('#postcode').val('')
+    $('#default-checkbox').attr('checked', false)
     $('#add-address-submit').html('添加')
 
   $('#add-address-form').validate
