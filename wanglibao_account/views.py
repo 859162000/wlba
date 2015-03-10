@@ -1217,7 +1217,7 @@ class AddressView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        address_list = UserAddress.objects.filter(user=self.request.user)
+        address_list = UserAddress.objects.filter(user=self.request.user).order_by('-id')
 
         return {
             'address_list': address_list
@@ -1228,7 +1228,7 @@ class AddressListAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request):
-        address_list = UserAddress.objects.filter(user=request.user)
+        address_list = UserAddress.objects.filter(user=request.user).order_by('-id')
         address_list = [{
             'id': address.id,
             'name': address.name,
