@@ -22,6 +22,8 @@ class AuthTokenSerializer(serializers.Serializer):
             if user:
                 if not user.is_active:
                     raise serializers.ValidationError('User account is disabled.')
+                if user.wanglibaouserprofile.frozen:
+                    raise serializers.ValidationError('User account is frozen.')
                 attrs['user'] = user
                 return attrs
             else:

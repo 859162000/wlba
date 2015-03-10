@@ -59,7 +59,8 @@ class RedPackEvent(models.Model):
     value = models.IntegerField(null=False, default=0, verbose_name=u"红包个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
     give_mode = models.CharField(max_length=20, verbose_name=u"发放方式", db_index=True, choices=(
-                                ("nil", "零门槛"),
+                                ("nil", "零门槛(兑换码)"),
+                                ("activity", "活动奖励"),
                                 ("register", "注册"),
                                 ("validation", "实名认证"),
                                 ("first_buy", "首次投资"),

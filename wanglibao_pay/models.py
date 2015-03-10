@@ -16,6 +16,7 @@ class Bank(models.Model):
     limit = models.TextField(blank=True, verbose_name=u'银行限额信息')
     logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'银行图标')
     sort_order = models.IntegerField(default=0, verbose_name=u'排序权值 从大到小')
+    kuai_code = models.CharField(max_length=16, verbose_name=u'快钱侧银行代码', null=True, blank=True)
 
     class Meta:
         ordering = '-sort_order',
@@ -85,8 +86,9 @@ class PayInfo(models.Model):
     card_no = models.CharField(u'卡号', max_length=25, blank=True, null=True)
     channel = models.CharField(u'支付通道', max_length=20, blank=True, null=True, choices=(
         ("huifu", "Huifu"),
-        ("yeepay", "Yeepay"),
-        ("app", "App") #app取现使用
+        ("yeepay", "Yeepay"), #易宝
+        ("app", "App"), #app取现使用
+        ("kuaipay", "Kuaipay") #快钱
     ))
 
     def __unicode__(self):

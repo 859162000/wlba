@@ -508,7 +508,9 @@ else:
     KUAI_QUERY_URL = "https://sandbox.99bill.com:9445/cnp/pci_query"
     KUAI_DEL_URL = "https://sandbox.99bill.com:9445/cnp/pci_del"
     KUAI_DYNNUM_URL = "https://sandbox.99bill.com:9445/cnp/getDynNum"
-    KUAI_MER_ID = "1001213884201"
+    KUAI_PEM_PATH = os.path.join(BASE_DIR, "10411004511201290.pem")
+    KUAI_MER_ID = "104110045112012"
+    KUAI_MER_PASS = "vpos123"
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"

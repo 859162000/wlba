@@ -8,7 +8,7 @@ from order.utils import OrderHelper
 
 from wanglibao.celery import app
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning
+from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization
 from wanglibao_p2p.trade import P2POperator
 from django.db.models import Sum
 from django.contrib.auth.models import User
@@ -23,6 +23,10 @@ import time
 def p2p_watchdog():
     P2POperator().watchdog()
 
+
+@app.task
+def delete_old_product_amortization(pa_list):
+    ProductAmortization.objects.filter(id__in=pa_list).delete()
 
 @app.task
 def process_paid_product(product_id):

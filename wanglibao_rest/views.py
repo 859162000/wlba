@@ -456,6 +456,15 @@ class ShareUrlAPIView(APIView):
             body = {}
         return Response({"ret_code": 0, "message": "ok", "data": body})
 
+class DepositGateAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        rs = Misc.objects.filter(key="pay_gate").first()
+        if not rs or rs.value == "kuai":
+            return Response({"ret_code":0, "gate":"kuai"})
+        else:
+            return Response({"ret_code":0, "gate":"yee"})
 
 class TopsOfDayView(APIView):
     """
