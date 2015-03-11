@@ -599,6 +599,7 @@ class KuaiPay:
         user = request.user
         profile = user.wanglibaouserprofile
         card = None
+        bank = None
         if gate_id:
             bank = Bank.objects.filter(gate_id=gate_id).first()
             if not bank:
@@ -607,6 +608,9 @@ class KuaiPay:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
+
+        if not card and not bank:
+            return {"ret_code":201152, "message":"卡号不存在或银行不存在"}
 
         try:
             pay_info = PayInfo()
@@ -650,7 +654,6 @@ class KuaiPay:
                 url = self.DYNNUM_URL
 
             res = self._request(data, url)
-            print(res.content)
 
             if len(card_no) == 10:
                 result = self._handle_pay_result(res)
@@ -700,12 +703,14 @@ class KuaiPay:
                 "time":pay_info.create_time.strftime("%Y%m%d%H%M%S"), "vcode":vcode,
                 "card_no":pay_info.card_no, "token":token}
         data = self._sp_bindpay_xml(dic)
-        print(data)
+        logger.error("#" * 50)
+        logger.error(data)
         res = self._request(data, self.PAY_URL)
-        print(res.content)
+        logger.error(res.content)
         if res.status_code != 200 or "errorCode" in res.content:
             return {"ret_code":20122, "message":"服务器异常"}
         result = self._handle_pay_result(res)
+        logger.error(result)
         if not result:
             return {"ret_code":20123, "message":"信息不匹配"}
         elif result['ret_code'] > 0:
