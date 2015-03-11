@@ -754,7 +754,7 @@ class KuaiPay:
                     card = Card()
                     card.bank = pay_info.bank
                     card.no = card_no
-                    card.user = user
+                    card.user = pay_info.user
                     card.is_default = False
                     card.save()
             tools.despoit_ok(pay_info)
@@ -858,7 +858,7 @@ def list_bank(request):
     banks = Bank.get_kuai_deposit_banks()
     rs = []
     for x in banks:
-        rs.append({"name":x.name, "gate_id":x.gate_id})
+        rs.append({"name":x.name, "gate_id":x.gate_id, "bank_id":x.kuai_code})
     if not rs:
         return {"ret_code":20051, "message":"没有可选择的银行"}
     return {"ret_code":0, "message":"ok", "banks":rs}
