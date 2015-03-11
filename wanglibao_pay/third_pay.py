@@ -771,6 +771,7 @@ class KuaiPay:
         return rs
 
     def pay_callback(self, request):
+        logger.error(request.DATA)
         pass
 
 def del_xmlns(xmlns, tag):
