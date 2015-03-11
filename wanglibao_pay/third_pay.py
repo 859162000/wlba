@@ -474,6 +474,8 @@ class KuaiPay:
                             card['bank_id'] = z['bankId']['value']
                             bank = Bank.objects.filter(kuai_code=card['bank_id']).first()
                             card['bank_name'] = bank.name
+                            if bank.kuai_limit:
+                                card.update(_handle_kuai_bank_limit(bank.kuai_limit))
                         if "storablePan" in z:
                             card['storable_no'] = z["storablePan"]['value']
                     cards.append(card)
@@ -863,10 +865,27 @@ def list_bank(request):
     banks = Bank.get_kuai_deposit_banks()
     rs = []
     for x in banks:
-        rs.append({"name":x.name, "gate_id":x.gate_id, "bank_id":x.kuai_code})
+        obj = {"name":x.name, "gate_id":x.gate_id, "bank_id":x.kuai_code}
+        if x.kuai_limit:
+            obj.update(_handle_kuai_bank_limit(x.kuai_limit))
+        rs.append(obj)
     if not rs:
         return {"ret_code":20051, "message":"没有可选择的银行"}
     return {"ret_code":0, "message":"ok", "banks":rs}
+
+def _handle_kuai_bank_limit(limitstr):
+    obj = {}
+    try:
+        first, second = limitstr.split("|")
+        arr = first.split(",")
+        obj['first_one'] = arr[0].split("=")[1]
+        obj['first_day'] = arr[1].split("=")[1]
+        arr1 = second.split(",")
+        obj['second_one'] = arr1[0].split("=")[1]
+        obj['second_day'] = arr1[1].split("=")[1]
+    except:
+        pass
+    return obj
 
 @method_decorator(transaction.atomic)
 def withdraw(request):
