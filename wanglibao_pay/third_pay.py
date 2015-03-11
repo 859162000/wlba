@@ -749,7 +749,7 @@ class KuaiPay:
             pay_info.margin_record = margin_record
             pay_info.status = PayInfo.SUCCESS
             logger.error("orderId:%s success" % order_id)
-            rs = {"ret_code":0, "message":"success", "amount":amount}
+            rs = {"ret_code":0, "message":"success", "amount":amount, "margin":margin_record.margin_current}
 
         pay_info.save()
         if rs['ret_code'] == 0:
