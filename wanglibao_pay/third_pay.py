@@ -584,8 +584,8 @@ class KuaiPay:
         if len(card_no) > 10 and (not input_phone or not gate_id):
             return {"ret_code":20112, 'message':'信息输入不完整'}
 
-        if card_no[0] in ("3", "4", "5"):
-            return {"ret_code":20113, "message":"不能使用信用卡"}
+        #if card_no[0] in ("3", "4", "5"):
+        #    return {"ret_code":20113, "message":"不能使用信用卡"}
 
         try:
             float(amount)
