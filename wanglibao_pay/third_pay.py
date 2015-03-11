@@ -474,6 +474,8 @@ class KuaiPay:
                             card['bank_id'] = z['bankId']['value']
                             bank = Bank.objects.filter(kuai_code=card['bank_id']).first()
                             card['bank_name'] = bank.name
+                            if bank.kuai_limit:
+                                card.update(_handle_kuai_bank_limit(bank.kuai_limit))
                         if "storablePan" in z:
                             card['storable_no'] = z["storablePan"]['value']
                     cards.append(card)
@@ -487,6 +489,8 @@ class KuaiPay:
     def _handle_dynnum_result(self, res):
         if res.status_code != 200 or "errorCode" in res.content:
             return False
+
+        logger.error(res.content)
 
         dic = self._result2dict(res.content)
         res_code = None
@@ -582,8 +586,8 @@ class KuaiPay:
         if len(card_no) > 10 and (not input_phone or not gate_id):
             return {"ret_code":20112, 'message':'信息输入不完整'}
 
-        if card_no[0] in ("3", "4", "5"):
-            return {"ret_code":20113, "message":"不能使用信用卡"}
+        #if card_no[0] in ("3", "4", "5"):
+        #    return {"ret_code":20113, "message":"不能使用信用卡"}
 
         try:
             float(amount)
@@ -599,6 +603,7 @@ class KuaiPay:
         user = request.user
         profile = user.wanglibaouserprofile
         card = None
+        bank = None
         if gate_id:
             bank = Bank.objects.filter(gate_id=gate_id).first()
             if not bank:
@@ -607,6 +612,9 @@ class KuaiPay:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
+
+        if not card and not bank:
+            return {"ret_code":201152, "message":"卡号不存在或银行不存在"}
 
         try:
             pay_info = PayInfo()
@@ -650,7 +658,6 @@ class KuaiPay:
                 url = self.DYNNUM_URL
 
             res = self._request(data, url)
-            print(res.content)
 
             if len(card_no) == 10:
                 result = self._handle_pay_result(res)
@@ -687,6 +694,9 @@ class KuaiPay:
         token = request.DATA.get("token", "").strip()
         input_phone = request.DATA.get("phone", "").strip()
 
+        if not order_id.isdigit():
+            return {"ret_code":20125, "message":"订单号错误"}
+
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info or pay_info.status == PayInfo.SUCCESS:
             return {"ret_code":20121, "message":"订单不存在或已支付成功"}
@@ -697,12 +707,14 @@ class KuaiPay:
                 "time":pay_info.create_time.strftime("%Y%m%d%H%M%S"), "vcode":vcode,
                 "card_no":pay_info.card_no, "token":token}
         data = self._sp_bindpay_xml(dic)
-        print(data)
+        logger.error("#" * 50)
+        logger.error(data)
         res = self._request(data, self.PAY_URL)
-        print(res.content)
+        logger.error(res.content)
         if res.status_code != 200 or "errorCode" in res.content:
             return {"ret_code":20122, "message":"服务器异常"}
         result = self._handle_pay_result(res)
+        logger.error(result)
         if not result:
             return {"ret_code":20123, "message":"信息不匹配"}
         elif result['ret_code'] > 0:
@@ -739,7 +751,7 @@ class KuaiPay:
             pay_info.margin_record = margin_record
             pay_info.status = PayInfo.SUCCESS
             logger.error("orderId:%s success" % order_id)
-            rs = {"ret_code":0, "message":"success", "amount":amount}
+            rs = {"ret_code":0, "message":"success", "amount":amount, "margin":margin_record.margin_current}
 
         pay_info.save()
         if rs['ret_code'] == 0:
@@ -751,7 +763,7 @@ class KuaiPay:
                     card = Card()
                     card.bank = pay_info.bank
                     card.no = card_no
-                    card.user = user
+                    card.user = pay_info.user
                     card.is_default = False
                     card.save()
             tools.despoit_ok(pay_info)
@@ -851,13 +863,31 @@ def del_bank_card(request):
     return {"ret_code":0, "message":"删除成功"}
 
 def list_bank(request):
-    banks = Bank.get_deposit_banks()
+    #banks = Bank.get_deposit_banks()
+    banks = Bank.get_kuai_deposit_banks()
     rs = []
     for x in banks:
-        rs.append({"name":x.name, "gate_id":x.gate_id})
+        obj = {"name":x.name, "gate_id":x.gate_id, "bank_id":x.kuai_code}
+        if x.kuai_limit:
+            obj.update(_handle_kuai_bank_limit(x.kuai_limit))
+        rs.append(obj)
     if not rs:
         return {"ret_code":20051, "message":"没有可选择的银行"}
     return {"ret_code":0, "message":"ok", "banks":rs}
+
+def _handle_kuai_bank_limit(limitstr):
+    obj = {}
+    try:
+        first, second = limitstr.split("|")
+        arr = first.split(",")
+        obj['first_one'] = arr[0].split("=")[1]
+        obj['first_day'] = arr[1].split("=")[1]
+        arr1 = second.split(",")
+        obj['second_one'] = arr1[0].split("=")[1]
+        obj['second_day'] = arr1[1].split("=")[1]
+    except:
+        pass
+    return obj
 
 @method_decorator(transaction.atomic)
 def withdraw(request):
