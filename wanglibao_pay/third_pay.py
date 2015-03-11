@@ -595,10 +595,9 @@ class KuaiPay:
             return {"ret_code":20114, 'message':'金额格式错误'}
 
         amount = util.fmt_two_amount(amount)
-        if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
-            return {"ret_code":20115, 'message':'金额格式错误，大于100元且为100倍数'}
-        #if amount > 50000:
-        #    return {"ret_code":20116, 'message':'单笔充值不超过5万'}
+        #if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
+        if amount < 10 or amount % 1 != 0 or len(str(amount)) > 20:
+            return {"ret_code":20115, 'message':'金额格式错误，大于10元且为整数'}
 
         user = request.user
         profile = user.wanglibaouserprofile
