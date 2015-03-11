@@ -7,7 +7,8 @@
     },
     shim: {
       'jquery.validate': ['jquery']
-    }
+    },
+    waitSeconds: 0
   });
 
   require(['jquery', 'jquery.validate', 'lib/modal'], function($, validate, modal) {

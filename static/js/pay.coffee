@@ -4,6 +4,7 @@ require.config(
     'jquery.validate': 'lib/jquery.validate.min'
   shim:
     'jquery.validate': ['jquery']
+  waitSeconds: 0
 )
 
 require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->

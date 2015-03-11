@@ -14,6 +14,7 @@ from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
+from django.core import serializers
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404, HttpResponseRedirect
 from django.shortcuts import resolve_url, render_to_response
 from django.utils import timezone
@@ -42,7 +43,7 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
     AmortizationRecord, P2PProductContract
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from wanglibao_account.models import VerifyCounter, Binding, Message
+from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from order.models import Order
@@ -1209,6 +1210,151 @@ class IntroduceRelation(TemplateView):
         Only user with change payinfo permission can call this view
         """
         return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)
+
+
+class AddressView(TemplateView):
+    template_name = 'account_address.jade'
+
+    def get_context_data(self, **kwargs):
+
+        address_list = UserAddress.objects.filter(user=self.request.user).order_by('-id')
+
+        return {
+            'address_list': address_list
+        }
+
+
+class AddressListAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        address_list = UserAddress.objects.filter(user=request.user).order_by('-id')
+        if address_list:
+            address_list = [{
+                'id': address.id,
+                'name': address.name,
+                'phone_number': address.phone_number,
+                'address': address.address,
+                'postcode': address.postcode,
+                'is_default': address.is_default,
+                'province': address.province,
+                'city': address.city,
+                'area': address.area
+            } for address in address_list]
+            return Response({
+                'ret_code': 0,
+                'message': 'ok',
+                'address': address_list
+            })
+        else:
+            return Response({'ret_code': 3000, 'message': u'没有收货地址'})
+
+
+class AddressAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        address_id = request.DATA.get('address_id', "").strip()
+        address_name = request.DATA.get('name', "").strip()
+        phone_number = request.DATA.get('phone_number', "").strip()
+        address_address = request.DATA.get('address', "").strip()
+        postcode = request.DATA.get('postcode', "").strip()
+        province = request.DATA.get('province', "").strip()
+        city = request.DATA.get('city', "").strip()
+        area = request.DATA.get('area', "").strip()
+        is_default = request.DATA.get('is_default', False)
+        is_default = True if is_default == 'true' else False
+
+        if not address_name or not phone_number or not address_address:
+            return Response({'ret_code': 3001, 'message': u'信息输入不完整'})
+        if len(phone_number) > 15:
+            return Response({'ret_code': 3004, 'message': u'联系电话不能超过15位'})
+
+        if is_default:
+            """ clear the exists is_default value """
+            UserAddress.objects.filter(user=request.user).update(is_default=False)
+
+        if address_id:
+            try:
+                address = UserAddress.objects.get(id=address_id)
+                address.user = request.user
+                address.name = address_name
+                address.address = address_address
+                address.province = province
+                address.city = city
+                address.area = area
+                address.phone_number = phone_number
+                address.postcode = postcode
+                address.is_default = is_default
+                address.save()
+                return Response({'ret_code': 0, 'message': u'修改成功'})
+            except:
+                return Response({'ret_code': 3003, 'message': u'地址不存在'})
+        else:
+            address = UserAddress()
+            address.user = request.user
+            address.name = address_name
+            address.address = address_address
+            address.province = province
+            address.city = city
+            address.area = area
+            address.phone_number = phone_number
+            address.postcode = postcode
+            address.is_default = is_default
+            address.save()
+            return Response({'ret_code': 0, 'message': u'添加成功'})
+
+
+class AddressDeleteAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        address_id = request.DATA.get('address_id', "").strip()
+
+        if not address_id:
+            return Response({'ret_code': 3002, 'message': u'ID错误'})
+
+        try:
+            address = UserAddress.objects.get(id=address_id)
+            address.delete()
+            return Response({
+                'ret_code': 0,
+                'message': u'删除成功'
+            })
+        except:
+            return Response({'ret_code': 3003, 'message': u'地址不存在'})
+
+
+class AddressGetAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, address_id):
+        if not address_id:
+            return Response({'ret_code': 3002, 'message': u'ID错误'})
+
+        try:
+            address = UserAddress.objects.get(id=address_id)
+            if address:
+                address = {
+                    'address_id': address.id,
+                    'name': address.name,
+                    'phone_number': address.phone_number,
+                    'address': address.address,
+                    'postcode': address.postcode,
+                    'is_default': address.is_default,
+                    'province': address.province,
+                    'city': address.city,
+                    'area': address.area
+                }
+                return Response({
+                    'ret_code': 0,
+                    'message': 'ok',
+                    'address': address
+                })
+            else:
+                return Response({'ret_code': 3000, 'message': u'没有收货地址'})
+        except:
+            return Response({'ret_code': 3003, 'message': u'地址不存在'})
 
 
 # class CjdaoApiView(APIView):

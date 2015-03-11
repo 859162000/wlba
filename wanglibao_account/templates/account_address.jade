@@ -1,0 +1,65 @@
+extends account_home_base
+
+-load formatters
+
+block head
+  - with '收货地址' as title
+    include include/head
+
+block sidebar
+  - with '收货地址' as activeItem
+    include include/user_center_sidebar
+
+block main
+  .panel.p2p-record
+    h1 收货地址
+    .panel-container.padding-l-r-xl.margin-top-s
+      a#add-address-button.button.button-confirm-ok(href="#add-address-form") 新增
+      table.table.margin-top-s
+        thead
+          tr
+            th 收货人姓名
+            th 联系电话
+            th 详细地址
+            th 邮政编码
+            th 是否默认
+            th 操作
+        tbody
+          for address in address_list
+            tr
+              td {{address.name}}
+              td {{address.phone_number}}
+              td {{address.address}}
+              td {{address.postcode}}
+              td
+                if address.is_default == True
+                  默认
+              td
+                a.address_edit(data-id="{{address.id}}", href="javascript:;") 修改
+                | &nbsp;&nbsp;
+                a.address_delete.red(data-id="{{address.id}}", href="javascript:;") 删除
+block script
+  form#add-address-form.add-address-form(method="post", style="display:none")
+    .modal-title-bar
+      span.modal-title 添加收货地址
+    .modal-content-padding
+      input#address_id(type="hidden", name="address_id")
+      .form-row
+        input#address_name(type="text", name="address_name", maxlength=12, placeholder="收货人姓名")
+        .form-row-error
+      .form-row
+        input#phone_number(type="text", name="phone_number", maxlength=15, placeholder="联系电话")
+        .form-row-error
+      .form-row
+        input#address_address(type="text", name="address_address", maxlength=60, placeholder="详细地址")
+        .form-row-error
+      .form-row
+        input#postcode(type="text", name="postcode", maxlength=6, placeholder="邮政编码")
+      .form-row
+        .withdraw-checkbox
+          input#default-checkbox(type='checkbox', name="default-checkbox")
+          设为默认地址
+      .form-row
+        button#add-address-submit.span12.button-primary(type="submit") 添加
+  script.
+    require(['/static/js/account_address.js'])
