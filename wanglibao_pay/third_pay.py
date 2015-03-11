@@ -490,6 +490,8 @@ class KuaiPay:
         if res.status_code != 200 or "errorCode" in res.content:
             return False
 
+        logger.error(res.content)
+
         dic = self._result2dict(res.content)
         res_code = None
         gdc = dic['MasMessage'][0]["GetDynNumContent"]
