@@ -512,7 +512,8 @@ class KuaiPay:
             if "TxnMsgContent" in k:
                 tmc = k['TxnMsgContent']['value']
                 for x in tmc:
-                    if "amount" in x:amount = float(x['amount']['value']); continue
+                    #if "amount" in x:amount = float(x['amount']['value']); continue
+                    if "amount" in x:amount = util.fmt_two_amount(x['amount']['value']); continue
                     if "responseCode" in x: res_code = x['responseCode']['value']; continue
                     if "externalRefNumber" in x: order_id = x['externalRefNumber']['value']; continue
                     if "merchantId" in x: mer_id = x['merchantId']['value']; continue
