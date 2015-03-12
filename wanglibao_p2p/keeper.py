@@ -1,4 +1,5 @@
 # encoding: utf-8
+import logging
 from datetime import *
 from decimal import *
 from dateutil.relativedelta import relativedelta
@@ -18,6 +19,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 
+logger = logging.getLogger(__name__)
 
 class ProductKeeper(KeeperBaseMixin):
 
@@ -230,20 +232,99 @@ class AmortizationKeeper(KeeperBaseMixin):
     def generate_amortization_plan(self, savepoint=True):
         if self.product.status != u'满标已打款':
             raise P2PException('invalid product status.')
-        self.amortizations = self.product.amortizations.all()
-        self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
-        equities = self.product.equities.select_related('user').all()
 
-        get_amortization_plan(self.product.pay_method).calculate_term_date(self.product)
+
+        #get_amortization_plan(self.product.pay_method).calculate_term_date(self.product) #每期还款日期不在单独生成
+
         # Delete all old user amortizations
         with transaction.atomic(savepoint=savepoint):
-            UserAmortization.objects.filter(product_amortization__in=self.amortizations).delete()
+            #UserAmortization.objects.filter(product_amortization__in=self.amortizations).delete() 生成产品还款计划时，删除的时候就已经删除了
 
+            #self.amortizations = self.product.amortizations.all()
 
-            ProductAmortization.objects.select_for_update().filter(product=self.product)
+            self.amortizations = self.__generate_product_amortization(self.product)
+            self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
+            equities = self.product.equities.select_related('user').all()
+
+            #ProductAmortization.objects.select_for_update().filter(product=self.product)
             # for equity in equities:
             #     self.__dispatch(equity)
-            self.__generate_useramortization(equities)
+            #self.__generate_useramortization(equities)
+            
+            self.__generate_user_amortization(equities)
+
+
+    def __generate_product_amortization(self, product):
+        product_amo = ProductAmortization.objects.filter(product_id=product.pk).values('id')
+        if product_amo:
+            pa_list = [int(i['id']) for i in product_amo]
+            product.amortizations.clear()
+            from celery.execute import send_task
+            send_task("wanglibao_p2p.tasks.delete_old_product_amortization", kwargs={
+                        'pa_list': pa_list,
+                })
+
+        logger.info(u'The product status is 录标完成, start to generate amortization plan')
+
+        terms = get_amortization_plan(product.pay_method).generate(product.total_amount,
+                product.expected_earning_rate / 100,
+                datetime.now(), product.period)
+
+        for index, term in enumerate(terms['terms']):
+            amortization = ProductAmortization()
+            amortization.description = u'第%d期' % (index + 1)
+            amortization.principal = term[1]
+            amortization.interest = term[2]
+            amortization.term = index + 1
+
+            if term[5]:
+                amortization.term_date = term[5]
+
+            product.amortizations.add(amortization)
+            amortization.save()
+
+        product.amortization_count = len(terms['terms'])
+
+        product.status = u'待审核'
+        product.priority = product.id * 10
+        product.save()
+
+        return product.amortizations
+
+
+    def __generate_user_amortization(self, equities):
+
+        product = self.product
+
+        product_amortizations = []
+
+        for product_amortization in self.amortizations.all():
+            product_amortizations.append(product_amortization)
+
+        user_amos = list()
+
+        amortization_cls = get_amortization_plan(product.pay_method)
+        product_interest_start = datetime.now()
+        for equity in equities:
+            terms = amortization_cls.generate(equity.equity, product.expected_earning_rate / 100, product_interest_start, product.period)
+
+            for index, term in enumerate(terms['terms']):
+                amortization = UserAmortization()
+                amortization.description = u'第%d期' % (index + 1)
+                amortization.principal = term[1]
+                amortization.interest = term[2]
+                amortization.term = index + 1
+                amortization.user = equity.user
+                amortization.product_amortization = product_amortizations[index] 
+
+                if term[5]:
+                    amortization.term_date = term[5]
+
+                user_amos.append(amortization)
+
+
+        UserAmortization.objects.bulk_create(user_amos)
+
 
     def __generate_useramortization(self, equities):
         """

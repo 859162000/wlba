@@ -8,7 +8,7 @@ import math
 
 class AmortizationPlan(object):
     @classmethod
-    def generate(cls, amount, year_rate, term, period=None):
+    def generate(cls, amount, year_rate, interest_begin_date, period=None):
         raise NotImplemented('Not implemented')
 
     @classmethod
@@ -25,10 +25,9 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
     name = u'等额本息'
 
     @classmethod
-    def generate(cls, amount, year_rate, term, period=None):
+    def generate(cls, amount, year_rate, interest_begin_date, period=None):
         amount = Decimal(amount)
-        month_rate = year_rate / 12
-        month_rate = Decimal(month_rate).quantize(Decimal('0.000000000000000000001'))
+        month_rate = get_base_decimal(year_rate / 12)
 
         term_amount = amount * (month_rate * pow(1 + month_rate, period)) / (pow(1 + month_rate, period) - 1)
         term_amount = Decimal(term_amount).quantize(Decimal('.01'))
@@ -46,9 +45,9 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
 
             principal_left -= principal
 
-            result.append((term_amount, principal, interest, principal_left, term_amount * (period - i - 1)))
+            result.append((term_amount, principal, interest, principal_left, term_amount * (period - i - 1), interest_begin_date + relativedelta(months=i + 1)))
 
-        result.append((term_amount, principal_left, term_amount - principal_left, Decimal(0), Decimal(0)))
+        result.append((term_amount, principal_left, term_amount - principal_left, Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period)))
 
         return {
             "terms": result,
@@ -60,22 +59,25 @@ class MonthlyInterest(AmortizationPlan):
     name = u'按月付息'
 
     @classmethod
-    def generate(cls, amount, year_rate, term, period=None):
+    def generate(cls, amount, year_rate, interest_begin_date, period=None):
         amount = Decimal(amount)
+        year_rate = Decimal(year_rate)
 
-        month_rate = year_rate / 12
-        month_rate = Decimal(month_rate).quantize(Decimal('0.000000001'))
-        month_interest = amount * month_rate
-        month_interest = month_interest.quantize(Decimal('.01'))
 
-        total = month_interest * period + amount
+        proportion = get_base_decimal(Decimal(period)/Decimal(12))
+        total_interest = get_final_decimal(amount * year_rate * proportion)
+        
+        month_interest = get_final_decimal(total_interest/Decimal(period))
+
+        total = total_interest + amount
 
         result = []
 
         for i in xrange(0, period - 1):
-            result.append((month_interest, Decimal(0), month_interest, amount, total - month_interest * (i + 1)))
+            result.append((month_interest, Decimal(0), month_interest, amount, total - month_interest * (i + 1), interest_begin_date + relativedelta(months=i + 1)))
 
-        result.append((month_interest + amount, amount, month_interest, Decimal(0), Decimal(0)))
+        last_interest = total_interest - month_interest * (period - 1)
+        result.append((last_interest + amount, amount, last_interest, Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period)))
 
         return {
             "terms": result,
@@ -87,7 +89,7 @@ class InterestFirstThenPrincipal(AmortizationPlan):
     name = u'先息后本'
 
     @classmethod
-    def generate(cls, amount, year_rate, term, period=None):
+    def generate(cls, amount, year_rate, interest_begin_date, period=None):
         amount = Decimal(amount)
         year_rate = Decimal(year_rate)
 
@@ -115,7 +117,7 @@ class DisposablePayOff(AmortizationPlan):
     name = u'到期还本付息'
 
     @classmethod
-    def generate(cls, amount, year_rate, term, period=None):
+    def generate(cls, amount, year_rate, interest_begin_date, period=None):
         if period is None:
             return {
                 "terms": [],
@@ -124,17 +126,13 @@ class DisposablePayOff(AmortizationPlan):
         amount = Decimal(amount)
         year_rate = Decimal(year_rate)
 
-        month_rate = year_rate / 12
-        month_rate = Decimal(month_rate).quantize(Decimal('0.00000000000000000000000001'))
+        proportion = get_base_decimal(Decimal(period)/Decimal(12))
+        total_interest = get_final_decimal(amount * year_rate * proportion)
 
-        month_interest = amount * month_rate
-        month_interest = month_interest.quantize(Decimal('.01'))
-
-        total = amount + month_interest * period
-        result = [(total, amount, total - amount, Decimal(0), Decimal(0))]
+        result = [(total_interest + amount, amount, total_interest, Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period))]
         return {
             "terms": result,
-            "total": total
+            "total": total_interest + amount
         }
 
     @classmethod
@@ -149,7 +147,7 @@ class QuarterlyInterest(AmortizationPlan):
     name = u'按季度付息'
 
     @classmethod
-    def generate(cls, amount, year_rate, term, period=None):
+    def generate(cls, amount, year_rate, interest_begin_date, period=None):
         assert(period is not None)
 
         amount = Decimal(amount)
@@ -198,7 +196,7 @@ class DailyInterest(AmortizationPlan):
     name = u'按日计息'
 
     @classmethod
-    def generate(cls, amount, year_rate, term, period=None):
+    def generate(cls, amount, year_rate, interest_begin_date, period=None):
         amount = Decimal(amount)
 
         daily_rate = get_daily_interest(year_rate)
@@ -210,7 +208,32 @@ class DailyInterest(AmortizationPlan):
 
         result = []
 
-        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0)))
+        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period)))
+
+        return {
+            "terms": result,
+            "total": total
+        }
+
+class DailyInterestInAdvance(AmortizationPlan):
+    name = u'按日计息认购日开始计息'
+
+    @classmethod
+    def generate(cls, amount, year_rate, interest_begin_date, period=None, **kwargs):
+        amount = Decimal(amount)
+
+        subscription_date = kwargs.get('subscription_date', interest_begin_date)
+
+        daily_rate = get_daily_interest(year_rate)
+        daily_interest = amount * daily_rate
+
+        total_interest = (daily_interest * period).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+
+        total = total_interest + amount
+
+        result = []
+
+        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period)))
 
         return {
             "terms": result,
@@ -221,10 +244,10 @@ class DailyInterestMonthly(AmortizationPlan):
     name = u'按日计息按月付息'
 
     @classmethod
-    def generate(cls, amount, year_rate, term, period=None, **kwargs):
+    def generate(cls, amount, year_rate, interest_begin_date, period=None):
         amount = Decimal(amount)
 
-        interest_start = kwargs.get('start', datetime.now())
+        interest_start = interest_begin_date
         term_date = interest_start + timedelta(days=period)
 
         term_dates = [interest_start]
@@ -253,8 +276,6 @@ class DailyInterestMonthly(AmortizationPlan):
                 left_interest += total_interest
                 result.append((total_interest, Decimal(0), total_interest, Decimal(0), Decimal(0), term_dates[i]))
 
-            print term_period, term_date, anchor
-        
 
 
         total = daily_interest*period + amount
@@ -277,8 +298,11 @@ def get_amortization_plan(amortization_type):
         if plan.name == amortization_type:
             return plan
 
-def get_format_decimal(decimal):
-    return Decimal(decimal).quantize(Decimal('0.000000000000000001'))
+def get_base_decimal(decimal):
+    return Decimal(decimal).quantize(Decimal('0.000000000000000001'), ROUND_DOWN)
+
+def get_final_decimal(decimal):
+    return Decimal(decimal).quantize(Decimal('0.01'), ROUND_DOWN)
 
 def get_daily_interest(year_rate):
-    return get_format_decimal(year_rate)
+    return get_base_decimal(year_rate/360)

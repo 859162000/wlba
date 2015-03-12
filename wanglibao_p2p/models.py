@@ -544,6 +544,11 @@ class EquityRecord(models.Model):
     def __unicode__(self):
         return u'%s %s %s %s' % (self.catalog, self.user, self.product, self.amount)
 
+def next_step(sender, instance, **kwargs):
+    if instance.status == u'录标完成':
+        instance.status = u'待审核'
+        instance.priority = instance.id * 10
+        instance.save()
 
 def generate_amortization_plan(sender, instance, **kwargs):
     if instance.status == u'录标完成':
@@ -589,7 +594,8 @@ def process_after_money_paided(product):
 
 
 def post_save_process(sender, instance, **kwargs):
-    generate_amortization_plan(sender, instance, **kwargs)
+    #generate_amortization_plan(sender, instance, **kwargs)
+    next_step(sender, instance, **kwargs)
     process_after_money_paided(instance)
 
 

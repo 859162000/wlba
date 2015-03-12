@@ -66,6 +66,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'wanglibao',
     'registration_defaults',
+    'suit',
     'django.contrib.admin',
     'django_extensions',
     'reversion',

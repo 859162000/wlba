@@ -213,23 +213,23 @@ class P2PProductForm(forms.ModelForm):
             if self.cleaned_data.get('expected_earning_rate') == float(0):
                 raise forms.ValidationError(u'支付方式为等额本息时, 预期收益(%)必须大于零')
 
-        if self.cleaned_data['status'] == u'正在招标':
-
-            pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
-
-            if not pa:
-                raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
-
-            product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
-            if pa.count() != product.amortization_count:
-                raise forms.ValidationError(u'产品还款计划错误')
-
-            amort_principal = 0
-            for a in pa:
-                amort_principal += a.principal
-
-            if amort_principal != self.cleaned_data['total_amount']:
-                raise forms.ValidationError(u'还款计划本金之和与募集金额不相等，请检查')
+#        if self.cleaned_data['status'] == u'正在招标':
+#
+#            pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
+#
+#            if not pa:
+#                raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
+#
+#            product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
+#            if pa.count() != product.amortization_count:
+#                raise forms.ValidationError(u'产品还款计划错误')
+#
+#            amort_principal = 0
+#            for a in pa:
+#                amort_principal += a.principal
+#
+#            if amort_principal != self.cleaned_data['total_amount']:
+#                raise forms.ValidationError(u'还款计划本金之和与募集金额不相等，请检查')
 
         return self.cleaned_data
 
@@ -248,6 +248,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 
 
     form = P2PProductForm
+
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
@@ -327,7 +328,12 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
                     'settlement_time', 'created_time', 'status', 'description', )
 
     def status(self, obj):
-        return obj.product.status
+        if obj.product:
+            status = obj.product.status
+        else:
+            status = ''
+
+        return status
 
 
 class EarningAdmin(admin.ModelAdmin):

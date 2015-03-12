@@ -30,6 +30,7 @@ django-rest-swagger==0.1.14
 django-reversion==1.8.1
 django-simple-captcha==0.4.2
 django-supervisor==0.3.2
+django-suit==0.2.12
 django-widget-tweaks==1.3
 djangorestframework==2.3.13
 drf-wrapper==0.1

@@ -26,6 +26,7 @@ def p2p_watchdog():
 
 @app.task
 def delete_old_product_amortization(pa_list):
+    time.sleep(10)
     ProductAmortization.objects.filter(id__in=pa_list).delete()
 
 @app.task
