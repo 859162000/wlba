@@ -35,6 +35,9 @@ def depoly_staging():
     if not exists(namepath):
         with cd(env.root):
             run("mkdir %s" % who)
+    if not exists(namepath + "/log"):
+        with cd(namepath):
+            run("mkdir log")
     path = namepath + "/wanglibao-backend"
     if not exists(path):
         print green("Please input your repo url. Example:https://github.com/singpenguin/wanglibao-backend.git")
