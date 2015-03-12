@@ -89,6 +89,14 @@ def list_redpack(user, status, device_type):
                         packages['unused'].append(obj)
     return {"ret_code":0, "packages":packages}
 
+def utc_transform(dt):
+    tp = dt.timetuple()
+    stamp = time.mktime(tp)
+    dt = datetime.datetime.fromtimestamp(stamp,pytz.utc)
+    return dt.replace(tzinfo=None)
+
+
+
 def exchange_redpack(token, device_type, user):
     if token == "":
         return {"ret_code":30161, "message":"请输入兑换码"}
@@ -125,7 +133,8 @@ def exchange_redpack(token, device_type, user):
                 if int(obj['event_id']) != event.id:
                     return {"ret_code":301694, "message":"活动错误"}
 
-                register_time = timezone.datetime(2015, 03, 9, tzinfo=pytz.UTC)
+                register_time = timezone.datetime(2015, 03, 9)
+                register_time = utc_transform(register_time)
                 if user.date_joined > register_time:
                     event_on = RedPackEvent.objects.filter(id=obj['event_new_id'], invalid=False, value=0).first()
                 else:

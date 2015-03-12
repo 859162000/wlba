@@ -606,7 +606,7 @@ class KuaiPay:
         bank = None
         if gate_id:
             bank = Bank.objects.filter(gate_id=gate_id).first()
-            if not bank:
+            if not bank or not bank.kuai_code.strip():
                 return {"ret_code":201151, "message":"不支持该银行"}
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
