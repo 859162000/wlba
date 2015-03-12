@@ -142,6 +142,7 @@ def exchange_redpack(token, device_type, user):
                 record.change_platform = device_type
                 record.save()
             except Exception,e:
+                logger.info(u"%s" % e)
                 return {"ret_code":30169, "message":"服务器内部错误"}
 
     else:
