@@ -126,7 +126,7 @@ def exchange_redpack(token, device_type, user):
                 if user.date_joined > register_time:
                     event_on = RedPackEvent.objects.filter(id=obj['event_new_id'], invalid=False, value=0).first()
                 else:
-                    event_on = RedPackEvent.objects.filter(id=obj['evnet_old_id'], invalid=False, value=0).first()
+                    event_on = RedPackEvent.objects.filter(id=obj['event_old_id'], invalid=False, value=0).first()
                 
                 if not event_on:
                     return {"ret_code":301692, "message":"没有此活动"}
