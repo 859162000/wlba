@@ -65,6 +65,6 @@ def depoly_staging():
     rs = sudo("docker ps -a")
     if who not in rs:
         #sudo("docker run -d -p %s:8056 --name %s -v /home/jinlong/docker_image/%s:/root/wanglibao wanglibao /bin/sh -c '/root/start.sh;supervisord -n'" % (workers[who], who, who))
-        sudo("docker run -d -p %s:8056 --name %s -v /home/jinlong/docker_image/%s:/root/wanglibao /home/jinlong/docker_image/%s/log:/var/log/wanglibao wanglibao /bin/sh -c '/root/start.sh;supervisord -n'" % (workers[who], who, who, who))
+        sudo("docker run -d -p %s:8056 --name %s -v /home/jinlong/docker_image/%s:/root/wanglibao  -v /home/jinlong/docker_image/%s/log:/var/log/wanglibao wanglibao /bin/sh -c '/root/start.sh;supervisord -n'" % (workers[who], who, who, who))
     else:
         sudo("docker restart %s" % who)
