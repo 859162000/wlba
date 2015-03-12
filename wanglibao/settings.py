@@ -525,8 +525,8 @@ YEE_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/yee/app/deposit/callback/'
 #YEE_MER_SECRET_KEY = "418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8"
 
 #快钱回调地址
-KUAI_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/kuai/app/deposit/complete/'
-KUAI_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/kuai/app/deposit/callback/'
+KUAI_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/deposit/complete/'
+KUAI_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/deposit/callback/'
 
 #语音验证码参数
 YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
