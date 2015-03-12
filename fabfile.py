@@ -363,7 +363,8 @@ def generate_nginx_conf():
                                  upstream_port=str(env.apache_binding_port),
                                  listen_on_80=env.nginx_listen_on_80)
     put(StringIO(conf_content), "/etc/nginx/sites-available/wanglibao-proxy.conf", use_sudo=True)
-    sudo('rm -f /etc/nginx/sites-enabled/*')
+    #sudo('rm -f /etc/nginx/sites-enabled/*')
+    sudo('rm -f /etc/nginx/sites-enabled/wanglibao-proxy.conf')
     sudo('nginx_ensite wanglibao-proxy.conf')
 
 
