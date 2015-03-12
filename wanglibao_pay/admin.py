@@ -24,7 +24,7 @@ class PayInfoAdmin(admin.ModelAdmin):
 
 
 class BankAdmin(admin.ModelAdmin):
-    list_display = ('name', 'gate_id', 'code')
+    list_display = ('name', 'gate_id', 'code', "kuai_code")
 
 
 class CardAdmin(admin.ModelAdmin):

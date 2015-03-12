@@ -146,6 +146,7 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
 
     error_messages = {
         'invalid_login': u"用户名或者密码不正确",
+        'frozen': u"用户账户已被冻结",
     }
 
     def __init__(self, request=None, *args, **kwargs):
@@ -171,6 +172,13 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
                     code='invalid_login',
                     params={'identifier': identifier},
                 )
+            else:
+                if self.user_cache.wanglibaouserprofile.frozen:
+                    raise forms.ValidationError(
+                        self.error_messages['frozen'],
+                        code='frozen',
+                        params={'identifier': identifier},
+                    )
         return self.cleaned_data
 
     def get_user_id(self):

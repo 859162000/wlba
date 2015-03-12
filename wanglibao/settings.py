@@ -508,7 +508,9 @@ else:
     KUAI_QUERY_URL = "https://sandbox.99bill.com:9445/cnp/pci_query"
     KUAI_DEL_URL = "https://sandbox.99bill.com:9445/cnp/pci_del"
     KUAI_DYNNUM_URL = "https://sandbox.99bill.com:9445/cnp/getDynNum"
-    KUAI_MER_ID = "1001213884201"
+    KUAI_PEM_PATH = os.path.join(BASE_DIR, "10411004511201290.pem")
+    KUAI_MER_ID = "104110045112012"
+    KUAI_MER_PASS = "vpos123"
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
@@ -523,8 +525,8 @@ YEE_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/yee/app/deposit/callback/'
 #YEE_MER_SECRET_KEY = "418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8"
 
 #快钱回调地址
-KUAI_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/kuai/app/deposit/complete/'
-KUAI_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/kuai/app/deposit/callback/'
+KUAI_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/deposit/complete/'
+KUAI_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/deposit/callback/'
 
 #语音验证码参数
 YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
