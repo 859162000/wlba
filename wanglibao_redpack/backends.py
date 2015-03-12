@@ -12,7 +12,6 @@ import json
 import logging
 import decimal
 from django.utils import timezone
-from django.db.models import Q
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
 from wanglibao_p2p.models import P2PRecord
 from marketing import  helper
