@@ -17,6 +17,8 @@ class Bank(models.Model):
     logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'银行图标')
     sort_order = models.IntegerField(default=0, verbose_name=u'排序权值 从大到小')
     kuai_code = models.CharField(max_length=16, verbose_name=u'快钱侧银行代码', null=True, blank=True)
+    #快钱侧银行限额信息格式如下,"|"分隔第一次和第二次
+    #单笔=5000,单日=5000|单笔=50000,单日=10000000
     kuai_limit = models.CharField(max_length=500, blank=True, verbose_name=u'快钱侧银行限额信息')
 
     class Meta:
