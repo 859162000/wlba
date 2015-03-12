@@ -116,12 +116,15 @@ def exchange_redpack(token, device_type, user):
 
     if event.amount == 0:
         #金额为0,为特殊红包
-        xle = Misc.objects.filter(key="xunlei_event").first()
+        xle = Misc.objects.filter(key=event.describe).first()
         if xle:
             try:
                 obj = json.loads(xle.value)
                 if "event_id" not in obj or "event_new_id" not in obj or "event_old_id" not in obj:
                     return {"ret_code":301691, "message":"服务器内部错误"}
+                if int(obj['event_id']) != event.id:
+                    return {"ret_code":301694, "message":"活动错误"}
+
                 register_time = timezone.datetime(2015, 03, 9, tzinfo=pytz.UTC)
                 if user.date_joined > register_time:
                     event_on = RedPackEvent.objects.filter(id=obj['event_new_id'], invalid=False, value=0).first()
@@ -146,6 +149,8 @@ def exchange_redpack(token, device_type, user):
             except Exception,e:
                 logger.info(u"%s" % e)
                 return {"ret_code":30169, "message":"服务器内部错误"}
+        else:
+            return {"ret_code":301641, "message":"请输入有效的兑换码"}
 
     else:
         record = RedPackRecord()
