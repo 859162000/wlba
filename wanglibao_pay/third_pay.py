@@ -596,8 +596,9 @@ class KuaiPay:
 
         amount = util.fmt_two_amount(amount)
         #if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
-        if amount < 10 or amount % 1 != 0 or len(str(amount)) > 20:
-            return {"ret_code":20115, 'message':'金额格式错误，大于10元且为整数'}
+        #if amount < 10 or amount % 1 != 0 or len(str(amount)) > 20:
+        if amount < 10 or len(str(amount)) > 20:
+            return {"ret_code":20115, 'message':'充值须大于等于10元'}
 
         user = request.user
         profile = user.wanglibaouserprofile
@@ -650,10 +651,15 @@ class KuaiPay:
                 dic['storable_no'] = card_no
                 dic['time'] = timezone.now().strftime("%Y%m%d%H%M%S")
                 data = self._sp_qpay_xml(dic)
+                logger.error("second pay info")
+                logger.error(u"%s"%data)
                 url = self.PAY_URL
             else:
                 dic['bank_id'] = bank.kuai_code
                 data = self._sp_dynnum_xml(dic)
+                logger.error("first pay info")
+                logger.error(u"%s" % data)
+
                 url = self.DYNNUM_URL
 
             res = self._request(data, url)
