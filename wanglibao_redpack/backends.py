@@ -141,6 +141,8 @@ def exchange_redpack(token, device_type, user):
                 record.redpack = redpack_on
                 record.change_platform = device_type
                 record.save()
+                #修改event
+                event = event_on
             except Exception,e:
                 logger.info(u"%s" % e)
                 return {"ret_code":30169, "message":"服务器内部错误"}
