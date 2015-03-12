@@ -7,6 +7,7 @@ sys.setdefaultencoding('utf8')
 
 import pytz
 import time
+import datetime
 import json
 import logging
 import decimal
@@ -133,7 +134,7 @@ def exchange_redpack(token, device_type, user):
                 if int(obj['event_id']) != event.id:
                     return {"ret_code":301694, "message":"活动错误"}
 
-                register_time = timezone.datetime(2015, 03, 9)
+                register_time = timezone.datetime(2015, 3, 13)
                 register_time = utc_transform(register_time)
                 if user.date_joined > register_time:
                     event_on = RedPackEvent.objects.filter(id=obj['event_new_id'], invalid=False, value=0).first()
