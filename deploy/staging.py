@@ -20,7 +20,7 @@ who = env.get("who", "")
 
 workers = {"lizhenjing":8051, "hetao":8052, "lili":8053,
             "wangruyue":8054, "qifeifei":8055, "zhanghe":8056,
-            "limengting":8057, "wangxiaoqing":8058}
+            "limengting":8057, "wangxiaoqing":8058, "jinlong":8059}
 
 @roles("staging")
 def depoly_staging():
