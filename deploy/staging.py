@@ -9,7 +9,7 @@ from fabric.contrib.files import exists, contains
 from fabric.colors import green, red, yellow
 
 env.roledefs = {
-    "staging": ["192.168.1.242"]
+    "staging": ["staging.wanglibao.com"]
 }
 env.user = "jinlong"
 env.password = "jinlong"
