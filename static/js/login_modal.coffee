@@ -15,6 +15,49 @@ require.config
 
 require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder', 'underscore'], ($, modal, backend, validate,tool,  complexify, placeholder, _)->
 
+  getCookie = (name) ->
+    cookieValue = null
+    if document.cookie and document.cookie isnt ""
+      cookies = document.cookie.split(";")
+      i = 0
+      while i < cookies.length
+        cookie = $.trim(cookies[i])
+
+        # Does this cookie string begin with the name we want?
+        if cookie.substring(0, name.length + 1) is (name + "=")
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+          break
+        i++
+    cookieValue
+
+  csrfSafeMethod = (method) ->
+    # these HTTP methods do not require CSRF protection
+    /^(GET|HEAD|OPTIONS|TRACE)$/.test method
+
+  sameOrigin = (url) ->
+    # test that a given url is a same-origin URL
+    # url could be relative or scheme relative or absolute
+    host = document.location.host # host + port
+    protocol = document.location.protocol
+    sr_origin = "//" + host
+    origin = protocol + sr_origin
+
+    # Allow absolute or scheme relative URLs to same origin
+
+    # or any other URL that isn't scheme relative or absolute i.e relative.
+    (url is origin or url.slice(0, origin.length + 1) is origin + "/") or (url is sr_origin or url.slice(0, sr_origin.length + 1) is sr_origin + "/") or not (/^(\/\/|http:|https:).*/.test(url))
+
+
+  $.ajaxSetup beforeSend: (xhr, settings) ->
+    if not csrfSafeMethod(settings.type) and sameOrigin(settings.url)
+
+    # Send the token to same-origin, relative URLs only.
+    # Send the token only if the method warrants CSRF protection
+    # Using the CSRFToken value acquired earlier
+      xhr.setRequestHeader "X-CSRFToken", getCookie("csrftoken")
+    return
+
+
   $.validator.addMethod "emailOrPhone", (value, element)->
       return backend.checkEmail(value) or backend.checkMobile(value)
 
@@ -26,9 +69,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       password:
         required: true
         minlength: 6
+        maxlength: 20
       captcha_1:
         required: true
-        minlength: 4
+        minlength: 1
 
     messages:
       identifier:
@@ -37,39 +81,53 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       password:
         required: '不能为空'
         minlength: $.format("密码需要最少{0}位")
+        maxlength: '密码不能超过20位'
       captcha_1:
         required: '不能为空'
-        minlength: $.format("验证码要输入4位")
+        minlength: $.format("验证码至少输入1位")
 
     errorPlacement: (error, element) ->
         error.appendTo $(element).parents('.form-row').children('.form-row-error')
 
     submitHandler: (form) ->
+      if $('#login_submit').hasClass('disabled')
+        return
+      $('#login_submit').addClass('disabled')
       $.ajax
         url: $('#login-modal-form').attr('action')
         type: "POST"
         data: $("#login-modal-form").serialize()
       .done (data,textStatus) ->
-        location.reload()
+        next_url = ''
+        arr = /\?next=(\/.+)$/ig.exec(window.location)
+        if(arr && arr[1])
+          next_url = arr[1]
+          window.location.href = next_url
+        else
+          location.reload()
+
+		
+        $('#login_submit').removeClass('disabled')
       .fail (xhr)->
         result = JSON.parse xhr.responseText
         message = result.message
         error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
         $('.captcha-refresh', '#login-modal-form').trigger('click')
         alert error_message
+        $('#login_submit').removeClass('disabled')
 
   $('#register-modal-form').validate
     rules:
       identifier:
         required: true
         isMobile: true
-      validation_code:
+      validate_code:
         required: true
-        depends: (e)->
-          checkMobile($('#reg_identifier').val())
+
       password:
         required: true
         minlength: 6
+        maxlength: 20
       password2:
         equalTo: "#reg_password"
       agreement:
@@ -79,11 +137,12 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       identifier:
         required: '不能为空'
         isMobile: '请输入手机号'
-      validation_code:
+      validate_code:
         required: '不能为空'
       password:
         required: '不能为空'
         minlength: $.format("密码需要最少{0}位")
+        maxlength: '密码不能超过20位'
       password2:
         equalTo: '密码不一致'
       agreement:
@@ -94,12 +153,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       error.appendTo $(element).parents('.form-row').children('.form-row-error')
 
     submitHandler: (form) ->
+      $('input[name="identifier"]').trigger('keyup')
       $.ajax
         url: $(form).attr('action')
         type: "POST"
         data: $(form).serialize()
       .done (data,textStatus) ->
-        location.reload()
+          location.reload()
       .fail (xhr)->
         result = JSON.parse xhr.responseText
         message = result.message
@@ -146,7 +206,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
           $(element).addClass 'button-red'
           $(element).removeClass 'button-gray'
           result = JSON.parse xhr.responseText
-          tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
+          if xhr.status == 429
+
+            tool.modalAlert({title: '温馨提示', msg: "系统繁忙，请稍候重试", callback_ok: _showModal})
+          else
+            tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
 
         intervalId
         count = 60
@@ -154,6 +218,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         $(element).attr 'disabled', 'disabled'
         $(element).removeClass 'button-red'
         $(element).addClass 'button-gray'
+        $('.voice-validate').attr 'disabled', 'disabled'
 
         timerFunction = ()->
           if count >= 1
@@ -165,6 +230,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
             $(element).removeAttr 'disabled'
             $(element).addClass 'button-red'
             $(element).removeClass 'button-gray'
+            $('.voice').removeClass('hidden')
+            $('.voice-validate').removeAttr 'disabled'
+            $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>')
 
         # Fire now and future
         timerFunction()
@@ -178,7 +246,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
 
   container = $('.password-strength-container')
   $('#reg_password').complexify {minimumChars:6, strengthScaleFactor:1}, (valid, complexity)->
-      console.log 'complexity: ' + complexity
       if complexity == 0
         container.removeClass 'low'
         container.removeClass 'soso'
@@ -242,17 +309,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       $("#login-modal-form").hide()
       $("#register-modal-form").show()
 
-  $("#invite_top_bar").click () ->
-    backend.userProfile {
-
-    }
-    .done ->
-      window.location.href = $("#invite_top_bar").attr("data-url")
-    .fail (xhr)->
-      if xhr.status == 403
-        $('.login-modal').trigger('click')
-        return
-
   $("#agreement").change (value)->
     if $(this).attr "checked"
       $("#register_submit").addClass("disabled")
@@ -269,3 +325,91 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
   $('.nologin').click (e)->
     e.preventDefault()
     $('.login-modal').trigger('click')
+
+  $("input:password").bind "copy cut paste", (e) ->
+    element = this
+    setTimeout (->
+      text = $(element).val()
+      if(!/[^\u4e00-\u9fa5]+/ig.test(text) || /\s+/ig.test(text))
+        $(element).val('')
+      return
+    ), 100
+    #return false
+
+  msg_count = $('#message_count').html()
+  if msg_count > 0
+    backend.loadMessageCount('unread')
+      .done (data)->
+        if data.count > 0
+          $('#message_count').show()
+          $('#message_count').html(data.count)
+  #author: hetao; time: 2014.10.15
+#  $(window).load (e) ->
+#    $.getScript "http://wpa.b.qq.com/cgi/wpa.php", (data, textStatus, jqxhr) ->
+#      BizQQWPA.addCustom [
+#        {
+#          aty: "1" #指定工号类型
+#          a: "1001" #指定的工号企业 WPA OpenAPI
+#          nameAccount: "4008588066" #营销 QQ 号码
+#          selector: "qq-container" #WPA 被放置的元素
+#        }
+#        {
+#          aty: "1" #指定工号类型
+#          a: "1001" #指定的工号企业 WPA OpenAPI
+#          nameAccount: "4008588066" #营销 QQ 号码
+#          selector: "top-qq" #WPA 被放置的元素
+#        }
+#      ]
+  #author: hetao; time: 2014.11.20; description: 语音验证事件绑定
+  $(".voice").on 'click', '.voice-validate', (e)->
+    e.preventDefault()
+    isMobile = checkMobile($("#reg_identifier").val().trim())
+    if !isMobile
+      $("#id_type").val "phone"
+      $("#validate-code-container").show()
+      return
+
+    if($(this).attr('disabled') && $(this).attr('disabled') == 'disabled')
+      return
+
+    element = $('.voice .span12-omega')
+
+    url = $(this).attr('href')
+    $.ajax
+      url: url
+      type: "POST"
+      data: {
+        phone: $("#reg_identifier").val().trim()
+      }
+    .success (json)->
+      if(json.ret_code == 0)
+        #TODO
+
+        intervalId
+        count = 60
+        button = $("#button-get-validate-modal")
+
+        button.attr 'disabled', 'disabled'
+        button.addClass 'button-gray'
+
+        $('.voice').addClass 'tip'
+        timerFunction = ()->
+          if count >= 1
+            count--
+            element.text('语音验证码已经发送，请注意接听（' + count + '）')
+          else
+            clearInterval(intervalId)
+            element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>')
+            element.removeAttr 'disabled'
+            button.removeAttr 'disabled'
+            button.addClass 'button-red'
+            button.removeClass 'button-gray'
+            $('.voice').removeClass 'tip'
+
+        # Fire now and future
+        timerFunction()
+        intervalId = setInterval timerFunction, 1000
+      else
+        #TODO
+        element.html('系统繁忙请尝试短信验证码')
+

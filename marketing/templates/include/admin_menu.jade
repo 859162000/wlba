@@ -1,0 +1,17 @@
+.navbar-default.sidebar(role="navigation")
+  .sidebar-nav.navbar-collapse
+    ul.nav#side-menu
+      mixin menu-item(name, link, new_class)
+        if activeItem == name
+          li
+            a.active(href=link)
+              i.fa.fa-table.fa-fw= name
+        else
+          li
+            a(href=link)
+              i.fa.fa-table.fa-fw= name
+
+      +menu-item('日数据明细', '/AK7WtEQ4Q9KPs8Io_zOncw/statistics/diary', '', '')
+      +menu-item('日周月榜名单', '/AK7WtEQ4Q9KPs8Io_zOncw/statistics/tops', '', '')
+      +menu-item('累计购买金额统计单', '/AK7WtEQ4Q9KPs8Io_zOncw/statistics/aggregate', '', '')
+      +menu-item('邀请收益统计', '/AK7WtEQ4Q9KPs8Io_zOncw/statistics/introduced_by', '', '')

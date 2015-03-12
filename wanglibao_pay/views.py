@@ -1,13 +1,16 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import logging
 import re
 import socket
-import datetime
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.forms import model_to_dict
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template.loader import get_template
+from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -15,24 +18,29 @@ from django.views.generic import TemplateView, View
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from order.models import Order
 from order.utils import OrderHelper
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_pay.models import Bank, Card, PayResult
+from wanglibao_pay.models import Bank, Card, PayResult, PayInfo
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
-from wanglibao_pay.models import PayInfo
+from wanglibao_pay import third_pay
 from wanglibao_p2p.models import P2PRecord
 import decimal
-from rest_framework.response import Response
-from rest_framework.throttling import UserRateThrottle
 from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip
+from wanglibao_pay import util
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
+from wanglibao_account import message as inside_message
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
+from django.conf import settings
+from wanglibao_announcement.utility import AnnouncementAccounts
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -44,11 +52,13 @@ class BankListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(BankListView, self).get_context_data(**kwargs)
 
-        default_bank = Bank.get_deposit_banks().filter(name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
+        default_bank = Bank.get_deposit_banks().filter(
+            name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
 
         context.update({
             'default_bank': default_bank,
-            'banks': Bank.get_deposit_banks()[:12]
+            'banks': Bank.get_deposit_banks()[:12],
+            'announcements': AnnouncementAccounts
         })
         return context
 
@@ -65,10 +75,11 @@ class PayView(TemplateView):
         message = ''
         try:
             amount_str = request.POST.get('amount', '')
-            amount = decimal.Decimal(amount_str).\
+            amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             amount_str = str(amount)
             if amount <= 0:
+                # todo handler the raise
                 raise decimal.DecimalException()
 
             gate_id = request.POST.get('gate_id', '')
@@ -85,6 +96,7 @@ class PayView(TemplateView):
             pay_info.status = PayInfo.INITIAL
             pay_info.user = request.user
             pay_info.bank = bank
+            pay_info.channel = "huifu"
             pay_info.request_ip = get_client_ip(request)
 
             order = OrderHelper.place_order(request.user, Order.PAY_ORDER, pay_info.status,
@@ -97,6 +109,7 @@ class PayView(TemplateView):
                 'GateId': gate_id,
                 'OrdAmt': amount_str
             }
+
             pay = HuifuPay()
             form = pay.pay(post)
             pay_info.request = str(form)
@@ -121,6 +134,10 @@ class PayView(TemplateView):
         }
         return self.render_to_response(context)
 
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(PayView, self).dispatch(request, *args, **kwargs)
+
 
 class PayCompleteView(TemplateView):
     template_name = 'pay_complete.jade'
@@ -143,6 +160,7 @@ class PayCallback(View):
     def post(self, request, *args, **kwargs):
         HuifuPay.handle_pay_result(request)
         order_id = request.POST.get('OrdId', '')
+
         return HttpResponse('RECV_ORD_ID_' + order_id)
 
     @method_decorator(csrf_exempt)
@@ -161,7 +179,8 @@ class WithdrawView(TemplateView):
             'banks': banks,
             'user_profile': self.request.user.wanglibaouserprofile,
             'margin': self.request.user.margin.margin,
-            'fee': HuifuPay.FEE
+            'fee': HuifuPay.FEE,
+            'announcements': AnnouncementAccounts
         }
 
 
@@ -215,6 +234,7 @@ class WithdrawCompleteView(TemplateView):
 
             order = OrderHelper.place_order(request.user, Order.WITHDRAW_ORDER, pay_info.status,
                                             pay_info=model_to_dict(pay_info))
+
             pay_info.order = order
             keeper = MarginKeeper(request.user, pay_info.order.pk)
             margin_record = keeper.withdraw_pre_freeze(amount)
@@ -226,6 +246,13 @@ class WithdrawCompleteView(TemplateView):
                 'phones': [request.user.wanglibaouserprofile.phone],
                 'messages': [messages.withdraw_submitted(amount, timezone.now())]
             })
+            title, content = messages.msg_withdraw(timezone.now(), amount)
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": title,
+                "content": content,
+                "mtype": "withdraw"
+            })
         except decimal.DecimalException:
             result = u'提款金额在0～50000之间'
         except Card.DoesNotExist:
@@ -236,9 +263,19 @@ class WithdrawCompleteView(TemplateView):
             pay_info.status = PayInfo.FAIL
             pay_info.save()
 
-        return self.render_to_response({
-            'result': result
-        })
+        # return self.render_to_response({
+        #     'result': result
+        # })
+        return HttpResponseRedirect(reverse('withdraw-complete-result', kwargs={'result': result}))
+
+
+class WithdrawRedirectView(TemplateView):
+    template_name = 'withdraw_complete.jade'
+
+    def get_context_data(self, result, **kwargs):
+        return {
+            "result": result
+        }
 
 
 class WithdrawCallback(View):
@@ -265,27 +302,50 @@ class CardViewSet(ModelViewSet):
     def create(self, request):
         card = Card()
         card.user = request.user
-        card.no = request.DATA.get('no', '')
-        if request.DATA.get('is_default') == "true":
-            card.is_default = True
-        if not re.match('^[\d]{0,25}$',card.no):
+        no = request.DATA.get('no', '')
+        if no:
+            card.no = no
+        else:
             return Response({
-                "message": u"银行账号超过长度",
-                'error_number': ErrorNumber.form_error
-            }, status=status.HTTP_400_BAD_REQUEST)
+                                "message": u"银行账号不能为空",
+                                'error_number': ErrorNumber.card_number_error
+                            }, status=status.HTTP_400_BAD_REQUEST)
+
+        is_default = request.DATA.get('is_default', False)
+
+        if is_default == 'true':
+            card.is_default = True
+        elif is_default == 'false':
+            card.is_default = False
+        else:
+            return Response({
+                                "message": u"设置是否默认银行卡错误",
+                                'error_number': ErrorNumber.card_isdefault_error
+                            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not re.match('^[\d]{0,25}$', card.no):
+            return Response({
+                                "message": u"银行账号超过长度",
+                                'error_number': ErrorNumber.form_error
+                            }, status=status.HTTP_400_BAD_REQUEST)
+
         bank_id = request.DATA.get('bank', '')
+
         exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
         if exist_cards:
             return Response({
-                "message": u"该银行卡已经存在",
-                'error_number': ErrorNumber.duplicate
-            }, status=status.HTTP_400_BAD_REQUEST)
-        card.bank = Bank.objects.get(pk=bank_id)
-        if not card.bank:
+                                "message": u"该银行卡已经存在",
+                                'error_number': ErrorNumber.duplicate
+                            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            card.bank = Bank.objects.get(pk=bank_id)
+        except:
             return Response({
-                "message": u"没有找到该银行",
-                'error_number': ErrorNumber.not_find
-            }, status=status.HTTP_400_BAD_REQUEST)
+                                "message": u"没有找到该银行",
+                                'error_number': ErrorNumber.not_find
+                            }, status=status.HTTP_400_BAD_REQUEST)
+
         card.save()
 
         return Response({
@@ -301,15 +361,18 @@ class CardViewSet(ModelViewSet):
         if card:
             card.delete()
             return Response({
-            'id': card_id
-             })
+                'id': card_id
+            })
         else:
             return Response({
-                "message": u"查不到银行卡，请联系管理员",
-                'error_number': ErrorNumber.duplicate
-            }, status=status.HTTP_400_BAD_REQUEST)
+                                "message": u"查不到银行卡，请联系管理员",
+                                'error_number': ErrorNumber.duplicate
+                            }, status=status.HTTP_400_BAD_REQUEST)
+
 
 class WithdrawTransactions(TemplateView):
+    """ for admin
+    """
     template_name = 'withdraw_transactions.jade'
 
     def post(self, request):
@@ -332,14 +395,24 @@ class WithdrawTransactions(TemplateView):
             for payinfo in payinfos:
                 with transaction.atomic():
                     if payinfo.status != PayInfo.ACCEPTED and payinfo.status != PayInfo.PROCESSING:
-                        logger.info("The withdraw status [%s] not in %s or %s, ignore it" % (payinfo.status, PayInfo.ACCEPTED, PayInfo.PROCESSING))
+                        logger.info("The withdraw status [%s] not in %s or %s, ignore it" % (
+                        payinfo.status, PayInfo.ACCEPTED, PayInfo.PROCESSING))
                         continue
 
                     marginKeeper = MarginKeeper(payinfo.user)
                     marginKeeper.withdraw_ack(payinfo.amount)
-                    payinfo.status = PayInfo.SUCCESS
-                    payinfo.save()
 
+                    payinfo.status = PayInfo.SUCCESS
+                    payinfo.confirm_time = timezone.now()
+                    payinfo.save()
+                    # 发站内信
+                    title, content = messages.msg_withdraw_success(timezone.now(), payinfo.amount)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": payinfo.user_id,
+                        "title": title,
+                        "content": content,
+                        "mtype": "withdraw"
+                    })
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
             })
@@ -358,22 +431,39 @@ class WithdrawRollback(TemplateView):
     def post(self, request):
         uuid = request.POST.get('uuid', '')
         error_message = request.POST.get('error_message', '')
-        try:
-            payinfo = PayInfo.objects.get(uuid=uuid, type='W')
-        except PayInfo.DoesNotExist:
-            return HttpResponse({
-                u"没有找到 %s 该记录" % uuid
-            })
+        #try:
+        #    payinfo = PayInfo.objects.get(uuid=uuid, type='W')
+        #except PayInfo.DoesNotExist:
+        #    return HttpResponse({
+        #        u"没有找到 %s 该记录" % uuid
+        #    })
+
+        payinfo = PayInfo.objects.filter(uuid=uuid, type='W').first()
+        if not payinfo:
+            return HttpResponse({u"没有找到 %s 该记录" % uuid})
+
+        if payinfo.status == PayInfo.FAIL or payinfo.status == PayInfo.SUCCESS:
+            logger.info("The withdraw status [%s] already process , ignore it" % uuid)
+            return HttpResponse({u"该%s 请求已经处理过,请勿重复处理" % uuid})
 
         marginKeeper = MarginKeeper(payinfo.user)
-        marginKeeper.withdraw_rollback(payinfo.amount,error_message)
+        marginKeeper.withdraw_rollback(payinfo.amount, error_message)
         payinfo.status = PayInfo.FAIL
         payinfo.error_message = error_message
+        payinfo.confirm_time = None
         payinfo.save()
 
         send_messages.apply_async(kwargs={
             "phones": [payinfo.user.wanglibaouserprofile.phone],
             "messages": [messages.withdraw_failed(error_message)]
+        })
+
+        title, content = messages.msg_withdraw_fail(timezone.now(), payinfo.amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": payinfo.user.id,
+            "title": title,
+            "content": content,
+            "mtype": "withdraw"
         })
 
         return HttpResponse({
@@ -386,6 +476,7 @@ class WithdrawRollback(TemplateView):
         Only user with change payinfo permission can call this view
         """
         return super(WithdrawRollback, self).dispatch(request, *args, **kwargs)
+
 
 class AdminTransaction(TemplateView):
     template_name = 'admin_transaction.jade'
@@ -410,12 +501,12 @@ class AdminTransactionP2P(TemplateView):
                 }
 
             trade_records = P2PRecord.objects.filter(user=user_profile.user)
-
             pager = Paginator(trade_records, 20)
             page = self.request.GET.get('page')
             if not page:
                 page = 1
             trade_records = pager.page(page)
+
             return {
                 "pay_records": trade_records,
                 "phone": phone
@@ -426,7 +517,7 @@ class AdminTransactionP2P(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
@@ -435,7 +526,6 @@ class AdminTransactionP2P(TemplateView):
 
 
 class AdminTransactionWithdraw(TemplateView):
-
     template_name = 'admin_transaction_withdraw.jade'
 
 
@@ -471,7 +561,7 @@ class AdminTransactionWithdraw(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
@@ -480,7 +570,6 @@ class AdminTransactionWithdraw(TemplateView):
 
 
 class AdminTransactionDeposit(TemplateView):
-
     template_name = 'admin_transaction_deposit.jade'
 
     def get_context_data(self, **kwargs):
@@ -514,7 +603,7 @@ class AdminTransactionDeposit(TemplateView):
                 'message': u"手机号不能为空"
             }
 
-    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/admin'))
+    @method_decorator(permission_required('wanglibao_pay.change_payinfo', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
         """
         Only user with change payinfo permission can call this view
@@ -522,3 +611,152 @@ class AdminTransactionDeposit(TemplateView):
         return super(AdminTransactionDeposit, self).dispatch(request, *args, **kwargs)
 
 
+# 易宝支付创建订单接口
+class YeePayAppPayView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        yeepay = third_pay.YeePay()
+        result = yeepay.app_pay(request)
+        return Response(result)
+
+#易宝支付回调
+class YeePayAppPayCallbackView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        yeepay = third_pay.YeePay()
+        request.GET = request.DATA
+        result = yeepay.pay_callback(request)
+        return Response(result)
+
+#易宝支付同步回调
+class YeePayAppPayCompleteView(TemplateView):
+    template_name = 'pay_complete.jade'
+
+    def get(self, request, *args, **kwargs):
+        yeepay = third_pay.YeePay()
+        result = yeepay.pay_callback(request)
+
+        if result['ret_code']:
+            msg = u"充值失败"
+            amount = "None"
+        else:
+            msg = u"充值成功"
+            amount = result['amount']
+        return self.render_to_response({
+            'result': msg,
+            'amount': amount
+        })
+
+class KuaiPayQueryView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        pay = third_pay.KuaiPay()
+        result = pay.query_bind(request)
+        return Response(result)
+
+class KuaiPayDelView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        pay = third_pay.KuaiPay()
+        result = pay.delete_bind(request)
+        return Response(result)
+
+class KuaiPayView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        pay = third_pay.KuaiPay()
+        result = pay.pre_pay(request)
+        return Response(result)
+
+class KuaiPayCallbackView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        pay = third_pay.KuaiPay()
+        result = pay.pay_callback(request)
+        return Response(result)
+
+class KuaiPayDynNumView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        pay = third_pay.KuaiPay()
+        result = pay.dynnum_bind_pay(request)
+        return Response(result)
+
+
+class BankCardAddView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.add_bank_card(request)
+        return Response(result)
+
+
+class BankCardListView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.list_bank_card(request)
+        return Response(result)
+
+
+class BankCardDelView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.del_bank_card(request)
+        return Response(result)
+
+
+class BankListAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.list_bank(request)
+        return Response(result)
+
+
+class FEEAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        amount = request.DATA.get("amount", "").strip()
+        if not amount:
+            return Response({"ret_code": 30131, "message": "请输入金额"})
+
+        try:
+            float(amount)
+        except:
+            return {"ret_code": 30132, 'message': '金额格式错误'}
+
+        amount = util.fmt_two_amount(amount)
+        #计算费率
+
+        return Response({"ret_code": 0, "fee": 0})
+
+
+class WithdrawAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.withdraw(request)
+        if not result['ret_code']:
+            send_messages.apply_async(kwargs={
+                'phones': [result['phone']],
+                'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
+            })
+
+            title, content = messages.msg_withdraw(timezone.now(), result['amount'])
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": title,
+                "content": content,
+                "mtype": "withdraw"
+            })
+        return Response(result)

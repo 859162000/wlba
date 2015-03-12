@@ -101,6 +101,7 @@ if env.get('group') == 'staging':
 
         # task_queue should be ip
         'task_queue': ['staging.wanglibao.com'],
+        # 'task_queue': ['111.206.165.43'],
         'task_queue_private': ['127.0.0.1'],
 
         'db': ['staging.wanglibao.com'],
@@ -159,11 +160,11 @@ elif env.get('group') == 'production':
             '10.165.54.41'
         ],
         'web': [
-            '115.28.240.194',
+            '115.28.166.203',
             '114.215.146.91'
         ],
         'web_private': [
-            '10.161.55.165',
+            '10.144.172.198',
             '10.164.13.228'
         ],
         'cron_tab': ['114.215.146.91'],
@@ -272,7 +273,7 @@ def install_rabbit_mq():
         sudo("add-apt-repository \"deb http://www.rabbitmq.com/debian/ testing main\"")
         run("wget http://www.rabbitmq.com/rabbitmq-signing-key-public.asc")
         sudo("apt-key add rabbitmq-signing-key-public.asc")
-        sudo("apt-get update")
+        # sudo("apt-get update")
 
     apt_get("rabbitmq-server")
 
@@ -290,8 +291,8 @@ def init():
 
     banner("init")
     with hide("output"):
-        if not env.get('no-apt-update'):
-            sudo('apt-get update')
+        # if not env.get('no-apt-update'):
+        #     sudo('apt-get update')
 
         create_folder(env.path, mod="777")
         create_folder('/var/run/wanglibao/', owner='www-data', group='www-data', mod='770')
@@ -333,7 +334,7 @@ def init():
             if not contains('/etc/apt/sources.list', 'nginx'):
                 sudo('echo "deb http://ppa.launchpad.net/nginx/stable/ubuntu $(lsb_release -cs) main" >> /etc/apt/sources.list')
                 sudo('apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C300EE8C')
-                sudo("apt-get update")
+                # sudo("apt-get update")
             apt_get('nginx')
             put("vender/nginx_util/*",  "/usr/bin/", use_sudo=True, mode="770")
 
@@ -528,6 +529,7 @@ def config_apache():
 
             if env.get('group') == 'staging':
                 sudo('a2ensite chandao.conf')
+                sudo('ln -s /etc/apache2/sites-available/staging_80_redirect /etc/apache2/sites-enabled/')
 
             sudo('service apache2 reload')
             sudo('chown -R www-data:www-data /var/log/wanglibao/')
@@ -541,9 +543,14 @@ def config_loadbalancer():
         sudo('service nginx reload')
         sudo('rm -rf /var/cache/nginx')
 
-
 @task
 def deploy():
+    if env.get("fast", "").lower() == "true":
+        execute(check_out)
+        execute(config_apache)
+        banner('Fast Deploy Succeeded')
+        return
+
     execute(init)
 
     execute(check_out)

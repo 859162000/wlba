@@ -1,7 +1,7 @@
 mixin sidebar-item(name, link, expected_title)
   if title == expected_title
     li.sidebar-item.active
-      a= name
+      a(href=link)= name
   else
     li.sidebar-item
       a(href=link)= name
@@ -10,9 +10,11 @@ ul.sidebar
   div
     +sidebar-item('关于我们', '/about', '关于我们')
     +sidebar-item('管理团队', '/team', '管理团队')
+    +sidebar-item('公司展示', '/company', '公司展示')
     +sidebar-item('战略合作伙伴', '/partner', '战略合作伙伴')
     +sidebar-item('网利宝大事记', '/milestone', '网利宝大事记')
     +sidebar-item('企业社会责任', '/responsibility', '企业社会责任')
+    +sidebar-item('网站公告', '/announcement', '网站公告')
     +sidebar-item('招贤纳士', '/hiring', '招贤纳士')
     +sidebar-item('联系方式', '/contact_us', '联系方式')
 

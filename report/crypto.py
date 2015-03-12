@@ -3,7 +3,7 @@ import os
 from Crypto.Cipher import AES
 from M2Crypto import RSA,BIO,EVP
 import binascii
-
+from wanglibao import settings
 
 class Rsa(object):
 
@@ -15,7 +15,11 @@ class Rsa(object):
 
     @classmethod
     def encrypt(cls, data):
-        pub_key = RSA.load_pub_key("pub_key.pem")
+        pub_key_file = os.path.join(settings.BASE_DIR, "pub_key.pem")
+        pub_key = RSA.load_pub_key(pub_key_file)
+
+        print
+
         return pub_key.public_encrypt(data, RSA.pkcs1_oaep_padding)
 
     @classmethod

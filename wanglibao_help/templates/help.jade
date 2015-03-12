@@ -1,0 +1,57 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '帮助中心' as title
+    include include/common_head
+    - endwith
+    meta(name="keywords", content="帮助中心")
+    meta(name="description", content="帮助中心，热点问题")
+  body.white-background
+    include include/header
+    - with '帮助中心' as activeItem
+    include include/navigation
+    - endwith
+
+      .container.help
+        .space-vertical-m
+        .help-menu
+          ul
+            for item in nav
+              li(data-target="topic_{{item.id}}")
+                a(href="#") {{item.name}}
+        .help-content
+          for key,value in questions.items
+            if key == '0'
+              .hot-items.help-box.active(data-source="topic_{{key}}")
+                h1 常见问题
+                ul
+                  for item in value
+                    if forloop.counter|divisibleby:2
+                      li.odd
+                        a(href="#",data-topic="topic_{{item.topic.id}}",data-item="content_{{item.id}}") {{item.title|slice:":20"}}
+                    else
+                      li
+                        a(href="#",data-topic="topic_{{item.topic.id}}",data-item="content_{{item.id}}") {{item.title|slice:":20"}}
+
+            else
+              .list-items.help-box(data-source="topic_{{key}}")
+                itemId = key
+                h1 {{map|lookup:key}}
+                .list-container
+                  for item in value
+                    .list-item(data-source="content_{{item.id}}")
+                      .list-item-title
+                        span.anchor {{item.title}}
+                        .help-arrow
+                      .list-item-content {% autoescape off %}{{item.answer}}{% endautoescape %}
+
+
+
+    script.
+        require(["/static/js/help.js?v="+new Date().getTime()])
+    - with 1 as no_footbar
+    include include/footer
+    - endwith
+    include include/tracking

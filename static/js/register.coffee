@@ -40,13 +40,12 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
     phoneNumber = $("#id_identifier").val().trim()
     if checkMobile(phoneNumber)
       if console?
-        console.log "Phone number checked, now send the valdiation code"
+        console.log "Phone number checked, now send the validation code"
 
       $.ajax
           url: "/api/phone_validation_code/register/" + phoneNumber + "/"
           type: "POST"
         .fail (xhr)->
-          console.log("eoorsss")
           $.modal.close()
           clearInterval(intervalId)
           $(element).text('重新获取')
@@ -59,7 +58,10 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       intervalId
       count = 60
 
+      $(element).removeClass 'button-red'
+      $(element).addClass 'button-gray'
       $(element).attr 'disabled', 'disabled'
+      $('.voice-validate').attr 'disabled', 'disabled'
       timerFunction = ()->
         if count >= 1
           count--
@@ -68,6 +70,12 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
           clearInterval(intervalId)
           $(element).text('重新获取')
           $(element).removeAttr 'disabled'
+          $(element).addClass 'button-red'
+          $(element).removeClass 'button-gray'
+          #author:hetao;datetime:2014.11.19;description: 增加语音验证链接（计时完成后）
+          $('.voice').removeClass('hidden')
+          $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>')
+          $('.voice-validate').removeAttr 'disabled'
 
       # Fire now and future
       timerFunction()
@@ -85,12 +93,13 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       password:
         required: true
         minlength: 6
+        maxlength: 20
       password2:
         equalTo: "#id_password"
-      'validation_code':
+      'validate_code':
         required: true
         depends: (e)->
-          checkMobile($('#id_identifier').val())
+          #checkMobile($('#id_identifier').val())
 
     messages:
       identifier:
@@ -99,7 +108,8 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       password:
         required: '不能为空'
         minlength: $.format("密码需要最少{0}位")
-      'validation_code':
+        maxlength: '密码不能超过20位'
+      'validate_code':
         required: '不能为空'
       password2:
         equalTo: '密码不一致'
@@ -136,6 +146,63 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
 
 
   $("#register_submit").click (e)->
-    if $(this).hasClass("disabled")
-      e.preventDefault()
+    e.preventDefault()
+    if !$(this).hasClass("disabled")
+      $('input[name="identifier"]', $(this).parents('form')).trigger('keyup')
+      $('#register-form').submit()
       return
+
+
+
+
+  $(".voice").on 'click', '.voice-validate', (e)->
+    e.preventDefault()
+    isMobile = checkMobile($("#id_identifier").val().trim())
+    if !isMobile
+      $("#id_type").val "phone"
+      $("#validate-code-container").show()
+      return
+
+    if($(this).attr('disabled') && $(this).attr('disabled') == 'disabled')
+      return
+
+    element = $('.voice .span12-omega')
+
+    url = $(this).attr('href')
+    $.ajax
+      url: url
+      type: "POST"
+      data: {
+        phone: $("#id_identifier").val().trim()
+      }
+    .success (json)->
+      if(json.ret_code == 0)
+        #TODO
+
+        intervalId
+        count = 60
+        button = $("#button-get-validate-code")
+
+        button.attr 'disabled', 'disabled'
+        button.addClass 'button-gray'
+
+        $('.voice').addClass 'tip'
+        timerFunction = ()->
+          if count >= 1
+            count--
+            element.text('语音验证码已经发送，请注意接听（' + count + '）')
+          else
+            clearInterval(intervalId)
+            element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>')
+            element.removeAttr 'disabled'
+            button.removeAttr 'disabled'
+            button.addClass 'button-red'
+            button.removeClass 'button-gray'
+            $('.voice').removeClass 'tip'
+
+        # Fire now and future
+        timerFunction()
+        intervalId = setInterval timerFunction, 1000
+      else
+        #TODO
+        element.html('系统繁忙请尝试短信验证码')

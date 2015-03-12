@@ -9,10 +9,8 @@ body
   - with '基金产品' as activeItem
   include include/navigation
   - endwith
-  
-  .space-vertical-ssm
 
-  include include/inform
+  include announcement_block
 
   .container
     .span8.panel.panel-header
@@ -22,7 +20,7 @@ body
           if is_favorited != 1
             a#addToFavorite.button.button-small.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}") 收藏
           else
-            a#addToFavorite.button.button-small.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}") 取消
+            a#addToFavorite.button.button-small.button-white.pull-right(href="#", data-id="{{fund.id}}", data-is-favorited="{{is_favorited}}") 取消收藏
       .row
         .span6
           .well

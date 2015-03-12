@@ -1,0 +1,78 @@
+-load formatters
+
+doctype html
+html
+  - with '财经道用户登录' as title
+  include include/head
+  - endwith
+  body
+    .full-container-cjdao
+      .container.container-cjdao.row
+        .span7
+          .cjdao-logo
+            img(src="/static/images/wanglibao.png")
+            img(src="/static/images/cjdao.png")
+            h3 投资预约
+            p 您在财经道填写的信息已提交至网利宝，请继续完善信息，以便顺利投资网利宝优质项目。
+          .cjdao-product-info
+            h3 预约信息
+            .row
+              .span3.align-right 产品名称：
+              .span9-omega {{p2p.name}}
+            .row
+              .span3.align-right 发行机构：
+              .span9-omega 网利科技有限公司
+            .row
+              .span3.align-right 借款期限：
+              .span9-omega {{p2p.period}}
+            .row
+              .span3.align-right 起投金额：
+              .span9-omega 100(元)
+            .row
+              .span3.align-right 还款方式：
+              .span9-omega {{p2p.display_payback_method}}
+            .row
+              .span3.align-right 年化收益率：
+              if p2p.activity
+                rate_result = p2p
+                earning_rate = str(p2p.expected_earning_rate + float(p2p.activity.rule.rule_amount*100))
+                .span9-omega {{earning_rate}}%
+              else
+                earning_rate = str(p2p.expected_earning_rate)
+                .span9-omega {{earning_rate}}%
+        .span5-omega
+          form#login-cjdao-form.cjdao-form.form-left-line(method='post', action='/accounts/login/ajax/')
+            - csrf_token
+            .form-login-title
+              span.cjdao-form-item 登录信息
+            .space-vertical-l
+            .form-row
+              .span1.align-right 用户名
+              .span7
+                input#login_identifier(type="text", name="identifier", readonly="readonly", value="{{ phone }}", autocomplete='off', title="* 请输入用户名" )
+                .form-row-error.error
+
+            .form-row
+              .span1.align-right 密码
+              .span7
+                input(type="password", name="password", placeholder="请输入6-20位密码，建议英文、数字的组合", autocomplete='off', title="请输入密码")
+                .form-row-error
+            .form-row
+              .span1.align-right 验证码
+              .span7
+                input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入答案", maxlength="4",style="width:110px")
+                img.captcha.captcha-img(alt="captcha", src="", style="width:100px;height:40px")
+                a.captcha-refresh(type="button", title="点击刷新验证码")
+                .form-row-error
+            .form-row
+              .span1.align-right &nbsp;
+              .span7
+                button#login_submit.button.button-account.span12(type='submit') 立即登录
+                p.align-right
+                  a.blue(href="/accounts/password/reset/identifier/") 忘记密码？
+
+    script.
+      require(["/static/js/login_cjdao.js"])
+
+    include include/tracking

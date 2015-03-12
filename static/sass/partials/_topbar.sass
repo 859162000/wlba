@@ -26,11 +26,12 @@ $logo-height: image-height('logo.png')
   +inline-block()
   background: image-url('logo.png')
   background-repeat: no-repeat
-  height: 57px
-  width: image-width('logo.png')
+  background-position: center
+  height: 75px
+  width: 350px
 
   .svg &
-    background: image-url('logo.svg')
+    background: image-url('logo.png') no-repeat center middle
 
 .input-bar
   border: 2px solid $color-pomegranate
@@ -86,7 +87,7 @@ a.header-button
 .user-div
   float: left
   position: relative
-  width: 550px
+  width: 700px
   vertical-align: middle
 
 .user-info
@@ -153,6 +154,7 @@ a.topbar-anchor
   font-size: $font-xl
 
 .icon-weibo,
+.icon-qq,
 .icon-weixin
   display: inline-block
   overflow: hidden
@@ -166,6 +168,10 @@ a.topbar-anchor
 .icon-weibo
   background-position: 0 -152px
   top: -2px
+.weibo-container:hover
+  .icon-weibo
+    background-position: 0 -200px
+    background-color: #d94a39
 
 .icon-weibo:hover
   background-position: 0 -200px
@@ -175,8 +181,21 @@ a.topbar-anchor
   background-position: -33px -152px
   top: -2px
 
+.icon-qq
+  background-position: -102px -150px
+  top: -2px
+
+.weixin-container:hover
+  .icon-weixin
+    background-position: -33px -200px
+    background-color: #0ca001
+
 .icon-weixin:hover
   background-position: -33px -200px
+  background-color: #0ca001
+
+.icon-qq:hover
+  background-position: -102px -198px
   background-color: #0ca001
 
 .icon-login
@@ -196,7 +215,7 @@ a.topbar-anchor
   position: absolute
   bottom: 100%
   top: 20px
-  left: 220px
+  left: 349px
   z-index: 9
   padding-top: 15px
 
@@ -204,8 +223,53 @@ a.topbar-anchor
   position: absolute
   bottom: 100%
   top: 20px
-  left: 257px
+  left: 386px
   z-index: 9
   width: 164px
-  height: 194px
+  height: 223px
   padding-top: 15px
+
+.mobile-app-top
+  +inline-block
+  margin-left: 10px
+
+  .icon-mobile-app
+    background: url("/static/images/icon_mobile_app.gif")
+    height: 22px
+    width: 22px
+    margin-right: 8px
+    margin-top: -5px
+    //+transition(all .2s ease-in-out)
+
+  .mobile-app-top-prompt
+    width: 320px
+    height: 200px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -5px -197px
+    position: absolute
+    top: 32px
+    right: -80px
+    z-index: 999
+    display: none
+
+  .mobile-app-apple
+    width: 130px
+    height: 40px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -157px -400px
+    display: block
+    margin-top: 30px
+    margin-left: 160px
+    margin-bottom: 10px
+
+    &:hover
+      background-position: -157px -445px
+
+  .mobile-app-android
+    width: 130px
+    height: 40px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -16px -400px
+    display: block
+    margin-left: 160px
+
+    &:hover
+      background-position: -16px -445px
+

@@ -1,0 +1,46 @@
+- load formatters
+
+doctype html
+
+html
+  head
+    title p2p 产品审核页面
+    include include/common_head
+
+  body
+    .container
+
+      .panel
+        .panel-title-bar
+          .panel-title 用户持仓情况
+
+          url = '/p2p/equitydetail/%s/' % p2p.id
+
+        table.table
+          thead
+            tr
+              th 用户id
+              th 用户手机号
+              th 用户姓名
+              th 身份证
+              th 认购份额
+              th 合同
+
+          tbody
+            for equity in equities
+              tr
+                td {{equity.user.id}}
+                td {{equity.user.wanglibaouserprofile.phone}}
+                td {{equity.user.wanglibaouserprofile.name}}
+                td {{equity.user.wanglibaouserprofile.id_number}}
+                td {{equity.equity}}
+                if equity.latest_contract
+                  td
+                    a(href="/media/{{equity.latest_contract}}") 借款合同
+                else
+                  td 合同未生成
+
+    - with data=equities uri=url
+    include include/pager
+    - endwith
+

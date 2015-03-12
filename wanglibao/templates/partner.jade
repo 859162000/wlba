@@ -13,7 +13,12 @@ body
     .panel-padding.span9-omega
       .well-s
         h1.about-title 战略合作伙伴
-        .about-partner-container &nbsp;
+        .partner-container.partner-container-about
+          ul.partner-logo.partner-logo-about
+            for partner in partners
+              li
+                a(href="{{partner.link}}",target="_blank", title="{{partner.name}}")
+                  img(src="/media/{{partner.image}}", alt="{{partner.name}}")
 
   include include/footer
   include include/tracking

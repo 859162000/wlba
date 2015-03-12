@@ -40,22 +40,36 @@ block main
 
           .space-vertical-l
           .row
-            form#validate_id_form.form.span5(method="POST")
+            form#validate_id_form.form.span8(method="POST")
               - csrf_token
               .form-row
-                .span3(style="line-height:40px")
+                .span2(style="line-height:40px")
                   label 真实姓名
-                .span9-omega
+                .span6
                   input#id_name(type='text', name='name', placeholder='真实姓名')
                   .form-row-error
               .form-row
-                .span3(style="line-height:40px")
+                .span2 &nbsp;
+                .span10-omega.orange-text 您的姓名必须与银行卡的开户名一致，否则将无法成功提现。
+              .form-row
+                .span2(style="line-height:40px")
                   label 身份证号
-                .span9-omega
+                .span6
                   input#id_id_number(type='text', name='id_number', placeholder='身份证号')
                   .form-row-error
+              //.form-row
+              //  .span3(style="line-height:40px")
+              //    label 验证码
+              //  .span9-omega
+              //    input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+              //    input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入答案", maxlength="4",style="width:100px")
+              //    img.captcha.captcha-img(alt="captcha", src="")
+              //    a.captcha-refresh(type="button", title="点击刷新验证码")
+              //    .form-row-error
               .form-row
-                button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 提交
+                .span2 &nbsp;
+                .span6
+                  button#validate_id_button.button-primary.span12(type="submit") 提交
         .space-vertical-xl
   script.
       require(["/static/js/verifyId.js"])

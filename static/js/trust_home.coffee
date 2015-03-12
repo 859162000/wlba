@@ -121,7 +121,7 @@ require ['jquery', 'underscore', 'knockout', 'lib/backend', 'model/tab', 'model/
     e.preventDefault()
     trustId = $(e.target).attr('data-trust-id')
     trustName = $(e.target).attr('data-trust-name')
-    $(this).modal()
+    $(this).modal({closeText: ''})
 
   $('#preorder_submit').click (event)->
     event.preventDefault()

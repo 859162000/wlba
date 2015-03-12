@@ -13,9 +13,15 @@ mixin innerFooter()
         dd.section--item
           a(href="/team") 管理团队
         dd.section--item
+          a(href="/company") 公司展示
+        dd.section--item
           a(href="/partner") 战略合作伙伴
         dd.section--item
           a(href="/milestone") 网利宝大事记
+        dd.section--item
+          a(href="/security") 安全保障
+        dd.section--item
+          a(href="/announcement") 网站公告
 
       dl.footer-section
         dt.section--title 加入网利宝
@@ -28,22 +34,41 @@ mixin innerFooter()
 
       dl.footer-section
         dt.section--title 关注我们
+
+        .space-vertical-s
         dd.section--item
-          span 官方QQ讨论群
-        dd.section--item
-          span 362121062
+          span.weibo-container
+            a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
+            a.social-text.social-space(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo") 新浪微博
+          span.weixin-container
+            a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
+            a.social-text(href="javascript:void(0)", data-role="hover", data-target="#qrcode") 微信
+
+        a#qrweibo.footer--weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
+          img(src="/static/images/weibo-qr.png")
+        img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none", data-name="hoverbox")
+
+        span.mobile-app-bottom
+          span.icon.icon-mobile-app
+          span 手机网利宝
+          .mobile-app-bottom-prompt
+            a.mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+            a.mobile-app-android(href="https://www.wanglibao.com/static/wanglibao.apk", title="Android版")
+            div(style="height:70px")
 
       dl.footer-section
         //.icon-phone-footer.font-xxxl
         dt.section--title.footer--phone 4008-588-066
-        dd.section--item 客服热线 9:00 - 21:00
+
         .space-vertical-s
-        a.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo")
-        .space-xs
-        a.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode")
-        a#qrweibo.footer--weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
-          img(src="/static/images/weibo-qr.png")
-        img#qrcode.footer--weixin-qr-code(src="/static/images/weixin-qr.png", style="display:none", data-name="hoverbox")
+        dd.section--item
+          a.qq-container#qq-container(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+            在线客服
+            .qq-icon
+
+        .space-vertical-s
+        dd.section--item 服务热线 9:00 - 18:00（工作日）
+
 
   .footer-line
   if user.is_authenticated
@@ -53,9 +78,8 @@ mixin innerFooter()
   div(class="{{class_name}}")
     .footer-copyright 北京网利科技有限公司（北京市朝阳区霄云路天元港中心 A 座 610 室） Copyright©2014 wanglibao.com Inc. All Right Reserved. 京 ICP 备 14014548号-1
     .footer-auth
-      a.icon.icon-auth-ssl(href="http://www.instantssl.com/wildcard-ssl.html", target="_blank")
       a.icon.icon-auth-itrust(href="http://www.itrust.org.cn/yz/pjwx.asp?wm=1091876832", target="_blank")
-
+      a.icon.icon-auth-ssl(href="http://www.instantssl.com/wildcard-ssl.html", target="_blank")
 
   #login-modal(style="display:none")
     .padding-s
@@ -73,7 +97,7 @@ mixin innerFooter()
           span.footbar-building
           dl.pingan
             dt 平安保险全额承保
-            dd 网利宝资金账户
+            dd 账户资金安全由平安保险全额承保
           dl
             dt 高收益
             dd 收益是银行活期 30 倍以上
@@ -96,4 +120,5 @@ else
     +innerFooter()
 
 script.
-  require(['/static/js/hover.js','/static/js/login_modal.js'])
+  var v = new Date().getTime()
+  require(['/static/js/hover.js','/static/js/login_modal.js?v='+v])

@@ -76,6 +76,28 @@ $header-height: 150px
   @extend .panel-title-bar
   border-bottom: 1px solid $color-gainsboro
 
+.panel-title-bar__tops
+  @extend .panel-title-bar
+  background: url(/static/images/newyear/tops_banner.jpg) no-repeat left top
+  height: 53px
+  cursor: pointer
+
+.panel_top_finish_detail
+  a
+    height: 53px
+    cursor: pointer
+    background: url(/static/images/newyear/tops_finish.jpg) no-repeat left top
+    display: block
+
+.panel_top_finish
+  margin-top: 15px
+  a
+    height: 53px
+    cursor: pointer
+    background: url(/static/images/newyear/tops_finish.jpg) no-repeat left top
+    display: block
+
+
 .panel-title-bar__no-border
   @extend .panel-title-bar
   border-bottom: none
@@ -171,7 +193,6 @@ $header-height: 150px
 a.panel-sub-tab
   display: inline-block
   +unstyled-link
-  @extend .button-round-mini
 
   &.active
     background: $color-pomegranate

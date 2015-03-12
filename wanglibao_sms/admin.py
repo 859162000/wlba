@@ -3,7 +3,7 @@ from wanglibao_sms.models import PhoneValidateCode, ShortMessage
 
 
 class PhoneValidateCodeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'phone', 'validate_code', 'is_validated', 'last_send_time')
+    list_display = ('id', 'phone', 'validate_code', 'validate_type', 'is_validated', 'last_send_time')
     list_display_links = ('id',)
     search_fields = ('phone',)
 

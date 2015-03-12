@@ -1,5 +1,8 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from django.contrib.auth import get_user_model
+
+#from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import models
 from order.models import Order
 from wanglibao_margin.models import MarginRecord
@@ -13,9 +16,14 @@ class Bank(models.Model):
     limit = models.TextField(blank=True, verbose_name=u'银行限额信息')
     logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'银行图标')
     sort_order = models.IntegerField(default=0, verbose_name=u'排序权值 从大到小')
+    kuai_code = models.CharField(max_length=16, verbose_name=u'快钱侧银行代码', null=True, blank=True)
+    #快钱侧银行限额信息格式如下,"|"分隔第一次和第二次
+    #单笔=5000,单日=5000|单笔=50000,单日=10000000
+    kuai_limit = models.CharField(max_length=500, blank=True, verbose_name=u'快钱侧银行限额信息')
 
     class Meta:
         ordering = '-sort_order',
+        verbose_name_plural = "银行"
 
     def __unicode__(self):
         return u'%s' % self.name
@@ -28,13 +36,19 @@ class Bank(models.Model):
     def get_withdraw_banks(cls):
         return Bank.objects.all().exclude(code='').exclude(code__isnull=True).select_related()
 
+    @classmethod
+    def get_kuai_deposit_banks(cls):
+        return Bank.objects.all().exclude(kuai_code='').exclude(kuai_code__isnull=True).select_related()
 
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号')
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
-    user = models.ForeignKey(get_user_model())
+    user = models.ForeignKey(User)
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
     add_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "银行卡"
 
     def __unicode__(self):
         return u'%s' % self.no
@@ -62,6 +76,7 @@ class PayInfo(models.Model):
     total_amount = models.DecimalField(u'总金额', max_digits=20, decimal_places=2, default=0)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     update_time = models.DateTimeField(u'更新时间', auto_now=True)
+    confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
     request = models.TextField(u'请求数据', blank=True)
     response = models.TextField(u'返回数据', blank=True)
     status = models.CharField(u'状态', max_length=15)
@@ -69,12 +84,18 @@ class PayInfo(models.Model):
     error_message = models.CharField(u'错误原因', max_length=100, blank=True)
     request_ip = models.CharField(u'请求地址', max_length=50, blank=True, null=True)
     response_ip = models.CharField(u'响应地址', max_length=50, blank=True, null=True)
-    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     order = models.ForeignKey(Order, blank=True, null=True)
     margin_record = models.ForeignKey(MarginRecord, blank=True, null=True)
-    bank = models.ForeignKey(Bank, blank=True, null=True, on_delete=models.PROTECT)
+    bank = models.ForeignKey(Bank, blank=True, null=True, on_delete=models.PROTECT, verbose_name=u'银行')
     account_name = models.CharField(u'姓名', max_length=12, blank=True, null=True)
     card_no = models.CharField(u'卡号', max_length=25, blank=True, null=True)
+    channel = models.CharField(u'支付通道', max_length=20, blank=True, null=True, choices=(
+        ("huifu", "Huifu"),
+        ("yeepay", "Yeepay"), #易宝
+        ("app", "App"), #app取现使用
+        ("kuaipay", "Kuaipay") #快钱
+    ))
 
     def __unicode__(self):
         return u'%s' % self.pk

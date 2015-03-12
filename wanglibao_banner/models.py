@@ -1,5 +1,6 @@
 # encoding: utf-8
 from django.db import models
+from ckeditor.fields import RichTextField
 
 
 class Banner(models.Model):
@@ -16,6 +17,7 @@ class Banner(models.Model):
     )
 
     TYPES = (
+        ('p2p', 'p2p'),
         ('fund', 'fund'),
         ('trust', 'trust'),
         ('banner', 'banner'),
@@ -29,3 +31,42 @@ class Banner(models.Model):
     priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先')
     alt = models.TextField(blank=True, verbose_name=u'图片说明', help_text=u'图片说明')
     last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'上次更新时间')
+
+
+class Partner(models.Model):
+    class Meta:
+        verbose_name_plural = u'合作伙伴'
+        ordering = ['-priority', '-last_updated']
+
+    TYPES = (
+        ('partner', u'合作伙伴'),
+        ('links', u'友情链接')
+    )
+
+    type = models.CharField(max_length=15, verbose_name=u'类型', choices=TYPES, help_text=u'图片类型')
+    name = models.CharField(max_length=30, verbose_name=u'名称', help_text=u'图片名称')
+    link = models.CharField(max_length=200, blank=True, verbose_name=u'链接网址', default=u'http://', help_text=u'链接网址，需要以http://开头')
+    image = models.ImageField(upload_to='banner', blank=True, verbose_name=u'图片', help_text=u'图片，高度40px最佳')
+    alt = models.TextField(blank=True, verbose_name=u'图片说明', help_text=u'图片说明')
+    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先')
+    last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'上次更新时间')
+
+    def __unicode__(self):
+        return "%s" % self.name
+
+
+class Hiring(models.Model):
+    class Meta:
+        verbose_name_plural = u'招贤纳士'
+        ordering = ['-priority', '-last_updated']
+
+    name = models.CharField(max_length=30, verbose_name=u'岗位名称', help_text=u'岗位名称')
+    duties = RichTextField(verbose_name=u'岗位职责')
+    requirements = RichTextField(verbose_name=u'任职要求')
+    is_urgent = models.BooleanField(verbose_name=u'是否紧急', default=False)
+    is_hide = models.BooleanField(verbose_name=u'是否隐藏', default=False)
+    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先', default=0)
+    last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'更新时间')
+
+    def __unicode__(self):
+        return "%s" % self.name

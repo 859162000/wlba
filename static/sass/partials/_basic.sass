@@ -73,6 +73,8 @@ h6
 
 .font-xs
   font-size: $font-xs
+.font-ss
+  font-size: $font-ss
 .font-s
   font-size: $font-s
 .font-m
@@ -152,6 +154,9 @@ input
 .space-vertical-s
   +vertical-spacing($space-s)
 
+.space-vertical-sm
+  +vertical-spacing($space-sm)
+
 .space-vertical-ssm
   +vertical-spacing($space-ssm)
 
@@ -172,7 +177,8 @@ input
 
 .margin-left-s
   margin-left: $space-s
-
+.margin-left-sm
+  margin-left: $space-sm
 .margin-left-m
   margin-left: $space-m
 
@@ -247,7 +253,9 @@ input
 .padding-l-r-sm
   padding-left: $space-sm !important
   padding-right: $space-sm !important
-
+.padding-l-r-ssm
+  padding-left: $space-ssm !important
+  padding-right: $space-ssm !important
 .padding-l-r-m
   padding-left: $space-m !important
   padding-right: $space-m !important
@@ -372,6 +380,16 @@ a.blue
 .border-left
   border-left: solid 1px $color-alto
 
+.border-r
+  border-right: solid 1px $color-alto
+
+.border-b
+  border-bottom: solid 1px $color-alto
+
+.border-no-l-r
+  border-left: 0
+  border-right: 0
+
 .clamp-s
   padding-left: $space-s
   padding-right: $space-s
@@ -442,3 +460,12 @@ a.blue
 .font-weight
   font-weight: 800
 
+.span6
+  .gold-jiangli
+    margin-left: 80px
+
+.li-linghight
+  line-height: 35px
+
+.gold-row
+  margin-top: 20px

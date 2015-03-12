@@ -1,16 +1,24 @@
+# -*- coding: utf-8 -*-
+
 from adminplus.sites import AdminSitePlus
 from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
 from django.conf import settings
 from django.views.generic import TemplateView, RedirectView
-from wanglibao.views import IndexView, SecurityView
+from wanglibao.views import IndexView, SecurityView, PartnerView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
+from wanglibao_p2p.views import AdminP2PUserRecord
+# from wanglibao_account.views import CjdaoApiView
+from wanglibao_banner.views import HiringView
 
+from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
+    WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
+from marketing.views import NewsListView, NewsDetailView
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -40,24 +48,27 @@ urlpatterns = patterns(
 
     url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^api/', include('wanglibao_rest.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^help/', include('wanglibao_help.urls')),
+    url(r'^' + settings.ADMIN_ADDRESS + '/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    # url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
     url(r'^shumi/', include('shumi_backend.urls')),
     url(r'^pay/', include('wanglibao_pay.urls')),
 
-    #url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
-    url(r'^hiring/', TemplateView.as_view(template_name="hiring.jade")),
+    # url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
+    url(r'^hiring/', HiringView.as_view(), name="hiring"),
     url(r'^about/', TemplateView.as_view(template_name="about.jade")),
+    url(r'^company/', TemplateView.as_view(template_name="company.jade")),
     url(r'^team/', TemplateView.as_view(template_name="team.jade")),
-    url(r'^partner/', TemplateView.as_view(template_name="partner.jade")),
+    url(r'^partner/', PartnerView.as_view(), name="partner"),
     url(r'^milestone/', TemplateView.as_view(template_name="milestone.jade")),
     url(r'^responsibility/', TemplateView.as_view(template_name="responsibility.jade")),
     url(r'^contact_us/', TemplateView.as_view(template_name="contact_us.jade")),
-    url(r'^news/', TemplateView.as_view(template_name="news.jade")),
-    #url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
-    #url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),
+    url(r'^news/list', NewsListView.as_view(), name="news_list"),
+    url(r'^news/detail/(?P<id>\d+)', NewsDetailView.as_view(), name="news_detail"),
+    # url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
+    # url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),
     url(r'^agreement/', TemplateView.as_view(template_name="agreement.jade")),
     url(r'^mobile/agreement/', TemplateView.as_view(template_name="mobile_agreement.jade")),
     url(r'^mobile/about/', TemplateView.as_view(template_name="mobile_about.jade")),
@@ -65,6 +76,8 @@ urlpatterns = patterns(
 
     url(r'^preorder/', include('wanglibao_preorder.urls')),
     url(r'^activity/', include('marketing.urls')),
+    url(r'^announcement/', include('wanglibao_announcement.urls')),
+    url(r'^redpacket/', include('wanglibao_redpack.urls')),
 )
 
 urlpatterns += patterns(
@@ -74,18 +87,38 @@ urlpatterns += patterns(
 )
 
 
-# the admin router about transaciton infomation
+# the admin router about transaciton infdomation
 urlpatterns += patterns(
     '',
     url(r'transaction/p2p', AdminTransactionP2P.as_view(), name='transaction_p2p'),
     url(r'transaction/deposit', AdminTransactionDeposit.as_view(), name='transaction_deposit'),
     url(r'transaction/withdraw', AdminTransactionWithdraw.as_view(), name='transaction_withdraw'),
+    url(r'p2pequity/profile', AdminP2PUserRecord.as_view(), name='p2p_user_record'),
 )
 
+# the other Platform API
+urlpatterns += patterns(
+    '',
+    # 网贷之家
+    url(r'^tdt/getNowProjects.json', WangDaiListAPI.as_view()),
+    url(r'^tdt/getProjectsByDate.json', WangDaiByDateAPI.as_view()),
+    # 和讯网
+    url(r'^hexun/p2plist.json', HeXunListAPI.as_view()),
+    # 网贷天眼
+    url(r'^api/loans/$', WangdaiEyeListAPIView.as_view()),
+    url(r'^api/data/$', WangdaiEyeEquityAPIView.as_view()),
+    # 迅雷
+    url(r'^api/xunlei/getProjectList/$', XunleiP2PListAPIView.as_view()),
+    url(r'^api/xunlei/getXLUserInvestInfo/$', XunleiP2PbyUser.as_view()),
+    # 财经道
+    # url(r'^accounts/cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
+)
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns += patterns('',
+
+    urlpatterns += patterns(
+        '',
         url(r'^__debug__/', include(debug_toolbar.urls)),
     )
 

@@ -5,16 +5,17 @@ require.config
 
 require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
   submit_form = ()->
-    identifier = $('input[name="identifier"]').val()
+    identifier = $('#id_identifier').val()
     if !identifier
       tool.modalAlert({title: '温馨提示', msg: '请输入手机号'})
       return
     backend.userExists identifier
-    .done ->
-      $('form#identifier').submit()
-      return true
-    .fail ->
-      tool.modalAlert({title: '温馨提示', msg: '该用户不存在'})
+    .done (exist) ->
+      if exist.existing
+        $('form#identifier').submit()
+        return true
+      else
+        tool.modalAlert({title: '温馨提示', msg: '该用户不存在'})
 
   $('#submitButton').click (e)->
     e.preventDefault()

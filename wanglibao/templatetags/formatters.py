@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 
 from django import template
 from django.utils import timezone
+from django.conf import settings
 
 register = template.Library()
 
@@ -79,7 +80,9 @@ def percentage(value):
     """
     Convert float based percentage to string
     """
-    return u'%.1f%%' % (value, )
+    rs = "%s" % value
+    return "%s%%" % rs[:rs.find(".")+2]
+    #return u'%.1f%%' % (value, )
 
 @register.filter
 def percentage_number(value):
@@ -120,6 +123,11 @@ def safe_phone_str(phone):
 
 
 @register.filter
+def safe_phone_new(phone):
+    return phone[:3] + '*' * (len(phone) - 2 - 3) + phone[-2:]
+
+
+@register.filter
 def safe_phone(user):
     """
     Show part of user identifier, used in password reset page
@@ -137,7 +145,7 @@ def safe_id(id_number):
     Show part of id_number
     """
 
-    result = id_number[:-4] + '*' * 4
+    result = id_number[:-12] + '*' * 12
 
     return result
 
@@ -148,6 +156,33 @@ def safe_name(name):
     """
 
     result = "*" + name[1:]
+    return result
+
+@register.filter
+def safe_name_last(name):
+    """
+    Show part of name
+    """
+
+    result = name[:1] + "*" * 3
+    return result
+
+@register.filter
+def safe_name_first(name):
+    """
+    Show last word
+    """
+
+    result = "*" * 2 + name[-1]
+    return result
+
+@register.filter
+def safe_address(name):
+    """
+    Show part of name
+    """
+
+    result = name[:3] + '*' * 3
     return result
 
 @register.filter
@@ -232,6 +267,18 @@ def timedelta_now_day(time):
     else:
         return ""
 
+@register.filter
+def milltime_format(time):
+    from datetime import datetime
+    format_time = datetime.fromtimestamp(time)
+    return format_time.strftime('%Y-%m-%d %H:%M:%S')
+
+@register.filter
+def milldate_format(time):
+    from datetime import datetime
+    format_time = datetime.fromtimestamp(time)
+    return format_time.strftime('%Y-%m-%d')
+
 
 @register.filter
 def card_info(card):
@@ -303,3 +350,10 @@ def safe_paytype(value):
         return u'取款'
     else:
         return u'充值'
+
+@register.filter
+def admin_address(value):
+    """
+    Convert the number into 10k based string
+    """
+    return settings.ADMIN_ADDRESS

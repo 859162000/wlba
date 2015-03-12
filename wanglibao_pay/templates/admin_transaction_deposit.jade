@@ -13,7 +13,7 @@ head
 
                 .panel-content.padding-l-r-sm
                     .space-vertical-l
-                    a(href="/admin/pay/transaction")
+                    a(href='/{{ "" | admin_address}}/pay/transaction')
                         button.button-home-action(type='submit') 返回
                     .space-vertical-l
 
@@ -24,11 +24,11 @@ head
             .account-home-panel--title-bar__product.padding-l-r-xl
                 ul.title-bar--tabs
                     li.title-bar--tab
-                        a.title-bar--tab--anchor(href='/admin/pay/transaction/p2p?phone={{ phone }}') 交易记录
+                        a.title-bar--tab--anchor(href='/{{ "" | admin_address}}/pay/transaction/p2p?phone={{ phone }}') 交易记录
                     li.title-bar--tab.active
                         a.title-bar--tab--anchor(href='javascript:void(0)') 充值记录
                     li.title-bar--tab
-                        a.title-bar--tab--anchor(href='/admin/pay/transaction/withdraw?phone={{ phone }}') 提现记录
+                        a.title-bar--tab--anchor(href='/{{ "" | admin_address}}/pay/transaction/withdraw?phone={{ phone }}') 提现记录
             .panel-container.padding-l-r-xl
                 table.table
                     thead
@@ -54,7 +54,7 @@ head
 
 
                 if pay_records
-                    - with data=pay_records uri="/admin/pay/transaction/withdraw"
+                    - with data=pay_records uri='/{{ "" | admin_address}}/pay/transaction/deposit'
                     include include/pager_admin
                     - endwith
                 else

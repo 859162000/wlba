@@ -1,6 +1,7 @@
 @import "icons"
 
 .footer
+  
   background: #464646
   color: #BBBBBB
   margin-top: $space-s
@@ -13,11 +14,13 @@
 .footer-section--container
   @extend .row
   padding: 25px 0
-  height: 220px
+  height: 270px
   overflow: visible
 
   a
     +link-colors(darken(white, 40%), white)
+    &.qq-container
+      color: #fff
 
 
 .footer-section
@@ -95,16 +98,22 @@
   position: absolute
   bottom: 100%
   left: -39px
-  top: -52px
+  top: -80px
   z-index: 9
 
 .footer--weixin-qr-code
   position: absolute
   bottom: 100%
-  left: -5px
-  top: -115px
+  left: 66px
+  top: -150px
   z-index: 9
 
+.social-text
+  margin-left: 10px
+  display: inline-block
+
+  &.social-space
+    margin-right: 20px
 .footer--phone
   font-size: $font-xxl
   color: darken(white, 10%)
@@ -124,6 +133,26 @@
   background: url("/static/images/icon-public.png") no-repeat -380px -195px
   margin-left: 10px
   top: -2px
+
+//author:hetao;date:2014.10.14;target:QQ客服
+.qq-container
+  width: 140px
+  height: 27px
+  line-height: 27px
+  background: #e7350d
+  color: #fff
+  padding-left: 30px
+  +border-radius(5px)
+  position: relative
+  cursor: pointer
+  display: block
+  .qq-icon
+    width: 25px
+    height: 28px
+    background: url("/static/images/icon-public.png") no-repeat -278px -158px
+    position: absolute
+    left: 90px
+    top: -5px
 
 .footbar
   width: 100%
@@ -209,7 +238,7 @@
     margin-left: 10px
     margin-right: 10px
 
-.icon-auth-ssl
+.icon-auth-itrust
   width: 33px
   height: 33px
   background: url("/static/images/icon-auth-footer.png") 0 0 no-repeat
@@ -217,10 +246,55 @@
   &:hover
     background: url("/static/images/icon-auth-footer.png") 0 -34px no-repeat
 
-.icon-auth-itrust
+.icon-auth-ssl
   width: 46px
   height: 31px
   background: url("/static/images/icon-auth-footer.png") -37px 0 no-repeat
 
   &:hover
     background: url("/static/images/icon-auth-footer.png") -37px -33px no-repeat
+
+.mobile-app-bottom
+  display: inline-block
+  margin-top: 20px
+
+  .icon-mobile-app
+    background: url("/static/images/icon_mobile_app.gif")
+    height: 22px
+    width: 22px
+    margin-right: 8px
+    margin-top: -5px
+    //+transition(all .2s ease-in-out)
+
+  .mobile-app-bottom-prompt
+    width: 320px
+    height: 200px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -5px 0
+    position: absolute
+    top: -100px
+    right: -80px
+    z-index: 999
+    display: none
+
+  .mobile-app-apple
+    width: 130px
+    height: 40px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -157px -400px
+    display: block
+    margin-top: 50px
+    margin-left: 166px
+    margin-bottom: 10px
+
+    &:hover
+      background-position: -157px -445px
+
+  .mobile-app-android
+    width: 130px
+    height: 40px
+    background: url("/static/images/app_prompt_bg.png") no-repeat -16px -400px
+    display: block
+    margin-left: 166px
+
+    &:hover
+      background-position: -16px -445px
+

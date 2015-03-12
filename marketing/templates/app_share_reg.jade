@@ -1,0 +1,35 @@
+- load formatters
+doctype html
+html
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title 邀请好友理财送话费
+    link(rel="stylesheet",href="/static/css/wap/share_app.css")
+    script(src="/static/js/require.js", data-main="/static/js/header")
+
+  body
+    div.content
+        h2 请设置登录密码完成注册
+        h2 账号：
+          span.re_identifier {{ identifier }}
+        #register-form
+          - csrf_token
+          .form-row
+            .span8
+              input#reg_identifier(type="hidden", name="identifier", value="{{identifier}}")
+              input#reg_validate_code(type="number", data-clear-btn="false", name="validate_code", pattern="[0-9]{6}", placeholder="请输入验证码", id="number-2", value="")
+              input#reg_invitecode(type="hidden", name="invitecode", value="{{ invitecode }}")
+            .span4-omega
+              button#sendValidateCodeButton.send-validate-button(type="button", data-url="/api/phone_validation_code/register/{{ identifier }}/") 获取验证码
+          .space-s
+          .form-row
+            input#reg_password(type="password", name="password", id="password", value="", autocomplete="off", placeholder="请设置您的登录密码")
+          .space-s
+          .form-row
+            button#register_submit.download-btn(type="button",style="width:100%") 注 册
+          .error-message
+
+    script.
+      var v = new Date().getTime()
+      require(["/static/js/app_share_reg.js?v="+v])
+    include include/tracking

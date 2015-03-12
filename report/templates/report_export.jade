@@ -1,0 +1,56 @@
+- load formatters
+doctype html
+head
+    - with '导出表格' as title
+    include include/common_head
+    - endwith
+    body
+        .panel
+            .well
+                .panel-title-bar__no-border
+                    .panel-title 导出表格
+                    .panel-title
+                        for message in messages
+                            span3 {{ message|safe }}
+                .space-vertical-s
+                .panel-content.padding-l-r-sm
+                    .space-vertical-l
+                    a(href='/{{ "" | admin_address}}')
+                        button.button-home-action(type='submit') 返回
+                    .space-vertical-l
+                    .row
+                        .span3
+                            label 用户余额
+                        .span9-omega
+                            h3 {{ margin }}
+                    .row
+                        .span3
+                            label 冻结金额
+                        .span9-omega
+                            h3 {{ freeze }}
+                    .row
+                        .span3
+                            label 提款中金额
+                        .span9-omega
+                            h3 {{ withdrawing }}
+                    .space-vertical-l
+                    .space-vertical-l
+                    for typename, value in type
+                        .space-vertical-l
+                        .space-vertical-l
+                        .row
+                            form.form.span5(method="POST" action='')
+                                - csrf_token
+                                .form-row
+                                    .span3
+                                        label {{ typename }}
+                                    .span9-omega
+                                        input(type="hidden", name="type", value="{{ value }}")
+                                        span 2014-10-28 18:13:24
+                                        input(type='text', name='start_time', min="2014-01-01", max="2020-01-01", value="{{ yestoday }}")
+                                        input(type='text', name='end_time',  min="2014-01-01", max="2020-01-01", value="{{ today }}")
+                                        if value == 6
+                                          input(type='text', name='earning_type', value="I")
+                                .form-row
+                                    button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 生成
+

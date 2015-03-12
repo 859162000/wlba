@@ -15,23 +15,34 @@
 
   .panel-title-bar
     line-height: 55px
-    border-bottom: 1px dashed $color-gainsboro
+    border-bottom: 0
     font-size: $font-m
     color: $color-text-d2
     padding: 0 24px
+    position: relative
+    .tip
+      position: absolute
+      right: 20px
+      top: 0px
+      font-size: 12px
+      color: #999
     a
       font-size: 18px
       font-weight: normal
       line-height: 55px
       width: 620px
       display: inline-block
+      overflow: hidden
+      white-space: nowrap
+      text-overflow: ellipsis
+      float: left
       &:hover
         color: #1f8ccd
 
   .panel-content
     border-bottom: 1px dashed $color-gainsboro
     color: $color-text-d4
-    padding: 15px 24px
+    padding: 5px 24px 15px 24px
     line-height: 30px
 
     &:last-child
@@ -54,6 +65,29 @@
     padding-top: 0
     padding-bottom: 0
     line-height: 55px
+
+.panel-announce-bar
+  @extend .clearfix
+  padding: 0 24px
+  position: relative
+  line-height: 50px
+  border-bottom: 1px solid $color-gainsboro
+
+  .panel-announce-bar-title
+    +float-left
+    font-size: $font-l
+    color: $color-text-d2
+
+  .panel-announce-bar-content
+    +float-right
+    color: $color-text-d3
+    font-size: $font-s
+
+.icon-up-arrow
+  width: 18px
+  height: 18px
+  margin-right: 5px
+  background: url("/static/images/icon-public.png") -281px -194px no-repeat
 
 .progress-container
   height: 12px
@@ -90,9 +124,17 @@
     padding: 10px 0
     color: $color-emperor
 
+  .get-more
+    background-image: none
+    width: 60px
+
 .p2p-detail-bar
   padding-bottom: 10px
   font-size: $font-s
+  .tip
+    font-size: 12px
+    line-height: 40px
+    margin-left: 10px
 
 .p2p-detail-title
   font-size: $font-xxl
@@ -111,6 +153,13 @@
     margin-left: 10px
     top: -2px
 
+  a
+    color: $color-sea-green
+
+    &:hover
+      color: $color-white
+      background: $color-sea-green
+
 .p2p-detail-endtime
   padding-top: 0px
 
@@ -118,6 +167,8 @@
   padding: 10px 0
   text-align: center
   font-size: $font-s
+  position: relative
+
   .detail-icon
     display: inline-block
     width: 20px
@@ -152,6 +203,15 @@
   line-height: 35px
   border-bottom: dotted 1px $color-alto
 
+  &.bill-note
+    dt
+      text-align: left
+      color: #333
+      font-size: 18px
+    dd
+      line-height: 25px
+      margin-bottom: 20px
+
   &:last-child
     border-bottom: 0
 
@@ -185,13 +245,25 @@
     li
       padding-top: 60px
 
+  .img-container
+    margin-bottom: 50px
+    img
+      width: 540px
+      display: block
+      outline: none
+      margin: 0px auto
+    h2
+      text-align: center
+      font-size: 14px
+      color: #333
+
 .invest-form
   padding: 20px 30px 10px 30px
   background: #fafafa
-  height: 320px
+  height: auto
   font-size: $font-s
   color: $color-dusty-gray
-  line-height: 40px
+  line-height: 35px
 
   .invest
     height: 35px
@@ -202,12 +274,26 @@
     font-size: $font-xl
     color: $color-emperor
 
+    .detail-margin
+      font-size: 14px
+      color: #999
+
+    a
+      font-size: 14px
+      color: #1f8ccd
+
   .span4
     text-align: right
     padding-right: 15px
 
   button
     font-size: $font-m
+
+  .form-row
+    padding-top: 0
+
+  .form-row__middle
+    line-height: 35px
 
 .sold-out
   padding-top: 50px
@@ -219,6 +305,7 @@
 
 .guarantee-company
   border-bottom: solid 1px $color-alto
+  border-top: solid 1px $color-alto
 
   table
     border: solid 1px $color-alto
@@ -233,6 +320,8 @@
       font-size: $font-l
       padding: 5px 0
       color: $color-emperor
+      &.nowarrant
+        border-bottom: 1px solid $color-alto
 
     td
       border-bottom: solid 1px $color-alto
@@ -264,14 +353,40 @@
   display: inline-block
   margin-right: 10px
   position: relative
-  top: -2px
+  //top: -2px
   background-color: $color-red
   +border-radius(8px)
+  float: left
+
+.di
+  top: 19px
+.bill-icon
+  width: 18px
+  height: 18px
+  color: $color-white
+  font-size: $font-xs
+  line-height: 18px
+  padding-left: 3px
+  display: inline-block
+  margin-right: 10px
+  position: relative
+  //top: -2px
+  background-color: $color-denim
+  +border-radius(8px)
+  float: left
 
 .panel-p2p-stamp
   background: url("/static/images/stamp.png") no-repeat
   width: 70px
   height: 71px
+  position: absolute
+  right: 0px
+  top: 0px
+
+.panel-p2p-finished
+  background: url("/static/images/finished.png") no-repeat
+  width: 70px
+  height: 72px
   position: absolute
   right: 0px
   top: 0px
@@ -366,7 +481,7 @@
   color: rgb(243,96,73)
 
 .position
-  line-height: $space-xxxl
+  line-height: 70px
   font-size: $font-s
 
   a
@@ -411,3 +526,58 @@
       width: 70px
       top: -1px
       margin-right: 5px
+
+.xunlei-vip-rate
+  color: $color-denim
+  font-size: $font-l
+  position: relative
+
+.xunlei-vip-rate-detail
+  @extend .xunlei-vip-rate
+  font-size: $font-xxl
+
+.xunlei-vip-tip
+  +inline-block
+  position: absolute
+  z-index: 9
+  top: -25px
+  left: -25px
+  background: url("/static/images/activity/xunlei_vip.png") no-repeat
+  width: 86px
+  height: 23px
+  font-size: 9px
+  color: #fff
+  vertical-align: top
+  line-height: 17px
+
+.xunlei-vip-tip-detail
+  @extend .xunlei-vip-tip
+  top: -22px
+  left: -23px
+
+.xunlei-vip-form-txt
+  font-size: $font-xs
+  line-height: 20px
+
+#xunlei-binding-modal
+  width: 560px
+  height: 340px
+
+  ul
+    padding-top: 10px
+    line-height: 26px
+    font-size: $font-s
+
+.xunlei-vip-yes
+  background: url("/static/images/activity/xunlei_vip.png") 0 -24px no-repeat
+  width: 20px
+  height: 20px
+
+.xunlei-vip-no
+  background: url("/static/images/activity/xunlei_vip.png") -20px -24px no-repeat
+  width: 20px
+  height: 20px
+
+.xunlei-tip-container
+  text-align: right
+  line-height: 22px

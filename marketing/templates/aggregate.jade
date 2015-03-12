@@ -1,0 +1,87 @@
+//
+   Created by HeZhang on 15-2-3.
+-load formatters
+doctype html
+html
+  head
+    meta(name="viewport",content="width=device-width,initial-scale=1")
+    - with '累计购买金额统计单 ' as title
+    - endwith
+    link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/metisMenu/metisMenu.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/sb-admin-2.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/datepicker3.css", media="screen, projection", rel="stylesheet", type="text/css")
+
+    script(src="/static/js/require.js", data-main="/static/js/header")
+    script(src="https://code.jquery.com/jquery-1.11.1.min.js", data-main="/static/js/header")
+    script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js", data-main="/static/js/header")
+    script(src="/static/js/lib/bootstrap-datepicker.js", data-main="/static/js/header")
+
+  body(role="document")
+    #wrapper
+      nav.navbar.navbar-default.navbar-static-top(role="navigation", style="margin-bottom:0px")
+        .navbar-header
+          a.navbar-brand(href="?") 网利宝统计数据
+        - with '累计购买金额统计单' as activeItem
+        include include/admin_menu
+        - endwith
+      #page-wrapper
+        .row
+          .col-lg-12
+            h1.page-header 累计购买金额统计单
+
+        .row
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading 累计购买金额统计单
+
+              .panel-body
+                .row
+                  b(style="background:#fff;color:red")
+                    if message
+                      .panel-content.padding-l-r-sm
+                      label.error {{ message }}
+                  form
+                    .col-lg-6
+                      .form-group
+                        .input-daterange.input-group#datepicker
+                          input(type="text",name="start",value="{{start}}").input-sm.form-control
+                          span.input-group-addon to
+                          input(type="text",name="end",value="{{end}}").input-sm.form-control
+                        .input-group
+                          h4 查询最小金额（包含此金额）
+                          input(type="text",name="amount_min",value="{{amount_min}}").input-sm.form-control
+                        .input-group
+                          h4 查询截止截止金额（不包含此金额）
+                          input(type="text",name="amount_max",value="{{amount_max}}").input-sm.form-control
+                    .col-lg-6
+                      .form-group
+                        button(type="submit").btn.btn-default 查询
+                .row
+                  h4
+                    | &nbsp;&nbsp;&nbsp;&nbsp;
+                    | 统计总金额为： {{amount_all}}
+
+                .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 电话号
+                        th(rowspan="1") 用户id
+                        th(rowspan="1") 金额总额
+                    tbody
+                      if result
+                        for l in result
+                          tr
+                            td {{l.user__wanglibaouserprofile__phone}}
+                            td {{l.user__wanglibaouserprofile__name}}
+                            td {{l.amount}}
+
+    if result
+      - with data=result uri='/activity/aggregate/'
+      include include/pager_aggregate
+      - endwith
+
+script.
+  require(["/static/js/tops_admin.js"])
+

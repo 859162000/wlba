@@ -12,4 +12,6 @@ require ['jquery',
          'lib/modal'], ($, _, modal)->
   $('a[data-role=modal]').click (e)->
     e.preventDefault()
-    $(this).modal()
+
+    #autho: hetao; time: 2014.10.11; target: 修改招聘页弹框多了一个X的bug
+    $(this).modal closeText: ''

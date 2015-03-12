@@ -3,7 +3,10 @@ import string
 import uuid
 import re
 from django.conf import settings
-from django.contrib.auth import get_user_model
+#from django.contrib.auth import get_user_model
+from django.db import transaction
+from django.utils.decorators import method_decorator
+from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.template import Context, Template, add_to_builtins
 from django.template.loader import render_to_string, get_template
@@ -11,6 +14,10 @@ from django.utils import timezone
 from registration.models import RegistrationProfile
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd
 import logging
+import hashlib
+from decimal import Decimal
+from wanglibao_p2p.amortization_plan import get_amortization_plan
+
 
 logger = logging.getLogger(__name__)
 
@@ -56,12 +63,16 @@ def detect_identifier_type(identifier):
 
     return 'unknown'
 
-User = get_user_model()
+
+#User = get_user_model()
 
 
+@method_decorator(transaction.atomic)
 def create_user(identifier, password, nickname):
     username = generate_username(identifier)
     identifier_type = detect_identifier_type(identifier)
+    if identifier_type =="unknown":
+        return None
 
     user = User(username=username)
     user.set_password(password)
@@ -109,7 +120,7 @@ def verify_id(name, id_number):
         raise NameError("The specific backend not implemented")
 
 
-def generate_contract(equity, template_name=None):
+def generate_contract(equity, template_name=None, equities=None):
     """
     Generate the contract file for the equity.
 
@@ -118,6 +129,7 @@ def generate_contract(equity, template_name=None):
     """
     context = Context({
         'equity': equity,
+        'equities': equities,
         'now': timezone.now()
     })
 
@@ -128,5 +140,163 @@ def generate_contract(equity, template_name=None):
     else:
         # Load the template from database
         template = Template(equity.product.contract_template.content)
+        # print equity.product.contract_template.content[:100]
 
     return template.render(context)
+
+
+def generate_contract_preview(productAmortizations, product, template_name=None):
+    """
+    Generate the contract file for the equity.
+
+    :param equity: Equity param, which links the product and user
+    :return: The string representation of the contract
+    """
+    context = Context({
+        'productAmortizations': productAmortizations,
+        'product': product,
+        'now': timezone.now()
+    })
+
+    if template_name is not None:
+        template = get_template(template_name)
+    elif product.contract_template is None:
+        template = get_template('contract_template.jade')
+    else:
+        # Load the template from database
+        template = Template(product.contract_template.content_preview)
+
+    return template.render(context)
+
+
+def mlgb_md5(phone, flag):
+    new_str = '{}{}'.format(phone, flag)
+    m = hashlib.md5()
+    m.update(new_str)
+    return m.hexdigest()
+
+
+PAY_METHOD = {
+    u'等额本息': 1,
+    u'按月付息': 2,
+    u'到期还本付息': 4
+}
+
+
+# class CjdaoUtils():
+#
+#     @classmethod
+#     def get_wluser_by_phone(cls, phone):
+#         """
+#
+#         :param phone:
+#         :return:
+#         """
+#         if phone:
+#             return User.objects.filter(wanglibaouserprofile__phone=phone).first()
+#
+#     @classmethod
+#     def quick_md5_value(cls, uaccount, phone, companyid, key):
+#         data_string = '{}{}{}{}'.format(uaccount, phone, companyid, key)
+#         return cls.md5str(data_string)
+#
+#     @classmethod
+#     def md5_value(cls, *args):
+#         data_string = ''.join(args)
+#         m = hashlib.md5()
+#         m.update(data_string)
+#         return m.hexdigest()
+#
+#     @classmethod
+#     def valid_md5(cls, str, *args):
+#         data_string = ''.join(args)
+#         m = hashlib.md5()
+#         m.update(data_string)
+#         return str == m.hexdigest()
+#
+#     @classmethod
+#     def return_register(cls, cjdaoinfo, user, key):
+#
+#         k = ('phone', 'usertype', 'uaccount', 'companyid', 'accountbalance')
+#
+#         v = (user.wanglibaouserprofile.phone, str(cjdaoinfo.get('usertype')), str(cjdaoinfo.get('uaccount')),
+#              str(cjdaoinfo.get('companyid')), str(float(user.margin.margin)), key)
+#
+#         p = dict(zip(k, v))
+#         p.update(md5_value=cls.md5_value(*v))
+#         return p
+#
+#
+#     @classmethod
+#     def return_purchase(cls, cjdaoinfo, user, margin_record, p2p, key):
+#
+#         reward = Decimal.from_float(0).quantize(Decimal('0.0000'), 'ROUND_DOWN')
+#         if p2p.activity:
+#             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
+#         expectedrate = Decimal.from_float(p2p.expected_earning_rate) / 100 + reward
+#         expectedrate = float(expectedrate.quantize(Decimal('0.000'), 'ROUND_DOWN'))
+#
+#         terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
+#                                                                p2p.expected_earning_rate / 100,
+#                                                                p2p.amortization_count,
+#                                                                p2p.period)
+#         total_earning = terms.get("total") - p2p.total_amount
+#
+#         realincome = (margin_record.amount / p2p.total_amount ) * total_earning
+#         realincome = realincome.quantize(Decimal('0.00'), 'ROUND_DOWN')
+#
+#         print realincome
+#
+#         k = ('uaccount', 'phone', 'usertype', 'companyid', 'thirdproductid',
+#              'productname', 'buytime', 'money', 'expectedrate', 'realincome', 'transactionstatus',
+#              'ordercode', 'accountbalance')
+#
+#
+#         p2pname = p2p.name
+#         productname = p2pname.encode('utf-8')
+#
+#         v = (cjdaoinfo.get('uaccount'), str(user.wanglibaouserprofile.phone), str(cjdaoinfo.get('usertype')),
+#              cjdaoinfo.get('companyid'), str(p2p.id), productname,
+#              timezone.localtime(margin_record.create_time).strftime("%Y-%m-%d"),
+#              str(float(margin_record.amount)), str(expectedrate), str(realincome), '2', str(margin_record.order_id),
+#              str(float(margin_record.margin_current)), key)
+#
+#         p = dict(zip(k, v))
+#         p.update(md5_value=cls.md5_value(*v))
+#
+#         return p
+#
+#     @classmethod
+#     def post_product(cls, p2p, key):
+#
+#         k = [
+#             'thirdproductid', 'productname', 'companyname', 'startinvestmentmoney', 'acceptinvestmentmoney',
+#             'loandeadline',
+#             'expectedrate', 'risktype', 'incomeway', 'creditrating', 'iscurrent', 'isredeem', 'isassignment']
+#
+#
+#         reward = 0
+#         if p2p.activity:
+#             reward = p2p.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
+#         expectedrate = float(p2p.expected_earning_rate / 100) + float(reward)
+#
+#         p2pname = p2p.name
+#         productname = p2pname.encode('utf-8')
+#
+#         incomeway = PAY_METHOD.get(p2p.pay_method, 0)
+#         if incomeway:
+#             v = (
+#                 str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
+#                 str(expectedrate), '1', str(incomeway), 'a', '1', '1', '1', key)
+#         else:
+#             k.remove('incomeway')
+#             v = (
+#                 str(p2p.id), productname, '网利宝', '100', str(p2p.available_amout), str(p2p.period),
+#                 str(expectedrate), '1', 'a', '1', '1', '1', key)
+#
+#         p = dict(zip(k, v))
+#         p.update(md5_value=cls.md5_value(*v))
+#         return p
+#
+#
+

@@ -7,18 +7,33 @@
         span 客服热线：
         span 4008-588-066
 
+        span.margin-left-m 在线客服：
+        a.topbar-anchor.icon.icon-qq#top-qq(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", data-role="hover", target="_blank")
+
         span.margin-left-m 关注我们：
         a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
         a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
         a#qrweibo-top.weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
           img(src="/static/images/weibo-nqr.png")
         img#qrcode-top.icon.weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none", data-name="hoverbox")
+        span.mobile-app-top
+          span.icon.icon-mobile-app
+          span 手机网利宝
+          .mobile-app-top-prompt
+            div(style="height:30px; top:-20px; position:relative;")
+            a.mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+            a.mobile-app-android(href="https://www.wanglibao.com/static/wanglibao1.apk", title="Android版")
 
       .user-info.white#user-info-ajax
         span.icon.icon-login
         if user.is_authenticated
           span
             a(href="/accounts/home") {{user | display_name}} 的账户
+            | &nbsp;&nbsp;&nbsp;
+          span.message-tip
+            a(href="/accounts/message/?listtype=unread") 消息
+              span(id="message_count").message-count 10
+            | &nbsp;&nbsp;&nbsp;
           a.logout(href="/accounts/logout?next={{ request.path }}") 退出
         else
           a.login-modal.user-info--login(href="#login-modal") 登录

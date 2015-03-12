@@ -1,6 +1,7 @@
 wanglibao-backend
 =================
 
+
 The backend of wanglibao website
 
 Create virtualenv
@@ -68,6 +69,21 @@ Deploy
     $ pre: fab deploy --set group=pre
     $ production: fab deploy --set group=production
 
+	Fast deploy, add one parameter fast=true
+    $ staging: fab deploy --set group=staging,fast=true
+
+    deploy new
+    $ cd deploy
+
+    deploy all
+    $ fab -f depoly.py depoly_www
+    deploy static
+    $ fab -f depoly.py depoly_static
+    deploy web
+    $ fab -f depoly.py depoly_web
+    deploy mq
+    $ fab -f depoly.py depoly_mq
+
 Query example
 -------------------
 log in to web server through ssh, then run
@@ -101,3 +117,15 @@ Mac Build question：
 		pip install pillow (2.6.1)
 
 
+Recreate Contract
+-----------------
+
+    from wanglibao_p2p.models import P2PProduct, P2PEquity
+    from order.utils import OrderHelper
+    from wanglibao_p2p.keeper import EquityKeeper
+    
+    product = P2PProduct.objects.get(id=216)
+    order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
+    
+    for equity in product.equities.all():
+        EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)

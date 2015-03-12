@@ -1,0 +1,28 @@
+- load formatters
+doctype html
+head
+    - with '生成用户数据' as title
+    include include/common_head
+    - endwith
+    body
+        .panel
+            .well
+                .panel-title-bar__no-border
+                    .panel-title 生成用户数据
+                .space-vertical-s
+                .panel-content.padding-l-r-sm
+                    .space-vertical-l
+                    a(href='/{{ "" | admin_address}}')
+                        button.button-home-action(type='submit') 返回
+                    .space-vertical-l
+                    .space-vertical-l
+                    .row
+                        form.form.span5(method="GET" action='/{{ "" | admin_address}}/p2p/p2pequity/profile')
+                            - csrf_token
+                            .form-row
+                                .span3(style="line-height:40px")
+                                    label P2P产品id
+                                .span9-omega
+                                    input#id_id_number(type='text', name='p2p_id', placeholder='p2p产品id')
+                            .form-row
+                                button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 查询

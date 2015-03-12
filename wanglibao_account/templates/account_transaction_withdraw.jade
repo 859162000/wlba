@@ -9,19 +9,22 @@ block head
 
 block sidebar
   - with '交易记录' as activeItem
-    - with 'P2P交易记录' as activeSubItem
+    - with '理财交易记录' as activeSubItem
       include include/user_center_sidebar
 
 block main
-  .panel
-    .account-home-panel--title-bar__product.padding-l-r-xl
+  .panel.p2p-record
+    h1 理财交易记录
+    .account-home-panel--title-bar__product
       ul.title-bar--tabs
         li.title-bar--tab
-          a.title-bar--tab--anchor(href="/accounts/transaction/p2p/") 交易记录
+          a.title-bar--tab--anchor(href="/accounts/transaction/p2p/") 投资记录
         li.title-bar--tab
           a.title-bar--tab--anchor(href='/accounts/transaction/deposit/') 充值记录
         li.title-bar--tab.active
           a.title-bar--tab--anchor(href='javascript:void(0)') 提现记录
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href='/accounts/repayment/') 还款记录
     .panel-container.padding-l-r-xl
       table.table
         thead

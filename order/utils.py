@@ -37,6 +37,7 @@ class OrderHelper(object):
     def _create_order_note(cls, order, user, **fields):
         order_note = OrderNote()
         order_note.type = order.type
+        # order_note.message = order.status
         order_note.order = order
 
         if user:

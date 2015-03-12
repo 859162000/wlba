@@ -1,3 +1,5 @@
+- load formatters
+
 doctype html
 
 html
@@ -26,9 +28,11 @@ html
 
       .panel
         .panel-title-bar
-          .panel-title 用户持仓情况
+          .panel-title
+            用户持仓情况
+            a(href="/p2p/equitydetail/{{p2p.id}}") 查看详情
 
-        equities = p2p.equities.all()
+        //equities = p2p.equities.all()
         table.table
           thead
             tr
@@ -47,18 +51,16 @@ html
                 td {{equity.user.wanglibaouserprofile.name}}
                 td {{equity.user.wanglibaouserprofile.id_number}}
                 td {{equity.equity}}
-                if equity.contract
-                  td
-                    a(href="/media/{{equity.contract}}") 借款合同
-                else
-                  td 合同未生成
+                td
+                  a(href="/p2p/audit_contract/{{equity.id}}/", target="_blank") 借款合同
 
       .panel
         .panel-title-bar
           .panel-title 用户还款计划
         product_amortizations = p2p.amortizations.all()
         for amort in product_amortizations
-          h2 {{amort.term_date | date:"Y-m-d"}}
+          h2 {{amort.term_date | date:"Y-m-d"}} &nbsp;&nbsp;
+            a(href="/p2p/amortizationdetail/{{amort.id}}") 查看详情
           table.table
             thead
               tr
@@ -70,7 +72,7 @@ html
                 th 利息
                 th 罚息
             tbody
-              user_amorts = amort.subs.all()
+              user_amorts = amort.subs.all()[:20]
               for user_amort in user_amorts
                 tr
                   td {{user_amort.user.id}}
@@ -89,4 +91,4 @@ html
             -csrf_token
             button.button-primary(type="submit") 审核通过
 
-          a.button-primary.margin-left-m(href="/admin/wanglibao_p2p/p2pproduct/") 返回
+          a.button-primary.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/p2pproduct/') 返回

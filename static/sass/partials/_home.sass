@@ -4,9 +4,9 @@ body.index
 .full-container-index
   @extend .full-container
   position: relative
-  height: 360px
+  height: 320px
 
-$home-banner-height: 360px
+$home-banner-height: 320px
 
 .home-banner
   $file: 'home0.jpg'
@@ -40,7 +40,7 @@ $home-banner-height: 360px
 .banner-overlay
   background-color: #000
   opacity: 0.4
-  top: 45px
+  top: 30px
   filter: alpha(opacity=40)
   position: absolute
   width: 320px
@@ -53,7 +53,7 @@ $home-banner-height: 360px
   @extend .pie-element
   position: relative
   float: right
-  margin-top: 45px
+  margin-top: 20px
   padding: 40px
   font-size: $font-m
   color: white
@@ -125,13 +125,6 @@ $home-banner-height: 360px
   padding-top: 15px
   padding-bottom: 50px
   background-color: $color-white
-
-  .icon-process-title
-    width: 22px
-    height: 20px
-    background: url("/static/images/icon-public.png") no-repeat -325px -195px
-    margin-right: 10px
-    top: -1px
 
   .title
     text-align: left
@@ -245,53 +238,36 @@ $home-banner-height: 360px
 
   .partner-logo
     @extend .clearfix
-    height: 175px
-    border-top: dotted 1px #b2b2b2
-    border-right: dotted 1px #b2b2b2
+    border-left: dotted 1px #b2b2b2
 
     li
       float: left
       width: 157px
-      height: 87px
+      height: 86px
       border-bottom: dotted 1px #b2b2b2
-      border-left: dotted 1px #b2b2b2
+      border-top: dotted 1px #b2b2b2
+      border-right: dotted 1px #b2b2b2
 
       a
         display: block
         width: 100%
-        height: 86px
+        height: 100%
         border: solid 4px $color-white
+        text-align: center
 
         &:hover
           border: solid 4px #ddd
-      .partner-idg
-        background: url("/static/images/partner_logos.png") no-repeat 0 0
-      .partner-baidu
-        background: url("/static/images/partner_logos.png") no-repeat 0 -86px
-      .partner-sina
-        background: url("/static/images/partner_logos.png") no-repeat 0 -174px
-      .partner-xunlei
-        background: url("/static/images/partner_logos.png") no-repeat 0 -260px
-      .partner-minsheng
-        background: url("/static/images/partner_logos.png") no-repeat 0 -346px
-      .partner-huifu
-        background: url("/static/images/partner_logos.png") no-repeat 0 -432px
-      .partner-ump
-        background: url("/static/images/partner_logos.png") no-repeat 0 -518px
-      .partner-pingan
-        background: url("/static/images/partner_logos.png") no-repeat 0 -604px
-      .partner-dongyuan
-        background: url("/static/images/partner_logos.png") no-repeat 0 -690px
-      .partner-guoxin
-        background: url("/static/images/partner_logos.png") no-repeat 0 -776px
-      .partner-shumi
-        background: url("/static/images/partner_logos.png") no-repeat 0 -862px
-      .partner-lianhe
-        background: url("/static/images/partner_logos.png") no-repeat 0 -948px
-      .partner-longan
-        background: url("/static/images/partner_logos.png") no-repeat 0 -1034px
 
+        img
+          vertical-align: middle
+          margin-top: 20px
 
+.partner-container-about
+  width: 764px
+
+  .partner-logo
+    li
+      width: 190px
 
 .container-card-holder
   width: $content-width
@@ -499,6 +475,9 @@ a.hot-item-title-link
     em
       color: #999
 
+    p
+      font-size: 14px
+
     .money-highlight
       color: $color-sea-green
 
@@ -512,6 +491,66 @@ a.hot-item-title-link
 .invest-history-container
   border: 1px solid #e8e8e8
   padding-bottom: 0px
+
+.tops-container
+  border: 1px solid #e8e8e8
+  padding-bottom: 0px
+
+  .tabs
+    display: block !important
+
+  .tabs-nav
+    padding: 15px 0
+    overflow: hidden
+    border-bottom: 1px solid #dcdcdc
+    ul
+      li
+        float: left
+        margin-left: 20px
+        a
+          display: inline-block
+          height: 30px
+          line-height: 30px
+          padding: 0px 20px
+          font-size: 14px
+          +border-radius(5px)
+          &.active
+            background-color: red
+            color: #fff
+  .tabs-content
+    padding: 15px 15px 15px
+    .tab-content
+      display: none
+      &:first-child
+        display: block
+    table
+      width: 100%
+      tr
+        td
+          text-align: center
+          line-height: 30px
+          font-size: 14px
+          padding-bottom: 10px
+          .amount-sum
+            color: #ff9003
+            text-align: left
+
+          .order
+            background-image: url(/static/images/icon-public.png)
+            background-repeat: no-repeat
+            background-position: -465px -190px
+            width: 30px
+            height: 30px
+            color: #fff
+          .phone
+            padding-left: 0px
+            margin-left: 0px
+            text-align: left
+        &.tops-three
+          td
+            .order
+              background-position: -464px -153px
+
 
 .media-item
   padding: 5px 0
@@ -554,8 +593,51 @@ a.hot-item-title-link
 
   &:hover, &:active
     background: url("/static/images/next_active.png") no-repeat right center
-    color: $color-text-d3
+    color: #f86049
 
 .bottom-hr
   border: none
   border-top: 1px solid #ccc
+
+.high-bigger
+  margin-top: 20px
+  .span3
+    width: 306px
+    margin-left: 0
+    margin-right: 0
+  .span3-omega
+    width: 175px
+    float: right
+
+  span
+    float: left
+    width: 50px
+    height: 54px
+    margin-top: 5px
+    overflow: hidden
+    background: url("/static/images/icon-public.png") no-repeat
+    +transition(all .3s ease-in-out)
+
+  .icon-trust
+    background-position: -492px 0
+    &:hover
+      background-position: -492px -100px
+
+  .icon-authority
+    background-position: -724px 0
+    &:hover
+      background-position: -724px -100px
+  .icon-security
+    background-position: -647px 0
+    &:hover
+      background-position: -647px -100px
+  .icon-high-income
+    background-position: -566px 0
+    &:hover
+      background-position: -566px -100px
+  .high-bigger-text
+    float: left
+    margin-left: 20px
+    line-height: normal
+    h3
+      color: $color-text-d2
