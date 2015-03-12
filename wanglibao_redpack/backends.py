@@ -137,13 +137,13 @@ def exchange_redpack(token, device_type, user):
                 register_time = timezone.datetime(2015, 3, 13)
                 register_time = utc_transform(register_time).replace(tzinfo=pytz.utc)
                 if user.date_joined > register_time:
-                    record = RedPackRecord.objects.filter(user=user, id=obj['event_new_id']).first()
+                    record = RedPackRecord.objects.filter(user=user, redpack__event=obj['event_new_id']).first()
                     if record:
                         return {"ret_code":301695, "message":"您已参与过此活动"}
 
                     event_on = RedPackEvent.objects.filter(id=obj['event_new_id'], invalid=False, value=0).first()
                 else:
-                    record = RedPackRecord.objects.filter(user=user, id=obj['event_old_id']).first()
+                    record = RedPackRecord.objects.filter(user=user, redpack__event=obj['event_old_id']).first()
                     if record:
                         return {"ret_code":301695, "message":"您已参与过此活动"}
                     event_on = RedPackEvent.objects.filter(id=obj['event_old_id'], invalid=False, value=0).first()
