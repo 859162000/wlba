@@ -12,6 +12,7 @@ import json
 import logging
 import decimal
 from django.utils import timezone
+from django.db.models import Q
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
 from wanglibao_p2p.models import P2PRecord
 from marketing import  helper
@@ -137,8 +138,15 @@ def exchange_redpack(token, device_type, user):
                 register_time = timezone.datetime(2015, 3, 13)
                 register_time = utc_transform(register_time).replace(tzinfo=pytz.utc)
                 if user.date_joined > register_time:
+                    record = RedPackRecord.objects.filter(user=user, id=obj['event_new_id']).first()
+                    if record:
+                        return {"ret_code":301695, "message":"您已参与过此活动"}
+
                     event_on = RedPackEvent.objects.filter(id=obj['event_new_id'], invalid=False, value=0).first()
                 else:
+                    record = RedPackRecord.objects.filter(user=user, id=obj['event_old_id']).first()
+                    if record:
+                        return {"ret_code":301695, "message":"您已参与过此活动"}
                     event_on = RedPackEvent.objects.filter(id=obj['event_old_id'], invalid=False, value=0).first()
                 
                 if not event_on:
