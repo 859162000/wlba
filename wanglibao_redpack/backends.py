@@ -135,7 +135,7 @@ def exchange_redpack(token, device_type, user):
                     return {"ret_code":301694, "message":"活动错误"}
 
                 register_time = timezone.datetime(2015, 3, 13)
-                register_time = utc_transform(register_time)
+                register_time = utc_transform(register_time).replace(tzinfo=pytz.utc)
                 if user.date_joined > register_time:
                     event_on = RedPackEvent.objects.filter(id=obj['event_new_id'], invalid=False, value=0).first()
                 else:
