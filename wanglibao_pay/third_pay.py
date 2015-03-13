@@ -161,8 +161,10 @@ class YeePay:
             return {"ret_code":20073, 'message':'金额格式错误'}
 
         amount = util.fmt_two_amount(amount)
-        if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
-            return {"ret_code":20074, 'message':'金额格式错误，大于100元且为100倍数'}
+        #if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
+        if amount < 10 or len(str(amount)) > 20:
+            #return {"ret_code":20074, 'message':'金额格式错误，大于100元且为100倍数'}
+            return {"ret_code":20074, 'message':'充值金额需大于10元'}
         if amount > 20000:
             return {"ret_code":20073, 'message':'单笔充值不超过2万，单月不超过5万。如需充值更多金额可以去网站完成。'}
 
@@ -177,7 +179,8 @@ class YeePay:
 
         card_id = request.DATA.get("card_id", "")
         user = request.user
-        amount_sec = int(amount*100)
+        #amount_sec = int(amount*100)
+        amount_sec = long(amount*100)
         useragent = request.META.get("HTTP_USER_AGENT", "noagent").strip()
 
         try:
