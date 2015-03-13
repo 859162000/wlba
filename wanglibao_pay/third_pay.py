@@ -503,6 +503,8 @@ class KuaiPay:
         res_code = res_code.lower()
         if res_code == "00":
             return {"ret_code":0, "token":token}
+        elif res_code == "96":
+            return {"ret_code":1, "message":"支付网关服务异常"}
         else:
             return {"ret_code":1, "message":message}
 
