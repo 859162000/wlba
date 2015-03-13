@@ -35,3 +35,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=admin_send_message.js.map

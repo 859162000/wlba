@@ -51,3 +51,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=trust_detail.js.map

@@ -22,3 +22,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=userProfile.js.map

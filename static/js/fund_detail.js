@@ -14,3 +14,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=fund_detail.js.map

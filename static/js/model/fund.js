@@ -38,3 +38,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=fund.js.map

@@ -80,3 +80,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=help.js.map
