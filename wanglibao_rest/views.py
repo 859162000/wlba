@@ -461,10 +461,26 @@ class DepositGateAPIView(APIView):
 
     def post(self, request):
         rs = Misc.objects.filter(key="pay_gate").first()
-        if not rs or rs.value == "kuai":
+        try:
+            obj = json.loads(rs.value)
+        except:
             return Response({"ret_code":0, "gate":"kuai"})
-        else:
-            return Response({"ret_code":0, "gate":"yee"})
+
+        return Response({"ret_code":0, "data":obj})
+
+       # if "gate" in obj:
+       #     if obj['gate'] == "kuai":
+       #         if "notice" in obj:
+       #             return Response({"ret_code":0, "gate":"kuai", "notice":obj['notice']})
+       #         else:
+       #             return Response({"ret_code":0, "gate":"kuai", "notice":""})
+       #     else:
+       #         if "notice" in obj:
+       #             return Response({"ret_code":0, "gate":"yee", "notice":obj['notice']})
+       #         else:
+       #             return Response({"ret_code":0, "gate":"yee", "notice":""})
+       # else:
+       #     return Response({"ret_code":0, "gate":"kuai"})
 
 class TopsOfDayView(APIView):
     """

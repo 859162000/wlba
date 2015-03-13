@@ -1229,18 +1229,25 @@ class AddressListAPIView(APIView):
 
     def get(self, request):
         address_list = UserAddress.objects.filter(user=request.user).order_by('-id')
-        address_list = [{
-            'id': address.id,
-            'name': address.name,
-            'phone_number': address.phone_number,
-            'address': address.address,
-            'postcode': address.postcode,
-            'is_default': address.is_default,
-            'province': address.province,
-            'city': address.city,
-            'area': address.area
-        } for address in address_list]
-        return Response(address_list)
+        if address_list:
+            address_list = [{
+                'id': address.id,
+                'name': address.name,
+                'phone_number': address.phone_number,
+                'address': address.address,
+                'postcode': address.postcode,
+                'is_default': address.is_default,
+                'province': address.province,
+                'city': address.city,
+                'area': address.area
+            } for address in address_list]
+            return Response({
+                'ret_code': 0,
+                'message': 'ok',
+                'address': address_list
+            })
+        else:
+            return Response({'ret_code': 3000, 'message': u'没有收货地址'})
 
 
 class AddressAPIView(APIView):
@@ -1256,27 +1263,33 @@ class AddressAPIView(APIView):
         city = request.DATA.get('city', "").strip()
         area = request.DATA.get('area', "").strip()
         is_default = request.DATA.get('is_default', False)
+        is_default = True if is_default == 'true' else False
 
         if not address_name or not phone_number or not address_address:
             return Response({'ret_code': 3001, 'message': u'信息输入不完整'})
+        if len(phone_number) > 15:
+            return Response({'ret_code': 3004, 'message': u'联系电话不能超过15位'})
 
         if is_default:
             """ clear the exists is_default value """
             UserAddress.objects.filter(user=request.user).update(is_default=False)
 
         if address_id:
-            address = UserAddress.objects.get(id=address_id)
-            address.user = request.user
-            address.name = address_name
-            address.address = address_address
-            address.province = province
-            address.city = city
-            address.area = area
-            address.phone_number = phone_number
-            address.postcode = postcode
-            address.is_default = is_default
-            address.save()
-            return Response({'ret_code': 0, 'message': u'修改成功'})
+            try:
+                address = UserAddress.objects.get(id=address_id)
+                address.user = request.user
+                address.name = address_name
+                address.address = address_address
+                address.province = province
+                address.city = city
+                address.area = area
+                address.phone_number = phone_number
+                address.postcode = postcode
+                address.is_default = is_default
+                address.save()
+                return Response({'ret_code': 0, 'message': u'修改成功'})
+            except:
+                return Response({'ret_code': 3003, 'message': u'地址不存在'})
         else:
             address = UserAddress()
             address.user = request.user
@@ -1300,15 +1313,16 @@ class AddressDeleteAPIView(APIView):
 
         if not address_id:
             return Response({'ret_code': 3002, 'message': u'ID错误'})
-        address = UserAddress.objects.get(id=address_id)
-        if address:
+
+        try:
+            address = UserAddress.objects.get(id=address_id)
             address.delete()
             return Response({
                 'ret_code': 0,
                 'message': u'删除成功'
             })
-        else:
-            return Response({'ret_code': 3003, 'message': u"地址不存在"})
+        except:
+            return Response({'ret_code': 3003, 'message': u'地址不存在'})
 
 
 class AddressGetAPIView(APIView):
@@ -1318,22 +1332,29 @@ class AddressGetAPIView(APIView):
         if not address_id:
             return Response({'ret_code': 3002, 'message': u'ID错误'})
 
-        address = UserAddress.objects.get(id=address_id)
-        if not address:
+        try:
+            address = UserAddress.objects.get(id=address_id)
+            if address:
+                address = {
+                    'address_id': address.id,
+                    'name': address.name,
+                    'phone_number': address.phone_number,
+                    'address': address.address,
+                    'postcode': address.postcode,
+                    'is_default': address.is_default,
+                    'province': address.province,
+                    'city': address.city,
+                    'area': address.area
+                }
+                return Response({
+                    'ret_code': 0,
+                    'message': 'ok',
+                    'address': address
+                })
+            else:
+                return Response({'ret_code': 3000, 'message': u'没有收货地址'})
+        except:
             return Response({'ret_code': 3003, 'message': u'地址不存在'})
-        else:
-            address = {
-                'address_id': address.id,
-                'name': address.name,
-                'phone_number': address.phone_number,
-                'address': address.address,
-                'postcode': address.postcode,
-                'is_default': address.is_default,
-                'province': address.province,
-                'city': address.city,
-                'area': address.area
-            }
-        return Response(address)
 
 
 # class CjdaoApiView(APIView):
