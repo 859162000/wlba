@@ -653,7 +653,7 @@ class KuaiPay:
 
             if len(card_no) == 10:
                 dic['storable_no'] = card_no
-                dic['bank_id'] = bank.kuai_code
+                dic['bank_id'] = card.bank.kuai_code
                 dic['time'] = timezone.now().strftime("%Y%m%d%H%M%S")
 
                 data = self._sp_qpay_xml(dic)
