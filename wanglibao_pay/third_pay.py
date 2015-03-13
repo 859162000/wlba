@@ -727,6 +727,8 @@ class KuaiPay:
         res = self._request(data, self.PAY_URL)
         logger.error(res.content)
         if res.status_code != 200 or "errorCode" in res.content:
+            if "B.MGW.0120" in res.content:
+                return {"ret_code":201221, "message":"银行与银行卡不匹配"}
             return {"ret_code":20122, "message":"服务器异常"}
         result = self._handle_pay_result(res)
         logger.error(result)
