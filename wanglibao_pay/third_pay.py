@@ -357,7 +357,6 @@ class KuaiPay:
                     <externalRefNumber>%s</externalRefNumber>
                     <amount>%s</amount>
                     <pan>%s</pan>
-                    <bankId>%s</bankId>
                     <phoneNO>%s</phoneNO>
                     <cardHolderName>%s</cardHolderName>
                     <idType>0</idType>
@@ -365,7 +364,7 @@ class KuaiPay:
                 </GetDynNumContent>
             </MasMessage>
         """ % (self.MER_ID, dic['user_id'], dic['order_id'],
-                dic['amount'], dic['card_no'], dic['bank_id'], dic['phone'],
+                dic['amount'], dic['card_no'], dic['phone'],
                 dic['name'], dic['id_number']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
@@ -380,6 +379,7 @@ class KuaiPay:
                     <terminalId>00002012</terminalId>
                     <entryTime>%s</entryTime>
                     <cardNo>%s</cardNo>
+                    <bankId>%s</bankId>
                     <amount>%s</amount>
                     <externalRefNumber>%s</externalRefNumber>
                     <customerId>%s</customerId>
@@ -396,7 +396,7 @@ class KuaiPay:
                     </extMap>
                 </TxnMsgContent>
             </MasMessage>
-        """ % (self.MER_ID, dic['time'], dic['card_no'], dic['amount'], 
+        """ % (self.MER_ID, dic['time'], dic['card_no'], dic['bank_id'], dic['amount'], 
                 dic['order_id'], dic['user_id'], dic['name'], dic['id_number'],
                 dic['phone'], dic['vcode'], dic['token']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
@@ -413,6 +413,7 @@ class KuaiPay:
                     <tr3Url>%s</tr3Url>
                     <entryTime>%s</entryTime>
                     <storableCardNo>%s</storableCardNo>
+                    <bankId>%s</bankId>
                     <amount>%s</amount>
                     <externalRefNumber>%s</externalRefNumber>
                     <customerId>%s</customerId>
@@ -427,7 +428,7 @@ class KuaiPay:
                 </TxnMsgContent>
             </MasMessage>
         """ % (self.MER_ID, self.PAY_BACK_RETURN_URL, dic['time'],
-                dic['storable_no'], dic['amount'], dic['order_id'],
+                dic['storable_no'], dic['bank_id'], dic['amount'], dic['order_id'],
                 dic['user_id']))
         print(xml)
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
@@ -512,7 +513,8 @@ class KuaiPay:
             if "TxnMsgContent" in k:
                 tmc = k['TxnMsgContent']['value']
                 for x in tmc:
-                    if "amount" in x:amount = float(x['amount']['value']); continue
+                    #if "amount" in x:amount = float(x['amount']['value']); continue
+                    if "amount" in x:amount = util.fmt_two_amount(x['amount']['value']); continue
                     if "responseCode" in x: res_code = x['responseCode']['value']; continue
                     if "externalRefNumber" in x: order_id = x['externalRefNumber']['value']; continue
                     if "merchantId" in x: mer_id = x['merchantId']['value']; continue
@@ -530,8 +532,10 @@ class KuaiPay:
             return {"ret_code": 1, "message":"验证码不正确"}
         elif res_code == "c0":
             return {"ret_code": 2, "message":"请耐心等候充值完成"}
+        elif res_code == "og":
+            return {"ret_code": 3, "message":"充值金额太大"}
         else:
-            return {"ret_code": 3, "message":message}
+            return {"ret_code": 4, "message":message}
 
     def _handle_del_result(self, res):
         dic = self._result2dict(res.content)
@@ -649,13 +653,14 @@ class KuaiPay:
 
             if len(card_no) == 10:
                 dic['storable_no'] = card_no
+                dic['bank_id'] = bank.kuai_code
                 dic['time'] = timezone.now().strftime("%Y%m%d%H%M%S")
+
                 data = self._sp_qpay_xml(dic)
                 logger.error("second pay info")
                 logger.error(u"%s"%data)
                 url = self.PAY_URL
             else:
-                dic['bank_id'] = bank.kuai_code
                 data = self._sp_dynnum_xml(dic)
                 logger.error("first pay info")
                 logger.error(u"%s" % data)
@@ -710,7 +715,7 @@ class KuaiPay:
         dic = {"user_id":user.id, "order_id":order_id, "id_number":profile.id_number,
                 "phone":input_phone, "name":profile.name, "amount":pay_info.amount,
                 "time":pay_info.create_time.strftime("%Y%m%d%H%M%S"), "vcode":vcode,
-                "card_no":pay_info.card_no, "token":token}
+                "card_no":pay_info.card_no, "token":token, "bank_id":pay_info.bank.kuai_code}
         data = self._sp_bindpay_xml(dic)
         logger.error("#" * 50)
         logger.error(data)
