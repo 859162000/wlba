@@ -161,8 +161,10 @@ class YeePay:
             return {"ret_code":20073, 'message':'金额格式错误'}
 
         amount = util.fmt_two_amount(amount)
-        if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
-            return {"ret_code":20074, 'message':'金额格式错误，大于100元且为100倍数'}
+        #if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
+        if amount < 10 or len(str(amount)) > 20:
+            #return {"ret_code":20074, 'message':'金额格式错误，大于100元且为100倍数'}
+            return {"ret_code":20074, 'message':'充值金额需大于10元'}
         if amount > 20000:
             return {"ret_code":20073, 'message':'单笔充值不超过2万，单月不超过5万。如需充值更多金额可以去网站完成。'}
 
@@ -177,7 +179,8 @@ class YeePay:
 
         card_id = request.DATA.get("card_id", "")
         user = request.user
-        amount_sec = int(amount*100)
+        #amount_sec = int(amount*100)
+        amount_sec = long(amount*100)
         useragent = request.META.get("HTTP_USER_AGENT", "noagent").strip()
 
         try:
@@ -357,7 +360,6 @@ class KuaiPay:
                     <externalRefNumber>%s</externalRefNumber>
                     <amount>%s</amount>
                     <pan>%s</pan>
-                    <bankId>%s</bankId>
                     <phoneNO>%s</phoneNO>
                     <cardHolderName>%s</cardHolderName>
                     <idType>0</idType>
@@ -365,7 +367,7 @@ class KuaiPay:
                 </GetDynNumContent>
             </MasMessage>
         """ % (self.MER_ID, dic['user_id'], dic['order_id'],
-                dic['amount'], dic['card_no'], dic['bank_id'], dic['phone'],
+                dic['amount'], dic['card_no'], dic['phone'],
                 dic['name'], dic['id_number']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
@@ -380,6 +382,7 @@ class KuaiPay:
                     <terminalId>00002012</terminalId>
                     <entryTime>%s</entryTime>
                     <cardNo>%s</cardNo>
+                    <bankId>%s</bankId>
                     <amount>%s</amount>
                     <externalRefNumber>%s</externalRefNumber>
                     <customerId>%s</customerId>
@@ -396,7 +399,7 @@ class KuaiPay:
                     </extMap>
                 </TxnMsgContent>
             </MasMessage>
-        """ % (self.MER_ID, dic['time'], dic['card_no'], dic['amount'], 
+        """ % (self.MER_ID, dic['time'], dic['card_no'], dic['bank_id'], dic['amount'], 
                 dic['order_id'], dic['user_id'], dic['name'], dic['id_number'],
                 dic['phone'], dic['vcode'], dic['token']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
@@ -413,6 +416,7 @@ class KuaiPay:
                     <tr3Url>%s</tr3Url>
                     <entryTime>%s</entryTime>
                     <storableCardNo>%s</storableCardNo>
+                    <bankId>%s</bankId>
                     <amount>%s</amount>
                     <externalRefNumber>%s</externalRefNumber>
                     <customerId>%s</customerId>
@@ -427,9 +431,8 @@ class KuaiPay:
                 </TxnMsgContent>
             </MasMessage>
         """ % (self.MER_ID, self.PAY_BACK_RETURN_URL, dic['time'],
-                dic['storable_no'], dic['amount'], dic['order_id'],
+                dic['storable_no'], dic['bank_id'], dic['amount'], dic['order_id'],
                 dic['user_id']))
-        print(xml)
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
     def _request(self, data, url):
@@ -502,6 +505,8 @@ class KuaiPay:
         res_code = res_code.lower()
         if res_code == "00":
             return {"ret_code":0, "token":token}
+        elif res_code == "96":
+            return {"ret_code":1, "message":"支付网关服务异常"}
         else:
             return {"ret_code":1, "message":message}
 
@@ -512,7 +517,8 @@ class KuaiPay:
             if "TxnMsgContent" in k:
                 tmc = k['TxnMsgContent']['value']
                 for x in tmc:
-                    if "amount" in x:amount = float(x['amount']['value']); continue
+                    #if "amount" in x:amount = float(x['amount']['value']); continue
+                    if "amount" in x:amount = util.fmt_two_amount(x['amount']['value']); continue
                     if "responseCode" in x: res_code = x['responseCode']['value']; continue
                     if "externalRefNumber" in x: order_id = x['externalRefNumber']['value']; continue
                     if "merchantId" in x: mer_id = x['merchantId']['value']; continue
@@ -530,8 +536,10 @@ class KuaiPay:
             return {"ret_code": 1, "message":"验证码不正确"}
         elif res_code == "c0":
             return {"ret_code": 2, "message":"请耐心等候充值完成"}
+        elif res_code == "og":
+            return {"ret_code": 3, "message":"充值金额太大"}
         else:
-            return {"ret_code": 3, "message":message}
+            return {"ret_code": 4, "message":message}
 
     def _handle_del_result(self, res):
         dic = self._result2dict(res.content)
@@ -562,6 +570,8 @@ class KuaiPay:
 
         data = self._sp_delbind_xml(dic)
         res = self._request(data, self.DEL_URL)
+        logger.error(data)
+        logger.error(res.content)
 
         if res.status_code != 200 or "errorCode" in res.content:
             return {"ret_code":20101, "message":"解除绑定失败"}
@@ -649,13 +659,14 @@ class KuaiPay:
 
             if len(card_no) == 10:
                 dic['storable_no'] = card_no
+                dic['bank_id'] = card.bank.kuai_code
                 dic['time'] = timezone.now().strftime("%Y%m%d%H%M%S")
+
                 data = self._sp_qpay_xml(dic)
                 logger.error("second pay info")
                 logger.error(u"%s"%data)
                 url = self.PAY_URL
             else:
-                dic['bank_id'] = bank.kuai_code
                 data = self._sp_dynnum_xml(dic)
                 logger.error("first pay info")
                 logger.error(u"%s" % data)
@@ -710,13 +721,15 @@ class KuaiPay:
         dic = {"user_id":user.id, "order_id":order_id, "id_number":profile.id_number,
                 "phone":input_phone, "name":profile.name, "amount":pay_info.amount,
                 "time":pay_info.create_time.strftime("%Y%m%d%H%M%S"), "vcode":vcode,
-                "card_no":pay_info.card_no, "token":token}
+                "card_no":pay_info.card_no, "token":token, "bank_id":pay_info.bank.kuai_code}
         data = self._sp_bindpay_xml(dic)
         logger.error("#" * 50)
         logger.error(data)
         res = self._request(data, self.PAY_URL)
         logger.error(res.content)
         if res.status_code != 200 or "errorCode" in res.content:
+            if "B.MGW.0120" in res.content:
+                return {"ret_code":201221, "message":"银行与银行卡不匹配"}
             return {"ret_code":20122, "message":"服务器异常"}
         result = self._handle_pay_result(res)
         logger.error(result)
@@ -865,6 +878,17 @@ def del_bank_card(request):
     card =  Card.objects.filter(id=card_id, user=request.user).first()
     if not card:
         return {"ret_code":20042, "message":"该银行卡不存在"}
+    #删除快捷支付信息
+    storable_no = card.no[:6] + card.no[-4:]
+    pay = KuaiPay()
+    dic = {"user_id":request.user.id, "bank_id":card.bank.kuai_code,
+            "storable_no":storable_no}
+
+    data = pay._sp_delbind_xml(dic)
+    res = pay._request(data, pay.DEL_URL)
+    logger.error("#api delete card")
+    logger.error(res.content)
+
     card.delete()
     return {"ret_code":0, "message":"删除成功"}
 
