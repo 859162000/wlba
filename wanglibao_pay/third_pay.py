@@ -571,6 +571,8 @@ class KuaiPay:
 
         data = self._sp_delbind_xml(dic)
         res = self._request(data, self.DEL_URL)
+        logger.error(data)
+        logger.error(res.content)
 
         if res.status_code != 200 or "errorCode" in res.content:
             return {"ret_code":20101, "message":"解除绑定失败"}
