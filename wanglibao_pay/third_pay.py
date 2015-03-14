@@ -433,7 +433,6 @@ class KuaiPay:
         """ % (self.MER_ID, self.PAY_BACK_RETURN_URL, dic['time'],
                 dic['storable_no'], dic['bank_id'], dic['amount'], dic['order_id'],
                 dic['user_id']))
-        print(xml)
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
     def _request(self, data, url):
@@ -881,11 +880,14 @@ def del_bank_card(request):
         return {"ret_code":20042, "message":"该银行卡不存在"}
     #删除快捷支付信息
     storable_no = card.no[:6] + card.no[-4:]
-    #request.DATA = {"bank_id":card.bank.kuai_code, "storable_no":storable_no}
-    request.DATA.bank_id = card.bank.kuai_code
-    request.DATA.bank_id = storable_no
     pay = KuaiPay()
-    pay.delete_bind(request)
+    dic = {"user_id":request.user.id, "bank_id":card.bank.kuai_code,
+            "storable_no":storable_no}
+
+    data = pay._sp_delbind_xml(dic)
+    res = pay._request(data, pay.DEL_URL)
+    logger.error("#api delete card")
+    logger.error(res.content)
 
     card.delete()
     return {"ret_code":0, "message":"删除成功"}
