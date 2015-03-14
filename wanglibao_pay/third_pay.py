@@ -879,7 +879,9 @@ def del_bank_card(request):
         return {"ret_code":20042, "message":"该银行卡不存在"}
     #删除快捷支付信息
     storable_no = card.no[:6] + card.no[-4:]
-    request.DATA = {"bank_id":card.bank.kuai_code, "storable_no":storable_no}
+    #request.DATA = {"bank_id":card.bank.kuai_code, "storable_no":storable_no}
+    request.DATA.bank_id = card.bank.kuai_code
+    request.DATA.bank_id = storable_no
     pay = KuaiPay()
     pay.delete_bind(request)
 
