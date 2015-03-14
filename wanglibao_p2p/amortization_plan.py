@@ -208,7 +208,7 @@ class DailyInterest(AmortizationPlan):
 
         result = []
 
-        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period)))
+        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0), interest_begin_date + timedelta(months=period)))
 
         return {
             "terms": result,
@@ -216,16 +216,17 @@ class DailyInterest(AmortizationPlan):
         }
 
 class DailyInterestInAdvance(AmortizationPlan):
-    name = u'按日计息认购日开始计息'
-
+    name = u'按日计息一次性还本付息T+N'
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None, **kwargs):
         amount = Decimal(amount)
 
-        subscription_date = kwargs.get('subscription_date', interest_begin_date)
+        #subscription_date = kwargs.get('subscription_date', interest_begin_date)
 
         daily_rate = get_daily_interest(year_rate)
         daily_interest = amount * daily_rate
+
+        #period = period + (interest_begin_date - subscription_date).days
 
         total_interest = (daily_interest * period).quantize(Decimal('.01'), rounding=ROUND_DOWN)
 
@@ -233,7 +234,7 @@ class DailyInterestInAdvance(AmortizationPlan):
 
         result = []
 
-        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period)))
+        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0), interest_begin_date + timedelta(days=period)))
 
         return {
             "terms": result,
@@ -292,6 +293,7 @@ def get_amortization_plan(amortization_type):
                  MonthlyInterest,
                  DailyInterest,
                  DailyInterestMonthly,
+                 DailyInterestInAdvance,
                  InterestFirstThenPrincipal,
                  DisposablePayOff,
                  QuarterlyInterest):

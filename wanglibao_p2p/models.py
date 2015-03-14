@@ -72,9 +72,10 @@ class P2PProduct(ProductBase):
         (u'等额本息', u'等额本息'),
         (u'先息后本', u'先息后本'),
         (u'按月付息', u'按月付息到期还本'),
+        (u'到期还本付息', u'到期还本付息'),
         (u'按日计息', u'按日计息到期还本付息'),
         (u'按日计息按月付息', u'按日计息按月付息'),
-        (u'到期还本付息', u'到期还本付息'),
+        (u'按日计息一次性还本付息T+N', u'按日计息一次性还本付息T+N'),
         (u'按季度付息', u'按季度付息'),
     )
     BANK_METHOD_CHOICES = (
@@ -706,3 +707,24 @@ class P2PProductContract(models.Model):
     bill_amount = models.CharField(verbose_name=u'(票据)票面金额', max_length=32, blank=True)
     created_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间', auto_now_add=True)
     bill_due_date = models.DateField(blank=True, null=True, verbose_name=u'(票据)到期日')
+
+
+class InterestInAdvance(models.Model):
+    class Meta:
+        ordering = ['-id']
+        verbose_name = u'满标前计息'
+        verbose_name_plural = u'满标前计息'
+
+    def __unicode__(self):
+        return u'%s' % self.id
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(P2PProduct, verbose_name=u'产品', on_delete=models.SET_NULL, null=True)
+    amount = models.FloatField(default=0, verbose_name=u'购买金额', blank=False)
+    interest = models.FloatField(default=0, verbose_name=u'提前计息利息', blank=False)
+    days = models.IntegerField(verbose_name=u'提前计息天数', help_text=u'越大越优先', blank=False)
+    subscription_date = models.DateTimeField(default=timezone.now, verbose_name=u'申购时间')
+    product_soldout_date = models.DateTimeField(default=timezone.now, verbose_name=u'满标已打款时间')
+    product_year_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
+    create_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间', auto_now_add=True)
+

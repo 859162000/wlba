@@ -8,7 +8,7 @@ from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning,\
-    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision
+    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
@@ -379,6 +379,11 @@ class InterestPrecisionAdmin(admin.ModelAdmin):
             return Decimal(0)
         return instance.interest_precision_balance
 
+
+class InterestInAdvanceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'product', 'user', 'interest')
+
+
 class ProductInterestPrecisionAdmin(admin.ModelAdmin):
     list_display = ('id', 'product_name', 'principal', 'interest_receivable',
                     'interest_actual', 'balance',)
@@ -408,6 +413,7 @@ admin.site.register(ProductAmortization, ProductAmortizationAdmin)
 admin.site.register(Earning, EarningAdmin)
 admin.site.register(P2PProductContract, P2PProductContractAdmin)
 admin.site.register(InterestPrecisionBalance, InterestPrecisionAdmin)
+admin.site.register(InterestInAdvance, InterestInAdvanceAdmin)
 admin.site.register(ProductInterestPrecision, ProductInterestPrecisionAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
