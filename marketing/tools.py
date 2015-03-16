@@ -87,6 +87,11 @@ def decide_first(user_id, amount):
         start_time = timezone.datetime(2014, 12, 18)
         if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
             rs.reward_user(u'一个月风行会员')
+    elif channel == helper.Channel.PPTV:
+        #PPTV
+        start_time = timezone.datetime(2015, 3, 17)
+        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
+            rs.reward_user(u'一个月PPTV会员')
     elif channel == helper.Channel.JIUXIAN:
         #酒仙网
         if amount >= 500:
@@ -138,6 +143,7 @@ def register_ok(user_id, device_type):
     #注册红包
     redpack_backends.give_register_redpack(user, device_type)
 
+#实名认证
 @app.task
 def idvalidate_ok(user_id):
     user = User.objects.filter(id=user_id).first()
@@ -147,6 +153,16 @@ def idvalidate_ok(user_id):
     if channel == helper.Channel.KUAIPAN:
         rs = RewardStrategy(user)
         rs.reward_user(u'50G快盘容量')
+
+    if channel == helper.Channel.IQIYI:
+        rs = RewardStrategy(user)
+        rs.reward_user(u'7天爱奇艺会员')
+        #发短信
+
+    if channel == helper.Channel.PPTV:
+        rs = RewardStrategy(user)
+        rs.reward_user(u'一个月PPTV会员')
+        #发短信
 
 #充值成功
 def despoit_ok(pay_info):

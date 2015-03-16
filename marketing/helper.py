@@ -19,6 +19,8 @@ class Channel():
     FENGXING = "fengxing"
     JIUXIAN = "jiuxian"
     SOUGOUJINGJIA = "sougou"
+    IQIYI = "iqiyi"
+    PPTV = "pptv"
 
 
 
@@ -35,6 +37,9 @@ class RewardStrategy():
             u'100G快盘容量': self._send_hundred_kuaipan,
             u'七天风行会员': self._send_sevenday_fengxing,
             u'一个月风行会员': self._send_month_fengxing,
+            u'7天爱奇艺会员': self._send_sevenday_iqiyi,
+            u'一个月爱奇艺会员': self._send_month_iqiyi,
+            u'一个月PPTV会员': self._send_month_pptv,
         }
 
     def reward_user(self, type):
@@ -120,6 +125,21 @@ class RewardStrategy():
         """ 首次理财,风行会员赠送一个月激活码
         """
         title, content = messages.msg_first_fengxing(self.reward.content)
+        self._send_message_template(title, content)
+
+    def _send_sevenday_iqiyi(self):
+        """ 实名认证送7天爱奇艺会员 """
+        title, content = messages.msg_sevenday_iqiyi(self.reward.content)
+        self._send_message_template(title, content)
+
+    def _send_month_iqiyi(self):
+        """ 首次投资送一个月爱奇艺会员 """
+        title, content = messages.msg_month_iqiyi(self.reward.content)
+        self._send_message_template(title, content)
+
+    def _send_month_pptv(self):
+        """ 实名认证送一个月PPTV会员 """
+        title, content = messages.msg_month_pptv(self.reward.content)
         self._send_message_template(title, content)
 
     def _send_message_template(self, title, content):
