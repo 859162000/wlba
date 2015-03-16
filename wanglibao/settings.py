@@ -476,7 +476,7 @@ if ENV == ENV_PRODUCTION:
     KUAI_DEL_URL = "https://mas.99bill.com:443/cnp/pci_del"
     KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
     KUAI_PEM_PATH = os.path.join(BASE_DIR, "81231006011001390.pem")
-    KUAI_MER_ID = "81231006011001390"
+    KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
 
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
@@ -501,7 +501,7 @@ elif ENV == ENV_PREPRODUCTION:
     KUAI_DEL_URL = "https://mas.99bill.com:443/cnp/pci_del"
     KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
     KUAI_PEM_PATH = os.path.join(BASE_DIR, "81231006011001390.pem")
-    KUAI_MER_ID = "81231006011001390"
+    KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
 
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
