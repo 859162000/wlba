@@ -455,6 +455,8 @@ class KuaiPay:
         data = self._sp_bind_xml(request.user.id)
         res = self._request(data, self.QUERY_URL)
 
+        logger.error(res.content)
+
         if res.status_code != 200:
             return {"ret_code":-1, "message":"fetch error"}
         if "errorCode" in res.content:
