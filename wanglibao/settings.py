@@ -471,6 +471,14 @@ if ENV == ENV_PRODUCTION:
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
 
+    KUAI_PAY_URL = "https://www.99bill.com/cnp/purchase"
+    KUAI_QUERY_URL = "https://www.99bill.com/cnp/pci_query"
+    KUAI_DEL_URL = "https://www.99bill.com/cnp/pci_del"
+    KUAI_DYNNUM_URL = "https://www.99bill.com/cnp/getDynNum"
+    KUAI_PEM_PATH = os.path.join(BASE_DIR, "81231006011001390.pem")
+    KUAI_MER_ID = "1002418281901"
+    KUAI_MER_PASS = "DBLRDESEZ9EB2FIB"
+
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 elif ENV == ENV_PREPRODUCTION:
@@ -487,6 +495,14 @@ elif ENV == ENV_PREPRODUCTION:
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
+
+    KUAI_PAY_URL = "https://www.99bill.com/cnp/purchase"
+    KUAI_QUERY_URL = "https://www.99bill.com/cnp/pci_query"
+    KUAI_DEL_URL = "https://www.99bill.com/cnp/pci_del"
+    KUAI_DYNNUM_URL = "https://www.99bill.com/cnp/getDynNum"
+    KUAI_PEM_PATH = os.path.join(BASE_DIR, "81231006011001390.pem")
+    KUAI_MER_ID = "1002418281901"
+    KUAI_MER_PASS = "DBLRDESEZ9EB2FIB"
 
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
