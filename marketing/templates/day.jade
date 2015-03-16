@@ -131,52 +131,27 @@ html
                |每天的投标累计金额
                b.red ≥6万元
                | 的用户排行榜，次日清零
-              ul.day-user
+              ul.day-user#day-user
                 b.banyuan
                 li.day-user-hight
                   span 榜单
                   span 用户
                   span 累计金额
-                li.day-user-hight
-                  span.day-user-hight2 1
-                  span 139 ＸＸＸＸ 2453
-                  span 25,000元
-                li.day-user-hight
-                  span.day-user-hight2 2
-                  span 139 ＸＸＸＸ 2453
-                  span 25,000元
-                li.day-user-hight
-                  span.day-user-hight2 3
-                  span 139 ＸＸＸＸ 2453
-                  span 25,000元
-                li
-                  span 4
-                  span 139 ＸＸＸＸ 2453
-                  span 25,000元
-                li
-                  span 5
-                  span 139 ＸＸＸＸ 2453
-                  span 25,000元
-                li
-                  span 6
-                  span —— ——
-                  span —— ——
-                li
-                  span 7
-                  span —— ——
-                  span —— ——
-                li
-                  span 8
-                  span —— ——
-                  span —— ——
-                li
-                  span 9
-                  span —— ——
-                  span —— ——
-                li
-                  span 10
-                  span —— ——
-                  span —— ——
+
+                if top_ten
+                  for day in top_ten
+                    if forloop.counter < 4
+                      li.day-user-hight
+                        span.day-user-hight2 {{ forloop.counter }}
+                        span {{day.phone | safe_phone_new }}
+                        span {{day.amount_sum | money_format_int}}元
+                    else
+                      li
+                        span {{ forloop.counter }}
+                        span {{day.phone | safe_phone_new }}
+                        span {{day.amount_sum | money_format_int}}元
+
+
               .day-jiang
                 .p
                   p.day-hong 奖励每天投标累计最高的
@@ -225,6 +200,7 @@ html
           include include/login_form
           include include/register_form
 
+    script(src="/static/js/lib/jquery.min.js")
     script.
         var xz=document.getElementById("xiaz");
          var v = new Date().getTime()
@@ -246,6 +222,16 @@ html
             }
         };
 
+        for(var i={{top_len}}+1;i<=10;i++){
+           if(i<=3){
+             var str="<li class='day-user-hight'><span class='day-user-hight2'>"+i+"</span><span> —— </span><span> —— </span></li>";
+           } else {
+             var str="<li><span>"+i+"</span><span> —— </span><span> —— </span></li>";
+           }
+
+           $('#day-user').append(str);
+        }
+
     script.
-      //var v = new Date().getTime()
+      var v = new Date().getTime()
       require(['/static/js/hover.js','/static/js/login_modal.js?v='+v])
