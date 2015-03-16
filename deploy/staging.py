@@ -18,9 +18,15 @@ env.environment = "ENV_STAGING"
 
 who = env.get("who", "")
 
-workers = {"lizhenjing":8051, "hetao":8052, "lili":8053,
-            "wangruyue":8054, "qifeifei":8055, "zhanghe":8056,
-            "limengting":8057, "wangxiaoqing":8058, "jinlong":8059}
+workers = {"lizhenjing":{"app":8051, "mysql":33051}, 
+            "hetao":{"app":8052, "mysql":33052}, 
+            "lili":{"app":8053, "mysql":33053},
+            "wangruyue":{"app":8054, "mysql":33054}, 
+            "qifeifei":{"app":8055, "mysql":33055}, 
+            "zhanghe":{"app":8056, "mysql":33056},
+            "limengting":{"app":8057, "mysql":33057}, 
+            "wangxiaoqing":{"app":8058, "mysql":33058}, 
+            "jinlong":{"app":8059, "mysql":33059}}
 
 @roles("staging")
 def depoly_staging():
@@ -64,7 +70,6 @@ def depoly_staging():
             put(StringIO(json_env), 'env.json')
     rs = sudo("docker ps -a")
     if who not in rs:
-        #sudo("docker run -d -p %s:8056 --name %s -v /home/jinlong/docker_image/%s:/root/wanglibao wanglibao /bin/sh -c '/root/start.sh;supervisord -n'" % (workers[who], who, who))
-        sudo("docker run -d -p %s:8056 --name %s -v /home/jinlong/docker_image/%s:/root/wanglibao  -v /home/jinlong/docker_image/%s/log:/var/log/wanglibao wanglibao /bin/sh -c '/root/start.sh;supervisord -n'" % (workers[who], who, who, who))
+        sudo("docker run -d -p %s:8056 -p %s:3306 --name %s -v /home/jinlong/docker_image/%s:/root/wanglibao  -v /home/jinlong/docker_image/%s/log:/var/log/wanglibao wanglibao /bin/sh -c '/root/start.sh;supervisord -n'" % (workers[who]["app"], workers[who]["mysql"], who, who, who))
     else:
         sudo("docker restart %s" % who)
