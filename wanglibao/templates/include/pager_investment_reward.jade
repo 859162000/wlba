@@ -1,0 +1,71 @@
+- load formatters
+
+.pager
+  ul
+    - var my_color = "red"
+    if data.has_previous
+      li.pager-prev
+        a.pager-anchor(href='{{uri}}?day={{day}}&redpack={{redpack}}&rule={{rule}}&page={{data.previous_page_number}}') <
+    else
+      li.pager-prev.disabled
+        a.pager-anchor(href='javascript:void(0)') <
+
+    if data.paginator.num_pages <= 10
+      num_pages = data.paginator.num_pages + 1
+      - for index in 1|get_range:num_pages
+        if data.number == index
+          li.pager-page-number.active
+            // a.pager-anchor(href='{{uri}}?day={{day}}&redpack={{redpack}}&rule={{rule}}&page={{index}}', style="color:red") {{index}}
+            a.pager-anchor(href='javascript:void(0)', style="color:{{my_color}}") {{index}}
+        else
+          li.pager-page-number
+            a.pager-anchor(href='{{uri}}?day={{day}}&redpack={{redpack}}&rule={{rule}}&page={{index}}') {{index}}
+    else
+      if data.number == 1
+        li.pager-page-number.active
+          // a.pager-anchor(href='{{uri}}?day={{day}}&redpack={{redpack}}&rule={{rule}}&page=1', style="color:red") 1
+          a.pager-anchor(href='javascript:void(0)', style="color:{{my_color}}") 1
+      else
+        li.pager-page-number
+          a.pager-anchor(href='{{uri}}?day={{day}}&redpack={{redpack}}&rule={{rule}}&page=1') 1
+
+      if data.number >= 5
+        span ...
+
+      number_minus = data.number - 2
+      number_add = data.number + 3
+      if number_minus < 2
+        number_minus = 2
+        number_add = number_add + 1
+      if number_add > data.paginator.num_pages
+        number_add = data.paginator.num_pages
+      if data.number == data.paginator.num_pages
+        number_minus = number_minus - 1
+
+      - for index in number_minus|get_range:number_add
+        if data.number == index
+          li.pager-page-number.active
+            // a.pager-anchor(href='{{uri}}?day={{day}}&redpack={{redpack}}&rule={{rule}}&page={{index}}', style="color:red") {{index}}
+            a.pager-anchor(href='javascript:void(0)', style="color:{{my_color}}") {{index}}
+        else
+          li.pager-page-number
+            a.pager-anchor(href='{{uri}}?day={{day}}&redpack={{redpack}}&rule={{rule}}&page={{index}}') {{index}}
+
+      ellipsis = data.paginator.num_pages - data.number
+      if ellipsis >= 4
+        span ...
+
+      if data.number == data.paginator.num_pages
+        li.pager-page-number.active
+          // a.pager-anchor(href='{{uri}}?day={{day}}&redpack={{redpack}}&rule={{rule}}&page={{data.paginator.num_pages}}', style="color:red") {{data.paginator.num_pages}}
+          a.pager-anchor(href='javascript:void(0)', style="color:{{my_color}}") {{data.paginator.num_pages}}
+      else
+        li.pager-page-number
+          a.pager-anchor(href='{{uri}}?day={{day}}&redpack={{redpack}}&rule={{rule}}&page={{data.paginator.num_pages}}') {{data.paginator.num_pages}}
+
+    if data.has_next
+      li.pager-next
+        a.pager-anchor(href='{{uri}}?day={{day}}&redpack={{redpack}}&rule={{rule}}&page={{data.next_page_number}}') >
+    else
+      li.pager-next.disabled
+        a.pager-anchor(href='javascript:void(0)') >

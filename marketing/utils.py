@@ -4,6 +4,7 @@ import pytz
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator, PageNotAnInteger
 from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels
 import logging
 
@@ -94,3 +95,24 @@ def local_to_utc(source_date, source_time='min'):
     # convert to utc time
     new = time_zone.localize(datetime.combine(source_date, source_time))
     return new.astimezone(pytz.utc)
+
+
+def paginator_factory(obj, page=1, limit=100):
+    """ the page paginator generator
+
+    Args:
+        obj: the QuerySet of the query result
+        page: the page number to response
+        limit: the records number of this page
+
+    return the instance of paginator
+    """
+    paginator = Paginator(obj, limit)
+    try:
+        ins = paginator.page(page)
+    except PageNotAnInteger:
+        ins = paginator.page(1)
+    except Exception:
+        ins = paginator.page(paginator.num_pages)
+
+    return ins

@@ -479,6 +479,7 @@ if ENV == ENV_PRODUCTION:
     KUAI_PEM_PATH = os.path.join(BASE_DIR, "81231006011001390.pem")
     KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
+    KUAI_TERM_ID = "00004559"
 
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
@@ -504,6 +505,7 @@ elif ENV == ENV_PREPRODUCTION:
     KUAI_PEM_PATH = os.path.join(BASE_DIR, "81231006011001390.pem")
     KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
+    KUAI_TERM_ID = "00004559"
 
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
@@ -528,6 +530,7 @@ else:
     KUAI_PEM_PATH = os.path.join(BASE_DIR, "10411004511201290.pem")
     KUAI_MER_ID = "104110045112012"
     KUAI_MER_PASS = "vpos123"
+    KUAI_TERM_ID = "00002012"
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
