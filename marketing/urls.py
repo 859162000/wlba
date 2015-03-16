@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate
-
+from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = patterns(
@@ -38,4 +38,8 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^introduced_by/$', IntroducedAwardTemplate.as_view(template_name="introduced_by.jade")),
+    url(r'^investment_reward/$', InvestmentRewardView.as_view(template_name="investment_reward.jade")),
+    url(r'^investment/$', Investment.as_view(), name='day'),
+    url(r'^investment_history/$', InvestmentHistory.as_view(), name='day_history'),
 )
+
