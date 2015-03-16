@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.utils import timezone
 
 from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
-
+from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
     Activity, ActivityRule, Reward, RewardRecord, ClientData, Channels
 from marketing.views import GennaeratorCode
@@ -159,4 +159,4 @@ admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view
 admin.site.register_view('statistics/aggregate', view=AggregateView.as_view(), name=u'累计购买金额统计单')
 
 admin.site.register_view('statistics/introduced_by', view=IntroducedAwardTemplate.as_view(), name=u'邀请收益统计')
-
+admin.site.register_view('statistics/investment_reward', view=InvestmentRewardView.as_view(), name=u'打榜统计发红包')
