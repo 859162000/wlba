@@ -10,6 +10,38 @@ from marketing.utils import local_to_utc, paginator_factory
 from tops import Top
 
 
+class Investment(TemplateView):
+    """ 实时活动打榜页面"""
+    template_name = 'day.jade'
+
+    def get_context_data(self, **kwargs):
+        day_tops = _get_top_records()
+        return {
+            "top_ten": day_tops,
+            "top_len": len(day_tops)
+        }
+
+
+class InvestmentHistory(TemplateView):
+    """ 查询历史榜单 """
+
+    template_name = "day_history.jade"
+
+    def get_context_data(self, **kwargs):
+        day = self.request.GET.get('day')
+        day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
+        return {
+            "tops": day_tops
+        }
+
+
+def _get_top_records(day=None):
+    if day is None:
+        day = datetime.now()
+    top = Top(limit=10)
+    return top.day_tops_activate(day)
+
+
 class InvestmentRewardView(TemplateView):
     """ 日累计投资打榜活取奖励
     """
@@ -172,3 +204,4 @@ class InvestmentRewardView(TemplateView):
             "message": message,
             "day": day if isinstance(day, str) else day.date().__str__()
         })
+

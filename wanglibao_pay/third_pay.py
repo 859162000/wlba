@@ -315,6 +315,7 @@ class KuaiPay:
         self.DEL_URL = settings.KUAI_DEL_URL
         self.DYNNUM_URL = settings.KUAI_DYNNUM_URL
         self.PAY_BACK_RETURN_URL = settings.KUAI_PAY_BACK_RETURN_URL
+        self.TERM_ID = settings.KUAI_TERM_ID
 
         self.headers = {"User-Agent":"wanglibao for 99bill client by lzj",
                         "Content-Type":"application/x-www-form-urlencoded"}
@@ -379,7 +380,7 @@ class KuaiPay:
                     <interactiveStatus>TR1</interactiveStatus>
                     <txnType>PUR</txnType>
                     <merchantId>%s</merchantId>
-                    <terminalId>00002012</terminalId>
+                    <terminalId>%s</terminalId>
                     <entryTime>%s</entryTime>
                     <cardNo>%s</cardNo>
                     <bankId>%s</bankId>
@@ -399,7 +400,7 @@ class KuaiPay:
                     </extMap>
                 </TxnMsgContent>
             </MasMessage>
-        """ % (self.MER_ID, dic['time'], dic['card_no'], dic['bank_id'], dic['amount'], 
+        """ % (self.MER_ID, self.TERM_ID, dic['time'], dic['card_no'], dic['bank_id'], dic['amount'], 
                 dic['order_id'], dic['user_id'], dic['name'], dic['id_number'],
                 dic['phone'], dic['vcode'], dic['token']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
@@ -412,7 +413,7 @@ class KuaiPay:
                     <interactiveStatus>TR1</interactiveStatus>
                     <txnType>PUR</txnType>
                     <merchantId>%s</merchantId>
-                    <terminalId>00002012</terminalId>
+                    <terminalId>%s</terminalId>
                     <tr3Url>%s</tr3Url>
                     <entryTime>%s</entryTime>
                     <storableCardNo>%s</storableCardNo>
@@ -430,7 +431,7 @@ class KuaiPay:
                     </extMap>
                 </TxnMsgContent>
             </MasMessage>
-        """ % (self.MER_ID, self.PAY_BACK_RETURN_URL, dic['time'],
+        """ % (self.MER_ID, self.TERM_ID, self.PAY_BACK_RETURN_URL, dic['time'],
                 dic['storable_no'], dic['bank_id'], dic['amount'], dic['order_id'],
                 dic['user_id']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
@@ -454,6 +455,8 @@ class KuaiPay:
     def query_bind(self, request):
         data = self._sp_bind_xml(request.user.id)
         res = self._request(data, self.QUERY_URL)
+
+        logger.error(res.content)
 
         if res.status_code != 200:
             return {"ret_code":-1, "message":"fetch error"}
