@@ -42,6 +42,10 @@ GIFT_TYPE = (
     ('income', u'收益'),
     ('phonefare', u'手机话费')
 )
+SEND_TYPE = (
+    ('sys_auto', u'系统实时发放'),
+    ('manual_operation', u'人工手动发放')
+)
 
 
 class Activity(models.Model):
@@ -75,6 +79,8 @@ class ActivityRule(models.Model):
     rule_name = models.CharField(u'规则名称', max_length=128)
     rule_description = models.TextField(u'规则描述', null=True, blank=True)
     gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE)
+    both_share = models.BooleanField(u'参与邀请共享赠送礼品', default=False, help_text=u'勾选此项则，则用户在满足规则的条件内邀请别人，\
+                                    双方共享选定“赠送类型”中的礼品')
     trigger_node = models.CharField(u'触发节点', max_length=20, choices=TRIGGER_NODE)
     redpack = models.ForeignKey(RedPackEvent, verbose_name=u'红包类型', blank=True)
     reward = models.CharField(u'奖品类型名称', max_length=60, blank=True, help_text=u'类型名称一定要和奖品中的类型保持一致')
@@ -83,6 +89,7 @@ class ActivityRule(models.Model):
     max_amount = models.IntegerField(u'最大金额（投资或充值）', default=0)
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True, help_text=u'站内信模板不填写则触发该规则时不发站内信，如果有动态变量，用“%s”代替')
     sms_template = models.TextField(u'短信信模板（不填则不发）', blank=True, help_text=u'短信模板不填写则触发该规则时不发手机短信，如果有动态变量，用“%s”代替')
+    send_type = models.CharField(u'赠送发放方式', max_length=20, choices=SEND_TYPE, default=u'系统实时发放')
     created_at = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
