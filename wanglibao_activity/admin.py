@@ -1,10 +1,12 @@
 from django.contrib import admin
+from django import forms
+from django.forms import formsets
+from django.utils import timezone
 from models import Activity, ActivityRule, ActivityRecord
-
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'category', 'platform', 'product_cats', 'product_ids', 'description',\
-                    'start_at', 'end_at', 'status', 'priority')
+                    'start_at', 'end_at', 'is_stopped', 'priority')
 
 
 class ActivityRuleAdmin(admin.ModelAdmin):
