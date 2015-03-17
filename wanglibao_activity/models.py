@@ -96,7 +96,7 @@ class ActivityRule(models.Model):
                                     双方共享选定“赠送类型”中的礼品')
     redpack = models.CharField(u'红包类型名称', max_length=60, blank=True, help_text=u'红包名称一定要和红包活动中的名称保持一致')
     reward = models.CharField(u'奖品类型名称', max_length=60, blank=True, help_text=u'类型名称一定要和奖品中的类型保持一致')
-    income = models.FloatField(u'收益或收益率（送收益时填写）', default=0, blank=True, help_text=u'固定金额时填写大于1的数字，收益率时填写0-1之间的小数')
+    income = models.FloatField(u'金额或比率', default=0, blank=True, help_text=u'选择收益或话费时填写，固定金额时填写大于1的数字，收益率时填写0-1之间的小数')
     min_amount = models.IntegerField(u'最小金额（投资或充值）', default=0)
     max_amount = models.IntegerField(u'最大金额（投资或充值）', default=0)
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True, help_text=u'站内信模板不填写则触发该规则时不发站内信，如果有动态变量，用“%s”代替')
@@ -109,6 +109,18 @@ class ActivityRule(models.Model):
 
     class Meta:
         verbose_name_plural = u'活动规则'
+
+    def clean(self):
+        if self.gift_type == 'reward' and not self.reward:
+            raise ValidationError(u'赠送类型为“奖品”时，必须填写“奖品类型名称”')
+        if self.gift_type == 'redpack' and not self.redpack:
+            raise ValidationError(u'赠送类型为“红包”时，必须填写“红包类型名称”')
+        if self.gift_type == 'income' or self.gift_type == 'phonefare':
+            if self.income <= 0:
+                raise ValidationError(u'选择送收益或手机话费时要填写“金额或比率”')
+        if self.min_amount > 0 and self.max_amount > 0:
+            if self.min_amount >= self.max_amount:
+                raise ValidationError(u'最小金额和最大金额都大于0时，最大金额必须大于最小金额')
 
 
 class ActivityRecord(models.Model):
