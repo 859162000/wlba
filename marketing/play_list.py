@@ -198,7 +198,10 @@ class InvestmentRewardView(TemplateView):
         check_button = request.POST.get('check_button')
         if check_button == '1':
             records.filter(checked_status=0).update(checked_status=1)
-            send_redpack()
+            send_redpack.apply_async(kwargs={
+                "day": day.date().__str__(),
+                "desc": redpack
+            })
             message = u'审核通过完成，稍等查询红包发放结果！'
         elif check_button == '2':
             records.filter(checked_status=0).delete()
