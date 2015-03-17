@@ -87,11 +87,6 @@ def decide_first(user_id, amount):
         start_time = timezone.datetime(2014, 12, 18)
         if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
             rs.reward_user(u'一个月风行会员')
-    elif channel == helper.Channel.PPTV:
-        #PPTV
-        start_time = timezone.datetime(2015, 3, 17)
-        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
-            rs.reward_user(u'一个月PPTV会员')
     elif channel == helper.Channel.JIUXIAN:
         #酒仙网
         if amount >= 500:
