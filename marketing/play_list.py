@@ -21,18 +21,18 @@ class Investment(TemplateView):
             "top_len": len(day_tops)
         }
 
-
-class InvestmentHistory(TemplateView):
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponse
+class InvestmentHistory(APIView):
     """ 查询历史榜单 """
+    permission_classes = ()
 
-    template_name = "day_history.jade"
+    def post(self, request):
 
-    def get_context_data(self, **kwargs):
-        day = self.request.GET.get('day')
+        day = request.DATA.get('day', '')
         day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
-        return {
-            "tops": day_tops
-        }
+        return HttpResponse(day_tops)
 
 
 def _get_top_records(day=None):

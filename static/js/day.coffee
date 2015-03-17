@@ -4,6 +4,24 @@ require.config(
 )
 
 require ['jquery'], ($)->
+  #  请求数据
+  shuju=(time)->
+    $.ajax {
+      url: '/activity/investment_history/'
+      data: {
+        day: '2015-03-05'
+      }
+      type: 'POST'
+    }
+    .done (data)->
+      alert(data)
+#      获取当天日期
+  data=new Date()
+  Y=data.getFullYear()
+  m=data.getMonth()+1
+  day=data.getDate()
+  date=Y+'-'+m+"-"+day
+  shuju(date)
 #  tap切换
   $('.left-btn').on('click',()->
     $('.mon').html('3 月')
@@ -29,14 +47,3 @@ require ['jquery'], ($)->
     shuju(time)
   )
 
-#  请求数据
-  shuju=(time)->
-    $.ajax {
-      url: '/activity/investment_history/'
-      data: {
-        day: time
-      }
-      type: 'GET'
-    }
-    .done (data)->
-      alert(data)

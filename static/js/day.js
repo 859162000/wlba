@@ -7,7 +7,24 @@
   });
 
   require(['jquery'], function($) {
-    var shuju;
+    var Y, data, date, day, m, shuju;
+    shuju = function(time) {
+      return $.ajax({
+        url: '/activity/investment_history/',
+        data: {
+          day: '2015-03-05'
+        },
+        type: 'POST'
+      }).done(function(data) {
+        return alert(data);
+      });
+    };
+    data = new Date();
+    Y = data.getFullYear();
+    m = data.getMonth() + 1;
+    day = data.getDate();
+    date = Y + '-' + m + "-" + day;
+    shuju(date);
     $('.left-btn').on('click', function() {
       $('.mon').html('3 月');
       $('.day-long').animate({
@@ -22,8 +39,8 @@
       }, 500);
       return $('.day-san span').removeClass('tap-hight2');
     });
-    $('.day-yue span').on('click', function() {
-      var d, m, time;
+    return $('.day-yue span').on('click', function() {
+      var d, time;
       m = parseInt($('.mon').text());
       d = $(this).text();
       $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2');
@@ -35,17 +52,6 @@
       time = '2015-0' + m + '-' + d;
       return shuju(time);
     });
-    return shuju = function(time) {
-      return $.ajax({
-        url: '/activity/investment_history/',
-        data: {
-          day: time
-        },
-        type: 'GET'
-      }).done(function(data) {
-        return alert(data);
-      });
-    };
   });
 
 }).call(this);
