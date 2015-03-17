@@ -15,7 +15,7 @@ body
         for news in news_list
           .media-list-content
             p
-              img(src="/media/{{news.image}}")
+              img(src="/media/{{news.image}}", width="270", height="170")
             dl
               dt
                 a(href="{{news.link}}",target="_blank") {{news.name}}
