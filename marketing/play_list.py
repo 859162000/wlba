@@ -139,12 +139,14 @@ class InvestmentRewardView(TemplateView):
 
     def _return_format(self, message, day, redpack):
         play_list = self._query_play_list(day, redpack)
+        play_list_checked = play_list.filter(checked_status=2)
         return {
             "message": message,
             "result": paginator_factory(obj=play_list, page=self.request.GET.get('page'), limit=3),
             "day": day.date().__str__(),
             "redpack": redpack,
-            "amount_all": play_list.aggregate(sum_reward=Sum('reward')) if play_list else 0.00
+            "amount_all": play_list.aggregate(reward=Sum('reward')) if play_list else 0.00,
+            "amount_redpack": play_list_checked.aggregate(reward=Sum('reward')) if play_list_checked else 0.00
         }
 
     @staticmethod
