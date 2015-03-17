@@ -3,11 +3,14 @@
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.db.models import Sum
+from django.http import HttpResponse
 from django.views.generic import TemplateView
-from models import PlayList
 from marketing.tasks import send_redpack
 from marketing.utils import local_to_utc, paginator_factory
+from models import PlayList
 from tops import Top
+from rest_framework import renderers
+from rest_framework.views import APIView
 
 
 class Investment(TemplateView):
@@ -21,18 +24,18 @@ class Investment(TemplateView):
             "top_len": len(day_tops)
         }
 
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from django.http import HttpResponse
 class InvestmentHistory(APIView):
     """ 查询历史榜单 """
     permission_classes = ()
 
     def post(self, request):
-
-        day = request.DATA.get('day', '')
+        day = request.DATA.get('day')
         day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
-        return HttpResponse(day_tops)
+        result = [{
+            "tops": day_tops,
+            "tops_len": len(day_tops)
+        }]
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
 def _get_top_records(day=None):
