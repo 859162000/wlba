@@ -138,6 +138,7 @@ def register_ok(user_id, device_type):
     #注册红包
     redpack_backends.give_register_redpack(user, device_type)
 
+#实名认证
 @app.task
 def idvalidate_ok(user_id):
     user = User.objects.filter(id=user_id).first()
@@ -147,6 +148,16 @@ def idvalidate_ok(user_id):
     if channel == helper.Channel.KUAIPAN:
         rs = RewardStrategy(user)
         rs.reward_user(u'50G快盘容量')
+
+    if channel == helper.Channel.IQIYI:
+        rs = RewardStrategy(user)
+        rs.reward_user(u'7天爱奇艺会员')
+        #发短信
+
+    if channel == helper.Channel.PPTV:
+        rs = RewardStrategy(user)
+        rs.reward_user(u'一个月PPTV会员')
+        #发短信
 
 #充值成功
 def despoit_ok(pay_info):

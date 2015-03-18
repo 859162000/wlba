@@ -15,8 +15,8 @@ class NewsAndReport(models.Model):
     created_at = models.DateTimeField(u'添加时间', auto_now_add=True)
     image = models.ImageField(u'图片', null=True, upload_to='news', blank=True)
     keywords = models.CharField(u'关键字', max_length=200, null=True, blank=True, default='')
-    description = models.TextField(u'描述', null=True, blank=True, default='')
-    content = RichTextField(default='')
+    description = models.TextField(u'描述', null=True, default='')
+    content = RichTextField(default='', blank=True)
     hits = models.IntegerField(u'点击次数', blank=True, default=0)
 
     def __unicode__(self):

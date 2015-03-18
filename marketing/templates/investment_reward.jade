@@ -86,7 +86,7 @@ html
                             td {{l.user.wanglibaouserprofile.phone}}
                             td {{l.amount}}
                             td {{l.reward}}
-                            td {{l.checked_status}}
+                            td {{l.get_checked_status_display}}
 
                   //form.form.span5(method="POST" action='/{{ "" | admin_address}}/statistics/investment_reward')
                   form.form.span5(method="POST" action='/{{ "" | admin_address}}/statistics/investment_reward)
