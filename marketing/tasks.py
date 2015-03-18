@@ -1,11 +1,17 @@
 # coding=utf-8
 from celery.utils.log import get_task_logger
 from datetime import datetime
+from django.contrib.auth.models import User
+from django.db import transaction
 from django.db.models import Sum
-from marketing.models import TimelySiteData
+from django.utils import timezone
+from marketing.models import TimelySiteData, PlayList
 from marketing.utils import local_to_utc
+from wanglibao_account import message as inside_message
 from wanglibao.celery import app
 from wanglibao_margin.models import Margin
+from wanglibao_redpack.backends import give_activity_redpack
+from wanglibao_redpack.models import RedPackEvent
 
 
 logger = get_task_logger(__name__)
@@ -24,14 +30,7 @@ def generate_site_data():
 
 
 @app.task
-def send_redpack(day, desc, device_type='nil'):
-    from django.contrib.auth.models import User
-    from django.db import transaction
-    from django.utils import timezone
-    from marketing.models import PlayList
-    from wanglibao_redpack.models import RedPack, RedPackEvent, RedPackRecord
-    from wanglibao_account import message as inside_message
-
+def send_redpack(day, desc, rtype='nil'):
     now = timezone.now()
     day = datetime.strptime(day, '%Y-%m-%d')
     play_list = PlayList.objects.filter(
@@ -41,8 +40,8 @@ def send_redpack(day, desc, device_type='nil'):
     )
 
     for play in play_list:
-        rps = RedPackEvent.objects.filter(
-            give_mode=device_type,
+        events = RedPackEvent.objects.filter(
+            give_mode=rtype,
             invalid=False,
             give_start_at__lte=now,
             give_end_at__gte=now,
@@ -51,22 +50,17 @@ def send_redpack(day, desc, device_type='nil'):
         )
 
         with transaction.atomic():
-            for x in rps:
-                redpack = RedPack.objects.filter(event=x, status="unused").first()
-                if redpack:
-                    user = User.objects.get(id=play.user_id)
-                    record = RedPackRecord()
-                    record.user = user
-                    record.redpack = redpack
-                    record.change_platform = device_type
-                    record.save()
+            for event in events:
+                user = User.objects.get(id=play.user_id)
+                status, msg = give_activity_redpack(user=user, event=event, device_type='pc')
+                if status:
                     # 更新数据库状态
                     PlayList.objects.filter(pk=play.id).update(checked_status=2)
 
                     # 发送站内信
-                    message_content = u"您在每日投资打榜的活动中，投资{0}获得{1}元红包。<br/>\
-                              感谢您对我们的支持与关注。<br/>\
-                              网利宝".format(play.amount, play.reward)
+                    message_content = u"您在每日投资打榜的活动中，投资{0}获得{1}元红包。<br/>" \
+                                      u"感谢您对我们的支持与关注。<br/>" \
+                                      u"网利宝".format(play.amount, play.reward)
 
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,

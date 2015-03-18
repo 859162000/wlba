@@ -207,7 +207,7 @@ class InvestmentRewardView(TemplateView):
             send_redpack.apply_async(kwargs={
                 "day": day.date().__str__(),
                 "desc": redpack,
-                "device_type": "activity"
+                "rtype": "activity"
             })
             message = u'审核通过完成，稍等查询红包发放结果！'
         elif check_button == '2':
