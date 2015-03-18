@@ -103,8 +103,8 @@
                 $('#dan').append(str3);
               }
               if (j % 2 !== 0) {
-                str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                $('#shuang').append(str3);
+                str4 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                $('#shuang').html(str4);
               }
             }
           }
