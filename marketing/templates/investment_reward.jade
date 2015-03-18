@@ -68,7 +68,10 @@ html
 
                   h4
                     | &nbsp;&nbsp;&nbsp;&nbsp;
-                    | 发放红包总金额为：{{amount_all.sum_reward}}
+                    | 计划发放总金额为：{{amount_all.reward }}
+                    br
+                    | &nbsp;&nbsp;&nbsp;&nbsp;
+                    | 实际发放金额为：{{amount_redpack.reward }}
                     .table-responsive
                   table.table.table-striped.table-bordered.table-hover
                     thead
