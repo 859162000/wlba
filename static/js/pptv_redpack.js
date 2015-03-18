@@ -24,6 +24,53 @@
   require(['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder',
     'underscore'], function($, modal, backend, validate, tool, complexify, placeholder, _) {
     var checkMobile, container, csrfSafeMethod, getCookie, msg_count, sameOrigin, _showModal;
+    var pptvUntil = {
+              dataImg:["free","atte","recharge","tender","collec"],
+              newUrl:[{"x":"10px","y":"-63px"},{"x":"10px","y":"-207px"},{"x":"12px","y":"-350px"},{"x":"10px","y":"-495px"},{"x":"10px","y":"-637px"}],
+              $float: $(".circle-float"),
+              initIndex: null,
+              init:function(){
+                 var that = this
+                 $(".circle").hover(function(){
+                      that.initIndex = $(this).index()/2-1
+                      var imgUrl = "/static/images/pptv/"+that.dataImg[that.initIndex]+".jpg"
+                      that.$float.find("img").attr("src",imgUrl)
+                      $(".circle").find(".circle-body").removeAttr("style")
+                      that.$float.show()
+                  })
+                  $(".last").on("click",function(){
+                      that.last(that.changHover)
+                  })
+                  $(".next").on("click",function(){
+                      that.next(that.changHover)
+                  })
+                  $(".close").on("click",function(){
+                      that.close()
+                  })
+                  $(".register-btn").on("click",function(){
+                      $(document).scrollTop(0)
+                  })
+              },
+              next:function(callback){
+                  this.initIndex === 4 ? this.initIndex = 0: this.initIndex++;
+                  callback(this.initIndex)
+              },
+              last:function(callback){
+                  this.initIndex === 0 ? this.initIndex = 4: this.initIndex--;
+                  callback(this.initIndex)
+              },
+              close:function(){
+                  this.$float.hide();
+                  $(".circle").find(".circle-body").removeAttr("style")
+              },
+              changHover:function(index){
+                  var imgUrl = "/static/images/pptv/"+pptvUntil.dataImg[index]+".jpg"
+                  pptvUntil.$float.find("img").attr("src",imgUrl)
+                  $(".circle").find(".circle-body").removeAttr("style")
+                  $(".circle").eq(index).find(".circle-body").attr("style", "background-position:" + pptvUntil.newUrl[pptvUntil.initIndex].x + " " + pptvUntil.newUrl[pptvUntil.initIndex].y + ";background-color:#448aff;border:4px solid #448aff")
+              }
+          }
+          pptvUntil.init();
     getCookie = function(name) {
       var cookie, cookieValue, cookies, i;
       cookieValue = null;
