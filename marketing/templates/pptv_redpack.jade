@@ -1,0 +1,245 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+
+  body(style="background:#fff")
+    .full-container
+      .topbar
+        .container.row
+          .user-div
+            i.icon-phone.font-l &nbsp;
+            span 客服热线：
+            span 4008-588-066
+
+            span.margin-left-m 在线客服：
+            a.topbar-anchor.icon.icon-qq#top-qq(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", data-role="hover", target="_blank")
+
+            span.margin-left-m 关注我们：
+            a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
+            a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
+            a#qrweibo-top.weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
+              img(src="/static/images/weibo-nqr.png")
+            img#qrcode-top.icon.weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none", data-name="hoverbox")
+            span.mobile-app-top
+              span.icon.icon-mobile-app
+              span 手机网利宝
+              .mobile-app-top-prompt
+                div(style="height:30px; top:-20px; position:relative;")
+                a.mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+                a.mobile-app-android(href="https://www.wanglibao.com/static/wanglibao.apk", title="Android版")
+
+    .full-container-white.fudong
+      .container-navigation
+        .row
+          .span2
+            a(href='/')
+              .pptv-logo
+          .span10
+            .nav-items.xiao-nav
+              ul
+                mixin nav-item(name, link, new_class, free)
+                  if activeItem == name
+                    li.nav-item.active
+                      a.nav-item-anchor(href=link, class=new_class)= name
+                      if free == 'yes'
+                        span.icon.icon-free 免费
+                  else
+                    li.nav-item
+                      a.nav-item-anchor(href=link, class=new_class)= name
+                      if free == 'yes'
+                        span.icon.icon-free 免费
+
+                +nav-item('首页', '/', '', '')
+                +nav-item('理财专区', '/p2p/list/', '', '')
+                +nav-item('基金', '/fund/products', '', '')
+
+                +nav-item('安全保障', '/security', 'left-line', '')
+                +nav-item('帮助中心', '/help', '', '')
+    .wrap.pptv
+      .gold2
+        .denelu-form
+          h1.biaoti 注册送50元红包
+          form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
+            - csrf_token
+            .form-row
+              .form-control-group
+                .span12
+                  input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="手机号")
+              .form-row-error
+            .form-row.voice
+              .span12-omega.hidden.show
+                没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+              .form-control-group
+                .span6
+                   input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="验证码", autocomplete='off', title="验证码")
+                .span6-omega
+                   button#button-get-validate-code-modal.button-large.pptv-huoqu-ma(type='button',style="width:100%;margin-left:0") 获取验证码
+              .form-row-error
+
+            .form-row
+              input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="密码", autocomplete="off", maxlength="20")
+              .password-strength-container
+                span.password-strength-1
+                span.password-strength-2
+                span.password-strength-3
+              .form-row-error
+            .form-row
+              input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="确认密码", autocomplete='off', title="确认密码", maxlength="20")
+              .form-row-error
+            .form-row.form-bottom-bar
+              .agreement(style="padding:0 0 10px 0;text-align:left")
+                label(for="agreement",style="position: relative;top: 3px;")
+                  input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
+                | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                .form-row-error
+              button#register_submit.button-account.span10.xun-zhuce(type='submit') 注 册
+            .space-vertical-s
+          p.xun-p 已有账号，
+            a(href="/accounts/login/") 立即登录
+    .san-new
+      .san-new-content.container
+        .row.gold-dl-row
+          .san-span
+            dl
+             dt.com.com-trust
+             dd.pp-zi
+               h3 信赖
+               p IDG资本投资
+               p 第三方100%本息保障
+          .san-span
+            dl
+             dt.com.com-security
+             dd.pp-zi
+               h3 安全
+               p 招商银行全程监管
+               p 账户资金安全由平安保险承保
+          .san-span
+            dl
+             dt.com.com-authority
+             dd.pp-zi
+               h3 权威
+               p 洛克菲勒家族
+               p 全方位战略合作
+    .content-process
+      .content-pptv
+        .process-text 投资流程
+        .process-list
+          .circle-free.circle-float
+            .close
+            .last
+            .next
+            img(src="/static/images/pptv/free.jpg")
+          .triangle-start
+            .start-cont
+          .circle
+            .circle-body.free
+            .circle-txt 免费注册
+            .circle-txt2 送
+              em 50
+              |元红包
+          .triangle-center
+            .center-cont
+          .circle
+            .circle-body.atte
+            .circle-txt 进行认证
+            .circle-txt2 送
+              em 1
+              |个月PPTV会员
+          .triangle-center
+            .center-cont
+          .circle
+            .circle-body.recharge
+            .circle-txt 充值账户
+          .triangle-center
+            .center-cont
+          .circle
+            .circle-body.tender
+            .circle-txt 成功投标
+          .triangle-center
+            .center-cont
+          .circle
+            .circle-body.collec
+            .circle-txt 自动收款
+          .triangle-end
+            .end-cont
+    .san-new
+      .pptv-list
+        .border-box
+          .box-lfet
+            .head 银行定期存款
+            .img.box-img
+            .bot 银行本息担保
+          .box-right
+            .head 宝宝们
+            .img.box-img
+            .bot 亏本风险较低
+        .float-box
+          .float-head
+            img(src="/static/images/pptv/float-head.png")
+          .float-cont
+            p.head 13-18%
+            p.shou 收益率
+            p.p-icon
+              span
+              |平安保险承保账户资金
+          .float-btn
+            a.register-btn 注册投资
+    .san-new.content-process
+      .san-new-content.container
+        .row.gold-dl-row
+          .san-span.si-span
+            dl
+             dt.slist.slist-trust
+             dd.pp-zi
+               h3 收益高
+               p 40+银行收益
+          .san-span.si-span
+            dl
+             dt.slist.slist-security
+             dd.pp-zi
+               h3 回本快
+               p 按月付息款
+               p 一次还本息，先息后本
+          .san-span.si-span
+            dl
+             dt.slist.slist-authority
+             dd.pp-zi
+               h3 门槛低
+               p 100元起，0元手续费，不用去
+               p 银行排队，免费开户
+          .san-span.si-span
+            dl
+             dt.slist.slist-last
+             dd.pp-zi
+               h3 周期短
+               p 1个月，3个月
+               p 6个月，9个月
+    .san-new
+      .pptv-list
+        .gold-footer
+            dl.beijing
+              dt.hei 活动规则
+              dd 1. 手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账户；
+              dd 2. 红包使用期限：2015年3月16号-4月30号；
+              dd 3. 直抵50红包投资金额300元方可使用；
+              dd 4. 红包使用最多直抵50元。例：投资300元力减50元，实际支付250元；
+              dd 5. 新手红包均只能使用一次，使用后是否有余额红包即失效；
+              dd 6. 投资项目到期后本金+利息+红包金额可一并体现；
+              dd 7. 登录网利宝官网：
+                b.note <a href="http://www.wanglibao.com">www.wanglibao.com</a>，或者使用app进行投资理财；
+              dd 8. 本活动不收取任何费用，谨防上当受骗；
+              dd 9. 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现；
+              dd 10. 网利宝对此活动享有最终解释权。
+
+    .pptv-bottom.content-process
+      img(src="/static/images/pptv/pptv-bottom.png")
+    script.
+      require(['/static/js/hover.js','/static/js/pptv_redpack.js'])
+
+
+
