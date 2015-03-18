@@ -30,13 +30,19 @@
               $float: $(".circle-float"),
               initIndex: null,
               init:function(){
-                 var that = this
+                 var that = this;
+                 var isHover = false;
                  $(".circle").hover(function(){
                       that.initIndex = $(this).index()/2-1
                       var imgUrl = "/static/images/pptv/"+that.dataImg[that.initIndex]+".jpg"
                       that.$float.find("img").attr("src",imgUrl)
                       $(".circle").find(".circle-body").removeAttr("style")
                       that.$float.show()
+                  })
+                  $(".circle-float").hover(function(){
+                      isHover = true;
+                  },function(){
+                      isHover &&  that.close()
                   })
                   $(".last").on("click",function(){
                       that.last(that.changHover)
