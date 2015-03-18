@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from wanglibao_p2p.models import P2PRecord
 from marketing.models import Activity
-from django.db.models import Sum
+from django.db.models import Sum, Max
 from django.contrib.auth.models import User
 from django.utils import timezone
 from itertools import groupby
@@ -255,4 +255,39 @@ class Top(object):
 
         return weeks[index]
 
+    def day_tops_first_come_first_served(self, day, amount_min=None, amount_max=None):
+        """ 查询日榜单，先到先得
+        """
+        amsterdam = self.timezone_util
 
+        begin = amsterdam.localize(datetime.combine(day.date(), day.min.time()))
+        end = amsterdam.localize(datetime.combine(day.date(), day.max.time()))
+
+        records = P2PRecord.objects.filter(
+            create_time__range=(begin.astimezone(pytz.utc), end.astimezone(pytz.utc)),
+            catalog='申购'
+        ).values(
+            'user'
+        ).annotate(
+            amount_sum=Sum('amount'),
+            create_time=Max('create_time')
+        )
+
+        if amount_min:
+            records = records.filter(amount_sum__gte=amount_min)
+        if amount_max:
+            records = records.filter(amount_sum__lte=amount_max)
+
+        records = records.order_by('-amount_sum', 'create_time')
+
+        if self.num_limit != 0:
+            records = records[:self.num_limit]
+
+        return records
+
+    def day_tops_activate(self, day=datetime.now(), amount_min=60000):
+        """ 根据查询出的榜单，查询对应的用户信息
+        """
+        return self.extract_user_list(
+            self.day_tops_first_come_first_served(day=day, amount_min=amount_min)
+        )

@@ -472,13 +472,14 @@ if ENV == ENV_PRODUCTION:
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
 
-    KUAI_PAY_URL = "https://www.99bill.com:9445/cnp/purchase"
-    KUAI_QUERY_URL = "https://www.99bill.com:9445/cnp/pci_query"
-    KUAI_DEL_URL = "https://www.99bill.com:9445/cnp/pci_del"
-    KUAI_DYNNUM_URL = "https://www.99bill.com:9445/cnp/getDynNum"
+    KUAI_PAY_URL = "https://mas.99bill.com:443/cnp/purchase"
+    KUAI_QUERY_URL = "https://mas.99bill.com:443/cnp/pci_query"
+    KUAI_DEL_URL = "https://mas.99bill.com:443/cnp/pci_del"
+    KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
     KUAI_PEM_PATH = os.path.join(BASE_DIR, "81231006011001390.pem")
-    KUAI_MER_ID = "1002418281901"
-    KUAI_MER_PASS = "DBLRDESEZ9EB2FIB"
+    KUAI_MER_ID = "812310060110013"
+    KUAI_MER_PASS = "vpos123"
+    KUAI_TERM_ID = "00004559"
 
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
@@ -497,13 +498,14 @@ elif ENV == ENV_PREPRODUCTION:
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
 
-    KUAI_PAY_URL = "https://www.99bill.com:9445/cnp/purchase"
-    KUAI_QUERY_URL = "https://www.99bill.com:9445/cnp/pci_query"
-    KUAI_DEL_URL = "https://www.99bill.com:9445/cnp/pci_del"
-    KUAI_DYNNUM_URL = "https://www.99bill.com:9445/cnp/getDynNum"
+    KUAI_PAY_URL = "https://mas.99bill.com:443/cnp/purchase"
+    KUAI_QUERY_URL = "https://mas.99bill.com:443/cnp/pci_query"
+    KUAI_DEL_URL = "https://mas.99bill.com:443/cnp/pci_del"
+    KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
     KUAI_PEM_PATH = os.path.join(BASE_DIR, "81231006011001390.pem")
-    KUAI_MER_ID = "1002418281901"
-    KUAI_MER_PASS = "DBLRDESEZ9EB2FIB"
+    KUAI_MER_ID = "812310060110013"
+    KUAI_MER_PASS = "vpos123"
+    KUAI_TERM_ID = "00004559"
 
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
@@ -528,6 +530,7 @@ else:
     KUAI_PEM_PATH = os.path.join(BASE_DIR, "10411004511201290.pem")
     KUAI_MER_ID = "104110045112012"
     KUAI_MER_PASS = "vpos123"
+    KUAI_TERM_ID = "00002012"
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
