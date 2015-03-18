@@ -221,3 +221,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=register.js.map
