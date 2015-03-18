@@ -221,7 +221,7 @@
           clearInterval(intervalId);
           $(element).text('重新获取');
           $(element).removeAttr('disabled');
-          $(element).addClass('button-red');
+          $(element).addClass('pptv-huoqu-ma');
           $(element).removeClass('huoqu-ma-gray');
           result = JSON.parse(xhr.responseText);
           if (xhr.status === 429) {
@@ -241,7 +241,7 @@
         intervalId;
         count = 60;
         $(element).attr('disabled', 'disabled');
-        $(element).removeClass('button-red');
+        $(element).removeClass('pptv-huoqu-ma');
         $(element).addClass('huoqu-ma-gray');
         $('.voice-validate').attr('disabled', 'disabled');
         timerFunction = function() {
@@ -252,7 +252,7 @@
             clearInterval(intervalId);
             $(element).text('重新获取');
             $(element).removeAttr('disabled');
-            $(element).addClass('button-red');
+            $(element).addClass('pptv-huoqu-ma');
             $(element).removeClass('huoqu-ma-gray');
             $('.voice').removeClass('hidden');
             $('.voice-validate').removeAttr('disabled');
@@ -443,19 +443,6 @@
         //判断当页面到达顶部
         if (sTop == 0) clearTimeout(scrolldelay);
       }
-
-      //文本框的得到和失去光标
-      var zhi;
-      $('.com-tu').on("focus", function () {
-        if ($(this).attr('placeholder')) {
-          zhi = $(this).attr('placeholder');
-        }
-        $(this).attr('placeholder', '');
-      });
-
-      $('.com-tu').on('blur', function () {
-        $(this).attr('placeholder', zhi)
-      })
 
       $('#button-get-validate-code-modal').disabled=false;
       $('#button-get-validate-code-modal').on('click', function () {
