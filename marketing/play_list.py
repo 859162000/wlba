@@ -24,7 +24,6 @@ class Investment(TemplateView):
             "top_len": len(day_tops)
         }
 
-
 class InvestmentHistory(APIView):
     """ 查询历史榜单 """
     permission_classes = ()
