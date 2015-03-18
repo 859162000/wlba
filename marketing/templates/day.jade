@@ -150,8 +150,6 @@ html
                         span {{ forloop.counter }}
                         span {{day.phone | safe_phone_new }}
                         span {{day.amount_sum | money_format_int}}元
-
-
               .day-jiang
                 .p
                   p.day-hong 奖励每天投标累计最高的
@@ -196,7 +194,6 @@ html
             ul.login-modal-tab
              li#tab-login.active 用户登录
              li#tab-register 用户注册
-
           include include/login_form
           include include/register_form
 
