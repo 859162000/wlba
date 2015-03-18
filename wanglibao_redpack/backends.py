@@ -240,6 +240,23 @@ def _give_redpack(user, rtype, device_type):
                 record.save()
                 _send_message(user, event)
 
+#发放奖励类型的红包
+def give_activity_redpack(user, event, device_type):
+    device_type = _decide_device(device_type)
+    redpack = RedPack.objects.filter(event=event, status="unused").first()
+    if not redpack:
+        return False,u"没有此红包"
+    if redpack.token != "":
+        redpack.status = "used"
+        redpack.save()
+    record = RedPackRecord()
+    record.user = user
+    record.redpack = redpack
+    record.change_platform = device_type
+    record.save()
+    _send_message(user, event)
+    return True,""
+
 
 def consume(redpack, amount, user, order_id, device_type):
     amount = fmt_two_amount(amount)
