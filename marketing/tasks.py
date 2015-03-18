@@ -45,7 +45,7 @@ def send_redpack(day, desc, rtype='nil'):
             invalid=False,
             give_start_at__lte=now,
             give_end_at__gte=now,
-            describe__startswith=play.redpackevent,
+            describe=play.redpackevent,
             amount=play.reward
         )
 

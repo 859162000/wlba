@@ -89,7 +89,7 @@ class InvestmentRewardView(TemplateView):
 
         play_list = PlayList.objects.filter(
             play_at=local_to_utc(day, 'min'),
-            redpackevent__startswith=redpack
+            redpackevent=redpack
         )
 
         if play_list.count() > 0:
@@ -197,6 +197,9 @@ class InvestmentRewardView(TemplateView):
         amount_min, amount_max, start, end, reward, exchange, redpack = rule
 
         records = self._query_play_list(day=day, redpack=redpack)
+        if records.count() == 0:
+            message = u'不存在需要审核数据，请检查操作流程是否正确！'
+            return self.render_to_response(self._return_format(message, day, redpack))
         if records.filter(checked_status__in=[1, 2]).count() > 0:
             message = u'此规则已经审核，不允许再次审核！'
             return self.render_to_response(self._return_format(message, day, redpack))
