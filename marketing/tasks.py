@@ -1,9 +1,12 @@
 # coding=utf-8
 from celery.utils.log import get_task_logger
+from datetime import datetime
 from django.db.models import Sum
 from marketing.models import TimelySiteData
+from marketing.utils import local_to_utc
 from wanglibao.celery import app
 from wanglibao_margin.models import Margin
+
 
 logger = get_task_logger(__name__)
 
@@ -20,8 +23,9 @@ def generate_site_data():
     data.save()
 
 
+
 @app.task
-def send_redpack():
+def send_redpack(day, desc):
     from django.contrib.auth.models import User
     from django.db import transaction
     from django.utils import timezone
@@ -31,8 +35,12 @@ def send_redpack():
 
     device_type = 'nil'
     now = timezone.now()
-
-    play_list = PlayList.objects.filter(checked_status=1)
+    day = datetime.strptime(day, '%Y-%m-%d')
+    play_list = PlayList.objects.filter(
+        checked_status=1,
+        play_at=local_to_utc(day, 'min'),
+        redpackevent=desc
+    )
 
     for play in play_list:
         rps = RedPackEvent.objects.filter(
