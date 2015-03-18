@@ -51,7 +51,8 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
 
         return {
             "terms": result,
-            "total": total
+            "total": total,
+            "interest_arguments": None
         }
 
 
@@ -81,7 +82,13 @@ class MonthlyInterest(AmortizationPlan):
 
         return {
             "terms": result,
-            "total": total
+            "total": total,
+            "interest_arguments": {
+                "principal": amount,
+                "interest_actual": get_final_decimal(amount * year_rate * proportion),
+                "interest_receivable": get_base_decimal(amount * year_rate * proportion),
+                "interest_precision_balance": get_base_decimal(amount * year_rate * proportion) - get_final_decimal(amount * year_rate * proportion)
+            }
         }
 
 
@@ -109,7 +116,8 @@ class InterestFirstThenPrincipal(AmortizationPlan):
 
         return {
             "terms": result,
-            "total": total
+            "total": total,
+            "interest_precision": None
         }
 
 
@@ -121,7 +129,8 @@ class DisposablePayOff(AmortizationPlan):
         if period is None:
             return {
                 "terms": [],
-                "total": 0
+                "total": 0,
+                "interest_arguments": None
             }
         amount = Decimal(amount)
         year_rate = Decimal(year_rate)
@@ -132,7 +141,13 @@ class DisposablePayOff(AmortizationPlan):
         result = [(total_interest + amount, amount, total_interest, Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period))]
         return {
             "terms": result,
-            "total": total_interest + amount
+            "total": total_interest + amount,
+            "interest_arguments": {
+                "principal": amount,
+                "interest_actual": get_final_decimal(amount * year_rate * proportion),
+                "interest_receivable": get_base_decimal(amount * year_rate * proportion),
+                "interest_precision_balance": get_base_decimal(amount * year_rate * proportion) - get_final_decimal(amount * year_rate * proportion)
+            }
         }
 
     @classmethod
@@ -172,7 +187,8 @@ class QuarterlyInterest(AmortizationPlan):
 
         return {
             "terms": result,
-            "total": total
+            "total": total,
+            "interest_precision": Decimal(0)
         }
 
 
@@ -212,7 +228,13 @@ class DailyInterest(AmortizationPlan):
 
         return {
             "terms": result,
-            "total": total
+            "total": total,
+            "interest_arguments": {
+                "principal": amount,
+                "interest_actual": get_final_decimal(daily_interest*period),
+                "interest_receivable": get_base_decimal(daily_interest*period),
+                "interest_precision_balance": get_base_decimal(daily_interest*period) - get_final_decimal(daily_interest*period)
+            }
         }
 
 class DailyInterestInAdvance(AmortizationPlan):
@@ -238,7 +260,13 @@ class DailyInterestInAdvance(AmortizationPlan):
 
         return {
             "terms": result,
-            "total": total
+            "total": total,
+            "interest_arguments": {
+                "principal": amount,
+                "interest_actual": get_final_decimal(daily_interest*period),
+                "interest_receivable": get_base_decimal(daily_interest*period),
+                "interest_precision_balance": get_base_decimal(daily_interest*period) - get_final_decimal(daily_interest*period)
+            }
         }
 
 class DailyInterestMonthly(AmortizationPlan):
@@ -283,7 +311,13 @@ class DailyInterestMonthly(AmortizationPlan):
 
         return {
             "terms": result,
-            "total": total
+            "total": total,
+            "interest_arguments": {
+                "principal": amount,
+                "interest_actual": get_final_decimal(daily_interest*period),
+                "interest_receivable": get_base_decimal(daily_interest*period),
+                "interest_precision_balance": get_base_decimal(daily_interest*period) - get_final_decimal(daily_interest*period)
+            }
         }
 
 
@@ -308,3 +342,4 @@ def get_final_decimal(decimal):
 
 def get_daily_interest(year_rate):
     return get_base_decimal(year_rate/360)
+

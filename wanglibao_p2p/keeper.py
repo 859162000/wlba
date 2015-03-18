@@ -362,6 +362,10 @@ class AmortizationKeeper(KeeperBaseMixin):
                     amortization.term_date = term[5]
 
                 user_amos.append(amortization)
+            
+            if terms['interest_arguments']:
+                args = terms['interest_arguments'].update({equity:equity})
+                interest_precision = InterestPrecisionBalance(**args)
 
 
         UserAmortization.objects.bulk_create(user_amos)
