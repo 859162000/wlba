@@ -139,12 +139,14 @@ class InvestmentRewardView(TemplateView):
 
     def _return_format(self, message, day, redpack):
         play_list = self._query_play_list(day, redpack)
+        play_list_checked = play_list.filter(checked_status=2)
         return {
             "message": message,
             "result": paginator_factory(obj=play_list, page=self.request.GET.get('page'), limit=3),
             "day": day.date().__str__(),
             "redpack": redpack,
-            "amount_all": play_list.aggregate(sum_reward=Sum('reward')) if play_list else 0.00
+            "amount_all": play_list.aggregate(reward=Sum('reward')) if play_list else 0.00,
+            "amount_redpack": play_list_checked.aggregate(reward=Sum('reward')) if play_list_checked else 0.00
         }
 
     @staticmethod
@@ -198,7 +200,10 @@ class InvestmentRewardView(TemplateView):
         check_button = request.POST.get('check_button')
         if check_button == '1':
             records.filter(checked_status=0).update(checked_status=1)
-            send_redpack()
+            send_redpack.apply_async(kwargs={
+                "day": day.date().__str__(),
+                "desc": redpack
+            })
             message = u'审核通过完成，稍等查询红包发放结果！'
         elif check_button == '2':
             records.filter(checked_status=0).delete()
