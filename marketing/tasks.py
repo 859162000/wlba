@@ -23,9 +23,8 @@ def generate_site_data():
     data.save()
 
 
-
 @app.task
-def send_redpack(day, desc):
+def send_redpack(day, desc, device_type='nil'):
     from django.contrib.auth.models import User
     from django.db import transaction
     from django.utils import timezone
@@ -33,7 +32,6 @@ def send_redpack(day, desc):
     from wanglibao_redpack.models import RedPack, RedPackEvent, RedPackRecord
     from wanglibao_account import message as inside_message
 
-    device_type = 'nil'
     now = timezone.now()
     day = datetime.strptime(day, '%Y-%m-%d')
     play_list = PlayList.objects.filter(

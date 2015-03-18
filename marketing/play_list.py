@@ -11,6 +11,7 @@ from models import PlayList
 from tops import Top
 from rest_framework import renderers
 from rest_framework.views import APIView
+from wanglibao.templatetags.formatters import safe_phone_str
 
 
 class Investment(TemplateView):
@@ -24,6 +25,7 @@ class Investment(TemplateView):
             "top_len": len(day_tops)
         }
 
+
 class InvestmentHistory(APIView):
     """ 查询历史榜单 """
     permission_classes = ()
@@ -31,6 +33,9 @@ class InvestmentHistory(APIView):
     def post(self, request):
         day = request.DATA.get('day')
         day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
+        for tmp in day_tops:
+            if 'phone' in tmp:
+                tmp['phone'] = safe_phone_str(tmp['phone'])
         result = [{
             "tops": day_tops,
             "tops_len": len(day_tops)
@@ -201,7 +206,8 @@ class InvestmentRewardView(TemplateView):
             records.filter(checked_status=0).update(checked_status=1)
             send_redpack.apply_async(kwargs={
                 "day": day.date().__str__(),
-                "desc": redpack
+                "desc": redpack,
+                "device_type": "activity"
             })
             message = u'审核通过完成，稍等查询红包发放结果！'
         elif check_button == '2':
