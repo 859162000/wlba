@@ -831,12 +831,8 @@ def add_bank_card(request):
 
     if len(card_no) > 25 or not card_no.isdigit():
         return {"ret_code":20022, "message":"请输入正确的银行卡号"}
-    #bank_card_name = bankcard_checker.check(int(card_no[:6]))
-    #if not bank_card_name:
-    #    return {"ret_code":20022, "message":"请输入合法的银行卡号"}
-    #bank_card_name = bank_card_name.upper()
-    if card_no[0] in ("3", "4", "5"):
-        return {"ret_code":20023, "message":"不支持信用卡"}
+    #if card_no[0] in ("3", "4", "5"):
+    #    return {"ret_code":20023, "message":"不支持信用卡"}
 
     user = request.user
     bank = Bank.objects.filter(gate_id=gate_id).first()
