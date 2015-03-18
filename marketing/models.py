@@ -15,8 +15,8 @@ class NewsAndReport(models.Model):
     created_at = models.DateTimeField(u'添加时间', auto_now_add=True)
     image = models.ImageField(u'图片', null=True, upload_to='news', blank=True)
     keywords = models.CharField(u'关键字', max_length=200, null=True, blank=True, default='')
-    description = models.TextField(u'描述', null=True, blank=True, default='')
-    content = RichTextField(default='')
+    description = models.TextField(u'描述', null=True, default='')
+    content = RichTextField(default='', blank=True)
     hits = models.IntegerField(u'点击次数', blank=True, default=0)
 
     def __unicode__(self):
@@ -276,3 +276,26 @@ class IntroducedByReward(models.Model):
     class Meta:
         ordering = ['-created_at']
         verbose_name_plural = u'邀请奖励统计表'
+
+
+class PlayList(models.Model):
+    """ 活动打榜奖励 """
+    STATUS = (
+        (0, u'未审核'),
+        (1, u'审核通过'),
+        (2, u'发放红包成功'),
+    )
+
+    play_at = models.DateTimeField(u'活动统计开始时间', null=False)
+    user = models.ForeignKey(User)
+    amount = models.DecimalField(u'投资金额', max_digits=20, decimal_places=2, default=0)
+    ranking = models.IntegerField(u'排名', max_length=10, null=True, blank=True, default=0)
+    # redpackevent = models.IntegerField(u'活动', max_length=10, null=True, blank=True, default=0)
+    redpackevent = models.TextField(u'活动红包名称', null=False)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+    checked_status = models.IntegerField(u'审核状态', max_length=2, choices=STATUS, default=0)
+    amount_min = models.DecimalField(u'奖励开始金额', max_digits=20, decimal_places=2, default=0)
+    amount_max = models.DecimalField(u'奖励截止金额', max_digits=20, decimal_places=2, default=0)
+    start = models.IntegerField(u'奖励开始名次', max_length=2, null=True, blank=True)
+    end = models.IntegerField(u'奖励截止名次', max_length=2, null=True, blank=True)
+    reward = models.DecimalField(u'红包奖励金额', max_digits=20, decimal_places=2, default=0)

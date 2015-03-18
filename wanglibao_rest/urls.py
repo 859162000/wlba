@@ -40,6 +40,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             DepositGateAPIView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
+from marketing.play_list import InvestmentHistory
 
 router = DefaultRouter()
 
@@ -172,4 +173,8 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns('',
     url(r'^fund_info/', FundInfoAPIView.as_view()),
+)
+
+urlpatterns += patterns('',
+    url(r'^investment_history/', InvestmentHistory.as_view()),
 )

@@ -169,14 +169,12 @@ html
                     item_value = section_values[item_name]
                     dd.span10-omega {{item_value|linebreaksbr}}
 
-          if attachments and user.is_authenticated
-            .p2p-detail-list.clearfix
-              h1 相关文件
-
-              for attachment in attachments
-                .img-container
-                  img(src="/media/{{attachment.file}}")
-                  h2 {{attachment.name}}
+          .p2p-detail-list.clearfix
+            h1 相关文件
+            for attachment in attachments
+              .img-container
+                img(src="/media/{{attachment.file}}")
+                h2 {{attachment.name}}
 
           include include/bill_note
 

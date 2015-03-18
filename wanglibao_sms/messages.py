@@ -223,3 +223,21 @@ def msg_redpack_give(amount, name, dt):
     title = u"参与活动送红包"
     content = u"网利宝赠送的【%s】元【%s】已发放，请进入投资页面尽快投资赚收益吧！有效期至%s。<br/> <a href='/' target='_blank'>立即使用</a><br/>感谢您对我们的支持与关注。" % (amount, name, dt)
     return title,content
+
+
+def msg_sevenday_iqiyi(activation):
+    title = u"实名认证送7天爱奇艺会员"
+    content = u"感谢您在活动期间完成实名认证。<br/>网利宝赠送您7天爱奇艺会员，会员码为：%s，请注意查收。<br/>感谢您对我们的信任与支持！<br/>网利宝" % activation
+    return title, content
+
+
+def msg_month_iqiyi(activation):
+    title = u"首次投资送一个月爱奇艺会员"
+    content = u"感谢您在活动期间完成首次投资。<br/>网利宝赠送您一个月爱奇艺会员，会员码为：%s，请注意查收。<br/>感谢您对我们的信任与支持！<br/>网利宝" % activation
+    return title, content
+
+
+def msg_month_pptv(activation):
+    title = u"实名认证送一个月PPTV会员"
+    content = u"感谢您在活动期间完成实名认证。<br/>网利宝赠送您一个月PPTV会员，会员码为：%s，请注意查收。<br/>感谢您对我们的信任与支持！<br/>网利宝" % activation
+    return title, content

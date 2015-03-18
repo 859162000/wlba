@@ -1,0 +1,237 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        meta(name="keywords", content="网利宝")
+        meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
+        link(rel="stylesheet",href="/static/stylesheets/day.css")
+    body.white-background
+        .top
+          .row
+            .day-logo.span6
+            .day-nav.span4
+              ul
+                li
+                  a(href="https://www.wanglibao.com/", target="_blank") 网利宝官网
+                li
+                  a#xiaz 下载APP
+                li
+                  a.login-modal(href="#login-modal") 登陆
+                li
+                  a.register-modal(href="#login-modal") 注册
+        .day-banner
+        .day-time
+
+          .day-ing
+            h1.top-time 3.17-4.30
+            p.top-p 具体活动时间为———3月17日00:00:00至4月30日23:59:59,数据零点清零，用户可每天重复参赛
+            .day-head
+              h1(style="margin-right:188px").h1-hight 1、活动前准备
+              h1(style="margin-right:209px") 2、活动开始中
+              h1(style="margin-right:0") 3、活动结束
+
+            ul.ing
+              li.ing-hight
+                b.day-com.one
+              li
+                b.day-com.one
+              li
+                b.day-com.one
+                span.day-com.horologe
+        .day-wrap
+          .day-big
+            h1.rule
+              b.day-com.two
+              | 活动规则
+              b.day-com.three
+            .day-box1
+              p.red 参与时间00:00:00-23:59:59,零点数据清零，用户可每天重复参赛。
+              p 用户每天的投标累计金额
+                b.red ≥6
+                | 万元，将获得网站投资奖励
+              .day-dengji
+                ul.day-red
+                  li ￥1000
+                    b 红包
+                    i
+                  li ￥800
+                    b 红包
+                    i
+                  li ￥600
+                    b 红包
+                    i
+                  li ￥400
+                    b 红包
+                    i
+                  li ￥200
+                    b 红包
+                    i
+                ul.day-yello
+                  li ￥900
+                    b 红包
+                    i
+                  li ￥700
+                    b 红包
+                    i
+                  li ￥500
+                    b 红包
+                    i
+                  li ￥300
+                    b 红包
+                    i
+                  li ￥100
+                    b 红包
+                    i
+                p.day-mingci
+                  span 当日投标用户名额
+                  a 第一名
+                  a 第二名
+                  a 第三名
+                  a 第四名
+                  a 第五名
+                  a 第六名
+                  a 第七名
+                  a 第八名
+                  a 第九名
+                  a 第十名
+              .day-ul
+                ul
+                  li.jin 每日买满额度（元）
+                  li 50000-59999
+                  li 40000-49999
+                  li 30000-39999
+                  li 20000-29999
+                  li 10000-19999
+                ul
+                  li.jin 送红包额度（元）
+                  li 50
+                  li 40
+                  li 30
+                  li 20
+                  li 10
+              p
+                b.red 注：
+                |若出现两名或两名以上客户投标金额相同，则按当日投标时间先后排位；
+              p 每天投标累计金额
+                b.red ≥6
+                | 万元的用户未排入前十名将获得
+                b.red 60元
+                |红包
+            h1.rule
+              b.day-com.two
+              |&nbsp&nbsp排行榜
+              b.day-com.three
+            .day-box1
+              p
+               b.red(style="font-size:24px") 日榜：
+               |每天的投标累计金额
+               b.red ≥6万元
+               | 的用户排行榜，次日清零
+              ul.day-user#day-user
+                b.banyuan
+                li.day-user-hight
+                  span 榜单
+                  span 用户
+                  span 累计金额
+
+                if top_ten
+                  for day in top_ten
+                    if forloop.counter < 4
+                      li.day-user-hight
+                        span.day-user-hight2 {{ forloop.counter }}
+                        span {{day.phone | safe_phone_new }}
+                        span {{day.amount_sum | money_format_int}}元
+                    else
+                      li
+                        span {{ forloop.counter }}
+                        span {{day.phone | safe_phone_new }}
+                        span {{day.amount_sum | money_format_int}}元
+
+
+              .day-jiang
+                .p
+                  p.day-hong 奖励每天投标累计最高的
+                  p.day-hong
+                    b.h-gold 前10名
+                  p.day-hong 最高奖励
+                    b.h-gold 1000元红包
+                  h1 红人榜
+            h1.rule
+              b.day-com.four(style="width:416px")
+              |&nbsp&nbsp红包使用规则
+              b.day-com.three
+            .day-box1
+              ul.day-xijie
+                li
+                  span 1
+                  |红包有效期2015年3月17日-2015年6月17日；
+                li
+                  span 2
+                  |现金奖励在三个工作日内以红包形式发出，红包类型为直抵红包；
+                li
+                  span 3
+                  |获奖红包以站内信形式通知，完成一次投资回款后即可取现；
+                li
+                  span 4
+                  |红包均只能使用一次，使用后是否有余额即失效；
+                li
+                  span 5
+                  |刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现；
+                li
+                  span 6
+                  |本活动不收取任何费用，谨防上当受骗；
+                li
+                  span 7
+                  |网利宝对此活动享有最终解释权。
+            h1.day-history
+              a(href="/activity/xunleidenglu/") 历史榜单
+          .day-footer
+            .footer-img
+        #login-modal(style="display:none")
+          .padding-s
+            ul.login-modal-tab
+             li#tab-login.active 用户登录
+             li#tab-register 用户注册
+
+          include include/login_form
+          include include/register_form
+
+    script(src="/static/js/lib/jquery.min.js")
+    script.
+        var xz=document.getElementById("xiaz");
+         var v = new Date().getTime()
+          xz.onclick=function(v) {
+            xz.className='hight';
+            var android, iphone;
+            console.log(navigator.userAgent);
+            iphone = /iphone/i.test(navigator.userAgent.toLowerCase());
+            android = /android/i.test(navigator.userAgent.toLowerCase());
+            if (iphone) {
+              window.location.href = "https://itunes.apple.com/cn/app/id881326898";
+              return true;
+            }else if (android) {
+              window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao";
+              return true;
+            } else {
+              window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao";
+              return true;
+            }
+        };
+
+        for(var i={{top_len}}+1;i<=10;i++){
+           if(i<=3){
+             var str="<li class='day-user-hight'><span class='day-user-hight2'>"+i+"</span><span> —— </span><span> —— </span></li>";
+           } else {
+             var str="<li><span>"+i+"</span><span> —— </span><span> —— </span></li>";
+           }
+
+           $('#day-user').append(str);
+        }
+
+    script.
+      var v = new Date().getTime()
+      require(['/static/js/hover.js','/static/js/login_modal.js?v='+v])
