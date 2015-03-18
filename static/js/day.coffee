@@ -124,9 +124,6 @@ require ['jquery'], ($)->
   $('.day-yue span').on('click',()->
     m=parseInt($('.mon').text())
     d=$(this).text()
-    $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2')
-    $(this).parent().siblings().children('span').removeClass('tap-hight2')
-    $('#left-h1').html('－－'+m+'月'+d+'日用户榜单－－')
     if d.length<2
       d='0'+d
     time='2015-0'+m+'-'+d
@@ -136,7 +133,12 @@ require ['jquery'], ($)->
     day=data.getDate()
     date=Y+'-0'+m+"-"+day
     if time>='2015-03-17' and time<='2015-04-30' and time<=date
+      $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2')
+      $(this).parent().siblings().children('span').removeClass('tap-hight2')
+      $('#left-h1').html('－－'+m+'月'+d+'日用户榜单－－')
       shuju(time)
+
+
   )
 
 
