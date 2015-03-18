@@ -31,7 +31,7 @@
               initIndex: null,
               init:function(){
                  var that = this;
-                 var isHover = false;
+                 var isHover = false,setTimeHover;
                  $(".circle").hover(function(){
                       that.initIndex = $(this).index()/2-1
                       var imgUrl = "/static/images/pptv/"+that.dataImg[that.initIndex]+".jpg"
@@ -43,6 +43,7 @@
                       isHover = true;
                   },function(){
                       isHover &&  that.close()
+                      isHover = false;
                   })
                   $(".last").on("click",function(){
                       that.last(that.changHover)
