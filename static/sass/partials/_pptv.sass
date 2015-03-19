@@ -1,4 +1,6 @@
 
+$orgin-color: #ff6502
+$green-color: #94bf48
 body
   .pptv-logo
     +inline-block()
@@ -7,10 +9,19 @@ body
     background-position: center
     height: 75px
     width: 350px
+  .aiqiyi-logo
+    +inline-block()
+    background: image-url('aiqiyi-logo.jpg')
+    background-repeat: no-repeat
+    background-position: center
+    height: 75px
+    width: 350px
   .pptv
     background: #397ee9 url(/static/images/pptv/pptv-banner.jpg) center center
     .gold2
       position: relative
+      .aiqiyi-form
+        top: 40px
       .form-control-group
         height: 40px
       .pptv-huoqu-ma
@@ -21,6 +32,15 @@ body
         background: #8bc34a
         &:hover
           background: #659132
+  .aiqiyi
+    background: #94bf48 url(/static/images/aiqiyi/aiqiyi-banner.jpg) center center
+    height: 450px
+    @extend .gold2
+    .aiqiyi-biaoti
+      font-size: 22px
+      color: #ff5252
+      text-align: center
+      padding-top: 20px
   .san-new
     background: #fff
     .san-new-content
@@ -184,6 +204,8 @@ body
           width: 30px
           height: 30px
           z-index: 10
+        .aiqiyi-close
+          background: url("/static/images/aiqiyi/close.png") center no-repeat
         .last
           position: absolute
           left: 0
@@ -212,6 +234,12 @@ body
           position: relative
           width: 100%
           height: 100%
+      .aiqiyi-float
+        border: 3px solid $green-color
+        .last
+          background-color: $green-color
+        .next
+          background-color: $green-color
       .triangle-start
         float: left
         display: inline-block
@@ -263,36 +291,29 @@ body
           +border-radius(50px)
           background: #fff url("/static/images/pptv/liucheng.png") no-repeat
           +transition(all .3s ease-in-out)
+          &:hover
+            background-color: #448aff
+            border: 4px solid #448aff
         .free
           background-position: 10px 10px
           &:hover
             background-position: 10px -63px
-            background-color: #448aff
-            border: 4px solid #448aff
         .atte
           background-position: 10px -138px
           &:hover
             background-position: 10px -207px
-            background-color: #448aff
-            border: 4px solid #448aff
         .recharge
           background-position: 12px -280px
           &:hover
             background-position: 12px -350px
-            background-color: #448aff
-            border: 4px solid #448aff
         .tender
           background-position: 10px -423px
           &:hover
             background-position: 10px -495px
-            background-color: #448aff
-            border: 4px solid #448aff
         .collec
           background-position: 10px -566px
           &:hover
             background-position: 10px -637px
-            background-color: #448aff
-            border: 4px solid #448aff
         .circle-txt
           padding: 20px 0 10px 0
           text-align: center
@@ -306,12 +327,37 @@ body
           white-space: nowrap
           em
             color: #E54C4C
+        .aiqiyi-body
+          background: #fff url("/static/images/aiqiyi/liucheng.png") no-repeat
+          &:hover
+            background-color: $green-color
+            border: 4px solid $green-color
+        .free
+          background-position: 10px 10px
+          &:hover
+            background-position: 10px -63px
+        .atte
+          background-position: 10px -138px
+          &:hover
+            background-position: 10px -207px
+        .recharge
+          background-position: 12px -280px
+          &:hover
+            background-position: 12px -350px
+        .tender
+          background-position: 10px -423px
+          &:hover
+            background-position: 10px -495px
+        .collec
+          background-position: 10px -566px
+          &:hover
+            background-position: 10px -637px
         .circle-float
           position: absolute
           top: -430px
           left: 50%
-          width: 500px
-          height: 400px
+          width: 550px
+          height: 390px
           margin-left: -250px
           background: #fff
           display: none
@@ -342,5 +388,68 @@ body
             height: 100%
   .content-process
     background: #f7f7f7
+  .aiqiyi-process
+    background: #fff
+    padding-bottom: 40px
+    .text-head
+      padding: 20px 0 10px 0
+      span
+        color: #fff
+        font-size: 18px
+        background: $green-color
+        padding: 2px 21px
+        +border-radius(4px)
+    p
+      font-size: 18px
+      color: #666
+      line-height: 30px
+    .text-activity
+      padding: 30px 0 10px 0
+  .aiqiyi-table
+    background: #f7f7f7
+    .table-body
+      max-width: 1100px
+      min-width: 1100px
+      margin: 0px auto
+      .table-cont
+        padding-bottom: 50px
+      .table-txt
+        font-size: 18px
+        color: #666
+        padding: 20px 0 30px 0
+      .aiqiyi-table
+        width: 100%
+        text-align: center
+        tr
+          border: 1px solid $green-color
+          text-align: center
+          th
+            background: $green-color
+            text-align: center
+            color: #fff
+            font-size: 24px
+            height: 40px
+            width: 33%
+          td
+            text-align: center
+            height: 60px
+            font-size: 24px
+          .orgin-font
+            color: $green-color
+          .red-font
+            color: $orgin-color
+          .orgin-bg
+            background: $orgin-color
+            color: #fff
+            border-top: 1px solid $orgin-color
+            border-bottom: 1px solid $orgin-color
+            border-right: 3px solid $orgin-color
+            border-left: 3px solid $orgin-color
+            a
+              display: block
+          .orgin-br
+            border-bottom: 1px solid $orgin-color
+            border-right: 3px solid $orgin-color
+            border-left: 3px solid $orgin-color
   .pptv-bottom
     text-align: center
