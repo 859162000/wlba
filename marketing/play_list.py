@@ -11,6 +11,7 @@ from models import PlayList
 from tops import Top
 from rest_framework import renderers
 from rest_framework.views import APIView
+from wanglibao.templatetags.formatters import safe_phone_str
 
 
 class Investment(TemplateView):
@@ -32,6 +33,9 @@ class InvestmentHistory(APIView):
     def post(self, request):
         day = request.DATA.get('day')
         day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
+        for tmp in day_tops:
+            if 'phone' in tmp:
+                tmp['phone'] = safe_phone_str(tmp['phone'])
         result = [{
             "tops": day_tops,
             "tops_len": len(day_tops)
@@ -85,7 +89,7 @@ class InvestmentRewardView(TemplateView):
 
         play_list = PlayList.objects.filter(
             play_at=local_to_utc(day, 'min'),
-            redpackevent__startswith=redpack
+            redpackevent=redpack
         )
 
         if play_list.count() > 0:
@@ -139,12 +143,14 @@ class InvestmentRewardView(TemplateView):
 
     def _return_format(self, message, day, redpack):
         play_list = self._query_play_list(day, redpack)
+        play_list_checked = play_list.filter(checked_status=2)
         return {
             "message": message,
             "result": paginator_factory(obj=play_list, page=self.request.GET.get('page'), limit=3),
             "day": day.date().__str__(),
             "redpack": redpack,
-            "amount_all": play_list.aggregate(sum_reward=Sum('reward')) if play_list else 0.00
+            "amount_all": play_list.aggregate(reward=Sum('reward')) if play_list else 0.00,
+            "amount_redpack": play_list_checked.aggregate(reward=Sum('reward')) if play_list_checked else 0.00
         }
 
     @staticmethod
@@ -191,6 +197,9 @@ class InvestmentRewardView(TemplateView):
         amount_min, amount_max, start, end, reward, exchange, redpack = rule
 
         records = self._query_play_list(day=day, redpack=redpack)
+        if records.count() == 0:
+            message = u'不存在需要审核数据，请检查操作流程是否正确！'
+            return self.render_to_response(self._return_format(message, day, redpack))
         if records.filter(checked_status__in=[1, 2]).count() > 0:
             message = u'此规则已经审核，不允许再次审核！'
             return self.render_to_response(self._return_format(message, day, redpack))
@@ -198,7 +207,11 @@ class InvestmentRewardView(TemplateView):
         check_button = request.POST.get('check_button')
         if check_button == '1':
             records.filter(checked_status=0).update(checked_status=1)
-            send_redpack()
+            send_redpack.apply_async(kwargs={
+                "day": day.date().__str__(),
+                "desc": redpack,
+                "rtype": "activity"
+            })
             message = u'审核通过完成，稍等查询红包发放结果！'
         elif check_button == '2':
             records.filter(checked_status=0).delete()

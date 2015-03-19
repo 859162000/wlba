@@ -150,8 +150,6 @@ html
                         span {{ forloop.counter }}
                         span {{day.phone | safe_phone_new }}
                         span {{day.amount_sum | money_format_int}}元
-
-
               .day-jiang
                 .p
                   p.day-hong 奖励每天投标累计最高的
@@ -188,7 +186,7 @@ html
                   span 7
                   |网利宝对此活动享有最终解释权。
             h1.day-history
-              a(href="/activity/xunleidenglu/") 历史榜单
+              a(href="/activity/history/") 历史榜单
           .day-footer
             .footer-img
         #login-modal(style="display:none")
@@ -196,7 +194,6 @@ html
             ul.login-modal-tab
              li#tab-login.active 用户登录
              li#tab-register 用户注册
-
           include include/login_form
           include include/register_form
 
@@ -224,9 +221,9 @@ html
 
         for(var i={{top_len}}+1;i<=10;i++){
            if(i<=3){
-             var str="<li class='day-user-hight'><span class='day-user-hight2'>"+i+"</span><span> —— </span><span> —— </span></li>";
+             var str="<li class='day-user-hight'><span class='day-user-hight2'>"+i+"</span><span>－－</span><span>－－</span></li>";
            } else {
-             var str="<li><span>"+i+"</span><span> —— </span><span> —— </span></li>";
+             var str="<li><span>"+i+"</span><span>－－</span><span>－－</span></li>";
            }
 
            $('#day-user').append(str);
