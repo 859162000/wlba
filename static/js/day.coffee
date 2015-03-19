@@ -91,7 +91,7 @@ require ['jquery'], ($)->
               if j< data[0]['tops_len']
                 str+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'],2)+' 元</span></li>'
                 $('#dan').html(str)
-              if j>data[0]['tops_len']
+              if j>=data[0]['tops_len']
                 str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
                 $('#dan').append(str3)
             if j%2!=0
