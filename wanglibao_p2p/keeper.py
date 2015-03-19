@@ -367,7 +367,8 @@ class AmortizationKeeper(KeeperBaseMixin):
                 user_amos.append(amortization)
             
             if terms['interest_arguments']:
-                args = terms['interest_arguments'].update({equity:equity})
+                args = terms['interest_arguments'].update({"equity":equity})
+                args = terms['interest_arguments']
                 interest_precision = InterestPrecisionBalance(**args)
 
 
