@@ -67,7 +67,7 @@ class InvestmentRewardView(TemplateView):
         if cat == 'investment':
             rules = (
                 (60000, None, None, 10, 1000, -100, u'每日打榜红包_1000-100', ),
-                (60000, None, 11, None, 60, None, u'每日打榜红包_60'),
+                (60000, None, 10, None, 60, None, u'每日打榜红包_60'),
                 (50000, 59999, None, None, 50, None, u'每日打榜红包_50',),
                 (40000, 49999, None, None, 40, None, u'每日打榜红包_40',),
                 (30000, 39999, None, None, 30, None, u'每日打榜红包_30',),
