@@ -169,7 +169,7 @@
           type: "POST",
           data: $(form).serialize()
         }).done(function(data, textStatus) {
-          return window.location.href='/';
+          return window.location.href='/accounts/home/';
         }).fail(function(xhr) {
           var error_message, message, result;
           result = JSON.parse(xhr.responseText);
