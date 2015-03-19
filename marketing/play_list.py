@@ -196,10 +196,6 @@ class InvestmentRewardView(TemplateView):
         day, rule = data['day'], data['rule']
         amount_min, amount_max, start, end, reward, exchange, redpack = rule
 
-        print '>>>>>>>>>'
-        print 'datetime.now>>>>', datetime.now().date()
-        print 'day>>>>', day.date()
-
         records = self._query_play_list(day=day, redpack=redpack)
         if records.count() == 0:
             message = u'不存在需要审核数据，请检查操作流程是否正确！'
