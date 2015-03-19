@@ -343,6 +343,8 @@ class AmortizationKeeper(KeeperBaseMixin):
 
             InterestInAdvance.objects.bulk_create(interestInAdvances)
 
+        product_interest = Decimal(0)
+
         for equity in equities:
             terms = amortization_cls.generate(equity.equity, product.expected_earning_rate / 100, product_interest_start, product.period)
 
@@ -352,6 +354,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 amortization.principal = term[1]
                 if interest_in_advance:
                     amortization.interest = term[2] + interest_in_advance[str(equity.user.pk)]
+                    product_interest = product_interest + amortization.interest
                 else:
                     amortization.interest = term[2]
                 amortization.term = index + 1
@@ -369,6 +372,11 @@ class AmortizationKeeper(KeeperBaseMixin):
 
 
         UserAmortization.objects.bulk_create(user_amos)
+
+        if interest_in_advance:
+            product_amortizations[0].interest = product_interest
+            product_amortizations[0].save()
+
 
 
     def __generate_useramortization(self, equities):
