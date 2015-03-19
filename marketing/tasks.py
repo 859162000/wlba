@@ -58,9 +58,7 @@ def send_redpack(day, desc, rtype='nil'):
                     PlayList.objects.filter(pk=play.id).update(checked_status=2)
 
                     # 发送站内信
-                    message_content = u"您在每日投资打榜的活动中，投资{0}获得{1}元红包。<br/>" \
-                                      u"感谢您对我们的支持与关注。<br/>" \
-                                      u"网利宝".format(play.amount, play.reward)
+                    message_content = u"您在本次打榜活动中获奖，奖励红包已发送到您的账户，请在个人账户红包中查看。感谢您对我们的支持与关注。"
 
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
