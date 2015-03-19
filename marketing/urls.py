@@ -26,6 +26,7 @@ urlpatterns = patterns(
     url(r'^xunleidenglu/$', TemplateView.as_view(template_name="xunleiredpack.jade")),
     url(r'^app_new/$', TemplateView.as_view(template_name="app_new_user.jade")),
     url(r'^history/$', TemplateView.as_view(template_name="day_history.jade")),
+    url(r'^pptv_redpack/$', TemplateView.as_view(template_name="pptv_redpack.jade")),
 )
 
 urlpatterns += patterns(
