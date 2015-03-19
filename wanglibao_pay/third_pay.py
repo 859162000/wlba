@@ -625,7 +625,7 @@ class KuaiPay:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
-            if bank and bank != card.bank:
+            if bank and card and bank != card.bank:
                 return {"ret_code":201153, "message":"银行卡与银行不匹配"}
 
         if not card and not bank:
