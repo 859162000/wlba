@@ -74,7 +74,7 @@
           var imgUrl = "/static/images/pptv/"+pptvUntil.dataImg[index]+".jpg"
           pptvUntil.$float.find("img").attr("src",imgUrl)
           $(".circle").find(".circle-body").removeAttr("style")
-          $(".circle").eq(index).find(".circle-body").attr("style", "background-position:" + pptvUntil.newUrl[pptvUntil.initIndex].x + " " + pptvUntil.newUrl[pptvUntil.initIndex].y + ";background-color:#448aff;border:4px solid #448aff")
+          $(".circle").eq(index).find(".circle-body").attr("style", "background-position:" + pptvUntil.newUrl[pptvUntil.initIndex].x + " " + pptvUntil.newUrl[pptvUntil.initIndex].y + ";background-color:#94bf48;border:4px solid #94bf48")
       }
     }
     pptvUntil.init();
