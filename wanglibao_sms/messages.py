@@ -239,5 +239,5 @@ def msg_month_iqiyi(activation):
 
 def msg_month_pptv(activation):
     title = u"实名认证送一个月PPTV会员"
-    content = u"感谢您在活动期间完成实名认证。<br/>网利宝赠送您一个月PPTV会员，会员码为：%s，请注意查收。<br/>感谢您对我们的信任与支持！<br/>网利宝" % activation
+    content = u"感谢您在活动期间完成实名认证。<br/>网利宝赠送您一个月PPTV会员，会员码为：%s，有效期至2015年4月25日，请注意查收。<a href='http://pay.vip.pptv.com/vipcard/' target='_blank'>使用地址</a><br/>感谢您对我们的信任与支持！<br/>网利宝" % activation
     return title, content

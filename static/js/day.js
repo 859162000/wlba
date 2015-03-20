@@ -67,13 +67,14 @@
         },
         type: 'POST'
       }).done(function(data) {
-        var j, str, str2, str3, str4, _results;
+        var j, str, str2, str3, str4, str5, _results;
         data = JSON.parse(data);
         j = 0;
         str = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
         str2 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
         str3 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
         str4 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
+        str5 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
         _results = [];
         while (j < 10) {
           if (data[0]['tops_len'] === 0) {
@@ -87,24 +88,41 @@
             }
           }
           if (data[0]['tops_len'] !== 0) {
-            if (j < data[0]['tops_len']) {
+            if (data[0]['tops_len'] === 1) {
               if (j % 2 === 0) {
-                str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum'], 2) + ' 元</span></li>';
-                $('#dan').html(str);
+                if (j < data[0]['tops_len']) {
+                  str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum'], 2) + ' 元</span></li>';
+                  $('#dan').html(str);
+                }
+                if (j > data[0]['tops_len']) {
+                  str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                  $('#dan').append(str3);
+                }
               }
               if (j % 2 !== 0) {
-                str2 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum'], 2) + ' 元</span></li>';
-                $('#shuang').html(str2);
+                str5 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                $('#shuang').html(str5);
               }
-            }
-            if (j >= data[0]['tops_len']) {
+            } else {
               if (j % 2 === 0) {
-                str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                $('#dan').append(str3);
+                if (j < data[0]['tops_len']) {
+                  str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum'], 2) + ' 元</span></li>';
+                  $('#dan').html(str);
+                }
+                if (j >= data[0]['tops_len']) {
+                  str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                  $('#dan').append(str3);
+                }
               }
               if (j % 2 !== 0) {
-                str4 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                $('#shuang').html(str4);
+                if (j < data[0]['tops_len']) {
+                  str2 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum'], 2) + ' 元</span></li>';
+                  $('#shuang').html(str2);
+                }
+                if (j >= data[0]['tops_len']) {
+                  str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                  $('#shuang').append(str3);
+                }
               }
             }
           }

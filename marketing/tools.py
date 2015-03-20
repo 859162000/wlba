@@ -115,6 +115,11 @@ def decide_first(user_id, amount):
         start_time = timezone.datetime(2014, 11, 12)
         if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
             rs.reward_user(u'一个月迅雷会员')
+    elif channel == helper.Channel.IQIYI:
+        # 非快盘来源(需要确定到每个渠道)
+        start_time = timezone.datetime(2015, 3, 19)
+        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
+            rs.reward_user(u'一个月爱奇艺会员')
 
 #注册成功
 @app.task

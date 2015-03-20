@@ -6,7 +6,6 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-
   body(style="background:#fff")
     .full-container
       .topbar
@@ -38,7 +37,7 @@ html
         .row
           .span2
             a(href='/')
-              .pptv-logo
+              .aiqiyi-logo
           .span10
             .nav-items.xiao-nav
               ul
@@ -60,23 +59,23 @@ html
 
                 +nav-item('安全保障', '/security', 'left-line', '')
                 +nav-item('帮助中心', '/help', '', '')
-    .wrap.pptv
+    .wrap.aiqiyi.pptv
       .gold2
-        .denelu-form
-          h1.biaoti 注册送50元红包
+        .denelu-form.aiqiyi-form
+          h1.aiqiyi-biaoti 注册即送30元专享直抵红包
           form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
             - csrf_token
             .form-row
               .form-control-group
                 .span12
-                  input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="手机号")
+                  input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="手机号码")
               .form-row-error
             .form-row.voice
               .span12-omega.hidden.show
                 没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
               .form-control-group
                 .span6
-                   input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="验证码", autocomplete='off', title="验证码")
+                   input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="手机验证码", autocomplete='off', title="验证码")
                 .span6-omega
                    button#button-get-validate-code-modal.button-large.pptv-huoqu-ma(type='button',style="width:100%;margin-left:0") 获取验证码
               .form-row-error
@@ -125,79 +124,64 @@ html
                h3 权威
                p 洛克菲勒家族
                p 全方位战略合作
-    .content-process
+    .aiqiyi-table
+      .table-body
+        .table-txt 超高收益
+        .table-cont
+          table.aiqiyi-table
+            tr
+              th 银行定期存款
+              th.orgin-bg 网利宝
+              th 宝宝们
+            tr
+              td.orgin-font 3%
+              td.orgin-br.red-font 3% - 18%
+              td.orgin-font 3%
+            tr
+              td.orgin-font 银行本息担保
+              td.orgin-br.red-font 平安保险承保账户资金
+              td.orgin-font 亏本风险较低
+            tr
+              td.orgin-font 一年以上
+              td.orgin-br.red-font 多种期限任你选
+              td.orgin-font 无限制
+            tr(style="border:0")
+              td
+              td.orgin-bg
+                a.register-btn 立即注册
+              td
+    .aiqiyi-text.aiqiyi-process
       .content-pptv
-        .process-text 投资流程
-        .process-list
-          .circle-free.circle-float
-            .close
-            .last
-            .next
-            img(src="/static/images/pptv/free.jpg")
-          .triangle-start
-            .start-cont
-          .circle
-            .circle-body.free
-            .circle-txt 免费注册
-            .circle-txt2 送
-              em 50
-              |元红包
-          .triangle-center
-            .center-cont
-          .circle
-            .circle-body.atte
-            .circle-txt 进行认证
-            .circle-txt2 送
-              em 1
-              |个月PPTV会员
-          .triangle-center
-            .center-cont
-          .circle
-            .circle-body.recharge
-            .circle-txt 充值账户
-          .triangle-center
-            .center-cont
-          .circle
-            .circle-body.tender
-            .circle-txt 成功投标
-          .triangle-center
-            .center-cont
-          .circle
-            .circle-body.collec
-            .circle-txt 自动收款
-          .triangle-end
-            .end-cont
-    .san-new
-      .pptv-list
-        .border-box
-          .box-lfet
-            .head 银行定期存款
-            .img.box-img
-            .bot 银行本息担保
-          .box-right
-            .head 宝宝们
-            .img.box-img
-            .bot 亏本风险较低
-        .float-box
-          .float-head
-            img(src="/static/images/pptv/float-head.png")
-          .float-cont
-            p.head 13-18%
-            p.shou 收益率
-            p.p-icon
-              span
-              |平安保险承保账户资金
-          .float-btn
-            a.register-btn 注册投资
+        .text-head
+          span 操作流程
+        p 1、注册网利宝账户即送30元专享直抵红包，
+        p 2、账户实名认证后送7天爱奇艺会员，
+        p 3、首次投资送1个月爱奇艺会员。
+        .text-head.text-activity
+          span 活动规则
+        p 1. 手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账户；
+        p 2. 红包使用期限：2015年3月20日-2015年6月19日；
+        p 3. 直抵30红包投资金额500元方可使用；
+        p 4. 红包使用最多直抵30元。例：投资500元立减30元，实际支付470元；
+        p 5. 新手红包均只能使用一次，使用后是否有余额红包即失效；
+        p 6. 投资项目到期后本金+利息+红包金额可一并提现；
+        p 7. 登录网利宝官网：
+          b.note
+            a(href="http://www.wanglibao.com") www.wanglibao.com
+            |，或者使用app进行投资理财；
+        p 8. 网利宝平台不收取任何费用，谨防上当受骗；
+        p 9. 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现；
+        p 10. 网利宝对此活动享有最终解释权
+
     .san-new.content-process
-      .san-new-content.container
+      .san-new-content.cshouontainer
         .row.gold-dl-row
           .san-span.si-span
             dl
              dt.slist.slist-trust
              dd.pp-zi
                h3 收益高
-               p 40+银行收益
+               p 40+倍银行收益
           .san-span.si-span
             dl
              dt.slist.slist-security
@@ -219,27 +203,43 @@ html
                h3 周期短
                p 1个月，3个月
                p 6个月，9个月
-    .san-new
-      .pptv-list
-        .gold-footer
-            dl.beijing
-              dt.hei 活动规则
-              dd 1. 手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账户；
-              dd 2. 红包使用期限：2015年3月23日-2015年6月22日；
-              dd 3. 直抵50红包投资金额300元方可使用；
-              dd 4. 红包使用最多直抵50元。例：投资300元立减50元，实际支付250元；
-              dd 5. 新手红包均只能使用一次，使用后是否有余额红包即失效；
-              dd 6. 投资项目到期后本金+利息+红包金额可一并提现；
-              dd 7. 登录网利宝官网：
-                b.note <a href="http://www.wanglibao.com">www.wanglibao.com</a>，或者使用app进行投资理财；
-              dd 8. 本活动不收取任何费用，谨防上当受骗；
-              dd 9. 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现；
-              dd 10. 网利宝对此活动享有最终解释权。
-
+    .aiqiyi-process
+      .content-pptv
+        .process-text 投资流程
+        .process-list
+          .circle-free.circle-float.aiqiyi-float
+            .close.aiqiyi-close
+            .last
+            .next
+            img(src="/static/images/pptv/free.jpg")
+          .triangle-start
+            .start-cont
+          .circle
+            .circle-body.free.aiqiyi-body
+            .circle-txt 免费注册
+          .triangle-center
+            .center-cont
+          .circle
+            .circle-body.atte.aiqiyi-body
+            .circle-txt 进行认证
+          .triangle-center
+            .center-cont
+          .circle
+            .circle-body.recharge.aiqiyi-body
+            .circle-txt 充值账户
+          .triangle-center
+            .center-cont
+          .circle
+            .circle-body.tender.aiqiyi-body
+            .circle-txt 成功投标
+          .triangle-center
+            .center-cont
+          .circle
+            .circle-body.collec.aiqiyi-body
+            .circle-txt 自动收款
+          .triangle-end
+            .end-cont
     .pptv-bottom.content-process
       img(src="/static/images/pptv/pptv-bottom.png")
     script.
-      require(['/static/js/hover.js','/static/js/pptv_redpack.js'])
-
-
-
+      require(['/static/js/hover.js','/static/js/aiqiyi_redpack.js'])

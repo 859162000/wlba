@@ -65,6 +65,7 @@ require ['jquery'], ($)->
       str2='<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>'
       str3='<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>'
       str4='<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>'
+      str5='<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>'
       while j<10
         if data[0]['tops_len']==0
           if j%2==0
@@ -74,20 +75,32 @@ require ['jquery'], ($)->
             str4+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
             $('#shuang').html(str4)
         if data[0]['tops_len']!=0
-          if j<data[0]['tops_len']
+          if data[0]['tops_len']==1
             if j%2==0
-              str+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'],2)+' 元</span></li>'
-              $('#dan').html(str)
+              if j< data[0]['tops_len']
+                str+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'],2)+' 元</span></li>'
+                $('#dan').html(str)
+              if j>data[0]['tops_len']
+                str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
+                $('#dan').append(str3)
             if j%2!=0
-              str2+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'],2)+' 元</span></li>'
-              $('#shuang').html(str2)
-          if j>=data[0]['tops_len']
+              str5+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
+              $('#shuang').html(str5)
+          else
             if j%2==0
-              str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
-              $('#dan').append(str3)
+              if j< data[0]['tops_len']
+                str+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'],2)+' 元</span></li>'
+                $('#dan').html(str)
+              if j>=data[0]['tops_len']
+                str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
+                $('#dan').append(str3)
             if j%2!=0
-              str4+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
-              $('#shuang').html(str4)
+              if j<data[0]['tops_len']
+                str2+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'],2)+' 元</span></li>'
+                $('#shuang').html(str2)
+              if j>=data[0]['tops_len']
+                str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
+                $('#shuang').append(str3)
         j++
 # 获取当天日期
   data=new Date()
@@ -137,8 +150,6 @@ require ['jquery'], ($)->
       $(this).parent().siblings().children('span').removeClass('tap-hight2')
       $('#left-h1').html('－－'+m+'月'+d+'日用户榜单－－')
       shuju(time)
-
-
   )
 
 
