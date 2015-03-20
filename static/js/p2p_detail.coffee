@@ -51,7 +51,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       dividableBy100: true
       threshold: true
 
-  $('#purchase-form').validate
+  validator = $('#purchase-form').validate
     rules:
       amount: opt
     messages:
@@ -61,6 +61,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
     errorPlacement: (error, element) ->
       error.appendTo $(element).closest('.form-row__middle').find('.form-row-error')
+
+    success: () ->
+      console.log(arguments, validator)
 
     submitHandler: (form)->
       #autho: hetao; time: 2014.10.11; target: 抢购时未登录状态弹出登录层

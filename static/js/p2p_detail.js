@@ -16,7 +16,7 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
-    var buildTable, ddData, opt, page;
+    var buildTable, ddData, opt, page, validator;
     $('.payment2').hide();
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0 && !/\./ig.test(value);
@@ -61,7 +61,7 @@
         threshold: true
       };
     }
-    $('#purchase-form').validate({
+    validator = $('#purchase-form').validate({
       rules: {
         amount: opt
       },
@@ -73,6 +73,9 @@
       },
       errorPlacement: function(error, element) {
         return error.appendTo($(element).closest('.form-row__middle').find('.form-row-error'));
+      },
+      success: function() {
+        return console.log(arguments, validator);
       },
       submitHandler: function(form) {
         var tip;
@@ -554,5 +557,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_detail.js.map
