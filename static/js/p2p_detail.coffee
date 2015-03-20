@@ -13,7 +13,6 @@ require.config
 
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal)->
 
-  $('.payment2').hide()
   $.validator.addMethod 'dividableBy100', (value, element)->
     return value % 100 == 0 && !/\./ig.test(value)
   , '请输入100的整数倍'
@@ -52,6 +51,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       threshold: true
 
   validator = $('#purchase-form').validate
+    debug: true
     rules:
       amount: opt
     messages:
@@ -63,7 +63,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       error.appendTo $(element).closest('.form-row__middle').find('.form-row-error')
 
     success: () ->
-      console.log(arguments, validator)
+      $('#purchase-form').trigger('redpack')
 
     submitHandler: (form)->
       #autho: hetao; time: 2014.10.11; target: 抢购时未登录状态弹出登录层
@@ -148,6 +148,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     e.preventDefault()
     $('#purchase-form').submit()
 
+  $('#purchase-form').on 'redpack', ->
+    console.log('hello', 'redpack')
+
 
   #build the table for invest history
   buildTable = (list) ->
@@ -172,13 +175,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       i++
     html.join ""
 
-#  $(window).load (e) ->
-#    if(invest_result && invest_result.length > 0)
-#      $('.invest-history-table tbody').append(buildTable(invest_result.splice(0, 30)))
-#      if(invest_result.length > 5)
-#        $('.get-more').show()
-#      else
-#        $('.get-more').hide()
 
   page = 2
   $('.get-more').click (e) ->
@@ -239,252 +235,16 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           imagePosition: "left"
           selectText: "请选择红包"
           onSelected: (data) ->
-              obj = data.selectedData
-              if obj.value !=''
-                if $('#id_amount').val()
-                  j=0
-                  val_len=data2.packages.available.length
-                  while j<val_len
-                    if data2.packages.available[j].event_id ==7 and obj.value==data2.packages.available[j].id
-                      if obj.amount !=0
-                        pay_amount=$('#id_amount').val()
-                        $.ajax {
-                            url: '/api/redpacket/deduct/'
-                            data:{
-                              amount: pay_amount
-                              rpa: obj.amount
-                            }
-                            type: 'post'
-                          }
-                          .done (data)->
-                            $('.payment2').show()
-                            $('.payment').hide()
-                            $('.payment2').html(['红包使用<i>',data.deduct,'</i>元，','实际支付<i>', pay_amount-data.deduct, '</i>元'].join('')).css(color:'#999')
-                            $('.payment2 i').css(
-                              color: '#1A2CDB'
-                            )
-                      if $('#id_amount').val() - obj.invest_amount < 0
-                        $('.payment2').html('投资金额未达到红包使用门槛').css(
-                          color: 'red'
-                        )
-                        lable = $('label[for="id_amount"]')
-                        if $.trim(lable.text()) == ''
-                          $('label[for="id_amount"]').hide()
-                    else
-                      pay_amount=$('#id_amount').val()
-                      pay_now = parseFloat(pay_amount)
-                      pay_now =Math.round(pay_amount*100)/100
-                      $('.payment i').css(
-                          color: '#1A2CDB'
-                        )
-                      if pay_now-obj.amount<=0
-                        $('.payment2').show()
-                        $('.payment').hide()
-                        $('.payment2').html(['红包使用<i>',pay_now,'</i>元，','实际支付<i>', 0, '</i>元'].join('')).css(color:'#999')
-                        $('.payment2 i').css(
-                          color: '#1A2CDB'
-                        )
-                      else
-                        $('.payment2').show()
-                        $('.payment').hide()
-                        $('.payment2').html(['红包使用<i>',obj.amount,'</i>元，','实际支付<i>',pay_now-obj.amount,'</i>元，'].join('')).css(
-                          color:'#999'
-                        )
-                        $('.payment2 i').css(
-                          color: '#1A2CDB'
-                        )
-                    j++
-                else
-#                  $('.form-row-error').show()
-#                  $('.form-row-error').html('请输入投资金额').css(
-#                    color: 'red'
-#                  )
-#                  alert('请输入投资金额')
-#                  window.location.href=''
-              else if $('#id_amount').val()
-                pay_amount=$('#id_amount').val()
-                $('.payment').show()
-                $('.payment2').hide()
-                $('.payment').html(['实际支付<i>',pay_amount,'</i>元，'].join('')).css(
-                  color:'#999'
-                )
-                $('.payment i').css(
-                    color: '#1A2CDB'
-                  )
-        $('#id_amount').keyup (e) ->
-          max_pay=$('#id_amount').attr('data-max')
-          amount2=$('#id_amount').val()
-          if obj.value
-            if $('#id_amount').val()<=max_pay
-              for obj in ddData
-                if obj.value == $('.dd-selected-value').val()*1
-                  selectedData = obj
-                  break
-              amount = $('#id_amount').val()
-              k=0
-              val_len2=data2.packages.available.length
-              while k<val_len2
-                if selectedData and data2.packages.available[k].event_id ==7 and obj.value==data2.packages.available[k].id
-                  $('.payment2').show()
-                  if amount - selectedData.invest_amount >= 0
-                    pay_amount=$('#id_amount').val()
-                    $.ajax {
-                        url: '/api/redpacket/deduct/'
-                        data:{
-                          amount: pay_amount
-                          rpa: obj.amount
-                        }
-                        type: 'post'
-                      }
-                      .done (data)->
-                        $('.payment2').show()
-                        $('.payment').hide()
-                        $('.payment2').html(['红包使用<i>',data.deduct,'</i>元，','实际支付<i>', pay_amount-data.deduct, '</i>元'].join('')).css(color:'#999')
-                        $('.payment2 i').css(
-                          color: '#1A2CDB'
-                        )
-                  else if $.isNumeric(amount) and amount > 0
-                    pay_amount=$('#id_amount').val()
-                    $.ajax {
-                        url: '/api/redpacket/deduct/'
-                        data:{
-                          amount: pay_amount
-                          rpa: obj.amount
-                        }
-                        type: 'post'
-                      }
-                      .done (data)->
-                        if pay_amount-obj.amount<=0
-                          $('.payment2').show()
-                          $('.payment').hide()
-                          $('.payment2').html(['红包使用<i>',data.deduct,'</i>元，','实际支付<i>', pay_amount-data.deduct, '</i>元'].join('')).css(color:'#999')
-                          $('.payment2 i').css(
-                            color: '#1A2CDB'
-                          )
-                        else
-                          $('.payment2').show()
-                          $('.payment').hide()
-                          $('.payment2').html(['红包使用<i>',obj.amount,'</i>元，','实际支付<i>',pay_amount-obj.amount,'</i>元，'].join('')).css(
-                            color:'#999'
-                          )
-                          $('.payment2 i').css(
-                            color: '#1A2CDB'
-                          )
-                  else
-                    $('.payment2').html('投资金额未达到红包使用门槛').css(
-                      color: 'red'
-                    )
-                    lable = $('label[for="id_amount"]')
-                    if $.trim(lable.text()) == ''
-                      $('label[for="id_amount"]').hide()
-                else
-                  if amount2
-                    if amount2-obj.amount<0
-
-                      $('.payment2').show()
-                      $('.payment').hide()
-                      $('.payment2').html(['红包使用<i>',amount2,'</i>元，','实际支付<i>', 0, '</i>元'].join('')).css(color:'#999')
-                      $('.payment2 i').css(
-                        color: '#1A2CDB'
-                      )
-
-                    else
-
-
-                      amount3=$('#id_amount').val()
-                      $('.invest').removeClass('notlogin')
-                      if !isNaN(amount3-obj.amount)
-                        $('.payment2').show()
-                        $('.payment').hide()
-                        $('.payment2').html(['红包使用<i>',obj.amount,'</i>元，','实际支付<i>',amount3-obj.amount,'</i>元，'].join('')).css(
-                          color:'#999'
-                        )
-                        $('.payment2 i').css(
-                          color: '#1A2CDB'
-                        )
-                      else
-                        $('.payment2').show()
-                        $('.payment').hide()
-                        $('.payment2').html(['红包使用<i>',obj.amount,'</i>元，','实际支付<i>0</i>元，'].join('')).css(
-                          color:'#999'
-                        )
-                        $('.payment2 i').css(
-                          color: '#1A2CDB'
-                        )
-                  else
-                    $('.payment2').show()
-                    $('.payment').hide()
-                    $('.payment2').html(['红包使用<i>0</i>元，','实际支付<i>0</i>元，'].join('')).css(
-                      color:'#999'
-                    )
-                    $('.payment2 i').css(
-                      color: '#1A2CDB'
-                    )
-                k++
-            else
-              XMLHttpRequest. readyState=0
-              g=0
-              obj_val=data2.packages.available.length
-              while g<obj_val
-                if data2.packages.available[g].event_id ==7 and obj.value==data2.packages.available[g].id
-                  mes=obj.value
-                g++
-              if mes
-                pay_amount=$('#id_amount').val()
-                $.ajax {
-                  url: '/api/redpacket/deduct/'
-                  data:{
-                    amount: pay_amount
-                    rpa: obj.amount
-                  }
-                  type: 'post'
-                }
-                .done (data)->
-                  $('.payment2').show()
-                  $('.payment').hide()
-                  $('.payment2').html(['红包使用<i>',data.deduct,'</i>元，','实际支付<i>',pay_amount-data.deduct,'</i>元，'].join('')).css(
-                    color:'#999'
-                  )
-                  $('.payment2 i').css(
-                    color: '#1A2CDB'
-                  )
-
+              console.log(validator.checkForm(), 'hello')
+              if validator.checkForm()
+                $('#purchase-form').trigger('redpack')
               else
-                if amount2-obj.amount<0
-                  $('.payment').hide()
-                  $('.payment2').show()
-                  $('.payment2').html(['红包使用<i>',amount2,'</i>元，','实际支付<i>0</i>元，'].join('')).css(color:'#999')
-                  $('.payment2 i').css(
-                      color: '#1A2CDB'
-                  )
-                else
-                  $('.payment').hide()
-                  $('.payment2').show()
-                  $('.payment2').html(['红包使用<i>',obj.amount,'</i>元，','实际支付<i>',amount2-obj.amount,'</i>元，'].join('')).css(color:'#999')
-                  $('.payment2 i').css(
-                      color: '#1A2CDB'
-                  )
+                $('#purchase-form').valid()
 
-          else
-            if !isNaN($('#id_amount').val())
-              pay_amount=$('#id_amount').val()
-              pay_now = parseFloat(pay_amount)
-              pay_now =Math.round(pay_amount*100)/100
-              $('.payment i').css(
-                  color: '#1A2CDB'
-                )
-              $('.payment2').hide()
-              $('.payment').html(['实际支付<i>',pay_now,'</i>元，'].join('')).css(color:'#999')
-              $('.payment i').css(
-                  color: '#1A2CDB'
-                )
-            else
-              $('.payment2').hide()
-              $('.payment').html(['实际支付<i>0</i>元，'].join('')).css(color:'#999')
-              $('.payment i').css(
-                  color: '#1A2CDB'
-                )
-#          console.log($('.payment').text())
+
+
+        $('#id_amount').keyup (e) ->
+          console.log('hello')
 
 
         $('#id_amount').blur (e) ->
