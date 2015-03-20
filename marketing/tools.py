@@ -18,6 +18,7 @@ from marketing.models import IntroducedBy, Reward, RewardRecord
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_activity import backends as activity_backends
 
 #判断是否首次
 @app.task
@@ -135,15 +136,20 @@ def register_ok(user_id, device_type):
         "content": content,
         "mtype": "activityintro"
     })
+    #活动检测
+    activity_backends.check_activity(user, 'register', device_type)
     #注册红包
-    redpack_backends.give_register_redpack(user, device_type)
+    # redpack_backends.give_register_redpack(user, device_type)
 
 #实名认证
 @app.task
-def idvalidate_ok(user_id):
+def idvalidate_ok(user_id, device_type):
     user = User.objects.filter(id=user_id).first()
     #introduced_by = IntroducedBy.objects.filter(user=user).first()
     channel = helper.which_channel(user)
+
+    #活动检测
+    activity_backends.check_activity(user, 'validation', device_type)
 
     if channel == helper.Channel.KUAIPAN:
         rs = RewardStrategy(user)

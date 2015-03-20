@@ -14,5 +14,10 @@ class ActivityRuleAdmin(admin.ModelAdmin):
                     'reward', 'income', 'min_amount', 'max_amount')
 
 
+class ActivityRecordAdmin(admin.ModelAdmin):
+    list_display = ('activity', 'rule', 'platform', 'trigger_node', 'description', 'user', 'income', 'created_at')
+
+
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ActivityRule, ActivityRuleAdmin)
+admin.site.register(ActivityRecord, ActivityRecordAdmin)

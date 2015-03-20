@@ -30,12 +30,12 @@ STATUS = (
 )
 TRIGGER_NODE = (
     ('register', u'注册'),
-    ('id_validate', u'实名认证'),
-    ('recharge', u'充值'),
-    ('invest', u'投资'),
-    ('first_recharge', u'首次充值'),
-    ('first_invest', u'首次投资'),
-    ('', u'满标审核')
+    ('validation', u'实名认证'),
+    ('pay', u'充值'),
+    ('buy', u'投资'),
+    ('first_pay', u'首次充值'),
+    ('first_buy', u'首次投资'),
+    ('p2p_audit', u'满标审核')
 )
 GIFT_TYPE = (
     ('reward', u'奖品'),
@@ -100,7 +100,7 @@ class ActivityRule(models.Model):
     min_amount = models.IntegerField(u'最小金额（投资或充值）', default=0)
     max_amount = models.IntegerField(u'最大金额（投资或充值）', default=0)
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True, help_text=u'站内信模板不填写则触发该规则时不发站内信，如果有动态变量，用“%s”代替')
-    sms_template = models.TextField(u'短信信模板（不填则不发）', blank=True, help_text=u'短信模板不填写则触发该规则时不发手机短信，如果有动态变量，用“%s”代替')
+    sms_template = models.TextField(u'短信模板（不填则不发）', blank=True, help_text=u'短信模板不填写则触发该规则时不发手机短信，如果有动态变量，用“%s”代替')
     send_type = models.CharField(u'赠送发放方式', max_length=20, choices=SEND_TYPE, default=u'系统实时发放')
     created_at = models.DateTimeField(auto_now=True)
 
@@ -131,6 +131,7 @@ class ActivityRecord(models.Model):
     trigger_at = models.DateTimeField(u'触发时间', auto_created=False)
     description = models.TextField(u'摘要', blank=True)
     user = models.ForeignKey(User, verbose_name=u"触发用户")
+    income = models.FloatField(u'费用或收益', null=True, blank=True)
     created_at = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
