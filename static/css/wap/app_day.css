@@ -84,8 +84,8 @@ body{
 }
 
 .minge-one,.minge-two{
-    width: 6.2em;
-    height: 4em;
+    width: 6.4em;
+    height: 4.4em;
     display: inline-block;
     background: #c62c3d;
     text-align: center;
@@ -94,6 +94,7 @@ body{
     -webkit-border-radius: 0.5em;
     border-radius:0.5em;
     position: relative;
+    vertical-align:top;
 
 
 
@@ -102,20 +103,18 @@ body{
     margin-left: 2%;
 }
 .minge-one p{
-    position: absolute;
     color: #FFF;
-    top: 0.5em;
-    left: 11%;
-    line-height: 1.2em;
+    margin-top: 9%;
+    text-align: center;
+    line-height: 1.4em;
 }
 .minge-two{
       margin-left: 56%;
 }
 .minge-two h5{
-    position: absolute;
     font-size: 1.4em;
-    line-height: 3em;
-    left: 6%;
+    line-height: 3.3em;
+    text-align: center;
 
 }
 
@@ -206,26 +205,12 @@ li{
     font-size: 1.2em;
     margin: 0.3em;
 }
-.rule-one dl{
-    font-size: 1.2em;
-    margin: 0.3em;
+.rule-one p label{
+    width: 89%;
+    word-wrap: break-word;
+    vertical-align:top;
+    line-height: 2em;
 }
-.rule-one dt{
-    display: inline-block;
-    width: 6%;
-    height:1.5em;
-    border-radius: 1.5em;
-    background: #d22b3f;
-    text-align: center;
-    line-height: 1.5em;
-    color: #FFFFFF;
-    margin: 0.3em;
-}
-.rule-one dd{
-    display: inline-block;
-    width: 97%;
-}
-
 .rule-one span {
     display: inline-block;
     width: 1.5em;
