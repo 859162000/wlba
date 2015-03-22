@@ -155,8 +155,9 @@ def idvalidate_ok(user_id):
         rs.reward_user(u'50G快盘容量')
 
     if channel == helper.Channel.IQIYI:
-        rs = RewardStrategy(user)
-        rs.reward_user(u'7天爱奇艺会员')
+        pass
+        #rs = RewardStrategy(user)
+        #rs.reward_user(u'7天爱奇艺会员')
         #发短信
 
     if channel == helper.Channel.PPTV:
@@ -194,6 +195,19 @@ def despoit_ok(pay_info):
                 status=PayInfo.SUCCESS).count() == 1:
             rs = RewardStrategy(pay_info.user)
             rs.reward_user(u'七天迅雷会员')
+        title, content = messages.msg_pay_ok(pay_info.amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": pay_info.user.id,
+            "title": title,
+            "content": content,
+            "mtype": "activityintro"
+        })
+    elif channel == helper.Channel.IQIYI:
+        start_time = timezone.datetime(2015, 3, 21)
+        if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
+                status=PayInfo.SUCCESS).count() == 1:
+            rs = RewardStrategy(user)
+            rs.reward_user(u'7天爱奇艺会员')
         title, content = messages.msg_pay_ok(pay_info.amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id": pay_info.user.id,
