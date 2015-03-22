@@ -206,7 +206,7 @@ def despoit_ok(pay_info):
         start_time = timezone.datetime(2015, 3, 21)
         if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
                 status=PayInfo.SUCCESS).count() == 1:
-            rs = RewardStrategy(user)
+            rs = RewardStrategy(pay_info.user)
             rs.reward_user(u'7天爱奇艺会员')
         title, content = messages.msg_pay_ok(pay_info.amount)
         inside_message.send_one.apply_async(kwargs={
