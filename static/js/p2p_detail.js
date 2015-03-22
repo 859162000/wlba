@@ -179,7 +179,7 @@
       return $('#purchase-form').submit();
     });
     $('#purchase-form').on('redpack', function() {
-      return console.log('hello', 'redpack');
+      return console.log('hello', 'redpack', ddData);
     });
     buildTable = function(list) {
       var html, i, len;

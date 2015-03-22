@@ -149,7 +149,8 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     $('#purchase-form').submit()
 
   $('#purchase-form').on 'redpack', ->
-    console.log('hello', 'redpack')
+    console.log('hello', 'redpack', ddData)
+
 
 
   #build the table for invest history
