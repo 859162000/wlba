@@ -19,6 +19,13 @@ class Investment(TemplateView):
     template_name = 'day.jade'
 
     def get_context_data(self, **kwargs):
+        now = datetime.now()
+        if now.date().__str__() <= '2015-03-23':
+            return {
+                "top_ten": None,
+                "top_len": 0
+            }
+
         day_tops = _get_top_records()
         return {
             "top_ten": day_tops,
