@@ -7,14 +7,18 @@
 .one
   background-position: -56px -3px
 .two
-  background-position: 49px -246px
+  background-position: 10px -246px
   position: relative
-  top: -6px
+  top: 46px
+  left: 0px
+  width: 444px
 .three
   background-position: 28px -218px
   position: absolute
-  left: 644px
+  //left: 596px
   top: 45px
+  width: 444px
+  left: 639px
 .four
   background-position: -7px -247px
   position: relative
@@ -22,6 +26,27 @@
 .horologe
   background-position: -91px 8px
   position: relative
+.five
+  background-position: -5px -43px
+  height: 49px
+  position: relative
+  top: -7px
+.six
+  background-position: -5px -98px
+  width: 328px
+  margin: 0 auto
+.seven
+  background-position: -5px -161px
+  width: 339px
+  margin: 0 auto
+.left-btn
+  background-position: -162px -3px
+  left: 69px
+  top: 7px
+.right-btn
+  background-position: -140px -3px
+  left: 250px
+  top: 9px
 
 .top
   width: 1100px
@@ -32,6 +57,7 @@
     height: 58px
     background: url("/static/images/logo.png")
   .day-nav
+    width: 400px
     float: right
     ul
       li
@@ -128,10 +154,11 @@
       font-weight: bold
       color: #d22b3f
       position: relative
+      text-align: center
       b
         display: inline-block
-        width: 500px
         height: 10px
+        position: absolute
     .day-box1
       width: 100%
       height: auto
@@ -139,6 +166,12 @@
       padding-top: 20px
       background: #fff
       position: relative
+      .day-user-hight
+        color: #d54f5f
+        font-weight: bold
+      .day-user-hight2
+        color: #dcb128
+        font-size: 18px
       .red
         color: #d22b3f
       //-moz-border-image: url("/static/images/day-img/border.jpg") 30 30 round
@@ -322,25 +355,152 @@
             text-align: center
             line-height: 20px
             margin-right: 10px
-    .day-history
-      width: 310px
-      height: 80px
-      background: url("/static/images/day-img/h1-bj.png") no-repeat center center
-      border-radius: 10px
-      margin: 20px auto
-      line-height: 80px
-      font-size: 40px
-      color: #d22b3f
-      font-weight: bold
-      a
-        margin-left: 30px
+      .day-b-user
+        display: block
+        height: 49px
+        font-size: 18px
+        color: #fff
+        line-height: 40px
+        width: 125px
+        text-align: center
+        margin: 0 auto
+      .day-left
+        height: 400px
+        width: 650px
+        margin-top: 20px
+        .left-h1
+          line-height: 50px
+          text-align: center
+          color: #dcb128
+          font-weight: normal
+          font-size: 16px
+        .left-ul
+          background: #E0E0E0 url("/static/images/day-img/banyuan.jpg") repeat-y right
+          position: relative
+          margin-top: 20px
+          margin-left: 20px
+          .left-bj
+            height: 100%
+            width: 7px
+            position: absolute
+            background: url("/static/images/day-img/banyuan.jpg") repeat-y left
+            left: 0px
+            -moz-transform: rotate(180deg)
+            -webkit-transform: rotate(180deg)
+          .dan
+            width: 305px
+            border-right: 2px dashed #bfbfbf
+            li
+              line-height: 48px
+              .day-user-hight2
+                color: #dcb128
+                font-size: 18px
+                font-weight: bold
+              span
+                display: inline-block
+                width: 100px
+                text-align: center
+                font-size: 12px
+          .shuang
+            position: absolute
+            top: 0
+            left: 300px
+            border-right: none
+      .day-right
+        height: 400px
+        width: 449px
+        //background: #73e0d3
+        margin-top: 20px
+        position: absolute
+        top: 49px
+        left: 643px
+        .left-h1
+          line-height: 50px
+          text-align: center
+          color: #dcb128
+          font-weight: normal
+          font-size: 16px
+        .day-tap
+          margin-top: 20px
+          .tap-top
+            width: 80%
+            height: 50px
+            background: #f95763
+            margin:  0 auto
+            position: relative
+            .mon
+              text-align: center
+              width: 100%
+              display: inline-block
+              line-height: 50px
+              font-size: 20px
+              color: #fff
+            .day-btn
+              display: inline-block
+              width: 30px
+              height: 30px
+              position: absolute
+          .tap-view
+            width: 80%
+            height: 240px
+            background: #ffb7c5
+            margin: 10px auto
+            position: relative
+            overflow: hidden
+            .day-long
+              width: 720px
+              height: 240px
+              position: absolute
+              .day-yue
+                width: 357px
+                height: 240px
+                float: left
+                ul
+                  .tab-hight
+                    background: #f95763
+                    color: #dcb128
+                    font-weight: bold
+
+                  li
+                    line-height: 38px
+                    span
+                      display: inline-block
+                      width: 50px
+                      text-align: center
+                      font-size: 16px
+                      cursor: default
+                    .tap-hight2
+                      background: #f95763
+                      color: #fff
+                      font-weight: bold
+
+
+    .day-history-href
+      width: 700px
+      height: 135px
+      text-align: center
+      margin:  0 auto
+      .day-history
+        width: 310px
+        height: 92px
+        background: url("/static/images/day-img/h1-bj.png") no-repeat center center
+        border-radius: 10px
+        margin: 20px auto
+        line-height: 80px
+        font-size: 40px
+        font-weight: bold
+        //padding-left: 24px
+        display: inline-block
+        a
+          color: #d22b3f
+          //margin-left: 30px
   .day-footer
     width: 100%
     height: 300px
     background: #e4312a
     .footer-img
-      background: url("/static/images/day-img/day-footer.jpg") no-repeat center center
-      width: 1100px
+      background: url("/static/images/day-img/fooder.jpg") no-repeat center center
+      width: 1108px
       height: 100%
       margin: 0 auto
 

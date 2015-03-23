@@ -254,8 +254,12 @@ def _give_redpack(user, rtype, device_type):
     device_type = _decide_device(device_type)
     rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
     for x in rps:
-        if x.target_channel != "" and user_ch != x.target_channel:
-            continue
+        #if x.target_channel != "" and user_ch != x.target_channel:
+        if x.target_channel != "":
+            chs = x.target_channel.split(",")
+            chs = [x for x in chs if x.strip()!=""]
+            if user_ch not in chs:
+                continue
         redpack = RedPack.objects.filter(event=x, status="unused").first()
         if redpack:
             event = redpack.event
@@ -270,6 +274,23 @@ def _give_redpack(user, rtype, device_type):
                 record.change_platform = device_type
                 record.save()
                 _send_message(user, event)
+
+#发放奖励类型的红包
+def give_activity_redpack(user, event, device_type):
+    device_type = _decide_device(device_type)
+    redpack = RedPack.objects.filter(event=event, status="unused").first()
+    if not redpack:
+        return False,u"没有此红包"
+    if redpack.token != "":
+        redpack.status = "used"
+        redpack.save()
+    record = RedPackRecord()
+    record.user = user
+    record.redpack = redpack
+    record.change_platform = device_type
+    record.save()
+    _send_message(user, event)
+    return True,""
 
 
 def consume(redpack, amount, user, order_id, device_type):
