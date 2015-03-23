@@ -11,6 +11,7 @@ from models import Activity, ActivityRule, ActivityRecord
 from marketing import helper
 from marketing.models import IntroducedBy
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_pay.models import PayInfo
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ def check_activity(user, trigger_node, device_type, amount=0):
     if activity_list:
         for activity in activity_list:
             #get rules
-            activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node)
+            activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node, is_used=True)
             if activity_rules:
                 for rule in activity_rules:
                     if not rule.gift_type:
@@ -66,14 +67,30 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
         if trigger_node in ('register', 'validation'):
             print "====== trigger_node: %s =======" % trigger_node
             _send_gift(user, rule, device_type)
-        #pay, first pay, buy, first buy
-        if trigger_node in ('pay', 'first_pay', 'buy', 'first_buy'):
+        #recharge (pay, first_pay)
+        if trigger_node == 'recharge':
             print "====== trigger_node: %s =======" % trigger_node
             if rule.min_amount == 0 and rule.max_amount == 0:
-                _send_gift(user, rule, device_type)
-            else:
-                if rule.min_amount <= amount <= rule.max_amount:
-                    _send_gift(user, rule, device_type)
+                if rule.trigger_node == 'first_pay':
+                    #check first pay
+                    if PayInfo.objects.filter(user=user, type='D',
+                                              update_time__gt=rule.activity.start_at,
+                                              status=PayInfo.SUCCESS).count() == 1:
+                        _send_gift(user, rule, device_type, amount)
+                if rule.trigger_node == 'pay':
+                    _send_gift(user, rule, device_type, amount)
+        #invest (buy, first_buy)
+        if trigger_node == 'invest':
+            print "====== trigger_node: %s =======" % trigger_node
+            if rule.min_amount == 0 and rule.max_amount == 0:
+                if rule.trigger_node == 'first_buy':
+                    #check first pay
+                    if PayInfo.objects.filter(user=user, type='D',
+                                              update_time__gt=rule.activity.start_at,
+                                              status=PayInfo.SUCCESS).count() == 1:
+                        _send_gift(user, rule, device_type, amount)
+                if rule.trigger_node == 'buy':
+                    _send_gift(user, rule, device_type, amount)
         #p2p audit
         if rule.trigger_node == 'p2p_audit':
             #delay
@@ -84,6 +101,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
 
 
 def _send_gift(user, rule, device_type, amount=0):
+    rule_id = rule.id
     #send reward
     if rule.gift_type == 'reward':
         pass

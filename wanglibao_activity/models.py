@@ -97,12 +97,13 @@ class ActivityRule(models.Model):
     redpack = models.CharField(u'红包类型名称', max_length=60, blank=True, help_text=u'红包名称一定要和红包活动中的名称保持一致')
     reward = models.CharField(u'奖品类型名称', max_length=60, blank=True, help_text=u'类型名称一定要和奖品中的类型保持一致')
     income = models.FloatField(u'金额或比率', default=0, blank=True, help_text=u'选择收益或话费时填写，固定金额时填写大于1的数字，收益率时填写0-1之间的小数')
-    min_amount = models.IntegerField(u'最小金额（投资或充值）', default=0)
-    max_amount = models.IntegerField(u'最大金额（投资或充值）', default=0)
+    min_amount = models.IntegerField(u'最小金额', default=0, help_text=u'投资或充值，不包含该金额（>）')
+    max_amount = models.IntegerField(u'最大金额', default=0, help_text=u'投资或充值，包含该金额（<=）')
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True, help_text=u'站内信模板不填写则触发该规则时不发站内信，如果有动态变量，用“%s”代替')
     sms_template = models.TextField(u'短信模板（不填则不发）', blank=True, help_text=u'短信模板不填写则触发该规则时不发手机短信，如果有动态变量，用“%s”代替')
     send_type = models.CharField(u'赠送发放方式', max_length=20, choices=SEND_TYPE, default=u'系统实时发放')
     created_at = models.DateTimeField(auto_now=True)
+    is_used = models.BooleanField(u'是否启用', default=False)
 
     def __unicode__(self):
         return self.rule_name

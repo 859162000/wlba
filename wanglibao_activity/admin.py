@@ -5,17 +5,18 @@ from django.utils import timezone
 from models import Activity, ActivityRule, ActivityRecord
 
 class ActivityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'category', 'platform', 'product_cats', 'product_ids', 'description',\
-                    'start_at', 'end_at', 'is_stopped', 'priority')
+    list_display = ('name', 'code', 'category', 'platform', 'product_cats', 'product_ids',\
+                    'description', 'start_at', 'end_at', 'is_stopped', 'priority')
 
 
 class ActivityRuleAdmin(admin.ModelAdmin):
-    list_display = ('activity', 'rule_name', 'rule_description', 'trigger_node', 'gift_type', 'redpack', \
-                    'reward', 'income', 'min_amount', 'max_amount')
+    list_display = ('activity', 'rule_name', 'rule_description', 'trigger_node', 'gift_type',\
+                    'redpack', 'reward', 'income', 'min_amount', 'max_amount', 'is_used')
 
 
 class ActivityRecordAdmin(admin.ModelAdmin):
-    list_display = ('activity', 'rule', 'platform', 'trigger_node', 'description', 'user', 'income', 'created_at')
+    list_display = ('activity', 'rule', 'platform', 'trigger_node', 'description', 'user',\
+                    'income', 'created_at')
 
 
 admin.site.register(Activity, ActivityAdmin)

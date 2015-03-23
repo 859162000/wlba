@@ -225,6 +225,7 @@ def give_activity_redpack(user, rtype, redpack_name, device_type, rule_id):
 
 
 def _give_activity_redpack(user, rtype, redpack_name, device_type, rule_id):
+    """ rule_id: get message template """
     now = timezone.now()
     user_channel = helper.which_channel(user)
     device_type = _decide_device(device_type)
