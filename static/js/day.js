@@ -7,7 +7,7 @@
   });
 
   require(['jquery'], function($) {
-    var Y, count_down, data, date, day, fmoney, hight, init, m, shuju;
+    var Y, count_down, data, date, day, fmoney, gotime, hight, init, m, shuju, wei, wei2;
     init = function(time) {
       var csrfSafeMethod, getCookie, sameOrigin;
       csrfSafeMethod = void 0;
@@ -257,7 +257,14 @@
     hight(m, '.day-san');
     init(date);
     $('#left-h1').html('－－' + m + '月' + day + '日用户榜单－－');
-    count_down('2015-04-01 00:00:00');
+    wei = new Date();
+    wei2 = new Date("00:00:00 2015-3-24");
+    gotime = wei2.getTime() - wei.getTime();
+    setTimeout(function() {
+      $('.ing li').eq(1).addClass('ing-hight');
+      return $('.day-head h1').eq(1).addClass('h1-hight');
+    }, gotime);
+    count_down('2015-04-01 0:0:0');
     $('.left-btn').on('click', function() {
       var high_m;
       $('.mon').html('3 月');
@@ -291,7 +298,7 @@
       m = data.getMonth() + 1;
       day = data.getDate();
       date = Y + '-0' + m + "-" + day;
-      if (time >= '2015-03-17' && time <= '2015-04-30' && time <= date) {
+      if (time >= '2015-03-24' && time <= '2015-04-30' && time <= date) {
         $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2');
         $(this).parent().siblings().children('span').removeClass('tap-hight2');
         $('#left-h1').html('－－' + m + '月' + d + '日用户榜单－－');
