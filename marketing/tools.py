@@ -43,6 +43,10 @@ def decide_first(user_id, amount):
         inviter_id = introduced_by.introduced_by.id
         invited_id = introduced_by.user.id
         if amount >= 200:
+            start_time = timezone.datetime(2015, 3, 20)
+            if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
+                return
+
             inviter_phone = safe_phone_str(inviter_phone)
             invited_phone = safe_phone_str(invited_phone)
 
@@ -76,6 +80,10 @@ def decide_first(user_id, amount):
         return
     elif channel == helper.Channel.WANGLIBAOOTHER:
         if amount < 200:
+            return
+
+        start_time = timezone.datetime(2015, 3, 20)
+        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
             return
 
         phone = user.wanglibaouserprofile.phone
