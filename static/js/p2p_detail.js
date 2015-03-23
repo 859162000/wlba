@@ -16,7 +16,7 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
-    var buildTable, ddData, getRedAmount, getRedPack, isFirst, opt, page, showPayInfo, showPayTip, validator;
+    var buildTable, ddData, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, showPayInfo, showPayTip, validator;
     isFirst = true;
     showPayInfo = function(actual_payment, red_pack_payment) {
       return ['红包使用<i class="blue">', red_pack_payment, '</i>元，实际支付<i class="blue">', actual_payment, '</i>元'].join('');
@@ -45,6 +45,15 @@
         red_pack: final_redpack,
         actual_amount: amount - final_redpack
       };
+    };
+    hideEmptyLabel = function(e) {
+      return setTimeout((function() {
+        var lable;
+        lable = $('label[for="id_amount"]');
+        if ($.trim(lable.text()) === '') {
+          return $('label[for="id_amount"]').hide();
+        }
+      }), 10);
     };
     getRedPack = function() {
       var obj, selectedData, _i, _len;
@@ -119,7 +128,6 @@
       },
       errorPlacement: function(error, element) {
         $('.payment').hide();
-        console.log('hello');
         return error.appendTo($(element).closest('.form-row__middle').find('.form-row-error'));
       },
       success: function() {
@@ -231,6 +239,8 @@
     $('#purchase-form').on('redpack', function() {
       return showPayTip();
     });
+    $('#id_amount').blur(hideEmptyLabel);
+    $('#id_amount').keyup(hideEmptyLabel);
     buildTable = function(list) {
       var html, i, len;
       html = [];
@@ -306,7 +316,7 @@
               description: desc + ', ' + available_time + '过期'
             });
           }
-          $('.red-pack').ddslick({
+          return $('.red-pack').ddslick({
             data: ddData,
             width: 194,
             imagePosition: "left",
@@ -321,13 +331,6 @@
                 }
               }
               return isFirst = true;
-            }
-          });
-          return $('#id_amount').blur(function(e) {
-            var lable;
-            lable = $('label[for="id_amount"]');
-            if ($.trim(lable.text()) === '') {
-              return $('label[for="id_amount"]').hide();
             }
           });
         });

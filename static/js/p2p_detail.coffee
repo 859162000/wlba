@@ -41,6 +41,13 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     }
 
 
+  hideEmptyLabel = (e) ->
+    setTimeout (->
+      lable = $('label[for="id_amount"]')
+      if $.trim(lable.text()) == ''
+        $('label[for="id_amount"]').hide()
+    ), 10
+
   getRedPack = () ->
     for obj in ddData
       if obj.value == $('.dd-selected-value').val()*1
@@ -193,6 +200,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $('#purchase-form').on 'redpack', ->
     showPayTip()
 
+  $('#id_amount').blur hideEmptyLabel
+  $('#id_amount').keyup hideEmptyLabel
+
   #build the table for invest history
   buildTable = (list) ->
     html = []
@@ -286,10 +296,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             isFirst = true
 
 
-        $('#id_amount').blur (e) ->
-          lable = $('label[for="id_amount"]')
-          if $.trim(lable.text()) == ''
-            $('label[for="id_amount"]').hide()
 
 
       return
