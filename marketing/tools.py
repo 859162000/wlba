@@ -43,6 +43,10 @@ def decide_first(user_id, amount):
         inviter_id = introduced_by.introduced_by.id
         invited_id = introduced_by.user.id
         if amount >= 200:
+            start_time = timezone.datetime(2014, 9, 1)
+            if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
+                return
+
             inviter_phone = safe_phone_str(inviter_phone)
             invited_phone = safe_phone_str(invited_phone)
 
@@ -73,6 +77,34 @@ def decide_first(user_id, amount):
                     RewardRecord.objects.create(user=introduced_by.user, reward=rwd, description=content2)
                 except Exception, e:
                     print(e)
+        return
+    elif channel == helper.Channel.WANGLIBAOOTHER:
+        if amount < 200:
+            return
+
+        start_time = timezone.datetime(2015, 3, 20)
+        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
+            return
+
+        phone = user.wanglibaouserprofile.phone
+        send_messages.apply_async(kwargs={
+            "phones": [phone],
+            "messages": [messages.gift_first_buy(money=30)]
+        })
+        title, content = messages.msg_first_buy()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": user.id,
+            "title": title,
+            "content": content,
+            "mtype": "activity"
+        })
+        rwd = Reward.objects.filter(type=u'30元话费').first()
+        if not rwd:
+            return
+        try:
+            RewardRecord.objects.create(user=user, reward=rwd, description=content)
+        except Exception, e:
+            print(e)
         return
 
     # 判断来源
