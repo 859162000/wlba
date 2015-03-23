@@ -19,10 +19,16 @@ html
                   a(href="https://www.wanglibao.com/", target="_blank") 网利宝官网
                 li
                   a#xiaz 下载APP
-                li
-                  a.login-modal(href="#login-modal") 登录
-                li
-                  a.register-modal(href="#login-modal") 注册
+                if user.is_authenticated
+                  li
+                    a(href="/accounts/home") {{user | display_name}} 的账户
+                  li
+                    a.logout(href="/accounts/logout?next={{ request.path }}") 退出
+                else
+                  li
+                    a(href="/accounts/login/?next=/", target="_blank") 登录
+                  li
+                    a(href="/accounts/register/?next=/", target="_blank") 注册
         .day-banner
         .day-time
           .day-ing
@@ -124,7 +130,7 @@ html
               b.day-com.two
               |&nbsp&nbsp排行榜
               b.day-com.three
-            .day-box1
+            .day-box1(style="height:530px")
               p
                b.red(style="font-size:24px") 日榜：
                |每天的投标累计金额
@@ -188,13 +194,13 @@ html
               a(href="/activity/history/") 历史榜单
           .day-footer
             .footer-img
-        #login-modal(style="display:none")
-          .padding-s
-            ul.login-modal-tab
-             li#tab-login.active 用户登录
-             li#tab-register 用户注册
-          include include/login_form
-          include include/register_form
+        //#login-modal(style="display:none")
+        //  .padding-s
+        //    ul.login-modal-tab
+        //     li#tab-login.active 用户登录
+        //     li#tab-register 用户注册
+        //  include include/login_form
+        //  include include/register_form
 
     script(src="/static/js/lib/jquery.min.js")
     script.
@@ -227,7 +233,13 @@ html
 
            $('#day-user').append(str);
         }
+        if ({{user}}){
+        console.log('456')
+          //window.location.href='/'
+        }
+
+
 
     script.
       var v = new Date().getTime()
-      require(['/static/js/hover.js','/static/js/login_modal.js?v='+v])
+      require(['/static/js/hover.js'])
