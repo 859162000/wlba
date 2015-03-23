@@ -222,21 +222,13 @@ def _give_redpack(user, rtype, device_type):
     user_ch = helper.which_channel(user)
     device_type = _decide_device(device_type)
     rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
-    logger.info(u"%s" % rps)
-    logger.info(len(rps))
     for x in rps:
-        logger.info(u"%s" % x)
         #if x.target_channel != "" and user_ch != x.target_channel:
         if x.target_channel != "":
-            logger.info(u"%s" % x.target_channel)
-            logger.info(u"%s" % user_ch)
             chs = x.target_channel.split(",")
-            logger.info(u"%s" % chs)
-            chs = [x for x in chs if x.strip()!=""]
-            logger.info(u"%s" % chs)
+            chs = [m for m in chs if m.strip()!=""]
             if user_ch not in chs:
                 continue
-            logger.info(u"%s" % chs)
         redpack = RedPack.objects.filter(event=x, status="unused").first()
         if redpack:
             event = redpack.event
