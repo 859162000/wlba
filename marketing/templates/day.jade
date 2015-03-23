@@ -19,16 +19,21 @@ html
                   a(href="https://www.wanglibao.com/", target="_blank") 网利宝官网
                 li
                   a#xiaz 下载APP
-                li
-                  a.login-modal(href="#login-modal") 登陆
-                li
-                  a.register-modal(href="#login-modal") 注册
+                if user.is_authenticated
+                  li
+                    a(href="/accounts/home") {{user | display_name}} 的账户
+                  li
+                    a.logout(href="/accounts/logout?next={{ request.path }}") 退出
+                else
+                  li
+                    a(href="/accounts/login/?next=/", target="_blank") 登录
+                  li
+                    a(href="/accounts/register/?next=/", target="_blank") 注册
         .day-banner
         .day-time
-
           .day-ing
             h1.top-time 3.17-4.30
-            p.top-p 具体活动时间为———3月17日00:00:00至4月30日23:59:59,数据零点清零，用户可每天重复参赛
+            p.top-p 具体活动时间为———3月17日00:00:00至4月30日23:59:59，数据零点清零，用户可每天重复参赛。
             .day-head
               h1(style="margin-right:188px").h1-hight 1、活动前准备
               h1(style="margin-right:209px") 2、活动开始中
@@ -49,10 +54,10 @@ html
               | 活动规则
               b.day-com.three
             .day-box1
-              p.red 参与时间00:00:00-23:59:59,零点数据清零，用户可每天重复参赛。
+              p.red 参与时间00:00:00-23:59:59，零点数据清零，用户可每天重复参赛。
               p 用户每天的投标累计金额
                 b.red ≥6
-                | 万元，将获得网站投资奖励
+                | 万元，将获得网站投资奖励。
               .day-dengji
                 ul.day-red
                   li ￥1000
@@ -120,17 +125,17 @@ html
                 b.red ≥6
                 | 万元的用户未排入前十名将获得
                 b.red 60元
-                |红包
+                |红包。
             h1.rule
               b.day-com.two
               |&nbsp&nbsp排行榜
               b.day-com.three
-            .day-box1
+            .day-box1(style="height:530px")
               p
                b.red(style="font-size:24px") 日榜：
                |每天的投标累计金额
                b.red ≥6万元
-               | 的用户排行榜，次日清零
+               | 的用户排行榜，次日清零。
               ul.day-user#day-user
                 b.banyuan
                 li.day-user-hight
@@ -189,13 +194,13 @@ html
               a(href="/activity/history/") 历史榜单
           .day-footer
             .footer-img
-        #login-modal(style="display:none")
-          .padding-s
-            ul.login-modal-tab
-             li#tab-login.active 用户登录
-             li#tab-register 用户注册
-          include include/login_form
-          include include/register_form
+        //#login-modal(style="display:none")
+        //  .padding-s
+        //    ul.login-modal-tab
+        //     li#tab-login.active 用户登录
+        //     li#tab-register 用户注册
+        //  include include/login_form
+        //  include include/register_form
 
     script(src="/static/js/lib/jquery.min.js")
     script.
@@ -221,14 +226,20 @@ html
 
         for(var i={{top_len}}+1;i<=10;i++){
            if(i<=3){
-             var str="<li class='day-user-hight'><span class='day-user-hight2'>"+i+"</span><span>－－</span><span>－－</span></li>";
+             var str="<li class='day-user-hight'><span class='day-user-hight2'>"+i+"</span><span>虚位以待</span><span>虚位以待</span></li>";
            } else {
-             var str="<li><span>"+i+"</span><span>－－</span><span>－－</span></li>";
+             var str="<li><span>"+i+"</span><span>虚位以待</span><span>虚位以待</span></li>";
            }
 
            $('#day-user').append(str);
         }
+        if ({{user}}){
+        console.log('456')
+          //window.location.href='/'
+        }
+
+
 
     script.
       var v = new Date().getTime()
-      require(['/static/js/hover.js','/static/js/login_modal.js?v='+v])
+      require(['/static/js/hover.js'])
