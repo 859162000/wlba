@@ -4,6 +4,7 @@ require.config(
 )
 
 require ['jquery'], ($)->
+
 #  倒计时
   count_down = (o) ->
     sec=(new Date(o.replace(/-/ig,'/')).getTime() - new Date().getTime())/1000
