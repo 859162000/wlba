@@ -62,7 +62,7 @@ require ['jquery'], ($)->
       $('.day-long').animate({'left':'-357px'},500)
       hight(m,'.day-si')
       clearTimeout(timer)
-      count_down('2015-04-31 24:00:00')
+      count_down('2015-04-30 24:00:00')
     return
 
 
@@ -121,8 +121,6 @@ require ['jquery'], ($)->
       if date!=time
         while j<10
           if data[0]['tops_len']==0
-  #          console.log(date)
-            console.log(time)
             if j%2==0
               str3+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
               $('#dan').html(str3)
