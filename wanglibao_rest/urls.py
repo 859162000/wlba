@@ -107,8 +107,7 @@ urlpatterns = patterns(
     # url(r'^p2ps/$', P2PProductListView.as_view()),
     url(r'^p2ps/(?P<pk>[0-9]+)/$', P2PProductDetailView.as_view()),
 
-    #关闭api根路径
-    #url(r'', include(router.urls)),
+    url(r'', include(router.urls)),
     #客户端使用,重写
     url(r'^id_validation/$', IdValidateAPIView.as_view()),
     url(r'^bank_card/add/$', BankCardAddView.as_view()),
