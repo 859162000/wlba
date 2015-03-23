@@ -57,7 +57,7 @@
         t += l[i] + ((i + 1) % 3 === 0 && i + 1 !== l.length ? ',' : '');
         i++;
       }
-      return t.split('').reverse().join('') + '.' + r;
+      return t.split('').reverse().join('');
     };
     shuju = function(time) {
       return $.ajax({
@@ -67,68 +67,134 @@
         },
         type: 'POST'
       }).done(function(data) {
-        var j, str, str2, str3, str4, str5, _results;
+        var Y, date, day, j, m, str, str2, str3, str4, str5, _results, _results1;
         data = JSON.parse(data);
+        date = new Date();
+        Y = date.getFullYear();
+        m = date.getMonth() + 1;
+        day = date.getDate();
+        if (day.length < 2) {
+          day = '0' + day;
+        }
+        date = Y + '-0' + m + "-" + day;
         j = 0;
         str = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
         str2 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
         str3 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
         str4 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
         str5 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
-        _results = [];
-        while (j < 10) {
-          if (data[0]['tops_len'] === 0) {
-            if (j % 2 === 0) {
-              str3 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-              $('#dan').html(str3);
-            }
-            if (j % 2 !== 0) {
-              str4 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-              $('#shuang').html(str4);
-            }
-          }
-          if (data[0]['tops_len'] !== 0) {
-            if (data[0]['tops_len'] === 1) {
+        if (date !== time) {
+          _results = [];
+          while (j < 10) {
+            if (data[0]['tops_len'] === 0) {
+              console.log(time);
               if (j % 2 === 0) {
-                if (j < data[0]['tops_len']) {
-                  str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum'], 2) + ' 元</span></li>';
-                  $('#dan').html(str);
-                }
-                if (j > data[0]['tops_len']) {
-                  str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                  $('#dan').append(str3);
-                }
+                str3 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                $('#dan').html(str3);
               }
               if (j % 2 !== 0) {
-                str5 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                $('#shuang').html(str5);
+                str4 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                $('#shuang').html(str4);
               }
-            } else {
-              if (j % 2 === 0) {
-                if (j < data[0]['tops_len']) {
-                  str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum'], 2) + ' 元</span></li>';
-                  $('#dan').html(str);
+            }
+            if (data[0]['tops_len'] !== 0) {
+              if (data[0]['tops_len'] === 1) {
+                if (j % 2 === 0) {
+                  if (j < data[0]['tops_len']) {
+                    str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
+                    $('#dan').html(str);
+                  }
+                  if (j > data[0]['tops_len']) {
+                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                    $('#dan').append(str3);
+                  }
                 }
-                if (j >= data[0]['tops_len']) {
-                  str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                  $('#dan').append(str3);
+                if (j % 2 !== 0) {
+                  str5 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                  $('#shuang').html(str5);
                 }
-              }
-              if (j % 2 !== 0) {
-                if (j < data[0]['tops_len']) {
-                  str2 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum'], 2) + ' 元</span></li>';
-                  $('#shuang').html(str2);
+              } else {
+                if (j % 2 === 0) {
+                  if (j < data[0]['tops_len']) {
+                    str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
+                    $('#dan').html(str);
+                  }
+                  if (j >= data[0]['tops_len']) {
+                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                    $('#dan').append(str3);
+                  }
                 }
-                if (j >= data[0]['tops_len']) {
-                  str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                  $('#shuang').append(str3);
+                if (j % 2 !== 0) {
+                  if (j < data[0]['tops_len']) {
+                    str2 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
+                    $('#shuang').html(str2);
+                  }
+                  if (j >= data[0]['tops_len']) {
+                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
+                    $('#shuang').append(str3);
+                  }
                 }
               }
             }
+            _results.push(j++);
           }
-          _results.push(j++);
+          return _results;
+        } else {
+          _results1 = [];
+          while (j < 10) {
+            if (data[0]['tops_len'] === 0) {
+              if (j % 2 === 0) {
+                str3 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
+                $('#dan').html(str3);
+              }
+              if (j % 2 !== 0) {
+                str4 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
+                $('#shuang').html(str4);
+              }
+            }
+            if (data[0]['tops_len'] !== 0) {
+              if (data[0]['tops_len'] === 1) {
+                if (j % 2 === 0) {
+                  if (j < data[0]['tops_len']) {
+                    str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
+                    $('#dan').html(str);
+                  }
+                  if (j > data[0]['tops_len']) {
+                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
+                    $('#dan').append(str3);
+                  }
+                }
+                if (j % 2 !== 0) {
+                  str5 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
+                  $('#shuang').html(str5);
+                }
+              } else {
+                if (j % 2 === 0) {
+                  if (j < data[0]['tops_len']) {
+                    str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
+                    $('#dan').html(str);
+                  }
+                  if (j >= data[0]['tops_len']) {
+                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
+                    $('#dan').append(str3);
+                  }
+                }
+                if (j % 2 !== 0) {
+                  if (j < data[0]['tops_len']) {
+                    str2 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
+                    $('#shuang').html(str2);
+                  }
+                  if (j >= data[0]['tops_len']) {
+                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
+                    $('#shuang').append(str3);
+                  }
+                }
+              }
+            }
+            _results1.push(j++);
+          }
+          return _results1;
         }
-        return _results;
       });
     };
     data = new Date();
