@@ -206,9 +206,9 @@ class InvestmentRewardView(TemplateView):
 
         check_button = request.POST.get('check_button')
         if check_button == '1':
-            # if datetime.now().date() <= day.date():
-            #     message = u'未到日终，不允许审核发放红包！'
-            #     return self.render_to_response(self._return_format(message, day, redpack))
+            if datetime.now().date() <= day.date():
+                message = u'未到日终，不允许审核发放红包！'
+                return self.render_to_response(self._return_format(message, day, redpack))
 
             records.filter(checked_status=0).update(checked_status=1)
             send_redpack.apply_async(kwargs={
