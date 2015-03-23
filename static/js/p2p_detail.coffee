@@ -280,7 +280,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             if validator.checkForm() && $('.dd-selected-value').val() != ''
               $('#purchase-form').trigger('redpack')
             else
-              console.log('hello')
               $('.payment').hide()
               if !isFirst
                 $('#purchase-form').valid()

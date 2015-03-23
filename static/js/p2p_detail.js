@@ -119,6 +119,7 @@
       },
       errorPlacement: function(error, element) {
         $('.payment').hide();
+        console.log('hello');
         return error.appendTo($(element).closest('.form-row__middle').find('.form-row-error'));
       },
       success: function() {
@@ -314,7 +315,6 @@
               if (validator.checkForm() && $('.dd-selected-value').val() !== '') {
                 $('#purchase-form').trigger('redpack');
               } else {
-                console.log('hello');
                 $('.payment').hide();
                 if (!isFirst) {
                   $('#purchase-form').valid();
