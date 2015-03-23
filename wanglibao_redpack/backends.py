@@ -225,10 +225,15 @@ def _give_redpack(user, rtype, device_type):
     for x in rps:
         #if x.target_channel != "" and user_ch != x.target_channel:
         if x.target_channel != "":
+            logger.info(u"%s" % x.target_channel)
+            logger.info(u"%s" % user_ch)
             chs = x.target_channel.split(",")
+            logger.info(u"%s" % chs)
             chs = [x for x in chs if x.strip()!=""]
+            logger.info(u"%s" % chs)
             if user_ch not in chs:
                 continue
+            logger.info(u"%s" % chs)
         redpack = RedPack.objects.filter(event=x, status="unused").first()
         if redpack:
             event = redpack.event
