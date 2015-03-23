@@ -19,16 +19,21 @@ html
                   a(href="https://www.wanglibao.com/", target="_blank") 网利宝官网
                 li
                   a#xiaz 下载APP
-                li
-                  a.login-modal(href="#login-modal")  登陆
-                li
-                  a.register-modal(href="#login-modal") 注册
+                if user.is_authenticated
+                  li
+                    a(href="/accounts/home") {{user | display_name}} 的账户
+                  li
+                    a.logout(href="/accounts/logout?next={{ request.path }}") 退出
+                else
+                  li
+                    a(href="/accounts/login/?next=/", target="_blank") 登录
+                  li
+                    a(href="/accounts/register/?next=/", target="_blank") 注册
         .day-banner
         .day-time
-
           .day-ing
             h1.top-time 3.17-4.30
-            p.top-p 具体活动时间为———3月17日00:00:00至4月30日23:59:59,数据零点清零，用户可每天重复参赛
+            p.top-p 具体活动时间为———3月17日00:00:00至4月30日23:59:59，数据零点清零，用户可每天重复参赛。
             .day-head
               h1(style="margin-right:188px").h1-hight 1、活动前准备
               h1(style="margin-right:209px") 2、活动开始中
@@ -110,7 +115,7 @@ html
                             li
                               span 15
                               span 16
-                              span.tap-hight2 17
+                              span 17
                               span 18
                               span 19
                               span 20
@@ -188,17 +193,17 @@ html
                   span 1
                   |用户每天投标累计金额
                   b.red ≥6
-                  |万元,将获得网站投资奖励;
+                  |万元，将获得网站投资奖励；
                 li
                   span 2
                   |每天投标累计金额
                   b.red ≥6
                   |万元的用户未排入前十名将各获得
                   b.red 60元
-                  |红包;
+                  |红包；
                 li
                   span 3
-                  |若出现两名或两名以上客户投标金额相同时,则按当日投标时间先后排位；
+                  |若出现两名或两名以上客户投标金额相同时，则按当日投标时间先后排位；
             //h1.day-history
             //  a 历史榜单
           .day-footer
