@@ -32,8 +32,8 @@ html
         .day-banner
         .day-time
           .day-ing
-            h1.top-time 3.17-4.30
-            p.top-p 具体活动时间为——3月17日00:00:00至4月30日23:59:59，数据零点清零，用户可每天重复参赛。
+            h1.top-time 3.24-4.30
+            p.top-p 具体活动时间为——3月24日00:00:00至4月30日23:59:59，数据零点清零，用户可每天重复参赛。
             .day-head
               h1(style="margin-right:188px").h1-hight 1、活动前准备
               h1(style="margin-right:209px") 2、活动开始中
@@ -171,7 +171,7 @@ html
               ul.day-xijie
                 li
                   span 1
-                  |红包有效期2015年3月17日-2015年6月17日；
+                  |红包有效期2015年3月24日-2015年6月24日；
                 li
                   span 2
                   |现金奖励在三个工作日内以红包形式发出，红包类型为直抵红包；
@@ -190,17 +190,11 @@ html
                 li
                   span 7
                   |网利宝对此活动享有最终解释权。
-            h1.day-history
-              a(href="/activity/history/") 历史榜单
+            .day-history-href
+                a.day-history(href="/p2p/list/",target="_black",style="margin-right:76px;background:url('/static/images/day-img/h2-jd-1.png') no-repeat center center; padding-left:36px") 我要投资
+                a.day-history(href="/activity/history/",target="_black",style="padding-right:29px") 历史榜单
           .day-footer
             .footer-img
-        //#login-modal(style="display:none")
-        //  .padding-s
-        //    ul.login-modal-tab
-        //     li#tab-login.active 用户登录
-        //     li#tab-register 用户注册
-        //  include include/login_form
-        //  include include/register_form
 
     script(src="/static/js/lib/jquery.min.js")
     script.
@@ -233,10 +227,6 @@ html
 
            $('#day-user').append(str);
         }
-        $('.day-history').on('click',function(){
-          window.location.href="/activity/history"
-
-        })
     script.
       var v = new Date().getTime()
       require(['/static/js/hover.js'])
