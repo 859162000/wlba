@@ -13,6 +13,34 @@ require.config
 
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal)->
 
+  showPayInfo = (actual_payment, red_pack_payment) ->
+    return ['红包使用<i>', red_pack_payment, '</i>元，实际支付', actual_payment, '<i>', red_pack_payment, '</i>元'].join('')
+
+  getRedAmount = (method, red_pack_amount) ->
+    amount = $('#id_amount').val()
+    if method == '*'
+      final_redpack = amount*red_pack_amount
+    else
+      final_redpack = red_pack_amount
+
+    return
+      red_pack: final_redpack
+      actual_amount: amount - final_redpack
+
+
+  getRedPack = () ->
+    for obj in ddData
+      if obj.value == $('.dd-selected-value').val()*1
+        selectedData = obj
+        break
+    return selectedData
+
+  showPayTip = (method, amount) ->
+    redPack = getRedPack()
+    redPackInfo = getRedAmount(redPack.method, redPack.amount)
+    html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack)
+    $('.payment').html(html).show()
+
   $.validator.addMethod 'dividableBy100', (value, element)->
     return value % 100 == 0 && !/\./ig.test(value)
   , '请输入100的整数倍'
@@ -213,6 +241,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           text: '不使用红包'
           value: ''
           selected: true
+          method: ''
           amount: 0
           invest_amount: 0
           description: '不使用红包'
@@ -225,6 +254,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           ddData.push(
             text: obj.name
             value: obj.id
+            method: obj.method
             selected: false
             amount: obj.amount
             invest_amount: obj.invest_amount
@@ -243,7 +273,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
                 $('#purchase-form').valid()
 
 
-
         $('#id_amount').keyup (e) ->
           console.log('hello')
 
@@ -252,12 +281,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           lable = $('label[for="id_amount"]')
           if $.trim(lable.text()) == ''
             $('label[for="id_amount"]').hide()
-
-
-
-
-
-
 
 
       return
