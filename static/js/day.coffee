@@ -204,8 +204,14 @@ require ['jquery'], ($)->
   init(date)
   $('#left-h1').html('－－'+m+'月'+day+'日用户榜单－－')
   wei=new Date()
-  wei2=new Date("00:00:00 2015-3-24")
+  wei2=new Date()
+  wei2.setMonth(2)
+  wei2.setDate(24)
+  wei2.setHours(0)
+  wei2.setMinutes(0)
+  wei2.setSeconds(0)
   gotime=wei2.getTime()-wei.getTime()
+ 
   setTimeout(()->
     $('.ing li').eq(1).addClass('ing-hight')
     $('.day-head h1').eq(1).addClass('h1-hight')
