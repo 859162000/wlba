@@ -16,7 +16,54 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
-    var buildTable, ddData, opt, page, validator;
+    var buildTable, ddData, getRedAmount, getRedPack, isFirst, opt, page, showPayInfo, showPayTip, validator;
+    isFirst = true;
+    showPayInfo = function(actual_payment, red_pack_payment) {
+      return ['红包使用<i class="blue">', red_pack_payment, '</i>元，实际支付<i class="blue">', actual_payment, '</i>元'].join('');
+    };
+    getRedAmount = function(method, red_pack_amount, event_id) {
+      var amount, final_redpack, flag;
+      amount = $('#id_amount').val();
+      if (event_id === '7') {
+        flag = amount * 0.005;
+        if (flag <= 30) {
+          final_redpack = flag;
+        } else {
+          final_redpack = 30;
+        }
+        return {
+          red_pack: final_redpack,
+          actual_amount: amount - final_redpack
+        };
+      }
+      if (method === '*') {
+        final_redpack = amount * red_pack_amount;
+      } else {
+        final_redpack = red_pack_amount;
+      }
+      return {
+        red_pack: final_redpack,
+        actual_amount: amount - final_redpack
+      };
+    };
+    getRedPack = function() {
+      var obj, selectedData, _i, _len;
+      for (_i = 0, _len = ddData.length; _i < _len; _i++) {
+        obj = ddData[_i];
+        if (obj.value === $('.dd-selected-value').val() * 1) {
+          selectedData = obj;
+          break;
+        }
+      }
+      return selectedData;
+    };
+    showPayTip = function(method, amount) {
+      var html, redPack, redPackInfo;
+      redPack = getRedPack();
+      redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id);
+      html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack);
+      return $('.payment').html(html).show();
+    };
     $.validator.addMethod('dividableBy100', function(value, element) {
       return value % 100 === 0 && !/\./ig.test(value);
     }, '请输入100的整数倍');
@@ -61,7 +108,6 @@
       };
     }
     validator = $('#purchase-form').validate({
-      debug: true,
       rules: {
         amount: opt
       },
@@ -72,10 +118,13 @@
         }
       },
       errorPlacement: function(error, element) {
+        $('.payment').hide();
         return error.appendTo($(element).closest('.form-row__middle').find('.form-row-error'));
       },
       success: function() {
-        return $('#purchase-form').trigger('redpack');
+        if ($('.dd-selected-value').val() !== '') {
+          return $('#purchase-form').trigger('redpack');
+        }
       },
       submitHandler: function(form) {
         var tip;
@@ -179,7 +228,7 @@
       return $('#purchase-form').submit();
     });
     $('#purchase-form').on('redpack', function() {
-      return console.log('hello', 'redpack', ddData);
+      return showPayTip();
     });
     buildTable = function(list) {
       var html, i, len;
@@ -235,6 +284,7 @@
             text: '不使用红包',
             value: '',
             selected: true,
+            method: '',
             amount: 0,
             invest_amount: 0,
             description: '不使用红包'
@@ -248,6 +298,7 @@
             ddData.push({
               text: obj.name,
               value: obj.id,
+              method: obj.method,
               selected: false,
               amount: obj.amount,
               invest_amount: obj.invest_amount,
@@ -260,16 +311,17 @@
             imagePosition: "left",
             selectText: "请选择红包",
             onSelected: function(data) {
-              console.log(validator.checkForm(), 'hello');
-              if (validator.checkForm()) {
-                return $('#purchase-form').trigger('redpack');
+              if (validator.checkForm() && $('.dd-selected-value').val() !== '') {
+                $('#purchase-form').trigger('redpack');
               } else {
-                return $('#purchase-form').valid();
+                console.log('hello');
+                $('.payment').hide();
+                if (!isFirst) {
+                  $('#purchase-form').valid();
+                }
               }
+              return isFirst = true;
             }
-          });
-          $('#id_amount').keyup(function(e) {
-            return console.log('hello');
           });
           return $('#id_amount').blur(function(e) {
             var lable;

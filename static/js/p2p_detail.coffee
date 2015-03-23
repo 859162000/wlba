@@ -12,20 +12,33 @@ require.config
     "ddslick": ['jquery']
 
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal)->
+  isFirst = true
 
   showPayInfo = (actual_payment, red_pack_payment) ->
-    return ['红包使用<i>', red_pack_payment, '</i>元，实际支付', actual_payment, '<i>', red_pack_payment, '</i>元'].join('')
+    return ['红包使用<i class="blue">', red_pack_payment, '</i>元，实际支付<i class="blue">', actual_payment, '</i>元'].join('')
 
-  getRedAmount = (method, red_pack_amount) ->
+  getRedAmount = (method, red_pack_amount, event_id) ->
     amount = $('#id_amount').val()
+    if event_id == '7'
+      flag = amount*0.005
+      if flag <= 30
+        final_redpack = flag
+      else
+        final_redpack = 30
+
+      return {
+        red_pack: final_redpack
+        actual_amount: amount - final_redpack
+      }
     if method == '*'
       final_redpack = amount*red_pack_amount
     else
       final_redpack = red_pack_amount
 
-    return
+    return {
       red_pack: final_redpack
       actual_amount: amount - final_redpack
+    }
 
 
   getRedPack = () ->
@@ -37,7 +50,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   showPayTip = (method, amount) ->
     redPack = getRedPack()
-    redPackInfo = getRedAmount(redPack.method, redPack.amount)
+    redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id)
     html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack)
     $('.payment').html(html).show()
 
@@ -79,7 +92,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       threshold: true
 
   validator = $('#purchase-form').validate
-    debug: true
     rules:
       amount: opt
     messages:
@@ -88,10 +100,12 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         number: '请输入数字'
 
     errorPlacement: (error, element) ->
+      $('.payment').hide()
       error.appendTo $(element).closest('.form-row__middle').find('.form-row-error')
 
     success: () ->
-      $('#purchase-form').trigger('redpack')
+      if $('.dd-selected-value').val() != ''
+        $('#purchase-form').trigger('redpack')
 
     submitHandler: (form)->
       #autho: hetao; time: 2014.10.11; target: 抢购时未登录状态弹出登录层
@@ -177,9 +191,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     $('#purchase-form').submit()
 
   $('#purchase-form').on 'redpack', ->
-    console.log('hello', 'redpack', ddData)
-
-
+    showPayTip()
 
   #build the table for invest history
   buildTable = (list) ->
@@ -203,7 +215,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       ].join("")
       i++
     html.join ""
-
 
   page = 2
   $('.get-more').click (e) ->
@@ -266,15 +277,14 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           imagePosition: "left"
           selectText: "请选择红包"
           onSelected: (data) ->
-              console.log(validator.checkForm(), 'hello')
-              if validator.checkForm()
-                $('#purchase-form').trigger('redpack')
-              else
+            if validator.checkForm() && $('.dd-selected-value').val() != ''
+              $('#purchase-form').trigger('redpack')
+            else
+              console.log('hello')
+              $('.payment').hide()
+              if !isFirst
                 $('#purchase-form').valid()
-
-
-        $('#id_amount').keyup (e) ->
-          console.log('hello')
+            isFirst = true
 
 
         $('#id_amount').blur (e) ->
