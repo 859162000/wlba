@@ -223,8 +223,12 @@ def _give_redpack(user, rtype, device_type):
     device_type = _decide_device(device_type)
     rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
     for x in rps:
-        if x.target_channel != "" and user_ch != x.target_channel:
-            continue
+        #if x.target_channel != "" and user_ch != x.target_channel:
+        if x.target_channel != "":
+            chs = x.target_channel.split(",")
+            chs = [x for x in chs if x.strip()!=""]
+            if user_ch not in chs:
+                continue
         redpack = RedPack.objects.filter(event=x, status="unused").first()
         if redpack:
             event = redpack.event

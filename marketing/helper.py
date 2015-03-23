@@ -21,6 +21,8 @@ class Channel():
     SOUGOUJINGJIA = "sougou"
     IQIYI = "iqiyi"
     PPTV = "pptv"
+    #网利宝非用户邀请渠道
+    WANGLIBAOOTHER = "wanglibao-other"
 
 
 
