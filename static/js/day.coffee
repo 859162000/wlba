@@ -4,6 +4,51 @@ require.config(
 )
 
 require ['jquery'], ($)->
+#  缓存
+  init = (time)->
+    csrfSafeMethod = undefined
+    getCookie = undefined
+    sameOrigin = undefined
+
+    getCookie = (name) ->
+      cookie = undefined
+      cookieValue = undefined
+      cookies = undefined
+      i = undefined
+      cookieValue = null
+      if document.cookie and document.cookie != ''
+        cookies = document.cookie.split(';')
+        i = 0
+        while i < cookies.length
+          cookie = $.trim(cookies[i])
+          if cookie.substring(0, name.length + 1) == name + '='
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+            break
+          i++
+      cookieValue
+
+    csrfSafeMethod = (method) ->
+      /^(GET|HEAD|OPTIONS|TRACE)$/.test method
+
+    sameOrigin = (url) ->
+      host = undefined
+      origin = undefined
+      protocol = undefined
+      sr_origin = undefined
+      host = document.location.host
+      protocol = document.location.protocol
+      sr_origin = '//' + host
+      origin = protocol + sr_origin
+      url == origin or url.slice(0, origin.length + 1) == origin + '/' or url == sr_origin or url.slice(0, sr_origin.length + 1) == sr_origin + '/' or !/^(\/\/|http:|https:).*/.test(url)
+
+    $.ajaxSetup beforeSend: (xhr, settings) ->
+      if !csrfSafeMethod(settings.type) and sameOrigin(settings.url)
+        xhr.setRequestHeader 'X-CSRFToken', getCookie('csrftoken')
+      return
+    shuju(time)
+    return
+
+
 #  倒计时
   count_down = (o) ->
     sec=(new Date(o.replace(/-/ig,'/')).getTime() - new Date().getTime())/1000
@@ -17,7 +62,7 @@ require ['jquery'], ($)->
       $('.day-long').animate({'left':'-357px'},500)
       hight(m,'.day-si')
       clearTimeout(timer)
-      count_down('2015-04-31 24:00:00')
+      count_down('2015-04-30 24:00:00')
     return
 
 
@@ -52,7 +97,7 @@ require ['jquery'], ($)->
   #  请求数据
   shuju=(time)->
     $.ajax {
-      url: '/activity/investment_history/'
+      url: '/api/investment_history/'
       data: {
         day: time
       }
@@ -76,8 +121,6 @@ require ['jquery'], ($)->
       if date!=time
         while j<10
           if data[0]['tops_len']==0
-  #          console.log(date)
-            console.log(time)
             if j%2==0
               str3+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
               $('#dan').html(str3)
@@ -158,7 +201,7 @@ require ['jquery'], ($)->
       day='0'+day
   date=Y+'-0'+m+"-"+day
   hight(m,'.day-san')
-  shuju(date)
+  init(date)
   $('#left-h1').html('－－'+m+'月'+day+'日用户榜单－－')
 
 #获取倒计时时间

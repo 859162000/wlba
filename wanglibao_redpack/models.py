@@ -67,7 +67,7 @@ class RedPackEvent(models.Model):
                                 ("first_pay", "首次充值"),), default="注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default="全平台", choices=PLATFORM)
     apply_platform = models.CharField(max_length=10, verbose_name=u"使用平台", default="全平台", choices=PLATFORM)
-    target_channel = models.CharField(max_length=20, verbose_name=u"渠道(非邀请码)", blank=True, default="")
+    target_channel = models.CharField(max_length=1000, verbose_name=u"渠道(非邀请码)", blank=True, default="")
     give_start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放/兑换开始时间")
     give_end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放/兑换结束时间")
     available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")

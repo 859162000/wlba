@@ -7,7 +7,57 @@
   });
 
   require(['jquery'], function($) {
-    var Y, count_down, data, date, day, fmoney, hight, m, shuju;
+    var Y, count_down, data, date, day, fmoney, hight, init, m, shuju;
+    init = function(time) {
+      var csrfSafeMethod, getCookie, sameOrigin;
+      csrfSafeMethod = void 0;
+      getCookie = void 0;
+      sameOrigin = void 0;
+      getCookie = function(name) {
+        var cookie, cookieValue, cookies, i;
+        cookie = void 0;
+        cookieValue = void 0;
+        cookies = void 0;
+        i = void 0;
+        cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          cookies = document.cookie.split(';');
+          i = 0;
+          while (i < cookies.length) {
+            cookie = $.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) === name + '=') {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+            i++;
+          }
+        }
+        return cookieValue;
+      };
+      csrfSafeMethod = function(method) {
+        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+      };
+      sameOrigin = function(url) {
+        var host, origin, protocol, sr_origin;
+        host = void 0;
+        origin = void 0;
+        protocol = void 0;
+        sr_origin = void 0;
+        host = document.location.host;
+        protocol = document.location.protocol;
+        sr_origin = '//' + host;
+        origin = protocol + sr_origin;
+        return url === origin || url.slice(0, origin.length + 1) === origin + '/' || url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + '/' || !/^(\/\/|http:|https:).*/.test(url);
+      };
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+          }
+        }
+      });
+      shuju(time);
+    };
     count_down = function(o) {
       var sec, timer;
       sec = (new Date(o.replace(/-/ig, '/')).getTime() - new Date().getTime()) / 1000;
@@ -22,7 +72,7 @@
         }, 500);
         hight(m, '.day-si');
         clearTimeout(timer);
-        count_down('2015-04-31 24:00:00');
+        count_down('2015-04-30 24:00:00');
       }
     };
     hight = function(high_m, ele) {
@@ -61,7 +111,7 @@
     };
     shuju = function(time) {
       return $.ajax({
-        url: '/activity/investment_history/',
+        url: '/api/investment_history/',
         data: {
           day: time
         },
@@ -87,7 +137,6 @@
           _results = [];
           while (j < 10) {
             if (data[0]['tops_len'] === 0) {
-              console.log(time);
               if (j % 2 === 0) {
                 str3 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
                 $('#dan').html(str3);
@@ -206,7 +255,7 @@
     }
     date = Y + '-0' + m + "-" + day;
     hight(m, '.day-san');
-    shuju(date);
+    init(date);
     $('#left-h1').html('－－' + m + '月' + day + '日用户榜单－－');
     count_down('2015-04-01 00:00:00');
     $('.left-btn').on('click', function() {
