@@ -115,6 +115,11 @@ def decide_first(user_id, amount):
         start_time = timezone.datetime(2014, 11, 12)
         if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
             rs.reward_user(u'一个月迅雷会员')
+    elif channel == helper.Channel.IQIYI:
+        # 非快盘来源(需要确定到每个渠道)
+        start_time = timezone.datetime(2015, 3, 19)
+        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
+            rs.reward_user(u'一个月爱奇艺会员')
 
 #注册成功
 @app.task
@@ -138,6 +143,7 @@ def register_ok(user_id, device_type):
     #注册红包
     redpack_backends.give_register_redpack(user, device_type)
 
+#实名认证
 @app.task
 def idvalidate_ok(user_id):
     user = User.objects.filter(id=user_id).first()
@@ -147,6 +153,17 @@ def idvalidate_ok(user_id):
     if channel == helper.Channel.KUAIPAN:
         rs = RewardStrategy(user)
         rs.reward_user(u'50G快盘容量')
+
+    if channel == helper.Channel.IQIYI:
+        pass
+        #rs = RewardStrategy(user)
+        #rs.reward_user(u'7天爱奇艺会员')
+        #发短信
+
+    if channel == helper.Channel.PPTV:
+        rs = RewardStrategy(user)
+        rs.reward_user(u'一个月PPTV会员')
+        #发短信
 
 #充值成功
 def despoit_ok(pay_info):
@@ -178,6 +195,19 @@ def despoit_ok(pay_info):
                 status=PayInfo.SUCCESS).count() == 1:
             rs = RewardStrategy(pay_info.user)
             rs.reward_user(u'七天迅雷会员')
+        title, content = messages.msg_pay_ok(pay_info.amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": pay_info.user.id,
+            "title": title,
+            "content": content,
+            "mtype": "activityintro"
+        })
+    elif channel == helper.Channel.IQIYI:
+        start_time = timezone.datetime(2015, 3, 21)
+        if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
+                status=PayInfo.SUCCESS).count() == 1:
+            rs = RewardStrategy(pay_info.user)
+            rs.reward_user(u'7天爱奇艺会员')
         title, content = messages.msg_pay_ok(pay_info.amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id": pay_info.user.id,

@@ -66,7 +66,7 @@ html
       .gold2
          img(src="/static/images/xunlei-denglu/xun-wang.png").xun-wang
          .denelu-form
-            h1.biaoti 轻松领100元红包
+            h1.biaoti 轻松拿70元话费
             form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
               - csrf_token
               .form-row
@@ -94,9 +94,9 @@ html
               .form-row
                 input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
                 .form-row-error
-              //.form-row
-              //  input#id_invitecode.com-tu.tu1(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
-              //  .form-row-error
+              .form-row
+                input#id_invitecode.com-tu.tu1(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
+                .form-row-error
               .form-row.form-bottom-bar
                 button#register_submit.button-account.span10.xun-zhuce(type='submit') 注 册
                 .agreement(style="padding:0")
@@ -187,67 +187,65 @@ html
                   |100%本息保障
       .space-vertical-l
       .space-vertical-s
-    //  .content-title
-    //      h2.h2-da 没心，没肺，没节操的送！
-    //        p 活动期间，每个账户投资额达到以下额度，可获得相应奖品
-    //.dingwei
-    //  img(src="/static/images/xunlei-denglu/beibie.jpg").tete
-    //  .content-desc(style="margin-top:40px;position:relative;z-index:2")
-    //    .xiangdui
-    //      .space-vertical-s
-    //      .row.gold-row
-    //        .span6
-    //          img(src="/static/images/xunlei-denglu/xinban.png").gold-jiangli2
-    //        .span6-omega
-    //          ul.font-m.li-linghight
-    //            li 1、 累计购买满130万
-    //              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-    //              span.highlight 送
-    //              |iPhone 6 Plus（16G 5.5英寸）
-    //            li 2、 累计购买满100万
-    //              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-    //              span.highlight 送
-    //              |iPhone 6（16G 4.7英寸）
-    //            li 3、 累计购买满80万
-    //              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-    //              span.highlight 送
-    //              |华为mate7 4G版手机（16G）
-    //            li 4、 累计购买满50万
-    //              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-    //              span.highlight 送
-    //              |iPad Air 2（16G WLAN）
-    //            li 5、 累计购买满40万
-    //              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-    //              span.highlight 送
-    //              |iPad mini3（16G WLAN）
-    //            li 6、 累计购买满30万
-    //              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-    //              span.highlight 送
-    //              |1000元京东礼品卡
-    //            li 7、 累计购买满10万
-    //              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-    //              span.highlight 送
-    //              |300元京东礼品卡
-    //            li 8、 累计购买满1万-9万
-    //              &nbsp
-    //              |每满1万元
-    //              &nbsp
-    //              span.highlight 送
-    //              |30元话费
+      .content-title
+          h2.h2-da 没心，没肺，没节操的送！
+            p 活动期间，每个账户投资额达到以下额度，可获得相应奖品
+    .dingwei
+      img(src="/static/images/xunlei-denglu/beibie.jpg").tete
+      .content-desc(style="margin-top:40px;position:relative;z-index:2")
+        .xiangdui
+          .space-vertical-s
+          .row.gold-row
+            .span6
+              img(src="/static/images/xunlei-denglu/xinban.png").gold-jiangli2
+            .span6-omega
+              ul.font-m.li-linghight
+                li 1、 累计购买满130万
+                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                  span.highlight 送
+                  |iPhone 6 Plus（16G 5.5英寸）
+                li 2、 累计购买满100万
+                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                  span.highlight 送
+                  |iPhone 6（16G 4.7英寸）
+                li 3、 累计购买满80万
+                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                  span.highlight 送
+                  |华为mate7 4G版手机（16G）
+                li 4、 累计购买满50万
+                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                  span.highlight 送
+                  |iPad Air 2（16G WLAN）
+                li 5、 累计购买满40万
+                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                  span.highlight 送
+                  |iPad mini3（16G WLAN）
+                li 6、 累计购买满30万
+                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                  span.highlight 送
+                  |1000元京东礼品卡
+                li 7、 累计购买满10万
+                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                  span.highlight 送
+                  |300元京东礼品卡
+                li 8、 累计购买满1万-9万
+                  &nbsp
+                  |每满1万元
+                  &nbsp
+                  span.highlight 送
+                  |30元话费
     .gold
       .gold-footer(style="background:#fff;padding-left:0")
         .gold-declare(style="border-bottom:none;padding-left:0")
           dl.beijing
             dt.hei 奖品发放说明
-            dd 1、网利宝账户以身份证号为唯一识别标识。
-            dd 2、P2P理财年化收益活动奖励将随P2P理财项目还款发放。
-            dd 3、每个网利宝账户仅限一次使用该理财红包，新用户需投资300元即可使用100元直抵红包，实际支付200元。
-            dd 4、老用户需投资5000元即可使用100元直抵红包，实际支付4900元。
-            dd 5、理财红包兑换处：我的账户--红包--兑换。
-            dd 6、红包有效期3月13日-6月13日，过期无效。
-            dd 7、活动有效期3月13日-4月30日。
-            dd 8、此次活动红包仅限由迅雷发放。
-            dd 9、此次活动最终解释权归网利宝官方所有。
+            dd 1.网利宝账户以身份证号为唯一识别标识。
+            dd 2.P2P理财年化收益活动奖励将随P2P理财项目还款发放。
+            dd 3.京东礼品卡密码、迅雷会员激活码和话费均发送到交易手机号。
+            dd 4.奖品统一于活动结束后7个工作日内开始发放。
+            dd 5.由于实物奖品快递需要，满额度用户请提交真实“姓名、手机、身份证、通讯地址”至
+               b.note <a href="mailto:kefu@wanglibank.com">kefu@wanglibank.com</a>
+            dd 6.此次活动的最终解释权归网利宝官方所有
 
       .bai
         .content-title

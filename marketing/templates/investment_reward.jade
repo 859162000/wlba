@@ -1,0 +1,122 @@
+//
+                          Created by HeZhang on 15-2-3.
+-load formatters
+doctype html
+html
+  head
+    meta(name="viewport",content="width=device-width,initial-scale=1")
+    - with '打榜发红包统计单 ' as title
+    - endwith
+    link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/metisMenu/metisMenu.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/sb-admin-2.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(href="/static/css/plugins/datepicker3.css", media="screen, projection", rel="stylesheet", type="text/css")
+    style
+      .zuo {float:left}.ju{margin-bottom:20px}
+      .btn-cha {padding:10px 40px;margin-top:20px}
+      .btn-cha2 {margin-left:400px;padding:10px 40px;margin-top:20px}
+      .bac { background:#fff}
+      .liang { margin-bottom:20px}
+    script(src="/static/js/require.js", data-main="/static/js/header")
+    script(src="https://code.jquery.com/jquery-1.11.1.min.js", data-main="/static/js/header")
+    script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js", data-main="/static/js/header")
+    script(src="/static/js/lib/bootstrap-datepicker.js", data-main="/static/js/header")
+    body(role="document")
+    #wrapper
+      nav.navbar.navbar-default.navbar-static-top(role="navigation", style="margin-bottom:0px")
+        .navbar-header
+          a.navbar-brand(href="?") 网利宝统计数据
+        - with '打榜发红包统计单' as activeItem
+        include include/admin_menu
+        - endwith
+      #page-wrapper
+        .row
+          .col-lg-12
+            h1.page-header 打榜发红包统计单
+              .row
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading.bac(style="background:#fff;")
+                b(style="background:#fff;color:red")
+                  if message
+                    .panel-content.padding-l-r-sm
+                    label.error {{ message }}
+                .panel-body
+                .row
+                  form.form.span5(method="GET" action='/{{ "" | admin_address}}/statistics/investment_reward')
+                    .col-lg-8
+                      .form-group
+                        .liang.col-lg-5
+                          .input-group.ju.input-daterange#datepicker
+                            span.input-group-addon * 统计日期:
+                            input(type="text",name="day",value="{{day}}").input-sm.form-control
+                          .input-group.ju
+                              select(name="redpack", value="{{redpack}}", id="redpack")
+                                option(value="每日打榜红包_1000-100") 每日打榜红包_1000-100
+                                option(value="每日打榜红包_60") 每日打榜红包_60
+                                option(value="每日打榜红包_50") 每日打榜红包_50
+                                option(value="每日打榜红包_40") 每日打榜红包_40
+                                option(value="每日打榜红包_30") 每日打榜红包_30
+                                option(value="每日打榜红包_20") 每日打榜红包_20
+                                option(value="每日打榜红包_10") 每日打榜红包_10
+
+                    .col-lg-4
+                      .form-group
+                        button(type="submit", name="rule", value='investment').btn.btn-default.btn-cha 统计
+
+                .row
+
+                  h4
+                    | &nbsp;&nbsp;&nbsp;&nbsp;
+                    | 计划发放总金额为：{{amount_all.reward }}
+                    br
+                    | &nbsp;&nbsp;&nbsp;&nbsp;
+                    | 实际发放金额为：{{amount_redpack.reward }}
+                    .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 用户id
+                        th(rowspan="1") 电话
+                        th(rowspan="1") 投资金额
+                        th(rowspan="1") 奖励
+                        th(rowspan="1") 发放状态
+                    tbody
+                      if result
+                        for l in result
+                          tr
+                            td {{l.user}}
+                            td {{l.user.wanglibaouserprofile.phone}}
+                            td {{l.amount}}
+                            td {{l.reward}}
+                            td {{l.get_checked_status_display}}
+
+                  //form.form.span5(method="POST" action='/{{ "" | admin_address}}/statistics/investment_reward')
+                  form.form.span5(method="POST" action='/{{ "" | admin_address}}/statistics/investment_reward)
+                    - csrf_token
+                    .form-group
+                      input(type="hidden",name="day",value="{{day}}").input-sm.form-control
+                      input(type="hidden",name="redpack",value="{{redpack}}").input-sm.form-control
+                      button(type="submit", name='check_button', value='1').btn.btn-default.btn-cha2 审核通过
+                      button(type="submit", name='check_button', value='2').btn.btn-default.btn-cha2 审核未通过
+
+    if result
+      //{{ "" | admin_address}}
+      - with data=result uri='/activity/investment_reward/'
+      include include/pager_investment_reward
+      - endwith
+
+script.
+  require(["/static/js/tops_admin.js"])
+  var len=$('#redpack option').length
+  for (var i=0;i<len;i++){
+    if ($('#redpack option').eq(i).val()=='{{redpack}}'){
+      $('#redpack option').eq(i).attr('selected','selected')
+    }
+  }
+
+
+
+
+
+

@@ -329,6 +329,7 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
 
+    	tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id})
         return Response({"ret_code": 0, "message": u"验证成功"})
 
 

@@ -30,3 +30,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=emptyTable.js.map
