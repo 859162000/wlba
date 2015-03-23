@@ -74,6 +74,30 @@ def decide_first(user_id, amount):
                 except Exception, e:
                     print(e)
         return
+    elif channel == helper.Channel.WANGLIBAOOTHER:
+        if amount < 200:
+            return
+
+        phone = user.wanglibaouserprofile.phone
+        send_messages.apply_async(kwargs={
+            "phones": [phone],
+            "messages": [messages.gift_first_buy(money=30)]
+        })
+        title, content = messages.msg_first_buy()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": user.id,
+            "title": title,
+            "content": content,
+            "mtype": "activity"
+        })
+        rwd = Reward.objects.filter(type=u'30元话费').first()
+        if not rwd:
+            return
+        try:
+            RewardRecord.objects.create(user=user, reward=rwd, description=content)
+        except Exception, e:
+            print(e)
+        return
 
     # 判断来源
     rs = RewardStrategy(user)
