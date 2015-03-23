@@ -27,7 +27,7 @@ from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import Bank, Card, PayResult, PayInfo
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
-from wanglibao_pay import third_pay
+from wanglibao_pay import third_pay, trade_record
 from wanglibao_p2p.models import P2PRecord
 import decimal
 from wanglibao_pay.serializers import CardSerializer
@@ -739,6 +739,13 @@ class FEEAPIView(APIView):
         #计算费率
 
         return Response({"ret_code": 0, "fee": 0})
+
+class TradeRecordAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        rs = trade_record.detect(request)
+        return Response(rs)
 
 
 class WithdrawAPIView(APIView):
