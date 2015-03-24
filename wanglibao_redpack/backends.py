@@ -220,11 +220,11 @@ def give_first_buy_redpack(user, device_type):
     _give_redpack(user, "first_buy", device_type)
 
 
-def give_activity_redpack(user, rtype, redpack_name, device_type, rule_id):
-    _give_activity_redpack(user, rtype, redpack_name, device_type, rule_id)
+def give_activity_redpack_new(user, rtype, redpack_name, device_type, rule_id):
+    _give_activity_redpack_new(user, rtype, redpack_name, device_type, rule_id)
 
 
-def _give_activity_redpack(user, rtype, redpack_name, device_type, rule_id):
+def _give_activity_redpack_new(user, rtype, redpack_name, device_type, rule_id):
     """ rule_id: get message template """
     now = timezone.now()
     user_channel = helper.which_channel(user)

@@ -92,16 +92,28 @@ class ActivityRule(models.Model):
     rule_description = models.TextField(u'规则描述', null=True, blank=True)
     gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE)
     trigger_node = models.CharField(u'触发节点', max_length=20, choices=TRIGGER_NODE)
-    both_share = models.BooleanField(u'参与邀请共享赠送礼品', default=False, help_text=u'勾选此项则，则用户在满足规则的条件内邀请别人，\
-                                    双方共享选定“赠送类型”中的礼品')
-    redpack = models.CharField(u'红包类型名称', max_length=60, blank=True, help_text=u'红包名称一定要和红包活动中的名称保持一致')
-    reward = models.CharField(u'奖品类型名称', max_length=60, blank=True, help_text=u'类型名称一定要和奖品中的类型保持一致')
-    income = models.FloatField(u'金额或比率', default=0, blank=True, help_text=u'选择收益或话费时填写，固定金额时填写大于1的数字，收益率时填写0-1之间的小数')
-    min_amount = models.IntegerField(u'最小金额', default=0, help_text=u'投资或充值，不包含该金额（>）')
-    max_amount = models.IntegerField(u'最大金额', default=0, help_text=u'投资或充值，包含该金额（<=）')
-    msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True, help_text=u'站内信模板不填写则触发该规则时不发站内信，如果有动态变量，用“%s”代替')
-    sms_template = models.TextField(u'短信模板（不填则不发）', blank=True, help_text=u'短信模板不填写则触发该规则时不发手机短信，如果有动态变量，用“%s”代替')
-    send_type = models.CharField(u'赠送发放方式', max_length=20, choices=SEND_TYPE, default=u'系统实时发放')
+    both_share = models.BooleanField(u'参与邀请共享赠送礼品', default=False,
+                                     help_text=u'勾选此项则，则用户在满足规则的条件内邀请别人，双方共享选定“赠送类型”中的礼品')
+    redpack = models.CharField(u'红包类型名称', max_length=60, blank=True,
+                               help_text=u'红包名称一定要和红包活动中的名称保持一致')
+    reward = models.CharField(u'奖品类型名称', max_length=60, blank=True,
+                              help_text=u'类型名称一定要和奖品中的类型保持一致')
+    income = models.FloatField(u'金额或比率', default=0, blank=True,
+                               help_text=u'选择收益或话费时填写，固定金额时填写大于1的数字，收益率时填写0-1之间的小数')
+    min_amount = models.IntegerField(u'最小金额', default=0,
+                                     help_text=u'投资或充值，不包含该金额（>）')
+    max_amount = models.IntegerField(u'最大金额', default=0,
+                                     help_text=u'投资或充值，包含该金额（<=）')
+    msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True,
+                                    help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\
+                                              内置：手机号：“{{ mobile }}，奖品激活码：{{ reward }}，\
+                                              邀请人：{{ inviter }}，被邀请人：{{ invited }}”')
+    sms_template = models.TextField(u'短信模板（不填则不发）', blank=True,
+                                    help_text=u'短信模板不填写则触发该规则时不发手机短信，变量写在2个大括号之间，<br/>\
+                                              内置：手机号：“{{ mobile }}，奖品激活码：{{ reward }}，\
+                                              邀请人：{{ inviter }}，被邀请人：{{ invited }}”')
+    send_type = models.CharField(u'赠送发放方式', max_length=20, choices=SEND_TYPE,
+                                 default=u'系统实时发放')
     created_at = models.DateTimeField(auto_now=True)
     is_used = models.BooleanField(u'是否启用', default=False)
 

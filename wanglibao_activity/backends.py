@@ -7,11 +7,15 @@ import logging
 import decimal
 from django.utils import timezone
 from django.db.models import Q
+from django.db import transaction
+from django.template import Template, Context
 from models import Activity, ActivityRule, ActivityRecord
 from marketing import helper
-from marketing.models import IntroducedBy
+from marketing.models import IntroducedBy, Reward, RewardRecord
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_pay.models import PayInfo
+from wanglibao_p2p.models import P2PRecord
+from wanglibao_account import message as inside_message
 
 logger = logging.getLogger(__name__)
 
@@ -69,8 +73,9 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
             _send_gift(user, rule, device_type)
         #recharge (pay, first_pay)
         if trigger_node == 'recharge':
-            print "====== trigger_node: %s =======" % trigger_node
-            if rule.min_amount == 0 and rule.max_amount == 0:
+            print "====== recharge trigger_node: %s =======" % trigger_node
+            is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
+            if is_amount:
                 if rule.trigger_node == 'first_pay':
                     #check first pay
                     if PayInfo.objects.filter(user=user, type='D',
@@ -81,13 +86,13 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
                     _send_gift(user, rule, device_type, amount)
         #invest (buy, first_buy)
         if trigger_node == 'invest':
-            print "====== trigger_node: %s =======" % trigger_node
-            if rule.min_amount == 0 and rule.max_amount == 0:
+            print "====== invest trigger_node: %s =======" % trigger_node
+            is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
+            if is_amount:
                 if rule.trigger_node == 'first_buy':
                     #check first pay
-                    if PayInfo.objects.filter(user=user, type='D',
-                                              update_time__gt=rule.activity.start_at,
-                                              status=PayInfo.SUCCESS).count() == 1:
+                    if P2PRecord.objects.filter(user=user,
+                                                create_time__gt=rule.activity.start_at).count() == 1:
                         _send_gift(user, rule, device_type, amount)
                 if rule.trigger_node == 'buy':
                     _send_gift(user, rule, device_type, amount)
@@ -101,34 +106,52 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
 
 
 def _send_gift(user, rule, device_type, amount=0):
-    rule_id = rule.id
+    # rule_id = rule.id
+    rtype = rule.trigger_node
+    is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
     #send reward
-    if rule.gift_type == 'reward':
-        pass
+    if rule.gift_type == 'reward' or rule.gift_type == 'phonefare':
+        reward_name = rule.reward
+        print "======do send reward, device : %s =======" % device_type
+        if amount and amount > 0:
+            if is_amount:
+                _send_gift_reward(user, rule, rtype, reward_name, device_type)
+        else:
+            _send_gift_reward(user, rule, rtype, reward_name, device_type)
+
     #send red pack
     if rule.gift_type == 'redpack':
-        rtype = rule.trigger_node
         redpack_name = rule.redpack
+        #此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
         #send to
-        print "======= do send, device: %s =========" % device_type
-        if rule.send_type == 'sys_auto':
-            redpack_backends.give_activity_redpack(user, rtype, redpack_name, device_type, rule_id)
-        #insert record
-        _save_activity_record(rule, user)
-        #check do have the introduce relationship
-        if rule.both_share:
-            user_ib = _check_introduced_by(user)
-            if user_ib:
-                #to invite people red pack
-                if rule.send_type == 'sys_auto':
-                    redpack_backends.give_activity_redpack(user_ib, rtype, redpack_name, device_type, rule_id)
-                _save_activity_record(rule, user_ib, True)
+        print "======= do send redpack, device: %s =========" % device_type
+        if amount and amount > 0:
+            if is_amount:
+                _send_gift_redpack(user, rule, rtype, redpack_name, device_type)
+        else:
+            _send_gift_redpack(user, rule, rtype, redpack_name, device_type)
     #send income or amount
     if rule.gift_type == 'income':
-        pass
+        income = rule.income
+        #send to
+        print "======= do send income, device: %s =========" % device_type
+        if amount and amount > 0:
+            if is_amount:
+                _send_gift_income(user, rule, rtype, income, device_type)
+        else:
+            _send_gift_income(user, rule, rtype, income, device_type)
+
     #送话费
-    if rule.gift_type == 'phonefare':
-        pass
+    # if rule.gift_type == 'phonefare':
+    #     income = rule.income
+    #     #send to
+    #     print "======= do send phonefare, device: %s =========" % device_type
+    #     if amount and amount > 0:
+    #         if is_amount:
+    #             _send_gift_phonefare(user, rule, rtype, income, device_type)
+    #     else:
+    #         _send_gift_phonefare(user, rule, rtype, income, device_type)
+
 
 
 def _check_introduced_by(user):
@@ -136,6 +159,84 @@ def _check_introduced_by(user):
     if ib:
         return ib.introduced_by
     return None
+
+
+def _check_amount(min_amount, max_amount, amount):
+    if amount == 0:
+        return False
+    else:
+        if min_amount == 0 and max_amount ==0:
+            return True
+        elif min_amount > 0 and max_amount == 0:
+            if amount >= min_amount:
+                return True
+            else:
+                return False
+        else:
+            if min_amount < amount <= max_amount:
+                return True
+            else:
+                return False
+
+
+def _send_gift_reward(user, rule, rtype, reward_name, device_type):
+    now = timezone.now()
+    if rule.send_type == 'sys_auto':
+        #do send
+        try:
+            with transaction.atomic():
+                reward = Reward.objects.filter(type=reward_name,
+                                               is_used=False,
+                                               end_time__gte=now).first()
+                if reward:
+                    reward.is_used = True
+                    reward.save()
+
+                    description = '>'.join([rtype, reward_name])
+                    #记录奖品发放流水
+                    has_reward_record = _keep_reward_record(user, reward, description)
+                    #记录规则流水
+                    _save_activity_record(rule, user)
+
+                    if has_reward_record:
+                        #发放站内信或短信
+                        _send_reward_message(user, rule, reward)
+
+                    if rule.both_share:
+                        user_ib = _check_introduced_by(user)
+                        if user_ib:
+                            #给邀请人发站内信
+                            _send_reward_message(user_ib, rule, reward)
+                            _save_activity_record(rule, user_ib, True)
+        except Exception, e:
+            raise e
+    else:
+        #只记录不发信息
+        _save_activity_record(rule, user)
+
+
+def _send_gift_income(user, rule, rtype, income, device_type):
+    return
+
+
+def _send_gift_phonefare(user, rule, rtype, income, device_type):
+    return
+
+
+def _send_gift_redpack(user, rule, rtype, redpack_name, device_type):
+    if rule.send_type == 'sys_auto':
+        redpack_backends.give_activity_redpack_new(user, rtype, redpack_name, device_type, rule.id)
+    #insert record
+    _save_activity_record(rule, user)
+    #check do have the introduce relationship
+    if rule.both_share:
+        user_ib = _check_introduced_by(user)
+        if user_ib:
+            #to invite people red pack
+            if rule.send_type == 'sys_auto':
+                redpack_backends.give_activity_redpack_new(user_ib, rtype, redpack_name, device_type, rule.id)
+            _save_activity_record(rule, user_ib, True)
+
 
 def _save_activity_record(rule, user, introduced_by=False):
     record = ActivityRecord()
@@ -159,3 +260,38 @@ def _save_activity_record(rule, user, introduced_by=False):
         description = ''.join([description + rule.reward])
     record.description = description
     record.save()
+
+
+def _send_reward_message(user, rule, reward):
+    title = rule.rule_name
+    msg_template = rule.msg_template
+    sms_template = rule.sms_template
+    if msg_template:
+        t = Template(msg_template)
+        context = Context({
+            'mobile': '',
+            'reward': reward.content,
+            'inviter': '',
+            'invited': ''
+        })
+        content = t.render(context)
+        _send_message_template(user, title, content)
+
+
+def _keep_reward_record(user, reward, description=''):
+    try:
+        RewardRecord.objects.create(user=user,
+                                    reward=reward,
+                                    description=description)
+        return True
+    except Exception, e:
+        return False
+
+
+def _send_message_template(user, title, content):
+    inside_message.send_one.apply_async(kwargs={
+        "user_id": user.id,
+        "title": title,
+        "content": content,
+        "mtype": "activity"
+    })
