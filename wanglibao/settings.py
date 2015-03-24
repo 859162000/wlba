@@ -107,6 +107,7 @@ INSTALLED_APPS = (
     'wanglibao_margin',
     'wanglibao_redpack',
     'wanglibao_help',
+    'wanglibao_mobile',
 
     'report',
     'misc',
@@ -233,6 +234,7 @@ STATICFILES_FINDERS = (
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
+    os.path.join('wanglibao_mobile/static'),
 )
 
 

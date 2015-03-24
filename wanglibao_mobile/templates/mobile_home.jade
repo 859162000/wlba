@@ -1,0 +1,403 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
+
+  body.white-background
+    include include/header
+    - with '首页' as activeItem
+    include include/navigation
+    - endwith
+
+    .full-container-index.clearfix
+      banners_ = enumerate(banners)
+      for index, banner in banners_
+        if index == 0
+          if banner.type == 'ad'
+            a(href="{{banner.link}}", target='_blank')
+              .home-banner(style="display:block; background-image:url('/media/{{banner.image}}')")
+          else
+            .home-banner(style="display:block; background-image:url('/media/{{banner.image}}')")
+        else
+          if banner.type == 'ad'
+            a(href="{{banner.link}}", target='_blank')
+              .home-banner(style="background-image:url('/media/{{banner.image}}')")
+          else
+            .home-banner(style="background-image:url('/media/{{banner.image}}')")
+      ul.background-anchors
+        banners_ = enumerate(banners)
+        for index, banner in banners_
+          li
+            if index == 0
+              a.background-anchor.active(href="#") x
+            else
+              a.background-anchor(href="#") x
+      .container-home
+        .banner-overlay
+        .banner-form
+          if user.is_authenticated
+            .space-vertical-m
+            h1.banner-form--title 欢迎来网利宝投资理财
+            .space-vertical-s
+            p.banner-form--row.font-s 您的登录账户:
+              span {{user|display_name}}
+            .space-vertical-m
+            .banner-form--row.align-center
+              a.banner-form--button(href="/accounts/home") 进入我的账户
+          else
+            h1.banner-form--title 网利宝年化收益率
+            p.banner-form--row.font-s 平均收益 <em class="highlight">{{site_data.highest_earning_rate | percentage}}</em>
+            if product.category == '证大速贷'
+              p.banner-form--row.font-s <span class="highlight">{{site_data.demand_rate_times}}</span>倍以上活期收益&nbsp;&nbsp;&nbsp;第三方本息保障
+            else
+              p.banner-form--row.font-s <span class="highlight">{{site_data.demand_rate_times}}</span>倍以上活期收益&nbsp;&nbsp;&nbsp;第三方本息担保
+
+            a.banner-form--button.full-width.register-modal(href="#login-modal") 注册送现金红包
+            p.align-right.font-s
+              span 已有账号？<a class="login-button login-modal" href="#login-modal">立即登录</a>
+    .container.high-bigger
+      .row
+        .span3
+          span.icon.icon-trust
+          .high-bigger-text
+            h3 信赖
+            p IDG资本投资
+            p 第三方100%本息保障
+        .span3(style="width:285px")
+          span.icon.icon-authority
+          .high-bigger-text
+            h3 权威
+            p 洛克菲勒家族
+            p 全方位战略合作
+        .span3
+          span.icon.icon-security
+          .high-bigger-text
+            h3 安全
+            p 招商银行全程监管
+            p 账户资金安全由平安保险承保
+        .span3-omega
+          span.icon.icon-high-income
+          .high-bigger-text
+            h3 高收益
+            p 30倍银行活期收益
+            p 100元起投 0手续费
+    .space-vertical-s
+    include announcement_block
+    .space-vertical-s
+    .container
+      .row
+        .span8
+          a(name="p2p")
+          for product in p2p_products
+            status = product.display_status
+            .panel-p2p-product
+              .shadow-inner
+                if forloop.counter == 1
+                  .panel-announce-bar
+                    .panel-announce-bar-title 投资列表
+                    .panel-announce-bar-content
+                      for announce in announcements_p2p
+                        span.icon.icon-up-arrow
+                        a#p2p-new-announce(data-url="/announcement/detail/{{announce.id}}", href="javascript:viod(0);") {{announce.title}}
+                .panel-title-bar
+                  if product.category == '票据'
+                    .bill-icon.di 票
+
+                  elif product.warrant_company
+                    .warrant-icon.di 担
+                  a(href="/p2p/detail/{{product.id}}") {{product.name}}
+                  if product.category == '证大速贷'
+                      span.tip 满标后持满180天即可债权转让
+                .panel-content
+                  .row
+                    .span2.align-center
+                      p
+                        em {{product.total_amount | money_format_int}}
+                      p 融资金额(元)
+                    .span2.align-center
+                      p
+                        em {{product.period}}
+                        span.font-l 个月
+                      p 还款期限
+                    .span3.align-center
+                      p
+                        earning_rate = str(product.expected_earning_rate)
+                        //if product.excess_earning_rate > 0
+                        //  earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
+                        em.highlight {{earning_rate}}
+                        span.highlight.font-m %
+                        if product.activity
+                          em.highlight +
+                          span.xunlei-vip-rate(title="{{product.activity.name}}") {{product.activity.rule.percent_text}}%
+                            span.xunlei-vip-tip(title="{{product.activity.name}}") {{product.activity.name}}
+                      p 年化收益
+                    .span2.align-center
+                      p
+                        amount = product.total_amount - product.ordered_amount
+                        em {{amount | money_format_int}}
+                      p 可投资金额(元)
+                    .span3-omega.align-right
+                      p
+                        if status == '抢购中'
+                          a.button-home(href="/p2p/detail/{{product.id}}/")
+                            span.icon-p2p-home.purcharsing
+                            {{status}}
+                        else
+                          a.button-home-disabled(href="javascript:void(0)", disabled)
+                            if status == '已还款'
+                              span.icon-p2p-home.finished
+                            elif status == '还款中'
+                              span.icon-p2p-home.payment
+                            else
+                              span.icon-p2p-home.audit
+
+                            {{status}}
+
+                      if status == '抢购中'
+                        p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
+                          span(id="counter_{{product.id}}") {{product.end_time | timedelta_now_day }}
+                      else
+                        p
+
+                .panel-p2p--footer
+                  .row
+                    .span4
+                      span 进度：
+                      .progress-container
+                        percent = float(product.ordered_amount) / product.total_amount * 100
+                        if status == '抢购中' or status == '满标审核'
+                          .progress-indicator(style="width:{{percent | percentage}}")
+                        else
+                          .progress-indicator(style="width:{{percent | percentage}}")
+
+                      if status == '抢购中' or status == '满标审核'
+                        span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                      else
+                        span &nbsp;&nbsp; {{percent | percentage}}
+                    .span5.align-left
+                      if product.category == '证大速贷'
+                        span 本息保障: &nbsp;&nbsp;
+                        span.d3-text {{product.warrant_company.name}}
+                      elif product.category == '票据'
+                        span 承兑行: &nbsp;&nbsp;
+                        span.red-text {{product.warrant_company.name}}
+                        span &nbsp;&nbsp;无条件兑付
+                      else
+                        span 担保机构: &nbsp;&nbsp;
+                        span.d3-text {{product.warrant_company.name}}
+
+                    .span3-omega.align-right
+                      span 还款方式: &nbsp;&nbsp;
+                      span.d3-text {{product.display_payback_method}}
+                if status == '还款中'
+                  if forloop.counter == 1
+                    .panel-p2p-stamp(style="top:55px")
+                  else
+                    .panel-p2p-stamp
+                if status == '已还款'
+                  if forloop.counter == 1
+                    .panel-p2p-finished(style="top:55px")
+                  else
+                    .panel-p2p-finished
+            .space-vertical-sm
+          if True
+            .row
+              a.get-more(href="{% url 'p2p_list' %}" target="_blank") 查看更多
+
+
+        .span4-omega
+          div
+            if is_valid
+              .panel.tops-container
+                .panel-title-bar__tops
+                .panel-content-container
+                  .tabs
+                    .tabs-nav
+                      ul
+                        li
+                          a(href="#day").active 日排行
+                        li
+                          a(href="#week") 周排行
+                        li
+                          a(href="#month") 月排行
+                    .tabs-content
+                      .tab-content#day
+
+                        table
+                          for day in day_tops
+                            if forloop.counter < 4
+                              tr.tops-three
+                                td
+                                  .order {{forloop.counter}}
+                                td
+                                  .phone {{day.phone | safe_phone_new}}
+                                td
+                                  .amount-sum ￥{{day.amount_sum|money_format_int}}
+                            else
+                              tr
+                                td
+                                  .order {{forloop.counter}}
+                                td
+                                  .phone {{day.phone | safe_phone_new}}
+                                td
+                                  .amount-sum ￥{{day.amount_sum|money_format_int}}
+
+                      .tab-content#week
+                        table
+                          for week in week_tops
+                            if forloop.counter < 4
+                              tr.tops-three
+                                td
+                                  .order {{forloop.counter}}
+                                td
+                                  .phone {{week.phone | safe_phone_new}}
+                                td
+                                  .amount-sum ￥{{week.amount_sum|money_format_int}}
+                            else
+                              tr
+                                td
+                                  .order {{forloop.counter}}
+                                td
+                                  .phone {{week.phone | safe_phone_new}}
+                                td
+                                  .amount-sum ￥{{week.amount_sum|money_format_int}}
+
+                      .tab-content#month
+                        table
+                          for month in all_tops
+                            if forloop.counter < 4
+                              tr.tops-three
+                                td
+                                  .order {{forloop.counter}}
+                                td
+                                  .phone {{month.phone | safe_phone_new}}
+                                td
+                                  .amount-sum ￥{{month.amount_sum|money_format_int}}
+                            else
+                              tr
+                                td
+                                  .order {{forloop.counter}}
+                                td
+                                  .phone {{month.phone | safe_phone_new}}
+                                td
+                                  .amount-sum ￥{{month.amount_sum|money_format_int}}
+            else
+              .panel_top_finish
+                a(href="/activity/newyear")
+
+          div
+            .panel.news-list-container
+              .panel-title-bar__border-gray
+                .panel-title 媒体报道
+                span.span3-omega.font-s
+                    a(href="/news/list/") 更多>>
+              .panel-content-container.padding-l-r-s
+                ul.margin-top-s
+                  for news in news_and_reports
+                    li.media-item
+                      div.media-title.text-overflow-hidden
+                        a.news-icon(href="{{news.link}}" title="{{news.name}}", target='_blank')
+                          if news.image
+                            img(src="/media/{{news.image}}", style="width:65px;height:40px")
+                          else
+                            img(src="/static/images/media_default.jpg", style="width:65px;height:40px")
+
+                        a.news-txt.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') {{news.name}}
+
+            div(style="margin-top: 33px;").panel.invest-history-container
+              .panel-title-bar__no-border
+                .panel-title 最新投资记录1
+              .panel-content-container
+                table.invest-history-table
+                  colgroup
+                    col(width="35%")
+                    col(width="30%")
+                    col(width="35%")
+                  thead
+                    tr
+                      th 申购时间
+                      th 投资人
+                      th.invest-num 金额
+                  tbody
+                    trade_records = trade_records
+                    top = trade_records[:15]
+                    rest = trade_records[15:]
+                    for trade in top
+                      tr
+                        td
+                          p {{trade.create_time | date:"Y-m-d"}}
+                        td
+                          em {{trade.user | safe_phone}}
+                        td.invest-num
+
+                          span.money-highlight {{trade.amount|money_format_int}}
+                          span 元
+                    tbody(style="display:none")
+                      for trade in rest
+                        tr
+                          td
+                            p {{trade.create_time | date:"Y-m-d"}}
+                            p {{trade.create_time | date:"H:i:s"}}
+                          td
+                            em {{trade.user | safe_phone}}
+                          td.invest-num
+                            span.money-highlight {{trade.amount|money_format_int}}
+                              span 元
+
+    .full-container-white-no-border
+      .investment-process-container
+        .row
+          .step.first-step
+            span.icon.icon-first-step
+            .process-title 第一步&nbsp;免费注册
+            .process-content 30秒轻松免费注册成为会员
+          .step-arrow
+            ins
+          .step.second-step
+            span.icon.icon-second-step
+            .process-title 第二步&nbsp;进行认证
+            .process-content 完成实名认证
+          .step-arrow
+            ins
+          .step.third-step
+            span.icon.icon-third-step
+            .process-title 第三步&nbsp;充值账户
+            .process-content 在线充值，免收手续费
+          .step-arrow
+            ins
+          .step.fourth-step
+            span.icon.icon-fourth-step
+            .process-title 第四步&nbsp;成功投标
+            .process-content 按需筛选借款标并进行投标
+          .step-arrow
+            ins
+          .step.fifth-step
+            span.icon.icon-fifth-step
+            .process-title 第五步&nbsp;自动收款
+            .process-content 借款期满后自动回款
+
+    hr.bottom-hr
+    script.
+      require(["/static/js/index.js"])
+    .partner-container
+      .title
+        span.icon.icon-partner-title
+        |合作伙伴
+      ul.partner-logo
+        for partner in partners
+          li
+            a(href="{{partner.link}}",target="_blank", title="{{partner.name}}")
+              img(src="/media/{{partner.image}}", alt="{{partner.name}}")
+    - with 1 as no_margin
+    include include/footer
+    - endwith
+
+    include include/tracking
+
