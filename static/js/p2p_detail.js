@@ -16,14 +16,26 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
-    var buildTable, ddData, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, showPayInfo, showPayTip, validator;
+    var buildTable, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, showPayInfo, showPayTip, validator;
     isFirst = true;
+    getFormatedNumber = function(num) {
+      console.log(num);
+      return Math.round(num * 100) / 100;
+    };
+    getActualAmount = function(investAmount, redpackAmount) {
+      if (investAmount <= redpackAmount) {
+        return 0;
+      } else {
+        return getFormatedNumber(investAmount - redpackAmount);
+      }
+    };
     showPayInfo = function(actual_payment, red_pack_payment) {
       return ['红包使用<i class="blue">', red_pack_payment, '</i>元，实际支付<i class="blue">', actual_payment, '</i>元'].join('');
     };
-    getRedAmount = function(method, red_pack_amount, event_id) {
+    getRedAmount = function(method, red_pack_amount, event_id, highest_amount) {
       var amount, final_redpack, flag;
       amount = $('#id_amount').val();
+      console.log(highest_amount, 'highest amount');
       if (event_id === '7') {
         flag = amount * 0.005;
         if (flag <= 30) {
@@ -32,18 +44,21 @@
           final_redpack = 30;
         }
         return {
-          red_pack: final_redpack,
-          actual_amount: amount - final_redpack
+          red_pack: getFormatedNumber(final_redpack),
+          actual_amount: getActualAmount(amount, final_redpack)
         };
       }
       if (method === '*') {
         final_redpack = amount * red_pack_amount;
+        if (highest_amount && highest_amount < final_redpack) {
+          final_redpack = highest_amount;
+        }
       } else {
         final_redpack = red_pack_amount;
       }
       return {
-        red_pack: final_redpack,
-        actual_amount: amount - final_redpack
+        red_pack: getFormatedNumber(final_redpack),
+        actual_amount: getActualAmount(amount, final_redpack)
       };
     };
     hideEmptyLabel = function(e) {
@@ -67,9 +82,14 @@
       return selectedData;
     };
     showPayTip = function(method, amount) {
-      var html, redPack, redPackInfo;
+      var highest_amount, html, redPack, redPackInfo;
       redPack = getRedPack();
-      redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id);
+      highest_amount = 0;
+      console.log('highest', redPack);
+      if (redPack.highest_amount) {
+        highest_amount = redPack.highest_amount;
+      }
+      redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id, highest_amount);
       html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack);
       return $('.payment').html(html).show();
     };
@@ -128,6 +148,7 @@
       },
       errorPlacement: function(error, element) {
         $('.payment').hide();
+        console.log('hide', 'errorPlacement');
         return error.appendTo($(element).closest('.form-row__middle').find('.form-row-error'));
       },
       success: function() {
@@ -288,7 +309,7 @@
         $.post('/api/redpacket/', {
           status: 'available'
         }).done(function(data) {
-          var available_time, availables, data2, datetime, desc, obj, _i, _len;
+          var available_time, availables, data2, datetime, desc, highest_amount, obj, _i, _len;
           data2 = data;
           availables = data.packages.available;
           ddData.push({
@@ -298,6 +319,7 @@
             method: '',
             amount: 0,
             invest_amount: 0,
+            highest_amount: 0,
             description: '不使用红包'
           });
           for (_i = 0, _len = availables.length; _i < _len; _i++) {
@@ -306,6 +328,10 @@
             datetime = new Date();
             datetime.setTime(obj.unavailable_at * 1000);
             available_time = [datetime.getFullYear(), datetime.getMonth() + 1, datetime.getDate()].join('-');
+            highest_amount = 0;
+            if (obj.highest_amount) {
+              highest_amount = obj.highest_amount;
+            }
             ddData.push({
               text: obj.name,
               value: obj.id,
@@ -313,6 +339,7 @@
               selected: false,
               amount: obj.amount,
               invest_amount: obj.invest_amount,
+              highest_amount: highest_amount,
               description: desc + ', ' + available_time + '过期'
             });
           }
@@ -324,13 +351,15 @@
             onSelected: function(data) {
               if (validator.checkForm() && $('.dd-selected-value').val() !== '') {
                 $('#purchase-form').trigger('redpack');
+                console.log('--33');
               } else {
                 $('.payment').hide();
-                if (!isFirst) {
-                  $('#purchase-form').valid();
-                }
               }
-              return isFirst = true;
+              if (!isFirst) {
+                $('#purchase-form').valid();
+                hideEmptyLabel();
+              }
+              return isFirst = false;
             }
           });
         });
