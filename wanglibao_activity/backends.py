@@ -58,7 +58,12 @@ def check_activity(user, trigger_node, device_type, amount=0):
                         continue
                     else:
                         print "========= check start ========="
-                        _check_rules_trigger(user, rule, trigger_node, device_type, amount)
+                        if rule.is_introduced:
+                            user_ib = _check_introduced_by(user)
+                            if user_ib:
+                                _check_rules_trigger(user, rule, trigger_node, device_type, amount)
+                        else:
+                            _check_rules_trigger(user, rule, trigger_node, device_type, amount)
             else:
                 return
     else:
