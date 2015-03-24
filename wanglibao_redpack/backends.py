@@ -202,6 +202,8 @@ def _decide_device(device_type):
         return "ios"
     elif device_type == "android":
         return "android"
+    elif device_type == "all":
+        return "all"
     else:
         return "pc"
 
@@ -216,6 +218,35 @@ def give_first_pay_redpack(user, device_type):
 
 def give_first_buy_redpack(user, device_type):
     _give_redpack(user, "first_buy", device_type)
+
+
+def give_activity_redpack_new(user, rtype, redpack_name, device_type, rule_id):
+    _give_activity_redpack_new(user, rtype, redpack_name, device_type, rule_id)
+
+
+def _give_activity_redpack_new(user, rtype, redpack_name, device_type, rule_id):
+    """ rule_id: get message template """
+    now = timezone.now()
+    user_channel = helper.which_channel(user)
+    device_type = _decide_device(device_type)
+    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, name=redpack_name, \
+                                      give_start_at__lt=now, give_end_at__gt=now).first()
+    if rps and user_channel == rps.target_channel:
+        redpack = RedPack.objects.filter(event=rps, status="unused").first()
+        if redpack:
+            event = redpack.event
+            give_pf = event.give_platform
+            if give_pf == "all" or give_pf == device_type:
+                if redpack.token != "":
+                    redpack.status = "used"
+                    redpack.save()
+                record = RedPackRecord()
+                record.user = user
+                record.redpack = redpack
+                record.change_platform = device_type
+                record.save()
+                _send_message(user, event)
+
 
 def _give_redpack(user, rtype, device_type):
     now = timezone.now()
