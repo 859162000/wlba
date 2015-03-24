@@ -257,7 +257,7 @@ def _give_redpack(user, rtype, device_type):
         #if x.target_channel != "" and user_ch != x.target_channel:
         if x.target_channel != "":
             chs = x.target_channel.split(",")
-            chs = [x for x in chs if x.strip()!=""]
+            chs = [m for m in chs if m.strip()!=""]
             if user_ch not in chs:
                 continue
         redpack = RedPack.objects.filter(event=x, status="unused").first()
