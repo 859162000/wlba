@@ -43,7 +43,8 @@ def check_activity(user, trigger_node, device_type, amount=0):
     # else:
     #     channel = ib.channel.name
     channel = helper.which_channel(user)
-    print "====== trigger: %s, device: %s ======" % (trigger_node, device_type)
+    print "====== trigger: %s, device: %s ====== \n" % (trigger_node, device_type)
+    print "====== now: %s =======" % now
     #get all the activities
     activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False, channel=channel)\
                                     .filter(Q(platform=device_type) | Q(platform=u'all'))
