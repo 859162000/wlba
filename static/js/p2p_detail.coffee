@@ -15,8 +15,16 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   isFirst = true
 
   getFormatedNumber = (num) ->
-    console.log(num)
     return Math.round(num*100)/100
+
+  clearToShow = (arr) ->
+    i = 0
+    while arr[i]
+      if $.trim($(arr[i]).text()) == ''
+        arr.splice(i, 1)
+      else
+        i++
+    return arr
 
   getActualAmount = (investAmount, redpackAmount) ->
     if investAmount <= redpackAmount
@@ -29,7 +37,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   getRedAmount = (method, red_pack_amount, event_id, highest_amount) ->
     amount = $('#id_amount').val()
-    console.log(highest_amount, 'highest amount')
     if event_id == '7'
       flag = amount*0.005
       if flag <= 30
@@ -71,7 +78,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   showPayTip = (method, amount) ->
     redPack = getRedPack()
     highest_amount = 0
-    console.log('highest', redPack)
     if redPack.highest_amount
       highest_amount = redPack.highest_amount
     redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id, highest_amount)
@@ -123,14 +129,63 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         required: '请输入投资金额'
         number: '请输入数字'
 
+
     errorPlacement: (error, element) ->
       $('.payment').hide()
-      console.log('hide', 'errorPlacement')
       error.appendTo $(element).closest('.form-row__middle').find('.form-row-error')
+
+    showErrors: (errorMap, errorList) ->
+      #if errorList.length > 0
+        #@defaultShowErrors()
+        i = 0
+        while @errorList[i]
+          error = @errorList[i]
+          if @settings.highlight
+            @settings.highlight.call this, error.element, @settings.errorClass, @settings.validClass
+
+          @showLabel error.element, error.message
+          i++
+
+        if @errorList.length
+          @toShow = @toShow.add(@containers)
+
+        if @settings.success
+          i = 0
+          while @successList[i]
+            @showLabel @successList[i]
+            i++
+
+        if @settings.unhighlight
+          i = 0
+          elements = @validElements()
+          while elements[i]
+            @settings.unhighlight.call this, elements[i], @settings.errorClass, @settings.validClass
+            i++
+
+        @toHide = @toHide.not(@toShow)
+        @hideErrors()
+        @toShow = clearToShow(@toShow)
+        @addWrapper(@toShow).show()
+
 
     success: () ->
       if $('.dd-selected-value').val() != ''
         $('#purchase-form').trigger('redpack')
+
+    highlight: (element, errorClass, validClass) ->
+      if $(element).attr('id') == 'id_amount'
+        $('.payment').hide()
+
+    unhighlight: (element, errorClass, validClass) ->
+      if $(element).attr('id') == 'id_amount'
+        hideEmptyLabel()
+
+    invalidHandler: (event, validator) ->
+      $('.payment').hide()
+
+    onfocusout: false
+
+    debug: true
 
     submitHandler: (form)->
       #autho: hetao; time: 2014.10.11; target: 抢购时未登录状态弹出登录层
@@ -218,8 +273,8 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $('#purchase-form').on 'redpack', ->
     showPayTip()
 
-  $('#id_amount').blur hideEmptyLabel
-  $('#id_amount').keyup hideEmptyLabel
+  #$('#id_amount').blur hideEmptyLabel
+  #$('#id_amount').keyup hideEmptyLabel
 
   #build the table for invest history
   buildTable = (list) ->
@@ -314,7 +369,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           onSelected: (data) ->
             if validator.checkForm() && $('.dd-selected-value').val() != ''
               $('#purchase-form').trigger('redpack')
-              console.log('--33')
             else
               $('.payment').hide()
 
@@ -323,10 +377,4 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
               hideEmptyLabel()
             isFirst = false
 
-
-
-
       return
-
-
-

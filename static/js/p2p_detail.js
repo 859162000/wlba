@@ -16,11 +16,22 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
-    var buildTable, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, showPayInfo, showPayTip, validator;
+    var buildTable, clearToShow, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, showPayInfo, showPayTip, validator;
     isFirst = true;
     getFormatedNumber = function(num) {
-      console.log(num);
       return Math.round(num * 100) / 100;
+    };
+    clearToShow = function(arr) {
+      var i;
+      i = 0;
+      while (arr[i]) {
+        if ($.trim($(arr[i]).text()) === '') {
+          arr.splice(i, 1);
+        } else {
+          i++;
+        }
+      }
+      return arr;
     };
     getActualAmount = function(investAmount, redpackAmount) {
       if (investAmount <= redpackAmount) {
@@ -35,7 +46,6 @@
     getRedAmount = function(method, red_pack_amount, event_id, highest_amount) {
       var amount, final_redpack, flag;
       amount = $('#id_amount').val();
-      console.log(highest_amount, 'highest amount');
       if (event_id === '7') {
         flag = amount * 0.005;
         if (flag <= 30) {
@@ -85,7 +95,6 @@
       var highest_amount, html, redPack, redPackInfo;
       redPack = getRedPack();
       highest_amount = 0;
-      console.log('highest', redPack);
       if (redPack.highest_amount) {
         highest_amount = redPack.highest_amount;
       }
@@ -148,14 +157,62 @@
       },
       errorPlacement: function(error, element) {
         $('.payment').hide();
-        console.log('hide', 'errorPlacement');
         return error.appendTo($(element).closest('.form-row__middle').find('.form-row-error'));
+      },
+      showErrors: function(errorMap, errorList) {
+        var elements, error, i;
+        i = 0;
+        while (this.errorList[i]) {
+          error = this.errorList[i];
+          if (this.settings.highlight) {
+            this.settings.highlight.call(this, error.element, this.settings.errorClass, this.settings.validClass);
+          }
+          this.showLabel(error.element, error.message);
+          i++;
+        }
+        if (this.errorList.length) {
+          this.toShow = this.toShow.add(this.containers);
+        }
+        if (this.settings.success) {
+          i = 0;
+          while (this.successList[i]) {
+            this.showLabel(this.successList[i]);
+            i++;
+          }
+        }
+        if (this.settings.unhighlight) {
+          i = 0;
+          elements = this.validElements();
+          while (elements[i]) {
+            this.settings.unhighlight.call(this, elements[i], this.settings.errorClass, this.settings.validClass);
+            i++;
+          }
+        }
+        this.toHide = this.toHide.not(this.toShow);
+        this.hideErrors();
+        this.toShow = clearToShow(this.toShow);
+        return this.addWrapper(this.toShow).show();
       },
       success: function() {
         if ($('.dd-selected-value').val() !== '') {
           return $('#purchase-form').trigger('redpack');
         }
       },
+      highlight: function(element, errorClass, validClass) {
+        if ($(element).attr('id') === 'id_amount') {
+          return $('.payment').hide();
+        }
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        if ($(element).attr('id') === 'id_amount') {
+          return hideEmptyLabel();
+        }
+      },
+      invalidHandler: function(event, validator) {
+        return $('.payment').hide();
+      },
+      onfocusout: false,
+      debug: true,
       submitHandler: function(form) {
         var tip;
         if ($('.invest').hasClass('notlogin')) {
@@ -260,8 +317,6 @@
     $('#purchase-form').on('redpack', function() {
       return showPayTip();
     });
-    $('#id_amount').blur(hideEmptyLabel);
-    $('#id_amount').keyup(hideEmptyLabel);
     buildTable = function(list) {
       var html, i, len;
       html = [];
@@ -351,7 +406,6 @@
             onSelected: function(data) {
               if (validator.checkForm() && $('.dd-selected-value').val() !== '') {
                 $('#purchase-form').trigger('redpack');
-                console.log('--33');
               } else {
                 $('.payment').hide();
               }
