@@ -26,7 +26,7 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
                             KuaiPayView, KuaiPayCallbackView, KuaiPayQueryView,
-                            KuaiPayDelView, KuaiPayDynNumView)
+                            KuaiPayDelView, KuaiPayDynNumView, TradeRecordAPIView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -126,6 +126,8 @@ urlpatterns = patterns(
     url(r'^home/fundasset', AccountFundAssetAPI.as_view()),
     url(r'^home/p2p/amortization/(?P<product_id>\d+)', P2PAmortizationAPI.as_view()),
     url(r'^home/invite/', AccountInviteAPIView.as_view()),
+
+    url(r'^trade_record/', TradeRecordAPIView.as_view()),
 
     url(r'^p2p/contract/(?P<product_id>\d+)', UserProductContract.as_view()),
     url(r'^withdraw/$', WithdrawAPIView.as_view(), name="withdraw-api-view"),

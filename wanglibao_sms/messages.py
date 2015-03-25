@@ -66,6 +66,11 @@ def jiuxian_invited(money):
            % money
 
 @suffix
+def gift_first_buy(money):
+    return u'感谢您在网利宝完成首次理财！您的注册手机号将于3个工作日内收到%s元话费，请查收。回复TD退订 4008-588-066' \
+           % money
+
+@suffix
 def rand_pass(password):
     return u'感谢注册网利宝，您的初始密码是%s，请登录wanglibao.com修改密码。' % password
 
@@ -168,6 +173,12 @@ def msg_invite_are(inviter, invited):
     content = u"您已和您的好友%s成功建立邀请关系，您和您好友将共享60元话费,您的30元话费将于3个工作日内充值至您的手机号%s，请注意查收。<br/>感谢您对我们的支持与关注！<br/>网利宝" % (inviter, invited)
     return title, content
 
+#网利宝其他渠道首次投资送话费
+def msg_first_buy():
+    title = u"邀请好友送话费"
+    content = u"您已完成网利宝投资，您的30元话费奖励将于3个工作日内充值至您的注册手机号，请注意查收。<br/>感谢您对我们的支持与关注！<br/>网利宝"
+    return title, content
+
 def msg_jiuxian():
     title = u"邀请好友送话费"
     content =  u'亲爱的您好：<br>感谢您在网利宝完成首次理财！您的注册手机号将于3个工作日内收到30元话费，请查收。<br/>感谢您对我们的支持与关注！网利宝'
@@ -226,8 +237,8 @@ def msg_redpack_give(amount, name, dt):
 
 
 def msg_sevenday_iqiyi(activation):
-    title = u"实名认证送7天爱奇艺会员"
-    content = u"感谢您在活动期间完成实名认证。<br/>网利宝赠送您7天爱奇艺会员，会员码为：%s，请注意查收。<br/>感谢您对我们的信任与支持！<br/>网利宝" % activation
+    title = u"充值送7天爱奇艺会员"
+    content = u"感谢您在活动期间完成充值。<br/>网利宝赠送您7天爱奇艺会员，会员码为：%s，请注意查收。<br/>感谢您对我们的信任与支持！<br/>网利宝" % activation
     return title, content
 
 

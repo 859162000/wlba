@@ -19,6 +19,13 @@ class Investment(TemplateView):
     template_name = 'day.jade'
 
     def get_context_data(self, **kwargs):
+        now = datetime.now()
+        if now.date().__str__() <= '2015-03-23':
+            return {
+                "top_ten": None,
+                "top_len": 0
+            }
+
         day_tops = _get_top_records()
         return {
             "top_ten": day_tops,
@@ -32,14 +39,20 @@ class InvestmentHistory(APIView):
 
     def post(self, request):
         day = request.DATA.get('day')
-        day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
-        for tmp in day_tops:
-            if 'phone' in tmp:
-                tmp['phone'] = safe_phone_str(tmp['phone'])
-        result = [{
-            "tops": day_tops,
-            "tops_len": len(day_tops)
-        }]
+        if day <= '2015-03-23':
+            result = [{
+                "tops": None,
+                "tops_len": 0
+            }]
+        else:
+            day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
+            for tmp in day_tops:
+                if 'phone' in tmp:
+                    tmp['phone'] = safe_phone_str(tmp['phone'])
+            result = [{
+                "tops": day_tops,
+                "tops_len": len(day_tops)
+            }]
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
@@ -206,9 +219,9 @@ class InvestmentRewardView(TemplateView):
 
         check_button = request.POST.get('check_button')
         if check_button == '1':
-            # if datetime.now().date() <= day.date():
-            #     message = u'未到日终，不允许审核发放红包！'
-            #     return self.render_to_response(self._return_format(message, day, redpack))
+            if datetime.now().date() <= day.date():
+                message = u'未到日终，不允许审核发放红包！'
+                return self.render_to_response(self._return_format(message, day, redpack))
 
             records.filter(checked_status=0).update(checked_status=1)
             send_redpack.apply_async(kwargs={
