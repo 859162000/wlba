@@ -47,6 +47,11 @@ SEND_TYPE = (
     ('sys_auto', u'系统实时发放'),
     ('manual_operation', u'人工手动发放')
 )
+MSG_TYPE = (
+    ('message', u'站内信'),
+    ('sms', u'手机短信'),
+    ('only_record', u'只记录')
+)
 
 
 class Activity(models.Model):
@@ -147,6 +152,7 @@ class ActivityRecord(models.Model):
     trigger_node = models.CharField(u'触发节点', max_length=20, choices=TRIGGER_NODE)
     trigger_at = models.DateTimeField(u'触发时间', auto_created=False)
     description = models.TextField(u'摘要', blank=True)
+    msg_type = models.CharField(u'信息类型', max_length=20, choices=MSG_TYPE, default=u"只记录")
     user = models.ForeignKey(User, verbose_name=u"触发用户")
     income = models.FloatField(u'费用或收益', null=True, blank=True)
     created_at = models.DateTimeField(auto_now=True)
