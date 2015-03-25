@@ -37,7 +37,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   getRedAmount = (method, red_pack_amount, event_id, highest_amount) ->
     amount = $('#id_amount').val()
-    if event_id == '7'
+    if event_id*1 == 7
       flag = amount*0.005
       if flag <= 30
         final_redpack = flag
@@ -339,6 +339,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           amount: 0
           invest_amount: 0
           highest_amount: 0
+          event_id: 0
           description: '不使用红包'
         )
         for obj in availables
@@ -358,6 +359,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             selected: false
             amount: obj.amount
             invest_amount: obj.invest_amount
+            event_id: obj.event_id
             highest_amount: highest_amount
             description: desc + ', ' + available_time + '过期'
           )
