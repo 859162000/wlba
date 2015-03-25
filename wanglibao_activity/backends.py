@@ -291,7 +291,7 @@ def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=Fa
             description = u'【需人工发放】'
     if introduced_by:
         share_txt = u'【邀请人获得】'
-        description = ''.join([description, share_txt, msg_content])
+        description = ''.join([description, share_txt])
     if rule.gift_type == 'redpack':
         description = ''.join([description, msg_content])
     elif rule.gift_type == 'reward':
