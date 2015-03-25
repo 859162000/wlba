@@ -34,7 +34,8 @@ def _deposit_record(user, pagesize, pagenum):
     res = []
     records = PayInfo.objects.filter(user=user, type="D", status=u"成功")[(pagenum-1)*pagesize:pagenum*pagesize]
     for x in records:
-        obj = {"amount":x.amount, 
+        obj = {"id":x.id,
+                "amount":x.amount, 
                 "created_at":util.fmt_dt_normal(util.local_datetime(x.create_time)),
                 "channel":"APP"}
         if x.channel == "huifu":
@@ -44,10 +45,15 @@ def _deposit_record(user, pagesize, pagenum):
 
 def _withdraw_record(user, pagesize, pagenum):
     res = []
-    records = PayInfo.objects.filter(user=user, type="W", status=u"成功")[(pagenum-1)*pagesize:pagenum*pagesize]
+    #records = PayInfo.objects.filter(user=user, type="W", status=u"成功")[(pagenum-1)*pagesize:pagenum*pagesize]
+    records = PayInfo.objects.filter(user=user, type="W")[(pagenum-1)*pagesize:pagenum*pagesize]
     for x in records:
-        obj = {"amount":x.amount, 
+        obj = {"id":x.id,
+                "amount":x.amount, 
                 "created_at":util.fmt_dt_normal(util.local_datetime(x.create_time)),
+                "status":x.status,
+                "confirm_time":x.confirm_time,
+                "card_no":x.card_no,
                 "channel":"APP"}
         if not x.channel:
             obj['channel'] = "PC"
@@ -58,10 +64,12 @@ def _amo_record(user, pagesize, pagenum):
     res = []
     amos = UserAmortization.objects.filter(user=user, settled=True)[(pagenum-1)*pagesize:pagenum*pagesize]
     for x in amos:
-        obj = {"name":x.product_amortization.product.name, "term":x.term,
+        obj = {"id":x.id,
+                "name":x.product_amortization.product.name, "term":x.term,
                 "term_date":util.fmt_dt_normal(util.local_datetime(x.term_date)),
                 "principal":x.principal, "interest":x.interest,
                 "penal_interest":x.penal_interest,
+                "total_amount":(x.principal+x.interest+x.penal_interest),
                 "settlement_time":util.fmt_dt_normal(util.local_datetime(x.settlement_time))}
         res.append(obj)
     return res

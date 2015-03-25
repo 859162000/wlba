@@ -18,10 +18,11 @@ from marketing.models import IntroducedBy, Reward, RewardRecord
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_activity import backends as activity_backends
 
-#判断是否首次
+#判断是否首次购买
 @app.task
-def decide_first(user_id, amount):
+def decide_first(user_id, amount, device_type='pc'):
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
 
@@ -31,6 +32,9 @@ def decide_first(user_id, amount):
 
     introduced_by.bought_at = timezone.now()
     introduced_by.save()
+
+    #活动检测
+    activity_backends.check_activity(user, 'invest', device_type, amount)
 
     #channel = helper.which_channel(user, intro=introduced_by)
     channel = helper.which_channel(user)
@@ -172,15 +176,20 @@ def register_ok(user_id, device_type):
         "content": content,
         "mtype": "activityintro"
     })
+    #活动检测
+    activity_backends.check_activity(user, 'register', device_type)
     #注册红包
     redpack_backends.give_register_redpack(user, device_type)
 
 #实名认证
 @app.task
-def idvalidate_ok(user_id):
+def idvalidate_ok(user_id, device_type):
     user = User.objects.filter(id=user_id).first()
     #introduced_by = IntroducedBy.objects.filter(user=user).first()
     channel = helper.which_channel(user)
+
+    #活动检测
+    activity_backends.check_activity(user, 'validation', device_type)
 
     if channel == helper.Channel.KUAIPAN:
         rs = RewardStrategy(user)
@@ -198,7 +207,11 @@ def idvalidate_ok(user_id):
         #发短信
 
 #充值成功
-def despoit_ok(pay_info):
+def despoit_ok(pay_info, device_type='pc'):
+
+    #活动检测，充值
+    activity_backends.check_activity(pay_info.user, 'recharge', device_type, pay_info.amount)
+
     channel = helper.which_channel(pay_info.user)
     if channel == helper.Channel.FENGXING:
         start_time = timezone.datetime(2014, 12, 18)
