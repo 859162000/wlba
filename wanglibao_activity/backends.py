@@ -225,7 +225,7 @@ def _send_gift_income(user, rule):
             if rule.both_share:
                 user_introduced_by = _check_introduced_by(user)
                 if user_introduced_by:
-                    _send_message_sms(user_introduced_by, rule)
+                    _send_message_sms(user_introduced_by, rule, None)
         else:
             #只记录不发信息
             _save_activity_record(rule, user, 'only_record')
@@ -240,11 +240,11 @@ def _send_gift_phonefare(user, rule):
     phone_fare = rule.income
     if phone_fare > 0:
         if rule.send_type == 'sys_auto':
-            _send_message_sms(user, rule)
+            _send_message_sms(user, rule, None)
             if rule.both_share:
                 user_introduced_by = _check_introduced_by(user)
                 if user_introduced_by:
-                    _send_message_sms(user_introduced_by, rule)
+                    _send_message_sms(user_introduced_by, rule, None)
         else:
             #只记录不发信息
             _save_activity_record(rule, user, 'only_record')
@@ -291,18 +291,26 @@ def _save_activity_record(rule, user, msg_type, introduced_by=False):
         description = ''.join([description, share_txt])
     if rule.gift_type == 'redpack':
         description = ''.join([description, rule.redpack])
-    if rule.gift_type == 'reward':
-        description = ''.join([description + rule.reward])
+    elif rule.gift_type == 'reward':
+        description = ''.join([description, rule.reward])
+    else:
+        description = ''.join([description, rule.rule_name])
     record.description = description
     record.save()
 
 
-def _send_message_sms(user, rule, reward):
+def _send_message_sms(user, rule, reward=None):
     title = rule.rule_name
-    msg_template = rule.msg_template
-    sms_template = rule.sms_template
+    if rule.both_share:
+        msg_template = rule.msg_template_introduce
+        sms_template = rule.sms_template_introduce
+    else:
+        msg_template = rule.msg_template
+        sms_template = rule.sms_template
     mobile = user.wanglibaouserprofile.phone
-    inviter_phone, invited_phone = '', ''
+    inviter_phone, invited_phone, reward_content = '', '', ''
+    if reward:
+        reward_content = reward.content
     introduced_by = IntroducedBy.objects.filter(user=user).first()
     if introduced_by and introduced_by.introduced_by:
         inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
@@ -311,7 +319,7 @@ def _send_message_sms(user, rule, reward):
         invited_phone = safe_phone_str(invited_phone)
     context = Context({
         'mobile': safe_phone_str(mobile),
-        'reward': reward.content,
+        'reward': reward_content,
         'inviter': inviter_phone,
         'invited': invited_phone,
         'amount': rule.income

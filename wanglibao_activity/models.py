@@ -115,12 +115,14 @@ class ActivityRule(models.Model):
                                      help_text=u'投资或充值，包含该金额（<=）')
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True,
                                     help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\
-                                              内置：手机号：“{{ mobile }}，奖品激活码：{{ reward }}，\
-                                              邀请人：{{ inviter }}，被邀请人：{{ invited }}”')
+                                              内置：手机号：“{{ mobile }}，奖品激活码：{{ reward }}，奖品截止日期{{end_date}}<br/>\
+                                              邀请人：{{ inviter }}，被邀请人：{{ invited }}，赠送金额或收益{{amount}}”')
     sms_template = models.TextField(u'短信模板（不填则不发）', blank=True,
-                                    help_text=u'短信模板不填写则触发该规则时不发手机短信，变量写在2个大括号之间，<br/>\
-                                              内置：手机号：“{{ mobile }}，奖品激活码：{{ reward }}，\
-                                              邀请人：{{ inviter }}，被邀请人：{{ invited }}”')
+                                    help_text=u'短信模板不填写则触发该规则时不发手机短信，变量写在2个大括号之间，变量：同上')
+    msg_template_introduce = models.TextField(u'邀请人站内信模板', blank=True,
+                                              help_text=u'邀请人站内信模板不填写则不发送，变量写在2个大括号之间，变量：同上')
+    sms_template_introduce = models.TextField(u'邀请人短信模板', blank=True,
+                                              help_text=u'邀请人短信模板不填写则不发送，变量写在2个大括号之间，变量：同上')
     send_type = models.CharField(u'赠送发放方式', max_length=20, choices=SEND_TYPE,
                                  default=u'系统实时发放')
     created_at = models.DateTimeField(auto_now=True)
