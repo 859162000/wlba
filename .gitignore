@@ -1,5 +1,4 @@
 *.pyc
-# pycharm's files
 .idea/
 db.sqlite3
 media
