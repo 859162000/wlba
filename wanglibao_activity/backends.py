@@ -192,7 +192,7 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type):
         if rule.both_share:
             user_introduced_by = _check_introduced_by(user)
             if user_introduced_by:
-                _send_reward(user_introduced_by, rule, rtype, reward_name)
+                _send_reward(user_introduced_by, rule, rtype, reward_name, user_introduced_by)
     else:
         #只记录不发信息
         _save_activity_record(rule, user, 'only_record')
@@ -200,7 +200,7 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type):
             _save_activity_record(rule, user, 'only_record', True)
 
 
-def _send_reward(user, rule, rtype, reward_name):
+def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
     now = timezone.now()
     reward = Reward.objects.filter(type=reward_name,
                                    is_used=False,
@@ -213,7 +213,10 @@ def _send_reward(user, rule, rtype, reward_name):
         has_reward_record = _keep_reward_record(user, reward, description)
         if has_reward_record:
             #发放站内信或短信
-            _send_message_sms(user, rule, reward)
+            if user_introduced_by:
+                _send_message_sms(user, rule, user_introduced_by, reward)
+            else:
+                _send_message_sms(user, rule, None, reward)
 
 
 def _send_gift_income(user, rule):
@@ -225,7 +228,7 @@ def _send_gift_income(user, rule):
             if rule.both_share:
                 user_introduced_by = _check_introduced_by(user)
                 if user_introduced_by:
-                    _send_message_sms(user_introduced_by, rule, None)
+                    _send_message_sms(user, rule, user_introduced_by, None)
         else:
             #只记录不发信息
             _save_activity_record(rule, user, 'only_record')
@@ -240,11 +243,11 @@ def _send_gift_phonefare(user, rule):
     phone_fare = rule.income
     if phone_fare > 0:
         if rule.send_type == 'sys_auto':
-            _send_message_sms(user, rule, None)
+            _send_message_sms(user, rule, None, None)
             if rule.both_share:
                 user_introduced_by = _check_introduced_by(user)
                 if user_introduced_by:
-                    _send_message_sms(user_introduced_by, rule, None)
+                    _send_message_sms(user, rule, user_introduced_by, None)
         else:
             #只记录不发信息
             _save_activity_record(rule, user, 'only_record')
@@ -299,41 +302,62 @@ def _save_activity_record(rule, user, msg_type, introduced_by=False):
     record.save()
 
 
-def _send_message_sms(user, rule, reward=None):
+def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
+    """
+        inviter: 邀请人
+        invited： 被邀请人
+    """
     title = rule.rule_name
-    if rule.both_share:
-        msg_template = rule.msg_template_introduce
-        sms_template = rule.sms_template_introduce
-    else:
-        msg_template = rule.msg_template
-        sms_template = rule.sms_template
     mobile = user.wanglibaouserprofile.phone
     inviter_phone, invited_phone, reward_content = '', '', ''
     if reward:
         reward_content = reward.content
-    introduced_by = IntroducedBy.objects.filter(user=user).first()
-    if introduced_by and introduced_by.introduced_by:
-        inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
-        invited_phone = introduced_by.user.wanglibaouserprofile.phone
-        inviter_phone = safe_phone_str(inviter_phone)
-        invited_phone = safe_phone_str(invited_phone)
-    context = Context({
-        'mobile': safe_phone_str(mobile),
-        'reward': reward_content,
-        'inviter': inviter_phone,
-        'invited': invited_phone,
-        'amount': rule.income
-    })
-    if msg_template:
-        msg = Template(msg_template)
-        content = msg.render(context)
-        _send_message_template(user, title, content)
-        _save_activity_record(rule, user, 'message')
-    if sms_template:
-        sms = Template(sms_template)
-        content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
-        _send_sms_template(safe_phone_str(mobile), content)
-        _save_activity_record(rule, user, 'sms')
+    if user_introduced_by:
+        msg_template = rule.msg_template_introduce
+        sms_template = rule.sms_template_introduce
+        inviter_phone = safe_phone_str(user_introduced_by.wanglibaouserprofile.phone)
+        invited_phone = safe_phone_str(mobile)
+        context = Context({
+            'mobile': safe_phone_str(mobile),
+            'reward': reward_content,
+            'inviter': inviter_phone,
+            'invited': invited_phone,
+            'amount': rule.income
+        })
+        if msg_template:
+            msg = Template(msg_template)
+            content = msg.render(context)
+            _send_message_template(user_introduced_by, title, content)
+            _save_activity_record(rule, user_introduced_by, 'message', True)
+        if sms_template:
+            sms = Template(sms_template)
+            content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
+            _send_sms_template(safe_phone_str(mobile), content)
+            _save_activity_record(rule, user_introduced_by, 'sms', True)
+    else:
+        msg_template = rule.msg_template
+        sms_template = rule.sms_template
+        invited_phone = safe_phone_str(mobile)
+        introduced_by = IntroducedBy.objects.filter(user=user).first()
+        if introduced_by and introduced_by.introduced_by:
+            inviter_phone = safe_phone_str(introduced_by.introduced_by.wanglibaouserprofile.phone)
+        context = Context({
+            'mobile': invited_phone,
+            'reward': reward_content,
+            'inviter': inviter_phone,
+            'invited': invited_phone,
+            'amount': rule.income
+        })
+        if msg_template:
+            msg = Template(msg_template)
+            content = msg.render(context)
+            _send_message_template(user, title, content)
+            _save_activity_record(rule, user, 'message')
+        if sms_template:
+            sms = Template(sms_template)
+            content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
+            _send_sms_template(safe_phone_str(mobile), content)
+            _save_activity_record(rule, user, 'sms')
 
 
 def _keep_reward_record(user, reward, description=''):
