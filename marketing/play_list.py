@@ -40,10 +40,10 @@ class InvestmentHistory(APIView):
     def post(self, request):
         day = request.DATA.get('day')
         if day <= '2015-03-23':
-            result = {
-                "top_ten": None,
-                "top_len": 0
-            }
+            result = [{
+                "tops": None,
+                "tops_len": 0
+            }]
         else:
             day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
             for tmp in day_tops:
