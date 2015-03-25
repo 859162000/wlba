@@ -313,5 +313,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=day.js.map
