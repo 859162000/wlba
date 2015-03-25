@@ -18,6 +18,9 @@ class ActivityRecordAdmin(admin.ModelAdmin):
     list_display = ('activity', 'rule', 'platform', 'trigger_node', 'msg_type', \
                     'description', 'user', 'income', 'created_at')
 
+    def has_add_permission(self, request):
+        return False
+
 
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ActivityRule, ActivityRuleAdmin)

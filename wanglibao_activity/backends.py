@@ -195,9 +195,9 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type):
                 _send_reward(user_introduced_by, rule, rtype, reward_name, user_introduced_by)
     else:
         #只记录不发信息
-        _save_activity_record(rule, user, 'only_record')
+        _save_activity_record(rule, user, 'only_record', reward_name)
         if rule.both_share:
-            _save_activity_record(rule, user, 'only_record', True)
+            _save_activity_record(rule, user, 'only_record', reward_name, True)
 
 
 def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
@@ -231,9 +231,9 @@ def _send_gift_income(user, rule):
                     _send_message_sms(user, rule, user_introduced_by, None)
         else:
             #只记录不发信息
-            _save_activity_record(rule, user, 'only_record')
+            _save_activity_record(rule, user, 'only_record', rule.rule_name)
             if rule.both_share:
-                _save_activity_record(rule, user, 'only_record', True)
+                _save_activity_record(rule, user, 'only_record', rule.rule_name, True)
     else:
         return
 
@@ -250,9 +250,9 @@ def _send_gift_phonefare(user, rule):
                     _send_message_sms(user, rule, user_introduced_by, None)
         else:
             #只记录不发信息
-            _save_activity_record(rule, user, 'only_record')
+            _save_activity_record(rule, user, 'only_record', rule.rule_name)
             if rule.both_share:
-                _save_activity_record(rule, user, 'only_record', True)
+                _save_activity_record(rule, user, 'only_record', rule.rule_name, True)
     else:
         return
 
@@ -261,7 +261,7 @@ def _send_gift_redpack(user, rule, rtype, redpack_name, device_type):
     if rule.send_type == 'sys_auto':
         redpack_backends.give_activity_redpack_new(user, rtype, redpack_name, device_type, rule.id)
     #insert record
-    _save_activity_record(rule, user, 'message')
+    _save_activity_record(rule, user, 'message', redpack_name)
     #check do have the introduce relationship
     if rule.both_share:
         user_ib = _check_introduced_by(user)
@@ -269,10 +269,10 @@ def _send_gift_redpack(user, rule, rtype, redpack_name, device_type):
             #to invite people red pack
             if rule.send_type == 'sys_auto':
                 redpack_backends.give_activity_redpack_new(user_ib, rtype, redpack_name, device_type, rule.id)
-            _save_activity_record(rule, user_ib, 'message', True)
+            _save_activity_record(rule, user_ib, 'message', redpack_name, True)
 
 
-def _save_activity_record(rule, user, msg_type, introduced_by=False):
+def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=False):
     record = ActivityRecord()
     record.activity = rule.activity
     record.rule = rule
@@ -293,11 +293,11 @@ def _save_activity_record(rule, user, msg_type, introduced_by=False):
         share_txt = u'【邀请人获得】'
         description = ''.join([description, share_txt])
     if rule.gift_type == 'redpack':
-        description = ''.join([description, rule.redpack])
+        description = ''.join([description, msg_content])
     elif rule.gift_type == 'reward':
-        description = ''.join([description, rule.reward])
+        description = ''.join([description, msg_content])
     else:
-        description = ''.join([description, rule.rule_name])
+        description = ''.join([description, msg_content])
     record.description = description
     record.save()
 
@@ -328,12 +328,12 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
             msg = Template(msg_template)
             content = msg.render(context)
             _send_message_template(user_introduced_by, title, content)
-            _save_activity_record(rule, user_introduced_by, 'message', True)
+            _save_activity_record(rule, user_introduced_by, 'message', content, True)
         if sms_template:
             sms = Template(sms_template)
             content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
-            _send_sms_template(safe_phone_str(mobile), content)
-            _save_activity_record(rule, user_introduced_by, 'sms', True)
+            _send_sms_template(user_introduced_by.wanglibaouserprofile.phone, content)
+            _save_activity_record(rule, user_introduced_by, 'sms', content, True)
     else:
         msg_template = rule.msg_template
         sms_template = rule.sms_template
@@ -352,12 +352,12 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
             msg = Template(msg_template)
             content = msg.render(context)
             _send_message_template(user, title, content)
-            _save_activity_record(rule, user, 'message')
+            _save_activity_record(rule, user, 'message', content)
         if sms_template:
             sms = Template(sms_template)
             content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
-            _send_sms_template(safe_phone_str(mobile), content)
-            _save_activity_record(rule, user, 'sms')
+            _send_sms_template(mobile, content)
+            _save_activity_record(rule, user, 'sms', content)
 
 
 def _keep_reward_record(user, reward, description=''):
