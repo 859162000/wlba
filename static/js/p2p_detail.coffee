@@ -77,6 +77,8 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   showPayTip = (method, amount) ->
     redPack = getRedPack()
+    if !redPack
+      return
     highest_amount = 0
     if redPack.highest_amount
       highest_amount = redPack.highest_amount
@@ -170,6 +172,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
     success: () ->
       if $('.dd-selected-value').val() != ''
+        console.log('test')
         $('#purchase-form').trigger('redpack')
 
     highlight: (element, errorClass, validClass) ->

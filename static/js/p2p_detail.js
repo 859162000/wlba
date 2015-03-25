@@ -94,6 +94,9 @@
     showPayTip = function(method, amount) {
       var highest_amount, html, redPack, redPackInfo;
       redPack = getRedPack();
+      if (!redPack) {
+        return;
+      }
       highest_amount = 0;
       if (redPack.highest_amount) {
         highest_amount = redPack.highest_amount;
@@ -195,6 +198,7 @@
       },
       success: function() {
         if ($('.dd-selected-value').val() !== '') {
+          console.log('test');
           return $('#purchase-form').trigger('redpack');
         }
       },
