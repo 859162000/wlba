@@ -67,3 +67,9 @@ class HomeView(TemplateView):
             'is_valid': top.is_valid()
         }
 
+
+class TestView(TemplateView):
+    template_name = 'test.jade'
+
+    def get_context_data(self, **kwargs):
+        return {}
