@@ -211,7 +211,7 @@ require ['jquery'], ($)->
   wei2.setMinutes(0)
   wei2.setSeconds(0)
   gotime=wei2.getTime()-wei.getTime()
- 
+
   setTimeout(()->
     $('.ing li').eq(1).addClass('ing-hight')
     $('.day-head h1').eq(1).addClass('h1-hight')

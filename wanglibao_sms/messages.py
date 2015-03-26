@@ -191,7 +191,8 @@ def msg_bid_success(product_name, date):
 
 def msg_pay_ok(amount):
     title = u"充值成功"
-    content = u"您的网利宝账户已成功充值￥%s元，请查收。<br/>活动1：投资不同产品，即送1个月迅雷白金会员或10G、50G、100G快盘网盘。<br/>活动2：参加精彩活动，额外获赠1%%年化收益奖励。<br/>活动3：理财达到一定额度“迅雷白金会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/>活动4：邀请好友完成首次单笔200元理财，双方共享60元话费。<br/><a href='/' target='_blank'>点击此处进行理财</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % amount
+    # content = u"您的网利宝账户已成功充值￥%s元，请查收。<br/>活动1：投资不同产品，即送1个月迅雷白金会员或10G、50G、100G快盘网盘。<br/>活动2：参加精彩活动，额外获赠1%%年化收益奖励。<br/>活动3：理财达到一定额度“迅雷白金会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/>活动4：邀请好友完成首次单笔200元理财，双方共享60元话费。<br/><a href='/' target='_blank'>点击此处进行理财</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % amount
+    content = u"您的网利宝账户已成功充值￥%s元，请查收。<br /><a href='/' target='_blank'>点击此处进行理财</a><br />感谢您对我们的支持与关注。<br />网利宝" % amount
     return title, content
 
 def msg_pay_ok_f(amount, activation):

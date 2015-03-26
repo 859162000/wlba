@@ -73,5 +73,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=table.js.map

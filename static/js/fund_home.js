@@ -44,5 +44,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=fund_home.js.map

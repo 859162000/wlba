@@ -108,5 +108,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=fundTable.js.map

@@ -122,5 +122,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=trustTable.js.map
