@@ -74,19 +74,15 @@ body{
     position: relative;
     top:0.22em;
 }
-.text-two p{
-    text-align: center;
-    font-size: 1em;
-    line-height: 2em;
-    color: #666666;
-    /*Letter-spacing:-0.1em;*/
-}
-.text-two p>span{
+.text-two h2{
     color: #ff5d33;
+    padding-left: 1.4em;
+    font-size: 1.3em;
+    line-height: 2em;
 }
 .text-two h1,.footer h1{
     font-size: 1.3em;
-    line-height: 2em;
+    line-height: 2.5em;
     color: #727272;
     padding-left: 1em;
 }
