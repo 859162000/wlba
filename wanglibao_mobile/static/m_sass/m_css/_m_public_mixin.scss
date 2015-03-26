@@ -1,0 +1,20 @@
+
+//
+@mixin line-combine($br-color){
+  border: 0;
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(50%,transparent),color-stop(50%,transparent),color-stop(100%,$br-color));
+  background-image: -webkit-linear-gradient(top,transparent 50%,$br-color 50%,$br-color 100%);
+  background-image: linear-gradient(to bottom,transparent 50%,$br-color 50%,$br-color 100%);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: bottom;
+}
+@mixin line-combine-top($br-color){
+  border: 0;
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(50%,transparent),color-stop(50%,transparent),color-stop(100%,$br-color));
+  background-image: -webkit-linear-gradient(top,transparent 50%,$br-color 50%,$br-color 100%);
+  background-image: linear-gradient(to bottom,transparent 50%,$br-color 50%,$br-color 100%);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top;
+}

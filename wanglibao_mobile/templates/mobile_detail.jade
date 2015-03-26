@@ -1,0 +1,104 @@
+doctype html
+html
+  head
+    - with '网利宝' as title
+    title 网利宝
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0")
+    meta(name="format-detection", content="telephone=no")
+    link(rel="stylesheet",href="/static/stylesheets/test.css")
+  body
+    .m-head.m-detail-head 产品详情
+      .head-left.m-back
+        a(href="/mobile/mobile_index/")
+      .head-right.m-detail-right
+    .m-detail-fixed
+      .m-fixed-num 13.0
+      .m-fixed-pro
+        p.text 年化收益
+        p.pro %
+      .m-fixed-btn
+        a(href='#') 抢购
+      .m-detail-clear
+    .m-detail-content
+      .detail-name 企业资金周琦（一期）  （抢标有奖）
+      mixin detail-list(key, value)
+        .detail-list
+          .product-list-key=key
+          if key == '剩余可投金额'
+            .product-list-value.txt-red=value
+          else
+            .product-list-value=value
+      +detail-list('融资金额', '1,500,000元')
+      +detail-list('年化收益', '12.0%+1.0%(标满后2个工作日内赠送)')
+      +detail-list('还款期限', '6个月')
+      +detail-list('还款方式', '6个月')
+      +detail-list('融资进度', '87%')
+      +detail-list('剩余可投金额', '200,300元')
+      +detail-list('剩余时间', '5天0小时42分')
+      +detail-list('合作机构', '湖南恒大')
+    .m-detail-tab
+      .m-tab-head
+        .m-tab-left.m-tab-active.tab-bor 借款人资料
+        .m-tab-right.tab-bor 投资记录
+      .m-tab-body
+        .tab-body-left.cont-bor
+          mixin tab-text-list(tile, textArr)
+            .tab-cont
+              .tab-titile=tile
+              each val, index in textArr
+                - var key = index +1
+                p=key
+                  |、
+                  =val
+          - var reward = ["普惠奖： 单笔投标5000元（不含）以上，送5元话费；", "抢楼奖： 投资1000元（含）以上，按时间顺序排名为8的尾号，送5元话费；", "满标奖: 满标最后一笔投资，送10元话费；", "每个用户每个奖项智能领取一次话费，最多可领取三次话费，本活动最终解释权归网利宝所有。"]
+          +tab-text-list('抢标奖励', reward)
+          - var huankuan = ["经营收入", "第三方担保机构代偿", '平台风险准备金', '法律援助']
+          +tab-text-list('还款保障', huankuan)
+          - var huankuan = ["经营收入", "第三方担保机构代偿", '平台风险准备金', '法律援助']
+          +tab-text-list('还款保障', reward)
+        .tab-body-right.cont-bor
+          .tab-right-titile
+            .titi-name 投资人
+            .tit-money 投资金额
+            .tit-time  投资时间
+          mixin right-people(num, money, year, second)
+            .tab-right-cont
+              .right-list-num=num
+              .right-list-money=money
+              .right-list-time
+                .right-time-year=year
+                .right-time-second=second
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+          +right-people('123*****998', '10,000', '2015-03-26', '16:24:37')
+  script.
+    var tab = document.querySelectorAll(".tab-bor");
+    var cont = document.querySelectorAll(".cont-bor");
+    var classname = ['m-tab-left','m-tab-right'];
+    for(var i=0;i< tab.length;i++){
+        tab[i].onclick=function(num){
+            return function(){
+                for(var j=0;j< cont.length;j++){
+                    cont[j].style.display= "none";
+                    tab[j].className = classname[j] + " tab-bor";
+                }
+                tab[num].className = tab[num].className +" m-tab-active";
+                cont[num].style.display= "block";
+            }
+        }(i)
+    }
