@@ -245,7 +245,7 @@ def msg_redpack_give(amount, name, dt):
 
 def msg_redpack_give_percent(amount, highest_amount, name, dt):
     title = u"参与活动送红包"
-    if hiehest_amount == 0:
+    if highest_amount == 0:
         str_tmp = ''
     else:
         str_tmp = u'最高抵扣【%s】元，' % highest_amount
