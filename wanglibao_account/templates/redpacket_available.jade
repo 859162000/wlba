@@ -54,7 +54,7 @@ block main
         tbody
           each red_packet in red_packets
             tr
-              td {{red_packet.name}} {{red_packet.event_id}} {{red_packet.amount}}
+              td {{red_packet.name}}
               if red_packet.method == '-'
                 td {{red_packet.amount}} 元
               else
@@ -64,6 +64,7 @@ block main
                 td {{red_packet.product}} <br/> {{red_packet.apply_at | milltime_format }}
               else
                 td --
+                u
 
 
     script.
