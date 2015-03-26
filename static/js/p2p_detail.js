@@ -198,7 +198,6 @@
       },
       success: function() {
         if ($('.dd-selected-value').val() !== '') {
-          console.log('test');
           return $('#purchase-form').trigger('redpack');
         }
       },
@@ -428,5 +427,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_detail.js.map
