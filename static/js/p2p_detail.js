@@ -24,7 +24,7 @@
     clearToShow = function(arr) {
       var i;
       i = 0;
-      while (arr[i]) {
+      while (arr[i] && arr.length) {
         if ($.trim($(arr[i]).text()) === '') {
           arr.splice(i, 1);
         } else {
@@ -159,7 +159,6 @@
         }
       },
       errorPlacement: function(error, element) {
-        $('.payment').hide();
         return error.appendTo($(element).closest('.form-row__middle').find('.form-row-error'));
       },
       showErrors: function(errorMap, errorList) {
@@ -198,7 +197,6 @@
       },
       success: function() {
         if ($('.dd-selected-value').val() !== '') {
-          console.log('test');
           return $('#purchase-form').trigger('redpack');
         }
       },
@@ -428,5 +426,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_detail.js.map

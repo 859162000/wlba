@@ -19,7 +19,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   clearToShow = (arr) ->
     i = 0
-    while arr[i]
+    while arr[i] and arr.length
       if $.trim($(arr[i]).text()) == ''
         arr.splice(i, 1)
       else
@@ -133,46 +133,42 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
 
     errorPlacement: (error, element) ->
-      $('.payment').hide()
       error.appendTo $(element).closest('.form-row__middle').find('.form-row-error')
 
     showErrors: (errorMap, errorList) ->
-      #if errorList.length > 0
-        #@defaultShowErrors()
-        i = 0
-        while @errorList[i]
-          error = @errorList[i]
-          if @settings.highlight
-            @settings.highlight.call this, error.element, @settings.errorClass, @settings.validClass
+      i = 0
+      while @errorList[i]
+        error = @errorList[i]
+        if @settings.highlight
+          @settings.highlight.call this, error.element, @settings.errorClass, @settings.validClass
 
-          @showLabel error.element, error.message
+        @showLabel error.element, error.message
+        i++
+
+      if @errorList.length
+        @toShow = @toShow.add(@containers)
+
+      if @settings.success
+        i = 0
+        while @successList[i]
+          @showLabel @successList[i]
           i++
 
-        if @errorList.length
-          @toShow = @toShow.add(@containers)
+      if @settings.unhighlight
+        i = 0
+        elements = @validElements()
+        while elements[i]
+          @settings.unhighlight.call this, elements[i], @settings.errorClass, @settings.validClass
+          i++
 
-        if @settings.success
-          i = 0
-          while @successList[i]
-            @showLabel @successList[i]
-            i++
-
-        if @settings.unhighlight
-          i = 0
-          elements = @validElements()
-          while elements[i]
-            @settings.unhighlight.call this, elements[i], @settings.errorClass, @settings.validClass
-            i++
-
-        @toHide = @toHide.not(@toShow)
-        @hideErrors()
-        @toShow = clearToShow(@toShow)
-        @addWrapper(@toShow).show()
+      @toHide = @toHide.not(@toShow)
+      @hideErrors()
+      @toShow = clearToShow(@toShow)
+      @addWrapper(@toShow).show()
 
 
     success: () ->
       if $('.dd-selected-value').val() != ''
-        console.log('test')
         $('#purchase-form').trigger('redpack')
 
     highlight: (element, errorClass, validClass) ->
