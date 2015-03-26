@@ -428,3 +428,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=p2p_detail.js.map
