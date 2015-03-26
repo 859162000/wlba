@@ -4,6 +4,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from wanglibao_redpack.models import RedPackEvent
+from ckeditor.fields import RichTextField
 
 PLATFORM = (
     ("all", u"全平台"),
@@ -159,3 +160,52 @@ class ActivityRecord(models.Model):
         verbose_name_plural = u'活动触发流水'
 
 
+class ActivityTemplates(models.Model):
+    """ the templates of activity """
+    logo = models.ImageField(u'网利宝logo图片', null=True, upload_to='activity', blank=True)
+    logo_other = models.ImageField(u'第三方logo图片', null=True, upload_to='activity', blank=True)
+    location = models.BooleanField(u'改变logo顺序', default=False, help_text=u'勾选此项则，则网利宝logo在后，第三方logo在前')
+    banner = models.ImageField(u'banner图片', null=True, upload_to='activity', blank=True)
+    desc = models.CharField(max_length=1024, blank=True, verbose_name=u'活动描述', help_text=u'例如<一句话描述，活动期间怎么怎么滴>')
+    desc_time = models.CharField(max_length=1024, blank=True, verbose_name=u'活动时间描述', help_text=u'例如<活动时间：2015-03-18至2015-03-28>')
+
+    reward_img = models.ImageField(upload_to='activity', blank=True, null=True, verbose_name=u'奖品图片')
+    reward_desc = RichTextField(verbose_name=u'奖品描述', blank=True, null=True)
+
+    introduce_desc = RichTextField(verbose_name=u'邀请好友描述', blank=True, null=True)
+    introduce_img = models.ImageField(upload_to='activity', blank=True, null=True, verbose_name=u'邀请好友图片图片')
+
+    rule_use = RichTextField(verbose_name=u'使用规则', blank=True, null=True)
+    rule_activity = RichTextField(verbose_name=u'活动规则', blank=True, null=True)
+    rule_reward = RichTextField(verbose_name=u'奖品发放', blank=True, null=True)
+
+    def __unicode__(self):
+        return u'活动模板'
+
+    class Meta:
+        verbose_name_plural = u'活动模板'
+
+
+class TemplatesImages(models.Model):
+    """ the list of templates images """
+
+    IMG_TYPE = (
+        ('reward', u'赠送礼包'),
+        ('register', u'注册流程'),
+    )
+
+    templates = models.ForeignKey(ActivityTemplates, null=True, blank=False, related_name='activity_templates')
+    img_type = models.CharField(max_length=20, choices=IMG_TYPE, verbose_name=u'图片类别')
+    name = models.CharField(max_length=60, verbose_name=u'图片名称', help_text=u'当图片类别是元素时,模板中会显示')
+    img = models.ImageField(upload_to='activity', blank=True, verbose_name=u'图片')
+    desc_one = models.CharField(max_length=1024, blank=True, verbose_name=u'图片描述1', help_text=u'展示在图片旁边的描述信息')
+    desc_two = models.CharField(max_length=1024, blank=True, verbose_name=u'图片描述2', help_text=u'展示在图片旁边的描述信息')
+
+    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先')
+    last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'上次更新时间')
+
+    def __unicode__(self):
+        return u'活动模板内容图片'
+
+    class Meta:
+        verbose_name_plural = u'活动模板内容图片'
