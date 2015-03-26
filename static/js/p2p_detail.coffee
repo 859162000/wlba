@@ -172,7 +172,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
     success: () ->
       if $('.dd-selected-value').val() != ''
-        console.log('test')
         $('#purchase-form').trigger('redpack')
 
     highlight: (element, errorClass, validClass) ->
