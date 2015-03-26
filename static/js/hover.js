@@ -60,5 +60,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=hover.js.map
