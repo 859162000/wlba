@@ -17,8 +17,11 @@ class ActivityRuleAdmin(admin.ModelAdmin):
 
 
 class ActivityRecordAdmin(admin.ModelAdmin):
-    list_display = ('activity', 'rule', 'platform', 'trigger_node', 'description', 'user',\
-                    'income', 'created_at')
+    list_display = ('activity', 'rule', 'platform', 'trigger_node', 'msg_type', \
+                    'description', 'user', 'income', 'created_at')
+
+    def has_add_permission(self, request):
+        return False
 
 
 class TemplatesImageInline(admin.TabularInline):
