@@ -23,5 +23,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=reset_password_done.js.map
