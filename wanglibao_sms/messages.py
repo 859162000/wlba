@@ -245,7 +245,11 @@ def msg_redpack_give(amount, name, dt):
 
 def msg_redpack_give_percent(amount, highest_amount, name, dt):
     title = u"参与活动送红包"
-    content = u"网利宝赠送的【%s】红包已发放，抵扣投资额的%s%%，最高抵扣【%s】元，请进入投资页面尽快投资赚收益吧！有效期至%s。<br/> <a href='/' target='_blank'>立即使用</a><br/>感谢您对我们的支持与关注。" % (name, amount, highest_amount, dt)
+    if hiehest_amount == 0:
+        str_tmp = ''
+    else:
+        str_tmp = u'最高抵扣【%s】元，' % highest_amount
+    content = u"网利宝赠送的【%s】红包已发放，抵扣投资额的%s%%，%s请进入投资页面尽快投资赚收益吧！有效期至%s。<br/> <a href='/' target='_blank'>立即使用</a><br/>感谢您对我们的支持与关注。" % (name, amount, str_tmp, dt)
     return title, content
 
 
