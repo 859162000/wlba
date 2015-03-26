@@ -86,6 +86,12 @@ def product_full_message(name):
 def redpack_give(amount, name, dt):
     return u'您的账户获得【%s】奖励【%s】元。有效期至%s。' % (name, amount, dt)
 
+
+@suffix
+def redpack_give_percent(amount, highest_amount, name, dt):
+    return u'您的账户获得【%s】奖励，抵扣投资额的%s%%。有效期至%s。' % (name, amount, dt)
+
+
 #站内信模板
 def msg_bid_purchase(order_id, product_name, amount):
     title = u"投标通知"
@@ -235,6 +241,12 @@ def msg_redpack_give(amount, name, dt):
     title = u"参与活动送红包"
     content = u"网利宝赠送的【%s】元【%s】已发放，请进入投资页面尽快投资赚收益吧！有效期至%s。<br/> <a href='/' target='_blank'>立即使用</a><br/>感谢您对我们的支持与关注。" % (amount, name, dt)
     return title,content
+
+
+def msg_redpack_give_percent(amount, highest_amount, name, dt):
+    title = u"参与活动送红包"
+    content = u"网利宝赠送的【%s】红包已发放，抵扣投资额的%s%%，最高抵扣【%s】元，请进入投资页面尽快投资赚收益吧！有效期至%s。<br/> <a href='/' target='_blank'>立即使用</a><br/>感谢您对我们的支持与关注。" % (name, amount, highest_amount, dt)
+    return title, content
 
 
 def msg_sevenday_iqiyi(activation):
