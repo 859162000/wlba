@@ -28,12 +28,7 @@ def decide_first(user_id, amount, device_type='pc'):
 
     # 迅雷新活动，投资5000送50元红包，每次投资都送
     if helper.which_channel(user) == helper.Channel.XUNLEI:
-        redpack_backends.give_activity_redpack_new(
-            user=user,
-            rtype='activity',
-            redpack_name=u'迅雷红包活动_5000-50',
-            device_type=device_type,
-            rule_id=None)
+        redpack_backends.give_buy_redpack(user=user, device_type=device_type, describe=u'迅雷红包活动_5000-50')
 
     introduced_by = IntroducedBy.objects.filter(user=user).first()
     if not introduced_by or introduced_by.bought_at is not None:
@@ -214,14 +209,6 @@ def idvalidate_ok(user_id, device_type):
         rs = RewardStrategy(user)
         rs.reward_user(u'一个月PPTV会员')
         #发短信
-
-    # 注册送7天迅雷会员
-    if channel == helper.Channel.XUNLEI:
-        start_time = timezone.datetime(2015, 03, 26)
-        end_time = timezone.datetime(2015, 05, 01)
-        if start_time <= timezone.now() <= end_time:
-            rs = RewardStrategy(user)
-            rs.reward_user(u'七天迅雷会员')
 
 #充值成功
 def despoit_ok(pay_info, device_type='pc'):
