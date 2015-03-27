@@ -26,6 +26,10 @@ def decide_first(user_id, amount, device_type='pc'):
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
 
+    # 迅雷新活动，投资5000送50元红包，每次投资都送
+    if helper.which_channel(user) == helper.Channel.XUNLEI and amount >= long(5000):
+        redpack_backends.give_buy_redpack(user=user, device_type=device_type, describe=u'迅雷红包活动_5000-50')
+
     introduced_by = IntroducedBy.objects.filter(user=user).first()
     if not introduced_by or introduced_by.bought_at is not None:
         return
@@ -51,13 +55,13 @@ def decide_first(user_id, amount, device_type='pc'):
             if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
                 return
 
-            inviter_phone = safe_phone_str(inviter_phone)
-            invited_phone = safe_phone_str(invited_phone)
+            inviter_phone_safe = safe_phone_str(inviter_phone)
+            invited_phone_safe = safe_phone_str(invited_phone)
 
             send_messages.apply_async(kwargs={
                 "phones": [inviter_phone, invited_phone],
-                "messages": [messages.gift_inviter(invited_phone=invited_phone, money=30),
-                            messages.gift_invited(inviter_phone=inviter_phone, money=30)]
+                "messages": [messages.gift_inviter(invited_phone=invited_phone_safe, money=30),
+                            messages.gift_invited(inviter_phone=inviter_phone_safe, money=30)]
             })
             title, content = messages.msg_invite_major(inviter_phone, invited_phone)
             inside_message.send_one.apply_async(kwargs={
