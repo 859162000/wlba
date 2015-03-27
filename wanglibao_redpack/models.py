@@ -59,15 +59,17 @@ class RedPackEvent(models.Model):
     value = models.IntegerField(null=False, default=0, verbose_name=u"红包个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
     give_mode = models.CharField(max_length=20, verbose_name=u"发放方式", db_index=True, choices=(
-                                ("nil", "零门槛(兑换码)"),
-                                ("activity", "活动奖励"),
-                                ("register", "注册"),
-                                ("validation", "实名认证"),
-                                ("first_buy", "首次投资"),
-                                ("first_pay", "首次充值"),), default="注册")
+                                ("nil", u"零门槛(兑换码)"),
+                                ("activity", u"活动奖励"),
+                                ("register", u"注册"),
+                                ("validation", u"实名认证"),
+                                ("first_buy", u"首次投资"),
+                                ("first_pay", u"首次充值"),
+                                ('buy', u'投资'),
+                                ('pay', u'充值')), default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default="全平台", choices=PLATFORM)
     apply_platform = models.CharField(max_length=10, verbose_name=u"使用平台", default="全平台", choices=PLATFORM)
-    target_channel = models.CharField(max_length=20, verbose_name=u"渠道(非邀请码)", blank=True, default="")
+    target_channel = models.CharField(max_length=1000, verbose_name=u"渠道(非邀请码)", blank=True, default="")
     give_start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放/兑换开始时间")
     give_end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放/兑换结束时间")
     available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")

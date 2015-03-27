@@ -295,6 +295,7 @@ class IdValidateAPIView(APIView):
     def post(self, request):
         name = request.DATA.get("name", "").strip()
         id_number = request.DATA.get("id_number", "").strip()
+        device_type = split_ua(request)
 
         if not name or not id_number:
             return Response({"ret_code": 30051, "message": u"信息输入不完整"})
@@ -329,6 +330,7 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
 
+        tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device_type": device_type})
         return Response({"ret_code": 0, "message": u"验证成功"})
 
 
@@ -637,7 +639,7 @@ class IdValidate(APIView):
             # else:
 
             # 实名认证 活动赠送
-            tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id})
+            tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device_type": "pc"})
             #channel = which_channel(user)
             #rs = RewardStrategy(user)
             #if channel == Channel.KUAIPAN:

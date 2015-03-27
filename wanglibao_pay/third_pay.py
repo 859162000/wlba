@@ -511,7 +511,7 @@ class KuaiPay:
         elif res_code == "96":
             return {"ret_code":1, "message":"支付网关服务异常"}
         else:
-            return {"ret_code":1, "message":message}
+            return {"ret_code":2, "message":message}
 
     def _handle_pay_result(self, res):
         dic = self._result2dict(res.content)
@@ -541,8 +541,10 @@ class KuaiPay:
             return {"ret_code": 2, "message":"请耐心等候充值完成"}
         elif res_code == "og":
             return {"ret_code": 3, "message":"充值金额太大"}
+        elif res_code == "51":
+            return {"ret_code": 51, "message":"余额不足"}
         else:
-            return {"ret_code": 4, "message":message}
+            return {"ret_code": 5, "message":message}
 
     def _handle_del_result(self, res):
         dic = self._result2dict(res.content)
@@ -625,6 +627,8 @@ class KuaiPay:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
+            if bank and card and bank != card.bank:
+                return {"ret_code":201153, "message":"银行卡与银行不匹配"}
 
         if not card and not bank:
             return {"ret_code":201152, "message":"卡号不存在或银行不存在"}
@@ -656,7 +660,7 @@ class KuaiPay:
             pay_info.save()
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
-            dic = {"user_id":user.id, "order_id":order.id, "id_number":profile.id_number,
+            dic = {"user_id":user.id, "order_id":order.id, "id_number":profile.id_number.upper(),
                     "phone":input_phone, "name":profile.name, "amount":amount,
                     "card_no":pay_info.card_no}
 
@@ -721,7 +725,7 @@ class KuaiPay:
             return {"ret_code":20121, "message":"订单不存在或已支付成功"}
         user = request.user
         profile = user.wanglibaouserprofile
-        dic = {"user_id":user.id, "order_id":order_id, "id_number":profile.id_number,
+        dic = {"user_id":user.id, "order_id":order_id, "id_number":profile.id_number.upper(),
                 "phone":input_phone, "name":profile.name, "amount":pay_info.amount,
                 "time":pay_info.create_time.strftime("%Y%m%d%H%M%S"), "vcode":vcode,
                 "card_no":pay_info.card_no, "token":token, "bank_id":pay_info.bank.kuai_code}
@@ -738,6 +742,10 @@ class KuaiPay:
         logger.error(result)
         if not result:
             return {"ret_code":20123, "message":"信息不匹配"}
+        elif result['ret_code'] == 51:
+            #余额不足也进行绑定卡信息
+            self.bind_card(pay_info)
+            return {"ret_code":201241, "message":result['message']}
         elif result['ret_code'] > 0:
             return {"ret_code":20124, "message":result['message']}
         ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content)
@@ -777,19 +785,35 @@ class KuaiPay:
         pay_info.save()
         if rs['ret_code'] == 0:
             #保存卡信息到个人名下
-            card_no = pay_info.card_no
-            if len(card_no) > 10:
-                exist_cards = Card.objects.filter(no=card_no, user=pay_info.user).first()
-                if not exist_cards:
-                    card = Card()
-                    card.bank = pay_info.bank
-                    card.no = card_no
-                    card.user = pay_info.user
-                    card.is_default = False
-                    card.save()
+            self.bind_card(pay_info)
+           # card_no = pay_info.card_no
+           # if len(card_no) > 10:
+           #     exist_cards = Card.objects.filter(no=card_no, user=pay_info.user).first()
+           #     if not exist_cards:
+           #         card = Card()
+           #         card.bank = pay_info.bank
+           #         card.no = card_no
+           #         card.user = pay_info.user
+           #         card.is_default = False
+           #         card.save()
             tools.despoit_ok(pay_info)
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
+
+    def bind_card(self, pay_info):
+        #保存卡信息到个人名下
+        card_no = pay_info.card_no
+        if len(card_no) > 10:
+            exist_cards = Card.objects.filter(no=card_no, user=pay_info.user).first()
+            if exist_cards:
+                return False
+            card = Card()
+            card.bank = pay_info.bank
+            card.no = card_no
+            card.user = pay_info.user
+            card.is_default = False
+            card.save()
+            return True
 
     def pay_callback(self, request):
         logger.error(request.DATA)
@@ -831,12 +855,8 @@ def add_bank_card(request):
 
     if len(card_no) > 25 or not card_no.isdigit():
         return {"ret_code":20022, "message":"请输入正确的银行卡号"}
-    #bank_card_name = bankcard_checker.check(int(card_no[:6]))
-    #if not bank_card_name:
-    #    return {"ret_code":20022, "message":"请输入合法的银行卡号"}
-    #bank_card_name = bank_card_name.upper()
-    if card_no[0] in ("3", "4", "5"):
-        return {"ret_code":20023, "message":"不支持信用卡"}
+    #if card_no[0] in ("3", "4", "5"):
+    #    return {"ret_code":20023, "message":"不支持信用卡"}
 
     user = request.user
     bank = Bank.objects.filter(gate_id=gate_id).first()

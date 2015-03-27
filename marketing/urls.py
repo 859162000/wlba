@@ -25,7 +25,13 @@ urlpatterns = patterns(
     url(r'^app_shengyan/$', TemplateView.as_view(template_name="shengyan_h5.jade")),
     url(r'^xunleidenglu/$', TemplateView.as_view(template_name="xunleiredpack.jade")),
     url(r'^app_new/$', TemplateView.as_view(template_name="app_new_user.jade")),
-    url(r'^day/$', TemplateView.as_view(template_name="day.jade")),
+    url(r'^history/$', TemplateView.as_view(template_name="day_history.jade")),
+    url(r'^pptv_redpack/$', TemplateView.as_view(template_name="pptv_redpack.jade")),
+    url(r'^app_day/$', TemplateView.as_view(template_name="app_day.jade")),
+    url(r'^app_full/$', TemplateView.as_view(template_name="app_full.jade")),
+    url(r'^aiqiyi_redpack/$', TemplateView.as_view(template_name="aiqiyi_redpack.jade")),
+    url(r'^full/$', TemplateView.as_view(template_name="full_get.jade")),
+
 )
 
 urlpatterns += patterns(
@@ -39,6 +45,5 @@ urlpatterns += patterns(
     url(r'^introduced_by/$', IntroducedAwardTemplate.as_view(template_name="introduced_by.jade")),
     url(r'^investment_reward/$', InvestmentRewardView.as_view(template_name="investment_reward.jade")),
     url(r'^investment/$', Investment.as_view(), name='day'),
-    url(r'^investment_history/$', InvestmentHistory.as_view(), name='day_history'),
 )
 

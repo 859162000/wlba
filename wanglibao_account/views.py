@@ -46,6 +46,7 @@ from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
+from wanglibao.templatetags.formatters import safe_phone_str
 from order.models import Order
 from wanglibao_announcement.utility import AnnouncementAccounts
 from django.template.defaulttags import register
@@ -408,6 +409,20 @@ class AccountHomeAPIView(APIView):
         }
 
         return Response(res)
+
+class AccountInviteAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, **kwargs):
+        introduces = IntroducedBy.objects.filter(introduced_by=request.user)
+        res = []
+        if introduces:
+            for x in introduces:
+                invite = {"name":x.user.wanglibaouserprofile.name,
+                        "phone":safe_phone_str(x.user.wanglibaouserprofile.phone),
+                        "created_at":timezone.get_current_timezone().normalize(x.created_at).strftime("%Y-%m-%d %H:%M:%S")}
+                res.append(invite)
+        return Response({"ret_code":0, "data":res})
 
 
 class AccountP2PRecordAPI(APIView):

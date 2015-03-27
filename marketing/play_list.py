@@ -11,6 +11,7 @@ from models import PlayList
 from tops import Top
 from rest_framework import renderers
 from rest_framework.views import APIView
+from wanglibao.templatetags.formatters import safe_phone_str
 
 
 class Investment(TemplateView):
@@ -18,6 +19,13 @@ class Investment(TemplateView):
     template_name = 'day.jade'
 
     def get_context_data(self, **kwargs):
+        now = datetime.now()
+        if now.date().__str__() <= '2015-03-23':
+            return {
+                "top_ten": None,
+                "top_len": 0
+            }
+
         day_tops = _get_top_records()
         return {
             "top_ten": day_tops,
@@ -31,11 +39,20 @@ class InvestmentHistory(APIView):
 
     def post(self, request):
         day = request.DATA.get('day')
-        day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
-        result = [{
-            "tops": day_tops,
-            "tops_len": len(day_tops)
-        }]
+        if day <= '2015-03-23':
+            result = [{
+                "tops": None,
+                "tops_len": 0
+            }]
+        else:
+            day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
+            for tmp in day_tops:
+                if 'phone' in tmp:
+                    tmp['phone'] = safe_phone_str(tmp['phone'])
+            result = [{
+                "tops": day_tops,
+                "tops_len": len(day_tops)
+            }]
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
@@ -63,7 +80,7 @@ class InvestmentRewardView(TemplateView):
         if cat == 'investment':
             rules = (
                 (60000, None, None, 10, 1000, -100, u'每日打榜红包_1000-100', ),
-                (60000, None, 11, None, 60, None, u'每日打榜红包_60'),
+                (60000, None, 10, None, 60, None, u'每日打榜红包_60'),
                 (50000, 59999, None, None, 50, None, u'每日打榜红包_50',),
                 (40000, 49999, None, None, 40, None, u'每日打榜红包_40',),
                 (30000, 39999, None, None, 30, None, u'每日打榜红包_30',),
@@ -85,7 +102,7 @@ class InvestmentRewardView(TemplateView):
 
         play_list = PlayList.objects.filter(
             play_at=local_to_utc(day, 'min'),
-            redpackevent__startswith=redpack
+            redpackevent=redpack
         )
 
         if play_list.count() > 0:
@@ -139,12 +156,14 @@ class InvestmentRewardView(TemplateView):
 
     def _return_format(self, message, day, redpack):
         play_list = self._query_play_list(day, redpack)
+        play_list_checked = play_list.filter(checked_status=2)
         return {
             "message": message,
-            "result": paginator_factory(obj=play_list, page=self.request.GET.get('page'), limit=3),
+            "result": paginator_factory(obj=play_list, page=self.request.GET.get('page'), limit=20),
             "day": day.date().__str__(),
             "redpack": redpack,
-            "amount_all": play_list.aggregate(sum_reward=Sum('reward')) if play_list else 0.00
+            "amount_all": play_list.aggregate(reward=Sum('reward')) if play_list else 0.00,
+            "amount_redpack": play_list_checked.aggregate(reward=Sum('reward')) if play_list_checked else 0.00
         }
 
     @staticmethod
@@ -191,14 +210,25 @@ class InvestmentRewardView(TemplateView):
         amount_min, amount_max, start, end, reward, exchange, redpack = rule
 
         records = self._query_play_list(day=day, redpack=redpack)
+        if records.count() == 0:
+            message = u'不存在需要审核数据，请检查操作流程是否正确！'
+            return self.render_to_response(self._return_format(message, day, redpack))
         if records.filter(checked_status__in=[1, 2]).count() > 0:
             message = u'此规则已经审核，不允许再次审核！'
             return self.render_to_response(self._return_format(message, day, redpack))
 
         check_button = request.POST.get('check_button')
         if check_button == '1':
+            if datetime.now().date() <= day.date():
+                message = u'未到日终，不允许审核发放红包！'
+                return self.render_to_response(self._return_format(message, day, redpack))
+
             records.filter(checked_status=0).update(checked_status=1)
-            send_redpack()
+            send_redpack.apply_async(kwargs={
+                "day": day.date().__str__(),
+                "desc": redpack,
+                "rtype": "activity"
+            })
             message = u'审核通过完成，稍等查询红包发放结果！'
         elif check_button == '2':
             records.filter(checked_status=0).delete()

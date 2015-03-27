@@ -43,8 +43,15 @@ class BannerViewSet(APIView):
         device_t = "mobile"
         bans = Banner.objects.filter(device=device_t)
         for x in bans:
-            result.append({"id":x.id, "image":str(x.image), "link":x.link, "name":x.name,
-                            "priority":x.priority, "type":x.type})
+            obj = {"id":x.id, "image":str(x.image), "link":x.link, "name":x.name,
+                            "priority":x.priority, "type":x.type}
+            if device_t == "mobile":
+                if not x.alt:
+                    result.append(obj)
+                elif x.alt == device['channel_id']:
+                    result.append(obj)
+            else:
+                result.append(obj)
         return Response({"ret_code":0, "results":result})
             
 
