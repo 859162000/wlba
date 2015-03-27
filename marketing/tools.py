@@ -20,13 +20,15 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
 
-#判断是否首次购买
+#购买判断，第一次，第二次以后
 @app.task
 def decide_first(user_id, amount, device_type='pc'):
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
 
     introduced_by = IntroducedBy.objects.filter(user=user).first()
+    if not introduced_by:
+        return
     #if not introduced_by or introduced_by.bought_at is not None:
     #    return
 
