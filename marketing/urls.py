@@ -31,6 +31,7 @@ urlpatterns = patterns(
     url(r'^app_full/$', TemplateView.as_view(template_name="app_full.jade")),
     url(r'^aiqiyi_redpack/$', TemplateView.as_view(template_name="aiqiyi_redpack.jade")),
     url(r'^full/$', TemplateView.as_view(template_name="full_get.jade")),
+    url(r'^xunleiredpack/$', TemplateView.as_view(template_name="xunleiredpack2.jade")),
 
 )
 
