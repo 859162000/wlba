@@ -32,6 +32,9 @@ urlpatterns = patterns(
     url(r'^full/$', TemplateView.as_view(template_name="full_get.jade")),
     url(r'^activityTop', TemplateView.as_view(template_name="include/activityTop.jade")),
     url(r'^activityFooter', TemplateView.as_view(template_name="include/activityFooter.jade")),
+    url(r'^activityRule', TemplateView.as_view(template_name="include/activityRule.jade")),
+    url(r'^activityone', TemplateView.as_view(template_name="include/activityACTRule.jade")),
+    url(r'^activitytwo', TemplateView.as_view(template_name="lx.jade")),
 )
 
 urlpatterns += patterns(
