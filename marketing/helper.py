@@ -14,6 +14,7 @@ from wanglibao_account import message as inside_message
 class Channel():
     """ 渠道结构 """
     XUNLEI = "xunlei"
+    XUNLEIINVEST = "xunlei-invest"
     KUAIPAN = "kuaipan"
     WANGLIBAO = "wanglibao"
     FENGXING = "fengxing"
