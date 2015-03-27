@@ -103,10 +103,10 @@ class ActivityRule(models.Model):
                                         help_text=u'勾选此项则，则会先判断用户是否被别人邀请，是就触发该规则，不是则不做处理')
     both_share = models.BooleanField(u'参与邀请共享赠送礼品', default=False,
                                      help_text=u'勾选此项则，则用户在满足规则的条件内邀请别人，双方共享选定“赠送类型”中的礼品')
-    redpack = models.CharField(u'红包类型ID', max_length=60, blank=True,
-                               help_text=u'红包类型ID一定要和红包活动中的ID保持一致，否则会导致无法发放红包')
-    reward = models.CharField(u'奖品类型ID', max_length=60, blank=True,
-                              help_text=u'奖品类型ID一定要和奖品中的ID保持一致，否则会导致无法发放奖品')
+    redpack = models.CharField(u'红包活动ID', max_length=60, blank=True,
+                               help_text=u'红包活动ID一定要和红包活动中的ID保持一致，否则会导致无法发放红包')
+    reward = models.CharField(u'奖品类型名称', max_length=60, blank=True,
+                              help_text=u'奖品类型名称一定要和奖品中的类型保持一致，否则会导致无法发放奖品')
     income = models.FloatField(u'金额或比率', default=0, blank=True,
                                help_text=u'选择收益或话费时填写，固定金额时填写大于1的数字，收益率时填写0-1之间的小数')
     min_amount = models.IntegerField(u'最小金额', default=0,
@@ -139,7 +139,7 @@ class ActivityRule(models.Model):
         if self.gift_type == 'reward' and not self.reward:
             raise ValidationError(u'赠送类型为“奖品”时，必须填写“奖品类型名称”')
         if self.gift_type == 'redpack' and not self.redpack:
-            raise ValidationError(u'赠送类型为“红包”时，必须填写“红包类型名称”')
+            raise ValidationError(u'赠送类型为“红包”时，必须填写“红包类型ID”')
         if self.gift_type == 'income' or self.gift_type == 'phonefare':
             if self.income <= 0:
                 raise ValidationError(u'选择送收益或手机话费时要填写“金额或比率”')

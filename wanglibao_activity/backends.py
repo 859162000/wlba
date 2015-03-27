@@ -121,13 +121,13 @@ def _send_gift(user, rule, device_type, amount=0):
     is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
     #送奖品
     if rule.gift_type == 'reward':
-        reward_id = int(rule.reward)
+        reward_name = rule.reward
         print "======do send reward, device : %s =======" % device_type
         if amount and amount > 0:
             if is_amount:
-                _send_gift_reward(user, rule, rtype, reward_id, device_type)
+                _send_gift_reward(user, rule, rtype, reward_name, device_type)
         else:
-            _send_gift_reward(user, rule, rtype, reward_id, device_type)
+            _send_gift_reward(user, rule, rtype, reward_name, device_type)
 
     #送红包
     if rule.gift_type == 'redpack':
@@ -186,25 +186,25 @@ def _check_amount(min_amount, max_amount, amount):
                 return False
 
 
-def _send_gift_reward(user, rule, rtype, reward_id, device_type):
+def _send_gift_reward(user, rule, rtype, reward_name, device_type):
     now = timezone.now()
     if rule.send_type == 'sys_auto':
         #do send
-        _send_reward(user, rule, rtype, reward_id)
+        _send_reward(user, rule, rtype, reward_name)
         if rule.both_share:
             user_introduced_by = _check_introduced_by(user)
             if user_introduced_by:
-                _send_reward(user_introduced_by, rule, rtype, reward_id, user_introduced_by)
+                _send_reward(user_introduced_by, rule, rtype, reward_name, user_introduced_by)
     else:
         #只记录不发信息
-        _save_activity_record(rule, user, 'only_record', rule.rule_name)
+        _save_activity_record(rule, user, 'only_record', reward_name)
         if rule.both_share:
-            _save_activity_record(rule, user, 'only_record', rule.rule_name, True)
+            _save_activity_record(rule, user, 'only_record', reward_name, True)
 
 
-def _send_reward(user, rule, rtype, reward_id, user_introduced_by=None):
+def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
     now = timezone.now()
-    reward = Reward.objects.filter(id=reward_id,
+    reward = Reward.objects.filter(type=reward_name,
                                    is_used=False,
                                    end_time__gte=now).first()
     if reward:
