@@ -51,13 +51,13 @@ def decide_first(user_id, amount, device_type='pc'):
             if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
                 return
 
-            inviter_phone = safe_phone_str(inviter_phone)
-            invited_phone = safe_phone_str(invited_phone)
+            inviter_phone_safe = safe_phone_str(inviter_phone)
+            invited_phone_safe = safe_phone_str(invited_phone)
 
             send_messages.apply_async(kwargs={
                 "phones": [inviter_phone, invited_phone],
-                "messages": [messages.gift_inviter(invited_phone=invited_phone, money=30),
-                            messages.gift_invited(inviter_phone=inviter_phone, money=30)]
+                "messages": [messages.gift_inviter(invited_phone=invited_phone_safe, money=30),
+                            messages.gift_invited(inviter_phone=inviter_phone_safe, money=30)]
             })
             title, content = messages.msg_invite_major(inviter_phone, invited_phone)
             inside_message.send_one.apply_async(kwargs={
