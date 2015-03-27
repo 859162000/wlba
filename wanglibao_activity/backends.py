@@ -313,15 +313,17 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
     title = rule.rule_name
     mobile = user.wanglibaouserprofile.phone
     inviter_phone, invited_phone, reward_content = '', '', ''
-    end_date, name, highest_amount = '', '', ''
+    end_date, name, highest_amount = '', rule.rule_name, ''
     if reward:
         reward_content = reward.content
         fmt_str = "%Y年%m月%d日"
         end_date = timezone.localtime(reward.end_time).strftime(fmt_str)
+        name = reward.type
     if rule.redpack:
         red_pack = RedPackEvent.objects.filter(id=int(rule.redpack)).first()
         if red_pack:
             highest_amount = red_pack.highest_amount
+            name = red_pack.name
     if user_introduced_by:
         msg_template = rule.msg_template_introduce
         sms_template = rule.sms_template_introduce
@@ -334,7 +336,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
             'invited': invited_phone,
             'amount': rule.income,
             'end_date': end_date,
-            'name': rule.rule_name,
+            'name': name,
             'highest_amount': highest_amount
         })
         if msg_template:
@@ -361,7 +363,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
             'invited': invited_phone,
             'amount': rule.income,
             'end_date': end_date,
-            'name': rule.rule_name,
+            'name': name,
             'highest_amount': highest_amount
         })
         if msg_template:
