@@ -42,7 +42,7 @@ def _deposit_record(user, pagesize, pagenum):
                 "created_at":util.fmt_dt_normal(util.local_datetime(x.create_time)),
                 "channel":"APP"}
         channel = PayInfo.objects.filter(order=x.order_id).first()
-        if channel.channel == "huifu":
+        if channel and channel.channel == "huifu":
             obj['channel'] = "PC"
         res.append(obj)
     return res
