@@ -1,0 +1,60 @@
+//
+   Created by taohe on 14-9-22.
+-load formatters
+doctype html
+html
+  head
+  include include/admin_head_meta
+
+  body(role="document")
+
+    include include/admin_menu
+    #wrapper
+      nav.navbar.navbar-default.navbar-static-top(role="navigation", style="margin-bottom:0px")
+        .navbar-header
+          a.navbar-brand(href="?") 网利宝统计数据
+
+        - with '还款中标的' as activeItem
+        include include/admin_menu
+        - endwith
+
+      #page-wrapper
+
+        .row
+          .col-lg-12
+            h1.page-header 提前还款
+
+        .row
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading 还款中标的
+
+              .panel-body
+                .row
+
+                  form.navbar-form.navbar-left(role="search")
+                    .form-group
+                      input(type="text",name="p2p_name",placeholder="标的名称").form-control
+                    .form-group
+                      button(type="submit").btn.btn-primary 查询
+
+                .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 标id
+                        th(rowspan="1") 标名
+                        th(rowspan="1") 额度
+                        th(rowspan="1") 期数
+                        th(rowspan="1") 计息方式
+                    tbody
+                      for p2p in p2p_list
+                        tr
+                          td {{ p2p.id }}
+                          td 
+                            a(href="prepayment/{{p2p.id}}") {{ p2p.name }}
+                          td {{ p2p.total_amount }}
+                          td {{ p2p.period }}
+                          td {{ p2p.pay_method }}
+
+

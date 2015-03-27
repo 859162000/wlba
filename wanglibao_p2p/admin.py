@@ -12,7 +12,7 @@ from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, At
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
-from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization
+from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminPrepayment, AdminP2PList
 from wanglibao.admin import ReadPermissionModelAdmin
 from wanglibao_p2p.forms import RequiredInlineFormSet
 
@@ -418,3 +418,5 @@ admin.site.register(ProductInterestPrecision, ProductInterestPrecisionAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')
+admin.site.register_view('p2p/prepayment/(?P<id>\w+)', view=AdminPrepayment.as_view(), name=u'提前还款')
+admin.site.register_view('p2p/p2plist', view=AdminP2PList.as_view(), name=u'还款中标的')

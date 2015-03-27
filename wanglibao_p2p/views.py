@@ -594,3 +594,33 @@ def AuditEquityCreateContract(request, equity_id):
     except ValueError, e:
         raise Http404
 
+
+class AdminP2PList(TemplateView):
+    template_name = 'admin_p2plist.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_list = P2PProduct.objects.filter(status=u'还款中')
+        return {
+            'p2p_list': p2p_list
+            }
+
+class AdminPrepayment(TemplateView):
+    template_name = 'admin_prepayment.jade'
+
+    def get_context_data(self, **kwargs):
+        #id = kwargs.get('id', 0), '###'
+        id = kwargs['id']
+        print id, '0000'
+        if id:
+            p2p = P2PProduct.objects.filter(pk=id).select_related('amortizations')
+        if p2p[0].status != u'还款中':
+            return {
+                    p2p: None,
+                    amortizations: []
+                    }
+
+        
+        return {
+            'p2p': p2p[0],
+            'amortizations': p2p[0].amortizations.all()
+            }

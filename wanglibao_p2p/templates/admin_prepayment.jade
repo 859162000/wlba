@@ -1,0 +1,65 @@
+//
+   Created by taohe on 14-9-22.
+-load formatters
+doctype html
+html
+  head
+  include include/admin_head_meta
+
+  body(role="document")
+
+    include include/admin_menu
+    #wrapper
+      nav.navbar.navbar-default.navbar-static-top(role="navigation", style="margin-bottom:0px")
+        .navbar-header
+          a.navbar-brand(href="?") 网利宝统计数据
+
+        - with '还款中标的' as activeItem
+        include include/admin_menu
+        - endwith
+
+      #page-wrapper
+
+        .row
+          .col-lg-12
+            h1.page-header 提前还款
+
+        .row
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading 
+                if p2p
+                  {{p2p.name}}
+
+              .panel-body
+                .row
+
+                  form.navbar-form.navbar-left(role="search")
+                    .form-group
+                      input(type="text",name="p2p_name",placeholder="罚息").form-control
+                    .form-group
+                      button(type="submit").btn.btn-primary 提前还款
+
+                .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 还款期数
+                        th(rowspan="1") 还款时间
+                        th(rowspan="1") 还款本金
+                        th(rowspan="1") 还款利息
+                        th(rowspan="1") 是还已还款
+                    tbody
+                      for amortization in amortizations
+                        tr
+                          td {{ amortization.term }}
+                          td {{ amortization.term_date }}
+                          td {{ amortization.principal }}
+                          td {{ amortization.interest }}
+                          td
+                            if amortization.settled 
+                              是
+                            else
+                              否
+
+

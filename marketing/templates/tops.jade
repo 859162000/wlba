@@ -4,18 +4,7 @@
 doctype html
 html
   head
-    meta(name="viewport",content="width=device-width,initial-scale=1")
-    - with '日数据明细 ' as title
-    - endwith
-    link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", media="screen, projection", rel="stylesheet", type="text/css")
-    link(href="/static/css/plugins/metisMenu/metisMenu.css", media="screen, projection", rel="stylesheet", type="text/css")
-    link(href="/static/css/sb-admin-2.css", media="screen, projection", rel="stylesheet", type="text/css")
-    link(href="/static/css/plugins/datepicker3.css", media="screen, projection", rel="stylesheet", type="text/css")
-
-    script(src="/static/js/require.js", data-main="/static/js/header")
-    script(src="https://code.jquery.com/jquery-1.11.1.min.js", data-main="/static/js/header")
-    script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js", data-main="/static/js/header")
-    script(src="/static/js/lib/bootstrap-datepicker.js", data-main="/static/js/header")
+  include include/admin_head_meta
 
   body(role="document")
 
