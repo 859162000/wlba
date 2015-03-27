@@ -261,18 +261,23 @@ def _send_gift_phonefare(user, rule):
 
 
 def _send_gift_redpack(user, rule, rtype, redpack_id, device_type):
+    """ 红包模板目前仍沿用红包模块的模板，以后需要时再更改；
+        另外红包会发送短信和站内信，因此，此处记录流水时两者都记录。
+    """
     if rule.send_type == 'sys_auto':
         redpack_backends.give_activity_redpack_new(user, rtype, redpack_id, device_type, rule.id)
-    #insert record
+    #记录流水
     _save_activity_record(rule, user, 'message', rule.rule_name)
-    #check do have the introduce relationship
+    _save_activity_record(rule, user, 'sms', rule.rule_name)
+    #检测是否有邀请关系
     if rule.both_share:
         user_ib = _check_introduced_by(user)
         if user_ib:
-            #to invite people red pack
+            #给邀请人发红包
             if rule.send_type == 'sys_auto':
                 redpack_backends.give_activity_redpack_new(user_ib, rtype, redpack_id, device_type, rule.id)
             _save_activity_record(rule, user_ib, 'message', rule.rule_name, True)
+            _save_activity_record(rule, user_ib, 'sms', rule.rule_name, True)
 
 
 def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=False):
@@ -285,22 +290,13 @@ def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=Fa
     record.user = user
     record.income = rule.income
     record.msg_type = msg_type
-    if msg_type == 'only_record':
-        description = u''
-    else:
-        if rule.send_type == 'sys_auto':
-            description = u'【系统发放】'
-        else:
-            description = u'【需人工发放】'
+    record.send_type = rule.send_type
+
+    description = ''
     if introduced_by:
-        share_txt = u'【邀请人获得】'
-        description = ''.join([description, share_txt])
-    if rule.gift_type == 'redpack':
-        description = ''.join([description, msg_content])
-    elif rule.gift_type == 'reward':
-        description = ''.join([description, msg_content])
-    else:
-        description = ''.join([description, msg_content])
+        description = u'【邀请人获得】'
+    description = ''.join([description, msg_content])
+
     record.description = description
     record.save()
 
