@@ -1,14 +1,15 @@
 require.config({
     baseUrl: '/static/js',
     paths: {
-      jquery: 'lib/jquery.min',
+      'jquery': 'lib/jquery.min',
       'jquery.modal': 'lib/jquery.modal.min',
+      'underscore': 'lib/underscore-min'
     },
     shim: {
-      'jquery.modal': ['jquery']
+      'jquery.modal': ['underscore','jquery']
     }
 });
 
-require(['jquery', 'jquery.modal'], function($, modal) {
+require(['jquery.modal'], function(modal) {
     console.log($.trim('hetao - '), 'hh')
 });
