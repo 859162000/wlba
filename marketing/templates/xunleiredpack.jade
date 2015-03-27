@@ -66,9 +66,9 @@ html
       .gold2
          img(src="/static/images/xunlei-denglu/xun-wang.png").xun-wang
          .denelu-form
-            h1.biaoti 轻松领100元红包
-            .align-center
-              a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
+            h1.biaoti 轻松拿380元现金红包
+            //.align-center
+            //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
             form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
               - csrf_token
               .form-row
@@ -148,7 +148,7 @@ html
             .span4
               h3
                img(src="/static/images/xunlei-denglu/xunlei-gaoshouyi.jpg")
-              div.shouyi-tu
+              div.shouyi-tu(style="height:316px")
                 img(src="/static/images/xunlei-denglu/xunlei-gaoshouyi-tu.png").wai.zheng
                 p
                   span
@@ -183,20 +183,105 @@ html
                   |100%本息保障
       .space-vertical-l
       .space-vertical-s
-    .gold
+    .dingwei
+      .container-title
+          .xl-zc-tit
+            .xl-zc-le
+              h2.black 零点数据清零，用户可每天重复参赛
+              p 用户每天的投标累计金额
+                span.xl-yell ≥6万元
+                |，将获得网站投资奖励。
+            .xl-zc-r
+              p
+                span.xl-yell 注：
+                |若出现两名或两名以上客户投标金额相同，则按当日投标时间先后排位；
+                br
+                |每天投标累计金额
+                span.xl-yell ≥6万元
+                |的用户未排入前十名将获得
+                span.xl-yell 60元
+                |现金。
+          .space-vertical-s
+          .row.xun-select
+            .span7
+              img(src="/static/images/xunlei-denglu/xl-zc-bang2.jpg")
+            .span4
+              ul.xl-zc-ul
+                li(style="border-bottom:none")
+                  span.xl-zc-hight(style="border-right:1px solid #fff") 每日买满额度（元）
+                  span.xl-zc-hight 送现金额度（元）
+                li
+                  span 50000-59999
+                  span 50
+                li
+                  span 40000-49999
+                  span 40
+                li
+                  span 30000-39999
+                  span 30
+                li
+                  span 20000-29999
+                  span 20
+                li
+                  span 10000-19999
+                  span 10
+    .space-vertical-l
+    .space-vertical-s
+    .gold(style="background:#fff")
+      .container-title(style="background:#fff")
+          .xl-zc-tit
+            .xl-zc-le
+              h2.black 没心！没肺！没节操的送！
+              p 活动期间，单笔投资额达到以下额度，可获得相应奖品 。
+            .xl-zc-r
+          .space-vertical-s
+          .row.gold-row
+           .span3
+              dl.full-jiang
+                span.full-huang
+                h3.full-h2 单日投资200万
+                dt.full-com2.full-one
+                dd(style="color:#e9573f")
+                  span(style="background:#e9573f") 送
+                  |全新Retina MacBook
+           .span3
+             dl.full-jiang
+               span.full-huang
+               h3.full-h2 单日投资150万
+               dt.full-com2.full-two
+               dd(style="color:#e9573f")
+                 span(style="background:#e9573f") 送
+                 |iPhone 6 Plus ( 16G )
+           .span3
+             dl.full-jiang
+               span.full-huang
+               h3.full-h2 单日投资100万
+               dt.full-com2.full-three
+               dd(style="color:#e9573f")
+                 span(style="background:#e9573f") 送
+                 |iPhone 6 ( 16G )
+           .span2
+             dl.full-jiang
+               span.full-huang
+               h3.full-h2 单日投资50万
+               dt.full-com2.full-four
+               dd(style="color:#e9573f")
+                 span(style="background:#e9573f") 送
+                 |Apple Watch Sport
+      .space-vertical-l
+      .space-vertical-s
       .gold-footer(style="background:#fff;padding-left:0")
         .gold-declare(style="border-bottom:none;padding-left:0")
           dl.beijing
             dt.hei 奖品发放说明
-            dd 1、网利宝账户以身份证号为唯一识别标识。
-            dd 2、P2P理财年化收益活动奖励将随P2P理财项目还款发放。
-            dd 3、每个网利宝账户仅限一次使用该理财红包，新用户需投资300元即可使用100元直抵红包，实际支付200元。
-            dd 4、老用户需投资5000元即可使用100元直抵红包，实际支付4900元。
-            dd 5、理财红包兑换处：我的账户--红包--兑换。
-            dd 6、红包有效期3月13日-6月13日，过期无效。
-            dd 7、活动有效期3月13日-4月30日。
-            dd 8、此次活动红包仅限由迅雷发放。
-            dd 9、此次活动最终解释权归网利宝官方所有。
+            dd 1、网利宝账户以身份证为唯一识别标识。
+            dd 2、活动规则：网利宝新用户注册即送380元现金红包，充值送7天迅雷白金会员，首次投资送一个月迅雷白金会员，
+            dd &nbsp&nbsp&nbsp&nbsp&nbsp投资300元可使用30元现金红包，单笔投资满5000送50元现金红包。
+            dd &nbsp&nbsp&nbsp&nbsp&nbsp如有疑问请咨询网利宝客服4008-588-066（服务时间：9：00-18:00 工作日）
+            dd 3、奖品统一于活动后7个工作日内开始发放
+            dd 4、由于实物奖品快递需求，满额度用户请提交真实“姓名、手机、身份证、通讯地址”至
+              a(style="color:#e9573f") kefu@wanglibank.com
+            dd 5、此次活动最终解释权归网利宝官方所有。
 
       .bai
         .content-title
@@ -216,11 +301,19 @@ html
             .step.third-step
               span.icon.icon-third-step
               .process-title 充值
+              .process-content(style="color:#3C3939") 送
+                b(style="color:#de4b39") &nbsp10元
+                |话费 +
+                b(style="color:#de4b39") 7天
+                |迅雷会员
             .step-arrow
               ins
             .step.fourth-step
               span.icon.icon-fourth-step
               .process-title 投资
+              .process-content(style="color:#3C3939") 送
+                b(style="color:#de4b39") &nbsp30元
+                |话费
             .step-arrow
               ins
             .step.fifth-step
