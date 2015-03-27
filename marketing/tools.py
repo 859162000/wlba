@@ -20,19 +20,17 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
 
-#判断是否首次购买
+#购买判断，第一次，第二次以后
 @app.task
 def decide_first(user_id, amount, device_type='pc'):
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
 
-    # 迅雷新活动，投资5000送50元红包，每次投资都送
-    if helper.which_channel(user) == helper.Channel.XUNLEI and amount >= long(5000):
-        redpack_backends.give_buy_redpack(user=user, device_type=device_type, describe=u'迅雷红包活动_5000-50')
-
     introduced_by = IntroducedBy.objects.filter(user=user).first()
-    if not introduced_by or introduced_by.bought_at is not None:
+    if not introduced_by:
         return
+    #if not introduced_by or introduced_by.bought_at is not None:
+    #    return
 
     introduced_by.bought_at = timezone.now()
     introduced_by.save()
@@ -130,6 +128,9 @@ def decide_first(user_id, amount, device_type='pc'):
     elif channel == helper.Channel.JIUXIAN:
         #酒仙网
         if amount >= 500:
+            if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
+                return
+
             invited_phone = introduced_by.user.wanglibaouserprofile.phone
             send_messages.apply_async(kwargs={
                 "phones": [invited_phone],
@@ -155,6 +156,11 @@ def decide_first(user_id, amount, device_type='pc'):
         start_time = timezone.datetime(2014, 11, 12)
         if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
             rs.reward_user(u'一个月迅雷会员')
+    # 迅雷新活动，投资5000送50元红包，每次投资都送
+    elif channel == helper.Channel.XUNLEIINVEST:
+        if amount >= 5000:
+            redpack_backends.give_buy_redpack(user=user, device_type=device_type, describe=u'迅雷红包活动_5000-50')
+
     elif channel == helper.Channel.IQIYI:
         # 非快盘来源(需要确定到每个渠道)
         start_time = timezone.datetime(2015, 3, 19)
