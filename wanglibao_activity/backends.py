@@ -13,6 +13,7 @@ from models import Activity, ActivityRule, ActivityRecord
 from marketing import helper
 from marketing.models import IntroducedBy, Reward, RewardRecord
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_redpack.models import RedPackEvent
 from wanglibao_pay.models import PayInfo
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_account import message as inside_message
@@ -312,8 +313,15 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
     title = rule.rule_name
     mobile = user.wanglibaouserprofile.phone
     inviter_phone, invited_phone, reward_content = '', '', ''
+    end_date, name, highest_amount = '', '', ''
     if reward:
         reward_content = reward.content
+        fmt_str = "%Y年%m月%d日"
+        end_date = timezone.localtime(reward.end_time).strftime(fmt_str)
+    if rule.redpack:
+        red_pack = RedPackEvent.objects.filter(id=int(rule.redpack)).first()
+        if red_pack:
+            highest_amount = red_pack.highest_amount
     if user_introduced_by:
         msg_template = rule.msg_template_introduce
         sms_template = rule.sms_template_introduce
@@ -324,7 +332,10 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
             'reward': reward_content,
             'inviter': inviter_phone,
             'invited': invited_phone,
-            'amount': rule.income
+            'amount': rule.income,
+            'end_date': end_date,
+            'name': rule.rule_name,
+            'highest_amount': highest_amount
         })
         if msg_template:
             msg = Template(msg_template)
@@ -348,7 +359,10 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
             'reward': reward_content,
             'inviter': inviter_phone,
             'invited': invited_phone,
-            'amount': rule.income
+            'amount': rule.income,
+            'end_date': end_date,
+            'name': rule.rule_name,
+            'highest_amount': highest_amount
         })
         if msg_template:
             msg = Template(msg_template)
