@@ -46,8 +46,6 @@ def check_activity(user, trigger_node, device_type, amount=0):
     # else:
     #     channel = ib.channel.name
     channel = helper.which_channel(user)
-    print "====== trigger: %s, device: %s ====== \n" % (trigger_node, device_type)
-    print "====== now: %s =======" % now
     #查询符合条件的活动
     activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False, channel=channel)\
                                     .filter(Q(platform=device_type) | Q(platform=u'all'))
@@ -68,7 +66,6 @@ def check_activity(user, trigger_node, device_type, amount=0):
                     if not rule.gift_type:
                         continue
                     else:
-                        print "========= check start ========="
                         if rule.is_introduced:
                             user_ib = _check_introduced_by(user)
                             if user_ib:
@@ -87,11 +84,9 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
     """ check the trigger node """
     #注册 或 实名认证
     if trigger_node in ('register', 'validation'):
-        print "====== trigger_node: %s =======" % trigger_node
         _send_gift(user, rule, device_type)
     #充值 (pay, first_pay)
     elif trigger_node in ('pay', 'first_pay'):
-        print "====== recharge trigger_node: %s =======" % trigger_node
         is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
         if is_amount:
             if trigger_node == 'first_pay':
@@ -104,7 +99,6 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
                 _send_gift(user, rule, device_type, amount)
     #投资 (buy, first_buy)
     elif trigger_node in ('buy', 'first_buy'):
-        print "====== invest trigger_node: %s =======" % trigger_node
         is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
         if is_amount:
             if trigger_node == 'first_buy':
@@ -130,7 +124,6 @@ def _send_gift(user, rule, device_type, amount=0):
     #送奖品
     if rule.gift_type == 'reward':
         reward_name = rule.reward
-        print "======do send reward, device : %s =======" % device_type
         if amount and amount > 0:
             if is_amount:
                 _send_gift_reward(user, rule, rtype, reward_name, device_type)
@@ -142,7 +135,6 @@ def _send_gift(user, rule, device_type, amount=0):
         redpack_id = int(rule.redpack)
         #此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
         #send to
-        print "======= do send redpack, device: %s =========" % device_type
         if amount and amount > 0:
             if is_amount:
                 _send_gift_redpack(user, rule, rtype, redpack_id, device_type)
@@ -151,7 +143,6 @@ def _send_gift(user, rule, device_type, amount=0):
     #送现金或收益
     if rule.gift_type == 'income':
         #send to
-        print "======= do send income, device: %s =========" % device_type
         if amount and amount > 0:
             if is_amount:
                 _send_gift_income(user, rule)
@@ -161,7 +152,6 @@ def _send_gift(user, rule, device_type, amount=0):
     #送话费
     if rule.gift_type == 'phonefare':
         #send to
-        print "======= do send phonefare, device: %s =========" % device_type
         if amount and amount > 0:
             if is_amount:
                 _send_gift_phonefare(user, rule)
@@ -177,10 +167,11 @@ def _check_introduced_by(user):
 
 
 def _check_amount(min_amount, max_amount, amount):
+    amount = int(amount)
     if amount == 0:
         return False
     else:
-        if min_amount == 0 and max_amount ==0:
+        if min_amount == 0 and max_amount == 0:
             return True
         elif min_amount > 0 and max_amount == 0:
             if amount >= min_amount:
@@ -202,7 +193,7 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type):
         if rule.both_share:
             user_introduced_by = _check_introduced_by(user)
             if user_introduced_by:
-                _send_reward(user_introduced_by, rule, rtype, reward_name, user_introduced_by)
+                _send_reward(user, rule, rtype, reward_name, user_introduced_by)
     else:
         #只记录不发信息
         _save_activity_record(rule, user, 'only_record', reward_name)
