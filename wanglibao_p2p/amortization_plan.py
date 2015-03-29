@@ -343,3 +343,7 @@ def get_final_decimal(decimal):
 def get_daily_interest(year_rate):
     return get_base_decimal(year_rate/360)
 
+def get_payment_history(p2p, date):
+    next_term_date = date + relativedelta(months=1)
+    amortization = ProductAmortization.objects.filter(product=p2p, term_date__gt=date, term_date__lt=next_term_date)
+

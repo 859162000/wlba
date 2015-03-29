@@ -624,3 +624,30 @@ class AdminPrepayment(TemplateView):
             'p2p': p2p[0],
             'amortizations': p2p[0].amortizations.all()
             }
+
+    def post(self, request, **kwargs):
+        try:
+            repayment_type = request.POST.get('repayment_type')
+            repayment_date = request.POST.get('repayment_date')
+
+            id = request.POST.get('id')
+
+            p2p = P2PProduct.objects.filter(pk=id)
+            p2p = p2p[0]
+
+            amortization = ProductAmortization.objects.filter(product=p2p, term_date__gt=repayment_date)
+
+            #1. 拿到当期未还款计划
+            #1.11 如果是按期提前还款
+            #1.12 利息 = 当期利息
+            #1.21 如果是按日提前还款
+            #1.22 利息 = 当期利息 -  未计利息(年利率/360*未计息天数)
+            #2. 拿到此标的年华收益
+            #3. 计算日收益
+            #4. 计算当期未计息天数
+            year_rate = float(request.POST.get('year_rate')) / 100
+            period = int(request.POST.get('period'))
+        except:
+            messages.warning(request, u'输入错误, 请重新检测')
+            return redirect('./amortization')
+
