@@ -158,6 +158,10 @@ def decide_first(user_id, amount, device_type='pc'):
             rs.reward_user(u'一个月迅雷会员')
     # 迅雷新活动，投资5000送50元红包，每次投资都送
     elif channel == helper.Channel.XUNLEIINVEST:
+        # 非快盘来源(需要确定到每个渠道)
+        start_time = timezone.datetime(2015, 03, 29)
+        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
+            rs.reward_user(u'一个月迅雷会员')
         if amount >= 5000:
             redpack_backends.give_buy_redpack(user=user, device_type=device_type, describe=u'迅雷红包活动_5000-50')
 
@@ -246,6 +250,19 @@ def despoit_ok(pay_info, device_type='pc'):
         })
     elif channel == helper.Channel.XUNLEI:
         start_time = timezone.datetime(2014, 12, 30)
+        if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
+                status=PayInfo.SUCCESS).count() == 1:
+            rs = RewardStrategy(pay_info.user)
+            rs.reward_user(u'七天迅雷会员')
+        title, content = messages.msg_pay_ok(pay_info.amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": pay_info.user.id,
+            "title": title,
+            "content": content,
+            "mtype": "activityintro"
+        })
+    elif channel == helper.Channel.XUNLEIINVEST:
+        start_time = timezone.datetime(2015, 03, 29)
         if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
                 status=PayInfo.SUCCESS).count() == 1:
             rs = RewardStrategy(pay_info.user)
