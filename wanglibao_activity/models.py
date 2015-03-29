@@ -196,7 +196,7 @@ class ActivityTemplates(models.Model):
     """ the templates of activity """
 
     OPEN_CHOICE = (
-        (0, u'关闭次模块'),
+        (0, u'关闭此模块'),
         (1, u'加载默认模块'),
         (2, u'加载自定义设置'),
     )
@@ -217,7 +217,7 @@ class ActivityTemplates(models.Model):
     reward_img = models.CharField(u'活动奖品图片ID:', max_length=60, blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割')
     reward_desc = RichTextField(u'奖品描述', blank=True, null=True)
     # 好友邀请及描述
-    is_introduce = models.IntegerField(u'加载邀请好友模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
+    is_introduce = models.IntegerField(u'加载邀请好友模块方案', max_length=20, choices=OPEN_CHOICE, default=0, help_text=u'当选择加载自定义设置时，自定义内容才会被加载到模板中')
     introduce_desc = RichTextField(u'邀请好友描述', blank=True, null=True)
     introduce_img = RichTextField(u'邀请好友指定图片ID:', blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割')
     # 新手投资流程
