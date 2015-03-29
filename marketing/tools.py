@@ -26,15 +26,15 @@ def decide_first(user_id, amount, device_type='pc'):
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
 
+    #活动检测
+    activity_backends.check_activity(user, 'invest', device_type, amount)
+
     introduced_by = IntroducedBy.objects.filter(user=user).first()
     if not introduced_by or introduced_by.bought_at is not None:
         return
 
     introduced_by.bought_at = timezone.now()
     introduced_by.save()
-
-    #活动检测
-    activity_backends.check_activity(user, 'invest', device_type, amount)
 
     #channel = helper.which_channel(user, intro=introduced_by)
     channel = helper.which_channel(user)
