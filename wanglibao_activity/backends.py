@@ -54,7 +54,15 @@ def check_activity(user, trigger_node, device_type, amount=0):
     if activity_list:
         for activity in activity_list:
             #查询活动规则
-            activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node, is_used=True)
+            if trigger_node == 'invest':
+                activity_rules = ActivityRule.objects.filter(activity=activity,  is_used=True)\
+                    .filter(Q(trigger_node='buy') | Q(trigger_node='first_buy'))
+            elif trigger_node == 'recharge':
+                activity_rules = ActivityRule.objects.filter(activity=activity,  is_used=True) \
+                    .filter(Q(trigger_node='pay') | Q(trigger_node='first_pay'))
+            else:
+                activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node, is_used=True)
+
             if activity_rules:
                 for rule in activity_rules:
                     if not rule.gift_type:
@@ -64,11 +72,11 @@ def check_activity(user, trigger_node, device_type, amount=0):
                         if rule.is_introduced:
                             user_ib = _check_introduced_by(user)
                             if user_ib:
-                                _check_rules_trigger(user, rule, trigger_node, device_type, amount)
+                                _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
                             else:
                                 return
                         else:
-                            _check_rules_trigger(user, rule, trigger_node, device_type, amount)
+                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
             else:
                 return
     else:
@@ -77,41 +85,40 @@ def check_activity(user, trigger_node, device_type, amount=0):
 
 def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
     """ check the trigger node """
-    if trigger_node == rule.trigger_node:
-        #注册 或 实名认证
-        if trigger_node in ('register', 'validation'):
-            print "====== trigger_node: %s =======" % trigger_node
-            _send_gift(user, rule, device_type)
-        #充值 (pay, first_pay)
-        if trigger_node == 'recharge':
-            print "====== recharge trigger_node: %s =======" % trigger_node
-            is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
-            if is_amount:
-                if rule.trigger_node == 'first_pay':
-                    #check first pay
-                    if PayInfo.objects.filter(user=user, type='D',
-                                              update_time__gt=rule.activity.start_at,
-                                              status=PayInfo.SUCCESS).count() == 1:
-                        _send_gift(user, rule, device_type, amount)
-                if rule.trigger_node == 'pay':
+    #注册 或 实名认证
+    if trigger_node in ('register', 'validation'):
+        print "====== trigger_node: %s =======" % trigger_node
+        _send_gift(user, rule, device_type)
+    #充值 (pay, first_pay)
+    elif trigger_node in ('pay', 'first_pay'):
+        print "====== recharge trigger_node: %s =======" % trigger_node
+        is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
+        if is_amount:
+            if trigger_node == 'first_pay':
+                #check first pay
+                if PayInfo.objects.filter(user=user, type='D',
+                                          update_time__gt=rule.activity.start_at,
+                                          status=PayInfo.SUCCESS).count() == 1:
                     _send_gift(user, rule, device_type, amount)
-        #投资 (buy, first_buy)
-        if trigger_node == 'invest':
-            print "====== invest trigger_node: %s =======" % trigger_node
-            is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
-            if is_amount:
-                if rule.trigger_node == 'first_buy':
-                    #check first pay
-                    if P2PRecord.objects.filter(user=user,
-                                                create_time__gt=rule.activity.start_at).count() == 1:
-                        _send_gift(user, rule, device_type, amount)
-                if rule.trigger_node == 'buy':
+            if trigger_node == 'pay':
+                _send_gift(user, rule, device_type, amount)
+    #投资 (buy, first_buy)
+    elif trigger_node in ('buy', 'first_buy'):
+        print "====== invest trigger_node: %s =======" % trigger_node
+        is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
+        if is_amount:
+            if trigger_node == 'first_buy':
+                #check first pay
+                if P2PRecord.objects.filter(user=user,
+                                            create_time__gt=rule.activity.start_at).count() == 1:
                     _send_gift(user, rule, device_type, amount)
-        #p2p audit
-        if rule.trigger_node == 'p2p_audit':
-            #delay
-            # _send_gift(user, rule, device_type)
-            return
+            if trigger_node == 'buy':
+                _send_gift(user, rule, device_type, amount)
+    #p2p audit
+    elif trigger_node == 'p2p_audit':
+        #delay
+        # _send_gift(user, rule, device_type)
+        return
     else:
         return
 
@@ -266,7 +273,7 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type):
     """
     if rule.send_type == 'sys_auto':
         redpack_backends.give_activity_redpack_new(user, rtype, redpack_id, device_type, rule.id)
-    #记录流水
+    #记录流水，目前红包系同时发送站内信和短信，因此此处记录两条流水，下同
     _save_activity_record(rule, user, 'message', rule.rule_name)
     _save_activity_record(rule, user, 'sms', rule.rule_name)
     #检测是否有邀请关系

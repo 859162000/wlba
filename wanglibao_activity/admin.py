@@ -6,7 +6,8 @@ from models import Activity, ActivityRule, ActivityRecord
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'category', 'platform', 'product_cats', 'product_ids',\
-                    'channel', 'description', 'start_at', 'end_at', 'is_stopped', 'priority')
+                    'channel', 'description', 'start_at', 'end_at', \
+                    'activity_status', 'is_stopped', 'priority')
 
 
 class ActivityRuleAdmin(admin.ModelAdmin):
