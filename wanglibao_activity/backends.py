@@ -64,6 +64,8 @@ def check_activity(user, trigger_node, device_type, amount=0):
                             user_ib = _check_introduced_by(user)
                             if user_ib:
                                 _check_rules_trigger(user, rule, trigger_node, device_type, amount)
+                            else:
+                                return
                         else:
                             _check_rules_trigger(user, rule, trigger_node, device_type, amount)
             else:
@@ -129,15 +131,15 @@ def _send_gift(user, rule, device_type, amount=0):
 
     #送红包
     if rule.gift_type == 'redpack':
-        redpack_name = rule.redpack
+        redpack_id = int(rule.redpack)
         #此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
         #send to
         print "======= do send redpack, device: %s =========" % device_type
         if amount and amount > 0:
             if is_amount:
-                _send_gift_redpack(user, rule, rtype, redpack_name, device_type)
+                _send_gift_redpack(user, rule, rtype, redpack_id, device_type)
         else:
-            _send_gift_redpack(user, rule, rtype, redpack_name, device_type)
+            _send_gift_redpack(user, rule, rtype, redpack_id, device_type)
     #送现金或收益
     if rule.gift_type == 'income':
         #send to
@@ -208,7 +210,7 @@ def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
     if reward:
         reward.is_used = True
         reward.save()
-        description = '>'.join([rtype, reward_name])
+        description = '>'.join([rtype, reward.type])
         #记录奖品发放流水
         has_reward_record = _keep_reward_record(user, reward, description)
         if has_reward_record:
@@ -257,19 +259,19 @@ def _send_gift_phonefare(user, rule):
         return
 
 
-def _send_gift_redpack(user, rule, rtype, redpack_name, device_type):
+def _send_gift_redpack(user, rule, rtype, redpack_id, device_type):
     if rule.send_type == 'sys_auto':
-        redpack_backends.give_activity_redpack_new(user, rtype, redpack_name, device_type, rule.id)
+        redpack_backends.give_activity_redpack_new(user, rtype, redpack_id, device_type, rule.id)
     #insert record
-    _save_activity_record(rule, user, 'message', redpack_name)
+    _save_activity_record(rule, user, 'message', rule.rule_name)
     #check do have the introduce relationship
     if rule.both_share:
         user_ib = _check_introduced_by(user)
         if user_ib:
             #to invite people red pack
             if rule.send_type == 'sys_auto':
-                redpack_backends.give_activity_redpack_new(user_ib, rtype, redpack_name, device_type, rule.id)
-            _save_activity_record(rule, user_ib, 'message', redpack_name, True)
+                redpack_backends.give_activity_redpack_new(user_ib, rtype, redpack_id, device_type, rule.id)
+            _save_activity_record(rule, user_ib, 'message', rule.rule_name, True)
 
 
 def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=False):
