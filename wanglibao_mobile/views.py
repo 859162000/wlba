@@ -13,9 +13,12 @@ from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
 from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
+from wanglibao_p2p.amortization_plan import get_amortization_plan
+from decimal import *
+from wanglibao_account.models import Binding
 
 
-class HomeView(TemplateView):
+class IndexView(TemplateView):
     template_name = 'mobile_home.jade'
 
 
@@ -68,8 +71,84 @@ class HomeView(TemplateView):
         }
 
 
-class TestView(TemplateView):
-    template_name = 'test.jade'
+class HomeView(TemplateView):
+    template_name = 'mobile_index.jade'
 
     def get_context_data(self, **kwargs):
-        return {}
+        p2p_pre_four = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+            .filter(status=u'正在招标').order_by('-priority', '-total_amount')[:4]
+
+        p2p_middle = P2PProduct.objects.select_related('warrant_company','activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+            .filter(status__in=[
+                u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'
+        ]).order_by('-soldout_time', '-priority')
+
+
+        p2p_last = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+            .filter(status=u'还款中').order_by('-soldout_time', '-priority')[:2]
+
+        p2p_products = chain(p2p_pre_four, p2p_middle, p2p_last)
+        return {
+            "p2p_products": p2p_products
+        }
+        
+class DetailView(TemplateView):
+    template_name = 'mobile_detail.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(DetailView, self).get_context_data(**kwargs)
+
+        try:
+            #p2p = P2PProduct.objects.select_related('activity').get(pk=id, hide=False).exclude(status=u'流标')
+            p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标').get(pk=id, hide=False)
+
+            if p2p.soldout_time:
+                end_time = p2p.soldout_time
+            else:
+                end_time = p2p.end_time
+        except P2PProduct.DoesNotExist:
+            raise Http404(u'您查找的产品不存在')
+
+        terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
+                                                               p2p.expected_earning_rate / 100,
+                                                               p2p.amortization_count,
+                                                               p2p.period)
+        total_earning = terms.get("total") - p2p.total_amount
+        total_fee_earning = 0
+
+        if p2p.activity:
+            total_fee_earning = Decimal(
+                p2p.total_amount * p2p.activity.rule.rule_amount * (Decimal(p2p.period) / Decimal(12))).quantize(
+                Decimal('0.01'))
+
+        user = self.request.user
+        current_equity = 0
+
+        if user.is_authenticated():
+            equity_record = p2p.equities.filter(user=user).first()
+            if equity_record is not None:
+                current_equity = equity_record.equity
+
+            xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
+            context.update({
+                'xunlei_vip': xunlei_vip
+            })
+
+        orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
+
+        site_data = SiteData.objects.all()[0]
+        #排行榜
+
+
+        context.update({
+            'p2p': p2p,
+            'end_time': end_time,
+            'orderable_amount': orderable_amount,
+            'total_earning': total_earning,
+            'current_equity': current_equity,
+            'site_data': site_data,
+            'attachments': p2p.attachment_set.all(),
+            'total_fee_earning': total_fee_earning
+        })
+
+        return context
