@@ -137,6 +137,7 @@ class Migration(SchemaMigration):
             'msg_type': ('django.db.models.fields.CharField', [], {'default': "u'\\u53ea\\u8bb0\\u5f55'", 'max_length': '20'}),
             'platform': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
             'rule': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_activity.ActivityRule']"}),
+            'send_type': ('django.db.models.fields.CharField', [], {'default': "u'\\u7cfb\\u7edf'", 'max_length': '20'}),
             'trigger_at': ('django.db.models.fields.DateTimeField', [], {}),
             'trigger_node': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
