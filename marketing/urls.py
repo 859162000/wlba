@@ -30,13 +30,11 @@ urlpatterns = patterns(
     url(r'^app_day/$', TemplateView.as_view(template_name="app_day.jade")),
     url(r'^app_full/$', TemplateView.as_view(template_name="app_full.jade")),
     url(r'^aiqiyi_redpack/$', TemplateView.as_view(template_name="aiqiyi_redpack.jade")),
-<<<<<<< HEAD
     url(r'^full/$', TemplateView.as_view(template_name="full_get.jade")),
     url(r'^xunleiredpack/$', TemplateView.as_view(template_name="xunleiredpack2.jade")),
-=======
     url(r'^activityTime/$', TemplateView.as_view(template_name="activityTime.jade")),
->>>>>>> wanglibao/activity
-
+    url(r'^activityTop', TemplateView.as_view(template_name="include/activityLogin.jade")),
+    url(r'^activitylx', TemplateView.as_view(template_name="lx.jade")),
 )
 
 urlpatterns += patterns(
