@@ -36,7 +36,6 @@ def _decide_device(device_type):
 
 
 def check_activity(user, trigger_node, device_type, amount=0):
-    return
     now = timezone.now()
     device_type = _decide_device(device_type)
     if not trigger_node:
