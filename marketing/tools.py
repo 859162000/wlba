@@ -171,6 +171,12 @@ def decide_first(user_id, amount, device_type='pc'):
         if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
             rs.reward_user(u'一个月爱奇艺会员')
 
+    elif channel == helper.Channel.BAIDUSHOUJI:
+        # 非快盘来源(需要确定到每个渠道)
+        start_time = timezone.datetime(2015, 3, 30)
+        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
+            rs.reward_user(u'一个月爱奇艺会员')
+
 #注册成功
 @app.task
 def register_ok(user_id, device_type):
@@ -274,7 +280,7 @@ def despoit_ok(pay_info, device_type='pc'):
             "content": content,
             "mtype": "activityintro"
         })
-    elif channel == helper.Channel.IQIYI:
+    elif channel == helper.Channel.IQIYI or channel == helper.Channel.BAIDUSHOUJI:
         start_time = timezone.datetime(2015, 3, 21)
         if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
                 status=PayInfo.SUCCESS).count() == 1:
