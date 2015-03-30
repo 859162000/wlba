@@ -41,5 +41,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=autofloat.js.map

@@ -116,5 +116,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=add_card.js.map

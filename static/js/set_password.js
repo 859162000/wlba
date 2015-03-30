@@ -42,5 +42,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=set_password.js.map
