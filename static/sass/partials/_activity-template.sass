@@ -1,0 +1,190 @@
+//==============公用
+p, img
+  margin: 0
+  padding: 0
+
+ul,ol
+  list-style: none
+a
+  text-decoration: none
+
+//===========================================================活动时间
+.activity_time .time_texta
+  text-align: center
+  font-size: 24px
+  line-height: 58px
+
+.activity_time .time_text
+  text-align: center
+  font-size: 20px
+  line-height: 40px
+
+.activity_time_row
+  width: 100%
+  margin-bottom: 20px
+
+.time-span
+  width: 33%
+  display: inline-block
+
+.time-zi
+  margin-left: 0
+
+.time-zi h3
+  text-align: center
+  color: #666
+  font-size: 18px
+  margin: 5px
+
+.time-zi p
+  text-align: center
+  color: #141c27
+  font-size: 14px
+
+.time-com
+  width: 140px
+  height: 140px
+  overflow: hidden
+  background: url("/static/images/pptv/sann.png") no-repeat
+  margin: 0 auto
+
+.time-com-trust
+  background-position: -148px -0px
+
+.time-com-security
+  background-position: 0 -4px
+
+.time-com-authority
+  background-position: -298px -0px
+//=====================================================活动奖品
+.prize-all > .span6, .prize-all > .span6-omega
+  display: inline-block
+
+.prize-all > .span6
+  .prize-jiangli
+    margin-left: 80px
+
+.prize-all-right
+  line-height: 39px
+//=================================================邀请好友
+.invitation
+  height: 300px
+  background: url("/static/images/gold/xunlei_02.jpg") center center no-repeat
+  margin-top: 20px
+
+.invitation-container
+  text-align: center
+  padding: 20px 0
+  .invitation-btn
+    display: inline-block
+    background: #ff5d33
+    width: 150px
+    height: 40px
+    line-height: 40px
+    color: #FFFFFF
+    border-radius: 5px
+
+//==================================================投资流程
+.process
+  max-width: 1100px
+  min-width: 1100px
+  margin: 0 auto
+.process-top
+  padding: 30px 0
+  font-size: 24px
+  color: #212121
+
+.process-imgg
+  height: 200px
+  position: relative
+  .process-start
+    float: left
+    display: inline-block
+    position: relative
+    width: 80px
+    height: 100px
+    .process-cont
+      position: absolute
+      top: 50%
+      left: 0
+      margin-top: -2px
+      height: 4px
+      width: 100%
+      background: #dedede
+      &:after
+        position: absolute
+        left: 0
+        top: -4px
+        content: ''
+        width: 0
+        height: 0
+        border-left: 12px solid #dedede
+        border-top: 6px solid transparent
+        border-bottom: 6px solid transparent
+  .process-circle
+    display: inline-block
+    float: left
+    width: 108px
+    .process-body
+      width: 100px
+      height: 100px
+      border: 4px solid #dedede
+      +border-radius(55px)
+      background: #fff url("/static/images/pptv/liucheng.png") no-repeat
+      +transition(all .3s ease-in-out)
+      &:hover
+        background-color: #448aff
+        border: 4px solid #448aff
+    .one-free
+      background-position: 14px 15px
+      &:hover
+        background-position: 12px -60px
+    .two-atte
+      background-position: 14px -132px
+      &:hover
+        background-position: 12px -204px
+    .three-recharge
+      background-position: 16px -274px
+      &:hover
+        background-position: 14px -346px
+    .four-tender
+      background-position: 14px -420px
+      &:hover
+        background-position: 12px -492px
+    .five-collec
+      background-position:  12px -561px
+      &:hover
+        background-position: 12px -634px
+    .process-txt
+      padding: 20px 0 10px 0
+      text-align: center
+      color: #666
+      font-size: 18px
+    .process-txt2
+      font-size: 14px
+      color: #898585
+      text-align: center
+      padding-bottom: 20px
+      white-space: nowrap
+      em
+        color: #E54C4C
+  .process-center
+    @extend .process-start
+    width: 100px
+    .process-cont
+      @extend .process-cont
+      &:after
+        left: 50%
+        margin-left: -3px
+  .process-end
+    @extend .process-start
+    .processend-cont
+      @extend .process-cont
+      &:after
+        right: 0
+        left: auto
+        margin-right: -3px
+
+//====================================================
+
+
