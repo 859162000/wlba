@@ -81,5 +81,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=account_favorite.js.map

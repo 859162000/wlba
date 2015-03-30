@@ -20,5 +20,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=invite_bar.js.map

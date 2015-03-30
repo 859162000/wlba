@@ -58,5 +58,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=pager.js.map

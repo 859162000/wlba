@@ -16,5 +16,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=sider_bar.js.map

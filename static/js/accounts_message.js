@@ -35,5 +35,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=accounts_message.js.map
