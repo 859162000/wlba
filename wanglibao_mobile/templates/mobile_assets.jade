@@ -1,0 +1,41 @@
+doctype html
+html
+  head
+    - with '网利宝' as title
+    title 网利宝
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0")
+    meta(name="format-detection", content="telephone=no")
+    link(rel="stylesheet",href="/static/stylesheets/test.css")
+  body(style="height:100%;background:#f5f5f5;")
+    .m-head 我的资产
+      .head-right.head-my
+    .m-assets-profit
+      p.profit-txt 累计收益 （元）
+      p.profit-num 0.00
+    .m-assets-unprofit
+      p.unprofit-txt 待收收益 （元）
+      p.unprofit-num 0.00
+    .m-assets-list
+      mixin card-style(cardUrl, iconUrl, tit, redTxt, huiTxt)
+        .assets-fn-list
+          a.assets-card(href=cardUrl)
+            i(class=iconUrl)
+            .assets-fn-body
+              .fn-body-tit=tit
+              .fn-body-on
+              if redTxt
+                .fn-body-money
+                  span.red=redTxt
+                  if huiTxt
+                    span.hui=huiTxt
+      +card-style('javascript:void(0)', 'assets-icon', 'P2P总资产', '122,456.05 ', '元')
+      +card-style('javascript:void(0)', 'assets-icon', '已投项目')
+      +card-style('javascript:void(0)', 'assets-icon', '充值')
+      +card-style('javascript:void(0)', 'assets-icon', '账户余额')
+    .m-assets-bottom
+      .bottom-txt 如需查询或赎回已申购货币基金，请去网利宝站<br>www.wanglibao.com
+    include m_include/m_footers
+
