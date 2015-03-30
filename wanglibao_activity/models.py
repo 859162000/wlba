@@ -47,6 +47,15 @@ SEND_TYPE = (
     ('sys_auto', u'系统实时发放'),
     ('manual_operation', u'人工手动发放')
 )
+SEND_TYPE_ABBR = (
+    ('sys_auto', u'系统'),
+    ('manual_operation', u'人工')
+)
+MSG_TYPE = (
+    ('message', u'站内信'),
+    ('sms', u'手机短信'),
+    ('only_record', u'只记录')
+)
 
 
 class Activity(models.Model):
@@ -60,8 +69,8 @@ class Activity(models.Model):
     channel = models.CharField(u'渠道代码', max_length=20, blank=True, help_text=u'如果选择“渠道活动”，则填入对应渠道的渠道代码')
     start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动开始时间*")
     end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动结束时间*")
-    is_stopped = models.BooleanField(u'是否手工停止', default=False)
-    stopped_at = models.DateTimeField(null=True, verbose_name=u"手动停止时间", blank=True)
+    is_stopped = models.BooleanField(u'是否停止', default=False)
+    stopped_at = models.DateTimeField(null=True, verbose_name=u"停止时间", blank=True)
     created_at = models.DateTimeField(u'添加时间', auto_now_add=True)
     banner = models.ImageField(u'活动图片', null=True, upload_to='activity', blank=True)
     template = models.TextField(u'活动模板（pyjade编译过的模板）', null=True, blank=True)
@@ -87,6 +96,21 @@ class Activity(models.Model):
         if self.is_stopped:
             self.stopped_at = timezone.now()
 
+    def activity_status(self):
+        now = timezone.now()
+        if self.is_stopped:
+            return u'手工停止'
+        else:
+            if self.start_at > now:
+                return u'未开始'
+            elif self.end_at < now:
+                return u'已结束'
+            else:
+                return u'进行中'
+
+    activity_status.short_description = u'活动状态'
+    activity_status.allow_tags = True
+
 
 class ActivityRule(models.Model):
     activity = models.ForeignKey(Activity, verbose_name=u'活动名称')
@@ -94,28 +118,31 @@ class ActivityRule(models.Model):
     rule_description = models.TextField(u'规则描述', null=True, blank=True)
     gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE)
     trigger_node = models.CharField(u'触发节点', max_length=20, choices=TRIGGER_NODE)
-    is_introduced = models.BooleanField(u'有邀请关系时才启用', default=False,
+    is_introduced = models.BooleanField(u'邀请好友时才启用', default=False,
                                         help_text=u'勾选此项则，则会先判断用户是否被别人邀请，是就触发该规则，不是则不做处理')
     both_share = models.BooleanField(u'参与邀请共享赠送礼品', default=False,
                                      help_text=u'勾选此项则，则用户在满足规则的条件内邀请别人，双方共享选定“赠送类型”中的礼品')
-    redpack = models.CharField(u'红包类型名称', max_length=60, blank=True,
-                               help_text=u'红包名称一定要和红包活动中的名称保持一致')
+    redpack = models.CharField(u'红包活动ID', max_length=60, blank=True,
+                               help_text=u'红包活动ID一定要和红包活动中的ID保持一致，否则会导致无法发放红包')
     reward = models.CharField(u'奖品类型名称', max_length=60, blank=True,
-                              help_text=u'类型名称一定要和奖品中的类型保持一致')
+                              help_text=u'奖品类型名称一定要和奖品中的类型保持一致，否则会导致无法发放奖品')
     income = models.FloatField(u'金额或比率', default=0, blank=True,
                                help_text=u'选择收益或话费时填写，固定金额时填写大于1的数字，收益率时填写0-1之间的小数')
     min_amount = models.IntegerField(u'最小金额', default=0,
-                                     help_text=u'投资或充值，不包含该金额（>）')
+                                     help_text=u'投资或充值，大于该金额（>），当只有最小金额时为大于等于该金额（>=）')
     max_amount = models.IntegerField(u'最大金额', default=0,
-                                     help_text=u'投资或充值，包含该金额（<=）')
+                                     help_text=u'投资或充值，小于等于该金额（<=）')
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True,
                                     help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\
-                                              内置：手机号：“{{ mobile }}，奖品激活码：{{ reward }}，\
-                                              邀请人：{{ inviter }}，被邀请人：{{ invited }}”')
+                                              内置：注册人手机：“{{ mobile }}，奖品激活码：{{ reward }}，截止日期{{end_date}}<br/>\
+                                              邀请人：{{ inviter }}，被邀请人：{{ invited }}，金额或百分比{{ amount }}<br/>\
+                                              活动名称：{{ name }}，红包最高抵扣金额：{{ highest_amount }}”')
     sms_template = models.TextField(u'短信模板（不填则不发）', blank=True,
-                                    help_text=u'短信模板不填写则触发该规则时不发手机短信，变量写在2个大括号之间，<br/>\
-                                              内置：手机号：“{{ mobile }}，奖品激活码：{{ reward }}，\
-                                              邀请人：{{ inviter }}，被邀请人：{{ invited }}”')
+                                    help_text=u'短信模板不填写则触发该规则时不发手机短信，变量写在2个大括号之间，变量：同上')
+    msg_template_introduce = models.TextField(u'邀请人站内信模板', blank=True,
+                                              help_text=u'邀请人站内信模板不填写则不发送，变量写在2个大括号之间，变量：同上')
+    sms_template_introduce = models.TextField(u'邀请人短信模板', blank=True,
+                                              help_text=u'邀请人短信模板不填写则不发送，变量写在2个大括号之间，变量：同上')
     send_type = models.CharField(u'赠送发放方式', max_length=20, choices=SEND_TYPE,
                                  default=u'系统实时发放')
     created_at = models.DateTimeField(auto_now=True)
@@ -131,7 +158,7 @@ class ActivityRule(models.Model):
         if self.gift_type == 'reward' and not self.reward:
             raise ValidationError(u'赠送类型为“奖品”时，必须填写“奖品类型名称”')
         if self.gift_type == 'redpack' and not self.redpack:
-            raise ValidationError(u'赠送类型为“红包”时，必须填写“红包类型名称”')
+            raise ValidationError(u'赠送类型为“红包”时，必须填写“红包类型ID”')
         if self.gift_type == 'income' or self.gift_type == 'phonefare':
             if self.income <= 0:
                 raise ValidationError(u'选择送收益或手机话费时要填写“金额或比率”')
@@ -147,6 +174,8 @@ class ActivityRecord(models.Model):
     trigger_node = models.CharField(u'触发节点', max_length=20, choices=TRIGGER_NODE)
     trigger_at = models.DateTimeField(u'触发时间', auto_created=False)
     description = models.TextField(u'摘要', blank=True)
+    msg_type = models.CharField(u'信息类型', max_length=20, choices=MSG_TYPE, default=u"只记录")
+    send_type = models.CharField(u'发放方式', max_length=20, choices=SEND_TYPE_ABBR, default=u'系统')
     user = models.ForeignKey(User, verbose_name=u"触发用户")
     income = models.FloatField(u'费用或收益', null=True, blank=True)
     created_at = models.DateTimeField(auto_now=True)
