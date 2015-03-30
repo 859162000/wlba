@@ -48,19 +48,23 @@ block main
         thead
           tr
             th 红包
-            th 可用额度
+            th 可用额度/比例
             th 有效期
             th 使用详情
         tbody
           each red_packet in red_packets
             tr
               td {{red_packet.name}}
-              td {{red_packet.amount}} 元
+              if red_packet.method == '-'
+                td {{red_packet.amount}} 元
+              else
+                td {{red_packet.amount | percentage_number_two}} %
               td {{red_packet.available_at | milldate_format}} 至 {{red_packet.unavailable_at | milldate_format}}
               if status == 'used'
                 td {{red_packet.product}} <br/> {{red_packet.apply_at | milltime_format }}
               else
                 td --
+                u
 
 
     script.

@@ -8,7 +8,8 @@ from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, Ac
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'category', 'platform', 'product_cats', 'product_ids',\
-                    'channel', 'description', 'start_at', 'end_at', 'is_stopped', 'priority')
+                    'channel', 'description', 'start_at', 'end_at', \
+                    'activity_status', 'is_stopped', 'priority')
 
 
 class ActivityRuleAdmin(admin.ModelAdmin):
@@ -17,8 +18,8 @@ class ActivityRuleAdmin(admin.ModelAdmin):
 
 
 class ActivityRecordAdmin(admin.ModelAdmin):
-    list_display = ('activity', 'rule', 'platform', 'trigger_node', 'msg_type', \
-                    'description', 'user', 'income', 'created_at')
+    list_display = ('id', 'activity', 'rule', 'platform', 'trigger_node', 'msg_type', \
+                    'send_type', 'description', 'user', 'income', 'created_at')
 
     def has_add_permission(self, request):
         return False

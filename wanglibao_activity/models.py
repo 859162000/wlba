@@ -48,6 +48,10 @@ SEND_TYPE = (
     ('sys_auto', u'系统实时发放'),
     ('manual_operation', u'人工手动发放')
 )
+SEND_TYPE_ABBR = (
+    ('sys_auto', u'系统'),
+    ('manual_operation', u'人工')
+)
 MSG_TYPE = (
     ('message', u'站内信'),
     ('sms', u'手机短信'),
@@ -66,8 +70,8 @@ class Activity(models.Model):
     channel = models.CharField(u'渠道代码', max_length=20, blank=True, help_text=u'如果选择“渠道活动”，则填入对应渠道的渠道代码')
     start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动开始时间*")
     end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动结束时间*")
-    is_stopped = models.BooleanField(u'是否手工停止', default=False)
-    stopped_at = models.DateTimeField(null=True, verbose_name=u"手动停止时间", blank=True)
+    is_stopped = models.BooleanField(u'是否停止', default=False)
+    stopped_at = models.DateTimeField(null=True, verbose_name=u"停止时间", blank=True)
     created_at = models.DateTimeField(u'添加时间', auto_now_add=True)
     banner = models.ImageField(u'活动图片', null=True, upload_to='activity', blank=True)
     template = models.TextField(u'活动模板（pyjade编译过的模板）', null=True, blank=True)
@@ -92,6 +96,21 @@ class Activity(models.Model):
             raise ValidationError(u'选择指定产品时，需要填写产品的ID，多个ID之间用英文逗号间隔')
         if self.is_stopped:
             self.stopped_at = timezone.now()
+
+    def activity_status(self):
+        now = timezone.now()
+        if self.is_stopped:
+            return u'手工停止'
+        else:
+            if self.start_at > now:
+                return u'未开始'
+            elif self.end_at < now:
+                return u'已结束'
+            else:
+                return u'进行中'
+
+    activity_status.short_description = u'活动状态'
+    activity_status.allow_tags = True
 
 
 class ActivityRule(models.Model):
@@ -157,6 +176,7 @@ class ActivityRecord(models.Model):
     trigger_at = models.DateTimeField(u'触发时间', auto_created=False)
     description = models.TextField(u'摘要', blank=True)
     msg_type = models.CharField(u'信息类型', max_length=20, choices=MSG_TYPE, default=u"只记录")
+    send_type = models.CharField(u'发放方式', max_length=20, choices=SEND_TYPE_ABBR, default=u'系统')
     user = models.ForeignKey(User, verbose_name=u"触发用户")
     income = models.FloatField(u'费用或收益', null=True, blank=True)
     created_at = models.DateTimeField(auto_now=True)
