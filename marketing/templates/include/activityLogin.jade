@@ -1,0 +1,52 @@
+
+html
+  head
+    link(rel="stylesheet",href="/static/stylesheets/activity.css")
+    link(rel="stylesheet",href="/static/css/bootstrap.min.css")
+  body
+    .act-login
+        h1.act-biaoti 轻松拿70元话费
+        form#register-modal-form.act-login-form(method='post', action='/accounts/register/ajax/')
+          - csrf_token
+          .act-form-row
+            .form-control-group
+              .span12
+                input#reg_identifier.act-com-tu.act-tu1.act-com-wid(type="text", name="identifier", placeholder="请输入手机号")
+            .act-form-row-error
+          .act-form-row.voice
+            .span12-omega.act-login-form.act-hidden.act-show
+              没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+            .form-control-group
+              .span6
+                 input#id_validate_code.act-com-tu.act-tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+              .span6-omega
+                 button#button-get-validate-code-modal.act-button-orange.act-button-large.act-huoqu-ma(type='button',style="top:-2px") 获取验证码
+            .act-form-row-error
+
+          .act-form-row
+            input#reg_password.full-width.act-com-tu.act-tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+            .password-strength-container
+              span.password-strength-1
+              span.password-strength-2
+              span.password-strength-3
+            .act-form-row-error
+          .act-form-row
+            input#reg_password2.act-com-tu.act-tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+            .act-form-row-error
+          //.act-form-row
+          //  input#id_invitecode.act-com-tu.act-tu1(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
+          //  .act-form-row-error
+          .act-form-row.form-bottom-bar
+            button#register_submit.act-button-orange.act-button-large.act-huoqu-ma.span10(type='submit') 注 册
+            .agreement
+              label(for="agreement")
+                input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
+              | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+              .act-form-row-error
+          .space-vertical-s
+        p.xun-p 已有账号,
+          a(href="/accounts/login/") 立即登录
+        script(src="/static/js/require.js", data-main="/static/js/header")
+        script.
+          var v = new Date().getTime()
+          require(['/static/js/activityLogin.js?v='+v])

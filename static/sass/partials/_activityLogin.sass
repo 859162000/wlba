@@ -1,0 +1,89 @@
+.act-login
+  width: 316px
+  height: auto
+  border: 1px solid #70cc3c
+  position: absolute
+  border-radius: 5px
+  .act-biaoti
+    color: red
+    line-height: 50px
+    text-align: center
+    margin-top: 8px
+  .act-login-form
+    width: 276px
+    background: #fff
+    margin: 0 auto
+
+    input
+      line-height: 35px
+      border: none
+      border: 1px solid #ccc
+      width: 100%
+    .act-com-tu
+      background: url(/static/images/xunlei-denglu/xunlei-denglu-tu.png) no-repeat
+      padding-left: 30px
+    .act-tu1
+      background-position: 0 -73px
+    .act-tu2
+      background-position: 0 5px
+    .act-tu3
+      background-position: 0 -32px
+    .act-form-row
+      @extend .row
+      text-align: left
+      position: relative
+      padding-top: 10px
+    .act-form-row-error
+      @extend .row
+      line-height: 1.3
+      color: red
+      label.error
+        font-size: $font-s
+        color: $color-pomegranate
+
+        &:before
+          content: '* '
+        &:empty
+          display: none
+      label
+        font-weight: normal
+    .act-hidden
+      display: none !important
+    .act-show
+      margin-bottom: 10px
+    .act-button-orange
+      background: $color-orange
+      color: $color-white
+      border: none
+      border-radius: 5px
+      &:hover
+        background: #f67313
+    .act-button-large
+      @extend .button
+      font-size: $font-m
+      line-height: 40px
+      padding: 0 1em
+    .act-huoqu-ma
+      padding: 0 10px
+      border: none
+      color: #fff
+      background: #ff461f
+      border-radius: 5px
+      margin-left: 20px
+    .act-huoqu-ma-gray
+      background: #cccccc
+      margin-left: 10px
+    .act-button-account
+      @extend .button-primary
+      font-size: 24px
+      padding: 10px
+    .agreement
+      font-size: $font-s
+      color: $color-dusty-gray
+      text-align: center
+      clear: both
+      margin: 0 auto
+      margin-top: 50px
+  .xun-p
+    text-align: center
+    margin: 10px 0
