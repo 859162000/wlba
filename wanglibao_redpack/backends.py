@@ -229,6 +229,10 @@ def give_first_buy_redpack(user, device_type):
     _give_redpack(user, "first_buy", device_type)
 
 
+def give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id):
+    _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id)
+
+
 def give_buy_redpack(user, device_type, rtype='buy', describe=''):
     now = timezone.now()
     rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
@@ -236,9 +240,6 @@ def give_buy_redpack(user, device_type, rtype='buy', describe=''):
         rps = rps.filter(describe=describe)
     for x in rps:
         give_activity_redpack(user=user, event=x, device_type=device_type)
-
-def give_activity_redpack_new(user, rtype, redpack_name, device_type, rule_id):
-    _give_activity_redpack_new(user, rtype, redpack_name, device_type, rule_id)
 
 
 def _give_activity_redpack_new(user, rtype, redpack_name, device_type, rule_id):
