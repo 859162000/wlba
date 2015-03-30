@@ -29,6 +29,7 @@ urlpatterns = patterns(
     url(r'^pptv_redpack/$', TemplateView.as_view(template_name="pptv_redpack.jade")),
     url(r'^app_day/$', TemplateView.as_view(template_name="app_day.jade")),
     url(r'^aiqiyi_redpack/$', TemplateView.as_view(template_name="aiqiyi_redpack.jade")),
+    url(r'^activityTime/$', TemplateView.as_view(template_name="activityTime.jade")),
 
 )
 
