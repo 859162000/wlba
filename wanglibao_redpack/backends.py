@@ -242,12 +242,12 @@ def give_buy_redpack(user, device_type, rtype='buy', describe=''):
         give_activity_redpack(user=user, event=x, device_type=device_type)
 
 
-def _give_activity_redpack_new(user, rtype, redpack_name, device_type, rule_id):
+def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id):
     """ rule_id: get message template """
     now = timezone.now()
     user_channel = helper.which_channel(user)
     device_type = _decide_device(device_type)
-    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, name=redpack_name, \
+    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id, \
                                       give_start_at__lt=now, give_end_at__gt=now).first()
     if rps and user_channel == rps.target_channel:
         redpack = RedPack.objects.filter(event=rps, status="unused").first()
