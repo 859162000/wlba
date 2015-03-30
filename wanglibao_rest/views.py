@@ -168,7 +168,11 @@ class RegisterAPIView(APIView):
         if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30015, "message": u"该手机号已经注册"})
 
+        device = split_ua(request)
         invite_code = request.DATA.get('invite_code', "")
+        if not invite_code and device['channel_id'] == "baidu":
+            invite_code = "baidushouji"
+
         if invite_code:
             try:
                 record = Channels.objects.filter(code=invite_code).first()
@@ -186,7 +190,6 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
-        device = split_ua(request)
         tools.register_ok.apply_async(kwargs={"user_id": user.id, "device_type":device['device_type']})
         # save client info
         save_client(request, phone=identifier, action=0)
