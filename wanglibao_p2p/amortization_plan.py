@@ -5,7 +5,6 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 import math
 
-
 class AmortizationPlan(object):
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None):
@@ -343,7 +342,45 @@ def get_final_decimal(decimal):
 def get_daily_interest(year_rate):
     return get_base_decimal(year_rate/360)
 
-def get_payment_history(p2p, date):
-    next_term_date = date + relativedelta(months=1)
-    amortization = ProductAmortization.objects.filter(product=p2p, term_date__gt=date, term_date__lt=next_term_date)
+REPAYMENT_MONTHLY = 'monthly'
+REPAYMENT_DAILY = 'daily'
+def get_payment_history(p2p, date, repayment_type):
 
+    from wanglibao_p2p.models import ProductAmortization
+
+    next_term_date = date + relativedelta(months=1)
+    amortizations = ProductAmortization.objects.filter(product=p2p)
+
+    principal_paid = Decimal(0) 
+    last_paid_date = None
+    amortization = None
+
+    for amo in list(amortizations):
+        if amo.settled:
+            principal_paid = principal_paid + amo.principal
+            last_paid_date = amo.term_date
+        else:
+            if amortization is None:
+               amortization = amo
+
+    if amortization is None:
+        return
+
+    if last_paid_date is None:
+        last_paid_date = p2p.make_loans_time 
+
+    if repayment_type == REPAYMENT_MONTHLY: 
+        interest = amortization.interest
+    else:
+        import pytz
+        term_date = timezone.localtime(amortization.term_date)
+        date = pytz.UTC.localize(date)
+        days = (term_date - date).days
+        interest = amortization.interest - get_daily_interest(p2p.expected_earning_rate)*days*p2p.total_amount 
+
+    principal = p2p.total_amount - principal_paid
+
+    return {
+        'principal': principal,
+        'interest': interest
+    }

@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao_p2p.amortization_plan import get_amortization_plan
+from wanglibao_p2p.amortization_plan import get_amortization_plan, get_payment_history
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, \
@@ -635,7 +635,8 @@ class AdminPrepayment(TemplateView):
             p2p = P2PProduct.objects.filter(pk=id)
             p2p = p2p[0]
 
-            amortization = ProductAmortization.objects.filter(product=p2p, term_date__gt=repayment_date)
+            #amortization = ProductAmortization.objects.filter(product=p2p, term_date__gt=repayment_date)
+            print 'hello-newest', '--', p2p, id
 
             #1. 拿到当期未还款计划
             #1.11 如果是按期提前还款
@@ -645,8 +646,12 @@ class AdminPrepayment(TemplateView):
             #2. 拿到此标的年华收益
             #3. 计算日收益
             #4. 计算当期未计息天数
-            year_rate = float(request.POST.get('year_rate')) / 100
-            period = int(request.POST.get('period'))
+
+            flag_date = datetime.datetime(2015, 4, 23)
+            print 'flag_date', flag_date
+            obj = get_payment_history(p2p, flag_date, 'daily')
+            print obj, 'tiatt'
+            return redirect('./'+id)
         except:
             messages.warning(request, u'输入错误, 请重新检测')
             return redirect('./amortization')

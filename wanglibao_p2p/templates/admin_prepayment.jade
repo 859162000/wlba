@@ -33,9 +33,11 @@ html
 
               .panel-body
                 .row
-                  form.navbar-form.navbar-left
+                  form.navbar-form.navbar-left(method="post", action="/AK7WtEQ4Q9KPs8Io_zOncw/p2p/prepayment/{{p2p.pk}}")
+                    - csrf_token
                     .form-group
                       input(type="text",name="repayment_date",placeholder="日期").form-control
+                      input(type="hidden", name="id", value="{{p2p.pk}}")
 
                     .form-group
                       .radio
@@ -51,7 +53,7 @@ html
                       button(type="submit").btn.btn-primary 提前还款计算
 
                 .row
-                  form.navbar-form.navbar-left(role="search")
+                  form.navbar-form.navbar-left(role="search",method="post")
                     .form-group
                       input(type="text",name="p2p_name",placeholder="罚息").form-control
                     .form-group
