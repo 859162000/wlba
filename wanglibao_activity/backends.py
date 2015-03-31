@@ -200,7 +200,7 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type):
         if rule.both_share:
             user_introduced_by = _check_introduced_by(user)
             if user_introduced_by:
-                _save_activity_record(rule, user, 'only_record', reward_name, True)
+                _save_activity_record(rule, user_introduced_by, 'only_record', reward_name, True)
 
 
 def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
@@ -238,7 +238,7 @@ def _send_gift_income(user, rule):
             if rule.both_share:
                 user_introduced_by = _check_introduced_by(user)
                 if user_introduced_by:
-                    _save_activity_record(rule, user, 'only_record', rule.rule_name, True)
+                    _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True)
     else:
         return
 
@@ -259,7 +259,7 @@ def _send_gift_phonefare(user, rule):
             if rule.both_share:
                 user_introduced_by = _check_introduced_by(user)
                 if user_introduced_by:
-                    _save_activity_record(rule, user, 'only_record', rule.rule_name, True)
+                    _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True)
     else:
         return
 
