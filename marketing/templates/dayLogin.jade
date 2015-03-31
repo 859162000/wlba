@@ -4,6 +4,7 @@
 doctype html
 html
   head
+    link(rel="stylesheet",href="/static/stylesheets/activity.css")
     - with '网利宝' as title
     include include/common_head
     - endwith
@@ -61,12 +62,12 @@ html
 
                 +nav-item('安全保障', '/security', 'left-line', '')
                 +nav-item('帮助中心', '/help', '', '')
-    .wrap
+    .wrap(style="height:494px;background:url(/static/images/full-img/day-zc-ban2.jpg) center center")
       //img(src="/static/images/xunlei-denglu/xun-banner5.jpg").te1
       .gold2
-         img(src="/static/images/xunlei-denglu/xun-wang.png").xun-wang
+         //img(src="/static/images/xunlei-denglu/xun-wang.png").xun-wang
          .denelu-form
-            h1.biaoti 轻松拿380元现金红包
+            h1.biaoti 轻松拿50元现金红包
             //.align-center
             //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
             form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
@@ -98,7 +99,7 @@ html
                 .form-row-error
               .form-row.form-bottom-bar
                 button#register_submit.button-account.span10.xun-zhuce(type='submit') 注 册
-                .agreement(style="padding:0")
+                .agreement(style="padding-top:5px")
                   label(for="agreement")
                     input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
                   | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
@@ -107,8 +108,10 @@ html
 
             p.xun-p 已有账号,
               a(href="/accounts/login/") 立即登录
-    .san
+    .san(style="background:#05d6b4")
       .container.high-bigger.high-bigger2
+        .day-zc-time
+          p 具体活动时间为——3月30日00:00:00至 4月30日23:59:59，数据零点清零，用户可每天重复参赛。
         .row.gold-dl-row
           .span4
             dl
@@ -183,7 +186,7 @@ html
                   |100%本息保障
       .space-vertical-l
       .space-vertical-s
-    .dingwei
+    .dingwei(style="background:url(/static/images/full-img/day-zc-bj.jpg) center center")
       .container-title
           .xl-zc-tit
             .xl-zc-le
@@ -228,101 +231,65 @@ html
     .space-vertical-l
     .space-vertical-s
     .gold(style="background:#fff")
-      .container-title(style="background:#fff")
-          .xl-zc-tit
-            .xl-zc-le
-              h2.black 没心！没肺！没节操的送！
-              p 活动期间，单日投资额达到以下额度，可获得相应奖品 。
-            .xl-zc-r
-          .space-vertical-s
-          .row.gold-row
-           .span3
-              dl.full-jiang
-                span.full-huang
-                h3.full-h2 单日投资200万
-                dt.full-com2.full-one
-                dd(style="color:#e9573f")
-                  span(style="background:#e9573f") 送
-                  |全新Retina MacBook
-           .span3
-             dl.full-jiang
-               span.full-huang
-               h3.full-h2 单日投资150万
-               dt.full-com2.full-two
-               dd(style="color:#e9573f")
-                 span(style="background:#e9573f") 送
-                 |iPhone 6 Plus ( 16G )
-           .span3
-             dl.full-jiang
-               span.full-huang
-               h3.full-h2 单日投资100万
-               dt.full-com2.full-three
-               dd(style="color:#e9573f")
-                 span(style="background:#e9573f") 送
-                 |iPhone 6 ( 16G )
-           .span2
-             dl.full-jiang
-               span.full-huang
-               h3.full-h2 单日投资50万
-               dt.full-com2.full-four
-               dd(style="color:#e9573f")
-                 span(style="background:#e9573f") 送
-                 |Apple Watch Sport
-      .space-vertical-l
-      .space-vertical-s
       .gold-footer(style="background:#fff;padding-left:0")
         .gold-declare(style="border-bottom:none;padding-left:0")
           dl.beijing
-            dt.hei 奖品发放说明
-            dd 1、网利宝账户以身份证为唯一识别标识。
-            dd 2、活动规则：
-            dd &nbsp&nbsp&nbsp&nbsp&nbsp新用户注册即送380元现金红包，投资300元可使用30元现金红包，350元红包按投资额1%抵扣使用 ；
-            dd &nbsp&nbsp&nbsp&nbsp&nbsp首次充值送7天迅雷白金会员，首次投资送一个月迅雷白金会员，单笔投资满5000送50元现金红包 ；
-            dd &nbsp&nbsp&nbsp&nbsp&nbsp如有疑问请咨询网利宝客服4008-588-066（服务时间：9:00-18:00 工作日）；
-            dd 3、奖品统一于活动后7个工作日内开始发放。
-            dd 4、由于实物奖品快递需求，满额度用户请提交真实“姓名、手机、身份证、通讯地址”至
-              a(style="color:#e9573f") kefu@wanglibank.com
-              |。
-            dd 5、此次活动最终解释权归网利宝官方所有。
+            dt.hei 活动规则
+            dd 1、手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账户；
+            dd 2、现金奖励在三个工作日内以红包形式发出，红包类型为现金红包；
+            dd 3、获奖红包以站内信形式通知，完成一次投资回款后即可取现；
+            dd 4、红包有效期2015年3月30日-2015年6月24日 ；
+            dd 5、直抵50红包投资金额500元方可使用；红包使用最多直抵50元；
+            dd &nbsp&nbsp&nbsp&nbsp&nbsp例：投资500元立减50元，实际支付450元；
+            dd 6、新手红包均只能使用一次，使用后是否有余额红包即失效；
+            dd 7、本活动不收取任何费用，谨防上当受骗；
+            dd 8、刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现；
+            dd 9、此次活动最终解释权归网利宝官方所有。
 
       .bai
-        .content-title
-          h2.hei(style="font-size:24px") 投资流程
-        .investment-process-container
-          .row
-            .step.first-step
-              span.icon.icon-first-step
-              .process-title 免费注册账号
-            .step-arrow
-              ins
-            .step.second-step
-              span.icon.icon-second-step
-              .process-title 实名认证
-            .step-arrow
-              ins
-            .step.third-step
-              span.icon.icon-third-step
-              .process-title 充值
-            .step-arrow
-              ins
-            .step.fourth-step
-              span.icon.icon-fourth-step
-              .process-title 投资
-            .step-arrow
-              ins
-            .step.fifth-step
-              span.icon.icon-fifth-step
-              .process-title 获得投资和奖励
-        .invite-container.row
-            a.invite-btn#top-zc 立即注册
+        .aiqiyi-process
+          .content-pptv
+            .process-text 投资流程
+            .process-list
+              .circle-free.circle-float.aiqiyi-float
+                .close.aiqiyi-close
+                .last
+                .next
+                img(src="/static/images/pptv/free.jpg")
+              .triangle-start
+                .start-cont
+              .circle
+                .circle-body.free.aiqiyi-body
+                .circle-txt.day-zc-txt 免费注册账号
+              .triangle-center
+                .center-cont
+              .circle
+                .circle-body.atte.aiqiyi-body
+                .circle-txt.day-zc-txt 实名认证
+              .triangle-center
+                .center-cont
+              .circle
+                .circle-body.recharge.aiqiyi-body
+                .circle-txt.day-zc-txt 充值
+              .triangle-center
+                .center-cont
+              .circle
+                .circle-body.tender.aiqiyi-body
+                .circle-txt.day-zc-txt 投标
+              .triangle-center
+                .center-cont
+              .circle
+                .circle-body.collec.aiqiyi-body
+                .circle-txt.day-zc-txt 获得收益和奖励
+              .triangle-end
+                .end-cont
 
-    .warp-footer
-      img(src="/static/images/xunlei-denglu/ditu.jpg").foot-img
-
+    .warp-footer(style='background:#05d6b4;margin-top:40px')
+      include include/activityFooter
       include include/tracking
 
       script.
-
           var v = new Date().getTime()
-          require(['/static/js/hover.js','/static/js/xun-newzhuce.js?v='+v])
+          require(['/static/js/hover.js','/static/js/aiqiyi_redpack.js?v='+v])
+
 
