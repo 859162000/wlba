@@ -163,7 +163,8 @@ def _check_introduced_by(user):
     ib = IntroducedBy.objects.filter(user=user).first()
     if ib:
         return ib.introduced_by
-    return None
+    else:
+        return None
 
 
 def _check_amount(min_amount, max_amount, amount):
