@@ -168,6 +168,8 @@ def _check_introduced_by(user):
 
 
 def _check_amount(min_amount, max_amount, amount):
+    min_amount = int(min_amount)
+    max_amount = int(max_amount)
     amount = int(amount)
     if amount == 0:
         return False
