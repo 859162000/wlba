@@ -29,25 +29,29 @@ class ActivityImagesAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('name', 'img_type', 'img', 'desc_one', 'desc_two', 'priority')}),
     )
-    # ordering = ('-img_type', '-priority')
+
+    ordering = ('-img_type', '-priority')
 
 
 class ActivityTemplatesAdmin(admin.ModelAdmin):
 
-    list_display = ('id', )
+    list_display = ('id', 'name', 'banner')
 
-    fieldsets = (
-        (None, {'fields': ('name', )}),
-        ('logo', {'fields': ('logo', 'logo_other', 'location')}),
-        ('banner', {'fields': ('banner',)}),
-        (u'活动时间及描述模块', {'fields': ('is_activity_desc', 'desc', 'desc_time'), 'classes': ['collapse']}),
-        (u'奖品图片和描述模块', {'fields': ('is_reward', 'reward_img', 'reward_desc'), 'classes': ['collapse']}),
-        (u'邀请好友模块', {'fields': ['is_introduce', 'introduce_img', 'introduce_desc'], 'classes': ['collapse']}),
-        (u'新手投资模块', {'fields': ('is_teacher', 'teacher_desc'), 'classes': ['collapse']}),
-        (u'活动使用规则模块', {'fields': ('is_rule_use', 'rule_use'), 'classes': ['collapse']}),
-        (u'活动规则模块', {'fields': ('is_rule_activity', 'rule_activity'), 'classes': ['collapse']}),
-        (u'奖品发放规则模块', {'fields': ('is_rule_reward', 'rule_reward'), 'classes': ['collapse']}),
-    )
+    ordering = ('id',)
+
+    # fieldsets = (
+    #     (None, {'fields': ('name', )}),
+    #     ('logo', {'fields': ('logo', 'logo_other', 'location')}),
+    #     ('banner and login', {'fields': ('banner', 'is_login')}),
+    #     (u'活动时间及描述模块', {'fields': ('is_activity_desc', 'desc', 'desc_time'), 'classes': ['collapse']}),
+    #     (u'奖品图片和描述模块', {'fields': ('is_reward', 'reward_img', 'reward_desc'), 'classes': ['collapse']}),
+    #     (u'邀请好友模块', {'fields': ['is_introduce', 'introduce_img', 'introduce_desc'], 'classes': ['collapse']}),
+    #     (u'新手投资模块', {'fields': ('is_teacher', 'teacher_desc'), 'classes': ['collapse']}),
+    #     (u'活动使用规则模块', {'fields': ('is_rule_use', 'rule_use'), 'classes': ['collapse']}),
+    #     (u'活动规则模块', {'fields': ('is_rule_activity', 'rule_activity'), 'classes': ['collapse']}),
+    #     (u'奖品发放规则模块', {'fields': ('is_rule_reward', 'rule_reward'), 'classes': ['collapse']}),
+    #     (u'底部背景颜色模块', {'fields': ('is_footer', 'footer_color'), 'classes': ['collapse']}),
+    # )
 
 admin.site.register(ActivityImages, ActivityImagesAdmin)
 admin.site.register(ActivityTemplates, ActivityTemplatesAdmin)
