@@ -165,7 +165,7 @@ urlpatterns = patterns(
     url(r'^redpacket/deduct/$', RedPacketDeductAPIView.as_view()),
 
     url(r'^message/count/$', MessageCountAPIView.as_view()),
-    url(r'^message/detail/$', MessageDetailAPIView.as_view()),
+    url(r'^message/(?P<message_id>\d+)/$', MessageDetailAPIView.as_view()), 
     url(r'^message/list/$', MessageListAPIView.as_view()),
 
     url(r'^address/$', AddressAPIView.as_view()),
