@@ -81,19 +81,23 @@ def add_introduced_award(start, end, amount_min, percent):
     start_utc = local_to_utc(start, source_time='min')
     end_utc = local_to_utc(end, source_time='max')
 
+    # print '============begin============', datetime.now()
     new_user = IntroducedBy.objects.filter(
         bought_at__range=(start_utc, end_utc)
     ).filter(
         introduced_by__isnull=False
     ).exclude(
         introduced_by__wanglibaouserprofile__utype__gt=0
-    )
+    ).select_related('user')
+
+    # print '============query new_user ok============', datetime.now()
 
     query_set_list = []
     num = 0
     for first_user in new_user:
         num += 1
         # everyone
+        # print '============begin query p2precord============', datetime.now()
         first_record = P2PRecord.objects.filter(
             user=first_user.user,
             create_time__range=(start_utc, end_utc),
@@ -106,6 +110,8 @@ def add_introduced_award(start, end, amount_min, percent):
                 u'还款中',
                 u'已完成', ]
         ).order_by('create_time').first()
+
+        # print '============end query p2precord============', datetime.now()
 
         # first trade min amount limit
         if first_record is not None and first_record.amount >= Decimal(amount_min):
@@ -133,6 +139,8 @@ def add_introduced_award(start, end, amount_min, percent):
             reward.checked_status = 0
             # reward.save()
             query_set_list.append(reward)
+
+        # print '============one record end============', datetime.now()
 
         if len(query_set_list) == 100:
             IntroducedByReward.objects.bulk_create(query_set_list)
@@ -168,48 +176,49 @@ def send_reward(start, end, amount_min, percent):
     )
 
     for record in records:
-        with transaction.atomic():
-            user, introduced_by, reward_type, got_amount, product = record.user, record.introduced_by_person, reward_type, record.introduced_reward, record.product
+        # with transaction.atomic():
+        user, introduced_by, reward_type, got_amount, product = record.user, record.introduced_by_person, reward_type, record.introduced_reward, record.product
 
-            reward = Reward.objects.filter(is_used=False, type=reward_type).first()
+        reward = Reward.objects.filter(is_used=False, type=reward_type).first()
 
-            # 发送短信
-            text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
-            send_messages.apply_async(kwargs={
-                "phones": [introduced_by.wanglibaouserprofile.phone],
-                "messages": [text_content]
-            })
+        # 发送短信
+        text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
+        send_messages.apply_async(kwargs={
+            #"phones": [introduced_by.wanglibaouserprofile.phone],
+            "phones": [introduced_by.wanglibaouserprofile.phone],
+            "messages": [text_content]
+        })
 
-            # 发放收益
-            earning = Earning()
-            earning.amount = got_amount
-            earning.type = 'I'
-            earning.product = product
-            order = OrderHelper.place_order(
-                introduced_by,
-                Order.ACTIVITY,
-                u"邀请送收益活动赠送",
-                earning=model_to_dict(earning))
-            earning.order = order
-            keeper = MarginKeeper(introduced_by, order.pk)
+        # 发放收益
+        earning = Earning()
+        earning.amount = got_amount
+        earning.type = 'I'
+        earning.product = product
+        order = OrderHelper.place_order(
+            introduced_by,
+            Order.ACTIVITY,
+            u"邀请送收益活动赠送",
+            earning=model_to_dict(earning))
+        earning.order = order
+        keeper = MarginKeeper(introduced_by, order.pk)
 
-            # 赠送活动描述
-            desc = u'%s,邀请好友首次理财活动中，活赠%s元' % (introduced_by.wanglibaouserprofile.name, got_amount)
-            earning.margin_record = keeper.deposit(got_amount, description=desc)
-            earning.user = introduced_by
-            earning.save()
+        # 赠送活动描述
+        desc = u'%s,邀请好友首次理财活动中，活赠%s元' % (introduced_by.wanglibaouserprofile.name, got_amount)
+        earning.margin_record = keeper.deposit(got_amount, description=desc)
+        earning.user = introduced_by
+        earning.save()
 
-            # 发放站内信
-            message_content = u"您在邀请好友送收益的活动中，您的好友%s在活动期间完成首次投资，根据活动规则，您获得%s元收益。<br/>\
-                      <a href = 'https://www.wanglibao.com/accounts/home/'>查看账户余额</a><br/>\
-                      感谢您对我们的支持与关注。<br/>\
-                      网利宝" % (safe_phone_str(user.wanglibaouserprofile.phone), got_amount)
-            RewardRecord.objects.create(user=introduced_by, reward=reward, description=message_content)
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": introduced_by.id,
-                "title": u"邀请送收益活动",
-                "content": message_content,
-                "mtype": "activity"
-            })
+        # 发放站内信
+        message_content = u"您在邀请好友送收益的活动中，您的好友%s在活动期间完成首次投资，根据活动规则，您获得%s元收益。<br/>\
+                  <a href = 'https://www.wanglibao.com/accounts/home/'>查看账户余额</a><br/>\
+                  感谢您对我们的支持与关注。<br/>\
+                  网利宝" % (safe_phone_str(user.wanglibaouserprofile.phone), got_amount)
+        RewardRecord.objects.create(user=introduced_by, reward=reward, description=message_content)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": introduced_by.id,
+            "title": u"邀请送收益活动",
+            "content": message_content,
+            "mtype": "activity"
+        })
 
-            IntroducedByReward.objects.filter(id=record.id).update(checked_status=1)
+        IntroducedByReward.objects.filter(id=record.id).update(checked_status=1)
