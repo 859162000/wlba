@@ -198,7 +198,9 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type):
         #只记录不发信息
         _save_activity_record(rule, user, 'only_record', reward_name)
         if rule.both_share:
-            _save_activity_record(rule, user, 'only_record', reward_name, True)
+            user_introduced_by = _check_introduced_by(user)
+            if user_introduced_by:
+                _save_activity_record(rule, user_introduced_by, 'only_record', reward_name, True)
 
 
 def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
@@ -234,7 +236,9 @@ def _send_gift_income(user, rule):
             #只记录不发信息
             _save_activity_record(rule, user, 'only_record', rule.rule_name)
             if rule.both_share:
-                _save_activity_record(rule, user, 'only_record', rule.rule_name, True)
+                user_introduced_by = _check_introduced_by(user)
+                if user_introduced_by:
+                    _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True)
     else:
         return
 
@@ -253,7 +257,9 @@ def _send_gift_phonefare(user, rule):
             #只记录不发信息
             _save_activity_record(rule, user, 'only_record', rule.rule_name)
             if rule.both_share:
-                _save_activity_record(rule, user, 'only_record', rule.rule_name, True)
+                user_introduced_by = _check_introduced_by(user)
+                if user_introduced_by:
+                    _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True)
     else:
         return
 
