@@ -903,7 +903,7 @@ class MessageView(TemplateView):
         }
 
 
-class MessageListView(APIView):
+class MessageListAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
@@ -911,7 +911,7 @@ class MessageListView(APIView):
         return Response(result)
 
 
-class MessageCountView(APIView):
+class MessageCountAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
@@ -919,7 +919,7 @@ class MessageCountView(APIView):
         return Response(result)
 
 
-class MessageDetailView(APIView):
+class MessageDetailAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, message_id):

@@ -281,14 +281,16 @@ class PushTestView(APIView):
         #push_user_id = request.GET.get("push_user_id", "921913645184221981")
         #push_channel_id = request.GET.get("push_channel_id", "4922700431463139292")
 
-        push_user_id = request.GET.get("push_user_id", "781430269530794382")
-        push_channel_id = request.GET.get("push_channel_id", "5422135652350005874")
+
+        push_user_id = request.GET.get("push_user_id", "1033966060923467900")
+        push_channel_id = request.GET.get("push_channel_id", "4138455529717951568")
         from wanglibao_sms import bae_channel
 
         channel = bae_channel.BaeChannel()
-        message = {"message": "push Test"}
+        message = {"message": "push Test", "user_id":1, "type":"in"}
         msg_key = "wanglibao_staging"
-        res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
+        #res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
+        res, cont = channel.pushAndroidMessage(push_user_id, push_channel_id, message, msg_key)
         return Response({"ret_code": 0, "message": cont})
 
 
@@ -712,7 +714,7 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
                     pu.push_channel_id = push_channel_id
                     pu.save()
             token, created = Token.objects.get_or_create(user=serializer.object['user'])
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
+            return Response({'token': token.key, "user_id":serializer.object['user'].id}, status=status.HTTP_200_OK)
         else:
             device_type = request.DATA.get("device_type", "ios")
             if device_type == "ios":
