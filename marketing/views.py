@@ -461,7 +461,7 @@ class IntroducedAwardTemplate(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         return super(IntroducedAwardTemplate, self).dispatch(request, *args, **kwargs)
 
-    def my_paginator(self, obj, limit=200):
+    def my_paginator(self, obj, limit=100):
         # 增加分页查询机制
         paginator = Paginator(obj, limit)
         page = self.request.GET.get('page')
