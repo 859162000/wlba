@@ -33,7 +33,6 @@ urlpatterns = patterns(
     url(r'^full/$', TemplateView.as_view(template_name="full_get.jade")),
     url(r'^xunleiredpack/$', TemplateView.as_view(template_name="xunleiredpack2.jade")),
     url(r'^fullLogin/$', TemplateView.as_view(template_name="fullLogin.jade")),
-
 )
 
 urlpatterns += patterns(

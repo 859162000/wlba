@@ -26,6 +26,9 @@ def decide_first(user_id, amount, device_type='pc'):
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
 
+    #活动检测
+    activity_backends.check_activity(user, 'invest', device_type, amount)
+
     introduced_by = IntroducedBy.objects.filter(user=user).first()
     if not introduced_by:
         return
@@ -34,9 +37,6 @@ def decide_first(user_id, amount, device_type='pc'):
 
     introduced_by.bought_at = timezone.now()
     introduced_by.save()
-
-    #活动检测
-    activity_backends.check_activity(user, 'invest', device_type, amount)
 
     #channel = helper.which_channel(user, intro=introduced_by)
     channel = helper.which_channel(user)
@@ -171,6 +171,12 @@ def decide_first(user_id, amount, device_type='pc'):
         if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
             rs.reward_user(u'一个月爱奇艺会员')
 
+    elif channel == helper.Channel.BAIDUSHOUJI:
+        # 非快盘来源(需要确定到每个渠道)
+        start_time = timezone.datetime(2015, 3, 30)
+        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
+            rs.reward_user(u'一个月爱奇艺会员')
+
 #注册成功
 @app.task
 def register_ok(user_id, device_type):
@@ -193,7 +199,7 @@ def register_ok(user_id, device_type):
     #活动检测
     activity_backends.check_activity(user, 'register', device_type)
     #注册红包
-    redpack_backends.give_register_redpack(user, device_type)
+    # redpack_backends.give_register_redpack(user, device_type)
 
 #实名认证
 @app.task
@@ -274,7 +280,7 @@ def despoit_ok(pay_info, device_type='pc'):
             "content": content,
             "mtype": "activityintro"
         })
-    elif channel == helper.Channel.IQIYI:
+    elif channel == helper.Channel.IQIYI or channel == helper.Channel.BAIDUSHOUJI:
         start_time = timezone.datetime(2015, 3, 21)
         if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
                 status=PayInfo.SUCCESS).count() == 1:

@@ -1,0 +1,176 @@
+@import susy
+@import compass/typography/links
+@import compass/css3
+@import variables
+@import layout
+
+*
+  margin: 0
+  padding: 0
+
+.act-full-container
+  width: 100%
+  height: 40px
+  border-bottom: 1px solid #cccccc
+  background: #fff
+  .act-topbar
+    width: 1100px
+    height: 100%
+    margin:  0 auto
+    line-height: 40px
+    .act-weibo-qr-code
+      position: absolute
+      bottom: 100%
+      top: 20px
+      left: 643px
+      z-index: 9
+      padding-top: 15px
+
+    .act-weixin-qr-code
+      position: absolute
+      bottom: 100%
+      top: 20px
+      left: 695px
+      z-index: 9
+      width: 164px
+      height: 223px
+      padding-top: 15px
+
+    .act-icon-phone,
+    .act-icon-weibo,
+    .act-icon-mobile-app,
+    .act-icon-weixin
+      display: inline-block
+      overflow: hidden
+      width: $space-m
+      height: $space-m
+      line-height: $space-m
+      background: url("/static/images/cum-tu2.png") no-repeat
+      +border-radius(13px)
+      +transition(all .3s ease-in-out)
+      margin-left: 20px
+      position: relative
+      top: -5px
+    .act-icon-phone
+      background-position: 5px 3px
+      top: 6px
+      left: -10px
+    .act-icon-weibo
+      background-position: -27px 3px
+      top: 6px
+      left: -10px
+
+    .act-weibo-container:hover
+      .icon-weibo
+        background-position: 0 -200px
+        background-color: #d94a39
+
+    .act-icon-weibo:hover
+      background-position: -27px 3px
+      background-color: #d94a39
+
+    .act-icon-weixin
+      background-position: -60px 1px
+      top: 6px
+      left: -10px
+    .act-weixin-container:hover
+      .act-icon-weixin
+        background-position: -60px 1px
+        background-color: #0ca001
+
+    .act-icon-weixin:hover
+      background-position: -60px 1px
+      background-color: #0ca001
+
+    .act-margin-left-m
+      margin-left: 30px
+    .act-mobile-app-top
+      float: right
+    .act-icon-mobile-app
+      background-position: -99px 1px
+      top: 6px
+      left: -10px
+
+    .act-mobile-app-top-prompt
+      width: 320px
+      height: 200px
+      background: url("/static/images/app_prompt_bg.png") no-repeat -5px -197px
+      position: absolute
+      top: 40px
+      right: 246px
+      z-index: 999
+      display: none
+
+    .act-mobile-app-apple
+      width: 130px
+      height: 40px
+      background: url("/static/images/app_prompt_bg.png") no-repeat -157px -400px
+      display: block
+      margin-top: 30px
+      margin-left: 160px
+      margin-bottom: 10px
+
+      &:hover
+        background-position: -157px -445px
+
+    .act-mobile-app-android
+      width: 130px
+      height: 40px
+      background: url("/static/images/app_prompt_bg.png") no-repeat -16px -400px
+      display: block
+      margin-left: 160px
+
+      &:hover
+        background-position: -16px -445px
+.activity-nav
+  width: 100%
+  height: 90px
+  background: #fff
+  .act-container-login-nav
+    width: 1100px
+    height: 90px
+    margin: 0 auto
+    .act-logo
+      +inline-block()
+      background: image-url('logo.png')
+      background-repeat: no-repeat
+      background-position: center
+      height: 75px
+      width: 350px
+      display: inline-block
+      .svg &
+        background: image-url('logo.png') no-repeat center middle
+    .login-nav
+      display: inline-block
+      float: right
+      .nav-items
+        ul
+          li
+            float: left
+            list-style: none
+            line-height: 90px
+            text-align: center
+            a
+              text-decoration: none
+              color: #7b8288
+              font-size: 16px
+              margin-left: 40px
+            a:hover
+              color: $color-pomegranate
+            a.button-red
+              background: $color-pomegranate
+              color: white
+            a.button-account-nav
+              padding: 10px 15px
+              color: #ffffff
+              +border-radius(5px)
+
+              &:hover
+                background: #bf320d
+                color: #ccc
+
+
+
+
+
+

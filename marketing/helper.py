@@ -24,6 +24,7 @@ class Channel():
     PPTV = "pptv"
     #网利宝非用户邀请渠道
     WANGLIBAOOTHER = "wanglibao-other"
+    BAIDUSHOUJI = "baidushouji"
 
 
 
