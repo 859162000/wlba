@@ -84,7 +84,7 @@ html
                         //th(rowspan="1") 截止日期
                         //th(rowspan="1") 首笔投资最低额
                         //th(rowspan="1") 收益百分比
-                        //th(rowspan="1") 审核状态
+                        th(rowspan="1") 审核状态
                         //th(rowspan="1") 审核时间
                     tbody
                       if result
@@ -101,12 +101,16 @@ html
                             //td {{l.activity_end_at}}
                             //td {{l.activity_amount_min}}
                             //td {{l.percent_reward}}
-                            //td {{l.checked_status}}
+                            td {{l.get_checked_status_display}}
                             //td {{l.checked_at}}
                               .chart
                   form.form.span5(method="POST" action='/{{ "" | admin_address}}/statistics/introduced_by')
                     - csrf_token
                     .form-group
+                      input(type="hidden",name="start",value="{{start}}").input-sm.form-control
+                      input(type="hidden",name="end",value="{{end}}").input-sm.form-control
+                      input(type="hidden",name="amount_min",value="{{amount_min}}").input-sm.form-control
+                      input(type="hidden",name="percent",value="{{percent}}").input-sm.form-control
                       button(type="submit", name='check_ok', value='1').btn.btn-default.btn-cha2 审核通过
                       button(type="submit", name='check_no', value='2').btn.btn-default.btn-cha2 审核未通过
 

@@ -22,7 +22,10 @@ class BaeChannel:
     def pushIosMessage(self, userId, channelId, messages, msgKeys):
         if "type" not in messages:
             messages['type'] = "normal"
-        messages = json.dumps({"type":messages['type'], "aps": {"alert":messages['message'], "sound":"default", "badge":1}})
+        if "user_id" not in messages:
+            messages['user_id'] = 0
+        messages = json.dumps({"type":messages['type'],"user_id":messages['user_id'], 
+                            "aps": {"alert":messages['message'], "sound":"default", "badge":1}})
         return self._pushMsg(userId, channelId, messages, msgKeys, deviceType=4, message_type=1, ds=2)
 
     def _pushMsg(self, userId, channelId, messages, msgKeys, deviceType=3, message_type=0, ds=2):
