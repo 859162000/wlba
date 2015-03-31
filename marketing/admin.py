@@ -142,6 +142,7 @@ class IntroducedByRewardAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'introduced_by_person', 'product')
     fieldsets = [(None, {'fields': t},)]
     readonly_fields = t
+    ordering = ('id', 'created_at')
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
