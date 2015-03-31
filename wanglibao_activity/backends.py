@@ -85,30 +85,26 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
     #注册 或 实名认证
     if trigger_node in ('register', 'validation'):
         _send_gift(user, rule, device_type)
-    #充值 (pay, first_pay)
-    elif trigger_node in ('pay', 'first_pay'):
-        is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
-        if is_amount:
-            if trigger_node == 'first_pay':
-                #check first pay
-                if PayInfo.objects.filter(user=user, type='D',
-                                          update_time__gt=rule.activity.start_at,
-                                          status=PayInfo.SUCCESS).count() == 1:
-                    _send_gift(user, rule, device_type, amount)
-            if trigger_node == 'pay':
-                _send_gift(user, rule, device_type, amount)
-    #投资 (buy, first_buy)
-    elif trigger_node in ('buy', 'first_buy'):
-        is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
-        if is_amount:
-            if trigger_node == 'first_buy':
-                #check first pay
-                if P2PRecord.objects.filter(user=user,
-                                            create_time__gt=rule.activity.start_at).count() == 1:
-                    _send_gift(user, rule, device_type, amount)
-            if trigger_node == 'buy':
-                _send_gift(user, rule, device_type, amount)
-    #p2p audit
+    #首次充值
+    elif trigger_node == 'first_pay':
+        #check first pay
+        if PayInfo.objects.filter(user=user, type='D',
+                                  update_time__gt=rule.activity.start_at,
+                                  status=PayInfo.SUCCESS).count() == 1:
+            _send_gift(user, rule, device_type, amount)
+    #充值
+    elif trigger_node == 'pay':
+        _send_gift(user, rule, device_type, amount)
+    #首次购买
+    elif trigger_node == 'first_buy':
+        #check first pay
+        if P2PRecord.objects.filter(user=user,
+                                    create_time__gt=rule.activity.start_at).count() == 1:
+            _send_gift(user, rule, device_type, amount)
+    #购买
+    elif trigger_node == 'buy':
+        _send_gift(user, rule, device_type, amount)
+    #满标审核
     elif trigger_node == 'p2p_audit':
         #delay
         # _send_gift(user, rule, device_type)
