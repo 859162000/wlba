@@ -793,14 +793,14 @@ class MobileDownloadAPIView(APIView):
         channel = self.request.GET.get('channel', '')
         if channel and channel == 'weipai':
             if "HTTP_USER_AGENT" not in request.META:
-                return HttpResponseRedirect('https://www.wanglibao.com/static/weipai.apk')
+                return HttpResponseRedirect('https://www.wanglibao.com/static/wanglibao_weipai.apk')
 
             useragent = request.META['HTTP_USER_AGENT'].lower()
 
             if "iphone" in useragent or "ipad" in useragent:
                 return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
             else:
-                return HttpResponseRedirect('https://www.wanglibao.com/static/weipai.apk')
+                return HttpResponseRedirect('https://www.wanglibao.com/static/wanglibao_weipai.apk')
         else:
 
             if "HTTP_USER_AGENT" not in request.META:
