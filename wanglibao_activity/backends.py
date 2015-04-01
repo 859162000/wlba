@@ -69,7 +69,6 @@ def check_activity(user, trigger_node, device_type, amount=0):
                         if rule.is_introduced:
                             user_ib = _check_introduced_by(user)
                             if user_ib:
-                                logger.error("------------- user introduced by: yes ---------------")
                                 _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
                             else:
                                 continue
@@ -211,7 +210,7 @@ def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
     if reward:
         reward.is_used = True
         reward.save()
-        description = '>'.join([rtype, reward.type])
+        description = '=>'.join([rtype, reward.type])
         #记录奖品发放流水
         has_reward_record = _keep_reward_record(user, reward, description)
         if has_reward_record:
