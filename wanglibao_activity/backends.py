@@ -49,6 +49,8 @@ def check_activity(user, trigger_node, device_type, amount=0):
     #查询符合条件的活动
     activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False, channel=channel)\
                                     .filter(Q(platform=device_type) | Q(platform=u'all'))
+    logger.error('==================== start: activity_list ===================')
+    logger.error(activity_list.query)
     if activity_list:
         for activity in activity_list:
             #查询活动规则
@@ -61,6 +63,9 @@ def check_activity(user, trigger_node, device_type, amount=0):
             else:
                 activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node, is_used=True)
 
+            logger.error("=================== activity_rules ===================")
+            logger.error(activity_rules.query)
+
             if activity_rules:
                 for rule in activity_rules:
                     if not rule.gift_type:
@@ -69,6 +74,7 @@ def check_activity(user, trigger_node, device_type, amount=0):
                         if rule.is_introduced:
                             user_ib = _check_introduced_by(user)
                             if user_ib:
+                                logger.error("------------- user introduced by: yes ---------------")
                                 _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
                             else:
                                 return
@@ -91,18 +97,22 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
         if PayInfo.objects.filter(user=user, type='D',
                                   update_time__gt=rule.activity.start_at,
                                   status=PayInfo.SUCCESS).count() == 1:
+            logger.error('------------ first_pay -------------')
             _send_gift(user, rule, device_type, amount)
     #充值
     elif trigger_node == 'pay':
+        logger.error('------------ pay -------------')
         _send_gift(user, rule, device_type, amount)
     #首次购买
     elif trigger_node == 'first_buy':
         #check first pay
         if P2PRecord.objects.filter(user=user,
                                     create_time__gt=rule.activity.start_at).count() == 1:
+            logger.error('------------ first_buy ------------------')
             _send_gift(user, rule, device_type, amount)
     #购买
     elif trigger_node == 'buy':
+        logger.error('------------- buy --------------')
         _send_gift(user, rule, device_type, amount)
     #满标审核
     elif trigger_node == 'p2p_audit':
@@ -122,8 +132,10 @@ def _send_gift(user, rule, device_type, amount=0):
         reward_name = rule.reward
         if amount and amount > 0:
             if is_amount:
+                logger.error('---------- reward: amount:True ----------')
                 _send_gift_reward(user, rule, rtype, reward_name, device_type)
         else:
+            logger.error('---------- reward: amount:False ----------')
             _send_gift_reward(user, rule, rtype, reward_name, device_type)
 
     #送红包
@@ -133,16 +145,20 @@ def _send_gift(user, rule, device_type, amount=0):
         #send to
         if amount and amount > 0:
             if is_amount:
+                logger.error('---------- red pack: amount:True ----------')
                 _send_gift_redpack(user, rule, rtype, redpack_id, device_type)
         else:
+            logger.error('---------- red pack: amount:False ----------')
             _send_gift_redpack(user, rule, rtype, redpack_id, device_type)
     #送现金或收益
     if rule.gift_type == 'income':
         #send to
         if amount and amount > 0:
             if is_amount:
+                logger.error('---------- income: amount:True ----------')
                 _send_gift_income(user, rule)
         else:
+            logger.error('---------- income: amount:False ----------')
             _send_gift_income(user, rule)
 
     #送话费
@@ -150,8 +166,10 @@ def _send_gift(user, rule, device_type, amount=0):
         #send to
         if amount and amount > 0:
             if is_amount:
+                logger.error('---------- phone fare: amount:True ----------')
                 _send_gift_phonefare(user, rule)
         else:
+            logger.error('---------- phone fare: amount:False ----------')
             _send_gift_phonefare(user, rule)
 
 
@@ -208,6 +226,8 @@ def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
                                    is_used=False,
                                    end_time__gte=now).first()
     if reward:
+        logger.error('---------- log reward sql----------')
+        logger.error(reward.query)
         reward.is_used = True
         reward.save()
         description = '>'.join([rtype, reward.type])
