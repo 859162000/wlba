@@ -3,7 +3,6 @@
 
 
 import time
-import datetime
 from django.contrib.auth.models import User
 from wanglibao.celery import app
 from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type, UserPushId
@@ -49,9 +48,11 @@ def list_msg(params, user):
     else:
         msgs = Message.objects.filter(target_user=user)[(pagenum-1)*pagesize:pagenum*pagesize]
     rs = []
+    mt = dict(message_type)
     for x in msgs:
         rs.append({"id":x.id, "title":x.message_text.title, "content":x.message_text.content, 
-                    "timestamp":datetime.datetime.fromtimestamp(x.message_text.created_at), "read_status":x.read_status})
+                    "mtype":mt[x.message_text.mtype],
+                    "created_at":time.strftime("%Y-%m-%d", time.localtime(x.message_text.created_at)), "read_status":x.read_status})
     return {"ret_code":0, "message":"ok", "data":rs}
 
 def sign_read(user, message_id):
@@ -81,7 +82,7 @@ def create(title, content, mtype):
     msgTxt.save()
     return msgTxt
     
-def _send(target_user, msgTxt):
+def _send(target_user, msgTxt, push_type):
     msg = Message()
     msg.target_user = target_user
     msg.message_text = msgTxt
@@ -94,7 +95,7 @@ def _send(target_user, msgTxt):
         if devices:
             channel = bae_channel.BaeChannel()
             msg_key = "wanglibao_%s" % time.time()
-            message = {"message":msgTxt.content}
+            message = {"message":msgTxt.content, "user_id":target_user.id, "type":push_type}
             for d in devices:
                 if d.device_type in ("ios", "iPhone", "iPad"):
                     res, cont = channel.pushIosMessage(d.push_user_id, d.push_channel_id, message, msg_key)
@@ -105,7 +106,7 @@ def _send(target_user, msgTxt):
     msg.save()
     return True
 
-def _send_batch(user_objs, msgTxt):
+def _send_batch(user_objs, msgTxt, push_type):
     #notice_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype)
     msg_list = list()
     for user_obj in user_objs:
@@ -124,11 +125,12 @@ def _send_batch(user_objs, msgTxt):
 
     channel = bae_channel.BaeChannel()
     msg_key = "wanglibao_%s" % time.time()
-    message = {"message": msgTxt.content}
+    message = {"message": msgTxt.content, "type":push_type}
 
     for device in devices:
         # notice = True
         #不管有没有设置，默认都发推送
+        message['user_id'] = device.user.id
 
         if device.device_type in ("ios", "iPhone", "iPad"):
             res, cont = channel.pushIosMessage(device.push_user_id, device.push_channel_id, message, msg_key)
@@ -187,7 +189,7 @@ def send_all(msgTxt_id):
     return "send to all ok"
 
 @app.task
-def send_one(user_id, title, content, mtype):
+def send_one(user_id, title, content, mtype, push_type="in"):
     """
         给某个人发送站内信（需要推送时也在这里写）
     """
@@ -198,11 +200,11 @@ def send_one(user_id, title, content, mtype):
     user = User.objects.filter(pk=user_id).first()
     if not user:
         return False
-    _send(user, msgTxt)
+    _send(user, msgTxt, push_type)
     return True
 
 @app.task
-def send_batch(users, title=None, content=None, mtype=None, msgTxt=None):
+def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_type="in"):
     """
         批量发送站内信, users is a user_id list.
     """
@@ -219,5 +221,5 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None):
     #         continue
     #     _send(user, msgTxt)
 
-    _send_batch(user_objs, msgTxt)
+    _send_batch(user_objs, msgTxt, push_type)
     return True
