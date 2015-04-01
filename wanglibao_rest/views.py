@@ -790,15 +790,29 @@ class MobileDownloadAPIView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        if "HTTP_USER_AGENT" not in request.META:
-            return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
+        channel = self.request.GET.get('channel', '')
+        if channel and channel == 'weipai':
+            if "HTTP_USER_AGENT" not in request.META:
+                return HttpResponseRedirect('https://www.wanglibao.com/static/weipai.apk')
 
-        useragent = request.META['HTTP_USER_AGENT'].lower()
+            useragent = request.META['HTTP_USER_AGENT'].lower()
 
-        if "iphone" in useragent or "ipad" in useragent:
-            return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
+            if "iphone" in useragent or "ipad" in useragent:
+                return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
+            else:
+                return HttpResponseRedirect('https://www.wanglibao.com/static/weipai.apk')
         else:
-            return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
+
+            if "HTTP_USER_AGENT" not in request.META:
+                return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
+
+            useragent = request.META['HTTP_USER_AGENT'].lower()
+
+            if "iphone" in useragent or "ipad" in useragent:
+                return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
+            else:
+                return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
+
 
 class KuaipanPurchaseListAPIView(APIView):
     permission_classes = ()
