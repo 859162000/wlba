@@ -9,7 +9,16 @@ import pytz
 REPAYMENT_MONTHLY = 'monthly'
 REPAYMENT_DAILY = 'daily'
 def get_payment_history(p2p, date, repayment_type):
-
+    """
+            #1. 拿到当期未还款计划
+            #1.11 如果是按期提前还款
+            #1.12 利息 = 当期利息
+            #1.21 如果是按日提前还款
+            #1.22 利息 = 当期利息 -  未计利息(年利率/360*未计息天数)
+            #2. 拿到此标的年华收益
+            #3. 计算日收益
+            #4. 计算当期未计息天数
+    """
 
     next_term_date = date + relativedelta(months=1)
     amortizations = ProductAmortization.objects.filter(product=p2p)
