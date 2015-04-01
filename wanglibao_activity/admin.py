@@ -22,12 +22,20 @@ class ActivityRuleAdmin(admin.ModelAdmin):
 
 
 class ActivityRecordAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'activity', 'rule', 'platform', 'trigger_node', 'msg_type', \
-                    'send_type', 'description', 'user', 'income', 'created_at')
+                    'send_type', 'description', 'user', 'income', 'trigger_at')
     list_filter = ('platform', 'trigger_node', 'msg_type', 'send_type',)
     search_fields = ('activity__name', 'rule__rule_name', 'user__wanglibaouserprofile__phone')
 
+    def __init__(self, *args, **kwargs):
+        super(ActivityRecordAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None, )
+
     def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
         return False
 
 
