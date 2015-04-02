@@ -48,34 +48,30 @@ def check_activity(user, trigger_node, device_type, amount=0):
     channel = helper.which_channel(user)
     #查询符合条件的活动
     activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False, channel=channel)\
-                                    .filter(Q(platform=device_type) | Q(platform=u'all'))
+                                    .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
     if activity_list:
         for activity in activity_list:
             #查询活动规则
             if trigger_node == 'invest':
                 activity_rules = ActivityRule.objects.filter(activity=activity,  is_used=True)\
-                    .filter(Q(trigger_node='buy') | Q(trigger_node='first_buy'))
+                    .filter(Q(trigger_node='buy') | Q(trigger_node='first_buy')).order_by('-id')
             elif trigger_node == 'recharge':
                 activity_rules = ActivityRule.objects.filter(activity=activity,  is_used=True) \
-                    .filter(Q(trigger_node='pay') | Q(trigger_node='first_pay'))
+                    .filter(Q(trigger_node='pay') | Q(trigger_node='first_pay')).order_by('-id')
             else:
-                activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node, is_used=True)
+                activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node, \
+                                                             is_used=True).order_by('-id')
 
             if activity_rules:
                 for rule in activity_rules:
-                    if not rule.gift_type:
-                        continue
-                    else:
-                        if rule.is_introduced:
-                            user_ib = _check_introduced_by(user)
-                            if user_ib:
-                                _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
-                            else:
-                                return
-                        else:
+                    if rule.is_introduced:
+                        user_ib = _check_introduced_by(user)
+                        if user_ib:
                             _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
+                    else:
+                        _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
             else:
-                return
+                continue
     else:
         return
 
@@ -210,7 +206,7 @@ def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
     if reward:
         reward.is_used = True
         reward.save()
-        description = '>'.join([rtype, reward.type])
+        description = '=>'.join([rtype, reward.type])
         #记录奖品发放流水
         has_reward_record = _keep_reward_record(user, reward, description)
         if has_reward_record:

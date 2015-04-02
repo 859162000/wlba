@@ -199,7 +199,7 @@ def register_ok(user_id, device_type):
     #活动检测
     activity_backends.check_activity(user, 'register', device_type)
     #注册红包
-    # redpack_backends.give_register_redpack(user, device_type)
+    redpack_backends.give_register_redpack(user, device_type)
 
 #实名认证
 @app.task
