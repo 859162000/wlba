@@ -37,7 +37,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
 
     e.preventDefault()
 
-    phoneNumber = $("#id_identifier").val().trim()
+    phoneNumber = $.trim($("#id_identifier").val())
     if checkMobile(phoneNumber)
       if console?
         console.log "Phone number checked, now send the validation code"
@@ -157,7 +157,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
 
   $(".voice").on 'click', '.voice-validate', (e)->
     e.preventDefault()
-    isMobile = checkMobile($("#id_identifier").val().trim())
+    isMobile = checkMobile($.trim($("#id_identifier").val()))
     if !isMobile
       $("#id_type").val "phone"
       $("#validate-code-container").show()
@@ -173,7 +173,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       url: url
       type: "POST"
       data: {
-        phone: $("#id_identifier").val().trim()
+        phone: $.trim($("#id_identifier").val())
       }
     .success (json)->
       if(json.ret_code == 0)
