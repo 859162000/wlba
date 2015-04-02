@@ -158,7 +158,6 @@
         },
         password: {
           required: '不能为空',
-
           maxlength: '密码不能超过20位'
         },
         password2: {
@@ -173,22 +172,28 @@
         return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
       },
       submitHandler: function(form) {
-        $('input[name="idenHtifier"]').trigger('keyup');
-        return $.ajax({
-          url: $(form).attr('action'),
-          type: "POST",
-          data: $(form).serialize()
-        }).done(function(data, textStatus) {
-          return window.location.href='/accounts/home/';
-        }).fail(function(xhr) {
-          var error_message, message, result;
-          result = JSON.parse(xhr.responseText);
-          message = result.message;
-          error_message = _.chain(message).pairs().map(function(e) {
-            return e[1];
-          }).flatten().value();
-          return alert(error_message);
-        });
+        if ($('#reg_password').val()==$('#reg_password2').val()){
+          $('input[name="idenHtifier"]').trigger('keyup');
+          return $.ajax({
+            url: $(form).attr('action'),
+            type: "POST",
+            data: $(form).serialize()
+          }).done(function(data, textStatus) {
+            return window.location.href='/accounts/home/';
+          }).fail(function(xhr) {
+            var error_message, message, result;
+            result = JSON.parse(xhr.responseText);
+            message = result.message;
+            error_message = _.chain(message).pairs().map(function(e) {
+              return e[1];
+            }).flatten().value();
+            return alert(error_message);
+          });
+        }else{
+          var txt='密码不一致';
+          $('#reg_password2').focus();
+        }
+
       }
     });
     $('input, textarea').placeholder();
