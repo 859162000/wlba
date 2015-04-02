@@ -21,6 +21,7 @@ import xml.etree.ElementTree as ET
 #from wanglibao_sms import messages
 #from django.utils import timezone
 #from wanglibao_account import message as inside_message
+from wanglibao_rest.utils import split_ua
 
 logger = logging.getLogger(__name__)
 
@@ -275,7 +276,8 @@ class HuifuPay(Pay):
         pay_info.save()
 
         if flag:
-            tools.despoit_ok(pay_info)
+            device = split_ua(request)
+            tools.despoit_ok(pay_info, device['device_type'])
             """
             # 迅雷活动, 12.8 首次充值
             start_time = timezone.datetime(2014, 12, 7)
