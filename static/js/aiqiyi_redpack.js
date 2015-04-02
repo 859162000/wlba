@@ -29,17 +29,24 @@
       newUrl:[{"x":"10px","y":"-63px"},{"x":"10px","y":"-207px"},{"x":"12px","y":"-350px"},{"x":"10px","y":"-495px"},{"x":"10px","y":"-637px"}],
       $float: $(".circle-float"),
       initIndex: null,
+      Timer: null,
       init:function(){
          var that = this;
          var isHover = false,setTimeHover;
          $(".circle").hover(function(){
+              clearTimeout(that.Timer)
               that.initIndex = $(this).index()/2-1
               var imgUrl = "/static/images/pptv/"+that.dataImg[that.initIndex]+".jpg"
               that.$float.find("img").attr("src",imgUrl)
               $(".circle").find(".circle-body").removeAttr("style")
               that.$float.show()
-          })
+          },function(){
+               that.Timer=setTimeout(function(){
+                 that.$float.hide()
+               },800)
+         })
           $(".circle-float").hover(function(){
+              clearTimeout(that.Timer)
               isHover = true;
           },function(){
               isHover &&  that.close()
@@ -114,8 +121,9 @@
         }
       }
     });
-    $.validator.addMethod("emailOrPhone", function(value, element) {
-      return backend.checkEmail(value) || backend.checkMobile(value);
+
+    $.validator.addMethod("passwordequal", function(value, element) {
+      return value === $('#reg_password').val();
     });
 
     $('#register-modal-form').validate({
@@ -133,7 +141,8 @@
           maxlength: 20
         },
         password2: {
-          equalTo: "#reg_password"
+          passwordequal: true,
+          required: true
         },
         agreement: {
           required: true
@@ -149,11 +158,12 @@
         },
         password: {
           required: '不能为空',
-          minlength: $.format("密码需要最少{0}位"),
+
           maxlength: '密码不能超过20位'
         },
         password2: {
-          equalTo: '密码不一致'
+          passwordequal: '密码不一致',
+          required: '不能为空'
         },
         agreement: {
           required: '请勾选注册协议'
@@ -163,7 +173,7 @@
         return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
       },
       submitHandler: function(form) {
-        $('input[name="identifier"]').trigger('keyup');
+        $('input[name="idenHtifier"]').trigger('keyup');
         return $.ajax({
           url: $(form).attr('action'),
           type: "POST",
@@ -283,7 +293,7 @@
       } else if (complexity < 60) {
         container.removeClass('low');
         container.removeClass('strong');
-        return container.addClass('soso');
+        return container.addClass('trimsoso');
       } else {
         container.removeClass('low');
         container.removeClass('soso');
@@ -356,17 +366,17 @@
       e.preventDefault();
       return $('.login-modal').trigger('click');
     });
-    $("input:password").bind("copy cut paste", function(e) {
-      var element;
-      element = this;
-      return setTimeout((function() {
-        var text;
-        text = $(element).val();
-        if (!/[^\u4e00-\u9fa5]+/ig.test(text) || /\s+/ig.test(text)) {
-          $(element).val('');
-        }
-      }), 100);
-    });
+//    $("input:password").bind("copy cut paste", function(e) {
+//      var element;
+//      element = this;
+//      return setTimeout((function() {
+//        var text;
+//        text = $(element).val();
+//        if (!/[^\u4e00-\u9fa5]+/ig.test(text) || /\s+/ig.test(text)) {
+//          $(element).val('');
+//        }
+//      }), 100);
+//    });
     msg_count = $('#message_count').html();
     if (msg_count > 0) {
       backend.loadMessageCount('unread').done(function(data) {
@@ -380,7 +390,7 @@
     return $(".voice").on('click', '.voice-validate', function(e) {
       var element, isMobile, url;
       e.preventDefault();
-      isMobile = checkMobile($("#reg_identifier").val().trim());
+      isMobile = checkMobile($.trim($("#reg_identifier").val()));
       if (!isMobile) {
         $("#id_type").val("phone");
         $("#validate-code-container").show();
@@ -395,7 +405,7 @@
         url: url,
         type: "POST",
         data: {
-          phone: $("#reg_identifier").val().trim()
+          phone: $.trim($("#reg_identifier").val())
         }
       }).success(function(json) {
         var button, count, intervalId, timerFunction;
