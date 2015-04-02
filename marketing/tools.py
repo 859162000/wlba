@@ -127,6 +127,7 @@ def decide_first(user_id, amount, device_type='pc'):
             rs.reward_user(u'一个月风行会员')
     elif channel == helper.Channel.JIUXIAN:
         #酒仙网
+        start_time = timezone.datetime(2014, 12, 18)
         if amount >= 500:
             if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
                 return

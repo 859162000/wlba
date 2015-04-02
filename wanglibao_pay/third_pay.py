@@ -31,6 +31,7 @@ from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5 as pk
 from Crypto.Cipher import PKCS1_v1_5, AES
 import base64
+from wanglibao_rest.utils import split_ua
 
 logger = logging.getLogger(__name__)
 
@@ -300,7 +301,8 @@ class YeePay:
 
         pay_info.save()
         if rs['ret_code'] == 0:
-            tools.despoit_ok(pay_info)
+            device = split_ua(request)
+            tools.despoit_ok(pay_info, device['device_type'])
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
@@ -691,7 +693,9 @@ class KuaiPay:
                     pay_info.response = res.content
                     pay_info.save()
                     return {"ret_code":201181, "message":result['message']}
-                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content)
+                device = split_ua(request)
+                device_type = device['device_type']
+                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
                 return ms
             else:
                 token = self._handle_dynnum_result(res)
@@ -748,11 +752,13 @@ class KuaiPay:
             return {"ret_code":201241, "message":result['message']}
         elif result['ret_code'] > 0:
             return {"ret_code":20124, "message":result['message']}
-        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content)
+        device = split_ua(request)
+        device_type = device['device_type']
+        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
         return ms
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content):
+    def handle_margin(self, amount, order_id, user_id, ip, response_content, device_type):
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info:
             return {"ret_code":20131, "message":"order not exist"}
@@ -796,7 +802,7 @@ class KuaiPay:
            #         card.user = pay_info.user
            #         card.is_default = False
            #         card.save()
-            tools.despoit_ok(pay_info)
+            tools.despoit_ok(pay_info, device_type)
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
