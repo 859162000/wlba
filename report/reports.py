@@ -300,7 +300,7 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
         output = cStringIO.StringIO()
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
-                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号', u'备注'])
+                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号', u'备注', u'借款企业/个人'])
 
         amortizations = ProductAmortization.objects.filter(
             term_date__gte=start_time, term_date__lt=end_time, product__status=u'还款中', settled=False)
@@ -319,7 +319,8 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
                 str(amortization.interest),
                 u'待还',
                 unicode("wanglibao_cphkjl_" + str(amortization.id)),
-                amortization.product.warrant_company.name
+                amortization.product.warrant_company.name,
+                amortization.product.brief
             ])
         return output.getvalue()
 

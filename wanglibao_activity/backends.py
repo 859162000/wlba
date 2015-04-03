@@ -64,17 +64,12 @@ def check_activity(user, trigger_node, device_type, amount=0):
 
             if activity_rules:
                 for rule in activity_rules:
-                    if not rule.gift_type:
-                        continue
-                    else:
-                        if rule.is_introduced:
-                            user_ib = _check_introduced_by(user)
-                            if user_ib:
-                                _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
-                            else:
-                                continue
-                        else:
+                    if rule.is_introduced:
+                        user_ib = _check_introduced_by(user)
+                        if user_ib:
                             _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
+                    else:
+                        _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
             else:
                 continue
     else:
