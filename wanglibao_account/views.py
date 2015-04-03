@@ -410,6 +410,31 @@ class AccountHomeAPIView(APIView):
 
         return Response(res)
 
+
+class AccountInviteView(TemplateView):
+    template_name = 'invite.jade'
+
+    def get_context_data(self, **kwargs):
+
+        friends = IntroducedBy.objects.filter(introduced_by=self.request.user)
+        friends_list = []
+        friends_list.extend(friends)
+
+        limit = 10
+        paginator = Paginator(friends_list, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            friends_list = paginator.page(page)
+        except PageNotAnInteger:
+            friends_list = paginator.page(1)
+        except Exception:
+            friends_list = paginator.page(paginator.num_pages)
+        return {
+            'friends': friends_list
+        }
+
+
 class AccountInviteAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 

@@ -12,7 +12,7 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransactionDeposit, AccountRedPacket,
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
                    Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailAPIView, MessageCountAPIView,
-                   MessageListAPIView, AccountRepayment, AddressView)#, CjdaoApiView)
+                   MessageListAPIView, AccountRepayment, AddressView, AccountInviteView)#, CjdaoApiView)
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -43,7 +43,7 @@ urlpatterns = patterns(
     url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/login/')),
     url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
 
-    url(r'^invite/$', login_required(TemplateView.as_view(template_name='invite.jade'), login_url='/accounts/login/')),
+    url(r'^invite/$', login_required(AccountInviteView.as_view(), login_url='/accounts/login/')),
 
     url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
 
