@@ -83,7 +83,9 @@ class P2PProductSerializer(ModelSerializerExtended):
         if not self.request.user.is_authenticated():
             for section_key in extra_data:
                 for item_key in extra_data[section_key]:
-                    if item_key:
+                    if not item_key:
+                        extra_data[section_key][section_key] = u'请登录后查看'
+                    else:
                         extra_data[section_key][item_key] = u'请登录后查看'
 
         return extra_data
