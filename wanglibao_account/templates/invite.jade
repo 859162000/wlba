@@ -66,6 +66,30 @@ block main
             a.wlb_qzone(href="#",title="分享到QQ空间")
               span.icon.icon-invite-qzone
               i QQ空间
+  .account-home-panel
+    h3.border-b 邀请列表
+    table.table.margin-top-m
+      thead
+        tr
+          th 用户名
+          th 手机号
+          th 好友注册时间
+       body
+        for friend in friends
+          tr
+            td
+              is_valid = friend.user.wanglibaouserprofile.id_is_valid
+              if is_valid
+                | {{friend.user.wanglibaouserprofile.name | safe_name}}
+              else
+                | 未认证
+            td {{friend.user.wanglibaouserprofile.phone | safe_phone_new}}
+            td {{friend.created_at}}
+    .row
+      - with data=friends uri='/accounts/invite/'
+      include include/pager
+      - endwith
+
   script(src="/static/js/lib/jquery.min.js")
   script(src="/static/js/lib/jquery.zclip.min.js")
   script(src="/static/js/lib/jquery.modal.min.js")
