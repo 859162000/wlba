@@ -185,8 +185,8 @@ class P2PProductResource(resources.ModelResource):
 
 
 class P2PProductForm(forms.ModelForm):
-    serial_number = forms.CharField(label=u'产品编号*', required=True)
-
+    serial_number = forms.CharField(label=u'产品编号*', required=True, max_length=100, widget=forms.TextInput(attrs={'class': 'vTextField'}))
+    
     class Meta:
         model = P2PProduct
     
