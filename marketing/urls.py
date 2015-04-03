@@ -34,7 +34,6 @@ urlpatterns = patterns(
     url(r'^xunleiredpack/$', TemplateView.as_view(template_name="xunleiredpack2.jade")),
     url(r'^activityTime/$', TemplateView.as_view(template_name="activityTime.jade")),
     url(r'^activityTop', TemplateView.as_view(template_name="include/activityLogin.jade")),
-    url(r'^activitylx', TemplateView.as_view(template_name="lx.jade")),
 )
 
 urlpatterns += patterns(
