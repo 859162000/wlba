@@ -190,7 +190,6 @@
             return alert(error_message);
           });
         }else{
-          var txt='密码不一致';
           $('#reg_password2').focus();
         }
 
