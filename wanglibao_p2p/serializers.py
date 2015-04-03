@@ -80,12 +80,20 @@ class P2PProductSerializer(ModelSerializerExtended):
 
         extra_data = json.loads(value, object_pairs_hook=OrderedDict)
 
+        is_login = True
         if not self.request.user.is_authenticated():
-            for section_key in extra_data:
-                for item_key in extra_data[section_key]:
-                    if not item_key:
+            is_login = False
+
+        for section_key in extra_data:
+            for item_key in extra_data[section_key]:
+                if not item_key:
+                    if not is_login:
                         extra_data[section_key][section_key] = u'请登录后查看'
+                        del extra_data[section_key][item_key]
                     else:
+                        extra_data[section_key][section_key] = extra_data[section_key][item_key]
+                else:
+                    if not is_login:
                         extra_data[section_key][item_key] = u'请登录后查看'
 
         return extra_data
