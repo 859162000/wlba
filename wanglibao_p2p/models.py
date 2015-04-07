@@ -651,7 +651,7 @@ def process_after_money_paided(product):
 
 
 def post_save_process(sender, instance, **kwargs):
-    #generate_amortization_plan(sender, instance, **kwargs)
+    generate_amortization_plan(sender, instance, **kwargs)
     next_step(sender, instance, **kwargs)
     process_after_money_paided(instance)
 

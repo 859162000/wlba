@@ -327,6 +327,8 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
     list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled',
                     'settlement_time', 'created_time', 'status', 'description', )
 
+    search_fields = ('product__name', 'product__serial_number')
+
     def status(self, obj):
         if obj.product:
             status = obj.product.status
