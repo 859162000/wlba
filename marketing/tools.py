@@ -19,6 +19,7 @@ from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
+from datetime import datetime
 
 #购买判断，第一次，第二次以后
 @app.task
@@ -50,6 +51,10 @@ def decide_first(user_id, amount, device_type='pc'):
         invited_id = introduced_by.user.id
         if amount >= 200:
             start_time = timezone.datetime(2014, 9, 1)
+            end_time = timezone.datetime(2015, 4, 8)
+            now = datetime.now()
+            if now > end_time:
+                return
             if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
                 return
 
@@ -83,34 +88,6 @@ def decide_first(user_id, amount, device_type='pc'):
                     RewardRecord.objects.create(user=introduced_by.user, reward=rwd, description=content2)
                 except Exception, e:
                     print(e)
-        return
-    elif channel == helper.Channel.WANGLIBAOOTHER:
-        if amount < 200:
-            return
-
-        start_time = timezone.datetime(2015, 3, 20)
-        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
-            return
-
-        phone = user.wanglibaouserprofile.phone
-        send_messages.apply_async(kwargs={
-            "phones": [phone],
-            "messages": [messages.gift_first_buy(money=30)]
-        })
-        title, content = messages.msg_first_buy()
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": user.id,
-            "title": title,
-            "content": content,
-            "mtype": "activity"
-        })
-        rwd = Reward.objects.filter(type=u'30元话费').first()
-        if not rwd:
-            return
-        try:
-            RewardRecord.objects.create(user=user, reward=rwd, description=content)
-        except Exception, e:
-            print(e)
         return
 
     # 判断来源
@@ -199,8 +176,6 @@ def register_ok(user_id, device_type):
     })
     #活动检测
     activity_backends.check_activity(user, 'register', device_type)
-    #注册红包
-    redpack_backends.give_register_redpack(user, device_type)
 
 #实名认证
 @app.task

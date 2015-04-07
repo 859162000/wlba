@@ -59,13 +59,16 @@ def sign_read(user, message_id):
     """
         标记消息已读
     """
-    msg = Message.objects.filter(target_user=user).filter(pk=message_id).first()
-    if msg and msg.read_status == False:
-        msg.read_status = True
-        msg.read_at = long(time.time())
-        msg.save()
-    elif not msg:
-        return {"ret_code":30091, "message":"消息不存在"}
+    if int(message_id) == 0:
+        Message.objects.filter(target_user=user, read_status=False).update(read_status=True, read_at=long(time.time()))
+    else:
+        msg = Message.objects.filter(target_user=user).filter(pk=message_id).first()
+        if msg and msg.read_status == False:
+            msg.read_status = True
+            msg.read_at = long(time.time())
+            msg.save()
+        elif not msg:
+            return {"ret_code":30091, "message":"消息不存在"}
     return {"ret_code":0, "message":"ok"}
 
 def create(title, content, mtype):
