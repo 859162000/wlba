@@ -48,7 +48,7 @@ class BannerViewSet(APIView):
             if device_t == "mobile":
                 if not x.alt:
                     result.append(obj)
-                elif x.alt == device['channel_id']:
+                elif 'channel_id' in device and x.alt == device['channel_id']:
                     result.append(obj)
             else:
                 result.append(obj)
