@@ -9,7 +9,8 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AccountFundAssetAPI,
                             P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
                             AdminSendMessageAPIView, AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
-                            AddressGetAPIView, AccountInviteAPIView)
+                            AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
+                            MessageCountAPIView, MessageDetailAPIView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -21,7 +22,7 @@ from wanglibao_fund.views import FundViewSet, FundIssuerViewSet
 from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTrustViewSet, \
     MobileHotFundViewSet, MobileMainPageViewSet, MobileMainPageP2PViewSet
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
-    P2PProductDetailView
+    P2PProductDetailView, RepaymentAPIView
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
@@ -37,7 +38,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
-                            DepositGateAPIView)
+                            DepositGateAPIView, PushTestView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
@@ -163,10 +164,16 @@ urlpatterns = patterns(
     url(r'^redpacket/exchange/$', RedPacketChangeAPIView.as_view()),
     url(r'^redpacket/deduct/$', RedPacketDeductAPIView.as_view()),
 
+    url(r'^message/count/$', MessageCountAPIView.as_view()),
+    url(r'^message/(?P<message_id>\d+)/$', MessageDetailAPIView.as_view()), 
+    url(r'^message/list/$', MessageListAPIView.as_view()),
+
     url(r'^address/$', AddressAPIView.as_view()),
     url(r'^address/list/$', AddressListAPIView.as_view()),
     url(r'^address/(?P<address_id>\d+)/$', AddressGetAPIView.as_view()),
     url(r'^address/delete/$', AddressDeleteAPIView.as_view()),
+
+    url(r'^repayment/$', RepaymentAPIView.as_view()),
 )
 
 urlpatterns += patterns('',

@@ -4,9 +4,6 @@
 doctype html
 html
   head
-    - with '网利宝' as title
-    include include/common_head
-    - endwith
     title 满就送
     meta(http-equiv="content-type", content="text/html; charset=utf-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
@@ -14,18 +11,34 @@ html
     meta(name="keywords", content="迅雷,网利宝,狂欢节")
     meta(name="description", content="迅雷+网利宝狂欢节，错过绝对会后悔”")
     link(href="/static/stylesheets/screen.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(rel="stylesheet",href="/static/stylesheets/full.css")
   body
-    //include include/header
-    //- with '首页' as activeItem
-    //include include/navigation
-    //- endwith
-
-    .container-login-nav(style="padding-left:20px")
-      a(href='/')
-        .logo
-      .login-nav(style="padding:25px 20px 0 0")
-        include include/nav_common
-
+    .act-full-container
+      .act-topbar
+        .container.row
+          .act-user-div
+            i.act-icon-phone.font-l &nbsp;
+            span 客服热线：
+            span 4008-588-066
+            span.act-margin-left-m 关注我们：
+            a.topbar-anchor.act-icon.act-icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
+            a.topbar-anchor.act-icon.act-icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
+            a#qrweibo-top.act-weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
+              img(src="/static/images/weibo-nqr.png")
+            img#qrcode-top.act-icon.act-weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none", data-name="hoverbox")
+            span.act-mobile-app-top
+              span.act-icon.act-icon-mobile-app
+              span 手机网利宝
+              .act-mobile-app-top-prompt
+                div(style="height:30px; top:-20px; position:relative;")
+                a.act-mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+                a.act-mobile-app-android(href="https://www.wanglibao.com/static/wanglibao1.apk", title="Android版")
+    .activity-nav
+      .act-container-login-nav
+        a(href='/')
+          .act-logo
+        .login-nav
+          include include/nav_common
     .kuaipan-container
       .gold
         a(href="/#p2p")
@@ -45,7 +58,7 @@ html
           .row.gold-row
            .span3
               dl.full-jiang
-                span.full-huangtou
+                span.full-huang
                 h3.full-h 单日投资200万
                 dt.full-com.full-one
                 dd
@@ -127,3 +140,35 @@ html
                   span.highlight kefu@wanglibank.com
           .gold-version
         include include/tracking
+  script(src="/static/js/lib/jquery.min.js")
+  script.
+    $('.act-mobile-app-top').bind('mouseenter', function(e) {
+      return $('.act-mobile-app-top-prompt').show();
+    }).bind('mouseleave', function(e) {
+      return $('.act-mobile-app-top-prompt').hide();
+    });
+    $('.act-mobile-app-top-prompt').bind('mouseenter', function(e) {
+      return $(this).show();
+    }).bind('mouseleave', function(e) {
+      return $(this).hide();
+    });
+    $('.act-icon-weixin').bind('mouseenter',function(){
+      $('#qrcode-top').show();
+    }).bind('mouseleave',function(){
+      $('#qrcode-top').hide();
+    })
+    $('#qrcode-top').bind('mouseenter', function(e) {
+      return $(this).show();
+    }).bind('mouseleave', function(e) {
+      return $(this).hide();
+    });
+    $('.act-icon-weibo').bind('mouseenter',function(){
+      $('#qrweibo-top').show();
+    }).bind('mouseleave',function(){
+      $('#qrweibo-top').hide();
+    })
+    $('#qrweibo-top').bind('mouseenter', function(e) {
+      return $(this).show();
+    }).bind('mouseleave', function(e) {
+      return $(this).hide();
+    });

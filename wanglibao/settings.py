@@ -359,6 +359,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
+        'wanglibao_activity': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
         'p2p': {
             'handlers': ['file'],
             'level': 'DEBUG',

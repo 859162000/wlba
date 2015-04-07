@@ -168,7 +168,11 @@ class RegisterAPIView(APIView):
         if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30015, "message": u"该手机号已经注册"})
 
+        device = split_ua(request)
         invite_code = request.DATA.get('invite_code', "")
+        if not invite_code and device['channel_id'] == "baidu":
+            invite_code = "baidushouji"
+
         if invite_code:
             try:
                 record = Channels.objects.filter(code=invite_code).first()
@@ -186,7 +190,6 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
-        device = split_ua(request)
         tools.register_ok.apply_async(kwargs={"user_id": user.id, "device_type":device['device_type']})
         # save client info
         save_client(request, phone=identifier, action=0)
@@ -278,14 +281,16 @@ class PushTestView(APIView):
         #push_user_id = request.GET.get("push_user_id", "921913645184221981")
         #push_channel_id = request.GET.get("push_channel_id", "4922700431463139292")
 
-        push_user_id = request.GET.get("push_user_id", "781430269530794382")
-        push_channel_id = request.GET.get("push_channel_id", "5422135652350005874")
+
+        push_user_id = request.GET.get("push_user_id", "1033966060923467900")
+        push_channel_id = request.GET.get("push_channel_id", "4138455529717951568")
         from wanglibao_sms import bae_channel
 
         channel = bae_channel.BaeChannel()
-        message = {"message": "push Test"}
+        message = {"message": "push Test", "user_id":1, "type":"in"}
         msg_key = "wanglibao_staging"
-        res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
+        #res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
+        res, cont = channel.pushAndroidMessage(push_user_id, push_channel_id, message, msg_key)
         return Response({"ret_code": 0, "message": cont})
 
 
@@ -295,7 +300,7 @@ class IdValidateAPIView(APIView):
     def post(self, request):
         name = request.DATA.get("name", "").strip()
         id_number = request.DATA.get("id_number", "").strip()
-        device_type = split_ua(request)
+        device = split_ua(request)
 
         if not name or not id_number:
             return Response({"ret_code": 30051, "message": u"信息输入不完整"})
@@ -330,7 +335,7 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
 
-        tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device_type": device_type})
+        tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device_type": device['device_type']})
         return Response({"ret_code": 0, "message": u"验证成功"})
 
 
@@ -709,7 +714,7 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
                     pu.push_channel_id = push_channel_id
                     pu.save()
             token, created = Token.objects.get_or_create(user=serializer.object['user'])
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
+            return Response({'token': token.key, "user_id":serializer.object['user'].id}, status=status.HTTP_200_OK)
         else:
             device_type = request.DATA.get("device_type", "ios")
             if device_type == "ios":
@@ -785,15 +790,29 @@ class MobileDownloadAPIView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        if "HTTP_USER_AGENT" not in request.META:
-            return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
+        channel = self.request.GET.get('channel', '')
+        if channel and channel == 'weipai':
+            if "HTTP_USER_AGENT" not in request.META:
+                return HttpResponseRedirect('https://www.wanglibao.com/static/wanglibao_weipai.apk')
 
-        useragent = request.META['HTTP_USER_AGENT'].lower()
+            useragent = request.META['HTTP_USER_AGENT'].lower()
 
-        if "iphone" in useragent or "ipad" in useragent:
-            return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
+            if "iphone" in useragent or "ipad" in useragent:
+                return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
+            else:
+                return HttpResponseRedirect('https://www.wanglibao.com/static/wanglibao_weipai.apk')
         else:
-            return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
+
+            if "HTTP_USER_AGENT" not in request.META:
+                return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
+
+            useragent = request.META['HTTP_USER_AGENT'].lower()
+
+            if "iphone" in useragent or "ipad" in useragent:
+                return HttpResponseRedirect('https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8')
+            else:
+                return HttpResponseRedirect('http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao')
+
 
 class KuaipanPurchaseListAPIView(APIView):
     permission_classes = ()

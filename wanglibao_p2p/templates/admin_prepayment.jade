@@ -33,10 +33,10 @@ html
 
               .panel-body
                 .row
-                  form.navbar-form.navbar-left(method="post", action="/AK7WtEQ4Q9KPs8Io_zOncw/p2p/prepayment/{{p2p.pk}}")
+                  form.navbar-form.navbar-left#repayment(method="post", action="/AK7WtEQ4Q9KPs8Io_zOncw/p2p/prepayment/{{p2p.pk}}")
                     - csrf_token
                     .form-group
-                      input(type="text",name="repayment_date",placeholder="日期").form-control
+                      input(type="text",name="repayment_date",placeholder="日期",value="{{default_date}}").form-control
                       input(type="hidden", name="id", value="{{p2p.pk}}")
 
                     .form-group
@@ -50,7 +50,20 @@ html
                           按日
 
                     .form-group
-                      button(type="submit").btn.btn-primary 提前还款计算
+                      button(type="button").btn.btn-primary#repayment-calculate 提前还款计算
+
+                .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 还款时间
+                        th(rowspan="1") 还款本金
+                        th(rowspan="1") 还款利息
+                    tbody
+                      tr
+                        td.repayment_date {{ amortization.term_date }}
+                        td.repayment_principal {{ amortization.principal }}
+                        td.repayment_interest {{ amortization.interest }}
 
                 .row
                   form.navbar-form.navbar-left(role="search",method="post")
@@ -83,3 +96,4 @@ html
                               否
 
 
+script(src="/static/js/repayment.js")

@@ -13,7 +13,7 @@ from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from rest_framework import status
-from rest_framework import generics
+from rest_framework import generics, renderers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -620,7 +620,8 @@ class AdminPrepayment(TemplateView):
         
         return {
             'p2p': p2p[0],
-            'amortizations': p2p[0].amortizations.all()
+            'amortizations': p2p[0].amortizations.all(),
+            'default_date': datetime.datetime.now().strftime('%Y-%m-%d')
             }
 
     def post(self, request, **kwargs):
@@ -640,3 +641,22 @@ class AdminPrepayment(TemplateView):
             messages.warning(request, u'输入错误, 请重新检测')
             return redirect('./amortization')
 
+
+class RepaymentAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        repayment_date = request.DATA.get('repayment_date', "")
+        repayment_type = request.DATA.get('repayment_type', "")
+        id = request.POST.get('id')
+
+        p2p = P2PProduct.objects.filter(pk=id)
+        p2p = p2p[0]
+
+        from dateutil import parser
+        flag_date = parser.parse(repayment_date)
+        obj = get_payment_history(p2p, flag_date, repayment_type)
+
+        obj.update({'date': repayment_date})
+
+        return HttpResponse(renderers.JSONRenderer().render(obj, 'application/json'))
