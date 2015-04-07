@@ -4,43 +4,71 @@
 doctype html
 html
   head
-    title 好友邀请
-    meta(http-equiv="content-type", content="text/html; charset=utf-8")
-    meta(http-equiv="X-UA-Compatible", content="IE=edge")
-    meta(name="baidu-site-verification", content="iBKXouRC1a")
-    meta(name="keywords", content="迅雷,网利宝,狂欢节")
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    //meta(http-equiv="content-type", content="text/html; charset=utf-8")
+    //meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    //meta(name="baidu-site-verification", content="iBKXouRC1a")
+    //meta(name="keywords", content="迅雷,网利宝,狂欢节")
     meta(name="description", content="迅雷+网利宝狂欢节，错过绝对会后悔”")
     link(href="/static/stylesheets/screen.css", media="screen, projection", rel="stylesheet", type="text/css")
     link(rel="stylesheet",href="/static/stylesheets/full.css")
-  body
-    .act-full-container
-      .act-topbar
+  body(style='background:#ffffff')
+    .full-container
+      .topbar
         .container.row
-          .act-user-div
-            i.act-icon-phone.font-l &nbsp;
+          .user-div
+            i.icon-phone.font-l &nbsp;
             span 客服热线：
             span 4008-588-066
-            span.act-margin-left-m 关注我们：
-            a.topbar-anchor.act-icon.act-icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
-            a.topbar-anchor.act-icon.act-icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
-            a#qrweibo-top.act-weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
+
+            span.margin-left-m 在线客服：
+            a.topbar-anchor.icon.icon-qq#top-qq(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", data-role="hover", target="_blank")
+
+            span.margin-left-m 关注我们：
+            a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
+            a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
+            a#qrweibo-top.weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
               img(src="/static/images/weibo-nqr.png")
-            img#qrcode-top.act-icon.act-weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none", data-name="hoverbox")
-            span.act-mobile-app-top
-              span.act-icon.act-icon-mobile-app
+            img#qrcode-top.icon.weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none", data-name="hoverbox")
+            span.mobile-app-top
+              span.icon.icon-mobile-app
               span 手机网利宝
-              .act-mobile-app-top-prompt
+              .mobile-app-top-prompt
                 div(style="height:30px; top:-20px; position:relative;")
-                a.act-mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
-                a.act-mobile-app-android(href="https://www.wanglibao.com/static/wanglibao1.apk", title="Android版")
-    .activity-nav
-      .act-container-login-nav
-        a(href='/')
-          //.act-logo
-        .login-nav
-          include include/nav_common
+                a.mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+                a.mobile-app-android(href="https://www.wanglibao.com/static/wanglibao.apk", title="Android版")
+
+    .full-container-white.fudong
+      .container-navigation
+        .row
+          .span2
+            a(href='/')
+              .logo
+          .span10
+            .nav-items.xiao-nav
+              ul
+                mixin nav-item(name, link, new_class, free)
+                  if activeItem == name
+                    li.nav-item.active
+                      a.nav-item-anchor(href=link, class=new_class)= name
+                      if free == 'yes'
+                        span.icon.icon-free 免费
+                  else
+                    li.nav-item
+                      a.nav-item-anchor(href=link, class=new_class)= name
+                      if free == 'yes'
+                        span.icon.icon-free 免费
+
+                +nav-item('首页', '/', '', '')
+                +nav-item('理财专区', '/p2p/list/', '', '')
+                +nav-item('基金', '/fund/products', '', '')
+
+                +nav-item('安全保障', '/security', 'left-line', '')
+                +nav-item('帮助中心', '/help', '', '')
     #bannery
-    .kuaipan-container
+    .kuaipan-container(style='background:#ffffff')
 
       .gold
         h1.highlight 活动时间：2015-04-08至2015-05-05
@@ -120,35 +148,7 @@ html
                   span.highlight kefu@wanglibank.com
           .gold-version
         include include/tracking
-  script(src="/static/js/lib/jquery.min.js")
+
   script.
-    $('.act-mobile-app-top').bind('mouseenter', function(e) {
-      return $('.act-mobile-app-top-prompt').show(500);
-    }).bind('mouseleave', function(e) {
-      return $('.act-mobile-app-top-prompt').hide();
-    });
-    $('.act-mobile-app-top-prompt').bind('mouseenter', function(e) {
-      return $(this).show();
-    }).bind('mouseleave', function(e) {
-      return $(this).hide();
-    });
-    $('.act-icon-weixin').bind('mouseenter',function(){
-      $('#qrcode-top').show();
-    }).bind('mouseleave',function(){
-      $('#qrcode-top').hide();
-    })
-    $('#qrcode-top').bind('mouseenter', function(e) {
-      return $(this).show();
-    }).bind('mouseleave', function(e) {
-      return $(this).hide();
-    });
-    $('.act-icon-weibo').bind('mouseenter',function(){
-      $('#qrweibo-top').show();
-    }).bind('mouseleave',function(){
-      $('#qrweibo-top').hide();
-    })
-    $('#qrweibo-top').bind('mouseenter', function(e) {
-      return $(this).show();
-    }).bind('mouseleave', function(e) {
-      return $(this).hide();
-    });
+   var v = new Date().getTime()
+   require(['/static/js/hover.js','/static/js/aiqiyi_redpack.js?v='+v])
