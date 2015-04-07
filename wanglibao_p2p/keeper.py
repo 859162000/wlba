@@ -241,9 +241,9 @@ class AmortizationKeeper(KeeperBaseMixin):
         with transaction.atomic(savepoint=savepoint):
             #UserAmortization.objects.filter(product_amortization__in=self.amortizations).delete() 生成产品还款计划时，删除的时候就已经删除了
 
-            #self.amortizations = self.product.amortizations.all()
+            self.amortizations = self.product.amortizations.all()
 
-            self.amortizations = self.__generate_product_amortization(self.product)
+            #self.amortizations = self.__generate_product_amortization(self.product)
             self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
             equities = self.product.equities.select_related('user').all()
 
