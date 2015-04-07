@@ -269,7 +269,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
-    search_fields = ('user__wanglibaouserprofile__phone',)
+    search_fields = ('user__wanglibaouserprofile__phone', 'product_amortization__product__name')
     raw_id_fields = ('product_amortization', 'user')
 
 

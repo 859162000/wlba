@@ -70,13 +70,13 @@ class P2PProduct(ProductBase):
 
     PAY_METHOD_CHOICES = (
         (u'等额本息', u'等额本息'),
-        (u'先息后本', u'先息后本'),
+        #(u'先息后本', u'先息后本'),
         (u'按月付息', u'按月付息到期还本'),
         (u'到期还本付息', u'到期还本付息'),
-        (u'按日计息', u'按日计息到期还本付息'),
-        (u'按日计息按月付息', u'按日计息按月付息'),
-        (u'按日计息一次性还本付息T+N', u'按日计息一次性还本付息T+N'),
-        (u'按季度付息', u'按季度付息'),
+        (u'按日计息', u'日计息一次性还本付息'),
+        (u'日计息月付息', u'日计息月付息到期还本'),
+        #(u'按日计息一次性还本付息T+N', u'按日计息一次性还本付息T+N'),
+        #(u'按季度付息', u'按季度付息'),
     )
     BANK_METHOD_CHOICES = (
         (u'工商银行',u'工商银行'),
@@ -384,16 +384,12 @@ class ProductPaymentHistory(models.Model):
     interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
 
-    settled = models.BooleanField(u'已结算给客户', default=False, editable=False)
-    settlement_time = models.DateTimeField(u'结算时间', auto_now=True)
 
     ready_for_settle = models.BooleanField(u'是否可以开始结算', default=False)
 
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     description = models.CharField(u'摘要', max_length=500, blank=True)
 
-    objects = models.Manager()
-    is_ready = AmortizationReadyManager()
 
     class Meta:
         verbose_name_plural = u'产品还款记录'
@@ -402,10 +398,6 @@ class ProductPaymentHistory(models.Model):
     @property
     def total(self):
         return self.principal + self.interest + self.penal_interest
-
-    # @property
-    # def amortizations(self):
-    #     return self.objects.filter(product=self.product)
 
     def __unicode__(self):
         return u'产品%s: 第 %s 期' % (str(self.product_id), self.term)
@@ -421,9 +413,6 @@ class UserPaymentHistory(models.Model):
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
-
-    settled = models.BooleanField(u'已结算', default=False)
-    settlement_time = models.DateTimeField(u'结算时间', auto_now=True)
 
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     description = models.CharField(u'摘要', max_length=500, blank=True)
@@ -628,7 +617,10 @@ def generate_amortization_plan(sender, instance, **kwargs):
 
         logger.info(u'The product status is 录标完成, start to generate amortization plan')
 
-        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, None, instance.period)
+        #terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, None, instance.period)
+        terms = get_amortization_plan(product.pay_method).generate(product.total_amount,
+                product.expected_earning_rate / 100,
+                datetime.now(), product.period)
 
         for index, term in enumerate(terms['terms']):
             amortization = ProductAmortization()
@@ -637,7 +629,7 @@ def generate_amortization_plan(sender, instance, **kwargs):
             amortization.interest = term[2]
             amortization.term = index + 1
 
-            if term[5]:
+            if len(terms['terms']):
                 amortization.term_date = term[5]
 
             instance.amortizations.add(amortization)

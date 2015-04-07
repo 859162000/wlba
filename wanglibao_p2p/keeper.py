@@ -278,7 +278,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             amortization.interest = term[2]
             amortization.term = index + 1
 
-            if term[5]:
+            if len(terms) == 6:
                 amortization.term_date = term[5]
 
             product.amortizations.add(amortization)
@@ -361,7 +361,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 amortization.user = equity.user
                 amortization.product_amortization = product_amortizations[index] 
 
-                if term[5]:
+                if len(terms['terms']) == 6:
                     amortization.term_date = term[5]
 
                 user_amos.append(amortization)

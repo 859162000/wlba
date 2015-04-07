@@ -648,6 +648,7 @@ class RepaymentAPIView(APIView):
     def post(self, request, *args, **kwargs):
         repayment_date = request.DATA.get('repayment_date', "")
         repayment_type = request.DATA.get('repayment_type', "")
+
         id = request.POST.get('id')
 
         p2p = P2PProduct.objects.filter(pk=id)
