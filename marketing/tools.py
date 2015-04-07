@@ -51,7 +51,7 @@ def decide_first(user_id, amount, device_type='pc'):
         invited_id = introduced_by.user.id
         if amount >= 200:
             start_time = timezone.datetime(2014, 9, 1)
-            end_time = timezone.datetime(2015, 4, 7, 16)
+            end_time = timezone.datetime(2015, 4, 8)
             now = datetime.now()
             if now > end_time:
                 return
