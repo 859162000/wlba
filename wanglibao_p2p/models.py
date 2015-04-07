@@ -618,9 +618,9 @@ def generate_amortization_plan(sender, instance, **kwargs):
         logger.info(u'The product status is 录标完成, start to generate amortization plan')
 
         #terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, None, instance.period)
-        terms = get_amortization_plan(product.pay_method).generate(product.total_amount,
-                product.expected_earning_rate / 100,
-                datetime.now(), product.period)
+        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount,
+                instance.expected_earning_rate / 100,
+                datetime.now(), instance.period)
 
         for index, term in enumerate(terms['terms']):
             amortization = ProductAmortization()
