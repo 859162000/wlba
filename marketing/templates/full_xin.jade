@@ -1,0 +1,154 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    title 满就送
+    meta(http-equiv="content-type", content="text/html; charset=utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="baidu-site-verification", content="iBKXouRC1a")
+    meta(name="keywords", content="迅雷,网利宝,狂欢节")
+    meta(name="description", content="迅雷+网利宝狂欢节，错过绝对会后悔”")
+    link(href="/static/stylesheets/screen.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(rel="stylesheet",href="/static/stylesheets/full.css")
+  body
+    .act-full-container
+      .act-topbar
+        .container.row
+          .act-user-div
+            i.act-icon-phone.font-l &nbsp;
+            span 客服热线：
+            span 4008-588-066
+            span.act-margin-left-m 关注我们：
+            a.topbar-anchor.act-icon.act-icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
+            a.topbar-anchor.act-icon.act-icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
+            a#qrweibo-top.act-weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
+              img(src="/static/images/weibo-nqr.png")
+            img#qrcode-top.act-icon.act-weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none", data-name="hoverbox")
+            span.act-mobile-app-top
+              span.act-icon.act-icon-mobile-app
+              span 手机网利宝
+              .act-mobile-app-top-prompt
+                div(style="height:30px; top:-20px; position:relative;")
+                a.act-mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+                a.act-mobile-app-android(href="https://www.wanglibao.com/static/wanglibao1.apk", title="Android版")
+    .activity-nav
+      .act-container-login-nav
+        a(href='/')
+          //.act-logo
+        .login-nav
+          include include/nav_common
+    #bannery
+    .kuaipan-container
+
+      .gold
+        h1.highlight 活动时间：2015-04-08至2015-05-05
+        .space-vertical-l
+        .frenda
+            .frenda-left
+                p.bigg
+                label(style='font-size: 50px;color: #FFFFFF') 100
+                span(style='font-size: 20px;color: #FFFFFF') 元理财包
+                p(style='font-size: 16px;color: #ffafab') (20元现金红包，10元、20元、50元0.5%折扣包)
+            .frenda-left
+                p.bigg
+                span(style='font-size: 20px;color: #FFFFFF') 共享
+                label(style='font-size: 50px;color: #FFFFFF') 40
+                span(style='font-size: 20px;color: #FFFFFF') 元话费
+                p(style='font-size: 16px;color: #ffafab') (各20元)
+
+
+
+        .content-title
+          .title-inner-line
+            h2 新手投资流程
+        .investment-process-container
+          .row
+            .step.first-step
+              span.icon.icon-first-step
+              .process-title 第一步&nbsp;免费注册
+              .process-content 30秒轻松免费注册成为会员
+            .step-arrow
+              ins
+            .step.second-step
+              span.icon.icon-second-step
+              .process-title 第二步&nbsp;进行认证
+              .process-content 完成实名认证
+            .step-arrow
+              ins
+            .step.third-step
+              span.icon.icon-third-step
+              .process-title 第三步&nbsp;充值账户
+              .process-content 在线充值，免收手续费
+            .step-arrow
+              ins
+            .step.fourth-step
+              span.icon.icon-fourth-step
+              .process-title 第四步&nbsp;成功投标
+              .process-content 按需筛选借款标并进行投标
+            .step-arrow
+              ins
+            .step.fifth-step
+              span.icon.icon-fifth-step
+              .process-title 第五步&nbsp;自动收款
+              .process-content 借款期满后自动回款
+
+        .gold-footer
+          .gold-declare
+            dl
+              dt 红包使用规则：
+              dd 1.红包在完成注册后即刻发放，请在我的账户里-红包里面查看；
+              dd 2.红包投资不可叠加使用，一次回款后可提现；
+              dd 3.现金红包有效期：
+               span(style='color: #f54337') 4月8日-5月10日
+               |；
+              dd 4.折扣红包有效期：
+               span(style='color: #f54337') 4月8日-6月8日
+               |；
+              dd 5.每个红包只能使用一次，无论是否有余额即失效；
+            dl(style='margin-top: 40px;')
+              dt 活动规则:
+              dd 1、手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账号；
+              dd 2、注册即送100元理财包（20元现金红包，10元、20元、50元0.5%折扣红包）
+              dd 3、投资200元起方可使用20元现金红包，
+              dd 4、10元、20元、50元折扣红包都按投资额的0.5%折扣使用，例如：购买2000元可用10元红包
+              dd 5、邀请好友，好友首次交易200元，共享40元话费（各20元），多邀多送不封顶！
+              dd 6、奖品信息将发送至您的网利宝站内信，话费将充值进您的交易手机号；
+             // dd 6.由于实物奖品快递需要，满额度用户请提交真实“姓名、手机、身份证、通讯地址” 至
+                a(href="mailto:kefu@wanglibank.com")
+                  span.highlight kefu@wanglibank.com
+          .gold-version
+        include include/tracking
+  script(src="/static/js/lib/jquery.min.js")
+  script.
+    $('.act-mobile-app-top').bind('mouseenter', function(e) {
+      return $('.act-mobile-app-top-prompt').show(500);
+    }).bind('mouseleave', function(e) {
+      return $('.act-mobile-app-top-prompt').hide();
+    });
+    $('.act-mobile-app-top-prompt').bind('mouseenter', function(e) {
+      return $(this).show();
+    }).bind('mouseleave', function(e) {
+      return $(this).hide();
+    });
+    $('.act-icon-weixin').bind('mouseenter',function(){
+      $('#qrcode-top').show();
+    }).bind('mouseleave',function(){
+      $('#qrcode-top').hide();
+    })
+    $('#qrcode-top').bind('mouseenter', function(e) {
+      return $(this).show();
+    }).bind('mouseleave', function(e) {
+      return $(this).hide();
+    });
+    $('.act-icon-weibo').bind('mouseenter',function(){
+      $('#qrweibo-top').show();
+    }).bind('mouseleave',function(){
+      $('#qrweibo-top').hide();
+    })
+    $('#qrweibo-top').bind('mouseenter', function(e) {
+      return $(this).show();
+    }).bind('mouseleave', function(e) {
+      return $(this).hide();
+    });
