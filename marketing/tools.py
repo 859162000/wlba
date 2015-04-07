@@ -19,6 +19,7 @@ from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
+from datetime import datetime
 
 #购买判断，第一次，第二次以后
 @app.task
@@ -51,7 +52,10 @@ def decide_first(user_id, amount, device_type='pc'):
         if amount >= 200:
             start_time = timezone.datetime(2014, 9, 1)
             end_time = timezone.datetime(2015, 4, 7, 16)
-            if P2PRecord.objects.filter(user=user, create_time__gt=start_time, create_time__lt=end_time).count() > 1:
+            now = datetime.now()
+            if now > end_time:
+                return
+            if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
                 return
 
             inviter_phone_safe = safe_phone_str(inviter_phone)
