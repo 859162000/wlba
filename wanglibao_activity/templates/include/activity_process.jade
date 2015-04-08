@@ -12,17 +12,11 @@
             .process-circle
                 .process-body.one-free
                 .process-txt 免费注册
-                .process-txt2 送
-                  em 50
-                  |元红包
             .process-center
                 .process-cont
             .process-circle
                 .process-body.two-atte
                 .process-txt 进行认证
-                .process-txt2 送
-                  em 1
-                  |个月PPTV会员
             .process-center
                 .process-cont
             .process-circle
@@ -47,17 +41,24 @@
         newUrl:[{"x":"10px","y":"-63px"},{"x":"10px","y":"-207px"},{"x":"12px","y":"-350px"},{"x":"10px","y":"-495px"},{"x":"10px","y":"-637px"}],
         $float: $(".circle-float"),
         initIndex: null,
+        Timer: null,
         init:function(){
            var that = this;
            var isHover = false,setTimeHover;
            $(".process-circle").hover(function(){
+                clearTimeout(that.Timer)
                 that.initIndex = $(this).index()/2-1
                 var imgUrl = "/static/images/pptv/"+that.dataImg[that.initIndex]+".jpg"
                 that.$float.find("img").attr("src",imgUrl)
                 $(".process-circle").find(".process-body").removeAttr("style")
                 that.$float.show()
+            },function(){
+              that.Timer=setTimeout(function(){
+                 that.$float.hide()
+               },800)
             })
             $(".circle-float").hover(function(){
+                clearTimeout(that.Timer)
                 isHover = true;
             },function(){
                 isHover &&  that.close()
