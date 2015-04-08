@@ -85,6 +85,7 @@ class TimelySitedataAdmin(admin.ModelAdmin):
 
 class InviteCodeAdmin(ReadPermissionModelAdmin):
     list_display = ('id', 'code', 'is_used')
+    list_filter = ('is_used',)
     search_fields = ['code']
 
     def get_readonly_fields(self, request, obj=None):
