@@ -1,11 +1,7 @@
 # coding: utf-8
 
 from django.contrib import admin
-from django.contrib.admin.filters import DateFieldListFilter, FieldListFilter, ChoicesFieldListFilter
 import datetime
-from django.utils.translation import ugettext_lazy as _
-from django import forms
-from django.forms import formsets
 from django.utils import timezone
 from import_export.admin import ExportMixin
 from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, ActivityImages
@@ -26,14 +22,14 @@ class ActivityRuleAdmin(admin.ModelAdmin):
 
 
 class CustomDateFilter(admin.SimpleListFilter):
-    title = _(u'触发时间')
+    title = u'触发时间'
     parameter_name = u'trigger_at'
 
     def lookups(self, request, model_admin):
         return (
-            ('today', _(u'今天')),
-            ('yesterday', _(u'昨天')),
-            ('before_yesterday', _(u'前天'))
+            ('today', u'今天'),
+            ('yesterday', u'昨天'),
+            ('before_yesterday', u'前天')
         )
 
     def queryset(self, request, queryset):
