@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIView,
                             AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI,
-                            AccountFundAssetAPI,
+                            AccountFundAssetAPI, PaymentHistoryAPI,
                             P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
                             AdminSendMessageAPIView, AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
@@ -126,6 +126,7 @@ urlpatterns = patterns(
     url(r'^home/p2passet', AccountP2PAssetAPI.as_view()),
     url(r'^home/fundasset', AccountFundAssetAPI.as_view()),
     url(r'^home/p2p/amortization/(?P<product_id>\d+)', P2PAmortizationAPI.as_view()),
+    url(r'^home/p2p/paymenthistory/(?P<product_id>\d+)', PaymentHistoryAPI.as_view()),
     url(r'^home/invite/', AccountInviteAPIView.as_view()),
 
     url(r'^trade_record/', TradeRecordAPIView.as_view()),
