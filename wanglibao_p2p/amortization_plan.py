@@ -271,7 +271,7 @@ class DailyInterestInAdvance(AmortizationPlan):
         }
 
 class DailyInterestMonthly(AmortizationPlan):
-    name = u'按日计息按月付息'
+    name = u'日计息月付息'
 
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None):
