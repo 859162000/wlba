@@ -16,7 +16,7 @@ $(function() {
     });
 
     $('#repayment-btn').click(function(e) {
-        var form = $('#repayment').serialize();
+        var form = $('#repayment').serialize() + '&' + $('#repayment-form').serialize() + '&now=1';
         $.ajax({
             type: 'post',
             url: '/api/repayment/',

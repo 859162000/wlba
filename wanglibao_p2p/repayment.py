@@ -1,5 +1,5 @@
 # coding=utf-8
-from wanglibao_p2p.models import ProductAmortization
+from wanglibao_p2p.models import ProductAmortization, UserAmortization
 from wanglibao_p2p.amortization_plan import get_daily_interest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
@@ -8,7 +8,7 @@ import pytz
 
 REPAYMENT_MONTHLY = 'monthly'
 REPAYMENT_DAILY = 'daily'
-def get_payment_history(p2p, date, repayment_type):
+def get_payment_history(p2p, date, repayment_type, equity):
     """
             #1. 拿到当期未还款计划
             #1.11 如果是按期提前还款
@@ -21,7 +21,13 @@ def get_payment_history(p2p, date, repayment_type):
     """
 
     next_term_date = date + relativedelta(months=1)
-    amortizations = ProductAmortization.objects.filter(product=p2p)
+
+    if equity:
+        amortizations = UserAmortization.objects.filter(product_amortization__product=p2p, user=equity.user)
+        total_amount = equity.equity 
+    else:
+        amortizations = ProductAmortization.objects.filter(product=p2p)
+        total_amount = p2p.total_amount
 
     principal_paid = Decimal(0) 
     last_paid_date = None
@@ -47,11 +53,12 @@ def get_payment_history(p2p, date, repayment_type):
         term_date = timezone.localtime(amortization.term_date)
         date = pytz.UTC.localize(date)
         days = (term_date - date).days
-        interest = amortization.interest - get_daily_interest(p2p.expected_earning_rate/100)*days*p2p.total_amount 
+        interest = amortization.interest - get_daily_interest(p2p.expected_earning_rate/100)*days*total_amount 
 
-    principal = p2p.total_amount - principal_paid
+    principal = total_amount - principal_paid
 
     return {
         'principal': principal,
-        'interest': interest
+        'interest': interest,
+        'term': amortization.term
     }

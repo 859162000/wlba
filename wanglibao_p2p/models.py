@@ -386,8 +386,6 @@ class ProductPaymentHistory(models.Model):
     penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
 
 
-    ready_for_settle = models.BooleanField(u'是否可以开始结算', default=False)
-
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     description = models.CharField(u'摘要', max_length=500, blank=True)
 
@@ -423,7 +421,7 @@ class UserPaymentHistory(models.Model):
         ordering = ['user', 'term']
 
     def __unicode__(self):
-        return u'分期%s 用户%s 本金%s 利息%s' % (self.product_amortization, self.user, self.principal, self.interest)
+        return u'分期%s 用户%s 本金%s 利息%s' % (self.product_payment, self.user, self.principal, self.interest)
 
 
 class P2PEquity(models.Model):
@@ -630,8 +628,10 @@ def generate_amortization_plan(sender, instance, **kwargs):
             amortization.interest = term[2]
             amortization.term = index + 1
 
-            if len(terms['terms']):
+            if len(term) == 6:
                 amortization.term_date = term[5]
+            else:
+                amortization.term_date = datetime.now()
 
             instance.amortizations.add(amortization)
             amortization.save()

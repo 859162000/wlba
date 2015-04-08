@@ -7,6 +7,7 @@ import datetime
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.db.models import Q, Sum
+from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.views.generic import TemplateView
@@ -24,7 +25,7 @@ from wanglibao_p2p.repayment import get_payment_history
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, \
-    P2PProductContract, InterestPrecisionBalance
+    P2PProductContract, InterestPrecisionBalance, UserPaymentHistory, ProductPaymentHistory
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
@@ -648,6 +649,12 @@ class RepaymentAPIView(APIView):
     def post(self, request, *args, **kwargs):
         repayment_date = request.DATA.get('repayment_date', "")
         repayment_type = request.DATA.get('repayment_type', "")
+        repayment_now = request.DATA.get('now', "0")
+        penal_interest = request.DATA.get('penal_interest', 0)
+        if penal_interest == '':
+            penal_interest = Decimal(0)
+        else:
+            penal_interest = Decimal(penal_interest)
 
         id = request.POST.get('id')
 
@@ -656,8 +663,37 @@ class RepaymentAPIView(APIView):
 
         from dateutil import parser
         flag_date = parser.parse(repayment_date)
-        obj = get_payment_history(p2p, flag_date, repayment_type)
+        obj = get_payment_history(p2p, flag_date, repayment_type, None)
 
         obj.update({'date': repayment_date})
+
+        if repayment_now == '1':
+            with transaction.atomic(savepoint=True):
+                #1.生成产品提前还款记录
+                description='提前还款'
+                product_repayment = ProductPaymentHistory(
+                        product=p2p, term=obj.get('term'), principal=obj.get('principal'), term_date=repayment_date,
+                        interest=obj.get('interest'), penal_interest=penal_interest, description=description 
+                        )
+                #1.1 根据产品年化收益、计息方式、借款总额生成还款记录
+                product_repayment.save() 
+                #2.生成用户提前还款记录
+                #2.1 拿到产品所有用户持仓
+                equities = p2p.equities.all()
+                user_repayments = list()
+                for equity in equities:
+                    #2.2 根据产品年化收益、计息方式、用户借款总额生成还款记录
+                    user_repayment_result = get_payment_history(p2p, flag_date, repayment_type, equity)
+                    user_repayment = UserPaymentHistory(
+                            product_payment=product_repayment, term=user_repayment_result.get('term'),
+                            principal=user_repayment_result.get('principal'), user=equity.user, term_date=repayment_date,
+                            interest=user_repayment_result.get('interest'), penal_interest=Decimal(0), description=description 
+                            )
+
+                    user_repayments.append(user_repayment)
+                UserPaymentHistory.objects.bulk_create(user_repayments)
+
+                ProductAmortization.objects.filter(product=p2p, settled=False).update(settled=True, settlement_time=repayment_date)
+                UserAmortization.objects.filter(product_amortization__product=p2p, settled=False).update(settled=True, settlement_time=repayment_date)
 
         return HttpResponse(renderers.JSONRenderer().render(obj, 'application/json'))

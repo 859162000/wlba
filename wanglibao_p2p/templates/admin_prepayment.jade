@@ -66,11 +66,11 @@ html
                         td.repayment_interest {{ amortization.interest }}
 
                 .row
-                  form.navbar-form.navbar-left(role="search",method="post")
+                  form.navbar-form.navbar-left#repayment-form(role="search",method="post")
                     .form-group
-                      input(type="text",name="p2p_name",placeholder="罚息").form-control
+                      input(type="text",name="penal_interest",placeholder="罚息").form-control
                     .form-group
-                      button(type="submit").btn.btn-primary#repayment-btn 提前还款
+                      button(type="button").btn.btn-primary#repayment-btn 提前还款
 
 
                 .table-responsive
