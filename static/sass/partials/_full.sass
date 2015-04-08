@@ -18,109 +18,112 @@
     height: 100%
     margin:  0 auto
     line-height: 40px
-    .act-weibo-qr-code
-      position: absolute
-      bottom: 100%
-      top: 20px
-      left: 579px
-      z-index: 9
-      padding-top: 15px
+    .container
+      .act-user-div
+        position: relative
+        .act-weibo-qr-code
+          position: absolute
+          bottom: 100%
+          top: 20px
+          left: 212px
+          z-index: 9
+          padding-top: 15px
 
-    .act-weixin-qr-code
-      position: absolute
-      bottom: 100%
-      top: 20px
-      left: 635px
-      z-index: 9
-      width: 164px
-      height: 223px
-      padding-top: 15px
-    .act-icon-phone,
-    .act-icon-weibo,
-    .act-icon-mobile-app,
-    .act-icon-weixin
-      display: inline-block
-      overflow: hidden
-      width: $space-m
-      height: $space-m
-      line-height: $space-m
-      background: url("/static/images/cum-tu2.png") no-repeat
-      +border-radius(13px)
-      +transition(all .3s ease-in-out)
-      margin-left: 20px
-      position: relative
-      top: -5px
-    .act-icon-phone
-      background-position: 5px 3px
-      top: 6px
-      left: -10px
-    .act-icon-weibo
-      background-position: -27px 3px
-      top: 6px
-      left: -10px
+        .act-weixin-qr-code
+          position: absolute
+          bottom: 100%
+          top: 20px
+          left: 266px
+          z-index: 9
+          width: 164px
+          height: 223px
+          padding-top: 15px
 
-    .act-weibo-container:hover
-      .icon-weibo
-        background-position: 0 -200px
-        background-color: #d94a39
+        .act-icon-phone,
+        .act-icon-weibo,
+        .act-icon-mobile-app,
+        .act-icon-weixin
+          display: inline-block
+          overflow: hidden
+          width: $space-m
+          height: $space-m
+          line-height: $space-m
+          background: url("/static/images/cum-tu2.png") no-repeat
+          +border-radius(13px)
+          +transition(all .3s ease-in-out)
+          margin-left: 20px
+          position: relative
+          top: -5px
+        .act-icon-phone
+          background-position: 5px 3px
+          top: 6px
+          left: -10px
+        .act-icon-weibo
+          background-position: -27px 3px
+          top: 6px
+          left: -10px
 
-    .act-icon-weibo:hover
-      background-position: -27px 3px
-      background-color: #d94a39
+        .act-weibo-container:hover
+          .icon-weibo
+            background-position: 0 -200px
+            background-color: #d94a39
 
-    .act-icon-weixin
-      background-position: -60px 1px
-      top: 6px
-      left: -10px
-    .act-weixin-container:hover
-      .act-icon-weixin
-        background-position: -60px 1px
-        background-color: #0ca001
+        .act-icon-weibo:hover
+          background-position: -27px 3px
+          background-color: #d94a39
 
-    .act-icon-weixin:hover
-      background-position: -60px 1px
-      background-color: #0ca001
+        .act-icon-weixin
+          background-position: -60px 1px
+          top: 6px
+          left: -10px
+        .act-weixin-container:hover
+          .act-icon-weixin
+            background-position: -60px 1px
+            background-color: #0ca001
 
-    .act-margin-left-m
-      margin-left: 30px
-    .act-mobile-app-top
-      float: right
-    .act-icon-mobile-app
-      background-position: -99px 1px
-      top: 6px
-      left: -10px
+        .act-icon-weixin:hover
+          background-position: -60px 1px
+          background-color: #0ca001
 
-    .act-mobile-app-top-prompt
-      width: 320px
-      height: 200px
-      background: url("/static/images/app_prompt_bg.png") no-repeat -5px -197px
-      position: absolute
-      top: 40px
-      right: 246px
-      z-index: 999
-      display: none
+        .act-margin-left-m
+          margin-left: 30px
+        .act-mobile-app-top
+          float: right
+        .act-icon-mobile-app
+          background-position: -99px 1px
+          top: 6px
+          left: -10px
 
-    .act-mobile-app-apple
-      width: 130px
-      height: 40px
-      background: url("/static/images/app_prompt_bg.png") no-repeat -157px -400px
-      display: block
-      margin-top: 30px
-      margin-left: 160px
-      margin-bottom: 10px
+        .act-mobile-app-top-prompt
+          width: 320px
+          height: 200px
+          background: url("/static/images/app_prompt_bg.png") no-repeat -5px -197px
+          position: absolute
+          top: 40px
+          right: -15px
+          z-index: 999
+          display: none
 
-      &:hover
-        background-position: -157px -445px
+        .act-mobile-app-apple
+          width: 130px
+          height: 40px
+          background: url("/static/images/app_prompt_bg.png") no-repeat -157px -400px
+          display: block
+          margin-top: 30px
+          margin-left: 160px
+          margin-bottom: 10px
 
-    .act-mobile-app-android
-      width: 130px
-      height: 40px
-      background: url("/static/images/app_prompt_bg.png") no-repeat -16px -400px
-      display: block
-      margin-left: 160px
+          &:hover
+            background-position: -157px -445px
+        .act-mobile-app-android
+          width: 130px
+          height: 40px
+          background: url("/static/images/app_prompt_bg.png") no-repeat -16px -400px
+          display: block
+          margin-left: 160px
 
-      &:hover
-        background-position: -16px -445px
+          &:hover
+            background-position: -16px -445px
 .activity-nav
   width: 100%
   height: 90px
