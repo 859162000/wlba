@@ -1,9 +1,9 @@
 # coding: utf-8
 
 from django.contrib import admin
-from django import forms
-from django.forms import formsets
+import datetime
 from django.utils import timezone
+from import_export.admin import ExportMixin
 from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, ActivityImages
 
 class ActivityAdmin(admin.ModelAdmin):
@@ -21,16 +21,43 @@ class ActivityRuleAdmin(admin.ModelAdmin):
     search_fields = ('rule_name', 'activity__name')
 
 
-class ActivityRecordAdmin(admin.ModelAdmin):
+class CustomDateFilter(admin.SimpleListFilter):
+    title = u'触发时间'
+    parameter_name = u'trigger_at'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('today', u'今天'),
+            ('yesterday', u'昨天'),
+            ('before_yesterday', u'前天')
+        )
+
+    def queryset(self, request, queryset):
+        dt = datetime.datetime.now()
+        if self.value() == 'today':
+            return queryset.filter(trigger_at__gte=timezone.datetime(dt.year, dt.month, dt.day),
+                                   trigger_at__lt=timezone.datetime(dt.year, dt.month, dt.day, 23, 59, 59))
+        if self.value() == 'yesterday':
+            return queryset.filter(trigger_at__gte=timezone.datetime(dt.year, dt.month, dt.day - 1),
+                                   trigger_at__lt=timezone.datetime(dt.year, dt.month, dt.day - 1, 23, 59, 59))
+        if self.value() == 'before_yesterday':
+            return queryset.filter(trigger_at__gte=timezone.datetime(dt.year, dt.month, dt.day - 2),
+                                   trigger_at__lt=timezone.datetime(dt.year, dt.month, dt.day - 2, 23, 59, 59))
+
+
+class ActivityRecordAdmin(ExportMixin, admin.ModelAdmin):
     actions = None
     list_display = ('id', 'activity', 'rule', 'platform', 'trigger_node', 'msg_type', \
                     'send_type', 'description', 'user', 'income', 'trigger_at')
-    list_filter = ('platform', 'trigger_node', 'msg_type', 'send_type',)
+    list_filter = (
+        'platform', 'trigger_node', 'msg_type', 'send_type',
+        CustomDateFilter
+    )
     search_fields = ('activity__name', 'rule__rule_name', 'user__wanglibaouserprofile__phone')
 
-    def __init__(self, *args, **kwargs):
-        super(ActivityRecordAdmin, self).__init__(*args, **kwargs)
-        self.list_display_links = (None, )
+    # def __init__(self, *args, **kwargs):
+    #     super(ActivityRecordAdmin, self).__init__(*args, **kwargs)
+    #     self.list_display_links = (None, )
 
     def has_add_permission(self, request):
         return False
