@@ -21,5 +21,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=hiring.js.map

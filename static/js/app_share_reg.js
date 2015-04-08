@@ -80,5 +80,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=app_share_reg.js.map

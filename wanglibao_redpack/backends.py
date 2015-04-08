@@ -184,11 +184,20 @@ def exchange_redpack(token, device_type, user):
 def _send_message(user, event):
     fmt_str = "%Y年%m月%d日"
     give_time = timezone.localtime(event.unavailable_at).strftime(fmt_str)
-    send_messages.apply_async(kwargs={
-        'phones': [user.wanglibaouserprofile.phone],
-        'messages': [messages.redpack_give(event.amount, event.name, give_time)]
-    })
-    title, content = messages.msg_redpack_give(event.amount, event.name, give_time)
+    if event.rtype == 'percent':
+        send_messages.apply_async(kwargs={
+            'phones': [user.wanglibaouserprofile.phone],
+            'messages': [messages.redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)]
+        })
+    else:
+        send_messages.apply_async(kwargs={
+            'phones': [user.wanglibaouserprofile.phone],
+            'messages': [messages.redpack_give(event.amount, event.name, give_time)]
+        })
+    if event.rtype == 'percent':
+        title, content = messages.msg_redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)
+    else:
+        title, content = messages.msg_redpack_give(event.amount, event.name, give_time)
     inside_message.send_one.apply_async(kwargs={
         "user_id": user.id,
         "title": title,
@@ -222,6 +231,15 @@ def give_first_buy_redpack(user, device_type):
 
 def give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id):
     _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id)
+
+
+def give_buy_redpack(user, device_type, rtype='buy', describe=''):
+    now = timezone.now()
+    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
+    if describe:
+        rps = rps.filter(describe=describe)
+    for x in rps:
+        give_activity_redpack(user=user, event=x, device_type=device_type)
 
 
 def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id):

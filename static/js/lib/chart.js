@@ -130,5 +130,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=chart.js.map

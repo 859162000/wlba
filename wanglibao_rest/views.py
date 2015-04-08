@@ -168,7 +168,11 @@ class RegisterAPIView(APIView):
         if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30015, "message": u"该手机号已经注册"})
 
+        device = split_ua(request)
         invite_code = request.DATA.get('invite_code', "")
+        if not invite_code and device['channel_id'] == "baidu":
+            invite_code = "baidushouji"
+
         if invite_code:
             try:
                 record = Channels.objects.filter(code=invite_code).first()
@@ -186,7 +190,6 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
-        device = split_ua(request)
         tools.register_ok.apply_async(kwargs={"user_id": user.id, "device_type":device['device_type']})
         # save client info
         save_client(request, phone=identifier, action=0)
@@ -295,7 +298,7 @@ class IdValidateAPIView(APIView):
     def post(self, request):
         name = request.DATA.get("name", "").strip()
         id_number = request.DATA.get("id_number", "").strip()
-        device_type = split_ua(request)
+        device = split_ua(request)
 
         if not name or not id_number:
             return Response({"ret_code": 30051, "message": u"信息输入不完整"})
@@ -330,7 +333,7 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.save()
 
-        tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device_type": device_type})
+        tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device_type": device['device_type']})
         return Response({"ret_code": 0, "message": u"验证成功"})
 
 

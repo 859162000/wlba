@@ -21,5 +21,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=modal.js.map

@@ -4,6 +4,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from wanglibao_redpack.models import RedPackEvent
+from ckeditor.fields import RichTextField
 
 PLATFORM = (
     ("all", u"全平台"),
@@ -188,3 +189,78 @@ class ActivityRecord(models.Model):
         verbose_name_plural = u'活动触发流水'
 
 
+class ActivityImages(models.Model):
+    """ the list of templates images """
+
+    IMG_TYPE = (
+        ('reward', u'赠送礼包'),
+        ('register', u'注册流程'),
+    )
+
+    img_type = models.CharField(max_length=20, choices=IMG_TYPE, verbose_name=u'图片类别')
+    name = models.CharField(max_length=128, verbose_name=u'图片名称', help_text=u'当图片类别是元素时,模板中会显示')
+    img = models.ImageField(upload_to='activity', blank=True, verbose_name=u'图片')
+    desc_one = models.CharField(max_length=1024, blank=True, verbose_name=u'图片描述1', help_text=u'展示在图片旁边的描述信息')
+    desc_two = models.CharField(max_length=1024, blank=True, verbose_name=u'图片描述2', help_text=u'展示在图片旁边的描述信息')
+    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先')
+    last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'上次更新时间')
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = u'模板图片'
+
+
+class ActivityTemplates(models.Model):
+    """ the templates of activity """
+
+    OPEN_CHOICE = (
+        (0, u'关闭此模块'),
+        (1, u'加载默认模块'),
+        (2, u'加载自定义设置'),
+    )
+
+    name = models.CharField(u'活动名称', max_length=128, blank=True, help_text=u'例如<活动时间：2015-03-18至2015-03-28>')
+    # logo
+    logo = models.ImageField(u'网利宝logo图片', null=True, upload_to='activity', blank=True)
+    logo_other = models.ImageField(u'第三方logo图片', null=True, upload_to='activity', blank=True)
+    location = models.BooleanField(u'是否改变logo顺序', default=False, help_text=u'勾选此项则，则网利宝logo在后，第三方logo在前')
+    # banner
+    banner = models.ImageField(u'banner图片', null=True, upload_to='activity', blank=True)
+    # login
+    is_login = models.BooleanField(u'登录入口', default=False, help_text=u'勾选此项则在活动页面加载注册登录入口模块')
+    login_desc = models.CharField(u'登录入口标语', max_length=128, blank=True, help_text=u'例如<一句话宣传语>')
+    # 活动时间及描述
+    is_activity_desc = models.IntegerField(u'加载活动时间及描述模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
+    desc = models.CharField(u'活动描述', max_length=1024, blank=True, null=True, help_text=u'例如<一句话描述，活动期间怎么怎么滴>')
+    desc_time = models.CharField(u'活动时间', max_length=1024, blank=True, null=True, help_text=u'例如<活动时间：2015-03-18至2015-03-28>')
+    desc_img = models.CharField(u'活动图片ID:', max_length=60, blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割，根据图片优先级展示图片')
+    # 活动奖品图片及描述
+    is_reward = models.IntegerField(u'加载活动奖品模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
+    reward_img = models.ImageField(u'活动奖品图片', blank=True, null=True, upload_to='activity')
+    reward_desc = models.TextField(u'奖品描述', blank=True, null=True)
+    # 好友邀请及描述
+    is_introduce = models.IntegerField(u'加载邀请好友模块方案', max_length=20, choices=OPEN_CHOICE, default=0, help_text=u'当选择加载自定义设置时，自定义内容才会被加载到模板中')
+    introduce_img = models.ImageField(u'邀请好友图片:', blank=True, null=True, upload_to='activity')
+    # 新手投资流程
+    is_teacher = models.IntegerField(u'加载活动奖品模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
+    teacher_desc = models.CharField(u'新手投资活动图片ID:', max_length=60, blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割，根据图片优先级展示图片')
+    # 规则描述
+    is_rule_use = models.IntegerField(u'加载活动使用规则模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
+    rule_use = models.TextField(u'使用规则', blank=True, null=True)
+    is_rule_activity = models.IntegerField(u'加载活动规则模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
+    rule_activity = models.TextField(u'活动规则', blank=True, null=True)
+    is_rule_reward = models.IntegerField(u'加载奖品发放规则模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
+    rule_reward = models.TextField(
+        u'奖品发放', blank=True, null=True, help_text=u'按条目输入所有规则，当需要换行是，使用在行尾添加符号 |*|，<br /> \
+        例如<1.网利宝账户以身份证号为唯一识别标识。|*|2.P2P理财年化收益活动奖励将随P2P理财项目还款发放。>')
+    # 底部模块
+    is_footer = models.IntegerField(u'底部背景颜色模块', max_length=20, choices=OPEN_CHOICE, default=0)
+    footer_color = models.CharField(u'自定义底部背景颜色', max_length=20, null=True, blank=True, help_text=u'自定义底部背景颜色，如<#A70DC0>')
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = u'活动模板'

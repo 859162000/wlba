@@ -660,7 +660,7 @@ class KuaiPay:
             pay_info.save()
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
-            dic = {"user_id":user.id, "order_id":order.id, "id_number":profile.id_number,
+            dic = {"user_id":user.id, "order_id":order.id, "id_number":profile.id_number.upper(),
                     "phone":input_phone, "name":profile.name, "amount":amount,
                     "card_no":pay_info.card_no}
 
@@ -725,7 +725,7 @@ class KuaiPay:
             return {"ret_code":20121, "message":"订单不存在或已支付成功"}
         user = request.user
         profile = user.wanglibaouserprofile
-        dic = {"user_id":user.id, "order_id":order_id, "id_number":profile.id_number,
+        dic = {"user_id":user.id, "order_id":order_id, "id_number":profile.id_number.upper(),
                 "phone":input_phone, "name":profile.name, "amount":pay_info.amount,
                 "time":pay_info.create_time.strftime("%Y%m%d%H%M%S"), "vcode":vcode,
                 "card_no":pay_info.card_no, "token":token, "bank_id":pay_info.bank.kuai_code}

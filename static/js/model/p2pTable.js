@@ -58,5 +58,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2pTable.js.map
