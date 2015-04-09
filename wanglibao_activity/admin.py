@@ -3,8 +3,10 @@
 from django.contrib import admin
 import datetime
 from django.utils import timezone
+from import_export import resources, fields
 from import_export.admin import ExportMixin
 from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, ActivityImages
+import models as m
 
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'category', 'platform', 'product_cats', 'product_ids',\
@@ -45,6 +47,31 @@ class CustomDateFilter(admin.SimpleListFilter):
                                    trigger_at__lt=timezone.datetime(dt.year, dt.month, dt.day - 2, 23, 59, 59))
 
 
+class ActivityResource(resources.ModelResource):
+    activity = fields.Field(attribute="activity__name", column_name=u"活动名称")
+    rule = fields.Field(attribute="rule__rule_name", column_name=u"规则名称")
+    platform = fields.Field(attribute="platform", column_name=u"平台")
+    trigger_node = fields.Field(attribute="trigger_node", column_name=u"触发节点")
+    user = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name=u"用户手机号")
+    income = fields.Field(attribute="income", column_name=u"金额/收益")
+    description = fields.Field(attribute="description", column_name=u"摘要详情")
+    trigger_at = fields.Field(attribute="trigger_at", column_name=u"触发时间")
+
+    class Meta:
+        model = ActivityRecord
+        fields = ('activity', 'rule', 'platform', 'trigger_node', 'user', 'income', 'description', 'trigger_at')
+        export_order = ('activity', 'rule', 'platform', 'trigger_node', 'user', 'income', 'description', 'trigger_at')
+
+    def dehydrate_platform(self, obj):
+        return dict(m.PLATFORM)[obj.platform]
+
+    def dehydrate_trigger_node(self, obj):
+        return dict(m.TRIGGER_NODE)[obj.trigger_node]
+
+    def dehydrate_trigger_at(self, obj):
+        return timezone.localtime(obj.trigger_at).strftime("%Y-%m-%d %H:%M:%S")
+
+
 class ActivityRecordAdmin(ExportMixin, admin.ModelAdmin):
     actions = None
     list_display = ('id', 'activity', 'rule', 'platform', 'trigger_node', 'msg_type', \
@@ -54,6 +81,7 @@ class ActivityRecordAdmin(ExportMixin, admin.ModelAdmin):
         CustomDateFilter
     )
     search_fields = ('activity__name', 'rule__rule_name', 'user__wanglibaouserprofile__phone')
+    resource_class = ActivityResource
 
     # def __init__(self, *args, **kwargs):
     #     super(ActivityRecordAdmin, self).__init__(*args, **kwargs)
