@@ -8,4 +8,4 @@ from wanglibao_activity.views import TemplatesFormatTemplate
 urlpatterns = patterns(
     '',
     url(r'one/(?P<id>\w+)', TemplatesFormatTemplate.as_view(template_name='template_one.jade')),
-    url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),)
+    url(r'^templates_two', TemplateView.as_view(template_name="templates_two.jade")),)
