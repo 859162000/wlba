@@ -8,16 +8,18 @@ from import_export.admin import ExportMixin
 from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, ActivityImages
 import models as m
 
+
 class ActivityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'category', 'platform', 'product_cats', 'product_ids',\
-                    'channel', 'description', 'start_at', 'end_at', \
+    list_display = ('name', 'code', 'category', 'platform', 'product_cats', 'product_ids',
+                    'channel', 'description', 'start_at', 'end_at',
                     'activity_status', 'is_stopped', 'priority')
     search_fields = ('name', 'channel')
     list_filter = ('category', 'platform', 'is_stopped')
+    ordering = ('-priority', '-end_at')
 
 
 class ActivityRuleAdmin(admin.ModelAdmin):
-    list_display = ('activity', 'rule_name', 'rule_description', 'trigger_node', 'gift_type',\
+    list_display = ('activity', 'rule_name', 'rule_description', 'trigger_node', 'gift_type',
                     'redpack', 'reward', 'income', 'min_amount', 'max_amount', 'is_used')
     list_filter = ('trigger_node', 'gift_type', 'is_used')
     search_fields = ('rule_name', 'activity__name')
@@ -74,7 +76,7 @@ class ActivityResource(resources.ModelResource):
 
 class ActivityRecordAdmin(ExportMixin, admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'activity', 'rule', 'platform', 'trigger_node', 'msg_type', \
+    list_display = ('id', 'activity', 'rule', 'platform', 'trigger_node', 'msg_type',
                     'send_type', 'description', 'user', 'income', 'trigger_at')
     list_filter = (
         'platform', 'trigger_node', 'msg_type', 'send_type',
