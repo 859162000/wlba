@@ -9,4 +9,6 @@ urlpatterns = patterns(
     '',
     url(r'one/(?P<id>\w+)', TemplatesFormatTemplate.as_view(template_name='template_one.jade')),
     url(r'^index', TemplateView.as_view(template_name='tindex.jade')),
+    url(r'iphone', TemplateView.as_view(template_name='iphone.jade')),
+
 )
