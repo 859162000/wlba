@@ -59,7 +59,7 @@ def check_activity(user, trigger_node, device_type, amount=0):
                 activity_rules = ActivityRule.objects.filter(activity=activity,  is_used=True) \
                     .filter(Q(trigger_node='pay') | Q(trigger_node='first_pay')).order_by('-id')
             else:
-                activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node, \
+                activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node,
                                                              is_used=True).order_by('-id')
 
             if activity_rules:
@@ -116,9 +116,9 @@ def _send_gift(user, rule, device_type, amount=0):
         reward_name = rule.reward
         if amount and amount > 0:
             if is_amount:
-                _send_gift_reward(user, rule, rtype, reward_name, device_type)
+                _send_gift_reward(user, rule, rtype, reward_name, device_type, amount)
         else:
-            _send_gift_reward(user, rule, rtype, reward_name, device_type)
+            _send_gift_reward(user, rule, rtype, reward_name, device_type, amount)
 
     #送红包
     if rule.gift_type == 'redpack':
@@ -135,18 +135,18 @@ def _send_gift(user, rule, device_type, amount=0):
         #send to
         if amount and amount > 0:
             if is_amount:
-                _send_gift_income(user, rule)
+                _send_gift_income(user, rule, amount)
         else:
-            _send_gift_income(user, rule)
+            _send_gift_income(user, rule, amount)
 
     #送话费
     if rule.gift_type == 'phonefare':
         #send to
         if amount and amount > 0:
             if is_amount:
-                _send_gift_phonefare(user, rule)
+                _send_gift_phonefare(user, rule, amount)
         else:
-            _send_gift_phonefare(user, rule)
+            _send_gift_phonefare(user, rule, amount)
 
 
 def _check_introduced_by(user):
@@ -178,15 +178,15 @@ def _check_amount(min_amount, max_amount, amount):
                 return False
 
 
-def _send_gift_reward(user, rule, rtype, reward_name, device_type):
+def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount):
     now = timezone.now()
     if rule.send_type == 'sys_auto':
         #do send
-        _send_reward(user, rule, rtype, reward_name)
+        _send_reward(user, rule, rtype, reward_name, None, amount)
         if rule.both_share:
             user_introduced_by = _check_introduced_by(user)
             if user_introduced_by:
-                _send_reward(user, rule, rtype, reward_name, user_introduced_by)
+                _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
     else:
         #只记录不发信息
         _save_activity_record(rule, user, 'only_record', reward_name)
@@ -196,7 +196,7 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type):
                 _save_activity_record(rule, user_introduced_by, 'only_record', reward_name, True)
 
 
-def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
+def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None, amount=0):
     now = timezone.now()
     reward = Reward.objects.filter(type=reward_name,
                                    is_used=False,
@@ -210,21 +210,21 @@ def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None):
         if has_reward_record:
             #发放站内信或短信
             if user_introduced_by:
-                _send_message_sms(user, rule, user_introduced_by, reward)
+                _send_message_sms(user, rule, user_introduced_by, reward, amount)
             else:
-                _send_message_sms(user, rule, None, reward)
+                _send_message_sms(user, rule, None, reward, amount)
 
 
-def _send_gift_income(user, rule):
+def _send_gift_income(user, rule, amount):
     # now = timezone.now()
     income = rule.income
     if income > 0:
         if rule.send_type == 'sys_auto':
-            _send_message_sms(user, rule)
+            _send_message_sms(user, rule, None, None, amount)
             if rule.both_share:
                 user_introduced_by = _check_introduced_by(user)
                 if user_introduced_by:
-                    _send_message_sms(user, rule, user_introduced_by, None)
+                    _send_message_sms(user, rule, user_introduced_by, None, amount)
         else:
             #只记录不发信息
             _save_activity_record(rule, user, 'only_record', rule.rule_name)
@@ -236,16 +236,16 @@ def _send_gift_income(user, rule):
         return
 
 
-def _send_gift_phonefare(user, rule):
+def _send_gift_phonefare(user, rule, amount):
     # now = timezone.now()
     phone_fare = rule.income
     if phone_fare > 0:
         if rule.send_type == 'sys_auto':
-            _send_message_sms(user, rule, None, None)
+            _send_message_sms(user, rule, None, None, amount)
             if rule.both_share:
                 user_introduced_by = _check_introduced_by(user)
                 if user_introduced_by:
-                    _send_message_sms(user, rule, user_introduced_by, None)
+                    _send_message_sms(user, rule, user_introduced_by, None, amount)
         else:
             #只记录不发信息
             _save_activity_record(rule, user, 'only_record', rule.rule_name)
@@ -298,7 +298,7 @@ def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=Fa
     record.save()
 
 
-def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
+def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0):
     """
         inviter: 邀请人
         invited： 被邀请人
@@ -327,7 +327,8 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
             'reward': reward_content,
             'inviter': inviter_phone,
             'invited': invited_phone,
-            'amount': rule.income,
+            'income': rule.income,
+            'amount': amount,
             'end_date': end_date,
             'name': name,
             'highest_amount': highest_amount
@@ -354,7 +355,8 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None):
             'reward': reward_content,
             'inviter': inviter_phone,
             'invited': invited_phone,
-            'amount': rule.income,
+            'give_amount': rule.income,
+            'amount': amount,
             'end_date': end_date,
             'name': name,
             'highest_amount': highest_amount

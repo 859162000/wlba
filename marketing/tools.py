@@ -42,62 +42,14 @@ def decide_first(user_id, amount, device_type='pc'):
     #channel = helper.which_channel(user, intro=introduced_by)
     channel = helper.which_channel(user)
 
-    #if "channel" not in introduced_by.introduced_by.username:
-    if channel == helper.Channel.WANGLIBAO:
-        inviter_phone = introduced_by.introduced_by.wanglibaouserprofile.phone
-        invited_phone = introduced_by.user.wanglibaouserprofile.phone
-
-        inviter_id = introduced_by.introduced_by.id
-        invited_id = introduced_by.user.id
-        if amount >= 200:
-            start_time = timezone.datetime(2014, 9, 1)
-            end_time = timezone.datetime(2015, 4, 8)
-            now = datetime.now()
-            if now > end_time:
-                return
-            if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() > 1:
-                return
-
-            inviter_phone_safe = safe_phone_str(inviter_phone)
-            invited_phone_safe = safe_phone_str(invited_phone)
-
-            send_messages.apply_async(kwargs={
-                "phones": [inviter_phone, invited_phone],
-                "messages": [messages.gift_inviter(invited_phone=invited_phone_safe, money=30),
-                            messages.gift_invited(inviter_phone=inviter_phone_safe, money=30)]
-            })
-            title, content = messages.msg_invite_major(inviter_phone, invited_phone)
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": inviter_id,
-                "title": title,
-                "content": content,
-                "mtype": "activity"
-            })
-            title2, content2 = messages.msg_invite_are(inviter_phone, invited_phone)
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": invited_id,
-                "title": title2,
-                "content": content2,
-                "mtype": "activity"
-            })
-
-            rwd = Reward.objects.filter(type=u'30元话费').first()
-            if rwd:
-                try:
-                    RewardRecord.objects.create(user=introduced_by.introduced_by, reward=rwd, description=content)
-                    RewardRecord.objects.create(user=introduced_by.user, reward=rwd, description=content2)
-                except Exception, e:
-                    print(e)
+    end_date = timezone.datetime(2015, 4, 10, 12, 00, 00)
+    now = datetime.now()
+    if now > end_date:
         return
 
     # 判断来源
     rs = RewardStrategy(user)
-    if channel == helper.Channel.KUAIPAN:
-        # 快盘来源
-        start_time = timezone.datetime(2014, 11, 26)
-        if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
-            rs.reward_user(u'100G快盘容量')
-    elif channel == helper.Channel.FENGXING:
+    if channel == helper.Channel.FENGXING:
         #风行
         start_time = timezone.datetime(2014, 12, 18)
         if P2PRecord.objects.filter(user=user, create_time__gt=start_time).count() == 1:
@@ -160,14 +112,9 @@ def decide_first(user_id, amount, device_type='pc'):
 def register_ok(user_id, device_type):
     user = User.objects.filter(id=user_id).first()
 
-    #introduced_by = IntroducedBy.objects.filter(user=user).first()
+    # channel = helper.which_channel(user)
 
-    channel = helper.which_channel(user)
-
-    if channel == helper.Channel.FENGXING:
-        title, content = messages.msg_register_f()
-    else:
-        title, content = messages.msg_register()
+    title, content = messages.msg_register()
     inside_message.send_one.apply_async(kwargs={
         "user_id": user_id,
         "title": title,
@@ -181,32 +128,29 @@ def register_ok(user_id, device_type):
 @app.task
 def idvalidate_ok(user_id, device_type):
     user = User.objects.filter(id=user_id).first()
-    #introduced_by = IntroducedBy.objects.filter(user=user).first()
-    channel = helper.which_channel(user)
 
     #活动检测
     activity_backends.check_activity(user, 'validation', device_type)
 
-    if channel == helper.Channel.KUAIPAN:
-        rs = RewardStrategy(user)
-        rs.reward_user(u'50G快盘容量')
-
-    if channel == helper.Channel.IQIYI:
-        pass
-        #rs = RewardStrategy(user)
-        #rs.reward_user(u'7天爱奇艺会员')
-        #发短信
-
-    if channel == helper.Channel.PPTV:
-        rs = RewardStrategy(user)
-        rs.reward_user(u'一个月PPTV会员')
-        #发短信
 
 #充值成功
 def despoit_ok(pay_info, device_type='pc'):
 
+    title, content = messages.msg_pay_ok(pay_info.amount)
+    inside_message.send_one.apply_async(kwargs={
+        "user_id": pay_info.user.id,
+        "title": title,
+        "content": content,
+        "mtype": "activityintro"
+    })
+
     #活动检测，充值
     activity_backends.check_activity(pay_info.user, 'recharge', device_type, pay_info.amount)
+
+    end_date = timezone.datetime(2015, 4, 10, 12, 00, 00)
+    now = datetime.now()
+    if now > end_date:
+        return
 
     channel = helper.which_channel(pay_info.user)
     if channel == helper.Channel.FENGXING:
@@ -262,14 +206,6 @@ def despoit_ok(pay_info, device_type='pc'):
                 status=PayInfo.SUCCESS).count() == 1:
             rs = RewardStrategy(pay_info.user)
             rs.reward_user(u'7天爱奇艺会员')
-        title, content = messages.msg_pay_ok(pay_info.amount)
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": pay_info.user.id,
-            "title": title,
-            "content": content,
-            "mtype": "activityintro"
-        })
-    else:
         title, content = messages.msg_pay_ok(pay_info.amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id": pay_info.user.id,
