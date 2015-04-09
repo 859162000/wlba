@@ -85,7 +85,6 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
     elif trigger_node == 'first_pay':
         #check first pay
         if PayInfo.objects.filter(user=user, type='D',
-                                  update_time__gt=rule.activity.start_at,
                                   status=PayInfo.SUCCESS).count() == 1:
             _send_gift(user, rule, device_type, amount)
     #充值
@@ -94,8 +93,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
     #首次购买
     elif trigger_node == 'first_buy':
         #check first pay
-        if P2PRecord.objects.filter(user=user,
-                                    create_time__gt=rule.activity.start_at).count() == 1:
+        if P2PRecord.objects.filter(user=user).count() == 1:
             _send_gift(user, rule, device_type, amount)
     #购买
     elif trigger_node == 'buy':
