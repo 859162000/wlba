@@ -36,7 +36,7 @@ TRIGGER_NODE = (
     ('buy', u'投资'),
     ('first_pay', u'首次充值'),
     ('first_buy', u'首次投资'),
-    ('p2p_audit', u'满标审核')
+    # ('p2p_audit', u'满标审核')
 )
 GIFT_TYPE = (
     ('reward', u'奖品'),
@@ -119,10 +119,14 @@ class ActivityRule(models.Model):
     rule_description = models.TextField(u'规则描述', null=True, blank=True)
     gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE)
     trigger_node = models.CharField(u'触发节点', max_length=20, choices=TRIGGER_NODE)
+    is_in_date = models.BooleanField(u'判断触发节点动作的时间是否在活动时间内', default=False,
+                                     help_text=u'勾选此项，则会以活动的起止时间来判断触发节点的动作，否则不判断时间（注册、实名认证除外）')
     is_introduced = models.BooleanField(u'邀请好友时才启用', default=False,
-                                        help_text=u'勾选此项则，则会先判断用户是否被别人邀请，是就触发该规则，不是则不做处理')
+                                        help_text=u'勾选此项，则会先判断用户是否被别人邀请，是就触发该规则，不是则不做处理')
     both_share = models.BooleanField(u'参与邀请共享赠送礼品', default=False,
                                      help_text=u'勾选此项则，则用户在满足规则的条件内邀请别人，双方共享选定“赠送类型”中的礼品')
+    is_invite_in_date = models.BooleanField(u'判断是否在活动区间内邀请好友', default=False,
+                                            help_text=u'勾选此项则，则会先判断邀请关系的成立时间是否在活动期间，是就触发该规则，不是则不做处理')
     redpack = models.CharField(u'红包活动ID', max_length=60, blank=True,
                                help_text=u'红包活动ID一定要和红包活动中的ID保持一致，否则会导致无法发放红包')
     reward = models.CharField(u'奖品类型名称', max_length=60, blank=True,
@@ -177,6 +181,7 @@ class ActivityRecord(models.Model):
     description = models.TextField(u'摘要', blank=True)
     msg_type = models.CharField(u'信息类型', max_length=20, choices=MSG_TYPE, default=u"只记录")
     send_type = models.CharField(u'发放方式', max_length=20, choices=SEND_TYPE_ABBR, default=u'系统')
+    gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE, default='')
     user = models.ForeignKey(User, verbose_name=u"触发用户")
     income = models.FloatField(u'费用或收益', null=True, blank=True)
     created_at = models.DateTimeField(auto_now=True)
