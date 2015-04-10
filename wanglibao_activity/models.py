@@ -119,8 +119,8 @@ class ActivityRule(models.Model):
     rule_description = models.TextField(u'规则描述', null=True, blank=True)
     gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE)
     trigger_node = models.CharField(u'触发节点', max_length=20, choices=TRIGGER_NODE)
-    is_in_date = models.BooleanField(u'判断触发节点动作的时间是否在活动时间内', default=False,
-                                     help_text=u'勾选此项，则会以活动的起止时间来判断触发节点的动作，否则不判断时间（注册、实名认证除外）')
+    is_in_date = models.BooleanField(u'判断首次充值（或首次投资）的时间是否在活动时间内', default=False,
+                                     help_text=u'勾选此项，则会以活动的起止时间来判断首次投资或充值的动作，否则不做时间判断')
     is_introduced = models.BooleanField(u'邀请好友时才启用', default=False,
                                         help_text=u'勾选此项，则会先判断用户是否被别人邀请，是就触发该规则，不是则不做处理')
     both_share = models.BooleanField(u'参与邀请共享赠送礼品', default=False,
