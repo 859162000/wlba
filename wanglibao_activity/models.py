@@ -200,8 +200,8 @@ class ActivityImages(models.Model):
     img_type = models.CharField(max_length=20, choices=IMG_TYPE, verbose_name=u'图片类别')
     name = models.CharField(max_length=128, verbose_name=u'图片名称', help_text=u'当图片类别是元素时,模板中会显示')
     img = models.ImageField(upload_to='activity', blank=True, verbose_name=u'图片')
-    desc_one = models.CharField(max_length=1024, blank=True, verbose_name=u'图片描述1', help_text=u'展示在图片旁边的描述信息')
-    desc_two = models.CharField(max_length=1024, blank=True, verbose_name=u'图片描述2', help_text=u'展示在图片旁边的描述信息')
+    desc_one = models.TextField(blank=True, verbose_name=u'图片描述1', help_text=u'展示在图片旁边的描述信息')
+    desc_two = models.TextField(blank=True, verbose_name=u'图片描述2', help_text=u'展示在图片旁边的描述信息')
     priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先')
     last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'上次更新时间')
 
@@ -221,6 +221,20 @@ class ActivityTemplates(models.Model):
         (2, u'加载自定义设置'),
     )
 
+    TEACHER_CHOICE = (
+        (0, u'关闭此模块'),
+        (1, u'加载第一种默认样式'),
+        (2, u'加载第二种默认样式'),
+    )
+
+    REWARD_CHOICE = (
+        (0, u'关闭此模块'),
+        (1, u'加载第一种默认样式'),
+        (2, u'加载第二种默认样式'),
+        (3, u'自定义第一种样式'),
+        (4, u'自定义第二种样式'),
+    )
+
     name = models.CharField(u'活动名称', max_length=128, blank=True, help_text=u'例如<活动时间：2015-03-18至2015-03-28>')
     # logo
     logo = models.ImageField(u'网利宝logo图片', null=True, upload_to='activity', blank=True)
@@ -237,15 +251,17 @@ class ActivityTemplates(models.Model):
     desc_time = models.CharField(u'活动时间', max_length=1024, blank=True, null=True, help_text=u'例如<活动时间：2015-03-18至2015-03-28>')
     desc_img = models.CharField(u'活动图片ID:', max_length=60, blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割，根据图片优先级展示图片')
     # 活动奖品图片及描述
-    is_reward = models.IntegerField(u'加载活动奖品模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
-    reward_img = models.ImageField(u'活动奖品图片', blank=True, null=True, upload_to='activity')
-    reward_desc = models.TextField(u'奖品描述', blank=True, null=True)
+    is_reward = models.IntegerField(u'加载活动奖品模块方案', max_length=20, choices=REWARD_CHOICE, default=0)
+    reward_img = models.CharField(u'活动奖品ID', max_length=60, blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割，根据图片优先级展示图片')
+    reward_desc = models.TextField(u'自定义第二种样式活动描述', blank=True, null=True, help_text=u'当自定义第二种样式时，需要填写词描述，例如<活动期间，单日投资额达到以下额度，可获得相应奖品。>')
     # 好友邀请及描述
     is_introduce = models.IntegerField(u'加载邀请好友模块方案', max_length=20, choices=OPEN_CHOICE, default=0, help_text=u'当选择加载自定义设置时，自定义内容才会被加载到模板中')
     introduce_img = models.ImageField(u'邀请好友图片:', blank=True, null=True, upload_to='activity')
     # 新手投资流程
-    is_teacher = models.IntegerField(u'加载活动奖品模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
-    teacher_desc = models.CharField(u'新手投资活动图片ID:', max_length=60, blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割，根据图片优先级展示图片')
+    is_teacher = models.IntegerField(u'加载活动奖品模块方案', max_length=20, choices=TEACHER_CHOICE, default=0)
+    teacher_desc = models.CharField(
+        u'自定义描述', max_length=1024, blank=True, null=True, default=' |*| |*| |*| |*| ',
+        help_text=u'如果新手新手投资流程对应的步骤有自定义描述，在此处添加，描述使用|*|分割。例如在第1、2、4步骤下添加注释，则<描述1|*|描述2|*||*|描述4|*|>')
     # 规则描述
     is_rule_use = models.IntegerField(u'加载活动使用规则模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
     rule_use = models.TextField(u'使用规则', blank=True, null=True)
@@ -258,6 +274,18 @@ class ActivityTemplates(models.Model):
     # 底部模块
     is_footer = models.IntegerField(u'底部背景颜色模块', max_length=20, choices=OPEN_CHOICE, default=0)
     footer_color = models.CharField(u'自定义底部背景颜色', max_length=20, null=True, blank=True, help_text=u'自定义底部背景颜色，如<#A70DC0>')
+    # 高收益柱形图
+    is_earning_one = models.BooleanField(u'高收益柱形图介绍模块', default=False, help_text=u'勾选此项则在活动页面加载高收益柱形图模块')
+    # 多种选择介绍
+    is_earning_two = models.BooleanField(u'多种选择介绍模块', default=False, help_text=u'勾选此项则在活动页面加载多种选择介绍模块模块')
+    # 投资奖励活动介绍
+    is_earning_three = models.BooleanField(u'活动投资奖励模块', default=False, help_text=u'勾选此项则在活动页面加载活动投资奖励模块')
+    # 添加波浪背景模块
+    is_background = models.IntegerField(u'加载背景图模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
+    background_img = models.ImageField(u'自定义背景图片:', blank=True, null=True, upload_to='activity')
+    background_location = models.CharField(u'背景图片位置', max_length=20, null=True, blank=True, help_text=u'填写要添加背景图片模块序号，选择加载默认模块或者自定义设置时，都需要填写此项')
+    # 选择显示模板顺序
+    models_sequence = models.CharField(u'填写展示模块的顺序', max_length=60, null=False, blank=True, help_text=u'根据各个模块的编号填写加载各个模块的顺序，头部、banner和底部不允许改变，无需填写，序号使用逗号分割，例如<1,2,3,4>')
 
     def __unicode__(self):
         return self.name
