@@ -1,6 +1,7 @@
 
 .act-login
-    h1.act-biaoti 轻松拿70元话费
+    if result.login_desc
+      h1.act-biaoti {{result.login_desc}}
     form#register-modal-form.act-login-form(method='post', action='/accounts/register/ajax/')
       - csrf_token
       .act-form-row

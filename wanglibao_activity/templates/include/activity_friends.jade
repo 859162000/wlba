@@ -1,0 +1,9 @@
+// 邀请好友模块
+if result.is_introduce != 0
+  if result.is_introduce == 1
+    .invitation
+  else
+    .invitation(style="background:url('/media/{{result.introduce_img}}') center center no-repeat")
+
+  .invitation-container
+    a(href="/accounts/invite/").invitation-btn 邀请好友

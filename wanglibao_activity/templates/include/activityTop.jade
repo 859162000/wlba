@@ -23,9 +23,13 @@
 .activity-nav
   .act-container-login-nav
     a(href='/')
-      .act-logo
+      .act-logo(style="background:url('/media/{{result.logo}}');background-repeat:no-repeat;background-position:center;height:114px;width:160px;display:inline-block")
+      if result.logo_other
+        .act-logo(style="background:url('/media/{{result.logo_other}}');background-repeat:no-repeat;background-position:center;height:114px;width:160px;display:inline-block")
     .login-nav
       include include/nav_common
+
+
 
   script(src="/static/js/lib/jquery.min.js")
   script.
