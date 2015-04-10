@@ -8,6 +8,12 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+
+        # Changing field 'ActivityImages.desc_two'
+        db.alter_column(u'wanglibao_activity_activityimages', 'desc_two', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'ActivityImages.desc_one'
+        db.alter_column(u'wanglibao_activity_activityimages', 'desc_one', self.gf('django.db.models.fields.TextField')())
         # Deleting field 'ActivityTemplates.introduce_desc'
         db.delete_column(u'wanglibao_activity_activitytemplates', 'introduce_desc')
 
@@ -36,9 +42,44 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True),
                       keep_default=False)
 
+        # Adding field 'ActivityTemplates.is_earning_one'
+        db.add_column(u'wanglibao_activity_activitytemplates', 'is_earning_one',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'ActivityTemplates.is_earning_two'
+        db.add_column(u'wanglibao_activity_activitytemplates', 'is_earning_two',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'ActivityTemplates.is_earning_three'
+        db.add_column(u'wanglibao_activity_activitytemplates', 'is_earning_three',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'ActivityTemplates.is_background'
+        db.add_column(u'wanglibao_activity_activitytemplates', 'is_background',
+                      self.gf('django.db.models.fields.IntegerField')(default=0, max_length=20),
+                      keep_default=False)
+
+        # Adding field 'ActivityTemplates.background_img'
+        db.add_column(u'wanglibao_activity_activitytemplates', 'background_img',
+                      self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'ActivityTemplates.background_location'
+        db.add_column(u'wanglibao_activity_activitytemplates', 'background_location',
+                      self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'ActivityTemplates.models_sequence'
+        db.add_column(u'wanglibao_activity_activitytemplates', 'models_sequence',
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=60, blank=True),
+                      keep_default=False)
+
 
         # Changing field 'ActivityTemplates.teacher_desc'
-        db.alter_column(u'wanglibao_activity_activitytemplates', 'teacher_desc', self.gf('django.db.models.fields.CharField')(max_length=60, null=True))
+        db.alter_column(u'wanglibao_activity_activitytemplates', 'teacher_desc', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True))
 
         # Changing field 'ActivityTemplates.desc_time'
         db.alter_column(u'wanglibao_activity_activitytemplates', 'desc_time', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True))
@@ -61,10 +102,13 @@ class Migration(SchemaMigration):
         # Changing field 'ActivityTemplates.introduce_img'
         db.alter_column(u'wanglibao_activity_activitytemplates', 'introduce_img', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True))
 
-        # Changing field 'ActivityTemplates.reward_img'
-        db.alter_column(u'wanglibao_activity_activitytemplates', 'reward_img', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True))
-
     def backwards(self, orm):
+
+        # Changing field 'ActivityImages.desc_two'
+        db.alter_column(u'wanglibao_activity_activityimages', 'desc_two', self.gf('django.db.models.fields.CharField')(max_length=1024))
+
+        # Changing field 'ActivityImages.desc_one'
+        db.alter_column(u'wanglibao_activity_activityimages', 'desc_one', self.gf('django.db.models.fields.CharField')(max_length=1024))
         # Adding field 'ActivityTemplates.introduce_desc'
         db.add_column(u'wanglibao_activity_activitytemplates', 'introduce_desc',
                       self.gf('ckeditor.fields.RichTextField')(null=True, blank=True),
@@ -84,6 +128,27 @@ class Migration(SchemaMigration):
 
         # Deleting field 'ActivityTemplates.footer_color'
         db.delete_column(u'wanglibao_activity_activitytemplates', 'footer_color')
+
+        # Deleting field 'ActivityTemplates.is_earning_one'
+        db.delete_column(u'wanglibao_activity_activitytemplates', 'is_earning_one')
+
+        # Deleting field 'ActivityTemplates.is_earning_two'
+        db.delete_column(u'wanglibao_activity_activitytemplates', 'is_earning_two')
+
+        # Deleting field 'ActivityTemplates.is_earning_three'
+        db.delete_column(u'wanglibao_activity_activitytemplates', 'is_earning_three')
+
+        # Deleting field 'ActivityTemplates.is_background'
+        db.delete_column(u'wanglibao_activity_activitytemplates', 'is_background')
+
+        # Deleting field 'ActivityTemplates.background_img'
+        db.delete_column(u'wanglibao_activity_activitytemplates', 'background_img')
+
+        # Deleting field 'ActivityTemplates.background_location'
+        db.delete_column(u'wanglibao_activity_activitytemplates', 'background_location')
+
+        # Deleting field 'ActivityTemplates.models_sequence'
+        db.delete_column(u'wanglibao_activity_activitytemplates', 'models_sequence')
 
 
         # Changing field 'ActivityTemplates.teacher_desc'
@@ -109,9 +174,6 @@ class Migration(SchemaMigration):
 
         # Changing field 'ActivityTemplates.introduce_img'
         db.alter_column(u'wanglibao_activity_activitytemplates', 'introduce_img', self.gf('ckeditor.fields.RichTextField')(null=True))
-
-        # Changing field 'ActivityTemplates.reward_img'
-        db.alter_column(u'wanglibao_activity_activitytemplates', 'reward_img', self.gf('django.db.models.fields.CharField')(max_length=60, null=True))
 
     models = {
         u'auth.group': {
@@ -173,8 +235,8 @@ class Migration(SchemaMigration):
         },
         u'wanglibao_activity.activityimages': {
             'Meta': {'object_name': 'ActivityImages'},
-            'desc_one': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
-            'desc_two': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
+            'desc_one': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'desc_two': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'img': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
             'img_type': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
@@ -222,6 +284,8 @@ class Migration(SchemaMigration):
         },
         u'wanglibao_activity.activitytemplates': {
             'Meta': {'object_name': 'ActivityTemplates'},
+            'background_img': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'background_location': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'banner': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'desc': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'null': 'True', 'blank': 'True'}),
             'desc_img': ('django.db.models.fields.CharField', [], {'max_length': '60', 'null': 'True', 'blank': 'True'}),
@@ -230,6 +294,10 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'introduce_img': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'is_activity_desc': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '20'}),
+            'is_background': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '20'}),
+            'is_earning_one': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_earning_three': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_earning_two': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_footer': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '20'}),
             'is_introduce': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '20'}),
             'is_login': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -242,13 +310,14 @@ class Migration(SchemaMigration):
             'login_desc': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'logo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'logo_other': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'models_sequence': ('django.db.models.fields.CharField', [], {'max_length': '60', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'reward_desc': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'reward_img': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'reward_img': ('django.db.models.fields.CharField', [], {'max_length': '60', 'null': 'True', 'blank': 'True'}),
             'rule_activity': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'rule_reward': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'rule_use': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'teacher_desc': ('django.db.models.fields.CharField', [], {'max_length': '60', 'null': 'True', 'blank': 'True'})
+            'teacher_desc': ('django.db.models.fields.CharField', [], {'default': "' |*| |*| |*| |*| '", 'max_length': '1024', 'null': 'True', 'blank': 'True'})
         }
     }
 

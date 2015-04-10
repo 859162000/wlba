@@ -1,39 +1,33 @@
-.prize-all
-       .span6
-           img(src="/static/images/gold/awards_bg.jpg").prize-jiangli
-       .span5-omega
-           ul.prize-all-right
-               li 1、 累计购买满130万
-                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                  span 送
-                  |iPhone 6 Plus（16G 5.5英寸）
-               li 2、 累计购买满100万
-                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                  span 送
-                  |iPhone 6（16G 4.7英寸）
-               li 3、 累计购买满80万
-                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                  span 送
-                  |华为mate7 4G版手机（16G）
-               li 4、 累计购买满50万
-                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                  span 送
-                  |iPad Air 2（16G WLAN）
-               li 5、 累计购买满40万
-                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                  span 送
-                  |iPad mini3（16G WLAN）
-               li 6、 累计购买满30万
-                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                  span 送
-                  |1000元京东礼品卡
-               li 7、 累计购买满10万
-                  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                  span 送
-                  |300元京东礼品卡
-               li 8、 累计购买满1万-9万
-                  &nbsp
-                  |每满1万元
-                  &nbsp
-                  span 送
-                  |30元话费
+// 奖品展示模块
+if result.is_reward != 0
+  if result.is_reward == 1
+    include include/activity_prize_one
+  if result.is_reward == 2
+    include include/activity_prize_two
+  if result.is_reward == 3
+    .prize-all
+      .span6
+        img(src="/media/{{result.reward_img.0.img}}").prize-jiangli
+      if result.reward_desc
+        .span5-omega
+          ul.prize-all-right
+            for des in result.reward_desc
+              li {{des}}
+  if result.is_reward == 4
+    .act-iphone
+      .act-iphone-tit
+        .act-iphone-le
+          h2.black 没心！没肺！没节操的送！
+          p {{result.reward_desc}}
+        .act-iphone-r
+      .row.act-iphone-row
+        for img in result.reward_img
+          .span3(style="margin-right:12px")
+            dl.act-iphone-jiang
+              span.act-iphone-huang
+              h3.act-iphone-h2 {{img.name}}
+              dt.act-iphone-com2.act-iphone-one(style="background: url('/media/{{img.img}}') no-repeat center center")
+              dd(style="color:#e9573f")
+                span(style="background:#e9573f") 送
+                |{{img.desc_one}}
+
