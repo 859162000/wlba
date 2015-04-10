@@ -40,7 +40,7 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
-    AmortizationRecord, P2PProductContract, UserPaymentHistory
+    AmortizationRecord, P2PProductContract, UserPaymentHistory, P2PProduct
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
@@ -1064,7 +1064,8 @@ class PaymentHistoryAPI(APIView):
     def get(self, request, **kwargs):
         user = request.user
         product_id = kwargs['product_id']
-        equity = P2PEquity.objects.filter(user=user, product_id=product_id).prefetch_related('product').first()
+        product = P2PProduct.objects.filter(pk=product_id).first()
+        equity = P2PEquity.objects.filter(user=user, product=product).first()
         payments = UserPaymentHistory.objects.filter(user=self.request.user,
                                                         product_payment__product_id=product_id)
 
@@ -1076,9 +1077,10 @@ class PaymentHistoryAPI(APIView):
                                    'payment_amount': float(payment.principal + payment.interest),  # 总记
                                } for payment in payments]
 
+
         res = {
-            'equity_product_short_name': equity.product.short_name,  # 还款标题
-            'equity_product_serial_number': equity.product.serial_number,  # 还款计划编号
+            'equity_product_short_name': product.short_name,  # 还款标题
+            'equity_product_serial_number': product.serial_number,  # 还款计划编号
             'payment_record': payment_record
 
         }

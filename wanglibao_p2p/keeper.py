@@ -235,7 +235,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             raise P2PException('invalid product status.')
 
 
-        #get_amortization_plan(self.product.pay_method).calculate_term_date(self.product) #每期还款日期不在单独生成
+        get_amortization_plan(self.product.pay_method).calculate_term_date(self.product) #每期还款日期不在单独生成
 
         # Delete all old user amortizations
         with transaction.atomic(savepoint=savepoint):
@@ -542,6 +542,9 @@ class AmortizationKeeper(KeeperBaseMixin):
                 #"messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, sub_amo.principal + sub_amo.interest + sub_amo.penal_interest)]
                 "messages": message_list
             })
+
+            payment = PaymentHistory(p2p)
+            payment.payment(amortization)
 
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 

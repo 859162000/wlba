@@ -61,7 +61,7 @@ class MonthlyInterest(AmortizationPlan):
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None):
         amount = Decimal(amount)
-        year_rate = Decimal(year_rate)
+        year_rate = Decimal(str(year_rate))
 
 
         proportion = get_base_decimal(Decimal(period)/Decimal(12))
@@ -97,7 +97,7 @@ class InterestFirstThenPrincipal(AmortizationPlan):
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None):
         amount = Decimal(amount)
-        year_rate = Decimal(year_rate)
+        year_rate = Decimal(str(year_rate))
 
         month_rate = year_rate / 12
         month_rate = Decimal(month_rate).quantize(Decimal('0.000000001'))
@@ -132,7 +132,7 @@ class DisposablePayOff(AmortizationPlan):
                 "interest_arguments": None
             }
         amount = Decimal(amount)
-        year_rate = Decimal(year_rate)
+        year_rate = Decimal(str(year_rate))
 
         proportion = get_base_decimal(Decimal(period)/Decimal(12))
         total_interest = get_final_decimal(amount * year_rate * proportion)
@@ -165,7 +165,7 @@ class QuarterlyInterest(AmortizationPlan):
         assert(period is not None)
 
         amount = Decimal(amount)
-        year_rate = Decimal(year_rate)
+        year_rate = Decimal(str(year_rate))
         quarter_rate = year_rate / 4
 
         quarter_interest = amount * quarter_rate
@@ -238,6 +238,16 @@ class DailyInterest(AmortizationPlan):
             }
         }
 
+
+    @classmethod
+    def calculate_term_date(cls, product):
+        amortization = product.amortizations.all().first()
+        period = product.period
+        today = timezone.now()
+
+        amortization.term_date = today + timedelta(days=period)
+        amortization.save()
+
 class DailyInterestInAdvance(AmortizationPlan):
     name = u'按日计息一次性还本付息T+N'
     @classmethod
@@ -270,6 +280,15 @@ class DailyInterestInAdvance(AmortizationPlan):
             }
         }
 
+    @classmethod
+    def calculate_term_date(cls, product):
+        amortization = product.amortizations.all().first()
+        period = product.period
+        today = timezone.now()
+
+        amortization.term_date = today + timedelta(days=period)
+        amortization.save()
+
 class DailyInterestMonthly(AmortizationPlan):
     name = u'日计息月付息'
 
@@ -295,7 +314,7 @@ class DailyInterestMonthly(AmortizationPlan):
                 anchor = term_date
                 term_dates.append(anchor)
                 term_period = term_dates[i] - term_dates[i-1]
-                total_interest = daily_interest * period - left_interest
+                total_interest = (daily_interest * period - left_interest).quantize(Decimal('.01'), rounding=ROUND_DOWN)
                 result.append((total_interest+amount, amount, total_interest, Decimal(0), Decimal(0), term_dates[i]))
 
             else:
@@ -321,6 +340,29 @@ class DailyInterestMonthly(AmortizationPlan):
             }
         }
 
+    @classmethod
+    def calculate_term_date(cls, product):
+
+        period = product.period
+
+        interest_start = datetime.now()
+        term_dates = [interest_start]
+        term_date = interest_start + timedelta(days=period)
+
+        i = 0
+        while term_dates[i] < term_date:
+            i = i + 1
+            if interest_start + relativedelta(months=i) > term_date:
+                anchor = term_date
+                term_dates.append(anchor)
+            else:
+                anchor = interest_start + relativedelta(months=i)
+                term_dates.append(anchor)
+
+        amortizations = product.amortizations.all()
+        for index, amortization in enumerate(amortizations):
+            amortization.term_date = term_dates[index+1]
+            amortization.save()
 
 
 def get_amortization_plan(amortization_type):

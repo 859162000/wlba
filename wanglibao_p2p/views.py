@@ -21,7 +21,7 @@ from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
-from wanglibao_p2p.repayment import get_payment_history
+from wanglibao_p2p.repayment import get_payment_history, PaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, \
@@ -615,8 +615,8 @@ class AdminPrepayment(TemplateView):
             p2p = P2PProduct.objects.filter(pk=id).select_related('amortizations')
         if p2p[0].status != u'还款中':
             return {
-                    p2p: None,
-                    amortizations: []
+                    'p2p': None,
+                    'amortizations': []
                     }
         
         return {
@@ -663,37 +663,11 @@ class RepaymentAPIView(APIView):
 
         from dateutil import parser
         flag_date = parser.parse(repayment_date)
-        obj = get_payment_history(p2p, flag_date, repayment_type, None)
 
-        obj.update({'date': repayment_date})
-
+        payment = PaymentHistory(p2p)
         if repayment_now == '1':
-            with transaction.atomic(savepoint=True):
-                #1.生成产品提前还款记录
-                description='提前还款'
-                product_repayment = ProductPaymentHistory(
-                        product=p2p, term=obj.get('term'), principal=obj.get('principal'), term_date=repayment_date,
-                        interest=obj.get('interest'), penal_interest=penal_interest, description=description 
-                        )
-                #1.1 根据产品年化收益、计息方式、借款总额生成还款记录
-                product_repayment.save() 
-                #2.生成用户提前还款记录
-                #2.1 拿到产品所有用户持仓
-                equities = p2p.equities.all()
-                user_repayments = list()
-                for equity in equities:
-                    #2.2 根据产品年化收益、计息方式、用户借款总额生成还款记录
-                    user_repayment_result = get_payment_history(p2p, flag_date, repayment_type, equity)
-                    user_repayment = UserPaymentHistory(
-                            product_payment=product_repayment, term=user_repayment_result.get('term'),
-                            principal=user_repayment_result.get('principal'), user=equity.user, term_date=repayment_date,
-                            interest=user_repayment_result.get('interest'), penal_interest=Decimal(0), description=description 
-                            )
+            json = payment.repayment(flag_date, repayment_type, penal_interest, True)
+        else:
+            json = payment.repayment(flag_date, repayment_type, penal_interest, False)
 
-                    user_repayments.append(user_repayment)
-                UserPaymentHistory.objects.bulk_create(user_repayments)
-
-                ProductAmortization.objects.filter(product=p2p, settled=False).update(settled=True, settlement_time=repayment_date)
-                UserAmortization.objects.filter(product_amortization__product=p2p, settled=False).update(settled=True, settlement_time=repayment_date)
-
-        return HttpResponse(renderers.JSONRenderer().render(obj, 'application/json'))
+        return HttpResponse(renderers.JSONRenderer().render(json, 'application/json'))
