@@ -7,5 +7,5 @@ from wanglibao_activity.views import TemplatesFormatTemplate
 
 urlpatterns = patterns(
     '',
-    url(r'activity/(?P<id>\w+)', TemplatesFormatTemplate.as_view(template_name='lx.jade')),
+    url(r'zero/(?P<id>\d+)/$', TemplatesFormatTemplate.as_view(template_name='template_zero.jade')),
 )
