@@ -84,8 +84,14 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
     #首次充值
     elif trigger_node == 'first_pay':
         #check first pay
-        if PayInfo.objects.filter(user=user, type='D',
-                                  status=PayInfo.SUCCESS).count() == 1:
+        if rule.is_in_date:
+            first_num = PayInfo.objects.filter(user=user, type='D',
+                                               update_time__gt=rule.activity.start_at,
+                                               status=PayInfo.SUCCESS).count()
+        else:
+            first_num = PayInfo.objects.filter(user=user, type='D',
+                                               status=PayInfo.SUCCESS).count()
+        if first_num == 1:
             _send_gift(user, rule, device_type, amount)
     #充值
     elif trigger_node == 'pay':
@@ -93,7 +99,12 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
     #首次购买
     elif trigger_node == 'first_buy':
         #check first pay
-        if P2PRecord.objects.filter(user=user).count() == 1:
+        if rule.is_in_date:
+            first_num = P2PRecord.objects.filter(user=user,
+                                                 create_time__gt=rule.activity.start_at).count()
+        else:
+            first_num = P2PRecord.objects.filter(user=user).count()
+        if first_num == 1:
             _send_gift(user, rule, device_type, amount)
     #购买
     elif trigger_node == 'buy':
@@ -149,8 +160,12 @@ def _send_gift(user, rule, device_type, amount=0):
             _send_gift_phonefare(user, rule, amount)
 
 
-def _check_introduced_by(user):
-    ib = IntroducedBy.objects.filter(user=user).first()
+def _check_introduced_by(user, start_dt, is_invite_in_date):
+    if is_invite_in_date:
+        ib = IntroducedBy.objects.filter(user=user, created_at__gt=start_dt).first()
+    else:
+        ib = IntroducedBy.objects.filter(user=user).first()
+
     if ib:
         return ib.introduced_by
     else:
@@ -184,14 +199,14 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount):
         #do send
         _send_reward(user, rule, rtype, reward_name, None, amount)
         if rule.both_share:
-            user_introduced_by = _check_introduced_by(user)
+            user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
     else:
         #只记录不发信息
         _save_activity_record(rule, user, 'only_record', reward_name)
         if rule.both_share:
-            user_introduced_by = _check_introduced_by(user)
+            user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _save_activity_record(rule, user_introduced_by, 'only_record', reward_name, True)
 
@@ -222,14 +237,14 @@ def _send_gift_income(user, rule, amount):
         if rule.send_type == 'sys_auto':
             _send_message_sms(user, rule, None, None, amount)
             if rule.both_share:
-                user_introduced_by = _check_introduced_by(user)
+                user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                 if user_introduced_by:
                     _send_message_sms(user, rule, user_introduced_by, None, amount)
         else:
             #只记录不发信息
             _save_activity_record(rule, user, 'only_record', rule.rule_name)
             if rule.both_share:
-                user_introduced_by = _check_introduced_by(user)
+                user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                 if user_introduced_by:
                     _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True)
     else:
@@ -243,14 +258,14 @@ def _send_gift_phonefare(user, rule, amount):
         if rule.send_type == 'sys_auto':
             _send_message_sms(user, rule, None, None, amount)
             if rule.both_share:
-                user_introduced_by = _check_introduced_by(user)
+                user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                 if user_introduced_by:
                     _send_message_sms(user, rule, user_introduced_by, None, amount)
         else:
             #只记录不发信息
             _save_activity_record(rule, user, 'only_record', rule.rule_name)
             if rule.both_share:
-                user_introduced_by = _check_introduced_by(user)
+                user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                 if user_introduced_by:
                     _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True)
     else:
@@ -268,7 +283,7 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type):
     _save_activity_record(rule, user, 'sms', rule.rule_name)
     #检测是否有邀请关系
     if rule.both_share:
-        user_ib = _check_introduced_by(user)
+        user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
         if user_ib:
             #给邀请人发红包
             if rule.send_type == 'sys_auto':
@@ -288,6 +303,7 @@ def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=Fa
     record.income = rule.income
     record.msg_type = msg_type
     record.send_type = rule.send_type
+    record.gift_type = rule.gift_type
 
     description = ''
     if introduced_by:
