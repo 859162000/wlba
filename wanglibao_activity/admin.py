@@ -67,10 +67,9 @@ class ActivityTemplatesForm(forms.ModelForm):
                 raise forms.ValidationError(u'选择自定义设置方案时，必须填写“奖品描述”')
 
         if self.cleaned_data.get('is_introduce') == 2:
-            # if not self.introduce_desc:
-            #     raise ValidationError(u'选择自定义设置方案时，必须填写“邀请好友描述”')
             if not self.cleaned_data.get('introduce_img'):
-                raise forms.ValidationError(u'选择自定义设置方案时，必须填写“邀请好友指定图片ID”')
+                raise forms.ValidationError(u'选择自定义设置方案时，必须上传图片')
+
         if self.cleaned_data.get('is_teacher') == 2 and not self.cleaned_data.get('teacher_desc'):
             raise forms.ValidationError(u'选择自定义设置方案时，必须填写“新手投资模块描述”')
 
