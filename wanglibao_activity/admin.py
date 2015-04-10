@@ -62,8 +62,10 @@ class ActivityResource(resources.ModelResource):
 
     class Meta:
         model = ActivityRecord
-        fields = ('activity', 'rule', 'platform', 'trigger_node', 'user', 'income', 'description', 'trigger_at')
-        export_order = ('activity', 'rule', 'platform', 'trigger_node', 'user', 'income', 'description', 'trigger_at')
+        fields = ('activity', 'rule', 'platform', 'trigger_node', 'gift_type',
+                  'user', 'income', 'description', 'trigger_at')
+        export_order = ('activity', 'rule', 'platform', 'trigger_node', 'gift_type',
+                        'user', 'income', 'description', 'trigger_at')
 
     def dehydrate_platform(self, obj):
         return dict(m.PLATFORM)[obj.platform]
@@ -78,9 +80,9 @@ class ActivityResource(resources.ModelResource):
 class ActivityRecordAdmin(ExportMixin, admin.ModelAdmin):
     actions = None
     list_display = ('id', 'activity', 'rule', 'platform', 'trigger_node', 'msg_type',
-                    'send_type', 'description', 'user', 'income', 'trigger_at')
+                    'send_type', 'gift_type', 'description', 'user', 'income', 'trigger_at')
     list_filter = (
-        'platform', 'trigger_node', 'msg_type', 'send_type',
+        'platform', 'trigger_node', 'msg_type', 'send_type', 'gift_type',
         CustomDateFilter
     )
     search_fields = ('activity__name', 'rule__rule_name', 'user__wanglibaouserprofile__phone')
