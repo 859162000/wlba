@@ -12,73 +12,8 @@ body
       - endwith
     .panel-padding.span9-omega
       .well-s
-        h1.about-title 管理团队
-          //| 深谙金融和互联网行业的一流专业团队
-          //p.font-s 网利金融是刘二飞先生参与创办的 唯一 互联网金融公司
-        .space-vertical-l
-        .row
-          .span3
-            img(src="/static/images/ceo.jpg",alt="赵润龙")
-          .span9-omega
-            h1.about-sub-title 联合创始人，董事长及CEO &nbsp;&nbsp;赵润龙
-            p.para - 曾就职于摩根斯坦利、美银美林等世界级投行，主导了包括中华电信、无锡尚德、富力地产等数十亿美元标杆性项目
-            p.para - 曾在硅谷创立中国版Facebook “友林网”，后发展成为全球最大的华人留学生社交平台
-            p.para - 与前美林主席刘二飞先生一同创办由中投和贝莱德为主要股东的中国概念基金
-            p.para - 赵润龙先生为美国加州伯克利大学经济学、HAAS商学院最高荣誉双学位毕业生、伯克利大学华人学生会主席
-        .space-vertical-l
-        .row
-          .span3
-            img(src="/static/images/luxiaoye.jpg",alt="陆晓野")
-          .span9-omega
-            h1.about-sub-title 联合创始人，总裁&nbsp;&nbsp;陆晓野
-            p.para - 华夏基金前CIO，基金行业互联网金融的早期推动者，主导了华夏基金与阿里、百度、腾讯等中国具有重大革命意义的互联网金融创新项目
-            p.para - 参与公募基金行业从开放式基金、货币基金等几乎全部行业创新
-            p.para - 中国大陆首支ETF产品（上证50ETF）的核心设计成员之一
-            p.para - 陆晓野先生拥有人民大学商学院硕士学位、北京控制工程研究所硕士学位
-            br
-        .space-vertical-l
-        .row
-          .span3
-            img(src="/static/images/chao.jpg",alt="王超")
-          .span9-omega
-            h1.about-sub-title 联合创始人，COO&nbsp;&nbsp;王超
-            p.para - 曾就职于华夏基金，领导开发了华夏基金风控、交易、安全等核心系统，对公募集基金和系统风控有深刻理解
-            p.para - 2011年创办北京中科融鑫信息科技有限公司并担任CEO，服务于中国的金融机构IT系统
-            p.para - 王超先生拥有中国科学院硕士学位
-            br
-        .space-vertical-l
-        .row
-          .span3
-            img(src="/static/images/james.jpg",alt="李培勤")
-          .span9-omega
-            h1.about-sub-title 执行合伙人&nbsp;&nbsp;李培勤
-            p.para - 曾任淡马锡旗下风投机构祥峰投资(Vertex)总经理
-            p.para - 曾任新加坡经济开发局(EDB)中国区总负责人
-            p.para - 曾任新加坡政府直接投资有限公司（GIC）中国投资总顾问
-            p.para - 曾任新加坡电信中国区总裁，后加入摩托罗拉，为其中国投资战略总负责人
-            br
-        .space-vertical-l
-        .row
-          .span3
-            img(src="/static/images/xuhaitong.jpg",alt="徐海通")
-          .span9-omega
-            h1.about-sub-title 金融产品总监&nbsp;&nbsp;徐海通
-            p.para - 多年证券、金融行业从业经验
-            p.para - 曾任南京证券深圳首席证券分析师、《财富天下》特邀财经评论员，《全景网》全国十大财经博主
-            p.para - 曾任中金(CICC)投资经理，在结构化投资、股权投资、企业并购方面拥有丰富经验
-            p.para - 曾任广州证券资产管理总部营销总监，专注于资产管理和基金业务
-            br
-        .space-vertical-l
-        .row
-          .span3
-            img(src="/static/images/caijingzhong.jpg",alt="蔡景钟")
-          .span9-omega
-            h1.about-sub-title 顾问&nbsp;&nbsp;蔡景钟
-            p.para - 曾任沃尔玛中国CFO
-            p.para - 曾任五星控股投资副总裁，领导了五星电器与百思买（BestBuy）的整合
-            p.para - 曾任华润集团控制部总监，华润集团财务公司副总经理，先后领导了华润对苏果、华润对华源、华润对三九集团的并购整合
-            p.para - 专注于现代零售行业、汽车行业、消费行业等领域投资，在供应链金融、融资租赁、车贷金融经验和渠道资源方面拥有丰富的实力
-            br
+        h1.about-title {{about_us.title}}
+        |{{about_us.content|safe}}
 
 
 
