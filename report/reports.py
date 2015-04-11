@@ -18,6 +18,7 @@ from django.contrib.auth.models import User
 from wanglibao_margin.models import Margin
 from django.db.models import Sum
 from marketing.models import ClientData
+from wanglibao_redpack.models import RedPackRecord
 
 logger = logging.getLogger(__name__)
 storage = DefaultStorage()
@@ -598,7 +599,38 @@ class ReportGenerator(object):
         MarginReportGenerator.generate_report(start_time=start_time, end_time=end_time)
 
 
+class RedpackReportGenerator(ReportGeneratorBase):
+    prefix = 'hbls'
+    reportname_format = u'红包流水 %s--%s'
 
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
 
+        redpackrecord = RedPackRecord.objects.filter(created_at__gte=start_time, created_at__lt=end_time).\
+            prefetch_related('redpack').prefetch_related('redpack__event').\
+            prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
+        output = cStringIO.StringIO()
 
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'红包活动ID', u'红包活动名称', u'用户名称', u'用户手机号', u'兑换平台', u'使用平台',
+                         u'红包创建时间', u'红包使用时间', u'关联订单'])
+        name = ''
+        phone = ''
+        for index, record in enumerate(redpackrecord):
+            if record.user:
+                name = record.user.wanglibaouserprofile.name
+                phone = record.user.wanglibaouserprofile.phone
+            writer.writerow([
+                str(index + 1),
+                unicode(record.redpack.event.id),
+                record.redpack.event.name,
+                name,
+                phone,
+                record.change_platform,
+                record.apply_platform,
+                timezone.localtime(record.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                timezone.localtime(record.apply_at).strftime("%Y-%m-%d %H:%M:%S") if record.apply_at else '',
+                unicode(record.order_id) if record.order_id else '',
+            ])
+        return output.getvalue()
