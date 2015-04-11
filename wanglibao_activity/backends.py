@@ -65,7 +65,7 @@ def check_activity(user, trigger_node, device_type, amount=0):
             if activity_rules:
                 for rule in activity_rules:
                     if rule.is_introduced:
-                        user_ib = _check_introduced_by(user)
+                        user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
                             _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
                     else:
