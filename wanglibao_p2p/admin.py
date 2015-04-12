@@ -8,7 +8,7 @@ from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning,\
-    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance, ProductPaymentHistory, UserPaymentHistory
+    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
@@ -356,11 +356,7 @@ class P2PProductContractAdmin(admin.ModelAdmin):
                     'party_c_id_number', 'party_c_address', 'bill_drawer_bank', 'bill_accepting_bank',
                     'bill_number', 'bill_amount', 'bill_due_date')
 
-class ProductPaymentAdmin(admin.ModelAdmin):
-    search_fields = ('product_payment__product__name', 'product_payment__product__serial_number')
 
-class UserPaymentAdmin(admin.ModelAdmin):
-    search_fields = ('user__wanglibaouserprofile__phone', 'product_payment__product__name')
 
 class InterestPrecisionAdmin(admin.ModelAdmin):
     list_display = ('id', 'equity_product', 'equity_phone', 'equity_name', 'equity_number',
@@ -422,8 +418,6 @@ admin.site.register(P2PProductContract, P2PProductContractAdmin)
 admin.site.register(InterestPrecisionBalance, InterestPrecisionAdmin)
 admin.site.register(InterestInAdvance, InterestInAdvanceAdmin)
 admin.site.register(ProductInterestPrecision, ProductInterestPrecisionAdmin)
-admin.site.register(ProductPaymentHistory, ProductPaymentAdmin)
-admin.site.register(UserPaymentHistory, UserPaymentAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')

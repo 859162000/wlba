@@ -317,6 +317,7 @@ class ProductAmortization(models.Model):
 
     term = models.IntegerField(u'还款期数')
     term_date = models.DateTimeField(u'还款时间', null=True, blank=True)
+
     principal = models.DecimalField(u'返还本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
@@ -355,6 +356,7 @@ class UserAmortization(models.Model):
     user = models.ForeignKey(User)
     term = models.IntegerField(u'还款期数')
     term_date = models.DateTimeField(u'还款时间')
+
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
@@ -371,57 +373,6 @@ class UserAmortization(models.Model):
 
     def __unicode__(self):
         return u'分期%s 用户%s 本金%s 利息%s' % (self.product_amortization, self.user, self.principal, self.interest)
-
-
-class ProductPaymentHistory(models.Model):
-
-    version = IntegerVersionField()
-
-    product = models.ForeignKey(P2PProduct, related_name='payments', null=True)
-
-    term = models.IntegerField(u'还款期数')
-    term_date = models.DateTimeField(u'还款时间', null=True, blank=True)
-    principal = models.DecimalField(u'返还本金', max_digits=20, decimal_places=2)
-    interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
-    penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
-
-
-    created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
-    description = models.CharField(u'摘要', max_length=500, blank=True)
-
-
-    class Meta:
-        verbose_name_plural = u'产品还款记录'
-        ordering = ['term']
-
-    @property
-    def total(self):
-        return self.principal + self.interest + self.penal_interest
-
-    def __unicode__(self):
-        return u'产品%s: 第 %s 期' % (str(self.product_id), self.term)
-
-
-class UserPaymentHistory(models.Model):
-    version = IntegerVersionField()
-
-    product_payment = models.ForeignKey(ProductPaymentHistory, related_name='subs')
-    user = models.ForeignKey(User)
-    term = models.IntegerField(u'还款期数')
-    term_date = models.DateTimeField(u'还款时间')
-    principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
-    interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
-    penal_interest = models.DecimalField(u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
-
-    created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
-    description = models.CharField(u'摘要', max_length=500, blank=True)
-
-    class Meta:
-        verbose_name_plural = u'用户还款记录'
-        ordering = ['user', 'term']
-
-    def __unicode__(self):
-        return u'分期%s 用户%s 本金%s 利息%s' % (self.product_payment, self.user, self.principal, self.interest)
 
 
 class P2PEquity(models.Model):

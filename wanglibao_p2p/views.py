@@ -21,11 +21,11 @@ from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
-from wanglibao_p2p.repayment import get_payment_history, PaymentHistory
+from wanglibao_p2p.prepayment import PrepaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, \
-    P2PProductContract, InterestPrecisionBalance, UserPaymentHistory, ProductPaymentHistory
+    P2PProductContract, InterestPrecisionBalance
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
@@ -44,6 +44,7 @@ from marketing.tops import Top
 from order.utils import OrderHelper
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
+from exceptions import PrepaymentException
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -625,22 +626,6 @@ class AdminPrepayment(TemplateView):
             'default_date': datetime.datetime.now().strftime('%Y-%m-%d')
             }
 
-    def post(self, request, **kwargs):
-        try:
-            repayment_type = request.POST.get('repayment_type')
-            repayment_date = request.POST.get('repayment_date')
-            id = request.POST.get('id')
-
-            p2p = P2PProduct.objects.filter(pk=id)
-            p2p = p2p[0]
-
-            from dateutil import parser
-            flag_date = parser.parse(repayment_date)
-            obj = get_payment_history(p2p, flag_date, 'daily')
-            return redirect('./'+id)
-        except:
-            messages.warning(request, u'输入错误, 请重新检测')
-            return redirect('./amortization')
 
 
 class RepaymentAPIView(APIView):
@@ -664,10 +649,24 @@ class RepaymentAPIView(APIView):
         from dateutil import parser
         flag_date = parser.parse(repayment_date)
 
-        payment = PaymentHistory(p2p)
-        if repayment_now == '1':
-            json = payment.repayment(flag_date, repayment_type, penal_interest, True)
-        else:
-            json = payment.repayment(flag_date, repayment_type, penal_interest, False)
+        try:
+            payment = PrepaymentHistory(p2p, flag_date)
+            if repayment_now == '1':
+                record = payment.prepayment(penal_interest, repayment_type, flag_date)
+            else:
+                record = payment.get_product_repayment(Decimal(0), repayment_type, flag_date)
 
-        return HttpResponse(renderers.JSONRenderer().render(json, 'application/json'))
+            result = {
+                    'errno': 0,
+                    'principal': record.principal,
+                    'interest': record.interest,
+                    'penal_interest': record.penal_interest,
+                    'date': flag_date
+                    }
+        except PrepaymentException:
+            result = {
+                    'errno': 1,
+                    'errmessage': u'你的还款计划有问题'
+                    }
+
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))

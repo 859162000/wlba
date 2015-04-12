@@ -543,8 +543,8 @@ class AmortizationKeeper(KeeperBaseMixin):
                 "messages": message_list
             })
 
-            payment = PaymentHistory(p2p)
-            payment.payment(amortization)
+            #payment = PaymentHistory(p2p)
+            #payment.payment(amortization)
 
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 
