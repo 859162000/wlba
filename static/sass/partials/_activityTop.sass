@@ -24,8 +24,8 @@
         .act-weibo-qr-code
           position: absolute
           bottom: 100%
-          top: 20px
-          left: 212px
+          top: 13px
+          left: 122px
           z-index: 9
           padding-top: 15px
 
@@ -33,7 +33,7 @@
           position: absolute
           bottom: 100%
           top: 20px
-          left: 266px
+          left: 297px
           z-index: 9
           width: 164px
           height: 223px
@@ -100,7 +100,7 @@
           background: url("/static/images/app_prompt_bg.png") no-repeat -5px -197px
           position: absolute
           top: 40px
-          right: -15px
+          right: -40px
           z-index: 999
           display: none
 
@@ -133,6 +133,7 @@
     width: 1100px
     height: 90px
     margin: 0 auto
+    position: relative
     .act-logo
       +inline-block()
       background: image-url('logo.png')
@@ -145,7 +146,8 @@
         background: image-url('logo.png') no-repeat center middle
     .login-nav
       display: inline-block
-      float: right
+      position: absolute
+      right: 0
       .nav-items
         ul
           li

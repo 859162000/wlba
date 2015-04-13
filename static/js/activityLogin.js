@@ -321,7 +321,7 @@
         }
       });
     }
-     myeven();
+     //myeven();
     return $(".voice").on('click', '.voice-validate', function(e) {
       var element, isMobile, url;
       e.preventDefault();
