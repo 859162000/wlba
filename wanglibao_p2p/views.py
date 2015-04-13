@@ -613,7 +613,8 @@ class AdminPrepayment(TemplateView):
     def get_context_data(self, **kwargs):
         id = kwargs['id']
         if id:
-            p2p = P2PProduct.objects.filter(pk=id).select_related('amortizations')
+            p2p = P2PProduct.objects.filter(pk=id).select_related('amortizations') \
+                    .order_by('-id')
         if p2p[0].status != u'还款中':
             return {
                     'p2p': None,

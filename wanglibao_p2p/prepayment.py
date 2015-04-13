@@ -16,6 +16,9 @@ DESCRIPTION = u'提前还款'
 
 class PrepaymentHistory(object):
     def __init__(self, product, payment_date):
+        if self.product.status != u'还款中':
+            raise PrepaymentException()
+            return
         try:
             self.product = product
             self.amortization = self.get_product_amortization(payment_date)
