@@ -2,6 +2,7 @@
 from wanglibao_p2p.models import ProductAmortization, UserAmortization, AmortizationRecord, P2PEquity
 from wanglibao_p2p.amortization_plan import get_daily_interest, get_final_decimal
 from wanglibao_margin.marginkeeper import MarginKeeper
+from keeper import ProductKeeper
 from order.utils import OrderHelper
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
@@ -68,6 +69,10 @@ class PrepaymentHistory(object):
             amortization_records.append(product_record)
 
             AmortizationRecord.objects.bulk_create(amortization_records)
+
+            ProductAmortization.objects.filter(product=self.product, settled=False).update(settled=True)
+            UserAmortization.objects.filter(product_amortization__product=self.product, settled=False).update(settled=True)
+            ProductKeeper(self.product).finish(None)
 
         return product_record
 
