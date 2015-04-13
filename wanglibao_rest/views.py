@@ -170,7 +170,7 @@ class RegisterAPIView(APIView):
 
         device = split_ua(request)
         invite_code = request.DATA.get('invite_code', "")
-        if not invite_code and device['channel_id'] == "baidu":
+        if not invite_code and ("channel_id" in device and device['channel_id'] == "baidu"):
             invite_code = "baidushouji"
 
         if invite_code:
