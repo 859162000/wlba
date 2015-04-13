@@ -42,11 +42,13 @@ def list_msg(params, user):
     if not 1<=pagenum<100 or not 1<=pagesize<=50:
         return {"ret_code":30083, "message":"参数输入错误"}
     if listtype == "unread":
-        msgs = Message.objects.filter(target_user=user, read_status=False, notice=True)[(pagenum-1)*pagesize:pagenum*pagesize]
+        msgs = Message.objects.filter(target_user=user, 
+                            read_status=False, notice=True).order_by('-message_text__created_at')[(pagenum-1)*pagesize:pagenum*pagesize]
     elif listtype == "read":
-        msgs = Message.objects.filter(target_user=user, read_status=True, notice=True)[(pagenum-1)*pagesize:pagenum*pagesize]
+        msgs = Message.objects.filter(target_user=user, 
+                            read_status=True, notice=True).order_by('-message_text__created_at')[(pagenum-1)*pagesize:pagenum*pagesize]
     else:
-        msgs = Message.objects.filter(target_user=user)[(pagenum-1)*pagesize:pagenum*pagesize]
+        msgs = Message.objects.filter(target_user=user).order_by('-message_text__created_at')[(pagenum-1)*pagesize:pagenum*pagesize]
     rs = []
     mt = dict(message_type)
     for x in msgs:

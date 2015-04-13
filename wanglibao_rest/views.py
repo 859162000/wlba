@@ -170,7 +170,7 @@ class RegisterAPIView(APIView):
 
         device = split_ua(request)
         invite_code = request.DATA.get('invite_code', "")
-        if not invite_code and device['channel_id'] == "baidu":
+        if not invite_code and ("channel_id" in device and device['channel_id'] == "baidu"):
             invite_code = "baidushouji"
 
         if invite_code:
@@ -278,19 +278,22 @@ class PushTestView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        #push_user_id = request.GET.get("push_user_id", "921913645184221981")
-        #push_channel_id = request.GET.get("push_channel_id", "4922700431463139292")
+        push_user_id = request.GET.get("push_user_id", "921913645184221981")
+        push_channel_id = request.GET.get("push_channel_id", "4922700431463139292")
 
 
-        push_user_id = request.GET.get("push_user_id", "1033966060923467900")
-        push_channel_id = request.GET.get("push_channel_id", "4138455529717951568")
+        #push_user_id = request.GET.get("push_user_id", "1033966060923467900")
+        #push_channel_id = request.GET.get("push_channel_id", "4138455529717951568")
+
+        push_user_id = request.GET.get("push_user_id", "781430269530794382")
+        push_channel_id = request.GET.get("push_channel_id", "5422135652350005874")
         from wanglibao_sms import bae_channel
 
         channel = bae_channel.BaeChannel()
-        message = {"message": "push Test", "user_id":1, "type":"in"}
+        message = {"message": "push Test<br/><br/><a href='http://www.wanglibao.com'>网利宝</a><br/>", "user_id":8731, "type":"in"}
         msg_key = "wanglibao_staging"
-        #res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
-        res, cont = channel.pushAndroidMessage(push_user_id, push_channel_id, message, msg_key)
+        res, cont = channel.pushIosMessage(push_user_id, push_channel_id, message, msg_key)
+        #res, cont = channel.pushAndroidMessage(push_user_id, push_channel_id, message, msg_key)
         return Response({"ret_code": 0, "message": cont})
 
 
