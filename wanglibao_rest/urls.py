@@ -147,7 +147,7 @@ urlpatterns = patterns(
 
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
-    #url(r'^pushtest/$', PushTestView.as_view()),
+    url(r'^pushtest/$', PushTestView.as_view()),
     url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
     url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
     url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
