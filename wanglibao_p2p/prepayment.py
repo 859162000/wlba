@@ -128,7 +128,7 @@ class PrepaymentHistory(object):
         else:
             term_date = timezone.localtime(amortization.term_date)
             days = self.days - (term_date - repayment_date).days
-            return self.product_daily_interest(days)
+            return get_final_decimal(self.product_daily_interest(days))
     
     def get_user_interest(self, amortization, repayment_type, repayment_date):
         if repayment_type == REPAYMENT_MONTHLY:
@@ -136,7 +136,7 @@ class PrepaymentHistory(object):
         else:
             term_date = timezone.localtime(amortization.term_date)
             days = self.days - (term_date - repayment_date).days
-            return self.user_daily_interest(days, amortization.user)
+            return get_final_decimal(self.user_daily_interest(days, amortization.user))
 
     def product_daily_interest(self, days):
         total_amount = self.product.total_amount
