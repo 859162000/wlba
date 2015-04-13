@@ -253,7 +253,9 @@ require ['jquery'], ($)->
     Y=data.getFullYear()
     zm=data.getMonth()+1
     day=data.getDate()
-    date=Y+'-0'+zm+"-0"+day
+    if day.length<2
+      day='0'+day
+    date=Y+'-0'+zm+"-"+day
     if time>='2015-03-24' and time<='2015-04-30' and time<=date
       $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2')
       $(this).parent().siblings().children('span').removeClass('tap-hight2')
