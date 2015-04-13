@@ -2,7 +2,10 @@
 // 使用规则模块
 if result.is_rule_use != 0
   .wry-act-rule
-    h1.wry-act-rule-h 使用规则
+    if result.rule_use_name
+      h1.wry-act-rule-h {{ result.rule_use_name }}
+    else
+      h1.wry-act-rule-h 使用规则
     ul.wry-act-rule-ul
       if result.is_rule_use == 1
         li 1.网利宝账户以身份证号为唯一识别标识。

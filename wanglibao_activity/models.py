@@ -202,12 +202,12 @@ class ActivityImages(models.Model):
         ('register', u'注册流程'),
     )
 
-    img_type = models.CharField(max_length=20, choices=IMG_TYPE, verbose_name=u'图片类别')
+    img_type = models.CharField(max_length=20, choices=IMG_TYPE, default='reward', verbose_name=u'图片类别')
     name = models.CharField(max_length=128, verbose_name=u'图片名称', help_text=u'当图片类别是元素时,模板中会显示')
     img = models.ImageField(upload_to='activity', blank=True, verbose_name=u'图片')
-    desc_one = models.TextField(blank=True, verbose_name=u'图片描述1', help_text=u'展示在图片旁边的描述信息')
+    desc_one = models.TextField(blank=True, verbose_name=u'图片描述1', help_text=u'展示在图片旁边的描述信息，当此项是奖品图片的描述或者自定义图片的描述信息时，需要信息换行时，在行结尾结尾添加符号：|*|')
     desc_two = models.TextField(blank=True, verbose_name=u'图片描述2', help_text=u'展示在图片旁边的描述信息')
-    priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先')
+    priority = models.IntegerField(verbose_name=u'优先级', default=0, help_text=u'越大越优先')
     last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'上次更新时间')
 
     def __unicode__(self):
@@ -240,6 +240,12 @@ class ActivityTemplates(models.Model):
         (4, u'自定义第二种样式'),
     )
 
+    TEXT_LOCATION_CHOICE = (
+        (0, u'靠左'),
+        (1, u'居中'),
+        (2, u'靠右'),
+    )
+
     name = models.CharField(u'活动名称', max_length=128, blank=True, help_text=u'例如<活动时间：2015-03-18至2015-03-28>')
     # logo
     logo = models.ImageField(u'网利宝logo图片', null=True, upload_to='activity', blank=True)
@@ -249,15 +255,19 @@ class ActivityTemplates(models.Model):
     banner = models.ImageField(u'banner图片', null=True, upload_to='activity', blank=True)
     # login
     is_login = models.BooleanField(u'登录入口', default=False, help_text=u'勾选此项则在活动页面加载注册登录入口模块')
+    login_invite = models.BooleanField(u'邀请码输入框', default=False, help_text=u'勾选此项则登录窗口允许用户输入邀请码')
     login_desc = models.CharField(u'登录入口标语', max_length=128, blank=True, help_text=u'例如<一句话宣传语>')
+    is_login_href = models.BooleanField(u'登录入口是否添加超链接', default=False, help_text=u'勾选此项则在登录入口添加超链接')
+    login_href_desc = models.CharField(u'入口超链接描述', max_length=128, blank=True, help_text=u'超连接描述如<【立即领取】>')
+    login_href = models.CharField(u'入口超链接', max_length=128, blank=True, help_text=u'超连接地址如<https://www.wanglibao.com/>')
     # 活动时间及描述
-    is_activity_desc = models.IntegerField(u'加载活动时间及描述模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
+    is_activity_desc = models.IntegerField(u'加载活动时间及描述模块方案', max_length=20, choices=OPEN_CHOICE, default=0, help_text=u'当选择加载默认模块时，则加载默认图片，可以自定义活动时间和活动描述')
     desc = models.CharField(u'活动描述', max_length=1024, blank=True, null=True, help_text=u'例如<一句话描述，活动期间怎么怎么滴>')
     desc_time = models.CharField(u'活动时间', max_length=1024, blank=True, null=True, help_text=u'例如<活动时间：2015-03-18至2015-03-28>')
-    desc_img = models.CharField(u'活动图片ID:', max_length=60, blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割，根据图片优先级展示图片')
+    desc_img = models.CharField(u'活动图片ID:', max_length=60, blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割，根据图片ID顺序展示图片')
     # 活动奖品图片及描述
     is_reward = models.IntegerField(u'加载活动奖品模块方案', max_length=20, choices=REWARD_CHOICE, default=0)
-    reward_img = models.CharField(u'活动奖品ID', max_length=60, blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割，根据图片优先级展示图片')
+    reward_img = models.CharField(u'活动奖品图片ID', max_length=60, blank=True, null=True, help_text=u'如果有多个图片，则图片ID之间用英文逗号分割，根据图片ID顺序展示图片')
     reward_desc = models.TextField(u'自定义第二种样式活动描述', blank=True, null=True, help_text=u'当自定义第二种样式时，需要填写词描述，例如<活动期间，单日投资额达到以下额度，可获得相应奖品。>')
     # 好友邀请及描述
     is_introduce = models.IntegerField(u'加载邀请好友模块方案', max_length=20, choices=OPEN_CHOICE, default=0, help_text=u'当选择加载自定义设置时，自定义内容才会被加载到模板中')
@@ -267,15 +277,18 @@ class ActivityTemplates(models.Model):
     teacher_desc = models.CharField(
         u'自定义描述', max_length=1024, blank=True, null=True, default=' |*| |*| |*| |*| ',
         help_text=u'如果新手新手投资流程对应的步骤有自定义描述，在此处添加，描述使用|*|分割。例如在第1、2、4步骤下添加注释，则<描述1|*|描述2|*||*|描述4|*|>')
-    # 规则描述
+    # 活动规则
     is_rule_use = models.IntegerField(u'加载活动使用规则模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
-    rule_use = models.TextField(u'使用规则', blank=True, null=True)
+    rule_use_name = models.CharField(u'重命名规则名称', max_length='128', null=True, blank=True, help_text=u'填写此项则更改规则名称')
+    rule_use = models.TextField(u'使用规则', blank=True, null=True, help_text=u'每一条规则结尾使用|*|分割。例如在第1、2、4步骤下添加注释，则<规则1|*|规则2|*|规则3>')
+    # 使用规则
     is_rule_activity = models.IntegerField(u'加载活动规则模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
-    rule_activity = models.TextField(u'活动规则', blank=True, null=True)
+    rule_activity_name = models.CharField(u'重命名规则名称', max_length='128', null=True, blank=True, help_text=u'填写此项则更改规则名称')
+    rule_activity = models.TextField(u'活动规则', blank=True, null=True, help_text=u'每一条规则结尾使用|*|分割。例如在第1、2、4步骤下添加注释，则<规则1|*|规则2|*|规则3>')
+    # 奖品发放规则
     is_rule_reward = models.IntegerField(u'加载奖品发放规则模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
-    rule_reward = models.TextField(
-        u'奖品发放', blank=True, null=True, help_text=u'按条目输入所有规则，当需要换行是，使用在行尾添加符号 |*|，<br /> \
-        例如<1.网利宝账户以身份证号为唯一识别标识。|*|2.P2P理财年化收益活动奖励将随P2P理财项目还款发放。>')
+    rule_reward_name = models.CharField(u'重命名规则名称', max_length='128', null=True, blank=True, help_text=u'填写此项则更改规则名称')
+    rule_reward = models.TextField(u'奖品发放', blank=True, null=True, help_text=u'每一条规则结尾使用|*|分割。例如在第1、2、4步骤下添加注释，则<规则1|*|规则2|*|规则3>')
     # 底部模块
     is_footer = models.IntegerField(u'底部背景颜色模块', max_length=20, choices=OPEN_CHOICE, default=0)
     footer_color = models.CharField(u'自定义底部背景颜色', max_length=20, null=True, blank=True, help_text=u'自定义底部背景颜色，如<#A70DC0>')
@@ -286,14 +299,24 @@ class ActivityTemplates(models.Model):
     # 投资奖励活动介绍
     is_earning_three = models.BooleanField(u'活动投资奖励模块', default=False, help_text=u'勾选此项则在活动页面加载活动投资奖励模块')
     # 添加波浪背景模块
-    is_background = models.IntegerField(u'加载背景图模块方案', max_length=20, choices=OPEN_CHOICE, default=0)
+    is_background = models.IntegerField(u'加载背景图模块方案', max_length=20, choices=OPEN_CHOICE, default=0, help_text=u'默认方案为使用默认背景图片，自定义方案为自定义背景图片')
     background_img = models.ImageField(u'自定义背景图片:', blank=True, null=True, upload_to='activity')
-    background_location = models.CharField(u'背景图片位置', max_length=20, null=True, blank=True, help_text=u'填写要添加背景图片模块序号，选择加载默认模块或者自定义设置时，都需要填写此项')
+    background_location = models.CharField(u'背景图片位置', max_length=20, null=True, blank=True, help_text=u'填写要添加背景图片的模块序号，此项只允许填写一个模块序号')
     # 选择显示模板顺序
     models_sequence = models.CharField(u'填写展示模块的顺序', max_length=60, null=False, blank=True, help_text=u'根据各个模块的编号填写加载各个模块的顺序，头部、banner和底部不允许改变，无需填写，序号使用逗号分割，例如<1,2,3,4>')
+
+    # 自定义图片及描述
+    is_diy = models.BooleanField(u'自定义图片或描述模块', default=False, help_text=u'勾选此项则活动页面加载自定义图片及描述')
+    diy_img = models.CharField(u'自定义图片ID', max_length=20, null=True, blank=True, help_text=u'在模板图片根据ID查找，<br /> 1、存在图片和描述，则加载图片和描述 <br /> 2、如果只有图片没有描述，则只加载图片 <br /> 3、如果只有描述没有图片，则只加载描述')
+    diy_location = models.IntegerField(u'自定义描述位置', max_length=20, choices=TEXT_LOCATION_CHOICE, default=0, help_text=u'当自定义图片ID存在描述时，根据此项定位描述位置')
 
     def __unicode__(self):
         return self.name
 
     class Meta:
         verbose_name_plural = u'活动模板'
+
+    def preview_link(self):
+        return u'<a href="/templates/zero/%s/" target="_blank">预览</a>' % str(self.id)
+    preview_link.short_description = u'预览'
+    preview_link.allow_tags = True
