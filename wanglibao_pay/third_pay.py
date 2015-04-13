@@ -872,6 +872,9 @@ def add_bank_card(request):
     exist_cards = Card.objects.filter(no=card_no, user=user).first()
     if exist_cards:
         return {"ret_code":20024, "message":"该银行卡已经存在"}
+    exist_cards = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+    if exist_cards:
+        return {"ret_code":20026, "message":"该银行卡已经存在"}
 
     is_default = request.DATA.get("is_default", "false")
     if is_default.lower() in ("true", "1"):

@@ -12,42 +12,8 @@ body
       - endwith
     .panel-padding.span9-omega
       .well-s
-        h1.about-title 公司展示
-
-        .companies
-
-          table
-            tr
-              td
-                img(src="/static/images/companies/bengbu_03.jpg")
-                span 本部
-
-              td
-                img(src="/static/images/companies/bengbu_02.jpg")
-                span 本部
-            tr
-              td
-                img(src="/static/images/companies/bengbu_05.jpg")
-                span 本部
-              td
-                img(src="/static/images/companies/lianxin_02.jpg")
-                span 本部
-
-            tr
-              td
-                img(src="/static/images/companies/xian.jpg")
-                span 西安地方办事处
-              td
-                img(src="/static/images/companies/guizhou.jpg")
-                span 贵州地方办事处
-
-            tr
-               td
-                 img(src="/static/images/companies/yunnan01.jpg")
-                 span 云南地方办事处
-               td
-                 img(src="/static/images/companies/yunnan02.jpg")
-                 span 云南地方办事处
+        h1.about-title {{about_us.title}}
+        |{{about_us.content|safe}}
 
 
   include include/footer

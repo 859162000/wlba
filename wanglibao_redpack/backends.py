@@ -335,15 +335,16 @@ def consume(redpack, amount, user, order_id, device_type):
     if event.apply_platform != "all" and event.apply_platform != device_type:
         return {"ret_code":30176, "message":"此红包只能在%s平台使用" % event.apply_platform}
 
+    rtype = event.rtype
+    rule_value = event.amount
+    deduct = _calc_deduct(amount, rtype, rule_value, event)
+
     record.order_id = order_id
     record.apply_platform = device_type
+    record.apply_amount = deduct
     record.apply_at = timezone.now()
     record.save()
 
-    rtype = event.rtype
-    rule_value = event.amount
-    deduct = event.amount
-    deduct = _calc_deduct(amount, rtype, rule_value, event)
    # if REDPACK_RULE[rtype] == "*":
    #     #return {"ret_code":30176, "message":"目前不支付百分比红包"}
    #     rule_value = rule_value/100.0
