@@ -1,7 +1,8 @@
 # coding=utf-8
-from wanglibao_p2p.models import ProductAmortization, UserAmortization
-from wanglibao_p2p.amortization_plan import get_daily_interest
+from wanglibao_p2p.models import ProductAmortization, UserAmortization, AmortizationRecord, P2PEquity
+from wanglibao_p2p.amortization_plan import get_daily_interest, get_final_decimal
 from wanglibao_margin.marginkeeper import MarginKeeper
+from order.utils import OrderHelper
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from django.db import transaction
@@ -16,7 +17,7 @@ DESCRIPTION = u'提前还款'
 
 class PrepaymentHistory(object):
     def __init__(self, product, payment_date):
-        if self.product.status != u'还款中':
+        if product.status != u'还款中':
             raise PrepaymentException()
             return
         try:
@@ -48,21 +49,21 @@ class PrepaymentHistory(object):
 
             amortization_records = list()
 
-            user_amortizations = amortization.subs().all()
+            user_amortizations = amortization.subs.all()
 
             for user_amortization in user_amortizations:
                 user_record = self.get_user_repayment(user_amortization, Decimal(0), repayment_type, payment_date)
 
                 user_margin_keeper = MarginKeeper(user_record.user)
                 user_margin_keeper.amortize(user_record.principal, user_record.interest,
-                        user_record.penal_interest, savepoint=False, description=description)
+                        user_record.penal_interest, savepoint=False, description=self.description)
 
-                order_id = OrderHelper.place_order(user, order_type=self.catalog, product_id=self.product.id, status=u'新建').id
+                order_id = OrderHelper.place_order(user_record.user, order_type=self.catalog, product_id=self.product.id, status=u'新建').id
 
                 user_record.order_id = order_id
                 user_record.amortization = amortization
 
-                amortization_records.append(user_amortization)
+                amortization_records.append(user_record)
 
             amortization_records.append(product_record)
 
@@ -119,13 +120,14 @@ class PrepaymentHistory(object):
         principal = self.get_user_principal(amortization)
         interest = self.get_user_interest(amortization, repayment_type, repayment_date)
         return AmortizationRecord(
-                amortization=None, term=amortization.term, principal=principal, interest=interest,
+                amortization=self.amortization, term=amortization.term, principal=principal, interest=interest,
                 penal_interest=Decimal(0), description=DESCRIPTION, user=amortization.user, catalog=self.catalog, order_id=None
                 )
 
 
 
     def get_product_interest(self, amortization, repayment_type, repayment_date):
+        repayment_date = pytz.UTC.localize(repayment_date)
         if repayment_type == REPAYMENT_MONTHLY:
             return amortization.interest
         else:
@@ -134,6 +136,7 @@ class PrepaymentHistory(object):
             return get_final_decimal(self.product_daily_interest(days))
     
     def get_user_interest(self, amortization, repayment_type, repayment_date):
+        repayment_date = pytz.UTC.localize(repayment_date)
         if repayment_type == REPAYMENT_MONTHLY:
             return amortization.interest
         else:
@@ -166,7 +169,7 @@ class PrepaymentHistory(object):
             principal_paid = principal_paid.get('principal__sum')
         else:
             principal_paid = Decimal(0)
-        equity = P2PEquity.objects.filter(product__product=self.product, user=amortization.user).first()
+        equity = P2PEquity.objects.filter(product=self.product, user=amortization.user).first()
         return equity.equity - principal_paid
 
 

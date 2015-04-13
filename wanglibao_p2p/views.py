@@ -602,7 +602,8 @@ class AdminP2PList(TemplateView):
     template_name = 'admin_p2plist.jade'
 
     def get_context_data(self, **kwargs):
-        p2p_list = P2PProduct.objects.filter(status=u'还款中')
+        p2p_list = P2PProduct.objects.filter(status=u'还款中') \
+                .order_by('-id')
         return {
             'p2p_list': p2p_list
             }
@@ -613,8 +614,7 @@ class AdminPrepayment(TemplateView):
     def get_context_data(self, **kwargs):
         id = kwargs['id']
         if id:
-            p2p = P2PProduct.objects.filter(pk=id).select_related('amortizations') \
-                    .order_by('-id')
+            p2p = P2PProduct.objects.filter(pk=id).select_related('amortizations')
         if p2p[0].status != u'还款中':
             return {
                     'p2p': None,
