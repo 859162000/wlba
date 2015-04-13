@@ -2,6 +2,7 @@
 .act-login
     if result.login_desc
       h1.act-biaoti {{result.login_desc}}
+      a.act-get(href="") 【立即领取】
     form#register-modal-form.act-login-form(method='post', action='/accounts/register/ajax/')
       - csrf_token
       .act-form-row

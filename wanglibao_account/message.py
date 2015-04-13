@@ -103,7 +103,8 @@ def _send(target_user, msgTxt, push_type):
             message = {"message":msgTxt.content, "user_id":target_user.id, "type":push_type}
             for d in devices:
                 if d.device_type in ("ios", "iPhone", "iPad"):
-                    res, cont = channel.pushIosMessage(d.push_user_id, d.push_channel_id, message, msg_key)
+                    #res, cont = channel.pushIosMessage(d.push_user_id, d.push_channel_id, message, msg_key)
+                    pass
                 elif d.device_type == "android":
                     res, cont = channel.pushAndroidMessage(d.push_user_id, d.push_channel_id, message, msg_key)
 
