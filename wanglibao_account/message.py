@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from wanglibao.celery import app
 from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type, UserPushId
 from wanglibao_sms import bae_channel
+from BeautifulSoup import BeautifulSoup
 
 def count_msg(params, user):
     """
@@ -52,9 +53,30 @@ def list_msg(params, user):
     rs = []
     mt = dict(message_type)
     for x in msgs:
-        rs.append({"id":x.id, "title":x.message_text.title, "content":x.message_text.content, 
+        content = x.message_text.content
+        obj = {"id":x.id, "title":x.message_text.title, "content":content, 
                     "mtype":mt[x.message_text.mtype],
-                    "created_at":time.strftime("%Y-%m-%d", time.localtime(x.message_text.created_at)), "read_status":x.read_status})
+                    "created_at":time.strftime("%Y-%m-%d", time.localtime(x.message_text.created_at)), "read_status":x.read_status}
+        bs = BeautifulSoup(content)
+        arr = bs.findAll('a')
+        for item in arr:
+            if hasattr(item,'href'):
+                if item['href'] == "/":
+                    obj[item['href']] = 'index'
+                    obj[item.text] = 'index'
+                elif item['href'].startswith("/pay/banks"):
+                    obj[item['href']] = 'pay'
+                    obj[item.text] = 'pay'
+                elif item['href'].startswith("/accounts/home"):
+                    obj[item['href']] = 'home'
+                    obj[item.text] = 'home'
+                elif item['href'].startswith("/accounts/id_verify"):
+                    obj[item['href']] = 'validate'
+                    obj[item.text] = 'validate'
+                else:
+                    obj[item['href']] = item['href']
+                    obj[item.text] = item['href']
+        rs.append(obj)
     return {"ret_code":0, "message":"ok", "data":rs}
 
 def sign_read(user, message_id):
