@@ -21,37 +21,67 @@ class TemplatesFormatTemplate(TemplateView):
             "7": "include/activity_act_rule.jade",
             "8": "include/activity_earning_one.jade",
             "9": "include/activity_earning_two.jade",
-            "10": "include/activity_earning_three.jade"
+            "10": "include/activity_earning_three.jade",
+            "11": "include/activity_earning_four.jade"
         }
 
         sequence, sequence_one, sequence_two, module_background = None, None, None, None
         if record:
+            # 活动模块
             if record.is_activity_desc == 2:
-                record.desc_img = ActivityImages.objects.filter(id__in=record.desc_img.split(',')).order_by('-priority')
-
+                if record.desc_img:
+                    id_list = map(lambda x: x.strip(), record.desc_img.split(','))
+                    record.desc_img = ActivityImages.objects.filter(id__in=id_list)
+                    """
+                    # the first method, don't use it
+                    ordering = "FIELD(`id`, %s)" % ','.join(str(k) for k in id_list)
+                    record.desc_img = record.desc_img.extra(select={'ordering': ordering}, order_by=('ordering',))
+                    """
+                    # the second method
+                    record.desc_img = list(record.desc_img)
+                    record.desc_img.sort(key=lambda x: id_list.index(str(x.id)))
+            # 奖品发放模块
             if record.is_reward and record.is_reward in (3, 4):
-                record.reward_img = ActivityImages.objects.filter(id__in=record.reward_img.split(',')).order_by('-priority')
-                if record.is_reward == 3:
-                    record.reward_desc = record.reward_img.first().desc_one.split('|*|')
+                id_list = map(lambda x: x.strip(), record.reward_img.split(','))
+                record.reward_img = ActivityImages.objects.filter(id__in=id_list)
+                """
+                # the first method, don't use it
+                ordering = "FIELD(`id`, %s)" % ','.join(str(k) for k in id_list)
+                record.reward_img.extra(select={'ordering': ordering}, order_by=('ordering',))
+                """
+                # the second method
+                record.reward_img = list(record.reward_img)
+                record.reward_img.sort(key=lambda x: id_list.index(str(x.id)))
 
+                if record.is_reward == 3:
+                    record.reward_desc = map(lambda x: x.strip(), record.reward_img.first().desc_one.split('|*|'))
+            # 规则模块
             if record.is_rule_use == 2:
-                record.rule_use = record.rule_use.split('|*|')
+                record.rule_use = map(lambda x: x.strip(), record.rule_use.split('|*|'))
 
             if record.is_rule_activity == 2:
-                record.rule_activity = record.rule_activity.split('|*|')
+                record.rule_activity = map(lambda x: x.strip(), record.rule_activity.split('|*|'))
 
             if record.is_rule_reward == 2:
-                record.rule_reward = record.rule_reward.split('|*|')
-
+                record.rule_reward = map(lambda x: x.strip(), record.rule_reward.split('|*|'))
+            # logo模块位置调整
             if record.location:
                 record.logo, record.logo_other = record.logo_other, record.logo
 
-            record.teacher_desc = record.teacher_desc.split('|*|')
+            # 自定义模块
+            if record.is_diy:
+                record.diy_img = ActivityImages.objects.filter(id=record.diy_img.strip())
+                if record.diy_img:
+                    record.diy_desc = map(lambda x: x.strip(), record.diy_img.first().desc_one.split('|*|'))
+            # 新手投资模块描述
+            record.teacher_desc = map(lambda x: x.strip(), record.teacher_desc.split('|*|'))
             record.teacher_desc.extend(['' for n in range(5-len(record.teacher_desc))])
 
+            # 根据序号活取各个加载模块
             if record.models_sequence:
-                record.models_sequence = record.models_sequence.split(',')
+                record.models_sequence = map(lambda x: x.strip(), record.models_sequence.split(','))
 
+            # 同蓝图控制
             if record.is_background:
                 module_background = include.get(record.background_location)
                 location = record.models_sequence.index(record.background_location)

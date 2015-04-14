@@ -1,9 +1,9 @@
 // 活动规则模块
 if result.is_rule_activity != 0
   .wry-act-rule
-    h1.wry-act-rule-h 活动规则
-    ul.wry-act-rule-ul
-      if result.is_rule_activity == 1
+    if result.is_rule_activity == 1
+      h1.wry-act-rule-h 活动规则
+      ul.wry-act-rule-ul
         li 1.网利宝账户以身份证号为唯一识别标识。
         li 2.P2P理财年化收益活动奖励将随P2P理财项目还款发放。
         li 3.每个网利宝账户仅限一次使用该理财红包，新用户需投资300元即可使用100元直抵红包，实际支付200元。
@@ -12,6 +12,8 @@ if result.is_rule_activity != 0
         li 6.P2P理财年化收益活动奖励将随P2P理财项目还款发放。
         li 7.每个网利宝账户仅限一次使用该理财红包，新用户需投资300元即可使用100元直抵红包，实际支付200元。
         li 8.老用户需投资5000元即可使用100元直抵红包，实际支付4900元。
-      else
+    else
+      h1.wry-act-rule-h {{ result.rule_activity_name }}
+      ul.wry-act-rule-ul
         for record in result.rule_activity
           li {{ record }}
