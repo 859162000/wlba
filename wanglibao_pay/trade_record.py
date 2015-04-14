@@ -5,7 +5,7 @@
 from django.utils import timezone
 from wanglibao_pay.models import PayInfo
 from wanglibao_pay import util
-from wanglibao_p2p.models import UserAmortization
+from wanglibao_p2p.models import AmortizationRecord
 from wanglibao_margin.models import MarginRecord
 
 def detect(request):
@@ -67,14 +67,16 @@ def _withdraw_record(user, pagesize, pagenum):
 
 def _amo_record(user, pagesize, pagenum):
     res = []
-    amos = UserAmortization.objects.filter(user=user, settled=True)[(pagenum-1)*pagesize:pagenum*pagesize]
+    amos = AmortizationRecord.objects.select_related('amortization_product') \
+               .filter(user=user)[(pagenum-1)*pagesize:pagenum*pagesize]
     for x in amos:
         obj = {"id":x.id,
-                "name":x.product_amortization.product.name, "term":x.term,
-                "term_date":util.fmt_dt_normal(util.local_datetime(x.term_date)),
+                "name":x.amortization.product.name, "term":x.term,
+                "total_term":x.amortization.product.amortization_count,
+                "term_date":util.fmt_dt_normal(util.local_datetime(x.created_time)),
                 "principal":x.principal, "interest":x.interest,
                 "penal_interest":x.penal_interest,
                 "total_amount":(x.principal+x.interest+x.penal_interest),
-                "settlement_time":util.fmt_dt_normal(util.local_datetime(x.settlement_time))}
+                "settlement_time":util.fmt_dt_normal(util.local_datetime(x.created_time))}
         res.append(obj)
     return res
