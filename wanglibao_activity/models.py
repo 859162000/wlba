@@ -137,8 +137,11 @@ class ActivityRule(models.Model):
                                      help_text=u'投资或充值，大于该金额（>），当只有最小金额时为大于等于该金额（>=）')
     max_amount = models.IntegerField(u'最大金额', default=0,
                                      help_text=u'投资或充值，小于等于该金额（<=）')
-    is_total_invest = models.BooleanField(u'启用累计投资', default=False, help_text=u'选择该选项，则最大、最小金额视为活动期间的累计金额')
-    ranking = models.IntegerField(u'单标投资名次', default=0, help_text=u'设置单个标的投资名次，只能填写大于1的数字，0不做判断')
+    is_total_invest = models.BooleanField(u'活动累计投资', default=False,
+                                          help_text=u'勾选该选项，则最大、最小金额视为累计投资金额，系统会判断用户在活动期间的累计投资金额')
+    is_p2p_total_invest = models.BooleanField(u'单标累计投资', default=False,
+                                              help_text=u'勾选该选项，则最大、最小金额视为累计投资金额，系统会判断用户在指定标的内累计投资金额')
+    ranking = models.IntegerField(u'单标投资名次', blank=True, default=0, help_text=u'设置单个标的投资名次，只能填写大于1的数字，0不做判断')
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True,
                                     help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\
                                               内置：注册人手机：“{{mobile}}，奖品激活码：{{reward}}，截止日期{{end_date}}<br/>\
