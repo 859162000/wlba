@@ -21,6 +21,7 @@ import time
 
 @app.task
 def p2p_watchdog():
+    print 'hello, world'
     P2POperator().watchdog()
 
 

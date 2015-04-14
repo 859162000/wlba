@@ -310,38 +310,6 @@ class AmortizationKeeper(KeeperBaseMixin):
         pay_method = product.pay_method
         subscription_date = None
 
-        interest_in_advance = {}
-
-        if pay_method == '按日计息一次性还本付息T+N':
-        
-            #1.如果是一次性还本付息T+N, 拿到此标的所有用户购买记录
-            equity_records = EquityRecord.objects.filter(product=product, catalog=u'申购')
-            InterestInAdvance.objects.filter(product=product).delete()
-
-            interestInAdvances = []
-
-            #2.把每一条的记录计算出n日的收益
-            for equity_record in equity_records:
-                days = (timezone.now() - equity_record.create_time).days
-                user_record_plan = amortization_cls.generate(
-                        equity_record.amount,
-                        product.expected_earning_rate / 100,
-                        equity_record.create_time,
-                        days)['terms'][0]
-
-                interestInAdvance = InterestInAdvance(
-                        user=equity_record.user, product=product, amount=equity_record.amount,
-                        subscription_date=equity_record.create_time, product_soldout_date=timezone.now(),
-                        days=days, interest=user_record_plan[2])
-
-                interestInAdvances.append(interestInAdvance)
-
-                if interest_in_advance.get(str(equity_record.user.pk), None):
-                    interest_in_advance[str(equity_record.user.pk)] = interest_in_advance[str(equity_record.user.pk)] + user_record_plan[2]
-
-                interest_in_advance[str(equity_record.user.pk)] = user_record_plan[2]
-
-            InterestInAdvance.objects.bulk_create(interestInAdvances)
 
         product_interest = Decimal(0)
 
@@ -352,19 +320,15 @@ class AmortizationKeeper(KeeperBaseMixin):
                 amortization = UserAmortization()
                 amortization.description = u'第%d期' % (index + 1)
                 amortization.principal = term[1]
-                if interest_in_advance:
-                    amortization.interest = term[2] + interest_in_advance[str(equity.user.pk)]
-                    product_interest = product_interest + amortization.interest
-                else:
-                    amortization.interest = term[2]
+                amortization.interest = term[2]
                 amortization.term = index + 1
                 amortization.user = equity.user
                 amortization.product_amortization = product_amortizations[index] 
 
-                if len(term) == 6:
-                    amortization.term_date = term[5]
+                if len(terms) == 6:
+                    amortization.term_date = terms[5]
                 else:
-                    amortization.term_date = datetime.now()
+                    amortization.term_date = timezone.now()
 
                 user_amos.append(amortization)
             
@@ -375,10 +339,6 @@ class AmortizationKeeper(KeeperBaseMixin):
 
 
         UserAmortization.objects.bulk_create(user_amos)
-
-        if interest_in_advance:
-            product_amortizations[0].interest = product_interest
-            product_amortizations[0].save()
 
 
 
@@ -542,9 +502,6 @@ class AmortizationKeeper(KeeperBaseMixin):
                 #"messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, sub_amo.principal + sub_amo.interest + sub_amo.penal_interest)]
                 "messages": message_list
             })
-
-            #payment = PaymentHistory(p2p)
-            #payment.payment(amortization)
 
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 
