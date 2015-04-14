@@ -46,7 +46,10 @@
           .act-form-row-error
       .space-vertical-s
     p.xun-p 已有账号，
-      a(href="/accounts/login/") 立即登录
+      if user.is_authenticated
+        a(href="/accounts/home/") 立即登录
+      else
+        a(href="/accounts/login/") 立即登录
     script(src="/static/js/require.js", data-main="/static/js/header")
     script.
       var v = new Date().getTime()
