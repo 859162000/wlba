@@ -100,25 +100,34 @@ class ActivityRecordAdmin(ExportMixin, admin.ModelAdmin):
 
 
 class ActivityImagesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'img_type', 'img', 'desc_one', 'desc_two', 'priority')
-
-    ordering = ('id', '-img_type', '-priority')
+    list_display = ('id', 'name', 'img_type', 'img', 'desc_one', 'desc_two')
+    ordering = ('-id',)
+    search_fields = ('name',)
+    fieldsets = (
+        (None, {'fields': ('img_type', 'name', 'img', 'desc_one', 'desc_two')}),
+    )
 
 
 class ActivityTemplatesForm(forms.ModelForm):
     class Meta:
         model = ActivityTemplates
 
+    # def preview_link(self):
+    #     # return u'<a href="/templates/zero/%s/" target="_blank">预览</a>' % str(self.id)
+    #     return u'<a href="/templates/zero/" target="_blank">预览</a>'
+    # preview_link.short_description = u'预览'
+    # preview_link.allow_tags = True
+
     def clean(self):
         if self.cleaned_data.get('location'):
             if not (self.cleaned_data.get('logo', '') and self.cleaned_data.get('logo_other', '')):
                 raise forms.ValidationError(u'当选择交换logo方式时，必须同时上传两个logo')
 
-        if self.cleaned_data.get('is_activity_desc') == 2:
-            if not self.cleaned_data.get('desc'):
-                raise forms.ValidationError(u'选择自定义设置方案时，必须填写“活动描述”')
-            if not self.cleaned_data.get('desc_time'):
-                raise forms.ValidationError(u'选择自定义设置方案时，必须填写“活动时间”')
+        # if self.cleaned_data.get('is_activity_desc') == 2:
+        #     if not self.cleaned_data.get('desc'):
+        #         raise forms.ValidationError(u'选择自定义设置方案时，必须填写“活动描述”')
+        #     if not self.cleaned_data.get('desc_time'):
+        #         raise forms.ValidationError(u'选择自定义设置方案时，必须填写“活动时间”')
 
         if self.cleaned_data.get('is_reward') == 3:
             if not self.cleaned_data.get('reward_img'):
@@ -137,14 +146,14 @@ class ActivityTemplatesForm(forms.ModelForm):
         if self.cleaned_data.get('is_teacher') == 3 and not self.cleaned_data.get('teacher_desc'):
             raise forms.ValidationError(u'选择自定义设置方案时，必须填写“新手投资模块描述”')
 
-        if self.cleaned_data.get('is_rule_use') == 2 and not self.cleaned_data.get('rule_use'):
-            raise forms.ValidationError(u'选择自定义设置方案时，必须填写“使用规则”')
-
-        if self.cleaned_data.get('is_rule_activity') == 2 and not self.cleaned_data.get('rule_activity'):
-            raise forms.ValidationError(u'选择自定义设置方案时，必须填写“活动规则”')
-
-        if self.cleaned_data.get('is_rule_reward') == 2 and not self.cleaned_data.get('rule_reward'):
-            raise forms.ValidationError(u'选择自定义设置方案时，必须填写“奖品发放”')
+        # if self.cleaned_data.get('is_rule_use') == 2 and not self.cleaned_data.get('rule_use'):
+        #     raise forms.ValidationError(u'选择自定义设置方案时，必须填写“使用规则”')
+        #
+        # if self.cleaned_data.get('is_rule_activity') == 2 and not self.cleaned_data.get('rule_activity'):
+        #     raise forms.ValidationError(u'选择自定义设置方案时，必须填写“活动规则”')
+        #
+        # if self.cleaned_data.get('is_rule_reward') == 2 and not self.cleaned_data.get('rule_reward'):
+        #     raise forms.ValidationError(u'选择自定义设置方案时，必须填写“奖品发放”')
 
         if self.cleaned_data.get('is_footer') == 2 and not self.cleaned_data.get('footer_color'):
             raise forms.ValidationError(u'选择自定义设置方案时，必须填写自定义底部背景颜色')
@@ -158,29 +167,39 @@ class ActivityTemplatesForm(forms.ModelForm):
             if self.cleaned_data.get('is_background') == 2 and not self.cleaned_data.get('background_img'):
                 raise forms.ValidationError(u'自定义背景设置时，必须上传背景图片')
 
+        if self.cleaned_data.get('is_login_href'):
+            if not self.cleaned_data.get('login_href_desc'):
+                raise forms.ValidationError(u'启用入口超链接时，必须填写入口超链接描述')
+            if not self.cleaned_data.get('login_href'):
+                raise forms.ValidationError(u'启用入口超链接时，必须填写入口超链接')
+
         return self.cleaned_data
 
 
 class ActivityTemplatesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'banner')
-    ordering = ('id',)
     form = ActivityTemplatesForm
+
+    list_display = ('id', 'name', 'banner', 'preview_link')
+    ordering = ('-id',)
+    search_fields = ('name',)
 
     fieldsets = (
         (None, {'fields': ('name', )}),
         ('logo', {'fields': ('logo', 'logo_other', 'location')}),
-        ('banner and login', {'fields': ('banner', 'is_login', 'login_desc')}),
+        ('banner', {'fields': ('banner',)}),
+        ('login', {'fields': ('is_login', 'login_desc', 'login_invite', 'is_login_href', 'login_href_desc', 'login_href')}),
         (u'底部背景颜色模块', {'fields': ('is_footer', 'footer_color')}),
         (u'1 活动时间及描述模块', {'fields': ('is_activity_desc', 'desc', 'desc_time', 'desc_img'), 'classes': ['collapse']}),
         (u'2 奖品图片和描述模块', {'fields': ('is_reward', 'reward_img', 'reward_desc'), 'classes': ['collapse']}),
         (u'3 邀请好友模块', {'fields': ['is_introduce', 'introduce_img'], 'classes': ['collapse']}),
         (u'4 新手投资模块', {'fields': ('is_teacher', 'teacher_desc'), 'classes': ['collapse']}),
-        (u'5 使用规则模块', {'fields': ('is_rule_use', 'rule_use'), 'classes': ['collapse']}),
-        (u'6 活动规则模块', {'fields': ('is_rule_activity', 'rule_activity'), 'classes': ['collapse']}),
-        (u'7 奖品发放规则模块', {'fields': ('is_rule_reward', 'rule_reward'), 'classes': ['collapse']}),
+        (u'5 使用规则模块', {'fields': ('is_rule_use', 'rule_use_name', 'rule_use'), 'classes': ['collapse']}),
+        (u'6 活动规则模块', {'fields': ('is_rule_activity', 'rule_activity_name', 'rule_activity'), 'classes': ['collapse']}),
+        (u'7 奖品发放规则模块', {'fields': ('is_rule_reward', 'rule_reward_name', 'rule_reward'), 'classes': ['collapse']}),
         (u'8 高收益柱形图介绍模块', {'fields': ('is_earning_one',), 'classes': ['collapse']}),
         (u'9 多种选择介绍模块', {'fields': ('is_earning_two',), 'classes': ['collapse']}),
         (u'10 活动投资奖励模块', {'fields': ('is_earning_three',), 'classes': ['collapse']}),
+        (u'11 自定义图片或描述模块', {'fields': ('is_diy', 'diy_img', 'diy_location'), 'classes': ['collapse']}),
         (u'背景图片设置模块', {'fields': ('is_background', 'background_location', 'background_img')}),
         (u'模块展示顺序*', {'fields': ('models_sequence',)}),
     )

@@ -4,15 +4,15 @@
   .act-topbar
     .container.row
       .act-user-div
-        i.act-icon-phone.font-l &nbsp;
+        i(style="padding:0px;margin:0px;border:0px;font:inherit;").act-icon-phone.font-l &nbsp;
         span 客服热线：
         span 4008-588-066
         span.act-margin-left-m 关注我们：
         a.topbar-anchor.act-icon.act-icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
         a.topbar-anchor.act-icon.act-icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
-        a#qrweibo-top.act-weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none" , data-name="hoverbox")
-          img(src="/static/images/weibo-nqr.png")
-        img#qrcode-top.act-icon.act-weixin-qr-code(src="/static/images/weixin-nqr.png", data-name="hoverbox")
+        a#qrweibo-top.act-weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank",  data-name="hoverbox",style="display:none")
+          img.act-weibo-qr-code(src="/static/images/weibo-nqr.png")
+        img#qrcode-top.act-icon.act-weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none",data-name="hoverbox")
         span.act-mobile-app-top
           span.act-icon.act-icon-mobile-app
           span 手机网利宝
@@ -23,15 +23,18 @@
 .activity-nav
   .act-container-login-nav
     a(href='/')
-      .act-logo(style="background:url('/media/{{result.logo}}');background-repeat:no-repeat;background-position:center;height:114px;width:160px;display:inline-block")
       if result.logo_other
-        .act-logo(style="background:url('/media/{{result.logo_other}}');background-repeat:no-repeat;background-position:center;height:114px;width:160px;display:inline-block")
+        .act-logo(style="background:url('/media/{{result.logo}}');background-repeat:no-repeat;background-position:center;height:75px;width:175px;display:inline-block")
+        .act-logo(style="background:url('/media/{{result.logo_other}}');background-repeat:no-repeat;background-position:center;height:75px;width:175px;display:inline-block")
+      else
+        .act-logo(style="background:url('/media/{{result.logo}}');background-repeat:no-repeat;background-position:center;height:75px;width:350px;display:inline-block")
     .login-nav
       include include/nav_common
 
 
-
-  script(src="/static/js/lib/jquery.min.js")
+  //script(src="/static/js/require.js", data-main="/static/js/header")
+  //script(src="/static/js/lib/jquery.min.js")
+  //script(src="/static/js/login_modal.js")
   script.
     $('.act-mobile-app-top').bind('mouseenter', function(e) {
       return $('.act-mobile-app-top-prompt').show();

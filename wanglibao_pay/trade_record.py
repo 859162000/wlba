@@ -58,6 +58,7 @@ def _withdraw_record(user, pagesize, pagenum):
                 "status":x.status,
                 "confirm_time":util.fmt_dt_normal(x.confirm_time),
                 "card_no":x.card_no,
+                "fee":x.fee,
                 "channel":"APP"}
         if not x.channel:
             obj['channel'] = "PC"

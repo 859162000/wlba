@@ -285,10 +285,12 @@
     });
     $("#agreement").change(function(value) {
       if ($(this).attr("checked")) {
+        $('#register_submit').css({'background':'#ccc'})
         $("#register_submit").addClass("disabled");
         return $(this).removeAttr("checked");
       } else {
         $("#register_submit").removeClass("disabled");
+        $('#register_submit').css({'background':'#e7350d'})
         return $(this).attr("checked", "checked");
       }
     });
@@ -321,7 +323,7 @@
         }
       });
     }
-     myeven();
+     //myeven();
     return $(".voice").on('click', '.voice-validate', function(e) {
       var element, isMobile, url;
       e.preventDefault();

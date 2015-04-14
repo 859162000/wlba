@@ -17,32 +17,33 @@ if result.is_activity_desc != 0
               p {{img.desc_two}}
   else
     .activity_time
+      if result.desc_time
+        p.time_texta {{result.desc_time}}
+      else
         p.time_texta 活动时间：2015-03-18至2015-03-28
+      if result.desc
+        p.time_text {{result.desc}}
+      else
         p.time_text 一句话的描述，活动期间活动期间活动期间活动和期间
     .activity_time_row
-        .time-span
-            dl
-                dt.time-com.time-com-trust
-                dd.time-zi
-                    h3 信赖
-                    p IDG资本投资
-                    p 第三方100%本息保障
-        .time-span
-            dl
-                dt.time-com.time-com-security
-                dd.time-zi
-                    h3 安全
-                    p 招商银行全程监管
-                    p 账户资金安全由平安保险承保
-        .time-span
-            dl
-                dt.time-com.time-com-authority
-                dd.time-zi
-                    h3 权威
-                    p 洛克菲勒家族
-                    p 全方位战略合作
-
-
-
-
-
+      .time-span
+        dl
+          dt.time-com.time-com-trust
+          dd.time-zi
+            h3 信赖
+            p IDG资本投资
+            p 第三方100%本息保障
+      .time-span
+        dl
+          dt.time-com.time-com-security
+          dd.time-zi
+            h3 安全
+            p 招商银行全程监管
+            p 账户资金安全由平安保险承保
+      .time-span
+        dl
+          dt.time-com.time-com-authority
+          dd.time-zi
+            h3 权威
+            p 洛克菲勒家族
+            p 全方位战略合作
