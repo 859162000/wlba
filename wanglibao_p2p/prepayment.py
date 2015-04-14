@@ -78,32 +78,32 @@ class PrepaymentHistory(object):
 
 
     def get_product_amortization(self, payment_date):
-        date_now = timezone.now()
+        date_now = timezone.now().date()
 
         amortizations = self.product.amortizations.all()
         days = list()
 
         amortization_current = None
-        payment_date = pytz.UTC.localize(payment_date)
-        make_loans_time = timezone.localtime(self.product.make_loans_time)
+        payment_date = pytz.UTC.localize(payment_date).date()
+        make_loans_time = timezone.localtime(self.product.make_loans_time).date()
 
         for index, amortization in enumerate(amortizations):
-            term_date = timezone.localtime(amortization.term_date)
+            term_date = timezone.localtime(amortization.term_date).date()
 
             #如果上一期没有结算的话抛出异常
             if index > 0 and term_date < date_now and amortization.settled == False:
                 raise PrepaymentException()
 
             if index == 0:
-                self.days = (term_date - make_loans_time).days
                 if  make_loans_time < date_now < term_date \
                         and make_loans_time < payment_date < term_date:
+                    self.days = (term_date - make_loans_time).days
                     amortization_current = amortization
             else:
-                last_term_date = timezone.localtime(amortizations[index-1].term_date)
-                self.days = (term_date - make_loans_time).days
+                last_term_date = timezone.localtime(amortizations[index-1].term_date).date()
                 if  last_term_date < date_now < term_date \
                         and last_term_date < payment_date < term_date:
+                    self.days = (term_date - make_loans_time).days
                     amortization_current = amortization
 
         if amortization_current:
@@ -132,20 +132,20 @@ class PrepaymentHistory(object):
 
 
     def get_product_interest(self, amortization, repayment_type, repayment_date):
-        repayment_date = pytz.UTC.localize(repayment_date)
+        repayment_date = pytz.UTC.localize(repayment_date).date()
         if repayment_type == REPAYMENT_MONTHLY:
             return amortization.interest
         else:
-            term_date = timezone.localtime(amortization.term_date)
+            term_date = timezone.localtime(amortization.term_date).date()
             days = self.days - (term_date - repayment_date).days
             return get_final_decimal(self.product_daily_interest(days))
     
     def get_user_interest(self, amortization, repayment_type, repayment_date):
-        repayment_date = pytz.UTC.localize(repayment_date)
+        repayment_date = pytz.UTC.localize(repayment_date).date()
         if repayment_type == REPAYMENT_MONTHLY:
             return amortization.interest
         else:
-            term_date = timezone.localtime(amortization.term_date)
+            term_date = timezone.localtime(amortization.term_date).date()
             days = self.days - (term_date - repayment_date).days
             return get_final_decimal(self.user_daily_interest(days, amortization.user))
 
