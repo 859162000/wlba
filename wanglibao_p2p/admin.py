@@ -18,13 +18,26 @@ from wanglibao_p2p.forms import RequiredInlineFormSet
 
 formsets.DEFAULT_MAX_NUM = 2000
 
-class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
+
+class UserEquityResource(resources.ModelResource):
+    user = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name=u"用户手机号")
+    product = fields.Field(attribute="product__name", column_name=u"产品名称")
+    equity = fields.Field(attribute="equity", column_name=u"用户所持份额")
+
+    class Meta:
+        model = P2PEquity
+        fields = ('user', 'product', 'equity')
+        export_order = ('user', 'product', 'equity')
+
+
+class UserEquityAdmin(ExportMixin, admin.ModelAdmin):
     list_display = (
         'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest',
         'penal_interest')
     list_filter = ('confirm',)
     search_fields = ('product__name', 'user__wanglibaouserprofile__phone')
     raw_id_fields = ('user', 'product')
+    resource_class = UserEquityResource
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
