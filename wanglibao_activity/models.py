@@ -259,7 +259,7 @@ class ActivityTemplates(models.Model):
     login_desc = models.CharField(u'登录入口标语', max_length=128, blank=True, help_text=u'例如<一句话宣传语>')
     is_login_href = models.BooleanField(u'登录入口是否添加超链接', default=False, help_text=u'勾选此项则在登录入口添加超链接')
     login_href_desc = models.CharField(u'入口超链接描述', max_length=128, blank=True, help_text=u'超连接描述如<【立即领取】>')
-    login_href = models.CharField(u'入口超链接', max_length=128, blank=True, help_text=u'超连接地址如<https://www.wanglibao.com/>')
+    login_href = models.CharField(u'入口超链接', max_length=128, blank=True, help_text=u'添加超链接绝对地址，以http或https开头')
     # 活动时间及描述
     is_activity_desc = models.IntegerField(u'加载活动时间及描述模块方案', max_length=20, choices=OPEN_CHOICE, default=0, help_text=u'当选择加载默认模块时，则加载默认图片，可以自定义活动时间和活动描述')
     desc = models.CharField(u'活动描述', max_length=1024, blank=True, null=True, help_text=u'例如<一句话描述，活动期间怎么怎么滴>')
