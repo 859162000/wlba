@@ -372,7 +372,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             'reward': reward_content,
             'inviter': inviter_phone,
             'invited': invited_phone,
-            'give_amount': rule.income,
+            'income': rule.income,
             'amount': amount,
             'end_date': end_date,
             'name': name,
