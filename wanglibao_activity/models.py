@@ -36,12 +36,12 @@ TRIGGER_NODE = (
     ('buy', u'投资'),
     ('first_pay', u'首次充值'),
     ('first_buy', u'首次投资'),
-    # ('p2p_audit', u'满标审核')
+    ('p2p_audit', u'满标审核')
 )
 GIFT_TYPE = (
     ('reward', u'奖品'),
     ('redpack', u'红包'),
-    ('income', u'收益'),
+    # ('income', u'收益'),
     ('phonefare', u'手机话费')
 )
 SEND_TYPE = (
@@ -67,12 +67,12 @@ class Activity(models.Model):
     product_cats = models.CharField(u'指定产品范围', max_length=20, default=u'P2P产品', choices=PRODUCT_CATEGORY)
     product_ids = models.CharField(u'指定产品ID', max_length=20, blank=True, default='', help_text=u"如果有多个产品，则产品ID之间用英文逗号分割")
     description = models.TextField(u'描述', null=True, blank=True)
-    channel = models.CharField(u'渠道代码', max_length=20, blank=True, help_text=u'如果选择“渠道活动”，则填入对应渠道的渠道代码')
+    channel = models.CharField(u'渠道名称', max_length=20, blank=True, help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao')
     start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动开始时间*")
     end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动结束时间*")
     is_stopped = models.BooleanField(u'是否停止', default=False)
     stopped_at = models.DateTimeField(null=True, verbose_name=u"停止时间", blank=True)
-    created_at = models.DateTimeField(u'添加时间', auto_now_add=True)
+    created_at = models.DateTimeField(u'添加时间', default=timezone.now, auto_now_add=True)
     banner = models.ImageField(u'活动图片', null=True, upload_to='activity', blank=True)
     template = models.TextField(u'活动模板（pyjade编译过的模板）', null=True, blank=True)
     url = models.URLField(u'活动URL地址', null=True, blank=True)
@@ -137,6 +137,11 @@ class ActivityRule(models.Model):
                                      help_text=u'投资或充值，大于该金额（>），当只有最小金额时为大于等于该金额（>=）')
     max_amount = models.IntegerField(u'最大金额', default=0,
                                      help_text=u'投资或充值，小于等于该金额（<=）')
+    is_total_invest = models.BooleanField(u'活动累计投资', default=False,
+                                          help_text=u'勾选该选项，则最大、最小金额视为累计投资金额，系统会判断用户在活动期间的累计投资金额')
+    is_p2p_total_invest = models.BooleanField(u'单标累计投资', default=False,
+                                              help_text=u'勾选该选项，则最大、最小金额视为累计投资金额，系统会判断用户在指定标的内累计投资金额')
+    ranking = models.IntegerField(u'单标投资名次', blank=True, default=0, help_text=u'设置单个标的投资名次，只能填写大于1的数字，0不做判断')
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True,
                                     help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\
                                               内置：注册人手机：“{{mobile}}，奖品激活码：{{reward}}，截止日期{{end_date}}<br/>\
@@ -150,7 +155,7 @@ class ActivityRule(models.Model):
                                               help_text=u'邀请人短信模板不填写则不发送，变量写在2个大括号之间，变量：同上')
     send_type = models.CharField(u'赠送发放方式', max_length=20, choices=SEND_TYPE,
                                  default=u'系统实时发放')
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now=True, default=timezone.now)
     is_used = models.BooleanField(u'是否启用', default=False)
 
     def __unicode__(self):
@@ -184,7 +189,7 @@ class ActivityRecord(models.Model):
     gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE, default='')
     user = models.ForeignKey(User, verbose_name=u"触发用户")
     income = models.FloatField(u'费用或收益', null=True, blank=True)
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now=True, default=timezone.now)
 
     def __unicode__(self):
         return u'活动触发流水'

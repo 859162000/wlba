@@ -44,7 +44,7 @@ class P2PTrader(object):
             device = split_ua(request)
             self.device_type = device['device_type']
         else:
-            self.device_type = ""
+            self.device_type = "pc"
 
     def purchase(self, amount, redpack=0):
         description = u'购买P2P产品 %s %s 份' % (self.product.short_name, amount)
@@ -63,7 +63,8 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-        tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount, "device_type": self.device_type})
+        tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
+                                               "device_type": self.device_type, "product_id": self.product.id})
 
         # 投标成功发站内信
         pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
