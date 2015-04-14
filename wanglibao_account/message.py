@@ -52,32 +52,33 @@ def list_msg(params, user):
         msgs = Message.objects.filter(target_user=user).order_by('-message_text__created_at')[(pagenum-1)*pagesize:pagenum*pagesize]
     rs = []
     mt = dict(message_type)
+    dtype = {}
     for x in msgs:
         content = x.message_text.content
         obj = {"id":x.id, "title":x.message_text.title, "content":content, 
                     "mtype":mt[x.message_text.mtype],
                     "created_at":time.strftime("%Y-%m-%d", time.localtime(x.message_text.created_at)), "read_status":x.read_status}
+        rs.append(obj)
         bs = BeautifulSoup(content)
         arr = bs.findAll('a')
         for item in arr:
-            if hasattr(item,'href'):
+            if hasattr(item,'href') and item['href'] not in dtype:
                 if item['href'] == "/":
-                    obj[item['href']] = 'index'
-                    obj[item.text] = 'index'
+                    dtype[item['href']] = 'index'
+                    dtype[item.text] = 'index'
                 elif item['href'].startswith("/pay/banks"):
-                    obj[item['href']] = 'pay'
-                    obj[item.text] = 'pay'
+                    dtype[item['href']] = 'pay'
+                    dtype[item.text] = 'pay'
                 elif item['href'].startswith("/accounts/home"):
-                    obj[item['href']] = 'home'
-                    obj[item.text] = 'home'
+                    dtype[item['href']] = 'home'
+                    dtype[item.text] = 'home'
                 elif item['href'].startswith("/accounts/id_verify"):
-                    obj[item['href']] = 'validate'
-                    obj[item.text] = 'validate'
+                    dtype[item['href']] = 'validate'
+                    dtype[item.text] = 'validate'
                 else:
-                    obj[item['href']] = item['href']
-                    obj[item.text] = item['href']
-        rs.append(obj)
-    return {"ret_code":0, "message":"ok", "data":rs}
+                    dtype[item['href']] = item['href']
+                    dtype[item.text] = item['href']
+    return {"ret_code":0, "message":"ok", "data":rs, "dtype":dtype}
 
 def sign_read(user, message_id):
     """
