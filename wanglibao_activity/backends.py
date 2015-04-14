@@ -35,7 +35,7 @@ def _decide_device(device_type):
         return 'all'
 
 
-def check_activity(user, trigger_node, device_type, amount=0):
+def check_activity(user, trigger_node, device_type, amount=0, product_id=0):
     now = timezone.now()
     device_type = _decide_device(device_type)
     if not trigger_node:
@@ -67,16 +67,16 @@ def check_activity(user, trigger_node, device_type, amount=0):
                     if rule.is_introduced:
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
-                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
+                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id)
                     else:
-                        _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount)
+                        _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id)
             else:
                 continue
     else:
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id):
     """ check the trigger node """
     #注册 或 实名认证
     if trigger_node in ('register', 'validation'):
@@ -106,10 +106,10 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
             first_buy_num = P2PRecord.objects.filter(user=user).count()
 
         if first_buy_num == 1:
-            _send_gift(user, rule, device_type, amount)
+            _send_gift(user, rule, device_type, amount, product_id)
     #购买
     elif trigger_node == 'buy':
-        _send_gift(user, rule, device_type, amount)
+        _send_gift(user, rule, device_type, amount, product_id)
     #满标审核
     elif trigger_node == 'p2p_audit':
         #delay
@@ -119,7 +119,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount):
         return
 
 
-def _send_gift(user, rule, device_type, amount=0):
+def _send_gift(user, rule, device_type, amount=0, product_id=0):
     # rule_id = rule.id
     rtype = rule.trigger_node
     is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
