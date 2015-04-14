@@ -180,7 +180,7 @@ class ActivityTemplatesAdmin(admin.ModelAdmin):
     form = ActivityTemplatesForm
 
     list_display = ('id', 'name', 'banner', 'preview_link')
-    ordering = ('id',)
+    ordering = ('-id',)
     search_fields = ('name',)
 
     fieldsets = (
