@@ -210,7 +210,7 @@ def send_reward(start, end, amount_min, percent):
 
         # 发放站内信
         message_content = u"您在邀请好友送收益的活动中，您的好友%s在活动期间完成首次投资，根据活动规则，您获得%s元收益。<br/>\
-                  <a href = 'https://www.wanglibao.com/accounts/home/'>查看账户余额</a><br/>\
+                  <a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>\
                   感谢您对我们的支持与关注。<br/>\
                   网利宝" % (safe_phone_str(user.wanglibaouserprofile.phone), got_amount)
         RewardRecord.objects.create(user=introduced_by, reward=reward, description=message_content)
