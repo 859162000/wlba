@@ -86,7 +86,7 @@ def _amo_record(user, pagesize, pagenum, product_id):
                     "principal":x.principal, "interest":x.interest,
                     "penal_interest":x.penal_interest,
                     "total_amount":(x.principal+x.interest+x.penal_interest),
-                    "settlement_time":util.fmt_dt_normal(util.local_datetime(x.settlement_time))}
+                    "settlement_time":util.fmt_date_normal(util.local_datetime(x.settlement_time))}
             res.append(obj)
     else:
         amos_record = AmortizationRecord.objects.select_related('amortization_product') \
