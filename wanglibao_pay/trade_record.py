@@ -12,6 +12,7 @@ def detect(request):
     stype = request.DATA.get("type", "").strip()
     pagesize = request.DATA.get("pagesize", "10").strip()
     pagenum = request.DATA.get("pagenum", "1").strip()
+    product_id = request.DATA.get("product_id", "").strip()
 
     if not stype or stype not in ("deposit", "withdraw", "amortization"):
         return {"ret_code":30191, "message":"错误的类型"}
@@ -21,6 +22,11 @@ def detect(request):
     pagenum = int(pagenum)
     if pagesize > 100:
         return {"ret_code":30193, "message":"参数超出限制"}
+    if product_id:
+        if not product_id.isdigit():
+            return {"ret_code":30194, "message":"产品号错误"}
+        else:
+            product_id = int(product_id)
 
     user = request.user
     if stype == "deposit":
