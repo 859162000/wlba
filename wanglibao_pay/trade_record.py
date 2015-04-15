@@ -12,7 +12,7 @@ def detect(request):
     stype = request.DATA.get("type", "").strip()
     pagesize = request.DATA.get("pagesize", "10").strip()
     pagenum = request.DATA.get("pagenum", "1").strip()
-    product_id = request.DATA.get("product_id", "")
+    product_id = request.DATA.get("product_id", "").strip()
 
     if not stype or stype not in ("deposit", "withdraw", "amortization"):
         return {"ret_code":30191, "message":"错误的类型"}
