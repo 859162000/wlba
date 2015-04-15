@@ -4,7 +4,7 @@
 from django.conf.urls import patterns, url
 from views import HomeView, IndexView, DetailView
 from django.views.generic import TemplateView, RedirectView
-from views import HomeView
+from views import HomeView, AccountRedirectView
 
 urlpatterns = patterns('',
     #url(r'^detail/(?P<id>\w+)', P2PDetailView.as_view(), name='p2p detail'),
@@ -15,4 +15,6 @@ urlpatterns = patterns('',
     url(r'^mobile_assets/$', TemplateView.as_view(template_name="mobile_assets.jade")),
     url(r'^mobile_more/$', TemplateView.as_view(template_name="mobile_more.jade")),
     url(r'^mobile_detail/$', TemplateView.as_view(template_name="mobile_detail.jade")),
+
+    url(r'^account/redirect/$', AccountRedirectView.as_view(), name='mobile_account_redirect'),
 )
