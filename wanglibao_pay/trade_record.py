@@ -34,7 +34,7 @@ def detect(request):
     elif stype == "withdraw":
         res = _withdraw_record(user, pagesize, pagenum)
     else:
-        res = _amo_record(user, pagesize, pagenum)
+        res = _amo_record(user, pagesize, pagenum, product_id)
     return {"ret_code":0, "data":res, "pagenum":pagenum}
 
 def _deposit_record(user, pagesize, pagenum):
