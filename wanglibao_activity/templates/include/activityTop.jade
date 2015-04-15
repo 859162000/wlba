@@ -33,7 +33,7 @@
 
 
   //script(src="/static/js/require.js", data-main="/static/js/header")
-  //script(src="/static/js/lib/jquery.min.js")
+  script(src="/static/js/lib/jquery.min.js")
   //script(src="/static/js/login_modal.js")
   script.
     $('.act-mobile-app-top').bind('mouseenter', function(e) {
@@ -66,5 +66,13 @@
       return $(this).show();
     }).bind('mouseleave', function(e) {
       return $(this).hide();
+    });
+    $('.nologin').on('click',function(){
+      {% if user.is_authenticated == False %}
+        window.location.href='/accounts/home/'
+      {% endif %}
+      {% if user.is_authenticated == True %}
+        window.location.href='/accounts/login/'
+      {% endif %}
     });
 
