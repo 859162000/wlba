@@ -8,20 +8,22 @@ html
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
     meta(name="format-detection", content="telephone=no")
     link(rel="stylesheet",href="/static/stylesheets/weixin.css")
-  body
+  body(style='background:#fafafa')
       .top-i
           a.jiao
             img(src='/static/m_images/weixin_img/sanjiao.png')
-          p 输入登入密码
+          p 邀请好友理财送...
       include m_include/weixin_kehuduan
-      form.wei_deng
+      form.wei_pss
+          label 请设置登入密码完成注册
+          br
+          label 账号:
+      form.wei_pss
+          label 验证码
+          input(type='text' placeholder='短信验证码')
+      form.wei_pss
           label 登入密码
-          input(type='text' placeholder='请输入密码')
-      a.wei_hui 找回密码
-      .wei_buttonn
-        a 登入
-      .wei_kefu
-          p
-           |客服电话
-           label 4008-588-066
+          input(type='text' placeholder='请设置您的登入密码')
 
+      .wei_buttonn
+        a 注册

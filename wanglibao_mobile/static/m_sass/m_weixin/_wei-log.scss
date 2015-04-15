@@ -132,11 +132,11 @@ body{
 .top-i .jiao{
   display: inline-block;
   position: absolute;
-  top: 20%;
+  top: 28%;
   left:28px;
 }
 .top-i .jiao>img{
-  width: 2em;
+  width: 1.5em;
 }
 .top-i p{
   text-align: center;
@@ -188,21 +188,22 @@ article .grent>p{
 }
 article>input{
   margin-top: 2em;
-  width: 19em;
+  width: 90%;
   height: 3em;
   border-radius: 7px 7px 0 0;
   border: none;
   text-align: center;
   line-height: 1em;
   font-size: 2em;
-  color: #cccccc;
+  color: #727272;
   background: url('/static/m_images/weixin_img/ipion.png') no-repeat,#FFFFFF;
-  background-position: 2% 40%;
+  background-position: 4% 47%;
   background-size: 6% 70%;
+  outline:medium;
 }
 article>a{
   display: inline-block;
-  width: 19em;
+  width: 90%;
   height: 3em;
   border-radius: 0 0 7px 7px;
   background: #f44336;
@@ -235,13 +236,14 @@ article>a{
 .wei_hui{
   line-height: 2em;
   margin-left: 72%;
-  color: #0088cc;
+  color: #2196f3;
   display: block;
   font-size: 2em;
 }
 .wei_buttonn{
   width: 100%;
   text-align: center;
+  margin-top: 2em;
 }
 .wei_buttonn>a{
   height: 2em;
@@ -264,7 +266,7 @@ article>a{
   color: #909090;
 }
 .wei_kefu>p>label{
-  color: #0088cc!important;
+  color: #2196f3!important;
 }
 //===============================
 .wei_actice{
@@ -302,17 +304,17 @@ article>a{
   width: 100%;
   margin-bottom: 7em;
 }
-.d dl{
+.mainn dl{
   width: 49%;
   display: inline-block;
   border: 0;
-  margin-top: 1em;
+  margin-top: 0.5em;
 }
 .mainn dl dt{
   text-align: center;
 }
 .mainn dl dt>img{
-  width: 10em;
+  width: 8em;
 }
 .mainn dl dd{
   text-align: center;
@@ -347,4 +349,130 @@ footer .wei_left{
 }
 footer .wei_right{
   background: #797979;
+}
+//=============================
+
+.wei_ma{
+  width: 100%;
+  text-align: center;
+}
+.wei_ma>h3{
+  margin-top: 2em;
+  color: #FFFFFF;
+  line-height: 1.5em;
+  font-size: 3em;
+}
+.wei_ma>h4{
+  color: #FFFFFF;
+  font-size: 1.8em;
+  line-height: 2em;
+}
+.wei_ma>img{
+  width: 80%;
+  margin-top: 1em;
+}
+.download{
+  width: 100%;
+  text-align: center;
+  height: 3em;
+
+}
+.download>a{
+  width: 90%;
+  line-height: 3em;
+  color: #FFFFFF;
+  font-size: 2em;
+  display: inline-block;
+  background: #f44336;
+  border-radius: 7px;
+
+}
+//=============================
+.wei_feea{
+  width: 100%;
+  height: 13em;
+  border-bottom:  1px #cccccc solid;
+  border-top:  1px #cccccc solid;
+  margin-top: 2em;
+
+}
+.wei_feea>p{
+  font-size: 2em;
+  color: #727272;
+  margin: 0 1em 0 1em;
+}
+.wei_feea>p>span{
+  color: #f44336;
+  background: #4dff4f;
+}
+
+//=================================
+.wei_pss{
+  width: 100%;
+  line-height: 3em;
+  border-top: 1px #cccccc solid;
+  border-bottom: 1px #cccccc solid;
+  margin-top: 1em;
+  font-size: 1.7em;
+  background: #FFFFFF;
+}
+.wei_pss>label{
+  margin-left: 1em;
+  color: #979797;
+}
+.wei_pss>input{
+  border: none;
+  font-size: 1em;
+  color: #cccccc;
+  width: 46%;
+  outline:medium;
+
+}
+.wei_pss>span{
+  color: #2196f3;
+}
+.line{
+   border-bottom: 1px #cccccc solid;
+}
+.wei_agree{
+  width: 58%;
+  margin-left: 40%;
+  margin-top: 2em;
+}
+.wei_agree>input{
+  border: none;
+
+}
+.wei_agree>label{
+  font-size: 2em;
+  color: #727272;
+
+}
+.wei_agree>label>span{
+  color: #2196f3;
+}
+//-----------------------------------include----//
+.wei_kehuduan{
+  width: 100%;
+  height: 5em;
+  background: rgba(114, 114, 114, 0.72);
+  position: absolute;
+}
+.wei_kehuduan>img{
+  width: 3em;
+  margin-left: 4%;
+  vertical-align:middle;
+}
+
+.wei_kehuduan>label{
+  color: #FFFFFF;
+  font-size: 2em;
+  margin-left: 3%;
+  line-height: 3em;
+
+}
+.wei_kehuduan>a{
+  color: #FFFFFF;
+  font-size: 2em;
+  margin-left: 32%;
 }

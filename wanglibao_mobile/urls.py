@@ -18,6 +18,11 @@ urlpatterns = patterns('',
     url(r'^weixin_index/$', TemplateView.as_view(template_name="weixin_index.jade")),
     url(r'^weixin_inputt/$', TemplateView.as_view(template_name="weixin_inputt.jade")),
     url(r'^weixin_about/$', TemplateView.as_view(template_name="weixin_about.jade")),
-     url(r'^weixin_fee/$', TemplateView.as_view(template_name="weixin_fee.jade")),
+    url(r'^weixin_fee/$', TemplateView.as_view(template_name="weixin_fee.jade")),
+    url(r'^weixin_app/$', TemplateView.as_view(template_name="weixin_app.jade")),
+    url(r'^weixin_feea/$', TemplateView.as_view(template_name="weixin_feea.jade")),
+    url(r'^weixin_feea/$', TemplateView.as_view(template_name="weixin_feea.jade")),
+    url(r'^weixin_registered/$', TemplateView.as_view(template_name="weixin_registered.jade")),
+    url(r'^weixin_invitation/$', TemplateView.as_view(template_name="weixin_invitation.jade")),
 
 )
