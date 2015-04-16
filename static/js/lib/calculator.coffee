@@ -1,4 +1,15 @@
 define ['jquery'], ($)->
+  calculate = (amount, rate, period, pay_method) ->
+    if /等额本息/ig.test(pay_method)
+      term_amount = amount * (rate * Math.pow(1 + rate, period)) / (Math.pow(1 + rate, period) -1)
+      result  = term_amount * period - amount
+    else if /日计息/ig.test(pay_method)
+      result = amount * (rate/360) * period
+    else
+      result = amount * (rate/12) * period
+
+    return result.toFixed(2)
+
   $('input[data-role=earning-calculator]').keyup (e)->
     target = $(e.target)
     rate = target.attr 'data-rate'
@@ -47,6 +58,14 @@ define ['jquery'], ($)->
     total_earning = parseFloat(target.attr 'data-total-earning')
     fee_total_earning = parseFloat(target.attr 'total-fee-earning')
     existing = parseFloat(target.attr 'data-existing')
+
+    period = target.attr 'data-period'
+    rate = target.attr 'data-rate'
+    rate = rate/100
+    pay_method = target.attr 'data-paymethod'
+    activity_rate = target.attr 'activity-rate'
+    activity_rate = activity_rate/100
+
     amount = parseFloat(target.val()) || 0
 
     if amount > target.attr 'data-max'
@@ -55,8 +74,10 @@ define ['jquery'], ($)->
 
     amount = parseFloat(existing) + parseFloat(amount)
 
-    earning = ((amount / total_amount) * total_earning).toFixed(2)
-    fee_earning = ((amount / total_amount) * fee_total_earning).toFixed(2)
+    #earning = ((amount / total_amount) * total_earning).toFixed(2)
+    #fee_earning = ((amount / total_amount) * fee_total_earning).toFixed(2)
+    earning = calculate(amount, rate, period, pay_method)
+    fee_earning = calculate(amount, activity_rate, period, pay_method)
 
     if earning < 0
       earning = 0

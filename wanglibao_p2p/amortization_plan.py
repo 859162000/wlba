@@ -208,7 +208,7 @@ class QuarterlyInterest(AmortizationPlan):
 
 
 class DailyInterest(AmortizationPlan):
-    name = u'按日计息'
+    name = u'日计息一次性还本付息'
 
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None):
@@ -290,7 +290,7 @@ class DailyInterestInAdvance(AmortizationPlan):
         amortization.save()
 
 class DailyInterestMonthly(AmortizationPlan):
-    name = u'日计息月付息'
+    name = u'日计息月付息到期还本'
 
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None):

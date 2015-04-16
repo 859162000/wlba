@@ -298,6 +298,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         product = self.product
 
         product_amortizations = []
+        interest_precisions = list()
 
         for product_amortization in self.amortizations.all():
             product_amortizations.append(product_amortization)
@@ -305,7 +306,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         user_amos = list()
 
         amortization_cls = get_amortization_plan(product.pay_method)
-        product_interest_start = datetime.now()
+        product_interest_start = timezone.now()
 
         pay_method = product.pay_method
         subscription_date = None
@@ -336,10 +337,11 @@ class AmortizationKeeper(KeeperBaseMixin):
                 args = terms['interest_arguments'].update({"equity":equity})
                 args = terms['interest_arguments']
                 interest_precision = InterestPrecisionBalance(**args)
+                interest_precisions.append(interest_precision)
 
 
         UserAmortization.objects.bulk_create(user_amos)
-
+        InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
 
     def __generate_useramortization(self, equities):

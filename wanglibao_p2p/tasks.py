@@ -21,7 +21,6 @@ import time
 
 @app.task
 def p2p_watchdog():
-    print 'hello, world'
     P2POperator().watchdog()
 
 
@@ -81,7 +80,7 @@ def build_earning(product_id):
 
 
         earning = Earning()
-        amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
+        amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.pay_method)
         earning.amount = amount
         earning.type = 'D'
         earning.product = p2p
