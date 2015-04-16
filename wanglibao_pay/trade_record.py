@@ -76,7 +76,7 @@ def _withdraw_record(user, pagesize, pagenum):
 def _amo_record(user, pagesize, pagenum, product_id):
     res = []
     if product_id:
-        amos = UserAmortization.objects.filter(user=user,
+        amos = UserAmortization.objects.filter(user=user, settled=True,
             product_amortization__product_id=product_id)[(pagenum-1)*pagesize:pagenum*pagesize]
         for x in amos:
             obj = {"id":x.id,
