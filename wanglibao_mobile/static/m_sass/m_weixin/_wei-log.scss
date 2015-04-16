@@ -186,7 +186,7 @@ article .grent>p{
   font-size: 1.8em;
   text-align: center;
 }
-article>input{
+article .wei_for>input{
   margin-top: 2em;
   width: 90%;
   height: 3em;
@@ -201,7 +201,7 @@ article>input{
   background-size: 6% 70%;
   outline:medium;
 }
-article>a{
+article .wei_for>.judge{
   display: inline-block;
   width: 90%;
   height: 3em;
@@ -210,6 +210,8 @@ article>a{
   font-size: 2em;
   line-height: 3em;
   color: #FFFFFF;
+  border: none;
+  outline:medium;
 
 }
 //==================================
@@ -413,10 +415,12 @@ footer .wei_right{
   border-top: 1px #cccccc solid;
   border-bottom: 1px #cccccc solid;
   margin-top: 1em;
-  font-size: 1.7em;
+  font-size: 1.5em;
   background: #FFFFFF;
 }
 .wei_pss>label{
+  display: inline-block;
+  width: 20%;
   margin-left: 1em;
   color: #979797;
 }
@@ -424,11 +428,13 @@ footer .wei_right{
   border: none;
   font-size: 1em;
   color: #cccccc;
-  width: 46%;
+  width: 39%;
   outline:medium;
 
 }
-.wei_pss>span{
+.wei_pss>#btn{
+  width: 33%;
+  background: none;
   color: #2196f3;
 }
 .line{

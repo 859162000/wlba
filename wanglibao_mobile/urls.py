@@ -4,7 +4,7 @@
 from django.conf.urls import patterns, url
 from views import HomeView, IndexView, DetailView
 from django.views.generic import TemplateView, RedirectView
-from views import HomeView
+from views import HomeView, AccountRedirectView
 
 urlpatterns = patterns('',
     #url(r'^detail/(?P<id>\w+)', P2PDetailView.as_view(), name='p2p detail'),
@@ -24,5 +24,5 @@ urlpatterns = patterns('',
     url(r'^weixin_feea/$', TemplateView.as_view(template_name="weixin_feea.jade")),
     url(r'^weixin_registered/$', TemplateView.as_view(template_name="weixin_registered.jade")),
     url(r'^weixin_invitation/$', TemplateView.as_view(template_name="weixin_invitation.jade")),
-
+    url(r'^account/redirect/$', AccountRedirectView.as_view(), name='mobile_account_redirect'),
 )

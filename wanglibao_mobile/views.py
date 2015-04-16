@@ -17,6 +17,10 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from decimal import *
 from wanglibao_account.models import Binding
 
+from django.contrib.auth.models import User
+from django.views.generic import RedirectView
+from wanglibao_account.utils import detect_identifier_type
+
 
 class IndexView(TemplateView):
     template_name = 'mobile_home.jade'
@@ -152,3 +156,39 @@ class DetailView(TemplateView):
         })
 
         return context
+
+
+class AccountRedirectView(RedirectView):
+    """
+    移动端用户首先输入手机号，点击下一步。
+    以get方式请求此视图，并把用户输入得手机号通过参数传入
+    判断手机号是否注册
+    注册过的跳转登录页面
+    未注册的跳转注册页面
+    跳转过程中会将用户手机号以参数的形式传入
+    """
+    # 移动端登录页面
+    mobile_login_url = '/mobile/weixin_inputt/'
+    # 移动端注册页面
+    mobile_register_url = '/mobile/weixin_registered/'
+
+    def get_redirect_url(self, *args, **kwargs):
+        # 判断是否为手机号
+        identifier_type = detect_identifier_type(kwargs.get('identifier'))
+        if identifier_type != 'phone':
+            # 不是手机号，跳转原地址并附带参数
+            return '%s?identifier=%s&is_phone=false' % (kwargs.get('referer_url').split('?')[0], kwargs.get('identifier'))
+
+        # 判断手机号是否已注册
+        is_registered = User.objects.filter(wanglibaouserprofile__phone=kwargs.get('identifier')).count()
+        is_registered = bool(is_registered)
+        # 如果手机号已注册，跳转到登录页面
+        # 如果手机号未注册，跳转到注册页面
+        redirect_url = [self.mobile_register_url, self.mobile_login_url][is_registered]
+        return '%s?identifier=%s' % (redirect_url, kwargs.get('identifier'))
+
+    def get(self, request, *args, **kwargs):
+        # 通过get方式传入用户手机号
+        kwargs['identifier'] = request.GET.get('identifier')
+        kwargs['referer_url'] = request.META.get('HTTP_REFERER')
+        return super(AccountRedirectView, self).get(request, *args, **kwargs)
