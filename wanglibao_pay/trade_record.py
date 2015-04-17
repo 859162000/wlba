@@ -80,7 +80,7 @@ def _amo_record(user, pagesize, pagenum, product_id):
             product_amortization__product_id=product_id).order_by("-term_date")[(pagenum-1)*pagesize:pagenum*pagesize]
         for x in amos:
             obj = {"id":x.id,
-                    "name":x.product_amortization.product.name, "term":x.term,
+                    "name":x.product_amortization.product.short_name, "term":x.term,
                     # "total_term":x.product_amortization.product.amortization_count,
                     "term_date":util.fmt_dt_normal(util.local_datetime(x.term_date)),
                     "principal":x.principal, "interest":x.interest,
@@ -93,7 +93,7 @@ def _amo_record(user, pagesize, pagenum, product_id):
             .filter(user=user).order_by("-term_date")[(pagenum-1)*pagesize:pagenum*pagesize]
         for x in amos_record:
             obj = {"id":x.id,
-                    "name":x.amortization.product.name, "term":x.term,
+                    "name":x.amortization.product.short_name, "term":x.term,
                     "total_term":x.amortization.product.amortization_count,
                     "term_date":util.fmt_dt_normal(util.local_datetime(x.created_time)),
                     "principal":x.principal, "interest":x.interest,
