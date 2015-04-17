@@ -5,13 +5,16 @@
 from django.utils import timezone
 from wanglibao_pay.models import PayInfo
 from wanglibao_pay import util
-from wanglibao_p2p.models import AmortizationRecord
+from wanglibao_p2p.models import UserAmortization, AmortizationRecord
 from wanglibao_margin.models import MarginRecord
+import logging
+logger = logging.getLogger('p2p')
 
 def detect(request):
     stype = request.DATA.get("type", "").strip()
     pagesize = request.DATA.get("pagesize", "10").strip()
     pagenum = request.DATA.get("pagenum", "1").strip()
+    product_id = request.DATA.get("product_id", "").strip()
 
     if not stype or stype not in ("deposit", "withdraw", "amortization"):
         return {"ret_code":30191, "message":"错误的类型"}
@@ -21,6 +24,11 @@ def detect(request):
     pagenum = int(pagenum)
     if pagesize > 100:
         return {"ret_code":30193, "message":"参数超出限制"}
+    if product_id:
+        if not product_id.isdigit():
+            return {"ret_code":30194, "message":"产品号错误"}
+        else:
+            product_id = int(product_id)
 
     user = request.user
     if stype == "deposit":
@@ -28,7 +36,7 @@ def detect(request):
     elif stype == "withdraw":
         res = _withdraw_record(user, pagesize, pagenum)
     else:
-        res = _amo_record(user, pagesize, pagenum)
+        res = _amo_record(user, pagesize, pagenum, product_id)
     return {"ret_code":0, "data":res, "pagenum":pagenum}
 
 def _deposit_record(user, pagesize, pagenum):
@@ -65,18 +73,33 @@ def _withdraw_record(user, pagesize, pagenum):
         res.append(obj)
     return res
 
-def _amo_record(user, pagesize, pagenum):
+def _amo_record(user, pagesize, pagenum, product_id):
     res = []
-    amos = AmortizationRecord.objects.select_related('amortization_product') \
-               .filter(user=user)[(pagenum-1)*pagesize:pagenum*pagesize]
-    for x in amos:
-        obj = {"id":x.id,
-                "name":x.amortization.product.name, "term":x.term,
-                "total_term":x.amortization.product.amortization_count,
-                "term_date":util.fmt_dt_normal(util.local_datetime(x.created_time)),
-                "principal":x.principal, "interest":x.interest,
-                "penal_interest":x.penal_interest,
-                "total_amount":(x.principal+x.interest+x.penal_interest),
-                "settlement_time":util.fmt_dt_normal(util.local_datetime(x.created_time))}
-        res.append(obj)
+    if product_id:
+        amos = UserAmortization.objects.filter(user=user, settled=True,
+            product_amortization__product_id=product_id)[(pagenum-1)*pagesize:pagenum*pagesize]
+        for x in amos:
+            obj = {"id":x.id,
+                    "name":x.product_amortization.product.name, "term":x.term,
+                    # "total_term":x.product_amortization.product.amortization_count,
+                    "term_date":util.fmt_dt_normal(util.local_datetime(x.term_date)),
+                    "principal":x.principal, "interest":x.interest,
+                    "penal_interest":x.penal_interest,
+                    "total_amount":(x.principal+x.interest+x.penal_interest),
+                    "settlement_time":util.fmt_date_normal(util.local_datetime(x.settlement_time))}
+            res.append(obj)
+    else:
+        amos_record = AmortizationRecord.objects.select_related('amortization_product') \
+            .filter(user=user)[(pagenum-1)*pagesize:pagenum*pagesize]
+        for x in amos_record:
+            obj = {"id":x.id,
+                    "name":x.amortization.product.name, "term":x.term,
+                    "total_term":x.amortization.product.amortization_count,
+                    "term_date":util.fmt_dt_normal(util.local_datetime(x.created_time)),
+                    "principal":x.principal, "interest":x.interest,
+                    "penal_interest":x.penal_interest,
+                    "total_amount":(x.principal+x.interest+x.penal_interest),
+                    "settlement_time":util.fmt_dt_normal(util.local_datetime(x.created_time))}
+            res.append(obj)
+    logger.info("return amo_record ===>>>: %s" % res)
     return res
