@@ -45,13 +45,13 @@ block script
     .modal-content-padding
       input#address_id(type="hidden", name="address_id")
       .form-row
-        input#address_name(type="text", name="address_name", maxlength=12, placeholder="收货人姓名")
+        input#address_name(type="text", name="address_name", maxlength=15, placeholder="收货人姓名")
         .form-row-error
       .form-row
-        input#phone_number(type="text", name="phone_number", maxlength=15, placeholder="联系电话")
+        input#phone_number(type="text", name="phone_number", maxlength=11, placeholder="联系电话")
         .form-row-error
       .form-row
-        input#address_address(type="text", name="address_address", maxlength=60, placeholder="详细地址")
+        input#address_address(type="text", name="address_address", maxlength=50, placeholder="详细地址")
         .form-row-error
       .form-row
         input#postcode(type="text", name="postcode", maxlength=6, placeholder="邮政编码")
