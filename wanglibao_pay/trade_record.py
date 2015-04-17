@@ -41,13 +41,14 @@ def detect(request):
 
 def _deposit_record(user, pagesize, pagenum):
     res = []
-    records = PayInfo.objects.filter(user=user, type="D", status=u"成功")[(pagenum-1)*pagesize:pagenum*pagesize]
+    records = PayInfo.objects.filter(user=user, type="D").exclude(status=PayInfo.PROCESSING)[(pagenum-1)*pagesize:pagenum*pagesize]
     #records = MarginRecord.objects.filter(user=user, catalog=u"现金存入")[(pagenum-1)*pagesize:pagenum*pagesize]
     for x in records:
         obj = {"id":x.id,
                 "amount":x.amount, 
                 "balance":x.margin_record.margin_current,
                 "created_at":util.fmt_dt_normal(util.local_datetime(x.create_time)),
+                "status":x.status,
                 "channel":"APP"}
         #channel = PayInfo.objects.filter(order=x.order_id).first()
         if x.channel and x.channel == "huifu":
@@ -61,7 +62,7 @@ def _withdraw_record(user, pagesize, pagenum):
     records = PayInfo.objects.filter(user=user, type="W")[(pagenum-1)*pagesize:pagenum*pagesize]
     for x in records:
         obj = {"id":x.id,
-                "amount":x.amount, 
+                "amount":x.total_amount, 
                 "created_at":util.fmt_dt_normal(util.local_datetime(x.create_time)),
                 "status":x.status,
                 "confirm_time":util.fmt_dt_normal(x.confirm_time),
@@ -92,7 +93,7 @@ def _amo_record(user, pagesize, pagenum, product_id):
         amos_record = AmortizationRecord.objects.select_related('amortization_product') \
             .filter(user=user).order_by("-term_date")[(pagenum-1)*pagesize:pagenum*pagesize]
         for x in amos_record:
-            obj = {"id":x.id,
+            obj = {"id":x.order_id,
                     "name":x.amortization.product.short_name, "term":x.term,
                     "total_term":x.amortization.product.amortization_count,
                     "term_date":util.fmt_dt_normal(util.local_datetime(x.created_time)),
