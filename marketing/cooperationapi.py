@@ -290,7 +290,6 @@ class WangdaiEyeListAPIView(APIView):
                 rate = p2pproduct.expected_earning_rate + float(reward * 100)
 
                 rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'))
-
                 obj = {
                     "id": str(p2pproduct.id),
                     "platform_name": u"网利宝",
@@ -299,11 +298,15 @@ class WangdaiEyeListAPIView(APIView):
                     "username": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
                     "status": status,
                     "userid": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
-                    "c_type": u"抵押标" if p2pproduct.category == u'证大速贷' else u"信用标",
+                    # "c_type": u"抵押标" if p2pproduct.category == u'证大速贷' else u"信用标",
+                    "c_type": 2 if p2pproduct.category == u'证大速贷' else 0,
                     "amount": amount,
                     "rate": rate,
-                    "period": u'{}个月'.format(p2pproduct.period),
-                    "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6)),
+                    # "period": u'{}个月'.format(p2pproduct.period),
+                    "period": p2pproduct.period,
+                    "p_type": 1,#期限类型,0 代表天,1 代表月
+                    # "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6)),
+                    "pay_way": P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6),
                     "process": process,
                     "reward": reward,
                     "guarantee": "null",
