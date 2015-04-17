@@ -192,3 +192,45 @@ class AccountRedirectView(RedirectView):
         kwargs['identifier'] = request.GET.get('identifier')
         kwargs['referer_url'] = request.META.get('HTTP_REFERER')
         return super(AccountRedirectView, self).get(request, *args, **kwargs)
+
+
+import requests
+from collections import OrderedDict
+import uuid
+import time
+import hashlib
+import json
+
+
+def get_access_token(app_id, app_secret):
+    url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s'
+    res = requests.get(url % (app_id, app_secret)).json()
+    return res
+
+
+def get_jsapi_ticket(access_token):
+    url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=%s&type=jsapi'
+    res = requests.get(url % access_token).json()
+    return res
+
+
+def weixin_config(request):
+    """
+    :param request:
+    :return:
+    """
+    app_id = 'wx4bf8abb47962a812'
+    app_secret = '45066980fd1fa0c6bd06653f08da46aa'
+
+    access_token = get_access_token(app_id, app_secret).get('access_token')
+    jsapi_ticket = get_jsapi_ticket(access_token).get('ticket')
+
+    params = OrderedDict()
+    params['jsapi_ticket'] = jsapi_ticket
+    params['noncestr'] = uuid.uuid1().hex
+    params['timestamp'] = str(int(time.time()))
+    params['url'] = request.GET.get('url')
+    data = '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
+    params['signature'] = hashlib.sha1(data).hexdigest()
+
+    return HttpResponse(json.dumps(params), content_type="application/json")
