@@ -78,7 +78,7 @@ function wei_password() {
                         sessionStorage.setItem("name", Verification());
                         var read=sessionStorage.getItem("read");
                          if(read='8888'){
-                           window.location.href = "/mobile/weixin_app/";
+                           window.location.href = "/mobile/weixin_fee/";
                         }else{
                             window.location.href = "/mobile/weixin_app/";
                         }
