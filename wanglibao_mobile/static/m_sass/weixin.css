@@ -95,7 +95,7 @@ a:hover {
 
 /*公共样式 end*/
 .top-i {
-  height: 6em;
+  height: 5em;
   background: #f44336;
   position: relative; }
 
@@ -106,18 +106,13 @@ a:hover {
   left: 28px; }
 
 .top-i .jiao > img {
-  width: 1.5em; }
+  width: 1.3em; }
 
 .top-i p {
   text-align: center;
   color: #FFFFFF;
   line-height: 3em;
-  font-size: 2.5em; }
-
-.wei_dian {
-  position: absolute;
-  top: 45%;
-  left: 82%; }
+  font-size: 2.3em; }
 
 .wei_dian > img {
   width: 4em; }
@@ -127,16 +122,15 @@ article {
   text-align: center; }
 
 article .wei_zi {
-  width: 20em;
-  margin-top: 1em; }
+  width: 20em; }
 
 article .wei_loge {
-  width: 12em;
-  margin-top: 4em; }
+  width: 32%;
+  margin-top: 2em; }
 
 article > p {
   font-size: 2em;
-  line-height: 3em;
+  margin: 7% 0 6% 0;
   color: #FFFFFF; }
 
 article .grent {
@@ -145,7 +139,7 @@ article .grent {
   height: 3em;
   background: url("/static/m_images/weixin_img/lv.png") center no-repeat;
   background-size: 100% 100%;
-  margin-top: 0.5em;
+  margin-top: 4%;
   line-height: 3em; }
 
 article .grent > p {
@@ -153,30 +147,35 @@ article .grent > p {
   font-size: 1.8em;
   text-align: center; }
 
-article > input {
-  margin-top: 2em;
+article .wei_for {
+  height: 30%; }
+
+article .wei_for > input {
+  margin-top: 12%;
   width: 90%;
-  height: 3em;
+  height: 3.5em;
   border-radius: 7px 7px 0 0;
   border: none;
   text-align: center;
   line-height: 1em;
-  font-size: 2em;
+  font-size: 1.4em;
   color: #727272;
   background: url("/static/m_images/weixin_img/ipion.png") no-repeat, white;
   background-position: 4% 47%;
   background-size: 6% 70%;
   outline: medium; }
 
-article > a {
+article .wei_for > .judge {
   display: inline-block;
   width: 90%;
-  height: 3em;
+  height: 3.5em;
   border-radius: 0 0 7px 7px;
   background: #f44336;
-  font-size: 2em;
+  font-size: 1.4em;
   line-height: 3em;
-  color: #FFFFFF; }
+  color: #FFFFFF;
+  border: none;
+  outline: medium; }
 
 .wei_deng {
   width: 100%;
@@ -314,7 +313,7 @@ footer .wei_right {
   text-align: center; }
 
 .wei_ma > h3 {
-  margin-top: 2em;
+  margin-top: 1em;
   color: #FFFFFF;
   line-height: 1.5em;
   font-size: 3em; }
@@ -355,8 +354,31 @@ footer .wei_right {
   margin: 0 1em 0 1em; }
 
 .wei_feea > p > span {
-  color: #f44336;
-  background: #4dff4f; }
+  color: #f44336; }
+
+.wei_fee {
+  width: 40%;
+  height: 3em;
+  font-size: 2em;
+  border: none;
+  border-radius: 1em;
+  border: 1px #727272 solid;
+  margin-left: 8%;
+  outline: medium;
+  vertical-align: top; }
+
+.wei_ffee {
+  width: 30%;
+  height: 3em;
+  border-radius: 0.5em;
+  display: inline-block;
+  background: #00ff44;
+  line-height: 3em;
+  text-align: center;
+  font-size: 2em;
+  color: #FFFFFF;
+  margin-left: 8%;
+  vertical-align: top; }
 
 .wei_pss {
   width: 100%;
@@ -364,10 +386,12 @@ footer .wei_right {
   border-top: 1px #cccccc solid;
   border-bottom: 1px #cccccc solid;
   margin-top: 1em;
-  font-size: 1.7em;
+  font-size: 1.5em;
   background: #FFFFFF; }
 
 .wei_pss > label {
+  display: inline-block;
+  width: 45%;
   margin-left: 1em;
   color: #979797; }
 
@@ -375,10 +399,12 @@ footer .wei_right {
   border: none;
   font-size: 1em;
   color: #cccccc;
-  width: 46%;
+  width: 39%;
   outline: medium; }
 
-.wei_pss > span {
+.wei_pss > #btn {
+  width: 33%;
+  background: none;
   color: #2196f3; }
 
 .line {
@@ -393,7 +419,7 @@ footer .wei_right {
   border: none; }
 
 .wei_agree > label {
-  font-size: 2em;
+  font-size: 1.5em;
   color: #727272; }
 
 .wei_agree > label > span {
@@ -401,22 +427,26 @@ footer .wei_right {
 
 .wei_kehuduan {
   width: 100%;
-  height: 5em;
+  height: 3em;
   background: rgba(114, 114, 114, 0.72);
-  position: absolute; }
+  position: absolute;
+  line-height: 2em; }
 
 .wei_kehuduan > img {
-  width: 3em;
+  width: 2em;
   margin-left: 4%;
   vertical-align: middle; }
 
 .wei_kehuduan > label {
+  display: inline-block;
+  width: 75%;
   color: #FFFFFF;
   font-size: 2em;
   margin-left: 3%;
-  line-height: 3em; }
+  line-height: 2em;
+  vertical-align: middle; }
 
 .wei_kehuduan > a {
   color: #FFFFFF;
   font-size: 2em;
-  margin-left: 32%; }
+  vertical-align: middle; }

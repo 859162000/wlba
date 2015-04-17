@@ -24,5 +24,7 @@ urlpatterns = patterns('',
     url(r'^weixin_feea/$', TemplateView.as_view(template_name="weixin_feea.jade")),
     url(r'^weixin_registered/$', TemplateView.as_view(template_name="weixin_registered.jade")),
     url(r'^weixin_invitation/$', TemplateView.as_view(template_name="weixin_invitation.jade")),
+    url(r'^weixin_retrieve/$', TemplateView.as_view(template_name="weixin_retrieve.jade")),
     url(r'^account/redirect/$', AccountRedirectView.as_view(), name='mobile_account_redirect'),
+
 )

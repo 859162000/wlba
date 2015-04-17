@@ -15,15 +15,18 @@ html
           p 邀请好友理财送...
       include m_include/weixin_kehuduan
       form.wei_pss
-          label 请设置登入密码完成注册
+          label(style='width: 54%;') 请设置登入密码完成注册
           br
-          label 账号:
+          label.phone_a 账号:
       form.wei_pss
-          label 验证码
-          input(type='text' placeholder='短信验证码')
+          label(style='width: 20%;') 验证码
+          input(type='text' placeholder='短信验证码').yanma
+          label(style='width: 25%;').wei_xin
       form.wei_pss
           label 登入密码
-          input(type='text' placeholder='请设置您的登入密码')
+          input(type='text' placeholder='请设置您的登入密码').passwordd
 
       .wei_buttonn
         a 注册
+      script(src="/static/m_js/m_lib/jquery.min.js")
+      script(src="/static/m_js/weixin.js")
