@@ -194,43 +194,47 @@ class AccountRedirectView(RedirectView):
         return super(AccountRedirectView, self).get(request, *args, **kwargs)
 
 
-import requests
 from collections import OrderedDict
 import uuid
 import time
 import hashlib
 import json
-
-
-def get_access_token(app_id, app_secret):
-    url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s'
-    res = requests.get(url % (app_id, app_secret)).json()
-    return res
-
-
-def get_jsapi_ticket(access_token):
-    url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=%s&type=jsapi'
-    res = requests.get(url % access_token).json()
-    return res
+from .weixin import get_access_token, get_jsapi_ticket
+APP_ID = 'wx4bf8abb47962a812'
+APP_SECRET = '45066980fd1fa0c6bd06653f08da46aa'
 
 
 def weixin_config(request):
-    """
-    :param request:
-    :return:
-    """
-    app_id = 'wx4bf8abb47962a812'
-    app_secret = '45066980fd1fa0c6bd06653f08da46aa'
+    url = request.META.get('HTTP_REFERER', '') or request.GET.get('url', '')
 
-    access_token = get_access_token(app_id, app_secret).get('access_token')
-    jsapi_ticket = get_jsapi_ticket(access_token).get('ticket')
+    if not url:
+        return HttpResponse(json.dumps({
+            'errcode': 1,
+            'msg': u'不能获取url'
+        }), content_type="application/json")
+
+    try:
+        access_token = get_access_token(APP_ID, APP_SECRET).get('access_token')
+        jsapi_ticket = get_jsapi_ticket(access_token).get('ticket')
+        assert jsapi_ticket
+    except Exception, e:
+        return HttpResponse(json.dumps({
+            'errcode': 1,
+            'errmsg': e.message,
+            'msg': u'请求微信接口错误'
+        }), content_type="application/json")
 
     params = OrderedDict()
     params['jsapi_ticket'] = jsapi_ticket
     params['noncestr'] = uuid.uuid1().hex
     params['timestamp'] = str(int(time.time()))
-    params['url'] = request.GET.get('url')
-    data = '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
-    params['signature'] = hashlib.sha1(data).hexdigest()
+    params['url'] = url.split('#')[0]
+    string = '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
 
-    return HttpResponse(json.dumps(params), content_type="application/json")
+    data = {
+        'noncestr': params.get('noncestr'),
+        'timestamp': params.get('timestamp'),
+        'signature': hashlib.sha1(string).hexdigest()
+    }
+
+    return HttpResponse(json.dumps(data), content_type="application/json")
