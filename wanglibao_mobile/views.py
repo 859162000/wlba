@@ -200,41 +200,49 @@ import time
 import hashlib
 import json
 from .weixin import get_access_token, get_jsapi_ticket
-APP_ID = 'wx4bf8abb47962a812'
-APP_SECRET = '45066980fd1fa0c6bd06653f08da46aa'
+WEIXIN_APP_ID = 'wx4bf8abb47962a812'
+WEIXIN_APP_SECRET = '45066980fd1fa0c6bd06653f08da46aa'
 
 
 def weixin_config(request):
+    """
+    获取微信JS-SDK配置参数
+    :param request:
+    :return:
+    """
     url = request.META.get('HTTP_REFERER', '') or request.GET.get('url', '')
 
     if not url:
-        return HttpResponse(json.dumps({
+        data = {
             'errcode': 1,
-            'msg': u'不能获取url'
-        }), content_type="application/json")
+            'errmsg': u'不能获取url',
+        }
+        return HttpResponse(json.dumps(data), content_type="application/json")
 
     try:
-        access_token = get_access_token(APP_ID, APP_SECRET).get('access_token')
+        access_token = get_access_token(WEIXIN_APP_ID, WEIXIN_APP_SECRET).get('access_token')
         jsapi_ticket = get_jsapi_ticket(access_token).get('ticket')
         assert jsapi_ticket
     except Exception, e:
-        return HttpResponse(json.dumps({
+        data = {
             'errcode': 1,
-            'errmsg': e.message,
-            'msg': u'请求微信接口错误'
-        }), content_type="application/json")
+            'errmsg': u'请求微信接口错误',
+            'data': e.message,
+        }
+        return HttpResponse(json.dumps(data), content_type="application/json")
 
+    # 生成 微信JS-SDK使用权限签名
     params = OrderedDict()
     params['jsapi_ticket'] = jsapi_ticket
     params['noncestr'] = uuid.uuid1().hex
     params['timestamp'] = str(int(time.time()))
     params['url'] = url.split('#')[0]
     string = '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
+    signature = hashlib.sha1(string).hexdigest()
 
     data = {
         'noncestr': params.get('noncestr'),
         'timestamp': params.get('timestamp'),
-        'signature': hashlib.sha1(string).hexdigest()
+        'signature': signature,
     }
-
     return HttpResponse(json.dumps(data), content_type="application/json")
