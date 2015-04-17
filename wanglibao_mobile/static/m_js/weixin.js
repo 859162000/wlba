@@ -21,8 +21,8 @@
 })();
 function log() {
     $('.judge').on('click', function () {
-        if(Verification()=='8888'){
-             sessionStorage.setItem("read", '8888');
+        if (Verification() == '8888') {
+            sessionStorage.setItem("read", '8888');
         }
         if ($(".ipon").val() == "") {
             alert("手机号码不能为空！");
@@ -76,10 +76,10 @@ function wei_password() {
                     var number_a = result['token'];
                     if (number_a !== '') {
                         sessionStorage.setItem("name", Verification());
-                        var read=sessionStorage.getItem("read");
-                         if(read='8888'){
-                           window.location.href = "/mobile/weixin_fee/";
-                        }else{
+                        var read = sessionStorage.getItem("read");
+                        if (read == '8888') {
+                            window.location.href = "/mobile/weixin_fee/";
+                        } else {
                             window.location.href = "/mobile/weixin_app/";
                         }
                     } else {
@@ -261,17 +261,17 @@ function retrieve() {
 function fee() {
     var name = sessionStorage.getItem("name");
     $('footer').hide();
-    $('.wei_left').on('click',function(){
-         window.location.href = "/mobile/weixin_index/?backurl=" + '8888';
+    $('.wei_left').on('click', function () {
+        window.location.href = "/mobile/weixin_index/?backurl=" + '8888';
     })
-     $('.wei_right').on('click',function(){
-         window.location.href = "/mobile/weixin_index/?backurl=" + '8888';
+    $('.wei_right').on('click', function () {
+        window.location.href = "/mobile/weixin_index/?backurl=" + '8888';
     })
 
 
     $.ajax({
         type: "get",
-        url: "/mobile/weixin_config/?url=http://wanglibao.tunnel.mobi/mobile/weixin_fee/",
+        url: "/mobile/weixin_config/?url=http://wanglibao.tunnel.mobi/",
         dataType: "json",
         success: function (result) {
             wx.config({
@@ -280,22 +280,105 @@ function fee() {
                 timestamp: result['timestamp'], // 必填，生成签名的时间戳
                 nonceStr: result['noncestr'], // 必填，生成签名的随机串
                 signature: result['signature'],// 必填，签名，见附录1
-                jsApiList: ['hideOptionMenu', 'showOptionMenu'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+                jsApiList: ['hideOptionMenu', 'showOptionMenu', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
             });
-            if (name == null) {
+            wx.ready(function () {
+                if (name == null) {
+                    $('footer').show();
+                    wx.hideOptionMenu();
+                } else {
+                    wx.checkJsApi({
+                        'jsApiList': [
+                            'onMenuShareTimeline'
+                        ]
+                    });
+                    alert(22)
+                    var URL = window.location.href;
+                    wx.showOptionMenu();
+                    wx.onMenuShareTimeline({
+                        title: '邀请好友送30元话费', // 分享标题
+                        link: URL, // 分享链接
+                        imgUrl: 'http://wanglibao.tunnel.mobi/static/m_images/weixin_img/xinlai.png'
+                    });
+                    wx.onMenuShareAppMessage({
+                        title: '邀请好友送30元话费', // 分享标题
+                        desc: '', // 分享描述
+                        link: 'http://wanglibao.tunnel.mobi/mobile/weixin_feea/', // 分享链接
+                        imgUrl: '/static/m_images/weixin_img/ipion.png', // 分享图标
+                        type: '', // 分享类型,music、video或link，不填默认为link
+                        dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                    });
+                    wx.onMenuShareQQ({
+                        title: '邀请好友送30元话费', // 分享标题
+                        desc: '', // 分享描述
+                        link: 'http://wanglibao.tunnel.mobi/mobile/weixin_feea/', // 分享链接
+                        imgUrl: '/static/m_images/weixin_img/ipion.png', // 分享图标
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                    });
+                }
+            })
+            /*if (name == null) {
                 $('footer').show();
                 wx.ready(function () {
-                wx.hideOptionMenu();
+                    wx.hideOptionMenu();
+                });
+            } else {
+                var URL = window.location.href;
+                wx.ready(function () {
+                    wx.showOptionMenu();
+                    wx.onMenuShareTimeline({
+                        title: '邀请好友送30元话费', // 分享标题
+                        link: 'http://wanglibao.tunnel.mobi/mobile/weixin_feea/', // 分享链接
+                        imgUrl: 'http://wanglibao.tunnel.mobi/static/m_images/weixin_img/xinlai.png', // 分享图标
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
 
-            });
-            }else{
-              wx.ready(function () {
-               wx.showOptionMenu();
+                    });
+                    wx.onMenuShareAppMessage({
+                        title: '邀请好友送30元话费', // 分享标题
+                        desc: '', // 分享描述
+                        link: 'http://wanglibao.tunnel.mobi/mobile/weixin_feea/', // 分享链接
+                        imgUrl: '/static/m_images/weixin_img/ipion.png', // 分享图标
+                        type: '', // 分享类型,music、video或link，不填默认为link
+                        dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                    });
+                    wx.onMenuShareQQ({
+                        title: '邀请好友送30元话费', // 分享标题
+                        desc: '', // 分享描述
+                        link: 'http://wanglibao.tunnel.mobi/mobile/weixin_feea/', // 分享链接
+                        imgUrl: '/static/m_images/weixin_img/ipion.png', // 分享图标
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                    });
 
 
-            });
-            }
-
+                });
+            }*/
 
 
         }

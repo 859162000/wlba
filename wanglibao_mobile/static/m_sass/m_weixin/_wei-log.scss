@@ -141,7 +141,7 @@ body{
 .top-i p{
   text-align: center;
   color: #FFFFFF;
-  line-height: 3em;
+  line-height: 2.6em;
   font-size: 2.3em;
 }
 .wei_dian>img{
@@ -303,7 +303,8 @@ article .wei_for>.judge{
 
 .mainn{
   width: 100%;
-  margin-bottom: 7em;
+ // margin-bottom: 100px;
+  padding-bottom: 100px;
 }
 .mainn dl{
   width: 49%;
@@ -406,27 +407,27 @@ footer .wei_right{
   color: #f44336;
 }
 .wei_fee{
-  width: 40%;
+  width: 49%;
   height: 3em;
   font-size: 2em;
   border: none;
   border-radius: 1em;
   border: 1px #727272 solid;
-  margin-left: 8%;
+  margin-left: 5%;
   outline:medium;
   vertical-align: top;
 }
 .wei_ffee{
-  width: 30%;
+  width: 35%;
   height: 3em;
   border-radius: 0.5em;
   display: inline-block;
-  background: #00ff44;
+  background: #8cc34b;
   line-height: 3em;
   text-align: center;
   font-size: 2em;
   color: #FFFFFF;
-  margin-left: 8%;
+  margin-left: 5%;
   vertical-align: top;
 }
 //=================================
@@ -481,29 +482,30 @@ footer .wei_right{
 //-----------------------------------include----//
 .wei_kehuduan{
   width: 100%;
-  height: 3em;
-  background: rgba(114, 114, 114, 0.72);
-  position: absolute;
-  line-height: 2em;
+  display: -webkit-box;
+ -webkit-box-align: center;
+  background: rgba(114,114,114,0.72);
+  padding: 6px 0;
+  overflow: hidden;
 }
 .wei_kehuduan>img{
-  width: 2em;
-  margin-left: 4%;
-  vertical-align:middle;
+  width: 24px;
+  height: 24px;
+  margin: 0 10px;
 }
 
 .wei_kehuduan>label{
-  display: inline-block;
-  width: 75%;
+  display: block;
+  -webkit-box-flex: 1;
   color: #FFFFFF;
   font-size: 2em;
-  margin-left: 3%;
-  line-height: 2em;
-  vertical-align:middle;
+
 
 }
 .wei_kehuduan>a{
+  display: block;
+  width: 30px;
   color: #FFFFFF;
   font-size: 2em;
-  vertical-align:middle;
+  margin-right: 10px;
 }

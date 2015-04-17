@@ -8,7 +8,7 @@ html
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
     meta(name="format-detection", content="telephone=no")
     link(rel="stylesheet",href="/static/stylesheets/weixin.css")
-  body(style='background: url(/static/m_images/weixin_img/ban.jpg) no-repeat; background-size: 100% 100%;')
+  body(style='background: url(/static/m_images/weixin_img/ban.jpg) no-repeat; background-size:cover;')
       .top-i
           a.jiao
             img(src='/static/m_images/weixin_img/sanjiao.png')
@@ -19,7 +19,9 @@ html
           h4 为了您的交易安全请到APP端进行投资
           img(src='/static/m_images/weixin_img/app.png')
       .download
-          a 下&nbsp;载&nbsp;A&nbsp;P&nbsp;P
+          a(href='www.wanglibao.com/api/mobiledownload/') 下&nbsp;载&nbsp;A&nbsp;P&nbsp;P
+      script(src="/static/m_js/m_lib/jquery.min.js")
+      script(src="/static/m_js/weixin.js")
 
 
 
