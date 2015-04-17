@@ -46,10 +46,11 @@ def _deposit_record(user, pagesize, pagenum):
     for x in records:
         obj = {"id":x.id,
                 "amount":x.amount, 
-                "balance":x.margin_record.margin_current,
                 "created_at":util.fmt_dt_normal(util.local_datetime(x.create_time)),
                 "status":x.status,
                 "channel":"APP"}
+        if x.status == u"成功":
+            x['balance'] = x.margin_record.margin_current
         #channel = PayInfo.objects.filter(order=x.order_id).first()
         if x.channel and x.channel == "huifu":
             obj['channel'] = "PC"
