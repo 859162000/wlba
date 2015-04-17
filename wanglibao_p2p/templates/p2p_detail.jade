@@ -40,9 +40,7 @@ html
               .span5
                 p.dark-gray
                   span.font-xxl {{p2p.period}}
-                  - with p2p.pay_method as interest_catalog
-                  include include/detail_unit
-                  - endwith
+                  span.font-xl {{p2p.pay_method|period_unit}}
                 p 还款期限
               .span3-omega
                 p.highlight

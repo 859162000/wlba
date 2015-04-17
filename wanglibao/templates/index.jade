@@ -124,9 +124,7 @@ html
                     .span2.align-center
                       p
                         em {{product.period}}
-                        - with product.pay_method as interest_catalog
-                        include include/unit
-                        - endwith
+                        span.font-l {{product.pay_method|period_unit}}
                       p 还款期限
                     .span3.align-center
                       p
