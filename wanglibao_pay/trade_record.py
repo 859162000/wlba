@@ -50,7 +50,7 @@ def _deposit_record(user, pagesize, pagenum):
                 "status":x.status,
                 "channel":"APP"}
         if x.status == u"成功":
-            x['balance'] = x.margin_record.margin_current
+            obj['balance'] = x.margin_record.margin_current
         #channel = PayInfo.objects.filter(order=x.order_id).first()
         if x.channel and x.channel == "huifu":
             obj['channel'] = "PC"
