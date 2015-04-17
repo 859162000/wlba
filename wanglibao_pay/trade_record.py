@@ -91,7 +91,7 @@ def _amo_record(user, pagesize, pagenum, product_id):
             res.append(obj)
     else:
         amos_record = AmortizationRecord.objects.select_related('amortization_product') \
-            .filter(user=user).order_by("-term_date")[(pagenum-1)*pagesize:pagenum*pagesize]
+            .filter(user=user).order_by("-created_time")[(pagenum-1)*pagesize:pagenum*pagesize]
         for x in amos_record:
             obj = {"id":x.order_id,
                     "name":x.amortization.product.short_name, "term":x.term,
