@@ -6,7 +6,7 @@ import datetime
 from django.utils import timezone
 from import_export import resources, fields
 from import_export.admin import ExportMixin
-from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, ActivityImages
+from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, ActivityImages, WapActivityTemplates
 import models as m
 
 
@@ -187,7 +187,7 @@ class ActivityTemplatesAdmin(admin.ModelAdmin):
     form = ActivityTemplatesForm
 
     list_display = ('id', 'name', 'banner', 'preview_link')
-    ordering = ('id',)
+    ordering = ('-id',)
     search_fields = ('name',)
 
     fieldsets = (
@@ -212,6 +212,13 @@ class ActivityTemplatesAdmin(admin.ModelAdmin):
     )
 
 
+class WapActivityTemplatesAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'url', 'aim_template', 'is_rendering', 'func_rendering', 'start_at', 'end_at', 'created_at', 'is_used')
+    ordering = ('-id',)
+    search_fields = ('name', 'url', 'aim_template')
+
+
+admin.site.register(WapActivityTemplates, WapActivityTemplatesAdmin)
 admin.site.register(ActivityImages, ActivityImagesAdmin)
 admin.site.register(ActivityTemplates, ActivityTemplatesAdmin)
 

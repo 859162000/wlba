@@ -543,6 +543,8 @@ class KuaiPay:
             return {"ret_code": 2, "message":"请耐心等候充值完成"}
         elif res_code == "og":
             return {"ret_code": 3, "message":"充值金额太大"}
+        elif res_code == "tc":
+            return {"ret_code": 4, "message":"不能使用信用卡"}
         elif res_code == "51":
             return {"ret_code": 51, "message":"余额不足"}
         else:

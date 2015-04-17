@@ -273,7 +273,7 @@ class ActivityTemplates(models.Model):
     login_desc = models.CharField(u'登录入口标语', max_length=128, blank=True, help_text=u'例如<一句话宣传语>')
     is_login_href = models.BooleanField(u'登录入口是否添加超链接', default=False, help_text=u'勾选此项则在登录入口添加超链接')
     login_href_desc = models.CharField(u'入口超链接描述', max_length=128, blank=True, help_text=u'超连接描述如<【立即领取】>')
-    login_href = models.CharField(u'入口超链接', max_length=128, blank=True, help_text=u'超连接地址如<https://www.wanglibao.com/>')
+    login_href = models.CharField(u'入口超链接', max_length=128, blank=True, help_text=u'添加超链接绝对地址，以http或https开头')
     # 活动时间及描述
     is_activity_desc = models.IntegerField(u'加载活动时间及描述模块方案', max_length=20, choices=OPEN_CHOICE, default=0, help_text=u'当选择加载默认模块时，则加载默认图片，可以自定义活动时间和活动描述')
     desc = models.CharField(u'活动描述', max_length=1024, blank=True, null=True, help_text=u'例如<一句话描述，活动期间怎么怎么滴>')
@@ -334,3 +334,24 @@ class ActivityTemplates(models.Model):
         return u'<a href="/templates/zero/%s/" target="_blank">预览</a>' % str(self.id)
     preview_link.short_description = u'预览'
     preview_link.allow_tags = True
+
+
+class WapActivityTemplates(models.Model):
+    """ 管理wap活动页面 """
+    name = models.CharField(u"名称", max_length=60, blank=True)
+    url = models.CharField(u"活动URL地址", max_length=128, blank=True, null=True)
+    aim_template = models.CharField(u"目的模板名称", max_length=60, blank=True, null=True)
+    is_rendering = models.BooleanField(u'是否使用函数渲染模板', default=False)
+    func_rendering = models.CharField(
+        u'渲染模板的函数名称', max_length=60, null=True, blank=True,
+        help_text=u'填写函数名称，如需要使用 rendering_func(*args, **kwargs)，则填写 rendering_func函数名')
+    start_at = models.DateTimeField(u"活动开始时间*", default=timezone.now, null=False)
+    end_at = models.DateTimeField(u"活动结束时间*", default=timezone.now, null=False)
+    created_at = models.DateTimeField(auto_now=True, default=timezone.now)
+    is_used = models.BooleanField(u'是否启用', default=False)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = u'wap活动页管理功能'
