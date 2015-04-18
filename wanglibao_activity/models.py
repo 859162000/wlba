@@ -345,4 +345,4 @@ class WapActivityTemplates(models.Model):
         return self.name
 
     class Meta:
-        verbose_name_plural = u'wap活动页管理功能'
+        verbose_name_plural = u'活动页跳转管理功能'
