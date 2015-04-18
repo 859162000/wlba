@@ -20,6 +20,8 @@ from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView,
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
 from marketing.views import NewsListView, NewsDetailView
+from wanglibao_activity.decorators import decorator_include
+from wanglibao_activity.decorators import wap_activity_manage
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -76,7 +78,7 @@ urlpatterns = patterns(
     url(r'^ckeditor/', include('ckeditor.urls')),
 
     url(r'^preorder/', include('wanglibao_preorder.urls')),
-    url(r'^activity/', include('marketing.urls')),
+    url(r'^activity/', decorator_include(include('marketing.urls'), wap_activity_manage)),
     url(r'^announcement/', include('wanglibao_announcement.urls')),
     url(r'^redpacket/', include('wanglibao_redpack.urls')),
     url(r'^templates/', include('wanglibao_activity.urls')),
