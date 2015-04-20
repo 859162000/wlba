@@ -24,9 +24,10 @@ html
             |邀请你使用网利宝理财,首次体验可获赠
             span 20元
           br
+          input(type='hidden', name='identifier', value='{{ identifier }}')
           input.wei_fee
           a.wei_ffee 获取验证码
-          .wei.feee(style='width:58%;margin-left:40%;margin-top:0.5em;')
+          form.wei.feee(style='width:58%;margin-left:40%;margin-top:0.5em;')
               input(type='checkbox' checked='checked')
               label(style='font-size: 1.5em;color: #727272;')
                   |我同意

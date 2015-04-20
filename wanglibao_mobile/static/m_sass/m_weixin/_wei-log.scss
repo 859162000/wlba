@@ -185,7 +185,7 @@ article .grent>p{
 article .wei_for{
   height: 30%;
 }
-article .wei_for>input{
+article .wei_for>.ipon{
   margin-top: 12%;
   width: 90%;
   height: 3.5em;
@@ -218,10 +218,10 @@ article .wei_for>.judge{
   width: 100%;
   height: 3em;
   line-height: 3em;
-  border-top: 2px #cccccc solid;
+  border-top: 1px #cccccc solid;
   border-bottom: 1px #cccccc solid;
   margin-top: 3em;
-  font-size: 2.5em;
+  font-size: 2em;
 }
 .wei_deng>label{
   margin-left: 1em;
@@ -248,7 +248,7 @@ article .wei_for>.judge{
 }
 .wei_buttonn>a{
   height: 2em;
-  font-size: 3em;
+  font-size: 2.5em;
   line-height: 2em;
   background: #f44336;
   display: inline-block;
@@ -304,7 +304,7 @@ article .wei_for>.judge{
 .mainn{
   width: 100%;
  // margin-bottom: 100px;
-  padding-bottom: 100px;
+  padding-bottom: 5em;
 }
 .mainn dl{
   width: 49%;
@@ -339,9 +339,9 @@ footer{
 footer a{
   display: inline-block;
   width: 50%;
-  height: 3em;
+  height: 2.5em;
   text-align: center;
-  line-height: 3em;
+  line-height: 2.5em;
   font-size: 2em;
   color: #FFFFFF;
 
@@ -392,10 +392,10 @@ footer .wei_right{
 //=============================
 .wei_feea{
   width: 100%;
-  height: 13em;
   border-bottom:  1px #cccccc solid;
   border-top:  1px #cccccc solid;
   margin-top: 2em;
+  padding: 2em 0;
 
 }
 .wei_feea>p{
@@ -411,11 +411,12 @@ footer .wei_right{
   height: 3em;
   font-size: 2em;
   border: none;
-  border-radius: 1em;
+  border-radius: 13px;
   border: 1px #727272 solid;
   margin-left: 5%;
   outline:medium;
   vertical-align: top;
+  outline:medium;
 }
 .wei_ffee{
   width: 35%;
@@ -429,6 +430,7 @@ footer .wei_right{
   color: #FFFFFF;
   margin-left: 5%;
   vertical-align: top;
+  outline:medium;
 }
 //=================================
 .wei_pss{
@@ -454,7 +456,7 @@ footer .wei_right{
   outline:medium;
 
 }
-.wei_pss>#btn{
+.wei_pss>#btn,.wei_pss>#btnn{
   width: 33%;
   background: none;
   color: #2196f3;

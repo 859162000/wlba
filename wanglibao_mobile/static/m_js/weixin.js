@@ -82,8 +82,6 @@ function wei_password() {
                         } else {
                             window.location.href = "/mobile/weixin_app/";
                         }
-                    } else {
-
                     }
                 },
                 complete: function (XMLHttpRequest, textStatus) {
@@ -104,7 +102,7 @@ function wei_password() {
 //=============================注册
 function registered() {
     $('#btn').click(function () {
-        $('#btn').html('已发送<span id="timeb2">60</span>');
+        $('#btn').html('已发送<span id="timeb2">60</span>秒');
         timer = self.setInterval(addsec, 1000);
         wei_zheng();
         var pno = Verification();
@@ -138,8 +136,10 @@ function registered() {
             return false;
 
 
-        }
-        if (pass == "" || qupass == "" || yan == "") {
+        }else if(!document.getElementById("id").checked){
+            alert("你必须同意协议");
+            return false
+        }else if (pass == "" || qupass == "" || yan == "") {
             alert("内容不全,请填全");
             return false;
         } else {
@@ -162,11 +162,13 @@ function registered() {
                         alert($dade.message.validate_code);
                     } else {
                         sessionStorage.setItem("name", Verification());
-                        //if(){
-                        //
-                        //}else{
-                        //    window.location.href = "/mobile/weixin_app/";
-                        //}
+                        var read = sessionStorage.getItem("read");
+                        if (read == '8888') {
+                            window.location.href = "/mobile/weixin_fee/";
+                        } else {
+                            window.location.href = "/mobile/weixin_app/";
+                        }
+
 
 
                     }
@@ -181,7 +183,7 @@ function registered() {
 //=============================找回密码
 function retrieve() {
     $('#btnn').click(function () {
-        $('#btnn').html('已经发送<span id="timeb2">60</span>');
+        $('#btnn').html('已经发送<span id="timeb2">60</span>秒');
         timer = self.setInterval(addsecc, 1000);
         wei_zheng();
         var pno = Verification();
@@ -223,8 +225,11 @@ function retrieve() {
             return false;
 
 
-        }
-        if (pas == "" || qupas == "" || ya == "") {
+        }else
+        if(!document.getElementById("id").checked){
+            alert("你必须同意协议");
+            return false
+        }else  if (pas == "" || qupas == "" || ya == "") {
             alert("内容不全,请填全");
             return false;
         } else {
@@ -241,8 +246,8 @@ function retrieve() {
                     console.log(typeof XMLHttpRequest)
                     var $dade = JSON.parse(XMLHttpRequest.responseText)
                     console.log($dade);
-                    if ($dade.message.identifier) {
-                        alert($dade.message);
+                    if ($dade.message=="验证码验证失败") {
+                        alert('验证码错误');
                     } else if ($dade.message.validate_code) {
                         alert($dade.message.validate_code);
                     } else {
@@ -263,20 +268,20 @@ function fee() {
     $('footer').hide();
     $('.wei_left').on('click', function () {
         window.location.href = "/mobile/weixin_index/?backurl=" + '8888';
-    })
+    });
     $('.wei_right').on('click', function () {
         window.location.href = "/mobile/weixin_index/?backurl=" + '8888';
-    })
+    });
 
 
     $.ajax({
         type: "get",
-        url: "/mobile/weixin_config/?url=http://wanglibao.tunnel.mobi/",
+        url: "/mobile/weixin_config/",
         dataType: "json",
         success: function (result) {
             wx.config({
                 debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-                appId: 'wx4bf8abb47962a812', // 必填，公众号的唯一标识
+                appId: 'wx408ba19bdadea213', // 必填，公众号的唯一标识
                 timestamp: result['timestamp'], // 必填，生成签名的时间戳
                 nonceStr: result['noncestr'], // 必填，生成签名的随机串
                 signature: result['signature'],// 必填，签名，见附录1
@@ -292,19 +297,21 @@ function fee() {
                             'onMenuShareTimeline'
                         ]
                     });
-                    alert(22)
-                    var URL = window.location.href;
+                    //var weixin_url='http://wanglibao.tunnel.mobi';
+                    var share_link ='/mobile/weixin_feea/?identifier=' + name;
+                    var share_img_url = '/static/m_images/weixin_img/loginn.png';
+                    var share_title = '邀请好友送30元话费';
                     wx.showOptionMenu();
                     wx.onMenuShareTimeline({
-                        title: '邀请好友送30元话费', // 分享标题
-                        link: URL, // 分享链接
-                        imgUrl: 'http://wanglibao.tunnel.mobi/static/m_images/weixin_img/xinlai.png'
+                        title: share_title, // 分享标题
+                        link: share_link, // 分享链接
+                        imgUrl: share_img_url
                     });
                     wx.onMenuShareAppMessage({
-                        title: '邀请好友送30元话费', // 分享标题
+                        title: share_title, // 分享标题
                         desc: '', // 分享描述
-                        link: 'http://wanglibao.tunnel.mobi/mobile/weixin_feea/', // 分享链接
-                        imgUrl: '/static/m_images/weixin_img/ipion.png', // 分享图标
+                        link: share_link, // 分享链接
+                        imgUrl: share_img_url, // 分享图标
                         type: '', // 分享类型,music、video或link，不填默认为link
                         dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
                         success: function () {
@@ -315,10 +322,10 @@ function fee() {
                         }
                     });
                     wx.onMenuShareQQ({
-                        title: '邀请好友送30元话费', // 分享标题
+                        title: share_title, // 分享标题
                         desc: '', // 分享描述
-                        link: 'http://wanglibao.tunnel.mobi/mobile/weixin_feea/', // 分享链接
-                        imgUrl: '/static/m_images/weixin_img/ipion.png', // 分享图标
+                        link: share_link, // 分享链接
+                        imgUrl: share_img_url, // 分享图标
                         success: function () {
                             // 用户确认分享后执行的回调函数
                         },
@@ -328,57 +335,6 @@ function fee() {
                     });
                 }
             })
-            /*if (name == null) {
-                $('footer').show();
-                wx.ready(function () {
-                    wx.hideOptionMenu();
-                });
-            } else {
-                var URL = window.location.href;
-                wx.ready(function () {
-                    wx.showOptionMenu();
-                    wx.onMenuShareTimeline({
-                        title: '邀请好友送30元话费', // 分享标题
-                        link: 'http://wanglibao.tunnel.mobi/mobile/weixin_feea/', // 分享链接
-                        imgUrl: 'http://wanglibao.tunnel.mobi/static/m_images/weixin_img/xinlai.png', // 分享图标
-                        success: function () {
-                            // 用户确认分享后执行的回调函数
-                        },
-                        cancel: function () {
-                            // 用户取消分享后执行的回调函数
-                        }
-
-                    });
-                    wx.onMenuShareAppMessage({
-                        title: '邀请好友送30元话费', // 分享标题
-                        desc: '', // 分享描述
-                        link: 'http://wanglibao.tunnel.mobi/mobile/weixin_feea/', // 分享链接
-                        imgUrl: '/static/m_images/weixin_img/ipion.png', // 分享图标
-                        type: '', // 分享类型,music、video或link，不填默认为link
-                        dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
-                        success: function () {
-                            // 用户确认分享后执行的回调函数
-                        },
-                        cancel: function () {
-                            // 用户取消分享后执行的回调函数
-                        }
-                    });
-                    wx.onMenuShareQQ({
-                        title: '邀请好友送30元话费', // 分享标题
-                        desc: '', // 分享描述
-                        link: 'http://wanglibao.tunnel.mobi/mobile/weixin_feea/', // 分享链接
-                        imgUrl: '/static/m_images/weixin_img/ipion.png', // 分享图标
-                        success: function () {
-                            // 用户确认分享后执行的回调函数
-                        },
-                        cancel: function () {
-                            // 用户取消分享后执行的回调函数
-                        }
-                    });
-
-
-                });
-            }*/
 
 
         }
@@ -386,19 +342,21 @@ function fee() {
     })
 }
 function feea() {
-    var phon = Verification();
-    aa = '12340913683';
-    b = aa.substring(0, 3) + "****" + aa.substring(7, 11);
+    var phon = $('input[name=identifier]').val(),
+        wei_f = '',
+        b = '';
+    if (phon) {
+        b = phon.substring(0, 3) + "****" + phon.substring(7, 11)
+    }
     $('.wei_feea p label').html(b);
 
     $('.wei_ffee').click(function () {
 
         wei_zheng();
-        var pno = Verification();
-
+        wei_f = $('.wei_fee').val();
         $.ajax({
             type: "POST",
-            url: "/api/phone_validation_code/register/" + '13248086789' + "/",
+            url: "/api/phone_validation_code/register/" + wei_f + "/",
             data: null,
             dataType: "json",
             complete: function (XMLHttpRequest, textStatus) {
@@ -407,7 +365,7 @@ function feea() {
                 if ($data.message == '') {
 
                     alert('手机号码已发送您的手机上请注意查收');
-                    window.location.href = "/mobile/weixin_invitation/?backurl=" + '13248086789';
+                    window.location.href = "/mobile/weixin_invitation/?identifier=" + wei_f + '&invite_code=' + phon;
                 } else {
                     alert($data.message);
                 }
@@ -420,9 +378,8 @@ function feea() {
 
 }
 function yoa_registered() {
-    $('.wei_xin').html('已发送<span id="timeb2">60</span>');
+    $('.wei_xin').html('已发送<span id="timeb2">60</span>秒');
     timer = self.setInterval(addseca, 1000);
-    $('.phone_a').html('账号:&nbsp;' + Verification());
     $('.wei_buttonn').on('click', function () {
         var yanma = $(".yanma").val(),
             passwordd = $(".passwordd").val();
@@ -441,8 +398,13 @@ function yoa_registered() {
             wei_zheng();
             $.ajax({
                 type: "post",
-                url: "/accounts/register/ajax/?promo_token=weixin",
-                data: {identifier: Verification(), validate_code: yanma, password: passwordd, invitecode: ''},
+                url: "/api/register/?promo_token=weixin",
+                data: {
+                    identifier: $('input[name=identifier]').val(),
+                    validate_code: yanma,
+                    password: passwordd,
+                    invite_code: $('input[name=invite_code]').val()
+                },
                 dataType: "json",
                 success: function (result) {
 
@@ -516,11 +478,9 @@ function addsecc() {
 function addseca() {
 
     var t = $('#timeb2').html();
-    //alert(t);
     if (t > 0) {
 
         $('#timeb2').html(t - 1);
-        //alert(t);
     } else {
 
         window.clearInterval(timer);

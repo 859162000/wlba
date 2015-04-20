@@ -194,43 +194,81 @@ class AccountRedirectView(RedirectView):
         return super(AccountRedirectView, self).get(request, *args, **kwargs)
 
 
-import requests
 from collections import OrderedDict
 import uuid
 import time
 import hashlib
 import json
-
-
-def get_access_token(app_id, app_secret):
-    url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s'
-    res = requests.get(url % (app_id, app_secret)).json()
-    return res
-
-
-def get_jsapi_ticket(access_token):
-    url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=%s&type=jsapi'
-    res = requests.get(url % access_token).json()
-    return res
+from .weixin import get_access_token, get_jsapi_ticket
+WEIXIN_APP_ID = 'wx408ba19bdadea213'
+WEIXIN_APP_SECRET = '49994accb3de28c84e117a5b454f4c83'
 
 
 def weixin_config(request):
     """
+    获取微信JS-SDK配置参数
     :param request:
     :return:
     """
-    app_id = 'wx4bf8abb47962a812'
-    app_secret = '45066980fd1fa0c6bd06653f08da46aa'
+    url = request.META.get('HTTP_REFERER', '') or request.GET.get('url', '')
 
-    access_token = get_access_token(app_id, app_secret).get('access_token')
-    jsapi_ticket = get_jsapi_ticket(access_token).get('ticket')
+    if not url:
+        data = {
+            'errcode': 1,
+            'errmsg': u'不能获取url',
+        }
+        return HttpResponse(json.dumps(data), content_type="application/json")
 
+    try:
+        access_token = get_access_token(WEIXIN_APP_ID, WEIXIN_APP_SECRET).get('access_token')
+        jsapi_ticket = get_jsapi_ticket(access_token).get('ticket')
+        assert jsapi_ticket
+    except Exception, e:
+        data = {
+            'errcode': 1,
+            'errmsg': u'请求微信接口错误',
+            'data': e.message,
+        }
+        return HttpResponse(json.dumps(data), content_type="application/json")
+
+    # 生成 微信JS-SDK使用权限签名
     params = OrderedDict()
     params['jsapi_ticket'] = jsapi_ticket
     params['noncestr'] = uuid.uuid1().hex
     params['timestamp'] = str(int(time.time()))
-    params['url'] = request.GET.get('url')
-    data = '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
-    params['signature'] = hashlib.sha1(data).hexdigest()
+    params['url'] = url.split('#')[0]
+    string = '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
+    signature = hashlib.sha1(string).hexdigest()
 
-    return HttpResponse(json.dumps(params), content_type="application/json")
+    data = {
+        'noncestr': params.get('noncestr'),
+        'timestamp': params.get('timestamp'),
+        'signature': signature,
+    }
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+#weixin_invitation.jade
+class WeixinFeeaView(TemplateView):
+    template_name = 'weixin_feea.jade'
+
+    def get_context_data(self, **kwargs):
+        data = {
+            'identifier': self.request.GET.get('identifier')
+        }
+        return data
+
+
+
+class WeixinInvitationView(TemplateView):
+    template_name = 'weixin_invitation.jade'
+
+    def get_context_data(self, **kwargs):
+        data = {
+            'identifier': self.request.GET.get('identifier'),
+            'invite_code': self.request.GET.get('invite_code')
+        }
+        print data
+        return data
+
+

@@ -8,23 +8,25 @@ html
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
     meta(name="format-detection", content="telephone=no")
     link(rel="stylesheet",href="/static/stylesheets/weixin.css")
-  body(style='background:#fafafa')
+  body(style='background:#fafafa; background-size:cover;')
       .top-i
           a.jiao
             img(src='/static/m_images/weixin_img/sanjiao.png')
           p 邀请好友理财送...
       include m_include/weixin_kehuduan
       form.wei_pss
+          input(type='hidden', name='identifier', value='{{ identifier }}')
+          input(type='hidden', name='invite_code', value='{{ invite_code }}')
           label(style='width: 54%;') 请设置登入密码完成注册
           br
-          label.phone_a 账号:
+          label.phone_a 账号:{{ identifier }}
       form.wei_pss
           label(style='width: 20%;') 验证码
           input(type='text' placeholder='短信验证码').yanma
-          label(style='width: 25%;').wei_xin
+          label(style='width: 30%;').wei_xin
       form.wei_pss
-          label 登入密码
-          input(type='text' placeholder='请设置您的登入密码').passwordd
+          label(style='width: 20%;') 登入密码
+          input(type='password' placeholder='请设置您的登入密码').passwordd
 
       .wei_buttonn
         a 注册

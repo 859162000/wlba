@@ -4,7 +4,8 @@
 from django.conf.urls import patterns, url
 from views import HomeView, IndexView, DetailView
 from django.views.generic import TemplateView, RedirectView
-from views import HomeView, AccountRedirectView, weixin_config
+from views import HomeView, AccountRedirectView, weixin_config, \
+    WeixinFeeaView, WeixinInvitationView
 
 urlpatterns = patterns('',
     #url(r'^detail/(?P<id>\w+)', P2PDetailView.as_view(), name='p2p detail'),
@@ -20,10 +21,9 @@ urlpatterns = patterns('',
     url(r'^weixin_about/$', TemplateView.as_view(template_name="weixin_about.jade")),
     url(r'^weixin_fee/$', TemplateView.as_view(template_name="weixin_fee.jade")),
     url(r'^weixin_app/$', TemplateView.as_view(template_name="weixin_app.jade")),
-    url(r'^weixin_feea/$', TemplateView.as_view(template_name="weixin_feea.jade")),
-    url(r'^weixin_feea/$', TemplateView.as_view(template_name="weixin_feea.jade")),
+    url(r'^weixin_feea/$', WeixinFeeaView.as_view()),
     url(r'^weixin_registered/$', TemplateView.as_view(template_name="weixin_registered.jade")),
-    url(r'^weixin_invitation/$', TemplateView.as_view(template_name="weixin_invitation.jade")),
+    url(r'^weixin_invitation/$', WeixinInvitationView.as_view()),
     url(r'^weixin_retrieve/$', TemplateView.as_view(template_name="weixin_retrieve.jade")),
     url(r'^account/redirect/$', AccountRedirectView.as_view(), name='mobile_account_redirect'),
     url(r'^weixin_config/', weixin_config, name='weixin_config')
