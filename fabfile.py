@@ -485,7 +485,7 @@ def config_apache():
                 run("rm -rf publish/static/sass")
                 run("rm -rf publish/static/images/images-original")
                 with cd('publish'):
-                    run("find . | grep .coffee | xargs rm")
+                    run("find . | grep .coffee | xargs rm -rf")
 
                 print green("published files cleaned, copy it to /var/static/wanglibao")
                 sudo('mkdir -p /var/static/wanglibao')
