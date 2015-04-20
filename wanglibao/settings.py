@@ -118,7 +118,7 @@ INSTALLED_APPS = (
 
     'widget_tweaks',
     'mathfilters',
-    'test_without_migrations',
+    #'test_without_migrations',
 
     'raven.contrib.django.raven_compat',
     'ckeditor',
