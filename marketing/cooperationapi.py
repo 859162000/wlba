@@ -230,9 +230,10 @@ class WangDaiByDateAPI(APIView):
 
 P2PEYE_PAY_WAY = {
     u'等额本息': 1,
-    u'按月付息': 2,
+    u'按月付息到期还本': 2,
     u'到期还本付息': 4,
     u'按季度付息': 5,
+    u'先息后本':0,
 }
 
 class WangdaiEyeListAPIView(APIView):
@@ -309,7 +310,7 @@ class WangdaiEyeListAPIView(APIView):
                     "period": p2pproduct.period,
                     "p_type": 1,#期限类型,0 代表天,1 代表月
                     # "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6)),
-                    "pay_way": P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6),
+                    "pay_way": P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0),
                     "process": process,
                     "reward": reward,
                     "guarantee": "null",
