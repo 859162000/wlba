@@ -85,6 +85,8 @@ class PrepaymentHistory(object):
 
         amortization_current = None
         payment_date = pytz.UTC.localize(payment_date).date()
+        if self.product.make_loans_time is None:
+            raise PrepaymentException()
         make_loans_time = timezone.localtime(self.product.make_loans_time).date()
 
         for index, amortization in enumerate(amortizations):
