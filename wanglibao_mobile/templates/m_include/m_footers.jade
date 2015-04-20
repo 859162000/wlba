@@ -1,0 +1,25 @@
+
+.m-footer
+  a.footer-list(href="/mobile/mobile_index/")
+    span.m-home 首页
+  a.footer-list(href="/mobile/mobile_assets/")
+    span.m-assets 我的资产
+  a.footer-list(href="/mobile/mobile_more/")
+    span.m-more 更多
+  script.
+    var url_active = window.location.href;
+    var urlName = url_active.split('/')[4];
+    switch(urlName){
+      case 'mobile_index':
+        document.querySelectorAll(".footer-list")[0].className = 'footer-list active';
+        break;
+      case 'mobile_assets':
+        document.querySelectorAll(".footer-list")[1].className = 'footer-list active';
+        break;
+      case 'mobile_more':
+        document.querySelectorAll(".footer-list")[2].className = 'footer-list active';
+        break;
+    }
+    document.addEventListener('touchstart',function(){})
+
+
