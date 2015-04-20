@@ -21,6 +21,9 @@ $(function() {
     });
 
     $('#repayment-btn').click(function(e) {
+        if(!confirm('操作将不能恢复，确认提前还款吗？')) {
+            return;
+        }
         var form = $('#repayment').serialize() + '&' + $('#repayment-form').serialize() + '&now=1';
         $.ajax({
             type: 'post',
