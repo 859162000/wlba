@@ -27,7 +27,7 @@ class SiteDataAdmin(admin.ModelAdmin):
 
 class PromotionTokenAdmin(ReadPermissionModelAdmin):
     list_display = ("user", "token")
-    search_fields = ['user__wanglibaouserprofile__phone']
+    search_fields = ['user__wanglibaouserprofile__phone', 'token']
     raw_id_fields = ('user', )
 
     def get_readonly_fields(self, request, obj=None):

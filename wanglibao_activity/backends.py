@@ -6,7 +6,7 @@ import json
 import logging
 import decimal
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.db import transaction
 from django.template import Template, Context
 from models import Activity, ActivityRule, ActivityRecord
@@ -35,19 +35,14 @@ def _decide_device(device_type):
         return 'all'
 
 
-def check_activity(user, trigger_node, device_type, amount=0, product_id=0):
+def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_full=False):
     now = timezone.now()
     device_type = _decide_device(device_type)
     if not trigger_node:
         return
-    # ib = IntroducedBy.objects.filter(user=user).first()
-    # if not ib or not ib.channel:
-    #     channel = 'wanglibao'
-    # else:
-    #     channel = ib.channel.name
     channel = helper.which_channel(user)
     #查询符合条件的活动
-    activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False, channel=channel)\
+    activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False, channel__contains=channel)\
                                     .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
     if activity_list:
         for activity in activity_list:
@@ -67,17 +62,18 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0):
                     if rule.is_introduced:
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
-                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id)
+                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full)
                     else:
-                        _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id)
+                        _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full)
             else:
                 continue
     else:
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full):
     """ check the trigger node """
+    product_id = int(product_id)
     #注册 或 实名认证
     if trigger_node in ('register', 'validation'):
         _send_gift(user, rule, device_type)
@@ -92,10 +88,10 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             first_pay_num = PayInfo.objects.filter(user=user, type='D',
                                                    status=PayInfo.SUCCESS).count()
         if first_pay_num == 1:
-            _send_gift(user, rule, device_type, amount)
+            _check_trade_amount(user, rule, device_type, amount)
     #充值
     elif trigger_node == 'pay':
-        _send_gift(user, rule, device_type, amount)
+        _check_trade_amount(user, rule, device_type, amount)
     #首次购买
     elif trigger_node == 'first_buy':
         #check first pay
@@ -106,10 +102,22 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             first_buy_num = P2PRecord.objects.filter(user=user).count()
 
         if first_buy_num == 1:
-            _send_gift(user, rule, device_type, amount, product_id)
+            #判断当前购买产品id是否在活动设置的id中
+            if product_id > 0 and rule.activity.product_ids:
+                is_product = _check_product_id(product_id, rule.activity.product_ids)
+                if is_product:
+                    _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+            else:
+                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+
     #购买
     elif trigger_node == 'buy':
-        _send_gift(user, rule, device_type, amount, product_id)
+        if product_id > 0 and rule.activity.product_ids:
+            is_product = _check_product_id(product_id, rule.activity.product_ids)
+            if is_product:
+                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+        else:
+            _check_buy_product(user, rule, device_type, amount, product_id, is_full)
     #满标审核
     elif trigger_node == 'p2p_audit':
         #delay
@@ -119,46 +127,29 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         return
 
 
-def _send_gift(user, rule, device_type, amount=0, product_id=0):
+def _send_gift(user, rule, device_type, amount=0):
     # rule_id = rule.id
     rtype = rule.trigger_node
-    is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
     #送奖品
     if rule.gift_type == 'reward':
         reward_name = rule.reward
-        if amount and amount > 0:
-            if is_amount:
-                _send_gift_reward(user, rule, rtype, reward_name, device_type, amount)
-        else:
-            _send_gift_reward(user, rule, rtype, reward_name, device_type, amount)
+        _send_gift_reward(user, rule, rtype, reward_name, device_type, amount)
 
     #送红包
     if rule.gift_type == 'redpack':
         redpack_id = int(rule.redpack)
         #此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
-        #send to
-        if amount and amount > 0:
-            if is_amount:
-                _send_gift_redpack(user, rule, rtype, redpack_id, device_type)
-        else:
-            _send_gift_redpack(user, rule, rtype, redpack_id, device_type)
+        _send_gift_redpack(user, rule, rtype, redpack_id, device_type)
+
     #送现金或收益
     if rule.gift_type == 'income':
         #send to
-        if amount and amount > 0:
-            if is_amount:
-                _send_gift_income(user, rule, amount)
-        else:
-            _send_gift_income(user, rule, amount)
+        _send_gift_income(user, rule, amount)
 
     #送话费
     if rule.gift_type == 'phonefare':
         #send to
-        if amount and amount > 0:
-            if is_amount:
-                _send_gift_phonefare(user, rule, amount)
-        else:
-            _send_gift_phonefare(user, rule, amount)
+        _send_gift_phonefare(user, rule, amount)
 
 
 def _check_introduced_by(user, start_dt, is_invite_in_date):
@@ -171,6 +162,59 @@ def _check_introduced_by(user, start_dt, is_invite_in_date):
         return ib.introduced_by
     else:
         return None
+
+
+def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
+    #检查单标投资顺序是否设置数字
+    ranking_num = int(rule.ranking)
+    if ranking_num > 0:
+        #查询单标投资顺序
+        records = P2PRecord.objects.filter(product__id=product_id, catalog=u'申购') \
+                                   .order_by('create_time')
+        if records:
+            this_record = records[ranking_num-1]
+            if this_record.user.id == user.id:
+                _send_gift(user, rule, device_type)
+    elif ranking_num == -1 and is_full is True:
+        #查询是否满标，满标时不再考虑最小/最大金额，直接发送
+        _send_gift(user, rule, device_type)
+    else:
+        _check_trade_amount(user, rule, device_type, amount)
+
+    #判断单标累计投资名次
+    if rule.is_total_invest and is_full is True:
+        total_invest_order = int(rule.total_invest_order)
+        if total_invest_order > 0:
+            #按用户查询单标投资的总金额
+            records = P2PRecord.objects.filter(product__id=product_id, catalog=u'申购') \
+                                       .annotate(amount_sum=Sum('amount')).values('user') \
+                                       .order_by('-amount_sum')
+            if records:
+                record = records[total_invest_order-1]
+                if record.user.id == user.id:
+                    #如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
+                    amount_sum = record.amount_sum
+                    is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
+                    if is_amount:
+                        _send_gift(user, rule, device_type)
+        else:
+            #直接取当前用户的投资总额
+            record = P2PRecord.objects.filter(product__id=product_id, user=user, catalog=u'申购')\
+                                      .annotate(amount_sum=Sum('amount')).first()
+            if record:
+                amount_sum = record.amount_sum
+                is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
+                if is_amount:
+                    _send_gift(user, rule, device_type)
+
+
+def _check_trade_amount(user, rule, device_type, amount):
+    is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
+    if amount and amount > 0:
+        if is_amount:
+            _send_gift(user, rule, device_type, amount)
+    else:
+        _send_gift(user, rule, device_type, amount)
 
 
 def _check_amount(min_amount, max_amount, amount):
@@ -192,6 +236,18 @@ def _check_amount(min_amount, max_amount, amount):
                 return True
             else:
                 return False
+
+
+def _check_product_id(product_id, product_ids):
+    if product_ids:
+        product_ids_arr = product_ids.split(',')
+        product_ids_arr = [int(pid) for pid in product_ids_arr if pid != '']
+        if product_id in product_ids_arr:
+            return True
+        else:
+            return False
+    else:
+        return False
 
 
 def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount):
