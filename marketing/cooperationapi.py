@@ -230,11 +230,12 @@ class WangDaiByDateAPI(APIView):
 
 P2PEYE_PAY_WAY = {
     u'等额本息': 1,
-    u'按月付息到期还本': 2,
+    u'按月付息': 2,
     u'到期还本付息': 4,
     u'按季度付息': 5,
     u'先息后本':0,
 }
+
 
 class WangdaiEyeListAPIView(APIView):
     """ 网贷天眼 API
