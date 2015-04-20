@@ -168,9 +168,9 @@ class AccountRedirectView(RedirectView):
     跳转过程中会将用户手机号以参数的形式传入
     """
     # 移动端登录页面
-    mobile_login_url = '/mobile/account/login/'
+    mobile_login_url = '/mobile/weixin_inputt/'
     # 移动端注册页面
-    mobile_register_url = '/mobile/account/register/'
+    mobile_register_url = '/mobile/weixin_registered/'
 
     def get_redirect_url(self, *args, **kwargs):
         # 判断是否为手机号
@@ -199,9 +199,23 @@ import uuid
 import time
 import hashlib
 import json
-from .weixin import get_access_token, get_jsapi_ticket
+from .weixin import get_access_token, get_jsapi_ticket, generate_weixin_jssdk_config
 WEIXIN_APP_ID = 'wx4bf8abb47962a812'
 WEIXIN_APP_SECRET = '45066980fd1fa0c6bd06653f08da46aa'
+
+
+class WeixinFeeView(TemplateView):
+    template_name = 'weixin_fee.jade'
+
+    def get_context_data(self, **kwargs):
+        url = self.request.META.get('HTTP_REFERER', '') or self.request.GET.get('url', '')
+        data = dict()
+        data['app_id'] = WEIXIN_APP_ID
+        try:
+            data.update(generate_weixin_jssdk_config(WEIXIN_APP_ID, WEIXIN_APP_SECRET, url))
+        except:
+            pass
+        return data
 
 
 def weixin_config(request):
@@ -246,3 +260,28 @@ def weixin_config(request):
         'signature': signature,
     }
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+#weixin_invitation.jade
+class WeixinFeeaView(TemplateView):
+    template_name = 'weixin_feea.jade'
+
+    def get_context_data(self, **kwargs):
+        data = {
+            'identifier': self.request.GET.get('identifier')
+        }
+        return data
+
+
+
+class WeixinInvitationView(TemplateView):
+    template_name = 'weixin_invitation.jade'
+
+    def get_context_data(self, **kwargs):
+        data = {
+            'identifier': self.request.GET.get('identifier'),
+            'invite_code': self.request.GET.get('invite_code')
+        }
+        return data
+
+
