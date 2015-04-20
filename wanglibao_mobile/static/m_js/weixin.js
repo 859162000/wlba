@@ -28,7 +28,7 @@ function log() {
             alert("手机号码不能为空！");
             return false;
         } else if (!$(".ipon").val().match(/^1[3|4|5|7|8|9][0-9]\d{4,8}$/)) {
-            alert("手机号码格式不正确！");
+            alert("请输入正确的手机号码");
             return false;
             //} else {
             //     var userName = $.trim($(".ipon").val());
@@ -59,7 +59,7 @@ function wei_password() {
             alert("密码不能为空！");
             return false;
         } else if (!$(".wei_word").val().match(/^[0-9_a-zA-Z]{6,20}$/)) {
-            alert("密码不正确");
+            alert("密码长度6-20位，请重新输入");
             return false;
         } else {
             var userName = $.trim($(".wei_word").val());
@@ -125,14 +125,14 @@ function registered() {
             yan = $(".wei_yan").val(),
             yao = $(".wei_yao").val();
         if (pass == "") {
-            alert("不能为空");
+            alert("信息不能为空，请填写完整");
             return false;
         }
         if (!pass.match(/^[0-9_a-zA-Z]{6,20}$/)) {
-            alert("密码格式不正确");
+            alert("密码长度6-20位，请重新输入");
             return false;
         } else if (pass !== qupass) {
-            alert("密码不一致");
+            alert("密码不一致，请重新输入");
             return false;
 
 
@@ -140,7 +140,7 @@ function registered() {
             alert("你必须同意协议");
             return false
         }else if (pass == "" || qupass == "" || yan == "") {
-            alert("内容不全,请填全");
+            alert("信息不能为空，请填写完整");
             return false;
         } else {
             wei_zheng();
@@ -214,14 +214,14 @@ function retrieve() {
             qupas = $(".wei_quepas").val(),
             ya = $(".wei_ya").val();
         if (pas == "") {
-            alert("不能为空");
+            alert("信息不能为空，请填写完整");
             return false;
         }
         if (!pas.match(/^[0-9_a-zA-Z]{6,20}$/)) {
-            alert("密码格式不正确");
+            alert("密码长度6-20位，请重新输入");
             return false;
         } else if (pas !== qupas) {
-            alert("密码不一致");
+            alert("密码不一致，请重新输入");
             return false;
 
 
@@ -230,7 +230,7 @@ function retrieve() {
             alert("你必须同意协议");
             return false
         }else  if (pas == "" || qupas == "" || ya == "") {
-            alert("内容不全,请填全");
+            alert("信息不能为空，请填写完整");
             return false;
         } else {
             wei_zheng();
@@ -384,15 +384,15 @@ function yoa_registered() {
         var yanma = $(".yanma").val(),
             passwordd = $(".passwordd").val();
         if (yanma == "") {
-            alert("不能为空");
+            alert("信息不能为空，请填写完整");
             return false;
         }
         if (!passwordd.match(/^[0-9_a-zA-Z]{6,20}$/)) {
-            alert("密码格式不正确");
+            alert("密码长度6-20位，请重新输入");
             return false;
         }
         if (yanma == "" || passwordd == "") {
-            alert("内容不全,请填全");
+            alert("信息不能为空，请填写完整");
             return false;
         } else {
             wei_zheng();
