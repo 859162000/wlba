@@ -1,0 +1,48 @@
+$mobile-head-height: 60px;
+$mobile-head-leftcolor: #0490e8;
+$mobile-head-rightcolor: #ff4c2e;
+$mobile-br-color: #dadada;
+.m-head-center{
+  text-align: center;
+  height: $mobile-head-height;
+  font-size: $font-size-large;
+  line-height: $mobile-head-height;
+}
+.m-head{
+  color: #666;
+  background-color: #fff;
+  position: relative;
+  border-bottom: 1px solid $mobile-br-color;
+  @include line-combine($mobile-br-color);
+  @extend .m-head-center;
+  .head-left{
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0 10px;
+    color: $mobile-head-leftcolor;
+    @extend .m-head-center
+  }
+  .head-right{
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0 10px;
+    color: $mobile-head-rightcolor;
+    @extend .m-head-center
+  }
+  .m-back{
+    background: url(/static/m_images/m-back.png) no-repeat left;
+    background-size: 100%;
+    width: 60px;
+    a{
+      display: block;
+      height: 100%;
+    }
+  }
+  .m-detail-right{
+    background: url(/static/m_images/m_detail/caculator_press.png) no-repeat -16px;
+    background-size: 100%;
+    width: 60px;
+  }
+}

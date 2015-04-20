@@ -20,7 +20,7 @@ ACTIVITY_CATEGORY = (
 PRODUCT_CATEGORY = (
     ('all', u'所有产品'),
     ('p2p', u'P2P'),
-    ('bill', u'票据'),
+    #('bill', u'票据'),
     ('ids', u'指定ID产品')
 )
 STATUS = (
@@ -61,13 +61,15 @@ MSG_TYPE = (
 
 class Activity(models.Model):
     name = models.CharField(u'活动名称*', max_length=128)
-    code = models.CharField(u'活动代码*', max_length=16, unique=True, help_text=u'字母或数字的组合')
+    code = models.CharField(u'活动代码*', max_length=64, unique=True, help_text=u'字母或数字的组合')
     category = models.CharField(u'活动类型*', max_length=20, choices=ACTIVITY_CATEGORY, default=u'站内活动')
     platform = models.CharField(u'发布平台*', max_length=20, choices=PLATFORM, default=u'全平台')
     product_cats = models.CharField(u'指定产品范围', max_length=20, default=u'P2P产品', choices=PRODUCT_CATEGORY)
-    product_ids = models.CharField(u'指定产品ID', max_length=20, blank=True, default='', help_text=u"如果有多个产品，则产品ID之间用英文逗号分割")
+    product_ids = models.CharField(u'指定产品ID', max_length=200, blank=True, default='',
+                                   help_text=u"如果有多个产品，则产品ID之间用英文逗号分割")
     description = models.TextField(u'描述', null=True, blank=True)
-    channel = models.CharField(u'渠道名称', max_length=20, blank=True, help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao')
+    channel = models.CharField(u'渠道名称', max_length=64, blank=True,
+                               help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao，多个渠道用英文逗号间隔')
     start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动开始时间*")
     end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动结束时间*")
     is_stopped = models.BooleanField(u'是否停止', default=False)
@@ -137,11 +139,16 @@ class ActivityRule(models.Model):
                                      help_text=u'投资或充值，大于该金额（>），当只有最小金额时为大于等于该金额（>=）')
     max_amount = models.IntegerField(u'最大金额', default=0,
                                      help_text=u'投资或充值，小于等于该金额（<=）')
-    is_total_invest = models.BooleanField(u'活动累计投资', default=False,
-                                          help_text=u'勾选该选项，则最大、最小金额视为累计投资金额，系统会判断用户在活动期间的累计投资金额')
-    is_p2p_total_invest = models.BooleanField(u'单标累计投资', default=False,
-                                              help_text=u'勾选该选项，则最大、最小金额视为累计投资金额，系统会判断用户在指定标的内累计投资金额')
-    ranking = models.IntegerField(u'单标投资名次', blank=True, default=0, help_text=u'设置单个标的投资名次，只能填写大于1的数字，0不做判断')
+    is_total_invest = models.BooleanField(u'启用满标累计投资', default=False,
+                                          help_text=u'勾选该选项，则最大、最小金额视为累计投资金额，系统会在满标时检测用户在当前标的中的累计投资金额')
+    total_invest_order = models.IntegerField(u'满标累计投资排名', blank=True, default=0,
+                                             help_text=u'只能填写大于1的数字<br/>\
+                                                       默认为0时只判断投资总额是否符合最大/最小金额区间<br/>\
+                                                       如果设置最大/最小金额，则会判断用户投资总额是否符合最大/最小金额区间')
+    ranking = models.IntegerField(u'单标投资顺序', blank=True, default=0,
+                                  help_text=u'设置单个标的投资顺序，只能填写-1或者大于1的数字，默认0不做判断<br/>\
+                                            最大/最小金额和投资顺序不同时计算，即设置单标投资顺序时不考虑最大/最小金额<br/>\
+                                            注：满标（即最后一名）填写-1')
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True,
                                     help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\
                                               内置：注册人手机：“{{mobile}}，奖品激活码：{{reward}}，截止日期{{end_date}}<br/>\
@@ -175,6 +182,8 @@ class ActivityRule(models.Model):
         if self.min_amount > 0 and self.max_amount > 0:
             if self.min_amount >= self.max_amount:
                 raise ValidationError(u'最小金额和最大金额都大于0时，最大金额必须大于最小金额')
+        if self.total_invest_order > 0 and not self.is_total_invest:
+            raise ValidationError(u'当设置累计投资名次时必须勾选“启用满标累计投资”')
 
 
 class ActivityRecord(models.Model):
@@ -325,3 +334,24 @@ class ActivityTemplates(models.Model):
         return u'<a href="/templates/zero/%s/" target="_blank">预览</a>' % str(self.id)
     preview_link.short_description = u'预览'
     preview_link.allow_tags = True
+
+
+class WapActivityTemplates(models.Model):
+    """ 管理wap活动页面 """
+    name = models.CharField(u"名称", max_length=60, blank=True)
+    url = models.CharField(u"活动URL地址", max_length=128, blank=True, null=True)
+    aim_template = models.CharField(u"目的模板名称", max_length=60, blank=True, null=True)
+    is_rendering = models.BooleanField(u'是否使用函数渲染模板', default=False)
+    func_rendering = models.CharField(
+        u'渲染模板的函数名称', max_length=60, null=True, blank=True,
+        help_text=u'填写函数名称，如需要使用 rendering_func(*args, **kwargs)，则填写 rendering_func函数名')
+    start_at = models.DateTimeField(u"活动开始时间*", default=timezone.now, null=False)
+    end_at = models.DateTimeField(u"活动结束时间*", default=timezone.now, null=False)
+    created_at = models.DateTimeField(auto_now=True, default=timezone.now)
+    is_used = models.BooleanField(u'是否启用', default=False)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = u'活动页跳转管理功能'

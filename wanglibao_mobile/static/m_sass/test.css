@@ -1,0 +1,57 @@
+/*
+Syntax error: File to import not found or unreadable: compass/reset.
+              Load path: /home/wanglibao/qifeifei/wanglibao-backend/wanglibao_mobile/static/m_sass
+        on line 11 of test.scss
+
+6: @import "m_partials/normalize";
+7: @import "m_partials/print";
+8: @import "m_partials/glyphicons";
+9: 
+10: // Core CSS
+11: @import "compass/reset";
+12: @import "compass/css3";
+13: @import "m_partials/scaffolding";
+14: @import "m_partials/type";
+15: @import "m_partials/code";
+16: @import "m_partials/grid";
+
+Backtrace:
+test.scss:11
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/import_node.rb:67:in `rescue in import'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/import_node.rb:45:in `import'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/import_node.rb:28:in `imported_file'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/import_node.rb:37:in `css_import?'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:217:in `visit_import'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:37:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:100:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:53:in `block in visit_children'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:53:in `map'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:53:in `visit_children'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:109:in `block in visit_children'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:121:in `with_environment'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:108:in `visit_children'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:37:in `block in visit'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:128:in `visit_root'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:37:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:100:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:7:in `visit'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/tree/root_node.rb:20:in `render'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/engine.rb:315:in `_render'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/engine.rb:262:in `render'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/plugin/compiler.rb:362:in `update_stylesheet'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/plugin/compiler.rb:203:in `block in update_stylesheets'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/plugin/compiler.rb:201:in `each'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/plugin/compiler.rb:201:in `update_stylesheets'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/plugin.rb:81:in `update_stylesheets'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/exec.rb:443:in `watch_or_update'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/exec.rb:326:in `process_result'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/exec.rb:41:in `parse'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/lib/sass/exec.rb:21:in `parse!'
+/var/lib/gems/1.9.1/gems/sass-3.2.14/bin/scss:13:in `<top (required)>'
+/usr/local/bin/scss:23:in `load'
+/usr/local/bin/scss:23:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Syntax error: File to import not found or unreadable: compass/reset.\A               Load path: /home/wanglibao/qifeifei/wanglibao-backend/wanglibao_mobile/static/m_sass\A         on line 11 of test.scss\A \A 6: @import \"m_partials/normalize\";\A 7: @import \"m_partials/print\";\A 8: @import \"m_partials/glyphicons\";\A 9: \A 10: // Core CSS\A 11: @import \"compass/reset\";\A 12: @import \"compass/css3\";\A 13: @import \"m_partials/scaffolding\";\A 14: @import \"m_partials/type\";\A 15: @import \"m_partials/code\";\A 16: @import \"m_partials/grid\";"; }
