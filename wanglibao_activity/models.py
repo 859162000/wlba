@@ -325,3 +325,24 @@ class ActivityTemplates(models.Model):
         return u'<a href="/templates/zero/%s/" target="_blank">预览</a>' % str(self.id)
     preview_link.short_description = u'预览'
     preview_link.allow_tags = True
+
+
+class WapActivityTemplates(models.Model):
+    """ 管理wap活动页面 """
+    name = models.CharField(u"名称", max_length=60, blank=True)
+    url = models.CharField(u"活动URL地址", max_length=128, blank=True, null=True)
+    aim_template = models.CharField(u"目的模板名称", max_length=60, blank=True, null=True)
+    is_rendering = models.BooleanField(u'是否使用函数渲染模板', default=False)
+    func_rendering = models.CharField(
+        u'渲染模板的函数名称', max_length=60, null=True, blank=True,
+        help_text=u'填写函数名称，如需要使用 rendering_func(*args, **kwargs)，则填写 rendering_func函数名')
+    start_at = models.DateTimeField(u"活动开始时间*", default=timezone.now, null=False)
+    end_at = models.DateTimeField(u"活动结束时间*", default=timezone.now, null=False)
+    created_at = models.DateTimeField(auto_now=True, default=timezone.now)
+    is_used = models.BooleanField(u'是否启用', default=False)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = u'活动页跳转管理功能'
