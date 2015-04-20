@@ -292,7 +292,6 @@ class WangdaiEyeListAPIView(APIView):
                 rate = p2pproduct.expected_earning_rate + float(reward * 100)
 
                 rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'))
-                invest_num =  P2PRecord.objects.filter(product=p2pproduct).count()
 
                 obj = {
                     "id": str(p2pproduct.id),
@@ -318,7 +317,7 @@ class WangdaiEyeListAPIView(APIView):
                         "%Y-%m-%d %H:%M:%S"),
                     "end_time": timezone.localtime(p2pproduct.soldout_time).strftime(
                         "%Y-%m-%d %H:%M:%S") if p2pproduct.soldout_time else 'null',
-                    "invest_num": str(invest_num),
+                    "invest_num": str(p2pproduct.equities.count()),
                     "c_reward": "null"
                 }
                 loans.append(obj)
@@ -341,8 +340,8 @@ class WangdaiEyeEquityAPIView(APIView):
         result = {
             "result_code": "-1",
             "result_msg": u"未授权的访问!",
-            "page_count": "null",
-            "page_index": "null",
+            "page_count": "0",
+            "page_index": "0",
             "loans": "null"
         }
         try:
