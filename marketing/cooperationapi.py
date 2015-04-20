@@ -17,7 +17,7 @@ from django.utils import timezone, dateparse
 from rest_framework import renderers
 from rest_framework.views import APIView
 from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.models import P2PProduct, P2PEquity, P2PRecord
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
 
 
@@ -245,8 +245,8 @@ class WangdaiEyeListAPIView(APIView):
         result = {
             "result_code": "-1",
             "result_msg": u"未授权的访问!",
-            "page_count": "null",
-            "page_index": "null",
+            "page_count": "0",
+            "page_index": "0",
             "loans": "null"
         }
 
@@ -278,6 +278,7 @@ class WangdaiEyeListAPIView(APIView):
         if p2pproducts:
             loans = []
             for p2pproduct in p2pproducts:
+                status = 0 if p2pproduct.status == u'正在招标' else 1
                 # 进度
                 amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
                 percent = p2pproduct.ordered_amount / amount
@@ -290,6 +291,8 @@ class WangdaiEyeListAPIView(APIView):
                 rate = p2pproduct.expected_earning_rate + float(reward * 100)
 
                 rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'))
+                invest_num =  P2PRecord.objects.filter(product=p2pproduct).count()
+
                 obj = {
                     "id": str(p2pproduct.id),
                     "platform_name": u"网利宝",
@@ -314,7 +317,7 @@ class WangdaiEyeListAPIView(APIView):
                         "%Y-%m-%d %H:%M:%S"),
                     "end_time": timezone.localtime(p2pproduct.soldout_time).strftime(
                         "%Y-%m-%d %H:%M:%S") if p2pproduct.soldout_time else 'null',
-                    "invest_num": str(p2pproduct.equities.count()),
+                    "invest_num": str(invest_num),
                     "c_reward": "null"
                 }
                 loans.append(obj)
@@ -388,8 +391,8 @@ class WangdaiEyeEquityAPIView(APIView):
                 "username": eq.user.username,
                 "userid": str(eq.user.id),
                 "type": u"手动",
-                "money": str(eq.equity),
-                "account": str(eq.equity),
+                "money": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),#str(eq.equity),
+                "account": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),#str(eq.equity),
                 "status": u"成功",
                 "add_time": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             }
