@@ -1,0 +1,51 @@
+$m-footer-height: 60px;
+@mixin backgroun-foot($bgSz, $url){
+  background: url($url) no-repeat center 8px;
+  background-size: $bgSz;
+}
+
+.m-footer{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: $m-footer-height;
+  background: #fff;
+  @include line-combine-top($mobile-br-color);
+  a{
+    display: inline-block;
+    width: 33.33%;
+    height: 100%;
+    text-align: center;
+    line-height: $m-footer-height;
+    color: #666;
+    span{
+      padding-top: 16px;
+      display: inline-block;
+    }
+    .m-home{
+      @include backgroun-foot(100%,'/static/m_images/m_footer/m-home.png');
+    }
+    .m-assets{
+      @include backgroun-foot(50%,'/static/m_images/m_footer/m-assets.png');
+    }
+    .m-more{
+      @include backgroun-foot(100%,'/static/m_images/m_footer/m-more.png');
+    }
+  }
+  .active{
+    span{
+      color: #ff4c2e;
+    }
+    .m-home{
+      @include backgroun-foot(100%,'/static/m_images/m_footer/m-home-active.png');
+    }
+    .m-assets{
+      @include backgroun-foot(50%,'/static/m_images/m_footer/m-assets-active.png');
+    }
+    .m-more{
+      @include backgroun-foot(100%,'/static/m_images/m_footer/m-more-active.png');
+    }
+  }
+
+}
