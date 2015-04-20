@@ -273,74 +273,48 @@ function fee() {
         window.location.href = "/mobile/weixin_index/?backurl=" + '8888';
     });
 
+    wx.config({
+        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        appId: $('meta[name=app-id]').attr('content'), // 必填，公众号的唯一标识
+        timestamp: $('meta[name=timestamp]').attr('content'), // 必填，生成签名的时间戳
+        nonceStr: $('meta[name=noncestr]').attr('content'), // 必填，生成签名的随机串
+        signature: $('meta[name=signature]').attr('content'),// 必填，签名，见附录1
+        jsApiList: ['hideOptionMenu', 'showOptionMenu', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+    });
 
-    $.ajax({
-        type: "get",
-        url: "/mobile/weixin_config/",
-        dataType: "json",
-        success: function (result) {
-            wx.config({
-                debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-                appId: 'wx4bf8abb47962a812', // 必填，公众号的唯一标识
-                timestamp: result['timestamp'], // 必填，生成签名的时间戳
-                nonceStr: result['noncestr'], // 必填，生成签名的随机串
-                signature: result['signature'],// 必填，签名，见附录1
-                jsApiList: ['hideOptionMenu', 'showOptionMenu', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+    wx.ready(function () {
+        if (name == null) {
+            $('footer').show();
+            wx.hideOptionMenu();
+        } else {
+            //var weixin_url='http://wanglibao.tunnel.mobi';
+            var share_link ='/mobile/weixin_feea/?identifier=' + name;
+            var share_img_url = '/static/m_images/weixin_img/loginn.png';
+            var share_title = '邀请好友送30元话费';
+            wx.showOptionMenu();
+            wx.onMenuShareTimeline({
+                title: share_title, // 分享标题
+                link: share_link, // 分享链接
+                imgUrl: share_img_url
             });
-            wx.ready(function () {
-                if (name == null) {
-                    $('footer').show();
-                    wx.hideOptionMenu();
-                } else {
-                    wx.checkJsApi({
-                        'jsApiList': [
-                            'onMenuShareTimeline'
-                        ]
-                    });
-                    //var weixin_url='http://wanglibao.tunnel.mobi';
-                    var share_link ='/mobile/weixin_feea/?identifier=' + name;
-                    var share_img_url = '/static/m_images/weixin_img/loginn.png';
-                    var share_title = '邀请好友送30元话费';
-                    wx.showOptionMenu();
-                    wx.onMenuShareTimeline({
-                        title: share_title, // 分享标题
-                        link: share_link, // 分享链接
-                        imgUrl: share_img_url
-                    });
-                    wx.onMenuShareAppMessage({
-                        title: share_title, // 分享标题
-                        desc: '', // 分享描述
-                        link: share_link, // 分享链接
-                        imgUrl: share_img_url, // 分享图标
-                        type: '', // 分享类型,music、video或link，不填默认为link
-                        dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
-                        success: function () {
-                            // 用户确认分享后执行的回调函数
-                        },
-                        cancel: function () {
-                            // 用户取消分享后执行的回调函数
-                        }
-                    });
-                    wx.onMenuShareQQ({
-                        title: share_title, // 分享标题
-                        desc: '', // 分享描述
-                        link: share_link, // 分享链接
-                        imgUrl: share_img_url, // 分享图标
-                        success: function () {
-                            // 用户确认分享后执行的回调函数
-                        },
-                        cancel: function () {
-                            // 用户取消分享后执行的回调函数
-                        }
-                    });
-                }
-            })
-
-
+            wx.onMenuShareAppMessage({
+                title: share_title, // 分享标题
+                desc: '', // 分享描述
+                link: share_link, // 分享链接
+                imgUrl: share_img_url, // 分享图标
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '' // 如果type是music或video，则要提供数据链接，默认为空
+            });
+            wx.onMenuShareQQ({
+                title: share_title, // 分享标题
+                desc: '', // 分享描述
+                link: share_link, // 分享链接
+                imgUrl: share_img_url // 分享图标
+            });
         }
-
-    })
+    });
 }
+
 function feea() {
     var phon = $('input[name=identifier]').val(),
         wei_f = '',
