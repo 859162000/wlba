@@ -16,11 +16,11 @@ html
       include m_include/weixin_kehuduan
       form.wei_pss
           label 设置密码
-          input(type='password' placeholder='请输入密码').wei_pass
+          input(type='password', placeholder='请输入密码', maxlength='20').wei_pass#input
           //
           .line
           label 确认密码
-          input(type='password' placeholder='请再次输入密码').wei_quepass
+          input(type='password', placeholder='请再次输入密码', maxlength='20').wei_quepass#input
       h2.weixin_ti
       form.wei_pss
           label &nbsp;&nbsp;验证码

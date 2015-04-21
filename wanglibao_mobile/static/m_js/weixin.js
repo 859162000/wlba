@@ -12,7 +12,7 @@
             $('.weixin_tw').html('');
 
         } else {
-            $('.weixin_tw').html('<span>你必须同意协议</span>');
+            $('.weixin_tw').html('<span>注册需要同意网利宝用户协议</span>');
         }
     })
 
@@ -27,7 +27,7 @@
 
 })();
 function log() {
-    $('#wx-mobel-btn,#box p').on('click', function (e) {
+    $('#wx-mobel-btn,#box p,#box h1').on('click', function (e) {
         $('#wx-mobel-box').show()
         e.stopPropagation();
     })
@@ -42,7 +42,7 @@ function log() {
         if ($(".ipon").val() == "") {
             alert("手机号码不能为空！");
             return false;
-        } else if (!$(".ipon").val().match(/^1[3|4|5|7|8|9][0-9]\d{4,8}$/)) {
+        } else if (!$(".ipon").val().match(/^1[3|4|5|7|8|9][0-9]\d{8,8}$/)) {
             alert("请输入正确的手机号码");
             return false;
             //} else {
@@ -76,7 +76,7 @@ function wei_password() {
                 $('.weixin_ti').html('');
             });
             return false;
-        } else if (!$(".wei_word").val().match(/^(\w|[@*#!~!$%^&()]){6,20}$/ig)) {
+        } else if (!$(".wei_word").val().match(/^{6,20}$/)) {
             $('.weixin_ti').html('<span>密码长度6-20位，请重新输入</span>');
             $('input').focus(function () {
                 $('.weixin_ti').html('');
@@ -155,6 +155,7 @@ function registered() {
 
 
     $('#wei_button').on('click', function () {
+       //$(".wei_pass").attr(maxlength)
         var pass = $(".wei_pass").val(),
             qupass = $(".wei_quepass").val(),
             yan = $(".wei_yan").val(),
@@ -166,7 +167,7 @@ function registered() {
             })
             return false;
         }
-        if (!pass.match(/^(\w|[@*#!~!$%^&()]){6,20}$/ig)) {
+        if (!pass.match(/^{6,20}$/)) {
             $('.weixin_ti').html('<span>密码长度6-20位，请重新输入</span>');
             $('input').focus(function () {
                 $('.weixin_ti').html('');
@@ -181,7 +182,7 @@ function registered() {
 
 
         } else if (!document.getElementById("id").checked) {
-            $('.weixin_tw').html('<span>你必须同意协议</span>');
+            $('.weixin_tw').html('<span>注册需要同意网利宝用户协议</span>');
 
             return false
         } else if (pass == "" || qupass == "" || yan == "") {
@@ -281,7 +282,7 @@ function retrieve() {
             });
             return false;
         }
-        if (!pas.match(/^(\w|[@*#!~!$%^&()]){6,20}$/ig)) {
+        if (!pas.match(/^{6,20}$/)) {
             $('.weixin_ti').html('<span>密码长度6-20位，请重新输入</span>');
             $('input').focus(function () {
                 $('.weixin_ti').html('');
@@ -370,9 +371,8 @@ function fee() {
                             'onMenuShareTimeline'
                         ]
                     });
-                    //var weixin_url='http://wanglibao.tunnel.mobi';
-                    var share_link = '/mobile/weixin_feea/?identifier=' + name;
-                    var share_img_url = '/static/m_images/weixin_img/loginn.png';
+                    var share_link = 'https://www.wanglibao.com/mobile/weixin_feea/?identifier=' + name;
+                    var share_img_url = 'https://www.wanglibao.com/static/m_images/weixin_img/loginn.png';
                     var share_title = '邀请好友送30元话费';
                     wx.showOptionMenu();
                     wx.onMenuShareTimeline({
@@ -427,7 +427,7 @@ function feea() {
             $('.wei_red').html('');
 
         } else {
-            $('.wei_red').html('你必须同意协议');
+            $('.wei_red').html('注册需要同意网利宝用户协议');
 
         }
 
@@ -441,11 +441,11 @@ function feea() {
         if (wei_f == "") {
             alert("手机号码不能为空！");
             return false;
-        } else if (!$(".wei_fee").val().match(/^1[3|4|5|7|8|9][0-9]\d{4,8}$/)) {
+        } else if (!$(".wei_fee").val().match(/^1[3|4|5|7|8|9][0-9]\d{8,8}$/)) {
             alert("请输入正确的手机号码");
             return false;
         } else if (!document.getElementById("idd").checked) {
-            $('.wei_red').html('你必须同意协议');
+            $('.wei_red').html('注册需要同意网利宝用户协议');
             return false
         } else {
             $.ajax({
@@ -532,7 +532,7 @@ if($('.wei_xin').attr('data-num')==0){
             })
             return false;
         }
-        if (!passwordd.match(/^(\w|[@*#!~!$%^&()]){6,20}$/ig)) {
+        if (!passwordd.match(/^{6,20}$/)) {
             $('.weixin_tq').html('<span>密码长度6-20位，请重新输入</span>');
             $('input').focus(function () {
                 $('.weixin_tq').html('');
