@@ -6,7 +6,7 @@ import datetime
 from django.utils import timezone
 from import_export import resources, fields
 from import_export.admin import ExportMixin
-from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, ActivityImages
+from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, ActivityImages, WapActivityTemplates
 import models as m
 
 
@@ -85,8 +85,15 @@ class ActivityRecordAdmin(ExportMixin, admin.ModelAdmin):
         'platform', 'trigger_node', 'msg_type', 'send_type', 'gift_type',
         CustomDateFilter
     )
-    search_fields = ('activity__name', 'rule__rule_name', 'user__wanglibaouserprofile__phone')
+    search_fields = ('activity__name', 'description', 'rule__rule_name', 'user__wanglibaouserprofile__phone')
     resource_class = ActivityResource
+
+    def get_export_filename(self, file_format):
+        date_str = timezone.now().strftime('%Y-%m-%d')
+        filename = "%s-%s.%s" % (u"活动流水记录".encode('utf-8'),
+                                 date_str,
+                                 file_format.get_extension())
+        return filename
 
     # def __init__(self, *args, **kwargs):
     #     super(ActivityRecordAdmin, self).__init__(*args, **kwargs)
@@ -205,6 +212,13 @@ class ActivityTemplatesAdmin(admin.ModelAdmin):
     )
 
 
+class WapActivityTemplatesAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'url', 'aim_template', 'is_rendering', 'func_rendering', 'start_at', 'end_at', 'created_at', 'is_used')
+    ordering = ('-id',)
+    search_fields = ('name', 'url', 'aim_template')
+
+
+admin.site.register(WapActivityTemplates, WapActivityTemplatesAdmin)
 admin.site.register(ActivityImages, ActivityImagesAdmin)
 admin.site.register(ActivityTemplates, ActivityTemplatesAdmin)
 

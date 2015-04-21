@@ -492,6 +492,14 @@ class KuaiPay:
         if merchantId != self.MER_ID or customerId != str(request.user.id):
             return {"ret_code":20092, "message":"卡信息不匹配"}
 
+        try:
+            card_list = Card.objects.filter(user=request.user).select_related('bank').order_by('-last_update')
+            bank_list = [c.bank.kuai_code for c in card_list]
+            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x['bank_id']))
+            cards = cards_tmp
+        except:
+            pass
+
         return {"ret_code":0, "message":"test", "cards":cards}
 
     def _handle_dynnum_result(self, res):
@@ -543,6 +551,8 @@ class KuaiPay:
             return {"ret_code": 2, "message":"请耐心等候充值完成"}
         elif res_code == "og":
             return {"ret_code": 3, "message":"充值金额太大"}
+        elif res_code == "tc":
+            return {"ret_code": 4, "message":"不能使用信用卡"}
         elif res_code == "51":
             return {"ret_code": 51, "message":"余额不足"}
         else:
@@ -696,6 +706,10 @@ class KuaiPay:
                 device = split_ua(request)
                 device_type = device['device_type']
                 ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
+
+                # 充值成功后，更新本次银行使用的时间
+                Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).update(last_update=timezone.now())
+
                 return ms
             else:
                 token = self._handle_dynnum_result(res)
@@ -705,6 +719,10 @@ class KuaiPay:
                     pay_info.error_message = token['message']
                     pay_info.save()
                     return {"ret_code":201182, "message":token['message']}
+
+                # 充值成功后，更新本次银行使用的时间
+                Card.objects.filter(no=card_no, user=user).update(last_update=timezone.now())
+
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
             logger.error(traceback.format_exc())

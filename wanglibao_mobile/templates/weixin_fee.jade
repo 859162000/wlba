@@ -1,0 +1,69 @@
+doctype html
+html
+  head
+    - with '网利宝' as title
+    title 网利宝
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
+    meta(name="format-detection", content="telephone=no")
+    link(rel="stylesheet",href="/static/stylesheets/weixin.css?v=2131230")
+  body
+      .top-i
+          a.jiao
+            img(src='/static/m_images/weixin_img/sanjiao.png')
+          p 邀请好友理财送话费
+      include m_include/weixin_kehuduan
+      banner
+        img(src='/static/m_images/weixin_img/bannerr.jpg')
+      .mainn
+          dl
+            dt
+                img(src='/static/m_images/weixin_img/xinlai.png')
+            dd
+                h3 信赖
+                p IDG资本投资
+                p 100%本息保障
+          dl
+            dt
+                img(src='/static/m_images/weixin_img/quanwei.png')
+            dd
+                h3 权威
+                p 洛克菲勒家族
+                p 全方位战略合作
+          dl
+            dt
+                img(src='/static/m_images/weixin_img/anquan.png')
+            dd
+                h3 安全
+                p 账户资金安全
+                p 由平安保险承保
+          dl
+            dt
+                img(src='/static/m_images/weixin_img/shouyiago.png')
+            dd
+                h3 高收益
+                p 30倍银行活期收益
+                p 100元起投 0手续费
+      footer
+        a.wei_left 登录
+        a.wei_right 注册
+      script(src="/static/m_js/m_lib/jquery.min.js")
+      script(src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js")
+      script(src="/static/m_js/weixin.js")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

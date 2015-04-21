@@ -23,7 +23,7 @@ from wanglibao_activity import backends as activity_backends
 
 #投资成功
 @app.task
-def decide_first(user_id, amount, device_type='pc', product_id=0):
+def decide_first(user_id, amount, device_type='pc', product_id=0, is_full=False):
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
 
@@ -34,7 +34,7 @@ def decide_first(user_id, amount, device_type='pc', product_id=0):
         introduced_by.save()
 
     #活动检测
-    activity_backends.check_activity(user, 'invest', device_type, amount, product_id)
+    activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full)
 
 
 #注册成功
