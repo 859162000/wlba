@@ -7,13 +7,13 @@
     $('.top-i .jiao>img').on('click', function () {
         history.go(-1);
     });
-    $('#id').change(function(){
-       if (document.getElementById("id").checked) {
+    $('#id').change(function () {
+        if (document.getElementById("id").checked) {
             $('.weixin_tw').html('');
 
-        } else{
+        } else {
             $('.weixin_tw').html('<span>你必须同意协议</span>');
-       }
+        }
     })
 
 
@@ -399,30 +399,54 @@ function feea() {
         b = phon.substring(0, 3) + "****" + phon.substring(7, 11)
     }
     $('.wei_feea p label').html(b);
+    $('#idd').change(function () {
+        if (document.getElementById("idd").checked) {
+            $('.wei_red').html('');
+
+        } else {
+            $('.wei_red').html('你必须同意协议');
+
+        }
+
+    })
+
 
     $('.wei_ffee').click(function () {
 
         wei_zheng();
         wei_f = $('.wei_fee').val();
-        $.ajax({
-            type: "POST",
-            url: "/api/phone_validation_code/register/" + wei_f + "/",
-            data: null,
-            dataType: "json",
-            complete: function (XMLHttpRequest, textStatus) {
-                console.log(typeof XMLHttpRequest)
-                var $data = JSON.parse(XMLHttpRequest.responseText);
-                if ($data.message == '') {
+        if (wei_f == "") {
+            alert("手机号码不能为空！");
+            return false;
+        } else if (!$(".wei_fee").val().match(/^1[3|4|5|7|8|9][0-9]\d{4,8}$/)) {
+            alert("请输入正确的手机号码");
+            return false;
+        } else if (!document.getElementById("idd").checked) {
+            $('.wei_red').html('你必须同意协议');
+            return false
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "/api/phone_validation_code/register/" + wei_f + "/",
+                data: null,
+                dataType: "json",
+                complete: function (XMLHttpRequest, textStatus) {
+                    console.log(typeof XMLHttpRequest)
+                    var $data = JSON.parse(XMLHttpRequest.responseText);
+                    if ($data.message == '') {
 
-                    alert('验证码已发送您的手机上请注意查收');
-                    window.location.href = "/mobile/weixin_invitation/?identifier=" + wei_f + '&invite_code=' + phon;
-                } else {
-                    alert($data.message);
+                        alert('验证码已发送您的手机上请注意查收');
+                        window.location.href = "/mobile/weixin_invitation/?identifier=" + wei_f + '&invite_code=' + phon;
+                    } else {
+                        alert($data.message);
+                    }
+
                 }
 
-            }
+            });
 
-        });
+        }
+
     });
 
 
@@ -441,14 +465,14 @@ function yoa_registered() {
             return false;
         }
         if (!passwordd.match(/^[0-9_a-zA-Z]{6,20}$/)) {
-             $('.weixin_tq').html('<span>密码长度6-20位，请重新输入</span>');
+            $('.weixin_tq').html('<span>密码长度6-20位，请重新输入</span>');
             $('input').focus(function () {
                 $('.weixin_tq').html('');
             })
             return false;
         }
         if (yanma == "" || passwordd == "") {
-             $('.weixin_ti').html('<span>信息不能为空，请填写完整</span>');
+            $('.weixin_ti').html('<span>信息不能为空，请填写完整</span>');
             $('input').focus(function () {
                 $('.weixin_ti').html('');
             })
@@ -465,9 +489,6 @@ function yoa_registered() {
                     invite_code: $('input[name=invite_code]').val()
                 },
                 dataType: "json",
-                success: function (result) {
-
-                },
                 complete: function (XMLHttpRequest, textStatus) {
                     console.log(typeof XMLHttpRequest)
                     var $dade = JSON.parse(XMLHttpRequest.responseText)
@@ -475,7 +496,11 @@ function yoa_registered() {
                     if ($dade.message.identifier) {
                         alert($dade.message.identifier);
                     } else if ($dade.message.validate_code) {
-                        alert($dade.message.validate_code);
+                        $('.weixin_tq').html('<span>'+$dade.message.validate_code+'</span>');
+                        $('input').focus(function () {
+                            $('.weixin_tq').html('');
+                        })
+                      //  alert($dade.message.validate_code);
                     } else {
                         sessionStorage.setItem("name", Verification());
                         window.location.href = "/mobile/weixin_app/";
