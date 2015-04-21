@@ -316,7 +316,7 @@
       Y = data.getFullYear();
       zm = data.getMonth() + 1;
       day = data.getDate();
-      if (day.length < 2) {
+      if (day < 10) {
         day = '0' + day;
       }
       date = Y + '-0' + zm + "-" + day;
