@@ -8,6 +8,7 @@ import decimal
 from django.utils import timezone
 from django.db.models import Q, Sum
 from django.db import transaction
+from django.contrib.auth.models import User
 from django.template import Template, Context
 from models import Activity, ActivityRule, ActivityRecord
 from marketing import helper
@@ -191,12 +192,13 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
                                        .extra({'amount_sum': Sum('amount')}).order_by('-amount_sum')
             if records:
                 record = records[total_invest_order-1]
-                if record['user'] == user.id:
-                    #如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
-                    amount_sum = record['amount_sum']
-                    is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
-                    if is_amount:
-                        _send_gift(user, rule, device_type, is_full)
+                #给符合名次的用户发放奖励
+                total_user = User.objects.filter(id=record['user']).first()
+                #如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
+                amount_sum = record['amount_sum']
+                is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
+                if is_amount and total_user:
+                    _send_gift(total_user, rule, device_type, is_full)
         # else:
         #     #直接取当前用户的投资总额
         #     record = P2PRecord.objects.filter(product__id=product_id, user=user, catalog=u'申购')\
