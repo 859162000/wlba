@@ -25,14 +25,15 @@ html
       form.wei_pss
           label &nbsp;&nbsp;验证码
           input(type='text' placeholder='短信验证码').wei_yan
-          span#btn 获取验证码
+          span(data-num="0")#btn 获取验证码
       h2.weixin_tq
       input(type='hidden' value='weixin')
       .wei_agree
           input(type='checkbox' checked='checked')#id
           label
               |我同意
-              span 网利宝用户协议
+              span
+               a(href='https://www.wanglibao.com/mobile/agreement/') 网利宝用户协议
       h2.weixin_tw
       .wei_buttonn#wei_button
         a 完成
