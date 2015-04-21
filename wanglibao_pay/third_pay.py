@@ -704,6 +704,10 @@ class KuaiPay:
                 device = split_ua(request)
                 device_type = device['device_type']
                 ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
+
+                # 充值成功后，更新本次银行使用的时间
+                Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).update(last_update=timezone.now())
+
                 return ms
             else:
                 token = self._handle_dynnum_result(res)
@@ -715,10 +719,7 @@ class KuaiPay:
                     return {"ret_code":201182, "message":token['message']}
 
                 # 充值成功后，更新本次银行使用的时间
-                if len(card_no) == 10:
-                    Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).update(last_update=timezone.now())
-                else:
-                    Card.objects.filter(no=card_no, user=user).update(last_update=timezone.now())
+                Card.objects.filter(no=card_no, user=user).update(last_update=timezone.now())
 
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
