@@ -200,8 +200,8 @@ import time
 import hashlib
 import json
 from .weixin import get_access_token, get_jsapi_ticket
-WEIXIN_APP_ID = 'wxc821bce45dfa8ca6'
-WEIXIN_APP_SECRET = 'ecfa1d0b679d80d543aa7957dfa4774a'
+WEIXIN_APP_ID = 'wx110c1d06158c860b'
+WEIXIN_APP_SECRET = '2523d084edca65b6633dae215967a23f'
 
 
 def weixin_config(request):

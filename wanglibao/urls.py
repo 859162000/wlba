@@ -79,7 +79,8 @@ urlpatterns = patterns(
     url(r'^ckeditor/', include('ckeditor.urls')),
 
     url(r'^preorder/', include('wanglibao_preorder.urls')),
-    url(r'^activity/', decorator_include(include('marketing.urls'), wap_activity_manage)),
+    # url(r'^activity/', decorator_include(include('marketing.urls'), wap_activity_manage)),
+    url(r'^activity/', include('marketing.urls')),
     url(r'^announcement/', include('wanglibao_announcement.urls')),
     url(r'^redpacket/', include('wanglibao_redpack.urls')),
     url(r'^templates/', include('wanglibao_activity.urls')),
