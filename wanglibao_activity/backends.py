@@ -76,7 +76,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     product_id = int(product_id)
     #注册 或 实名认证
     if trigger_node in ('register', 'validation'):
-        _send_gift(user, rule, device_type)
+        _send_gift(user, rule, device_type, is_full)
     #首次充值
     elif trigger_node == 'first_pay':
         #check first pay
@@ -88,10 +88,10 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             first_pay_num = PayInfo.objects.filter(user=user, type='D',
                                                    status=PayInfo.SUCCESS).count()
         if first_pay_num == 1:
-            _check_trade_amount(user, rule, device_type, amount)
+            _check_trade_amount(user, rule, device_type, amount, is_full)
     #充值
     elif trigger_node == 'pay':
-        _check_trade_amount(user, rule, device_type, amount)
+        _check_trade_amount(user, rule, device_type, amount, is_full)
     #首次购买
     elif trigger_node == 'first_buy':
         #check first pay
@@ -127,29 +127,29 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         return
 
 
-def _send_gift(user, rule, device_type, amount=0):
+def _send_gift(user, rule, device_type, is_full, amount=0):
     # rule_id = rule.id
     rtype = rule.trigger_node
     #送奖品
     if rule.gift_type == 'reward':
         reward_name = rule.reward
-        _send_gift_reward(user, rule, rtype, reward_name, device_type, amount)
+        _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_full)
 
     #送红包
     if rule.gift_type == 'redpack':
         redpack_id = int(rule.redpack)
         #此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
-        _send_gift_redpack(user, rule, rtype, redpack_id, device_type)
+        _send_gift_redpack(user, rule, rtype, redpack_id, device_type, is_full)
 
     #送现金或收益
     if rule.gift_type == 'income':
         #send to
-        _send_gift_income(user, rule, amount)
+        _send_gift_income(user, rule, amount, is_full)
 
     #送话费
     if rule.gift_type == 'phonefare':
         #send to
-        _send_gift_phonefare(user, rule, amount)
+        _send_gift_phonefare(user, rule, amount, is_full)
 
 
 def _check_introduced_by(user, start_dt, is_invite_in_date):
@@ -174,12 +174,12 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
         if records:
             this_record = records[ranking_num-1]
             if this_record.user.id == user.id:
-                _send_gift(user, rule, device_type)
+                _send_gift(user, rule, device_type, is_full)
     elif ranking_num == -1 and is_full is True:
         #查询是否满标，满标时不再考虑最小/最大金额，直接发送
-        _send_gift(user, rule, device_type)
+        _send_gift(user, rule, device_type, is_full)
     else:
-        _check_trade_amount(user, rule, device_type, amount)
+        _check_trade_amount(user, rule, device_type, amount, is_full)
 
     #判断单标累计投资名次
     if rule.is_total_invest and is_full is True:
@@ -196,7 +196,7 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
                     amount_sum = record['amount_sum']
                     is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
                     if is_amount:
-                        _send_gift(user, rule, device_type)
+                        _send_gift(user, rule, device_type, is_full)
         # else:
         #     #直接取当前用户的投资总额
         #     record = P2PRecord.objects.filter(product__id=product_id, user=user, catalog=u'申购')\
@@ -208,13 +208,13 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
         #             _send_gift(user, rule, device_type)
 
 
-def _check_trade_amount(user, rule, device_type, amount):
+def _check_trade_amount(user, rule, device_type, amount, is_full):
     is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
     if amount and amount > 0:
         if is_amount:
-            _send_gift(user, rule, device_type, amount)
+            _send_gift(user, rule, device_type, is_full, amount)
     else:
-        _send_gift(user, rule, device_type, amount)
+        _send_gift(user, rule, device_type, is_full, amount)
 
 
 def _check_amount(min_amount, max_amount, amount):
@@ -250,7 +250,7 @@ def _check_product_id(product_id, product_ids):
         return False
 
 
-def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount):
+def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_full):
     now = timezone.now()
     if rule.send_type == 'sys_auto':
         #do send
@@ -261,11 +261,11 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount):
                 _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
     else:
         #只记录不发信息
-        _save_activity_record(rule, user, 'only_record', reward_name)
+        _save_activity_record(rule, user, 'only_record', reward_name, False, is_full)
         if rule.both_share:
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
-                _save_activity_record(rule, user_introduced_by, 'only_record', reward_name, True)
+                _save_activity_record(rule, user_introduced_by, 'only_record', reward_name, True, is_full)
 
 
 def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None, amount=0):
@@ -287,7 +287,7 @@ def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None, amount
                 _send_message_sms(user, rule, None, reward, amount)
 
 
-def _send_gift_income(user, rule, amount):
+def _send_gift_income(user, rule, amount, is_full):
     # now = timezone.now()
     income = rule.income
     if income > 0:
@@ -299,16 +299,16 @@ def _send_gift_income(user, rule, amount):
                     _send_message_sms(user, rule, user_introduced_by, None, amount)
         else:
             #只记录不发信息
-            _save_activity_record(rule, user, 'only_record', rule.rule_name)
+            _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
             if rule.both_share:
                 user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                 if user_introduced_by:
-                    _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True)
+                    _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
     else:
         return
 
 
-def _send_gift_phonefare(user, rule, amount):
+def _send_gift_phonefare(user, rule, amount, is_full):
     # now = timezone.now()
     phone_fare = rule.income
     if phone_fare > 0:
@@ -320,24 +320,24 @@ def _send_gift_phonefare(user, rule, amount):
                     _send_message_sms(user, rule, user_introduced_by, None, amount)
         else:
             #只记录不发信息
-            _save_activity_record(rule, user, 'only_record', rule.rule_name)
+            _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
             if rule.both_share:
                 user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                 if user_introduced_by:
-                    _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True)
+                    _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
     else:
         return
 
 
-def _send_gift_redpack(user, rule, rtype, redpack_id, device_type):
+def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, is_full):
     """ 红包模板目前仍沿用红包模块的模板，以后需要时再更改；
         另外红包会发送短信和站内信，因此，此处记录流水时两者都记录。
     """
     if rule.send_type == 'sys_auto':
         redpack_backends.give_activity_redpack_new(user, rtype, redpack_id, device_type, rule.id)
     #记录流水，目前红包系同时发送站内信和短信，因此此处记录两条流水，下同
-    _save_activity_record(rule, user, 'message', rule.rule_name)
-    _save_activity_record(rule, user, 'sms', rule.rule_name)
+    _save_activity_record(rule, user, 'message', rule.rule_name, False, is_full)
+    _save_activity_record(rule, user, 'sms', rule.rule_name, False, is_full)
     #检测是否有邀请关系
     if rule.both_share:
         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
@@ -345,11 +345,11 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type):
             #给邀请人发红包
             if rule.send_type == 'sys_auto':
                 redpack_backends.give_activity_redpack_new(user_ib, rtype, redpack_id, device_type, rule.id)
-            _save_activity_record(rule, user_ib, 'message', rule.rule_name, True)
-            _save_activity_record(rule, user_ib, 'sms', rule.rule_name, True)
+            _save_activity_record(rule, user_ib, 'message', rule.rule_name, True, is_full)
+            _save_activity_record(rule, user_ib, 'sms', rule.rule_name, True, is_full)
 
 
-def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=False):
+def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=False, is_full=False):
     record = ActivityRecord()
     record.activity = rule.activity
     record.rule = rule
@@ -365,7 +365,7 @@ def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=Fa
     description, total_order, ranking = '', '', ''
     if introduced_by:
         description = u'【邀请人获得】'
-    if rule.total_invest_order > 0:
+    if rule.total_invest_order > 0 and is_full is True:
         total_order = u'【满标累计投资第%d名】' % rule.total_invest_order
     if rule.ranking > 0:
         ranking = u'【第%d名投资】' % rule.ranking
