@@ -492,6 +492,9 @@ class KuaiPay:
         if merchantId != self.MER_ID or customerId != str(request.user.id):
             return {"ret_code":20092, "message":"卡信息不匹配"}
 
+        card_list = Card.objects.filter(user=request.user).select_related('bank')
+        bank_list = [card_list.bank.kuai_code]
+        cards = sorted(cards, lambda x: bank_list.index(x['bank_id']))
         return {"ret_code":0, "message":"test", "cards":cards}
 
     def _handle_dynnum_result(self, res):
@@ -709,7 +712,10 @@ class KuaiPay:
                     return {"ret_code":201182, "message":token['message']}
 
                 # 充值成功后，更新本次银行使用的时间
-                Bank.objects.filter(gate_id=gate_id).update(last_update=timezone.now())
+                if len(card_no) == 10:
+                    Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).update(last_update=timezone.now())
+                else:
+                    Card.objects.filter(no=card_no, user=user).update(last_update=timezone.now())
 
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
