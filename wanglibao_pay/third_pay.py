@@ -707,6 +707,10 @@ class KuaiPay:
                     pay_info.error_message = token['message']
                     pay_info.save()
                     return {"ret_code":201182, "message":token['message']}
+
+                # 充值成功后，更新本次银行使用的时间
+                Bank.objects.filter(gate_id=gate_id).update(last_update=timezone.now())
+
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
             logger.error(traceback.format_exc())
@@ -928,7 +932,7 @@ def del_bank_card(request):
 
 def list_bank(request):
     #banks = Bank.get_deposit_banks()
-    banks = Bank.get_kuai_deposit_banks()
+    banks = Bank.get_kuai_deposit_banks().order_by('-last_update')
     rs = []
     for x in banks:
         obj = {"name":x.name, "gate_id":x.gate_id, "bank_id":x.kuai_code}
