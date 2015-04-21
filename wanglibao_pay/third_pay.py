@@ -492,12 +492,14 @@ class KuaiPay:
         if merchantId != self.MER_ID or customerId != str(request.user.id):
             return {"ret_code":20092, "message":"卡信息不匹配"}
 
-        card_list = Card.objects.filter(user=request.user).select_related('bank').order_by('-last_update')
-        bank_list = [c.bank.kuai_code for c in card_list]
+        try:
+            card_list = Card.objects.filter(user=request.user).select_related('bank').order_by('-last_update')
+            bank_list = [c.bank.kuai_code for c in card_list]
+            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x['bank_id']))
+            cards = cards_tmp
+        except:
+            pass
 
-        print 'bank_list>>>', bank_list
-        print 'card>>>', cards
-        cards = sorted(cards, key=lambda x: bank_list.index(x['bank_id']))
         return {"ret_code":0, "message":"test", "cards":cards}
 
     def _handle_dynnum_result(self, res):
