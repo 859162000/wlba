@@ -493,7 +493,7 @@ class KuaiPay:
             return {"ret_code":20092, "message":"卡信息不匹配"}
 
         card_list = Card.objects.filter(user=request.user).select_related('bank').order_by('-last_update')
-        bank_list = [card_list.bank.kuai_code]
+        bank_list = [c.bank.kuai_code for c in card_list]
         cards = sorted(cards, lambda x: bank_list.index(x['bank_id']))
         return {"ret_code":0, "message":"test", "cards":cards}
 
