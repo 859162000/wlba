@@ -186,26 +186,26 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
         total_invest_order = int(rule.total_invest_order)
         if total_invest_order > 0:
             #按用户查询单标投资的总金额
-            records = P2PRecord.objects.filter(product__id=product_id, catalog=u'申购') \
-                                       .annotate(amount_sum=Sum('amount')).values('user') \
-                                       .order_by('-amount_sum')
+            records = P2PRecord.objects.filter(product__id=product_id, catalog=u'申购').values('user') \
+                                       .annotate(amount_sum=Sum('amount')) \
+                                       .extra({'amount_sum': Sum('amount')}).order_by('-amount_sum')
             if records:
                 record = records[total_invest_order-1]
-                if record.user.id == user.id:
+                if record['user'] == user.id:
                     #如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
-                    amount_sum = record.amount_sum
+                    amount_sum = record['amount_sum']
                     is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
                     if is_amount:
                         _send_gift(user, rule, device_type)
-        else:
-            #直接取当前用户的投资总额
-            record = P2PRecord.objects.filter(product__id=product_id, user=user, catalog=u'申购')\
-                                      .annotate(amount_sum=Sum('amount')).first()
-            if record:
-                amount_sum = record.amount_sum
-                is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
-                if is_amount:
-                    _send_gift(user, rule, device_type)
+        # else:
+        #     #直接取当前用户的投资总额
+        #     record = P2PRecord.objects.filter(product__id=product_id, user=user, catalog=u'申购')\
+        #                               .extra({'amount_sum': Sum('amount')}).first()
+        #     if record:
+        #         amount_sum = record.amount_sum
+        #         is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
+        #         if is_amount:
+        #             _send_gift(user, rule, device_type)
 
 
 def _check_trade_amount(user, rule, device_type, amount):
