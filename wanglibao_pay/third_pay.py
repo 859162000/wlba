@@ -932,7 +932,7 @@ def del_bank_card(request):
 
 def list_bank(request):
     #banks = Bank.get_deposit_banks()
-    banks = Bank.get_kuai_deposit_banks().order_by('-last_update')
+    banks = Bank.get_kuai_deposit_banks()
     rs = []
     for x in banks:
         obj = {"name":x.name, "gate_id":x.gate_id, "bank_id":x.kuai_code}
