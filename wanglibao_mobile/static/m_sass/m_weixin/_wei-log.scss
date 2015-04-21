@@ -125,24 +125,24 @@ body{
 
 }
 .top-i{
-  height: 5em;
+  height: 60px;
   background: #f44336;
   position: relative;
 }
 .top-i .jiao{
   display: inline-block;
   position: absolute;
-  top: 28%;
+  top: 23%;
   left:28px;
 }
 .top-i .jiao>img{
-  width: 1.3em;
+  width: 16px;
 }
 .top-i p{
   text-align: center;
   color: #FFFFFF;
-  line-height: 2.6em;
-  font-size: 2.3em;
+  line-height:60px;
+  font-size: 22px;
 }
 .wei_dian>img{
   width: 4em;
@@ -222,17 +222,18 @@ article .wei_for>.judge{
   border-top: 1px #cccccc solid;
   border-bottom: 1px #cccccc solid;
   margin-top: 3em;
-  font-size: 2em;
+  font-size: 1.5em;
 }
 .wei_deng>label{
+  display: inline-block;
   margin-left: 1em;
-  color: #979797;
+  color: #5E5959;
 }
 .wei_deng>input{
   border: none;
   font-size: 1em;
   color: #cccccc;
-  width: 50%;
+  width: 70%;
   outline:medium;
 }
 .wei_hui{
@@ -447,7 +448,7 @@ footer .wei_right{
   display: inline-block;
   width: 20%;
   margin-left: 1em;
-  color: #979797;
+  color: #5E5959;
 }
 .wei_pss>input{
   border: none;
@@ -456,6 +457,9 @@ footer .wei_right{
   width: 39%;
   outline:medium;
 
+}
+.wei_pss>#input{
+  width: 70%;
 }
 .wei_pss>#btn,.wei_pss>#btnn{
   width: 33%;
@@ -479,7 +483,7 @@ footer .wei_right{
   color: #727272;
 
 }
-.wei_agree>label>span{
+.wei_agree>label>span>a{
   color: #2196f3;
 }
 //-----------------------------------include----//
