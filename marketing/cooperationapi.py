@@ -286,7 +286,7 @@ class WangdaiEyeListAPIView(APIView):
                 percent = p2pproduct.ordered_amount / amount
                 process = percent.quantize(Decimal('0.00'), 'ROUND_DOWN')
 
-                # reward = Decimal.from_float(0).quantize(Decimal('0.0000'), 'ROUND_DOWN')
+                reward = Decimal.from_float(0).quantize(Decimal('0.0000'), 'ROUND_DOWN')
                 if p2pproduct.activity:
                     reward = p2pproduct.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
 
@@ -312,8 +312,7 @@ class WangdaiEyeListAPIView(APIView):
                     # "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6)),
                     "pay_way": P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0),
                     "process": process,
-                    # "reward": reward,
-                    "reward": 0,
+                    "reward": reward,
                     # "guarantee": "null",
                     "guarantee": 0,
                     "start_time": timezone.localtime(p2pproduct.publish_time).strftime(
