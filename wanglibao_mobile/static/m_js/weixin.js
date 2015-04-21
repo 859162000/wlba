@@ -128,9 +128,9 @@ function registered() {
 
 
     $('#btn').click(function () {
-        if($('#btn').attr('data-num')==0){
-            $('#btn').attr('data-num','1');
-            $('#btn').css('color','#cccccc');
+        if ($('#btn').attr('data-num') == 0) {
+            $('#btn').attr('data-num', '1');
+            $('#btn').css('color', '#cccccc');
             $('#btn').html('已发送<span id="timeb2" >60</span>秒');
             timer = self.setInterval(addsec, 1000);
             wei_zheng();
@@ -146,16 +146,16 @@ function registered() {
                 }
 
             });
-            setInterval(function(){
-                $('#btn').attr('data-num','0');
-                 $('#btn').css('color','#2196f3');
-            },60000)
+            setInterval(function () {
+                $('#btn').attr('data-num', '0');
+                $('#btn').css('color', '#2196f3');
+            }, 60000)
         }
     });
 
 
     $('#wei_button').on('click', function () {
-       //$(".wei_pass").attr(maxlength)
+        //$(".wei_pass").attr(maxlength)
         var pass = $(".wei_pass").val(),
             qupass = $(".wei_quepass").val(),
             yan = $(".wei_yan").val(),
@@ -236,36 +236,36 @@ function registered() {
 //=============================找回密码
 function retrieve() {
     $('#btnn').click(function () {
-         if($('#btnn').attr('data-num')==0){
-            $('#btnn').attr('data-num','1');
-            $('#btnn').css('color','#cccccc');
-             $('#btnn').html('已经发送<span id="timeb2">60</span>秒');
-        timer = self.setInterval(addsecc, 1000);
-        wei_zheng();
-        var pno = Verification();
-        $.ajax({
-            type: "POST",
-            url: "/api/phone_validation_code/reset_password/" + pno + "/",
-            data: null,
-            dataType: "json",
-            success: function (result) {
+        if ($('#btnn').attr('data-num') == 0) {
+            $('#btnn').attr('data-num', '1');
+            $('#btnn').css('color', '#cccccc');
+            $('#btnn').html('已经发送<span id="timeb2">60</span>秒');
+            timer = self.setInterval(addsecc, 1000);
+            wei_zheng();
+            var pno = Verification();
+            $.ajax({
+                type: "POST",
+                url: "/api/phone_validation_code/reset_password/" + pno + "/",
+                data: null,
+                dataType: "json",
+                success: function (result) {
 
-            },
-            complete: function (XMLHttpRequest, textStatus) {
-                console.log(typeof XMLHttpRequest)
-                if (typeof XMLHttpRequest == 'string') {
-                    var $data = JSON.parse(XMLHttpRequest.responseText)
-                    alert($data.message);
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    console.log(typeof XMLHttpRequest)
+                    if (typeof XMLHttpRequest == 'string') {
+                        var $data = JSON.parse(XMLHttpRequest.responseText)
+                        alert($data.message);
+                    }
+
                 }
 
-            }
-
-        });
-              setInterval(function(){
-                $('#btnn').attr('data-num','0');
-                 $('#btnn').css('color','#2196f3');
-            },60000)
-         }
+            });
+            setInterval(function () {
+                $('#btnn').attr('data-num', '0');
+                $('#btnn').css('color', '#2196f3');
+            }, 60000)
+        }
 
     });
     $('.wei_hui').on('click', function () {
@@ -475,15 +475,15 @@ function feea() {
 
 }
 function yoa_registered() {
-if($('.wei_xin').attr('data-num')==0){
-            $('.wei_xin').attr('data-num','1');
-     $('.wei_xin').html('已发送<span id="timeb2">60</span>秒');
-    timer = self.setInterval(addseca, 1000);
-      setInterval(function(){
-                $('.wei_xin').attr('data-num','0');
-                 $('.wei_xin').css('color','#2196f3');
-            },60000)
-}
+    if ($('.wei_xin').attr('data-num') == 0) {
+        $('.wei_xin').attr('data-num', '1');
+        $('.wei_xin').html('已发送<span id="timeb2">60</span>秒');
+        timer = self.setInterval(addseca, 1000);
+        setInterval(function () {
+            $('.wei_xin').attr('data-num', '0');
+            $('.wei_xin').css('color', '#2196f3');
+        }, 60000)
+    }
 
     $('.wei_xin').on('click', function () {
         if ($('.wei_xin').attr('data-num') == 0) {
@@ -512,12 +512,10 @@ if($('.wei_xin').attr('data-num')==0){
             });
 
 
-
-
-            setInterval(function(){
-                $('.wei_xin').attr('data-num','0');
-                 $('.wei_xin').css('color','#2196f3');
-            },60000)
+            setInterval(function () {
+                $('.wei_xin').attr('data-num', '0');
+                $('.wei_xin').css('color', '#2196f3');
+            }, 60000)
 
         }
     })
@@ -639,7 +637,6 @@ function addseca() {
 
         window.clearInterval(timer);
         $('.wei_xin').html('<span id="timeb2"></span>重新获取验证码');
-
 
 
     }
