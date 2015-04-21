@@ -47,6 +47,7 @@ class Card(models.Model):
     user = models.ForeignKey(User)
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
     add_at = models.DateTimeField(auto_now=True)
+    last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
     class Meta:
         verbose_name_plural = "银行卡"
