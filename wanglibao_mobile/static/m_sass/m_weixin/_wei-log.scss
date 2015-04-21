@@ -191,7 +191,7 @@ article .wei_for>.ipon{
   height: 3.5em;
   border-radius: 7px 7px 0 0;
   border: none;
-  text-align: center;
+  //text-align: center;
   line-height: 1em;
   font-size: 1.4em;
   color: #727272;
@@ -199,6 +199,7 @@ article .wei_for>.ipon{
   background-position: 4% 47%;
   background-size: 6% 70%;
   outline:medium;
+    padding-left: 3em;
 }
 article .wei_for>.judge{
   display: inline-block;
@@ -444,7 +445,7 @@ footer .wei_right{
 }
 .wei_pss>label{
   display: inline-block;
-  width: 45%;
+  width: 20%;
   margin-left: 1em;
   color: #979797;
 }
@@ -510,4 +511,34 @@ footer .wei_right{
   color: #FFFFFF;
   font-size: 2em;
   margin-right: 10px;
+}
+.weixin_ti>span {
+  line-height: 2em;
+  margin-top: 1em;
+  background: #ffffff;
+  width: 100%;
+  padding-left: 2em;
+  color: #FF164B;
+  border: 1px solid #F9D59D;
+  display: inline-block;
+}
+.weixin_tq>span {
+  line-height: 2em;
+  margin-top: 1em;
+  background: #ffffff;
+  width: 100%;
+  padding-left: 2em;
+  color: #FF164B;
+  border: 1px solid #F9D59D;
+  display: inline-block;
+}
+.weixin_tw>span {
+  line-height: 2em;
+  margin-top: 1em;
+  background: #ffffff;
+  width: 100%;
+  padding-left: 2em;
+  color: #FF164B;
+  border: 1px solid #F9D59D;
+  display: inline-block;
 }
