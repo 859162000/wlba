@@ -85,7 +85,7 @@ class ActivityRecordAdmin(ExportMixin, admin.ModelAdmin):
         'platform', 'trigger_node', 'msg_type', 'send_type', 'gift_type',
         CustomDateFilter
     )
-    search_fields = ('activity__name', 'rule__rule_name', 'user__wanglibaouserprofile__phone')
+    search_fields = ('activity__name', 'description', 'rule__rule_name', 'user__wanglibaouserprofile__phone')
     resource_class = ActivityResource
 
     def get_export_filename(self, file_format):
