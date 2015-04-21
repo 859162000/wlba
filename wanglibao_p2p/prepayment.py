@@ -89,13 +89,14 @@ class PrepaymentHistory(object):
             raise PrepaymentException()
         make_loans_time = timezone.localtime(self.product.make_loans_time).date()
 
+        
         for index, amortization in enumerate(amortizations):
             term_date = timezone.localtime(amortization.term_date).date()
 
             #如果上一期没有结算的话抛出异常
                     #and term_date < date_now
-            if index > 0 and amortization.settled == False:
-                raise PrepaymentException()
+            #if index > 0 and amortizations[index-1].settled == False:
+            #    raise PrepaymentException()
 
             if index == 0:
                 #and make_loans_time < date_now < term_date:
