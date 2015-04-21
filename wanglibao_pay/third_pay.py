@@ -712,7 +712,10 @@ class KuaiPay:
                     return {"ret_code":201182, "message":token['message']}
 
                 # 充值成功后，更新本次银行使用的时间
-                card.update(last_update=timezone.now())
+                if len(card_no) == 10:
+                    Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).update(last_update=timezone.now())
+                else:
+                    Card.objects.filter(no=card_no, user=user).update(last_update=timezone.now())
 
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
