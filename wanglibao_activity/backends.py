@@ -178,7 +178,7 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
     elif ranking_num == -1 and is_full is True:
         #查询是否满标，满标时不再考虑最小/最大金额，直接发送
         _send_gift(user, rule, device_type, is_full)
-    else:
+    elif ranking_num == 0:
         _check_trade_amount(user, rule, device_type, amount, is_full)
 
     #判断单标累计投资名次
