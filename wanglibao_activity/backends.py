@@ -362,10 +362,14 @@ def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=Fa
     record.send_type = rule.send_type
     record.gift_type = rule.gift_type
 
-    description = ''
+    description, total_order, ranking = '', '', ''
     if introduced_by:
         description = u'【邀请人获得】'
-    description = ''.join([description, msg_content])
+    if rule.total_invest_order > 0:
+        total_order = u'【满标累计投资第%d名】' % rule.total_invest_order
+    if rule.ranking > 0:
+        ranking = u'【第%d名投资】' % rule.ranking
+    description = ''.join([description, ranking, total_order, msg_content])
 
     record.description = description
     record.save()
