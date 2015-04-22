@@ -16,7 +16,7 @@ html
       include m_include/weixin_kehuduan
       form.wei_deng(style='background:#ffffff;')
           label 登录密码
-          input(type='password' placeholder='请输入密码').wei_word
+          input(type='password', placeholder='请输入密码', maxlength='20').wei_word
       h2.weixin_ti
       a.wei_hui 找回密码
       .wei_buttonn#wei_buttonn
@@ -24,8 +24,17 @@ html
       .wei_kefu
           p
            |客服电话
-           label 4008-588-066
+           label#wx-mobel-btn 4008-588-066
+        #wx-mobel-box
+          #box
+            span#off ×
+            p 网利宝竭诚为您服务
+              br
+              |服务时间： 9:00 - 18:00 （法定节假日除外）
+            h1
+             a(href='tel:4008-588-066') 拨打电话 4008-588-066
+
 
   script(src="/static/m_js/m_lib/jquery.min.js")
-  script(src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js")
+  script(src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js")
   script(src="/static/m_js/weixin.js")

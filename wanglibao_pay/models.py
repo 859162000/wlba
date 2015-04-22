@@ -20,6 +20,7 @@ class Bank(models.Model):
     #快钱侧银行限额信息格式如下,"|"分隔第一次和第二次
     #单笔=5000,单日=5000|单笔=50000,单日=10000000
     kuai_limit = models.CharField(max_length=500, blank=True, verbose_name=u'快钱侧银行限额信息')
+    last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
     class Meta:
         ordering = '-sort_order',
@@ -46,6 +47,7 @@ class Card(models.Model):
     user = models.ForeignKey(User)
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
     add_at = models.DateTimeField(auto_now=True)
+    last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
     class Meta:
         verbose_name_plural = "银行卡"

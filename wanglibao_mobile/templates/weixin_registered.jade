@@ -16,27 +16,28 @@ html
       include m_include/weixin_kehuduan
       form.wei_pss
           label 设置密码
-          input(type='password' placeholder='请输入密码').wei_pass
+          input(type='password', placeholder='请输入密码', maxlength='20').wei_pass#input
           //
           .line
           label 确认密码
-          input(type='password' placeholder='请再次输入密码').wei_quepass
+          input(type='password', placeholder='请再次输入密码', maxlength='20').wei_quepass#input
       h2.weixin_ti
       form.wei_pss
           label &nbsp;&nbsp;验证码
           input(type='text' placeholder='短信验证码').wei_yan
-          span#btn 获取验证码
+          span(data-num="0")#btn 获取验证码
       h2.weixin_tq
       input(type='hidden' value='weixin')
       .wei_agree
           input(type='checkbox' checked='checked')#id
           label
               |我同意
-              span 网利宝用户协议
+              span
+               a(href='https://www.wanglibao.com/mobile/agreement/') 网利宝用户协议
       h2.weixin_tw
       .wei_buttonn#wei_button
         a 完成
 
       script(src="/static/m_js/m_lib/jquery.min.js")
-      script(src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js")
+      script(src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js")
       script(src="/static/m_js/weixin.js")
