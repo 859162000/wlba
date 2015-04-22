@@ -27,11 +27,11 @@
 
 })();
 function log() {
-     if (Verification() == '8888') {
-           $('.top-i .jiao>img').on('click', function () {
-                window.location.href = "/mobile/weixin_fee/";
-            });
-     }
+    if (Verification() == '8888') {
+        $('.top-i .jiao>img').on('click', function () {
+            window.location.href = "/mobile/weixin_fee/";
+        });
+    }
     //$('.top-i .jiao img').on('click', function () {
     //            window.location.href = "/mobile/weixin_fee/";
     //        });
@@ -74,9 +74,10 @@ function log() {
 //=============================登入
 
 function wei_password() {
-     $('.top-i .jiao>.wei_fa').on('click', function () {
-                window.location.href = "/mobile/weixin_index/";
-            });
+    $('.top-i .jiao>.wei_fa').on('click', function () {
+        // window.location.href = "/mobile/weixin_index/";
+        history.go(-1);
+    });
     $('#wx-mobel-btn,#box p,#box h1').on('click', function (e) {
         $('#wx-mobel-box').show()
         e.stopPropagation();
@@ -140,9 +141,10 @@ function wei_password() {
 }
 //=============================注册
 function registered() {
-      $('.top-i .jiao>.wei_fann').on('click', function () {
-                window.location.href = "/mobile/weixin_index/";
-            });
+    $('.top-i .jiao>.wei_fann').on('click', function () {
+        // window.location.href = "/mobile/weixin_index/";
+        history.go(-1);
+    });
 
     $('#btn').click(function () {
         if ($('#btn').attr('data-num') == 0) {
@@ -253,9 +255,9 @@ function registered() {
 //=============================找回密码
 function retrieve() {
     $('.top-i .jiao>.wei_fanh').on('click', function () {
-                //window.location.href = "/mobile/weixin_inputt/";
+        //window.location.href = "/mobile/weixin_inputt/";
         history.go(-1);
-            });
+    });
     $('#btnn').click(function () {
         if ($('#btnn').attr('data-num') == 0) {
             $('#btnn').attr('data-num', '1');
@@ -551,7 +553,7 @@ function yoa_registered() {
             })
             return false;
         }
-        if (!(passwordd.length>=6&& passwordd.length<=20)) {
+        if (!(passwordd.length >= 6 && passwordd.length <= 20)) {
             $('.weixin_tq').html('<span>密码长度6-20位，请重新输入</span>');
             $('input').focus(function () {
                 $('.weixin_tq').html('');
