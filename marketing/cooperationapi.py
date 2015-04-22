@@ -320,7 +320,8 @@ class WangdaiEyeListAPIView(APIView):
                     "end_time": timezone.localtime(p2pproduct.soldout_time).strftime(
                         "%Y-%m-%d %H:%M:%S") if p2pproduct.soldout_time else 'null',
                     "invest_num": str(p2pproduct.equities.count()),
-                    "c_reward": "null"
+                    # "c_reward": "null"
+                    "c_reward": 0
                 }
                 loans.append(obj)
             result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(p2pproducts.number),
