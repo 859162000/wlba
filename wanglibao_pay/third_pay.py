@@ -482,6 +482,7 @@ class KuaiPay:
                             card['bank_id'] = z['bankId']['value']
                             bank = Bank.objects.filter(kuai_code=card['bank_id']).first()
                             card['bank_name'] = bank.name
+                            card['gate_id'] = bank.gate_id
                             if bank.kuai_limit:
                                 card.update(_handle_kuai_bank_limit(bank.kuai_limit))
                         if "storablePan" in z:
@@ -494,8 +495,8 @@ class KuaiPay:
 
         try:
             card_list = Card.objects.filter(user=request.user).select_related('bank').order_by('-last_update')
-            bank_list = [c.bank.kuai_code for c in card_list]
-            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x['bank_id']))
+            bank_list = [c.bank.gate_id for c in card_list]
+            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x['gate_id']))
             cards = cards_tmp
         except:
             pass
