@@ -707,9 +707,6 @@ class KuaiPay:
                 device_type = device['device_type']
                 ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
 
-                # 充值成功后，更新本次银行使用的时间
-                Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).update(last_update=timezone.now())
-
                 return ms
             else:
                 token = self._handle_dynnum_result(res)
@@ -719,9 +716,6 @@ class KuaiPay:
                     pay_info.error_message = token['message']
                     pay_info.save()
                     return {"ret_code":201182, "message":token['message']}
-
-                # 充值成功后，更新本次银行使用的时间
-                Card.objects.filter(no=card_no, user=user).update(last_update=timezone.now())
 
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
@@ -821,6 +815,13 @@ class KuaiPay:
            #         card.is_default = False
            #         card.save()
             tools.despoit_ok(pay_info, device_type)
+
+            # 充值成功后，更新本次银行使用的时间
+            if len(pay_info.card_no) == 10:
+                Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now())
+            else:
+                Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now())
+
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
