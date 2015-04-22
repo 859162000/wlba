@@ -325,7 +325,7 @@ class DailyInterestMonthly(AmortizationPlan):
                 #total_interest = (daily_interest * term_period.days).quantize(Decimal('.01'), rounding=ROUND_DOWN)
                 total_interest = get_interest_daily(amount, year_rate, term_period.days)
                 left_interest += total_interest['actual']
-                result.append((total_interest, Decimal(0), total_interest, Decimal(0), Decimal(0), term_dates[i]))
+                result.append((total_interest['actual'], Decimal(0), total_interest['actual'], Decimal(0), Decimal(0), term_dates[i]))
 
 
 
