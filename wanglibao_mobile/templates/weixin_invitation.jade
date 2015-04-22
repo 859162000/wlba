@@ -21,13 +21,14 @@ html
           br
           label.phone_a 账号:{{ identifier }}
       form.wei_pss
-          label(style='width: 20%;') 验证码
+          label(style='width: 20%;') &nbsp;&nbsp;验证码
           input(type='text' placeholder='短信验证码').yanma
-          label(style='width: 30%;').wei_xin
+          label(data-num="0" style='width: 30%;').wei_xin
+      h2.weixin_ti
       form.wei_pss
           label(style='width: 20%;') 登入密码
           input(type='password' placeholder='请设置您的登入密码').passwordd
-
+      h2.weixin_tq
       .wei_buttonn
         a 注册
       script(src="/static/m_js/m_lib/jquery.min.js")

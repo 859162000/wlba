@@ -614,7 +614,7 @@ class RedpackReportGenerator(ReportGeneratorBase):
 
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'红包活动ID', u'红包活动名称', u'用户名称', u'用户手机号', u'兑换平台', u'使用平台',
-                         u'红包创建时间', u'红包使用时间', u'关联订单'])
+                         u'红包创建时间', u'红包使用时间', u'使用金额', u'关联订单'])
         name = ''
         phone = ''
         for index, record in enumerate(redpackrecord):
@@ -631,6 +631,7 @@ class RedpackReportGenerator(ReportGeneratorBase):
                 record.apply_platform,
                 timezone.localtime(record.created_at).strftime("%Y-%m-%d %H:%M:%S"),
                 timezone.localtime(record.apply_at).strftime("%Y-%m-%d %H:%M:%S") if record.apply_at else '',
+                record.apply_amount,
                 unicode(record.order_id) if record.order_id else '',
             ])
         return output.getvalue()

@@ -313,7 +313,8 @@ class WangdaiEyeListAPIView(APIView):
                     "pay_way": P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0),
                     "process": process,
                     "reward": reward,
-                    "guarantee": "null",
+                    # "guarantee": "null",
+                    "guarantee": 0,
                     "start_time": timezone.localtime(p2pproduct.publish_time).strftime(
                         "%Y-%m-%d %H:%M:%S"),
                     "end_time": timezone.localtime(p2pproduct.soldout_time).strftime(

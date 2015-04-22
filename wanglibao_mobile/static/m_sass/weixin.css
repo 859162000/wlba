@@ -95,24 +95,24 @@ a:hover {
 
 /*公共样式 end*/
 .top-i {
-  height: 5em;
+  height: 60px;
   background: #f44336;
   position: relative; }
 
 .top-i .jiao {
   display: inline-block;
   position: absolute;
-  top: 28%;
+  top: 23%;
   left: 28px; }
 
 .top-i .jiao > img {
-  width: 1.3em; }
+  width: 16px; }
 
 .top-i p {
   text-align: center;
   color: #FFFFFF;
-  line-height: 2.6em;
-  font-size: 2.3em; }
+  line-height: 60px;
+  font-size: 22px; }
 
 .wei_dian > img {
   width: 4em; }
@@ -156,14 +156,14 @@ article .wei_for > .ipon {
   height: 3.5em;
   border-radius: 7px 7px 0 0;
   border: none;
-  text-align: center;
   line-height: 1em;
   font-size: 1.4em;
   color: #727272;
   background: url("/static/m_images/weixin_img/ipion.png") no-repeat, white;
   background-position: 4% 47%;
   background-size: 6% 70%;
-  outline: medium; }
+  outline: medium;
+  padding-left: 3em; }
 
 article .wei_for > .judge {
   display: inline-block;
@@ -184,17 +184,18 @@ article .wei_for > .judge {
   border-top: 1px #cccccc solid;
   border-bottom: 1px #cccccc solid;
   margin-top: 3em;
-  font-size: 2em; }
+  font-size: 1.5em; }
 
 .wei_deng > label {
+  display: inline-block;
   margin-left: 1em;
-  color: #979797; }
+  color: #5E5959; }
 
 .wei_deng > input {
   border: none;
   font-size: 1em;
   color: #cccccc;
-  width: 50%;
+  width: 70%;
   outline: medium; }
 
 .wei_hui {
@@ -202,7 +203,7 @@ article .wei_for > .judge {
   margin-left: 72%;
   color: #2196f3;
   display: block;
-  font-size: 2em; }
+  font-size: 1.5em; }
 
 .wei_buttonn {
   width: 100%;
@@ -224,7 +225,7 @@ article .wei_for > .judge {
   width: 100%; }
 
 .wei_kefu > p {
-  font-size: 2em;
+  font-size: 1.5em;
   line-height: 4em;
   color: #909090; }
 
@@ -393,9 +394,9 @@ footer .wei_right {
 
 .wei_pss > label {
   display: inline-block;
-  width: 45%;
+  width: 20%;
   margin-left: 1em;
-  color: #979797; }
+  color: #5E5959; }
 
 .wei_pss > input {
   border: none;
@@ -403,6 +404,9 @@ footer .wei_right {
   color: #cccccc;
   width: 39%;
   outline: medium; }
+
+.wei_pss > #input {
+  width: 70%; }
 
 .wei_pss > #btn, .wei_pss > #btnn {
   width: 33%;
@@ -424,7 +428,7 @@ footer .wei_right {
   font-size: 1.5em;
   color: #727272; }
 
-.wei_agree > label > span {
+.wei_agree > label > span > a {
   color: #2196f3; }
 
 .wei_kehuduan {
@@ -452,3 +456,77 @@ footer .wei_right {
   color: #FFFFFF;
   font-size: 2em;
   margin-right: 10px; }
+
+.weixin_ti > span {
+  line-height: 2em;
+  margin-top: 1em;
+  background: #ffffff;
+  width: 100%;
+  padding-left: 2em;
+  color: #FF164B;
+  border: 1px solid #F9D59D;
+  display: inline-block; }
+
+.weixin_tq > span {
+  line-height: 2em;
+  margin-top: 1em;
+  background: #ffffff;
+  width: 100%;
+  padding-left: 2em;
+  color: #FF164B;
+  border: 1px solid #F9D59D;
+  display: inline-block; }
+
+.weixin_tw > span {
+  line-height: 2em;
+  margin-top: 1em;
+  background: #ffffff;
+  width: 100%;
+  padding-left: 2em;
+  color: #FF164B;
+  border: 1px solid #F9D59D;
+  display: inline-block; }
+
+#wx-mobel-box {
+  width: 100%;
+  height: 100%;
+  background: rgba(110, 106, 106, 0.38);
+  position: absolute;
+  top: 0;
+  display: none; }
+
+#box {
+  background: #fff;
+  width: 90%;
+  margin: 0 auto;
+  border-radius: 0.5em;
+  text-align: center;
+  position: relative;
+  top: 50%; }
+
+#box p {
+  line-height: 1.5em;
+  padding: 1.5em 0;
+  border-bottom: 1px solid #ccc;
+  font-size: 1.5em;
+  color: #515151; }
+
+#box span {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background: #999;
+  color: #fff;
+  font-size: 2em;
+  border-radius: 0.5em;
+  position: absolute;
+  right: 0.3em;
+  top: 0.3em;
+  text-align: center;
+  line-height: 1em; }
+
+#box h1 {
+  line-height: 2.5em;
+  font-size: 2em;
+  color: #2612ff;
+  font-weight: normal; }
