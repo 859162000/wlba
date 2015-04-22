@@ -58,8 +58,8 @@ class P2PTrader(object):
                 result = redpack_backends.consume(redpack,amount, self.user, self.order_id, self.device_type)
                 if result['ret_code'] != 0:
                     raise Exception,result['message']
-                red_record = self.margin_keeper.redpack_deposit(result['deduct'], order_id=redpack_order_id,
-                                            u"购买P2P抵扣%s元" % result['deduct'], savepoint=False)
+                red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'], 
+                                                        order_id=redpack_order_id, savepoint=False)
                 OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
                                         amount=amount, deduct=result['deduct'], redpack=redpack)
 
