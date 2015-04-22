@@ -149,7 +149,9 @@ class MarginKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def __tracer(self, catalog, amount, margin_current, description=u'', order_id=self.order_id):
+    def __tracer(self, catalog, amount, margin_current, description=u'', order_id=None):
+        if not order_id:
+            order_id = self.order_id
         trace = MarginRecord(catalog=catalog, amount=amount, margin_current=margin_current, description=description,
                              order_id=order_id, user=self.user)
         trace.save()
