@@ -85,59 +85,62 @@ html
           else
             h1 我要投资
           if status == '抢购中'
-            form#purchase-form
-              {{form.product}}
-              if current_equity > 0
-                .row
-                  span.span4 已投资金额
-                  span.span8-omega
-                    span.dark-gray.font-m {{current_equity|money_format_int}}元
-
-              .row
-                span.span4 可投资金额
-                span.span8-omega
-                  span.dark-gray.font-m {{orderable_amount|money_format_int}}元
-              if orderable_amount > 0
-                .form-row.form-row__middle
-                  span.span4 投资金额
-                  span.span8-omega
-                    .row
-                      period = p2p.period * 30
-                      if p2p.category == '票据'
-                        user_limit = u"1元起投"
-                      else
-                        user_limit = u"100的整数倍"
-                      -render_field form.amount class+="span12" type="text" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning data-rate=p2p.expected_earning_rate data-period=p2p.period data-paymethod=p2p.pay_method activity-rate=p2p.activity.rule.percent_text maxlength="8"
-                    .form-row-error
-
-                if user.is_authenticated and red_packets > 0
-                  .row.margin-top-s
-                    span.span4 可用红包
+            if user.is_authenticated and p2p.category == '新手标' and not is_invested
+              include include/new_user_purchase
+            else
+              form#purchase-form
+                {{form.product}}
+                if current_equity > 0
+                  .row
+                    span.span4 已投资金额
                     span.span8-omega
-                      .red-pack
+                      span.dark-gray.font-m {{current_equity|money_format_int}}元
 
                 .row
-                  span.span4 预期收益
+                  span.span4 可投资金额
                   span.span8-omega
-                    span.highlight.font-m.invest#expected_income 0.00
-                    | 元
-                    if p2p.activity
+                    span.dark-gray.font-m {{orderable_amount|money_format_int}}元
+                if orderable_amount > 0
+                  .form-row.form-row__middle
+                    span.span4 投资金额
+                    span.span8-omega
+                      .row
+                        period = p2p.period * 30
+                        if p2p.category == '票据'
+                          user_limit = u"1元起投"
+                        else
+                          user_limit = u"100的整数倍"
+                        -render_field form.amount class+="span12" type="text" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning data-rate=p2p.expected_earning_rate data-period=p2p.period data-paymethod=p2p.pay_method activity-rate=p2p.activity.rule.percent_text maxlength="8"
+                      .form-row-error
+
+                  if user.is_authenticated and red_packets > 0
+                    .row.margin-top-s
+                      span.span4 可用红包
+                      span.span8-omega
+                        .red-pack
+
+                  .row
+                    span.span4 预期收益
+                    span.span8-omega
+                      span.highlight.font-m.invest#expected_income 0.00
+                      | 元
+                      if p2p.activity
+                        if user.is_authenticated
+                          //if xunlei_vip.isvip == True
+                          span.font-m +&nbsp;
+                          span.blue.font-m#xunlei-vip-income-head 0.00
+
+                  .row.redpack_tip(style="line-height:24px")
+                    span.span12.payment(style="padding-left:24px;display:none")
+                      红包使用200元,实际支付2元
+                  .row
+                    span.span4
+                      //author: hetao; time: 2014.10.11 target: 用户未登陆时先弹出登陆框
+                    span.span8-omega
                       if user.is_authenticated
-                        //if xunlei_vip.isvip == True
-                        span.font-m +&nbsp;
-                        span.blue.font-m#xunlei-vip-income-head 0.00
-
-                .row.redpack_tip(style="line-height:24px")
-                  span.span12.payment(style="padding-left:24px;display:none")
-                    红包使用200元,实际支付2元
-                .row
-                  span.span4
-                    //author: hetao; time: 2014.10.11 target: 用户未登陆时先弹出登陆框
-                  span.span8-omega
-                    if user.is_authenticated
-                      a.submit-button.span12.button-primary.button-middle.invest#stop(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
-                    else
-                      a.submit-button.span12.button-primary.button-middle.invest.notlogin(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                        a.submit-button.span12.button-primary.button-middle.invest#stop(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                      else
+                        a.submit-button.span12.button-primary.button-middle.invest.notlogin(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
           if status != '抢购中'
             .sold-out
               p.align-center

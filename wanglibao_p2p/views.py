@@ -86,7 +86,8 @@ class P2PDetailView(TemplateView):
 
             xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
             context.update({
-                'xunlei_vip': xunlei_vip
+                'xunlei_vip': xunlei_vip,
+                'is_invested': user.wanglibaouserprofile.is_invested
             })
 
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)

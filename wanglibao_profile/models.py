@@ -3,6 +3,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
+from wanglibao_p2p.models import P2PRecord
 
 USER_TYPE = (
     ('0', u'正常用户'),
@@ -40,6 +41,13 @@ class WanglibaoUserProfile(models.Model):
     def __unicode__(self):
         return "phone: %s nickname: %s  %s" % (self.phone, self.nick_name, self.user.username)
 
+    @property
+    def is_invested(self):
+        is_invested = False
+        if P2PRecord.objects.filter(user=self.user, catalog=u'申购').count():
+            is_invested = True
+
+        return is_invested
 
 def create_profile(sender, **kw):
     """

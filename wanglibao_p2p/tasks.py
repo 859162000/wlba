@@ -80,7 +80,7 @@ def build_earning(product_id):
 
 
         earning = Earning()
-        amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.pay_method)
+        amount = rule.get_earning(obj.get('sum_amount'), p2p.period, p2p.pay_method)
         earning.amount = amount
         earning.type = 'D'
         earning.product = p2p
