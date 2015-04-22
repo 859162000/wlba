@@ -338,7 +338,7 @@ class ProductionAmortizationsReportAllGenerator(ReportGeneratorBase):
                          u'借款期数', u'还款时间', u'已还本金', u'已还利息', u'未还本金', u'未还利息', u'额外罚息', u'标的状态'])
 
         amortizations = ProductAmortization.objects.filter(
-            term_date__gte=start_time, term_date__lt=end_time).order_by('-product', 'term')
+            product__publish_time__gte=start_time, product__publish_time__lt=end_time).order_by('-product', 'term')
 
         for index, amortization in enumerate(amortizations):
             if amortization.settled:
@@ -366,8 +366,8 @@ class ProductionAmortizationsReportAllGenerator(ReportGeneratorBase):
 
             writer.writerow([
                 amortization.product.serial_number,
-                amortization.product.borrower_name,
                 amortization.product.name,
+                amortization.product.borrower_name,
                 str(amortization.product.total_amount),
                 soldout_time,
                 make_loans_time,
