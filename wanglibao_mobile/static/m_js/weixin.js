@@ -1,12 +1,12 @@
 (function () {
 
 
-    $('.wei_kehuduan>a').on('click', function () {
+    $('.wei_kehuduan a').on('click', function () {
         $('.wei_kehuduan').hide();
     });
-    $('.top-i .jiao>img').on('click', function () {
-        history.go(-1);
-    });
+    /*$('.top-i .jiao>img').on('click', function () {
+     history.go(-1);
+     });*/
     $('#id').change(function () {
         if (document.getElementById("id").checked) {
             $('.weixin_tw').html('');
@@ -27,13 +27,14 @@
 
 })();
 function log() {
-    $('#wx-mobel-btn,#box p,#box h1').on('click', function (e) {
-        $('#wx-mobel-box').show()
-        e.stopPropagation();
-    })
-    $('#wx-mobel-box,#off').on('click', function () {
-        $('#wx-mobel-box').hide()
-    })
+     if (Verification() == '8888') {
+           $('.top-i .jiao>img').on('click', function () {
+                window.location.href = "/mobile/weixin_fee/";
+            });
+     }
+    //$('.top-i .jiao img').on('click', function () {
+    //            window.location.href = "/mobile/weixin_fee/";
+    //        });
 
     $('.judge').on('click', function () {
         if (Verification() == '8888') {
@@ -42,7 +43,10 @@ function log() {
         if ($(".ipon").val() == "") {
             alert("手机号码不能为空！");
             return false;
-        } else if (!$(".ipon").val().match(/^1[3|4|5|7|8|9][0-9]\d{8,8}$/)) {
+        } else /*if(){
+
+         }*/
+        if (!$(".ipon").val().match(/^1[3|4|5|7|8|9][0-9]\d{8,8}$/)) {
             alert("请输入正确的手机号码");
             return false;
             //} else {
@@ -68,7 +72,18 @@ function log() {
     });
 }
 //=============================登入
+
 function wei_password() {
+     $('.top-i .jiao>.wei_fa').on('click', function () {
+                window.location.href = "/mobile/weixin_index/";
+            });
+    $('#wx-mobel-btn,#box p,#box h1').on('click', function (e) {
+        $('#wx-mobel-box').show()
+        e.stopPropagation();
+    })
+    $('#wx-mobel-box,#off').on('click', function () {
+        $('#wx-mobel-box').hide()
+    })
     $('#wei_buttonn').on('click', function () {
         if ($(".wei_word").val() == "") {
             $('.weixin_ti').html('<span>密码不能为空！</span>');
@@ -76,7 +91,7 @@ function wei_password() {
                 $('.weixin_ti').html('');
             });
             return false;
-        } else if (!$(".wei_word").val().match(/^{6,20}$/)) {
+        } else if (!($(".wei_word").val().length >= 6 && $(".wei_word").val().length <= 20)) {
             $('.weixin_ti').html('<span>密码长度6-20位，请重新输入</span>');
             $('input').focus(function () {
                 $('.weixin_ti').html('');
@@ -125,7 +140,9 @@ function wei_password() {
 }
 //=============================注册
 function registered() {
-
+      $('.top-i .jiao>.wei_fann').on('click', function () {
+                window.location.href = "/mobile/weixin_index/";
+            });
 
     $('#btn').click(function () {
         if ($('#btn').attr('data-num') == 0) {
@@ -167,7 +184,7 @@ function registered() {
             })
             return false;
         }
-        if (!pass.match(/^{6,20}$/)) {
+        if (!(pass.length >= 6 && pass.length <= 20)) {
             $('.weixin_ti').html('<span>密码长度6-20位，请重新输入</span>');
             $('input').focus(function () {
                 $('.weixin_ti').html('');
@@ -235,6 +252,10 @@ function registered() {
 
 //=============================找回密码
 function retrieve() {
+    $('.top-i .jiao>.wei_fanh').on('click', function () {
+                //window.location.href = "/mobile/weixin_inputt/";
+        history.go(-1);
+            });
     $('#btnn').click(function () {
         if ($('#btnn').attr('data-num') == 0) {
             $('#btnn').attr('data-num', '1');
@@ -282,7 +303,7 @@ function retrieve() {
             });
             return false;
         }
-        if (!pas.match(/^{6,20}$/)) {
+        if (!(pas.length >= 6 && pas.length <= 20)) {
             $('.weixin_ti').html('<span>密码长度6-20位，请重新输入</span>');
             $('input').focus(function () {
                 $('.weixin_ti').html('');
@@ -520,7 +541,7 @@ function yoa_registered() {
         }
     })
 
-    $('.wei_buttonn').on('click', function () {
+    $('#wei_zhu').on('click', function () {
         var yanma = $(".yanma").val(),
             passwordd = $(".passwordd").val();
         if (yanma == "") {
@@ -530,7 +551,7 @@ function yoa_registered() {
             })
             return false;
         }
-        if (!passwordd.match(/^{6,20}$/)) {
+        if (!(passwordd.length>=6&& passwordd.length<=20)) {
             $('.weixin_tq').html('<span>密码长度6-20位，请重新输入</span>');
             $('input').focus(function () {
                 $('.weixin_tq').html('');
