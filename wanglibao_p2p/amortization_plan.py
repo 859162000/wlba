@@ -63,20 +63,17 @@ class MonthlyInterest(AmortizationPlan):
         amount = Decimal(amount)
         year_rate = Decimal(str(year_rate))
 
+        interest = get_interest_monthly(amount, year_rate, Decimal(period))
+        month_interest = get_interest_monthly(amount, year_rate)['actual']
 
-        proportion = get_base_decimal(Decimal(period)/Decimal(12))
-        total_interest = get_final_decimal(amount * year_rate * proportion)
-        
-        month_interest = get_final_decimal(total_interest/Decimal(period))
-
-        total = total_interest + amount
+        total = interest['actual'] + amount
 
         result = []
 
         for i in xrange(0, period - 1):
             result.append((month_interest, Decimal(0), month_interest, amount, total - month_interest * (i + 1), interest_begin_date + relativedelta(months=i + 1)))
 
-        last_interest = total_interest - month_interest * (period - 1)
+        last_interest = interest['actual'] - month_interest * (period - 1)
         result.append((last_interest + amount, amount, last_interest, Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period)))
 
         return {
@@ -84,9 +81,9 @@ class MonthlyInterest(AmortizationPlan):
             "total": total,
             "interest_arguments": {
                 "principal": amount,
-                "interest_actual": get_final_decimal(amount * year_rate * proportion),
-                "interest_receivable": get_base_decimal(amount * year_rate * proportion),
-                "interest_precision_balance": get_base_decimal(amount * year_rate * proportion) - get_final_decimal(amount * year_rate * proportion)
+                "interest_actual": interest['actual'],
+                "interest_receivable": interest['receivalble'],
+                "interest_precision_balance": interest['precision']
             }
         }
 
@@ -134,18 +131,17 @@ class DisposablePayOff(AmortizationPlan):
         amount = Decimal(amount)
         year_rate = Decimal(str(year_rate))
 
-        proportion = get_base_decimal(Decimal(period)/Decimal(12))
-        total_interest = get_final_decimal(amount * year_rate * proportion)
+        total_interest = get_interest_monthly(amount, year_rate, Decimal(period))
 
-        result = [(total_interest + amount, amount, total_interest, Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period))]
+        result = [(total_interest['actual'] + amount, amount, total_interest['actual'], Decimal(0), Decimal(0), interest_begin_date + relativedelta(months=period))]
         return {
             "terms": result,
-            "total": total_interest + amount,
+            "total": total_interest['actual'] + amount,
             "interest_arguments": {
                 "principal": amount,
-                "interest_actual": get_final_decimal(amount * year_rate * proportion),
-                "interest_receivable": get_base_decimal(amount * year_rate * proportion),
-                "interest_precision_balance": get_base_decimal(amount * year_rate * proportion) - get_final_decimal(amount * year_rate * proportion)
+                "interest_actual": total_interest['actual'],
+                "interest_receivable": total_interest['actual'],
+                "interest_precision_balance": total_interest['precision']
             }
         }
 
@@ -213,28 +209,30 @@ class DailyInterest(AmortizationPlan):
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None):
         amount = Decimal(amount)
+        year_rate = Decimal(str(year_rate))
 
-        daily_rate = get_daily_interest(year_rate)
-        daily_interest = amount * daily_rate
+        #daily_rate = get_daily_interest(str(year_rate))
+        #daily_interest = amount * daily_rate
 
-        total_interest = (daily_interest * period).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+        #total_interest = (daily_interest * period).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+        total_interest = get_interest_daily(amount, year_rate, period)
 
-        total = total_interest + amount
+        total = total_interest['actual'] + amount
 
         result = []
 
         term_date =  interest_begin_date + timedelta(days=period)
 
-        result.append((total_interest + amount, amount, total_interest, Decimal(0), Decimal(0), term_date))
+        result.append((total_interest['actual'] + amount, amount, total_interest['actual'], Decimal(0), Decimal(0), term_date))
 
         return {
             "terms": result,
             "total": total,
             "interest_arguments": {
                 "principal": amount,
-                "interest_actual": get_final_decimal(daily_interest*period),
-                "interest_receivable": get_base_decimal(daily_interest*period),
-                "interest_precision_balance": get_base_decimal(daily_interest*period) - get_final_decimal(daily_interest*period)
+                "interest_actual": total_interest['actual'],
+                "interest_receivable": total_interest['receivalble'],
+                "interest_precision_balance": total_interest['precision']
             }
         }
 
@@ -295,16 +293,18 @@ class DailyInterestMonthly(AmortizationPlan):
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None):
         amount = Decimal(amount)
+        year_rate = Decimal(str(year_rate))
 
         interest_start = interest_begin_date
         term_date = interest_start + timedelta(days=period)
 
         term_dates = [interest_start]
-        daily_rate = get_daily_interest(year_rate)
-        daily_interest = amount * daily_rate
+        #daily_rate = get_daily_interest(str(year_rate))
+        #daily_interest = amount * daily_rate
 
         result = []
         left_interest = Decimal(0)
+        all_interest = get_interest_daily(amount, year_rate, period)
 
         i = 0
         while term_dates[i] < term_date:
@@ -314,29 +314,31 @@ class DailyInterestMonthly(AmortizationPlan):
                 anchor = term_date
                 term_dates.append(anchor)
                 term_period = term_dates[i] - term_dates[i-1]
-                total_interest = (daily_interest * period - left_interest).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+                #total_interest = (daily_interest * period - left_interest).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+                total_interest = all_interest['actual'] - left_interest
                 result.append((total_interest+amount, amount, total_interest, Decimal(0), Decimal(0), term_dates[i]))
 
             else:
                 anchor = interest_start + relativedelta(months=i)
                 term_dates.append(anchor)
                 term_period = term_dates[i] - term_dates[i-1]
-                total_interest = (daily_interest * term_period.days).quantize(Decimal('.01'), rounding=ROUND_DOWN)
-                left_interest += total_interest
+                #total_interest = (daily_interest * term_period.days).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+                total_interest = get_interest_daily(amount, year_rate, term_period.days)
+                left_interest += total_interest['actual']
                 result.append((total_interest, Decimal(0), total_interest, Decimal(0), Decimal(0), term_dates[i]))
 
 
 
-        total = daily_interest*period + amount
+        total = all_interest['actual'] + amount
 
         return {
             "terms": result,
             "total": total,
             "interest_arguments": {
                 "principal": amount,
-                "interest_actual": get_final_decimal(daily_interest*period),
-                "interest_receivable": get_base_decimal(daily_interest*period),
-                "interest_precision_balance": get_base_decimal(daily_interest*period) - get_final_decimal(daily_interest*period)
+                "interest_actual": all_interest['actual'],
+                "interest_receivable": all_interest['receivalble'],
+                "interest_precision_balance": all_interest['precision']
             }
         }
 
@@ -345,7 +347,7 @@ class DailyInterestMonthly(AmortizationPlan):
 
         period = product.period
 
-        interest_start = datetime.now()
+        interest_start = timezone.now()
         term_dates = [interest_start]
         term_date = interest_start + timedelta(days=period)
 
@@ -385,4 +387,23 @@ def get_final_decimal(decimal):
 
 def get_daily_interest(year_rate):
     return get_base_decimal(year_rate/360)
+
+def get_total_interest(amount, year_rate, period, base):
+    receivalble = get_base_decimal(amount * year_rate * period / base)
+    actual = get_final_decimal(receivalble)
+    return {
+            'receivalble': receivalble,
+            'actual': actual,
+            'precision': receivalble - actual
+            }
+
+def get_interest_monthly(amount, year_rate, period=None):
+    if period is None:
+        period = Decimal(1)
+    return get_total_interest(amount, year_rate, period, Decimal(12))
+
+def get_interest_daily(amount, year_rate, period=None):
+    if period is None:
+        period = Decimal(1)
+    return get_total_interest(amount, year_rate, period, Decimal(360))
 
