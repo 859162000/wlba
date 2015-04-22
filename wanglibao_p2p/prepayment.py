@@ -95,8 +95,8 @@ class PrepaymentHistory(object):
 
             #如果上一期没有结算的话抛出异常
                     #and term_date < date_now
-            #if index > 0 and amortizations[index-1].settled == False:
-            #    raise PrepaymentException()
+            if index > 0 and amortizations[index-1].settled == False:
+                raise PrepaymentException()
 
             if index == 0:
                 #and make_loans_time < date_now < term_date:
