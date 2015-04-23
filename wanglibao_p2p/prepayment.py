@@ -103,12 +103,14 @@ class PrepaymentHistory(object):
                 if make_loans_time < payment_date < term_date:
                     self.days = (term_date - make_loans_time).days
                     amortization_current = amortization
+                    break
             else:
                 last_term_date = timezone.localtime(amortizations[index-1].term_date).date()
                 #and last_term_date < date_now < term_date:
                 if last_term_date < payment_date < term_date:
                     self.days = (term_date - make_loans_time).days
                     amortization_current = amortization
+                    break
 
         if amortization_current:
             return amortization_current
