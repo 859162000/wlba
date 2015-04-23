@@ -135,6 +135,47 @@ class SendRegisterValidationCodeView(APIView):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
 
 
+
+
+class WeixinSendRegisterValidationCodeView(APIView):
+    """
+    The phone validate view which accept a post request and send a validate code to the phone
+
+    在iphone5 iphone5s中 原接口返回430错误 重写复制 SendRegisterValidationCodeView 类
+    添加 throttle_classes = (UserRateThrottle,)
+    删除 dispatch 方法
+
+    只提供给微信端注册的手机验证码接口使用
+    """
+    permission_classes = ()
+    throttle_classes = (UserRateThrottle,)
+
+    def post(self, request, phone, format=None):
+        phone_number = phone.strip()
+        #phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
+        phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
+        if phone_check:
+            return Response({
+                                "message": u"该手机号已经被注册，不能重复注册",
+                                "error_number": ErrorNumber.duplicate
+                            }, status=400)
+
+        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        if phone_validate_code_item:
+            count = phone_validate_code_item.code_send_count
+            if count > 6:
+                return Response({
+                                    "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
+                                    "error_number": ErrorNumber.duplicate
+                                }, status=400)
+
+        status, message = send_validation_code(phone_number)
+        return Response({
+                            'message': message
+                        }, status=status)
+
+
+
 class RegisterAPIView(APIView):
     permission_classes = ()
     # throttle_classes = (UserRateThrottle,)

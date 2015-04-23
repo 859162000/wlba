@@ -4,9 +4,7 @@
     $('.wei_kehuduan a').on('click', function () {
         $('.wei_kehuduan').hide();
     });
-    /*$('.top-i .jiao>img').on('click', function () {
-     history.go(-1);
-     });*/
+
     $('#id').change(function () {
         if (document.getElementById("id").checked) {
             $('.weixin_tw').html('');
@@ -24,8 +22,49 @@
     fee();
     feea();
     yoa_registered()
+    //wei_yanzheng()
 
 })();
+
+getCookie = function (name) {
+    var cookie, cookieValue, cookies, i;
+    cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        cookies = document.cookie.split(";");
+        i = 0;
+        while (i < cookies.length) {
+            cookie = $.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+            i++;
+        }
+    }
+    return cookieValue;
+};
+
+csrfSafeMethod = function (method) {
+    return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+};
+
+sameOrigin = function (url) {
+    var host, origin, protocol, sr_origin;
+    host = document.location.host;
+    protocol = document.location.protocol;
+    sr_origin = "//" + host;
+    origin = protocol + sr_origin;
+    return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+};
+
+$.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+        }
+    }
+});
+
 function log() {
     if (Verification() == '8888') {
         $('.top-i .jiao>img').on('click', function () {
@@ -108,10 +147,8 @@ function wei_password() {
                 data: {identifier: Verification(), password: userName},
                 dataType: "json",
                 success: function (result) {
-                    //console.log(result);
-                    //console.log(result['token']);
                     var number_a = result['token'];
-                    if (number_a !== '') {
+                    if (number_a != 'false') {
                         sessionStorage.setItem("name", Verification());
                         var read = sessionStorage.getItem("read");
                         if (read == '8888') {
@@ -119,6 +156,9 @@ function wei_password() {
                         } else {
                             window.location.href = "/mobile/weixin_app/";
                         }
+                    }
+                    else {
+                        alert('登录错误');
                     }
                 },
                 complete: function (XMLHttpRequest, textStatus) {
@@ -148,26 +188,32 @@ function registered() {
 
     $('#btn').click(function () {
         if ($('#btn').attr('data-num') == 0) {
-            $('#btn').attr('data-num', '1');
-            $('#btn').css('color', '#cccccc');
-            $('#btn').html('已发送<span id="timeb2" >60</span>秒');
-            timer = self.setInterval(addsec, 1000);
-            wei_zheng();
             var pno = Verification();
+
             $.ajax({
                 type: "POST",
-                url: "/api/phone_validation_code/register/" + pno + "/",
-                data: null,
-                dataType: "json",
-                complete: function (XMLHttpRequest, textStatus) {
-                    console.log(typeof XMLHttpRequest)
-
+                url: "/api/weixin/phone_validation_code/register/" + pno + "/",
+                success: function (result) {
+                    if (result['message'] == '') {
+                        $('#btn').attr('data-num', '1');
+                        $('#btn').css('color', '#cccccc');
+                        $('#btn').html('已发送<span id="timeb2" >60</span>秒');
+                        timer = self.setInterval(addsec, 1000);
+                    }
+                    else {
+                        alert(result['message'])
+                    }
+                },
+                error: function(xhr) {
+                    var data = JSON.parse(xhr.responseText);
+                    alert(data['message']);
                 }
 
             });
-            setInterval(function () {
+            var time2 = setInterval(function () {
                 $('#btn').attr('data-num', '0');
                 $('#btn').css('color', '#2196f3');
+                clearInterval(time2)
             }, 60000)
         }
     });
@@ -211,42 +257,37 @@ function registered() {
             })
 
             return false;
-        } else {
-            wei_zheng();
-            $.ajax({
-                type: "post",
-                url: "/accounts/register/ajax/?promo_token=weixin",
-                data: {identifier: Verification(), validate_code: yan, password: pass, invitecode: yao},
-                dataType: "json",
-                success: function (result) {
+        }
 
-                },
-                complete: function (XMLHttpRequest, textStatus) {
-                    console.log(typeof XMLHttpRequest)
-                    var $dade = JSON.parse(XMLHttpRequest.responseText)
-                    console.log($dade);
-                    if ($dade.message.identifier) {
-                        alert($dade.message.identifier);
-                    } else if ($dade.message.validate_code) {
-                        $('.weixin_tq').html('<span>' + $dade.message.validate_code + '</span>');
-                        $('input').focus(function () {
-                            $('.weixin_tq').html('');
-                        });
-                        //alert($dade.message.validate_code);
+        $.ajax({
+            type: "post",
+            url: "/api/register/?promo_token=weixin",
+            data: {identifier: Verification(), validate_code: yan, password: pass, invitecode: yao},
+            dataType: "json",
+            success: function (result) {
+
+                if (result['ret_code'] == 0) {
+                    sessionStorage.setItem("name", Verification());
+                    var read = sessionStorage.getItem("read");
+                    if (read == '8888') {
+                        window.location.href = "/mobile/weixin_fee/";
                     } else {
-                        sessionStorage.setItem("name", Verification());
-                        var read = sessionStorage.getItem("read");
-                        if (read == '8888') {
-                            window.location.href = "/mobile/weixin_fee/";
-                        } else {
-                            window.location.href = "/mobile/weixin_app/";
-                        }
-
-
+                        window.location.href = "/mobile/weixin_app/";
                     }
                 }
-            })
-        }
+                else if (result['ret_code'] == 30014) {
+                    $('.weixin_tq').html('<span>' + result['message'] + '</span>');
+                    $('input').focus(function () {
+                        $('.weixin_tq').html('');
+                    });
+                }
+                else {
+                    alert(result['message']);
+                }
+
+            }
+        })
+
 
     })
 
@@ -269,13 +310,10 @@ function retrieve() {
             $.ajax({
                 type: "POST",
                 url: "/api/phone_validation_code/reset_password/" + pno + "/",
-                data: null,
-                dataType: "json",
                 success: function (result) {
 
                 },
                 complete: function (XMLHttpRequest, textStatus) {
-                    console.log(typeof XMLHttpRequest)
                     if (typeof XMLHttpRequest == 'string') {
                         var $data = JSON.parse(XMLHttpRequest.responseText)
                         alert($data.message);
@@ -284,9 +322,10 @@ function retrieve() {
                 }
 
             });
-            setInterval(function () {
+             var time2 = setInterval(function () {
                 $('#btnn').attr('data-num', '0');
                 $('#btnn').css('color', '#2196f3');
+                clearInterval(time2)
             }, 60000)
         }
 
@@ -327,31 +366,48 @@ function retrieve() {
             return false;
         } else {
             wei_zheng();
+            var data = {new_password: pas, identifier: Verification(), validate_code: ya}
             $.ajax({
                 type: "post",
                 url: "/api/reset_password/",
-                data: {new_password: pas, identifier: Verification(), validate_code: ya},
+                data: data,
                 dataType: "json",
                 success: function (result) {
-                    console.log(result)
-                },
-                complete: function (XMLHttpRequest, textStatus) {
-                    console.log(typeof XMLHttpRequest)
-                    var $dade = JSON.parse(XMLHttpRequest.responseText)
-                    console.log($dade);
-                    if ($dade.message == "验证码验证失败") {
+                    if (result['ret_code'] == 0) {
+                        alert(result['message']);
+                        sessionStorage.setItem("name", data['identifier']);
+                        window.location.href = "/mobile/weixin_inputt/?identifier=" + data['identifier'];
+                        //history.go(-1);
+                    }
+                    else if (result['ret_code'] == 30004) {
                         $('.weixin_tq').html('<span>验证码错误</span>');
                         $('input').focus(function () {
                             $('.weixin_tq').html('');
                         });
-
-                    } else if ($dade.message.validate_code) {
-                        alert($dade.message.validate_code);
-                    } else {
-                        sessionStorage.setItem("name", Verification());
-                        window.location.href = "/mobile/weixin_inputt/";
-
                     }
+                    else {
+                        alert(result['message']);
+                    }
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    //console.log(typeof XMLHttpRequest)
+                    //var $dade = JSON.parse(XMLHttpRequest.responseText)
+                    //console.log($dade);
+                    //if ($dade.message == "验证码验证失败") {
+                    //    $('.weixin_tq').html('<span>验证码错误</span>');
+                    //    $('input').focus(function () {
+                    //        $('.weixin_tq').html('');
+                    //    });
+                    //
+                    //} else if ($dade.message.validate_code) {
+                    //    alert($dade.message.validate_code);
+                    //} else {
+                    //     alert($dade.message);
+                    //    sessionStorage.setItem("name", Verification());
+                    //    //window.location.href = "/mobile/weixin_inputt/";
+                    //     history.go(-1);
+                    //
+                    //}
                 }
             })
         }
@@ -370,73 +426,65 @@ function fee() {
         window.location.href = "/mobile/weixin_index/?backurl=" + '8888';
     });
 
+    wx.config({
+        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        appId: $('meta[name=app-id]').attr('content'), // 必填，公众号的唯一标识
+        timestamp: $('meta[name=timestamp]').attr('content'), // 必填，生成签名的时间戳
+        nonceStr: $('meta[name=noncestr]').attr('content'), // 必填，生成签名的随机串
+        signature: $('meta[name=signature]').attr('content'),// 必填，签名，见附录1
+        jsApiList: ['hideOptionMenu', 'showOptionMenu', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+    });
 
-    $.ajax({
-        type: "get",
-        url: "/mobile/weixin_config/",
-        dataType: "json",
-        success: function (result) {
-            wx.config({
-                debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-                appId: 'wx110c1d06158c860b', // 必填，公众号的唯一标识
-                timestamp: result['timestamp'], // 必填，生成签名的时间戳
-                nonceStr: result['noncestr'], // 必填，生成签名的随机串
-                signature: result['signature'],// 必填，签名，见附录1
-                jsApiList: ['hideOptionMenu', 'showOptionMenu', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+    wx.ready(function () {
+        if (name == null) {
+            $('footer').show();
+            wx.hideOptionMenu();
+        } else {
+            wx.checkJsApi({
+                'jsApiList': [
+                    'onMenuShareTimeline'
+                ]
             });
-            wx.ready(function () {
-                if (name == null) {
-                    $('footer').show();
-                    wx.hideOptionMenu();
-                } else {
-                    wx.checkJsApi({
-                        'jsApiList': [
-                            'onMenuShareTimeline'
-                        ]
-                    });
-                    var share_link = 'https://www.wanglibao.com/mobile/weixin_feea/?identifier=' + name;
-                    var share_img_url = 'https://www.wanglibao.com/static/m_images/weixin_img/loginn.png';
-                    var share_title = '邀请好友送30元话费';
-                    wx.showOptionMenu();
-                    wx.onMenuShareTimeline({
-                        title: share_title, // 分享标题
-                        link: share_link, // 分享链接
-                        imgUrl: share_img_url
-                    });
-                    wx.onMenuShareAppMessage({
-                        title: share_title, // 分享标题
-                        desc: '', // 分享描述
-                        link: share_link, // 分享链接
-                        imgUrl: share_img_url, // 分享图标
-                        type: '', // 分享类型,music、video或link，不填默认为link
-                        dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
-                        success: function () {
-                            // 用户确认分享后执行的回调函数
-                        },
-                        cancel: function () {
-                            // 用户取消分享后执行的回调函数
-                        }
-                    });
-                    wx.onMenuShareQQ({
-                        title: share_title, // 分享标题
-                        desc: '', // 分享描述
-                        link: share_link, // 分享链接
-                        imgUrl: share_img_url, // 分享图标
-                        success: function () {
-                            // 用户确认分享后执行的回调函数
-                        },
-                        cancel: function () {
-                            // 用户取消分享后执行的回调函数
-                        }
-                    });
+            var share_link = 'https://www.wanglibao.com/mobile/weixin_feea/?identifier=' + name;
+            var share_img_url = 'https://www.wanglibao.com/static/m_images/weixin_img/loginn.png';
+            var share_title = '邀请好友送30元话费';
+            wx.showOptionMenu();
+            wx.onMenuShareTimeline({
+                title: share_title, // 分享标题
+                link: share_link, // 分享链接
+                imgUrl: share_img_url
+            });
+            wx.onMenuShareAppMessage({
+                title: share_title, // 分享标题
+                desc: '', // 分享描述
+                link: share_link, // 分享链接
+                imgUrl: share_img_url, // 分享图标
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function () {
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                    // 用户取消分享后执行的回调函数
                 }
-            })
-
-
+            });
+            wx.onMenuShareQQ({
+                title: share_title, // 分享标题
+                desc: '', // 分享描述
+                link: share_link, // 分享链接
+                imgUrl: share_img_url, // 分享图标
+                success: function () {
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                    // 用户取消分享后执行的回调函数
+                }
+            });
         }
+    });
 
-    })
 }
+
 function feea() {
     var phon = $('input[name=identifier]').val(),
         wei_f = '',
@@ -621,7 +669,7 @@ function addsec() {
 
     var t = $('#timeb2').html();
     //alert(t);
-    if (t > 0) {
+    if (t > 1) {
 
         $('#timeb2').html(t - 1);
         if (t) {
@@ -653,7 +701,7 @@ function addsecc() {
 function addseca() {
 
     var t = $('#timeb2').html();
-    if (t > 0) {
+    if (t > 1) {
 
         $('#timeb2').html(t - 1);
     } else {
@@ -665,42 +713,10 @@ function addseca() {
     }
 
 }
-function wei_zheng() {
-    getCookie = function (name) {
-        var cookie, cookieValue, cookies, i;
-        cookieValue = null;
-        if (document.cookie && document.cookie !== "") {
-            cookies = document.cookie.split(";");
-            i = 0;
-            while (i < cookies.length) {
-                cookie = $.trim(cookies[i]);
-                if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-                i++;
-            }
-        }
-        return cookieValue;
-    };
-    csrfSafeMethod = function (method) {
-        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
-    };
-    sameOrigin = function (url) {
-        var host, origin, protocol, sr_origin;
-        host = document.location.host;
-        protocol = document.location.protocol;
-        sr_origin = "//" + host;
-        origin = protocol + sr_origin;
-        return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
-    };
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-            }
-        }
-    });
+function wei_yanzheng() {
+   $('#wei_xieyi2').on('click', function () {
+      history.go(-1);
+     });
 }
 
 
