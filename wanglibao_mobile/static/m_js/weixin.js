@@ -1,15 +1,20 @@
 (function () {
 
-    $('.wei_kehuduan>a').on('click', function () {
+
+    $('.wei_kehuduan a').on('click', function () {
         $('.wei_kehuduan').hide();
     });
-    $('.top-i .jiao>img').on('click', function () {
-        history.go(-1);
-    });
 
-    //$('input').focus(function () {
-    //    $(this).attr('placeholder', ' ');
-    //})
+    $('#id').change(function () {
+        if (document.getElementById("id").checked) {
+            $('.weixin_tw').html('');
+
+        } else {
+            $('.weixin_tw').html('<span>注册需要同意网利宝用户协议</span>');
+        }
+    })
+
+
     log();
     wei_password();
     registered();
@@ -17,9 +22,59 @@
     fee();
     feea();
     yoa_registered()
+    //wei_yanzheng()
 
 })();
+
+getCookie = function (name) {
+    var cookie, cookieValue, cookies, i;
+    cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        cookies = document.cookie.split(";");
+        i = 0;
+        while (i < cookies.length) {
+            cookie = $.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+            i++;
+        }
+    }
+    return cookieValue;
+};
+
+csrfSafeMethod = function (method) {
+    return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+};
+
+sameOrigin = function (url) {
+    var host, origin, protocol, sr_origin;
+    host = document.location.host;
+    protocol = document.location.protocol;
+    sr_origin = "//" + host;
+    origin = protocol + sr_origin;
+    return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+};
+
+$.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+        }
+    }
+});
+
 function log() {
+    if (Verification() == '8888') {
+        $('.top-i .jiao>img').on('click', function () {
+            window.location.href = "/mobile/weixin_fee/";
+        });
+    }
+    //$('.top-i .jiao img').on('click', function () {
+    //            window.location.href = "/mobile/weixin_fee/";
+    //        });
+
     $('.judge').on('click', function () {
         if (Verification() == '8888') {
             sessionStorage.setItem("read", '8888');
@@ -27,7 +82,10 @@ function log() {
         if ($(".ipon").val() == "") {
             alert("手机号码不能为空！");
             return false;
-        } else if (!$(".ipon").val().match(/^1[3|4|5|7|8|9][0-9]\d{4,8}$/)) {
+        } else /*if(){
+
+         }*/
+        if (!$(".ipon").val().match(/^1[3|4|5|7|8|9][0-9]\d{8,8}$/)) {
             alert("请输入正确的手机号码");
             return false;
             //} else {
@@ -53,13 +111,31 @@ function log() {
     });
 }
 //=============================登入
+
 function wei_password() {
+    $('.top-i .jiao>.wei_fa').on('click', function () {
+        // window.location.href = "/mobile/weixin_index/";
+        history.go(-1);
+    });
+    $('#wx-mobel-btn,#box p,#box h1').on('click', function (e) {
+        $('#wx-mobel-box').show()
+        e.stopPropagation();
+    })
+    $('#wx-mobel-box,#off').on('click', function () {
+        $('#wx-mobel-box').hide()
+    })
     $('#wei_buttonn').on('click', function () {
         if ($(".wei_word").val() == "") {
-            alert("密码不能为空！");
+            $('.weixin_ti').html('<span>密码不能为空！</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            });
             return false;
-        } else if (!$(".wei_word").val().match(/^[0-9_a-zA-Z]{6,20}$/)) {
-            alert("密码长度6-20位，请重新输入");
+        } else if (!($(".wei_word").val().length >= 6 && $(".wei_word").val().length <= 20)) {
+            $('.weixin_ti').html('<span>密码长度6-20位，请重新输入</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            });
             return false;
         } else {
             var userName = $.trim($(".wei_word").val());
@@ -71,10 +147,8 @@ function wei_password() {
                 data: {identifier: Verification(), password: userName},
                 dataType: "json",
                 success: function (result) {
-                    //console.log(result);
-                    //console.log(result['token']);
                     var number_a = result['token'];
-                    if (number_a !== '') {
+                    if (number_a != 'false') {
                         sessionStorage.setItem("name", Verification());
                         var read = sessionStorage.getItem("read");
                         if (read == '8888') {
@@ -83,6 +157,9 @@ function wei_password() {
                             window.location.href = "/mobile/weixin_app/";
                         }
                     }
+                    else {
+                        alert('登录错误');
+                    }
                 },
                 complete: function (XMLHttpRequest, textStatus) {
                     console.log(typeof XMLHttpRequest)
@@ -90,7 +167,10 @@ function wei_password() {
                     if ($data.non_field_errors) {
 
                         console.log($data.non_field_errors)
-                        alert('密码错误');
+                        $('.weixin_ti').html('<span>账号密码不匹配，请重试。如果忘记密码，请点击找回密码</span>');
+                        $('input').focus(function () {
+                            $('.weixin_ti').html('');
+                        });
                     }
 
                 }
@@ -101,80 +181,113 @@ function wei_password() {
 }
 //=============================注册
 function registered() {
-    $('#btn').click(function () {
-        $('#btn').html('已发送<span id="timeb2">60</span>秒');
-        timer = self.setInterval(addsec, 1000);
-        wei_zheng();
-        var pno = Verification();
-        $.ajax({
-            type: "POST",
-            url: "/api/phone_validation_code/register/" + pno + "/",
-            data: null,
-            dataType: "json",
-            complete: function (XMLHttpRequest, textStatus) {
-                console.log(typeof XMLHttpRequest)
-
-
-            }
-
-        });
+    $('.top-i .jiao>.wei_fann').on('click', function () {
+        // window.location.href = "/mobile/weixin_index/";
+        history.go(-1);
     });
+
+    $('#btn').click(function () {
+        if ($('#btn').attr('data-num') == 0) {
+            var pno = Verification();
+
+            $.ajax({
+                type: "POST",
+                url: "/api/weixin/phone_validation_code/register/" + pno + "/",
+                success: function (result) {
+                    if (result['message'] == '') {
+                        $('#btn').attr('data-num', '1');
+                        $('#btn').css('color', '#cccccc');
+                        $('#btn').html('已发送<span id="timeb2" >60</span>秒');
+                        timer = self.setInterval(addsec, 1000);
+                    }
+                    else {
+                        alert(result['message'])
+                    }
+                },
+                error: function(xhr) {
+                    var data = JSON.parse(xhr.responseText);
+                    alert(data['message']);
+                }
+
+            });
+            var time2 = setInterval(function () {
+                $('#btn').attr('data-num', '0');
+                $('#btn').css('color', '#2196f3');
+                clearInterval(time2)
+            }, 60000)
+        }
+    });
+
+
     $('#wei_button').on('click', function () {
+        //$(".wei_pass").attr(maxlength)
         var pass = $(".wei_pass").val(),
             qupass = $(".wei_quepass").val(),
             yan = $(".wei_yan").val(),
             yao = $(".wei_yao").val();
         if (pass == "") {
-            alert("信息不能为空，请填写完整");
+            $('.weixin_ti').html('<span>信息不能为空，请填写完整</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            })
             return false;
         }
-        if (!pass.match(/^[0-9_a-zA-Z]{6,20}$/)) {
-            alert("密码长度6-20位，请重新输入");
+        if (!(pass.length >= 6 && pass.length <= 20)) {
+            $('.weixin_ti').html('<span>密码长度6-20位，请重新输入</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            })
             return false;
         } else if (pass !== qupass) {
-            alert("密码不一致，请重新输入");
+            $('.weixin_ti').html('<span>密码不一致，请重新输入</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            })
             return false;
 
 
-        }else if(!document.getElementById("id").checked){
-            alert("你必须同意协议");
+        } else if (!document.getElementById("id").checked) {
+            $('.weixin_tw').html('<span>注册需要同意网利宝用户协议</span>');
+
             return false
-        }else if (pass == "" || qupass == "" || yan == "") {
-            alert("信息不能为空，请填写完整");
+        } else if (pass == "" || qupass == "" || yan == "") {
+            $('.weixin_tq').html('<span>信息不能为空，请填写完整</span>');
+            $('input').focus(function () {
+                $('.weixin_tq').html('');
+            })
+
             return false;
-        } else {
-            wei_zheng();
-            $.ajax({
-                type: "post",
-                url: "/accounts/register/ajax/?promo_token=weixin",
-                data: {identifier: Verification(), validate_code: yan, password: pass, invitecode: yao},
-                dataType: "json",
-                success: function (result) {
+        }
 
-                },
-                complete: function (XMLHttpRequest, textStatus) {
-                    console.log(typeof XMLHttpRequest)
-                    var $dade = JSON.parse(XMLHttpRequest.responseText)
-                    console.log($dade);
-                    if ($dade.message.identifier) {
-                        alert($dade.message.identifier);
-                    } else if ($dade.message.validate_code) {
-                        alert($dade.message.validate_code);
+        $.ajax({
+            type: "post",
+            url: "/api/register/?promo_token=weixin",
+            data: {identifier: Verification(), validate_code: yan, password: pass, invitecode: yao},
+            dataType: "json",
+            success: function (result) {
+
+                if (result['ret_code'] == 0) {
+                    sessionStorage.setItem("name", Verification());
+                    var read = sessionStorage.getItem("read");
+                    if (read == '8888') {
+                        window.location.href = "/mobile/weixin_fee/";
                     } else {
-                        sessionStorage.setItem("name", Verification());
-                        var read = sessionStorage.getItem("read");
-                        if (read == '8888') {
-                            window.location.href = "/mobile/weixin_fee/";
-                        } else {
-                            window.location.href = "/mobile/weixin_app/";
-                        }
-
-
-
+                        window.location.href = "/mobile/weixin_app/";
                     }
                 }
-            })
-        }
+                else if (result['ret_code'] == 30014) {
+                    $('.weixin_tq').html('<span>' + result['message'] + '</span>');
+                    $('input').focus(function () {
+                        $('.weixin_tq').html('');
+                    });
+                }
+                else {
+                    alert(result['message']);
+                }
+
+            }
+        })
+
 
     })
 
@@ -182,29 +295,40 @@ function registered() {
 
 //=============================找回密码
 function retrieve() {
+    $('.top-i .jiao>.wei_fanh').on('click', function () {
+        //window.location.href = "/mobile/weixin_inputt/";
+        history.go(-1);
+    });
     $('#btnn').click(function () {
-        $('#btnn').html('已经发送<span id="timeb2">60</span>秒');
-        timer = self.setInterval(addsecc, 1000);
-        wei_zheng();
-        var pno = Verification();
-        $.ajax({
-            type: "POST",
-            url: "/api/phone_validation_code/reset_password/" + pno + "/",
-            data: null,
-            dataType: "json",
-            success: function (result) {
+        if ($('#btnn').attr('data-num') == 0) {
+            $('#btnn').attr('data-num', '1');
+            $('#btnn').css('color', '#cccccc');
+            $('#btnn').html('已经发送<span id="timeb2">60</span>秒');
+            timer = self.setInterval(addsecc, 1000);
+            wei_zheng();
+            var pno = Verification();
+            $.ajax({
+                type: "POST",
+                url: "/api/phone_validation_code/reset_password/" + pno + "/",
+                success: function (result) {
 
-            },
-            complete: function (XMLHttpRequest, textStatus) {
-                console.log(typeof XMLHttpRequest)
-                if (typeof XMLHttpRequest == 'string') {
-                    var $data = JSON.parse(XMLHttpRequest.responseText)
-                    alert($data.message);
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    if (typeof XMLHttpRequest == 'string') {
+                        var $data = JSON.parse(XMLHttpRequest.responseText)
+                        alert($data.message);
+                    }
+
                 }
 
-            }
+            });
+             var time2 = setInterval(function () {
+                $('#btnn').attr('data-num', '0');
+                $('#btnn').css('color', '#2196f3');
+                clearInterval(time2)
+            }, 60000)
+        }
 
-        });
     });
     $('.wei_hui').on('click', function () {
         location.href = '/mobile/weixin_retrieve/?backurl=' + Verification();
@@ -214,47 +338,76 @@ function retrieve() {
             qupas = $(".wei_quepas").val(),
             ya = $(".wei_ya").val();
         if (pas == "") {
-            alert("信息不能为空，请填写完整");
+            $('.weixin_ti').html('<span>信息不能为空，请填写完整</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            });
             return false;
         }
-        if (!pas.match(/^[0-9_a-zA-Z]{6,20}$/)) {
-            alert("密码长度6-20位，请重新输入");
+        if (!(pas.length >= 6 && pas.length <= 20)) {
+            $('.weixin_ti').html('<span>密码长度6-20位，请重新输入</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            });
             return false;
         } else if (pas !== qupas) {
-            alert("密码不一致，请重新输入");
+            $('.weixin_ti').html('<span>密码不一致，请重新输入</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            });
             return false;
 
 
-        }else
-        if(!document.getElementById("id").checked){
-            alert("你必须同意协议");
-            return false
-        }else  if (pas == "" || qupas == "" || ya == "") {
-            alert("信息不能为空，请填写完整");
+        } else if (pas == "" || qupas == "" || ya == "") {
+            $('.weixin_tq').html('<span>信息不能为空，请填写完整</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            });
             return false;
         } else {
             wei_zheng();
+            var data = {new_password: pas, identifier: Verification(), validate_code: ya}
             $.ajax({
                 type: "post",
                 url: "/api/reset_password/",
-                data: {new_password: pas, identifier: Verification(), validate_code: ya},
+                data: data,
                 dataType: "json",
                 success: function (result) {
-                    console.log(result)
+                    if (result['ret_code'] == 0) {
+                        alert(result['message']);
+                        sessionStorage.setItem("name", data['identifier']);
+                        window.location.href = "/mobile/weixin_inputt/?identifier=" + data['identifier'];
+                        //history.go(-1);
+                    }
+                    else if (result['ret_code'] == 30004) {
+                        $('.weixin_tq').html('<span>验证码错误</span>');
+                        $('input').focus(function () {
+                            $('.weixin_tq').html('');
+                        });
+                    }
+                    else {
+                        alert(result['message']);
+                    }
                 },
                 complete: function (XMLHttpRequest, textStatus) {
-                    console.log(typeof XMLHttpRequest)
-                    var $dade = JSON.parse(XMLHttpRequest.responseText)
-                    console.log($dade);
-                    if ($dade.message=="验证码验证失败") {
-                        alert('验证码错误');
-                    } else if ($dade.message.validate_code) {
-                        alert($dade.message.validate_code);
-                    } else {
-                        sessionStorage.setItem("name", Verification());
-                        window.location.href = "/mobile/weixin_inputt/";
-
-                    }
+                    //console.log(typeof XMLHttpRequest)
+                    //var $dade = JSON.parse(XMLHttpRequest.responseText)
+                    //console.log($dade);
+                    //if ($dade.message == "验证码验证失败") {
+                    //    $('.weixin_tq').html('<span>验证码错误</span>');
+                    //    $('input').focus(function () {
+                    //        $('.weixin_tq').html('');
+                    //    });
+                    //
+                    //} else if ($dade.message.validate_code) {
+                    //    alert($dade.message.validate_code);
+                    //} else {
+                    //     alert($dade.message);
+                    //    sessionStorage.setItem("name", Verification());
+                    //    //window.location.href = "/mobile/weixin_inputt/";
+                    //     history.go(-1);
+                    //
+                    //}
                 }
             })
         }
@@ -287,9 +440,13 @@ function fee() {
             $('footer').show();
             wx.hideOptionMenu();
         } else {
-            //var weixin_url='http://wanglibao.tunnel.mobi';
-            var share_link ='/mobile/weixin_feea/?identifier=' + name;
-            var share_img_url = '/static/m_images/weixin_img/loginn.png';
+            wx.checkJsApi({
+                'jsApiList': [
+                    'onMenuShareTimeline'
+                ]
+            });
+            var share_link = 'https://www.wanglibao.com/mobile/weixin_feea/?identifier=' + name;
+            var share_img_url = 'https://www.wanglibao.com/static/m_images/weixin_img/loginn.png';
             var share_title = '邀请好友送30元话费';
             wx.showOptionMenu();
             wx.onMenuShareTimeline({
@@ -303,16 +460,29 @@ function fee() {
                 link: share_link, // 分享链接
                 imgUrl: share_img_url, // 分享图标
                 type: '', // 分享类型,music、video或link，不填默认为link
-                dataUrl: '' // 如果type是music或video，则要提供数据链接，默认为空
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function () {
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                    // 用户取消分享后执行的回调函数
+                }
             });
             wx.onMenuShareQQ({
                 title: share_title, // 分享标题
                 desc: '', // 分享描述
                 link: share_link, // 分享链接
-                imgUrl: share_img_url // 分享图标
+                imgUrl: share_img_url, // 分享图标
+                success: function () {
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                    // 用户取消分享后执行的回调函数
+                }
             });
         }
     });
+
 }
 
 function feea() {
@@ -323,50 +493,126 @@ function feea() {
         b = phon.substring(0, 3) + "****" + phon.substring(7, 11)
     }
     $('.wei_feea p label').html(b);
+    $('#idd').change(function () {
+        if (document.getElementById("idd").checked) {
+            $('.wei_red').html('');
+
+        } else {
+            $('.wei_red').html('注册需要同意网利宝用户协议');
+
+        }
+
+    })
+
 
     $('.wei_ffee').click(function () {
 
         wei_zheng();
         wei_f = $('.wei_fee').val();
-        $.ajax({
-            type: "POST",
-            url: "/api/phone_validation_code/register/" + wei_f + "/",
-            data: null,
-            dataType: "json",
-            complete: function (XMLHttpRequest, textStatus) {
-                console.log(typeof XMLHttpRequest)
-                var $data = JSON.parse(XMLHttpRequest.responseText);
-                if ($data.message == '') {
+        if (wei_f == "") {
+            alert("手机号码不能为空！");
+            return false;
+        } else if (!$(".wei_fee").val().match(/^1[3|4|5|7|8|9][0-9]\d{8,8}$/)) {
+            alert("请输入正确的手机号码");
+            return false;
+        } else if (!document.getElementById("idd").checked) {
+            $('.wei_red').html('注册需要同意网利宝用户协议');
+            return false
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "/api/phone_validation_code/register/" + wei_f + "/",
+                data: null,
+                dataType: "json",
+                complete: function (XMLHttpRequest, textStatus) {
+                    console.log(typeof XMLHttpRequest)
+                    var $data = JSON.parse(XMLHttpRequest.responseText);
+                    if ($data.message == '') {
 
-                    alert('手机号码已发送您的手机上请注意查收');
-                    window.location.href = "/mobile/weixin_invitation/?identifier=" + wei_f + '&invite_code=' + phon;
-                } else {
-                    alert($data.message);
+                        alert('验证码已发送您的手机上请注意查收');
+                        window.location.href = "/mobile/weixin_invitation/?identifier=" + wei_f + '&invite_code=' + phon;
+                    } else {
+                        alert($data.message);
+                    }
+
                 }
 
-            }
+            });
 
-        });
+        }
+
     });
 
 
 }
 function yoa_registered() {
-    $('.wei_xin').html('已发送<span id="timeb2">60</span>秒');
-    timer = self.setInterval(addseca, 1000);
-    $('.wei_buttonn').on('click', function () {
+    if ($('.wei_xin').attr('data-num') == 0) {
+        $('.wei_xin').attr('data-num', '1');
+        $('.wei_xin').html('已发送<span id="timeb2">60</span>秒');
+        timer = self.setInterval(addseca, 1000);
+        setInterval(function () {
+            $('.wei_xin').attr('data-num', '0');
+            $('.wei_xin').css('color', '#2196f3');
+        }, 60000)
+    }
+
+    $('.wei_xin').on('click', function () {
+        if ($('.wei_xin').attr('data-num') == 0) {
+            $('.wei_xin').attr('data-num', '1');
+            $('.wei_xin').css('color', '#cccccc');
+            $('.wei_xin').html('已发送<span id="timeb2">60</span>');
+            timer = self.setInterval(addseca, 1000);
+            $.ajax({
+                type: "POST",
+                url: "/api/phone_validation_code/register/" + identifier + "/",
+                data: null,
+                dataType: "json",
+                complete: function (XMLHttpRequest, textStatus) {
+                    console.log(typeof XMLHttpRequest)
+                    var $data = JSON.parse(XMLHttpRequest.responseText);
+                    if ($data.message == '') {
+
+                        alert('验证码已发送您的手机上请注意查收');
+                        window.location.href = "/mobile/weixin_invitation/?identifier=" + wei_f + '&invite_code=' + phon;
+                    } else {
+                        alert($data.message);
+                    }
+
+                }
+
+            });
+
+
+            setInterval(function () {
+                $('.wei_xin').attr('data-num', '0');
+                $('.wei_xin').css('color', '#2196f3');
+            }, 60000)
+
+        }
+    })
+
+    $('#wei_zhu').on('click', function () {
         var yanma = $(".yanma").val(),
             passwordd = $(".passwordd").val();
         if (yanma == "") {
-            alert("信息不能为空，请填写完整");
+            $('.weixin_ti').html('<span>信息不能为空，请填写完整</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            })
             return false;
         }
-        if (!passwordd.match(/^[0-9_a-zA-Z]{6,20}$/)) {
-            alert("密码长度6-20位，请重新输入");
+        if (!(passwordd.length >= 6 && passwordd.length <= 20)) {
+            $('.weixin_tq').html('<span>密码长度6-20位，请重新输入</span>');
+            $('input').focus(function () {
+                $('.weixin_tq').html('');
+            })
             return false;
         }
         if (yanma == "" || passwordd == "") {
-            alert("信息不能为空，请填写完整");
+            $('.weixin_ti').html('<span>信息不能为空，请填写完整</span>');
+            $('input').focus(function () {
+                $('.weixin_ti').html('');
+            })
             return false;
         } else {
             wei_zheng();
@@ -380,9 +626,6 @@ function yoa_registered() {
                     invite_code: $('input[name=invite_code]').val()
                 },
                 dataType: "json",
-                success: function (result) {
-
-                },
                 complete: function (XMLHttpRequest, textStatus) {
                     console.log(typeof XMLHttpRequest)
                     var $dade = JSON.parse(XMLHttpRequest.responseText)
@@ -390,7 +633,11 @@ function yoa_registered() {
                     if ($dade.message.identifier) {
                         alert($dade.message.identifier);
                     } else if ($dade.message.validate_code) {
-                        alert($dade.message.validate_code);
+                        $('.weixin_tq').html('<span>' + $dade.message.validate_code + '</span>');
+                        $('input').focus(function () {
+                            $('.weixin_tq').html('');
+                        })
+                        //  alert($dade.message.validate_code);
                     } else {
                         sessionStorage.setItem("name", Verification());
                         window.location.href = "/mobile/weixin_app/";
@@ -422,10 +669,12 @@ function addsec() {
 
     var t = $('#timeb2').html();
     //alert(t);
-    if (t > 0) {
+    if (t > 1) {
 
         $('#timeb2').html(t - 1);
-        //alert(t);
+        if (t) {
+
+        }
     } else {
 
         window.clearInterval(timer);
@@ -452,58 +701,22 @@ function addsecc() {
 function addseca() {
 
     var t = $('#timeb2').html();
-    if (t > 0) {
+    if (t > 1) {
 
         $('#timeb2').html(t - 1);
     } else {
 
         window.clearInterval(timer);
         $('.wei_xin').html('<span id="timeb2"></span>重新获取验证码');
-        $('.wei_xin').on('click', function () {
-            $('.wei_xin').html('已发送<span id="timeb2">60</span>');
-            timer = self.setInterval(addseca, 1000);
-        })
 
 
     }
 
 }
-function wei_zheng() {
-    getCookie = function (name) {
-        var cookie, cookieValue, cookies, i;
-        cookieValue = null;
-        if (document.cookie && document.cookie !== "") {
-            cookies = document.cookie.split(";");
-            i = 0;
-            while (i < cookies.length) {
-                cookie = $.trim(cookies[i]);
-                if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-                i++;
-            }
-        }
-        return cookieValue;
-    };
-    csrfSafeMethod = function (method) {
-        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
-    };
-    sameOrigin = function (url) {
-        var host, origin, protocol, sr_origin;
-        host = document.location.host;
-        protocol = document.location.protocol;
-        sr_origin = "//" + host;
-        origin = protocol + sr_origin;
-        return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
-    };
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-            }
-        }
-    });
+function wei_yanzheng() {
+   $('#wei_xieyi2').on('click', function () {
+      history.go(-1);
+     });
 }
 
 

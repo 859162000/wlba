@@ -41,7 +41,7 @@
       e.preventDefault();
       element = this;
       e.preventDefault();
-      phoneNumber = $("#id_identifier").val().trim();
+      phoneNumber = $.trim($("#id_identifier").val());
       if (checkMobile(phoneNumber)) {
         if (typeof console !== "undefined" && console !== null) {
           console.log("Phone number checked, now send the validation code");
@@ -171,7 +171,7 @@
     return $(".voice").on('click', '.voice-validate', function(e) {
       var element, isMobile, url;
       e.preventDefault();
-      isMobile = checkMobile($("#id_identifier").val().trim());
+      isMobile = checkMobile($.trim($("#id_identifier").val()));
       if (!isMobile) {
         $("#id_type").val("phone");
         $("#validate-code-container").show();
@@ -186,7 +186,7 @@
         url: url,
         type: "POST",
         data: {
-          phone: $("#id_identifier").val().trim()
+          phone: $.trim($("#id_identifier").val())
         }
       }).success(function(json) {
         var button, count, intervalId, timerFunction;

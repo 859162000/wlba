@@ -61,15 +61,16 @@ html
 
                 +nav-item('安全保障', '/security', 'left-line', '')
                 +nav-item('帮助中心', '/help', '', '')
-    .wrap
-      //img(src="/static/images/xunlei-denglu/xun-banner5.jpg").te1
+    .wrap#wrap
+      //img(src="/static/images/xunlei-denglu/xun-banner-redpack.jpg").te1
       .gold2
          img(src="/static/images/xunlei-denglu/xun-wang.png").xun-wang
          .denelu-form
             h1.biaoti 轻松领100元红包
-            .align-center
+            h1.align-center(style="height:250px;margin-top:100px;") 活动已结束
+            //.align-center
               a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
-            form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
+            //form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
               - csrf_token
               .form-row
                 .form-control-group
@@ -105,7 +106,7 @@ html
                   .form-row-error
               .space-vertical-s
 
-            p.xun-p 已有账号,
+            //p.xun-p 已有账号,
               a(href="/accounts/login/") 立即登录
     .san
       .container.high-bigger.high-bigger2
@@ -227,7 +228,7 @@ html
               span.icon.icon-fifth-step
               .process-title 获得投资和奖励
         .invite-container.row
-            a.invite-btn#top-zc 立即注册
+            a.invite-btn.disabled 活动已结束
 
     .warp-footer
       img(src="/static/images/xunlei-denglu/ditu.jpg").foot-img

@@ -11,8 +11,8 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView,
                    AccountTransactionDeposit, AccountRedPacket,
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
-                   Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailView, MessageCountView,
-                   MessageListView, AccountRepayment, AddressView)#, CjdaoApiView)
+                   Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailAPIView, MessageCountAPIView,
+                   MessageListAPIView, AccountRepayment, AddressView, AccountInviteView)#, CjdaoApiView)
 from django.contrib.auth import views as auth_views
 
 urlpatterns = patterns(
@@ -43,7 +43,7 @@ urlpatterns = patterns(
     url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/login/')),
     url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
 
-    url(r'^invite/$', login_required(TemplateView.as_view(template_name='invite.jade'), login_url='/accounts/login/')),
+    url(r'^invite/$', login_required(AccountInviteView.as_view(), login_url='/accounts/login/')),
 
     url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
 
@@ -60,9 +60,9 @@ urlpatterns = patterns(
     url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
 
     url(r'^message/$', login_required(MessageView.as_view(), login_url='/accounts/login/')),
-    url(r'^message/list/$', MessageListView.as_view(), name='message_list_view'),
-    url(r'^message/count/$', MessageCountView.as_view(), name='message_count_view'),
-    url(r'^message/(?P<message_id>\d+)/$', MessageDetailView.as_view(), name='message_detail_view'),
+    url(r'^message/list/$', MessageListAPIView.as_view(), name='message_list_view'),
+    url(r'^message/count/$', MessageCountAPIView.as_view(), name='message_count_view'),
+    url(r'^message/(?P<message_id>\d+)/$', MessageDetailAPIView.as_view(), name='message_detail_view'),
     url(r'^email/sent/$', EmailSentView.as_view(), name='email_sent'),
 
     url(r'^password/change/$', "wanglibao_account.views.password_change", name='password_change'),

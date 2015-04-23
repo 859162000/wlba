@@ -1,0 +1,163 @@
+.modal
+  overflow: hidden
+  border-radius: 0
+  box-shadow: none
+  padding: 0
+
+  #close-modal
+    content: "x"
+
+.act-login
+  width: 316px
+  height: auto
+  position: absolute
+  border-radius: 5px
+  background: #fff
+  top: 45px
+  right: 0
+  text-align: center
+  .act-biaoti
+    color: red
+    line-height: 50px
+    text-align: center
+    margin-top: 8px
+  .act-get
+    display: inline-block
+    margin: 0 auto
+  .act-login-form
+    width: 276px
+    background: #fff
+    margin: 0 auto
+    input
+      line-height: 35px
+      border: none
+      border: 1px solid #ccc
+      width: 100%
+      height: 35px
+      line-height: normal
+    #agreement
+      position: absolute
+      top: 60px
+      left: 36px
+      height: 13px
+      width: 13px
+    .act-com-tu
+      background: url(/static/images/xunlei-denglu/xunlei-denglu-tu.png) no-repeat
+      padding-left: 30px
+    .act-tu1
+      background-position: 0 -73px
+    .act-tu2
+      background-position: 0 5px
+    .act-tu3
+      background-position: 0 -32px
+    .act-form-row
+      @extend .row
+      text-align: left
+      position: relative
+      padding-top: 10px
+    .act-form-row-error
+      @extend .row
+      line-height: 1.3
+      color: red
+      label.error
+        font-size: $font-s
+        color: $color-pomegranate
+
+        &:before
+          content: '* '
+        &:empty
+          display: none
+      label
+        font-weight: normal
+    .act-hidden
+      display: none !important
+    .act-show
+      margin-bottom: 10px
+    .act-button-orange
+      background: $color-orange
+      color: $color-white
+      border: none
+      border-radius: 5px
+      &:hover
+        background: #f67313
+    .act-button-large
+      @extend .button
+      font-size: $font-m
+      line-height: 40px
+      padding: 0 1em
+    .act-huoqu-ma
+      padding: 0 10px
+      border: none
+      color: #fff
+      background: #ff461f
+      border-radius: 5px
+      margin-left: 20px
+    .act-huoqu-ma-gray
+      background: #cccccc
+      margin-left: 10px
+    .act-button-account
+      @extend .button-primary
+      font-size: 24px
+      padding: 10px
+    .agreement
+      font-size: $font-s
+      color: $color-dusty-gray
+      text-align: center
+      clear: both
+      margin: 0 auto
+      margin-top: 50px
+  .xun-p
+    text-align: center
+    margin: 10px 0
+.modal-container
+  width: 470px
+  height: 195px
+  background: #fff
+  border: none
+  box-shadow: none
+  -webkit-box-shadow: none
+  a
+    font-size: 24px
+    color: #ccc!important
+    position: absolute
+    top: 0
+    right: 8px
+    text-decoration: none!important
+    a:hover
+      color: #cccccc!important
+      text-decoration: none!important
+  .modal-header
+    text-align: left
+    height: 50px
+    line-height: 50px
+    font-size: $font-l
+    background-color: #f1f1f1
+    border: none
+    padding-left: 10px
+    .icon-cancel
+      font-size: 1.8em
+      cursor: pointer
+  .modal-content
+    margin-top: 30px
+    text-align: center
+    font-size: $font-s
+    margin-bottom: 25px
+    box-shadow: none
+    -webkit-box-shadow: none
+    border: none
+    h2
+      margin-bottom: 7px
+    p
+      color: $color-text-d4
+  .modal-footer
+    text-align: center
+    border: none
+    a
+      font-size: 16px
+      margin-right: 20px
+      background: red
+      padding: 9px 40px
+      color: #fff!important
+      text-decoration: none
+      top: 144px
+      right: 160px

@@ -13,7 +13,7 @@ block main
       dl.font-s
         dt.font-xl.dark-text 邀请小伙伴理财，共享60元话费
 
-        dd 活动时间：2015年3月17日- 2015年4月7日。
+        dd 活动时间：2015年4月15日- 2015年5月31日。
         dd 1、小伙伴邀请以身份证号为唯一识别标识。
         dd 2、通过以下任一方式邀请，小伙伴需通过邀请链接注册网利宝，或注册时输入您的邀请码。
         dd.highlight 3、小伙伴购买理财产品，完成首次单笔200元（含）以上交易，邀请关系建立。
@@ -66,12 +66,36 @@ block main
             a.wlb_qzone(href="#",title="分享到QQ空间")
               span.icon.icon-invite-qzone
               i QQ空间
+  .account-home-panel
+    h3.border-b 邀请列表
+    table.table.margin-top-m
+      thead
+        tr
+          th 用户名
+          th 手机号
+          th 好友注册时间
+       body
+        for friend in friends
+          tr
+            td
+              is_valid = friend.user.wanglibaouserprofile.id_is_valid
+              if is_valid
+                | {{friend.user.wanglibaouserprofile.name | safe_name}}
+              else
+                | 未认证
+            td {{friend.user.wanglibaouserprofile.phone | safe_phone_new}}
+            td {{friend.created_at}}
+    .row
+      - with data=friends uri='/accounts/invite/'
+      include include/pager
+      - endwith
+
   script(src="/static/js/lib/jquery.min.js")
   script(src="/static/js/lib/jquery.zclip.min.js")
   script(src="/static/js/lib/jquery.modal.min.js")
   script.
     var _share_title = encodeURI('“邀请好友送话费”活动');
-    var _share_content = encodeURI('我刚刚注册了网利宝，IDG投资理财平台，3倍余额宝年化收益，100%本息保障，100元起投资，现在理财得30元话费，还有iPhone6，1000元京东卡...快来看看吧～ 戳这里>>https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
+    var _share_content = encodeURI('我刚刚注册了网利宝，IDG投资理财平台，3倍余额宝年化收益，100%本息保障，100元起投资，现在理财得20元话费，还有iPhone6，1000元京东卡...快来看看吧～ 戳这里>>https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
     var _activity_url = encodeURIComponent('https://www.wanglibao.com/activity/invite/');
     var _share_url = encodeURIComponent('https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
     var _share_pic = 'https://staging.wanglibao.com/static/images/share_pic.jpg';

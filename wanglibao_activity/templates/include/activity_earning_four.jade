@@ -1,0 +1,19 @@
+// 高收益柱形图
+if result.is_diy
+  .act-back(style="margin-top:45px")
+    if result.diy_desc
+      if result.diy_location == 0
+        for desc in result.diy_desc
+          h2.black(style="text-align:left") {{ desc }}
+      if result.diy_location == 1
+        for desc in result.diy_desc
+          h2.black(style="text-align:center") {{ desc }}
+      if result.diy_location == 2
+        for desc in result.diy_desc
+          h2.black(style="text-align:right") {{ desc }}
+
+      if result.diy_img
+        .content-desc
+          .row
+            .span12
+              img(src="/media/{{result.diy_img.0.img}}")

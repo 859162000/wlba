@@ -1,5 +1,5 @@
 from django.contrib import admin
-from wanglibao_banner.models import Banner, Partner, Hiring
+from wanglibao_banner.models import Banner, Partner, Hiring, Aboutus
 
 
 class BannerAdmin(admin.ModelAdmin):
@@ -17,6 +17,11 @@ class HiringAdmin(admin.ModelAdmin):
     list_editable = ('priority',)
 
 
+class AboutusAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'code')
+
+
 admin.site.register(Banner, BannerAdmin)
 admin.site.register(Partner, PartnerAdmin)
 admin.site.register(Hiring, HiringAdmin)
+admin.site.register(Aboutus, AboutusAdmin)

@@ -14,6 +14,7 @@ from wanglibao_account import message as inside_message
 class Channel():
     """ 渠道结构 """
     XUNLEI = "xunlei"
+    XUNLEIINVEST = "xunlei-invest"
     KUAIPAN = "kuaipan"
     WANGLIBAO = "wanglibao"
     FENGXING = "fengxing"
@@ -23,6 +24,7 @@ class Channel():
     PPTV = "pptv"
     #网利宝非用户邀请渠道
     WANGLIBAOOTHER = "wanglibao-other"
+    BAIDUSHOUJI = "baidushouji"
 
 
 

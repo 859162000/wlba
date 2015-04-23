@@ -41,26 +41,40 @@ block main
             a.title-bar--tab--anchor(href='/accounts/redpacket/expires/') 已过期
     .panel-container.padding-xl(style="padding-top:0px")
       table.table
-        col(width="20%")
-        col(width="10%")
-        col(width="35%")
-        col(width="35%")
         thead
           tr
-            th 红包
-            th 可用额度
-            th 有效期
-            th 使用详情
+            th 红包名称
+            th 金额
+            th 使用次数
+            th 使用限额
+            th 使用门槛
+            th(width='20%') 有效期
+            if status == 'used'
+              th 使用详情
+            else
+              th 使用范围
         tbody
           each red_packet in red_packets
             tr
               td {{red_packet.name}}
-              td {{red_packet.amount}} 元
+              if red_packet.method == '-'
+                td {{red_packet.amount}}元
+              else
+                td {{red_packet.highest_amount}}元
+              td 仅限一次
+              if red_packet.method == '-'
+                td {{red_packet.amount}}元
+              else
+                td 投资额{{red_packet.amount | percentage_number_two}}%
+              if red_packet.invest_amount == 0
+                td 无
+              else
+                td {{red_packet.invest_amount}}元
               td {{red_packet.available_at | milldate_format}} 至 {{red_packet.unavailable_at | milldate_format}}
               if status == 'used'
                 td {{red_packet.product}} <br/> {{red_packet.apply_at | milltime_format }}
               else
-                td --
+                td P2P理财
 
 
     script.

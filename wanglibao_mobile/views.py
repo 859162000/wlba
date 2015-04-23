@@ -192,8 +192,9 @@ class AccountRedirectView(RedirectView):
 
 
 from .weixin import generate_weixin_jssdk_config
-WEIXIN_APP_ID = 'wx4bf8abb47962a812'
-WEIXIN_APP_SECRET = '45066980fd1fa0c6bd06653f08da46aa'
+WEIXIN_APP_ID = 'wx110c1d06158c860b'
+WEIXIN_APP_SECRET = '2523d084edca65b6633dae215967a23f'
+
 
 
 class WeixinFeeView(TemplateView):

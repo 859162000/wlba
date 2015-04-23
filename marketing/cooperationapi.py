@@ -17,7 +17,7 @@ from django.utils import timezone, dateparse
 from rest_framework import renderers
 from rest_framework.views import APIView
 from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.models import P2PProduct, P2PEquity, P2PRecord
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
 
 
@@ -233,7 +233,9 @@ P2PEYE_PAY_WAY = {
     u'按月付息': 2,
     u'到期还本付息': 4,
     u'按季度付息': 5,
+    u'先息后本':0,
 }
+
 
 class WangdaiEyeListAPIView(APIView):
     """ 网贷天眼 API
@@ -245,8 +247,8 @@ class WangdaiEyeListAPIView(APIView):
         result = {
             "result_code": "-1",
             "result_msg": u"未授权的访问!",
-            "page_count": "null",
-            "page_index": "null",
+            "page_count": "0",
+            "page_index": "0",
             "loans": "null"
         }
 
@@ -278,6 +280,7 @@ class WangdaiEyeListAPIView(APIView):
         if p2pproducts:
             loans = []
             for p2pproduct in p2pproducts:
+                status = 0 if p2pproduct.status == u'正在招标' else 1
                 # 进度
                 amount = Decimal.from_float(p2pproduct.total_amount).quantize(Decimal('0.00'))
                 percent = p2pproduct.ordered_amount / amount
@@ -299,20 +302,26 @@ class WangdaiEyeListAPIView(APIView):
                     "username": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
                     "status": status,
                     "userid": md5(p2pproduct.borrower_name.encode('utf-8')).hexdigest(),
-                    "c_type": u"抵押标" if p2pproduct.category == u'证大速贷' else u"信用标",
+                    # "c_type": u"抵押标" if p2pproduct.category == u'证大速贷' else u"信用标",
+                    "c_type": 2 if p2pproduct.category == u'证大速贷' else 0,
                     "amount": amount,
                     "rate": rate,
-                    "period": u'{}个月'.format(p2pproduct.period),
-                    "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6)),
+                    # "period": u'{}个月'.format(p2pproduct.period),
+                    "period": p2pproduct.period,
+                    "p_type": 1,#期限类型,0 代表天,1 代表月
+                    # "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6)),
+                    "pay_way": P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0),
                     "process": process,
                     "reward": reward,
-                    "guarantee": "null",
+                    # "guarantee": "null",
+                    "guarantee": 0,
                     "start_time": timezone.localtime(p2pproduct.publish_time).strftime(
                         "%Y-%m-%d %H:%M:%S"),
                     "end_time": timezone.localtime(p2pproduct.soldout_time).strftime(
                         "%Y-%m-%d %H:%M:%S") if p2pproduct.soldout_time else 'null',
                     "invest_num": str(p2pproduct.equities.count()),
-                    "c_reward": "null"
+                    # "c_reward": "null"
+                    "c_reward": 0
                 }
                 loans.append(obj)
             result.update(loans=loans, page_count=str(paginator.num_pages), page_index=str(p2pproducts.number),
@@ -334,8 +343,8 @@ class WangdaiEyeEquityAPIView(APIView):
         result = {
             "result_code": "-1",
             "result_msg": u"未授权的访问!",
-            "page_count": "null",
-            "page_index": "null",
+            "page_count": "0",
+            "page_index": "0",
             "loans": "null"
         }
         try:
@@ -385,8 +394,8 @@ class WangdaiEyeEquityAPIView(APIView):
                 "username": eq.user.username,
                 "userid": str(eq.user.id),
                 "type": u"手动",
-                "money": str(eq.equity),
-                "account": str(eq.equity),
+                "money": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),#str(eq.equity),
+                "account": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),#str(eq.equity),
                 "status": u"成功",
                 "add_time": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             }
