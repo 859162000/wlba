@@ -200,8 +200,14 @@ WEIXIN_APP_SECRET = '2523d084edca65b6633dae215967a23f'
 class WeixinFeeView(TemplateView):
     template_name = 'weixin_fee.jade'
 
+    def get_current_url(self):
+        url = '%s%s%s' % (['http://', 'https://'][self.request.is_secure()],
+                          self.request.get_host(),
+                          self.request.get_full_path().split('#')[0])
+        return url
+
     def get_context_data(self, **kwargs):
-        url = self.request.META.get('HTTP_REFERER', '') or self.request.GET.get('url', '')
+        url = self.get_current_url()
         data = dict()
         data['app_id'] = WEIXIN_APP_ID
         try:
@@ -219,7 +225,6 @@ class WeixinFeeaView(TemplateView):
             'identifier': self.request.GET.get('identifier')
         }
         return data
-
 
 
 class WeixinInvitationView(TemplateView):
