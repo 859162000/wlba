@@ -174,81 +174,62 @@ class AccountRedirectView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         # 判断是否为手机号
-        identifier_type = detect_identifier_type(kwargs.get('identifier'))
+        identifier = self.request.GET.get('identifier')
+        referer_url = self.request.META.get('HTTP_REFERER')
+
+        identifier_type = detect_identifier_type(identifier)
         if identifier_type != 'phone':
             # 不是手机号，跳转原地址并附带参数
-            return '%s?identifier=%s&is_phone=false' % (kwargs.get('referer_url').split('?')[0], kwargs.get('identifier'))
+            return '%s?identifier=%s&is_phone=false' % (referer_url.split('?')[0], identifier)
 
         # 判断手机号是否已注册
-        is_registered = User.objects.filter(wanglibaouserprofile__phone=kwargs.get('identifier')).count()
+        is_registered = User.objects.filter(wanglibaouserprofile__phone=identifier).count()
         is_registered = bool(is_registered)
         # 如果手机号已注册，跳转到登录页面
         # 如果手机号未注册，跳转到注册页面
         redirect_url = [self.mobile_register_url, self.mobile_login_url][is_registered]
-        return '%s?identifier=%s' % (redirect_url, kwargs.get('identifier'))
-
-    def get(self, request, *args, **kwargs):
-        # 通过get方式传入用户手机号
-        kwargs['identifier'] = request.GET.get('identifier')
-        kwargs['referer_url'] = request.META.get('HTTP_REFERER')
-        return super(AccountRedirectView, self).get(request, *args, **kwargs)
+        return '%s?identifier=%s' % (redirect_url, identifier)
 
 
-from collections import OrderedDict
-import uuid
-import time
-import hashlib
-import json
-from .weixin import get_access_token, get_jsapi_ticket
+from .weixin import generate_weixin_jssdk_config
 WEIXIN_APP_ID = 'wx110c1d06158c860b'
 WEIXIN_APP_SECRET = '2523d084edca65b6633dae215967a23f'
 
+# WEIXIN_APP_ID = 'wx22c7a048569d3e7e'
+# WEIXIN_APP_SECRET = '1340e746fb4c3719d405fdc27752bc6f'
 
-def weixin_config(request):
-    """
-    获取微信JS-SDK配置参数
-    :param request:
-    :return:
-    """
-    url = request.META.get('HTTP_REFERER', '') or request.GET.get('url', '')
 
-    if not url:
+
+class WeixinFeeView(TemplateView):
+    template_name = 'weixin_fee.jade'
+
+    def get_current_url(self):
+        url = '%s%s%s' % (['http://', 'https://'][self.request.is_secure()],
+                          self.request.get_host(),
+                          self.request.get_full_path().split('#')[0])
+        return url
+
+    def get_context_data(self, **kwargs):
+        url = self.get_current_url()
+        data = dict()
+        data['app_id'] = WEIXIN_APP_ID
+        try:
+            data.update(generate_weixin_jssdk_config(WEIXIN_APP_ID, WEIXIN_APP_SECRET, url))
+        except:
+            pass
+        return data
+
+
+class WeixinIndexView(TemplateView):
+    template_name = 'weixin_index.jade'
+
+    def get_context_data(self, **kwargs):
         data = {
-            'errcode': 1,
-            'errmsg': u'不能获取url',
+            'identifier': self.request.GET.get('identifier', '')
         }
-        return HttpResponse(json.dumps(data), content_type="application/json")
-
-    try:
-        access_token = get_access_token(WEIXIN_APP_ID, WEIXIN_APP_SECRET).get('access_token')
-        jsapi_ticket = get_jsapi_ticket(access_token).get('ticket')
-        assert jsapi_ticket
-    except Exception, e:
-        data = {
-            'errcode': 1,
-            'errmsg': u'请求微信接口错误',
-            'data': e.message,
-        }
-        return HttpResponse(json.dumps(data), content_type="application/json")
-
-    # 生成 微信JS-SDK使用权限签名
-    params = OrderedDict()
-    params['jsapi_ticket'] = jsapi_ticket
-    params['noncestr'] = uuid.uuid1().hex
-    params['timestamp'] = str(int(time.time()))
-    params['url'] = url.split('#')[0]
-    string = '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
-    signature = hashlib.sha1(string).hexdigest()
-
-    data = {
-        'noncestr': params.get('noncestr'),
-        'timestamp': params.get('timestamp'),
-        'signature': signature,
-    }
-    return HttpResponse(json.dumps(data), content_type="application/json")
+        return data
 
 
-#weixin_invitation.jade
 class WeixinFeeaView(TemplateView):
     template_name = 'weixin_feea.jade'
 
@@ -258,17 +239,31 @@ class WeixinFeeaView(TemplateView):
         }
         return data
 
-
-
+from marketing.models import PromotionToken
 class WeixinInvitationView(TemplateView):
     template_name = 'weixin_invitation.jade'
 
     def get_context_data(self, **kwargs):
+        identifier = self.request.GET.get('identifier')
+        friend_identifier = self.request.GET.get('invite_code')
+
+        if friend_identifier:
+            try:
+                user = User.objects.get(wanglibaouserprofile__phone=friend_identifier)
+                promo_token = PromotionToken.objects.get(user=user)
+                invitecode = promo_token.token
+            except:
+                invitecode = ''
+        else:
+            invitecode = ''
+
+
         data = {
-            'identifier': self.request.GET.get('identifier'),
-            'invite_code': self.request.GET.get('invite_code')
+            'identifier': identifier,
+            'invite_code': invitecode
         }
-        print data
         return data
+
+
 
 

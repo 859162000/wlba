@@ -11,7 +11,7 @@ html
   body(style='background:#fafafa; background-size:cover;')
       .top-i
           a.jiao
-            img(src='/static/m_images/weixin_img/sanjiao.png')
+            img(src='/static/m_images/weixin_img/sanjiao.png').wei_fann
           p 账户注册
       include m_include/weixin_kehuduan
       form.wei_pss
@@ -33,11 +33,11 @@ html
           label
               |我同意
               span
-               a(href='https://www.wanglibao.com/mobile/agreement/') 网利宝用户协议
+               a(href='/mobile/weixin_xieyi/') 网利宝用户协议
       h2.weixin_tw
       .wei_buttonn#wei_button
         a 完成
 
       script(src="/static/m_js/m_lib/jquery.min.js")
       script(src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js")
-      script(src="/static/m_js/weixin.js")
+      script(src="/static/m_js/weixin.js?v201504201")

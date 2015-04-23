@@ -22,8 +22,8 @@ html
         .grent
             p 注册立享100元理财包+30元话费
         form(action='/mobile/account/redirect/' method='get' ).wei_for
-            input(type='tel' placeholder='请输入手机号进行注册或登录', name='identifier').ipon
+            input(type='tel' placeholder='请输入手机号进行注册或登录', name='identifier', value="{{ identifier }}").ipon
             button.judge 下一步
       script(src="/static/m_js/m_lib/jquery.min.js")
       script(src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js")
-      script(src="/static/m_js/weixin.js")
+      script(src="/static/m_js/weixin.js?v=324j4jkj431112")
