@@ -688,7 +688,7 @@ function addsecc() {
 
     var t = $('#timeb2').html();
     //alert(t);
-    if (t > 0) {
+    if (t > 1) {
 
         $('#timeb2').html(t - 1);
         //alert(t);
