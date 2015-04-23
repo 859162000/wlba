@@ -140,7 +140,7 @@ function wei_password() {
         } else {
             var userName = $.trim($(".wei_word").val());
 
-            wei_zheng();
+           
             $.ajax({
                 type: "POST",
                 url: "/api/api-token-auth/",
@@ -305,7 +305,6 @@ function retrieve() {
             $('#btnn').css('color', '#cccccc');
             $('#btnn').html('已经发送<span id="timeb2">60</span>秒');
             timer = self.setInterval(addsecc, 1000);
-            wei_zheng();
             var pno = Verification();
             $.ajax({
                 type: "POST",
@@ -365,7 +364,7 @@ function retrieve() {
             });
             return false;
         } else {
-            wei_zheng();
+
             var data = {new_password: pas, identifier: Verification(), validate_code: ya}
             $.ajax({
                 type: "post",
@@ -507,7 +506,7 @@ function feea() {
 
     $('.wei_ffee').click(function () {
 
-        wei_zheng();
+
         wei_f = $('.wei_fee').val();
         if (wei_f == "") {
             alert("手机号码不能为空！");
@@ -616,7 +615,7 @@ function yoa_registered() {
             })
             return false;
         } else {
-            wei_zheng();
+
             $.ajax({
                 type: "post",
                 url: "/api/register/?promo_token=weixin",
