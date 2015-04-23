@@ -64,6 +64,33 @@ server {
         deny all;
     }
 
+    location ~ ^/static/m_js/.*\.(css|js|html|htm|jpg|jpeg|gif|png|ico|htc|apk|ttf|woff|map|svg|eot){
+        root /var/www/wanglibao/wanglibao-backend/wanglibao_mobile;
+        access_log off;
+        if (-f $request_filename) {
+            expires 30d;
+            break;
+        }
+    }
+
+    location ~ ^/static/m_images/.*\.(css|js|html|htm|jpg|jpeg|gif|png|ico|htc|apk|ttf|woff|map|svg|eot){
+        root /var/www/wanglibao/wanglibao-backend/wanglibao_mobile;
+        access_log off;
+        if (-f $request_filename) {
+            expires 30d;
+            break;
+        }
+    }
+
+    location ~ ^/static/m_stylesheets/.*\.(css|js|html|htm|jpg|jpeg|gif|png|ico|htc|apk|ttf|woff|map|svg|eot){
+        root /var/www/wanglibao/wanglibao-backend/wanglibao_mobile;
+        access_log off;
+        if (-f $request_filename) {
+            expires 30d;
+            break;
+        }
+    }
+
     location ~ ^/static/admin/.*\.(css|js|html|htm|jpg|jpeg|gif|png|ico|pdf|doc|swf|zip|htc|xls|apk|properties|exe|ttf|woff|map|svg|eot){
         root /var/www/wanglibao/virt-wanglibao/lib/python2.7/site-packages/django/contrib/admin/;
         access_log off;

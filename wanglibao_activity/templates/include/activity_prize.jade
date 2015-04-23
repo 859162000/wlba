@@ -1,0 +1,33 @@
+// 奖品展示模块
+if result.is_reward != 0
+  if result.is_reward == 1
+    include include/activity_prize_one
+  if result.is_reward == 2
+    include include/activity_prize_two
+  if result.is_reward == 3
+    .prize-all
+      .span6
+        img(src="/media/{{result.reward_img.0.img}}").prize-jiangli
+      if result.reward_desc
+        .span5-omega
+          ul.prize-all-right
+            for des in result.reward_desc
+              li {{des}}
+  if result.is_reward == 4
+    .act-iphone
+      .act-iphone-tit
+        .act-iphone-le
+          h2.black 没心！没肺！没节操的送！
+          p {{result.reward_desc}}
+        .act-iphone-r
+      .row.act-iphone-row
+        for img in result.reward_img
+          .span3(style="margin-right:12px")
+            dl.act-iphone-jiang
+              span.act-iphone-huang
+              h3.act-iphone-h2 {{img.desc_one}}
+              dt.act-iphone-com2.act-iphone-one(style="background: url('/media/{{img.img}}') no-repeat center center")
+              dd(style="color:#e9573f")
+                span(style="background:#e9573f") 送
+                |{{img.name}}
+

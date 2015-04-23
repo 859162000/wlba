@@ -9,7 +9,8 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AccountFundAssetAPI,
                             P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
                             AdminSendMessageAPIView, AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
-                            AddressGetAPIView, AccountInviteAPIView)
+                            AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
+                            MessageCountAPIView, MessageDetailAPIView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -37,7 +38,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
-                            DepositGateAPIView)
+                            DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
@@ -83,6 +84,7 @@ router.register(r'daily_income', DailyIncomeViewSet)
 
 router.register(r'card', CardViewSet)
 
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = patterns(
     '',
@@ -94,6 +96,8 @@ urlpatterns = patterns(
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
+
+    url(r'weixin/phone_validation_code/register/(?P<phone>\d{11})/$', WeixinSendRegisterValidationCodeView.as_view()),
 
     url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),
 
@@ -146,7 +150,7 @@ urlpatterns = patterns(
 
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
-    #url(r'^pushtest/$', PushTestView.as_view()),
+    url(r'^pushtest/$', PushTestView.as_view()),
     url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
     url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
     url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
@@ -162,6 +166,10 @@ urlpatterns = patterns(
     url(r'^redpacket/$', RedPacketListAPIView.as_view()),
     url(r'^redpacket/exchange/$', RedPacketChangeAPIView.as_view()),
     url(r'^redpacket/deduct/$', RedPacketDeductAPIView.as_view()),
+
+    url(r'^message/count/$', MessageCountAPIView.as_view()),
+    url(r'^message/(?P<message_id>\d+)/$', MessageDetailAPIView.as_view()), 
+    url(r'^message/list/$', MessageListAPIView.as_view()),
 
     url(r'^address/$', AddressAPIView.as_view()),
     url(r'^address/list/$', AddressListAPIView.as_view()),

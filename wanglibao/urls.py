@@ -14,11 +14,14 @@ from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
 # from wanglibao_account.views import CjdaoApiView
-from wanglibao_banner.views import HiringView
+from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView, MilestoneView, \
+    ResponsibilityView, ContactView, AgreementView
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
 from marketing.views import NewsListView, NewsDetailView
+from wanglibao_activity.decorators import decorator_include
+from wanglibao_activity.decorators import wap_activity_manage
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -59,26 +62,28 @@ urlpatterns = patterns(
 
     # url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', HiringView.as_view(), name="hiring"),
-    url(r'^about/', TemplateView.as_view(template_name="about.jade")),
-    url(r'^company/', TemplateView.as_view(template_name="company.jade")),
-    url(r'^team/', TemplateView.as_view(template_name="team.jade")),
+    url(r'^about/', AboutView.as_view(), name='about'),
+    url(r'^company/', CompanyView.as_view(), name="company"),
+    url(r'^team/', TeamView.as_view(), name="team"),
     url(r'^partner/', PartnerView.as_view(), name="partner"),
-    url(r'^milestone/', TemplateView.as_view(template_name="milestone.jade")),
-    url(r'^responsibility/', TemplateView.as_view(template_name="responsibility.jade")),
-    url(r'^contact_us/', TemplateView.as_view(template_name="contact_us.jade")),
+    url(r'^milestone/', MilestoneView.as_view(), name="milestone"),
+    url(r'^responsibility/', ResponsibilityView.as_view(), name="responsibility"),
+    url(r'^contact_us/', ContactView.as_view(),name="contact_us"),
     url(r'^news/list', NewsListView.as_view(), name="news_list"),
     url(r'^news/detail/(?P<id>\d+)', NewsDetailView.as_view(), name="news_detail"),
     # url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
     # url(r'^why_portfolio/', TemplateView.as_view(template_name="why_portfolio.jade")),
-    url(r'^agreement/', TemplateView.as_view(template_name="agreement.jade")),
+    url(r'^agreement/', AgreementView.as_view(), name="agreement"),
     url(r'^mobile/agreement/', TemplateView.as_view(template_name="mobile_agreement.jade")),
     url(r'^mobile/about/', TemplateView.as_view(template_name="mobile_about.jade")),
     url(r'^ckeditor/', include('ckeditor.urls')),
 
     url(r'^preorder/', include('wanglibao_preorder.urls')),
-    url(r'^activity/', include('marketing.urls')),
+    url(r'^activity/', decorator_include(include('marketing.urls'), wap_activity_manage)),
+    # url(r'^activity/', include('marketing.urls')),
     url(r'^announcement/', include('wanglibao_announcement.urls')),
     url(r'^redpacket/', include('wanglibao_redpack.urls')),
+    url(r'^templates/', include('wanglibao_activity.urls')),
 )
 
 urlpatterns += patterns(
