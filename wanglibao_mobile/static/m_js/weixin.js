@@ -583,9 +583,10 @@ function yoa_registered() {
             });
 
 
-            setInterval(function () {
+            var time2 = setInterval(function () {
                 $('.wei_xin').attr('data-num', '0');
                 $('.wei_xin').css('color', '#2196f3');
+                clearInterval(time2)
             }, 60000)
 
         }
