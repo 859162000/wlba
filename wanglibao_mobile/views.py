@@ -195,6 +195,9 @@ from .weixin import generate_weixin_jssdk_config
 WEIXIN_APP_ID = 'wx110c1d06158c860b'
 WEIXIN_APP_SECRET = '2523d084edca65b6633dae215967a23f'
 
+# WEIXIN_APP_ID = 'wx22c7a048569d3e7e'
+# WEIXIN_APP_SECRET = '1340e746fb4c3719d405fdc27752bc6f'
+
 
 
 class WeixinFeeView(TemplateView):
@@ -217,6 +220,16 @@ class WeixinFeeView(TemplateView):
         return data
 
 
+class WeixinIndexView(TemplateView):
+    template_name = 'weixin_index.jade'
+
+    def get_context_data(self, **kwargs):
+        data = {
+            'identifier': self.request.GET.get('identifier', '')
+        }
+        return data
+
+
 class WeixinFeeaView(TemplateView):
     template_name = 'weixin_feea.jade'
 
@@ -226,15 +239,31 @@ class WeixinFeeaView(TemplateView):
         }
         return data
 
-
+from marketing.models import PromotionToken
 class WeixinInvitationView(TemplateView):
     template_name = 'weixin_invitation.jade'
 
     def get_context_data(self, **kwargs):
+        identifier = self.request.GET.get('identifier')
+        friend_identifier = self.request.GET.get('invite_code')
+
+        if friend_identifier:
+            try:
+                user = User.objects.get(wanglibaouserprofile__phone=friend_identifier)
+                promo_token = PromotionToken.objects.get(user=user)
+                invitecode = promo_token.token
+            except:
+                invitecode = ''
+        else:
+            invitecode = ''
+
+
         data = {
-            'identifier': self.request.GET.get('identifier'),
-            'invite_code': self.request.GET.get('invite_code')
+            'identifier': identifier,
+            'invite_code': invitecode
         }
         return data
+
+
 
 

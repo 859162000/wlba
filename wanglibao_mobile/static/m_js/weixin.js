@@ -20,9 +20,7 @@
     registered();
     retrieve();
     fee();
-    feea();
     yoa_registered()
-    //wei_yanzheng()
 
 })();
 
@@ -57,16 +55,16 @@ sameOrigin = function (url) {
     return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
 };
 
-$.ajaxSetup({
-    beforeSend: function (xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-            xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-        }
-    }
-});
+//$.ajaxSetup({
+//    beforeSend: function (xhr, settings) {
+//        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+//            xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+//        }
+//    }
+//});
 
 function log() {
-    if (Verification() == '8888') {
+    if (getQueryString('backurl') == '8888') {
         $('.top-i .jiao>img').on('click', function () {
             window.location.href = "/mobile/weixin_fee/";
         });
@@ -76,7 +74,7 @@ function log() {
     //        });
 
     $('.judge').on('click', function () {
-        if (Verification() == '8888') {
+        if (getQueryString('backurl') == '8888') {
             sessionStorage.setItem("read", '8888');
         }
         if ($(".ipon").val() == "") {
@@ -114,8 +112,7 @@ function log() {
 
 function wei_password() {
     $('.top-i .jiao>.wei_fa').on('click', function () {
-        // window.location.href = "/mobile/weixin_index/";
-        history.go(-1);
+        window.location.href = "/mobile/weixin_index/?identifier=" + Verification();
     });
     $('#wx-mobel-btn,#box p,#box h1').on('click', function (e) {
         $('#wx-mobel-box').show()
@@ -140,7 +137,7 @@ function wei_password() {
         } else {
             var userName = $.trim($(".wei_word").val());
 
-           
+
             $.ajax({
                 type: "POST",
                 url: "/api/api-token-auth/",
@@ -199,22 +196,23 @@ function registered() {
                         $('#btn').css('color', '#cccccc');
                         $('#btn').html('已发送<span id="timeb2" >60</span>秒');
                         timer = self.setInterval(addsec, 1000);
+                        var time2 = setInterval(function () {
+                            $('#btn').attr('data-num', '0');
+                            $('#btn').css('color', '#2196f3');
+                            clearInterval(time2)
+                        }, 60000)
                     }
                     else {
                         alert(result['message'])
                     }
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     var data = JSON.parse(xhr.responseText);
                     alert(data['message']);
                 }
 
             });
-            var time2 = setInterval(function () {
-                $('#btn').attr('data-num', '0');
-                $('#btn').css('color', '#2196f3');
-                clearInterval(time2)
-            }, 60000)
+
         }
     });
 
@@ -321,7 +319,7 @@ function retrieve() {
                 }
 
             });
-             var time2 = setInterval(function () {
+            var time2 = setInterval(function () {
                 $('#btnn').attr('data-num', '0');
                 $('#btnn').css('color', '#2196f3');
                 clearInterval(time2)
@@ -444,8 +442,10 @@ function fee() {
                     'onMenuShareTimeline'
                 ]
             });
-            var share_link = 'https://www.wanglibao.com/mobile/weixin_feea/?identifier=' + name;
-            var share_img_url = 'https://www.wanglibao.com/static/m_images/weixin_img/loginn.png';
+            var host = 'https://www.wanglibao.com';
+            //var host = 'http://wanglibao.pythink.com';
+            var share_link = host + '/mobile/weixin_feea/?identifier=' + name;
+            var share_img_url = host + '/static/m_images/weixin_img/loginn.png';
             var share_title = '邀请好友来网利宝理财，首次体验双方各拿30元话费';
             wx.showOptionMenu();
             wx.onMenuShareTimeline({
@@ -454,8 +454,8 @@ function fee() {
                 imgUrl: share_img_url
             });
             wx.onMenuShareAppMessage({
-                title: share_title, // 分享标题
-                desc: '', // 分享描述
+                title:'首次体验共享60元话费', // 分享标题
+                desc: '邀请好友来网利宝理财，首次体验双方各拿30元话费', // 分享描述
                 link: share_link, // 分享链接
                 imgUrl: share_img_url, // 分享图标
                 type: '', // 分享类型,music、video或link，不填默认为link
@@ -468,8 +468,8 @@ function fee() {
                 }
             });
             wx.onMenuShareQQ({
-                title: share_title, // 分享标题
-                desc: '', // 分享描述
+                title:'首次体验共享60元话费', // 分享标题
+                desc: '邀请好友来网利宝理财，首次体验双方各拿30元话费', // 分享描述
                 link: share_link, // 分享链接
                 imgUrl: share_img_url, // 分享图标
                 success: function () {
@@ -520,14 +520,11 @@ function feea() {
         } else {
             $.ajax({
                 type: "POST",
-                url: "/api/phone_validation_code/register/" + wei_f + "/",
-                data: null,
-                dataType: "json",
+                url: "/api/weixin/phone_validation_code/register/" + wei_f + "/",
                 complete: function (XMLHttpRequest, textStatus) {
                     console.log(typeof XMLHttpRequest)
                     var $data = JSON.parse(XMLHttpRequest.responseText);
                     if ($data.message == '') {
-
                         alert('验证码已发送您的手机上请注意查收');
                         window.location.href = "/mobile/weixin_invitation/?identifier=" + wei_f + '&invite_code=' + phon;
                     } else {
@@ -561,18 +558,16 @@ function yoa_registered() {
             $('.wei_xin').css('color', '#cccccc');
             $('.wei_xin').html('已发送<span id="timeb2">60</span>');
             timer = self.setInterval(addseca, 1000);
+            var identifier = $('input[name=identifier]').val();
             $.ajax({
                 type: "POST",
-                url: "/api/phone_validation_code/register/" + identifier + "/",
-                data: null,
-                dataType: "json",
+                url: "/api/weixin/phone_validation_code/register/" + identifier + "/",
                 complete: function (XMLHttpRequest, textStatus) {
                     console.log(typeof XMLHttpRequest)
                     var $data = JSON.parse(XMLHttpRequest.responseText);
                     if ($data.message == '') {
-
                         alert('验证码已发送您的手机上请注意查收');
-                        window.location.href = "/mobile/weixin_invitation/?identifier=" + wei_f + '&invite_code=' + phon;
+                        //window.location.href = "/mobile/weixin_invitation/?identifier=" + wei_f + '&invite_code=' + phon;
                     } else {
                         alert($data.message);
                     }
@@ -590,15 +585,19 @@ function yoa_registered() {
 
         }
     })
+    var $btn = $('#wei_zhu');
+    $btn.attr('disabled', false);
+    $btn.on('click', function () {
+        $btn.attr('disabled', true);
 
-    $('#wei_zhu').on('click', function () {
         var yanma = $(".yanma").val(),
             passwordd = $(".passwordd").val();
         if (yanma == "") {
             $('.weixin_ti').html('<span>信息不能为空，请填写完整</span>');
             $('input').focus(function () {
                 $('.weixin_ti').html('');
-            })
+            });
+            $btn.attr('disabled', false);
             return false;
         }
         if (!(passwordd.length >= 6 && passwordd.length <= 20)) {
@@ -606,6 +605,7 @@ function yoa_registered() {
             $('input').focus(function () {
                 $('.weixin_tq').html('');
             })
+            $btn.attr('disabled', false);
             return false;
         }
         if (yanma == "" || passwordd == "") {
@@ -613,36 +613,51 @@ function yoa_registered() {
             $('input').focus(function () {
                 $('.weixin_ti').html('');
             })
+            $btn.attr('disabled', false);
             return false;
         } else {
-
+            var data = {
+                identifier: $('input[name=identifier]').val(),
+                validate_code: yanma,
+                password: passwordd,
+                invite_code: $('input[name=invite_code]').val()
+            }
             $.ajax({
                 type: "post",
                 url: "/api/register/?promo_token=weixin",
-                data: {
-                    identifier: $('input[name=identifier]').val(),
-                    validate_code: yanma,
-                    password: passwordd,
-                    invite_code: $('input[name=invite_code]').val()
-                },
+                data: data,
                 dataType: "json",
-                complete: function (XMLHttpRequest, textStatus) {
-                    console.log(typeof XMLHttpRequest)
-                    var $dade = JSON.parse(XMLHttpRequest.responseText)
-                    console.log($dade);
-                    if ($dade.message.identifier) {
-                        alert($dade.message.identifier);
-                    } else if ($dade.message.validate_code) {
-                        $('.weixin_tq').html('<span>' + $dade.message.validate_code + '</span>');
-                        $('input').focus(function () {
-                            $('.weixin_tq').html('');
-                        })
-                        //  alert($dade.message.validate_code);
-                    } else {
-                        sessionStorage.setItem("name", Verification());
-                        window.location.href = "/mobile/weixin_app/";
+                success: function (res) {
+                    switch (res['ret_code']) {
+                        case 0:
+                            sessionStorage.setItem("name", data['identifier']);
+                            window.location.href = "/mobile/weixin_app/";
 
+                        default:
+                            $('.weixin_tq').html('<span>' + res['message'] + '</span>');
+                            $('input').focus(function () {
+                                $('.weixin_tq').html('');
+                            })
                     }
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    $btn.attr('disabled', false);
+                    //console.log(typeof XMLHttpRequest)
+                    //var $dade = JSON.parse(XMLHttpRequest.responseText)
+                    //console.log($dade);
+                    //if ($dade.message.identifier) {
+                    //    alert($dade.message.identifier);
+                    //} else if ($dade.message.validate_code) {
+                    //    $('.weixin_tq').html('<span>' + $dade.message.validate_code + '</span>');
+                    //    $('input').focus(function () {
+                    //        $('.weixin_tq').html('');
+                    //    })
+                    //    //  alert($dade.message.validate_code);
+                    //} else {
+                    //    sessionStorage.setItem("name", Verification());
+                    //    //window.location.href = "/mobile/weixin_app/";
+                    //
+                    //}
                 }
             })
         }
@@ -659,11 +674,20 @@ function Verification() {
         for (i = 0; i < strs.length; i++) {
             var pon = strs[i].split("=")[1];
         }
-
     }
     return pon
 
 }
+
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+
 
 function addsec() {
 
@@ -714,9 +738,9 @@ function addseca() {
 
 }
 function wei_yanzheng() {
-   $('#wei_xieyi2').on('click', function () {
-      history.go(-1);
-     });
+    $('#wei_xieyi2').on('click', function () {
+        history.go(-1);
+    });
 }
 
 

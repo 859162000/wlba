@@ -22,12 +22,13 @@ html
             label(style='color:#f44336')
             span
             |邀请你使用网利宝理财,首次体验可获赠
-            span 20元
+            span 30元
+            |话费。
           br
           input(type='hidden', name='identifier', value='{{ identifier }}')
-          input.wei_fee
+          input(placeholder='&nbsp;&nbsp;&nbsp;请输入手机号').wei_fee
           a.wei_ffee 获取验证码
-          form.wei.feee(style='width:58%;margin-left:40%;margin-top:0.5em;')
+          form.wei.feee(style='width:67%;margin-left:36%;margin-top:0.5em;')
               input(type='checkbox' checked='checked')#idd
               label(style='font-size: 1.5em;color: #727272;')
                   |我同意
@@ -67,6 +68,10 @@ html
 
       script(src="/static/m_js/m_lib/jquery.min.js")
       script(src="/static/m_js/weixin.js")
+      script.
+          (function() {
+              feea();
+          })();
 
 
 

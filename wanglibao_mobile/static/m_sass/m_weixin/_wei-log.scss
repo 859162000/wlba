@@ -231,7 +231,7 @@ article .wei_for>.judge{
 .wei_deng>input{
   border: none;
   font-size: 1em;
-  color: #cccccc;
+  color: #5E5959;;
   width: 70%;
   outline:medium;
 }
@@ -452,7 +452,7 @@ footer .wei_right{
 .wei_pss>input{
   border: none;
   font-size: 1em;
-  color: #cccccc;
+  color: #5E5959;
   width: 39%;
   outline:medium;
 
@@ -559,7 +559,7 @@ footer .wei_right{
 #wx-mobel-box{
     width: 100%;
     height: 100%;
-    background: rgba(110, 106, 106, 0.38);
+    background: rgba(0, 0, 0, 0.71);
     position: absolute;
     top: 0;
     display: none;
@@ -588,7 +588,7 @@ footer .wei_right{
     display: inline-block;
     width: 1em;
     height: 1em;
-    background: #999;
+    background: #565656;
     color: #fff;
     font-size: 2em;
     border-radius: 0.5em;
@@ -605,4 +605,19 @@ footer .wei_right{
     color: #2612ff;
     font-weight: normal;
 }
+
+
+#wx-mobel-box .wei_tishizi{
+  text-align: center;
+  font-size: 2em;
+  color: #ffffff;
+  margin-top: 70px;
+}
+.jiantou{
+  position: absolute;
+  right: 16px;
+  top: 15px;
+  width: 5.5em;
+}
+
 
