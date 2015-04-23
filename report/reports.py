@@ -18,6 +18,7 @@ from django.contrib.auth.models import User
 from wanglibao_margin.models import Margin
 from django.db.models import Sum
 from marketing.models import ClientData
+from wanglibao_redpack.models import RedPackRecord
 
 logger = logging.getLogger(__name__)
 storage = DefaultStorage()
@@ -300,7 +301,7 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
         output = cStringIO.StringIO()
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
-                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号', u'备注'])
+                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号', u'备注', u'借款企业/个人'])
 
         amortizations = ProductAmortization.objects.filter(
             term_date__gte=start_time, term_date__lt=end_time, product__status=u'还款中', settled=False)
@@ -319,7 +320,65 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
                 str(amortization.interest),
                 u'待还',
                 unicode("wanglibao_cphkjl_" + str(amortization.id)),
-                amortization.product.warrant_company.name
+                amortization.product.warrant_company.name,
+                amortization.product.brief
+            ])
+        return output.getvalue()
+
+
+class ProductionAmortizationsReportAllGenerator(ReportGeneratorBase):
+    prefix = 'cphkjhall'
+    reportname_format = u'产品还款计划All %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'借款编号', u'借款标题', u'借款企业/借款人', u'借款金额', u'满标时间', u'放款时间',
+                         u'借款期数', u'还款时间', u'已还本金', u'已还利息', u'未还本金', u'未还利息', u'额外罚息', u'标的状态'])
+
+        amortizations = ProductAmortization.objects.filter(
+            term_date__gte=start_time, term_date__lt=end_time).order_by('-product', 'term')
+
+        for index, amortization in enumerate(amortizations):
+            if amortization.settled:
+                principal_yes = str(amortization.principal)
+                interest_yes = str(amortization.interest)
+                principal_no = str(0)
+                interest_no = str(0)
+            else:
+                principal_yes = str(0)
+                interest_yes = str(0)
+                principal_no = str(amortization.principal)
+                interest_no = str(amortization.interest)
+            if amortization.term_date:
+                term_date = timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                term_date = ''
+            if amortization.product.soldout_time:
+                soldout_time = timezone.localtime(amortization.product.soldout_time).strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                soldout_time = ''
+            if amortization.product.make_loans_time:
+                make_loans_time = timezone.localtime(amortization.product.make_loans_time).strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                make_loans_time = ''
+
+            writer.writerow([
+                amortization.product.serial_number,
+                amortization.product.borrower_name,
+                amortization.product.name,
+                str(amortization.product.total_amount),
+                soldout_time,
+                make_loans_time,
+                u'第%d期' % amortization.term,
+                term_date,
+                principal_yes,
+                interest_yes,
+                principal_no,
+                interest_no,
+                str(amortization.penal_interest),
+                amortization.product.status
             ])
         return output.getvalue()
 
@@ -597,7 +656,39 @@ class ReportGenerator(object):
         MarginReportGenerator.generate_report(start_time=start_time, end_time=end_time)
 
 
+class RedpackReportGenerator(ReportGeneratorBase):
+    prefix = 'hbls'
+    reportname_format = u'红包流水 %s--%s'
 
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
 
+        redpackrecord = RedPackRecord.objects.filter(created_at__gte=start_time, created_at__lt=end_time).\
+            prefetch_related('redpack').prefetch_related('redpack__event').\
+            prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
+        output = cStringIO.StringIO()
 
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'红包活动ID', u'红包活动名称', u'用户名称', u'用户手机号', u'兑换平台', u'使用平台',
+                         u'红包创建时间', u'红包使用时间', u'使用金额', u'关联订单'])
+        name = ''
+        phone = ''
+        for index, record in enumerate(redpackrecord):
+            if record.user:
+                name = record.user.wanglibaouserprofile.name
+                phone = record.user.wanglibaouserprofile.phone
+            writer.writerow([
+                str(index + 1),
+                unicode(record.redpack.event.id),
+                record.redpack.event.name,
+                name,
+                phone,
+                record.change_platform,
+                record.apply_platform,
+                timezone.localtime(record.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                timezone.localtime(record.apply_at).strftime("%Y-%m-%d %H:%M:%S") if record.apply_at else '',
+                record.apply_amount,
+                unicode(record.order_id) if record.order_id else '',
+            ])
+        return output.getvalue()

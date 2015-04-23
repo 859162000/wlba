@@ -18,18 +18,43 @@ from wanglibao_p2p.forms import RequiredInlineFormSet
 
 formsets.DEFAULT_MAX_NUM = 2000
 
-class UserEquityAdmin(ConcurrentModelAdmin, VersionAdmin):
+
+class UserEquityResource(resources.ModelResource):
+    id = fields.Field(attribute="id", column_name=u"持仓ID")
+    user = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name=u"用户手机号")
+    product = fields.Field(attribute="product__name", column_name=u"产品名称")
+    equity = fields.Field(attribute="equity", column_name=u"用户所持份额")
+    created_at = fields.Field(attribute="created_at", column_name=u"持仓时间")
+
+    class Meta:
+        model = P2PEquity
+        fields = ('id', 'user', 'product', 'equity', 'created_at')
+        export_order = ('id', 'user', 'product', 'equity', 'created_at')
+
+    def dehydrate_created_at(self, obj):
+        return timezone.localtime(obj.created_at).strftime("%Y-%m-%d %H:%M:%S")
+
+
+class UserEquityAdmin(ExportMixin, admin.ModelAdmin):
     list_display = (
         'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest',
         'penal_interest')
     list_filter = ('confirm',)
     search_fields = ('product__name', 'user__wanglibaouserprofile__phone')
     raw_id_fields = ('user', 'product')
+    resource_class = UserEquityResource
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
             return [f.name for f in self.model._meta.fields]
         return ()
+
+    def get_export_filename(self, file_format):
+        date_str = timezone.now().strftime('%Y-%m-%d')
+        filename = "%s-%s.%s" % (u"用户持仓".encode('utf-8'),
+                                 date_str,
+                                 file_format.get_extension())
+        return filename
 
 
 class AmortizationInline(admin.TabularInline):
@@ -185,8 +210,8 @@ class P2PProductResource(resources.ModelResource):
 
 
 class P2PProductForm(forms.ModelForm):
-    serial_number = forms.CharField(label=u'产品编号*', required=True)
-
+    serial_number = forms.CharField(label=u'产品编号*', required=True, max_length=100, widget=forms.TextInput(attrs={'class': 'vTextField'}))
+    
     class Meta:
         model = P2PProduct
     
@@ -238,7 +263,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     inlines = [
         P2PProductContractInline, WarrantInline, AttachementInline, AmortizationInline#, P2PEquityInline
     ]
-    list_display = ('id', 'name', 'total_amount', 'brief', 'status', 'pay_method', 'end_time', 'audit_link', 'preview_link', 'preview_contract', 'copy_link', 'priority')
+    list_display = ('id', 'name', 'total_amount', 'brief', 'status', 'pay_method', 'end_time', 'warrant_company', 'audit_link', 'preview_link', 'preview_contract', 'copy_link', 'priority')
     list_editable = ('priority',)
     list_filter = ('status', )
     search_fields = ('name',)
@@ -314,12 +339,37 @@ class AmortizationRecordAdmin(admin.ModelAdmin):
     raw_id_fields = ('amortization', 'user')
 
 
-class EquityRecordAdmin(ReadPermissionModelAdmin):
+class EquityResource(resources.ModelResource):
+    order_id = fields.Field(attribute="order_id", column_name=u"流水号")
+    user = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name=u"用户手机号")
+    product = fields.Field(attribute="product__name", column_name=u"产品名称")
+    amount = fields.Field(attribute="amount", column_name=u"所持份额")
+    create_time = fields.Field(attribute="create_time", column_name=u"流水时间")
+    description = fields.Field(attribute="description", column_name=u"摘要信息")
+
+    class Meta:
+        model = EquityRecord
+        fields = ('order_id', 'user', 'product', 'amount', 'create_time', 'description')
+        export_order = ('order_id', 'user', 'product', 'amount', 'create_time', 'description')
+
+    def dehydrate_create_time(self, obj):
+        return timezone.localtime(obj.create_time).strftime("%Y-%m-%d %H:%M:%S")
+
+
+class EquityRecordAdmin(ExportMixin, ReadPermissionModelAdmin):
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
-    search_fields = ('user__wanglibaouserprofile__phone',)
+    search_fields = ('user__wanglibaouserprofile__phone', 'product__name')
+    resource_class = EquityResource
 
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]
+
+    def get_export_filename(self, file_format):
+        date_str = timezone.now().strftime('%Y-%m-%d')
+        filename = "%s-%s.%s" % (u"持仓流水".encode('utf-8'),
+                                 date_str,
+                                 file_format.get_extension())
+        return filename
 
 
 class ProductAmortizationAdmin(ReadPermissionModelAdmin):

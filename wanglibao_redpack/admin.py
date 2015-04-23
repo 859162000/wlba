@@ -36,10 +36,11 @@ class RedPackAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = RedPackResource
 
 class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
-    list_display = ("id", "redpack", "user", "change_platform", "apply_platform", "created_at", "apply_at", "order_id")
-    search_fields = ('user__wanglibaouserprofile__phone','redpack__event__name')
+    list_display = ("id", "redpack", "user", "change_platform", "apply_platform", "created_at",
+                    "apply_amount", "apply_at", "order_id")
+    search_fields = ('user__wanglibaouserprofile__phone', 'redpack__event__name')
     raw_id_fields = ('user', "redpack")
-    list_filter = ('change_platform','apply_platform')
+    list_filter = ('change_platform', 'apply_platform')
 
 
 admin.site.register(RedPack, RedPackAdmin)

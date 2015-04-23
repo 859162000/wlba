@@ -107,6 +107,7 @@ INSTALLED_APPS = (
     'wanglibao_margin',
     'wanglibao_redpack',
     'wanglibao_help',
+    'wanglibao_activity',
     'wanglibao_mobile',
 
     'report',
@@ -356,6 +357,10 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_pay': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+        'wanglibao_activity': {
             'handlers': ['file'],
             'level': 'DEBUG',
         },

@@ -69,16 +69,20 @@ require ['jquery'], ($)->
 
 #  high_day=parseInt()
   hight=(high_m,ele)->
+    data=new Date()
+    Y=data.getFullYear()
+    m=data.getMonth()+1
+    day=data.getDate()
     g=0
     while g<$('.day-yue li').length-2
       k=0
       while k<$(ele+' li:eq('+g+')').children('span').length
-
         if m==high_m and day==parseInt($(ele+' li:eq('+g+')').children('span:eq('+k+')').text())
-
           $(ele+' li:eq('+g+')').children('span:eq('+k+')').addClass('tap-hight2').siblings().removeClass('tap-hight2')
 #          $('.day-san').children('span').removeClass('tap-hight2')
           $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'rgb(244, 136, 144)','color':'#000'})
+        if m!=high_m and day==parseInt($(ele+' li:eq('+g+')').children('span:eq('+k+')').text())
+          $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'#FFB7C5','color':'#666671','font-weight':'normal'})
         k++
       g++
 
@@ -109,7 +113,8 @@ require ['jquery'], ($)->
       Y=date.getFullYear()
       m=date.getMonth()+1
       day=date.getDate()
-      if day.length<2
+
+      if day<10
           day='0'+day
       date=Y+'-0'+m+"-"+day
       j=0
@@ -197,7 +202,7 @@ require ['jquery'], ($)->
   Y=data.getFullYear()
   m=data.getMonth()+1
   day=data.getDate()
-  if day.length<2
+  if day<10
       day='0'+day
   date=Y+'-0'+m+"-"+day
   hight(m,'.day-san')
@@ -211,7 +216,7 @@ require ['jquery'], ($)->
   wei2.setMinutes(0)
   wei2.setSeconds(0)
   gotime=wei2.getTime()-wei.getTime()
- 
+
   setTimeout(()->
     $('.ing li').eq(1).addClass('ing-hight')
     $('.day-head h1').eq(1).addClass('h1-hight')
@@ -227,6 +232,7 @@ require ['jquery'], ($)->
     $('.day-si span').removeClass('tap-hight2')
     high_m=parseInt($('.mon').text())
     hight(high_m,'.day-san')
+
   )
   $('.right-btn').on('click',()->
     $('.mon').html('4 月')
@@ -245,9 +251,11 @@ require ['jquery'], ($)->
     time='2015-0'+m+'-'+d
     data=new Date()
     Y=data.getFullYear()
-    m=data.getMonth()+1
+    zm=data.getMonth()+1
     day=data.getDate()
-    date=Y+'-0'+m+"-"+day
+    if day.length<2
+      day='0'+day
+    date=Y+'-0'+zm+"-"+day
     if time>='2015-03-24' and time<='2015-04-30' and time<=date
       $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2')
       $(this).parent().siblings().children('span').removeClass('tap-hight2')

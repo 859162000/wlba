@@ -190,7 +190,7 @@ html
                         span.red-text {{product.warrant_company.name}}
                         span &nbsp;&nbsp;无条件兑付
                       else
-                        span 担保机构: &nbsp;&nbsp;
+                        span 合作机构: &nbsp;&nbsp;
                         span.d3-text {{product.warrant_company.name}}
 
                     .span3-omega.align-right
@@ -290,7 +290,7 @@ html
                                   .amount-sum ￥{{month.amount_sum|money_format_int}}
             else
               .panel_top_finish
-                a(href="/activity/newyear")
+                a(href="/activity/investment", target="_blank")
 
           div
             .panel.news-list-container

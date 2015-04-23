@@ -31,6 +31,7 @@ from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5 as pk
 from Crypto.Cipher import PKCS1_v1_5, AES
 import base64
+from wanglibao_rest.utils import split_ua
 
 logger = logging.getLogger(__name__)
 
@@ -300,7 +301,8 @@ class YeePay:
 
         pay_info.save()
         if rs['ret_code'] == 0:
-            tools.despoit_ok(pay_info)
+            device = split_ua(request)
+            tools.despoit_ok(pay_info, device['device_type'])
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
@@ -480,6 +482,7 @@ class KuaiPay:
                             card['bank_id'] = z['bankId']['value']
                             bank = Bank.objects.filter(kuai_code=card['bank_id']).first()
                             card['bank_name'] = bank.name
+                            card['gate_id'] = bank.gate_id
                             if bank.kuai_limit:
                                 card.update(_handle_kuai_bank_limit(bank.kuai_limit))
                         if "storablePan" in z:
@@ -489,6 +492,14 @@ class KuaiPay:
             return {"ret_code":20091, "message":message}
         if merchantId != self.MER_ID or customerId != str(request.user.id):
             return {"ret_code":20092, "message":"卡信息不匹配"}
+
+        try:
+            card_list = Card.objects.filter(user=request.user).select_related('bank').order_by('-last_update')
+            bank_list = [c.bank.gate_id for c in card_list]
+            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x['gate_id']))
+            cards = cards_tmp
+        except:
+            pass
 
         return {"ret_code":0, "message":"test", "cards":cards}
 
@@ -541,6 +552,8 @@ class KuaiPay:
             return {"ret_code": 2, "message":"请耐心等候充值完成"}
         elif res_code == "og":
             return {"ret_code": 3, "message":"充值金额太大"}
+        elif res_code == "tc":
+            return {"ret_code": 4, "message":"不能使用信用卡"}
         elif res_code == "51":
             return {"ret_code": 51, "message":"余额不足"}
         else:
@@ -660,7 +673,7 @@ class KuaiPay:
             pay_info.save()
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
-            dic = {"user_id":user.id, "order_id":order.id, "id_number":profile.id_number,
+            dic = {"user_id":user.id, "order_id":order.id, "id_number":profile.id_number.upper(),
                     "phone":input_phone, "name":profile.name, "amount":amount,
                     "card_no":pay_info.card_no}
 
@@ -691,7 +704,10 @@ class KuaiPay:
                     pay_info.response = res.content
                     pay_info.save()
                     return {"ret_code":201181, "message":result['message']}
-                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content)
+                device = split_ua(request)
+                device_type = device['device_type']
+                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
+
                 return ms
             else:
                 token = self._handle_dynnum_result(res)
@@ -701,6 +717,7 @@ class KuaiPay:
                     pay_info.error_message = token['message']
                     pay_info.save()
                     return {"ret_code":201182, "message":token['message']}
+
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
             logger.error(traceback.format_exc())
@@ -725,7 +742,7 @@ class KuaiPay:
             return {"ret_code":20121, "message":"订单不存在或已支付成功"}
         user = request.user
         profile = user.wanglibaouserprofile
-        dic = {"user_id":user.id, "order_id":order_id, "id_number":profile.id_number,
+        dic = {"user_id":user.id, "order_id":order_id, "id_number":profile.id_number.upper(),
                 "phone":input_phone, "name":profile.name, "amount":pay_info.amount,
                 "time":pay_info.create_time.strftime("%Y%m%d%H%M%S"), "vcode":vcode,
                 "card_no":pay_info.card_no, "token":token, "bank_id":pay_info.bank.kuai_code}
@@ -748,11 +765,13 @@ class KuaiPay:
             return {"ret_code":201241, "message":result['message']}
         elif result['ret_code'] > 0:
             return {"ret_code":20124, "message":result['message']}
-        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content)
+        device = split_ua(request)
+        device_type = device['device_type']
+        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
         return ms
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content):
+    def handle_margin(self, amount, order_id, user_id, ip, response_content, device_type):
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info:
             return {"ret_code":20131, "message":"order not exist"}
@@ -796,7 +815,14 @@ class KuaiPay:
            #         card.user = pay_info.user
            #         card.is_default = False
            #         card.save()
-            tools.despoit_ok(pay_info)
+            tools.despoit_ok(pay_info, device_type)
+
+            # 充值成功后，更新本次银行使用的时间
+            if len(pay_info.card_no) == 10:
+                Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now())
+            else:
+                Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now())
+
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
@@ -866,6 +892,9 @@ def add_bank_card(request):
     exist_cards = Card.objects.filter(no=card_no, user=user).first()
     if exist_cards:
         return {"ret_code":20024, "message":"该银行卡已经存在"}
+    exist_cards = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+    if exist_cards:
+        return {"ret_code":20026, "message":"该银行卡已经存在"}
 
     is_default = request.DATA.get("is_default", "false")
     if is_default.lower() in ("true", "1"):

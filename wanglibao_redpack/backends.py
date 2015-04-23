@@ -101,6 +101,7 @@ def utc_transform(dt):
 def exchange_redpack(token, device_type, user):
     if token == "":
         return {"ret_code":30161, "message":"请输入兑换码"}
+    token = token.replace("'","").replace('"',"").replace("`","")
     #redpack = RedPack.objects.filter(token=token).first()
     redpack = RedPack.objects.extra(where=["binary token='%s'" % token]).first()
     device_type = _decide_device(device_type)
@@ -184,11 +185,20 @@ def exchange_redpack(token, device_type, user):
 def _send_message(user, event):
     fmt_str = "%Y年%m月%d日"
     give_time = timezone.localtime(event.unavailable_at).strftime(fmt_str)
-    send_messages.apply_async(kwargs={
-        'phones': [user.wanglibaouserprofile.phone],
-        'messages': [messages.redpack_give(event.amount, event.name, give_time)]
-    })
-    title, content = messages.msg_redpack_give(event.amount, event.name, give_time)
+    if event.rtype == 'percent':
+        send_messages.apply_async(kwargs={
+            'phones': [user.wanglibaouserprofile.phone],
+            'messages': [messages.redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)]
+        })
+    else:
+        send_messages.apply_async(kwargs={
+            'phones': [user.wanglibaouserprofile.phone],
+            'messages': [messages.redpack_give(event.amount, event.name, give_time)]
+        })
+    if event.rtype == 'percent':
+        title, content = messages.msg_redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)
+    else:
+        title, content = messages.msg_redpack_give(event.amount, event.name, give_time)
     inside_message.send_one.apply_async(kwargs={
         "user_id": user.id,
         "title": title,
@@ -202,6 +212,8 @@ def _decide_device(device_type):
         return "ios"
     elif device_type == "android":
         return "android"
+    elif device_type == "all":
+        return "all"
     else:
         return "pc"
 
@@ -216,6 +228,49 @@ def give_first_pay_redpack(user, device_type):
 
 def give_first_buy_redpack(user, device_type):
     _give_redpack(user, "first_buy", device_type)
+
+
+def give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id):
+    _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id)
+
+
+def give_buy_redpack(user, device_type, rtype='buy', describe=''):
+    now = timezone.now()
+    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
+    if describe:
+        rps = rps.filter(describe=describe)
+    for x in rps:
+        give_activity_redpack(user=user, event=x, device_type=device_type)
+
+
+def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id):
+    """ rule_id: get message template """
+    now = timezone.now()
+    user_channel = helper.which_channel(user)
+    device_type = _decide_device(device_type)
+    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id, \
+                                      give_start_at__lt=now, give_end_at__gt=now).first()
+    if rps:
+        if rps.target_channel != "":
+            chs = rps.target_channel.split(",")
+            chs = [m for m in chs if m.strip() != ""]
+            if user_channel not in chs:
+                return
+        redpack = RedPack.objects.filter(event=rps, status="unused").first()
+        if redpack:
+            event = redpack.event
+            give_pf = event.give_platform
+            if give_pf == "all" or give_pf == device_type:
+                if redpack.token != "":
+                    redpack.status = "used"
+                    redpack.save()
+                record = RedPackRecord()
+                record.user = user
+                record.redpack = redpack
+                record.change_platform = device_type
+                record.save()
+                _send_message(user, event)
+
 
 def _give_redpack(user, rtype, device_type):
     now = timezone.now()
@@ -281,15 +336,16 @@ def consume(redpack, amount, user, order_id, device_type):
     if event.apply_platform != "all" and event.apply_platform != device_type:
         return {"ret_code":30176, "message":"此红包只能在%s平台使用" % event.apply_platform}
 
+    rtype = event.rtype
+    rule_value = event.amount
+    deduct = _calc_deduct(amount, rtype, rule_value, event)
+
     record.order_id = order_id
     record.apply_platform = device_type
+    record.apply_amount = deduct
     record.apply_at = timezone.now()
     record.save()
 
-    rtype = event.rtype
-    rule_value = event.amount
-    deduct = event.amount
-    deduct = _calc_deduct(amount, rtype, rule_value, event)
    # if REDPACK_RULE[rtype] == "*":
    #     #return {"ret_code":30176, "message":"目前不支付百分比红包"}
    #     rule_value = rule_value/100.0

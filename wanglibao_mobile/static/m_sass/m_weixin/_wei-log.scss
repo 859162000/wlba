@@ -125,14 +125,14 @@ body{
 
 }
 .top-i{
-  height: 60px;
+  height: 45px;
   background: #f44336;
   position: relative;
 }
 .top-i .jiao{
   display: inline-block;
   position: absolute;
-  top: 23%;
+  top: 20%;
   left:28px;
 }
 .top-i .jiao>img{
@@ -141,7 +141,7 @@ body{
 .top-i p{
   text-align: center;
   color: #FFFFFF;
-  line-height:60px;
+  line-height:50px;
   font-size: 22px;
 }
 .wei_dian>img{
@@ -186,7 +186,7 @@ article .wei_for{
   height: 30%;
 }
 article .wei_for>.ipon{
-  margin-top: 12%;
+  margin-top: 7%;
   width: 90%;
   height: 3.5em;
   border-radius: 7px 7px 0 0;
@@ -212,7 +212,6 @@ article .wei_for>.judge{
   color: #FFFFFF;
   border: none;
   outline:medium;
-
 }
 //==================================
 .wei_deng{
@@ -241,7 +240,7 @@ article .wei_for>.judge{
   margin-left: 72%;
   color: #2196f3;
   display: block;
-  font-size: 2em;
+  font-size: 1.5em;
 }
 .wei_buttonn{
   width: 100%;
@@ -264,7 +263,7 @@ article .wei_for>.judge{
 
 }
 .wei_kefu>p{
-  font-size: 2em;
+  font-size: 1.5em;
   line-height: 4em;
   color: #909090;
 }
@@ -578,10 +577,10 @@ footer .wei_right{
 }
 
 #box p{
-    line-height: 1.5em;
-    padding: 1.5em 0;
+    line-height: 2em;
+    padding: 1.3em 0;
     border-bottom: 1px solid #ccc;
-    font-size: 1.5em;
+    font-size: 1.3em;
     color: #515151;
 }
 

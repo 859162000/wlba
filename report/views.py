@@ -8,7 +8,8 @@ from django.contrib import messages
 from django.db.models import Sum
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
     PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator, \
-    EearningReportGenerator, WithDrawDetailReportGenerator, P2PstatusReportGenerator, ClientInfoGenerator
+    EearningReportGenerator, WithDrawDetailReportGenerator, P2PstatusReportGenerator, ClientInfoGenerator, \
+    RedpackReportGenerator, ProductionAmortizationsReportAllGenerator
 from wanglibao_margin.models import Margin
 
 type = (
@@ -22,6 +23,8 @@ type = (
     (u'提现详细记录', 7),
     (u'满标状态变化', 8),
     (u'客户端信息', 9),
+    (u'红包流水', 10),
+    (u'产品还款计划all', 11)
 )
 
 
@@ -70,6 +73,10 @@ class AdminReportExport(TemplateView):
             self._generate_p2pstatus(request, start_time, end_time)
         if type == '9':
             self._generate_clientinfo(request, start_time, end_time)
+        if type == '10':
+            self._generate_redpackdrecord(request, start_time, end_time)
+        if type == '11':
+            self._generate_production_amortizations_all(request, start_time, end_time)
 
         return HttpResponseRedirect('export')
 
@@ -103,6 +110,12 @@ class AdminReportExport(TemplateView):
 
     def _generate_clientinfo(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, ClientInfoGenerator, u'客户端信息')
+
+    def _generate_redpackdrecord(self, request, start_time, end_time):
+        self._apply_generate(request, start_time, end_time, RedpackReportGenerator, u'红包流水')
+
+    def _generate_production_amortizations_all(self, request, start_time, end_time):
+        self._apply_generate(request, start_time, end_time, ProductionAmortizationsReportAllGenerator, u'产品还款计划all')
 
     def _apply_generate(self, request, start_time, end_time, cls, message='', type=None):
         print type, 'type........'

@@ -76,7 +76,11 @@
       }
     };
     hight = function(high_m, ele) {
-      var g, k, _results;
+      var Y, data, day, g, k, m, _results;
+      data = new Date();
+      Y = data.getFullYear();
+      m = data.getMonth() + 1;
+      day = data.getDate();
       g = 0;
       _results = [];
       while (g < $('.day-yue li').length - 2) {
@@ -87,6 +91,13 @@
             $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').css({
               'background': 'rgb(244, 136, 144)',
               'color': '#000'
+            });
+          }
+          if (m !== high_m && day === parseInt($(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').text())) {
+            $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').css({
+              'background': '#FFB7C5',
+              'color': '#666671',
+              'font-weight': 'normal'
             });
           }
           k++;
@@ -123,7 +134,7 @@
         Y = date.getFullYear();
         m = date.getMonth() + 1;
         day = date.getDate();
-        if (day.length < 2) {
+        if (day < 10) {
           day = '0' + day;
         }
         date = Y + '-0' + m + "-" + day;
@@ -250,7 +261,7 @@
     Y = data.getFullYear();
     m = data.getMonth() + 1;
     day = data.getDate();
-    if (day.length < 2) {
+    if (day < 10) {
       day = '0' + day;
     }
     date = Y + '-0' + m + "-" + day;
@@ -291,7 +302,7 @@
       return hight(high_m, '.day-si');
     });
     return $('.day-yue span').on('click', function() {
-      var d, time;
+      var d, time, zm;
       m = parseInt($('.mon').text());
       d = $(this).text();
       if (d.length < 2) {
@@ -300,9 +311,12 @@
       time = '2015-0' + m + '-' + d;
       data = new Date();
       Y = data.getFullYear();
-      m = data.getMonth() + 1;
+      zm = data.getMonth() + 1;
       day = data.getDate();
-      date = Y + '-0' + m + "-" + day;
+      if (day.length < 2) {
+        day = '0' + day;
+      }
+      date = Y + '-0' + zm + "-" + day;
       if (time >= '2015-03-24' && time <= '2015-04-30' && time <= date) {
         $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2');
         $(this).parent().siblings().children('span').removeClass('tap-hight2');

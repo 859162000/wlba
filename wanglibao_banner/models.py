@@ -70,3 +70,12 @@ class Hiring(models.Model):
 
     def __unicode__(self):
         return "%s" % self.name
+
+
+class Aboutus(models.Model):
+    class Meta:
+        verbose_name_plural = u'关于我们'
+
+    title = models.CharField(u'中文标题', max_length=128)
+    code = models.CharField(u'英文代码', max_length=30)
+    content = RichTextField(verbose_name=u'详细内容')

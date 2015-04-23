@@ -42,4 +42,11 @@ def local_datetime(dt):
     return timezone.get_current_timezone().normalize(dt)
 
 def fmt_dt_normal(dt):
-    return dt.strftime("%Y-%m-%d %H:%M:%S")
+    if dt:
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
+    return ""
+
+def fmt_date_normal(dt):
+    if dt:
+        return dt.strftime("%Y-%m-%d")
+    return ""
