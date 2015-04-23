@@ -3,7 +3,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView
 from views import HomeView, IndexView, DetailView, AccountRedirectView, \
-    WeixinFeeaView, WeixinInvitationView, WeixinFeeView
+    WeixinFeeaView, WeixinInvitationView, WeixinFeeView, WeixinIndexView
 
 
 urlpatterns = patterns('',
@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     url(r'^mobile_assets/$', TemplateView.as_view(template_name="mobile_assets.jade")),
     url(r'^mobile_more/$', TemplateView.as_view(template_name="mobile_more.jade")),
     url(r'^mobile_detail/$', TemplateView.as_view(template_name="mobile_detail.jade")),
-    url(r'^weixin_index/$', TemplateView.as_view(template_name="weixin_index.jade")),
+    url(r'^weixin_index/$', WeixinIndexView.as_view()),
     url(r'^weixin_inputt/$', TemplateView.as_view(template_name="weixin_inputt.jade")),
     url(r'^weixin_about/$', TemplateView.as_view(template_name="weixin_about.jade")),
     url(r'^weixin_xieyi/$', TemplateView.as_view(template_name="weixin_xieyi.jade")),
