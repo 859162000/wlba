@@ -4,11 +4,11 @@ define ['jquery'], ($)->
       term_amount = amount * (rate * Math.pow(1 + rate, period)) / (Math.pow(1 + rate, period) -1)
       result  = term_amount * period - amount
     else if /日计息/ig.test(pay_method)
-      result = amount * (rate/360) * period
+      result = amount * rate * period / 360
     else
-      result = amount * (rate/12) * period
+      result = amount * rate * period / 12
 
-    return result.toFixed(2)
+    return Math.floor(result * 100) / 100
 
   $('input[data-role=earning-calculator]').keyup (e)->
     target = $(e.target)

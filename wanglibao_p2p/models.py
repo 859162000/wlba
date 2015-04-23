@@ -253,6 +253,10 @@ class P2PProduct(ProductBase):
     def display_status(self):
         return self.display_status_mapping[self.status]
 
+    @property
+    def terms(self):
+        return self.amortizations.all().count()
+
 
     display_payback_mapping = {
         u'等额本息': u'等额本息',

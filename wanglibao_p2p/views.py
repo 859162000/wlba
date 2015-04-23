@@ -606,9 +606,11 @@ class AdminP2PList(TemplateView):
         name = self.request.GET.get('p2p_name', False)
         if name:
             p2p_list = P2PProduct.objects.filter(status=u'还款中', name=name) \
+                    .select_related('amortizations') \
                     .order_by('-id')
         else:
             p2p_list = P2PProduct.objects.filter(status=u'还款中') \
+                    .select_related('amortizations') \
                     .order_by('-id')
 
         return {

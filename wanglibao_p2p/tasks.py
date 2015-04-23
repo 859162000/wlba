@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
+from wanglibao.templatetags.formatters import period_unit
 import time
 
 
@@ -66,12 +67,17 @@ def build_earning(product_id):
 
     p2p = P2PProduct.objects.select_related('activity__rule').get(pk=product_id)
 
+    if not Earning.objects.filter(product=p2p).count():
+        return
+
     #按用户汇总某个标的收益
     earning = P2PRecord.objects.values('user').annotate(sum_amount=Sum('amount')).filter(product=p2p, catalog=u'申购')
 
     phone_list = []
     earning_list = []
     rule = p2p.activity.rule
+
+    unit = period_unit(p2p.pay_method)
 
     #把收益数据插入earning表内
     for obj in earning:
@@ -104,7 +110,8 @@ def build_earning(product_id):
 
         earning_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
         title, content = messages.msg_bid_earning(p2p.name, p2p.activity.name,
-                                                  p2p.period, earning_time, rule.percent_text, amount)
+                                                  p2p.period, earning_time,
+                                                  rule.percent_text, amount, unit)
         inside_message.send_one.apply_async(kwargs={
             "user_id": obj.get('user'),
             "title": title,
