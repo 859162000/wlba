@@ -326,6 +326,63 @@ class ProductionAmortizationsReportGenerator(ReportGeneratorBase):
         return output.getvalue()
 
 
+class ProductionAmortizationsReportAllGenerator(ReportGeneratorBase):
+    prefix = 'cphkjhall'
+    reportname_format = u'产品还款计划All %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        output = cStringIO.StringIO()
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'借款编号', u'借款标题', u'借款企业/借款人', u'借款金额', u'满标时间', u'放款时间',
+                         u'借款期数', u'还款时间', u'已还本金', u'已还利息', u'未还本金', u'未还利息', u'额外罚息', u'标的状态'])
+
+        amortizations = ProductAmortization.objects.filter(
+            product__publish_time__gte=start_time, product__publish_time__lt=end_time).order_by('-product', 'term')
+
+        for index, amortization in enumerate(amortizations):
+            if amortization.settled:
+                principal_yes = str(amortization.principal)
+                interest_yes = str(amortization.interest)
+                principal_no = str(0)
+                interest_no = str(0)
+            else:
+                principal_yes = str(0)
+                interest_yes = str(0)
+                principal_no = str(amortization.principal)
+                interest_no = str(amortization.interest)
+            if amortization.term_date:
+                term_date = timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                term_date = ''
+            if amortization.product.soldout_time:
+                soldout_time = timezone.localtime(amortization.product.soldout_time).strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                soldout_time = ''
+            if amortization.product.make_loans_time:
+                make_loans_time = timezone.localtime(amortization.product.make_loans_time).strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                make_loans_time = ''
+
+            writer.writerow([
+                amortization.product.serial_number,
+                amortization.product.name,
+                amortization.product.borrower_name,
+                str(amortization.product.total_amount),
+                soldout_time,
+                make_loans_time,
+                u'第%d期' % amortization.term,
+                term_date,
+                principal_yes,
+                interest_yes,
+                principal_no,
+                interest_no,
+                str(amortization.penal_interest),
+                amortization.product.status
+            ])
+        return output.getvalue()
+
+
 class ProductionAmortizationsSettledReportGenerator(ReportGeneratorBase):
     prefix = 'hkjijs'
     reportname_format = u'产品还款结算 %s--%s'
