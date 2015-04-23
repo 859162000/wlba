@@ -447,7 +447,7 @@ function fee() {
             });
             var share_link = 'https://www.wanglibao.com/mobile/weixin_feea/?identifier=' + name;
             var share_img_url = 'https://www.wanglibao.com/static/m_images/weixin_img/loginn.png';
-            var share_title = '邀请好友送30元话费';
+            var share_title = '邀请好友来网利宝理财，首次体验双方各拿30元话费';
             wx.showOptionMenu();
             wx.onMenuShareTimeline({
                 title: share_title, // 分享标题
