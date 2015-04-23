@@ -88,7 +88,7 @@ def generate_weixin_jssdk_config(app_id, app_secret, url):
     params['jsapi_ticket'] = jsapi_ticket
     params['noncestr'] = uuid.uuid1().hex
     params['timestamp'] = str(int(time.time()))
-    params['url'] = url.split('#')[0]
+    params['url'] = url
     string = '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
     signature = hashlib.sha1(string).hexdigest()
 
