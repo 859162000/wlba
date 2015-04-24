@@ -100,7 +100,7 @@ class PrepaymentHistory(object):
 
             if index == 0:
                 #and make_loans_time < date_now < term_date:
-                if make_loans_time < payment_date < term_date and amortizations[index-1].settled:
+                if make_loans_time < payment_date < term_date:
                     self.days = (term_date - make_loans_time).days
                     amortization_current = amortization
                     break

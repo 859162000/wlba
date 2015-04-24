@@ -1,7 +1,9 @@
 define ['jquery'], ($)->
   calculate = (amount, rate, period, pay_method) ->
     if /等额本息/ig.test(pay_method)
-      term_amount = amount * (rate * Math.pow(1 + rate, period)) / (Math.pow(1 + rate, period) -1)
+      rate_pow = Math.pow(1 + rate, period)
+      divisor = rate_pow - 1
+      term_amount = amount * (rate * rate_pow) / divisor
       result  = term_amount * period - amount
     else if /日计息/ig.test(pay_method)
       result = amount * rate * period / 360
