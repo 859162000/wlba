@@ -212,6 +212,7 @@ class WeixinFeeView(TemplateView):
     def get_context_data(self, **kwargs):
         url = self.get_current_url()
         data = dict()
+        data['weixin_debug'] = '1' if self.request.GET.get('debug') == '1' else '0'
         data['app_id'] = WEIXIN_APP_ID
         try:
             data.update(generate_weixin_jssdk_config(WEIXIN_APP_ID, WEIXIN_APP_SECRET, url))
