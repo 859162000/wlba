@@ -446,8 +446,8 @@ function fee() {
                     'onMenuShareTimeline'
                 ]
             });
-            //var host = 'https://www.wanglibao.com';
-            var host = 'http://wanglibao.pythink.com';
+            var host = 'https://www.wanglibao.com';
+            //var host = 'http://wanglibao.pythink.com';
             var share_link = host + '/mobile/weixin_feea/?identifier=' + name;
             var share_img_url = host + '/static/m_images/weixin_img/loginn.png';
             var share_title = '邀请好友来网利宝理财，首次体验双方各拿30元话费';

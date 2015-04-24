@@ -192,11 +192,11 @@ class AccountRedirectView(RedirectView):
 
 
 from .weixin import generate_weixin_jssdk_config
-# WEIXIN_APP_ID = 'wx110c1d06158c860b'
-# WEIXIN_APP_SECRET = '2523d084edca65b6633dae215967a23f'
+WEIXIN_APP_ID = 'wx110c1d06158c860b'
+WEIXIN_APP_SECRET = '2523d084edca65b6633dae215967a23f'
 
-WEIXIN_APP_ID = 'wx22c7a048569d3e7e'
-WEIXIN_APP_SECRET = '1340e746fb4c3719d405fdc27752bc6f'
+# WEIXIN_APP_ID = 'wx22c7a048569d3e7e'
+# WEIXIN_APP_SECRET = '1340e746fb4c3719d405fdc27752bc6f'
 
 
 
