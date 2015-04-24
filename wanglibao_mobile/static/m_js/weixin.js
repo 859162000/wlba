@@ -268,7 +268,7 @@ function registered() {
             success: function (result) {
 
                 if (result['ret_code'] == 0) {
-                    alert('登录成功');
+                    alert('注册成功');
                     sessionStorage.setItem("name", Verification());
                     var read = sessionStorage.getItem("read");
                     if (read == '8888') {
@@ -641,6 +641,7 @@ function yoa_registered() {
                 success: function (res) {
                     switch (res['ret_code']) {
                         case 0:
+                            alert('注册成功');
                             sessionStorage.setItem("name", data['identifier']);
                             window.location.href = "/mobile/weixin_app/";
 
