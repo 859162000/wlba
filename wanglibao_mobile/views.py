@@ -204,7 +204,10 @@ class WeixinFeeView(TemplateView):
     template_name = 'weixin_fee.jade'
 
     def get_current_url(self):
-        url = '%s%s%s' % (['http://', 'https://'][self.request.is_secure()],
+        # url = '%s%s%s' % (['http://', 'https://'][self.request.is_secure()],
+        #                   self.request.get_host(),
+        #                   self.request.get_full_path().split('#')[0])
+        url = '%s%s%s' % (['http://', 'https://'][self.request.get_host() in ['www.wanglibao.com']],
                           self.request.get_host(),
                           self.request.get_full_path().split('#')[0])
         return url
