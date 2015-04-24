@@ -11,7 +11,7 @@ html
   body(style='background: url(/static/m_images/weixin_img/ban.jpg) no-repeat; background-size:cover;')
       .top-i
           a.jiao
-            //img(src='/static/m_images/weixin_img/sanjiao.png')
+            img(src='/static/m_images/weixin_img/sanjiao.png').weixin_f
           p 网利宝手机客户端
       .wei_ma
           h3 互联网私人银行
@@ -30,6 +30,9 @@ html
 
       script(src="/static/m_js/m_lib/jquery.min.js")
       script.
+          $('.weixin_f').on('click',function(){
+              history.go(-1);
+          })
           $('#wx-mobel-btn').on('click', function (e) {
               var userAgent = navigator.userAgent;
                 $.os = {};
