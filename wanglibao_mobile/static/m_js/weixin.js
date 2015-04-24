@@ -428,7 +428,7 @@ function fee() {
     });
 
     wx.config({
-        debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
         appId: $('meta[name=app-id]').attr('content'), // 必填，公众号的唯一标识
         timestamp: $('meta[name=timestamp]').attr('content'), // 必填，生成签名的时间戳
         nonceStr: $('meta[name=noncestr]').attr('content'), // 必填，生成签名的随机串
@@ -446,8 +446,8 @@ function fee() {
                     'onMenuShareTimeline'
                 ]
             });
-            var host = 'https://www.wanglibao.com';
-            //var host = 'http://wanglibao.pythink.com';
+            //var host = 'https://www.wanglibao.com';
+            var host = 'http://wanglibao.pythink.com';
             var share_link = host + '/mobile/weixin_feea/?identifier=' + name;
             var share_img_url = host + '/static/m_images/weixin_img/loginn.png';
             var share_title = '邀请好友来网利宝理财，首次体验双方各拿30元话费';
