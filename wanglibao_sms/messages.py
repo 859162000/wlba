@@ -110,28 +110,28 @@ def msg_bid_fail(product_name):
 
 def msg_register():
     title = u"注册成功"
-    content = u"感谢您注册网利宝。 完成实名认证并充值。<br/><a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
+    content = u"感谢您注册网利宝。 完成实名认证并充值。<br/><a href='/accounts/id_verify/' target='_blank'>点击完成实名认证</a><br/>感谢您对我们的支持与关注。<br/>网利宝"
     return title, content
 
 #风行过来的注册成功
 def msg_register_f():
     title = u"注册成功"
-    content = u"感谢您注册网利宝。 完成实名认证并充值成功，免费领取7天风行VIP会员。<br/> <a href='/accounts/id_verify/' target='_blank'>点击此处完成实名认证</a></br/> 感谢您对我们的信任与支持。<br/> 网利宝"
+    content = u"感谢您注册网利宝。 完成实名认证并充值成功，免费领取7天风行VIP会员。<br/> <a href='/accounts/id_verify/' target='_blank'>点击完成实名认证</a></br/> 感谢您对我们的信任与支持。<br/> 网利宝"
     return title, content
 
 def msg_register_authok(activation):
     title = u"注册成功"
-    content = u"感谢您注册网利宝。<br/>网利宝赠送您3天迅雷白金会员激活码，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/>立即兑换（<a href='http://act.vip.xunlei.com/vip/2014/xlhyk/' target='_blank'>http://act.vip.xunlei.com/vip/2014/xlhyk/</a>）<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"感谢您注册网利宝。<br/>网利宝赠送您3天迅雷白金会员激活码，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/>（<a href='http://act.vip.xunlei.com/vip/2014/xlhyk/' target='_blank'>立即兑换</a>）<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 def msg_despoit_ok(activation):
     title = u"充值成功"
-    content = u"恭喜您充值成功，赠送给您的3天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/' target='_blank'>立即购买赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"恭喜您充值成功，赠送给您的3天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 def msg_despoit_ok_7(activation):
     title = u"充值成功"
-    content = u"恭喜您充值成功，赠送给您的7天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/' target='_blank'>立即购买赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"恭喜您充值成功，赠送给您的7天迅雷白金会员激活码：%s，有效期至2015年12月31日。<br/>参加精彩活动，享受1%%额外收益，<a href='/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 def msg_validate_ok(activation):
@@ -142,7 +142,7 @@ def msg_validate_ok(activation):
 
 def msg_validate_ok2(activation):
     title = u"实名认证成功"
-    content = u"恭喜您完成实名认证，赠送给您的50G快盘会员激活码：%s，有效期至2015年12月31日。<a href='http://www.kuaipan.cn/n/user/records/lottery'>兑换快盘激活码</a><br/><a href='/pay/banks/' target='_blank'>立即充值</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"恭喜您完成实名认证，赠送给您的50G快盘会员激活码：%s，有效期至2015年12月31日。<a href='http://www.kuaipan.cn/n/user/records/lottery'>兑换快盘激活码</a><br/><a href='/pay/banks/' target='_blank'>立即充值赚钱</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 def msg_validate_fake():
@@ -153,7 +153,7 @@ def msg_validate_fake():
 #迅雷会员
 def msg_first_licai(activation):
     title = u"活动期首次理财成功"
-    content = u"感谢您在活动期间完成首次理财。<br/>网利宝赠送您1个月迅雷白金会员激活码，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/>立即兑换（<a href='http://act.vip.xunlei.com/vip/2014/xlhyk/' target='_blank'>http://act.vip.xunlei.com/vip/2014/xlhyk/</a>）<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
+    content = u"感谢您在活动期间完成首次理财。<br/>网利宝赠送您1个月迅雷白金会员激活码，请您查收！<br/>激活码：%s，有效期至2015年12月31日。<br/>（<a href='http://act.vip.xunlei.com/vip/2014/xlhyk/' target='_blank'>立即兑换</a>）<br/>感谢您对我们的支持与关注。<br/>网利宝" % activation
     return title, content
 
 
@@ -198,12 +198,12 @@ def msg_bid_success(product_name, date):
 def msg_pay_ok(amount):
     title = u"充值成功"
     # content = u"您的网利宝账户已成功充值￥%s元，请查收。<br/>活动1：投资不同产品，即送1个月迅雷白金会员或10G、50G、100G快盘网盘。<br/>活动2：参加精彩活动，额外获赠1%%年化收益奖励。<br/>活动3：理财达到一定额度“迅雷白金会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/>活动4：邀请好友完成首次单笔200元理财，双方共享60元话费。<br/><a href='/' target='_blank'>点击此处进行理财</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % amount
-    content = u"您的网利宝账户已成功充值￥%s元，请查收。<br /><a href='/' target='_blank'>点击此处进行理财</a><br />感谢您对我们的支持与关注。<br />网利宝" % amount
+    content = u"您的网利宝账户已成功充值￥%s元，请查收。<br /><a href='/' target='_blank'>点击进行理财</a><br />感谢您对我们的支持与关注。<br />网利宝" % amount
     return title, content
 
 def msg_pay_ok_f(amount, activation):
     title = u"充值成功"
-    content = u"恭喜您完成充值，您的网利宝账户已成功充值￥%s元，请查收。网利宝赠送给您的7天风行VIP会员：%s，有效期至2015年12月31日。<a href='http://www.fun.tv/vip/pay/v/coupon' target='_blank'>激活会员</a><br/> 活动期间：即日起-2015年1月31日<br/> 活动1：首次投资任意P2P产品，即送礼包。<br/> 活动2：参加精彩活动，额外获赠1%%年化收益奖励。<br/> 活动3：理财达到一定额度“风行VIP会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/> 活动4：邀请好友完成首次单笔200元理财，双方共享60元话费。<br/> <a href='/' target='_blank'>立即投资</a><br/> 感谢您对我们的信任与支持。<br/> 网利宝" % (amount, activation)
+    content = u"恭喜您完成充值，您的网利宝账户已成功充值￥%s元，请查收。网利宝赠送给您的7天风行VIP会员：%s，有效期至2015年12月31日。<a href='http://www.fun.tv/vip/pay/v/coupon' target='_blank'>激活会员</a><br/> 活动期间：即日起-2015年1月31日<br/> 活动1：首次投资任意P2P产品，即送礼包。<br/> 活动2：参加精彩活动，额外获赠1%%年化收益奖励。<br/> 活动3：理财达到一定额度“风行VIP会员、话费、京东卡、iPad、iPhone6、iPhone6 Plus”送不停。<br/> 活动4：邀请好友完成首次单笔200元理财，双方共享60元话费。<br/> <a href='/' target='_blank'>点击进行理财</a><br/> 感谢您对我们的信任与支持。<br/> 网利宝" % (amount, activation)
     return title, content
 
 def msg_pay_ok_f_2(amount):

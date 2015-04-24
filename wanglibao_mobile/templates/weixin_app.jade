@@ -1,0 +1,93 @@
+doctype html
+html
+  head
+    - with '网利宝' as title
+    title 网利宝
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
+    meta(name="format-detection", content="telephone=no")
+    link(rel="stylesheet",href="/static/m_stylesheets/weixin.css")
+  body(style='background: url(/static/m_images/weixin_img/ban.jpg) no-repeat; background-size:cover;')
+      .top-i
+          a.jiao
+            img(src='/static/m_images/weixin_img/sanjiao.png')
+          p 网利宝手机客户端
+      .wei_ma
+          h3 互联网私人银行
+          h4 为了您的交易安全请到APP端进行投资
+          img(src='/static/m_images/weixin_img/app.png')
+      .download
+          //a(href="/api/mobiledownload/")#xiaz 下&nbsp;载&nbsp;A&nbsp;P&nbsp;P
+          a(href="javascript:void(0)")#wx-mobel-btn 下&nbsp;载&nbsp;A&nbsp;P&nbsp;P
+      #wx-mobel-box
+          img(src='/static/m_images/weixin_img/jiantou.png').jiantou
+          p.wei_tishizi
+           |请点击右上角菜单，
+           br
+           |选择在Safari中打开。
+
+
+
+      script(src="/static/m_js/m_lib/jquery.min.js")
+      script.
+          $('#wx-mobel-btn').on('click', function (e) {
+              var userAgent = navigator.userAgent;
+                $.os = {};
+                $.os.weixin = userAgent.match(/MicroMessenger\/([\d.]+)/) ? true : false;
+                $.os.android = userAgent.match(/(Android)\s+([\d.]+)/) || userAgent.match(/Silk-Accelerated/) ? true : false;
+                $.os.ipad = userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false;
+                $.os.iphone = !$.os.ipad && userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false;
+                $.os.ios = $.os.ipad || $.os.iphone;
+              if ($.os.ios){
+                  if($.os.weixin){
+                      $('#wx-mobel-box').show()
+                      e.stopPropagation();
+                  }else{
+                      window.location.href = 'https://itunes.apple.com/cn/app/id881326898';
+                  }
+
+              }else if($.os.android){
+                  window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao';
+              }
+
+
+            })
+
+//
+      //script(src="/static/m_js/weixin.js")
+      //script.
+      //    var xz=document.getElementById("xiaz");
+      //     var v = new Date().getTime()
+      //      xz.onclick=function(v) {
+      //        xz.className='hight';
+      //        var android, iphone;
+      //        console.log(navigator.userAgent);
+      //        iphone = /iphone/i.test(navigator.userAgent.toLowerCase());
+      //        android = /android/i.test(navigator.userAgent.toLowerCase());
+      //        if (iphone) {
+      //          window.location.href = "https://itunes.apple.com/cn/app/id881326898";
+      //          return true;
+      //        }else if (android) {
+      //          window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao";
+      //          return true;
+      //        } else {
+      //          window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao";
+      //          return true;
+      //        }
+      //    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

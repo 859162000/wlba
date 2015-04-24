@@ -1,0 +1,57 @@
+doctype html
+html
+  head
+    - with '网利宝' as title
+    title 网利宝
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
+    meta(name="format-detection", content="telephone=no")
+    link(rel="stylesheet",href="/static/m_stylesheets/test.css")
+  body
+    .m-head 首页
+      .head-left 充值
+      .head-right 邀请有奖
+    .m-branner
+      mixin li-list(classname, items)
+        ul
+          each url in items
+            li(class=classname)
+              img(src=url)
+      - var imgUrl = ["/static/m_images/d_img/aiqiyi-banner.jpg"]
+      +li-list('branner-li', imgUrl)
+    .m-invest-cont
+      mixin invest-list(month, pernumred, pernumblue, name, explain)
+        .m-invest-list
+          a(href="/mobile/mobile_detail/")
+            .invest-body
+              p.invest-month
+                em=month
+                |个月
+              p.invest-num
+                em.pernum-red=pernumred
+                span.per %
+                em.plus +
+                span.pernum-blue=pernumblue
+              p.invest-icon
+                span.yuan 抢
+                span
+            .invest-tit
+              p.invest-name=name
+              if explain == '先息后本'
+                p.invest-explain
+                  span.explain-icon-blue
+                  =explain
+              else
+                p.invest-explain
+                  span.explain-icon-green
+                  =explain
+              p.clear
+      +invest-list('12', '22', '1.0%', '企业扩大经营141030015', '先息后本' )
+      +invest-list('10', '12', '1.0%', '企业扩大经营141030015', '等额本息' )
+      +invest-list('10', '15', '1.0%', '企业扩大经营141030015', '先息后本' )
+      +invest-list('10', '15', '1.0%', '企业扩大经营141030015', '先息后本' )
+      +invest-list('10', '15', '1.0%', '企业扩大经营141030015', '先息后本' )
+      +invest-list('10', '15', '1.0%', '企业扩大经营141030015', '先息后本' )
+      +invest-list('10', '15', '1.0%', '企业扩大经营141030015', '先息后本' )
+    include m_include/m_footers

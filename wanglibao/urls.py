@@ -52,6 +52,7 @@ urlpatterns = patterns(
     url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^api/', include('wanglibao_rest.urls')),
     url(r'^help/', include('wanglibao_help.urls')),
+    url(r'^mobile/', include('wanglibao_mobile.urls')),
     url(r'^' + settings.ADMIN_ADDRESS + '/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
@@ -79,6 +80,7 @@ urlpatterns = patterns(
 
     url(r'^preorder/', include('wanglibao_preorder.urls')),
     url(r'^activity/', decorator_include(include('marketing.urls'), wap_activity_manage)),
+    # url(r'^activity/', include('marketing.urls')),
     url(r'^announcement/', include('wanglibao_announcement.urls')),
     url(r'^redpacket/', include('wanglibao_redpack.urls')),
     url(r'^templates/', include('wanglibao_activity.urls')),

@@ -1,0 +1,40 @@
+doctype html
+html
+  head
+    - with '网利宝' as title
+    title 网利宝
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
+    meta(name="format-detection", content="telephone=no")
+    link(rel="stylesheet",href="/static/m_stylesheets/weixin.css")
+  body(style='background:#fafafa; background-size:cover;')
+      .top-i
+          a.jiao
+            img(src='/static/m_images/weixin_img/sanjiao.png').wei_fa
+          p 输入登录密码
+      include m_include/weixin_kehuduan
+      form.wei_deng(style='background:#ffffff;')
+          label 登录密码
+          input(type='password', placeholder='请输入密码', maxlength='20').wei_word
+      h2.weixin_ti
+      a.wei_hui 找回密码
+      .wei_buttonn#wei_buttonn
+        a 登录
+      .wei_kefu
+          p
+           |客服电话
+           label#wx-mobel-btn 4008-588-066
+        #wx-mobel-box
+          #box
+            span#off ×
+            p 网利宝竭诚为您服务
+              br
+              |服务时间: 9:00 - 18:00（法定节假日除外）
+            h1
+             a(href='tel:4008-588-066') 拨打电话 4008-588-066
+
+
+  script(src="/static/m_js/m_lib/jquery.min.js")
+  script(src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js")
+  script(src="/static/m_js/weixin.js?v=20656")

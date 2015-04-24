@@ -1,0 +1,40 @@
+doctype html
+html
+  head
+    - with '网利宝' as title
+    title 网利宝
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
+    meta(name="format-detection", content="telephone=no")
+    link(rel="stylesheet",href="/static/m_stylesheets/weixin.css")
+  body(style='background:#fafafa; background-size:cover;')
+      .top-i
+          a.jiao
+            img(src='/static/m_images/weixin_img/sanjiao.png')
+          p 邀请好友理财送...
+      include m_include/weixin_kehuduan
+      form.wei_pss
+          input(type='hidden', name='identifier', value='{{ identifier }}')
+          input(type='hidden', name='invite_code', value='{{ invite_code }}')
+          label(style='width: 54%;') 请设置登录密码完成注册
+          br
+          label(style='width: 70%;').phone_a 账号:{{ identifier }}
+      form.wei_pss
+          label(style='width: 20%;') &nbsp;&nbsp;验证码
+          input(type='text' placeholder='短信验证码').yanma
+          b(data-num="0" style='width: 30%;font-weight: normal;color: #cccccc;').wei_xin
+      h2.weixin_ti
+      form.wei_pss
+          label(style='width: 20%;') 登录密码
+          input(type='password' placeholder='请设置您的登录密码', style='width: 43%;').passwordd
+      h2.weixin_tq
+      button(disabled='disabled', style='border: none;background: #f44336;eight: 2em;font-size: 2.5em;line-height: 2em; width: 95%; border-radius: 7px; color: #FFFFFF;margin: 1.5em 0 0 2.5%;')#wei_zhu 注册
+      //.wei_buttonn#wei_zhu
+      //  a 注册
+      script(src="/static/m_js/m_lib/jquery.min.js")
+      script(src="/static/m_js/weixin.js")
+      script.
+          (function(){
+              yoa_registered();
+          })()

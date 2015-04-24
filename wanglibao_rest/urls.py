@@ -38,7 +38,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
-                            DepositGateAPIView, PushTestView)
+                            DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
@@ -84,6 +84,7 @@ router.register(r'daily_income', DailyIncomeViewSet)
 
 router.register(r'card', CardViewSet)
 
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = patterns(
     '',
@@ -95,6 +96,8 @@ urlpatterns = patterns(
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
+
+    url(r'^weixin/phone_validation_code/register/(?P<phone>\d{11})/$', WeixinSendRegisterValidationCodeView.as_view()),
 
     url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),
 

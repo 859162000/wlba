@@ -48,14 +48,20 @@ class P2PTrader(object):
 
     def purchase(self, amount, redpack=0):
         description = u'购买P2P产品 %s %s 份' % (self.product.short_name, amount)
+        is_full = False
         if self.user.wanglibaouserprofile.frozen:
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
             if redpack:
+                redpack_order_id = OrderHelper.place_order(self.user, order_type=u'红包消费', redpack=redpack,
+                                                        product_id=self.product.id, status=u'新建').id
                 result = redpack_backends.consume(redpack,amount, self.user, self.order_id, self.device_type)
                 if result['ret_code'] != 0:
                     raise Exception,result['message']
-                red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'], savepoint=False)
+                red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'], 
+                                                        order_id=redpack_order_id, savepoint=False)
+                OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
+                                        amount=amount, deduct=result['deduct'], redpack=redpack)
 
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False)
             margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
@@ -63,8 +69,12 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
+            if product_record.product_balance_after <= 0:
+                is_full = True
+
         tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
-                                               "device_type": self.device_type, "product_id": self.product.id})
+                                               "device_type": self.device_type, "product_id": self.product.id,
+                                               "is_full": is_full})
 
         # 投标成功发站内信
         pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
