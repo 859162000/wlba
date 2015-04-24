@@ -18,9 +18,44 @@ html
           h4 为了您的交易安全请到APP端进行投资
           img(src='/static/m_images/weixin_img/app.png')
       .download
-          a#xiaz(href='http://www.wanglibao.com/api/mobiledownload/') 下&nbsp;载&nbsp;A&nbsp;P&nbsp;P
+          //a(href="/api/mobiledownload/")#xiaz 下&nbsp;载&nbsp;A&nbsp;P&nbsp;P
+          a(href="javascript:void(0)")#wx-mobel-btn 下&nbsp;载&nbsp;A&nbsp;P&nbsp;P
+      #wx-mobel-box
+          img(src='/static/m_images/weixin_img/jiantou.png').jiantou
+          p.wei_tishizi
+           |请点击右上角菜单，
+           br
+           |选择在Safari中打开。
+
+
+
       script(src="/static/m_js/m_lib/jquery.min.js")
-      script(src="/static/m_js/weixin.js")
+      script.
+          $('#wx-mobel-btn').on('click', function (e) {
+              var userAgent = navigator.userAgent;
+                $.os = {};
+                $.os.weixin = userAgent.match(/MicroMessenger\/([\d.]+)/) ? true : false;
+                $.os.android = userAgent.match(/(Android)\s+([\d.]+)/) || userAgent.match(/Silk-Accelerated/) ? true : false;
+                $.os.ipad = userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false;
+                $.os.iphone = !$.os.ipad && userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false;
+                $.os.ios = $.os.ipad || $.os.iphone;
+              if ($.os.ios){
+                  if($.os.weixin){
+                      $('#wx-mobel-box').show()
+                      e.stopPropagation();
+                  }else{
+                      window.location.href = 'https://itunes.apple.com/cn/app/id881326898';
+                  }
+
+              }else if($.os.android){
+                  window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao';
+              }
+
+
+            })
+
+//
+      //script(src="/static/m_js/weixin.js")
       //script.
       //    var xz=document.getElementById("xiaz");
       //     var v = new Date().getTime()

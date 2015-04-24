@@ -22,17 +22,18 @@ html
             label(style='color:#f44336')
             span
             |邀请你使用网利宝理财,首次体验可获赠
-            span 20元
+            span 30元
+            |话费。
           br
           input(type='hidden', name='identifier', value='{{ identifier }}')
-          input.wei_fee
+          input(placeholder='&nbsp;&nbsp;&nbsp;请输入手机号').wei_fee
           a.wei_ffee 获取验证码
-          form.wei.feee(style='width:58%;margin-left:40%;margin-top:0.5em;')
+          form.wei.feee(style='width:67%;margin-left:36%;margin-top:0.5em;')
               input(type='checkbox' checked='checked')#idd
               label(style='font-size: 1.5em;color: #727272;')
                   |我同意
                   span
-                   a(href='https://www.wanglibao.com/mobile/agreement/' style='color: #2196f3;') <<网利宝用户协议>>
+                   a(href='/mobile/weixin_xieyi/' style='color: #2196f3;') <<网利宝用户协议>>
           h3.wei_red(style='color: red;padding-left: 40%;')
 
       .mainn
@@ -67,6 +68,10 @@ html
 
       script(src="/static/m_js/m_lib/jquery.min.js")
       script(src="/static/m_js/weixin.js")
+      script.
+          (function() {
+              feea();
+          })();
 
 
 
