@@ -68,8 +68,8 @@ def build_earning(product_id):
 
     command = 'touch ../%s.txt' % 'test'
     os.system(command)
-    num = Earning.objects.filter(product=p2p)
-    if not .count():
+    num = Earning.objects.filter(product=p2p).count()
+    if num > 0:
         command = 'touch ../%s.txt' % num
         os.system(command)
         return
