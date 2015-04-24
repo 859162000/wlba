@@ -68,8 +68,8 @@ function log() {
         $('.top-i .jiao>img').on('click', function () {
             window.location.href = "/mobile/weixin_fee/";
         });
-    }else{
-          $('#weixin_fanhui_fa').hide();
+    } else {
+        $('#weixin_fanhui_fa').hide();
     }
     //$('.top-i .jiao img').on('click', function () {
     //            window.location.href = "/mobile/weixin_fee/";
@@ -428,7 +428,7 @@ function fee() {
     });
 
     wx.config({
-        debug: !! parseInt($('meta[name=debug]').attr('content')), // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        debug: !!parseInt($('meta[name=debug]').attr('content')), // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
         appId: $('meta[name=app-id]').attr('content'), // 必填，公众号的唯一标识
         timestamp: $('meta[name=timestamp]').attr('content'), // 必填，生成签名的时间戳
         nonceStr: $('meta[name=noncestr]').attr('content'), // 必填，生成签名的随机串
@@ -458,7 +458,7 @@ function fee() {
                 imgUrl: share_img_url
             });
             wx.onMenuShareAppMessage({
-                title:'首次体验共享60元话费', // 分享标题
+                title: '首次体验共享60元话费', // 分享标题
                 desc: '邀请好友来网利宝理财，首次体验双方各拿30元话费', // 分享描述
                 link: share_link, // 分享链接
                 imgUrl: share_img_url, // 分享图标
@@ -472,7 +472,7 @@ function fee() {
                 }
             });
             wx.onMenuShareQQ({
-                title:'首次体验共享60元话费', // 分享标题
+                title: '首次体验共享60元话费', // 分享标题
                 desc: '邀请好友来网利宝理财，首次体验双方各拿30元话费', // 分享描述
                 link: share_link, // 分享链接
                 imgUrl: share_img_url, // 分享图标
@@ -555,9 +555,11 @@ function yoa_registered() {
         $('.wei_xin').attr('data-num', '1');
         $('.wei_xin').html('已发送<span id="timeb2">60</span>秒');
         timer = self.setInterval(addseca, 1000);
-        setInterval(function () {
+
+        var time2 = setInterval(function () {
             $('.wei_xin').attr('data-num', '0');
             $('.wei_xin').css('color', '#2196f3');
+            clearInterval(time2)
         }, 60000)
     }
 
@@ -575,7 +577,7 @@ function yoa_registered() {
                     console.log(typeof XMLHttpRequest)
                     var $data = JSON.parse(XMLHttpRequest.responseText);
                     if ($data.message == '') {
-                        alert('验证码已发送您的手机上请注意查收');
+                        //alert('验证码已发送您的手机上请注意查收');
                         //window.location.href = "/mobile/weixin_invitation/?identifier=" + wei_f + '&invite_code=' + phon;
                     } else {
                         alert($data.message);
