@@ -268,7 +268,7 @@ function registered() {
             success: function (result) {
 
                 if (result['ret_code'] == 0) {
-                    alert('登录成功');
+                    alert('注册成功');
                     sessionStorage.setItem("name", Verification());
                     var read = sessionStorage.getItem("read");
                     if (read == '8888') {
@@ -446,8 +446,8 @@ function fee() {
                     'onMenuShareTimeline'
                 ]
             });
-            //var host = 'https://www.wanglibao.com';
-            var host = 'http://wanglibao.pythink.com';
+            var host = 'https://www.wanglibao.com';
+            //var host = 'http://wanglibao.pythink.com';
             var share_link = host + '/mobile/weixin_feea/?identifier=' + name;
             var share_img_url = host + '/static/m_images/weixin_img/loginn.png';
             var share_title = '邀请好友来网利宝理财，首次体验双方各拿30元话费';
@@ -641,6 +641,7 @@ function yoa_registered() {
                 success: function (res) {
                     switch (res['ret_code']) {
                         case 0:
+                            alert('注册成功');
                             sessionStorage.setItem("name", data['identifier']);
                             window.location.href = "/mobile/weixin_app/";
 
