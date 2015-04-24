@@ -207,7 +207,7 @@ class WeixinFeeView(TemplateView):
         # url = '%s%s%s' % (['http://', 'https://'][self.request.is_secure()],
         #                   self.request.get_host(),
         #                   self.request.get_full_path().split('#')[0])
-        url = '%s%s%s' % (['http://', 'https://'][self.request.get_host() in ['www.wanglibao.com']],
+        url = '%s%s%s' % (['http://', 'https://'][self.request.get_host() in ['www.wanglibao.com', 'wx.wanglibao.com']],
                           self.request.get_host(),
                           self.request.get_full_path().split('#')[0])
         return url
