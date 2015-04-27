@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
+from wanglibao.templatetags.formatters import period_unit
 import time
 
 
@@ -26,6 +27,7 @@ def p2p_watchdog():
 
 @app.task
 def delete_old_product_amortization(pa_list):
+    time.sleep(10)
     ProductAmortization.objects.filter(id__in=pa_list).delete()
 
 @app.task
@@ -60,10 +62,17 @@ def full_send_message(product_name):
 @app.task
 def build_earning(product_id):
 
-    # command = 'touch ~/workspace/%s.txt' % 'test'
-    # os.system(command)
+    import os
 
     p2p = P2PProduct.objects.select_related('activity__rule').get(pk=product_id)
+
+    command = 'touch ../%s.txt' % 'test'
+    os.system(command)
+    num = Earning.objects.filter(product=p2p).count()
+    if num > 0:
+        command = 'touch ../%s.txt' % num
+        os.system(command)
+        return
 
     #按用户汇总某个标的收益
     earning = P2PRecord.objects.values('user').annotate(sum_amount=Sum('amount')).filter(product=p2p, catalog=u'申购')
@@ -72,6 +81,8 @@ def build_earning(product_id):
     earning_list = []
     rule = p2p.activity.rule
 
+    unit = period_unit(p2p.pay_method)
+
     #把收益数据插入earning表内
     for obj in earning:
         # bind = Binding.objects.filter(user_id=obj.get('user')).first()
@@ -79,7 +90,7 @@ def build_earning(product_id):
 
 
         earning = Earning()
-        amount = rule.get_earning(obj.get('sum_amount'), p2p.period, rule.rule_type)
+        amount = rule.get_earning(obj.get('sum_amount'), p2p.period, p2p.pay_method)
         earning.amount = amount
         earning.type = 'D'
         earning.product = p2p
@@ -103,7 +114,8 @@ def build_earning(product_id):
 
         earning_time = timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S")
         title, content = messages.msg_bid_earning(p2p.name, p2p.activity.name,
-                                                  p2p.period, earning_time, rule.percent_text, amount)
+                                                  p2p.period, earning_time,
+                                                  rule.percent_text, amount, unit)
         inside_message.send_one.apply_async(kwargs={
             "user_id": obj.get('user'),
             "title": title,
