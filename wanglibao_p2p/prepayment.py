@@ -74,6 +74,8 @@ class PrepaymentHistory(object):
             UserAmortization.objects.filter(product_amortization__product=self.product, settled=False).update(settled=True)
             ProductKeeper(self.product).finish(None)
 
+            #发站内信
+
         return product_record
 
 
