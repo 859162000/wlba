@@ -77,31 +77,21 @@ def _withdraw_record(user, pagesize, pagenum):
 
 def _amo_record(user, pagesize, pagenum, product_id):
     res = []
+    amos_record = AmortizationRecord.objects.select_related('amortization_product') \
+        .filter(user=user)
     if product_id:
-        amos = UserAmortization.objects.filter(user=user, settled=True,
-            product_amortization__product_id=product_id).order_by("-term_date")[(pagenum-1)*pagesize:pagenum*pagesize]
-        for x in amos:
-            obj = {"id":x.id,
-                    "name":x.product_amortization.product.short_name, "term":x.term,
-                    # "total_term":x.product_amortization.product.amortization_count,
-                    "term_date":util.fmt_dt_normal(util.local_datetime(x.term_date)),
-                    "principal":x.principal, "interest":x.interest,
-                    "penal_interest":x.penal_interest,
-                    "total_amount":(x.principal+x.interest+x.penal_interest),
-                    "settlement_time":util.fmt_date_normal(util.local_datetime(x.settlement_time))}
-            res.append(obj)
-    else:
-        amos_record = AmortizationRecord.objects.select_related('amortization_product') \
-            .filter(user=user).order_by("-created_time")[(pagenum-1)*pagesize:pagenum*pagesize]
-        for x in amos_record:
-            obj = {"id":x.order_id,
-                    "name":x.amortization.product.short_name, "term":x.term,
-                    "total_term":x.amortization.product.amortization_count,
-                    "term_date":util.fmt_dt_normal(util.local_datetime(x.created_time)),
-                    "principal":x.principal, "interest":x.interest,
-                    "penal_interest":x.penal_interest,
-                    "total_amount":(x.principal+x.interest+x.penal_interest),
-                    "settlement_time":util.fmt_dt_normal(util.local_datetime(x.created_time))}
-            res.append(obj)
+        amos_record = amos_record.filter(amortization__product__id=product_id)
+    amos_record = amos_record[(pagenum-1)*pagesize:pagenum*pagesize]
+    for x in amos_record:
+        obj = {"id":x.id,
+                "name":x.amortization.product.name, "term":x.term,
+                "total_term":x.amortization.product.amortization_count,
+                "term_date":util.fmt_dt_normal(util.local_datetime(x.created_time)),
+                "principal":x.principal, "interest":x.interest,
+                "penal_interest":x.penal_interest,
+                "total_amount":(x.principal+x.interest+x.penal_interest),
+                "settlement_time":util.fmt_dt_normal(util.local_datetime(x.created_time))
+                }
+        res.append(obj)
     logger.info("return amo_record ===>>>: %s" % res)
     return res
