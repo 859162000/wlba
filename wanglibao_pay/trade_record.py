@@ -78,7 +78,7 @@ def _withdraw_record(user, pagesize, pagenum):
 def _amo_record(user, pagesize, pagenum, product_id):
     res = []
     amos_record = AmortizationRecord.objects.select_related('amortization_product') \
-        .filter(user=user)
+        .filter(user=user).order_by('-created_time', '-id')
     if product_id:
         amos_record = amos_record.filter(amortization__product__id=product_id)
     amos_record = amos_record[(pagenum-1)*pagesize:pagenum*pagesize]
