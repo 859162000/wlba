@@ -7,7 +7,7 @@
   });
 
   require(['jquery'], function($) {
-    var Y, count_down, data, date, day, day_index, fmoney, gotime, hight, init, m, mon, shuju, wei, wei2;
+    var Y, count_down, data, date, day, fmoney, gotime, hight, init, m, shuju, wei, wei2;
     init = function(time) {
       var csrfSafeMethod, getCookie, sameOrigin;
       csrfSafeMethod = void 0;
@@ -58,7 +58,6 @@
       });
       shuju(time);
     };
-    day_index = 1;
     count_down = function(o) {
       var sec, timer;
       sec = (new Date(o.replace(/-/ig, '/')).getTime() - new Date().getTime()) / 1000;
@@ -67,14 +66,13 @@
         count_down(o);
       }), 1000);
       if (sec <= 0) {
-        $('.mon').html('5 月');
+        $('.mon').html('4 月');
         $('.day-long').animate({
-          'left': '-714px'
+          'left': '-357px'
         }, 500);
-        hight(m, '.day-wu');
+        hight(m, '.day-si');
         clearTimeout(timer);
-        day_index++;
-        count_down('2015-05-31 24:00:00');
+        count_down('2015-04-30 24:00:00');
       }
     };
     hight = function(high_m, ele) {
@@ -89,10 +87,9 @@
         k = 0;
         while (k < $(ele + ' li:eq(' + g + ')').children('span').length) {
           if (m === high_m && day === parseInt($(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').text())) {
-            $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').addClass('span-high').siblings().removeClass('span-high');
+            $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').addClass('tap-hight2').siblings().removeClass('tap-hight2');
             $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').css({
-              'background': 'url("/static/images/list-img/small.png") no-repeat',
-              'background-position': '-187px -86px',
+              'background': 'rgb(244, 136, 144)',
               'color': '#000'
             });
           }
@@ -268,9 +265,9 @@
       day = '0' + day;
     }
     date = Y + '-0' + m + "-" + day;
-    hight(m, 'day-san');
+    hight(m, '.day-san');
     init(date);
-    $('#left-h1').html(+m + '月' + day + '日用户榜单');
+    $('#left-h1').html('－－' + m + '月' + day + '日用户榜单－－');
     wei = new Date();
     wei2 = new Date();
     wei2.setMonth(2);
@@ -283,31 +280,26 @@
       $('.ing li').eq(1).addClass('ing-hight');
       return $('.day-head h1').eq(1).addClass('h1-hight');
     }, gotime);
-    count_down('2015-05-01 0:0:0');
-    mon = 0;
-    $('.right-btn').on('click', function() {
-      day_index++;
-      if (day_index < $('.day-yue').length) {
-        mon = day_index + 3;
-        $('.mon').html(mon + ' 月');
-        return $('.day-long').animate({
-          'left': -357 * day_index + 'px'
-        }, 500);
-      } else {
-        return day_index = 2;
-      }
-    });
+    count_down('2015-04-01 0:0:0');
     $('.left-btn').on('click', function() {
-      day_index--;
-      if (day_index >= 0) {
-        mon = day_index + 3;
-        $('.mon').html(mon + ' 月');
-        return $('.day-long').animate({
-          'left': -357 * day_index + 'px'
-        }, 500);
-      } else {
-        return day_index = 0;
-      }
+      var high_m;
+      $('.mon').html('3 月');
+      $('.day-long').animate({
+        'left': '0px'
+      }, 500);
+      $('.day-si span').removeClass('tap-hight2');
+      high_m = parseInt($('.mon').text());
+      return hight(high_m, '.day-san');
+    });
+    $('.right-btn').on('click', function() {
+      var high_m;
+      $('.mon').html('4 月');
+      $('.day-long').animate({
+        'left': '-357px'
+      }, 500);
+      $('.day-san span').removeClass('tap-hight2');
+      high_m = parseInt($('.mon').text());
+      return hight(high_m, '.day-si');
     });
     return $('.day-yue span').on('click', function() {
       var d, time, zm;
@@ -321,14 +313,14 @@
       Y = data.getFullYear();
       zm = data.getMonth() + 1;
       day = data.getDate();
-      if (day < 10) {
+      if (day.length < 2) {
         day = '0' + day;
       }
       date = Y + '-0' + zm + "-" + day;
-      if (time >= '2015-03-24' && time <= '2015-05-31' && time <= date) {
+      if (time >= '2015-03-24' && time <= '2015-04-30' && time <= date) {
         $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2');
         $(this).parent().siblings().children('span').removeClass('tap-hight2');
-        $('#left-h1').html(+m + '月' + d + '日用户榜单');
+        $('#left-h1').html('－－' + m + '月' + d + '日用户榜单－－');
         return shuju(time);
       }
     });
