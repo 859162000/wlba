@@ -6,6 +6,9 @@ __author__ = 'zhanghe'
 from django.contrib.auth.models import User
 from marketing.models import PromotionToken
 from wanglibao_sms.utils import send_validation_code
+from datetime import datetime
+from marketing.tops import Top
+
 
 __all__ = (
     'app_share_view',
@@ -42,3 +45,24 @@ def app_share_reg_view(request, *args, **kwargs):
         'invitecode': invitecode
     }
 
+
+def day_top_render(request, *args, **kwargs):
+    now = datetime.now()
+    if now.date().__str__() <= '2015-03-23':
+        return {
+            "top_ten": None,
+            "top_len": 0
+        }
+
+    day_tops = _get_top_records()
+    return {
+        "top_ten": day_tops,
+        "top_len": len(day_tops)
+    }
+
+
+def _get_top_records(day=None):
+    if day is None:
+        day = datetime.now()
+    top = Top(limit=10)
+    return top.day_tops_activate(day)
