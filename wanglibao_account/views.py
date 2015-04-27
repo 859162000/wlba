@@ -1063,7 +1063,11 @@ class P2PAmortizationAPI(APIView):
     def get(self, request, **kwargs):
         user = request.user
         product_id = kwargs['product_id']
+
         equity = P2PEquity.objects.filter(user=user, product_id=product_id).prefetch_related('product').first()
+        if not equity:
+            return Response({'ret_code': -1, 'message': u'该产品用户持仓信息为空'})
+
         amortizations = UserAmortization.objects.filter(user=self.request.user,
                                                         product_amortization__product_id=product_id)
 
