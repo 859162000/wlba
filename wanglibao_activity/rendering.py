@@ -12,7 +12,8 @@ from marketing.tops import Top
 
 __all__ = (
     'app_share_view',
-    'app_share_reg_view'
+    'app_share_reg_view',
+    'day_top_render',
 )
 
 
