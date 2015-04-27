@@ -490,8 +490,8 @@ class AccountP2PRecordAPI(APIView):
                            'equity_product_display_status': equity.product.display_status,  # 状态
                            'equity_term': equity.term,  # 还款期
                            'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
-                           'equity_paid_interest': float(equity.paid_interest),  # 单个已经收益
-                           'equity_total_interest': float(equity.total_interest),  # 单个预期收益
+                           'equity_paid_interest': float(equity.paid_interest),  # 单个已经收益  # ===111===value wrong
+                           'equity_total_interest': float(equity.total_interest),  # 单个预期收益  # ===222===value wrong
                            'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
                                request.get_host(), equity.product.id),  # 合同
                            'product_id': equity.product_id
