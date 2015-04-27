@@ -1,8 +1,23 @@
 .wei_kehuduan
     img(src='/static/m_images/weixin_img/loginn.png')
     label
-     a(href='/mobile/weixin_app/' style='color:#ffffff') 网利宝手机客户端
+     b(style='color:#ffffff; font-weight:normal;') 网利宝手机客户端
     a X
-//script(src="/static/m_js/m_lib/jquery.min.js")
-//script(src="/static/m_js/weixin.js")
+script(src="/static/m_js/m_lib/jquery.min.js")
+script.
+    $('.wei_kehuduan label b').on('click',function(){
+        var userAgent = navigator.userAgent;
+        $.os = {};
+        $.os.weixin = userAgent.match(/MicroMessenger\/([\d.]+)/) ? true : false;
+        $.os.android = userAgent.match(/(Android)\s+([\d.]+)/) || userAgent.match(/Silk-Accelerated/) ? true : false;
+        $.os.ipad = userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false;
+        $.os.iphone = !$.os.ipad && userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false;
+        $.os.ios = $.os.ipad || $.os.iphone;
+        if ($.os.ios) {
+             window.location.href = '/mobile/weixin_app/';
+        } else if ($.os.android) {
+            window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao';
+        }
+
+    })
 
