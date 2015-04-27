@@ -41,7 +41,7 @@ html
                     .span2.align-center
                       p
                         em {{product.period}}
-                        span.font-l 个月
+                        span.font-l {{product.pay_method|period_unit}}
                       p 还款期限
                     .span3.align-center
                       p
@@ -160,7 +160,7 @@ html
                             | &nbsp;收益
                           .span3.p2pinfo-ceil
                             em.font-weight {{ p2p.period }}
-                            em &nbsp;个月
+                            span.font-l {{p2p.pay_method|period_unit}}
                           .span5-omega.p2pinfo-ceil
                             em {{ p2p.available_amout | money_format_int }} 元可投
 
@@ -226,7 +226,7 @@ html
                             | &nbsp;收益
                           .span3.p2pinfo-ceil
                             em.p2pinfo-active.highlight.font-weight {{ p2p.period }}
-                            em &nbsp;个月
+                            span.font-l {{p2p.pay_method|period_unit}}
                           .span5-omega.p2pinfo-ceil
                             em {{ p2p.available_amout | money_format_int }} 元可投
 
@@ -290,7 +290,7 @@ html
                             | &nbsp;收益
                           .span3.p2pinfo-ceil
                             em.font-weight {{ p2p.period }}
-                            em &nbsp;个月
+                            span.font-l {{p2p.pay_method|period_unit}}
                           .span5-omega.p2pinfo-ceil
                             em.p2pinfo-active.highlight {{ p2p.available_amout | money_format_int }}
                             | &nbsp;元可投

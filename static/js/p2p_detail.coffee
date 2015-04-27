@@ -342,17 +342,23 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           description: '不使用红包'
         )
         for obj in availables
-          desc = (if obj.invest_amount and obj.invest_amount > 0 then "投资" + obj.invest_amount + "元可用" else "无投资门槛")
           datetime = new Date()
           datetime.setTime(obj.unavailable_at*1000)
           available_time = [datetime.getFullYear(), datetime.getMonth() + 1, datetime.getDate()].join('-')
           highest_amount = 0
 
+          if obj.method == 'percent'
+            amount = obj.highest_amount
+            desc = ['抵', obj.amount, '投资额'].join('')
+          else
+            amount = obj.amount
+            desc = (if obj.invest_amount and obj.invest_amount > 0 then [obj.invest_amount, "元起用"].join('') else "无投资门槛")
+
           if obj.highest_amount
             highest_amount = obj.highest_amount
 
           ddData.push(
-            text: obj.name
+            text: [obj.name, ' ', amount, '元'].join('')
             value: obj.id
             method: obj.method
             selected: false
