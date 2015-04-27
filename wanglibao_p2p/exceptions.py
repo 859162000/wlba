@@ -11,3 +11,6 @@ class ProductLack(P2PException):
 
 class ProductNotExist(P2PException):
     message = u'产品不存在'
+
+class PrepaymentException(P2PException):
+    message = u'提前还款异常'

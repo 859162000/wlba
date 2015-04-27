@@ -162,8 +162,24 @@ class ActivityRule(models.Model):
     def percent_text(self):
         return Decimal(self.rule_amount*100).quantize(Decimal('0.1'))
 
-    def get_earning(self, amount, months, type):
-         return Decimal(amount*self.rule_amount*(Decimal(months)/Decimal(12))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+    def get_earning(self, amount, period, pay_method):
+        CALCULATE_METHOD_MONTH = 'monthly'
+        CALCULATE_METHOD_DAY = 'daily'
+
+        pay_method_mapping = {
+                u'等额本息': CALCULATE_METHOD_MONTH,
+                u'按月付息': CALCULATE_METHOD_MONTH,
+                u'到期还本付息': CALCULATE_METHOD_MONTH ,
+                u'日计息一次性还本付息': CALCULATE_METHOD_DAY,
+                u'日计息月付息到期还本': CALCULATE_METHOD_DAY 
+                }
+
+        base_period = Decimal(12)
+        if pay_method_mapping.get(pay_method) == CALCULATE_METHOD_DAY:
+            base_period = Decimal(360)
+
+        return Decimal(amount*self.rule_amount*(Decimal(period)/base_period))\
+                .quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
     def __unicode__(self):
         return u'<%s>' % self.name

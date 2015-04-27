@@ -22,6 +22,7 @@ class ProfileView(APIView):
         user = request.user
         cards =  Card.objects.filter(user=user)
         profile = user.wanglibaouserprofile
+
         dic = {
             "user":profile.user_id,
             "frozen":profile.frozen,
@@ -39,6 +40,7 @@ class ProfileView(APIView):
             "investment_asset":profile.investment_asset,
             "investment_period":profile.investment_period,
             "deposit_default_bank_name":profile.deposit_default_bank_name,
+            "is_invested": profile.is_invested,
             "cards_number":len(cards)
         }
         return Response(dic)

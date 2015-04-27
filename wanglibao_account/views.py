@@ -40,7 +40,7 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
-    AmortizationRecord, P2PProductContract
+    AmortizationRecord, P2PProductContract, P2PProduct
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress

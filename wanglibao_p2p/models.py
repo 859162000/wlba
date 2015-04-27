@@ -2,6 +2,7 @@
 import collections
 import logging
 from decimal import Decimal
+from datetime import datetime
 import reversion
 from concurrency.fields import IntegerVersionField
 from django.db import models
@@ -66,14 +67,18 @@ class P2PProduct(ProductBase):
         (u'普通', u'普通'),
         (u'证大速贷', u'证大速贷'),
         (u'票据', u'票据'),
+        (u'新手标', u'新手标'),
     )
 
     PAY_METHOD_CHOICES = (
         (u'等额本息', u'等额本息'),
-        (u'先息后本', u'先息后本'),
         (u'按月付息', u'按月付息到期还本'),
         (u'到期还本付息', u'到期还本付息'),
-        (u'按季度付息', u'按季度付息'),
+        (u'日计息一次性还本付息', u'日计息一次性还本付息'),
+        (u'日计息月付息到期还本', u'日计息月付息到期还本'),
+        #(u'先息后本', u'先息后本'),
+        #(u'按日计息一次性还本付息T+N', u'按日计息一次性还本付息T+N'),
+        #(u'按季度付息', u'按季度付息'),
     )
     BANK_METHOD_CHOICES = (
         (u'工商银行',u'工商银行'),
@@ -125,7 +130,7 @@ class P2PProduct(ProductBase):
                               verbose_name=u'产品状态*')
 
     priority = models.IntegerField(verbose_name=u'优先级*', help_text=u'越大越优先', blank=False)
-    period = models.IntegerField(default=0, verbose_name=u'产品期限(月)*', blank=False)
+    period = models.IntegerField(default=0, verbose_name=u'产品期限(月/天)*', blank=False)
     brief = models.TextField(blank=True, verbose_name=u'产品备注')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
     excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)*')
@@ -248,6 +253,10 @@ class P2PProduct(ProductBase):
     def display_status(self):
         return self.display_status_mapping[self.status]
 
+    @property
+    def terms(self):
+        return self.amortizations.all().count()
+
 
     display_payback_mapping = {
         u'等额本息': u'等额本息',
@@ -313,6 +322,7 @@ class ProductAmortization(models.Model):
 
     term = models.IntegerField(u'还款期数')
     term_date = models.DateTimeField(u'还款时间', null=True, blank=True)
+
     principal = models.DecimalField(u'返还本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2, default=Decimal('0'))
@@ -351,6 +361,7 @@ class UserAmortization(models.Model):
     user = models.ForeignKey(User)
     term = models.IntegerField(u'还款期数')
     term_date = models.DateTimeField(u'还款时间')
+
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
@@ -542,6 +553,11 @@ class EquityRecord(models.Model):
     def __unicode__(self):
         return u'%s %s %s %s' % (self.catalog, self.user, self.product, self.amount)
 
+def next_step(sender, instance, **kwargs):
+    if instance.status == u'录标完成':
+        instance.status = u'待审核'
+        instance.priority = instance.id * 10
+        instance.save()
 
 def generate_amortization_plan(sender, instance, **kwargs):
     if instance.status == u'录标完成':
@@ -556,7 +572,10 @@ def generate_amortization_plan(sender, instance, **kwargs):
 
         logger.info(u'The product status is 录标完成, start to generate amortization plan')
 
-        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, None, instance.period)
+        #terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount, instance.expected_earning_rate / 100, None, instance.period)
+        terms = get_amortization_plan(instance.pay_method).generate(instance.total_amount,
+                instance.expected_earning_rate / 100,
+                datetime.now(), instance.period)
 
         for index, term in enumerate(terms['terms']):
             amortization = ProductAmortization()
@@ -564,6 +583,12 @@ def generate_amortization_plan(sender, instance, **kwargs):
             amortization.principal = term[1]
             amortization.interest = term[2]
             amortization.term = index + 1
+
+            if len(term) == 6:
+                amortization.term_date = term[5]
+            else:
+                amortization.term_date = datetime.now()
+
             instance.amortizations.add(amortization)
             amortization.save()
 
@@ -584,6 +609,7 @@ def process_after_money_paided(product):
 
 def post_save_process(sender, instance, **kwargs):
     generate_amortization_plan(sender, instance, **kwargs)
+    next_step(sender, instance, **kwargs)
     process_after_money_paided(instance)
 
 
@@ -694,3 +720,24 @@ class P2PProductContract(models.Model):
     bill_amount = models.CharField(verbose_name=u'(票据)票面金额', max_length=32, blank=True)
     created_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间', auto_now_add=True)
     bill_due_date = models.DateField(blank=True, null=True, verbose_name=u'(票据)到期日')
+
+
+class InterestInAdvance(models.Model):
+    class Meta:
+        ordering = ['-id']
+        verbose_name = u'满标前计息'
+        verbose_name_plural = u'满标前计息'
+
+    def __unicode__(self):
+        return u'%s' % self.id
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(P2PProduct, verbose_name=u'产品', on_delete=models.SET_NULL, null=True)
+    amount = models.FloatField(default=0, verbose_name=u'购买金额', blank=False)
+    interest = models.FloatField(default=0, verbose_name=u'提前计息利息', blank=False)
+    days = models.IntegerField(verbose_name=u'提前计息天数', help_text=u'越大越优先', blank=False)
+    subscription_date = models.DateTimeField(default=timezone.now, verbose_name=u'申购时间')
+    product_soldout_date = models.DateTimeField(default=timezone.now, verbose_name=u'满标已打款时间')
+    product_year_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
+    create_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间', auto_now_add=True)
+

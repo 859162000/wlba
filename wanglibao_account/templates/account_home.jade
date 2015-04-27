@@ -140,7 +140,7 @@ block main
                     p
                       a(href="/p2p/detail/{{row.equity.product.id}}/") {{row.equity.product.short_name}}
                     p 年化收益：{{row.equity.product.expected_earning_rate}}%
-                    p 期限：{{row.equity.product.period}}个月
+                    p 期限：{{row.equity.product.period}}{{row.equity.product.pay_method | period_unit}}
                   td {{row.equity.equity | money_format}}
 
                   if row.equity.product.display_status != '还款中'
