@@ -252,3 +252,39 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
 
     _send_batch(user_objs, msgTxt, push_type)
     return True
+
+def send_prepayment(user_records):
+'''
+    msg_list = list()
+    for user_record in user_records:
+
+        msg = Message()
+        msg.target_user = user_record.user
+
+        msg.message_text = msgTxt
+
+        msg.notice = True
+
+        msg_list.append(msg)
+
+    Message.objects.bulk_create(msg_list)
+
+    devices = UserPushId.objects.filter(user__in=user_objs)
+
+    channel = bae_channel.BaeChannel()
+    msg_key = "wanglibao_%s" % time.time()
+    message = {"message": msgTxt.content, "type":push_type}
+
+    for device in devices:
+        # notice = True
+        #不管有没有设置，默认都发推送
+        message['user_id'] = device.user.id
+
+        if device.device_type in ("ios", "iPhone", "iPad"):
+            res, cont = channel.pushIosMessage(device.push_user_id, device.push_channel_id, message, msg_key)
+        elif device.device_type == "android":
+            res, cont = channel.pushAndroidMessage(device.push_user_id, device.push_channel_id, message, msg_key)
+
+'''
+    pass
+    return True

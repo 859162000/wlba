@@ -350,7 +350,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           available_time = [datetime.getFullYear(), datetime.getMonth() + 1, datetime.getDate()].join('-')
           highest_amount = 0
 
-          if obj.method == 'percent'
+          if obj.method == '*'
             amount = obj.highest_amount
             desc = ['抵', obj.amount, '投资额'].join('')
           else

@@ -355,5 +355,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=list_day.js.map

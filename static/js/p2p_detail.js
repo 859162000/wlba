@@ -390,7 +390,7 @@
             datetime.setTime(obj.unavailable_at * 1000);
             available_time = [datetime.getFullYear(), datetime.getMonth() + 1, datetime.getDate()].join('-');
             highest_amount = 0;
-            if (obj.method === 'percent') {
+            if (obj.method === '*') {
               amount = obj.highest_amount;
               desc = ['抵', obj.amount, '投资额'].join('');
             } else {
@@ -436,5 +436,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=p2p_detail.js.map
