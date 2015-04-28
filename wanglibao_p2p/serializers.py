@@ -56,7 +56,7 @@ class P2PProductSerializer(ModelSerializerExtended):
     def total_earning_joined(self, obj):
         terms = get_amortization_plan(obj.pay_method).generate(obj.total_amount,
                                                                obj.expected_earning_rate/100,
-                                                               obj.amortization_count,
+                                                               timezone.now(),
                                                                obj.period)
         return float(terms.get("total") - obj.total_amount)
 

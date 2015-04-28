@@ -514,8 +514,8 @@ class AccountP2PRecordAPI(APIView):
                            'equity_product_display_status': equity.product.display_status,  # 状态
                            'equity_term': equity.term,  # 还款期
                            'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
-                           'equity_paid_interest': float(equity.paid_interest),  # 单个已经收益
-                           'equity_total_interest': float(equity.total_interest),  # 单个预期收益
+                           'equity_paid_interest': float(equity.paid_interest),  # 单个已经收益  # ===111===value wrong
+                           'equity_total_interest': float(equity.total_interest),  # 单个预期收益  # ===222===value wrong
                            'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
                                request.get_host(), equity.product.id),  # 合同
                            'product_id': equity.product_id
@@ -1087,7 +1087,11 @@ class P2PAmortizationAPI(APIView):
     def get(self, request, **kwargs):
         user = request.user
         product_id = kwargs['product_id']
+
         equity = P2PEquity.objects.filter(user=user, product_id=product_id).prefetch_related('product').first()
+        if not equity:
+            return Response({'ret_code': -1, 'message': u'该产品用户持仓信息为空'})
+
         amortizations = UserAmortization.objects.filter(user=self.request.user,
                                                         product_amortization__product_id=product_id)
 

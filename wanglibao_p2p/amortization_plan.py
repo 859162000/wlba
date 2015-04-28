@@ -310,7 +310,7 @@ class DailyInterestMonthly(AmortizationPlan):
         while term_dates[i] < term_date:
             i = i + 1
 
-            if interest_start + relativedelta(months=i) > term_date:
+            if interest_start + relativedelta(months=i) >= term_date:
                 anchor = term_date
                 term_dates.append(anchor)
                 term_period = term_dates[i] - term_dates[i-1]
