@@ -479,18 +479,15 @@ class P2PEquity(models.Model):
         return self.__get_amortizations()
 
     def __get_amortizations(self, settled_only=False):
-        # if settled_only:
-        #     # amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product,
-        #     #                                                 settled=True)
-        #     amortizations = AmortizationRecord.objects.filter(user=self.user, amortization__product=self.product)
-        # else:
-        #     amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product)
-        #     # print ===999===
         amortizations = UserAmortization.objects.filter(user=self.user,
                                                         product_amortization__product=self.product)
+        logger.info("===999===")
+        logger.info(amortizations)
         if settled_only and amortizations.filter(settled=True).exists():
             amortizations = AmortizationRecord.objects.filter(user=self.user,
                                                               amortization__product=self.product)
+            logger.info("===888===")
+            logger.info(amortizations)
         return amortizations
 
 
