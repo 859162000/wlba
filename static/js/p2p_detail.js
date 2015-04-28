@@ -239,7 +239,11 @@
                 title: '温馨提示',
                 msg: '份额认购成功',
                 callback_ok: function() {
-                  return window.location.href = "/accounts/home";
+                  if (data.category === '酒仙众筹标') {
+                    return window.location.href = "/accounts/home/jiuxian/";
+                  } else {
+                    return window.location.href = "/accounts/home";
+                  }
                 }
               });
             }).fail(function(xhr) {
@@ -432,3 +436,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=p2p_detail.js.map
