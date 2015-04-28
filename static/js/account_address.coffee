@@ -23,7 +23,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
     $('#phone_number').val('')
     $('#address_address').val('')
     $('#postcode').val('')
-    $('#default-checkbox').attr('checked', false)
+#    $('#default-checkbox').attr('checked', false)
     $('#add-address-submit').html('添加')
     $('span.modal-title').html('添加收货地址')
 
