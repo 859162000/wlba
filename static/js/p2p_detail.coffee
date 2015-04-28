@@ -207,6 +207,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         .done (data)->
 
           tool.modalAlert({title: '温馨提示', msg: '份额认购成功', callback_ok: ()->
+            if data.category == '酒仙众筹标'
+              window.location.href="/accounts/home/jiuxian/"
+            else
               window.location.href="/accounts/home"
           })
 

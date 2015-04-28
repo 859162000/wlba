@@ -12,7 +12,7 @@ from wanglibao_account.utils import generate_contract
 from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
     UserAmortization, P2PContract, InterestPrecisionBalance, P2PProductContract, ProductInterestPrecision,\
-    InterestInAdvance
+    InterestInAdvance, P2PEquityJiuxian
 from exceptions import ProductLack, P2PException
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_sms import messages
@@ -131,6 +131,7 @@ class EquityKeeper(KeeperBaseMixin):
         super(EquityKeeper, self).__init__(user=user, product=product, order_id=order_id)
         self.product = product
         self.equity = None
+        self.equity_jiuxian = None
 
     def reserve(self, amount, description=u'', savepoint=True):
         check_amount(amount)
@@ -145,13 +146,21 @@ class EquityKeeper(KeeperBaseMixin):
                 raise P2PException(u'已超过可认购份额限制，'
                                    u'该产品每个客户最大投资金额为%s元' % str(self.product.limit_amount_per_user))
 
-
-
             self.equity.equity += amount
             self.equity.created_at = datetime.now()
             self.equity.save()
             catalog = u'申购'
             record = self.__tracer(catalog, amount, description)
+
+            #酒仙网众筹用户增加额外的记录
+            if self.product.category == u'酒仙众筹标':
+                self.equity_jiuxian, created = P2PEquityJiuxian.objects\
+                    .get_or_create(user=self.user, product=self.product, equity=self.equity)
+                self.equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(pk=self.equity_jiuxian.id).first()
+                self.equity_jiuxian.equity_amount += amount
+                self.equity_jiuxian.created_at = datetime.now()
+                self.equity_jiuxian.save()
+
             return record
 
     def rollback(self, description=u'', savepoint=True):
@@ -174,6 +183,11 @@ class EquityKeeper(KeeperBaseMixin):
                     result = redpack_backends.restore(p2p.order_id, p2p.amount, p2p.user)
                     if result['ret_code'] == 0:
                         user_margin_keeper.redpack_return(result['deduct'], description=u"%s 流标 红包退回%s元" % (self.product.short_name, result['deduct']))
+            #酒仙网流标后删除酒仙标用户持仓记录
+            if self.product.category == u'酒仙众筹标':
+                equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(user=self.user, product=self.product).first()
+                if equity_jiuxian and equity_jiuxian.confirm is False:
+                    equity_jiuxian.delete()
             return record
 
     def settle(self, savepoint=True):
@@ -190,6 +204,14 @@ class EquityKeeper(KeeperBaseMixin):
             self.__tracer(catalog, equity.equity, description)
             user_margin_keeper = MarginKeeper(self.user)
             user_margin_keeper.settle(equity.equity, savepoint=False)
+
+            #酒仙网众筹用户增加额外的记录
+            if self.product.category == u'酒仙众筹标':
+                equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.user, product=self.product).first()
+                if equity_jiuxian:
+                    equity_jiuxian.confirm = True
+                    equity_jiuxian.confirm_at = datetime.now()
+                    equity_jiuxian.save()
 
     def generate_contract(self, savepoint=True):
         with transaction.atomic(savepoint=savepoint):
