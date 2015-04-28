@@ -39,15 +39,26 @@ html
                       input(type="text",name="repayment_date",placeholder="日期",value="{{default_date}}").form-control
                       input(type="hidden", name="id", value="{{p2p.pk}}")
 
-                    .form-group
-                      .radio
-                        label
-                          input(type="radio" name="repayment_type", value="monthly",checked="checked")
-                          按期
-                      .radio
-                        label
-                          input(type="radio" name="repayment_type", value="daily")
-                          按日
+                    if p2p.pay_method == '等额本息'
+                      .form-group
+                        .radio
+                          label
+                            input(type="radio" name="repayment_type", value="monthly",checked="checked", disabled="disabled")
+                            按期
+                        .radio
+                          label
+                            input(type="radio" name="repayment_type", value="daily", disabled="disabled")
+                            按日
+                    else
+                      .form-group
+                        .radio
+                          label
+                            input(type="radio" name="repayment_type", value="monthly",checked="checked")
+                            按期
+                        .radio
+                          label
+                            input(type="radio" name="repayment_type", value="daily")
+                            按日
 
                     .form-group
                       button(type="button").btn.btn-primary#repayment-calculate 提前还款计算

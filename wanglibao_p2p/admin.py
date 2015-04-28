@@ -412,7 +412,7 @@ class InterestPrecisionAdmin(admin.ModelAdmin):
     list_display = ('id', 'equity_product', 'equity_phone', 'equity_name', 'equity_number',
                     'principal', 'interest_receivable', 'interest_actual', 'balance',)
     raw_id_fields = ('equity',)
-    search_fields = ('equity__product__id', 'equity__user__wanglibaouserprofile__phone',)
+    search_fields = ('equity__product__id', 'equity__product__name', 'equity__user__wanglibaouserprofile__phone',)
 
     def equity_phone(self, instance):
         return instance.equity.user.wanglibaouserprofile.phone
@@ -440,7 +440,7 @@ class InterestInAdvanceAdmin(admin.ModelAdmin):
 class ProductInterestPrecisionAdmin(admin.ModelAdmin):
     list_display = ('id', 'product_name', 'principal', 'interest_receivable',
                     'interest_actual', 'balance',)
-    search_fields = ('product__id',)
+    search_fields = ('product__id', 'product__name')
 
 
     def product_name(self, instance):
