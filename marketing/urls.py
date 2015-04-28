@@ -37,6 +37,8 @@ urlpatterns = patterns(
     url(r'^full_login/$', TemplateView.as_view(template_name="fullLogin.jade")),
     url(r'^day_login/$', TemplateView.as_view(template_name="dayLogin.jade")),
     url(r'^full_xin/$', TemplateView.as_view(template_name="full_xin.jade")),
+    # url(r'^list_day/$', TemplateView.as_view(template_name="list_day.jade")),
+    url(r'^list_history/$', TemplateView.as_view(template_name="list_history.jade")),
     url(r'^day_mobile/$', TemplateView.as_view(template_name="day_mobile.jade")),
 )
 
@@ -51,5 +53,6 @@ urlpatterns += patterns(
     # url(r'^introduced_by/$', IntroducedAwardTemplate.as_view(template_name="introduced_by.jade")),
     url(r'^investment_reward/$', InvestmentRewardView.as_view(template_name="investment_reward.jade")),
     url(r'^investment/$', Investment.as_view(), name='day'),
+    # url(r'^list_day/$', Investment.as_view(), name='list_day'),
 )
 
