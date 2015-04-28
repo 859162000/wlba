@@ -45,6 +45,11 @@ def product_amortize(product, amortize_time, amount):
                                     str(amount))
 
 @suffix
+def product_prepayment(product, amortize_time, amount):
+    return u'您投资的%s项目已提前还款%s元，已到帐。' % (product.short_name,
+                                    str(amount))
+
+@suffix
 def validate_code(code):
     return u'您的验证码%s' % code
 
@@ -229,6 +234,11 @@ def msg_withdraw_success(withtime, amount):
 def msg_bid_amortize(product_name, retime, amount):
     title = u"项目还款"
     content = u"借款项目“%s”于%s还款￥%s元，请注意查收。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % (product_name, format_datetime(retime, u"%Y年%m月%d日%H:%M:%S"), amount)
+    return title, content
+
+def msg_bid_prepayment(product_name, retime, amount):
+    title = u"提前还款"
+    content = u"借款项目“%s”于%s提前还款￥%s元，请注意查收。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % (product_name, format_datetime(retime, u"%Y年%m月%d日%H:%M:%S"), amount)
     return title, content
 
 #满额送京东卡
