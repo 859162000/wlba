@@ -40,7 +40,7 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
-    AmortizationRecord, P2PProductContract, P2PProduct
+    AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
@@ -326,7 +326,18 @@ class AccountHome(TemplateView):
 
         xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
 
+        #酒仙众筹用户
+        tab_jiuxian = False
+        jiuxian_selected = False
+        equity_jiuxian = P2PEquityJiuxian.objects.filter(user=user).filter(product__category=u'酒仙众筹标').first()
+        if equity_jiuxian:
+            tab_jiuxian = True
+            if equity_jiuxian.selected_at:
+                jiuxian_selected = True
+            # mode = 'jiuxian'
 
+        if self.request.path.rstrip('/').split('/')[-1] == 'jiuxian':
+            mode = 'jiuxian'
 
         return {
             'message': message,
@@ -341,8 +352,21 @@ class AccountHome(TemplateView):
             'total_asset': total_asset,
             'mode': mode,
             'announcements': AnnouncementAccounts,
-            'xunlei_vip': xunlei_vip
+            'xunlei_vip': xunlei_vip,
+            'tab_jiuxian': tab_jiuxian,
+            'equity_jiuxian': equity_jiuxian,
+            'jiuxian_selected': jiuxian_selected
         }
+
+    def post(self, request):
+        select_type = request.POST.get('select_type')
+        equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.request.user)\
+            .filter(product__category=u'酒仙众筹标').first()
+        if equity_jiuxian:
+            equity_jiuxian.selected_type = select_type
+            equity_jiuxian.selected_at = timezone.now()
+            equity_jiuxian.save()
+        return HttpResponseRedirect(reverse('accounts_jiuxian'))
 
 
 class AccountHomeAPIView(APIView):
