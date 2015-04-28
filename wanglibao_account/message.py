@@ -254,7 +254,7 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
     return True
 
 def send_prepayment(user_records):
-'''
+    '''
     msg_list = list()
     for user_record in user_records:
 
@@ -285,6 +285,6 @@ def send_prepayment(user_records):
         elif device.device_type == "android":
             res, cont = channel.pushAndroidMessage(device.push_user_id, device.push_channel_id, message, msg_key)
 
-'''
+    '''
     pass
     return True
