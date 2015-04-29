@@ -68,6 +68,7 @@ class P2PProduct(ProductBase):
         (u'证大速贷', u'证大速贷'),
         (u'票据', u'票据'),
         (u'新手标', u'新手标'),
+        (u'酒仙众筹标', u'酒仙众筹标')
     )
 
     PAY_METHOD_CHOICES = (
@@ -264,6 +265,8 @@ class P2PProduct(ProductBase):
         u'按月付息': u'按月付息到期还本',
         u'到期还本付息': u'一次性还本付息',
         u'按季度付息': u'按季度付息',
+        u'日计息一次性还本付息': u'日计息一次性还本付息',
+        u'日计息月付息到期还本': u'日计息月付息到期还本',
     }
 
     @property
@@ -436,6 +439,18 @@ class P2PEquity(models.Model):
         return interest
 
     @property
+    def pre_total_interest(self):
+        if not self.is_p2precord:
+            return self.total_interest
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__pre_get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        interest = amortizations.aggregate(Sum('interest'))['interest__sum']
+        return interest
+
+    @property
     def paid_interest(self):
         if not self.confirm:
             return Decimal('0')
@@ -444,6 +459,26 @@ class P2PEquity(models.Model):
             return Decimal('0')
         paid_interest = paid_amos.aggregate(Sum('interest'))['interest__sum']
         return paid_interest
+
+    @property
+    def pre_paid_interest(self):
+        if not self.is_p2precord:
+            return self.paid_interest
+        if not self.confirm:
+            return Decimal('0')
+        paid_amos = self.__pre_get_amortizations()
+        if not paid_amos:
+            return Decimal('0')
+        paid_interest = paid_amos.aggregate(Sum('interest'))['interest__sum']
+        return paid_interest
+
+    @property
+    def is_p2precord(self):
+        amortizations = AmortizationRecord.objects.filter(user=self.user, amortization__product=self.product,
+                                                          catalog=u'提前还款')
+        if amortizations.exists():
+            return True
+        return False
 
     @property
     def unpaid_interest(self):
@@ -479,14 +514,21 @@ class P2PEquity(models.Model):
 
     def __get_amortizations(self, settled_only=False):
         if settled_only:
-            # amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product,
-            #                                                 settled=True)
-            amortizations = AmortizationRecord.objects.filter(user=self.user, amortization__product=self.product)
-            # print ===999===
+            amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product,
+                                                            settled=True)
         else:
             amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product)
         return amortizations
 
+    def __pre_get_amortizations(self):
+        amortizations = UserAmortization.objects.filter(user=self.user,
+                                                        product_amortization__product=self.product)
+        if amortizations.filter(settled=True).exists():
+            amortizations = AmortizationRecord.objects.filter(user=self.user,
+                                                              amortization__product=self.product)
+        else:
+            amortizations = amortizations.filter(settled=True)
+        return amortizations
 
 class AmortizationRecord(models.Model):
     catalog = models.CharField(u'流水类型', max_length=100)
@@ -743,3 +785,22 @@ class InterestInAdvance(models.Model):
     product_year_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
     create_at = models.DateTimeField(default=timezone.now, verbose_name=u'创建时间', auto_now_add=True)
 
+
+class P2PEquityJiuxian(models.Model):
+    user = models.ForeignKey(User, related_name='equity_jiuxian_user')
+    product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equity_jiuxian_p2p')
+    equity = models.ForeignKey(P2PEquity, help_text=u'持仓', related_name='equity_jiuxian')
+    equity_amount = models.BigIntegerField(u'用户所持份额', default=0)
+    confirm = models.BooleanField(u'确认成功', default=False)
+    confirm_at = models.DateTimeField(u'份额确认时间', null=True, blank=True)
+    selected_type = models.CharField(u'选择类型', choices=(
+        ('principal', u'本金+收益'),
+        ('wine', u'酒+收益')
+    ), max_length=20, default='principal')
+    selected_at = models.DateTimeField(u'类型选择时间', null=True, blank=True)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True, null=True)
+
+    class Meta:
+        unique_together = (('user', 'product'),)
+        verbose_name_plural = u'酒仙用户持仓'
+        ordering = ('-created_at',)

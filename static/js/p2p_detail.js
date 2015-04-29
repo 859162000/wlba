@@ -239,7 +239,11 @@
                 title: '温馨提示',
                 msg: '份额认购成功',
                 callback_ok: function() {
-                  return window.location.href = "/accounts/home";
+                  if (data.category === '酒仙众筹标') {
+                    return window.location.href = "/accounts/home/jiuxian/";
+                  } else {
+                    return window.location.href = "/accounts/home";
+                  }
                 }
               });
             }).fail(function(xhr) {
@@ -386,9 +390,9 @@
             datetime.setTime(obj.unavailable_at * 1000);
             available_time = [datetime.getFullYear(), datetime.getMonth() + 1, datetime.getDate()].join('-');
             highest_amount = 0;
-            if (obj.method === 'percent') {
+            if (obj.method === '*') {
               amount = obj.highest_amount;
-              desc = ['抵', obj.amount, '投资额'].join('');
+              desc = ['抵', obj.amount * 100, '%投资额'].join('');
             } else {
               amount = obj.amount;
               desc = (obj.invest_amount && obj.invest_amount > 0 ? [obj.invest_amount, "元起用"].join('') : "无投资门槛");

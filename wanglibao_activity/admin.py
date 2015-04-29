@@ -95,12 +95,12 @@ class ActivityRecordAdmin(ExportMixin, admin.ModelAdmin):
                                  file_format.get_extension())
         return filename
 
-    # def __init__(self, *args, **kwargs):
-    #     super(ActivityRecordAdmin, self).__init__(*args, **kwargs)
-    #     self.list_display_links = (None, )
+    def __init__(self, *args, **kwargs):
+        super(ActivityRecordAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None, )
 
-    def has_add_permission(self, request):
-        return False
+    # def has_add_permission(self, request):
+    #     return False
 
     def has_delete_permission(self, request, obj=None):
         return False

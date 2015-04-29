@@ -9,7 +9,7 @@ from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning,\
     P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance
-from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
+from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization, P2PEquityJiuxian
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminPrepayment, AdminP2PList
@@ -412,7 +412,7 @@ class InterestPrecisionAdmin(admin.ModelAdmin):
     list_display = ('id', 'equity_product', 'equity_phone', 'equity_name', 'equity_number',
                     'principal', 'interest_receivable', 'interest_actual', 'balance',)
     raw_id_fields = ('equity',)
-    search_fields = ('equity__product__id', 'equity__user__wanglibaouserprofile__phone',)
+    search_fields = ('equity__product__id', 'equity__product__name', 'equity__user__wanglibaouserprofile__phone',)
 
     def equity_phone(self, instance):
         return instance.equity.user.wanglibaouserprofile.phone
@@ -440,7 +440,7 @@ class InterestInAdvanceAdmin(admin.ModelAdmin):
 class ProductInterestPrecisionAdmin(admin.ModelAdmin):
     list_display = ('id', 'product_name', 'principal', 'interest_receivable',
                     'interest_actual', 'balance',)
-    search_fields = ('product__id',)
+    search_fields = ('product__id', 'product__name')
 
 
     def product_name(self, instance):
@@ -451,6 +451,29 @@ class ProductInterestPrecisionAdmin(admin.ModelAdmin):
         if instance.interest_precision_balance == Decimal('0'):
             return Decimal(0)
         return instance.interest_precision_balance
+
+
+class P2PEquityJiuxianAdmin(ExportMixin, admin.ModelAdmin):
+    actions = None
+    list_display = ('id', 'user', 'product', 'equity_amount', 'selected_type',
+                    'selected_at')
+
+    def get_export_filename(self, file_format):
+        date_str = timezone.now().strftime('%Y-%m-%d')
+        filename = "%s-%s.%s" % (u"酒仙众筹标用户投资记录".encode('utf-8'),
+                                 date_str,
+                                 file_format.get_extension())
+        return filename
+
+    def __init__(self, *args, **kwargs):
+        super(P2PEquityJiuxianAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None, )
+
+    # def has_add_permission(self, request):
+    #     return False
+    #
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(P2PProduct, P2PProductAdmin)
@@ -468,6 +491,7 @@ admin.site.register(P2PProductContract, P2PProductContractAdmin)
 admin.site.register(InterestPrecisionBalance, InterestPrecisionAdmin)
 admin.site.register(InterestInAdvance, InterestInAdvanceAdmin)
 admin.site.register(ProductInterestPrecision, ProductInterestPrecisionAdmin)
+admin.site.register(P2PEquityJiuxian, P2PEquityJiuxianAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')
