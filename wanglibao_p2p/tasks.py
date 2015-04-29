@@ -62,16 +62,10 @@ def full_send_message(product_name):
 @app.task
 def build_earning(product_id):
 
-    import os
-
     p2p = P2PProduct.objects.select_related('activity__rule').get(pk=product_id)
 
-    command = 'touch ../%s.txt' % 'test'
-    os.system(command)
     num = Earning.objects.filter(product=p2p).count()
     if num > 0:
-        command = 'touch ../%s.txt' % num
-        os.system(command)
         return
 
     #按用户汇总某个标的收益

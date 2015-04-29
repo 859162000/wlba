@@ -352,7 +352,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
           if obj.method == '*'
             amount = obj.highest_amount
-            desc = ['抵', obj.amount, '投资额'].join('')
+            desc = ['抵', obj.amount*100, '%投资额'].join('')
           else
             amount = obj.amount
             desc = (if obj.invest_amount and obj.invest_amount > 0 then [obj.invest_amount, "元起用"].join('') else "无投资门槛")

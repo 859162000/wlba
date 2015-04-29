@@ -107,14 +107,19 @@ class EquityKeeperDecorator():
 
         with transaction.atomic(savepoint=savepoint):
             # p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
-            p2p_equity = P2PEquity.objects.select_related('user__wanglibaouserprofile', \
-                                                          'product__contract_template').select_related('product').filter(id=equity_id).first()
+            p2p_equity = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template')\
+                                          .select_related('product').filter(id=equity_id).first()
             amortizations = UserAmortization.objects.filter(user=p2p_equity.user, product_amortization__product=p2p_equity.product)
             productAmortizations = ProductAmortization.objects.filter(product=p2p_equity.product).select_related('product').all()
             contract_info = P2PProductContract.objects.filter(product=p2p_equity.product).first()
             p2p_equity.contract_info = contract_info
             p2p_equity.amortizations_all = amortizations
             p2p_equity.productAmortizations = productAmortizations
+            #酒仙众筹标信息
+            equity_jiuxian = P2PEquityJiuxian.objects.filter(user=p2p_equity.user, product=p2p_equity.product).first()
+            p2p_equity.equity_jiuxian = equity_jiuxian
+            # p2p_equity.jiuxian_interest = amortizations.first()
+
             contract_string = generate_contract(p2p_equity, None, None)
 
             contract = P2PContract()
