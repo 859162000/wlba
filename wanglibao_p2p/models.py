@@ -481,6 +481,14 @@ class P2PEquity(models.Model):
         return False
 
     @property
+    def activity_interest(self):
+        activity_interest = Earning.objects.filter(user=self.user, product=self.product, paid=True)
+        if not activity_interest:
+            return Decimal('0')
+        activity_interest = activity_interest.aggregate(Sum('amount'))['amount__sum']
+        return activity_interest
+
+    @property
     def unpaid_interest(self):
         return self.total_interest - self.paid_interest
 
