@@ -366,7 +366,7 @@ class AccountHome(TemplateView):
             equity_jiuxian.selected_type = select_type
             equity_jiuxian.selected_at = timezone.now()
             equity_jiuxian.save()
-        return HttpResponseRedirect(reverse('accounts_jiuxian'))
+        return HttpResponseRedirect(reverse('accounts_address'))
 
 
 class AccountHomeAPIView(APIView):
