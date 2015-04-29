@@ -424,8 +424,8 @@ class AccountHomeAPIView(APIView):
             'p2p_withdrawing': float(p2p_withdrawing),  # P2P提现中冻结金额
             'p2p_unpayed_principle': float(p2p_unpayed_principle),  # P2P待收本金
             'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest),  # p2p总待收益
-            'p2p_total_paid_interest': float(p2p_total_paid_interest),  # P2P总累积收益
-            'p2p_total_interest': float(p2p_total_interest + p2p_activity_interest),  # P2P总收益
+            'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest),  # P2P总累积收益
+            'p2p_total_interest': float(p2p_total_interest),  # P2P总收益
 
             'fund_total_asset': float(fund_total_asset),  # 基金总资产
             'fund_total_income': float(total_income),  # 基金累积收益
