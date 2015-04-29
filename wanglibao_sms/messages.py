@@ -45,6 +45,11 @@ def product_amortize(product, amortize_time, amount):
                                     str(amount))
 
 @suffix
+def product_prepayment(product, amortize_time, amount):
+    return u'您投资的%s项目已提前还款%s元，已到帐。' % (product.short_name,
+                                    str(amount))
+
+@suffix
 def validate_code(code):
     return u'您的验证码%s' % code
 
@@ -98,9 +103,9 @@ def msg_bid_purchase(order_id, product_name, amount):
     content = u"感谢您投资订单号【%s】借款项目“%s”￥%s元，该项目正在招标中，您的投标资金暂时被冻结，满标后将放款计息。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % (order_id, product_name, amount)
     return title, content
 
-def msg_bid_earning(product_name, activity_name, term, time, earning_percent, earning_aoumnt):
+def msg_bid_earning(product_name, activity_name, term, time, earning_percent, earning_aoumnt, unit):
     title = u"活动收益"
-    content = u"借款项目“%s(%s）,期限%s个月”于%s赠送【%s%s】活动收益【%s】元，请注意查收。 查看账户余额 感谢您对我们的支持与关注。" % (product_name, activity_name, term, time, earning_percent, u"%", earning_aoumnt)
+    content = u"借款项目“%s(%s）,期限%s%s”于%s赠送【%s%s】活动收益【%s】元，请注意查收。 查看账户余额 感谢您对我们的支持与关注。" % (product_name, activity_name, term, unit, time, earning_percent, u"%", earning_aoumnt)
     return title, content
 
 def msg_bid_fail(product_name):
@@ -229,6 +234,11 @@ def msg_withdraw_success(withtime, amount):
 def msg_bid_amortize(product_name, retime, amount):
     title = u"项目还款"
     content = u"借款项目“%s”于%s还款￥%s元，请注意查收。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % (product_name, format_datetime(retime, u"%Y年%m月%d日%H:%M:%S"), amount)
+    return title, content
+
+def msg_bid_prepayment(product_name, retime, amount):
+    title = u"提前还款"
+    content = u"借款项目“%s”于%s提前还款￥%s元，请注意查收。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注。<br/>网利宝" % (product_name, format_datetime(retime, u"%Y年%m月%d日%H:%M:%S"), amount)
     return title, content
 
 #满额送京东卡

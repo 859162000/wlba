@@ -66,6 +66,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'wanglibao',
     'registration_defaults',
+    'suit',
     'django.contrib.admin',
     'django_extensions',
     'reversion',
@@ -118,6 +119,7 @@ INSTALLED_APPS = (
 
     'widget_tweaks',
     'mathfilters',
+    #'test_without_migrations',
 
     'raven.contrib.django.raven_compat',
     'ckeditor',
@@ -603,3 +605,4 @@ CJDAOKEY = '1234'
 RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
 RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
 POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
+

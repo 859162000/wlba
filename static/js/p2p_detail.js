@@ -239,7 +239,11 @@
                 title: '温馨提示',
                 msg: '份额认购成功',
                 callback_ok: function() {
-                  return window.location.href = "/accounts/home";
+                  if (data.category === '酒仙众筹标') {
+                    return window.location.href = "/accounts/home/jiuxian/";
+                  } else {
+                    return window.location.href = "/accounts/home";
+                  }
                 }
               });
             }).fail(function(xhr) {
@@ -366,7 +370,7 @@
         $.post('/api/redpacket/', {
           status: 'available'
         }).done(function(data) {
-          var available_time, availables, data2, datetime, desc, highest_amount, obj, _i, _len;
+          var amount, available_time, availables, data2, datetime, desc, highest_amount, obj, _i, _len;
           data2 = data;
           availables = data.packages.available;
           ddData.push({
@@ -382,16 +386,22 @@
           });
           for (_i = 0, _len = availables.length; _i < _len; _i++) {
             obj = availables[_i];
-            desc = (obj.invest_amount && obj.invest_amount > 0 ? "投资" + obj.invest_amount + "元可用" : "无投资门槛");
             datetime = new Date();
             datetime.setTime(obj.unavailable_at * 1000);
             available_time = [datetime.getFullYear(), datetime.getMonth() + 1, datetime.getDate()].join('-');
             highest_amount = 0;
+            if (obj.method === '*') {
+              amount = obj.highest_amount;
+              desc = ['抵', obj.amount * 100, '%投资额'].join('');
+            } else {
+              amount = obj.amount;
+              desc = (obj.invest_amount && obj.invest_amount > 0 ? [obj.invest_amount, "元起用"].join('') : "无投资门槛");
+            }
             if (obj.highest_amount) {
               highest_amount = obj.highest_amount;
             }
             ddData.push({
-              text: obj.name,
+              text: [obj.name, ' ', amount, '元'].join(''),
               value: obj.id,
               method: obj.method,
               selected: false,

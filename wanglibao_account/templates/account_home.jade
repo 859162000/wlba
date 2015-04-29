@@ -63,10 +63,87 @@ block main
               span#fund_total_asset_title.big_number
             p.align-center 货币基金(元)
 
-  if mode == 'p2p'
+  if mode == 'jiuxian'
     .account-home-panel__no-padding
       .account-home-panel--title-bar__product
         ul.title-bar--tabs
+          li.title-bar--tab.active
+            a.title-bar--tab--anchor(href="/accounts/home/jiuxian/") 众筹选项
+          li.title-bar--tab
+            a.title-bar--tab--anchor(href="/accounts/home/") 理财专区
+          li.title-bar--tab
+            a.title-bar--tab--anchor(href="/accounts/home/fund/") 货币基金
+        a.pull-right.align-right.detail-view(href='/accounts/transaction/p2p/') 查看交易记录
+      .clamp-xl
+        .space-vertical-s
+        h3 酒仙众筹产品选择
+        .space-vertical-s
+        form.form(name="jiuxian_selected", method="post")
+          table.table
+            thead
+              tr
+                th 还款期限/月
+                th 年化收益
+                th 投资总额/元
+                th 预期收益
+                th 收益类型
+            tbody
+              if equity_jiuxian
+                wine_num = equity_jiuxian.equity_amount / 100
+                tr
+                  td {{equity_jiuxian.product.period}}{{row.equity.product.pay_method | period_unit}}
+                  td {{equity_jiuxian.product.expected_earning_rate}}%
+                  td {{equity_jiuxian.equity_amount | money_format}}
+                  if equity_jiuxian.product.display_status == '还款中' or equity_jiuxian.product.display_status == '已完成'
+                    td {{equity_jiuxian.equity.total_interest | money_format}}
+                  else
+                    td -
+                  td
+                    if equity_jiuxian.selected_type == 'wine'
+                      | 酒 {{wine_num}} 瓶 + 收益
+                    else
+                      | 投资金额 + 收益
+              else
+                tr
+                  td(colspan='5') 无酒仙众筹标持仓记录
+          .space-vertical-s
+          if equity_jiuxian
+            if equity_jiuxian.product.display_status != '还款中' or equity_jiuxian.product.display_status != '已完成'
+              if not jiuxian_selected
+                - csrf_token
+                .form-row
+                  label.span4(for="principal")
+                    input(type="radio", name="select_type", id="principal", checked="checked", value="principal")
+                    | 投资金额 + 收益
+                  label.span5(for="wine")
+                    input(type="radio", name="select_type", id="wine", value="wine")
+                    | 酒 {{wine_num}} 瓶 + 收益（选择后请填写
+                    a(href="/accounts/address/", target="_blank") 收货地址
+                    |）
+                .space-vertical-s
+                .form-row
+                  button.span3.button-primary(type="submit") 确定
+              .space-vertical-s
+            h5 注：众筹项目仅限选择一次，选择后单标累计投资额均默认单标初次选项
+          .space-vertical-s
+          h3 众筹说明
+          ul.font-s.margin-top-s.lh-l
+            li 1、本金抵扣的酒为52°智慧舍得酒，市面价值299元
+            li 2、此选项仅限选择一次，选择后无法更改
+            li 3、1000元本金等同10瓶52°智慧舍得酒，选择酒后抵扣相应的本金
+            li 4、选择“酒+收益”，项目到期后由酒仙网快递相应数量的52°智慧舍得酒，利息照常返还至网利宝账户.
+            li 5、选择"本金+收益” 无礼品赠送，项目到期后按正常理财产品收益计算
+            li 6、满标后未做选择，系统默认用户选择“本金+收益”
+            li 7、网利宝对此众筹活动享有最终解释权
+            li 8、本众筹不参与网利宝其它活动。
+          .space-vertical-l
+  elif mode == 'p2p'
+    .account-home-panel__no-padding
+      .account-home-panel--title-bar__product
+        ul.title-bar--tabs
+          if tab_jiuxian
+            li.title-bar--tab
+              a.title-bar--tab--anchor(href="/accounts/home/jiuxian/") 众筹选项
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") 理财专区
           li.title-bar--tab
@@ -109,15 +186,6 @@ block main
               p
                 span.big_number {{margin_withdrawing|money_format}}
               p.desc 提现中冻结金额
-
-        //.space-vertical-s
-        //.row
-        //  .xunlei-tip-container
-        //    span.p2p-xunlei-icon
-        //    if user.is_authenticated and xunlei_vip.isvip == True
-        //      您已是绑定迅雷会员，投资即可获额外收益。
-        //    else
-        //      只要在满标之前<a href="#xunlei-binding-modal" class="blue xunlei-binding-modal">绑定迅雷会员</a>，即可获额外收益。
         .space-vertical-s
 
         table.table
@@ -140,7 +208,7 @@ block main
                     p
                       a(href="/p2p/detail/{{row.equity.product.id}}/") {{row.equity.product.short_name}}
                     p 年化收益：{{row.equity.product.expected_earning_rate}}%
-                    p 期限：{{row.equity.product.period}}个月
+                    p 期限：{{row.equity.product.period}}{{row.equity.product.pay_method | period_unit}}
                   td {{row.equity.equity | money_format}}
 
                   if row.equity.product.display_status != '还款中'
@@ -179,6 +247,9 @@ block main
     .account-home-panel__no-padding
       .account-home-panel--title-bar__product
         ul.title-bar--tabs
+          if tab_jiuxian
+            li.title-bar--tab
+              a.title-bar--tab--anchor(href="/accounts/home/jiuxian/") 众筹选项
           li.title-bar--tab
             a.title-bar--tab--anchor(href="/accounts/home/") 理财专区
           li.title-bar--tab.active

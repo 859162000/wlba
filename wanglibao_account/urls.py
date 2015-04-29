@@ -21,6 +21,8 @@ urlpatterns = patterns(
                                    login_url='/accounts/login/')),
     url(r'^home/fund/$', login_required(AccountHome.as_view(),
                                         login_url='/accounts/login/')),
+    url(r'^home/jiuxian/$', login_required(AccountHome.as_view(),
+                                           login_url='/accounts/login/'), name='accounts_jiuxian'),
     url(r'^p2p/amortization/(?P<product_id>\d+)', login_required(P2PAmortizationView.as_view(),
                                                                  login_url='/accounts/login/')),
     url(r'^p2p/contract/(?P<product_id>\d+)', user_product_contract),
@@ -92,7 +94,7 @@ urlpatterns = patterns(
         },
         name='auth_password_reset_confirm'),
     url(r'', include('registration.backends.default.urls')),
-    url(r'^address/$', login_required(AddressView.as_view(), login_url='/accounts/login/')),
+    url(r'^address/$', login_required(AddressView.as_view(), login_url='/accounts/login/'), name='accounts_address'),
 
 )
 

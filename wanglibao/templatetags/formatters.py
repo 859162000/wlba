@@ -361,3 +361,13 @@ def admin_address(value):
     Convert the number into 10k based string
     """
     return settings.ADMIN_ADDRESS
+
+
+@register.filter
+def period_unit(value):
+    import re
+    matches = re.search(u'日计息', value)
+    if matches and matches.group():
+        return u'天'
+    else:
+        return u'个月'

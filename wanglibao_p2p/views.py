@@ -7,19 +7,21 @@ import datetime
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.db.models import Q, Sum
+from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from rest_framework import status
-from rest_framework import generics
+from rest_framework import generics, renderers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.amortization_plan import get_amortization_plan
+from wanglibao_p2p.prepayment import PrepaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, \
@@ -42,6 +44,7 @@ from marketing.tops import Top
 from order.utils import OrderHelper
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
+from exceptions import PrepaymentException
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -63,7 +66,7 @@ class P2PDetailView(TemplateView):
 
         terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
                                                                p2p.expected_earning_rate / 100,
-                                                               p2p.amortization_count,
+                                                               datetime.datetime.now(),
                                                                p2p.period)
         total_earning = terms.get("total") - p2p.total_amount
         total_fee_earning = 0
@@ -83,7 +86,8 @@ class P2PDetailView(TemplateView):
 
             xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
             context.update({
-                'xunlei_vip': xunlei_vip
+                'xunlei_vip': xunlei_vip,
+                'is_invested': user.wanglibaouserprofile.is_invested
             })
 
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
@@ -174,7 +178,8 @@ class PurchaseP2P(APIView):
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
 
                 return Response({
-                    'data': product_info.amount
+                    'data': product_info.amount,
+                    'category': equity_info.product.category
                 })
             except Exception, e:
                 return Response({
@@ -425,11 +430,11 @@ class P2PProductViewSet(PaginatedModelViewSet):
         if pager:
             return qs.filter(hide=False).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).filter(~Q(category=u'票据')).filter(pager).order_by('-priority', '-publish_time')
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).order_by('-priority', '-publish_time')
         else:
             return qs.filter(hide=False).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).filter(~Q(category=u'票据')).order_by('-priority', '-publish_time')
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')
 
 
 class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -594,3 +599,85 @@ def AuditEquityCreateContract(request, equity_id):
     except ValueError, e:
         raise Http404
 
+
+class AdminP2PList(TemplateView):
+    template_name = 'admin_p2plist.jade'
+
+    def get_context_data(self, **kwargs):
+        name = self.request.GET.get('p2p_name', False)
+        if name:
+            p2p_list = P2PProduct.objects.filter(status=u'还款中', name=name) \
+                    .select_related('amortizations') \
+                    .order_by('-id')
+        else:
+            p2p_list = P2PProduct.objects.filter(status=u'还款中') \
+                    .select_related('amortizations') \
+                    .order_by('-id')
+
+        return {
+            'p2p_list': p2p_list
+            }
+
+class AdminPrepayment(TemplateView):
+    template_name = 'admin_prepayment.jade'
+
+    def get_context_data(self, **kwargs):
+        id = kwargs['id']
+        if id:
+            p2p = P2PProduct.objects.filter(pk=id).select_related('amortizations')
+        if p2p[0].status != u'还款中':
+            return {
+                    'p2p': None,
+                    'amortizations': []
+                    }
+        
+        return {
+            'p2p': p2p[0],
+            'amortizations': p2p[0].amortizations.all(),
+            'default_date': datetime.datetime.now().strftime('%Y-%m-%d')
+            }
+
+
+
+class RepaymentAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        repayment_date = request.DATA.get('repayment_date', "")
+        repayment_type = request.DATA.get('repayment_type', "")
+        repayment_now = request.DATA.get('now', "0")
+        penal_interest = request.DATA.get('penal_interest', 0)
+        if penal_interest == '':
+            penal_interest = Decimal(0)
+        else:
+            penal_interest = Decimal(penal_interest)
+
+        id = request.POST.get('id')
+
+        p2p = P2PProduct.objects.filter(pk=id)
+        p2p = p2p[0]
+
+        from dateutil import parser
+        flag_date = parser.parse(repayment_date)
+
+        try:
+            payment = PrepaymentHistory(p2p, flag_date)
+            if repayment_now == '1':
+                record = payment.prepayment(penal_interest, repayment_type, flag_date)
+            else:
+                record = payment.get_product_repayment(Decimal(0), repayment_type, flag_date)
+
+            result = {
+                    'errno': 0,
+                    'principal': record.principal,
+                    'interest': record.interest,
+                    'penal_interest': record.penal_interest,
+                    'date': repayment_date
+                    }
+        except PrepaymentException:
+            result = {
+                    'errno': 1,
+                    'errmessage': u'你的还款计划有问题'
+                    }
+
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))

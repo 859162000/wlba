@@ -8,11 +8,11 @@ from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning,\
-    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision
-from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization
+    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance
+from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization, P2PEquityJiuxian
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
-from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization
+from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminPrepayment, AdminP2PList
 from wanglibao.admin import ReadPermissionModelAdmin
 from wanglibao_p2p.forms import RequiredInlineFormSet
 
@@ -238,23 +238,23 @@ class P2PProductForm(forms.ModelForm):
             if self.cleaned_data.get('expected_earning_rate') == float(0):
                 raise forms.ValidationError(u'支付方式为等额本息时, 预期收益(%)必须大于零')
 
-        if self.cleaned_data['status'] == u'正在招标':
-
-            pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
-
-            if not pa:
-                raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
-
-            product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
-            if pa.count() != product.amortization_count:
-                raise forms.ValidationError(u'产品还款计划错误')
-
-            amort_principal = 0
-            for a in pa:
-                amort_principal += a.principal
-
-            if amort_principal != self.cleaned_data['total_amount']:
-                raise forms.ValidationError(u'还款计划本金之和与募集金额不相等，请检查')
+#        if self.cleaned_data['status'] == u'正在招标':
+#
+#            pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])
+#
+#            if not pa:
+#                raise forms.ValidationError(u'产品状态必须先设置成[录标完成],之后才能改为[正在招标]')
+#
+#            product = P2PProduct.objects.filter(version=self.cleaned_data['version']).first()
+#            if pa.count() != product.amortization_count:
+#                raise forms.ValidationError(u'产品还款计划错误')
+#
+#            amort_principal = 0
+#            for a in pa:
+#                amort_principal += a.principal
+#
+#            if amort_principal != self.cleaned_data['total_amount']:
+#                raise forms.ValidationError(u'还款计划本金之和与募集金额不相等，请检查')
 
         return self.cleaned_data
 
@@ -273,6 +273,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 
 
     form = P2PProductForm
+
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
@@ -293,7 +294,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
-    search_fields = ('user__wanglibaouserprofile__phone',)
+    search_fields = ('user__wanglibaouserprofile__phone', 'product_amortization__product__name')
     raw_id_fields = ('product_amortization', 'user')
 
 
@@ -376,8 +377,15 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
     list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled',
                     'settlement_time', 'created_time', 'status', 'description', )
 
+    search_fields = ('product__name', 'product__serial_number')
+
     def status(self, obj):
-        return obj.product.status
+        if obj.product:
+            status = obj.product.status
+        else:
+            status = ''
+
+        return status
 
 
 class EarningAdmin(admin.ModelAdmin):
@@ -399,11 +407,12 @@ class P2PProductContractAdmin(admin.ModelAdmin):
                     'bill_number', 'bill_amount', 'bill_due_date')
 
 
+
 class InterestPrecisionAdmin(admin.ModelAdmin):
     list_display = ('id', 'equity_product', 'equity_phone', 'equity_name', 'equity_number',
                     'principal', 'interest_receivable', 'interest_actual', 'balance',)
     raw_id_fields = ('equity',)
-    search_fields = ('equity__product__id', 'equity__user__wanglibaouserprofile__phone',)
+    search_fields = ('equity__product__id', 'equity__product__name', 'equity__user__wanglibaouserprofile__phone',)
 
     def equity_phone(self, instance):
         return instance.equity.user.wanglibaouserprofile.phone
@@ -423,10 +432,15 @@ class InterestPrecisionAdmin(admin.ModelAdmin):
             return Decimal(0)
         return instance.interest_precision_balance
 
+
+class InterestInAdvanceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'product', 'user', 'interest')
+
+
 class ProductInterestPrecisionAdmin(admin.ModelAdmin):
     list_display = ('id', 'product_name', 'principal', 'interest_receivable',
                     'interest_actual', 'balance',)
-    search_fields = ('product__id',)
+    search_fields = ('product__id', 'product__name')
 
 
     def product_name(self, instance):
@@ -437,6 +451,29 @@ class ProductInterestPrecisionAdmin(admin.ModelAdmin):
         if instance.interest_precision_balance == Decimal('0'):
             return Decimal(0)
         return instance.interest_precision_balance
+
+
+class P2PEquityJiuxianAdmin(ExportMixin, admin.ModelAdmin):
+    actions = None
+    list_display = ('id', 'user', 'product', 'equity_amount', 'selected_type',
+                    'selected_at')
+
+    def get_export_filename(self, file_format):
+        date_str = timezone.now().strftime('%Y-%m-%d')
+        filename = "%s-%s.%s" % (u"酒仙众筹标用户投资记录".encode('utf-8'),
+                                 date_str,
+                                 file_format.get_extension())
+        return filename
+
+    def __init__(self, *args, **kwargs):
+        super(P2PEquityJiuxianAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None, )
+
+    # def has_add_permission(self, request):
+    #     return False
+    #
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(P2PProduct, P2PProductAdmin)
@@ -452,7 +489,11 @@ admin.site.register(ProductAmortization, ProductAmortizationAdmin)
 admin.site.register(Earning, EarningAdmin)
 admin.site.register(P2PProductContract, P2PProductContractAdmin)
 admin.site.register(InterestPrecisionBalance, InterestPrecisionAdmin)
+admin.site.register(InterestInAdvance, InterestInAdvanceAdmin)
 admin.site.register(ProductInterestPrecision, ProductInterestPrecisionAdmin)
+admin.site.register(P2PEquityJiuxian, P2PEquityJiuxianAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')
+admin.site.register_view('p2p/prepayment/(?P<id>\w+)', view=AdminPrepayment.as_view(), name=u'提前还款')
+admin.site.register_view('p2p/p2plist', view=AdminP2PList.as_view(), name=u'还款中标的')
