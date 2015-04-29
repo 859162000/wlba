@@ -390,7 +390,7 @@ class AccountHomeAPIView(APIView):
                 p2p_total_paid_interest += equity.pre_paid_interest  # 累积收益
                 p2p_total_unpaid_interest += equity.unpaid_interest  # 待收益
                 p2p_total_interest += equity.pre_total_interest  # 总收益
-                p2p_activity_interest += equity.p2p_activity_interest  # 活动收益
+                p2p_activity_interest += equity.activity_interest  # 活动收益
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
