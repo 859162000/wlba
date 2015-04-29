@@ -94,7 +94,7 @@ urlpatterns = patterns(
         },
         name='auth_password_reset_confirm'),
     url(r'', include('registration.backends.default.urls')),
-    url(r'^address/$', login_required(AddressView.as_view(), login_url='/accounts/login/')),
+    url(r'^address/$', login_required(AddressView.as_view(), login_url='/accounts/login/'), name='accounts_address'),
 
 )
 
