@@ -3,6 +3,9 @@ from wanglibao_p2p.models import ProductAmortization, UserAmortization, Amortiza
 from wanglibao_p2p.amortization_plan import get_daily_interest, get_final_decimal
 from wanglibao_margin.marginkeeper import MarginKeeper
 from keeper import ProductKeeper
+from wanglibao_sms import messages
+from wanglibao_account import message as inside_message
+from wanglibao_sms.tasks import send_messages
 from order.utils import OrderHelper
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
@@ -50,7 +53,17 @@ class PrepaymentHistory(object):
 
             amortization_records = list()
 
-            user_amortizations = amortization.subs.all()
+            user_amortizations = amortization.subs.all().select_related('user__wanglibaouserprofile')
+
+            phone_list = list()
+            message_list = list()
+            product = amortization.product
+            import re
+            matches = re.search(u'日计息', product.pay_method)
+            if matches and matches.group():
+                pname = u"%s,期限%s天" % (product.name, product.period)
+            else:
+                pname = u"%s,期限%s个月" % (product.name, product.period)
 
             for user_amortization in user_amortizations:
                 user_record = self.get_user_repayment(user_amortization, Decimal(0), repayment_type, payment_date)
@@ -66,6 +79,21 @@ class PrepaymentHistory(object):
 
                 amortization_records.append(user_record)
 
+                #提前还款短信
+                amo_amount = user_record.principal + user_record.interest + user_record.penal_interest
+
+                phone_list.append(user_amortization.user.wanglibaouserprofile.phone)
+                message_list.append(messages.product_prepayment(amortization.product, user_amortization.settlement_time, amo_amount))
+
+                #提前还款站内信
+                title,content = messages.msg_bid_prepayment(pname, timezone.now(), amo_amount)
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id":user_amortization.user.id,
+                    "title":title,
+                    "content":content,
+                    "mtype":"amortize"
+                })
+
             amortization_records.append(product_record)
 
             AmortizationRecord.objects.bulk_create(amortization_records)
@@ -73,6 +101,12 @@ class PrepaymentHistory(object):
             ProductAmortization.objects.filter(product=self.product, settled=False).update(settled=True)
             UserAmortization.objects.filter(product_amortization__product=self.product, settled=False).update(settled=True)
             ProductKeeper(self.product).finish(None)
+
+            #发短信
+            send_messages.apply_async(kwargs={
+                "phones": phone_list,
+                "messages": message_list
+            })
 
         return product_record
 

@@ -178,7 +178,8 @@ class PurchaseP2P(APIView):
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
 
                 return Response({
-                    'data': product_info.amount
+                    'data': product_info.amount,
+                    'category': equity_info.product.category
                 })
             except Exception, e:
                 return Response({

@@ -1,0 +1,182 @@
+$dayM-font-tit: 14px
+$dayM-font-cont: 12px
+$dayM-color-date: #fff
+$dayM-color-tit: #6bb4d2
+$dayM-line-height: 24px
+
+*
+  margin: 0
+  padding: 0
+  font-family: Helvetica, STHeiti STXihei, Microsoft JhengHei, Microsoft YaHei, Tohoma, Arial
+  -webkit-box-sizing: border-box
+.dayM-banner
+  position: relative
+  span
+    display: inline-block
+    position: absolute
+    left: 22%
+    height: 8px
+    width: 8px
+    -webkit-transition: all .5s ease-in
+  #pig
+    background: url("/static/images/day_mobile/pig.png") no-repeat center
+    background-size: 100%
+    width: 20px
+    height: 20px
+    top: 17%
+    display: none
+    z-index: 2
+    -webkit-transition: all .2s ease-in
+  .gold1
+    background: url("/static/images/day_mobile/gold1.png") no-repeat center
+    background-size: 100%
+    left: 25%
+    top: -10px
+  .gold2
+    background: url("/static/images/day_mobile/gold2.png") no-repeat center
+    background-size: 100%
+    top: -10px
+  .gold3
+    background: url("/static/images/day_mobile/gold3.png") no-repeat center
+    background-size: 100%
+    height: 10px
+    width: 10px
+    top: -10px
+  img
+    width: 100%
+  .bounceInDown
+    display: block!important
+    -webkit-animation: bounceInDown 1s
+
+@-webkit-keyframes bounceInDown
+  0%,60%,75%,90%,100%
+    -webkit-transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1)
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1)
+  0%
+    opacity: 0
+    -webkit-transform: translate3d(0, -3000px, 0)
+    transform: translate3d(0, -3000px, 0)
+  60%
+    opacity: 1
+    -webkit-transform: translate3d(0, 15px, 0)
+    transform: translate3d(0, 15px, 0)
+
+  75%
+    -webkit-transform: translate3d(0, -5px, 0)
+    transform: translate3d(0, -5px, 0)
+
+  90%
+    -webkit-transform: translate3d(0, 5px, 0)
+    transform: translate3d(0, 5px, 0)
+  100%
+    -webkit-transform: none
+    transform: none
+
+    
+.dayM-activity-cont
+  padding: 0 8px
+  text-align: center
+.dayM-act-time
+  height: 48px
+  background: url("/static/images/day_mobile/activity-time.jpg") no-repeat center
+  background-size: 100%
+  font-size: $dayM-font-tit
+  line-height: 48px
+  padding-top: 6px
+  color: $dayM-color-date
+  margin-bottom: 10px
+
+.dayM-act-rule
+  font-size: $dayM-font-cont
+  line-height: $dayM-line-height
+  .act-rule-tit
+    background: url("/static/images/day_mobile/activity-gui.png") no-repeat center
+    background-size: 73px
+    color: $dayM-color-tit
+    font-size: $dayM-font-tit
+    font-weight: bold
+    padding: 10px 0px
+  p:nth-child(2)
+    color: #da3c34
+  p:last-child
+    color: #333
+    em
+      color: #da3c34
+      font-style: normal
+.dayM-act-linerMap
+  margin: 16px 0
+  img
+    width: 100%
+.dayM-act-table
+  font-size: $dayM-font-tit
+  table
+    width: 100%
+    border-collapse: collapse
+    td
+      border: 1px solid #d6d6d6
+      color: #666
+      padding: 7px 0
+    .tableTh
+      td
+        border: 0
+        color: $dayM-color-date
+        background: $dayM-color-tit
+        &:first-child
+          border-right: 1px solid #d6d6d6
+        &:last-child
+          border-right: 1px solid $dayM-color-tit
+.dayM-act-tableRule
+  display: -webkit-box
+  text-align: left
+  font-size: $dayM-font-cont
+  line-height: $dayM-line-height
+  margin: 12px 0
+  span
+    width: 20px
+    color: #da3c34
+  p
+    -webkit-box-flex: 1
+    color: #333
+  em
+    color: #da3c34
+    font-style: normal
+.dayM-footer
+  background: $dayM-color-tit
+  font-size: $dayM-font-tit
+  .dayM-gift-icon
+    background: url("/static/images/day_mobile/activity-gui.png") no-repeat center
+    background-size: 73px
+    color: $dayM-color-tit
+    font-weight: bold
+    padding: 20px 0px
+    text-align: center
+  .dayM-gift-rule
+    color: #256580
+    padding: 0 8px
+    span
+      position: absolute
+      left: 0
+      display: inline-block
+      width: 20px
+      height: 20px
+      line-height: 20px
+      text-align: center
+      background: #256580
+      border-radius: 50%
+      color: #fff
+    p
+      position: relative
+      line-height: 20px
+      padding-left: 30px
+      margin-bottom: 8px
+    em
+      font-style: normal
+      color: #fff
+  .dayM-URL
+    color: #fff
+    font-size: $dayM-font-tit
+    text-align: center
+    padding-bottom: 12px
+    a
+      color: #fff
+      text-decoration: none
