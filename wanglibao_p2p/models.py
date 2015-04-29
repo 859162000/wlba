@@ -469,7 +469,7 @@ class P2PEquity(models.Model):
         paid_amos = self.__pre_get_amortizations()
         if not paid_amos:
             return Decimal('0')
-        paid_interest = paid_amos.aggregate(Sum('principal'))['principal__sum']
+        paid_interest = paid_amos.aggregate(Sum('interest'))['principal__sum']
         return paid_interest
 
     @property
