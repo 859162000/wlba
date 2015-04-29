@@ -54,7 +54,7 @@ head
 
 
                 if pay_records
-                    - with data=pay_records uri='/{{ "" | admin_address}}/pay/transaction/deposit'
+                    - with data=pay_records uri='/pay/transaction/deposit'
                     include include/pager_admin
                     - endwith
                 else

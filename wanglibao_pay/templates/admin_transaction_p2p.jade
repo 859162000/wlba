@@ -51,7 +51,7 @@ head
                                     td {{trade_record.catalog}}
 
                 if pay_records
-                    - with data=pay_records uri='/{{ "" | admin_address}}/pay/transaction/p2p'
+                    - with data=pay_records uri='/pay/transaction/p2p'
                     include include/pager_admin
                     - endwith
                 else

@@ -52,7 +52,7 @@ head
                                     td {{trade_record.status}}
 
                 if pay_records
-                    - with data=pay_records uri='/{{ "" | admin_address}}/pay/transaction/withdraw'
+                    - with data=pay_records uri='/pay/transaction/withdraw'
                     include include/pager_admin
                     - endwith
                 else
