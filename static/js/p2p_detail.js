@@ -392,7 +392,7 @@
             highest_amount = 0;
             if (obj.method === '*') {
               amount = obj.highest_amount;
-              desc = ['抵', obj.amount, '投资额'].join('');
+              desc = ['抵', obj.amount * 100, '%投资额'].join('');
             } else {
               amount = obj.amount;
               desc = (obj.invest_amount && obj.invest_amount > 0 ? [obj.invest_amount, "元起用"].join('') : "无投资门槛");
@@ -436,3 +436,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=p2p_detail.js.map
