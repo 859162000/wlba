@@ -116,8 +116,8 @@ class EquityKeeperDecorator():
             p2p_equity.amortizations_all = amortizations
             p2p_equity.productAmortizations = productAmortizations
             #酒仙众筹标信息
-            equity_jiuxian = P2PEquityJiuxian.objects.filter(user=p2p_equity.user, product=p2p_equity.product).first()
-            p2p_equity.equity_jiuxian = equity_jiuxian
+            # equity_jiuxian = P2PEquityJiuxian.objects.filter(user=p2p_equity.user, product=p2p_equity.product).first()
+            # p2p_equity.equity_jiuxian = equity_jiuxian
             # p2p_equity.jiuxian_interest = amortizations.first()
 
             contract_string = generate_contract(p2p_equity, None, None)
