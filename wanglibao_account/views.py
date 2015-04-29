@@ -383,12 +383,14 @@ class AccountHomeAPIView(APIView):
         p2p_total_paid_interest = 0
         p2p_total_unpaid_interest = 0
         p2p_total_interest = 0
+        p2p_activity_interest = 0
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal  # 待收本金
                 p2p_total_paid_interest += equity.pre_paid_interest  # 累积收益
                 p2p_total_unpaid_interest += equity.unpaid_interest  # 待收益
                 p2p_total_interest += equity.pre_total_interest  # 总收益
+                p2p_activity_interest += equity.activity_interest  # 活动收益
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
@@ -423,7 +425,7 @@ class AccountHomeAPIView(APIView):
             'p2p_unpayed_principle': float(p2p_unpayed_principle),  # P2P待收本金
             'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest),  # p2p总待收益
             'p2p_total_paid_interest': float(p2p_total_paid_interest),  # P2P总累积收益
-            'p2p_total_interest': float(p2p_total_interest),  # P2P总收益
+            'p2p_total_interest': float(p2p_total_interest + p2p_activity_interest),  # P2P总收益
 
             'fund_total_asset': float(fund_total_asset),  # 基金总资产
             'fund_total_income': float(total_income),  # 基金累积收益

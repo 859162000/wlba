@@ -85,7 +85,7 @@ function log() {
         } else /*if(){
 
          }*/
-        if (!$(".ipon").val().match(/^1[3|4|5|7|8|9][0-9]\d{8,8}$/)) {
+        if (!$(".ipon").val().match(/^1[2|3|4|5|7|8|9][0-9]\d{8,8}$/)) {
             alert("请输入正确的手机号码");
             return false;
             //} else {
@@ -516,7 +516,7 @@ function feea() {
         if (wei_f == "") {
             alert("手机号码不能为空！");
             return false;
-        } else if (!$(".wei_fee").val().match(/^1[3|4|5|7|8|9][0-9]\d{8,8}$/)) {
+        } else if (!$(".wei_fee").val().match(/^1[2|3|4|5|7|8|9][0-9]\d{8,8}$/)) {
             alert("请输入正确的手机号码");
             return false;
         } else if (!document.getElementById("idd").checked) {
