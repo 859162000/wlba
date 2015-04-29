@@ -86,6 +86,7 @@ block main
                 th 年化收益
                 th 投资总额/元
                 th 预期收益
+                th 收益类型
             tbody
               if equity_jiuxian
                 wine_num = equity_jiuxian.equity_amount / 100
@@ -97,26 +98,42 @@ block main
                     td {{equity_jiuxian.equity.total_interest | money_format}}
                   else
                     td -
+                  td
+                    if equity_jiuxian.selected_type == 'wine'
+                      | 酒 {{wine_num}} 瓶 + 收益
+                    else
+                      | 投资金额 + 收益
               else
                 tr
-                  td(colspan='4') 无酒仙众筹标持仓记录
+                  td(colspan='5') 无酒仙众筹标持仓记录
           .space-vertical-s
           if equity_jiuxian
-            if not jiuxian_selected
-              - csrf_token
-              .form-row
-                label.span4(for="principal")
-                  input(type="radio", name="select_type", id="principal", checked="checked", value="principal")
-                  | 投资金额 + 收益
-                label.span5(for="wine")
-                  input(type="radio", name="select_type", id="wine", value="wine")
-                  | 酒 {{wine_num}} 瓶 + 收益（选择后请填写收货地址）
+            if equity_jiuxian.product.display_status != '还款中' or equity_jiuxian.product.display_status != '已完成'
+              if not jiuxian_selected
+                - csrf_token
+                .form-row
+                  label.span4(for="principal")
+                    input(type="radio", name="select_type", id="principal", checked="checked", value="principal")
+                    | 投资金额 + 收益
+                  label.span5(for="wine")
+                    input(type="radio", name="select_type", id="wine", value="wine")
+                    | 酒 {{wine_num}} 瓶 + 收益（选择后请填写
+                    a(href="/accounts/address/", target="_blank") 收货地址
+                    |）
+                .space-vertical-s
+                .form-row
+                  button.span3.button-primary(type="submit") 确定
               .space-vertical-s
-              .form-row
-                button.span3.button-primary(type="submit") 确定
-            .space-vertical-s
-            h5 &nbsp;&nbsp;注：众筹项目仅限选择一次，选择后单标累计投资额均默认单标初次选项
+            h5 注：众筹项目仅限选择一次，选择后单标累计投资额均默认单标初次选项
           .space-vertical-s
+          h3 众筹说明
+          ul
+            li 1、本金抵扣的酒为舍得52°智慧酒，市面价值 元
+            li 2、次选项仅限选择一次，选择后无更改的机会
+            li 3、100元本金等同1瓶酒，选择酒则抵扣相应的本金
+            li 4、选择“酒+收益”，项目到期后由酒仙网快递相应数量的酒，收益照常返还至网利宝账户
+            li 5、选择“本金+收益”，无礼品赠送，项目到期后按正常理财产品收益计算
+          .space-vertical-l
   elif mode == 'p2p'
     .account-home-panel__no-padding
       .account-home-panel--title-bar__product

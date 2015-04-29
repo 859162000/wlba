@@ -430,11 +430,11 @@ class P2PProductViewSet(PaginatedModelViewSet):
         if pager:
             return qs.filter(hide=False).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).filter(~Q(category=u'票据')).filter(pager).order_by('-priority', '-publish_time')
+            ]).filter(~Q(category=u'票据') | ~Q(category=u'酒仙众筹标')).filter(pager).order_by('-priority', '-publish_time')
         else:
             return qs.filter(hide=False).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).filter(~Q(category=u'票据')).order_by('-priority', '-publish_time')
+            ]).filter(~Q(category=u'票据') | ~Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')
 
 
 class P2PProductDetailView(generics.RetrieveUpdateDestroyAPIView):
