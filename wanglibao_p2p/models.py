@@ -439,6 +439,18 @@ class P2PEquity(models.Model):
         return interest
 
     @property
+    def pre_total_interest(self):
+        if not self.is_p2precord:
+            return self.total_interest
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__pre_get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        interest = amortizations.aggregate(Sum('interest'))['interest__sum']
+        return interest
+
+    @property
     def paid_interest(self):
         if not self.confirm:
             return Decimal('0')
@@ -447,6 +459,26 @@ class P2PEquity(models.Model):
             return Decimal('0')
         paid_interest = paid_amos.aggregate(Sum('interest'))['interest__sum']
         return paid_interest
+
+    @property
+    def pre_paid_interest(self):
+        if not self.is_p2precord:
+            return self.paid_interest
+        if not self.confirm:
+            return Decimal('0')
+        paid_amos = self.__pre_get_amortizations()
+        if not paid_amos:
+            return Decimal('0')
+        paid_interest = paid_amos.aggregate(Sum('interest'))['interest__sum']
+        return paid_interest
+
+    @property
+    def is_p2precord(self):
+        amortizations = AmortizationRecord.objects.filter(user=self.user, amortization__product=self.product,
+                                                          catalog=u'提前还款')
+        if amortizations.exists():
+            return True
+        return False
 
     @property
     def unpaid_interest(self):
@@ -481,12 +513,6 @@ class P2PEquity(models.Model):
         return self.__get_amortizations()
 
     def __get_amortizations(self, settled_only=False):
-        # amortizations = UserAmortization.objects.filter(user=self.user,
-        #                                                 product_amortization__product=self.product)
-        # if amortizations.filter(settled=True).exists():
-        #     amortizations = AmortizationRecord.objects.filter(user=self.user,
-        #                                                       amortization__product=self.product)
-
         if settled_only:
             amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product,
                                                             settled=True)
@@ -494,6 +520,15 @@ class P2PEquity(models.Model):
             amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product)
         return amortizations
 
+    def __pre_get_amortizations(self):
+        amortizations = UserAmortization.objects.filter(user=self.user,
+                                                        product_amortization__product=self.product)
+        if amortizations.filter(settled=True).exists():
+            amortizations = AmortizationRecord.objects.filter(user=self.user,
+                                                              amortization__product=self.product)
+        else:
+            amortizations = amortizations.filter(settled=True)
+        return amortizations
 
 class AmortizationRecord(models.Model):
     catalog = models.CharField(u'流水类型', max_length=100)
