@@ -386,9 +386,9 @@ class AccountHomeAPIView(APIView):
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal  # 待收本金
-                p2p_total_paid_interest += equity.paid_interest  # 累积收益
+                p2p_total_paid_interest += equity.pre_paid_interest  # 累积收益
                 p2p_total_unpaid_interest += equity.unpaid_interest  # 待收益
-                p2p_total_interest += equity.total_interest  # 总收益
+                p2p_total_interest += equity.pre_total_interest  # 总收益
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
