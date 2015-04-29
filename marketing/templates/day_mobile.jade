@@ -1,12 +1,11 @@
 doctype html
 html
   head
-    - with '网利宝' as title
-    - endwith
+    title 日榜活动
     meta(name="keywords", content="网利宝")
     meta(name="format-detection", content="telephone=no")
     meta(name="viewport",content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0")
-    link(rel="stylesheet",href="/static/stylesheets/dayMobile.css")
+    link(rel="stylesheet",href="/static/stylesheets/dayMobile.css?v=12222122212")
   body
     .dayM-banner
       span#pig
@@ -15,15 +14,15 @@ html
       span.gold3
       img(src='/static/images/day_mobile/branner.jpg')
     .dayM-activity-cont
-      .dayM-act-time 活动时间 ： 5月1日00:00:00 --6月1日23:59:59
+      .dayM-act-time 活动时间：5月1日00:00:00 -- 6月1日23:59:59
       .dayM-act-rule
         .act-rule-tit 活动规则
-        p.rule-red 参与时间00:00:00-23:59:59,零点数据清零,
+        p.rule-red 参与时间00:00:00-23:59:59，零点数据清零，
           br
-          |用户可每天重复参赛.
+          |用户可每天重复参赛。
         p 用户每天投标累计金额
           em ≥6
-          |万元，将获得网站投资奖励
+          |万元，将获得网站投资奖励。
       .dayM-act-linerMap
         img(src='/static/images/day_mobile/activity-table.jpg')
       .dayM-act-table
@@ -45,24 +44,26 @@ html
           +trData('10000-19999', '10', '')
       .dayM-act-tableRule
         span 注：
-        p 若出现两名或两名以上客户投标金额相同时，则按当日投标时间先后排位;
+        p 若出现两名或两名以上客户投标金额相同时，则按当日投标时间先后排位；
           br
           |每天投标累计金额
           em ≥6
           |万元用户未排入前十名将各获得
           em 60元
-          |红包
+          |红包。
     .dayM-footer
       .dayM-gift-icon 红包规则
       .dayM-gift-rule
-        mixin giftList(index, ruleTxt, whiteTxt)
+        mixin giftList(index, ruleTxt, whiteTxt, date)
           p
             span=index
             =ruleTxt
             if whiteTxt != ''
               em=whiteTxt
+              if date
+               |；
         +giftList('1', '现金奖励在三个工作日内以红包形式发出，红包类型为现金红包；', '')
-        +giftList('2', '红包有效期 ', '2015年5月1日-2015年8月1日；')
+        +giftList('2', '红包有效期 ', '2015年5月1日-2015年8月1日', 1)
         +giftList('3', '获奖红包以站内信形式通知，完成一次投资回款后即可取现；', '')
         +giftList('4', '红包均只能使用一次，使用后是否有余额即失效；', '')
         +giftList('5', '刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现；', '')
