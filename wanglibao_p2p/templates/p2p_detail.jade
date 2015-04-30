@@ -92,7 +92,7 @@ html
           else
             h1 我要投资
           if status == '抢购中'
-            if user.is_authenticated and p2p.category == '新手标' and not is_invested
+            if user.is_authenticated and p2p.category == '新手标' and is_invested
               include include/new_user_purchase
             else
               form#purchase-form

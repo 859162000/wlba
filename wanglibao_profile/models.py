@@ -46,7 +46,6 @@ class WanglibaoUserProfile(models.Model):
         is_invested = False
         if P2PRecord.objects.filter(user=self.user, catalog=u'申购').count():
             is_invested = True
-
         return is_invested
 
 def create_profile(sender, **kw):
