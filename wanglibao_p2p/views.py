@@ -8,6 +8,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.db.models import Q, Sum
 from django.db import transaction
+from django.template import RequestContext
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.views.generic import TemplateView
@@ -543,7 +544,8 @@ class AdminAmortization(TemplateView):
             terms = acs['terms']
             key = ('term_amount', 'principal', 'interest', 'principal_left')
             newterms = [dict(zip(key, term)) for term in terms]
-            return render_to_response('admin_amortization.jade', {'total': total, 'newterms': newterms})
+            return render_to_response('admin_amortization.jade', {'total': total, 'newterms': newterms},
+                    context_instance=RequestContext(request))
         else:
             messages.warning(request, u'查询错误')
             return redirect('./amortization')
