@@ -1,0 +1,95 @@
+*{
+  margin: 0;
+  padding: 0;
+  font-family: Helvetica, STHeiti STXihei, Microsoft JhengHei, Microsoft YaHei, Tohoma, Arial;
+  -webkit-box-sizing: border-box;
+}
+body{
+    background: #fafafa;
+    font-size: 14px;
+}
+
+.highlight{
+    font-style: normal;
+    color: #f6554b;
+}
+
+.raise-head img{
+    width: 100%;
+    height: auto;
+    display: block;
+}
+.raise-act-time{
+    background: #fff;
+    border-bottom: 1px solid #dadada;
+    padding: 11px 0;
+    color: #f6554b;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+.explain-tab{
+    background: #fff;
+    border-top: 1px solid #dadada;
+    border-bottom: 1px solid #dadada;
+    padding: 6px 0 6px 8px;
+    color: #f6554b;
+}
+.explain-tit{
+    padding: 10px 8px;
+    color: #666;
+    line-height: 22px;
+}
+.explain-table{
+    padding: 0 8px;
+}
+.explain-table table{
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+.explain-table table th{
+    width: 50%;
+    text-align: center;
+    background: #7fcec1;
+    color: #fff;
+    padding: 8px 0;
+    font-weight: normal;
+}
+.explain-table table th:first-child{
+    border-right: 1px solid #d6d6d6;
+}
+.explain-table table td{
+    width: 50%;
+    text-align: center;
+    color: #666;
+    background: #fff;
+    padding: 8px 0;
+    border: 1px solid #d6d6d6;
+}
+.raise-act-count{
+    padding: 20px 8px;
+    color: #666;
+
+}
+.raise-act-count p:last-child{
+    text-align: center;
+    padding-top: 20px;
+}
+.raise-act-rule dt{
+    background: #fff;
+    border-top: 1px solid #dadada;
+    border-bottom: 1px solid #dadada;
+    padding: 6px 0 6px 8px;
+    color: #000;
+    margin-bottom: 10px;
+}
+
+.raise-act-rule dd{
+    padding: 0 8px;
+    color: #666;
+    line-height: 24px;
+}
+.raise-act-rule dd:last-child{
+    margin-bottom: 10px;
+}
