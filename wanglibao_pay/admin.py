@@ -8,10 +8,12 @@ from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
 
 
 class PayInfoAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'get_phone', 'get_name', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time', 'update_time', 'error_message', 'channel')
     search_fields = ['=user__wanglibaouserprofile__phone', '=id']
     raw_id_fields = ('order', 'margin_record', "user")
     list_filter = ('status', 'channel', 'type')
+    list_per_page = 100
 
     def get_phone(self, obj):
         return obj.user.wanglibaouserprofile.phone
@@ -21,6 +23,9 @@ class PayInfoAdmin(admin.ModelAdmin):
     def get_name(self, obj):
         return obj.user.wanglibaouserprofile.name
     get_name.short_description = u'姓名'
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class BankAdmin(admin.ModelAdmin):
