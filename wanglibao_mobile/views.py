@@ -46,7 +46,8 @@ class IndexView(TemplateView):
             getmore = True
 
         trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:20]
-        banners = Banner.objects.filter(device=Banner.PC_2)
+        # banners = Banner.objects.filter(device=Banner.PC_2)
+        banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
         news_and_reports = NewsAndReport.objects.all().order_by("-score")[:5]
         site_data = SiteData.objects.all().first()
         partners = Partner.objects.filter(type='partner')
