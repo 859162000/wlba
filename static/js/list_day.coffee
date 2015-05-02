@@ -62,8 +62,7 @@ require ['jquery'], ($)->
       $('.day-long').animate({'left':'-714px'},500)
       hight(m,'.day-wu')
       clearTimeout(timer)
-      day_index++;
-      count_down('2015-05-31 24:00:00')
+      day_index=2;
     return
 
 
@@ -74,13 +73,15 @@ require ['jquery'], ($)->
     Y=data.getFullYear()
     m=data.getMonth()+1
     day=data.getDate()
+    if m==6 and day>1
+      return
     g=0
     while g<$('.day-yue li').length-2
       k=0
       while k<$(ele+' li:eq('+g+')').children('span').length
         if m==high_m and day==parseInt($(ele+' li:eq('+g+')').children('span:eq('+k+')').text())
           $(ele+' li:eq('+g+')').children('span:eq('+k+')').addClass('span-high').siblings().removeClass('span-high')
-#          $('.day-san').children('span').removeClass('tap-hight2')
+          $('.day-wu').children('span').removeClass('span-high')
           $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'url("/static/images/list-img/small.png") no-repeat','background-position':'-187px -86px','color':'#000'})
         if m!=high_m and day==parseInt($(ele+' li:eq('+g+')').children('span:eq('+k+')').text())
           $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'#FFB7C5','color':'#666671','font-weight':'normal'})
@@ -206,7 +207,7 @@ require ['jquery'], ($)->
   if day<10
       day='0'+day
   date=Y+'-0'+m+"-"+day
-  hight(m,'day-san')
+  hight(m,'day-wu')
   init(date)
   $('#left-h1').html(+m+'月'+day+'日用户榜单')
   wei=new Date()
@@ -224,7 +225,22 @@ require ['jquery'], ($)->
   gotime)
 
 #获取倒计时时间
-  count_down('2015-05-01 0:0:0')
+  if m==6
+    sec=(new Date('2015-06-01'.replace(/-/ig,'/')).getTime() - new Date().getTime())/1000
+    sec=parseInt(sec)
+    timer=setTimeout (->
+      count_down '2015-06-01'
+      return
+    ), 1000
+    if sec <=0
+      $('.mon').html('6 月')
+      $('.day-long').animate({'left':'-1071px'},500)
+      hight(m,'.day-liu')
+      clearTimeout(timer)
+      day_index=3;
+  else
+    count_down('2015-05-01 0:0:0')
+
 
 #  tap切换
 #  $('.left-btn').on('click',()->
@@ -249,7 +265,6 @@ require ['jquery'], ($)->
   mon=0;
   $('.right-btn').on('click',()->
       day_index++;
-#      alert($('.day-yue').length)
       if day_index<$('.day-yue').length
         mon=day_index+3
         $('.mon').html(mon+' 月')
@@ -258,7 +273,7 @@ require ['jquery'], ($)->
 #        high_num=$('.day-yue:eq('+day_index+')').attr('data-num')
 #        hight(high_m,high_num)
       else
-        day_index=2
+        day_index=3
   )
 
   $('.left-btn').on('click',()->
@@ -288,7 +303,7 @@ require ['jquery'], ($)->
     if day<10
       day='0'+day
     date=Y+'-0'+zm+"-"+day
-    if time>='2015-03-24' and time<='2015-05-31' and time<=date
+    if time>='2015-03-24' and time<='2015-06-01' and time<=date
       $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2')
       $(this).parent().siblings().children('span').removeClass('tap-hight2')
       $('#left-h1').html(+m+'月'+d+'日用户榜单')

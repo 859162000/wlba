@@ -7,7 +7,7 @@
   });
 
   require(['jquery'], function($) {
-    var Y, count_down, data, date, day, day_index, fmoney, gotime, hight, init, m, mon, shuju, wei, wei2;
+    var Y, count_down, data, date, day, day_index, fmoney, gotime, hight, init, m, mon, sec, shuju, timer, wei, wei2;
     init = function(time) {
       var csrfSafeMethod, getCookie, sameOrigin;
       csrfSafeMethod = void 0;
@@ -73,8 +73,7 @@
         }, 500);
         hight(m, '.day-wu');
         clearTimeout(timer);
-        day_index++;
-        count_down('2015-05-31 24:00:00');
+        day_index = 2;
       }
     };
     hight = function(high_m, ele) {
@@ -83,6 +82,9 @@
       Y = data.getFullYear();
       m = data.getMonth() + 1;
       day = data.getDate();
+      if (m === 6 && day > 1) {
+        return;
+      }
       g = 0;
       _results = [];
       while (g < $('.day-yue li').length - 2) {
@@ -90,6 +92,7 @@
         while (k < $(ele + ' li:eq(' + g + ')').children('span').length) {
           if (m === high_m && day === parseInt($(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').text())) {
             $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').addClass('span-high').siblings().removeClass('span-high');
+            $('.day-wu').children('span').removeClass('span-high');
             $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').css({
               'background': 'url("/static/images/list-img/small.png") no-repeat',
               'background-position': '-187px -86px',
@@ -268,7 +271,7 @@
       day = '0' + day;
     }
     date = Y + '-0' + m + "-" + day;
-    hight(m, 'day-san');
+    hight(m, 'day-wu');
     init(date);
     $('#left-h1').html(+m + '月' + day + '日用户榜单');
     wei = new Date();
@@ -283,7 +286,24 @@
       $('.ing li').eq(1).addClass('ing-hight');
       return $('.day-head h1').eq(1).addClass('h1-hight');
     }, gotime);
-    count_down('2015-05-01 0:0:0');
+    if (m === 6) {
+      sec = (new Date('2015-06-01'.replace(/-/ig, '/')).getTime() - new Date().getTime()) / 1000;
+      sec = parseInt(sec);
+      timer = setTimeout((function() {
+        count_down('2015-06-01');
+      }), 1000);
+      if (sec <= 0) {
+        $('.mon').html('6 月');
+        $('.day-long').animate({
+          'left': '-1071px'
+        }, 500);
+        hight(m, '.day-liu');
+        clearTimeout(timer);
+        day_index = 3;
+      }
+    } else {
+      count_down('2015-05-01 0:0:0');
+    }
     mon = 0;
     $('.right-btn').on('click', function() {
       day_index++;
@@ -294,7 +314,7 @@
           'left': -357 * day_index + 'px'
         }, 500);
       } else {
-        return day_index = 2;
+        return day_index = 3;
       }
     });
     $('.left-btn').on('click', function() {
@@ -325,7 +345,7 @@
         day = '0' + day;
       }
       date = Y + '-0' + zm + "-" + day;
-      if (time >= '2015-03-24' && time <= '2015-05-31' && time <= date) {
+      if (time >= '2015-03-24' && time <= '2015-06-01' && time <= date) {
         $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2');
         $(this).parent().siblings().children('span').removeClass('tap-hight2');
         $('#left-h1').html(+m + '月' + d + '日用户榜单');
