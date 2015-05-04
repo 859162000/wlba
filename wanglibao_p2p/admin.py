@@ -495,5 +495,5 @@ admin.site.register(P2PEquityJiuxian, P2PEquityJiuxianAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')
-admin.site.register_view('p2p/prepayment/(?P<id>\w+)', view=AdminPrepayment.as_view(), name=u'提前还款')
+admin.site.register_view('p2p/prepayment/(?P<id>\w+)', view=AdminPrepayment.as_view(), name=u'待优化')
 admin.site.register_view('p2p/p2plist', view=AdminP2PList.as_view(), name=u'还款中标的')

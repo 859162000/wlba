@@ -4,47 +4,53 @@ html
   head
     meta(name="viewport" content="width=device-width, initial-scale=1")
     meta(name="format-detection" content="telephone=no,email=no")
-    title 满就送
-    link(rel="stylesheet",href="/static/css/wap/app_full.css")
+    title 累计加息
+    link(rel="stylesheet",href="/static/css/wap/app_fullNew.css")
   body
-      .box
-          .top
-              img(src="/static/images/app_full/banner-new.jpg").app_top
-          .text-one
-              p.text-one-top MacBook、iPhone6 Plus、iPhone6、Apple Watch等你来拿，你理财我送礼！
-              p.text-one-summer 平安保险对用户账户资金安全全额承保。
-              p.text-one-bottom 活动时间：2015年5月1日 - 2015年5月31日
-          .heart
-              span
-              p 没心！没肺！没节操的送！
-              span
-          .text-two
-              h1
-                |1、单日投资200万
-                span 送
-                |全新Retina MacBook ( 金色 )
-              h1
-                |2、单日投资150万
-                span 送
-                |iPhone 6 Plus ( 16G )
-              h1
-                |3、单日投资100万
-                span 送
-                |iPhone 6 ( 16G )
-              h1
-                |4、单日投资50万&nbsp;&nbsp;
-                span 送
-                |Apple Watch Sport
-          .footer.newFullfooter
-              h2 奖品发放说明：
-              h1 1.网利宝账户以身份证号为唯一识别标识；
-              h1 2.活动奖励将在活动期结束后发放；
-              h1 3.单日奖励的投资时间为当日的00:00:00到23:59:59；
-              h1 4.奖品信息将发至您的网利宝账号；
-              h1 5.奖品以苹果官方网站采购到货起，7个工作日内开始发放；
-              h1
-                |6.由于实物奖品快递需要，满额度用户请提交真实“姓名、手机、身份证、通讯地址”至
-                span  kefu@wanglibank.com
-                |。
-              p
-               a(href="https://www.wanglibao.com/", target="_blank")详请关注网利宝官网：www.wanglibao.com
+      .raise-head
+        img(src="/static/images/app_full/app_full_banner.jpg")
+      .raise-act-time 活动时间： 2015年5月1日 - 2015年5月15日
+
+      .raise-act-explain
+        .explain-tab 疯狂加息！激情豪礼!
+        .explain-tit
+          em.highlight 注：
+          |除了每个标的基本收益以外，满足以下条件还可多挣年化收益。
+        .explain-table
+          table
+            thead
+              tr
+                th 单日累计投资额度满（元）
+                th 您获得奖励
+            tbody
+              mixin trList(leftTxt, shouyi)
+                tr
+                  td=leftTxt
+                  td
+                    em.highlight=shouyi
+                    |年化收益
+              +trList('200万（含）以上', '2.5% ')
+              +trList('150万（含）- 200万', '2.0% ')
+              +trList('100万（含）- 150万', '1.5% ')
+              +trList('50万（含）- 100万', '1.0% ')
+              +trList('20万（含）- 50万', '0.5% ')
+      .raise-act-count
+        p
+          em.highlight 计算公式：
+          |投资总额×赠送年化收益÷12×实际投标期限
+        p
+          em.highlight 详请关注网利宝官网：www.wanglibao.com
+
+      .raise-act-rule
+        dl
+          dt 活动规则
+          dd 1.活动时间：
+            em.highlight 5月1日-5月15日
+            |；
+          dd 2.现金奖励在三个工作日内以红包形式发出，红包类型为现金红包；
+          dd 3.红包有效期：
+            em.highlight 2015年5月1日-2015年7月1日
+            |；
+          dd 4.红包均只能使用一次，请在一次投资内全部使用，使用后是否有余额即失效；
+          dd 5.获奖红包以站内信形式通知，完成一次投资回款后即可取现；
+          dd 6.网利宝对此活动享有最终解释权。

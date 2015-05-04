@@ -15,9 +15,9 @@ class AmortizationPlan(object):
         amortizations = product.amortizations.all()
         today = timezone.now()
         for index, amortization in enumerate(amortizations):
-            if amortization.term_date is None:
-                amortization.term_date = today + relativedelta(months=index + 1)
-                amortization.save()
+            #if amortization.term_date is None:
+            amortization.term_date = today + relativedelta(months=index + 1)
+            amortization.save()
 
 
 class MatchingPrincipalAndInterest(AmortizationPlan):
