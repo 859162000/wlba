@@ -280,6 +280,9 @@ class P2PProduct(ProductBase):
     preview_contract.short_description = u'合同预览'
     preview_contract.allow_tags = True
 
+    def get_absolute_url(self):
+        return '/p2p/detail/%s' % self.id
+
 reversion.register(P2PProduct)
 
 

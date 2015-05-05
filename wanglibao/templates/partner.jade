@@ -17,7 +17,7 @@ body
           ul.partner-logo.partner-logo-about
             for partner in partners
               li
-                a(href="{{partner.link}}",target="_blank", title="{{partner.name}}")
+                a(href="{{partner.link}}",target="_blank", title="{{partner.name}}", rel="nofollow")
                   img(src="/media/{{partner.image}}", alt="{{partner.name}}")
 
   include include/footer

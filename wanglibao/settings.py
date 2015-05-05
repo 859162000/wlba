@@ -56,7 +56,6 @@ ALLOWED_HOSTS = ['*']
 from registration_defaults.settings import *
 
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -64,6 +63,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django.contrib.sitemaps',
     'wanglibao',
     'registration_defaults',
     'suit',
@@ -140,7 +140,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'marketing.middlewares.PromotionTokenMiddleWare'
+    'marketing.middlewares.PromotionTokenMiddleWare',
 )
 
 CONCURRENCY_POLICY = 2

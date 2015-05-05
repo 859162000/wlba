@@ -130,3 +130,63 @@ if settings.DEBUG:
 
 handler404 = 'wanglibao.views.page_not_found'
 handler500 = 'wanglibao.views.server_error'
+
+# 网站地图
+from django.contrib.sitemaps import GenericSitemap, Sitemap
+from wanglibao_p2p.models import P2PProduct
+from wanglibao_announcement.models import Announcement
+
+p2p_product_dict = {
+    'queryset': P2PProduct.objects.order_by('-end_time').all(),
+    'date_field': 'end_time',
+}
+
+announcement_dict = {
+    'queryset': Announcement.objects.all(),
+    'date_field': 'updatetime'
+}
+
+
+class StaticViewSitemap(Sitemap):
+    priority = 0.7
+    changefreq = 'daily'
+
+    def items(self):
+        return [
+            (u'首页', '/'),
+            (u'理财专区', '/p2p/list/'),
+            (u'基金', '/fund/products/'),
+            (u'安全保障', '/security/'),
+            (u'帮助中心', '/help/'),
+            (u'媒体报道', '/news/list/'),
+            (u'关于我们', '/about/'),
+            (u'管理团队', '/team/'),
+            (u'公司展示', '/company/'),
+            (u'战略合作伙伴', '/partner/'),
+            (u'网利宝大事记', '/milestone/'),
+            (u'企业社会责任', '/responsibility/'),
+            (u'网站公告', '/announcement/'),
+            (u'招贤纳士', '/hiring/'),
+            (u'联系方式', '/contact_us/'),
+        ]
+
+    def location(self, item):
+        return item[1]
+
+    def lastmod(self, item):
+        import datetime
+        return datetime.datetime.now()
+
+
+sitemaps = {
+    'all': StaticViewSitemap,
+    'p2p-products': GenericSitemap(p2p_product_dict, priority=0.8),
+    'announcements': GenericSitemap(announcement_dict, priority=0.6)
+}
+
+urlpatterns += patterns(
+    'django.contrib.sitemaps.views',
+    (r'^sitemap\.xml$', 'index', {'sitemaps': sitemaps}),
+    (r'^sitemap-(?P<section>.+)\.xml$', 'sitemap', {'sitemaps': sitemaps}),
+)
+

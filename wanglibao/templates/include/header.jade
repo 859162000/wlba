@@ -36,7 +36,7 @@
             | &nbsp;&nbsp;&nbsp;
           a.logout(href="/accounts/logout?next={{ request.path }}") 退出
         else
-          a.login-modal.user-info--login(href="#login-modal") 登录
-          a.register-modal.user-info--register(href="#login-modal") 注册
+          a.login-modal.user-info--login(href="#login-modal", rel="nofollow") 登录
+          a.register-modal.user-info--register(href="#login-modal", rel="nofollow") 注册
 
   include include/header_invite_bar

@@ -45,3 +45,6 @@ class Announcement(models.Model):
         return u'<a href="/announcement/preview/%s" target="_blank">预览</a>' % str(self.id)
     preview_link.short_description = u'预览'
     preview_link.allow_tags = True
+
+    def get_absolute_url(self):
+        return '/announcement/detail/%s' % self.id
