@@ -4,12 +4,11 @@
 doctype html
 html
   head
-    - with '网利宝' as title
+    - with '网利宝官网--p2p理财--p2p网贷--值得信赖的互联网金融服务平台' as title
     include include/common_head
     - endwith
-    meta(name="keywords", content="网利宝")
-    meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
-
+    meta(name="keywords", content="网利宝，网利宝官网，p2p金融，p2p理财，p2p网贷,P2p贷款,p2p平台，P2P网贷平台，互联网金融")
+    meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
   body.white-background
     include include/header
     - with '首页' as activeItem
@@ -305,9 +304,9 @@ html
                       div.media-title.text-overflow-hidden
                         a.news-icon(href="{{news.link}}" title="{{news.name}}", target='_blank')
                           if news.image
-                            img(src="/media/{{news.image}}", style="width:65px;height:40px")
+                            img(src="/media/{{news.image}}", style="width:65px;height:40px", alt="{{news.name}}")
                           else
-                            img(src="/static/images/media_default.jpg", style="width:65px;height:40px")
+                            img(src="/static/images/media_default.jpg", style="width:65px;height:40px", alt="{{news.name}}")
 
                         a.news-txt.font-s(href="{{news.link}}" title="{{news.name}}", target='_blank') {{news.name}}
 
@@ -393,7 +392,7 @@ html
       ul.partner-logo
         for partner in partners
           li
-            a(href="{{partner.link}}",target="_blank", title="{{partner.name}}")
+            a(href="{{partner.link}}", target="_blank", title="{{partner.name}}", rel="nofollow")
               img(src="/media/{{partner.image}}", alt="{{partner.name}}")
     - with 1 as no_margin
     include include/footer
