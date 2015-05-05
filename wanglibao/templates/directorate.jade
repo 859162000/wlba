@@ -1,0 +1,20 @@
+doctype html
+- with '关于网利宝' as title
+include include/head
+- endwith
+body
+  include include/header
+  include include/navigation
+  .container.margin-bottom-xxl
+    .siderbar-div
+      - with '董事局成员' as title
+      include include/about_sidebar
+      - endwith
+    .panel-padding.span9-omega
+      .well-s
+        h1.about-title {{directorate.title}}
+        |{{directorate.content|safe}}
+
+
+  include include/footer
+  include include/tracking

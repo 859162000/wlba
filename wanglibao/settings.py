@@ -606,3 +606,6 @@ RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
 RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
 POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
 
+SUIT_CONFIG = {
+    'LIST_PER_PAGE': 100
+}
