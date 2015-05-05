@@ -27,10 +27,10 @@ html
               - render_field form.password class+="input-large" placeholder="请输入密码" title="请输入密码"
 
             #{ form.password.errors }
-            .form-row
-              - render_field form.captcha class+="captcha" placeholder="请输入答案" title="请输入答案"
-              button.captcha-refresh(type="button") 刷新
-            #{ form.captcha.errors }
+            //.form-row
+            //  - render_field form.captcha class+="captcha" placeholder="请输入答案" title="请输入答案"
+            //  button.captcha-refresh(type="button") 刷新
+            //#{ form.captcha.errors }
             .form-row.form-bottom-bar
               button.span8.button-red.button-middle(type='submit') 登 录
               .span4-omega

@@ -15,6 +15,7 @@ require.config
 
 require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jquery.complexify', 'jquery.placeholder', 'underscore'], ($, modal, backend, validate,tool,  complexify, placeholder, _)->
 
+
   getCookie = (name) ->
     cookieValue = null
     if document.cookie and document.cookie isnt ""
@@ -106,7 +107,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         else
           location.reload()
 
-		
         $('#login_submit').removeClass('disabled')
       .fail (xhr)->
         result = JSON.parse xhr.responseText
