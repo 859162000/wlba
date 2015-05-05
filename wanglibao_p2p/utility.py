@@ -4,10 +4,11 @@ import hashlib
 
 from django.conf import settings
 from django.db.models import Q
-from django.utils import dateparse
+from django.utils import dateparse, timezone
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
-from amortization_plan import MatchingPrincipalAndInterest, MonthlyInterest, QuarterlyInterest, DisposablePayOff
+from amortization_plan import MatchingPrincipalAndInterest, MonthlyInterest, QuarterlyInterest, \
+        DisposablePayOff, DailyInterest, DailyInterestMonthly
 
 
 def checksum(hash_list):
@@ -100,7 +101,9 @@ class AmortizationCalculator():
             '1': self.debxmethod,
             '2': self.ayfxdqhbfxmethod,
             '3': self.dqhbfxmethod,
-            '4': self.ajdfxmethod
+            '4': self.ajdfxmethod,
+            '5': self.rjycxmethod,
+            '6': self.rjyfxmethod
         }
 
     def generate(self):
@@ -111,17 +114,27 @@ class AmortizationCalculator():
 
     def debxmethod(self):
         """ 等额本息 """
-        return MatchingPrincipalAndInterest.generate(self.amount, self.year_rate, term=None, period=self.period)
+        return MatchingPrincipalAndInterest.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
 
     def ayfxdqhbfxmethod(self):
         """ 按月付息到期还本 """
-        return MonthlyInterest.generate(self.amount, self.year_rate, term=None, period=self.period)
+        return MonthlyInterest.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
 
     def dqhbfxmethod(self):
         """ 到期还本付息 """
-        return DisposablePayOff.generate(self.amount, self.year_rate, term=None, period=self.period)
+        return DisposablePayOff.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
 
     def ajdfxmethod(self):
 
         """ 按季度付息 """
-        return QuarterlyInterest.generate(self.amount, self.year_rate, term=None, period=self.period)
+        return QuarterlyInterest.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
+
+    def rjycxmethod(self):
+
+        """ 日计息一次性还本付息 """
+        return DailyInterest.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
+
+    def rjyfxmethod(self):
+
+        """ 日计息月付息到期还本 """
+        return DailyInterestMonthly.generate(self.amount, self.year_rate, timezone.now(), period=self.period)

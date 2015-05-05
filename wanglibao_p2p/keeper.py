@@ -112,13 +112,15 @@ class EquityKeeperDecorator():
             amortizations = UserAmortization.objects.filter(user=p2p_equity.user, product_amortization__product=p2p_equity.product)
             productAmortizations = ProductAmortization.objects.filter(product=p2p_equity.product).select_related('product').all()
             contract_info = P2PProductContract.objects.filter(product=p2p_equity.product).first()
+
+            #酒仙众筹标信息
+            jiuxian_equity = P2PEquityJiuxian.objects.filter(user=p2p_equity.user, equity=p2p_equity).first()
+            if jiuxian_equity:
+                p2p_equity.jiuxian = jiuxian_equity
+
             p2p_equity.contract_info = contract_info
             p2p_equity.amortizations_all = amortizations
             p2p_equity.productAmortizations = productAmortizations
-            #酒仙众筹标信息
-            # equity_jiuxian = P2PEquityJiuxian.objects.filter(user=p2p_equity.user, product=p2p_equity.product).first()
-            # p2p_equity.equity_jiuxian = equity_jiuxian
-            # p2p_equity.jiuxian_interest = amortizations.first()
 
             contract_string = generate_contract(p2p_equity, None, None)
 
@@ -126,8 +128,6 @@ class EquityKeeperDecorator():
             contract.contract_path.save(str(p2p_equity.id)+'.html', ContentFile(contract_string), False)
             contract.equity = p2p_equity
             contract.save()
-
-
 
 
 class EquityKeeper(KeeperBaseMixin):

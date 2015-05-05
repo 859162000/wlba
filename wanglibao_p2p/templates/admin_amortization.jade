@@ -31,6 +31,8 @@ head
                     option(value=2) 按月付息到期还本
                     option(value=3) 到期还本付息
                     option(value=4) 按季度付息
+                    option(value=5) 日计息一次性还本付息 
+                    option(value=6) 日计息月付息到期还本 
               .form-row
                 .span3(style="line-height:40px")
                   label 借款总额
@@ -40,7 +42,7 @@ head
                 .span3(style="line-height:40px")
                   label 还款期限
                 .span9-omega
-                  input(type="text", name="period", placeholder="请输入还款期限数(月)")
+                  input(type="text", name="period", placeholder="请输入还款期限数(月/日)")
               .form-row
                 .span3(style="line-height:40px")
                   label 年化率
