@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from ckeditor.fields import RichTextField
+from django.core.exceptions import ValidationError
 
 
 class Banner(models.Model):
@@ -33,9 +34,14 @@ class Banner(models.Model):
     alt = models.TextField(blank=True, verbose_name=u'图片说明', help_text=u'图片说明')
     last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'上次更新时间')
     is_long_used = models.BooleanField(u'是否长期生效', default=True, help_text=u'默认banner长期有效，如果【不勾选】此项，则需要配置生效时间和失效时间')
-    start_at = models.DateTimeField(u"banner生效时间*", null=True, blank=True)
-    end_at = models.DateTimeField(u"banner失效时间*", null=True, blank=True)
+    start_at = models.DateTimeField(u"banner生效时间", null=True, blank=True)
+    end_at = models.DateTimeField(u"banner失效时间", null=True, blank=True)
     is_used = models.BooleanField(u'是否启用', default=True, help_text=u'默认启用')
+
+    def clean(self):
+        if not self.is_long_used:
+            if not self.start_at or not self.end_at:
+                raise ValidationError(u'如果取消banner长期有效，必须输入banner生效时间和失效时间')
 
 
 class Partner(models.Model):
