@@ -11,6 +11,8 @@ from django.views.generic import TemplateView
 from wanglibao_rest import utils
 from misc.models import Misc
 from wanglibao_banner.models import Banner, Aboutus
+from django.db.models import Q
+from django.utils import timezone
 
 
 #class BannerViewSet(PaginatedModelViewSet):
@@ -41,7 +43,8 @@ class BannerViewSet(APIView):
         elif device['device_type'] == "pc":
             device_t = "PC_2"
         device_t = "mobile"
-        bans = Banner.objects.filter(device=device_t)
+        # bans = Banner.objects.filter(device=device_t)
+        bans = Banner.objects.filter(Q(device=device_t), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
         for x in bans:
             obj = {"id":x.id, "image":str(x.image), "link":x.link, "name":x.name,
                             "priority":x.priority, "type":x.type}
@@ -134,4 +137,14 @@ class AgreementView(TemplateView):
         about_us = Aboutus.objects.filter(code='agreement').first()
         return {
             'about_us': about_us
+        }
+
+
+class DirectorateView(TemplateView):
+    template_name = 'directorate.jade'
+
+    def get_context_data(self, **kwargs):
+        directorate = Aboutus.objects.filter(code='directorate').first()
+        return {
+            'directorate': directorate
         }

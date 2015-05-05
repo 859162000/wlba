@@ -15,7 +15,7 @@ from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, A
 from wanglibao_p2p.views import AdminP2PUserRecord
 # from wanglibao_account.views import CjdaoApiView
 from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView, MilestoneView, \
-    ResponsibilityView, ContactView, AgreementView
+    ResponsibilityView, ContactView, AgreementView, DirectorateView
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
@@ -68,7 +68,8 @@ urlpatterns = patterns(
     url(r'^partner/', PartnerView.as_view(), name="partner"),
     url(r'^milestone/', MilestoneView.as_view(), name="milestone"),
     url(r'^responsibility/', ResponsibilityView.as_view(), name="responsibility"),
-    url(r'^contact_us/', ContactView.as_view(),name="contact_us"),
+    url(r'^contact_us/', ContactView.as_view(), name="contact_us"),
+    url(r'^directorate/', DirectorateView.as_view(), name="directorate"),
     url(r'^news/list', NewsListView.as_view(), name="news_list"),
     url(r'^news/detail/(?P<id>\d+)', NewsDetailView.as_view(), name="news_detail"),
     # url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
