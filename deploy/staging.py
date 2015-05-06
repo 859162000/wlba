@@ -75,6 +75,6 @@ def depoly_staging():
             put(StringIO(json_env), 'env.json')
     rs = sudo("docker ps -a")
     if who not in rs:
-        sudo("docker run -d -p %s:8056 -p %s:3306 --name %s -v /home/jinlong/docker_image/%s:/root/wanglibao  -v /home/jinlong/docker_image/%s/log:/var/log/wanglibao wanglibao /bin/sh -c '/root/start.sh;supervisord -n'" % (workers[who]["app"], workers[who]["mysql"], who, who, who))
+        sudo("docker run -d -p %s:8056 -p %s:3306 --name %s -v /home/jinlong/docker_image/%s:/root/wanglibao  -v /home/jinlong/docker_image/%s/log:/var/log/wanglibao wanglibao /bin/sh -c '/root/start.sh>/var/log/wanglibao/deploy.log;supervisord -n'" % (workers[who]["app"], workers[who]["mysql"], who, who, who))
     else:
         sudo("docker restart %s" % who)
