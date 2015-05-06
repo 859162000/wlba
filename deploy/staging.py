@@ -26,7 +26,12 @@ workers = {"lizhenjing":{"app":8051, "mysql":33051},
             "zhanghe":{"app":8056, "mysql":33056},
             "limengting":{"app":8057, "mysql":33057}, 
             "wangxiaoqing":{"app":8058, "mysql":33058}, 
-            "jinlong":{"app":8059, "mysql":33059}}
+            "jinlong":{"app":8059, "mysql":33059},
+            "jianghao":{"app":8061, "mysql":33061},
+            "wangjianfei":{"app":8062, "mysql":33062},
+            "huomeimei":{"app":8063, "mysql":33063},
+            "caowenhai":{"app":8064, "mysql":33064},
+            "qijinjin":{"app":8065, "mysql":33065}}
 
 @roles("staging")
 def depoly_staging():
