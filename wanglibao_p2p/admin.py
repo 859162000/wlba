@@ -15,6 +15,7 @@ from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminPrepayment, AdminP2PList
 from wanglibao.admin import ReadPermissionModelAdmin
 from wanglibao_p2p.forms import RequiredInlineFormSet
+from wanglibao_account.models import UserAddress
 
 formsets.DEFAULT_MAX_NUM = 2000
 
@@ -453,10 +454,42 @@ class ProductInterestPrecisionAdmin(admin.ModelAdmin):
         return instance.interest_precision_balance
 
 
+class EquityJiuxianResource(resources.ModelResource):
+    user = fields.Field(attribute="user__wanglibaouserprofile__phone", column_name=u"用户手机号")
+    product = fields.Field(attribute="product__name", column_name=u"产品名称")
+    equity_amount = fields.Field(attribute="equity_amount", column_name=u"所持份额")
+    selected_type = fields.Field(attribute="selected_type", column_name=u"选择收益类型")
+    address = fields.Field(attribute="address", column_name=u"地址信息")
+
+    class Meta:
+        model = P2PEquityJiuxian
+        fields = ('user', 'product', 'equity_amount', 'selected_type', 'address')
+        export_order = ('user', 'product', 'equity_amount', 'selected_type', 'address')
+
+    def dehydrate_selected_type(self, obj):
+        if obj.selected_type == 'wine':
+            return u'酒 + 收益'
+        else:
+            return u'本金 + 收益'
+
+    def dehydrate_address(self, obj):
+        address = ''
+        addr_infos = UserAddress.objects.filter(user=obj.user, is_default=True).first()
+        if addr_infos:
+            address = '//'.join([addr_infos.name, addr_infos.phone_number, addr_infos.address, addr_infos.postcode])
+        else:
+            addr_infos = UserAddress.objects.filter(user=obj.user).order_by('-id').first()
+            if addr_infos:
+                address = '//'.join([addr_infos.name, addr_infos.phone_number, addr_infos.address, addr_infos.postcode])
+
+        return address
+
+
 class P2PEquityJiuxianAdmin(ExportMixin, admin.ModelAdmin):
     actions = None
     list_display = ('id', 'user', 'product', 'equity_amount', 'selected_type',
                     'selected_at')
+    resource_class = EquityJiuxianResource
 
     def get_export_filename(self, file_format):
         date_str = timezone.now().strftime('%Y-%m-%d')

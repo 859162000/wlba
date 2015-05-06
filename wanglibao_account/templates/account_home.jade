@@ -108,7 +108,7 @@ block main
                   td(colspan='5') 无酒仙众筹标持仓记录
           .space-vertical-s
           if equity_jiuxian
-            if equity_jiuxian.product.display_status != '还款中' or equity_jiuxian.product.display_status != '已完成'
+            if equity_jiuxian.product.display_status == '正在招标'
               if not jiuxian_selected
                 - csrf_token
                 .form-row
