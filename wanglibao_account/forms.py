@@ -142,7 +142,7 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
     """
     identifier = forms.CharField(max_length=254)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
-    # captcha = CaptchaField()
+    captcha = CaptchaField()
 
     error_messages = {
         'invalid_login': u"用户名或者密码不正确",
