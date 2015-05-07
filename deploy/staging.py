@@ -26,7 +26,12 @@ workers = {"lizhenjing":{"app":8051, "mysql":33051},
             "zhanghe":{"app":8056, "mysql":33056},
             "limengting":{"app":8057, "mysql":33057}, 
             "wangxiaoqing":{"app":8058, "mysql":33058}, 
-            "jinlong":{"app":8059, "mysql":33059}}
+            "jinlong":{"app":8059, "mysql":33059},
+            "jianghao":{"app":8061, "mysql":33061},
+            "wangjianfei":{"app":8062, "mysql":33062},
+            "huomeimei":{"app":8063, "mysql":33063},
+            "caowenhai":{"app":8064, "mysql":33064},
+            "qijinjin":{"app":8065, "mysql":33065}}
 
 @roles("staging")
 def depoly_staging():
@@ -70,6 +75,6 @@ def depoly_staging():
             put(StringIO(json_env), 'env.json')
     rs = sudo("docker ps -a")
     if who not in rs:
-        sudo("docker run -d -p %s:8056 -p %s:3306 --name %s -v /home/jinlong/docker_image/%s:/root/wanglibao  -v /home/jinlong/docker_image/%s/log:/var/log/wanglibao wanglibao /bin/sh -c '/root/start.sh;supervisord -n'" % (workers[who]["app"], workers[who]["mysql"], who, who, who))
+        sudo("docker run -d -p %s:8056 -p %s:3306 --name %s -v /home/jinlong/docker_image/%s:/root/wanglibao  -v /home/jinlong/docker_image/%s/log:/var/log/wanglibao wanglibao /bin/sh -c '/root/start.sh>/var/log/wanglibao/deploy.log;supervisord -n'" % (workers[who]["app"], workers[who]["mysql"], who, who, who))
     else:
         sudo("docker restart %s" % who)
