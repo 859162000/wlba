@@ -23,6 +23,8 @@ html
           for product in p2p_products
             status = product.display_status
             .panel-p2p-product
+              if product.category == '新手标'
+                .new-user 新手福利
               .shadow-inner
                 .panel-title-bar
                   if product.category == '票据'
