@@ -335,7 +335,7 @@ class ProductionAmortizationsReportAllGenerator(ReportGeneratorBase):
         output = cStringIO.StringIO()
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'借款编号', u'借款标题', u'借款企业/借款人', u'借款金额', u'满标时间', u'放款时间',
-                         u'借款期数', u'还款时间', u'已还本金', u'已还利息', u'未还本金', u'未还利息', u'额外罚息', u'标的状态'])
+                         u'借款期数', u'还款时间', u'已还本金', u'已还利息', u'未还本金', u'未还利息', u'额外罚息', u'标的状态', u'合同编号'])
 
         amortizations = ProductAmortization.objects.filter(
             product__publish_time__gte=start_time, product__publish_time__lt=end_time).order_by('-product', 'term')
@@ -378,7 +378,8 @@ class ProductionAmortizationsReportAllGenerator(ReportGeneratorBase):
                 principal_no,
                 interest_no,
                 str(amortization.penal_interest),
-                amortization.product.status
+                amortization.product.status,
+                amortization.product.contract_serial_number
             ])
         return output.getvalue()
 
