@@ -49,7 +49,7 @@ class P2PProductSerializer(ModelSerializerExtended):
                   "borrower_id_number", "borrower_bankcard", "borrower_bankcard_bank_name",
                   "borrower_bankcard_bank_code", "borrower_bankcard_bank_province", "borrower_bankcard_bank_city",
                   "borrower_bankcard_bank_branch", "total_amount", "ordered_amount", "extra_data", "publish_time",
-                  "end_time", "soldout_time", "limit_per_user", "limit_amount_per_user", "warrant_company", "usage", "short_usage",
+                  "end_time", "soldout_time", "limit_per_user", "warrant_company", "usage", "short_usage",
                   "display_status", "product_amortization", "activity")
 
 
