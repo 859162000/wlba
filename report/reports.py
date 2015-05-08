@@ -682,14 +682,62 @@ class RedpackReportGenerator(ReportGeneratorBase):
             writer.writerow([
                 str(index + 1),
                 unicode(record.redpack.event.id),
-                record.redpack.event.name,
-                name,
-                phone,
-                record.change_platform,
-                record.apply_platform,
+                unicode(record.redpack.event.name),
+                unicode(name),
+                unicode(phone),
+                unicode(record.change_platform),
+                unicode(record.apply_platform),
                 timezone.localtime(record.created_at).strftime("%Y-%m-%d %H:%M:%S"),
                 timezone.localtime(record.apply_at).strftime("%Y-%m-%d %H:%M:%S") if record.apply_at else '',
-                record.apply_amount,
+                str(record.apply_amount),
                 unicode(record.order_id) if record.order_id else '',
             ])
+        return output.getvalue()
+
+
+class IntroducedRewardGenerator(ReportGeneratorBase):
+    prefix = 'yqsytj'
+    reportname_format = u'邀请收益统计 %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        from marketing.models import IntroducedByReward
+
+        introduced_records = IntroducedByReward.objects.filter(
+            checked_status=0,
+            activity_start_at=start_time,
+            activity_end_at=end_time
+        ).prefetch_related('user').prefetch_related('user__wanglibaouserprofile').select_related('introduced_by_person__wanglibaouserprofile')
+
+        output = cStringIO.StringIO()
+
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow([u'序号', u'被邀请人名称', u'被邀请人手机号', u'邀请人名称', u'邀请人手机号', u'产品名称',
+                         u'首笔购买时间', u'投资金额', u'奖励金额', u'发放状态'])
+        user, phone, user_parent, phone_parent = '', '', '', ''
+        for index, record in enumerate(introduced_records):
+            if record.user:
+                user = record.user.wanglibaouserprofile.name
+                phone = record.user.wanglibaouserprofile.phone,
+
+            if record.introduced_by_person:
+                try:
+                    user_parent = record.introduced_by_person.wanglibaouserprofile.name
+                    phone_parent = record.introduced_by_person.wanglibaouserprofile.phone
+                except:
+                    user_parent, phone_parent = '', ''
+
+            writer.writerow([
+                str(index + 1),
+                user,
+                unicode(phone),
+                user_parent,
+                unicode(phone_parent),
+                record.product.name,
+                timezone.localtime(record.first_bought_at,).strftime("%Y-%m-%d %H:%M:%S"),
+                str(record.first_amount),
+                str(record.introduced_reward),
+                str(record.checked_status)
+            ])
+
         return output.getvalue()
