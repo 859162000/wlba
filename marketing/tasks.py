@@ -82,7 +82,7 @@ def add_introduced_award(start, end, amount_min, percent):
     end_utc = local_to_utc(end, source_time='max')
 
     # 增加控制条件，没有被统计过才在统计生成
-    if IntroducedByReward.objects.filter(checked_status=0, activity_start_at=start_utc, activity_end_at=end_utc).exists():
+    if IntroducedByReward.objects.filter(activity_start_at=start_utc, activity_end_at=end_utc).exists():
         return False
 
     # print '============begin============', datetime.now()
