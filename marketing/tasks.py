@@ -179,6 +179,9 @@ def send_reward(start, end, amount_min, percent):
         percent_reward=Decimal(percent),
     )
 
+    if not records.exists():
+        return
+
     for record in records:
         # with transaction.atomic():
         user, introduced_by, reward_type, got_amount, product = record.user, record.introduced_by_person, reward_type, record.introduced_reward, record.product
