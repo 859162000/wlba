@@ -682,14 +682,14 @@ class RedpackReportGenerator(ReportGeneratorBase):
             writer.writerow([
                 str(index + 1),
                 unicode(record.redpack.event.id),
-                record.redpack.event.name,
-                name,
-                phone,
-                record.change_platform,
-                record.apply_platform,
+                unicode(record.redpack.event.name),
+                unicode(name),
+                unicode(phone),
+                unicode(record.change_platform),
+                unicode(record.apply_platform),
                 timezone.localtime(record.created_at).strftime("%Y-%m-%d %H:%M:%S"),
                 timezone.localtime(record.apply_at).strftime("%Y-%m-%d %H:%M:%S") if record.apply_at else '',
-                record.apply_amount,
+                str(record.apply_amount),
                 unicode(record.order_id) if record.order_id else '',
             ])
         return output.getvalue()
