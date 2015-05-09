@@ -10,17 +10,19 @@
 
     <div class="inner-center-column">
         <ul id="suit_form_tabs" class="nav nav-tabs nav-tabs-suit" data-tab-prefix="suit-tab">
-            <li><a href="#home">首页</a></li>
-            <li><a href="#profile">Profile</a></li>
-            <li><a href="#messages">Messages</a></li>
-            <li><a href="#settings">Settings</a></li>
+            <li><a href="#news">图文消息 ({{ material.news_count }})</a></li>
+            <li><a href="#image">图片库 ({{ material.image_count }})</a></li>
+            <li><a href="#voice">语音 ({{ material.voice_count }})</a></li>
+            <li><a href="#video">视频 ({{ material.video_count }})</a></li>
         </ul>
 
         <div class="tab-content tab-content-main">
-            <div class="tab-pane suit-tab-home" id="home">1</div>
-            <div class="tab-pane suit-tab-profile" id="profile">2</div>
-            <div class="tab-pane suit-tab-messages" id="messages">3</div>
-            <div class="tab-pane suit-tab-settings" id="settings">4</div>
+            <div class="suit-tab suit-tab-news">
+                图文消息素材列表
+            </div>
+            <div class="suit-tab suit-tab-image">图片库素材列表 开发中……</div>
+            <div class="suit-tab suit-tab-voice">语音素材列表 开发中……</div>
+            <div class="suit-tab suit-tab-video">视频素材列表 开发中……</div>
         </div>
 
         <script>

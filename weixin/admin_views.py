@@ -4,7 +4,8 @@ from django.views.generic import TemplateView
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
 from django.http import Http404
-from .models import Account
+from .models import Account, Material
+
 from wechatpy.client import WeChatClient
 
 class AdminTemplateView(TemplateView):
@@ -75,12 +76,20 @@ class WeixinMenuView(AdminWeixinTemplateView):
         }
 
 
-class WeixinMediaView(AdminWeixinTemplateView):
+class WeixinMaterialView(AdminWeixinTemplateView):
 
-    template_name = 'admin/weixin_media.html'
+    template_name = 'admin/weixin_material.html'
 
     def get_context_data(self, id, **kwargs):
         account = self.get_account(id)
+        try:
+            material = account.material
+        except Material.DoesNotExist:
+            material = Material.create(account)
+        # 获取素材总数 缓存24小时
+        material.init()
+
         return {
-            'account': account
+            'account': account,
+            'material': material
         }

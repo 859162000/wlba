@@ -63,6 +63,50 @@ class Account(models.Model):
 
         return self.jsapi_ticket_content
 
+
+class Material(models.Model):
+    voice_count = models.IntegerField(u'音频总数', default=0)
+    video_count = models.IntegerField(u'视频总数', default=0)
+    image_count = models.IntegerField(u'图片总数', default=0)
+    news_count = models.IntegerField(u'图文总数', default=0)
+    expires_at = models.DateTimeField(u'缓存过期时间', auto_now_add=True)
+    account = models.OneToOneField(Account)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    @classmethod
+    def create(cls, account):
+        material = cls()
+        material.account = account
+        material.save()
+        return material
+
+    @staticmethod
+    def _now():
+        from django.utils.timezone import utc
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        return now
+
+    def init(self):
+        now = self._now()
+        if now > self.expires_at:
+            client = WeChatClient(self.account.app_id, self.account.app_secret, self.account.access_token)
+            res = client.material.get_count()
+            self.voice_count = res.get('voice_count')
+            self.video_count = res.get('video_count')
+            self.image_count = res.get('image_count')
+            self.news_count = res.get('news_count')
+            self.expires_at = now + datetime.timedelta(hours=24)
+            self.save()
+
+
+class News(models.Model):
+    """
+    图文素材
+    """
+    media_id = models.CharField(u'素材ID', max_length=64)
+    data = models.CharField(u'图文内容', max_length=10000)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+
 #
 # class Reply(models.Model):
 #     MEDIA_CLASSIFY = (
@@ -112,13 +156,7 @@ class Account(models.Model):
 #     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
 #
 #
-# class News(models.Model):
-#     """
-#     图文素材
-#     """
-#     media_id = models.CharField(u'素材ID', max_length=64)
-#     data = models.CharField(u'图文内容', max_length=10000)
-#     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+
 #
 #
 

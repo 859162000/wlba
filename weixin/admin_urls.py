@@ -9,5 +9,5 @@ urlpatterns = patterns(
     url(r'^weixin/account/manage/(?P<id>\w+)/mass/$', views.WeixinMassView.as_view(), name='weixin_mass'),
     url(r'^weixin/account/manage/(?P<id>\w+)/reply/$', views.WeixinReplyView.as_view(), name='weixin_reply'),
     url(r'^weixin/account/manage/(?P<id>\w+)/menu/$', views.WeixinMenuView.as_view(), name='weixin_menu'),
-    url(r'^weixin/account/manage/(?P<id>\w+)/media/$', views.WeixinMediaView.as_view(), name='weixin_media'),
+    url(r'^weixin/account/manage/(?P<id>\w+)/material/$', views.WeixinMaterialView.as_view(), name='weixin_material'),
 )
