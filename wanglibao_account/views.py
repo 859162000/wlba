@@ -3,6 +3,9 @@ import datetime
 import logging
 import json
 import math
+import hashlib
+import urllib
+import urlparse
 
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
@@ -59,6 +62,9 @@ from wanglibao_rest import utils
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import RETURN_REGISTER
 
+from wanglibao.settings import TINMANGKEY
+from wanglibao_account.tasks import tianmang_callback
+from wanglibao.settings import RETURN_TINMANG_UTL_DEBUG
 
 logger = logging.getLogger(__name__)
 
@@ -1035,6 +1041,8 @@ def ajax_register(request):
                 user = create_user(identifier, password, nickname)
                 if not user:
                     return HttpResponse(messenger('error'))
+                #天芒注册
+                invitecode = my_tian_mang(request, user, invitecode)
 
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
@@ -1064,6 +1072,38 @@ def ajax_register(request):
     else:
         return HttpResponseNotAllowed(["GET"])
 
+def my_tian_mang(request, user, invitecode):
+    """
+    根据url判断是否是从天芒注册的, 如果是返回invitecode为tianmang
+    :param request:
+    :param user:
+    :param invitecode:
+    :return: 如果是天芒注册的返回invitecode为"tianmang" 否则是原始的invitecode
+    """
+    url=request.META.get("HTTP_REFERER", "")
+
+    parsed_url = urlparse.urlparse(url)
+    query_dic=urlparse.parse_qs(parsed_url.query, True)
+
+    promo_token_list = query_dic.get("promo_token", "")
+    promo_token = "" if not promo_token_list else promo_token_list[0]
+
+    if (not invitecode) and ("tianmang" == promo_token):
+        sn = query_dic.get("sn","")
+        if sn:
+            #注册成功后向天芒云 发送注册成功请求
+            invitecode = "tianmang"
+
+            params={
+                "oid": TINMANGKEY,
+                "sn" : sn,
+                "uid": hashlib.md5(user.wanglibaouserprofile.phone).hexdigest(),
+                "uname": urllib.urlencode(user.wanglibaouserprofile.nick_name),
+                "method": "json"
+            }
+            tianmang_callback.apply_async(kwargs={'url': RETURN_TINMANG_UTL_DEBUG, 'params': params})
+
+    return invitecode
 
 class P2PAmortizationView(TemplateView):
     template_name = 'p2p_amortization_plan.jade'

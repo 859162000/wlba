@@ -9,6 +9,7 @@ import time
 from decimal import Decimal
 from hashlib import md5
 import datetime
+import logging
 
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -19,7 +20,10 @@ from rest_framework.views import APIView
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.models import P2PProduct, P2PEquity, P2PRecord
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
+from .models import IntroducedBy
+from wanglibao_account.models import IdVerification
 
+logger = logging.getLogger(__name__)
 
 class HeXunListAPI(APIView):
     """ 和讯网 API， 获取 P2P 列表数据
@@ -522,3 +526,107 @@ class XunleiP2PbyUser(APIView):
         result.update(my_project=my_project)
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
+
+class TianmangBaseAPIView(APIView):
+    permission_classes = ()
+
+    def get_tianmang_promo_user(self, startday, endday):
+        startday= datetime.datetime.strptime(startday, "%Y-%m-%d")
+        endday = datetime.datetime.strptime(endday, "%Y-%m-%d")
+        if startday > endday:
+            tmpdate = endday
+            endday = startday
+            startday = tmpdate
+
+        if startday == endday:
+            daydelta = datetime.timedelta(days=1)
+            endday += daydelta
+        tianmang_promo_list = IntroducedBy.objects.filter(channel__code="tianmang", created_at__gte=startday, created_at__lte=endday)
+        return tianmang_promo_list
+
+class TianmangIDVerificationListAPIView(TianmangBaseAPIView):
+    """天芒云 批量获取身份证认证完成用户接口"""
+    permission_classes = ()
+    def get(self, request, startday, endday):
+        response_user_list = []
+        try :
+            tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
+            for tianmang_promo_user in tianmang_promo_list:
+                if tianmang_promo_user.user.wanglibaouserprofile.id_is_valid:
+                    m=md5()
+                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                    uid = m.hexdigest()
+                    #获取身份认证的时间
+                    created_at = IdVerification.objects.get(\
+                        id_number=tianmang_promo_user.user.wanglibaouserprofile.id_number).created_at
+
+                    response_user ={
+                        "time": timezone.localtime(created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                        "uid": uid,
+                        "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                        #"status":tianmang_promo_user.user.wanglibaouserprofile.id_is_valid and 1 or 0,
+                    }
+                    response_user_list.append(response_user)
+        except:
+            logger.error("TianmangIDVerificationListAPIView error")
+
+        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
+
+class TianmangRegisterListAPIView(TianmangBaseAPIView):
+    """天芒云 批量获取用户注册完成接口"""
+    permission_classes = ()
+    def get(self, request, startday, endday):
+        response_user_list = []
+        try :
+            tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
+
+            for tianmang_promo_user in tianmang_promo_list:
+                m=md5()
+                m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                uid = m.hexdigest()
+                response_user ={
+                    "time": timezone.localtime(tianmang_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "uid": uid,
+                    "uname": tianmang_promo_user.user.wanglibaouserprofile.nick_name,
+                    #"status":tianmang_promo_user.user.wanglibaouserprofile.phone_verified and 1 or 0,
+                }
+                response_user_list.append(response_user)
+        except:
+            logger.error("TianmangRegisterListAPIView error")
+
+        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
+
+class TianmangInvestListAPIView(TianmangBaseAPIView):
+    """天芒云 投资成功及金额获取用户接口"""
+    permission_classes = ()
+    def get(self, request, startday, endday):
+        response_user_list = []
+        try :
+            tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
+
+            for tianmang_promo_user in tianmang_promo_list:
+                p2p_equities = P2PEquity.objects.filter(user=tianmang_promo_user.user).filter(product__status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+                    ])
+                income_all = 0
+                for equity in p2p_equities:
+                    if equity.confirm:
+                        income_all += equity.equity
+
+                if not income_all:
+                    continue
+                m=md5()
+                m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                uid = m.hexdigest()
+                response_user ={
+                    "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "uid": uid,
+                    "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                    "investment": float(income_all),
+                    #"status": 1 if income_all > 0 else 0
+                }
+                response_user_list.append(response_user)
+        except:
+            logger.error("TianmangInvestListAPIView error")
+
+        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))

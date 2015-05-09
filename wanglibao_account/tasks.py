@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 __author__ = 'rsj217'
+import requests
+from wanglibao.celery import app
 
 # from wanglibao_p2p.models import P2PProduct
 # from wanglibao_account.utils import CjdaoUtils
@@ -52,3 +54,8 @@ __author__ = 'rsj217'
 #         logger.debug(r.status_code)
 #         logger.debug(r.text)
 #         logger.debug(p2p.id)
+
+@app.task
+def tianmang_callback(url, params):
+    ret = requests.get(url, params=params)
+    print ret.text

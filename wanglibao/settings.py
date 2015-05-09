@@ -607,6 +607,10 @@ RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
 RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
 POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
 
+RETURN_TINMANG_UTL = "http://www.bangwoya.com/callback/callback.php"
+RETURN_TINMANG_UTL_DEBUG = "http://demo.bangwoya.com/callback/callback.php"
+TINMANGKEY= '456'
+
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }
