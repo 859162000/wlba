@@ -356,10 +356,7 @@ class IntroducedAwardTemplate(TemplateView):
                 "amount_min": amount_min,
                 "percent": percent,
             })
-            # if self.add_introduced_award(start_utc, end_utc, amount_min, percent):
-            #     message = u'统计成功！'
-            # else:
-            #     message = u'统计失败！'
+
             message = u'正在统计，请稍后查询！'
         else:
             message = u'存在未审核记录，请先进行审核操作！'
@@ -388,80 +385,6 @@ class IntroducedAwardTemplate(TemplateView):
             "percent": percent,
             "amount_all": introduced_by_reward.aggregate(sum_introduced_reward=Sum('introduced_reward')) if introduced_by_reward else 0.00
         }
-
-    # @staticmethod
-    # def add_introduced_award(start_utc, end_utc, amount_min, percent):
-    #     # 不存在未审核记录，直接进行统计
-    #     # 查询复合条件的首次交易的被邀请人和邀请人信息
-    #     # new_user = IntroducedBy.objects.filter(
-    #     #     bought_at__range=(start_utc, end_utc)
-    #     # ).exclude(
-    #     #     introduced_by__username__startswith="channel"
-    #     # ).exclude(
-    #     #     introduced_by__wanglibaouserprofile__utype__gt=0
-    #     # )
-    #
-    #     new_user = IntroducedBy.objects.filter(
-    #         bought_at__range=(start_utc, end_utc)
-    #     ).filter(
-    #         introduced_by__isnull=False
-    #     ).exclude(
-    #         introduced_by__wanglibaouserprofile__utype__gt=0
-    #     )
-    #
-    #     query_set_list = []
-    #     num = 0
-    #     for first_user in new_user:
-    #         num += 1
-    #         # everyone
-    #         first_record = P2PRecord.objects.filter(
-    #             user=first_user.user,
-    #             create_time__range=(start_utc, end_utc),
-    #             catalog='申购',
-    #             product__status__in=[
-    #                 u'满标待打款',
-    #                 u'满标已打款',
-    #                 u'满标待审核',
-    #                 u'满标已审核',
-    #                 u'还款中',
-    #                 u'已完成', ]
-    #         ).order_by('create_time').first()
-    #
-    #         # first trade min amount limit
-    #         if first_record is not None and first_record.amount >= Decimal(amount_min):
-    #             reward = IntroducedByReward()
-    #             reward.user = first_user.user
-    #             reward.introduced_by_person = first_user.introduced_by
-    #             reward.product = first_record.product
-    #             reward.first_bought_at = first_user.bought_at
-    #             reward.first_amount = first_record.amount
-    #
-    #             # 计算被邀请人首笔投资总收益
-    #             amount_earning = Decimal(
-    #                 Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12)) * Decimal(first_record.product.expected_earning_rate) * Decimal('0.01')
-    #             ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
-    #             reward.first_reward = amount_earning
-    #             # 邀请人活取被邀请人首笔投资收益
-    #             reward.introduced_reward = Decimal(
-    #                 Decimal(first_record.amount) * (Decimal(first_record.product.period) / Decimal(12)) * Decimal(percent) * Decimal('0.01')
-    #             ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
-    #
-    #             reward.activity_start_at = start_utc
-    #             reward.activity_end_at = end_utc
-    #             reward.activity_amount_min = Decimal(amount_min)
-    #             reward.percent_reward = Decimal(percent)
-    #             reward.checked_status = 0
-    #             # reward.save()
-    #             query_set_list.append(reward)
-    #
-    #         if len(query_set_list) == 100:
-    #             IntroducedByReward.objects.bulk_create(query_set_list)
-    #             query_set_list = []
-    #
-    #     if len(query_set_list) > 0:
-    #         IntroducedByReward.objects.bulk_create(query_set_list)
-    #
-    #     return True
 
     @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
     def dispatch(self, request, *args, **kwargs):
@@ -499,26 +422,7 @@ class IntroducedAwardTemplate(TemplateView):
                     "percent": percent,
                 })
 
-            # # 审核通过，给用户发放奖励
-            # reward_type = u'邀请送收益'
-            # # True 标识只将信息标准输出到终端上，不进行实际操作
-            # # False 标识实际发送红包
-            # only_show = False
-            # records = IntroducedByReward.objects.filter(checked_status=0)
-            # for record in records:
-            #     self.reward_user(
-            #         user=record.user,
-            #         introduced_by=record.introduced_by_person,
-            #         reward_type=reward_type,
-            #         got_amount=record.introduced_reward,
-            #         product=record.product,
-            #         only_show=only_show
-            #     )
-            #
-            # # self.reward_user_all()
-            # IntroducedByReward.objects.filter(checked_status=0).update(checked_status=1)
             message = u'审核通过结束，稍后查询发放记录！'
-
 
         elif check == '2':
             # 审核未通过，删除统计记录
