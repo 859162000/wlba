@@ -101,7 +101,7 @@ html
                       else
                         span &nbsp;&nbsp; {{percent | percentage}}
 
-                    .span5.align-left
+                    .span4.align-left
                       if product.category == '证大速贷'
                         span 本息保障: &nbsp;&nbsp;
                         span.d3-text {{product.warrant_company.name}}
@@ -113,7 +113,7 @@ html
                         span 合作机构: &nbsp;&nbsp;
                         span.d3-text {{product.warrant_company.name}}
 
-                    .span3-omega.align-right
+                    .span4-omega.align-right
                       span 还款方式: &nbsp;&nbsp;
                       span.d3-text {{product.display_payback_method}}
                 if status == '还款中'
