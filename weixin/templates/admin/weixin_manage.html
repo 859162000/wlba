@@ -1,0 +1,40 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_list admin_urls suit_list suit_tags %}
+{% load url from future %}
+
+{% block content %}
+<div id="content-main">
+    <div>
+        <p>当前公众账号：{{ account.name }}</p>
+    </div>
+
+    <div>
+        <h3>功能</h3>
+        <ul>
+            <li><a href="{% url 'weixin_mass' account.id %}">群发功能</a></li>
+            <li><a href="{% url 'weixin_reply' account.id %}">自动回复</a></li>
+            <li><a href="{% url 'weixin_menu' account.id %}">自定义菜单</a></li>
+            <li><a href="#">投票管理</a></li>
+        </ul>
+    </div>
+    <div>
+        <h3>管理</h3>
+        <ul>
+            <li><a href="#">消息管理</a></li>
+            <li><a href="#">用户管理</a></li>
+            <li><a href="{% url 'weixin_media' account.id %}">素材管理</a></li>
+        </ul>
+    </div>
+
+    <div>
+        <h3>统计</h3>
+        <ul>
+            <li><a href="#">用户分析</a></li>
+            <li><a href="#">图文分析</a></li>
+            <li><a href="#">消息分析</a></li>
+            <li><a href="#">接口分析</a></li>
+        </ul>
+    </div>
+
+</div>
+{% endblock %}
