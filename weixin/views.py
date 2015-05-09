@@ -8,7 +8,6 @@ from wechatpy import parse_message, create_reply
 from wechatpy.utils import check_signature
 from wechatpy.exceptions import InvalidSignatureException
 from .common.wechat import tuling
-# Create your views here.
 
 
 class ConnectView(View):
