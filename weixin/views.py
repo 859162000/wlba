@@ -11,7 +11,6 @@ from .common.wechat import tuling
 # Create your views here.
 
 
-
 class ConnectView(View):
 
     def check_signature(self, request, id):
