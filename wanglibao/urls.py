@@ -53,6 +53,7 @@ urlpatterns = patterns(
     url(r'^api/', include('wanglibao_rest.urls')),
     url(r'^help/', include('wanglibao_help.urls')),
     url(r'^mobile/', include('wanglibao_mobile.urls')),
+    url(r'^' + settings.ADMIN_ADDRESS + '/', include('weixin.admin_urls')),
     url(r'^' + settings.ADMIN_ADDRESS + '/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
@@ -119,6 +120,12 @@ urlpatterns += patterns(
     url(r'^api/xunlei/getXLUserInvestInfo/$', XunleiP2PbyUser.as_view()),
     # 财经道
     # url(r'^accounts/cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
+)
+
+# 微信
+urlpatterns += patterns(
+    '',
+    url(r'weixin/', include('weixin.urls'))
 )
 
 if settings.DEBUG:
