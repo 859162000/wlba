@@ -365,6 +365,12 @@ class IntroducedAwardTemplate(TemplateView):
             message = u'存在未审核记录，请先进行审核操作！'
 
         introduced_result = IntroducedByReward.objects.filter(checked_status=0).order_by("first_bought_at")
+        if not introduced_by_reward.exists():
+            introduced_result = IntroducedByReward.objects.filter(
+                activity_start_at=start_utc,
+                activity_end_at=end_utc
+            ).order_by("first_bought_at")
+
         if introduced_by_reward and introduced_by_reward.count() > 0:
             time_zone = pytz.timezone('Asia/Shanghai')
             result_first = introduced_result.first()
