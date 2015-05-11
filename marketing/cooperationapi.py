@@ -531,8 +531,8 @@ class TianmangBaseAPIView(APIView):
     permission_classes = ()
 
     def get_tianmang_promo_user(self, startday, endday):
-        startday= datetime.datetime.strptime(startday, "%Y-%m-%d")
-        endday = datetime.datetime.strptime(endday, "%Y-%m-%d")
+        startday= datetime.datetime.strptime(startday, "%Y%m%d")
+        endday = datetime.datetime.strptime(endday, "%Y%m%d")
         if startday > endday:
             tmpdate = endday
             endday = startday
