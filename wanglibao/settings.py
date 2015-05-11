@@ -110,6 +110,7 @@ INSTALLED_APPS = (
     'wanglibao_help',
     'wanglibao_activity',
     'wanglibao_mobile',
+    'weixin',
 
     'report',
     'misc',
