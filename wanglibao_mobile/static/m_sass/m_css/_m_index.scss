@@ -3,13 +3,14 @@ $mobile-bg-color: #fff;
 @mixin mobile-yuan-style($bgcolor,$font-color,$mathpi,$font-size){
   display: inline-block;
   text-align: center;
-  height: $mathpi;
-  width: $mathpi;
-  line-height: $mathpi;
-  border-radius: $mathpi/2;
+  height: 6rem;
+  width: 6rem;
+  line-height: 6rem;
+
+  border-radius: (6rem/2);
   background: $bgcolor;
   color: $font-color;
-  font-size: $font-size;
+  font-size: 1.5rem;
 }
 @mixin font-color($font, $color){
   font-size: $font;
@@ -18,7 +19,7 @@ $mobile-bg-color: #fff;
 .m-head-center{
   text-align: center;
   height: $mobile-head-height;
-  font-size: $font-size-large;
+  font-size: 1.8rem;
   line-height: $mobile-head-height;
 }
 .m-head{
@@ -31,7 +32,7 @@ $mobile-bg-color: #fff;
     position: absolute;
     left: 0;
     top: 0;
-    padding: 0 10px;
+    padding: 0 1rem;
     color: $mobile-head-leftcolor;
     @extend .m-head-center
   }
@@ -39,7 +40,7 @@ $mobile-bg-color: #fff;
     position: absolute;
     right: 0;
     top: 0;
-    padding: 0 10px;
+    padding: 0 1.1rem;
     color: $mobile-head-rightcolor;
     @extend .m-head-center
   }
@@ -50,7 +51,7 @@ $mobile-bg-color: #fff;
   }
   li{
     margin-bottom: 0;
-    height: 140px;
+    height: 14rem;
     img{
       width: 100%;
       height: 100%;
@@ -58,12 +59,12 @@ $mobile-bg-color: #fff;
   }
 }
 .m-invest-cont{
-  padding: 10px 0;
-  margin-bottom: 50px;
+  padding: 1rem 0;
+  margin-bottom: 5rem;
   background: #f5f5f5;
 }
 .m-invest-list{
-  margin-bottom: 10px;
+  margin-bottom: 1rem;
   background: #fff;
   @include line-combine-top($mobile-br-color);
   &:active{
@@ -73,7 +74,7 @@ $mobile-bg-color: #fff;
     display: block;
   }
   .invest-body{
-    padding: 10px 0;
+    padding: 1rem 0;
     @include line-combine($mobile-br-color);
     p{
       display:inline-block;
@@ -88,43 +89,43 @@ $mobile-bg-color: #fff;
   .invest-month{
     width: 29%;
     position: relative;
-    top: 10px;
-    @include font-color($font-size-small, #999);
-    padding-left: 14px;
+    top: 1rem;
+    @include font-color(1.2rem, #999);
+    padding-left: 1.4rem;
     em{
-      @include font-color($line-height-computed, #333);
+      @include font-color(2rem, #333);
     }
   }
   .invest-num{
     width: 40%;
     position: relative;
-    top: 10px;
+    top: 1rem;
     .pernum-red{
-      @include font-color($font-size-h2, #ff4c2e);
+      @include font-color(3rem, #ff4c2e);
     }
     .per{
-      @include font-color($font-size-base, #ff4c2e);
+      @include font-color(1.4rem, #ff4c2e);
     }
     .plus{
-      @include font-color(22px, #ff4c2e);
+      @include font-color(1.2rem, #ff4c2e);
     }
     .pernum-blue{
       position: relative;
-      @include font-color($line-height-computed, #23a5fb);
+      @include font-color(2rem, #23a5fb);
     }
   }
   .invest-icon{
     width: 28%;
     text-align: center;
     text-align: right;
-    padding-right: 14px;
+    padding-right: 1.4rem;
     .yuan{
       @include mobile-yuan-style(#ff4c2e,#fff,60px,15px);
     }
   }
   .invest-tit{
-    @include line-combine($mobile-br-color);
-    padding:5px 14px;
+    border: .1rem solid #dadada;
+    padding:.4rem 1.4rem;
     p{
       margin: 0;
       color: #666;
@@ -135,12 +136,12 @@ $mobile-bg-color: #fff;
     .invest-explain{
       float: right;
       .explain-icon-blue{
-        margin-right: 4px;
-        @include mobile-yuan-style(#86c6f2,#fff,8px,12px);
+        margin-right: .4rem;
+        @include mobile-yuan-style(#86c6f2,#fff,.8rem,1.2rem);
       }
       .explain-icon-green{
-        margin-right: 4px;
-        @include mobile-yuan-style(#9fddae,#fff,8px,12px);
+        margin-right: .4rem;
+        @include mobile-yuan-style(#9fddae,#fff,.8rem,1.2rem);
       }
     }
     .clear{
