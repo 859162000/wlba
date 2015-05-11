@@ -260,8 +260,6 @@ def add_introduced_award_all(start, end, amount_min, percent):
         created_at__range=(start_utc, end_utc)
     ).filter(
         introduced_by__isnull=False
-    ).exclude(
-        introduced_by__wanglibaouserprofile__utype__gt=0
     ).select_related('user')
 
     if not new_user.exists():
@@ -377,6 +375,10 @@ def reward_earning(record, flag):
             <a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>\
             感谢您对我们的支持与关注。<br/>\
             网利宝" % (safe_phone_str(introduced_by.wanglibaouserprofile.phone), got_amount)
+
+    # 只给普通用户发放收益
+    if introduced_by.wanglibaouserprofile.utype != '0':
+        return
 
     # 不登记奖品
     # reward = Reward.objects.filter(is_used=False, type=reward_type).first()
