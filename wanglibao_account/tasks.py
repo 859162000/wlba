@@ -3,6 +3,8 @@
 
 __author__ = 'rsj217'
 import requests
+import urllib
+import logging
 from wanglibao.celery import app
 
 # from wanglibao_p2p.models import P2PProduct
@@ -13,7 +15,7 @@ from wanglibao.celery import app
 # import logging
 #
 #
-# logger = logging.getLogger('p2p')
+logger = logging.getLogger(__name__)
 #
 #
 # @app.task
@@ -57,5 +59,9 @@ from wanglibao.celery import app
 
 @app.task
 def tianmang_callback(url, params):
+    logger.info("Enter tianmang_callback task")
+    params = urllib.urlencode(params)
+    logger.info(params)
     ret = requests.get(url, params=params)
-    print ret.text
+    logger.info(ret.url)
+    logger.info(ret.text)

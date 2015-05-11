@@ -587,7 +587,7 @@ class TianmangRegisterListAPIView(TianmangBaseAPIView):
                 response_user ={
                     "time": timezone.localtime(tianmang_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
                     "uid": uid,
-                    "uname": tianmang_promo_user.user.wanglibaouserprofile.nick_name,
+                    "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
                     #"status":tianmang_promo_user.user.wanglibaouserprofile.phone_verified and 1 or 0,
                 }
                 response_user_list.append(response_user)

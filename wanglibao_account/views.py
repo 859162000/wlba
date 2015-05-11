@@ -1085,11 +1085,12 @@ def my_tian_mang(request, user, invitecode):
     parsed_url = urlparse.urlparse(url)
     query_dic=urlparse.parse_qs(parsed_url.query, True)
 
-    promo_token_list = query_dic.get("promo_token", "")
-    promo_token = "" if not promo_token_list else promo_token_list[0]
+    source_list = query_dic.get("source", "")
+    source = "" if not source_list else source_list[0]
 
-    if (not invitecode) and ("tianmang" == promo_token):
-        sn = query_dic.get("sn","")
+    if (not invitecode) and ("tianmang" == source):
+        sn_list = query_dic.get("sn","")
+        sn = "" if not sn_list else sn_list[0]
         if sn:
             #注册成功后向天芒云 发送注册成功请求
             invitecode = "tianmang"
@@ -1098,7 +1099,7 @@ def my_tian_mang(request, user, invitecode):
                 "oid": TINMANGKEY,
                 "sn" : sn,
                 "uid": hashlib.md5(user.wanglibaouserprofile.phone).hexdigest(),
-                "uname": urllib.urlencode(user.wanglibaouserprofile.nick_name),
+                "uname": user.wanglibaouserprofile.name,
                 "method": "json"
             }
             tianmang_callback.apply_async(kwargs={'url': RETURN_TINMANG_UTL_DEBUG, 'params': params})
