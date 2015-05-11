@@ -22,7 +22,7 @@ class WeChatOAuth(object):
     API_BASE_URL = 'https://api.weixin.qq.com/'
     OAUTH_BASE_URL = 'https://open.weixin.qq.com/connect/'
 
-    def __init__(self, app_id, secret, redirect_uri,
+    def __init__(self, app_id, app_secret, redirect_uri='',
                  scope='snsapi_base', state=''):
         """
         :param app_id: WeChat app id
@@ -32,7 +32,7 @@ class WeChatOAuth(object):
         :param state: WeChat OAuth2 state
         """
         self.app_id = app_id
-        self.secret = secret
+        self.app_secret = app_secret
         self.redirect_uri = redirect_uri
         self.scope = scope
         self.state = state
@@ -123,7 +123,7 @@ class WeChatOAuth(object):
             'sns/oauth2/access_token',
             params={
                 'appid': self.app_id,
-                'secret': self.secret,
+                'secret': self.app_secret,
                 'code': code,
                 'grant_type': 'authorization_code'
             }
