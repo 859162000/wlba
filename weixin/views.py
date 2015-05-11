@@ -115,7 +115,7 @@ class WeixinLogin(View):
                 WeixinUser.objects.get_or_create(openid=res.get('openid'))
                 request.session['openid'] = res.get('openid')
 
-        return render_to_response('register.html')
+        return render_to_response('login.html')
 
     def post(self, request):
         from django.contrib.auth import authenticate, login
