@@ -538,9 +538,8 @@ class TianmangBaseAPIView(APIView):
             endday = startday
             startday = tmpdate
 
-        if startday == endday:
-            daydelta = datetime.timedelta(days=1)
-            endday += daydelta
+        daydelta = datetime.timedelta(days=1)
+        endday += daydelta
         tianmang_promo_list = IntroducedBy.objects.filter(channel__code="tianmang", created_at__gte=startday, created_at__lte=endday)
         return tianmang_promo_list
 
