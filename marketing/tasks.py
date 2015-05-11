@@ -191,7 +191,6 @@ def send_reward(start, end, amount_min, percent):
         # 发送短信
         text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
         send_messages.apply_async(kwargs={
-            #"phones": [introduced_by.wanglibaouserprofile.phone],
             "phones": [introduced_by.wanglibaouserprofile.phone],
             "messages": [text_content]
         })
@@ -329,6 +328,7 @@ def add_introduced_award_all(start, end, amount_min, percent):
 @app.task
 def send_reward_all(start, end, amount_min, percent):
     from decimal import Decimal
+    from wanglibao_sms.tasks import send_messages
 
     start = datetime.strptime(start, '%Y-%m-%d')
     end = datetime.strptime(end, '%Y-%m-%d')
@@ -345,43 +345,50 @@ def send_reward_all(start, end, amount_min, percent):
     if not records.exists():
         return
 
+    phone_user = []
     for record in records:
         reward_earning(record, flag=1)
         reward_earning(record, flag=2)
 
+        if record.introduced_by_person.wanglibaouserprofile.utype == '0':
+            phone_user.append(record.introduced_by_person.wanglibaouserprofile.phone)
+        if record.user.wanglibaouserprofile.utype == '0':
+            phone_user.append(record.user.wanglibaouserprofile.phone)
+
+    phone_user = list(set(phone_user))
+    if phone_user:
+        # 发送短信
+        text_content = u'好友邀请收益已经到账，请在个人账户中进行查看。'
+        send_messages.apply_async(kwargs={
+            "phones": phone_user,
+            "messages": [text_content]
+        })
+
+        # 发放站内信
+        inside_message.send_batch.apply_async(kwargs={
+            "users": phone_user,
+            "title": u"邀请送收益活动",
+            "content": u'好友邀请收益已经到账，请在个人账户中进行查看。',
+            "mtype": "activity"
+        })
+
 
 def reward_earning(record, flag):
-    from wanglibao_sms.tasks import send_messages
     from wanglibao_p2p.models import Earning
     from order.utils import OrderHelper
     from order.models import Order
     from django.forms import model_to_dict
     from wanglibao_margin.marginkeeper import MarginKeeper
-    from wanglibao.templatetags.formatters import safe_phone_str
-    # from marketing.models import RewardRecord
 
     reward_type = u'邀请送收益'
     if flag == 1:
         user, introduced_by, reward_type, got_amount, product = record.user, record.introduced_by_person, reward_type, record.introduced_reward, record.product
-        # 站内信文本
-        message_content = u"您在邀请好友送收益的活动中，您的好友%s在活动期间完成投资，根据活动规则，您获得%s元收益。<br/>\
-            <a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>\
-            感谢您对我们的支持与关注。<br/>\
-            网利宝" % (safe_phone_str(user.wanglibaouserprofile.phone), got_amount)
     else:
         user, introduced_by, reward_type, got_amount, product = record.introduced_by_person, record.user, reward_type, record.introduced_reward, record.product
-        # 站内信文本
-        message_content = u"您在邀请好友送收益的活动中，您的好友%s在活动期间完成投资，根据活动规则，您获得%s元收益。<br/>\
-            <a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>\
-            感谢您对我们的支持与关注。<br/>\
-            网利宝" % (safe_phone_str(introduced_by.wanglibaouserprofile.phone), got_amount)
 
     # 只给普通用户发放收益
     if introduced_by.wanglibaouserprofile.utype != '0':
         return
-
-    # 不登记奖品
-    # reward = Reward.objects.filter(is_used=False, type=reward_type).first()
 
     # 发放收益
     earning = Earning()
@@ -404,20 +411,4 @@ def reward_earning(record, flag):
 
     IntroducedByReward.objects.filter(id=record.id).update(checked_status=1)
 
-    # 发送短信
-    text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
-    send_messages.apply_async(kwargs={
-        "phones": [introduced_by.wanglibaouserprofile.phone],
-        "messages": [text_content]
-    })
 
-    # 不登记奖品
-    # RewardRecord.objects.create(user=introduced_by, reward=reward, description=message_content)
-
-    # 发放站内信
-    inside_message.send_one.apply_async(kwargs={
-        "user_id": introduced_by.id,
-        "title": u"邀请送收益活动",
-        "content": message_content,
-        "mtype": "activity"
-    })
