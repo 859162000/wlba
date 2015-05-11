@@ -6,5 +6,6 @@ import views
 urlpatterns = patterns(
     '',
     url(r'^connect/(?P<id>\w+)/', views.ConnectView.as_view()),
-    url(r'^list/$', TemplateView.as_view(template_name="weixin_list.jade")),
+    url(r'^list/', views.P2PListView.as_view(), name='weixin_p2p_list'),
+    url(r'^detail/(?P<id>\w+)', views.P2PDetailView.as_view(), name='weixin_p2p_detail'),
 )
