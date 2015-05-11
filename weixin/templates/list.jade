@@ -1,0 +1,60 @@
+doctype html
+html
+  head
+    title weixin-list
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 我要投资
+      section 返回
+    .list-banner
+      img(src='')
+    .list-body
+      .list-section
+        .section-head
+          span.head-prompt 新手福利
+          span.head-tit  房屋抵押贷款（抢标有奖）
+        .section-body
+          .body-Profit
+            span.profit-cont
+              .profit-math.profit-hui
+                span.profit-num 12.0
+                span.profit-sign %
+                span.prpfit-add +
+                span.profit-addNum 1.0
+                span.profit-addNumsign %
+              .profit-tit 年化收益
+          .body-time
+            .time-num
+              em.section-hui 6
+              |个月
+            .time-tit 还款期限
+          .body-btn
+            span.btn-body.btn-blue 抢购
+        .section-progressd
+
+      .list-section
+        .section-head
+          span.head-prompt 新手福利
+          span.head-tit  房屋抵押贷款（抢标有奖）
+        .section-body
+          .body-Profit
+            span.profit-cont
+              .profit-math.profit-blue
+                span.profit-num 12.0
+                span.profit-sign %
+                span.prpfit-add +
+                span.profit-addNum 1.0
+                span.profit-addNumsign %
+              .profit-tit 年化收益
+          .body-time
+            .time-num
+              em.section-hui 6
+              |个月
+            .time-tit 还款期限
+          .body-btn
+            span.btn-body.btn-blue 抢购
+        .section-progressd
+  include include/weixin_footer
+
+  script(src="/static/src/mobile/mobile.js")

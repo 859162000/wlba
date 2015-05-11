@@ -5,9 +5,24 @@ html
     title 网利宝
     - endwith
     meta(name="keywords", content="网利宝")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
+    //meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
     meta(name="format-detection", content="telephone=no")
     link(rel="stylesheet",href="/static/m_stylesheets/test.css")
+    script.
+        (function() {
+            var scale = 1.0;
+            var ratio = 1;
+            if (window.devicePixelRatio == 2) {
+                scale *= 0.5;
+                ratio *= 2;
+            }else if(window.devicePixelRatio == 3){
+                scale *= 0.333;
+                ratio *= 3;
+            }
+            var text = '<meta name="viewport" content="initial-scale=' + scale + ', maximum-scale=' + scale +', minimum-scale=' + scale + ', width=device-width, user-scalable=no" />';
+            document.write(text);
+            document.documentElement.style.fontSize = 10*ratio + "px";
+        })();
   body
     .m-head 首页
       .head-left 充值

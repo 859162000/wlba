@@ -1,11 +1,11 @@
-$mobile-head-height: 60px;
+$mobile-head-height: 6rem;
 $mobile-head-leftcolor: #0490e8;
 $mobile-head-rightcolor: #ff4c2e;
 $mobile-br-color: #dadada;
 .m-head-center{
   text-align: center;
   height: $mobile-head-height;
-  font-size: $font-size-large;
+  font-size: 1.8rem;
   line-height: $mobile-head-height;
 }
 .m-head{
