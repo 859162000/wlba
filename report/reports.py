@@ -274,7 +274,7 @@ class PaybackReportGenerator(ReportGeneratorBase):
 
         for index, amortization in enumerate(amortizations):
             if amortization.settlement_time:
-                settled_at = timezone.localtime(amortization.settlement_time).strftime("%Y-%m-%d %H:%M:%S"),
+                settled_at = timezone.localtime(amortization.settlement_time).strftime("%Y-%m-%d %H:%M:%S")
             else:
                 settled_at = ""
 
@@ -481,7 +481,7 @@ class P2PstatusReportGenerator(ReportGeneratorBase):
         for index, p2precord in enumerate(p2precords):
             if p2precord.product.status == u"还款中":
                 er = EquityRecord.objects.filter(product=p2precord.product, catalog=u"申购确认").first()
-                amo_time = timezone.localtime(er.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                amo_time = timezone.localtime(er.create_time).strftime("%Y-%m-%d %H:%M:%S")
             else:
                 amo_time = ""
             writer.writerow([
