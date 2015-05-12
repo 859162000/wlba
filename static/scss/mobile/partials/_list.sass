@@ -49,13 +49,13 @@ footer
   margin-bottom: $margin-bottom
   border-top: 1px solid #e8e8e8
   background: #fff
-  display: block
 .section-head
   border-bottom: 1px solid #f0f0f0
   text-align: left
   height: 1.5rem
   line-height: 1.5rem
   font-size: $body-fontSize
+  display: block
   .head-prompt
     color: #fff
     background: #72bf64
@@ -67,11 +67,14 @@ footer
     color: $list-titColor
 
 .section-body
-  padding: .5rem .75rem
   display: -webkit-box
-  -webkit-box-align: end
   font-size: $body-fontSize
   border-bottom: 2px solid #e8e8e8
+  .body-left
+    -webkit-box-flex: 1
+    display: -webkit-box
+    -webkit-box-align: end
+    padding: .5rem 0 .5rem .75rem
   .body-Profit
     -webkit-box-flex: 1
   .profit-cont
@@ -84,7 +87,7 @@ footer
       line-height: 1.275rem
     .profit-add, .profit-addNum
       font-size: 1.05rem
-  //list页 datalist两种状态亮色和灰色
+  //list页 datalist两种状态亮色和灰色  blue为抢购中 hui为其他状态
   .profit-blue
     .profit-num,.prpfit-add
       color: #f26a6a
@@ -122,9 +125,12 @@ footer
         font-style: normal
         color: $list-titColor
 
-  .body-btn
-    width: 4.6rem
-    text-align: right
+  .body-right
+    width: 4.685rem
+    padding: 0 .75rem .5rem 0
+    display: -webkit-box
+    -webkit-box-align: end
+    -webkit-box-pack: end
     .btn-body
       border-radius: 0.2rem
       width: 3.5rem
@@ -134,17 +140,17 @@ footer
       text-align: center
     //list页按钮四种状态
     .btn-blue
-      border: 1px solid #abccf7
+      border: 1px solid $protucd-blue
       color: #4e7cda
     .btn-red
-      border: 1px solid #fac3c3
-      color: #fac3c3
+      border: 1px solid $protucd-red
+      color: $protucd-red
     .btn-lightblue
-      border: 1px solid #aee4f0
-      color: #aee4f0
+      border: 1px solid $protucd-lightblue
+      color: $protucd-lightblue
     .btn-grey
-      border: 1px solid #dadada
-      color: #dadada
+      border: 1px solid $protucd-grey
+      color: $protucd-grey
 .section-progressd
   height: 2px
   background: #abccf7

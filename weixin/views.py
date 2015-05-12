@@ -1,5 +1,4 @@
 # encoding:utf-8
-from django.shortcuts import render_to_response
 from django.views.generic import View, TemplateView, RedirectView
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.decorators import method_decorator
@@ -26,6 +25,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from django.db.models import Q
+from rest_framework.authtoken.views import ObtainAuthToken
+from wanglibao_rest.serializers import AuthTokenSerializer
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from rest_framework import status
 from decimal import Decimal
 import datetime
 import json
@@ -90,7 +94,9 @@ class WeixinJsapiConfig(View):
         try:
             account = Account.objects.get(pk=id)
         except Account.DoesNotExist:
-            return HttpResponse(json.dumps({'errcode': 1, 'errmsg': 'account does not exist'}), 'application/json')
+            data = {'errcode': 1, 'errmsg': 'account does not exist'}
+            return HttpResponse(json.dumps(data), 'application/json')
+
         client = WeChatClient(account.app_id, account.app_secret, account.access_token)
         noncestr = uuid.uuid1().hex
         timestamp = str(int(time.time()))
@@ -105,12 +111,15 @@ class WeixinJsapiConfig(View):
         return HttpResponse(json.dumps(data), 'application/json')
 
 
-class WeixinLogin(View):
+class WeixinLogin(TemplateView):
+    template_name = 'test_login.html'
 
-    def get(self, request):
-        code = request.GET.get('code')
+    def get_context_data(self, **kwargs):
+        code = self.request.GET.get('code')
+        data = {}
+
         if code:
-            account_id = request.GET.get('state')
+            account_id = self.request.GET.get('state')
             try:
                 account = Account.objects.get(pk=account_id)
             except Account.DoesNotExist:
@@ -124,35 +133,38 @@ class WeixinLogin(View):
                 account.oauth_refresh_token = res.get('refresh_token')
                 account.save()
                 WeixinUser.objects.get_or_create(openid=res.get('openid'))
-                request.session['openid'] = res.get('openid')
+                data['openid'] = res.get('openid')
 
-        return render_to_response('login.html')
+        return data
 
-    def post(self, request):
-        from django.contrib.auth import authenticate, login
-        user = authenticate(identifier=request.POST.get('identifier'), password=request.POST.get('password'))
-        if user:
-            if not user.is_active:
-                data = {'errcode': 1, 'errmsg': 'User account is disabled.'}
-                return HttpResponse(json.dumps(data), 'application/json')
 
-            if user.wanglibaouserprofile.frozen:
-                data = {'errcode': 1, 'errmsg': 'User account is frozen.'}
-                return HttpResponse(json.dumps(data), 'application/json')
+class ObtainAuthTokenCustomized(ObtainAuthToken):
+    serializer_class = AuthTokenSerializer
 
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.DATA)
+
+        if serializer.is_valid():
             try:
-                weixin_user = WeixinUser.objects.get(openid=request.session.get('openid'))
-                weixin_user.user = user
+                openid = request.DATA.get('openid')
+                weixin_user = WeixinUser.objects.get(openid=openid)
+                weixin_user.user = serializer.object['user']
                 weixin_user.save()
             except WeixinUser.DoesNotExist:
                 pass
 
-            login(request, user)
-            data = {'errcode': 0}
-            return HttpResponse(json.dumps(data), 'application/json')
+            # 设备类型，默认为IOS
+            device_type = request.DATA.get('device_type', 'ios')
+            if device_type not in ('ios', 'android'):
+                return Response({'message': 'device_type error'}, status=status.HTTP_200_OK)
 
-        data = {'errcode': 1, 'errmsg': 'login failed'}
-        return HttpResponse(json.dumps(data), 'application/json')
+            token, created = Token.objects.get_or_create(user=serializer.object['user'])
+            return Response({'token': token.key, 'user_id': serializer.object['user'].id}, status=status.HTTP_200_OK)
+        else:
+            device_type = request.DATA.get('device_type', 'ios')
+            if device_type == 'ios':
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'token': 'false'}, status=status.HTTP_200_OK)
 
 
 class WeixinOauthLoginRedirect(RedirectView):
@@ -236,7 +248,7 @@ class P2PListWeixin(APIView):
 
 
 class P2PDetailView(TemplateView):
-    template_name = "weixin_detail.jade"
+    template_name = 'weixin_detail.jade'
 
     def get_context_data(self, id, **kwargs):
         context = super(P2PDetailView, self).get_context_data(**kwargs)
@@ -256,7 +268,7 @@ class P2PDetailView(TemplateView):
                                                                p2p.expected_earning_rate / 100,
                                                                datetime.datetime.now(),
                                                                p2p.period)
-        total_earning = terms.get("total") - p2p.total_amount
+        total_earning = terms.get('total') - p2p.total_amount
         total_fee_earning = 0
 
         if p2p.activity:
@@ -285,4 +297,3 @@ class P2PDetailView(TemplateView):
         })
 
         return context
-

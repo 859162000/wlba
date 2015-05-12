@@ -26,33 +26,35 @@ html
         else
           listClass = 'profit-hui'
           btnClass = 'btn-red'
-        a(href="#").list-section
-          .section-head
+        .list-section
+          a(href="/weixin/detail/{{product.id}}").section-head
             if product.category == '新手标'
               span.head-prompt  新手福利
             span.head-tit {{product.name}}
           .section-body
-            .body-Profit
-              span.profit-cont
-                .profit-math(class=listClass)
-                  earning_rate = str(product.expected_earning_rate)
-                  span.profit-num {{earning_rate}}
-                  span.profit-sign %
-                  if product.activity
-                    span.prpfit-add +
-                    span.profit-addNum {{product.activity.rule.percent_text}}
-                    span.profit-addNumsign %
-                .profit-tit 年化收益
-            .body-time
-              .time-num
-                em.section-hui {{product.period}}
-                |个月
-              .time-tit 还款期限
-            .body-btn
-              .btn-body(class=btnClass) {{status}}
+            a(href="/weixin/detail/{{product.id}}").body-left
+              .body-Profit
+                span.profit-cont
+                  .profit-math(class=listClass)
+                    earning_rate = str(product.expected_earning_rate)
+                    span.profit-num {{earning_rate}}
+                    span.profit-sign %
+                    if product.activity
+                      span.prpfit-add +
+                      span.profit-addNum {{product.activity.rule.percent_text}}
+                      span.profit-addNumsign %
+                  .profit-tit 年化收益
+              .body-time
+                .time-num
+                  em.section-hui {{product.period}}
+                  |个月
+                .time-tit 还款期限
+            .body-right
+              a(href="#").btn-body(class=btnClass) {{status}}
           percent = float(product.ordered_amount) / product.total_amount * 100
           if status == '抢购中'
             .section-progressd(style="width:{{percent | percentage}}")
 
   include include/weixin_footer
-  script(src="/static/src/mobile/mobile.js")
+  script(src="/static/src/mobile/lib/zepto/zepto.js")
+  script(data-init='list' src="/static/src/mobile/mobile.js")
