@@ -201,6 +201,16 @@ class PurchaseP2PMobile(APIView):
     def allowed_methods(self):
         return ['POST']
 
+    def _check_invalid_new_user_product(self, p2p, user):
+        """
+        查看是否是合法的新手标(只有第一次投资才能购买新手标),如果不合法则返回True, 否则返回False
+        :param p2p:
+        :param user:
+        :return:不合法返回True, 合法返回False
+        """
+        error_new_user = (p2p.category == '新手标' and user.wanglibaouserprofile.is_invested)
+        return error_new_user
+
     def post(self, request):
 
         if not request.user.is_authenticated():
@@ -219,6 +229,14 @@ class PurchaseP2PMobile(APIView):
             p2p = form.cleaned_data['product']
             amount = form.cleaned_data['amount']
             redpack = request.DATA.get("redpack", "")
+
+            if self._check_invalid_new_user_product(p2p, request.user):
+                return Response(
+                    {
+                        'message': u'只有未进行投资的用户才可以购买单笔最高限购{per_total_amount}'.format(per_total_amount=p2p.limit_amount_per_user),
+                        'error_number' : ErrorNumber.new_user_error
+                    }, status=status.HTTP_200_OK)
+            
             if redpack and not redpack.isdigit():
                 return Response({
                                     'message': u'请输入有效红包',
