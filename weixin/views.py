@@ -134,7 +134,7 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
         serializer = self.serializer_class(data=request.DATA)
         # 设备类型，默认为IOS
         device_type = request.DATA.get('device_type', 'ios')
-        
+
         if serializer.is_valid():
             try:
                 openid = request.DATA.get('openid')
