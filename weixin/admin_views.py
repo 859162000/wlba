@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from .models import Account, Material, MaterialImage, MaterialNews
 from wechatpy.client import WeChatClient
 import json
+import hashlib
 
 
 class AdminTemplateView(TemplateView):
@@ -19,78 +20,13 @@ class AdminTemplateView(TemplateView):
 
 class AdminWeixinTemplateView(AdminTemplateView):
 
-    def get_account(self, id):
+    def get_account(self, id=None):
+        account_id = id or self.request.session.get('account_id')
         try:
-            account = Account.objects.get(pk=id)
+            account = Account.objects.get(pk=account_id)
         except Account.DoesNotExist:
             raise Http404('page not found')
         return account
-
-
-class WeixinView(AdminWeixinTemplateView):
-
-    template_name = 'admin/weixin_manage.html'
-
-    def get_context_data(self, id, **kwargs):
-        account = self.get_account(id)
-        print account.jsapi_ticket
-
-        return {
-            'account': account
-        }
-
-
-class WeixinMassView(AdminWeixinTemplateView):
-
-    template_name = 'admin/weixin_mass.html'
-
-    def get_context_data(self, id, **kwargs):
-        account = self.get_account(id)
-
-        return {
-            'account': account
-        }
-
-
-class WeixinReplyView(AdminWeixinTemplateView):
-
-    template_name = 'admin/weixin_reply.html'
-
-    def get_context_data(self, id, **kwargs):
-
-        account = self.get_account(id)
-
-        return {
-            'account': account
-        }
-
-
-class WeixinMenuView(AdminWeixinTemplateView):
-
-    template_name = 'admin/weixin_menu.html'
-
-    def get_context_data(self, id, **kwargs):
-        account = self.get_account(id)
-        return {
-            'account': account
-        }
-
-
-class WeixinMaterialView(AdminWeixinTemplateView):
-
-    template_name = 'admin/weixin_material.html'
-
-    def get_context_data(self, id, **kwargs):
-        account = self.get_account(id)
-        # 获取素材总数 缓存24小时
-        material = Material.objects.get_or_create(account=account)
-        material.init()
-
-        return {
-            'account': account,
-            'material': material
-        }
-
 
 
 class AdminView(View):
@@ -128,8 +64,75 @@ class AdminJsonApi(AdminView):
         return self.client
 
     def render_json(self, data):
-
         return HttpResponse(json.dumps(data), 'application/json')
+
+
+class WeixinView(AdminWeixinTemplateView):
+    template_name = 'admin/weixin_manage.html'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(WeixinView, self).get_context_data(**kwargs)
+        context['account'] = self.get_account(id)
+        self.request.session['account_id'] = id
+        return context
+
+
+class WeixinMassView(AdminWeixinTemplateView):
+    template_name = 'admin/weixin_mass.html'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(WeixinMassView, self).get_context_data(**kwargs)
+        context['account'] = self.get_account(id)
+        return context
+
+
+class WeixinReplyView(AdminWeixinTemplateView):
+    template_name = 'admin/weixin_reply.html'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(WeixinReplyView, self).get_context_data(**kwargs)
+        context['account'] = self.get_account(id)
+        return context
+
+
+class WeixinMenuView(AdminWeixinTemplateView):
+    template_name = 'admin/weixin_menu.html'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(WeixinMenuView, self).get_context_data(**kwargs)
+        context['account'] = self.get_account(id)
+        return context
+
+
+class WeixinMaterialView(AdminWeixinTemplateView):
+    template_name = 'admin/weixin_material.html'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(WeixinMaterialView, self).get_context_data(**kwargs)
+        context['account'] = self.get_account(id)
+        # 获取素材总数 缓存24小时
+        context['material'] = Material.objects.get_or_create(account=context.get('account'))
+        context.get('material').init()
+
+        return context
+
+
+class WeixinCustomerServiceView(AdminWeixinTemplateView):
+    template_name = 'admin/weixin_customer_service.html'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(WeixinCustomerServiceView, self).get_context_data(**kwargs)
+        context['account'] = self.get_account(id)
+        return context
+
+
+class WeixinCustomerServiceCreateView(AdminWeixinTemplateView):
+    template_name = 'admin/weixin_customer_service_create.html'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(WeixinCustomerServiceCreateView, self).get_context_data(**kwargs)
+        context['account'] = self.get_account(id)
+        return context
 
 
 class WeixinMaterialListJsonApi(AdminJsonApi):
@@ -190,6 +193,20 @@ class WeixinMaterialListJsonApi(AdminJsonApi):
         return self.render_json(res)
 
 
+class WeixinCustomerServiceCreateApi(AdminJsonApi):
+
+    def post(self, request, id):
+        account = self.get_account(id)
+
+        kf_account = '{}@gh_d852bc2cead2'.format(request.POST.get('kf_account'))
+        nickname = request.POST.get('nickname')
+        password = request.POST.get('password')
+
+        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
+        res = client.customservice.add_account(kf_account, nickname, password)
+        return self.render_json(res.json())
+
+
 class WeixinMaterialImageView(AdminView):
 
     def get(self, request, id, media_id):
@@ -208,3 +225,5 @@ class WeixinMaterialImageView(AdminView):
             else:
                 return HttpResponseForbidden()
         return HttpResponseRedirect(reverse('weixin_material_file', kwargs={'path', media.file}))
+
+

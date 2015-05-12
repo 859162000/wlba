@@ -24,7 +24,7 @@ class WeChatCustomService(BaseWeChatAPI):
         password = to_binary(password)
         password = hashlib.md5(password).hexdigest()
         return self._post(
-            'customservice/kfaccount/add',
+            'https://api.weixin.qq.com/customservice/kfaccount/add',
             data={
                 'kf_account': account,
                 'nickname': nickname,
