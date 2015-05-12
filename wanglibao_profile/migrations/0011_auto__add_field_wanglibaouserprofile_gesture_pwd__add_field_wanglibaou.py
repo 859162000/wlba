@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'WanglibaoUserProfile.gesture_pwd'
         db.add_column(u'wanglibao_profile_wanglibaouserprofile', 'gesture_pwd',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=16),
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=9),
                       keep_default=False)
 
         # Adding field 'WanglibaoUserProfile.gesture_is_enabled'
@@ -69,7 +69,7 @@ class Migration(SchemaMigration):
             'deposit_default_bank_name': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
             'frozen': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'gesture_is_enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'gesture_pwd': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '16'}),
+            'gesture_pwd': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '9'}),
             'id_is_valid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id_number': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '64', 'blank': 'True'}),
             'investment_asset': ('django.db.models.fields.IntegerField', [], {'default': '30'}),
