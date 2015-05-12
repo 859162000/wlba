@@ -1,4 +1,4 @@
-# /usr/bin/env python
+#/usr/bin/env python
 # encoding: utf-8
 
 from rest_framework import status
@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from wanglibao_profile.serializers import ProfileSerializer
 from wanglibao_account.models import VerifyCounter
-from wanglibao_account.utils import str_add_md5
 from wanglibao.const import ErrorNumber
 from wanglibao_account.utils import verify_id
 from wanglibao_pay.models import Card
@@ -21,7 +20,7 @@ class ProfileView(APIView):
         Retrieve the current user's profile
         """
         user = request.user
-        cards = Card.objects.filter(user=user)
+        cards =  Card.objects.filter(user=user)
         profile = user.wanglibaouserprofile
 
         dic = {
@@ -42,9 +41,7 @@ class ProfileView(APIView):
             "investment_period":profile.investment_period,
             "deposit_default_bank_name":profile.deposit_default_bank_name,
             "is_invested": profile.is_invested,
-            "cards_number":len(cards),
-            "gesture_pwd": str_add_md5(str(profile.gesture_pwd)),
-            "gesture_is_enabled": profile.gesture_is_enabled
+            "cards_number":len(cards)
         }
         return Response(dic)
         #serializer = ProfileSerializer(user.wanglibaouserprofile)
