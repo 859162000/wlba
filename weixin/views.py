@@ -132,7 +132,9 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.DATA)
-
+        # 设备类型，默认为IOS
+        device_type = request.DATA.get('device_type', 'ios')
+        
         if serializer.is_valid():
             try:
                 openid = request.DATA.get('openid')
@@ -142,18 +144,15 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
             except WeixinUser.DoesNotExist:
                 pass
 
-            # 设备类型，默认为IOS
-            device_type = request.DATA.get('device_type', 'ios')
             if device_type not in ('ios', 'android'):
                 return Response({'message': 'device_type error'}, status=status.HTTP_200_OK)
 
             token, created = Token.objects.get_or_create(user=serializer.object['user'])
             return Response({'token': token.key, 'user_id': serializer.object['user'].id}, status=status.HTTP_200_OK)
-        else:
-            device_type = request.DATA.get('device_type', 'ios')
-            if device_type == 'ios':
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response({'token': 'false'}, status=status.HTTP_200_OK)
+
+        if device_type == 'ios':
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'token': 'false'}, status=status.HTTP_200_OK)
 
 
 class WeixinOauthLoginRedirect(RedirectView):
