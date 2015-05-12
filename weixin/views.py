@@ -222,28 +222,22 @@ class P2PListWeixin(APIView):
 
     def get(self, request):
 
-        maxid = request.GET.get('maxid', '')
-        minid = request.GET.get('minid', '')
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('pagesize', 10)
+        page = int(page)
+        pagesize = int(pagesize)
 
-        pager = None
-        if maxid and not minid:
-            pager = Q(id__gt=maxid)
-        if minid and not maxid:
-            pager = Q(id__lt=minid)
-
-        if pager:
-            p2p_lists = P2PProduct.objects.filter(hide=False).filter(status__in=[
-                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).order_by('-priority', '-publish_time')[:10]
-        else:
-            p2p_lists = P2PProduct.objects.filter(hide=False).filter(status__in=[
-                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')[:10]
+        p2p_lists = P2PProduct.objects.filter(hide=False)\
+            .filter(status__in=[u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'])\
+            .exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))\
+            .order_by('-priority', '-publish_time')[(page-1)*pagesize:page*pagesize]
 
         html_data = _generate_ajax_template(p2p_lists, 'include/ajax/ajax_list.jade')
 
         return Response({
             'html_data': html_data,
+            'page': page,
+            'pagesize': pagesize,
         })
 
 
