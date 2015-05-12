@@ -1,0 +1,41 @@
+doctype html
+html
+    head
+        title weixin-list
+        include include/weixin_head.jade
+    body
+        header
+            hgroup 我要投资
+            section 返回
+        .account-balance
+            .account-balance-one
+                p 账户余额（元）
+                p 235，000，000，00
+            .account-balance-two
+                a(href='#').account-withdrawal 提现
+            .account-balance-three
+                a(href='#').account-top-up 充值
+        .account-assets
+            .account-assets-one
+                p 总资产（元）
+                p 581，000，00
+                p
+                 |累计收益：
+                 span ￥580.12
+            .account-assets-two
+                p
+                 |代收收益：
+                 span ￥580.12
+        .account-project
+            p
+             |已投项目
+             span
+            p
+             |账户安全
+             span
+
+
+
+
+    include include/weixin_footer
+    script(src="/static/src/mobile/mobile.js")
