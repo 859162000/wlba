@@ -1,0 +1,72 @@
+-load formatters
+-load mathfilters
+-load widget_tweaks
+doctype html
+html
+  head
+    title weixin-detail
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 产品详情
+      section 返回
+    .detail-animate
+      p.bannerBottom
+    .detail-title
+      h4 {{p2p.name}}
+      .product-money
+        .all-money
+          p
+            em {{p2p.total_amount | money_format_int}}
+            |元
+          p 融资金额
+        .surplus-money
+          p
+            em {{orderable_amount|money_format_int}}
+            |元
+          p 剩余可投金额
+    .detail-table
+      ul
+        li
+          span 合作机构
+          span {{p2p.warrant_company.name}}
+        li
+          span 还款方式
+          span {{p2p.display_payback_method}}
+        li
+          span 剩余时间
+          span {{p2p.end_time | timedelta_now_day }}
+        li
+          span 购买人数
+          span
+            em {{total_buy_user}}
+            |人参与
+    .detail-toggle
+      if p2p.extra_data
+        r = p2p.extra_data.items()
+        for section_name, section_values in r
+          .detail-toggle-list
+            h4 {{section_name}}
+              span
+            for item_name in section_values
+              dl
+                dt
+                 span
+                 |{{item_name}}
+                item_value = section_values[item_name]
+                dd {{item_value|linebreaksbr}}
+    status = p2p.display_status
+    if status == '抢购中'
+      statusClass = 'footerBtn-buy'
+    elif status == '已还款'
+      statusClass = 'footerBtn-grey'
+    elif status == '还款中'
+      statusClass = 'footerBtn-lightblue'
+    else
+      statusClass = 'footerBtn-red'
+    .detail-footerBtn(class=statusClass)
+      if status == '抢购中'
+        span
+      p {{status}}
+
+

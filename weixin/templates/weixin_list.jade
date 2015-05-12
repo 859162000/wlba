@@ -27,12 +27,12 @@ html
           listClass = 'profit-hui'
           btnClass = 'btn-red'
         .list-section
-          a(href="#").section-head
+          a(href="/weixin/detail/{{product.id}}").section-head
             if product.category == '新手标'
               span.head-prompt  新手福利
             span.head-tit {{product.name}}
           .section-body
-            a(href="#").body-left
+            a(href="/weixin/detail/{{product.id}}").body-left
               .body-Profit
                 span.profit-cont
                   .profit-math(class=listClass)
@@ -56,4 +56,5 @@ html
             .section-progressd(style="width:{{percent | percentage}}")
 
   include include/weixin_footer
-  script(src="/static/src/mobile/mobile.js")
+  script(src="/static/src/mobile/lib/zepto/zepto.js")
+  script(data-init='list' src="/static/src/mobile/mobile.js")

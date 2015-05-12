@@ -1,38 +1,62 @@
 doctype html
 html
     head
-        title weixin-list
+        title weixin-account
         include include/weixin_head.jade
     body
         header
-            hgroup 我要投资
+            hgroup 我的账户
             section 返回
         .account-balance
             .account-balance-one
-                p 账户余额（元）
-                p 235，000，000，00
+                p.balance-one-money 账户余额（元）
+                p.balance-one-yuan 235，000，000，00
             .account-balance-two
                 a(href='#').account-withdrawal 提现
             .account-balance-three
                 a(href='#').account-top-up 充值
         .account-assets
             .account-assets-one
-                p 总资产（元）
-                p 581，000，00
-                p
+                p.assets-one-monery 总资产（元）
+                p.assets-one-yuan 581，000，00
+                p.assets-one-earnings
                  |累计收益：
                  span ￥580.12
             .account-assets-two
-                p
+                p.assets-two-monery &nbsp;
+                p.assets-two-yuan &nbsp;
+                p.assets-two-earning
                  |代收收益：
                  span ￥580.12
         .account-project
-            p
+            p.project-one
              |已投项目
              span
-            p
+              a(href="#").project-one-angle
+            .line
+            p.project-one
              |账户安全
              span
+              a(href="#").project-one-angle
+        .account-pop-up
+            .account-pop-up-up
+                form
+                    p
+                     |尚未完成，
+                     span 实名认证
+                     |，填写以下信息
+                    input(type="text", placeholder="&nbsp;&nbsp;姓名")
+                    br
+                    label 错误提示：姓名和身份证不匹配
+                    input(type="text", placeholder="&nbsp;&nbsp;身份证")
+                    br
+                    label 错误提示：身份证错误无效证件
+                    .account-footer
+                        a(href="#") 取消
+                        .line-line
+                        a(href="#") 确定
+
+
 
 
 
