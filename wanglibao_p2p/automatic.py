@@ -47,7 +47,7 @@ class Automatic(object):
 
     def _access_products(self):
         """ 查询允许自动投标的标 """
-        return P2PProduct.objects.filter(status=u'正在招标', end_time__gte=timezone.now())
+        return P2PProduct.objects.filter(category=u'普通', status=u'正在招标', end_time__gte=timezone.now())
 
     def _access_plans(self, product):
         """ 查询设置自动投标的用户计划 """
