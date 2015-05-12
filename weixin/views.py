@@ -104,8 +104,8 @@ class WeixinLogin(TemplateView):
     template_name = 'test_login.html'
 
     def get_context_data(self, **kwargs):
+        context = super(WeixinLogin, self).get_context_data(**kwargs)
         code = self.request.GET.get('code')
-        data = {}
 
         if code:
             account_id = self.request.GET.get('state')
@@ -122,9 +122,9 @@ class WeixinLogin(TemplateView):
                 account.oauth_refresh_token = res.get('refresh_token')
                 account.save()
                 WeixinUser.objects.get_or_create(openid=res.get('openid'))
-                data['openid'] = res.get('openid')
+                context['openid'] = res.get('openid')
 
-        return data
+        return context
 
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
