@@ -42,6 +42,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
+from weixin.views import P2PListWeixin
 
 router = DefaultRouter()
 
@@ -110,6 +111,7 @@ urlpatterns = patterns(
 
     # url(r'^p2ps/$', P2PProductListView.as_view()),
     url(r'^p2ps/(?P<pk>[0-9]+)/$', P2PProductDetailView.as_view()),
+    url(r'^p2ps/wx/', P2PListWeixin.as_view()),
 
     url(r'', include(router.urls)),
     #客户端使用,重写

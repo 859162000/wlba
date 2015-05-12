@@ -11,8 +11,19 @@ from weixin.wechatpy.exceptions import InvalidSignatureException
 from weixin.wechatpy.oauth import WeChatOAuth
 from .models import Account, WeixinUser
 from .common.wechat import tuling
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_p2p.amortization_plan import get_amortization_plan
+from wanglibao_p2p.serializers import P2PProductSerializer
+from wanglibao.permissions import IsAdminUserOrReadOnly
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
+from django.template import Template, Context
+from django.template.loader import render_to_string, get_template
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from django.db.models import Q
 from rest_framework.authtoken.views import ObtainAuthToken
 from wanglibao_rest.serializers import AuthTokenSerializer
@@ -188,6 +199,54 @@ class P2PListView(TemplateView):
         }
 
 
+def _generate_ajax_template(content, template_name=None):
+
+    context = Context({
+        'results': content,
+    })
+
+    if template_name:
+        template = get_template(template_name)
+    else:
+        template = Template('<div></div>')
+
+    return template.render(context)
+
+
+class P2PListWeixin(APIView):
+    permission_classes = ()
+
+    @property
+    def allowed_methods(self):
+        return ['GET', 'POST']
+
+    def get(self, request):
+
+        maxid = request.GET.get('maxid', '')
+        minid = request.GET.get('minid', '')
+
+        pager = None
+        if maxid and not minid:
+            pager = Q(id__gt=maxid)
+        if minid and not maxid:
+            pager = Q(id__lt=minid)
+
+        if pager:
+            p2p_lists = P2PProduct.objects.filter(hide=False).filter(status__in=[
+                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).order_by('-priority', '-publish_time')[:10]
+        else:
+            p2p_lists = P2PProduct.objects.filter(hide=False).filter(status__in=[
+                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')[:10]
+
+        html_data = _generate_ajax_template(p2p_lists, 'include/ajax/ajax_list.jade')
+
+        return Response({
+            'html_data': html_data,
+        })
+
+
 class P2PDetailView(TemplateView):
     template_name = 'weixin_detail.jade'
 
@@ -217,8 +276,14 @@ class P2PDetailView(TemplateView):
                                         (Decimal(p2p.period) / Decimal(12))).quantize(Decimal('0.01'))
 
         current_equity = 0
+        user = self.request.user
+        if user.is_authenticated():
+            equity_record = p2p.equities.filter(user=user).first()
+            if equity_record is not None:
+                current_equity = equity_record.equity
 
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
+        total_buy_user = P2PEquity.objects.filter(product=p2p).count()
 
         context.update({
             'p2p': p2p,
@@ -228,6 +293,7 @@ class P2PDetailView(TemplateView):
             'current_equity': current_equity,
             'attachments': p2p.attachment_set.all(),
             'total_fee_earning': total_fee_earning,
+            'total_buy_user': total_buy_user,
         })
 
         return context
