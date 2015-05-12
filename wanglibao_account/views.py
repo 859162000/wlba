@@ -1042,7 +1042,7 @@ def ajax_register(request):
                 if not user:
                     return HttpResponse(messenger('error'))
                 #天芒注册
-                invitecode = my_tian_mang(request, user, invitecode)
+                invitecode = tianmang_process(request, user, invitecode)
 
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
@@ -1072,7 +1072,7 @@ def ajax_register(request):
     else:
         return HttpResponseNotAllowed(["GET"])
 
-def my_tian_mang(request, user, invitecode):
+def tianmang_process(request, user, invitecode):
     """
     根据url判断是否是从天芒注册的, 如果是返回invitecode为tianmang
     :param request:
