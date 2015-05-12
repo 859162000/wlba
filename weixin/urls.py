@@ -13,6 +13,7 @@ urlpatterns = patterns(
     url(r'^oauth/login/(?P<id>\w+)/', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
 
     # js api
-    url(r'^(?P<id>\w+)/jsapi_config.json$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config')
+    url(r'^(?P<id>\w+)/jsapi_config.json$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
+    url(r'^api-token-auth/$', views.ObtainAuthTokenCustomized.as_view(), name='weixin_login_api')
 
 )
