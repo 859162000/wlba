@@ -1,0 +1,49 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_list admin_urls suit_list suit_tags %}
+{% load url from future %}
+
+{% block content %}
+<div id="content-main" class="inner-two-columns">
+    <div>
+        <p>当前公众账号：{{ account.name }}</p>
+    </div>
+
+    <div class="inner-center-column">
+        <ul id="suit_form_tabs" class="nav nav-tabs nav-tabs-suit" data-tab-prefix="suit-tab">
+            <li><a href="#news">图文消息 ({{ material.news_count }})</a></li>
+            <li><a href="#image">图片库 ({{ material.image_count }})</a></li>
+            <li><a href="#voice">语音 ({{ material.voice_count }})</a></li>
+            <li><a href="#video">视频 ({{ material.video_count }})</a></li>
+        </ul>
+
+        <div class="tab-content tab-content-main">
+            <div class="suit-tab suit-tab-news">
+                图文消息素材列表
+            </div>
+            <div class="suit-tab suit-tab-image">
+                <img src="{% url 'weixin_material_image' account.id 'vHK0YU3-zuSBZm4QxG4IUanK4MEbEsd_XYFNzKJJnYw' %}" alt=""/>
+            </div>
+            <div class="suit-tab suit-tab-voice">语音素材列表 开发中……</div>
+            <div class="suit-tab suit-tab-video">视频素材列表 开发中……</div>
+        </div>
+
+        <script>
+            (function ($) {
+                $(function () {
+                    $('#suit_form_tabs').suit_form_tabs();
+                });
+
+                var url = '{% url 'weixin_material_list_json' account.id %}';
+                url += '?media_type=image&page=1';
+                $.get(url, function(res) {
+                    console.log(res);
+                    if (res['errcode']) {
+                        alert(res['errmsg']);
+                    }
+                });
+
+            }(Suit.$))
+        </script>
+    </div>
+</div>
+{% endblock %}

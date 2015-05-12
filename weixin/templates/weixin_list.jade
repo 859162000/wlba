@@ -1,3 +1,5 @@
+-load formatters
+-load mathfilters
 doctype html
 html
   head
@@ -10,51 +12,47 @@ html
     .list-banner
       img(src='')
     .list-body
-      .list-section
-        .section-head
-          span.head-prompt 新手福利
-          span.head-tit  房屋抵押贷款（抢标有奖）
-        .section-body
-          .body-Profit
-            span.profit-cont
-              .profit-math.profit-hui
-                span.profit-num 12.0
-                span.profit-sign %
-                span.prpfit-add +
-                span.profit-addNum 1.0
-                span.profit-addNumsign %
-              .profit-tit 年化收益
-          .body-time
-            .time-num
-              em.section-hui 6
-              |个月
-            .time-tit 还款期限
-          .body-btn
-            a(href="#1").btn-body.btn-blue 抢购
-        .section-progressd
+      for product in p2p_lists
+        status = product.display_status
+        if status == '抢购中'
+          listClass = 'profit-blue'
+          btnClass = 'btn-blue'
+        elif status == '已还款'
+          listClass = 'profit-hui'
+          btnClass = 'btn-grey'
+        elif status == '还款中'
+          listClass = 'profit-hui'
+          btnClass = 'btn-lightblue'
+        else
+          listClass = 'profit-hui'
+          btnClass = 'btn-red'
+        a(href="#").list-section
+          .section-head
+            if product.category == '新手标'
+              span.head-prompt  新手福利
+            span.head-tit {{product.name}}
+          .section-body
+            .body-Profit
+              span.profit-cont
+                .profit-math(class=listClass)
+                  earning_rate = str(product.expected_earning_rate)
+                  span.profit-num {{earning_rate}}
+                  span.profit-sign %
+                  if product.activity
+                    span.prpfit-add +
+                    span.profit-addNum {{product.activity.rule.percent_text}}
+                    span.profit-addNumsign %
+                .profit-tit 年化收益
+            .body-time
+              .time-num
+                em.section-hui {{product.period}}
+                |个月
+              .time-tit 还款期限
+            .body-btn
+              .btn-body(class=btnClass) {{status}}
+          percent = float(product.ordered_amount) / product.total_amount * 100
+          if status == '抢购中'
+            .section-progressd(style="width:{{percent | percentage}}")
 
-      .list-section
-        .section-head
-          span.head-prompt 新手福利
-          span.head-tit  房屋抵押贷款（抢标有奖）
-        .section-body
-          .body-Profit
-            span.profit-cont
-              .profit-math.profit-blue
-                span.profit-num 12.0
-                span.profit-sign %
-                span.prpfit-add +
-                span.profit-addNum 1.0
-                span.profit-addNumsign %
-              .profit-tit 年化收益
-          .body-time
-            .time-num
-              em.section-hui 6
-              |个月
-            .time-tit 还款期限
-          .body-btn
-            a(href="#1").btn-body.btn-blue 抢购
-        .section-progressd
   include include/weixin_footer
-
   script(src="/static/src/mobile/mobile.js")
