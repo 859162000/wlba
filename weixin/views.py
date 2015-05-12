@@ -61,10 +61,9 @@ class ConnectView(View):
 
         msg = parse_message(request.body)
 
-        # reply = create_reply(u'更多功能，敬请期待！', msg)
         if msg.type == 'text':
-            if msg.content in ['dkf', 'DKF', 'Dkf' u'多客服']:
-                reply = TransferCustomerServiceReply()
+            if msg.content == 'Dkf':
+                reply = TransferCustomerServiceReply(message=msg)
             else:
                 reply = tuling(msg)
         else:
