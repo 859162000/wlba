@@ -880,35 +880,32 @@ class GestureAddView(APIView):
         """
         add user gesture_pwd
         """
-        phone = request.DATA.get("phone", "").strip()
         gesture_pwd = request.DATA.get("gesture_pwd", "").strip()
 
-        if not phone or not gesture_pwd:
-            return Response({
-                "message": u"参数错误",
-                "error_number": ErrorNumber.unknown_error
-            }, status=400)
+        if not gesture_pwd:
+            return Response({"ret_code": 30201, "message": u"参数错误"})
 
+        if not 4 <= len(gesture_pwd) <= 9:
+            return Response({"ret_code": 30202, "message": u"手势密码需要在4-9位之间"})
+
+        if len(gesture_pwd) > len(set(gesture_pwd)):
+            return Response({"ret_code": 30203, "message": u"手势密码不能有重复字符"})
+
+        phone = request.user.wanglibaouserprofile.phone
         u_profile = WanglibaoUserProfile.objects.filter(user=request.user, phone=phone)
         if not u_profile.exists():
-            return Response({
-                "message": u"用户不存在",
-                "error_number": ErrorNumber.not_find
-            }, status=400)
+            return Response({"ret_code": 30204, "message": u"用户不存在"})
         else:
             u_profile_object = u_profile.first()
             if u_profile_object.gesture_pwd:
-                return Response({
-                    "message": u"手势密码已存在",
-                    "error_number": ErrorNumber.duplicate
-                }, status=400)
+                return Response({"ret_code": 30205, "message": u"手势密码已存在"})
+            if u_profile_object.gesture_is_enabled:
+                return Response({"ret_code": 30206, "message": u"手势密码已开启，无法重复添加"})
             u_profile_object.gesture_pwd = gesture_pwd
             u_profile_object.gesture_is_enabled = True
             u_profile_object.save()
 
-        return Response({
-            "message": u"设置成功"
-        }, status=status.HTTP_200_OK)
+        return Response({"ret_code": 0, "message": u"设置成功"})
 
 
 class GestureUpdateView(APIView):
@@ -918,64 +915,51 @@ class GestureUpdateView(APIView):
         """
         update user gesture_pwd
         """
-        phone = request.DATA.get("phone", "").strip()
         gesture_pwd = request.DATA.get("gesture_pwd", "").strip()
 
-        if not phone or not gesture_pwd:
-            return Response({
-                "message": u"参数错误",
-                "error_number": ErrorNumber.unknown_error
-            }, status=400)
+        if not gesture_pwd:
+            return Response({"ret_code": 30211, "message": u"参数错误"})
 
+        if not 4 <= len(gesture_pwd) <= 9:
+            return Response({"ret_code": 30212, "message": u"手势密码需要在4-9位之间"})
+
+        if len(gesture_pwd) > len(set(gesture_pwd)):
+            return Response({"ret_code": 30213, "message": u"手势密码不能有重复字符"})
+
+        phone = request.user.wanglibaouserprofile.phone
         u_profile = WanglibaoUserProfile.objects.filter(
             user=request.user, phone=phone, gesture_is_enabled=True)
         if not u_profile.exists():
-            return Response({
-                "message": u"用户不存在",
-                "error_number": ErrorNumber.not_find
-            }, status=400)
+            return Response({"ret_code": 30214, "message": u"用户不存在"})
 
         u_profile_object = u_profile.first()
         u_profile_object.gesture_pwd = gesture_pwd
         u_profile_object.save()
 
-        return Response({
-            "message": u"设置成功"
-        }, status=status.HTTP_200_OK)
+        return Response({"ret_code": 0, "message": u"设置成功"})
 
 
 class GestureIsEnabledView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        phone = request.DATA.get("phone", "").strip()
         gesture_is_enabled = request.DATA.get("gesture_is_enabled", "")
 
         try:
             gesture_is_enabled = int(gesture_is_enabled)
         except:
-            return Response({
-                "message": u"参数不合法",
-                "error_number": ErrorNumber.unknown_error
-            }, status=400)
+            return Response({"ret_code": 30221, "message": u"参数不合法"})
 
-        if not phone or gesture_is_enabled not in (0, 1):
-            return Response({
-                "message": u"参数错误",
-                "error_number": ErrorNumber.unknown_error
-            }, status=400)
+        if not gesture_is_enabled not in (0, 1):
+            return Response({"ret_code": 30222, "message": u"参数错误"})
 
+        phone = request.user.wanglibaouserprofile.phone
         u_profile = WanglibaoUserProfile.objects.filter(user=request.user, phone=phone)
         if not u_profile.exists():
-            return Response({
-                "message": u"用户不存在",
-                "error_number": ErrorNumber.not_find
-            }, status=400)
+            return Response({"ret_code": 30223, "message": u"用户不存在"})
 
         u_profile_object = u_profile.first()
         u_profile_object.gesture_is_enabled = gesture_is_enabled
         u_profile_object.save()
 
-        return Response({
-            "message": u"设置成功"
-        }, status=status.HTTP_200_OK)
+        return Response({"ret_code": 0, "message": u"设置成功"})
