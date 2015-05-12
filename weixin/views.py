@@ -202,7 +202,7 @@ class P2PListView(TemplateView):
 def _generate_ajax_template(content, template_name=None):
 
     context = Context({
-        'results': content,
+        'p2p_lists': content,
     })
 
     if template_name:
