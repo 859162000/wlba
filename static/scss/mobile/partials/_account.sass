@@ -1,0 +1,111 @@
+.account-balance
+  padding: 1rem 0 0 0.75rem
+  display: -webkit-flex
+  width: 100%
+  height: 3.4rem
+  border-bottom: 1px solid #e8e8e8
+  background: #FFFFFF
+  .account-balance-one
+    line-height: 1rem
+    width: 50%
+    .balance-one-money
+      color: #989898
+      font-size: 0.5rem
+    .balance-one-yuan
+      color: $head-backgroundColor
+      font-size: 0.6rem
+  .account-balance-two
+    -webkit-flex: 1
+    .account-withdrawal
+      display: block
+      width: 3.35rem
+      height: 1.75rem
+      border-radius: 5px
+      text-align: center
+      line-height: 1.75rem
+      border: 1px solid #abccf7
+      font-size: 0.5rem
+      color: #abccf7
+  .account-balance-three
+    -webkit-flex: 1
+    .account-top-up
+      display: block
+      width: 3.35rem
+      height: 1.75rem
+      border-radius: 5px
+      text-align: center
+      line-height: 1.75rem
+      border: 1px solid #9cd292
+      font-size: 0.5rem
+      color: #9cd292
+.account-assets
+  @extend .account-balance
+  height: 4.25rem
+  .account-assets-one
+    @extend .account-balance-one
+    .assets-one-monery
+      @extend .balance-one-money
+    .assets-one-yuan
+      @extend .balance-one-yuan
+    .assets-one-earnings
+      font-size: 0.55rem
+      color: #989898
+      span
+        color: #6b6b6b
+  .account-assets-two
+    @extend .account-assets-one
+    .assets-two-monery
+      @extend .assets-one-monery
+    .assets-two-yuan
+      @extend .assets-one-yuan
+    .assets-two-earning
+      @extend .assets-one-earnings
+.account-project
+  @extend .account-balance
+  height: 4.45rem
+  border-top: 1px solid #e8e8e8
+  margin-top: 1rem
+  -webkit-flex-flow: column
+  padding-top: 0
+  .project-one
+    color: #6b6b6b
+    font-size: 0.5rem
+    line-height: 2.22rem
+    span
+      width: 0
+      height: 0
+      border-bottom: 0.6rem solid transparent
+      border-top: 0.6rem solid transparent
+      border-left: 0.6rem solid #b6b6b6
+
+      font-size: 0
+      line-height: 0
+      position: relative
+      left: 75%
+      .project-one-angle
+        width: 0
+        height: 0
+        border-bottom: 0.5rem solid transparent
+        border-top: 0.5rem solid transparent
+        border-left: 0.5rem solid #FFFFFF
+        font-size: 0
+        line-height: 0
+        position: absolute
+        right: 0.15rem
+        top: -0.5rem
+  .line
+    border-bottom: 1px solid #e8e8e8
+.account-pop-up
+  width: 100%
+  height: 100%
+  background: rgba(0,0,0,0.2)
+  position: absolute
+  top: 0
+  .account-pop-up-up
+    width: 65%
+    height: 9.5rem
+    background: #FFFFFF
+    border: 1px solid #e8e8e8
+    border-radius: 1rem
+    margin: 5.65rem 0 0 17.25%
+
