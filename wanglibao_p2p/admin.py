@@ -8,7 +8,7 @@ from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning,\
-    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance
+    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance, AutomaticPlan
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization, P2PEquityJiuxian
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
@@ -317,7 +317,7 @@ class P2PRecordResource(resources.ModelResource):
 class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     list_display = (
         'catalog', 'order_id', 'product_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time',
-        'description')
+        'description', 'platform')
     resource_class = P2PRecordResource
     change_list_template = 'admin/import_export/change_list_export.html'
     search_fields = ('user__wanglibaouserprofile__phone','product__name')
@@ -509,6 +509,15 @@ class P2PEquityJiuxianAdmin(ExportMixin, admin.ModelAdmin):
         return False
 
 
+class AutomaticPlanAdmin(admin.ModelAdmin):
+    display = ('id', 'user', 'amounts_auto', 'amounts_left', 'period_min', 'period_max', 'rate_min', 'rate_max', 'create_at', 'is_used')
+    list_display = display
+    # readonly_fields = display
+    raw_id_fields = ('user',)
+    search_fields = ('user__wanglibaouserprofile__phone',)
+    ordering = ('id', 'create_at')
+
+
 admin.site.register(P2PProduct, P2PProductAdmin)
 admin.site.register(Warrant, WarrantAdmin)
 admin.site.register(P2PEquity, UserEquityAdmin)
@@ -525,6 +534,7 @@ admin.site.register(InterestPrecisionBalance, InterestPrecisionAdmin)
 admin.site.register(InterestInAdvance, InterestInAdvanceAdmin)
 admin.site.register(ProductInterestPrecision, ProductInterestPrecisionAdmin)
 admin.site.register(P2PEquityJiuxian, P2PEquityJiuxianAdmin)
+admin.site.register(AutomaticPlan, AutomaticPlanAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')

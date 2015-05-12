@@ -4,6 +4,7 @@ import logging
 import json
 import math
 
+from decimal import Decimal
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
 from django.db.models import Sum
@@ -40,7 +41,7 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
-    AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian
+    AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
@@ -1425,6 +1426,90 @@ class AddressGetAPIView(APIView):
                 return Response({'ret_code': 3000, 'message': u'没有收货地址'})
         except:
             return Response({'ret_code': 3003, 'message': u'地址不存在'})
+
+
+class AutomaticApiView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        plans = AutomaticPlan.objects.filter(user=request.user)
+        if plans.exists():
+            plan_list = [{
+                             'id': plan.id,
+                             'amounts_auto': plan.amounts_auto,
+                             'period_min': plan.period_min,
+                             'period_max': plan.period_max,
+                             'rate_min': plan.rate_min,
+                             'rate_max': plan.rate_max,
+                             'is_used': plan.is_used} for plan in plans]
+            return Response({
+                'ret_code': 0,
+                'message': 'ok',
+                'plan': plan_list,
+            })
+        else:
+            return Response({'ret_code': 3000, 'message': u'没有自动投标计划'})
+
+    def post(self, request):
+        amounts_auto = request.DATA.get('amounts_auto', Decimal(0))
+        period_min = request.DATA.get('period_min', 0)
+        period_max = request.DATA.get('period_max', 0)
+        rate_min = request.DATA.get('rate_min', 0)
+        rate_max = request.DATA.get('rate_max', 0)
+        is_used = request.DATA.get('is_used', False)
+
+        if not amounts_auto or not period_min or not period_max or not rate_min or not rate_max:
+            return Response({'ret_code': 3001, 'message': u'信息输入不完整'})
+
+        try:
+            if Decimal(amounts_auto) < 100:
+                return Response({'ret_code': 3002, 'message': u'自动投标金额必须大于等于100'})
+            if Decimal(amounts_auto) % 100 != 0:
+                return Response({'ret_code': 3003, 'message': u'自动投标金额必须是100的整数倍'})
+        except:
+            return Response({'ret_code': 3004, 'message': u'自动投标金额输入不合法'})
+
+        try:
+            if int(period_min) > int(period_max):
+                return Response({'ret_code': 3005, 'message': u'产品投资最大期限不允许小于最小期限'})
+        except:
+            return Response({'ret_code': 3006, 'message': u'产品投资期限输入不合法'})
+
+        try:
+            if float(rate_min) > float(rate_max):
+                return Response({'ret_code': 3007, 'message': u'产品投资最高收益率不允许小于最低收益率'})
+        except:
+            return Response({'ret_code': 3008, 'message': u'产品投资收益率输入不合法'})
+
+        try:
+            plan = AutomaticPlan.objects.filter(user=request.user)
+            plan = plan.first() if plan.exists() else AutomaticPlan()
+
+            plan.amounts_auto = Decimal(amounts_auto)
+            plan.period_min = int(period_min)
+            plan.period_max = int(period_max)
+            plan.rate_min = int(rate_min)
+            plan.rate_max = int(rate_max)
+            plan.is_used = True if is_used else False
+
+            plan.save()
+
+            plan_list = [{
+                             'id': plan.id,
+                             'amounts_auto': plan.amounts_auto,
+                             'period_min': plan.period_min,
+                             'period_max': plan.period_max,
+                             'rate_min': plan.rate_min,
+                             'rate_max': plan.rate_max,
+                             'is_used': plan.is_used} for plan in AutomaticPlan.objects.filter(user=request.user)]
+
+            return Response({
+                'ret_code': 0,
+                'message': 'ok',
+                'plan': plan_list
+            })
+        except:
+            return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
 
 
 # class CjdaoApiView(APIView):

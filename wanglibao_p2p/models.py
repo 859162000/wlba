@@ -581,6 +581,8 @@ class P2PRecord(models.Model):
 
     description = models.CharField(u'摘要', default='', max_length=1000)
 
+    platform = models.CharField(u'购买平台', max_length=100, default=u'')
+
     class Meta:
         ordering = ['-create_time']
         verbose_name_plural = u'产品流水'
@@ -815,3 +817,18 @@ class P2PEquityJiuxian(models.Model):
         unique_together = (('user', 'product'),)
         verbose_name_plural = u'酒仙用户持仓'
         ordering = ('-created_at',)
+
+
+class AutomaticPlan(models.Model):
+    user = models.ForeignKey(User, related_name='plan_user')
+    amounts_auto = models.DecimalField(u'自动投资金额', max_digits=20, decimal_places=2, default=0)
+    amounts_left = models.DecimalField(u'账户保留金额', max_digits=20, decimal_places=2, default=0)
+    period_min = models.IntegerField(u'产品投资最小期限(月/天)*', default=0, blank=False)
+    period_max = models.IntegerField(u'产品投资最大期限(月/天)*', default=0, blank=False)
+    rate_min = models.FloatField(u'最低预期收益(%)*', default=0, blank=False)
+    rate_max = models.FloatField(u'最高预期收益(%)*', default=0, blank=False)
+    create_at = models.DateTimeField(u'创建时间', auto_now_add=True, null=True)
+    is_used = models.BooleanField(u'是否启用', default=False)
+
+    class Meta:
+        verbose_name_plural = u'用户自动投标计划'
