@@ -63,11 +63,15 @@ class ConnectView(View):
 
         msg = parse_message(request.body)
 
+        # 更新公众号原始ID 更新公众号关注者数据
+        self.account.weixin_original_id = msg.target
+        WeixinUser.objects.get_or_create(openid=msg.source, account_original_id=msg.target)
+
         if msg.type == 'text':
-            if msg.content == 'Dkf':
-                reply = TransferCustomerServiceReply(message=msg)
-            else:
-                reply = tuling(msg)
+            # 自动回复  5000次／天
+            reply = tuling(msg)
+            # 多客服转接
+            # reply = TransferCustomerServiceReply(message=msg)
         else:
             reply = create_reply(u'更多功能，敬请期待！', msg)
 
@@ -80,9 +84,9 @@ class ConnectView(View):
 
 class WeixinJsapiConfig(View):
 
-    def get(self, request, id):
+    def get(self, request):
         try:
-            account = Account.objects.get(pk=id)
+            account = Account.objects.first()
         except Account.DoesNotExist:
             data = {'errcode': 1, 'errmsg': 'account does not exist'}
             return HttpResponse(json.dumps(data), 'application/json')
@@ -93,7 +97,7 @@ class WeixinJsapiConfig(View):
         url = request.META.get('HTTP_REFERER')
         signature = client.jsapi.get_jsapi_signature(noncestr, account.jsapi_ticket, timestamp, url)
         data = {
-            'app_id': account.app_id,
+            'appId': account.app_id,
             'timestamp': timestamp,
             'nonceStr': noncestr,
             'signature': signature
@@ -102,7 +106,7 @@ class WeixinJsapiConfig(View):
 
 
 class WeixinLogin(TemplateView):
-    template_name = 'test_login.html'
+    template_name = 'weixin_login.jade'
 
     def get_context_data(self, **kwargs):
         context = super(WeixinLogin, self).get_context_data(**kwargs)
@@ -157,9 +161,9 @@ class WeixinLoginApi(View):
 
 class WeixinOauthLoginRedirect(RedirectView):
 
-    def get_redirect_url(self, id, *args, **kwargs):
+    def get_redirect_url(self, *args, **kwargs):
         try:
-            account = Account.objects.get(pk=id)
+            account = Account.objects.first()
         except Account.DoesNotExist:
             raise Http404()
 
