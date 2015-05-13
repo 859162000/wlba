@@ -9,8 +9,13 @@
 <form action="" id="login">
     {% csrf_token %}
     <input name="openid" type="hidden" value="{{ openid }}"/>
+    <input name="captcha_0" type="hidden"/>
+    <div class="error-__all__" style="display: none;"></div>
     <div>用户名：<input type="text" name="identifier"></div>
     <div>密码：<input type="password" name="password"></div>
+    <div>验证码：<input type="text" name="captcha_1" /></div>
+    <div class="error-captcha" style="display: none;"></div>
+    <div><img src="" alt="" id="captcha"/></div>
     <div><button type="submit" disabled="disabled">登陆</button></div>
 </form>
 <script src="/static/js/lib/jquery.min.js"></script>
@@ -55,25 +60,55 @@
     });
 
     $(function() {
+        var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
+        var $captcha_img = $('img#captcha');
+        var $captcha_key = $('input[name=captcha_0]');
+
+        function captcha_refresh() {
+            $.get(captcha_refresh_url, function(res) {
+                $captcha_img.attr('src', res['image_url']);
+                $captcha_key.val(res['key']);
+            });
+        }
+
+        $captcha_img.on('click', function() {
+            captcha_refresh();
+        });
+
+        $captcha_img.click();
+
         var $form = $('#login');
         var $submit = $form.find('button[type=submit]');
+
+        $('input[name=identifier], input[name=password]').on('focus', function() {
+            $('.error-__all__').hide();
+        });
+
+        $('input[name=captcha_1]').on('focus', function() {
+            $('.error-captcha').hide();
+        });
+
         $submit.attr('disabled', false);
         $submit.on('click', function() {
             var url = '{% url 'weixin_login_api' %}';
-            var data = {
-                'identifier': $form.find('input[name=identifier]').val(),
-                'password': $form.find('input[name=password]').val(),
-                'openid': $form.find('input[name=openid]').val()
-            };
             $submit.attr('disabled', true);
             $.ajax({
                 'type': 'post',
                 'url': url,
-                'data': data,
-                'dataType': 'json',
+                'data': $form.serialize(),
                 'success': function(res) {
-                    console.log(res);
-                    alert(res);
+                    alert('登录成功');
+                },
+                'error': function(res) {
+                    if (res['status'] == 403) {
+                        alert('请勿重复提交');
+                        return false;
+                    }
+                    var data = res['responseJSON'];
+                    var key;
+                    for (key in data) {
+                        $('.error-' + key).text(data[key]).show();
+                    }
                 },
                 'complete': function() {
                     $submit.attr('disabled', false);
