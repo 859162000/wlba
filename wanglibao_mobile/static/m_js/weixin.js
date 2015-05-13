@@ -263,7 +263,7 @@ function registered() {
 
         $.ajax({
             type: "post",
-            url: "/api/register/?promo_token=weixin",
+            url: "/api/register/?promo_token=koudianying",
             data: {identifier: Verification(), validate_code: yan, password: pass, invitecode: yao},
             dataType: "json",
             success: function (result) {
