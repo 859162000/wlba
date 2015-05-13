@@ -106,7 +106,7 @@ class WeixinJsapiConfig(View):
 
 
 class WeixinLogin(TemplateView):
-    template_name = 'test_login.html'
+    template_name = 'weixin_login.jade'
 
     def get_context_data(self, **kwargs):
         context = super(WeixinLogin, self).get_context_data(**kwargs)
