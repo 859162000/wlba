@@ -2,7 +2,7 @@
 doctype html
 html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
     head
-        title weixin-account
+        title weixin-login
         include include/weixin_head.jade
     body
         header
@@ -27,11 +27,9 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
             .login-from-four
                 button(type="submit", disabled="disabled") 登入
             .login-footer
-                .login-left
+                p.login-left
                     a(href="#") 免费注册
-                .login-middle
-                    p |
-                .login-right
+                    a(href="javascript:void(0)") &nbsp;&nbsp;|&nbsp;&nbsp;
                     a(href="#") 忘记密码
 
 
