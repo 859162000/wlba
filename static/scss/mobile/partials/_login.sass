@@ -36,6 +36,17 @@
       line-height: 1.95rem
       margin-left: 8%
       padding-left: 2.6rem
+  .login-from-error
+    width: 84%
+    .error-identifier,.error-password
+      font-size: 0.35rem
+      margin-left: 16%
+      line-height: 1rem
+      color: $head-backgroundColor
+  .login-from-captcha
+    @extend .login-from-error
+    .error-captcha
+      @extend .error-identifier
   .login-from-two
     input
       margin-top: 0.55rem
@@ -52,6 +63,7 @@
       border-radius: 0.3rem
       border: $border-color 1px solid
       height: 1.95rem
+      overflow: hidden
   .login-from-four
     button
       font-size: 0.85rem
@@ -72,13 +84,6 @@
       line-height: 2.3rem
       color: #bbbab7
       text-align: center
-      //.login-middle
-      //  width: 2%
-      //  color: #bbbab7
-      //  text-align: center
-      //.login-left,.login-right
-      //  -webkit-flex: 1
-      //  text-align: center
 
 
 
