@@ -13,14 +13,14 @@ html
       .top-i
           a.jiao
             img(src='/static/m_images/weixin_img/sanjiao.png')#weixin_fanhui_fa
-          p 登录
-      include m_include/weixin_kehuduan
+          p 注册
+      //include m_include/weixin_kehuduan
       article
         img.wei_loge(src='/static/m_images/weixin_img/loginn.png')
         p 您&nbsp;&nbsp;的&nbsp;&nbsp;私&nbsp;&nbsp;人&nbsp;&nbsp;理&nbsp;&nbsp;财&nbsp;&nbsp;专&nbsp;&nbsp;家
         img(src='/static/m_images/weixin_img/yao.png').wei_zi
-        .grent
-            p 注册立享100元理财包+30元话费
+        //.grent
+        //    p 注册立享100元理财包+30元话费
         form(action='/mobile/account/redirect/' method='get' ).wei_for
             input(type='tel' placeholder='请输入手机号进行注册或登录', name='identifier', value="{{ identifier }}").ipon
             button.judge 下一步
