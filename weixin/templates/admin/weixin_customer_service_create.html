@@ -1,0 +1,102 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_list admin_urls suit_list suit_tags %}
+{% load url from future %}
+
+{% block content %}
+<div id="content-main">
+    <div>
+        <p>当前公众账号：{{ account.name }}</p>
+        <p>多客服 - 添加客服账号</p>
+    </div>
+
+    <div>
+        <form action="" id="customer_server_create">
+            {% csrf_token %}
+            <div>
+                <div>客服工号：<input type="text" name="kf_account" /></div>
+                <p>最多10个字符，必须是英文或者数字字符。</p>
+            </div>
+            <div>
+                <div>客服昵称：<input type="text" name="nickname" /></div>
+                <p>最长6个汉字或12个英文字符</p>
+            </div>
+            <div>登录密码：<input type="text" name="password" /></div>
+            <div><button type="submit" disabled="disabled">添加客服账号</button></div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+    <script>
+        (function($) {
+            getCookie = function (name) {
+                var cookie, cookieValue, cookies, i;
+                cookieValue = null;
+                if (document.cookie && document.cookie !== "") {
+                    cookies = document.cookie.split(";");
+                    i = 0;
+                    while (i < cookies.length) {
+                        cookie = $.trim(cookies[i]);
+                        if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                        i++;
+                    }
+                }
+                return cookieValue;
+            };
+
+            csrfSafeMethod = function (method) {
+                return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+            };
+
+            sameOrigin = function (url) {
+                var host, origin, protocol, sr_origin;
+                host = document.location.host;
+                protocol = document.location.protocol;
+                sr_origin = "//" + host;
+                origin = protocol + sr_origin;
+                return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+            };
+
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                        xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+                    }
+                }
+            });
+
+            var $form = $('#customer_server_create');
+            var $submit = $form.find('button[type=submit]');
+
+            $submit.attr('disabled', false);
+            $submit.on('click', function() {
+                var url = '{% url 'admin_weixin_customer_service_create_api' account.id %}';
+                var data = {
+                    'kf_account': $.trim($form.find('input[name=kf_account]').val()),
+                    'nickname': $.trim($form.find('input[name=nickname]').val()),
+                    'password': $.trim($form.find('input[name=password]').val())
+                };
+
+                $submit.attr('disabled', true);
+
+                $.ajax({
+                    'type': 'post',
+                    'url': url,
+                    'data': data,
+                    'dataType': 'json',
+                    'success': function(res) {
+                        console.log(res);
+                    },
+                    'complete': function() {
+                        $submit.attr('disabled', false);
+                    }
+                });
+                return false;
+            });
+        })(Suit.$)
+    </script>
+{% endblock %}
