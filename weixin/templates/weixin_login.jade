@@ -15,16 +15,17 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
                 .login-top-circle
                     img(src="/static/imgs/mobile/detail/login.png", alt="").img-one
                 img(src="/static/imgs/mobile/detail/loginsize.png", alt="").img-two
-        from(action="")#login.login-farom
+        from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
             input(name="openid", type="hidden", value="{{ openid }}")
+            input(name="captcha_0", type="hidden", value="")
             .login-from-one
                 input(type="text", name="identifier", placeholder="请输入手机号")
             .login-from-two
                 input(type="password", name="password", placeholder="请输入密码")
             .login-from-three
-                input(type="text", name="captcha_1", placeholder="点击验证码刷新").login-refresh
+                input(type="text", name="captcha_1", placeholder="点击验证码刷新", maxlength="4").login-refresh
                 .login-validation
-                    img(src="", alt="")#captc
+                    img(src="", alt="", width="180", height="76")#captcha
             .login-from-four
                 button(type="submit", disabled="disabled") 登入
             .login-footer
@@ -33,26 +34,26 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
                     a(href="javascript:void(0)") &nbsp;&nbsp;|&nbsp;&nbsp;
                     a(href="#") 忘记密码
 
-
-    script(src="/static/src/mobile/mobile.js")
     script(src="/static/js/lib/jquery.min.js")
+    script(src="/static/src/mobile/mobile.js")
+
     script.
         getCookie = function (name) {
-        var cookie, cookieValue, cookies, i;
-        cookieValue = null;
-        if (document.cookie && document.cookie !== "") {
-            cookies = document.cookie.split(";");
-            i = 0;
-            while (i < cookies.length) {
-                cookie = $.trim(cookies[i]);
-                if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+            var cookie, cookieValue, cookies, i;
+            cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                cookies = document.cookie.split(";");
+                i = 0;
+                while (i < cookies.length) {
+                    cookie = $.trim(cookies[i]);
+                    if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                    i++;
                 }
-                i++;
             }
-        }
-        return cookieValue;
+            return cookieValue;
         };
 
         csrfSafeMethod = function (method) {
@@ -76,18 +77,6 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
             }
         });
 
-        //获取QueryString的数组
-        function getQueryString(){
-             var result = location.search.match(new RegExp("[\?\&][^\?\&]+=[^\?\&]+","g"));
-             if(result == null){
-                 return "";
-             }
-             for(var i = 0; i < result.length; i++){
-                 result[i] = result[i].substring(1);
-             }
-             return result;
-        }
-
         //根据QueryString参数名称获取值
         function getQueryStringByName(name){
              var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
@@ -98,11 +87,11 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
         }
 
         $(function() {
-            var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
             var $captcha_img = $('img#captcha');
             var $captcha_key = $('input[name=captcha_0]');
 
             function captcha_refresh() {
+                var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
                 $.get(captcha_refresh_url, function(res) {
                     $captcha_img.attr('src', res['image_url']);
                     $captcha_key.val(res['key']);
@@ -115,7 +104,7 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
 
             $captcha_img.click();
 
-            var $form = $('#login');
+            var $form = $('#login-form');
             var $submit = $form.find('button[type=submit]');
 
             $('input[name=identifier], input[name=password]').on('focus', function() {
@@ -128,18 +117,25 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
 
             $submit.attr('disabled', false);
             $submit.on('click', function() {
-                var url = '{% url 'weixin_login_api' %}';
+                var data = {
+                    'identifier': $.trim($form.find('input[name=identifier]').val()),
+                    'password': $.trim($form.find('input[name=password]').val()),
+                    'captcha_0': $.trim($form.find('input[name=captcha_0]').val()),
+                    'captcha_1': $.trim($form.find('input[name=captcha_1]').val()),
+                    'openid': $.trim($form.find('input[name=openid]').val()),
+                }
                 $submit.attr('disabled', true);
                 $.ajax({
                     'type': 'post',
-                    'url': url,
-                    'data': $form.serialize(),
+                    'url': $form.attr('action'),
+                    'data': data,
                     'success': function(res) {
                         alert('登录成功');
                         var next = getQueryStringByName('next');
                         if (next) {
                             window.location.href = next;
                         }
+                        window.location.href = '/weixin/list/';
                     },
                     'error': function(res) {
                         if (res['status'] == 403) {
