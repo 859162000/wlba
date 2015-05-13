@@ -21,6 +21,7 @@ class Account(models.Model):
     name = models.CharField(u'公众号名称', max_length=120, null=False)
     classify = models.CharField(u'公众号类型', max_length=10, choices=ACCOUNT_CLASSIFY)
     token = models.CharField(u'公众号token', max_length=32, default=gen_token)
+    original_id = models.CharField(u'公众号原始ID', max_length=32, blank=True, db_index=True)
     app_id = models.CharField(u'app id', max_length=32)
     app_secret = models.CharField(u'app secret', max_length=64)
     access_token_content = models.CharField(u'access token', max_length=512, blank=True)
@@ -89,6 +90,16 @@ class Account(models.Model):
         now = self._now()
         self.oauth_access_token_expires_at = now + datetime.timedelta(seconds=expires - 60)
 
+    @property
+    def weixin_original_id(self):
+        raise AttributeError('not read filed')
+
+    @weixin_original_id.setter
+    def weixin_original_id(self, value):
+        if not self.original_id or self.original_id != value:
+            self.original_id = value
+            self.save()
+
 
 class WeixinUser(models.Model):
     SEX_DATA = (
@@ -107,6 +118,7 @@ class WeixinUser(models.Model):
     language = models.CharField(u'用户的语言', max_length=64, blank=True)
     headimgurl = models.URLField(u'用户头像', blank=True)
     subscribe_time = models.IntegerField(u'用户关注时间', default=0)
+    account_original_id = models.CharField(u'所属公众号原始ID', max_length=32, blank=True, db_index=True)
     user = models.ForeignKey(User, null=True)
 
 
@@ -118,7 +130,6 @@ class Material(models.Model):
     expires_at = models.DateTimeField(u'缓存过期时间', auto_now_add=True)
     account = models.OneToOneField(Account)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
-
 
     @staticmethod
     def _now():
@@ -156,101 +167,59 @@ class MaterialNews(models.Model):
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
 
 
-# class MaterialVoice(models.Model):
-#     file = models.ImageField(u'音频', upload_to='material_voice', null=True)
-#     media_id = models.CharField(u'素材ID', max_length=64, db_index=True)
-#     account = models.ForeignKey(Account)
-#     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
-#
-#
-# class MaterialVideo(models.Model):
-#     file = models.ImageField(u'视频', upload_to='material_video', null=True)
-#     media_id = models.CharField(u'素材ID', max_length=64, db_index=True)
-#     account = models.ForeignKey(Account)
-#     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+class ReplyContent(models.Model):
+    MEDIA_CLASSIFY = (
+        ('text', u'文本'),
+        ('image', u'图片'),
+        ('news', u'图文'),
+        # ('voice', u'音频'),
+        # ('video', u'视频'),
+    )
 
-# class News(models.Model):
-#     """
-#     图文素材
-#     """
-#     media_id = models.CharField(u'素材ID', max_length=64)
-#     data = models.CharField(u'图文内容', max_length=10000)
-#     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+    classify = models.CharField(u'回复类型', choices=MEDIA_CLASSIFY, max_length=10, default=MEDIA_CLASSIFY[0][0])
+    media_id = models.CharField(u'媒体ID', max_length=64)
+    content = models.CharField(u'内容', max_length=300)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
 
-#
-# class Reply(models.Model):
-#     MEDIA_CLASSIFY = (
-#         ('text', u'文本'),
-#         ('image', u'图片'),
-#         ('voice', u'音频'),
-#         ('video', u'视频'),
-#         ('news', u'图文'),
-#     )
-#
-#     classify = models.CharField(u'回复类型', choices=MEDIA_CLASSIFY, max_length=10)
-#     media_id = models.CharField(u'媒体ID', max_length=64)
-#     content = models.CharField(u'内容', max_length=10000)
-#
-#     def resource(self):
-#         data = {'type': self.classify}
-#         if self.classify == 'text':
-#             data['data'] = self.content
-#         if self.classify == 'news':
-#             import json
-#             res = News.objects.get(media_id=self.media_id)
-#             data['data'] = json.loads(res.data)
-#         data['data'] = self.media_id
-#         return data
-#
-#
-# class RuleReply(models.Model):
-#     """
-#     关键字匹配
-#     """
-#     name = models.CharField(u'规则名称', max_length=64)
-#     replies = models.ManyToManyField(Reply)
-#     pattern = models.CharField(u'回复', max_length=10)
-#     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
-#
-#
-# class Keyword(models.Model):
-#
-#     MATCH_PATTERN = (
-#         ('0', u'未全匹配'),
-#         ('1', u'已全匹配'),
-#     )
-#
-#     content = models.CharField(u'关键字内容', max_length=30)
-#     pattern = models.CharField(u'匹配模式', max_length=2, choices=MATCH_PATTERN)
-#     rule_reply = models.ForeignKey(RuleReply)
-#     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
-#
-#
-
-#
-#
+    def resource(self):
+        data = {'type': self.classify}
+        if self.classify == 'text':
+            data['data'] = self.content
+        if self.classify == 'news':
+            import json
+            res = MaterialNews.objects.get(media_id=self.media_id)
+            data['data'] = json.loads(res.data)
+        data['data'] = self.media_id
+        return data
 
 
-# class Image(models.Model):
-#     """
-#     图片素材
-#     """
-#     media_id = models.CharField(u'素材ID')
-#     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
-#
-#
-# class Voice(models.Model):
-#     """
-#     音频素材
-#     """
-#     media_id = models.CharField(u'素材ID')
-#     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
-#
-#
-# class Video(models.Model):
-#     """
-#     音频素材
-#     """
-#     media_id = models.CharField(u'素材ID')
-#     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+class ReplyRule(models.Model):
+    """
+    关键字匹配
+    """
+    PATTERN_CHOICES = (
+        (0, u'回复全部'),
+        (1, u'回复第一个'),
+        (2, u'随机回复一个'),
+    )
+
+    name = models.CharField(u'规则名称', max_length=64)
+    replies = models.ManyToManyField(ReplyContent)
+    pattern = models.IntegerField(u'回复规则', choices=PATTERN_CHOICES, default=PATTERN_CHOICES[0][0])
+    account = models.ForeignKey(Account)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+
+class ReplyKeyword(models.Model):
+
+    PATTERN_CHOICES = (
+        (0, u'未全匹配'),
+        (1, u'已全匹配'),
+    )
+
+    content = models.CharField(u'关键字内容', max_length=30)
+    pattern = models.IntegerField(u'匹配模式', choices=PATTERN_CHOICES)
+    rule_reply = models.ForeignKey(ReplyRule)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+
 
