@@ -54,7 +54,7 @@ var list = (function(org){
         _getNextPage :function(){
             $.ajax({
                 type: 'GET',
-                url: '/api/p2ps/wx',
+                url: '/api/p2ps/wx/',
                 data: {page: lib.page, 'pagesize': lib.pageSize},
                 beforeSend:function(){
                     lib.canGetPage =false
