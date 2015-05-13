@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_list admin_urls suit_list suit_tags %}
+{% load url from future %}
+
+{% block content %}
+<div id="content-main">
+    <div>
+        <p>当前公众账号：{{ account.name }}</p>
+        <p>多客服</p>
+    </div>
+
+    <div>
+        <ul>
+            <li><a href="{% url 'admin_weixin_customer_service_create' account.id %}">添加客服账号</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,165 @@
+
+header
+  position: relative
+  background: $head-backgroundColor
+  font-size: $header-fontSize
+  color: $head-fontColo
+  height: $header-height
+  hgroup
+    text-align: center
+    line-height: $header-height
+  section
+    position: absolute
+    left: 0
+    top: 0
+    height: $header-height
+    line-height: $header-height
+    padding-left: .5rem
+footer
+  position: fixed
+  left: 0
+  bottom: 0
+  width: 100%
+  height: 2.45rem
+  display: -webkit-box
+  text-align: center
+  background: #fff
+  border-top: 1px solid #dadada
+  font-size: $body-fontSize
+
+  a
+    display: block
+    -webkit-box-flex: 1
+    width: 100%
+    line-height: 2.45rem
+    text-align: center
+    color: #727272
+
+
+.list-banner
+  height: 7rem
+  background: #356cc2
+  margin-bottom: $margin-bottom
+  img
+    width: 100%
+.list-body
+  margin-bottom: 2.95rem
+.list-section
+  position: relative
+  margin-bottom: $margin-bottom
+  border-top: 1px solid #e8e8e8
+  background: #fff
+.section-head
+  border-bottom: 1px solid #f0f0f0
+  text-align: left
+  height: 1.5rem
+  line-height: 1.5rem
+  font-size: $body-fontSize
+  display: block
+  .head-prompt
+    color: #fff
+    background: #72bf64
+    padding: .05rem .45rem .05rem .75rem
+    border-bottom-right-radius: .75rem
+    border-top-right-radius: .75rem
+  .head-tit
+    margin-left: .5rem
+    color: $list-titColor
+
+.section-body
+  display: -webkit-box
+  font-size: $body-fontSize
+  border-bottom: 2px solid #e8e8e8
+  .body-left
+    -webkit-box-flex: 1
+    display: -webkit-box
+    -webkit-box-align: end
+    padding: .5rem 0 .5rem .75rem
+  .body-Profit
+    -webkit-box-flex: 1
+  .profit-cont
+    position: relative
+    display: inline-block
+  .profit-math
+    position: relative
+    .profit-num
+      font-size: 1.275rem
+      line-height: 1.275rem
+    .profit-add, .profit-addNum
+      font-size: 1.05rem
+  //list页 datalist两种状态亮色和灰色  blue为抢购中 hui为其他状态
+  .profit-blue
+    .profit-num,.prpfit-add
+      color: #f26a6a
+    .profit-sign
+      color: #fac3c3
+    .profit-addNum
+      color: #4e7cda
+    .profit-addNumsign
+      color: #abccf7
+  .profit-hui
+    .profit-num,.prpfit-add,.profit-addNum
+      color: $list-titColor
+    .profit-sign,.profit-addNumsign
+      color: #989898
+
+
+  .profit-tit
+    position: relative
+    left: 50%
+    width: 2.4rem
+    margin-left: -1.2rem
+    line-height: $body-fontSize
+    color: #b6b6b6
+  .time-tit
+    text-align: center
+    color: #b6b6b6
+    line-height: $body-fontSize
+  .body-time
+    width: 2.86rem
+    .time-num
+      text-align: center
+      color: #989898
+      em
+        font-size: 1.05rem
+        font-style: normal
+        color: $list-titColor
+
+  .body-right
+    width: 4.685rem
+    padding: 0 .75rem .5rem 0
+    display: -webkit-box
+    -webkit-box-align: end
+    -webkit-box-pack: end
+    .btn-body
+      border-radius: 0.2rem
+      width: 3.5rem
+      height: 1.85rem
+      display: inline-block
+      line-height: 1.85rem
+      text-align: center
+    //list页按钮四种状态
+    .btn-blue
+      border: 1px solid $protucd-blue
+      color: #4e7cda
+    .btn-red
+      border: 1px solid $protucd-red
+      color: $protucd-red
+    .btn-lightblue
+      border: 1px solid $protucd-lightblue
+      color: $protucd-lightblue
+    .btn-grey
+      border: 1px solid $protucd-grey
+      color: $protucd-grey
+.section-progressd
+  height: 2px
+  background: #abccf7
+  position: absolute
+  bottom: 0
+  left: 0
+
+
+
+
+
+
