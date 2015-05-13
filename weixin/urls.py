@@ -13,9 +13,10 @@ urlpatterns = patterns(
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^weixin_login/', TemplateView.as_view(template_name="weixin_login.jade")),
     url(r'^oauth/login/(?P<id>\w+)/', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
+    url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
 
     # js api
-    url(r'^(?P<id>\w+)/jsapi_config.json$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
-    url(r'^login.api/$', views.WeixinLoginApi.as_view(), name='weixin_login_api')
+    url(r'^jsapi_config.json$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
+    url(r'^login.api$', views.WeixinLoginApi.as_view(), name='weixin_login_api')
 
 )
