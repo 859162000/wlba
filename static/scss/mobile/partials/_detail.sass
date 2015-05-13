@@ -36,6 +36,7 @@
     margin-left: -3.85rem
     @include  circle(3.45rem, #faedec, #b6b6b6, .6rem)
     -webkit-animation: animation1 6s infinite
+    -webkit-transform: translateZ(0)
     em
       font-style: normal
       font-size: 1.275rem
@@ -48,6 +49,8 @@
     margin-left: .8rem
     z-index: 2
     @include  circle(3.25rem, #faedec, #b6b6b6, .6rem)
+    -webkit-animation: animation2 6s infinite
+    -webkit-transform: translateZ(0)
     em
       font-style: normal
       font-size: 1.05rem
@@ -55,7 +58,7 @@
       i
         font-style: normal
         font-size: .6rem
-    -webkit-animation: animation2 6s infinite
+
   .circle-progress
     overflow: hidden
     top: 5.5rem
@@ -94,9 +97,10 @@
     -webkit-transform: scale(1.05)
   100%
     -webkit-transform: scale(1.0)
+
 @-webkit-keyframes animation2
   10%
-    -webkit-transform: scale(1.00)
+    -webkit-transform: scale(1.05)
   20%,60%
     -webkit-transform: scale(1.05)
   30%,70%
@@ -104,7 +108,7 @@
   40%,80%
     -webkit-transform: scale(1.05)
   50%,90%
-    -webkit-transform: scale(1.0)
+    -webkit-transform: scale(1.00)
   100%
     -webkit-transform: scale(1.05)
 @-webkit-keyframes animation3
