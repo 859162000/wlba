@@ -12,9 +12,11 @@ header
     position: absolute
     left: 0
     top: 0
-    height: $header-height
-    line-height: $header-height
-    padding-left: .5rem
+    a
+      display: block
+      padding: 0 .5rem
+      line-height: $header-height
+      height: $header-height
 footer
   position: fixed
   left: 0
@@ -43,12 +45,14 @@ footer
   img
     width: 100%
 .list-body
-  margin-bottom: 2.95rem
+  //margin-bottom: 2.95rem
 .list-section
   position: relative
   margin-bottom: $margin-bottom
   border-top: 1px solid #e8e8e8
   background: #fff
+  &:last-child
+    margin-bottom: 0
 .section-head
   border-bottom: 1px solid #f0f0f0
   text-align: left
@@ -63,8 +67,11 @@ footer
     border-bottom-right-radius: .75rem
     border-top-right-radius: .75rem
   .head-tit
-    margin-left: .5rem
+    margin: 0 .5rem
     color: $list-titColor
+    white-space: nowrap
+    text-overflow: ellipsis
+    overflow: hidden
 
 .section-body
   display: -webkit-box
@@ -151,12 +158,16 @@ footer
     .btn-grey
       border: 1px solid $protucd-grey
       color: $protucd-grey
+.progress-broderNormal
+  border-bottom: 1px solid #e8e8e8
 .section-progressd
   height: 2px
   background: #abccf7
   position: absolute
   bottom: 0
   left: 0
+.spinner
+  margin: .25rem auto 2.75rem auto
 
 
 
