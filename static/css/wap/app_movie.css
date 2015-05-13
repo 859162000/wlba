@@ -1,0 +1,163 @@
+/*公共样式 start*/* {
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+body,div,h1,p,h2,header,ul,li,dl,dt,dd,ol,nav,input,footer{ margin:0; padding:0;}
+body{ color:#000;font-family:Arial, Helvetica,microsoft yahei, sans-serif;}
+body,html{ height:100%;-webkit-touch-callout: none;-webkit-user-select:none;}
+@media screen and (max-width:479px){
+body{font-size:10px;-webkit-text-size-adjust: none;}
+input{font-size:10px;}
+}
+@media screen and (min-width:480px) and (max-width:639px){
+body{font-size:15px;-webkit-text-size-adjust: none;}
+input{font-size:15px;}
+}
+@media screen and (min-width:640px) and (max-width:719px){
+body{font-size:20px;-webkit-text-size-adjust: none;}
+input{font-size:20px;}
+}
+@media screen and (min-width:720px){
+body{font-size:22.5px;-webkit-text-size-adjust: none;}
+input{font-size:22.5px;}
+}
+h1,h2,h3,h4,h5,h6{ margin:0; padding:0;font-size:100%; font-weight:normal;}
+ul,li{ list-style:none;}
+html{-webkit-text-size-adjust:none;}
+article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section {display:block;}
+img{border:none; vertical-align:middle; width:100%;}
+.clearfix:after {content:"\200B"; display:block; height:0; clear:both;}
+.clearfix{ *zoom:1;}
+input{ font-family:Arial, Helveetica, sans-serif;}
+a{ text-decoration:none; }
+a:hover{ text-decoration:none;}
+.clearfix:after {content:"\200B"; display:block; height:0; clear:both;}
+.clearfix{ *zoom:1;}
+/*公共样式 end*/
+
+html,body{
+    width: 100%;
+    height: 100%;
+}
+
+.one{
+    background: #eb4256 url("/static/images/movie/one1.png") no-repeat center center;
+    background-size: 80%;
+}
+
+.two{
+    background: #fca11c url("/static/images/movie/two1.png") no-repeat center center;
+    background-size: 80%;
+}
+
+.three{
+    background: #448aff url("/static/images/movie/three1.png") no-repeat center center;
+    background-size: 80%;
+}
+
+.m-ban{
+    width: 100%;
+}
+
+h1{
+    font-size: 2em;
+    line-height: 2em;
+    font-weight: normal;
+    padding-left: 0.5em;
+    border-bottom: 1px solid #dadada;
+}
+
+.m-money{
+    width: 100%;
+}
+
+/*.m-money ul{
+    margin-left: 1em;
+    margin-top: 1em;
+}
+
+.m-money ul li{
+    display: inline-block;
+    width: 30%;
+    height: 4.5em;
+    margin-right: 0.7em;
+}*/
+
+.m-money dl{
+    margin-left: 0.5em;
+    margin-top: 1em;
+    display: inline-block;
+    width: 30%;
+    height: 8em;
+}
+
+.m-money dl dt{
+    display: inline-block;
+    width: 100%;
+    height: 5em;
+}
+
+.m-dl{
+    margin-left: 1em;
+    margin-top: 1em;
+    height: 12em;
+}
+
+.m-dl dl{
+    width: 45%;
+    display: inline-block;
+    height: 8em;
+    margin-right: 1em;
+}
+
+.m-dl dl .left{
+    width: 100%;
+    height: 115%;
+    background: #448aff url("/static/images/movie/hand4.jpg") no-repeat center center;
+    background-size: 100% 95%;
+}
+
+.m-dl dl .right{
+    width: 100%;
+    height: 115%;
+    background: #fca11c url("/static/images/movie/phone.jpg") no-repeat center center;
+    background-size: 90%;
+}
+
+.m-dl dl dd,.m-money dl dd{
+    font-size: 1em;
+    text-align: center;
+    margin-top: 0.5em;
+    color: #615E5E;
+}
+.m-dl dl dd b,.m-money dl dd b{
+    font-weight: normal;
+    color: #eb4256;
+}
+
+.m-rule{
+    margin-left: 1em;
+}
+
+.m-rule ul li{
+    color: #615E5E;
+    font-size: 1em;
+    line-height: 2em;
+}
+
+.m-rule ul li a{
+    color: #615E5E;
+}
+
+
+p{
+    text-align: center;
+    color: #eb4256;
+    font-size: 1.5em;
+    line-height: 3em;
+}
+
+p a{
+    color: #eb4256;
+}
