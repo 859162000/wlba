@@ -1,0 +1,36 @@
+-load formatters
+doctype html
+html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
+    head
+        title weixin-account
+        include include/weixin_head.jade
+    body
+        header
+            hgroup 登录
+            section 返回
+        .login-top
+            .login-top-top
+            .login-top-main
+                .login-top-circle
+                    img(src="/static/imgs/mobile/detail/login.png", alt="").img-one
+                img(src="/static/imgs/mobile/detail/loginsize.png", alt="").img-two
+        from(action="")#login.login-farom
+            input(name="openid", type="hidden", value="{{ openid }}")
+            .login-from-one
+                input(type="text", name="identifier", placeholder="请输入手机号")
+            .login-from-two
+                input(type="password", name="password", placeholder="请输入密码")
+            .login-from-three
+                input(type="text", name="", placeholder="点击验证码刷新")
+            .login-from-four
+                button(type="submit", disabled="disabled") 登入
+            .login-footer
+                .login-left
+                    a(href="#") 免费注册
+                .login-middle
+                    p |
+                .login-right
+                    a(href="#") 忘记密码
+
+
+    script(src="/static/src/mobile/mobile.js")
