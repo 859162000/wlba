@@ -16,6 +16,6 @@ urlpatterns = patterns(
 
     # js api
     url(r'^(?P<id>\w+)/jsapi_config.json$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
-    url(r'^api-token-auth/$', views.ObtainAuthTokenCustomized.as_view(), name='weixin_login_api')
+    url(r'^login.api/$', views.WeixinLoginApi.as_view(), name='weixin_login_api')
 
 )

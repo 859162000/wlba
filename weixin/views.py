@@ -1,9 +1,19 @@
 # encoding:utf-8
 from django.views.generic import View, TemplateView, RedirectView
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
+from django.contrib.auth import login as auth_login
+from django.template import Template, Context
+from django.template.loader import get_template
+from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
+from wanglibao_buy.models import FundHoldInfo
+from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.amortization_plan import get_amortization_plan
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
@@ -11,26 +21,6 @@ from weixin.wechatpy.exceptions import InvalidSignatureException
 from weixin.wechatpy.oauth import WeChatOAuth
 from .models import Account, WeixinUser
 from .common.wechat import tuling
-from wanglibao_buy.models import FundHoldInfo
-from wanglibao_p2p.models import P2PProduct, P2PEquity
-from wanglibao_p2p.amortization_plan import get_amortization_plan
-from wanglibao_p2p.serializers import P2PProductSerializer
-from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from django.template import Template, Context
-from django.template.loader import render_to_string, get_template
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.throttling import UserRateThrottle
-from django.db.models import Q
-from rest_framework.authtoken.views import ObtainAuthToken
-from wanglibao_rest.serializers import AuthTokenSerializer
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from rest_framework import status
 from decimal import Decimal
 import datetime
 import json
@@ -138,32 +128,31 @@ class WeixinLogin(TemplateView):
         return context
 
 
-class ObtainAuthTokenCustomized(ObtainAuthToken):
-    serializer_class = AuthTokenSerializer
+class WeixinLoginApi(View):
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.DATA)
-        # 设备类型，默认为IOS
-        device_type = request.DATA.get('device_type', 'ios')
+    def _form(self, request):
+        return EmailOrPhoneAuthenticationForm(request, data=request.POST)
 
-        if serializer.is_valid():
+    def post(self, request):
+        form = self._form(request)
+
+        if form.is_valid():
+            user = form.get_user()
+
             try:
-                openid = request.DATA.get('openid')
+                openid = request.POST.get('openid')
                 weixin_user = WeixinUser.objects.get(openid=openid)
-                weixin_user.user = serializer.object['user']
+                weixin_user.user = user
                 weixin_user.save()
             except WeixinUser.DoesNotExist:
                 pass
 
-            if device_type not in ('ios', 'android'):
-                return Response({'message': 'device_type error'}, status=status.HTTP_200_OK)
+            auth_login(request, user)
+            request.session.set_expiry(1800)
+            data = {'nickname': user.wanglibaouserprofile.nick_name}
+            return HttpResponse(json.dumps(data), 'application/json')
 
-            token, created = Token.objects.get_or_create(user=serializer.object['user'])
-            return Response({'token': token.key, 'user_id': serializer.object['user'].id}, status=status.HTTP_200_OK)
-
-        if device_type == 'ios':
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'token': 'false'}, status=status.HTTP_200_OK)
+        return HttpResponseBadRequest(json.dumps(form.errors), 'application/json')
 
 
 class WeixinOauthLoginRedirect(RedirectView):
