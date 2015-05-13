@@ -173,7 +173,7 @@ class PurchaseP2P(APIView):
                     {
                         'message': u'只有未进行投资的用户才可以购买,单笔最高限购{per_total_amount}'.format(per_total_amount=p2p.limit_amount_per_user),
                         'error_number' : ErrorNumber.new_user_error
-                   }, status=status.HTTP_200_OK)
+                   }, status=status.HTTP_400_BAD_REQUEST)
             if redpack and not redpack.isdigit():
                 return Response({
                                     'message': u'请输入有效红包',
