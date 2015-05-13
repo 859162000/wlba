@@ -41,6 +41,7 @@ class WanglibaoUserProfile(models.Model):
     gesture_pwd = models.CharField(u'手势密码', max_length=9, default='')
     gesture_is_enabled = models.BooleanField(u'手势密码是否启用', default=False)
 
+
     def __unicode__(self):
         return "phone: %s nickname: %s  %s" % (self.phone, self.nick_name, self.user.username)
 

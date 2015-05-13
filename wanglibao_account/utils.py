@@ -300,10 +300,3 @@ PAY_METHOD = {
 #
 #
 
-def str_add_md5(value):
-    if isinstance(value, str):
-        m = hashlib.md5()
-        m.update(value)
-        return m.hexdigest()
-    else:
-        return ''

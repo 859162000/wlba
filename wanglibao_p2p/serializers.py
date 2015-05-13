@@ -100,6 +100,7 @@ class P2PProductSerializer(ModelSerializerExtended):
                     del extra_data[section_key][item_key]
 
 
+
         return extra_data
 
 

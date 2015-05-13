@@ -32,14 +32,20 @@
       init:function(){
          var that = this;
          var isHover = false,setTimeHover;
+         var Timer;
          $(".circle").hover(function(){
               that.initIndex = $(this).index()/2-1
               var imgUrl = "/static/images/pptv/"+that.dataImg[that.initIndex]+".jpg"
               that.$float.find("img").attr("src",imgUrl)
               $(".circle").find(".circle-body").removeAttr("style")
               that.$float.show()
+          },function(){
+            Timer=setTimeout(function(){
+              $(".circle-float").hide();
+            },2000);
           })
           $(".circle-float").hover(function(){
+              clearTimeout(Timer)
               isHover = true;
           },function(){
               isHover &&  that.close()
