@@ -8,30 +8,35 @@ html
   body
     header
       hgroup 我要投资
-      section 返回
+      section
+        a(href="#1") 返回
     .list-banner
       img(src='')
-    .list-body
+    .list-body#list-body
       for product in p2p_lists
         status = product.display_status
         if status == '抢购中'
           listClass = 'profit-blue'
           btnClass = 'btn-blue'
+          borderClass = 'progress-broderBold'
         elif status == '已还款'
           listClass = 'profit-hui'
           btnClass = 'btn-grey'
+          borderClass = 'progress-broderNormal'
         elif status == '还款中'
           listClass = 'profit-hui'
           btnClass = 'btn-lightblue'
+          borderClass = 'progress-broderNormal'
         else
           listClass = 'profit-hui'
           btnClass = 'btn-red'
+          borderClass = 'progress-broderNormal'
         .list-section
           a(href="/weixin/detail/{{product.id}}").section-head
             if product.category == '新手标'
               span.head-prompt  新手福利
             span.head-tit {{product.name}}
-          .section-body
+          .section-body(class=borderClass)
             a(href="/weixin/detail/{{product.id}}").body-left
               .body-Profit
                 span.profit-cont
@@ -50,11 +55,12 @@ html
                   |个月
                 .time-tit 还款期限
             .body-right
-              a(href="#").btn-body(class=btnClass) {{status}}
+              a(href="/weixin/detail/{{product.id}}").btn-body(class=btnClass) {{status}}
           percent = float(product.ordered_amount) / product.total_amount * 100
           if status == '抢购中'
             .section-progressd(style="width:{{percent | percentage}}")
+    include include/weixin_loading
 
-  include include/weixin_footer
+    include include/weixin_footer
   script(src="/static/src/mobile/lib/zepto/zepto.js")
   script(data-init='list' src="/static/src/mobile/mobile.js")
