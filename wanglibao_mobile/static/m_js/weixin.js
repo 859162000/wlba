@@ -222,7 +222,7 @@ function registered() {
 
     $('#wei_button').on('click', function () {
         //$(".wei_pass").attr(maxlength)
-//        $('#wx-mobel-box').show()
+        $('#wx-mobel-box').show();
         var pass = $(".wei_pass").val(),
             qupass = $(".wei_quepass").val(),
             yan = $(".wei_yan").val(),
