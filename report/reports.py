@@ -10,7 +10,7 @@ from django.core.files.storage import DefaultStorage
 from marketing.models import IntroducedBy
 from report.crypto import ReportCrypto
 from report.models import Report
-from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PRecord, Earning
+from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PRecord, Earning, EquityRecord
 from wanglibao_pay.models import PayInfo
 from wanglibao_margin.models import MarginRecord
 from django.utils import timezone
@@ -266,13 +266,18 @@ class PaybackReportGenerator(ReportGeneratorBase):
         output = cStringIO.StringIO()
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
-                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号'])
+                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号', u'完成时间'])
 
         amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time) \
             .prefetch_related('product_amortization').prefetch_related('product_amortization__product') \
             .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
         for index, amortization in enumerate(amortizations):
+            if amortization.settlement_time:
+                settled_at = timezone.localtime(amortization.settlement_time).strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                settled_at = ""
+
             writer.writerow([
                 str(index + 1),
                 amortization.product_amortization.product.serial_number,
@@ -286,8 +291,8 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 str(amortization.interest),
                 # u'待还',
                 amortization.product_amortization.product.status,
-                timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),
-                unicode("wanglibao_yhhkjl_" + str(amortization.id))
+                unicode("wanglibao_yhhkjl_" + str(amortization.id)),
+                settled_at
             ])
         return output.getvalue()
 
@@ -468,12 +473,17 @@ class P2PstatusReportGenerator(ReportGeneratorBase):
 
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'贷款号', u'用户名称', u'借款标题', u'借款金额', u'已借金额', u'利率', u'借款期限', u'还款方式',
-                         u'投资次数', u'状态', u'满标时间', u'真实姓名', u'手机号', u'身份证', u'银行名', u'银行账号',
+                         u'投资次数', u'状态', u'满标时间', u'还款中时间', u'真实姓名', u'手机号', u'身份证', u'银行名', u'银行账号',
                          u'银行卡类型', u'省份', u'地区', u'支行'])
 
         p2precords = P2PRecord.objects.filter(catalog=u'状态变化', create_time__gte=start_time, create_time__lt=end_time)
 
         for index, p2precord in enumerate(p2precords):
+            if p2precord.product.status == u"还款中":
+                er = EquityRecord.objects.filter(product=p2precord.product, catalog=u"申购确认").first()
+                amo_time = timezone.localtime(er.create_time).strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                amo_time = ""
             writer.writerow([
                 str(index + 1),
                 p2precord.product.serial_number,
@@ -488,6 +498,7 @@ class P2PstatusReportGenerator(ReportGeneratorBase):
                 unicode(p2precord.product.status),
                 (p2precord.product.soldout_time and timezone.localtime(p2precord.product.soldout_time).strftime(
                     "%Y-%m-%d %H:%M:%S")) or '-',
+                amo_time,
                 unicode(p2precord.product.borrower_name),
                 unicode(p2precord.product.borrower_phone),
                 unicode(p2precord.product.borrower_id_number),
