@@ -1,9 +1,19 @@
 # encoding:utf-8
 from django.views.generic import View, TemplateView, RedirectView
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
+from django.contrib.auth import login as auth_login
+from django.template import Template, Context
+from django.template.loader import get_template
+from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
+from wanglibao_buy.models import FundHoldInfo
+from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.amortization_plan import get_amortization_plan
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
@@ -11,25 +21,6 @@ from weixin.wechatpy.exceptions import InvalidSignatureException
 from weixin.wechatpy.oauth import WeChatOAuth
 from .models import Account, WeixinUser
 from .common.wechat import tuling
-from wanglibao_p2p.models import P2PProduct, P2PEquity
-from wanglibao_p2p.amortization_plan import get_amortization_plan
-from wanglibao_p2p.serializers import P2PProductSerializer
-from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from django.template import Template, Context
-from django.template.loader import render_to_string, get_template
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.throttling import UserRateThrottle
-from django.db.models import Q
-from rest_framework.authtoken.views import ObtainAuthToken
-from wanglibao_rest.serializers import AuthTokenSerializer
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from rest_framework import status
 from decimal import Decimal
 import datetime
 import json
@@ -72,10 +63,9 @@ class ConnectView(View):
 
         msg = parse_message(request.body)
 
-        # reply = create_reply(u'更多功能，敬请期待！', msg)
         if msg.type == 'text':
-            if msg.content in ['dkf', 'DKF', 'Dkf' u'多客服']:
-                reply = TransferCustomerServiceReply()
+            if msg.content == 'Dkf':
+                reply = TransferCustomerServiceReply(message=msg)
             else:
                 reply = tuling(msg)
         else:
@@ -115,8 +105,8 @@ class WeixinLogin(TemplateView):
     template_name = 'test_login.html'
 
     def get_context_data(self, **kwargs):
+        context = super(WeixinLogin, self).get_context_data(**kwargs)
         code = self.request.GET.get('code')
-        data = {}
 
         if code:
             account_id = self.request.GET.get('state')
@@ -133,38 +123,36 @@ class WeixinLogin(TemplateView):
                 account.oauth_refresh_token = res.get('refresh_token')
                 account.save()
                 WeixinUser.objects.get_or_create(openid=res.get('openid'))
-                data['openid'] = res.get('openid')
+                context['openid'] = res.get('openid')
 
-        return data
+        return context
 
 
-class ObtainAuthTokenCustomized(ObtainAuthToken):
-    serializer_class = AuthTokenSerializer
+class WeixinLoginApi(View):
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.DATA)
+    def _form(self, request):
+        return EmailOrPhoneAuthenticationForm(request, data=request.POST)
 
-        if serializer.is_valid():
+    def post(self, request):
+        form = self._form(request)
+
+        if form.is_valid():
+            user = form.get_user()
+
             try:
-                openid = request.DATA.get('openid')
+                openid = request.POST.get('openid')
                 weixin_user = WeixinUser.objects.get(openid=openid)
-                weixin_user.user = serializer.object['user']
+                weixin_user.user = user
                 weixin_user.save()
             except WeixinUser.DoesNotExist:
                 pass
 
-            # 设备类型，默认为IOS
-            device_type = request.DATA.get('device_type', 'ios')
-            if device_type not in ('ios', 'android'):
-                return Response({'message': 'device_type error'}, status=status.HTTP_200_OK)
+            auth_login(request, user)
+            request.session.set_expiry(1800)
+            data = {'nickname': user.wanglibaouserprofile.nick_name}
+            return HttpResponse(json.dumps(data), 'application/json')
 
-            token, created = Token.objects.get_or_create(user=serializer.object['user'])
-            return Response({'token': token.key, 'user_id': serializer.object['user'].id}, status=status.HTTP_200_OK)
-        else:
-            device_type = request.DATA.get('device_type', 'ios')
-            if device_type == 'ios':
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response({'token': 'false'}, status=status.HTTP_200_OK)
+        return HttpResponseBadRequest(json.dumps(form.errors), 'application/json')
 
 
 class WeixinOauthLoginRedirect(RedirectView):
@@ -291,3 +279,53 @@ class P2PDetailView(TemplateView):
         })
 
         return context
+
+
+class WeixinAccountHome(TemplateView):
+    template_name = 'weixin_account.jade'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+        ]).select_related('product')
+
+        unpayed_principle = 0
+        p2p_total_paid_interest = 0
+        p2p_total_unpaid_interest = 0
+        p2p_total_interest = 0
+        p2p_activity_interest = 0
+        for equity in p2p_equities:
+            if equity.confirm:
+                unpayed_principle += equity.unpaid_principal  # 待收本金
+                p2p_total_paid_interest += equity.pre_paid_interest  # 累积收益
+                p2p_total_unpaid_interest += equity.unpaid_interest  # 待收益
+                p2p_total_interest += equity.pre_total_interest  # 总收益
+                p2p_activity_interest += equity.activity_interest  # 活动收益
+
+        p2p_margin = user.margin.margin  # P2P余额
+        p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
+        p2p_withdrawing = user.margin.withdrawing  # P2P提现中冻结金额
+        p2p_unpayed_principle = unpayed_principle  # P2P待收本金
+
+        p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
+
+        fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+        fund_total_asset = 0
+        if fund_hold_info.exists():
+            for hold_info in fund_hold_info:
+                fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+
+        return {
+            'total_asset': p2p_total_asset + fund_total_asset,  # 总资产
+            'p2p_total_asset': p2p_total_asset,  # p2p总资产
+            'p2p_margin': p2p_margin,  # P2P余额
+            'p2p_freeze': p2p_freeze,  # P2P投资中冻结金额
+            'p2p_withdrawing': p2p_withdrawing,  # P2P提现中冻结金额
+            'p2p_unpayed_principle': p2p_unpayed_principle,  # P2P待收本金
+            'p2p_total_unpaid_interest': p2p_total_unpaid_interest,  # p2p总待收益
+            'p2p_total_paid_interest': p2p_total_paid_interest + p2p_activity_interest,  # P2P总累积收益
+            'p2p_total_interest': p2p_total_interest,  # P2P总收益
+        }
+
