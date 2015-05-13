@@ -10,11 +10,11 @@
     {% csrf_token %}
     <input name="openid" type="hidden" value="{{ openid }}"/>
     <input name="captcha_0" type="hidden"/>
-    <div class="error-__all__" style="display: none;"></div>
+    <div class="error-__all__" style="display: none; color: #f60;"></div>
     <div>用户名：<input type="text" name="identifier"></div>
     <div>密码：<input type="password" name="password"></div>
     <div>验证码：<input type="text" name="captcha_1" /></div>
-    <div class="error-captcha" style="display: none;"></div>
+    <div class="error-captcha" style="display: none; color: #f60;"></div>
     <div><img src="" alt="" id="captcha"/></div>
     <div><button type="submit" disabled="disabled">登陆</button></div>
 </form>
@@ -59,6 +59,27 @@
         }
     });
 
+    //获取QueryString的数组
+    function getQueryString(){
+         var result = location.search.match(new RegExp("[\?\&][^\?\&]+=[^\?\&]+","g"));
+         if(result == null){
+             return "";
+         }
+         for(var i = 0; i < result.length; i++){
+             result[i] = result[i].substring(1);
+         }
+         return result;
+    }
+
+    //根据QueryString参数名称获取值
+    function getQueryStringByName(name){
+         var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+         if(result == null || result.length < 1){
+             return "";
+         }
+         return result[1];
+    }
+
     $(function() {
         var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
         var $captcha_img = $('img#captcha');
@@ -98,6 +119,10 @@
                 'data': $form.serialize(),
                 'success': function(res) {
                     alert('登录成功');
+                    var next = getQueryStringByName('next');
+                    if (next) {
+                        window.location.href = next;
+                    }
                 },
                 'error': function(res) {
                     if (res['status'] == 403) {
