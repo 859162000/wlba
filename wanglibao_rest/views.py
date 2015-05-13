@@ -885,8 +885,16 @@ class GestureAddView(APIView):
         if not gesture_pwd:
             return Response({"ret_code": 30201, "message": u"参数错误"})
 
+        try:
+            int(gesture_pwd)
+        except:
+            return Response({"ret_code": 30207, "message": u"手势密码类型错误"})
+
+        if not gesture_pwd.isdigit() or ('0' in gesture_pwd):
+            return Response({"ret_code": 30208, "message": u"手势密码不合法"})
+
         if not 4 <= len(gesture_pwd) <= 9:
-            return Response({"ret_code": 30202, "message": u"手势密码需要在4-9位之间"})
+            return Response({"ret_code": 30202, "message": u"手势密码长度需要在4-9位之间"})
 
         if len(gesture_pwd) > len(set(gesture_pwd)):
             return Response({"ret_code": 30203, "message": u"手势密码不能有重复字符"})
@@ -920,6 +928,14 @@ class GestureUpdateView(APIView):
         if not gesture_pwd:
             return Response({"ret_code": 30211, "message": u"参数错误"})
 
+        try:
+            int(gesture_pwd)
+        except:
+            return Response({"ret_code": 30215, "message": u"手势密码类型错误"})
+
+        if not gesture_pwd.isdigit() or ('0' in gesture_pwd):
+            return Response({"ret_code": 30216, "message": u"手势密码不合法"})
+
         if not 4 <= len(gesture_pwd) <= 9:
             return Response({"ret_code": 30212, "message": u"手势密码需要在4-9位之间"})
 
@@ -927,12 +943,14 @@ class GestureUpdateView(APIView):
             return Response({"ret_code": 30213, "message": u"手势密码不能有重复字符"})
 
         phone = request.user.wanglibaouserprofile.phone
-        u_profile = WanglibaoUserProfile.objects.filter(
-            user=request.user, phone=phone, gesture_is_enabled=True)
+        u_profile = WanglibaoUserProfile.objects.filter(user=request.user, phone=phone)
         if not u_profile.exists():
             return Response({"ret_code": 30214, "message": u"用户不存在"})
 
-        u_profile_object = u_profile.first()
+        if u_profile.filter(gesture_is_enabled=False).exists():
+            return Response({"ret_code": 30217, "message": u"手势密码在停用状态，不能修改"})
+
+        u_profile_object = u_profile.filter(gesture_is_enabled=True).first()
         u_profile_object.gesture_pwd = gesture_pwd
         u_profile_object.save()
 
