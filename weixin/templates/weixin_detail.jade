@@ -54,9 +54,10 @@ html
         li
           span 还款方式
           span {{p2p.display_payback_method}}
-        li
-          span 剩余时间
-          span {{p2p.end_time | timedelta_now_day }}
+        if p2p.display_status == '抢购中'
+          li
+            span 剩余时间
+            span#countDown( data-left="{{p2p.end_time}}") {{p2p.end_time | timedelta_now_day }}
         li
           span 购买人数
           span
