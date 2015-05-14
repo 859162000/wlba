@@ -19,20 +19,20 @@
         }
     }
     return cookieValue;
-};
+  };
 
-csrfSafeMethod = function (method) {
-    return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
-};
+  csrfSafeMethod = function (method) {
+      return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+  };
 
-sameOrigin = function (url) {
-    var host, origin, protocol, sr_origin;
-    host = document.location.host;
-    protocol = document.location.protocol;
-    sr_origin = "//" + host;
-    origin = protocol + sr_origin;
-    return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
-};
+  sameOrigin = function (url) {
+      var host, origin, protocol, sr_origin;
+      host = document.location.host;
+      protocol = document.location.protocol;
+      sr_origin = "//" + host;
+      origin = protocol + sr_origin;
+      return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+  };
 
 $.ajaxSetup({
     beforeSend: function (xhr, settings) {
@@ -49,58 +49,59 @@ $.ajaxSetup({
       return re.test(identifier);
     };
 //  获取验证码
-   $("#btn-validate-code").click(function(e) {
-      var count, element, intervalId, phoneNumber, timerFunction;
-      e.preventDefault();
-      element = this;
-      phoneNumber = $.trim($("#phone").val());
-      if (checkMobile(phoneNumber)) {
-        if (typeof console !== "undefined" && console !== null) {
-          console.log("Phone number checked, now send the valdiation code");
+  $("#btn-validate-code").click(function(e) {
+
+    var count, element, intervalId, phoneNumber, timerFunction;
+    e.preventDefault();
+    element = this;
+    phoneNumber = $.trim($("#phone").val());
+    if (checkMobile(phoneNumber)) {
+      if (typeof console !== "undefined" && console !== null) {
+        console.log("Phone number checked, now send the valdiation code");
+      }
+      $.ajax({
+        url: "/api/phone_validation_code/register/" + phoneNumber + "/",
+        type: "POST"
+      }).fail(function(xhr) {
+        var result;
+        clearInterval(intervalId);
+        $(element).text('重新获取');
+        $(element).removeAttr('disabled');
+        $(element).css({'background':'#f44336','color':'#fff'});
+        $(element).removeClass('huoqu-ma-gray');
+        result = JSON.parse(xhr.responseText);
+        if (xhr.status === 429) {
+            $('#wx-mobel-box p').text('系统繁忙，请稍候重试');
+            $('#wx-mobel-box').show();
+        } else {
+            $('#wx-mobel-box p').text(result.message);
+            $('#wx-mobel-box').show();
         }
-        $.ajax({
-          url: "/api/phone_validation_code/register/" + phoneNumber + "/",
-          type: "POST"
-        }).fail(function(xhr) {
-          var result;
+      });
+      intervalId;
+      count = 60;
+      $(element).attr('disabled', 'disabled');
+      $(element).removeClass('pptv-huoqu-ma');
+      $(element).css({'background':'#ccc','color':'#000'});
+      $('.voice-validate').attr('disabled', 'disabled');
+      timerFunction = function() {
+        if (count >= 1) {
+          count--;
+          return $(element).text('已经发送(' + count + ')');
+        } else {
           clearInterval(intervalId);
-          $(element).text('重新获取');
           $(element).removeAttr('disabled');
           $(element).css({'background':'#f44336','color':'#fff'});
-          $(element).removeClass('huoqu-ma-gray');
-          result = JSON.parse(xhr.responseText);
-          if (xhr.status === 429) {
-              $('#wx-mobel-box p').text('系统繁忙，请稍候重试');
-              $('#wx-mobel-box').show();
-          } else {
-              $('#wx-mobel-box p').text(result.message);
-              $('#wx-mobel-box').show();
-          }
-        });
-        intervalId;
-        count = 60;
-        $(element).attr('disabled', 'disabled');
-        $(element).removeClass('pptv-huoqu-ma');
-        $(element).css({'background':'#ccc','color':'#000'});
-        $('.voice-validate').attr('disabled', 'disabled');
-        timerFunction = function() {
-          if (count >= 1) {
-            count--;
-            return $(element).text('已经发送(' + count + ')');
-          } else {
-            clearInterval(intervalId);
-            $(element).removeAttr('disabled');
-            $(element).css({'background':'#f44336','color':'#fff'});
-            $(element).text('重新获取')
-          }
-        };
-        timerFunction();
-        return intervalId = setInterval(timerFunction, 1000);
-      } else {
-        $('#wx-mobel-box p').text('手机号不正确');
-        $('#wx-mobel-box').show();
-      }
-    });
+          $(element).text('重新获取')
+        }
+      };
+      timerFunction();
+      return intervalId = setInterval(timerFunction, 1000);
+    } else {
+      $('#wx-mobel-box p').text('手机号不正确');
+      $('#wx-mobel-box').show();
+    }
+  });
 
 //  网利宝协议是否勾选
 

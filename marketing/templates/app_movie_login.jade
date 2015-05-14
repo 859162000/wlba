@@ -20,6 +20,7 @@ html
       //.grent
       //  p 注册立享100元理财包+30元话费
       form#register-form.wei_for
+        - csrf_token
         input(type='text', placeholder='请输入手机号', name='identifier').ipon#phone
         input(type='text', placeholder='请输入验证码', name='validate_code').ipon#validate-code
         button#btn-validate-code 获取验证码
