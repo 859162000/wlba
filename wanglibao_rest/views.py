@@ -968,7 +968,7 @@ class GestureIsEnabledView(APIView):
         except:
             return Response({"ret_code": 30221, "message": u"参数不合法"})
 
-        if not gesture_is_enabled not in (0, 1):
+        if gesture_is_enabled not in (0, 1):
             return Response({"ret_code": 30222, "message": u"参数错误"})
 
         phone = request.user.wanglibaouserprofile.phone
