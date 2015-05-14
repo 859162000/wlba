@@ -46,11 +46,11 @@ def full_send_message(product_name):
     for x in users:
         phones.append(x.wanglibaouserprofile.phone)
         user_ids.append(x.id)
-    title = messages.product_full_message(product_name)
-    send_messages.apply_async(kwargs={
-        "phones": phones,
-        "messages": [title],
-    })
+    #title = messages.product_full_message(product_name)
+    #send_messages.apply_async(kwargs={
+    #    "phones": phones,
+    #    "messages": [title],
+    #})
     msg = u"%s, 满标了。" % product_name
     inside_message.send_batch.apply_async(kwargs={
         "users":user_ids,
