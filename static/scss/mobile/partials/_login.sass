@@ -28,6 +28,7 @@
   .login-from-one,.login-from-two,.login-from-three
     position: relative
     width: 84%
+    height: 1.95rem
     margin-left: 8%
     margin-top: 0.55rem
     input
@@ -50,18 +51,11 @@
       z-index: 1
   .login-from-error
     width: 84%
-    .error-identifier,.error-password
+    .error-identifier,.error-password,.error-captcha
       font-size: 0.35rem
       margin-left: 16%
       line-height: 1rem
       color: $head-backgroundColor
-  .login-from-captcha
-    @extend .login-from-error
-    .error-captcha
-      @extend .error-identifier
-  .login-from-two
-    input
-      //margin-top: 0.55rem
   .login-from-three
     display: -webkit-flex
     -webkit-flex-flow: row
@@ -85,7 +79,6 @@
       overflow: hidden
   .login-from-four
     position: relative
-    top: 1.55rem
     button
       font-size: 0.85rem
       color: #FFFFFF
@@ -100,7 +93,6 @@
   .login-footer
     width: 84%
     margin-left: 8%
-    margin-top: 1.5rem
     .login-left
       font-size: .6rem
       line-height: 2.3rem
