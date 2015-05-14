@@ -263,21 +263,20 @@ function registered() {
 
         $.ajax({
             type: "post",
-            url: "/api/register/?promo_token=koudianying",
+            url: "/api/register/?promo_token=weixin",
             data: {identifier: Verification(), validate_code: yan, password: pass, invitecode: yao},
             dataType: "json",
             success: function (result) {
                 $('#wx-mobel-box').show()
                 if (result['ret_code'] == 0) {
-//                    alert('注册成功');
-                    $('#wx-mobel-box').show();
-//                    sessionStorage.setItem("name", Verification());
-//                    var read = sessionStorage.getItem("read");
-//                    if (read == '8888') {
-//                        window.location.href = "/mobile/weixin_fee/";
-//                    } else {
-//                        window.location.href = "/mobile/weixin_app/";
-//                    }
+                    alert('注册成功');
+                    sessionStorage.setItem("name", Verification());
+                    var read = sessionStorage.getItem("read");
+                    if (read == '8888') {
+                        window.location.href = "/mobile/weixin_fee/";
+                    } else {
+                        window.location.href = "/mobile/weixin_app/";
+                    }
                 }
                 else if (result['ret_code'] == 30014) {
                     $('.weixin_tq').html('<span>' + result['message'] + '</span>');
@@ -637,7 +636,7 @@ function yoa_registered() {
             }
             $.ajax({
                 type: "post",
-                url: "/api/register/?promo_token=koudianying",
+                url: "/api/register/?promo_token=wenxin",
                 data: data,
                 dataType: "json",
                 success: function (res) {
