@@ -12,7 +12,8 @@
     border-radius: 50%
     position: absolute
     top: -50%
-    left: 34.5%
+    left: 50%
+    margin-left: -2.6625rem
     .img-one
       width: 5rem
       margin: 0.1625rem 0 0 0.1625rem
@@ -20,7 +21,8 @@
     width: 5.225rem
     position: absolute
     top: 50%
-    left: 35%
+    left: 50%
+    margin-left: -2.6125rem
 .login-farom
   .login-from-one,.login-from-two,.login-from-three
     input
@@ -31,27 +33,44 @@
       border-radius: 0.3rem
       //margin-top: 0.55rem
       font-size: $body-fontSize
-      background: url('/static/imgs/mobile/detail/logininput.png') no-repeat left 0.65rem center #FFFFFF
+      background: url('/static/imgs/mobile/detail/logininput.png') no-repeat left 0.65rem center,#ffffff
       background-size: 1.1rem
       line-height: 1.95rem
       margin-left: 8%
       padding-left: 2.6rem
+  .login-from-error
+    width: 84%
+    .error-identifier,.error-password
+      font-size: 0.35rem
+      margin-left: 16%
+      line-height: 1rem
+      color: $head-backgroundColor
+  .login-from-captcha
+    @extend .login-from-error
+    .error-captcha
+      @extend .error-identifier
   .login-from-two
     input
       margin-top: 0.55rem
   .login-from-three
     display: -webkit-flex
+    -webkit-flex-flow: row
     .login-refresh
+      display: inline-block
+      vertical-align: top
       margin-top: 0.55rem
-      width: 54%
+      width: 60%
     .login-validation
+      display: inline-block
+      vertical-align: top
       margin-top: 0.55rem
       width: 22%
-      margin-left: 8%
+      margin-left: 1%
       background: #fff
       border-radius: 0.3rem
       border: $border-color 1px solid
       height: 1.95rem
+      overflow: hidden
   .login-from-four
     button
       font-size: 0.85rem
@@ -65,19 +84,17 @@
       border-radius: 0.3rem
       margin: 1.05rem 0 0 8%
   .login-footer
-    display: -webkit-flex
     width: 84%
     margin-left: 8%
-    font-size: .6rem
-    line-height: 2.3rem
-    .login-middle
-      width: 2%
+    .login-left
+      font-size: .6rem
+      line-height: 2.3rem
       color: #bbbab7
       text-align: center
-    .login-left,.login-right
-      -webkit-flex: 1
-      text-align: center
-      color: #bbbab7
+      a
+        display: inline-block
+        color: #bbbab7
+
 
 
 
