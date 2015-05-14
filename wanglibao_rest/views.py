@@ -189,7 +189,6 @@ class RegisterAPIView(APIView):
         identifier = identifier.strip()
         password = password.strip()
         validate_code = validate_code.strip()
-
         if not identifier or not password or not validate_code:
             return Response({"ret_code": 30011, "message": "信息输入不完整"})
 
