@@ -12,7 +12,8 @@
     border-radius: 50%
     position: absolute
     top: -50%
-    left: 34.5%
+    left: 50%
+    margin-left: -2.6625rem
     .img-one
       width: 5rem
       margin: 0.1625rem 0 0 0.1625rem
@@ -20,18 +21,19 @@
     width: 5.225rem
     position: absolute
     top: 50%
-    left: 35%
+    left: 50%
+    margin-left: -2.6125rem
 .login-farom
   .login-from-one,.login-from-two,.login-from-three
     input
       width: 84%
       height: 1.95rem
-      border: none
+      border: none 
       border: $border-color 1px solid
       border-radius: 0.3rem
       //margin-top: 0.55rem
       font-size: $body-fontSize
-      background: url('/static/imgs/mobile/detail/logininput.png') no-repeat left 0.65rem center #FFFFFF
+      background: url('/static/imgs/mobile/detail/logininput.png') no-repeat left 0.65rem center,#ffffff
       background-size: 1.1rem
       line-height: 1.95rem
       margin-left: 8%
@@ -52,13 +54,18 @@
       margin-top: 0.55rem
   .login-from-three
     display: -webkit-flex
+    -webkit-flex-flow: row
     .login-refresh
+      display: inline-block
+      vertical-align: top
       margin-top: 0.55rem
       width: 60%
     .login-validation
+      display: inline-block
+      vertical-align: top
       margin-top: 0.55rem
       width: 22%
-      margin-left: 2%
+      margin-left: 1%
       background: #fff
       border-radius: 0.3rem
       border: $border-color 1px solid
@@ -86,6 +93,7 @@
       text-align: center
       a
         display: inline-block
+        color: #bbbab7
 
 
 
