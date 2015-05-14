@@ -880,7 +880,10 @@ class GestureAddView(APIView):
         """
         add user gesture_pwd
         """
-        gesture_pwd = request.DATA.get("gesture_pwd", "").strip()
+        try:
+            gesture_pwd = request.DATA.get("gesture_pwd", "").strip()
+        except:
+            return Response({"ret_code": 30209, "message": u"参数类型错误"})
 
         if not gesture_pwd:
             return Response({"ret_code": 30201, "message": u"参数错误"})
@@ -897,7 +900,7 @@ class GestureAddView(APIView):
             return Response({"ret_code": 30202, "message": u"手势密码长度需要在4-9位之间"})
 
         if len(gesture_pwd) > len(set(gesture_pwd)):
-            return Response({"ret_code": 30203, "message": u"手势密码不能有重复字符"})
+            return Response({"ret_code": 30203, "message": u"手势密码不能有重复的点"})
 
         phone = request.user.wanglibaouserprofile.phone
         u_profile = WanglibaoUserProfile.objects.filter(user=request.user, phone=phone)
@@ -923,7 +926,10 @@ class GestureUpdateView(APIView):
         """
         update user gesture_pwd
         """
-        gesture_pwd = request.DATA.get("gesture_pwd", "").strip()
+        try:
+            gesture_pwd = request.DATA.get("gesture_pwd", "").strip()
+        except:
+            return Response({"ret_code": 30218, "message": u"参数类型错误"})
 
         if not gesture_pwd:
             return Response({"ret_code": 30211, "message": u"参数错误"})
@@ -940,7 +946,7 @@ class GestureUpdateView(APIView):
             return Response({"ret_code": 30212, "message": u"手势密码需要在4-9位之间"})
 
         if len(gesture_pwd) > len(set(gesture_pwd)):
-            return Response({"ret_code": 30213, "message": u"手势密码不能有重复字符"})
+            return Response({"ret_code": 30213, "message": u"手势密码不能有重复的点"})
 
         phone = request.user.wanglibaouserprofile.phone
         u_profile = WanglibaoUserProfile.objects.filter(user=request.user, phone=phone)
@@ -975,6 +981,9 @@ class GestureIsEnabledView(APIView):
         u_profile = WanglibaoUserProfile.objects.filter(user=request.user, phone=phone)
         if not u_profile.exists():
             return Response({"ret_code": 30223, "message": u"用户不存在"})
+
+        if u_profile.filter(gesture_is_enabled=gesture_is_enabled).exists():
+            return Response({"ret_code": 30224, "message": u"手势密码状态未修改"})
 
         u_profile_object = u_profile.first()
         u_profile_object.gesture_is_enabled = gesture_is_enabled
