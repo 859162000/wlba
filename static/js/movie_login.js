@@ -106,10 +106,12 @@ $.ajaxSetup({
 //  网利宝协议是否勾选
   $("#id").change(function(value) {
     if ($(this).attr("checked")) {
-      $("#registerd").addClass("disabled");
+      $("#registerd").css({'background':'#ccc'});
+      $("#registerd").attr('disabled','disabled');
       return $(this).removeAttr("checked");
     } else {
-      $("#registerd").removeClass("disabled");
+      $("#registerd").attr('disabled','true');
+      $("#registerd").css({'background':'#f44336'});
       return $(this).attr("checked", "checked");
     }
   });
@@ -151,7 +153,7 @@ $.ajaxSetup({
      return false;
     });
 //  消除模态框
-  $('body').on('click',function(){
+  $('#wx-mobel-box').on('click',function(){
     $('#wx-mobel-box').hide();
   })
 
