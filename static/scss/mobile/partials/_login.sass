@@ -33,7 +33,7 @@
       border-radius: 0.3rem
       //margin-top: 0.55rem
       font-size: $body-fontSize
-      background: url('/static/imgs/mobile/detail/logininput.png') no-repeat left 0.65rem center #FFFFFF
+      background: url('/static/imgs/mobile/detail/logininput.png') no-repeat left 0.65rem center,#ffffff
       background-size: 1.1rem
       line-height: 1.95rem
       margin-left: 8%
@@ -54,13 +54,18 @@
       margin-top: 0.55rem
   .login-from-three
     display: -webkit-flex
+    -webkit-flex-flow: row
     .login-refresh
+      display: inline-block
+      vertical-align: top
       margin-top: 0.55rem
       width: 60%
     .login-validation
+      display: inline-block
+      vertical-align: top
       margin-top: 0.55rem
       width: 22%
-      margin-left: 2%
+      margin-left: 1%
       background: #fff
       border-radius: 0.3rem
       border: $border-color 1px solid
@@ -88,6 +93,7 @@
       text-align: center
       a
         display: inline-block
+        color: #bbbab7
 
 
 
