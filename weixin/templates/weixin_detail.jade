@@ -25,14 +25,13 @@ html
       span.circle-time
         .time-txt
           em {{p2p.period}}
-            i 个月
+            i {{product.pay_method|period_unit}}
           br
           |还款期限
       span.circle-progress
         .percent-txt {{percent | percentage}}
-        .progress-percent(data-percent='{{percent}}')
-      p.bannerBottom
-
+        .progress-body
+          .progress-percent(data-percent='{{percent}}')
     .detail-title
       h4 {{p2p.name}}
       .product-money
@@ -92,6 +91,7 @@ html
       p {{status}}
   script(src="/static/src/mobile/lib/zepto/zepto.js")
   script(src="/static/src/mobile/lib/weixin/wx.js")
-  script(data-init='detail' src="/static/src/mobile/mobile.js")
+  script(data-init='detail' src="/static/src/mobile/mobile.js?v=222")
+
 
 
