@@ -275,8 +275,7 @@
             };
 
             $scope.is_move_menu_right_hidden = function() {
-                return ($scope.data.current_menu_index >= $scope.data.current_list_length -1 && $scope.data.current_menu_level == 1) ||
-                        ($scope.data.current_menu_index >= $scope.data.current_list_length -1 && $scope.data.current_menu_level == 2);
+                return $scope.data.current_menu_index >= $scope.data.current_list_length -1;
             };
 
             $scope.create_menu = function() {
