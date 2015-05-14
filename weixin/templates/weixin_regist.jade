@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    title weixin-detail
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 注册
+      section
+        a(href="javascript:history.back()") 返回
+    section.regist-main
+        .regist-list
+          .input-main
+            .main-left
+              .input-name= className
+              .input-body
+            .main-right
+              .check-body
+          else
+            .input-name= className
+            .input-body
+          .input-sign
+            for key, val in sign
+              .sign=key.val
+    section.regist-protocol

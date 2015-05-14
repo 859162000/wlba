@@ -54,7 +54,7 @@ var list = (function(org){
         _getNextPage :function(){
             $.ajax({
                 type: 'GET',
-                url: '/api/p2ps/wx',
+                url: '/api/p2ps/wx/',
                 data: {page: lib.page, 'pagesize': lib.pageSize},
                 beforeSend:function(){
                     lib.canGetPage =false
@@ -91,7 +91,12 @@ var detail = (function(org){
             $(function(){
                 setTimeout(function(){
                     var percent = parseFloat($progress.attr('data-percent'));
-                    percent == 100 ? $progress.css("height",'110%') : $progress.css("height", percent + '%');
+                    if(percent == 100){
+                        $progress.css("margin-top","-10%");
+                    }else{
+                        $progress.css("margin-top", (100 - percent) + '%');
+
+                    }
                     setTimeout(function(){
                         $progress.addClass('progress-bolang')
                     },1000)

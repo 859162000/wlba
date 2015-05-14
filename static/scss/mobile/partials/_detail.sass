@@ -18,6 +18,7 @@
   height: $r
   -webkit-transition: -webkit-transform 300ms ease-out
   -webkit-transform: translate3d(0,0,0)
+
 .detail-animate
   position: relative
   height: 9.75rem
@@ -36,6 +37,7 @@
     margin-left: -3.85rem
     @include  circle(3.45rem, #faedec, #b6b6b6, .6rem)
     -webkit-animation: animation1 6s infinite
+    -webkit-transform: translateZ(0)
     em
       font-style: normal
       font-size: 1.275rem
@@ -48,6 +50,8 @@
     margin-left: .8rem
     z-index: 2
     @include  circle(3.25rem, #faedec, #b6b6b6, .6rem)
+    -webkit-animation: animation2 6s infinite
+    -webkit-transform: translateZ(0)
     em
       font-style: normal
       font-size: 1.05rem
@@ -55,12 +59,18 @@
       i
         font-style: normal
         font-size: .6rem
-    -webkit-animation: animation2 6s infinite
+
+  .progress-body
+    height: 100%
+    overflow: hidden
+    width: 2.75rem
+    border-radius: 1.375rem
   .circle-progress
     overflow: hidden
     top: 5.5rem
     margin-left: -2.5rem
     @include  circle(2.75rem, #e5f2ff, #2ebcdb, .7rem)
+    z-index: 10
     .percent-txt
       position: absolute
       left: 0
@@ -69,18 +79,17 @@
       width: 100%
       line-height: 2.75rem
       z-index: 2
+      border-radius: 1.375rem
     .progress-percent
-      position: absolute
-      left: 0
-      bottom: 0
       width: 5.5rem
-      height: 0%
+      height: 3rem
+      margin-top: 100%
       background: url('/static/imgs/mobile/detail/progress-icon.jpg') no-repeat center top #aee4f0
       background-size: 100%
       z-index: 1
       -webkit-transition: all 1s ease-out
   .progress-bolang
-    -webkit-animation: animation3 3s infinite
+    -webkit-animation: animation3 5s infinite
 @-webkit-keyframes animation1
   10%
     -webkit-transform: scale(1.05)
@@ -94,9 +103,10 @@
     -webkit-transform: scale(1.05)
   100%
     -webkit-transform: scale(1.0)
+
 @-webkit-keyframes animation2
   10%
-    -webkit-transform: scale(1.00)
+    -webkit-transform: scale(1.05)
   20%,60%
     -webkit-transform: scale(1.05)
   30%,70%
@@ -104,16 +114,16 @@
   40%,80%
     -webkit-transform: scale(1.05)
   50%,90%
-    -webkit-transform: scale(1.0)
+    -webkit-transform: scale(1.00)
   100%
     -webkit-transform: scale(1.05)
 @-webkit-keyframes animation3
   0%
-    left: 0
+    margin-left: 0
   50%
-    left: -2.75rem
+    margin-left: -2.75rem
   100%
-    left: 0
+    margin-left: 0
 
 .detail-title
   font-size: .7rem
