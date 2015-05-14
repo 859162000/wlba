@@ -84,7 +84,6 @@ $.ajaxSetup({
         $(element).css({'background':'#ccc','color':'#000'});
         $('.voice-validate').attr('disabled', 'disabled');
         timerFunction = function() {
-          console.log(count)
           if (count >= 1) {
             count--;
             return $(element).text('已经发送(' + count + ')');
@@ -104,13 +103,12 @@ $.ajaxSetup({
     });
 
 //  网利宝协议是否勾选
+
   $("#id").change(function(value) {
     if ($(this).attr("checked")) {
       $("#registerd").css({'background':'#ccc'});
-      $("#registerd").attr('disabled','disabled');
       return $(this).removeAttr("checked");
     } else {
-      $("#registerd").attr('disabled','true');
       $("#registerd").css({'background':'#f44336'});
       return $(this).attr("checked", "checked");
     }
@@ -130,6 +128,9 @@ $.ajaxSetup({
        $('#wx-mobel-box').show();
      }else if($('#pw').val()!=$('#pw2').val()){
        $('#wx-mobel-box p').text('密码不一致');
+       $('#wx-mobel-box').show();
+     }else if (!$('#id').attr("checked")){
+       $('#wx-mobel-box p').text('请勾选网利宝协议');
        $('#wx-mobel-box').show();
      }else{
        $.ajax({
