@@ -86,11 +86,11 @@ def _amo_record(user, pagesize, pagenum, product_id):
         obj = {"id":x.id,
                 "name":x.amortization.product.name, "term":x.term,
                 "total_term":x.amortization.product.amortization_count,
-                "term_date":util.fmt_date_normal(util.local_datetime(x.created_time)),
+                "term_date":util.fmt_dt_normal(util.local_datetime(x.created_time)),
                 "principal":x.principal, "interest":x.interest,
                 "penal_interest":x.penal_interest,
                 "total_amount":(x.principal+x.interest+x.penal_interest),
-                "settlement_time":util.fmt_dt_normal(util.local_datetime(x.created_time))
+                "settlement_time":util.fmt_date_normal(util.local_datetime(x.created_time))
                 }
         res.append(obj)
     logger.info("return amo_record ===>>>: %s" % res)

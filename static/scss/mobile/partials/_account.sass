@@ -10,7 +10,7 @@
     width: 50%
     .balance-one-money
       color: #989898
-      font-size: 0.5rem
+      font-size: $body-fontSize
     .balance-one-yuan
       color: $head-backgroundColor
       font-size: 0.6rem
@@ -24,7 +24,7 @@
       text-align: center
       line-height: 1.75rem
       border: 1px solid #abccf7
-      font-size: 0.5rem
+      font-size: $body-fontSize
       color: #abccf7
       display: none
   .account-balance-three
@@ -37,7 +37,7 @@
       text-align: center
       line-height: 1.75rem
       border: 1px solid #9cd292
-      font-size: 0.5rem
+      font-size: $body-fontSize
       color: #9cd292
       display: none
 .account-assets
@@ -50,7 +50,7 @@
     .assets-one-yuan
       @extend .balance-one-yuan
     .assets-one-earnings
-      font-size: 0.55rem
+      font-size: $body-fontSize
       color: #989898
       span
         color: #6b6b6b
@@ -62,7 +62,7 @@
       @extend .assets-one-yuan
     .assets-two-earning
       @extend .assets-one-earnings
-      padding-left: 19%
+      padding-left: 34%
 .account-project
   @extend .account-balance
   height: 4.45rem
@@ -72,7 +72,7 @@
   padding-top: 0
   .project-one
     color: #6b6b6b
-    font-size: 0.5rem
+    font-size: $body-fontSize
     line-height: 2.22rem
     span  //三角
       width: 0
@@ -84,7 +84,7 @@
       font-size: 0
       line-height: 0
       position: relative
-      left: 75%
+      left: 80%
       .project-one-angle
         width: 0
         height: 0

@@ -39,7 +39,7 @@ for product in p2p_lists
             |个月
           .time-tit 还款期限
       .body-right
-        a(href="#").btn-body(class=btnClass) {{status}}
+        a(href="/weixin/detail/{{product.id}}").btn-body(class=btnClass) {{status}}
     percent = float(product.ordered_amount) / product.total_amount * 100
     if status == '抢购中'
       .section-progressd(style="width:{{percent | percentage}}")

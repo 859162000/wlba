@@ -12,9 +12,13 @@ header
     position: absolute
     left: 0
     top: 0
-    height: $header-height
-    line-height: $header-height
-    padding-left: .5rem
+    a
+      display: block
+      padding: 0 .5rem
+      line-height: $header-height
+      height: $header-height
+      &:active
+        background: $active-color
 footer
   position: fixed
   left: 0
@@ -43,19 +47,27 @@ footer
   img
     width: 100%
 .list-body
-  margin-bottom: 2.95rem
+  //margin-bottom: 2.95rem
 .list-section
   position: relative
   margin-bottom: $margin-bottom
   border-top: 1px solid #e8e8e8
   background: #fff
+  &:last-child
+    margin-bottom: 0
+  &:active
+    background: $active-color
 .section-head
   border-bottom: 1px solid #f0f0f0
   text-align: left
-  height: 1.5rem
-  line-height: 1.5rem
+  height: 1.7rem
+  line-height: 1.7rem
+  padding-right: .55rem
   font-size: $body-fontSize
   display: block
+  white-space: nowrap
+  text-overflow: ellipsis
+  overflow: hidden
   .head-prompt
     color: #fff
     background: #72bf64
@@ -63,9 +75,8 @@ footer
     border-bottom-right-radius: .75rem
     border-top-right-radius: .75rem
   .head-tit
-    margin-left: .5rem
+    margin-left: .55rem
     color: $list-titColor
-
 .section-body
   display: -webkit-box
   font-size: $body-fontSize
@@ -74,7 +85,7 @@ footer
     -webkit-box-flex: 1
     display: -webkit-box
     -webkit-box-align: end
-    padding: .5rem 0 .5rem .75rem
+    padding: 0.53rem 0 0.53rem 0.75rem
   .body-Profit
     -webkit-box-flex: 1
   .profit-cont
@@ -109,14 +120,14 @@ footer
     left: 50%
     width: 2.4rem
     margin-left: -1.2rem
-    line-height: $body-fontSize
+    line-height: .7rem
     color: #b6b6b6
   .time-tit
     text-align: center
     color: #b6b6b6
-    line-height: $body-fontSize
+    line-height: .7rem
   .body-time
-    width: 2.86rem
+    width: 4.86rem
     .time-num
       text-align: center
       color: #989898
@@ -151,12 +162,16 @@ footer
     .btn-grey
       border: 1px solid $protucd-grey
       color: $protucd-grey
+.progress-broderNormal
+  border-bottom: 1px solid #e8e8e8
 .section-progressd
   height: 2px
   background: #abccf7
   position: absolute
   bottom: 0
   left: 0
+.spinner
+  margin: .25rem auto 2.75rem auto
 
 
 

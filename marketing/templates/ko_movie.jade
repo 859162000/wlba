@@ -38,7 +38,7 @@ html
         .row
           .span2
             a(href='/')
-              .pptv-logo
+              .wlb-logo
           .span10
             .nav-items.xiao-nav
               ul
@@ -60,10 +60,10 @@ html
 
                 +nav-item('安全保障', '/security', 'left-line', '')
                 +nav-item('帮助中心', '/help', '', '')
-    .wrap.pptv
+    .wrap.pptv.koMovie(style="background:#397ee9 url(/static/images/ko/banner.jpg) center center")
       .gold2
         .denelu-form
-          h1.biaoti 注册送50元红包
+          h1.biaoti 注册即送20元红包
           form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
             - csrf_token
             .form-row
@@ -78,7 +78,7 @@ html
                 .span6
                    input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="验证码", autocomplete='off', title="验证码")
                 .span6-omega
-                   button#button-get-validate-code-modal.button-large.pptv-huoqu-ma(type='button',style="width:100%;margin-left:0") 获取验证码
+                   button#button-get-validate-code-modal.button-large.pptv-huoqu-ma.greenBtn(type='button',style="width:100%;margin-left:0") 获取验证码
               .form-row-error
 
             .form-row
@@ -101,6 +101,45 @@ html
             .space-vertical-s
           p.xun-p 已有账号，
             a(href="/accounts/login/") 立即登录
+    .present-content
+        .register-present
+            .register-h
+                span.register-title.icon1
+            .register-image
+                span.register-span
+            p.register-font
+                b 成功注册
+                网利宝会员，即可得
+                b 20元
+                网利宝现金红包
+        .register-present.second-content
+            .invest-h
+                span.register-title.icon2
+            p.second-font
+                b 首次投资100元起
+                ，送10元电影券一张
+            p.invest-image
+                span.invest-money.money10
+            p.second-font
+                b 首次投资≥500元
+                ，送20元电影券一张
+            p.invest-image
+                span.invest-money.money20
+            p.second-font
+                b 首次投资≥1000元
+                ，送50元电影券一张
+            p.invest-image
+                span.invest-money.money50
+        .register-present
+            .invitation-h
+                span.register-title.icon3
+            .telephone-charge
+                span.telephone-img
+            .invitation-welfare
+              b 成功邀请好友
+              首次投资网利宝，即可共享
+              b 60元
+              话费
     .san-new
       .san-new-content.container
         .row.gold-dl-row
@@ -139,17 +178,11 @@ html
           .circle
             .circle-body.free
             .circle-txt 免费注册
-            .circle-txt2 送
-              em 50
-              |元红包
           .triangle-center
             .center-cont
           .circle
             .circle-body.atte
             .circle-txt 进行认证
-            .circle-txt2 送
-              em 1
-              |个月PPTV会员
           .triangle-center
             .center-cont
           .circle
@@ -169,76 +202,28 @@ html
             .end-cont
     .san-new
       .pptv-list
-        .border-box
-          .box-lfet
-            .head 银行定期存款
-            .img.box-img
-            .bot 银行本息担保
-          .box-right
-            .head 宝宝们
-            .img.box-img
-            .bot 亏本风险较低
-        .float-box
-          .float-head
-            img(src="/static/images/pptv/float-head.png")
-          .float-cont
-            p.head 13-18%
-            p.shou 收益率
-            p.p-icon
-              span
-              |平安保险承保账户资金
-          .float-btn
-            a.register-btn 注册投资
-    .san-new.content-process
-      .san-new-content.container
-        .row.gold-dl-row
-          .san-span.si-span
-            dl
-             dt.slist.slist-trust
-             dd.pp-zi
-               h3 收益高
-               p 40+银行收益
-          .san-span.si-span
-            dl
-             dt.slist.slist-security
-             dd.pp-zi
-               h3 回本快
-               p 按月付息款
-               p 一次还本息，先息后本
-          .san-span.si-span
-            dl
-             dt.slist.slist-authority
-             dd.pp-zi
-               h3 门槛低
-               p 100元起，0元手续费，不用去
-               p 银行排队，免费开户
-          .san-span.si-span
-            dl
-             dt.slist.slist-last
-             dd.pp-zi
-               h3 周期短
-               p 1个月，3个月
-               p 6个月，9个月
-    .san-new
-      .pptv-list
         .gold-footer
             dl.beijing
               dt.hei 活动规则
-              dd 1. 手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账户；
-              dd 2. PPTV会员码数量有限，先到先得送完为止；
-              dd 3. 红包使用期限：2015年3月23日-2015年6月22日；
-              dd 4. 直抵50红包投资金额300元方可使用；
-              dd 5. 红包使用最多直抵50元。例：投资300元立减50元，实际支付250元；
-              dd 6. 新手红包均只能使用一次，使用后是否有余额红包即失效；
-              dd 7. 投资项目到期后本金+利息+红包金额可一并提现；
-              dd 8. 登录网利宝官网：
-                b.note <a href="http://www.wanglibao.com">www.wanglibao.com</a>，或者使用app进行投资理财；
-              dd 9. 本活动不收取任何费用，谨防上当受骗；
-              dd 10. 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现；
-              dd 11. 网利宝对此活动享有最终解释权。
+              dd 1. 所有抠电影用户均可以参加；
+              dd 2. 手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账号；
+              dd 3. 首次投资100以上（含100）即可获赠抠电影价值10元的电影券；
+              dd 4. 首次投资500以上（含500）即可获赠抠电影价值20元的电影券；
+              dd 5. 首次投资1000以上（含1000）即可获赠抠电影价值50元的电影券；
+              dd 6. 电影券不累计，即投资500及以上者享用20元电影券而不再享用10元电影券，投资1000者亦然；
+              dd 7. 注册获取的红包使用期限：2015年5月13日-8月12日；
+              dd 8. 抠电影电影券的使用期限：2015年5月13日-6月30日；
+              dd 9. 邀请好友首次投资200以上（含200）即可与好友分别享用30元话费；
+              dd 10. 红包只能使用一次投资项目到期后本金+利息+红包金额可一并提现；
+              dd 11. 登录网利宝官网：www.wanglibao.com，或者用APP进行投资理财；
+              dd 12. 本活动不收取任何费用，谨防上当受骗；
+              dd 13. 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+              dd 14. 网利宝对此活动享有最终解释权。
+
 
     .pptv-bottom.content-process
       img(src="/static/images/pptv/pptv-bottom.png")
+    include include/tracking
     script.
       require(['/static/js/hover.js','/static/js/pptv_redpack.js'])
 
