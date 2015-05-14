@@ -55,13 +55,13 @@ sameOrigin = function (url) {
     return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
 };
 
-//$.ajaxSetup({
-//    beforeSend: function (xhr, settings) {
-//        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-//            xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-//        }
-//    }
-//});
+$.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+        }
+    }
+});
 
 function log() {
     if (getQueryString('backurl') == '8888') {
@@ -154,7 +154,7 @@ function wei_password() {
                         if (read == '8888') {
                             window.location.href = "/mobile/weixin_fee/";
                         } else {
-                            window.location.href = "/mobile/weixin_app/";
+//                            window.location.href ="https://www.wanglibao.com/mobile/weixin_index/ion.href = "/mobile/weixin_app/";
                         }
                     }
                     else {
@@ -222,6 +222,7 @@ function registered() {
 
     $('#wei_button').on('click', function () {
         //$(".wei_pass").attr(maxlength)
+        $('#wx-mobel-box').show();
         var pass = $(".wei_pass").val(),
             qupass = $(".wei_quepass").val(),
             yan = $(".wei_yan").val(),
@@ -266,7 +267,7 @@ function registered() {
             data: {identifier: Verification(), validate_code: yan, password: pass, invitecode: yao},
             dataType: "json",
             success: function (result) {
-
+                $('#wx-mobel-box').show()
                 if (result['ret_code'] == 0) {
                     alert('注册成功');
                     sessionStorage.setItem("name", Verification());
@@ -635,7 +636,7 @@ function yoa_registered() {
             }
             $.ajax({
                 type: "post",
-                url: "/api/register/?promo_token=weixin",
+                url: "/api/register/?promo_token=wenxin",
                 data: data,
                 dataType: "json",
                 success: function (res) {
