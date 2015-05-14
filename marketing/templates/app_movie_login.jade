@@ -1,0 +1,47 @@
+doctype html
+html
+  head
+    - with '网利宝' as title
+    title 网利宝
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
+    meta(name="format-detection", content="telephone=no")
+    link(rel="stylesheet",href="/static/css/wap/movie_login.css")
+  body(style='background: url(/static/m_images/weixin_img/ban.jpg) no-repeat;background-size:cover;')
+    .top-i
+      a.jiao
+        img(src='/static/m_images/weixin_img/sanjiao.png')#weixin_fanhui_fa
+      p 注册
+    article
+      img.wei_loge(src='/static/m_images/weixin_img/loginn.png')
+      p 您&nbsp;&nbsp;的&nbsp;&nbsp;私&nbsp;&nbsp;人&nbsp;&nbsp;理&nbsp;&nbsp;财&nbsp;&nbsp;专&nbsp;&nbsp;家
+      //img(src='/static/m_images/weixin_img/yao.png').wei_zi
+      //.grent
+      //  p 注册立享100元理财包+30元话费
+      form#register-form.wei_for
+        input(type='text', placeholder='请输入手机号', name='identifier').ipon#phone
+        input(type='text', placeholder='请输入验证码', name='validate_code').ipon#validate-code
+        button#btn-validate-code 获取验证码
+        input(type='password', placeholder='请输入密码', name='password').ipon#pw
+        input(type='password', placeholder='请再次输入密码', name='password2').ipon#pw2
+        .wei_agree
+          input(type='checkbox' checked='checked')#id
+          label
+              |我同意
+              span
+               a(href='/activity/agree_xieyi/') 网利宝用户协议
+        button.judge#registerd 注册
+    #wx-mobel-box
+        #box
+          //span#off ×
+          p(style="border-bottom:none")
+            b 您已注册成功，请到网利宝官网进行投资理财
+            br
+            |官网网址：www.wanglibao.com
+    script(src="/static/js/lib/jquery.min.js")
+    script(src="/static/js/lib/jquery.validate.min.js")
+    script(src="/static/js/movie_login.js")
+//
+   Created by rsj217 on 15-5-14.
+
