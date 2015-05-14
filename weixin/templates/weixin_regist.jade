@@ -1,6 +1,3 @@
--load formatters
--load mathfilters
--load widget_tweaks
 doctype html
 html
   head
@@ -11,3 +8,18 @@ html
       hgroup 注册
       section
         a(href="javascript:history.back()") 返回
+    section.regist-main
+        .regist-list
+          .input-main
+            .main-left
+              .input-name= className
+              .input-body
+            .main-right
+              .check-body
+          else
+            .input-name= className
+            .input-body
+          .input-sign
+            for key, val in sign
+              .sign=key.val
+    section.regist-protocol
