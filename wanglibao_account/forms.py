@@ -140,9 +140,9 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    identifier = forms.CharField(max_length=254)
-    password = forms.CharField(label="Password", widget=forms.PasswordInput)
-    captcha = CaptchaField()
+    identifier = forms.CharField(max_length=254, error_messages={'required': u'请输入手机号'})
+    password = forms.CharField(label="Password", widget=forms.PasswordInput, error_messages={'required': u'请输入密码'})
+    captcha = CaptchaField(error_messages={'invalid': u'验证码错误', 'required': u'请输入验证码'})
 
     error_messages = {
         'invalid_login': u"用户名或者密码不正确",

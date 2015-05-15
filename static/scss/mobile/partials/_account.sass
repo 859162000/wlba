@@ -62,29 +62,33 @@
       @extend .assets-one-yuan
     .assets-two-earning
       @extend .assets-one-earnings
-      padding-left: 34%
+      text-align: right
+      margin-right: 0.705rem
 .account-project
-  @extend .account-balance
-  height: 4.45rem
+  //@extend .account-balance
+  padding-left: 0.75rem
+  background: #ffffff
   border-top: 1px solid $border-color
-  margin-top: 1rem
+  margin-top: 0.55rem
   -webkit-flex-flow: column
   padding-top: 0
   .project-one
     color: #6b6b6b
     font-size: $body-fontSize
     line-height: 2.22rem
+    height: 2.22rem
+    position: relative
     span  //三角
       width: 0
       height: 0
       border-bottom: 0.4rem solid transparent
       border-top: 0.4rem solid transparent
       border-left: 0.4rem solid #b6b6b6
-
       font-size: 0
       line-height: 0
-      position: relative
-      left: 80%
+      position: absolute
+      right: 0.705rem
+      top: 0.7rem
       .project-one-angle
         width: 0
         height: 0
@@ -98,6 +102,18 @@
         top: -0.3rem
   .line
     border-bottom: 1px solid $border-color
+.account-exit
+  @extend .account-project
+  height: 2.22rem
+  padding: 0
+  .account-exit-exit
+    display: block
+    overflow: hidden
+    text-align: center
+    line-height: 2.22rem
+    font-size: 0.85rem
+    color: #898989
+
 .account-pop-up
   width: 100%
   height: 100%
