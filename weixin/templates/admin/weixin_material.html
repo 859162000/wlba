@@ -21,7 +21,7 @@
                 图文消息素材列表
             </div>
             <div class="suit-tab suit-tab-image">
-                <img src="{% url 'weixin_material_image' account.id 'vHK0YU3-zuSBZm4QxG4IUanK4MEbEsd_XYFNzKJJnYw' %}" alt=""/>
+{#                <img src="{% url 'admin_weixin_material_image' 'wTuZRbdLAl-VVUhSukM8nHVTfp3fZfFKj2as_y0zi8Q' %}" alt=""/>#}
             </div>
             <div class="suit-tab suit-tab-voice">语音素材列表 开发中……</div>
             <div class="suit-tab suit-tab-video">视频素材列表 开发中……</div>
@@ -33,14 +33,14 @@
                     $('#suit_form_tabs').suit_form_tabs();
                 });
 
-                var url = '{% url 'weixin_material_list_json' account.id %}';
-                url += '?media_type=image&page=1';
-                $.get(url, function(res) {
-                    console.log(res);
-                    if (res['errcode']) {
-                        alert(res['errmsg']);
-                    }
-                });
+{#                var url = '{% url 'admin_weixin_material_list_json' %}';#}
+{#                url += '?media_type=image&page=1';#}
+{#                $.get(url, function(res) {#}
+{#                    console.log(res);#}
+{#                    if (res['errcode']) {#}
+{#                        alert(res['errmsg']);#}
+{#                    }#}
+{#                });#}
 
             }(Suit.$))
         </script>
