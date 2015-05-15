@@ -239,6 +239,7 @@ STATICFILES_FINDERS = (
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
     os.path.join('wanglibao_mobile/static'),
+    os.path.join('weixin/static'),
 )
 
 
@@ -610,7 +611,7 @@ POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
 
 RETURN_TINMANG_URL = "http://www.bangwoya.com/callback/callback.php"
 RETURN_TINMANG_URL_DEBUG = "http://demo.bangwoya.com/callback/callback.php"
-TINMANGKEY= '456'
+TINMANGKEY= '65'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

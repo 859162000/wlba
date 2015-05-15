@@ -1,0 +1,61 @@
+#weixin_menu {
+    width: 360px;
+    height: 640px;
+    background: url("../../images/admin/weixin_menu_bg.jpg") no-repeat;
+    float: left;
+}
+.weixin_menu_main {
+    height: 544px;
+}
+.weixin_menu_body {
+    height: 48px;
+    margin-left: 52px;
+    display: -webkit-flex;
+    display: flex;
+}
+.weixin_menu_item {
+    -webkit-flex: 1;
+    flex: 1;
+    line-height: 48px;
+    text-align: center;
+    border-right: 1px solid #e3e3e3;
+    position: relative;
+}
+.weixin_menu_handler {
+    height: 48px;
+    display: -webkit-flex;
+    display: flex;
+}
+.weixin_menu_handler a {
+    -webkit-flex: 1;
+    flex: 1;
+    font-size: 16px;
+    color: beige;
+    line-height: 48px;
+    text-align: center;
+}
+.weixin_sub_button_icon {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    border: 5px solid #fff;
+    border-right-color: #ccc;
+    border-bottom-color: #ccc;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+#weixin_menu_set {
+    margin-left: 400px;
+}
+.weixin_menu_sub_button_box {
+    position: absolute;
+    width: 100%;
+    bottom: 53px;
+}
+.weixin_menu_sub_button {
+    border: 1px solid #e3e3e3;
+    background: #fff;
+    margin-top: -1px;
+}
