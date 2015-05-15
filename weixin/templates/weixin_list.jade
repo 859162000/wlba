@@ -11,7 +11,8 @@ html
       section
         a(href="#1") 返回
     .list-banner
-      img(src='')
+      a(href="{{banner.link}}")
+        img(src="/media/{{banner.image}}")
     .list-body#list-body
       for product in p2p_lists
         status = product.display_status
