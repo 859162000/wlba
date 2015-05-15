@@ -7,55 +7,23 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
+from rest_framework.authentication import SessionAuthentication
 from .models import Account, Material, MaterialImage, MaterialNews
 from wechatpy.client import WeChatClient
 import json
 
 
-class AdminTemplateView(TemplateView):
-
-    @method_decorator(staff_member_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super(AdminTemplateView, self).dispatch(request, *args, **kwargs)
-
-
-class AdminWeixinTemplateView(AdminTemplateView):
-
-    def get_account(self, id=None):
-        account_id = id or self.request.session.get('account_id')
-        try:
-            account = Account.objects.get(pk=account_id)
-        except Account.DoesNotExist:
-            raise Http404('page not found')
-        return account
-
-
-class AdminView(View):
-    @method_decorator(staff_member_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super(AdminView, self).dispatch(request, *args, **kwargs)
-
-    def get_account(self, id):
-        try:
-            account = Account.objects.get(pk=id)
-        except Account.DoesNotExist:
-            raise Http404('page not found')
-        return account
-
-
-class AdminJsonApi(AdminView):
+class AdminWeixinAccountMixin(object):
     account_cache = None
     client_cache = None
-
-    @method_decorator(staff_member_required)
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super(AdminJsonApi, self).dispatch(request, *args, **kwargs)
 
     def get_account(self, account_id=None):
         account_id = account_id or self.request.session.get('account_id')
         try:
-            account = Account.objects.get(pk=account_id)
+            account = Account.objects.get(pk=int(account_id))
         except Account.DoesNotExist:
             raise Http404('page not found')
         return account
@@ -72,8 +40,36 @@ class AdminJsonApi(AdminView):
             self.client_cache = WeChatClient(self.account.app_id, self.account.app_secret, self.account.access_token)
         return self.client_cache
 
-    def render_json(self, data):
-        return HttpResponse(json.dumps(data), 'application/json')
+
+class AdminTemplateView(TemplateView):
+
+    @method_decorator(staff_member_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(AdminTemplateView, self).dispatch(request, *args, **kwargs)
+
+
+class AdminView(View):
+    @method_decorator(staff_member_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(AdminView, self).dispatch(request, *args, **kwargs)
+
+
+class AdminWeixinView(AdminView, AdminWeixinAccountMixin):
+    pass
+
+
+class AdminWeixinTemplateView(AdminTemplateView, AdminWeixinAccountMixin):
+    pass
+
+
+class AdminAPISessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        pass
+
+
+class AdminAPIView(APIView, AdminWeixinAccountMixin):
+    permission_classes = (IsAdminUser,)
+    authentication_classes = (AdminAPISessionAuthentication,)
 
 
 class WeixinView(AdminWeixinTemplateView):
@@ -81,63 +77,46 @@ class WeixinView(AdminWeixinTemplateView):
 
     def get_context_data(self, id, **kwargs):
         context = super(WeixinView, self).get_context_data(**kwargs)
-        context['account'] = self.get_account(id)
         self.request.session['account_id'] = id
+        context['account'] = self.account
         return context
 
 
 class WeixinMassView(AdminWeixinTemplateView):
     template_name = 'admin/weixin_mass.html'
 
-    def get_context_data(self, id, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(WeixinMassView, self).get_context_data(**kwargs)
-        context['account'] = self.get_account(id)
+        context['account'] = self.account
         return context
 
 
 class WeixinReplyView(AdminWeixinTemplateView):
     template_name = 'admin/weixin_reply.html'
 
-    def get_context_data(self, id, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(WeixinReplyView, self).get_context_data(**kwargs)
-        context['account'] = self.get_account(id)
+        context['account'] = self.account
         return context
 
 
 class WeixinMenuView(AdminWeixinTemplateView):
     template_name = 'admin/weixin_menu.html'
 
-    def get_context_data(self, id, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(WeixinMenuView, self).get_context_data(**kwargs)
-        account = self.get_account(id)
-
-        key = 'account_menu_{account_id}'.format(account_id=account.id)
-        if not cache.get(key):
-            menu = {'button': []}
-
-            try:
-                client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-                res = client.menu.get()
-                if not res.get('errcode'):
-                    menu = res.get('menu')
-            except:
-                pass
-
-            cache.set(key, json.dumps(menu), 60 * 60 * 24 / 10000)
-
-        context['menu'] = cache.get(key)
-        context['account'] = account
+        context['account'] = self.account
         return context
 
 
 class WeixinMaterialView(AdminWeixinTemplateView):
     template_name = 'admin/weixin_material.html'
 
-    def get_context_data(self, id, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(WeixinMaterialView, self).get_context_data(**kwargs)
-        context['account'] = self.get_account(id)
+        context['account'] = self.account
         # 获取素材总数 缓存24小时
-        context['material'] = Material.objects.get_or_create(account=context.get('account'))
+        context['material'], _ = Material.objects.get_or_create(account=self.account)
         context.get('material').init()
 
         return context
@@ -146,41 +125,43 @@ class WeixinMaterialView(AdminWeixinTemplateView):
 class WeixinCustomerServiceView(AdminWeixinTemplateView):
     template_name = 'admin/weixin_customer_service.html'
 
-    def get_context_data(self, id, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(WeixinCustomerServiceView, self).get_context_data(**kwargs)
-        context['account'] = self.get_account(id)
+        context['account'] = self.account
         return context
 
 
 class WeixinCustomerServiceCreateView(AdminWeixinTemplateView):
     template_name = 'admin/weixin_customer_service_create.html'
 
-    def get_context_data(self, id, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(WeixinCustomerServiceCreateView, self).get_context_data(**kwargs)
-        context['account'] = self.get_account(id)
+        context['account'] = self.account
         return context
 
 
-class WeixinMaterialImageView(AdminView):
+class WeixinMaterialImageView(AdminWeixinView):
 
-    def get(self, request, id, media_id):
-        account = self.get_account(id)
-        media = MaterialImage.objects.get(account=account, media_id=media_id)
+    def get(self, request, media_id):
+        media = MaterialImage.objects.get(account=self.account, media_id=media_id)
         if not media.file:
-            client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-            res = client.material.get(media_id)
-            if res.status_code == 200:
-                if res.json.get('errcode'):
-                    return HttpResponseForbidden(res.json.get('errmsg'))
-                # 图片存储到模型
-                from PIL import ImageFile
-                parser = ImageFile.Parser()
-                media.file = ''
-            else:
-                return HttpResponseForbidden()
-        return HttpResponseRedirect(reverse('weixin_material_file', kwargs={'path', media.file}))
+            res = self.client.material.get(media_id)
+            print dir(res)
+            print res.content
+            return HttpResponse(res.content, 'image/png')
+            # if res.status_code == 200:
+            #     if res.get('errcode'):
+            #         return HttpResponseForbidden(res.json.get('errmsg'))
+            #     # 图片存储到模型
+            #     from PIL import ImageFile
+            #     parser = ImageFile.Parser()
+            #     media.file = ''
+            # else:
+            #     return Response(status=400)
+        # return HttpResponseRedirect(reverse('admin_weixin_material_file', kwargs={'path', media.file}))
 
-class WeixinMaterialListJsonApi(AdminJsonApi):
+
+class WeixinMaterialListJsonApi(AdminAPIView):
     """
     获取素材列表接口
     type: voice, video, image, news
@@ -188,19 +169,18 @@ class WeixinMaterialListJsonApi(AdminJsonApi):
     count: int 1-20 default 20
     """
 
-    def get(self, request, id):
+    def get(self, request):
         media_type = request.GET.get('media_type')
         page = int(request.GET.get('page', '1'))
         count = int(request.GET.get('count', '20'))
         offset = count * (page - 1)
-        account = self.get_account(id)
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-        try:
-            res = client.material.batchget(media_type, offset, count)
-        except Exception, e:
-            return self.render_json({'errcode': e.errcode, 'errmsg': e.errmsg})
 
-        media_count = getattr(account.material, '{media_type}_count'.format(media_type=media_type))
+        try:
+            res = self.client.material.batchget(media_type, offset, count)
+        except Exception, e:
+            return Response({'errcode': e.errcode, 'errmsg': e.errmsg})
+
+        media_count = getattr(self.account.material, '{media_type}_count'.format(media_type=media_type))
 
         media_class_dict = {
             'image': MaterialImage,
@@ -213,7 +193,7 @@ class WeixinMaterialListJsonApi(AdminJsonApi):
         # 如果第一次获取，并且本地数据于微信官方数据不一致 则清空数据库
         if offset == 0 and media_count != res.get('total_count'):
             # 清空数据库
-            media_class.objects.filter(account=account).delete()
+            media_class.objects.filter(account=self.account).delete()
 
         for item in res.get('item'):
             try:
@@ -224,7 +204,7 @@ class WeixinMaterialListJsonApi(AdminJsonApi):
                         media_id=item.get('media_id'),
                         name=item.get('name'),
                         update_time=item.get('update_time'),
-                        account=account
+                        account=self.account
                     )
                 elif media_type == 'news':
                     pass
@@ -235,24 +215,22 @@ class WeixinMaterialListJsonApi(AdminJsonApi):
 
             res.get('item_count')
 
-        return self.render_json(res)
+        return Response(res)
 
 
-class WeixinCustomerServiceCreateApi(AdminJsonApi):
+class WeixinCustomerServiceApi(AdminAPIView):
 
-    def post(self, request, id):
-        account = self.get_account(id)
-
+    def post(self, request):
         kf_account = '{}@gh_d852bc2cead2'.format(request.POST.get('kf_account'))
         nickname = request.POST.get('nickname')
         password = request.POST.get('password')
 
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-        res = client.customservice.add_account(kf_account, nickname, password)
-        return self.render_json(res.json())
+        res = self.client.customservice.add_account(kf_account, nickname, password)
+        return Response(res.json())
 
 
-class WeixinMenuApi(AdminJsonApi):
+class WeixinMenuApi(AdminAPIView):
+    http_method_names = ['get', 'post', 'delete']
 
     def get(self, request):
         key = 'account_menu_{account_id}'.format(account_id=self.account.id)
@@ -267,13 +245,12 @@ class WeixinMenuApi(AdminJsonApi):
                 pass
 
             cache.set(key, menu, 60 * 60 * 24 / 10000)
-
-        return self.render_json(json.loads(cache.get(key)))
+        return Response(cache.get(key))
 
     def post(self, request):
         res = self.client.menu.create(request.body)
-        return self.render_json(res)
+        return Response(res)
 
     def delete(self, request):
         res = self.client.menu.delete()
-        return self.render_json(res)
+        return Response(res)

@@ -133,7 +133,9 @@ class WeixinLogin(TemplateView):
         return context
 
 
-class WeixinLoginApi(View):
+class WeixinLoginApi(APIView):
+    permission_classes = ()
+    http_method_names = ['post']
 
     def _form(self, request):
         return EmailOrPhoneAuthenticationForm(request, data=request.POST)
@@ -155,9 +157,9 @@ class WeixinLoginApi(View):
             auth_login(request, user)
             request.session.set_expiry(1800)
             data = {'nickname': user.wanglibaouserprofile.nick_name}
-            return HttpResponse(json.dumps(data), 'application/json')
+            return Response(data)
 
-        return HttpResponseBadRequest(json.dumps(form.errors), 'application/json')
+        return Response(form.errors, status=400)
 
 
 class WeixinOauthLoginRedirect(RedirectView):
@@ -187,7 +189,7 @@ class P2PListView(TemplateView):
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
         ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')[:10]
 
-        banner = Banner.objects.filter(device='weixin', is_used=True).order_by('-priority').first()
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority').first()
 
         return {
             'p2p_lists': p2p_lists,
@@ -275,6 +277,7 @@ class P2PDetailView(TemplateView):
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
         total_buy_user = P2PEquity.objects.filter(product=p2p).count()
 
+
         context.update({
             'p2p': p2p,
             'end_time': end_time,
@@ -325,6 +328,8 @@ class WeixinAccountHome(TemplateView):
             for hold_info in fund_hold_info:
                 fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
 
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority').first()
+
         return {
             'total_asset': p2p_total_asset + fund_total_asset,  # 总资产
             'p2p_total_asset': p2p_total_asset,  # p2p总资产
@@ -335,5 +340,6 @@ class WeixinAccountHome(TemplateView):
             'p2p_total_unpaid_interest': p2p_total_unpaid_interest,  # p2p总待收益
             'p2p_total_paid_interest': p2p_total_paid_interest + p2p_activity_interest,  # P2P总累积收益
             'p2p_total_interest': p2p_total_interest,  # P2P总收益
+            'banner': banner,
         }
 
