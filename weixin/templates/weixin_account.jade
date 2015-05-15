@@ -2,7 +2,6 @@
 doctype html
 html
     head
-        title weixin-account
         include include/weixin_head.jade
     body
         header
@@ -42,7 +41,7 @@ html
              span
               a(href="#").project-one-angle
         .account-exit
-            a(href="#").account-exit-exit 退出登录
+            a(href="/accounts/logout?next=/weixin/login/").account-exit-exit 退出登录
         .account-pop-up
             .account-pop-up-up
                 form

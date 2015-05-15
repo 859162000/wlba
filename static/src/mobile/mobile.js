@@ -2,17 +2,6 @@
 var org = (function(){
     var lib = {
         scriptName: 'mobile.js',
-        _setShareData:function(ops,suFn,canFn){
-            var setData = {};
-            if(typeof ops == 'object'){
-                for(var p in ops){
-                    setData[p] = ops[p];
-                }
-            }
-            typeof suFn =='function' && suFn != 'undefined' ? setData.success = suFn : "";
-            typeof canFn =='function' && canFn != 'undefined' ? setData.cancel = canFn : "";
-            return setData
-        },
         _getQueryStringByName:function(name){
             var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
              if(result == null || result.length < 1){
@@ -48,6 +37,17 @@ var org = (function(){
             origin = protocol + sr_origin;
             return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
         },
+        _setShareData:function(ops,suFn,canFn){
+            var setData = {};
+            if(typeof ops == 'object'){
+                for(var p in ops){
+                    setData[p] = ops[p];
+                }
+            }
+            typeof suFn =='function' && suFn != 'undefined' ? setData.success = suFn : "";
+            typeof canFn =='function' && canFn != 'undefined' ? setData.cancel = canFn : "";
+            return setData
+        },
         /*
          * 分享到微信朋友
          */
@@ -58,17 +58,22 @@ var org = (function(){
          * 分享到微信朋友圈
          */
         _onMenuShareTimeline:function(ops,suFn,canFn){
-            wx.onMenuShareTimeline(wShare._setShareData(ops,suFn,canFn));
+            wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
+        },
+        _onMenuShareQQ:function(){
+            wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
+
     }
     return {
-        scriptName : lib.scriptName,
-        getQueryStringByName: lib._getQueryStringByName,
-        getCookie : lib._getCookie,
-        csrfSafeMethod : lib._csrfSafeMethod,
-        sameOrigin : lib._sameOrigin,
-        onMenuShareAppMessage : lib._onMenuShareAppMessage,
-        onMenuShareTimeline : lib._onMenuShareTimeline
+        scriptName             : lib.scriptName,
+        getQueryStringByName   : lib._getQueryStringByName,
+        getCookie              : lib._getCookie,
+        csrfSafeMethod         : lib._csrfSafeMethod,
+        sameOrigin             : lib._sameOrigin,
+        onMenuShareAppMessage  : lib._onMenuShareAppMessage,
+        onMenuShareTimeline    : lib._onMenuShareTimeline,
+        onMenuShareQQ          : lib._onMenuShareQQ
     }
 })()
 
@@ -127,7 +132,7 @@ var login = (function(org){
                         if (next) {
                             window.location.href = next;
                         }
-                        window.location.href = '/weixin/list/';
+                        window.location.href = '/weixin/account/';
                     },
                     error: function(res) {
                         if (res['status'] == 403) {
@@ -179,11 +184,17 @@ var regist = (function(org){
             //显示协议
             $showXiyi.on('click',function(event){
                 event.preventDefault();
-                $protocolDiv.css('top',"0");
+                $protocolDiv.css("display",'block');
+                setTimeout(function(){
+                    $protocolDiv.css('top',"0%");
+                },0)
             })
             //关闭协议
             $cancelXiyi.on('click',function(){
                 $protocolDiv.css('top',"100%");
+                setTimeout(function(){
+                    $protocolDiv.css("display",'none');
+                },200)
             })
         },
         _checkFrom:function(){
@@ -194,7 +205,7 @@ var regist = (function(org){
                 phone:function(val, id){
                     $('#'+id).parents('.regist-list').find(".pub-check").hide();
                     var isRight = false;
-                    var re = new RegExp(/^(13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
+                    var re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
                     if(val){
                         re.test(val) ? isRight = true : ($('.'+signName[id][0]).show(),isRight = false);
                     }else{
@@ -297,7 +308,8 @@ var regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                             $submitBody.text('注册成功')
+                            $submitBody.text('注册成功')
+                            window.location.href = '/weixin/account/';
                         }else if(data.ret_code === 30014){
                            $('.'+signName['checkCode'][0]).show();
                             $submitBody.text('立即注册');
@@ -384,7 +396,6 @@ var detail = (function(org){
                         $progress.css("margin-top","-10%");
                     }else{
                         $progress.css("margin-top", (100 - percent) + '%');
-
                     }
                     setTimeout(function(){
                         $progress.addClass('progress-bolang')
@@ -419,22 +430,26 @@ var detail = (function(org){
             wx.ready(function(){
                 //分享给微信好友
                 org.onMenuShareAppMessage({
-                    title: "haha",
-                    desc: '没有什么啦',
+                    title: "标名",
+                    desc: '网利宝广招千万投资客，收益高，期限短！',
                     link: "https://www.wanglibao.com",
-                    imgUrl: "http://demo.open.weixin.qq.com/jssdk/images/p2166127561.jpg"},
-                    function(){
-                        alert("分享成功");
-                    }
-                );
+                    imgUrl: "http://demo.open.weixin.qq.com/jssdk/images/p2166127561.jpg"
+                });
                 //分享给微信朋友圈
                 org.onMenuShareTimeline({
-                    title: "啦啦啦",
+                    title: "网利宝广招千万投资客，收益高，期限短！",
                     link : "https://www.wanglibao.com",
                     imgUrl: "http://demo.open.weixin.qq.com/jssdk/images/p2166127561.jpg"
                 })
-            })
 
+                //分享给QQ
+                org.onMenuShareQQ({
+                    title: "啦啦啦",
+                    desc: "testtesttesttesttesttesttesttest",
+                    link :local,
+                    imgUrl: "http://demo.open.weixin.qq.com/jssdk/images/p2166127561.jpg"
+                })
+            })
         },
         _countDown:function(target){
             var endTimeList = target.attr("data-left").replace(/-/g,"/");

@@ -4,7 +4,6 @@
 doctype html
 html
   head
-    title weixin-detail
     include include/weixin_head.jade
   body
     header
@@ -33,7 +32,7 @@ html
         .progress-body
           .progress-percent(data-percent='{{percent}}')
     .detail-title
-      h4 {{p2p.name}}
+      h4(id="product-name", data-name="{{p2p.name}}") {{p2p.name}}
       .product-money
         .all-money
           p
@@ -86,7 +85,7 @@ html
     else
       statusClass = 'footerBtn-red'
     .detail-footerBtn(class=statusClass)
-      if status == '抢购中'
+      //if status == '抢购中'
         span
       p {{status}}
   script(src="/static/src/mobile/lib/zepto/zepto.js")
