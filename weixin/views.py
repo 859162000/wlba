@@ -189,7 +189,7 @@ class P2PListView(TemplateView):
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
         ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')[:10]
 
-        banner = Banner.objects.filter(device='weixin', is_used=True).order_by('-priority').first()
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority').first()
 
         return {
             'p2p_lists': p2p_lists,
@@ -277,6 +277,8 @@ class P2PDetailView(TemplateView):
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
         total_buy_user = P2PEquity.objects.filter(product=p2p).count()
 
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority').first()
+
         context.update({
             'p2p': p2p,
             'end_time': end_time,
@@ -286,6 +288,7 @@ class P2PDetailView(TemplateView):
             'attachments': p2p.attachment_set.all(),
             'total_fee_earning': total_fee_earning,
             'total_buy_user': total_buy_user,
+            'banner': banner,
         })
 
         return context
