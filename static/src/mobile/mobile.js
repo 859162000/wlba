@@ -73,7 +73,7 @@ var org = (function(){
 })()
 
 
-//login 没
+//login
 var login = (function(org){
     var lib = {
         $captcha_img : $('#captcha'),
@@ -114,7 +114,6 @@ var login = (function(org){
                     'captcha_1': $.trim($form.find('input[name=captcha_1]').val()),
                     'openid': $.trim($form.find('input[name=openid]').val())
                 }
-
                 $.ajax({
                     'type': 'post',
                     'url': $form.attr('action'),

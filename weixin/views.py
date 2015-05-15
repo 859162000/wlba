@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_buy.models import FundHoldInfo
+from wanglibao_banner.models import Banner
 from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
@@ -186,8 +187,11 @@ class P2PListView(TemplateView):
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
         ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')[:10]
 
+        banner = Banner.objects.filter(device='weixin', is_used=True).order_by('-priority').first()
+
         return {
-            'p2p_lists': p2p_lists
+            'p2p_lists': p2p_lists,
+            'banner': banner,
         }
 
 
