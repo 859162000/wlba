@@ -13,6 +13,34 @@ var org = (function(){
             typeof canFn =='function' && canFn != 'undefined' ? setData.cancel = canFn : "";
             return setData
         },
+        _getCookie :function(name){
+            var cookie, cookieValue, cookies, i;
+                cookieValue = null;
+                if (document.cookie && document.cookie !== "") {
+                    cookies = document.cookie.split(";");
+                    i = 0;
+                    while (i < cookies.length) {
+                      cookie = $.trim(cookies[i]);
+                      if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                      }
+                      i++;
+                    }
+                }
+              return cookieValue;
+        },
+        _csrfSafeMethod :function(method){
+            return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+        },
+        _sameOrigin:function(url){
+            var host, origin, protocol, sr_origin;
+            host = document.location.host;
+            protocol = document.location.protocol;
+            sr_origin = "//" + host;
+            origin = protocol + sr_origin;
+            return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+        },
         /*
          * 分享到微信朋友
          */
@@ -28,10 +56,159 @@ var org = (function(){
     }
     return {
         scriptName : lib.scriptName,
+        getCookie : lib._getCookie,
+        csrfSafeMethod : lib._csrfSafeMethod,
+        sameOrigin : lib._sameOrigin,
         onMenuShareAppMessage : lib._onMenuShareAppMessage,
         onMenuShareTimeline : lib._onMenuShareTimeline
     }
 })()
+
+var regist = (function(org){
+    var lib ={
+        init:function(){
+            lib._checkFrom()
+            lib._animateXieyi();
+        },
+        _animateXieyi:function(){
+            var $submitBody = $(".submit-body"),
+                $protocolDiv = $('.regist-protocol-div'),
+                $cancelXiyi = $('.cancel-xiyie'),
+                $showXiyi = $(".xieyi-btn"),
+                $agreement = $("#agreement");
+            //是否同意协议
+            $agreement.change(function() {
+              if ($(this).attr("checked") == 'checked') {
+                $submitBody.addClass("disabled").attr('disabled', 'disabled');
+                return $(this).removeAttr("checked");
+              } else {
+                $submitBody.removeClass("disabled").removeAttr('disabled');
+                return $(this).attr("checked", "checked");
+              }
+            });
+            //显示协议
+            $showXiyi.on('click',function(event){
+                event.preventDefault();
+                $protocolDiv.css('top',"0");
+            })
+            //关闭协议
+            $cancelXiyi.on('click',function(){
+                $protocolDiv.css('top',"100%");
+            })
+        },
+        _checkFrom:function(){
+            //校验提示
+            var signName = {'phone': ['phone-sign1', 'phone-sign2'], 'checkCode' : ['check-sign'], 'password': ['password-sign'], 'passwordRepeat': ['password-repeat-sign']}
+            //校验方法
+            var check ={
+                phone:function(val, id){
+                    $('#'+id).parents('.regist-list').find(".pub-check").hide();
+                    var isRight = false;
+                    var re = new RegExp(/^(13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
+                    if(val){
+                        re.test(val) ? isRight = true : ($('.'+signName[id][0]).show(),isRight = false);
+                    }else{
+                        $('#'+id).parents('.regist-list').find(".none-val").show();
+                    }
+                    return isRight;
+                },
+                checkCode:function(val){
+                    return true
+                },
+                password:function(val, id){
+                   if(6 > val.length || val.length > 20 ){
+                       $('.'+signName[id][0]).show();
+                       return false
+                   }
+                   return true
+                },
+                passwordRepeat:function(val, id){
+                    if($('#password').val() != val){
+                        $('.'+signName[id][0]).show();
+                        return false
+                    }
+                    return true
+                }
+            }
+            //验证码
+            $('.request-check').on('click',function(){
+                var phoneNumber = $("#phone").val(),
+                    $that = $(this), //保存指针
+                    count = 60,  //60秒倒计时
+                    intervalId ; //定时器
+
+                if(!check['phone'](phoneNumber, 'phone')) return //号码不符合退出
+                $.ajax({
+                    url: "/api/phone_validation_code/register/" + phoneNumber + "/",
+                    type: "POST",
+                    beforeSend: function(xhr, settings) {
+                        //django配置post请求
+                        if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
+                          xhr.setRequestHeader("X-CSRFToken", org.getCookie("csrftoken"));
+                        }
+                    },
+                    error: function (xhr) {
+                        clearInterval(intervalId);
+                        $that.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
+                        var result = JSON.parse(xhr.responseText);
+                        xhr.status === 429 ? alert('系统繁忙，请稍候重试') : alert(result.message);
+                    }
+                });
+
+                $that.attr('disabled', 'disabled').addClass('alreay-request');
+                var timerFunction = function() {
+                    if (count >= 1) {
+                        count--;
+                        return $that.text( count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        $that.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
+                        return
+                    }
+                };
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
+            });
+            var isSubmit,
+                dataList;
+            //校验主函数
+            $(".submit-body").on('click',function(){
+                $('.pub-check').hide(),
+                dataList = [], isSubmit =  true;
+                $.each($('.input-public'), function(){
+                    var value = $.trim($(this).val()), thisID = $(this).attr('id');
+                    if(value){
+                        check[thisID](value, thisID) ?  dataList.push(value) : isSubmit = false;
+                    }else{
+                        $(this).parents('.regist-list').find(".none-val").show();
+                        isSubmit = false;
+                    }
+                })
+            if(isSubmit){
+                $.ajax({
+                    url: "/api/register/",
+                    type: "POST",
+                    data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1]},
+                    beforeSend: function(xhr, settings) {
+                        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                          xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+                        }
+                    },
+                    success:function(data){
+                        console.log(data)
+                    },
+                    error: function (xhr) {
+
+                    }
+                });
+            }
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org)
 
 //list
 var list = (function(org){
@@ -64,7 +241,7 @@ var list = (function(org){
                     lib.page++;
                     lib.canGetPage = true;
                 },
-                error: function(xhr, type){
+                error: function(){
                     alert('Ajax error!')
                 }
             })
@@ -179,7 +356,8 @@ var detail = (function(org){
 
 ~(function(org){
     $.each($("script"), function(index, item){
-      if($(this).attr("src").indexOf(org.scriptName) > 0){
+      var src = $(this).attr("src");
+      if(src && src.indexOf(org.scriptName) > 0){
         if($(this).attr("data-init") && window[$(this).attr("data-init")]){
             window[$(this).attr("data-init")].init()
         }

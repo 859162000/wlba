@@ -239,6 +239,7 @@ STATICFILES_FINDERS = (
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
     os.path.join('wanglibao_mobile/static'),
+    os.path.join('weixin/static'),
 )
 
 

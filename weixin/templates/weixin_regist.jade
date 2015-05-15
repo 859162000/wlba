@@ -9,17 +9,50 @@ html
       section
         a(href="javascript:history.back()") 返回
     section.regist-main
+      mixin list(name, placeholder, inputID, checkClass, checkTxt, checkClass2, checkTxt2)
         .regist-list
           .input-main
-            .main-left
-              .input-name= className
-              .input-body
-            .main-right
-              .check-body
-          else
-            .input-name= className
             .input-body
+              .input-name=name
+              input(placeholder=placeholder,id=inputID).input-public
           .input-sign
-            for key, val in sign
-              .sign=key.val
-    section.regist-protocol
+            span.pub-check(class=checkClass)=checkTxt
+            span.pub-check.none-val=name
+              |不能为空
+            if checkClass2 != ''
+              span.pub-check(class=checkClass2)=checkTxt2
+      +list("手机号", "请输入手机号", "phone", "phone-sign1", "请输入正确的手机号", "phone-sign2", "该手机号已被注册")
+      .regist-list
+        .input-main.input-check-main
+          .input-body.input-check-body
+            .input-name 验证码
+            input(placeholder="请输入验证码")#checkCode.input-public
+          .input-check
+            button(type="button").request-check 获取验证码
+        .input-sign
+          span.pub-check.check-sign 请输入正确的验证码
+          span.pub-check.none-val 验证码不能为空
+      +list("设置密码", "请设置密码", "password", "password-sign", "请输入6-8位数字/字母和符号/区分大小写")
+      +list("确认密码", "请重复密码", "passwordRepeat", "password-repeat-sign", "输入的新密码不一致")
+
+      .regits-submit
+        button(type="button").submit-body 立即注册
+          span.regist-icon
+      .regits-protocol
+        label.protocol-left(for="agreement")
+          input(type="checkbox",checked="checked",name="agreement")#agreement
+          |我同意
+          span.xieyi-btn 《网利宝注册协议》
+        .protocol-right
+          a(href="/weixin/login/") 去登录
+    section.regist-protocol-div
+      header.xieyi-head
+        hgroup 注册协议
+        section.cancel-xiyie
+          a(href="javascript:void(0)") 取消
+      article.xieyi-cont
+        include include/weixin_xieyiFixed
+
+    script(src="/static/src/mobile/lib/zepto/zepto.js")
+    script(data-init='regist' src="/static/src/mobile/mobile.js?v=222")
+
