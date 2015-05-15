@@ -512,7 +512,7 @@ class P2PEquityJiuxianAdmin(ExportMixin, admin.ModelAdmin):
 class AutomaticPlanAdmin(admin.ModelAdmin):
     display = ('id', 'user', 'amounts_auto', 'amounts_left', 'period_min', 'period_max', 'rate_min', 'rate_max', 'create_at', 'is_used')
     list_display = display
-    # readonly_fields = display
+    readonly_fields = display
     raw_id_fields = ('user',)
     search_fields = ('user__wanglibaouserprofile__phone',)
     ordering = ('id', 'create_at')

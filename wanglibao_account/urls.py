@@ -14,6 +14,7 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailAPIView, MessageCountAPIView,
                    MessageListAPIView, AccountRepayment, AddressView, AccountInviteView)#, CjdaoApiView)
 from django.contrib.auth import views as auth_views
+from views import AutomaticView
 
 urlpatterns = patterns(
     '',
@@ -96,8 +97,7 @@ urlpatterns = patterns(
     url(r'', include('registration.backends.default.urls')),
     url(r'^address/$', login_required(AddressView.as_view(), login_url='/accounts/login/'), name='accounts_address'),
 
-    url(r'^auto_tender/$', login_required(TemplateView.as_view(template_name='account_auto_tender.jade'),
-                                      login_url='/accounts/login/')),
+    url(r'^auto_tender/$', login_required(AutomaticView.as_view(), login_url='/accounts/login/')),
 )
 
 if settings.DEBUG:

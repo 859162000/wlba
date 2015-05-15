@@ -4,6 +4,7 @@ __author__ = 'zhanghe'
 
 
 import re
+from decimal import Decimal
 from django.utils import timezone
 from wanglibao_p2p.models import AutomaticPlan, P2PProduct, P2PRecord
 from wanglibao_p2p.trade import P2PTrader
@@ -70,4 +71,6 @@ class Automatic(object):
 
     def _trade_amount(self, product, plan):
         """ 根据标信息和用户自动投标计划计算本次用户投标金额 """
-        return plan.amounts_auto if plan.amounts_auto < product.available_amout else product.available_amout
+        p2p_equity = product.equities.filter(user=plan.user)
+        equity_user = p2p_equity.equity if p2p_equity else Decimal('0')
+        return min(plan.amounts_auto, product.limit_amount_per_user - equity_user, product.remain)

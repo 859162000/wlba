@@ -11,6 +11,8 @@
   });
 
   require(['jquery', 'jquery.form'], function($, form) {
+    $('#dete-start').val($('#selectInput').val());
+    $('#dete-end').val($('#selectInput1').val());
     $('#invest-money').blur(function() {
       var checkStatus, r, self, val;
       self = $('#invest-money');
@@ -25,7 +27,7 @@
             $('.error-style').text('投标金额必须小于账户可用余额!');
             checkStatus = false;
           } else {
-            r = /^[1-9]\d*00$/;
+            r = /^[1-9]\d*00(\.00|\.0)?$/;
             if (!r.test(val)) {
               $('.error-style').text('投标金额必须是 100 的倍数!');
               checkStatus = false;

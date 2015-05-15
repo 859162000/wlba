@@ -1,5 +1,8 @@
 extends account_home_base
 
+-load formatters
+-load mathfilters
+
 block head
   - with '自动投标' as title
     include include/head
@@ -16,24 +19,25 @@ block main
                 ul.tender-ul-left
                     li
                         label 账户可用余额：
-                        b 10,000
+                        b {{ margin | money_format_int }}
                         span 元
                     li
                         label 每次投标金额：
-                        input#invest-total(type="hidden", name="invest-total", value="10000")
-                        input#invest-money(type="text", name="amounts_auto", autocomplete="off")
+                        input#invest-total(type="hidden", name="invest-total", value="{{ margin }}")
+                        input#invest-money(type="text", name="amounts_auto", autocomplete="off", value="{{ plan.amounts_auto }}")
                         span 元
                         i.add-ben
                         i.subtract
                     li
                         label 收益范围：
-                        input#scope-min.income-range(type="text", name="rate_min", autocomplete="off")
+                        input#scope-min.income-range(type="text", name="rate_min", autocomplete="off", value="{{ plan.rate_min }}")
                         span %
                         em -
-                        input#scope-max.income-range(type="text", name="rate_max", autocomplete="off")
+                        input#scope-max.income-range(type="text", name="rate_max", autocomplete="off", value="{{ plan.rate_max }}")
                         span %
                     li
                         label 收益期限：
+                        input#selectInput(type="hidden", value="{{ plan.period_min }}")
                         select#dete-start(name="period_min")
                             option(value='1') 1
                             option(value='2') 2
@@ -49,6 +53,7 @@ block main
                             option(value='12') 12
                         span 月
                         span.heng-style -
+                        input#selectInput1(type="hidden", value="{{ plan.period_max }}")
                         select#dete-end(name="period_max")
                             option(value='1') 1
                             option(value='2') 2
@@ -64,15 +69,22 @@ block main
                             option(value='12') 12
                         span 月
                     li
-                        label 是否启用：
-                        input#is_no.is_no(type="checkbox", name="is_used")
+                        label 开启自动投标：
+                        if plan.is_used
+                            input#is_no.is_no(type="checkbox", name="is_used", checked=true)
+                        else
+                            input#is_no.is_no(type="checkbox", name="is_used", checked=false)
                 ul.tender-ul-right
                     li （大于等于500元才可开启自动投标工具）
                     li （该数值须不小于200元，且为100的倍数）
                     li （9%-20%为有效利率范围）
             p.error-style
             .submit-div
-               span#submit.submit-style 开启自动投标
+               span#submit.submit-style 保存自动投标设置
+
 block script
   script.
       require(['/static/js/account_auto-tender.js'])
+
+
+
