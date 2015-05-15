@@ -277,7 +277,6 @@ class P2PDetailView(TemplateView):
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
         total_buy_user = P2PEquity.objects.filter(product=p2p).count()
 
-        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority').first()
 
         context.update({
             'p2p': p2p,
@@ -288,7 +287,6 @@ class P2PDetailView(TemplateView):
             'attachments': p2p.attachment_set.all(),
             'total_fee_earning': total_fee_earning,
             'total_buy_user': total_buy_user,
-            'banner': banner,
         })
 
         return context
@@ -330,6 +328,8 @@ class WeixinAccountHome(TemplateView):
             for hold_info in fund_hold_info:
                 fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
 
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority').first()
+
         return {
             'total_asset': p2p_total_asset + fund_total_asset,  # 总资产
             'p2p_total_asset': p2p_total_asset,  # p2p总资产
@@ -340,5 +340,6 @@ class WeixinAccountHome(TemplateView):
             'p2p_total_unpaid_interest': p2p_total_unpaid_interest,  # p2p总待收益
             'p2p_total_paid_interest': p2p_total_paid_interest + p2p_activity_interest,  # P2P总累积收益
             'p2p_total_interest': p2p_total_interest,  # P2P总收益
+            'banner': banner,
         }
 
