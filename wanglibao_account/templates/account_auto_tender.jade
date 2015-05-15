@@ -19,7 +19,7 @@ block main
                 ul.tender-ul-left
                     li
                         label 账户可用余额：
-                        b {{ margin | money_format_int }}
+                        b.money-format {{ margin | money_format_int }}
                         span 元
                     li
                         label 每次投标金额：
