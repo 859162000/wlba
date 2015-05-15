@@ -226,7 +226,7 @@ class WeixinFeeView(TemplateView):
 
 
 class WeixinIndexView(TemplateView):
-    template_name = 'weixin_index.jade'
+    template_name = 'app_movie_login.jade'
 
     def get_context_data(self, **kwargs):
         data = {

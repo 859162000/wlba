@@ -33,7 +33,6 @@ from wanglibao_account import message as inside_message
 from order.models import Order
 from order.utils import OrderHelper
 
-# Create your views here.
 
 class YaoView(TemplateView):
     template_name = 'yaoqing.jade'

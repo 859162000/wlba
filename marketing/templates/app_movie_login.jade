@@ -1,5 +1,5 @@
 doctype html
-html
+html(style="background: url(/static/m_images/weixin_img/ban.jpg) no-repeat; background:cover;")
   head
     - with '网利宝' as title
     title 网利宝
@@ -8,7 +8,7 @@ html
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;")
     meta(name="format-detection", content="telephone=no")
     link(rel="stylesheet",href="/static/css/wap/movie_login.css")
-  body(style='background: url(/static/m_images/weixin_img/ban.jpg) no-repeat;background-size:cover;')
+  body
     .top-i
       a.jiao
         img(src='/static/m_images/weixin_img/sanjiao.png')#weixin_fanhui_fa
@@ -20,6 +20,7 @@ html
       //.grent
       //  p 注册立享100元理财包+30元话费
       form#register-form.wei_for
+        - csrf_token
         input(type='text', placeholder='请输入手机号', name='identifier').ipon#phone
         input(type='text', placeholder='请输入验证码', name='validate_code').ipon#validate-code
         button#btn-validate-code 获取验证码
