@@ -28,8 +28,8 @@ env.activate = "source %s/bin/activate" % env.deploy_virt_path
 env.pip_install = "pip install -r %s/requirements.txt" % env.deploy_path
 env.branch = "production5.0"
 
-env.environment = 'ENV_PRODUCTION'
-#env.environment = 'ENV_STAGING'
+#env.environment = 'ENV_PRODUCTION'
+env.environment = 'ENV_STAGING'
 
 @roles('mq', 'pre')
 def install_rabbitmq():
