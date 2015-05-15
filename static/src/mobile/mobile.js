@@ -13,6 +13,13 @@ var org = (function(){
             typeof canFn =='function' && canFn != 'undefined' ? setData.cancel = canFn : "";
             return setData
         },
+        _getQueryStringByName:function(name){
+            var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+             if(result == null || result.length < 1){
+                 return "";
+             }
+             return result[1];
+        },
         _getCookie :function(name){
             var cookie, cookieValue, cookies, i;
                 cookieValue = null;
@@ -56,6 +63,7 @@ var org = (function(){
     }
     return {
         scriptName : lib.scriptName,
+        getQueryStringByName: lib._getQueryStringByName,
         getCookie : lib._getCookie,
         csrfSafeMethod : lib._csrfSafeMethod,
         sameOrigin : lib._sameOrigin,
@@ -63,6 +71,92 @@ var org = (function(){
         onMenuShareTimeline : lib._onMenuShareTimeline
     }
 })()
+
+
+//login 没
+var login = (function(org){
+    var lib = {
+        $captcha_img : $('#captcha'),
+        $captcha_key : $('input[name=captcha_0]'),
+        init:function(){
+            lib._captcha_refresh()
+            lib._checkFrom()
+            lib._captcha_refresh_listen()
+        },
+        _captcha_refresh :function(){
+            var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
+            $.get(captcha_refresh_url, function(res) {
+                lib.$captcha_img.attr('src', res['image_url']);
+                lib.$captcha_key.val(res['key']);
+            });
+        },
+        _captcha_refresh_listen :function(){
+            //刷新验证码
+            lib.$captcha_img.on('click', function() {
+                lib._captcha_refresh();
+            });
+        },
+        _checkFrom:function(){
+            var $form = $('#login-form');
+            var $submit = $form.find('button[type=submit]');
+
+            $('input[name=identifier], input[name=password], input[name=captcha_1]').on('focus', function() {
+                var $self = $(this);
+                var name = $self.attr('name').split('_')[0];
+                $('.error-' + name).hide();
+            });
+
+            $submit.on('click', function() {
+                var data = {
+                    'identifier': $.trim($form.find('input[name=identifier]').val()),
+                    'password': $.trim($form.find('input[name=password]').val()),
+                    'captcha_0': $.trim($form.find('input[name=captcha_0]').val()),
+                    'captcha_1': $.trim($form.find('input[name=captcha_1]').val()),
+                    'openid': $.trim($form.find('input[name=openid]').val())
+                }
+
+                $.ajax({
+                    'type': 'post',
+                    'url': $form.attr('action'),
+                    'data': data,
+                    beforeSend: function (xhr, settings) {
+                        $submit.attr('disabled', true);
+                        if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
+                            xhr.setRequestHeader("X-CSRFToken", org.getCookie("csrftoken"));
+                        }
+                    },
+                    success: function(res) {
+                        alert('登录成功');
+                        var next = org.getQueryStringByName('next');
+                        if (next) {
+                            window.location.href = next;
+                        }
+                        window.location.href = '/weixin/list/';
+                    },
+                    error: function(res) {
+                        if (res['status'] == 403) {
+                            alert('请勿重复提交');
+                            return false;
+                        }
+                        var data = JSON.parse(res.responseText);
+                        for (var key in data) {
+                            key == '__all__' ? alert(data[key]) : $('.error-' + key).text(data[key]).show();
+                        }
+                    },
+                    complete: function() {
+                        $submit.removeAttr('disabled');
+                    }
+                });
+                return false;
+            });
+        }
+    }
+    return {
+        init : lib.init
+    }
+
+
+})(org)
 
 var regist = (function(org){
     var lib ={
@@ -156,6 +250,7 @@ var regist = (function(org){
                 });
 
                 $that.attr('disabled', 'disabled').addClass('alreay-request');
+                //倒计时
                 var timerFunction = function() {
                     if (count >= 1) {
                         count--;
