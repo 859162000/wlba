@@ -16,6 +16,7 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
                     img(src="/static/imgs/mobile/detail/login.png", alt="").img-one
                 img(src="/static/imgs/mobile/detail/loginsize.png", alt="").img-two
         from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
+            - csrf_token
             input(name="openid", type="hidden", value="{{ openid }}")
             input(name="captcha_0", type="hidden", value="")
             .login-from-one(style="margin-top: 0;")
