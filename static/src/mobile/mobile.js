@@ -72,8 +72,6 @@ var org = (function(){
     }
 })()
 
-
-//login 没
 var login = (function(org){
     var lib = {
         $captcha_img : $('#captcha'),
@@ -114,19 +112,17 @@ var login = (function(org){
                     'captcha_1': $.trim($form.find('input[name=captcha_1]').val()),
                     'openid': $.trim($form.find('input[name=openid]').val())
                 }
-
                 $.ajax({
                     'type': 'post',
                     'url': $form.attr('action'),
                     'data': data,
                     beforeSend: function (xhr, settings) {
-                        $submit.attr('disabled', true);
+                        $submit.attr('disabled', true).text('登录中..');
                         if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
                             xhr.setRequestHeader("X-CSRFToken", org.getCookie("csrftoken"));
                         }
                     },
                     success: function(res) {
-                        alert('登录成功');
                         var next = org.getQueryStringByName('next');
                         if (next) {
                             window.location.href = next;
@@ -144,7 +140,7 @@ var login = (function(org){
                         }
                     },
                     complete: function() {
-                        $submit.removeAttr('disabled');
+                        $submit.removeAttr('disabled').text('登录');
                     }
                 });
                 return false;
@@ -243,12 +239,13 @@ var regist = (function(org){
                     },
                     error: function (xhr) {
                         clearInterval(intervalId);
-                        $that.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
                         var result = JSON.parse(xhr.responseText);
                         if(xhr.status === 429){
                             alert('系统繁忙，请稍候重试')
+                            $that.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
                         }else if(xhr.status === 400){
                             $('.'+signName['phone'][1]).show()
+                            $that.text('获取验证码').removeAttr('disabled').removeClass('alreay-request');
                         }else{
                             alert(result.message);
                         }
@@ -326,7 +323,6 @@ var regist = (function(org){
     }
 })(org)
 
-//list
 var list = (function(org){
     var lib = {
         windowHeight : $(window).height(),
@@ -471,7 +467,7 @@ var detail = (function(org){
 })(org)
 
 ~(function(org){
-    $.each($("script"), function(index, item){
+    $.each($("script"), function(){
       var src = $(this).attr("src");
       if(src && src.indexOf(org.scriptName) > 0){
         if($(this).attr("data-init") && window[$(this).attr("data-init")]){

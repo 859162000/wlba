@@ -9,8 +9,8 @@ html
   body
     header
       hgroup 产品详情
-      section
-        a(href="javascript:history.back()") 返回
+      a(href="javascript:history.back()")
+        span 返回
     .detail-animate
       earning_rate = float(p2p.expected_earning_rate)
       percent = float(p2p.ordered_amount) / p2p.total_amount * 100

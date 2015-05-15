@@ -6,8 +6,8 @@ html
   body
     header
       hgroup 注册
-      section
-        a(href="javascript:history.back()") 返回
+      a(href="javascript:history.back()")
+        span 返回
     section.regist-main
       mixin list(name, placeholder, inputID, checkClass, checkTxt, checkClass2, checkTxt2)
         .regist-list
@@ -23,6 +23,7 @@ html
               span.pub-check(class=checkClass2)=checkTxt2
       +list("手机号", "请输入手机号", "phone", "phone-sign1", "请输入正确的手机号", "phone-sign2", "该手机号已被注册")
       .regist-list
+
         .input-main.input-check-main
           .input-body.input-check-body
             .input-name 验证码

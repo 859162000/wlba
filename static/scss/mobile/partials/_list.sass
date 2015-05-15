@@ -8,17 +8,19 @@ header
   hgroup
     text-align: center
     line-height: $header-height
-  section
+  a
     position: absolute
     left: 0
     top: 0
-    a
-      display: block
-      padding: 0 .5rem
+    &:active
+      box-shadow: $active-shadow
+    span
+      padding: 0 .5rem 0 1.2rem
       line-height: $header-height
       height: $header-height
-      &:active
-        background: $active-color
+      background: url("/static/imgs/mobile/head_back.png") no-repeat .4rem center
+      background-size: .5rem
+
 footer
   position: fixed
   left: 0
@@ -41,9 +43,10 @@ footer
 
 
 .list-banner
-  height: 7rem
   background: #356cc2
   margin-bottom: $margin-bottom
+  a
+    display: block
   img
     width: 100%
 .list-body
