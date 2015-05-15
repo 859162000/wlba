@@ -388,8 +388,9 @@ var detail = (function(org){
             lib.countDown.length > 0 && lib._countDown(lib.countDown)
         },
         _animate:function(){
-            var $progress = $('.progress-percent');
             $(function(){
+                var $progress = $('.progress-percent')
+                $payalert = $('.new-pay');
                 setTimeout(function(){
                     var percent = parseFloat($progress.attr('data-percent'));
                     if(percent == 100){
@@ -401,6 +402,10 @@ var detail = (function(org){
                         $progress.addClass('progress-bolang')
                     },1000)
                 },300)
+                $payalert.on('click',function(){
+                    $(this).css('width', '0%');
+                    $(this).siblings('p').css('width',"100%");
+                })
             })
         },
         _tab:function(){
