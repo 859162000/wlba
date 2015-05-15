@@ -12,10 +12,12 @@ class Banner(models.Model):
     MOBILE = 'mobile'
     PC = 'PC'
     PC_2 = 'PC_2'
+    WEIXIN = 'weixin'
     DEVICES = (
         (MOBILE, MOBILE),
         (PC, PC),
         (PC_2, PC_2),
+        (WEIXIN, WEIXIN),
     )
 
     TYPES = (
