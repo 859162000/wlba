@@ -64,7 +64,7 @@ from wanglibao_rest import utils
 
 from wanglibao.settings import TINMANGKEY
 from wanglibao_account.tasks import tianmang_callback
-from wanglibao.settings import RETURN_TINMANG_UTL_DEBUG
+from wanglibao.settings import RETURN_TINMANG_URL_DEBUG
 
 logger = logging.getLogger(__name__)
 
@@ -1042,7 +1042,7 @@ def ajax_register(request):
                 if not user:
                     return HttpResponse(messenger('error'))
                 #天芒注册
-                invitecode = tianmang_process(request, user, invitecode)
+                #invitecode = tianmang_process(request, user, invitecode)
 
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
@@ -1102,7 +1102,7 @@ def tianmang_process(request, user, invitecode):
                 "uname": user.wanglibaouserprofile.name,
                 "method": "json"
             }
-            tianmang_callback.apply_async(kwargs={'url': RETURN_TINMANG_UTL_DEBUG, 'params': params})
+            tianmang_callback.apply_async(kwargs={'url': RETURN_TINMANG_URL_DEBUG, 'params': params})
 
     return invitecode
 
