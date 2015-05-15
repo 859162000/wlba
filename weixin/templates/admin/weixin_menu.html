@@ -2,7 +2,7 @@
 {% load i18n admin_static admin_list admin_urls suit_list suit_tags %}
 {% load url from future %}
 {% block extrastyle %}
-     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/weixin_menu.css' %}" media="all">
+     <link rel="stylesheet" type="text/css" href="{% static 'styles/admin/weixin_menu.css' %}" media="all">
 {% endblock %}
 
 {% block content %}
@@ -77,7 +77,7 @@
 {% endblock %}
 
 {% block extrajs %}
-    <script type="text/javascript" src="{% static 'admin/js/libs/angularjs/angular.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/lib/angular.min.js' %}"></script>
     <script>
         var app = angular.module('app', []);
 
@@ -88,6 +88,7 @@
 
         app.controller('MenuCtl', function($scope, $http) {
             $scope.data = {};
+            $scope.data.menu_api = '{% url 'admin_weixin_menu_api' %}';
             $scope.data.menu_classify_all = [
                 {'value': 'sub_button', 'text': '子菜单'},
                 {'value': 'click', 'text': '点击推事件'},
@@ -99,13 +100,17 @@
                 {'value': 'pic_weixin', 'text': '弹出微信相册发图器'},
                 {'value': 'location_select', 'text': '弹出地理位置选择器'}
             ];
-            $scope.data.menu = JSON.parse('{{ menu | safe }}');
+            $scope.data.menu = {'button': []};
             $scope.data.menu_classify = null;
             $scope.data.current_menu_level = null;
             $scope.data.current_menu_index = null;
             $scope.data.current_menu_parent_index = null;
             $scope.data.new_menu = null;
             $scope.data.new_menu_action = null;
+
+            $http.get($scope.data.menu_api).success(function(res) {
+                $scope.data.menu = res;
+            });
 
             $scope.$watch('data.current_menu_level', function(level) {
                 if (level == 1) {
@@ -279,8 +284,7 @@
             };
 
             $scope.create_menu = function() {
-                var url = '{% url 'admin_weixin_menu_create_api' %}';
-                $http.post(url, $scope.data.menu).success(function(res) {
+                $http.post($scope.data.menu_api, $scope.data.menu).success(function(res) {
                     if (res['errcode'] == 0) {
                         alert('生成成功');
                     }
@@ -291,8 +295,7 @@
             };
 
             $scope.delete_menu = function() {
-                var url = '{% url 'admin_weixin_menu_delete_api' %}';
-                $http.post(url).success(function(res) {
+                $http.delete($scope.data.menu_api).success(function(res) {
                      if (res['errcode'] == 0) {
                          alert('删除成功');
                      }

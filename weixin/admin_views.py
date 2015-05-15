@@ -44,10 +44,11 @@ class AdminView(View):
 
 
 class AdminJsonApi(AdminView):
-    account = None
-    client = None
+    account_cache = None
+    client_cache = None
 
     @method_decorator(staff_member_required)
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(AdminJsonApi, self).dispatch(request, *args, **kwargs)
 
@@ -60,10 +61,16 @@ class AdminJsonApi(AdminView):
         return account
 
     @property
-    def weixin_client(self):
-        if not self.client:
-            self.client = WeChatClient(self.account.app_id, self.account.app_secret, self.account.access_token)
-        return self.client
+    def account(self):
+        if not self.account_cache:
+            self.account_cache = self.get_account()
+        return self.account_cache
+
+    @property
+    def client(self):
+        if not self.client_cache:
+            self.client_cache = WeChatClient(self.account.app_id, self.account.app_secret, self.account.access_token)
+        return self.client_cache
 
     def render_json(self, data):
         return HttpResponse(json.dumps(data), 'application/json')
@@ -245,27 +252,28 @@ class WeixinCustomerServiceCreateApi(AdminJsonApi):
         return self.render_json(res.json())
 
 
-class WeixinMenuCreateApi(AdminJsonApi):
+class WeixinMenuApi(AdminJsonApi):
+
+    def get(self, request):
+        key = 'account_menu_{account_id}'.format(account_id=self.account.id)
+        if not cache.get(key):
+            menu = {'button': []}
+
+            try:
+                res = self.client.menu.get()
+                if not res.get('errcode'):
+                    menu = res.get('menu')
+            except:
+                pass
+
+            cache.set(key, menu, 60 * 60 * 24 / 10000)
+
+        return self.render_json(json.loads(cache.get(key)))
 
     def post(self, request):
-        account = self.get_account()
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-        res = client.menu.create(request.body)
+        res = self.client.menu.create(request.body)
         return self.render_json(res)
 
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super(WeixinMenuCreateApi, self).dispatch(request, *args, **kwargs)
-
-
-class WeixinMenuDeleteApi(AdminJsonApi):
-
-    def post(self, request):
-        account = self.get_account()
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-        res = client.menu.delete()
+    def delete(self, request):
+        res = self.client.menu.delete()
         return self.render_json(res)
-
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super(WeixinMenuDeleteApi, self).dispatch(request, *args, **kwargs)
