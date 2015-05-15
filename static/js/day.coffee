@@ -79,9 +79,9 @@ require ['jquery'], ($)->
       k=0
       while k<$(ele+' li:eq('+g+')').children('span').length
         if m==high_m and day==parseInt($(ele+' li:eq('+g+')').children('span:eq('+k+')').text())
-          $(ele+' li:eq('+g+')').children('span:eq('+k+')').addClass('tap-hight2').siblings().removeClass('tap-hight2')
+          $(ele+' li:eq('+g+')').children('span:eq('+k+')').addClass('span-high').siblings().removeClass('span-high')
 #          $('.day-san').children('span').removeClass('tap-hight2')
-          $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'rgb(244, 136, 144)','color':'#000'})
+          $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'url("/static/images/list-img/small.png") no-repeat','background-position':'-187px -86px','color':'#000'})
         if m!=high_m and day==parseInt($(ele+' li:eq('+g+')').children('span:eq('+k+')').text())
           $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'#FFB7C5','color':'#666671','font-weight':'normal'})
         k++
@@ -208,7 +208,7 @@ require ['jquery'], ($)->
   date=Y+'-0'+m+"-"+day
   hight(m,'day-san')
   init(date)
-  $('#left-h1').html('－－'+m+'月'+day+'日用户榜单－－')
+  $('#left-h1').html(+m+'月'+day+'日用户榜单')
   wei=new Date()
   wei2=new Date()
   wei2.setMonth(2)
@@ -249,6 +249,7 @@ require ['jquery'], ($)->
   mon=0;
   $('.right-btn').on('click',()->
       day_index++;
+#      alert($('.day-yue').length)
       if day_index<$('.day-yue').length
         mon=day_index+3
         $('.mon').html(mon+' 月')
@@ -256,6 +257,8 @@ require ['jquery'], ($)->
 #        high_m=parseInt($('.mon').text())
 #        high_num=$('.day-yue:eq('+day_index+')').attr('data-num')
 #        hight(high_m,high_num)
+      else
+        day_index=2
   )
 
   $('.left-btn').on('click',()->
@@ -267,6 +270,8 @@ require ['jquery'], ($)->
 #        high_m=parseInt($('.mon').text())
 #        high_num=$('.day-yue:eq('+day_index+')').attr('data-num')
 #        hight(high_m,high_num)
+      else
+        day_index=0
   )
 
 #  获取年月日
@@ -286,7 +291,7 @@ require ['jquery'], ($)->
     if time>='2015-03-24' and time<='2015-05-31' and time<=date
       $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2')
       $(this).parent().siblings().children('span').removeClass('tap-hight2')
-      $('#left-h1').html('－－'+m+'月'+d+'日用户榜单－－')
+      $('#left-h1').html(+m+'月'+d+'日用户榜单')
       shuju(time)
   )
 

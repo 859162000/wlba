@@ -89,9 +89,10 @@
         k = 0;
         while (k < $(ele + ' li:eq(' + g + ')').children('span').length) {
           if (m === high_m && day === parseInt($(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').text())) {
-            $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').addClass('tap-hight2').siblings().removeClass('tap-hight2');
+            $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').addClass('span-high').siblings().removeClass('span-high');
             $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').css({
-              'background': 'rgb(244, 136, 144)',
+              'background': 'url("/static/images/list-img/small.png") no-repeat',
+              'background-position': '-187px -86px',
               'color': '#000'
             });
           }
@@ -269,7 +270,7 @@
     date = Y + '-0' + m + "-" + day;
     hight(m, 'day-san');
     init(date);
-    $('#left-h1').html('－－' + m + '月' + day + '日用户榜单－－');
+    $('#left-h1').html(+m + '月' + day + '日用户榜单');
     wei = new Date();
     wei2 = new Date();
     wei2.setMonth(2);
@@ -292,6 +293,8 @@
         return $('.day-long').animate({
           'left': -357 * day_index + 'px'
         }, 500);
+      } else {
+        return day_index = 2;
       }
     });
     $('.left-btn').on('click', function() {
@@ -302,6 +305,8 @@
         return $('.day-long').animate({
           'left': -357 * day_index + 'px'
         }, 500);
+      } else {
+        return day_index = 0;
       }
     });
     return $('.day-yue span').on('click', function() {
@@ -323,7 +328,7 @@
       if (time >= '2015-03-24' && time <= '2015-05-31' && time <= date) {
         $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2');
         $(this).parent().siblings().children('span').removeClass('tap-hight2');
-        $('#left-h1').html('－－' + m + '月' + d + '日用户榜单－－');
+        $('#left-h1').html(+m + '月' + d + '日用户榜单');
         return shuju(time);
       }
     });
