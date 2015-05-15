@@ -84,10 +84,14 @@ html
       statusClass = 'footerBtn-lightblue'
     else
       statusClass = 'footerBtn-red'
+
     .detail-footerBtn(class=statusClass)
-      //if status == '抢购中'
-        span
-      p {{status}}
+      if status == '抢购中'
+        //span
+        p.new-pay {{status}}
+        p.new-pay-sign 功能开发中，敬请期待!
+      else
+        p {{status}}
   script(src="/static/src/mobile/lib/zepto/zepto.js")
   script(src="/static/src/mobile/lib/weixin/wx.js")
   script(data-init='detail' src="/static/src/mobile/mobile.js?v=222")
