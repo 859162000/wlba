@@ -204,7 +204,10 @@ class WeixinFeeView(TemplateView):
     template_name = 'weixin_fee.jade'
 
     def get_current_url(self):
-        url = '%s%s%s' % (['http://', 'https://'][self.request.is_secure()],
+        # url = '%s%s%s' % (['http://', 'https://'][self.request.is_secure()],
+        #                   self.request.get_host(),
+        #                   self.request.get_full_path().split('#')[0])
+        url = '%s%s%s' % (['http://', 'https://'][self.request.get_host() in ['www.wanglibao.com', 'wx.wanglibao.com']],
                           self.request.get_host(),
                           self.request.get_full_path().split('#')[0])
         return url
@@ -212,6 +215,7 @@ class WeixinFeeView(TemplateView):
     def get_context_data(self, **kwargs):
         url = self.get_current_url()
         data = dict()
+        data['weixin_debug'] = '1' if self.request.GET.get('debug') == '1' else '0'
         data['app_id'] = WEIXIN_APP_ID
         try:
             data.update(generate_weixin_jssdk_config(WEIXIN_APP_ID, WEIXIN_APP_SECRET, url))

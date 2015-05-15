@@ -12,7 +12,7 @@ html
   body(style='background: url(/static/m_images/weixin_img/ban.jpg) no-repeat;background-size:cover;')
       .top-i
           a.jiao
-            img(src='/static/m_images/weixin_img/sanjiao.png')
+            img(src='/static/m_images/weixin_img/sanjiao.png')#weixin_fanhui_fa
           p 登录
       include m_include/weixin_kehuduan
       article
@@ -25,5 +25,5 @@ html
             input(type='tel' placeholder='请输入手机号进行注册或登录', name='identifier', value="{{ identifier }}").ipon
             button.judge 下一步
       script(src="/static/m_js/m_lib/jquery.min.js")
-      script(src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js")
+      script(src="/static/m_js/jweixin-1.0.0.js")
       script(src="/static/m_js/weixin.js?v=324j4jkj431112")
