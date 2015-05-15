@@ -1428,27 +1428,32 @@ class AddressGetAPIView(APIView):
             return Response({'ret_code': 3003, 'message': u'地址不存在'})
 
 
+class AutomaticView(TemplateView):
+    template_name = 'account_auto_tender.jade'
+
+    def get_context_data(self, **kwargs):
+
+        plan = AutomaticPlan.objects.filter(user=self.request.user).first()
+        result = {}
+        if plan is not None:
+            result = {
+                'id': plan.id,
+                'amounts_auto': int(plan.amounts_auto),
+                'period_min': plan.period_min,
+                'period_max': plan.period_max,
+                'rate_min': int(plan.rate_min),
+                'rate_max': int(plan.rate_max),
+                'is_used': plan.is_used
+            }
+
+        return {
+            'margin': self.request.user.margin.margin,
+            'plan': result
+        }
+
+
 class AutomaticApiView(APIView):
     permission_classes = (IsAuthenticated, )
-
-    def get(self, request):
-        plans = AutomaticPlan.objects.filter(user=request.user)
-        if plans.exists():
-            plan_list = [{
-                             'id': plan.id,
-                             'amounts_auto': plan.amounts_auto,
-                             'period_min': plan.period_min,
-                             'period_max': plan.period_max,
-                             'rate_min': plan.rate_min,
-                             'rate_max': plan.rate_max,
-                             'is_used': plan.is_used} for plan in plans]
-            return Response({
-                'ret_code': 0,
-                'message': 'ok',
-                'plan': plan_list,
-            })
-        else:
-            return Response({'ret_code': 3000, 'message': u'没有自动投标计划'})
 
     def post(self, request):
         amounts_auto = request.DATA.get('amounts_auto', Decimal(0))
@@ -1466,6 +1471,8 @@ class AutomaticApiView(APIView):
                 return Response({'ret_code': 3002, 'message': u'自动投标金额必须大于等于100'})
             if Decimal(amounts_auto) % 100 != 0:
                 return Response({'ret_code': 3003, 'message': u'自动投标金额必须是100的整数倍'})
+            if Decimal(amounts_auto) > self.request.user.margin.margin:
+                return Response({'ret_code': 3003, 'message': u'自动投标金额不能够大于账户可用余额'})
         except:
             return Response({'ret_code': 3004, 'message': u'自动投标金额输入不合法'})
 
@@ -1494,19 +1501,9 @@ class AutomaticApiView(APIView):
 
             plan.save()
 
-            plan_list = [{
-                             'id': plan.id,
-                             'amounts_auto': plan.amounts_auto,
-                             'period_min': plan.period_min,
-                             'period_max': plan.period_max,
-                             'rate_min': plan.rate_min,
-                             'rate_max': plan.rate_max,
-                             'is_used': plan.is_used} for plan in AutomaticPlan.objects.filter(user=request.user)]
-
             return Response({
                 'ret_code': 0,
-                'message': 'ok',
-                'plan': plan_list
+                'message': u'自动投标计划设置成功'
             })
         except:
             return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
