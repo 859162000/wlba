@@ -20,6 +20,5 @@ urlpatterns = patterns(
     # ajax json api
     url(r'^weixin/account/manage/(?P<id>\w+)/material_list.json$', views.WeixinMaterialListJsonApi.as_view(), name='admin_weixin_material_list_json'),
     url(r'^weixin/account/manage/(?P<id>\w+)/customer_service/create.api$', views.WeixinCustomerServiceCreateApi.as_view(), name='admin_weixin_customer_service_create_api'),
-    url(r'^weixin/menu/create.api$', views.WeixinMenuCreateApi.as_view(), name='admin_weixin_menu_create_api'),
-    url(r'^weixin/menu/delete.api$', views.WeixinMenuDeleteApi.as_view(), name='admin_weixin_menu_delete_api'),
+    url(r'^weixin/menu.api$', views.WeixinMenuApi.as_view(), name='admin_weixin_menu_api'),
 )
