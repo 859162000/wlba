@@ -1,0 +1,254 @@
+./marketing/admin.py:        fields = ('id', 'type', 'content', 'description', 'is_used', 'end_time', 'create_time')
+./marketing/admin.py:    list_display = ('id', 'type', 'content', 'description', 'is_used', 'end_time', 'create_time')
+./marketing/admin.py:    search_fields = ('type', 'content')
+./marketing/admin.py:    list_filter = ('is_used', 'type')
+./marketing/migrations/0016_auto__add_rewardrecord__add_reward.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=40)),
+./marketing/migrations/0016_auto__add_rewardrecord__add_reward.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+./marketing/migrations/0017_auto__add_field_reward_end_time.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+./marketing/migrations/0018_auto__add_clientdata.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+./marketing/migrations/0019_auto__add_channels.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+./marketing/migrations/0020_auto__add_field_introducedby_channel.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+./marketing/migrations/0021_auto__add_introducedbyreward.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+./marketing/migrations/0022_auto__add_field_newsandreport_hits__add_field_newsandreport_keywords__.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+./marketing/migrations/0023_auto__chg_field_introducedby_introduced_by.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+./marketing/migrations/0024_auto__chg_field_introducedbyreward_introduced_by_person.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+./marketing/migrations/0025_auto__add_playlist.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+./order/admin.py:    list_display = ('id', 'type', 'status', 'parent', 'created_at')
+./order/admin.py:    list_filter = ('type', )
+./order/admin.py:    list_display = ('id', 'type', 'user', 'message', 'created_at', 'updated_at')
+./order/admin.py:    list_filter = ('type', )
+./order/migrations/0001_initial.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=64)),
+./order/migrations/0001_initial.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=64)),
+./order/migrations/0001_initial.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./order/migrations/0001_initial.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./order/migrations/0002_auto__chg_field_ordernote_created_at__chg_field_ordernote_updated_at__.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./order/migrations/0002_auto__chg_field_ordernote_created_at__chg_field_ordernote_updated_at__.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./order/migrations/0003_auto__add_field_order_parent.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./order/migrations/0003_auto__add_field_order_parent.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./order/utils.py:        order.type = fields.get('type', order.type)
+./report/reports.py:        if kwargs.get('type'):
+./report/reports.py:            content = cls.generate_report_content(start_time, end_time, kwargs.get('type'))
+./report/views.py:            'type': type,
+./report/views.py:        type = request.POST.get('type')
+./report/views.py:        print type, 'type........'
+./report/views.py:        print type, 'type........'
+./shumi_backend/utility.py:        record['type'] = fund_type[shumi_json_dict['fund_type']]
+./trust/admin.py:    list_display = ('id', 'short_name', 'issuer', 'type')
+./trust/migrations/0001_initial.py:            ('type', self.gf('django.db.models.fields.TextField')()),
+./trust/migrations/0001_initial.py:            'type': ('django.db.models.fields.TextField', [], {}),
+./trust/migrations/0002_auto__add_field_trust_mortgage__add_field_trust_mortgage_rate__add_fie.py:            'type': ('django.db.models.fields.TextField', [], {}),
+./trust/migrations/0003_auto__add_field_issuer_logo.py:            'type': ('django.db.models.fields.TextField', [], {}),
+./trust/migrations/0004_auto__chg_field_issuer_shareholders__chg_field_issuer_registered_capit.py:            'type': ('django.db.models.fields.TextField', [], {}),
+./trust/migrations/0005_auto__del_field_trust_note__del_field_trust_product_name__chg_field_tr.py:        db.alter_column(u'trust_trust', 'type', self.gf('django.db.models.fields.TextField')(null=True))
+./trust/migrations/0005_auto__del_field_trust_note__del_field_trust_product_name__chg_field_tr.py:        db.alter_column(u'trust_trust', 'type', self.gf('django.db.models.fields.TextField')())
+./trust/migrations/0005_auto__del_field_trust_note__del_field_trust_product_name__chg_field_tr.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./trust/migrations/0006_auto__add_field_trust_status.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./trust/migrations/0007_auto__add_field_trust_guarantee__add_field_trust_financing_party__add_.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./trust/migrations/0008_auto__add_field_trust_financing_party_description__add_field_trust_int.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./trust/migrations/0009_auto__add_field_trust_bought_people_count__add_field_trust_bought_coun.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./trust/migrations/0010_auto__add_field_trust_expected_earning_rate_high.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./trust/migrations/0011_auto__add_field_trust_product_type.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./trust/migrations/0012_auto__add_field_trust_bought_count_random__add_field_trust_bought_amou.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./wanglibao_announcement/admin.py:    list_display = ('title', 'device', 'type', 'starttime', 'endtime', 'priority', 'status', 'preview_link', 'createtime')
+./wanglibao_announcement/admin.py:    list_editable = ('type', 'priority', 'status')
+./wanglibao_announcement/admin.py:    list_filter = ('device', 'type', 'status')
+./wanglibao_announcement/migrations/0001_initial.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=15, null=True, blank=True)),
+./wanglibao_announcement/migrations/0001_initial.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15', 'null': 'True', 'blank': 'True'}),
+./wanglibao_announcement/migrations/0002_auto__add_field_announcement_createtime.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15', 'null': 'True', 'blank': 'True'}),
+./wanglibao_banner/admin.py:    list_display = ('name', 'device', 'type', 'priority', 'is_long_used', 'start_at', 'end_at', 'is_used')
+./wanglibao_banner/admin.py:    list_display = ('name', 'type', 'link', 'alt', 'priority')
+./wanglibao_banner/migrations/0001_initial.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=15)),
+./wanglibao_banner/migrations/0001_initial.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0002_auto__chg_field_banner_link.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0003_auto__add_partner.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=15)),
+./wanglibao_banner/migrations/0003_auto__add_partner.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0003_auto__add_partner.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0004_auto__add_hiring.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0004_auto__add_hiring.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0005_auto__chg_field_hiring_requirements__chg_field_hiring_duties.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0005_auto__chg_field_hiring_requirements__chg_field_hiring_duties.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0006_auto__add_aboutus.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0006_auto__add_aboutus.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0007_auto__add_field_banner_is_long_used__add_field_banner_start_at__add_fi.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_banner/migrations/0007_auto__add_field_banner_is_long_used__add_field_banner_start_at__add_fi.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+./wanglibao_buy/migrations/0001_initial.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=64)),
+./wanglibao_buy/migrations/0001_initial.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./wanglibao_buy/migrations/0002_auto__del_buyinfo__add_tradeinfo.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=64)),
+./wanglibao_buy/migrations/0002_auto__del_buyinfo__add_tradeinfo.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=64)),
+./wanglibao_buy/migrations/0002_auto__del_buyinfo__add_tradeinfo.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./wanglibao_buy/migrations/0003_auto__add_fundholdinfo.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./wanglibao_buy/migrations/0004_auto__add_availablefund__add_bindbank__add_tradehistory.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./wanglibao_buy/migrations/0005_auto__chg_field_availablefund_last_update__chg_field_tradehistory_crea.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./wanglibao_buy/migrations/0006_auto__add_field_availablefund_fund.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./wanglibao_buy/migrations/0006_auto__add_field_availablefund_fund.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_buy/migrations/0007_auto__add_monetaryfundnetvalue__add_unique_monetaryfundnetvalue_code_c.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./wanglibao_buy/migrations/0007_auto__add_monetaryfundnetvalue__add_unique_monetaryfundnetvalue_code_c.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_buy/migrations/0008_auto__add_field_dailyincome_count__chg_field_dailyincome_date.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./wanglibao_buy/migrations/0008_auto__add_field_dailyincome_count__chg_field_dailyincome_date.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_buy/migrations/0009_auto__add_bank.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+./wanglibao_buy/migrations/0009_auto__add_bank.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_buy/tests.py:            'type': 'fund',
+./wanglibao_buy/tests.py:            'type': 'fund',
+./wanglibao_buy/tests.py:            'type': 'fund',
+./wanglibao_buy/views.py:        type = data.get('type')
+./wanglibao_favorite/migrations/0001_initial.py:            'type': ('django.db.models.fields.TextField', [], {}),
+./wanglibao_favorite/migrations/0001_initial.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+./wanglibao_fund/migrations/0001_initial.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=16)),
+./wanglibao_fund/migrations/0001_initial.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+./wanglibao_fund/migrations/0002_auto__add_issuechargerate__add_redeemchargerate__add_field_fund_issuab.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+./wanglibao_fund/migrations/0003_auto__del_field_fund_sale_back_charge_rate__del_field_fund_buy_front_c.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+./wanglibao_fund/migrations/0004_auto__del_issuechargerate__del_redeemchargerate__add_issuefrontendchar.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+./wanglibao_fund/migrations/0005_auto__add_field_fund_profit_rate_month__add_field_fund_profit_rate_3mo.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+./wanglibao_fund/migrations/0006_auto__del_field_fund_fund_date__add_field_fund_currency__add_field_fun.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+./wanglibao_fund/migrations/0007_auto__del_field_fund_AIP_able__del_field_fund_sales_url__del_field_fun.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_fund/migrations/0008_auto__add_field_fund_rate_1_week__add_field_fundissuer_logo.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_fund/migrations/0009_auto__add_field_fund_bought_people_count__add_field_fund_bought_count_.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_fund/migrations/0010_auto__add_field_fund_shumi_info.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_fund/migrations/0011_auto__del_field_fund_shumi_info.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_fund/migrations/0012_auto__add_field_fund_bought_count_random__add_field_fund_bought_amount.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_fund/migrations/0013_auto__add_field_fundissuer_uuid.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_fund/migrations/0014_auto__add_field_fund_rapid_redeem.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_hotlist/migrations/0001_initial.py:            'type': ('django.db.models.fields.TextField', [], {}),
+./wanglibao_hotlist/migrations/0001_initial.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+./wanglibao_hotlist/migrations/0002_auto__del_field_hotfund_Fund__add_field_hotfund_fund.py:            'type': ('django.db.models.fields.TextField', [], {}),
+./wanglibao_hotlist/migrations/0002_auto__del_field_hotfund_Fund__add_field_hotfund_fund.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+./wanglibao_hotlist/migrations/0003_auto__add_mobilehotfund__add_mobilehottrust.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./wanglibao_hotlist/migrations/0003_auto__add_mobilehotfund__add_mobilehottrust.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_hotlist/migrations/0004_auto__del_mobilehottrust__del_mobilehotfund.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./wanglibao_hotlist/migrations/0004_auto__del_mobilehottrust__del_mobilehotfund.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_hotlist/migrations/0005_auto__add_mobilehotfund__add_mobilehottrust.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./wanglibao_hotlist/migrations/0005_auto__add_mobilehotfund__add_mobilehottrust.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_hotlist/migrations/0006_auto__add_mobilemainpage.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./wanglibao_hotlist/migrations/0006_auto__add_mobilemainpage.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_hotlist/migrations/0007_auto__add_mobilemainpagep2p.py:            'type': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+./wanglibao_hotlist/migrations/0007_auto__add_mobilemainpagep2p.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'})
+./wanglibao_p2p/migrations/0011_auto__add_attachment.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=32)),
+./wanglibao_p2p/migrations/0011_auto__add_attachment.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0012_auto__add_useramortization__del_field_p2pequity_total_interest.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0013_auto__del_field_attachment_extra_data.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0014_auto__add_contracttemplate__chg_field_useramortization_settlement_time.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0015_auto__add_field_p2pproduct_serial_number__del_field_p2pequity_term__de.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0016_auto__chg_field_p2pproduct_extra_data__chg_field_amortizationrecord_us.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0017_auto__add_field_p2pproduct_borrower_name__add_field_p2pproduct_borrowe.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0018_auto__chg_field_productamortization_term_date.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0019_auto__add_field_p2pproduct_version.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0020_auto__add_field_useramortization_version__add_field_p2pequity_version_.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0021_init_version.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0022_auto__del_field_p2pproduct_closed.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0023_auto__add_field_p2pproduct_contract_serial_number.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0024_auto__add_field_p2pproduct_repaying_source__add_field_p2pproduct_borro.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0025_auto__add_field_p2pproduct_borrower_bankcard_bank_name.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0026_set_confirm_at_date.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0027_auto__add_index_p2precord_catalog.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0028_auto__add_field_p2pproduct_excess_earning_rate.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0029_auto__add_field_p2pproduct_baoli_original_contract_number__add_field_p.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0030_load_contract.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0031_auto__add_field_p2pproduct_hide.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0032_auto__add_field_p2pequity_created_at.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0033_generate_equity_create_time.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0034_auto__add_field_p2pproduct_excess_earning_description.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0035_auto__chg_field_p2pproduct_repaying_source.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0036_auto__chg_field_warrant_name.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0037_auto__add_field_p2pproduct_priority.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0038_auto__add_field_p2pproduct_category.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0039_auto__add_field_p2pproduct_borrower_bankcard_type.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0040_auto__add_earning__add_field_p2pproduct_activity.py:            ('type', self.gf('django.db.models.fields.CharField')(default='D', max_length=5)),
+./wanglibao_p2p/migrations/0040_auto__add_earning__add_field_p2pproduct_activity.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0040_auto__add_earning__add_field_p2pproduct_activity.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0040_auto__add_earning__add_field_p2pproduct_activity.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0041_auto__add_field_contracttemplate_content_preview__add_field_contractte.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0041_auto__add_field_contracttemplate_content_preview__add_field_contractte.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0041_auto__add_field_contracttemplate_content_preview__add_field_contractte.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0042_auto__add_contract.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0042_auto__add_contract.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0042_auto__add_contract.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0047_auto__del_contract__add_p2pcontract.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0047_auto__del_contract__add_p2pcontract.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0047_auto__del_contract__add_p2pcontract.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0048_auto__add_p2pproductcontract__del_field_contracttemplate_party_c_addr_.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0048_auto__add_p2pproductcontract__del_field_contracttemplate_party_c_addr_.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0048_auto__add_p2pproductcontract__del_field_contracttemplate_party_c_addr_.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0049_auto__add_field_p2pproduct_make_loans_time.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0049_auto__add_field_p2pproduct_make_loans_time.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0049_auto__add_field_p2pproduct_make_loans_time.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0050_auto__add_interestprecisionbalance.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0050_auto__add_interestprecisionbalance.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0050_auto__add_interestprecisionbalance.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0051_auto__chg_field_interestprecisionbalance_interest_receivable__chg_fiel.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0051_auto__chg_field_interestprecisionbalance_interest_receivable__chg_fiel.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0051_auto__chg_field_interestprecisionbalance_interest_receivable__chg_fiel.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0052_auto__chg_field_interestprecisionbalance_equity__del_unique_interestpr.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0052_auto__chg_field_interestprecisionbalance_equity__del_unique_interestpr.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0052_auto__chg_field_interestprecisionbalance_equity__del_unique_interestpr.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0053_auto__add_field_p2pproductcontract_party_b_type__chg_field_p2pproductc.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0053_auto__add_field_p2pproductcontract_party_b_type__chg_field_p2pproductc.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0053_auto__add_field_p2pproductcontract_party_b_type__chg_field_p2pproductc.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0054_auto__del_field_p2pproductcontract_bill_due_date.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0054_auto__del_field_p2pproductcontract_bill_due_date.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0054_auto__del_field_p2pproductcontract_bill_due_date.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0055_auto__add_field_p2pproductcontract_bill_due_date.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0055_auto__add_field_p2pproductcontract_bill_due_date.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0055_auto__add_field_p2pproductcontract_bill_due_date.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0056_auto__add_productinterestprecision.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0056_auto__add_productinterestprecision.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0056_auto__add_productinterestprecision.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0057_auto__chg_field_productamortization_product.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0057_auto__chg_field_productamortization_product.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0057_auto__chg_field_productamortization_product.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0058_auto__add_interestinadvance.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0058_auto__add_interestinadvance.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0058_auto__add_interestinadvance.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_p2p/migrations/0059_auto__add_p2pequityjiuxian__add_unique_p2pequityjiuxian_user_product.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_p2p/migrations/0059_auto__add_p2pequityjiuxian__add_unique_p2pequityjiuxian_user_product.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+./wanglibao_p2p/migrations/0059_auto__add_p2pequityjiuxian__add_unique_p2pequityjiuxian_user_product.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'D'", 'max_length': '5'}),
+./wanglibao_pay/admin.py:    list_display = ('id', 'get_phone', 'get_name', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time', 'update_time', 'error_message', 'channel')
+./wanglibao_pay/admin.py:    list_filter = ('status', 'channel', 'type')
+./wanglibao_pay/migrations/0001_initial.py:            ('type', self.gf('django.db.models.fields.CharField')(max_length=5)),
+./wanglibao_pay/migrations/0001_initial.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0002_auto__add_field_payinfo_create_time__add_field_payinfo_update_time__ad.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0003_auto__add_bank__add_field_payinfo_request_ip__add_field_payinfo_respon.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0004_auto__add_card__chg_field_payinfo_card.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0005_auto__add_field_payinfo_order.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0005_auto__add_field_payinfo_order.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0006_auto__add_field_card_add_at.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0006_auto__add_field_card_add_at.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0007_auto__add_field_payinfo_fee__add_field_payinfo_total_amount.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0007_auto__add_field_payinfo_fee__add_field_payinfo_total_amount.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0008_auto__add_field_payinfo_bank__add_field_payinfo_margin_record.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0008_auto__add_field_payinfo_bank__add_field_payinfo_margin_record.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0009_auto__del_field_payinfo_card__add_field_payinfo_account_name__add_fiel.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0009_auto__del_field_payinfo_card__add_field_payinfo_account_name__add_fiel.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0010_auto__add_field_payinfo_uuid.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0010_auto__add_field_payinfo_uuid.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0011_generate_uuid.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0011_generate_uuid.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0012_auto__add_unique_payinfo_uuid.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0012_auto__add_unique_payinfo_uuid.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0013_auto__add_field_payinfo_confirm_time.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0013_auto__add_field_payinfo_confirm_time.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0014_auto__add_field_payinfo_channel.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0014_auto__add_field_payinfo_channel.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0015_auto__add_field_bank_kuai_code.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0015_auto__add_field_bank_kuai_code.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0016_auto__add_field_bank_kuai_limit.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0016_auto__add_field_bank_kuai_limit.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0017_auto__add_field_bank_last_update.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0017_auto__add_field_bank_last_update.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_pay/migrations/0018_auto__add_field_card_last_update.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+./wanglibao_pay/migrations/0018_auto__add_field_card_last_update.py:            'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
+./wanglibao_portfolio/migrations/0001_initial.py:            ('type', self.gf('django.db.models.fields.CharField')(default='percent', max_length=16)),
+./wanglibao_portfolio/migrations/0001_initial.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'percent'", 'max_length': '16'}),
+./wanglibao_portfolio/migrations/0002_auto__add_field_userportfolio_portfolio.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'percent'", 'max_length': '16'}),
+./wanglibao_portfolio/migrations/0003_load_portfolio.py:            'type': ('django.db.models.fields.CharField', [], {'default': "'percent'", 'max_length': '16'}),
+./wanglibao_sms/admin.py:    list_display = ('id', 'phones', 'contents', 'type', 'status', 'created_at', 'context')
+./wanglibao_sms/bae_channel.py:            messages['type'] = "normal"
+./wanglibao_sms/bae_channel.py:        messages = json.dumps({"type":messages['type'],"user_id":messages['user_id'], 
+./wanglibao_sms/migrations/0002_auto__add_shortmessage.py:            ('type', self.gf('django.db.models.fields.CharField')(default=u'\u7cfb\u7edf', max_length=8)),
+./wanglibao_sms/migrations/0002_auto__add_shortmessage.py:            'type': ('django.db.models.fields.CharField', [], {'default': "u'\\u7cfb\\u7edf'", 'max_length': '8'})
+./wanglibao_sms/migrations/0003_auto__add_field_shortmessage_channel.py:            'type': ('django.db.models.fields.CharField', [], {'default': "u'\\u7cfb\\u7edf'", 'max_length': '8'})
+./weixin/models.py:        data = {'type': self.classify}
+./weixin/wechatpy/client/api/jsapi.py:            params={'type': type}
+./weixin/wechatpy/client/api/material.py:            'type': media_type
+./weixin/wechatpy/client/api/material.py:                'type': media_type,
+./weixin/wechatpy/client/api/media.py:                'type': media_type
+./weixin/wechatpy/enterprise/client/api/media.py:                'type': media_type
