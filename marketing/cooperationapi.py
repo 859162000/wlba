@@ -534,9 +534,7 @@ class TianmangBaseAPIView(APIView):
         startday= datetime.datetime.strptime(startday, "%Y%m%d")
         endday = datetime.datetime.strptime(endday, "%Y%m%d")
         if startday > endday:
-            tmpdate = endday
-            endday = startday
-            startday = tmpdate
+            endday, startday = startday, endday
 
         #daydelta = datetime.timedelta(days=1)
         daydelta = datetime.timedelta(hours=23, minutes=59, seconds=59, milliseconds=59)
