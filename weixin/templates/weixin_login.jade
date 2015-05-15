@@ -36,135 +36,14 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
             .login-from-error
                 .error-captcha(style="display: none;")
             .login-from-four
-                button(type="submit", disabled="disabled") 登录
+                button(type="submit") 登录
             .login-footer
                 p.login-left
                     a(href="/weixin/regist/") 免费注册
                     //a(href="javascript:void(0)") &nbsp;&nbsp;|&nbsp;&nbsp;
                     //a(href="#") 忘记密码
 
-    script(src="/static/js/lib/jquery.min.js")
-    script(src="/static/src/mobile/mobile.js")
-
-    script.
-        getCookie = function (name) {
-            var cookie, cookieValue, cookies, i;
-            cookieValue = null;
-            if (document.cookie && document.cookie !== "") {
-                cookies = document.cookie.split(";");
-                i = 0;
-                while (i < cookies.length) {
-                    cookie = $.trim(cookies[i]);
-                    if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                    i++;
-                }
-            }
-            return cookieValue;
-        };
-
-        csrfSafeMethod = function (method) {
-            return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
-        };
-
-        sameOrigin = function (url) {
-            var host, origin, protocol, sr_origin;
-            host = document.location.host;
-            protocol = document.location.protocol;
-            sr_origin = "//" + host;
-            origin = protocol + sr_origin;
-            return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
-        };
-
-        $.ajaxSetup({
-            beforeSend: function (xhr, settings) {
-                if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                    xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-                }
-            }
-        });
-
-        //根据QueryString参数名称获取值
-        function getQueryStringByName(name){
-             var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
-             if(result == null || result.length < 1){
-                 return "";
-             }
-             return result[1];
-        }
-
-        $(function() {
-            var $captcha_img = $('img#captcha');
-            var $captcha_key = $('input[name=captcha_0]');
-
-            function captcha_refresh() {
-                var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
-                $.get(captcha_refresh_url, function(res) {
-                    $captcha_img.attr('src', res['image_url']);
-                    $captcha_key.val(res['key']);
-                });
-            }
-
-            $captcha_img.on('click', function() {
-                captcha_refresh();
-            });
-
-            $captcha_img.click();
-
-            var $form = $('#login-form');
-            var $submit = $form.find('button[type=submit]');
+    script(src="/static/src/mobile/lib/zepto/zepto.js")
+    script(data-init='login' src="/static/src/mobile/mobile.js")
 
 
-            $('input[name=identifier], input[name=password], input[name=captcha_1]').on('focus', function() {
-                var $self = $(this);
-                var name = $self.attr('name').split('_')[0];
-                $('.error-' + name).hide();
-            });
-
-            $submit.attr('disabled', false);
-            $submit.on('click', function() {
-                var data = {
-                    'identifier': $.trim($form.find('input[name=identifier]').val()),
-                    'password': $.trim($form.find('input[name=password]').val()),
-                    'captcha_0': $.trim($form.find('input[name=captcha_0]').val()),
-                    'captcha_1': $.trim($form.find('input[name=captcha_1]').val()),
-                    'openid': $.trim($form.find('input[name=openid]').val()),
-                }
-                $submit.attr('disabled', true);
-                $.ajax({
-                    'type': 'post',
-                    'url': $form.attr('action'),
-                    'data': data,
-                    'success': function(res) {
-                        alert('登录成功');
-                        var next = getQueryStringByName('next');
-                        if (next) {
-                            window.location.href = next;
-                        }
-                        window.location.href = '/weixin/list/';
-                    },
-                    'error': function(res) {
-                        if (res['status'] == 403) {
-                            alert('请勿重复提交');
-                            return false;
-                        }
-                        var data = res['responseJSON'];
-                        var key;
-                        for (key in data) {
-                            if (key == '__all__') {
-                                alert(data[key]);
-                            }
-                            else {
-                                $('.error-' + key).text(data[key]).show();
-                            }
-                        }
-                    },
-                    'complete': function() {
-                        $submit.attr('disabled', false);
-                    }
-                });
-                return false;
-            });
-        });
