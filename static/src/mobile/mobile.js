@@ -245,7 +245,13 @@ var regist = (function(org){
                         clearInterval(intervalId);
                         $that.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
                         var result = JSON.parse(xhr.responseText);
-                        xhr.status === 429 ? alert('系统繁忙，请稍候重试') : alert(result.message);
+                        if(xhr.status === 429){
+                            alert('系统繁忙，请稍候重试')
+                        }else if(xhr.status === 400){
+                            $('.'+signName['phone'][1]).show()
+                        }else{
+                            alert(result.message);
+                        }
                     }
                 });
 
@@ -279,21 +285,36 @@ var regist = (function(org){
                         isSubmit = false;
                     }
                 })
+
+            var $submitBody = $('.submit-body');
             if(isSubmit){
                 $.ajax({
                     url: "/api/register/",
                     type: "POST",
                     data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1]},
                     beforeSend: function(xhr, settings) {
-                        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                          xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+                        $submitBody.text('注册中...');
+                        if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
+                          xhr.setRequestHeader("X-CSRFToken", org.getCookie("csrftoken"));
                         }
                     },
                     success:function(data){
-                        console.log(data)
+                        if(data.ret_code === 0){
+                             $submitBody.text('注册成功')
+                        }else if(data.ret_code === 30014){
+                           $('.'+signName['checkCode'][0]).show();
+                            $submitBody.text('立即注册');
+                        }
                     },
                     error: function (xhr) {
-
+                        var result = JSON.parse(xhr.responseText);
+                        if(xhr.status === 429){
+                            alert('系统繁忙，请稍候重试')
+                        }else if(xhr.status === 400){
+                            $('.'+signName['phone'][1]).show()
+                        }else{
+                            alert(result.message);
+                        }
                     }
                 });
             }
