@@ -133,7 +133,9 @@ class WeixinLogin(TemplateView):
         return context
 
 
-class WeixinLoginApi(View):
+class WeixinLoginApi(APIView):
+    permission_classes = ()
+    http_method_names = ['post']
 
     def _form(self, request):
         return EmailOrPhoneAuthenticationForm(request, data=request.POST)
@@ -155,9 +157,9 @@ class WeixinLoginApi(View):
             auth_login(request, user)
             request.session.set_expiry(1800)
             data = {'nickname': user.wanglibaouserprofile.nick_name}
-            return HttpResponse(json.dumps(data), 'application/json')
+            return Response(data)
 
-        return HttpResponseBadRequest(json.dumps(form.errors), 'application/json')
+        return Response(form.errors, status=400)
 
 
 class WeixinOauthLoginRedirect(RedirectView):
