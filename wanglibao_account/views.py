@@ -64,7 +64,7 @@ from wanglibao_rest import utils
 
 from wanglibao.settings import TINMANGKEY
 from wanglibao_account.tasks import tianmang_callback
-from wanglibao.settings import RETURN_TINMANG_UTL_DEBUG
+from wanglibao.settings import RETURN_TINMANG_URL
 
 logger = logging.getLogger(__name__)
 
@@ -1102,7 +1102,7 @@ def tianmang_process(request, user, invitecode):
                 "uname": user.wanglibaouserprofile.name,
                 "method": "json"
             }
-            tianmang_callback.apply_async(kwargs={'url': RETURN_TINMANG_UTL_DEBUG, 'params': params})
+            tianmang_callback.apply_async(kwargs={'url': RETURN_TINMANG_URL, 'params': params})
 
     return invitecode
 
