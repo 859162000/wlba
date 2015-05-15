@@ -22,6 +22,7 @@ module.exports = function( grunt ) {
                 files: {
                     'scripts/mobile/dist/mobile.js': ['scripts/mobile/mobile.js']
                 }
+
             }
         }
 
