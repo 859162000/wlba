@@ -166,13 +166,13 @@ DATABASES = {
 # The deploy file will overwrite this based on flag local db
 LOCAL_MYSQL = ENV == ENV_DEV or ENV == ENV_STAGING
 
-if LOCAL_MYSQL:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'wanglibao',
-        'USER': 'wanglibao',
-        'PASSWORD': 'wanglibank',
-    }
+#if LOCAL_MYSQL:
+#    DATABASES['default'] = {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': 'wanglibao',
+#        'USER': 'wanglibao',
+#        'PASSWORD': 'wanglibank',
+#    }
 
 import sys
 

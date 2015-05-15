@@ -11,7 +11,7 @@ from fabric.colors import green, red, yellow
 
 env.roledefs = {
     'lb': ["182.92.9.134", "112.126.76.220"],
-    'web': ["182.92.167.178", "123.56.101.185"]
+    'web': ["182.92.167.178", "123.56.101.185"],
     'mq': ["182.92.104.171"],
     'pre': ["182.92.175.133"],
     'dbback': ["112.124.13.222"],
@@ -140,6 +140,12 @@ def deploy_static_action():
             else:
                 run('git checkout %s' % env.branch)
                 run('git pull origin %s' % env.branch)
+
+    if not exists(env.deploy_virt_path):
+        run("virtualenv %s" % env.deploy_virt_path)
+    with virtualenv():
+        run(env.pip_install)
+
     with settings(warn_only=True):
         rs = run("ps aux|grep nginx|grep -v 'grep'")
         print yellow("check nginx daemon")
