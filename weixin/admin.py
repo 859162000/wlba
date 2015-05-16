@@ -2,6 +2,7 @@
 from django.contrib import admin
 from .models import Account
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 
 class AccountAdmin(admin.ModelAdmin):
@@ -27,13 +28,22 @@ class AccountAdmin(admin.ModelAdmin):
     manage_url.allow_tags = True
 
     def get_list_display(self, request):
+        def replace_url(url):
+            if url.startswith('http://') and settings.ENV != settings.ENV_DEV:
+                url = url.replace('http://', 'https://')
+            return url
+
         def connect_url(obj):
-            return request.build_absolute_uri(reverse('weixin_connect', kwargs={'id': obj.id}))
+            url = request.build_absolute_uri(reverse('weixin_connect', kwargs={'id': obj.id}))
+            return replace_url(url)
+
         self.connect_url = connect_url
         self.connect_url.short_description = u'微信接口配置URL'
 
         def oauth_login_url(obj):
-            return request.build_absolute_uri(reverse('weixin_oauth_login_redirect'))
+            url = request.build_absolute_uri(reverse('weixin_oauth_login_redirect'))
+            return replace_url(url)
+
         self.oauth_login_url = oauth_login_url
         self.oauth_login_url.short_description = u'微信登录链接'
         return super(AccountAdmin, self).get_list_display(request)
