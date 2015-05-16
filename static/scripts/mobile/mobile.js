@@ -83,9 +83,9 @@ org.login = (function(org){
         $captcha_img : $('#captcha'),
         $captcha_key : $('input[name=captcha_0]'),
         init:function(){
-            lib._captcha_refresh()
-            lib._checkFrom()
-            lib._captcha_refresh_listen()
+            lib._captcha_refresh();
+            lib._checkFrom();
+            lib._captcha_refresh_listen();
         },
         _captcha_refresh :function(){
             var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
@@ -448,7 +448,7 @@ org.detail = (function(org){
                     $earningRate = $('.profit-txt'),
                     $period = $('.time-txt');
 
-                var host = 'https://staging.wanglibao.com',
+                var host = 'https://www.wanglibao.com',
                     shareName = $productName.attr('data-name'),
                     shareImg = host + '/static/imgs/mobile/share_logo.png',
                     shareLink = host + '/weixin/detail/'+$productName.attr('data-productID'),
