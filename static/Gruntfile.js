@@ -1,5 +1,8 @@
 module.exports = function( grunt ) {
     "use strict";
+
+    //var mozjpeg = require('imagemin-mozjpeg');
+
     grunt.initConfig({
         compass: {
             dist: {
@@ -25,6 +28,17 @@ module.exports = function( grunt ) {
 
             }
         }
+        /*
+        imagemin: {
+            static: {
+                options: {
+                    optimizationLevel: 3,
+                    svgoPlugins: [{ removeViewBox: false }],
+                    use: [mozjpeg()]
+                }
+            }
+        }
+        */
 
     });
 
@@ -32,7 +46,7 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks('grunt-contrib-compass');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    //grunt.loadNpmTasks('grunt-contrib-imagemin');
 
 };
-
 
