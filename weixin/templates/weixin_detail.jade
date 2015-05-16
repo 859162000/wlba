@@ -4,7 +4,6 @@
 doctype html
 html
   head
-    title weixin-detail
     include include/weixin_head.jade
   body
     header
@@ -17,13 +16,13 @@ html
       if p2p.activity
         earning_rate = earning_rate + float(p2p.activity.rule.percent_text)
       span.circle-profit
-        .profit-txt
+        .profit-txt(data-earn="{{earning_rate}}")
           em {{earning_rate}}
             i %
           br
           |年化收益
       span.circle-time
-        .time-txt
+        .time-txt(data-period="{{p2p.period}}{{p2p.pay_method|period_unit}}")
           em {{p2p.period}}
             i {{p2p.pay_method|period_unit}}
           br
@@ -33,7 +32,7 @@ html
         .progress-body
           .progress-percent(data-percent='{{percent}}')
     .detail-title
-      h4 {{p2p.name}}
+      h4.product-name(data-name="{{p2p.name}}",data-productID="{{p2p.id}}") {{p2p.name}}
       .product-money
         .all-money
           p
@@ -56,7 +55,7 @@ html
         if p2p.display_status == '抢购中'
           li
             span 剩余时间
-            span#countDown( data-left="{{p2p.end_time}}") {{p2p.end_time | timedelta_now_day }}
+            span#countDown(data-left="{{p2p.end_time}}") {{p2p.end_time | timedelta_now_day }}
         li
           span 购买人数
           span
@@ -85,13 +84,15 @@ html
       statusClass = 'footerBtn-lightblue'
     else
       statusClass = 'footerBtn-red'
+
     .detail-footerBtn(class=statusClass)
       if status == '抢购中'
-        span
-      p {{status}}
-  script(src="/static/src/mobile/lib/zepto/zepto.js")
-  script(src="/static/src/mobile/lib/weixin/wx.js")
-  script(data-init='detail' src="/static/src/mobile/mobile.js?v=222")
+        //span 计算器标签暂时隐藏
+        p.new-pay {{status}}
+        p.new-pay-sign 开发中，请到pc或app中购买!
+      else
+        p {{status}}
+  script(data-init='detail' src="/static/scripts/mobile/dist/mobile.js?v=222")
 
 
 
