@@ -311,7 +311,7 @@ org.regist = (function(org){
                 $.ajax({
                     url: '/api/register/',
                     type: 'POST',
-                    data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1]},
+                    data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invitecode': 'weixin'},
                     beforeSend: function(xhr, settings) {
                         $submitBody.text('注册中...');
                         if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
@@ -351,7 +351,7 @@ org.list = (function(org){
     var lib = {
         windowHeight : $(window).height(),
         canGetPage : true, //防止多次请求
-        scale : 0.7, //页面滚到百分70的时候请求
+        scale : 0.9, //页面滚到百分70的时候请求
         pageSize: 10, //每次请求的个数
         page: 2, //从第二页开始
         init :function(){
