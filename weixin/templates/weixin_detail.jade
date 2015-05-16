@@ -41,7 +41,8 @@ html
           p 融资金额
         .surplus-money
           p
-            em {{orderable_amount|money_format_int}}
+            amount = p2p.total_amount - p2p.ordered_amount
+            em {{amount | money_format_int}}
             |元
           p 剩余可投金额
     .detail-table
