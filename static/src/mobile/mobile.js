@@ -3,21 +3,21 @@ var org = (function(){
     var lib = {
         scriptName: 'mobile.js',
         _getQueryStringByName:function(name){
-            var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+            var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
              if(result == null || result.length < 1){
-                 return "";
+                 return '';
              }
              return result[1];
         },
         _getCookie :function(name){
             var cookie, cookieValue, cookies, i;
                 cookieValue = null;
-                if (document.cookie && document.cookie !== "") {
-                    cookies = document.cookie.split(";");
+                if (document.cookie && document.cookie !== '') {
+                    cookies = document.cookie.split(';');
                     i = 0;
                     while (i < cookies.length) {
                       cookie = $.trim(cookies[i]);
-                      if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                      if (cookie.substring(0, name.length + 1) === (name + '=')) {
                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                         break;
                       }
@@ -33,9 +33,9 @@ var org = (function(){
             var host, origin, protocol, sr_origin;
             host = document.location.host;
             protocol = document.location.protocol;
-            sr_origin = "//" + host;
+            sr_origin = '//' + host;
             origin = protocol + sr_origin;
-            return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+            return (url === origin || url.slice(0, origin.length + 1) === origin + '/') || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + '/') || !(/^(\/\/|http:|https:).*/.test(url));
         },
         _setShareData:function(ops,suFn,canFn){
             var setData = {};
@@ -44,8 +44,8 @@ var org = (function(){
                     setData[p] = ops[p];
                 }
             }
-            typeof suFn =='function' && suFn != 'undefined' ? setData.success = suFn : "";
-            typeof canFn =='function' && canFn != 'undefined' ? setData.cancel = canFn : "";
+            typeof suFn =='function' && suFn != 'undefined' ? setData.success = suFn : '';
+            typeof canFn =='function' && canFn != 'undefined' ? setData.cancel = canFn : '';
             return setData
         },
         /*
@@ -75,16 +75,16 @@ var org = (function(){
         onMenuShareTimeline    : lib._onMenuShareTimeline,
         onMenuShareQQ          : lib._onMenuShareQQ
     }
-})()
+})();
 
-var login = (function(org){
+org.login = (function(org){
     var lib = {
         $captcha_img : $('#captcha'),
         $captcha_key : $('input[name=captcha_0]'),
         init:function(){
-            lib._captcha_refresh()
-            lib._checkFrom()
-            lib._captcha_refresh_listen()
+            lib._captcha_refresh();
+            lib._checkFrom();
+            lib._captcha_refresh_listen();
         },
         _captcha_refresh :function(){
             var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
@@ -124,7 +124,7 @@ var login = (function(org){
                     beforeSend: function (xhr, settings) {
                         $submit.attr('disabled', true).text('登录中..');
                         if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
-                            xhr.setRequestHeader("X-CSRFToken", org.getCookie("csrftoken"));
+                            xhr.setRequestHeader('X-CSRFToken', org.getCookie('csrftoken'));
                         }
                     },
                     success: function(res) {
@@ -145,11 +145,10 @@ var login = (function(org){
                                 alert(data[key])
                             }else{
                                 if(data[key] == '验证码错误'){
-                                    $('.error-' + key).text(data[key]).show(function(){
-                                        lib._captcha_refresh()
-                                    },300)
+                                    $('.error-' + key).text(data[key]).show()
+                                    lib._captcha_refresh()
                                 }else{
-                                    alert(data[key])
+                                   $('.error-' + key).text(data[key]).show()
                                 }
 
                             }
@@ -168,43 +167,43 @@ var login = (function(org){
     }
 
 
-})(org)
+})(org);
 
-var regist = (function(org){
+org.regist = (function(org){
     var lib ={
         init:function(){
             lib._checkFrom()
             lib._animateXieyi();
         },
         _animateXieyi:function(){
-            var $submitBody = $(".submit-body"),
+            var $submitBody = $('.submit-body'),
                 $protocolDiv = $('.regist-protocol-div'),
                 $cancelXiyi = $('.cancel-xiyie'),
-                $showXiyi = $(".xieyi-btn"),
-                $agreement = $("#agreement");
+                $showXiyi = $('.xieyi-btn'),
+                $agreement = $('#agreement');
             //是否同意协议
             $agreement.change(function() {
-              if ($(this).attr("checked") == 'checked') {
-                $submitBody.addClass("disabled").attr('disabled', 'disabled');
-                return $(this).removeAttr("checked");
+              if ($(this).attr('checked') == 'checked') {
+                $submitBody.addClass('disabled').attr('disabled', 'disabled');
+                return $(this).removeAttr('checked');
               } else {
-                $submitBody.removeClass("disabled").removeAttr('disabled');
-                return $(this).attr("checked", "checked");
+                $submitBody.removeClass('disabled').removeAttr('disabled');
+                return $(this).attr('checked', 'checked');
               }
             });
             //显示协议
             $showXiyi.on('click',function(event){
                 event.preventDefault();
-                $protocolDiv.css("display",'block');
+                $protocolDiv.css('display','block');
                 setTimeout(function(){
-                    $protocolDiv.css('top',"0%");
+                    $protocolDiv.css('top','0%');
                 },0)
             })
             //关闭协议
             $cancelXiyi.on('click',function(){
-                $protocolDiv.css('top',"100%");
+                $protocolDiv.css('top','100%');
                 setTimeout(function(){
-                    $protocolDiv.css("display",'none');
+                    $protocolDiv.css('display','none');
                 },200)
             })
         },
@@ -214,13 +213,13 @@ var regist = (function(org){
             //校验方法
             var check ={
                 phone:function(val, id){
-                    $('#'+id).parents('.regist-list').find(".pub-check").hide();
+                    $('#'+id).parents('.regist-list').find('.pub-check').hide();
                     var isRight = false;
                     var re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
                     if(val){
                         re.test(val) ? isRight = true : ($('.'+signName[id][0]).show(),isRight = false);
                     }else{
-                        $('#'+id).parents('.regist-list').find(".none-val").show();
+                        $('#'+id).parents('.regist-list').find('.none-val').show();
                     }
                     return isRight;
                 },
@@ -244,19 +243,19 @@ var regist = (function(org){
             }
             //验证码
             $('.request-check').on('click',function(){
-                var phoneNumber = $("#phone").val(),
+                var phoneNumber = $('#phone').val(),
                     $that = $(this), //保存指针
                     count = 60,  //60秒倒计时
                     intervalId ; //定时器
 
                 if(!check['phone'](phoneNumber, 'phone')) return //号码不符合退出
                 $.ajax({
-                    url: "/api/phone_validation_code/register/" + phoneNumber + "/",
-                    type: "POST",
+                    url: '/api/phone_validation_code/register/' + phoneNumber + '/',
+                    type: 'POST',
                     beforeSend: function(xhr, settings) {
                         //django配置post请求
                         if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
-                          xhr.setRequestHeader("X-CSRFToken", org.getCookie("csrftoken"));
+                          xhr.setRequestHeader('X-CSRFToken', org.getCookie('csrftoken'));
                         }
                     },
                     error: function (xhr) {
@@ -292,7 +291,7 @@ var regist = (function(org){
             var isSubmit,
                 dataList;
             //校验主函数
-            $(".submit-body").on('click',function(){
+            $('.submit-body').on('click',function(){
                 $('.pub-check').hide(),
                 dataList = [], isSubmit =  true;
                 $.each($('.input-public'), function(){
@@ -300,7 +299,7 @@ var regist = (function(org){
                     if(value){
                         check[thisID](value, thisID) ?  dataList.push(value) : isSubmit = false;
                     }else{
-                        $(this).parents('.regist-list').find(".none-val").show();
+                        $(this).parents('.regist-list').find('.none-val').show();
                         isSubmit = false;
                     }
                 })
@@ -308,13 +307,13 @@ var regist = (function(org){
             var $submitBody = $('.submit-body');
             if(isSubmit){
                 $.ajax({
-                    url: "/api/register/",
-                    type: "POST",
-                    data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1]},
+                    url: '/api/register/',
+                    type: 'POST',
+                    data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invitecode': 'weixin'},
                     beforeSend: function(xhr, settings) {
                         $submitBody.text('注册中...');
                         if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
-                          xhr.setRequestHeader("X-CSRFToken", org.getCookie("csrftoken"));
+                          xhr.setRequestHeader('X-CSRFToken', org.getCookie('csrftoken'));
                         }
                     },
                     success:function(data){
@@ -344,13 +343,13 @@ var regist = (function(org){
     return {
         init : lib.init
     }
-})(org)
+})(org);
 
-var list = (function(org){
+org.list = (function(org){
     var lib = {
         windowHeight : $(window).height(),
         canGetPage : true, //防止多次请求
-        scale : 0.7, //页面滚到百分70的时候请求
+        scale : 0.8, //页面滚到百分70的时候请求
         pageSize: 10, //每次请求的个数
         page: 2, //从第二页开始
         init :function(){
@@ -372,7 +371,7 @@ var list = (function(org){
                     lib.canGetPage =false
                 },
                 success: function(data){
-                   $("#list-body").append(data.html_data);
+                   $('#list-body').append(data.html_data);
                     lib.page++;
                     lib.canGetPage = true;
                 },
@@ -386,9 +385,9 @@ var list = (function(org){
     return {
         init : lib.init
     }
-})(org)
+})(org);
 
-var detail = (function(org){
+org.detail = (function(org){
     var lib ={
         weiURL: '/weixin/jsapi_config.json',
         countDown: $('#countDown'),
@@ -405,9 +404,9 @@ var detail = (function(org){
                 setTimeout(function(){
                     var percent = parseFloat($progress.attr('data-percent'));
                     if(percent == 100){
-                        $progress.css("margin-top","-10%");
+                        $progress.css('margin-top','-10%');
                     }else{
-                        $progress.css("margin-top", (100 - percent) + '%');
+                        $progress.css('margin-top', (100 - percent) + '%');
                     }
                     setTimeout(function(){
                         $progress.addClass('progress-bolang')
@@ -415,22 +414,22 @@ var detail = (function(org){
                 },300)
                 $payalert.on('click',function(){
                     $(this).css('width', '0%');
-                    $(this).siblings('p').css('width',"100%");
+                    $(this).siblings('p').css('width','100%');
                 })
             })
         },
         _tab:function(){
-            $(".toggleTab").on('click',function(){
+            $('.toggleTab').on('click',function(){
                 $(this).siblings().toggle();
-                $(this).find('span').toggleClass('icon-rotate')
+                $(this).find('span').toggleClass('icon-rotate');
             })
         },
         _share: function(){
-            var jsApiList = ["scanQRCode", "onMenuShareAppMessage","onMenuShareTimeline","onMenuShareQQ",];
+            var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
             $.ajax({
                 type : 'GET',
                 url : lib.weiURL,
-                dataType : "json",
+                dataType : 'json',
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
@@ -448,12 +447,12 @@ var detail = (function(org){
                     $earningRate = $('.profit-txt'),
                     $period = $('.time-txt');
 
-                var host = 'https://staging.wanglibao.com',
+                var host = 'https://www.wanglibao.com',
                     shareName = $productName.attr('data-name'),
                     shareImg = host + '/static/imgs/mobile/share_logo.png',
                     shareLink = host + '/weixin/detail/'+$productName.attr('data-productID'),
                     shareMainTit = '我在网利宝发现一个不错的投资标的，快来看看吧',
-                    shareBody = shareName + ',年收益' + $earningRate + '%,期限' + $period;
+                    shareBody = shareName + ',年收益' + $earningRate.attr('data-earn') + '%,期限' + $period.attr('data-period');
                 //分享给微信好友
                 org.onMenuShareAppMessage({
                     title: shareMainTit,
@@ -477,7 +476,7 @@ var detail = (function(org){
             })
         },
         _countDown:function(target){
-            var endTimeList = target.attr("data-left").replace(/-/g,"/");
+            var endTimeList = target.attr('data-left').replace(/-/g,'/');
             var  TimeTo =function (dd){
                 var t = new Date(dd),
                     n = parseInt(new Date().getTime()),
@@ -492,8 +491,8 @@ var detail = (function(org){
                     h = parseInt((c-d*ds)/(3600*1000)),
                     m = parseInt((c - d*ds - h*3600*1000)/(60*1000)),
                     s = parseInt((c-d*ds-h*3600*1000-m*60*1000)/1000);
-                    m < 10 ? m = "0" + m: '';
-                    s < 10 ? s = "0" + s: '';
+                    m < 10 ? m = '0' + m: '';
+                    s < 10 ? s = '0' + s: '';
                     target.text(d+'天'+h+'小时'+m+'分'+s+'秒');
             }
             window['interval']= setInterval(function(){
@@ -504,14 +503,14 @@ var detail = (function(org){
     return {
         init : lib.init
     }
-})(org)
+})(org);
 
-~(function(org){
-    $.each($("script"), function(){
-      var src = $(this).attr("src");
+;(function(org){
+    $.each($('script'), function(){
+      var src = $(this).attr('src');
       if(src && src.indexOf(org.scriptName) > 0){
-        if($(this).attr("data-init") && window[$(this).attr("data-init")]){
-            window[$(this).attr("data-init")].init()
+        if($(this).attr('data-init') && org[$(this).attr('data-init')]){
+            org[$(this).attr('data-init')].init();
         }
       }
     })

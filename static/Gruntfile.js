@@ -25,6 +25,7 @@ module.exports = function( grunt ) {
                 files: {
                     'scripts/mobile/dist/mobile.js': ['scripts/mobile/mobile.js']
                 }
+
             }
         }
         /*
@@ -48,5 +49,4 @@ module.exports = function( grunt ) {
     //grunt.loadNpmTasks('grunt-contrib-imagemin');
 
 };
-
 
