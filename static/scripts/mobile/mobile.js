@@ -2785,7 +2785,18 @@ var login = (function(org){
                         }
                         var data = JSON.parse(res.responseText);
                         for (var key in data) {
-                            key == '__all__' ? alert(data[key]) : $('.error-' + key).text(data[key]).show();
+                            if(key == '__all__'){
+                                alert(data[key])
+                            }else{
+                                if(data[key] == '验证码错误'){
+                                    $('.error-' + key).text(data[key]).show(function(){
+                                        lib._captcha_refresh()
+                                    },300)
+                                }else{
+                                    alert(data[key])
+                                }
+
+                            }
                         }
                     },
                     complete: function() {
@@ -3032,8 +3043,9 @@ var detail = (function(org){
             lib.countDown.length > 0 && lib._countDown(lib.countDown)
         },
         _animate:function(){
-            var $progress = $('.progress-percent');
             $(function(){
+                var $progress = $('.progress-percent')
+                $payalert = $('.new-pay');
                 setTimeout(function(){
                     var percent = parseFloat($progress.attr('data-percent'));
                     if(percent == 100){
@@ -3045,6 +3057,10 @@ var detail = (function(org){
                         $progress.addClass('progress-bolang')
                     },1000)
                 },300)
+                $payalert.on('click',function(){
+                    $(this).css('width', '0%');
+                    $(this).siblings('p').css('width',"100%");
+                })
             })
         },
         _tab:function(){
@@ -3072,26 +3088,35 @@ var detail = (function(org){
                 }
             });
             wx.ready(function(){
+                var $productName = $('.product-name'),
+                    $earningRate = $('.profit-txt'),
+                    $period = $('.time-txt');
+
+                var host = 'https://staging.wanglibao.com',
+                    shareName = $productName.attr('data-name'),
+                    shareImg = host + '/static/imgs/mobile/share_logo.png',
+                    shareLink = host + '/weixin/detail/'+$productName.attr('data-productID'),
+                    shareMainTit = '我在网利宝发现一个不错的投资标的，快来看看吧',
+                    shareBody = shareName + ',年收益' + $earningRate + '%,期限' + $period;
                 //分享给微信好友
                 org.onMenuShareAppMessage({
-                    title: "标名",
-                    desc: '网利宝广招千万投资客，收益高，期限短！',
-                    link: "https://www.wanglibao.com",
-                    imgUrl: "http://demo.open.weixin.qq.com/jssdk/images/p2166127561.jpg"
+                    title: shareMainTit,
+                    desc: shareBody,
+                    link: shareLink,
+                    imgUrl: shareImg
                 });
                 //分享给微信朋友圈
                 org.onMenuShareTimeline({
-                    title: "网利宝广招千万投资客，收益高，期限短！",
-                    link : "https://www.wanglibao.com",
-                    imgUrl: "http://demo.open.weixin.qq.com/jssdk/images/p2166127561.jpg"
+                    title: shareMainTit,
+                    link : shareLink,
+                    imgUrl: shareImg
                 })
-
                 //分享给QQ
                 org.onMenuShareQQ({
-                    title: "啦啦啦",
-                    desc: "testtesttesttesttesttesttesttest",
-                    link :local,
-                    imgUrl: "http://demo.open.weixin.qq.com/jssdk/images/p2166127561.jpg"
+                    title: shareMainTit,
+                    desc: shareBody,
+                    link : shareLink,
+                    imgUrl: shareImg
                 })
             })
         },
