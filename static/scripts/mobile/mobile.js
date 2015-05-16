@@ -351,7 +351,7 @@ org.list = (function(org){
     var lib = {
         windowHeight : $(window).height(),
         canGetPage : true, //防止多次请求
-        scale : 0.9, //页面滚到百分70的时候请求
+        scale : 0.8, //页面滚到百分70的时候请求
         pageSize: 10, //每次请求的个数
         page: 2, //从第二页开始
         init :function(){
