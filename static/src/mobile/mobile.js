@@ -82,9 +82,9 @@ org.login = (function(org){
         $captcha_img : $('#captcha'),
         $captcha_key : $('input[name=captcha_0]'),
         init:function(){
-            lib._captcha_refresh()
-            lib._checkFrom()
-            lib._captcha_refresh_listen()
+            lib._captcha_refresh();
+            lib._checkFrom();
+            lib._captcha_refresh_listen();
         },
         _captcha_refresh :function(){
             var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
@@ -145,9 +145,8 @@ org.login = (function(org){
                                 alert(data[key])
                             }else{
                                 if(data[key] == '验证码错误'){
-                                    $('.error-' + key).text(data[key]).show(function(){
-                                        lib._captcha_refresh()
-                                    },300)
+                                    $('.error-' + key).text(data[key]).show()
+                                    lib._captcha_refresh()
                                 }else{
                                    $('.error-' + key).text(data[key]).show()
                                 }
@@ -448,12 +447,12 @@ org.detail = (function(org){
                     $earningRate = $('.profit-txt'),
                     $period = $('.time-txt');
 
-                var host = 'https://staging.wanglibao.com',
+                var host = 'https://www.wanglibao.com',
                     shareName = $productName.attr('data-name'),
                     shareImg = host + '/static/imgs/mobile/share_logo.png',
                     shareLink = host + '/weixin/detail/'+$productName.attr('data-productID'),
                     shareMainTit = '我在网利宝发现一个不错的投资标的，快来看看吧',
-                    shareBody = shareName + ',年收益' + $earningRate + '%,期限' + $period;
+                    shareBody = shareName + ',年收益' + $earningRate.attr('data-earn') + '%,期限' + $period.attr('data-period');
                 //分享给微信好友
                 org.onMenuShareAppMessage({
                     title: shareMainTit,
