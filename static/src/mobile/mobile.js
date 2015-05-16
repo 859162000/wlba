@@ -447,7 +447,7 @@ org.detail = (function(org){
                     $earningRate = $('.profit-txt'),
                     $period = $('.time-txt');
 
-                var host = 'https://staging.wanglibao.com',
+                var host = 'https://www.wanglibao.com',
                     shareName = $productName.attr('data-name'),
                     shareImg = host + '/static/imgs/mobile/share_logo.png',
                     shareLink = host + '/weixin/detail/'+$productName.attr('data-productID'),
