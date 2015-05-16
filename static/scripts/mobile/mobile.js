@@ -66,6 +66,7 @@ var org = (function(){
         }
 
     }
+    document.body.addEventListener('touchstart', function () { }); //ios 触发active渲染
     return {
         scriptName             : lib.scriptName,
         getQueryStringByName   : lib._getQueryStringByName,
@@ -310,7 +311,7 @@ org.regist = (function(org){
                 $.ajax({
                     url: '/api/register/',
                     type: 'POST',
-                    data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invitecode': 'weixin'},
+                    data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': 'weixin'},
                     beforeSend: function(xhr, settings) {
                         $submitBody.text('注册中...');
                         if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {

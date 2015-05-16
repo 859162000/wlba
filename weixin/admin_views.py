@@ -3,17 +3,28 @@ from __future__ import unicode_literals
 from django.views.generic import View, TemplateView
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
-from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.core.cache import cache
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework.authentication import SessionAuthentication
 from .models import Account, Material, MaterialImage, MaterialNews
 from wechatpy.client import WeChatClient
-import json
+from weixin.wechatpy.exceptions import WeChatException
+from functools import wraps
+
+
+def weixin_api_error(f):
+    @wraps(f)
+    def decoration(*args, **kwargs):
+        try:
+            res = f(*args, **kwargs)
+        except WeChatException, e:
+            return Response(e.__dict__, status=400)
+        return res
+    return decoration
 
 
 class AdminWeixinAccountMixin(object):
@@ -22,6 +33,8 @@ class AdminWeixinAccountMixin(object):
 
     def get_account(self, account_id=None):
         account_id = account_id or self.request.session.get('account_id')
+        if not account_id:
+            raise Http404()
         try:
             account = Account.objects.get(pk=int(account_id))
         except Account.DoesNotExist:
@@ -117,7 +130,10 @@ class WeixinMaterialView(AdminWeixinTemplateView):
         context['account'] = self.account
         # 获取素材总数 缓存24小时
         context['material'], _ = Material.objects.get_or_create(account=self.account)
-        context.get('material').init()
+        try:
+            context.get('material').init()
+        except WeChatException, e:
+            return HttpResponseBadRequest(e)
 
         return context
 
@@ -145,7 +161,10 @@ class WeixinMaterialImageView(AdminWeixinView):
     def get(self, request, media_id):
         media = MaterialImage.objects.get(account=self.account, media_id=media_id)
         if not media.file:
-            res = self.client.material.get(media_id)
+            try:
+                res = self.client.material.get(media_id)
+            except WeChatException, e:
+                return Response(e.__dict__, status=400)
             print dir(res)
             print res.content
             return HttpResponse(res.content, 'image/png')
@@ -168,18 +187,16 @@ class WeixinMaterialListJsonApi(AdminAPIView):
     page: int
     count: int 1-20 default 20
     """
+    http_method_names = ['get']
 
+    @weixin_api_error
     def get(self, request):
         media_type = request.GET.get('media_type')
         page = int(request.GET.get('page', '1'))
         count = int(request.GET.get('count', '20'))
         offset = count * (page - 1)
 
-        try:
-            res = self.client.material.batchget(media_type, offset, count)
-        except Exception, e:
-            return Response({'errcode': e.errcode, 'errmsg': e.errmsg})
-
+        res = self.client.material.batchget(media_type, offset, count)
         media_count = getattr(self.account.material, '{media_type}_count'.format(media_type=media_type))
 
         media_class_dict = {
@@ -220,11 +237,13 @@ class WeixinMaterialListJsonApi(AdminAPIView):
 
 class WeixinCustomerServiceApi(AdminAPIView):
 
+    http_method_names = ['post']
+
+    @weixin_api_error
     def post(self, request):
         kf_account = '{}@gh_d852bc2cead2'.format(request.POST.get('kf_account'))
         nickname = request.POST.get('nickname')
         password = request.POST.get('password')
-
         res = self.client.customservice.add_account(kf_account, nickname, password)
         return Response(res.json())
 
@@ -232,25 +251,28 @@ class WeixinCustomerServiceApi(AdminAPIView):
 class WeixinMenuApi(AdminAPIView):
     http_method_names = ['get', 'post', 'delete']
 
+    @weixin_api_error
     def get(self, request):
         key = 'account_menu_{account_id}'.format(account_id=self.account.id)
         if not cache.get(key):
-            menu = {'button': []}
-
+            res = self.client.menu.get()
             try:
-                res = self.client.menu.get()
-                if not res.get('errcode'):
-                    menu = res.get('menu')
+                menu = res.get('menu')
             except:
-                pass
+                menu = {'button': []}
 
             cache.set(key, menu, 60 * 60 * 24 / 10000)
         return Response(cache.get(key))
 
+    @weixin_api_error
     def post(self, request):
+        print request._is_secure()
+        from django.core.urlresolvers import reverse
+        print request.build_absolute_uri(reverse('weixin_oauth_login_redirect'))
         res = self.client.menu.create(request.body)
-        return Response(res)
+        return Response(res, status=201)
 
+    @weixin_api_error
     def delete(self, request):
         res = self.client.menu.delete()
-        return Response(res)
+        return Response(res, status=204)
