@@ -29,6 +29,8 @@ def set_promo_user(request, user, invitecode=''):
                 introduced_by_user = User.objects.get(pk=recordpromo.pk)
                 save_introducedBy(user, introduced_by_user)
 
+        request.session[settings.PROMO_TOKEN_QUERY_STRING] = None
+
        # user_id = request.session.get(settings.PROMO_TOKEN_USER_SESSION_KEY, None)
        # if user_id:
        #     introduced_by_user = User.objects.get(pk=user_id)
