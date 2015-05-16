@@ -18,7 +18,7 @@ urlpatterns = patterns(
     url(r'^weixin/account/customer_service/create/$', views.WeixinCustomerServiceCreateView.as_view(), name='admin_weixin_customer_service_create'),
 
     # ajax json api
-    url(r'^weixin/account/material_list.json$', views.WeixinMaterialListJsonApi.as_view(), name='admin_weixin_material_list_json'),
-    url(r'^weixin/account/customer_service.api$', views.WeixinCustomerServiceApi.as_view(), name='admin_weixin_customer_service_api'),
-    url(r'^weixin/account/menu.api$', views.WeixinMenuApi.as_view(), name='admin_weixin_menu_api'),
+    url(r'^weixin/account/api/material_list/$', views.WeixinMaterialListJsonApi.as_view(), name='admin_weixin_material_list_json'),
+    url(r'^weixin/account/api/customer_service/$', views.WeixinCustomerServiceApi.as_view(), name='admin_weixin_customer_service_api'),
+    url(r'^weixin/account/api/menu/$', views.WeixinMenuApi.as_view(), name='admin_weixin_menu_api'),
 )
