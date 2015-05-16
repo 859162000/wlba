@@ -390,7 +390,7 @@ org.list = (function(org){
 
 org.detail = (function(org){
     var lib ={
-        weiURL: '/weixin/jsapi_config.json',
+        weiURL: '/weixin/api/jsapi_config/',
         countDown: $('#countDown'),
         init :function(){
             lib._tab();
