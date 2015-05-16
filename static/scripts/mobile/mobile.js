@@ -78,7 +78,7 @@ var org = (function(){
     }
 })();
 
-var login = (function(org){
+org.login = (function(org){
     var lib = {
         $captcha_img : $('#captcha'),
         $captcha_key : $('input[name=captcha_0]'),
@@ -150,7 +150,7 @@ var login = (function(org){
                                         lib._captcha_refresh()
                                     },300)
                                 }else{
-                                    alert(data[key])
+                                   $('.error-' + key).text(data[key]).show()
                                 }
 
                             }
@@ -171,7 +171,7 @@ var login = (function(org){
 
 })(org);
 
-var regist = (function(org){
+org.regist = (function(org){
     var lib ={
         init:function(){
             lib._checkFrom()
@@ -347,7 +347,7 @@ var regist = (function(org){
     }
 })(org);
 
-var list = (function(org){
+org.list = (function(org){
     var lib = {
         windowHeight : $(window).height(),
         canGetPage : true, //防止多次请求
@@ -389,7 +389,7 @@ var list = (function(org){
     }
 })(org);
 
-var detail = (function(org){
+org.detail = (function(org){
     var lib ={
         weiURL: '/weixin/jsapi_config.json',
         countDown: $('#countDown'),
@@ -511,8 +511,8 @@ var detail = (function(org){
     $.each($('script'), function(){
       var src = $(this).attr('src');
       if(src && src.indexOf(org.scriptName) > 0){
-        if($(this).attr('data-init') && window[$(this).attr('data-init')]){
-            window[$(this).attr('data-init')].init();
+        if($(this).attr('data-init') && org[$(this).attr('data-init')]){
+            org[$(this).attr('data-init')].init();
         }
       }
     })
