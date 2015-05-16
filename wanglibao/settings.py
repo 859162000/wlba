@@ -392,6 +392,7 @@ if ENV != ENV_DEV:
 
     # wsgi scheme
     os.environ['wsgi.url_scheme'] = 'https'
+    os.environ['HTTPS'] = 'on'
 
 # starting shumi_backend config
 SM_CONSUMER_KEY = 'SM_SDK_WLB'
