@@ -20,6 +20,7 @@ from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
 from weixin.wechatpy.exceptions import InvalidSignatureException
 from weixin.wechatpy.oauth import WeChatOAuth
+from weixin.common.decorators import weixin_api_error
 from .models import Account, WeixinUser
 from .common.wechat import tuling
 from decimal import Decimal
@@ -83,27 +84,33 @@ class ConnectView(View):
         return super(ConnectView, self).dispatch(request, *args, **kwargs)
 
 
-class WeixinJsapiConfig(View):
 
+class WeixinJsapiConfig(APIView):
+    permission_classes = ()
+    http_method_names = ['get']
+
+    @weixin_api_error
     def get(self, request):
         try:
             account = Account.objects.first()
         except Account.DoesNotExist:
             data = {'errcode': 1, 'errmsg': 'account does not exist'}
-            return HttpResponse(json.dumps(data), 'application/json')
+            return Response(data, status=400)
 
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
         noncestr = uuid.uuid1().hex
         timestamp = str(int(time.time()))
         url = request.META.get('HTTP_REFERER')
+        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
         signature = client.jsapi.get_jsapi_signature(noncestr, account.jsapi_ticket, timestamp, url)
+
         data = {
             'appId': account.app_id,
             'timestamp': timestamp,
             'nonceStr': noncestr,
             'signature': signature
         }
-        return HttpResponse(json.dumps(data), 'application/json')
+
+        return Response(data)
 
 
 class WeixinLogin(TemplateView):
