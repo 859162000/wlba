@@ -22,8 +22,8 @@
 .detail-animate
   position: relative
   height: 9.75rem
-  background: url("/static/imgs/mobile/detail/detail_banner.jpg") no-repeat
-  background-size: 100%
+  background: url("/static/imgs/mobile/detail/detail_banner.jpg") no-repeat center center
+  background-size: 100% 100%
   .bannerBottom
     position: absolute
     left: 0
@@ -84,7 +84,7 @@
       width: 5.5rem
       height: 3rem
       margin-top: 100%
-      background: url('/static/imgs/mobile/detail/progress-icon.jpg') no-repeat center top #aee4f0
+      background: url('/static/imgs/mobile/detail/progress_icon.jpg') no-repeat center top #aee4f0
       background-size: 100%
       z-index: 1
       -webkit-transition: all 1s ease-out
@@ -234,6 +234,14 @@
     background-size: .85rem
   p
     background: $footerBtn-buy
+    -webkit-transition: width 300ms ease-out
+    -webkit-transform: translate3d(0,0,0)
+  .new-pay
+    width: 100%
+    &:active
+      box-shadow: $active-shadow
+  .new-pay-sign
+    width: 0%
 .footerBtn-red
   p
     color: #c89c9c

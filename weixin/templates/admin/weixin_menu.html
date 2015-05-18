@@ -1,14 +1,83 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_static admin_list admin_urls suit_list suit_tags %}
 {% load url from future %}
+{% block extrastyle %}
+     <link rel="stylesheet" type="text/css" href="{% static 'styles/admin/weixin_menu.css' %}" media="all">
+{% endblock %}
 
 {% block content %}
-<div id="content-main">
+<div id="content-main" ng-app="app">
     <div>
         <p>当前公众账号：{{ account.name }}</p>
     </div>
+    <div ng-controller="MenuCtl" ng-init="data.menu_api = '{% url 'admin_weixin_menu_api' %}';">
 
-    <h1>自定义菜单 开发中……</h1>
+        <div id="weixin_menu">
+            <div class="weixin_menu_main"></div>
+            <div class="weixin_menu_body">
+                <div ng-repeat="menu in data.menu.button" class="weixin_menu_item" ng-click="">
+                    <div ng-click="choice_menu(1, $index)">
+                        <span ng-bind="menu.name"></span>
+                        <i class="weixin_sub_button_icon" ng-hide="menu.type && menu.type != 'sub_button'"></i>
+                    </div>
+                    <div class="weixin_menu_sub_button_box" ng-hide="! menu.sub_button" ng-init="parent_index = $index;">
+                        <button type="button" ng-click="add_menu(2, $index);" ng-hide="(menu.type && menu.type != 'sub_button') || menu.sub_button.length >= 5">添加二级菜单</button>
+                        <div ng-repeat="sub_button in menu.sub_button" class="weixin_menu_sub_button" ng-click="choice_menu(2, $index, parent_index)"><span ng-bind="sub_button.name"></span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="weixin_menu_handler">
+                <a href="javascript:void(0);" ng-click="add_menu(1);" ng-hide="data.menu.button.length >= 3">添加一级菜单</a>
+                <a href="javascript:void(0);" ng-click="create_menu();">生成菜单</a>
+                <a href="javascript:void(0);" ng-click="delete_menu();">删除菜单</a>
+            </div>
+        </div>
 
+        <div id="weixin_menu_set" ng-hide="data.new_menu == null;">
+            <form name="new_menu_form" ng-submit="add_menu_confirm()">
+                <div>
+                    <label for="">类型</label>
+                    <select name="" id=""
+                            ng-model="data.new_menu.type"
+                            ng-options="item.value as item.text for item in data.menu_classify" ng-change="">
+                    </select>
+                </div>
+                <div>
+                    <label for="">名称</label>
+                    <input type="text" name="name" id="" ng-model="data.new_menu.name" ng-minlength="1" ng-maxlength="data.name_max_length" ng-required="true"/>
+                </div>
+                <div ng-hide="data.new_menu.type == 'view' || data.new_menu.type == 'sub_button'">
+                    <label for="">Key</label>
+                    <input type="text" name="key" id="" ng-model="data.new_menu.key" ng-required="data.new_menu.type != 'view' && data.new_menu.type != 'sub_button'"/>
+                </div>
+                <div ng-hide="data.new_menu.type != 'view'">
+                    <label for="">链接</label>
+                    <input type="url" name="url" id="" ng-model="data.new_menu.url" ng-required="data.new_menu.type == 'view'"/>
+                </div>
+                <div>
+                    <button type="submit" ng-disabled="new_menu_form.$invalid">确定</button>
+                </div>
+                <div ng-hide="data.current_menu_index == null">
+                    <button type="button" ng-click="remove_menu()">删除</button>
+                    <button type="button" ng-click="move_menu('left')" ng-bind="data.move_menu_left_btn" ng-hide="is_move_menu_left_hidden()"></button>
+                    <button type="button" ng-click="move_menu('right')" ng-bind="data.move_menu_right_btn" ng-hide="is_move_menu_right_hidden()"></button>
+                </div>
+            </form>
+        </div>
+        <div style="margin-left: 400px;">
+            <pre ng-bind="data.new_menu|json">
+
+            </pre>
+            <pre ng-bind="data.menu|json">
+
+            </pre>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extrajs %}
+    <script type="text/javascript" src="{% static 'js/lib/angular.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'src/admin/weixin.js' %}"></script>
+    <script type="text/javascript" src="{% static 'src/admin/weixin_menu.js' %}"></script>
 {% endblock %}

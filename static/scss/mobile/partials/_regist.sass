@@ -1,0 +1,143 @@
+
+$regitst-input-height: 2.2rem
+$regitst-inputName-width: 2.8rem
+$regitst-border-radius: .2rem
+.regist-main
+  padding: 1rem .75rem
+  .regist-list
+    margin-bottom: $margin-bottom
+  .input-check-main
+    display: -webkit-box
+    .input-check-body
+      -webkit-box-flex: 1
+    .input-check
+      width: 5rem
+      font-size: $font-size12
+      text-align: right
+    .request-check
+      display: inline-block
+      width: 4.75rem
+      height: $regitst-input-height
+      line-height: $regitst-input-height
+      text-align: center
+      background: #fff
+      color: $color-4e7cda
+      border-radius: $regitst-border-radius
+      border: 1px solid $color-grey-e8e8e8
+      font-size: 0.6rem
+      &:active
+        box-shadow: $active-shadow
+    .alreay-request
+      border: 1px solid #addaa5
+      color: $color-grey-989898
+  .input-body
+    display: -webkit-box
+    padding: .3rem .75rem
+    height: $regitst-input-height
+    border-radius: $regitst-border-radius
+    border: 1px solid $color-grey-e8e8e8
+    background: #fff
+  .input-public
+    -webkit-box-flex: 1
+    width: 100%
+    height: 1.5rem
+    line-height: 1.5rem
+    border: 0
+    display: block
+    font-size: $font-size14
+    &::-webkit-input-placeholder
+      font-size: $font-size10
+      color: $color-grey-b6b6b6
+  .input-name
+    font-size: $font-size12
+    color: $color-grey-989898
+    width: $regitst-inputName-width
+    line-height: 1.5rem
+    height: 1.5rem
+    text-align: left
+  .input-sign
+    color: $color-db493f
+    font-size: $font-size10
+    margin: .1rem 0 .2rem 0
+    .pub-check
+      display: none
+      margin-left: .7rem
+
+  .regits-submit
+    .submit-body
+      background: $color-db493f
+      font-size: .85rem
+      color: #fff
+      height: 2.45rem
+      width: 100%
+      line-height: 2.45rem
+      text-align: center
+      border-radius: $regitst-border-radius
+      border: 0
+      &:active
+        box-shadow: $active-shadow
+    .disabled
+      background-color: #d9d9d9
+  .regits-protocol
+    display: -webkit-box
+    font-size: $font-size12
+    height: 2.4rem
+    line-height: 2.4rem
+    .protocol-left
+      -webkit-box-flex: 1
+      color: $color-grey-989898
+      height: 2.4rem
+      display: -webkit-box
+      -webkit-box-align: center
+      input
+        margin-right: .3rem
+        display: block
+        height: .7rem
+      span
+        color: $color-4e7cda
+        display: block
+    .protocol-right
+      -webkit-box-flex: 1
+      text-align: right
+      a
+        display: inline-block
+        width: 3rem
+        text-align: right
+        color: $color-4e7cda
+        background: url("/static/imgs/mobile/regist/regist_login.png") no-repeat right center
+        background-size: .7rem
+        padding-right: 1.1rem
+
+
+.regist-protocol-div
+  display: none
+  position: fixed
+  width: 100%
+  top: 100%
+  bottom: 0
+  background: #fff
+  font-size: $font-size14
+  -webkit-transition: all 200ms ease-out
+  -webkit-transform: translate3d(0,0,0)
+  .xieyi-head
+    position: fixed
+    width: 100%
+  .xieyi-cont
+    position: absolute
+    top: 2.2rem
+    bottom: 0
+    padding: 0 .75rem
+    overflow-y: scroll
+  .agreement-number
+    width: 20%
+    float: left
+  .agreement-line
+    width: 80%
+    float: right
+  li
+    overflow: auto
+    margin-bottom: $margin-bottom
+  h1,h2
+    font-size: $font-size16
+    font-weight: bold
+    line-height: 1.5rem

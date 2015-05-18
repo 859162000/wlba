@@ -3,15 +3,16 @@
 doctype html
 html
   head
-    title weixin-list
     include include/weixin_head.jade
+    link(rel="prefetch", href="/static/imgs/mobile/detail/detail_banner.jpg")
   body
     header
       hgroup 我要投资
-      section
-        a(href="#1") 返回
+      //a(href="#1")
+        span 返回
     .list-banner
-      img(src='')
+      a(href="{{banner.link}}")
+        img(src="/media/{{banner.image}}")
     .list-body#list-body
       for product in p2p_lists
         status = product.display_status
@@ -52,7 +53,7 @@ html
               .body-time
                 .time-num
                   em.section-hui {{product.period}}
-                  |{{product.pay_method|period_unit}}
+                  | {{product.pay_method|period_unit}}
                 .time-tit 还款期限
             .body-right
               a(href="/weixin/detail/{{product.id}}").btn-body(class=btnClass) {{status}}
@@ -60,7 +61,6 @@ html
           if status == '抢购中'
             .section-progressd(style="width:{{percent | percentage}}")
     include include/weixin_loading
-
     include include/weixin_footer
-  script(src="/static/src/mobile/lib/zepto/zepto.js")
-  script(data-init='list' src="/static/src/mobile/mobile.js")
+    script(data-init='list', src="/static/scripts/mobile/dist/mobile.js?v=2")
+
