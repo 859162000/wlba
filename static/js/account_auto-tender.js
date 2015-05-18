@@ -3,14 +3,15 @@
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      'jquery.form': 'lib/jquery.form'
+      'jquery.form': 'lib/jquery.form',
+      tools: 'lib/modal.tools'
     },
     shim: {
       'jquery.form': ['jquery']
     }
   });
 
-  require(['jquery', 'jquery.form'], function($, form) {
+  require(['jquery', 'jquery.form', 'tools'], function($, form, tool) {
     $('#dete-start').val($('#selectInput').val());
     $('#dete-end').val($('#selectInput1').val());
     $('#invest-money').blur(function() {
@@ -93,6 +94,7 @@
       }
     });
     return $('#submit').click(function() {
+      var isNo, tip;
       $('#invest-money').blur();
       if ($('.error-style').text() === '') {
         $('.income-range').blur();
@@ -103,16 +105,28 @@
       }
       if ($('.error-style').text() === '') {
         if ($('#agree').is(':checked')) {
-          return $('#tenderForm').ajaxSubmit(function(data) {
-            $('.error-style').text(data.message);
-            if (data.ret_code === 3003) {
-              if ($('#is_no').is(':checked')) {
-                $('#submit').text("开启");
-                return $('#is_no').prop('checked', false);
-              } else {
-                $('#submit').text("关闭");
-                return $('#is_no').prop('checked', true);
-              }
+          isNo = $('#is_no').is(':checked');
+          if (isNo) {
+            tip = "您将开启自动投标";
+          } else {
+            tip = "您将关闭自动投标";
+          }
+          return tool.modalConfirm({
+            title: '温馨提示',
+            msg: tip,
+            callback_ok: function() {
+              return $('#tenderForm').ajaxSubmit(function(data) {
+                $('.error-style').text(data.message);
+                if (data.ret_code === 0) {
+                  if (isNo) {
+                    $('#submit').text("关闭");
+                    return $('#is_no').prop('checked', false);
+                  } else {
+                    $('#submit').text("开启");
+                    return $('#is_no').prop('checked', true);
+                  }
+                }
+              });
             }
           });
         } else {

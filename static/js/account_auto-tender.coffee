@@ -2,11 +2,11 @@ require.config
   paths:
     jquery: 'lib/jquery.min'
     'jquery.form': 'lib/jquery.form'
-
+    tools: 'lib/modal.tools'
   shim:
     'jquery.form': ['jquery']
 
-require ['jquery', 'jquery.form'], ($, form)->
+require ['jquery', 'jquery.form','tools'], ($, form,tool)->
   $('#dete-start').val($('#selectInput').val())
   $('#dete-end').val($('#selectInput1').val())
   $('#invest-money').blur ()->
@@ -81,14 +81,22 @@ require ['jquery', 'jquery.form'], ($, form)->
       return false
     if $('.error-style').text() is ''
       if $('#agree').is(':checked')
-        $('#tenderForm').ajaxSubmit (data) ->
-          $('.error-style').text(data.message)
-          if data.ret_code == 3003
-            if $('#is_no').is(':checked')
-              $('#submit').text("开启")
-              $('#is_no').prop('checked',false)
-            else
-              $('#submit').text("关闭")
-              $('#is_no').prop('checked',true)
+        isNo = $('#is_no').is(':checked')
+        if isNo
+          tip = "您将开启自动投标"
+        else
+          tip = "您将关闭自动投标"
+        tool.modalConfirm({
+          title: '温馨提示', msg: tip, callback_ok: ()->
+            $('#tenderForm').ajaxSubmit (data) ->
+              $('.error-style').text(data.message)
+              if data.ret_code == 0
+                if isNo
+                  $('#submit').text("关闭")
+                  $('#is_no').prop('checked', false)
+                else
+                  $('#submit').text("开启")
+                  $('#is_no').prop('checked', true)
+        })
       else
         alert('请同意协议')
