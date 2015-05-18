@@ -99,7 +99,7 @@
       if ($('.error-style').text() === '') {
         $('.income-range').blur();
       }
-      if (Number($('#dete-start').val()) > Number($('#dete-end').val())) {
+      if (Number($('#dete-start').val()) > Number($('#dete-end').val()) || ($('#dete-start').val() === null || $('#dete-end').val() === null)) {
         $('.error-style').text('请选择正确收益期限');
         return false;
       }
