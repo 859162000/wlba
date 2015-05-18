@@ -1,7 +1,32 @@
 
 var org = (function(){
+    document.body.addEventListener('touchstart', function () { }); //ios 触发active渲染
     var lib = {
         scriptName: 'mobile.js',
+        _ajax :function(options){
+            $.ajax({
+                url: options.url,
+                type: options.type,
+                data: options.data,
+                dataType : options.dataType,
+                beforeSend: function(xhr, settings) {
+                    options.beforeSend && options.beforeSend(xhr);
+                    //django配置post请求
+                    if (!lib._csrfSafeMethod(settings.type) && lib._sameOrigin(settings.url)) {
+                      xhr.setRequestHeader('X-CSRFToken', lib._getCookie('csrftoken'));
+                    }
+                },
+                success:function(data){
+                    options.success && options.success(data);
+                },
+                error: function (xhr) {
+                    options.error && options.error(xhr);
+                },
+                complete:function(){
+                    options.complete && options.complete();
+                }
+            });
+        },
         _getQueryStringByName:function(name){
             var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
              if(result == null || result.length < 1){
@@ -65,9 +90,9 @@ var org = (function(){
         }
 
     }
-    document.body.addEventListener('touchstart', function () { }); //ios 触发active渲染
     return {
         scriptName             : lib.scriptName,
+        ajax                   : lib._ajax,
         getQueryStringByName   : lib._getQueryStringByName,
         getCookie              : lib._getCookie,
         csrfSafeMethod         : lib._csrfSafeMethod,
@@ -118,15 +143,12 @@ org.login = (function(org){
                     'captcha_1': $.trim($form.find('input[name=captcha_1]').val()),
                     'openid': $.trim($form.find('input[name=openid]').val())
                 }
-                $.ajax({
+                org.ajax({
                     'type': 'post',
                     'url': $form.attr('action'),
                     'data': data,
-                    beforeSend: function (xhr, settings) {
+                    beforeSend: function (xhr) {
                         $submit.attr('disabled', true).text('登录中..');
-                        if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
-                            xhr.setRequestHeader('X-CSRFToken', org.getCookie('csrftoken'));
-                        }
                     },
                     success: function(res) {
                         var next = org.getQueryStringByName('next');
@@ -250,16 +272,10 @@ org.regist = (function(org){
                     intervalId ; //定时器
 
                 if(!check['phone'](phoneNumber, 'phone')) return //号码不符合退出
-                $.ajax({
-                    url: '/api/phone_validation_code/register/' + phoneNumber + '/',
-                    type: 'POST',
-                    beforeSend: function(xhr, settings) {
-                        //django配置post请求
-                        if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
-                          xhr.setRequestHeader('X-CSRFToken', org.getCookie('csrftoken'));
-                        }
-                    },
-                    error: function (xhr) {
+                org.ajax({
+                    url : '/api/phone_validation_code/register/' + phoneNumber + '/',
+                    type : 'POST',
+                    error :function(xhr){
                         clearInterval(intervalId);
                         var result = JSON.parse(xhr.responseText);
                         if(xhr.status === 429){
@@ -307,15 +323,12 @@ org.regist = (function(org){
 
             var $submitBody = $('.submit-body');
             if(isSubmit){
-                $.ajax({
+                org.ajax({
                     url: '/api/register/',
                     type: 'POST',
                     data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': 'weixin'},
                     beforeSend: function(xhr, settings) {
                         $submitBody.text('注册中...');
-                        if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
-                          xhr.setRequestHeader('X-CSRFToken', org.getCookie('csrftoken'));
-                        }
                     },
                     success:function(data){
                         if(data.ret_code === 0){
@@ -364,7 +377,7 @@ org.list = (function(org){
             });
         },
         _getNextPage :function(){
-            $.ajax({
+            org.ajax({
                 type: 'GET',
                 url: '/api/p2ps/wx/',
                 data: {page: lib.page, 'pagesize': lib.pageSize},
@@ -427,7 +440,7 @@ org.detail = (function(org){
         },
         _share: function(){
             var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
-            $.ajax({
+            org.ajax({
                 type : 'GET',
                 url : lib.weiURL,
                 dataType : 'json',
