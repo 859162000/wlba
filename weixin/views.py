@@ -95,13 +95,14 @@ class WeixinJsapiConfig(APIView):
             account = Account.objects.first()
         except Account.DoesNotExist:
             data = {'errcode': 1, 'errmsg': 'account does not exist'}
-            return HttpResponse(json.dumps(data), 'application/json')
+            return Response(data, status=400)
 
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
         noncestr = uuid.uuid1().hex
         timestamp = str(int(time.time()))
         url = request.META.get('HTTP_REFERER')
+        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
         signature = client.jsapi.get_jsapi_signature(noncestr, account.jsapi_ticket, timestamp, url)
+
         data = {
             'appId': account.app_id,
             'timestamp': timestamp,
