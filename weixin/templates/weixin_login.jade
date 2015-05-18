@@ -2,13 +2,12 @@
 doctype html
 html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
     head
-        title weixin-login
         include include/weixin_head.jade
     body
         header
             hgroup 登录
-            section
-              a(href="javascript:history.back()") 返回
+            a(href="/weixin/list/")
+              span 返回
         .login-top
             .login-top-top
             .login-top-main
@@ -16,21 +15,23 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
                     img(src="/static/imgs/mobile/detail/login.png", alt="").img-one
                 img(src="/static/imgs/mobile/detail/loginsize.png", alt="").img-two
         from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
+            - csrf_token
             input(name="openid", type="hidden", value="{{ openid }}")
             input(name="captcha_0", type="hidden", value="")
             .login-from-one(style="margin-top: 0;")
-                img(src="/static/imgs/mobile/detail/logininput.png", alt="").img-input
+                //img(src="/static/imgs/mobile/detail/logininput.png", alt="").img-input
                 input(type="text", name="identifier", placeholder="请输入手机号")
             .login-from-error
                 .error-identifier(style="display: none; ")
             .login-from-two
-                img(src="/static/imgs/mobile/detail/logininput.png", alt="").img-input
+                //img(src="/static/imgs/mobile/detail/logininput.png", alt="").img-input
                 input(type="password", name="password", placeholder="请输入密码")
             .login-from-error
                 .error-password(style="display: none; ")
-            .login-from-three
-                img(src="/static/imgs/mobile/detail/logininput.png", alt="").img-input
-                input(type="text", name="captcha_1", placeholder="点击验证码刷新", maxlength="4").login-refresh
+            .login-from-threed
+                .login-from-three
+                    //img(src="/static/imgs/mobile/detail/logininput.png", alt="").img-input
+                    input(type="text", name="captcha_1", placeholder="点击验证码刷新").login-refresh
                 .login-validation
                     img(src="", alt="", width="100%", height="100%, border-radius: 0.3rem")#captcha
             .login-from-error
@@ -42,8 +43,7 @@ html(style="background: url('/static/imgs/mobile/detail/loginback.png');")
                     a(href="/weixin/regist/") 免费注册
                     //a(href="javascript:void(0)") &nbsp;&nbsp;|&nbsp;&nbsp;
                     //a(href="#") 忘记密码
+    script(data-init='login', src="/static/scripts/mobile/dist/mobile.js")
 
-    script(src="/static/src/mobile/lib/zepto/zepto.js")
-    script(data-init='login' src="/static/src/mobile/mobile.js")
 
 

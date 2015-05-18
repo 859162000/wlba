@@ -2,13 +2,13 @@
 doctype html
 html
     head
-        title weixin-account
+        link(rel="prefetch", href="/media/{{banner.image}}")
         include include/weixin_head.jade
     body
         header
             hgroup 我的账户
-            section
-              a(href="javascript:history.back()") 返回
+            //a(href="javascript:history.back()")
+               span 返回
         .account-balance
             .account-balance-one
                 p.balance-one-money 账户余额（元）
@@ -21,25 +21,28 @@ html
             .account-assets-one
                 p.assets-one-monery 总资产（元）
                 p.assets-one-yuan ￥{{total_asset|money_format}}
-                p.assets-one-earnings
-                 |累计收益：
-                 span ￥{{p2p_total_paid_interest|money_format}}
-            .account-assets-two
-                p.assets-two-monery &nbsp;
-                p.assets-two-yuan &nbsp;
-                p.assets-two-earning
-                 |待收收益：
-                 span ￥{{p2p_total_unpaid_interest|money_format}}
+                p.assets-one-earnings(style="width:100%;")
+                 strong 累计收益：
+                    span ￥{{p2p_total_paid_interest|money_format}}
+                 strong(style="position: absolute;right:0.705rem;") 待收收益：
+                    span ￥{{p2p_total_unpaid_interest|money_format}}
+            //.account-assets-two
+            //    p.assets-two-earning
+
         .account-project
             p.project-one
              |已投项目
+             b &nbsp;敬请期待
              span
               a(href="#").project-one-angle
             .line
             p.project-one
              |账户安全
+             b &nbsp;敬请期待
              span
               a(href="#").project-one-angle
+        .account-exit
+            a(href="/accounts/logout?next=/weixin/list/").account-exit-exit 退出登录
         .account-pop-up
             .account-pop-up-up
                 form
@@ -57,11 +60,5 @@ html
                         a(href="#") 取消
                         .line-line
                         a(href="#") 确定
-
-
-
-
-
-
     include include/weixin_footer
-    script(src="/static/src/mobile/mobile.js")
+    script( src="/static/scripts/mobile/dist/mobile.js?v=222")
