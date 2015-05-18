@@ -20,6 +20,7 @@ from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
 from weixin.wechatpy.exceptions import InvalidSignatureException
 from weixin.wechatpy.oauth import WeChatOAuth
+from weixin.common.decorators import weixin_api_error
 from .models import Account, WeixinUser
 from .common.wechat import tuling
 from decimal import Decimal
@@ -83,8 +84,12 @@ class ConnectView(View):
         return super(ConnectView, self).dispatch(request, *args, **kwargs)
 
 
-class WeixinJsapiConfig(View):
 
+class WeixinJsapiConfig(APIView):
+    permission_classes = ()
+    http_method_names = ['get']
+
+    @weixin_api_error
     def get(self, request):
         try:
             account = Account.objects.first()
@@ -103,7 +108,8 @@ class WeixinJsapiConfig(View):
             'nonceStr': noncestr,
             'signature': signature
         }
-        return HttpResponse(json.dumps(data), 'application/json')
+
+        return Response(data)
 
 
 class WeixinLogin(TemplateView):
