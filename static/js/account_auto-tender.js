@@ -104,7 +104,16 @@
       if ($('.error-style').text() === '') {
         if ($('#agree').is(':checked')) {
           return $('#tenderForm').ajaxSubmit(function(data) {
-            return $('.error-style').text(data.message);
+            $('.error-style').text(data.message);
+            if (data.ret_code === 3003) {
+              if ($('#is_no').is(':checked')) {
+                $('#submit').text("开启");
+                return $('#is_no').prop('checked', false);
+              } else {
+                $('#submit').text("关闭");
+                return $('#is_no').prop('checked', true);
+              }
+            }
           });
         } else {
           return alert('请同意协议');

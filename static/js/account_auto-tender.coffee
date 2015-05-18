@@ -71,7 +71,7 @@ require ['jquery', 'jquery.form'], ($, form)->
       return false
     else
        $('.error-style').text('')
-       
+
   $('#submit').click ()->
     $('#invest-money').blur()
     if $('.error-style').text() is ''
@@ -83,5 +83,12 @@ require ['jquery', 'jquery.form'], ($, form)->
       if $('#agree').is(':checked')
         $('#tenderForm').ajaxSubmit (data) ->
           $('.error-style').text(data.message)
+          if data.ret_code == 3003
+            if $('#is_no').is(':checked')
+              $('#submit').text("开启")
+              $('#is_no').prop('checked',false)
+            else
+              $('#submit').text("关闭")
+              $('#is_no').prop('checked',true)
       else
         alert('请同意协议')
