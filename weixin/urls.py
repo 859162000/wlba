@@ -14,6 +14,7 @@ urlpatterns = patterns(
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/', TemplateView.as_view(template_name="weixin_regist.jade")),
     url(r'^calculator/', TemplateView.as_view(template_name="weixin_calculator.jade")),
+    url(r'^recharge/', TemplateView.as_view(template_name="weixin_recharge.jade")),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
