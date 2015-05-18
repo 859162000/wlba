@@ -1492,6 +1492,7 @@ class AutomaticApiView(APIView):
             plan = AutomaticPlan.objects.filter(user=request.user)
             plan = plan.first() if plan.exists() else AutomaticPlan()
 
+            plan.user = request.user
             plan.amounts_auto = Decimal(amounts_auto)
             plan.period_min = int(period_min)
             plan.period_max = int(period_max)
