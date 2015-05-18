@@ -33,6 +33,7 @@ require ['jquery', 'jquery.form'], ($, form)->
        $('.error-style').text('请输入投标金额')
        checkStatus = false
     return checkStatus
+
   $('.add-ben').click ()->
     self = $('#invest-money')
     val = $.trim(self.val())
@@ -40,12 +41,14 @@ require ['jquery', 'jquery.form'], ($, form)->
     if parseInt(val) + 100 <= parseInt($('#invest-total').val())
       self.val(parseInt(val) + 100)
       $('.error-style').text('')
+
   $('.subtract').click ()->
     self = $('#invest-money')
     val = $.trim(self.val())
     if $('.error-style').text() is ''
       if parseInt(val) - 100 >= 200
         self.val(parseInt(val) - 100)
+
   $('.income-range').blur ()->
     self = $('#scope-min')
     val = $.trim(self.val())
@@ -61,12 +64,14 @@ require ['jquery', 'jquery.form'], ($, form)->
         $('.error-style').text('')
     else
       $('.error-style').text('请填写收益范围')
+
   $('.tender-ul-left li select').change ()->
     if Number($('#dete-start').val()) > Number($('#dete-end').val())
       $('.error-style').text('请选择正确收益期限')
       return false
     else
        $('.error-style').text('')
+       
   $('#submit').click ()->
     $('#invest-money').blur()
     if $('.error-style').text() is ''
@@ -75,5 +80,8 @@ require ['jquery', 'jquery.form'], ($, form)->
       $('.error-style').text('请选择正确收益期限')
       return false
     if $('.error-style').text() is ''
-      $('#tenderForm').ajaxSubmit (data) ->
-        $('.error-style').text(data.message)
+      if $('#agree').is(':checked')
+        $('#tenderForm').ajaxSubmit (data) ->
+          $('.error-style').text(data.message)
+      else
+        alert('请同意协议')

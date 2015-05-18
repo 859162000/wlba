@@ -102,9 +102,13 @@
         return false;
       }
       if ($('.error-style').text() === '') {
-        return $('#tenderForm').ajaxSubmit(function(data) {
-          return $('.error-style').text(data.message);
-        });
+        if ($('#agree').is(':checked')) {
+          return $('#tenderForm').ajaxSubmit(function(data) {
+            return $('.error-style').text(data.message);
+          });
+        } else {
+          return alert('请同意协议');
+        }
       }
     });
   });

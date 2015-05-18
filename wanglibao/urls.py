@@ -85,6 +85,8 @@ urlpatterns = patterns(
     url(r'^announcement/', include('wanglibao_announcement.urls')),
     url(r'^redpacket/', include('wanglibao_redpack.urls')),
     url(r'^templates/', include('wanglibao_activity.urls')),
+
+    url(r'^tender_agreement/',  TemplateView.as_view(template_name="tender_agreement.jade")),
 )
 
 urlpatterns += patterns(
