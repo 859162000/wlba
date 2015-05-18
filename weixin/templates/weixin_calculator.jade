@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 收益计算器
+      a(href="javascript:history.back()")
+        span 返回
+      .calculator-head
+        .head-profit
+          p.profit-numbe
+          p.profit-txt
+        .head-time
+          p.time-number
+          p.time-txt
+      .calculator-body
+        .calculator-count
+          .count-txt-left
+          .count-input
+          .count-txt-right
+        .calculator-table
