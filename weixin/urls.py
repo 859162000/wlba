@@ -14,11 +14,9 @@ urlpatterns = patterns(
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/', TemplateView.as_view(template_name="weixin_regist.jade")),
-<<<<<<< HEAD
     url(r'^buy/', TemplateView.as_view(template_name="weixin_buy.jade")),
-=======
+    url(r'^authentication/', TemplateView.as_view(template_name="weixin_authentication.jade")),
     url(r'^calculator/(?P<id>\d+)/', views.CalculatorView.as_view(), name="weixin_calculator"),
->>>>>>> 841d08241ca83e17635f1fef3ee6f9d5a43ccd9a
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
