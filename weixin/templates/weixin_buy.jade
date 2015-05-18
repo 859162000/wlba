@@ -1,0 +1,44 @@
+-load formatters
+doctype html
+html
+    head
+        link(rel="prefetch", href="/media/{{banner.image}}")
+        include include/weixin_head.jade
+    body
+        header
+            hgroup 购买
+            a(href="javascript:history.back()")
+               span 返回
+        .buy-invest
+            p.invest-one 企业经营借款（一期）抢标有奖
+            h2 ￥579,400
+            p.invest-two 可投资金额
+        .buy-balance
+            .buy-balance-one
+                p.balance-left 可用余额
+                input(type="text", name="", value="1,320.32").balance-middle
+                a(href="#").balance-right 元
+            .buy-balance-two
+                p.balance-left 投资金额
+                input(type="text", name="", value="1000").balance-middle
+                p.balance-right 元
+            .buy-balance-three
+                p.balance-left 可用红包
+                .balance-middle
+                    .balance-middle-select
+                        select(name="type" class="").balance-middle-select-select
+                            option 1个
+                            option 2个
+                            option 3个
+                            option 4个
+        .buy-earnings
+            p.earnings 预期收益：125元
+        .buy-snap-up
+            a(href="#").snap-up 确认抢购
+        .buy-sufficient
+            p
+             |余额不足，
+             span 立即充值
+
+    include include/weixin_footer
+    script( src="/static/scripts/mobile/dist/mobile.js?v=222")
