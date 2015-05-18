@@ -79,10 +79,10 @@ block main
             p.error-style
             .submit-div
                 if plan.is_used
-                    input#is_no.is_no(type="hidden",checked=true,name="is_used")
+                    input#is_no.is_no(type="checkbox",checked=true,name="is_used",style="display:none")
                     span#submit.submit-style 关闭
                 else
-                    input#is_no.is_no(type="hidden",checked=false,name="is_used")
+                    input#is_no.is_no(type="checkbox",checked=false,name="is_used",style="display:none")
                     span#submit.submit-style 开启
 
 block script
