@@ -7,8 +7,8 @@ body
   include include/navigation
   .container
     .agreement-panel
-      h1 qqqq
-      |qqq
+      h1 {{about_us.title}}
+      |{{about_us.content|safe}}
       br
 
   include include/footer
