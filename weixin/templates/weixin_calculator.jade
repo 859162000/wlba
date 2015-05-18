@@ -7,16 +7,36 @@ html
       hgroup 收益计算器
       a(href="javascript:history.back()")
         span 返回
-      .calculator-head
-        .head-profit
-          p.profit-numbe
-          p.profit-txt
-        .head-time
-          p.time-number
-          p.time-txt
-      .calculator-body
-        .calculator-count
-          .count-txt-left
-          .count-input
-          .count-txt-right
-        .calculator-table
+    .calculator-head
+      .head-profit
+        p.profit-numbe 14
+          em %
+        p.profit-txt 年化收益
+      .head-time
+        p.time-number 3
+          em 个月
+        p.time-txt 还款期限
+    .calculator-body
+      .calculator-count
+        .count-txt-left 投资金额
+        input(type="tel",placeholder="输入100的整数被金额").count-input
+        .count-txt-right 元
+      .calculator-result 预期收益：
+        em 125
+        |元
+      .calculator-table
+        table
+          tr.table-th
+            td(rowspan="2") 月/份
+            td(colspan="2") 6个月
+          tr.table-th
+            td 本金
+            td 本收
+          tr
+            td 本金2
+            td 本收2
+            td 本金1
+    .calculator-buy 立即购买
+
+
+
