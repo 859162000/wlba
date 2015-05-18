@@ -36,7 +36,7 @@ for product in p2p_lists
         .body-time
           .time-num
             em.section-hui {{product.period}}
-            |个月
+            |{{product.pay_method|period_unit}}
           .time-tit 还款期限
       .body-right
         a(href="/weixin/detail/{{product.id}}").btn-body(class=btnClass) {{status}}
