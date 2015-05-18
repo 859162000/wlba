@@ -69,18 +69,21 @@ block main
                             option(value='12') 12
                         span 月
                     li
-                        label 开启自动投标：
-                        if plan.is_used
-                            input#is_no.is_no(type="checkbox", name="is_used", checked=true)
-                        else
-                            input#is_no.is_no(type="checkbox", name="is_used", checked=false)
+                        label 是否同意：
+                        input#agree.agree(type="checkbox", value="",checked="checked")
+                        <a href="/tender_agreement/" target="_blank" class="agreeHref">《协议》</a>
                 ul.tender-ul-right
                     li （大于等于500元才可开启自动投标工具）
                     li （该数值须不小于200元，且为100的倍数）
                     li （9%-20%为有效利率范围）
             p.error-style
             .submit-div
-               span#submit.submit-style 保存自动投标设置
+                if plan.is_used
+                    input#is_no.is_no(type="hidden",checked=true,name="is_used")
+                    span#submit.submit-style 关闭
+                else
+                    input#is_no.is_no(type="hidden",checked=false,name="is_used")
+                    span#submit.submit-style 开启
 
 block script
   script.
