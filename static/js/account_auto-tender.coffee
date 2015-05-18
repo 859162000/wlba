@@ -76,7 +76,7 @@ require ['jquery', 'jquery.form','tools'], ($, form,tool)->
     $('#invest-money').blur()
     if $('.error-style').text() is ''
        $('.income-range').blur()
-    if Number($('#dete-start').val()) > Number($('#dete-end').val())
+    if Number($('#dete-start').val()) > Number($('#dete-end').val()) or ($('#dete-start').val() == null or $('#dete-end').val() == null)
       $('.error-style').text('请选择正确收益期限')
       return false
     if $('.error-style').text() is ''
