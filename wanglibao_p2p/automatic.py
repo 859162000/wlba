@@ -38,8 +38,12 @@ class Automatic(object):
                 continue
 
             try:
+                amount = self._trade_amount(product, plan)
+                # 如果金额是0，则不需要进行投标
+                if not amount: continue
+
                 trader = P2PTrader(product=product, user=plan.user, request=None)
-                product_info, margin_info, equity_info = trader.purchase(amount=self._trade_amount(product, plan), platform=u'自动投标')
+                product_info, margin_info, equity_info = trader.purchase(amount=amount, platform=u'自动投标')
                 print('product amount: ', product_info.amount)
                 print('product category: ', equity_info.product.category)
             except Exception, e:
@@ -73,4 +77,6 @@ class Automatic(object):
         """ 根据标信息和用户自动投标计划计算本次用户投标金额 """
         p2p_equity = product.equities.filter(user=plan.user)
         equity_user = p2p_equity.equity if p2p_equity else Decimal('0')
-        return min(plan.amounts_auto, product.limit_amount_per_user - equity_user, product.remain)
+        # 如果可投金额小于用户计划金额，则不在投标
+        # return min(plan.amounts_auto, product.limit_amount_per_user - equity_user, product.remain)
+        return plan.amounts_auto if plan.amounts_auto >= min(product.limit_amount_per_user - equity_user, product.remain) else 0
