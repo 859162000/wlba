@@ -15,6 +15,9 @@ from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
 from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_p2p.amortization_plan import get_amortization_plan
+from wanglibao_margin.models import Margin
+from wanglibao_redpack import backends
+from wanglibao_rest import utils
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
@@ -352,3 +355,76 @@ class WeixinAccountHome(TemplateView):
             'banner': banner,
         }
 
+
+class P2PDetailBuyView(TemplateView):
+    template_name = 'weixin_buy.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(P2PDetailBuyView, self).get_context_data(**kwargs)
+
+        try:
+            p2p = P2PProduct.objects.exclude(status=u'流标').exclude(status=u'录标').get(pk=id, hide=False)
+
+            if p2p.soldout_time:
+                end_time = p2p.soldout_time
+            else:
+                end_time = p2p.end_time
+        except P2PProduct.DoesNotExist:
+            raise Http404(u'您查找的产品不存在')
+
+        amount = self.request.GET.get('amount', 0)
+
+        user = self.request.user
+        user_margin = user.margin.margin
+
+        current_equity = 0
+        equity_record = p2p.equities.filter(user=user).first()
+        if equity_record is not None:
+            current_equity = equity_record.equity
+
+        orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
+
+        device = utils.split_ua(self.request)
+        redpack = backends.list_redpack(user, 'available', device['device_type'])
+
+        context.update({
+            'p2p': p2p,
+            'end_time': end_time,
+            'user_margin': float(user_margin),
+            'amount': float(amount),
+            'redpack': redpack,
+            'current_equity': current_equity,
+            'orderable_amount': orderable_amount,
+        })
+
+        return context
+
+
+class CalculatorView(TemplateView):
+    template_name = 'weixin_calculator.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(CalculatorView, self).get_context_data(**kwargs)
+
+        try:
+            p2p = P2PProduct.objects.exclude(status=u'流标').exclude(status=u'录标').get(pk=id, hide=False)
+
+            if p2p.soldout_time:
+                end_time = p2p.soldout_time
+            else:
+                end_time = p2p.end_time
+        except P2PProduct.DoesNotExist:
+            raise Http404(u'您查找的产品不存在')
+
+        user_margin = 0
+        user = self.request.user
+        if user.is_authenticated():
+            user_margin = user.margin.margin
+
+        context.update({
+            'p2p': p2p,
+            'end_time': end_time,
+            'margin': float(user_margin),
+        })
+
+        return context

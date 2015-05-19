@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 充值
+      a(href="javascript:history.back()")
+        span 返回
+    section.recharge-main
+      .recharge-binding-bank
+        .binding-sign 为了提升交易额度，需要重新绑定银行卡，各银行额度请查看支持银行及限额。
+        .close-binding
+          img(src="/static/imgs/mobile/recharge/bank_close.png")
+      .recharge-body
+        .recharge-count
+          .count-txt-left 投资金额
+          input(type="tel",placeholder="输入100的整数被金额").count-input
+          .count-txt-right 元
+        .recharge-btn 下一步
+        .binding-bank-href 查看支持银行及限额
+
+    section.recharge-bank
+
+
