@@ -1,9 +1,35 @@
+.sanjiao
+  width: 0
+  height: 0
+  border-bottom: 0.4rem solid transparent
+  border-top: 0.4rem solid transparent
+  border-left: 0.4rem solid #b6b6b6
+  font-size: 0
+  line-height: 0
+  position: relative
+  a
+    width: 0
+    height: 0
+    border-bottom: 0.3rem solid transparent
+    border-top: 0.3rem solid transparent
+    border-left: 0.3rem solid #fff
+    font-size: 0
+    line-height: 0
+    position: absolute
+    right: 0.1rem
+    top: -0.3rem
+.center
+  display: -webkit-box
+  -webkit-box-pack: center
+  -webkit-box-align: center
+
 .recharge-binding-bank
   background: #ffffcb
   font-size: $font-size12
   color: $color-grey-6b6b6b
   padding: .25rem .75rem
   display: -webkit-box
+  margin-bottom: .75rem
   .binding-sign
     -webkit-box-flex: 1
   .close-binding
@@ -27,7 +53,9 @@
     background: #fff
     border: 1px solid $border-color
     text-align: center
-    margin: 2rem 0 1.5rem 0
+    margin-bottom: $margin-bottom
+    select
+      color: $color-grey-b6b6b6
     .count-txt-left
       width: 4rem
     .count-input
@@ -37,6 +65,8 @@
       line-height: normal
       text-align: left
       border: 0
+      background: #fff
+      -webkit-appearance: none
       &::-webkit-input-placeholder
         color: $color-grey-b6b6b6
     .count-txt-right
@@ -49,10 +79,50 @@
     text-align: center
     background: $color-db493f
     border-radius: $boder-radius
+    &:active
+      box-shadow: $active-shadow
   .binding-bank-href
-    margin-top: 1.5rem
+    margin-bottom: 1rem
     color: $color-4e7cda
     font-size: $font-size12
+    text-align: right
+
+.recharge-bank-edit
+  padding-left: .75rem
+  background: #fff
+  margin-bottom: .75rem
+  .bank-count
+    display: -webkit-box
+    -webkit-box-align: center
+    border-radius: $boder-radius
+    height: 2.2rem
+    font-size: $font-size12
+    color: $color-grey-989898
+    background: #fff
+    border-bottom: 1px solid $border-color
     text-align: center
+    &:last-child
+      border-bottom: none
+  .bank-txt-left
+    width: 4rem
+  .bank-input
+    -webkit-box-flex: 1
+    display: block
+    height: 100%
+    line-height: normal
+    text-align: left
+    border: 0
+    background: #fff
+  .bank-txt-right
+    width: 2.2rem
+    height: 100%
+    @extend .center
+    img
+      width: .9rem
+      height: 1rem
+      margin-right: .15rem
+    span
+      display: block
+      @extend .sanjiao
 
 
