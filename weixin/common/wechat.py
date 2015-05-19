@@ -3,14 +3,31 @@ from __future__ import unicode_literals
 from weixin.wechatpy import create_reply
 import urllib
 import requests
-"""
-jiazhe51598169@163.com change to wangjianfei@wanglibank.com
-shibajiao
-13715219924
-于振洋
-150429195605035055
-"""
+
 # 公众号类型
+class WeixinAccounts(object):
+
+    data = {
+        'main': {
+            'id': '',
+            'name': '网利宝',
+            'app_id': 'wx896485cecdb4111d',
+            'app_secret': 'b1e152144e4a4974cd06b8716faa98e1',
+            'classify': '已认证服务号'
+        },
+        'sub_1': {
+            'id': 'gh_77c09ff2f3a3',
+            'name': '网利宝',
+            'app_id': 'wx110c1d06158c860b',
+            'app_secret': '2523d084edca65b6633dae215967a23f',
+            'classify': '已认证订阅号',
+            'EncodingAESKey': '3QXabFsqXV64Bvdc4EvRciOfvWbYw7Fud38J8ianHmx'
+        }
+    }
+
+    @classmethod
+    def get(cls, key):
+        return cls.data.get(key)
 
 
 class Permission(object):
