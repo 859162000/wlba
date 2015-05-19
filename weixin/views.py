@@ -127,15 +127,17 @@ class WeixinLogin(TemplateView):
             except Account.DoesNotExist:
                 return HttpResponseNotFound()
 
-            oauth = WeChatOAuth(account.app_id, account.app_secret)
-            res = oauth.fetch_access_token(code)
-            if not res.get('errcode'):
+            try:
+                oauth = WeChatOAuth(account.app_id, account.app_secret)
+                res = oauth.fetch_access_token(code)
                 account.oauth_access_token = res.get('access_token')
                 account.oauth_access_token_expires_in = res.get('expires_in')
                 account.oauth_refresh_token = res.get('refresh_token')
                 account.save()
                 WeixinUser.objects.get_or_create(openid=res.get('openid'))
                 context['openid'] = res.get('openid')
+            except WeChatClient, e:
+                pass
 
         return context
 
