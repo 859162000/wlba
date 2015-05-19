@@ -355,7 +355,7 @@ class WeixinAccountHome(TemplateView):
 
 
 class P2PDetailBuyView(TemplateView):
-    template_name = ''
+    template_name = 'weixin_buy.jade'
 
     def get_context_data(self, id, **kwargs):
         context = super(P2PDetailBuyView, self).get_context_data(**kwargs)
@@ -373,11 +373,7 @@ class P2PDetailBuyView(TemplateView):
         amount = self.request.GET.get('amount', 0)
 
         user = self.request.user
-        margin = Margin.objects.filter(user=user).first()
-        if margin:
-            user_margin = margin.margin
-        else:
-            user_margin = 0
+        user_margin = user.margin.margin
 
         current_equity = 0
         equity_record = p2p.equities.filter(user=user).first()
@@ -392,12 +388,14 @@ class P2PDetailBuyView(TemplateView):
         context.update({
             'p2p': p2p,
             'end_time': end_time,
-            'user_margin': user_margin,
-            'amount': amount,
+            'user_margin': float(user_margin),
+            'amount': float(amount),
             'redpack': redpack,
             'current_equity': current_equity,
             'orderable_amount': orderable_amount,
         })
+
+        return context
 
 
 class CalculatorView(TemplateView):
@@ -419,12 +417,12 @@ class CalculatorView(TemplateView):
         user_margin = 0
         user = self.request.user
         if user.is_authenticated():
-            margin = Margin.objects.filter(user=user).first()
-            if margin:
-                user_margin = margin.margin
+            user_margin = user.margin.margin
 
         context.update({
             'p2p': p2p,
             'end_time': end_time,
-            'margin': user_margin,
+            'margin': float(user_margin),
         })
+
+        return context
