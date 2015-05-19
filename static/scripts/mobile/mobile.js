@@ -71,7 +71,7 @@ var org = (function(){
                     earning_element = earning_elements[i];
                     if (earning) {
                         earning += fee_earning;
-                        $(earning_element).text(earning);
+                        $(earning_element).text(earning.toFixed(2));
                     } else {
                         $(earning_element).text("0.00");
                     }
@@ -585,11 +585,53 @@ org.buy=(function(org){
     var lib = {
         init :function(){
             lib._calculate();
+            lib._buy();
+        },
+        _addEvenList: function(){
+
         },
         _calculate:function(){
-            org.calculate($('input[data-role=p2p-calculator]'),function(target){
-                console.log(target)
+            org.calculate($('input[data-role=p2p-calculator]'))
+        },
+        _buy:function(){
+            var $buyButton = $('.snap-up');
+
+            $buyButton.on('click',function(){
+                var $redpack = $("#gifts-package"),
+                    $buySufficient = $('.buy-sufficient'),
+                    balance = $("#balance").val(),
+                    amount = $('.amount').val(),
+                    productID = $(".invest-one").attr('data-protuctid');
+                if(amount % 100 != 0){
+                    return alert('请输入100的倍数金额');
+                }
+                if(amount > balance){
+                    return $buySufficient.show();
+                }
+                var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
+                if(!redpackValue || redpackValue == 'init'){
+                    redpackValue = null;
+                }
+
+                org.ajax({
+                    type: 'POST',
+                    url: '/api/p2p/purchase/mobile',
+                    data: {product: productID, amount: amount, redpack: redpackValue},
+                    beforeSend:function(){
+                        $buyButton.text("抢购中...")
+                    },
+                    success: function(data){
+                       console.log(data)
+                    },
+                    error: function(data){
+                        console.log(data)
+                    },
+                    complete:function(){
+                       $buyButton.text("确定抢购")
+                    }
+                })
             })
+
         }
     }
     return {
@@ -619,6 +661,7 @@ org.calculator=(function(org){
                 }
             })
         }
+
     }
     return {
         init : lib.init
