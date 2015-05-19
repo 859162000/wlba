@@ -28,6 +28,65 @@ var org = (function(){
                 }
             });
         },
+        _calculate :function(dom, callback){
+            var calculate = function(amount, rate, period, pay_method) {
+                var divisor, rate_pow, result, term_amount;
+                if (/等额本息/ig.test(pay_method)) {
+                    rate_pow = Math.pow(1 + rate, period);
+                    divisor = rate_pow - 1;
+                    term_amount = amount * (rate * rate_pow) / divisor;
+                    result = term_amount * period - amount;
+                } else if (/日计息/ig.test(pay_method)) {
+                    result = amount * rate * period / 360;
+                } else {
+                    result = amount * rate * period / 12;
+                }
+                return Math.floor(result * 100) / 100;
+            };
+            dom.on('input', function(e) {
+                var earning, earning_element, earning_elements, fee_earning, fee_element, fee_elements;
+                var target = $(e.target),
+                    existing = parseFloat(target.attr('data-existing')),
+                    period = target.attr('data-period'),
+                    rate = target.attr('data-rate')/100,
+                    pay_method = target.attr('data-paymethod');
+                    activity_rate = target.attr('activity-rate')/100;
+                    amount = parseFloat(target.val()) || 0;
+
+                if (amount > target.attr('data-max')) {
+                    amount = target.attr('data-max');
+                    target.val(amount);
+                }
+                amount = parseFloat(existing) + parseFloat(amount);
+                earning = calculate(amount, rate, period, pay_method);
+                fee_earning = calculate(amount, activity_rate, period, pay_method);
+
+                if (earning < 0) {
+                    earning = 0;
+                }
+                earning_elements = (target.attr('data-target')).split(',');
+                fee_elements = (target.attr('fee-target')).split(',');
+
+                for (var i = 0; i < earning_elements.length; i ++) {
+                    earning_element = earning_elements[i];
+                    if (earning) {
+                        earning += fee_earning;
+                        $(earning_element).text(earning);
+                    } else {
+                        $(earning_element).text("0.00");
+                    }
+                }
+                for (var j = 0; j < fee_elements.length;  j++) {
+                    fee_element = fee_elements[j];
+                    if (fee_earning) {
+                       $(fee_element).text(fee_earning);
+                    } else {
+                        $(fee_element).text("0.00");
+                    }
+                }
+                callback && callback(target);
+            });
+        },
         _getQueryStringByName:function(name){
             var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
              if(result == null || result.length < 1){
@@ -94,6 +153,7 @@ var org = (function(){
     return {
         scriptName             : lib.scriptName,
         ajax                   : lib._ajax,
+        calculate              : lib._calculate,
         getQueryStringByName   : lib._getQueryStringByName,
         getCookie              : lib._getCookie,
         csrfSafeMethod         : lib._csrfSafeMethod,
@@ -155,8 +215,9 @@ org.login = (function(org){
                         var next = org.getQueryStringByName('next');
                         if (next) {
                             window.location.href = next;
+                        }else{
+                            window.location.href = '/weixin/account/';
                         }
-                        window.location.href = '/weixin/account/';
                     },
                     error: function(res) {
                         if (res['status'] == 403) {
@@ -513,6 +574,50 @@ org.detail = (function(org){
             window['interval']= setInterval(function(){
                 TimeTo(endTimeList);
             },1000);
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+org.buy=(function(org){
+    var lib = {
+        init :function(){
+            lib._calculate();
+        },
+        _calculate:function(){
+            org.calculate($('input[data-role=p2p-calculator]'),function(target){
+                console.log(target)
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+org.calculator=(function(org){
+    var lib = {
+        init :function(){
+            org.calculate($('input[data-role=p2p-calculator]'))
+            lib._addEvenList();
+        },
+        _addEvenList:function(){
+            var $calculatorBuy = $('.calculator-buy'),
+                $countInput = $('.count-input'),
+                productId,
+                amount;
+            $calculatorBuy.on('click',function(){
+                productId = $(this).attr('data-productid');
+                amount  = $countInput.val();
+                console.log(productId)
+                if(amount){
+                    window.location.href = '/weixin/view/buy/' + productId + '/?amount='+ amount;
+                }else{
+                     window.location.href = '/weixin/view/buy/' + productId + '/';
+                }
+            })
         }
     }
     return {
