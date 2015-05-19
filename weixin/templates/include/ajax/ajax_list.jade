@@ -16,12 +16,12 @@ for product in p2p_lists
     listClass = 'profit-hui'
     btnClass = 'btn-red'
   .list-section
-    a(href="/weixin/detail/{{product.id}}").section-head
+    a(href="/weixin/view/detail/{{product.id}}/").section-head
       if product.category == '新手标'
         span.head-prompt  新手福利
       span.head-tit {{product.name}}
     .section-body
-      a(href="/weixin/detail/{{product.id}}").body-left
+      a(href="/weixin/view/detail/{{product.id}}/").body-left
         .body-Profit
           span.profit-cont
             .profit-math(class=listClass)
@@ -39,7 +39,7 @@ for product in p2p_lists
             |{{product.pay_method|period_unit}}
           .time-tit 还款期限
       .body-right
-        a(href="/weixin/detail/{{product.id}}").btn-body(class=btnClass) {{status}}
+        a(href="/weixin/view/buy/{{product.id}}/?next=/weixin/list/").btn-body(class=btnClass) {{status}}
     percent = float(product.ordered_amount) / product.total_amount * 100
     if status == '抢购中'
       .section-progressd(style="width:{{percent | percentage}}")

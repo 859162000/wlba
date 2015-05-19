@@ -56,7 +56,7 @@ html
                   | {{product.pay_method|period_unit}}
                 .time-tit 还款期限
             .body-right
-              a(href="/weixin/view/buy/{{product.id}}/").btn-body(class=btnClass) {{status}}
+              a(href="/weixin/view/buy/{{product.id}}/?next=/weixin/list/").btn-body(class=btnClass) {{status}}
           percent = float(product.ordered_amount) / product.total_amount * 100
           if status == '抢购中'
             .section-progressd(style="width:{{percent | percentage}}")
