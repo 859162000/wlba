@@ -79,4 +79,4 @@ class Automatic(object):
         equity_user = p2p_equity.equity if p2p_equity else Decimal('0')
         # 如果可投金额小于用户计划金额，则不在投标
         # return min(plan.amounts_auto, product.limit_amount_per_user - equity_user, product.remain)
-        return plan.amounts_auto if plan.amounts_auto >= min(product.limit_amount_per_user - equity_user, product.remain) else 0
+        return plan.amounts_auto if plan.amounts_auto <= min(product.limit_amount_per_user - equity_user, product.remain) else 0
