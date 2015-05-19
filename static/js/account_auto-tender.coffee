@@ -52,7 +52,7 @@ require ['jquery', 'jquery.form','tools'], ($, form,tool)->
   $('.income-range').blur ()->
     self = $('#scope-min')
     val = $.trim(self.val())
-    r = /^\+?[1-9]\d*$/
+    r = /^[0-9]*[1-9][0-9]*$/
     if val != ''
       if !r.test(val)
         $('.error-style').text('收益范围请输入正整数')
