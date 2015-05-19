@@ -78,6 +78,9 @@
         } else if (Number(val) > Number($.trim($('#scope-max').val()))) {
           $('.error-style').text('请填写正确收益范围');
           return false;
+        } else if (val > 30 || $('#scope-max').val() > 30) {
+          $('.error-style').text('请填写正确收益范围');
+          return false;
         } else {
           return $('.error-style').text('');
         }

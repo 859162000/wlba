@@ -60,6 +60,9 @@ require ['jquery', 'jquery.form','tools'], ($, form,tool)->
       else if Number(val) > Number($.trim($('#scope-max').val()))
         $('.error-style').text('请填写正确收益范围')
         return false
+      else if val > 30 or $('#scope-max').val() > 30
+        $('.error-style').text('请填写正确收益范围')
+        return false
       else
         $('.error-style').text('')
     else
