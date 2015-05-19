@@ -307,6 +307,7 @@ class P2PDetailView(TemplateView):
         total_buy_user = P2PEquity.objects.filter(product=p2p).count()
 
         amount = self.request.GET.get('amount', 0)
+        amount_profit = self.request.GET.get('amount_profit', 0)
         next = self.request.GET.get('next', '')
 
         context.update({
@@ -322,6 +323,7 @@ class P2PDetailView(TemplateView):
             'amount': float(amount),
             'redpack': redpack,
             'next': next,
+            'amount_profit': amount_profit,
         })
 
         return context

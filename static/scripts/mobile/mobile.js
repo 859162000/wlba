@@ -615,7 +615,7 @@ org.buy=(function(org){
 
                 org.ajax({
                     type: 'POST',
-                    url: '/api/p2p/purchase/mobile',
+                    url: '/api/p2p/purchase/',
                     data: {product: productID, amount: amount, redpack: redpackValue},
                     beforeSend:function(){
                         $buyButton.text("抢购中...")
@@ -649,13 +649,15 @@ org.calculator=(function(org){
             var $calculatorBuy = $('.calculator-buy'),
                 $countInput = $('.count-input'),
                 productId,
+                amount_profit,
                 amount;
             $calculatorBuy.on('click',function(){
                 productId = $(this).attr('data-productid');
                 amount  = $countInput.val();
-                console.log(productId)
+                amount_profit = $("#expected_income").text();
+
                 if(amount){
-                    window.location.href = '/weixin/view/buy/' + productId + '/?amount='+ amount;
+                    window.location.href = '/weixin/view/buy/' + productId + '/?amount='+ amount + ';amount_profit=' + amount_profit;
                 }else{
                      window.location.href = '/weixin/view/buy/' + productId + '/';
                 }

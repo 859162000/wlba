@@ -6,8 +6,12 @@ html
     body
         header
             hgroup 购买
-            a(href="/weixin/view/detail/{{p2p.id}}/")
-               span 返回
+            if next = ''
+              a(href="/weixin/view/detail/{{p2p.id}}/")
+                span 返回
+            else
+              a(href="{{next}}")
+                span 返回
         .buy-invest
             p.invest-one(data-protuctid="{{p2p.id}}") {{p2p.name}}
             h2 ￥{{orderable_amount|money_format}}
@@ -33,7 +37,7 @@ html
                           option(value='{{redpack.id}}') {{redpack.name}}
         .buy-earnings
             p.earnings 预期收益：
-              em#expected_income 0.00
+              em#expected_income {{amount_profit}}
               |元
         .buy-snap-up
             a(href="#").snap-up 确认抢购
