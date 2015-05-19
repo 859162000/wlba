@@ -612,9 +612,9 @@ org.calculator=(function(org){
                 amount  = $countInput.val();
                 console.log(productId)
                 if(amount){
-                    window.location.href = '/weixin/buy/' + productId + '/'+ amount +'/';
+                    window.location.href = '/weixin/view/buy/' + productId + '/?amount='+ amount;
                 }else{
-                     window.location.href = '/weixin/buy/' + productId + '/';
+                     window.location.href = '/weixin/view/buy/' + productId + '/';
                 }
             })
         }
