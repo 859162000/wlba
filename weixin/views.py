@@ -1,6 +1,6 @@
 # encoding:utf-8
 from django.views.generic import View, TemplateView, RedirectView
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
@@ -8,6 +8,7 @@ from django.contrib.auth import login as auth_login
 from django.template import Template, Context
 from django.template.loader import get_template
 from django.db.models import Q
+from django.shortcuts import render_to_response, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
@@ -306,6 +307,7 @@ class P2PDetailView(TemplateView):
         total_buy_user = P2PEquity.objects.filter(product=p2p).count()
 
         amount = self.request.GET.get('amount', 0)
+        next = self.request.GET.get('next', '')
 
         context.update({
             'p2p': p2p,
@@ -319,9 +321,16 @@ class P2PDetailView(TemplateView):
             'margin': float(user_margin),
             'amount': float(amount),
             'redpack': redpack,
+            'next': next,
         })
 
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            if self.kwargs['template'] == 'buy':
+                return HttpResponseRedirect('/weixin/login/?next=/weixin/view/buy/%s/' % self.kwargs['id'])
+        return super(P2PDetailView, self).dispatch(request, *args, **kwargs)
 
 
 class WeixinAccountHome(TemplateView):
