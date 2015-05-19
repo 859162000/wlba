@@ -1,0 +1,29 @@
+-load formatters
+doctype html
+html
+    head
+        link(rel="prefetch", href="/media/{{banner.image}}")
+        include include/weixin_head.jade
+    body
+        header
+            hgroup 账户安全
+            a(href="javascript:history.back()")
+               span 返回
+        .security-thename
+            p.thename-one
+                | 账户名
+                label 135*** **89
+            .line
+            p.thename-one(style="background: #fbfbfb;")
+                | 实名认证
+                label 张三
+            .line
+            p.thename-one
+                | 管理银行卡
+                span.thename-notadd 未添加
+                a(href="#").thename-add 添加&nbsp;&nbsp;&nbsp;
+                    span
+                        label.project-one-angle
+
+    include include/weixin_footer
+    script( src="/static/scripts/mobile/dist/mobile.js?v=222")

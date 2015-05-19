@@ -15,6 +15,7 @@ urlpatterns = patterns(
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/', TemplateView.as_view(template_name="weixin_regist.jade")),
     url(r'^buy/', TemplateView.as_view(template_name="weixin_buy.jade")),
+    url(r'^security/', TemplateView.as_view(template_name="weixin_security.jade")),
     url(r'^authentication/', TemplateView.as_view(template_name="weixin_authentication.jade")),
     url(r'^recharge/', TemplateView.as_view(template_name="weixin_recharge.jade")),
     url(r'^calculator/(?P<id>\d+)/', views.CalculatorView.as_view(), name="weixin_calculator"),
