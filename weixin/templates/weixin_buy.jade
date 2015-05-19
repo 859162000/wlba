@@ -16,13 +16,14 @@ html
         .buy-balance
             .buy-balance-one
                 p.balance-left 可用余额
-                input(type="text", name="", value="{{user_margin|money_format}}").balance-middle
+                input(type="text", name="", value="{{margin|money_format}}").balance-middle
                 a(href="#").balance-right 元
             .buy-balance-two
                 p.balance-left 投资金额
                 input(type="text", name="", value="{{amount}}").balance-middle
                 p.balance-right 元
-            .buy-balance-three
+            if redpack
+              .buy-balance-three
                 p.balance-left 可用红包
                 .balance-middle
                     .balance-middle-select
@@ -35,7 +36,7 @@ html
             p.earnings 预期收益：125元
         .buy-snap-up
             a(href="#").snap-up 确认抢购
-        if user_margin <= 0
+        if margin <= 0
           .buy-sufficient
             p
              |余额不足，
