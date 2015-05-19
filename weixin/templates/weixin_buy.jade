@@ -29,8 +29,6 @@ html
                       redpack_num = len(redpack['packages']['available'])
                       select(name="type")#gifts-package.balance-middle-select-select
                         option(value = 'init')  不使用红包
-                        option(value='test2')  不使用红包2
-                        option(value='test3')  不使用红包3
                         for redpack in redpack.packages.available
                           option(value='{{redpack.id}}') {{redpack.name}}
         .buy-earnings
