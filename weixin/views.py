@@ -375,6 +375,17 @@ class P2PDetailBuyView(TemplateView):
         user = self.request.user
         user_margin = user.margin.margin
 
+        terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
+                                                               p2p.expected_earning_rate / 100,
+                                                               datetime.datetime.now(),
+                                                               p2p.period)
+        total_earning = terms.get('total') - p2p.total_amount
+        total_fee_earning = 0
+
+        if p2p.activity:
+            total_fee_earning = Decimal(p2p.total_amount * p2p.activity.rule.rule_amount *
+                                        (Decimal(p2p.period) / Decimal(12))).quantize(Decimal('0.01'))
+
         current_equity = 0
         equity_record = p2p.equities.filter(user=user).first()
         if equity_record is not None:
@@ -393,6 +404,8 @@ class P2PDetailBuyView(TemplateView):
             'redpack': redpack,
             'current_equity': current_equity,
             'orderable_amount': orderable_amount,
+            'total_earning': total_earning,
+            'total_fee_earning': total_fee_earning,
         })
 
         return context
@@ -419,10 +432,32 @@ class CalculatorView(TemplateView):
         if user.is_authenticated():
             user_margin = user.margin.margin
 
+        terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
+                                                               p2p.expected_earning_rate / 100,
+                                                               datetime.datetime.now(),
+                                                               p2p.period)
+        total_earning = terms.get('total') - p2p.total_amount
+        total_fee_earning = 0
+
+        if p2p.activity:
+            total_fee_earning = Decimal(p2p.total_amount * p2p.activity.rule.rule_amount *
+                                        (Decimal(p2p.period) / Decimal(12))).quantize(Decimal('0.01'))
+
+        current_equity = 0
+        if user.is_authenticated():
+            equity_record = p2p.equities.filter(user=user).first()
+            if equity_record is not None:
+                current_equity = equity_record.equity
+
+        orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
+
         context.update({
             'p2p': p2p,
             'end_time': end_time,
             'margin': float(user_margin),
+            'orderable_amount': orderable_amount,
+            'total_earning': total_earning,
+            'total_fee_earning': total_fee_earning,
         })
 
         return context
