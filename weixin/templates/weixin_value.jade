@@ -1,0 +1,14 @@
+-load formatters
+doctype html
+html
+    head
+        link(rel="prefetch", href="/media/{{banner.image}}")
+        include include/weixin_head.jade
+    body
+        header
+            hgroup 充值
+            a(href="javascript:history.back()")
+                span 返回
+
+    include include/weixin_footer
+    script( src="/static/scripts/mobile/dist/mobile.js?v=222")
