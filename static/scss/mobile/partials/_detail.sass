@@ -234,6 +234,14 @@
     background-size: .85rem
   p
     background: $footerBtn-buy
+    -webkit-transition: width 300ms ease-out
+    -webkit-transform: translate3d(0,0,0)
+  .new-pay
+    width: 100%
+    &:active
+      box-shadow: $active-shadow
+  .new-pay-sign
+    width: 0%
 .footerBtn-red
   p
     color: #c89c9c

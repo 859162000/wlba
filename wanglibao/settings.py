@@ -392,6 +392,7 @@ if ENV != ENV_DEV:
 
     # wsgi scheme
     os.environ['wsgi.url_scheme'] = 'https'
+    os.environ['HTTPS'] = 'on'
 
 # starting shumi_backend config
 SM_CONSUMER_KEY = 'SM_SDK_WLB'
@@ -609,9 +610,9 @@ RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
 RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
 POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
 
-RETURN_TINMANG_UTL = "http://www.bangwoya.com/callback/callback.php"
-RETURN_TINMANG_UTL_DEBUG = "http://demo.bangwoya.com/callback/callback.php"
-TINMANGKEY= '456'
+RETURN_TINMANG_URL = "http://www.bangwoya.com/callback/callback.php"
+RETURN_TINMANG_URL_DEBUG = "http://demo.bangwoya.com/callback/callback.php"
+TINMANGKEY= '65'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

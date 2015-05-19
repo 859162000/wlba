@@ -3,7 +3,7 @@
 doctype html
 html
   head
-    title weixin-list
+    link(rel="prefetch", href="/static/imgs/mobile/detail/detail_banner.jpg")
     include include/weixin_head.jade
   body
     header
@@ -61,7 +61,6 @@ html
           if status == '抢购中'
             .section-progressd(style="width:{{percent | percentage}}")
     include include/weixin_loading
-
     include include/weixin_footer
-  script(src="/static/src/mobile/lib/zepto/zepto.js")
-  script(data-init='list' src="/static/src/mobile/mobile.js")
+    script(data-init='list', src="/static/scripts/mobile/dist/mobile.js?v=2")
+

@@ -32,7 +32,6 @@ footer
   background: #fff
   border-top: 1px solid #dadada
   font-size: $body-fontSize
-
   a
     display: block
     -webkit-box-flex: 1
@@ -40,15 +39,18 @@ footer
     line-height: 2.45rem
     text-align: center
     color: #727272
-
+    &:active
+      box-shadow: $active-shadow
+      color: $color-db493f
 
 .list-banner
-  background: #356cc2
   margin-bottom: $margin-bottom
   a
     display: block
   img
     width: 100%
+    display: block
+
 .list-body
   //margin-bottom: 2.95rem
 .list-section
@@ -121,8 +123,8 @@ footer
   .profit-tit
     position: relative
     left: 50%
-    width: 2.4rem
-    margin-left: -1.2rem
+    width: 2.6rem
+    margin-left: -1.3rem
     line-height: .7rem
     color: #b6b6b6
   .time-tit
