@@ -88,8 +88,8 @@ html
 
     .detail-footerBtn(class=statusClass)
       if status == '抢购中'
-        a(href="/weixin/calculator/{{p2p.id}}")
-        p.new-pay {{status}}
+        a(href="/weixin/calculator/{{p2p.id}}/").icon
+        a(href="/weixin/buy/{{p2p.id}}/").new-pay {{status}}
         //p.new-pay-sign 开发中，请到pc或app中购买!
       else
         p {{status}}
