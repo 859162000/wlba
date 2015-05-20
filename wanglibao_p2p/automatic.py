@@ -5,8 +5,9 @@ __author__ = 'zhanghe'
 
 import re
 from decimal import Decimal
+from django.db.models import Q
 from django.utils import timezone
-from wanglibao_p2p.models import AutomaticPlan, P2PProduct, P2PRecord
+from wanglibao_p2p.models import AutomaticPlan, AutomaticManager, P2PProduct, P2PRecord
 from wanglibao_p2p.trade import P2PTrader
 
 
@@ -17,6 +18,12 @@ class Automatic(object):
 
     def auto_trade(self):
         """ 自动投标交易 """
+
+        # 如果管理元停止了自动投标，则不在金额自动投标操作
+        automatic_manager = AutomaticManager.objects.filter(Q(is_used=True), Q(stop_plan=AutomaticManager.STOP_PLAN_STOP) | Q(stop_plan=AutomaticManager.STOP_PLAN_PAUSE) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))
+        if automatic_manager.exists():
+            return
+
         products = self._access_products()
         if not products.exists():
             print('do not has any access products, stop automatic trade')

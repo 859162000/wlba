@@ -845,9 +845,9 @@ class AutomaticManager(models.Model):
 
     name = models.CharField(u'计划名称', max_length=60)
     message = models.CharField(u'计划描述', max_length=1024, blank=True, null=True, help_text=u'此描述信息将在[我的账户]->[自动投标]向用户提示')
-    stop_plan = models.CharField(u'停止计划', max_length=30, null=False, choices=STOP_PLAN, help_text=u'选择按时停止，必须填写计划开始时间和结束时间')
-    start_at = models.DateTimeField(u"开始时间", null=True, blank=True, help_text=u'按时停止计划开始时间，自动投标计划此时停止运行')
-    end_at = models.DateTimeField(u"结束时间", null=True, blank=True, help_text=u'按时停止计划结束时间，自动投标计划此时恢复运行')
+    stop_plan = models.CharField(u'停止方案', max_length=30, null=False, choices=STOP_PLAN, help_text=u'选择暂停计划方案，必须填写计划开始时间和结束时间')
+    start_at = models.DateTimeField(u"暂停计划开始时间", null=True, blank=True, help_text=u'暂停计划方案开始时间，自动投标功能此时停止运行')
+    end_at = models.DateTimeField(u"暂停计划结束时间", null=True, blank=True, help_text=u'暂停计划方案结束时间，自动投标功能此时恢复运行')
     last_updated = models.DateTimeField(u'上次更新时间', auto_now=True, default=timezone.now())
     is_used = models.BooleanField(u'是否启用', default=False)
 
