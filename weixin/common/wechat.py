@@ -1,6 +1,7 @@
 # encoding:utf-8
 from __future__ import unicode_literals
-from weixin.wechatpy import create_reply
+from django.core.cache import cache
+from weixin.wechatpy import create_reply, WeChatClient
 import urllib
 import requests
 
@@ -13,7 +14,9 @@ class WeixinAccounts(object):
             'name': '网利宝',
             'app_id': 'wx896485cecdb4111d',
             'app_secret': 'b1e152144e4a4974cd06b8716faa98e1',
-            'classify': '已认证服务号'
+            'classify': '已认证服务号',
+            'mch_id': '1237430102',
+            'key': 'mmeBOdBjuovQOgPPSp1qZFONbHS9pkZn'
         },
         'sub_1': {
             'id': 'gh_77c09ff2f3a3',
@@ -22,12 +25,36 @@ class WeixinAccounts(object):
             'app_secret': '2523d084edca65b6633dae215967a23f',
             'classify': '已认证订阅号',
             'EncodingAESKey': '3QXabFsqXV64Bvdc4EvRciOfvWbYw7Fud38J8ianHmx'
+        },
+        'test': {
+            'app_id': 'wx22c7a048569d3e7e',
+            'app_secret': '1340e746fb4c3719d405fdc27752bc6f'
         }
     }
 
     @classmethod
     def get(cls, key):
         return cls.data.get(key)
+
+    @classmethod
+    def access_token(cls, key):
+        cache_key = 'access_token_{}'.format(key)
+        if not cache.get(cache_key):
+            account = cls.get(key)
+            client = WeChatClient(account.get('app_id'), account.get('app_secret'))
+            res = client.fetch_access_token()
+            cache.set(cache_key, res.get('access_token'), res.get('expires_in') - 60)
+        return cache.get(cache_key)
+
+    @classmethod
+    def jsapi_ticket(cls, key):
+        cache_key = 'jsapi_ticket_{}'.format(key)
+        if not cache.get(cache_key):
+            account = cls.get(key)
+            client = WeChatClient(account.get('app_id'), account.get('app_secret'), cls.access_token(key))
+            res = client.jsapi.get_ticket()
+            cache.set(cache_key, res.get('ticket'), res.get('expires_in') - 60)
+        return cache.get(cache_key)
 
 
 class Permission(object):

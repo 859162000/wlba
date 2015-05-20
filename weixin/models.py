@@ -43,15 +43,20 @@ class Account(models.Model):
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         return now
 
+    def update_access_token(self):
+        now = self._now()
+        client = WeChatClient(self.app_id, self.app_secret)
+        res = client.fetch_access_token()
+        self.access_token_content = res.get('access_token')
+        self.access_token_expires_at = now + datetime.timedelta(seconds=res.get('expires_in') - 60)
+        self.save()
+
     @property
     def access_token(self):
         now = self._now()
+
         if now > self.access_token_expires_at:
-            client = WeChatClient(self.app_id, self.app_secret)
-            res = client.fetch_access_token()
-            self.access_token_content = res.get('access_token')
-            self.access_token_expires_at = now + datetime.timedelta(seconds=res.get('expires_in') - 60)
-            self.save()
+            self.update_access_token()
 
         return self.access_token_content
 
@@ -75,7 +80,6 @@ class Account(models.Model):
             # 超时刷新
             pass
         return self.oauth_access_token_content
-
 
     @oauth_access_token.setter
     def oauth_access_token(self, access_token):
