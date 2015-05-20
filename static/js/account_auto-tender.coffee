@@ -97,9 +97,11 @@ require ['jquery', 'jquery.form','tools'], ($, form,tool)->
                 if isNo
                   $('#submit').text("关闭")
                   $('#is_no').prop('checked', false)
+                  $('#status').text("自动投标已开启")
                 else
                   $('#submit').text("开启")
                   $('#is_no').prop('checked', true)
+                  $('#status').text("自动投标已关闭")
         })
       else
         alert('请同意协议')

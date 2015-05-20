@@ -18,6 +18,12 @@ block main
             .ul-style
                 ul.tender-ul-left
                     li
+                        label 目前状态：
+                        if plan.is_used
+                           span#status.status-style 自动投标已开启
+                        else
+                           span#status.status-style 自动投标已关闭
+                    li
                         label 账户可用余额：
                         b.money-format {{ margin | money_format_int }}
                         span 元
@@ -76,14 +82,24 @@ block main
                     li （大于等于500元才可开启自动投标工具）
                     li （该数值须不小于200元，且为100的倍数）
                     li （1%-30%为有效利率范围）
-            p.error-style
-            .submit-div
-                if plan.is_used
-                    input#is_no.is_no(type="checkbox",checked=false,name="is_used",style="display:none")
-                    span#submit.submit-style 关闭
-                else
-                    input#is_no.is_no(type="checkbox",checked=true,name="is_used",style="display:none")
-                    span#submit.submit-style 开启
+            if status
+                p.error-style {{message}}
+                .submit-div
+                    if plan.is_used
+                        input#is_no.is_no(type="checkbox",checked=false,name="is_used",style="display:none")
+                        span.submit-style.button-gray 关闭
+                    else
+                        input#is_no.is_no(type="checkbox",checked=true,name="is_used",style="display:none")
+                        span.submit-style.button-gray 开启
+            else
+                p.error-style
+                .submit-div
+                    if plan.is_used
+                        input#is_no.is_no(type="checkbox",checked=false,name="is_used",style="display:none")
+                        span#submit.submit-style 关闭
+                    else
+                        input#is_no.is_no(type="checkbox",checked=true,name="is_used",style="display:none")
+                        span#submit.submit-style 开启
 
 block script
   script.

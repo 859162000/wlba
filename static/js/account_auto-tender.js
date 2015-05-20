@@ -123,10 +123,12 @@
                 if (data.ret_code === 0) {
                   if (isNo) {
                     $('#submit').text("关闭");
-                    return $('#is_no').prop('checked', false);
+                    $('#is_no').prop('checked', false);
+                    return $('#status').text("自动投标已开启");
                   } else {
                     $('#submit').text("开启");
-                    return $('#is_no').prop('checked', true);
+                    $('#is_no').prop('checked', true);
+                    return $('#status').text("自动投标已关闭");
                   }
                 }
               });
