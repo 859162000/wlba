@@ -17,6 +17,7 @@ from celery.schedules import crontab
 from Crypto.PublicKey import RSA
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+CERT_DIR = os.path.join(BASE_DIR, "certificate")
 
 try:
     with open(os.path.join(BASE_DIR, 'env.json'), 'r') as config_file:
@@ -478,15 +479,15 @@ if ENV == ENV_PRODUCTION:
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
-    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
-    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
-    YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
+    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
+    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
+    YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/cnp/purchase"
     KUAI_QUERY_URL = "https://mas.99bill.com:443/cnp/pci_query"
     KUAI_DEL_URL = "https://mas.99bill.com:443/cnp/pci_del"
     KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
-    KUAI_PEM_PATH = os.path.join(BASE_DIR, "81231006011001390.pem")
+    KUAI_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390.pem")
     KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
     KUAI_TERM_ID = "00004559"
@@ -504,15 +505,15 @@ elif ENV == ENV_PREPRODUCTION:
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
-    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
-    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
-    YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "yeepay_pub_key.pem"), "r").read())
+    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
+    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
+    YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/cnp/purchase"
     KUAI_QUERY_URL = "https://mas.99bill.com:443/cnp/pci_query"
     KUAI_DEL_URL = "https://mas.99bill.com:443/cnp/pci_del"
     KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
-    KUAI_PEM_PATH = os.path.join(BASE_DIR, "81231006011001390.pem")
+    KUAI_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390.pem")
     KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
     KUAI_TERM_ID = "00004559"
@@ -530,14 +531,14 @@ else:
 
     YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "YB01000000144"
-    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(BASE_DIR, 'pkcs8_rsa_private_key144.pem'), 'r').read())
-    YEE_PUB_KEY = RSA.importKey(open(os.path.join(BASE_DIR, "rsa_public_key144.pem"), "r").read())
+    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'pkcs8_rsa_private_key144.pem'), 'r').read())
+    YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "rsa_public_key144.pem"), "r").read())
 
     KUAI_PAY_URL = "https://sandbox.99bill.com:9445/cnp/purchase"
     KUAI_QUERY_URL = "https://sandbox.99bill.com:9445/cnp/pci_query"
     KUAI_DEL_URL = "https://sandbox.99bill.com:9445/cnp/pci_del"
     KUAI_DYNNUM_URL = "https://sandbox.99bill.com:9445/cnp/getDynNum"
-    KUAI_PEM_PATH = os.path.join(BASE_DIR, "10411004511201290.pem")
+    KUAI_PEM_PATH = os.path.join(CERT_DIR, "10411004511201290.pem")
     KUAI_MER_ID = "104110045112012"
     KUAI_MER_PASS = "vpos123"
     KUAI_TERM_ID = "00002012"
