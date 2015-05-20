@@ -8,17 +8,39 @@ html
       a(href="javascript:history.back()")
         span 返回
     section.recharge-main
-      .recharge-binding-bank
+      .recharge-binding-bank(style="display:none")
         .binding-sign 为了提升交易额度，需要重新绑定银行卡，各银行额度请查看支持银行及限额。
         .close-binding
           img(src="/static/imgs/mobile/recharge/bank_close.png")
+      .recharge-bank-edit
+        .bank-count
+          .bank-txt-left 银行卡号
+          input(type="tel",placeholder="输入100的整数被金额").bank-input
+          .bank-txt-right
+            img(src="/static/imgs/mobile/recharge/select_bank.png")
+        .bank-count
+          .bank-txt-left 开户银行
+          input(type="tel",placeholder="输入100的整数被金额").bank-input
+          .bank-txt-right
+            span.sanjiao
+              a
+
       .recharge-body
+        .recharge-count(style="display:none")
+          .count-txt-left 银行卡号
+          input(type="tel",placeholder="请输入持卡人储存卡号").count-input
+        .recharge-count(style="display:none")
+          .count-txt-left 开户银行
+          select(name="type").count-input
+            option(value = 'init')  请选择
         .recharge-count
-          .count-txt-left 投资金额
+          .count-txt-left 充值金额
           input(type="tel",placeholder="输入100的整数被金额").count-input
           .count-txt-right 元
-        .recharge-btn 下一步
         .binding-bank-href 查看支持银行及限额
+
+        .recharge-btn 下一步
+
 
     section.recharge-bank
 

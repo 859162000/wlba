@@ -1,6 +1,6 @@
 # encoding:utf-8
 from django.views.generic import View, TemplateView, RedirectView
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseBadRequest, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
@@ -8,6 +8,7 @@ from django.contrib.auth import login as auth_login
 from django.template import Template, Context
 from django.template.loader import get_template
 from django.db.models import Q
+from django.shortcuts import render_to_response, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
@@ -333,7 +334,17 @@ class P2PListWeixin(APIView):
 
 
 class P2PDetailView(TemplateView):
-    template_name = 'weixin_detail.jade'
+
+    def get_template_names(self):
+        template = self.kwargs['template']
+        if template == 'calculator':
+            template_name = 'weixin_calculator.jade'
+        elif template == 'buy':
+            template_name = 'weixin_buy.jade'
+        else:
+            template_name = 'weixin_detail.jade'
+
+        return template_name
 
     def get_context_data(self, id, **kwargs):
         context = super(P2PDetailView, self).get_context_data(**kwargs)
@@ -360,16 +371,25 @@ class P2PDetailView(TemplateView):
             total_fee_earning = Decimal(p2p.total_amount * p2p.activity.rule.rule_amount *
                                         (Decimal(p2p.period) / Decimal(12))).quantize(Decimal('0.01'))
 
+        user_margin = 0
         current_equity = 0
+        redpack = None
         user = self.request.user
         if user.is_authenticated():
+            user_margin = user.margin.margin
             equity_record = p2p.equities.filter(user=user).first()
             if equity_record is not None:
                 current_equity = equity_record.equity
 
+            device = utils.split_ua(self.request)
+            redpack = backends.list_redpack(user, 'available', device['device_type'])
+
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
         total_buy_user = P2PEquity.objects.filter(product=p2p).count()
 
+        amount = self.request.GET.get('amount', 0)
+        amount_profit = self.request.GET.get('amount_profit', 0)
+        next = self.request.GET.get('next', '')
 
         context.update({
             'p2p': p2p,
@@ -380,9 +400,20 @@ class P2PDetailView(TemplateView):
             'attachments': p2p.attachment_set.all(),
             'total_fee_earning': total_fee_earning,
             'total_buy_user': total_buy_user,
+            'margin': float(user_margin),
+            'amount': float(amount),
+            'redpack': redpack,
+            'next': next,
+            'amount_profit': amount_profit,
         })
 
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            if self.kwargs['template'] == 'buy':
+                return HttpResponseRedirect('/weixin/login/?next=/weixin/view/buy/%s/' % self.kwargs['id'])
+        return super(P2PDetailView, self).dispatch(request, *args, **kwargs)
 
 
 class WeixinAccountHome(TemplateView):
@@ -436,76 +467,3 @@ class WeixinAccountHome(TemplateView):
             'banner': banner,
         }
 
-
-class P2PDetailBuyView(TemplateView):
-    template_name = 'weixin_buy.jade'
-
-    def get_context_data(self, id, **kwargs):
-        context = super(P2PDetailBuyView, self).get_context_data(**kwargs)
-
-        try:
-            p2p = P2PProduct.objects.exclude(status=u'流标').exclude(status=u'录标').get(pk=id, hide=False)
-
-            if p2p.soldout_time:
-                end_time = p2p.soldout_time
-            else:
-                end_time = p2p.end_time
-        except P2PProduct.DoesNotExist:
-            raise Http404(u'您查找的产品不存在')
-
-        amount = self.request.GET.get('amount', 0)
-
-        user = self.request.user
-        user_margin = user.margin.margin
-
-        current_equity = 0
-        equity_record = p2p.equities.filter(user=user).first()
-        if equity_record is not None:
-            current_equity = equity_record.equity
-
-        orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
-
-        device = utils.split_ua(self.request)
-        redpack = backends.list_redpack(user, 'available', device['device_type'])
-
-        context.update({
-            'p2p': p2p,
-            'end_time': end_time,
-            'user_margin': float(user_margin),
-            'amount': float(amount),
-            'redpack': redpack,
-            'current_equity': current_equity,
-            'orderable_amount': orderable_amount,
-        })
-
-        return context
-
-
-class CalculatorView(TemplateView):
-    template_name = 'weixin_calculator.jade'
-
-    def get_context_data(self, id, **kwargs):
-        context = super(CalculatorView, self).get_context_data(**kwargs)
-
-        try:
-            p2p = P2PProduct.objects.exclude(status=u'流标').exclude(status=u'录标').get(pk=id, hide=False)
-
-            if p2p.soldout_time:
-                end_time = p2p.soldout_time
-            else:
-                end_time = p2p.end_time
-        except P2PProduct.DoesNotExist:
-            raise Http404(u'您查找的产品不存在')
-
-        user_margin = 0
-        user = self.request.user
-        if user.is_authenticated():
-            user_margin = user.margin.margin
-
-        context.update({
-            'p2p': p2p,
-            'end_time': end_time,
-            'margin': float(user_margin),
-        })
-
-        return context
