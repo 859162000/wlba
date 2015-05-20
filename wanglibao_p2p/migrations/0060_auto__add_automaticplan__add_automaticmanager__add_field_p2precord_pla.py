@@ -18,20 +18,36 @@ class Migration(SchemaMigration):
             ('period_max', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('rate_min', self.gf('django.db.models.fields.FloatField')(default=0)),
             ('rate_max', self.gf('django.db.models.fields.FloatField')(default=0)),
-            ('create_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, blank=True)),
+            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2015, 5, 20, 0, 0), auto_now=True, blank=True)),
             ('is_used', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal(u'wanglibao_p2p', ['AutomaticPlan'])
 
+        # Adding model 'AutomaticManager'
+        db.create_table(u'wanglibao_p2p_automaticmanager', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=60)),
+            ('message', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True, blank=True)),
+            ('stop_plan', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('start_at', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('end_at', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2015, 5, 20, 0, 0), auto_now=True, blank=True)),
+            ('is_used', self.gf('django.db.models.fields.BooleanField')(default=False)),
+        ))
+        db.send_create_signal(u'wanglibao_p2p', ['AutomaticManager'])
+
         # Adding field 'P2PRecord.platform'
         db.add_column(u'wanglibao_p2p_p2precord', 'platform',
-                      self.gf('django.db.models.fields.CharField')(default=u'', max_length=100),
+                      self.gf('django.db.models.fields.CharField')(default=u'\u624b\u52a8\u6295\u6807', max_length=100),
                       keep_default=False)
 
 
     def backwards(self, orm):
         # Deleting model 'AutomaticPlan'
         db.delete_table(u'wanglibao_p2p_automaticplan')
+
+        # Deleting model 'AutomaticManager'
+        db.delete_table(u'wanglibao_p2p_automaticmanager')
 
         # Deleting field 'P2PRecord.platform'
         db.delete_column(u'wanglibao_p2p_p2precord', 'platform')
@@ -137,13 +153,24 @@ class Migration(SchemaMigration):
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']"}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '32'})
         },
+        u'wanglibao_p2p.automaticmanager': {
+            'Meta': {'object_name': 'AutomaticManager'},
+            'end_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_used': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 5, 20, 0, 0)', 'auto_now': 'True', 'blank': 'True'}),
+            'message': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'null': 'True', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '60'}),
+            'start_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'stop_plan': ('django.db.models.fields.CharField', [], {'max_length': '30'})
+        },
         u'wanglibao_p2p.automaticplan': {
             'Meta': {'object_name': 'AutomaticPlan'},
             'amounts_auto': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '20', 'decimal_places': '2'}),
             'amounts_left': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '20', 'decimal_places': '2'}),
-            'create_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_used': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 5, 20, 0, 0)', 'auto_now': 'True', 'blank': 'True'}),
             'period_max': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'period_min': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'rate_max': ('django.db.models.fields.FloatField', [], {'default': '0'}),
@@ -264,7 +291,7 @@ class Migration(SchemaMigration):
             'category': ('django.db.models.fields.CharField', [], {'default': "u'\\u666e\\u901a'", 'max_length': '16'}),
             'contract_serial_number': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             'contract_template': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.ContractTemplate']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 5, 19, 0, 0)'}),
+            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 5, 27, 0, 0)'}),
             'excess_earning_description': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'excess_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'expected_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
@@ -317,7 +344,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1000'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'platform': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '100'}),
+            'platform': ('django.db.models.fields.CharField', [], {'default': "u'\\u624b\\u52a8\\u6295\\u6807'", 'max_length': '100'}),
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
             'product_balance_after': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})

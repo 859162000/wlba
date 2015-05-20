@@ -8,7 +8,7 @@ from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning,\
-    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance, AutomaticPlan
+    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance, AutomaticPlan, AutomaticManager
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization, P2PEquityJiuxian
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
@@ -510,12 +510,17 @@ class P2PEquityJiuxianAdmin(ExportMixin, admin.ModelAdmin):
 
 
 class AutomaticPlanAdmin(admin.ModelAdmin):
-    display = ('id', 'user', 'amounts_auto', 'amounts_left', 'period_min', 'period_max', 'rate_min', 'rate_max', 'create_at', 'is_used')
+    display = ('id', 'user', 'amounts_auto', 'amounts_left', 'period_min', 'period_max', 'rate_min', 'rate_max', 'last_updated', 'is_used')
     list_display = display
     readonly_fields = display
     raw_id_fields = ('user',)
     search_fields = ('user__wanglibaouserprofile__phone',)
-    ordering = ('id', 'create_at')
+    ordering = ('id', '-last_updated')
+
+
+class AutomaticManagerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'stop_plan', 'start_at', 'end_at', 'last_updated', 'is_used', 'message')
+    ordering = ('id', '-last_updated')
 
 
 admin.site.register(P2PProduct, P2PProductAdmin)
@@ -535,6 +540,7 @@ admin.site.register(InterestInAdvance, InterestInAdvanceAdmin)
 admin.site.register(ProductInterestPrecision, ProductInterestPrecisionAdmin)
 admin.site.register(P2PEquityJiuxian, P2PEquityJiuxianAdmin)
 admin.site.register(AutomaticPlan, AutomaticPlanAdmin)
+admin.site.register(AutomaticManager, AutomaticManagerAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')
