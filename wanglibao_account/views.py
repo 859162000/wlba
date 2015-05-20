@@ -7,7 +7,7 @@ import math
 from decimal import Decimal
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
@@ -41,7 +41,7 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
-    AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan
+    AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
@@ -1432,9 +1432,12 @@ class AutomaticView(TemplateView):
     template_name = 'account_auto_tender.jade'
 
     def get_context_data(self, **kwargs):
+        status, message, result = False, '', {}
+        automatic_manager = AutomaticManager.objects.filter(Q(is_used=True), Q(stop_plan=AutomaticManager.STOP_PLAN_STOP) | Q(stop_plan=AutomaticManager.STOP_PLAN_PAUSE) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))
+        if automatic_manager.exists():
+            status, message = True, automatic_manager.first().message
 
         plan = AutomaticPlan.objects.filter(user=self.request.user).first()
-        result = {}
         if plan is not None:
             result = {
                 'id': plan.id,
@@ -1448,7 +1451,10 @@ class AutomaticView(TemplateView):
 
         return {
             'margin': self.request.user.margin.margin,
-            'plan': result
+            'plan': result,
+            'status': status,
+            'message': message
+
         }
 
 
