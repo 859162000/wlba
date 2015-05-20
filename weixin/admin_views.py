@@ -254,9 +254,6 @@ class WeixinMenuApi(AdminAPIView):
 
     @weixin_api_error
     def post(self, request):
-        print request._is_secure()
-        from django.core.urlresolvers import reverse
-        print request.build_absolute_uri(reverse('weixin_oauth_login_redirect'))
         res = self.client.menu.create(request.body)
         return Response(res, status=201)
 
