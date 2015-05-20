@@ -72,7 +72,7 @@
       val = $.trim(self.val());
       r = /^[0-9]*[1-9][0-9]*$/;
       if (val !== '') {
-        if (!r.test(val)) {
+        if (!r.test(val) || !r.test($('#scope-max').val())) {
           $('.error-style').text('收益范围请输入正整数');
           return false;
         } else if (Number(val) > Number($.trim($('#scope-max').val()))) {
