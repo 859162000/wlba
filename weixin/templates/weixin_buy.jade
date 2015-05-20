@@ -13,16 +13,17 @@ html
               a(href="{{next}}")
                 span 返回
         .buy-invest
-            p.invest-one(data-protuctid="{{p2p.id}}") {{p2p.name}}
+            a(href="/weixin/view/detail/{{p2p.id}}/").invest-one(data-protuctid="{{p2p.id}}") {{p2p.name}}
             h2 ￥{{orderable_amount|money_format}}
             p.invest-two 可投资金额
         .buy-balance
             .buy-balance-one
                 p.balance-left 可用余额
-                input(type="text", name="", value="{{margin|money_format}}", disabled)#balance.balance-middle
+                .balance-middle(data-value="{{margin}}")#balance {{margin|money_format}}
                 a(href="#").balance-right 元
             .buy-balance-two
                 p.balance-left 投资金额
+                amount = int(amount)
                 input(type="tel",value="{{amount}}",placeholder="输入100的整数被金额",p2p-type="{{p2p.category}}",data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="#xunlei-vip-income-head",data-target="#expected_income", data-existing="0", data-rate="{{p2p.expected_earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").amount.balance-middle
                 p.balance-right 元
             if redpack
@@ -41,10 +42,15 @@ html
               |元
         .buy-snap-up
             a(href="#").snap-up 确认抢购
-        if margin <= 0
-          .buy-sufficient
-            p
-             |余额不足，
-             span 立即充值
-
+        .buy-sufficient
+          p
+           |余额不足，
+           a(href="/weixin/recharge/") 立即充值
+        .sign-main
+          .sign-body
+            img(src="/static/imgs/mobile/sign/sign_icon.png")
+            p.sign-tit 恭喜您，购买成功！
+            p.balance-tit 您目前账户余额：
+              em.balance-sign
+            a(href="/weixin/list/") 继续够买
     script(data-init="buy", src="/static/scripts/mobile/mobile.js?v=222")

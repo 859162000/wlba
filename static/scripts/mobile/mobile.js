@@ -599,10 +599,10 @@ org.buy=(function(org){
             $buyButton.on('click',function(){
                 var $redpack = $("#gifts-package"),
                     $buySufficient = $('.buy-sufficient'),
-                    balance = $("#balance").val(),
-                    amount = $('.amount').val(),
+                    balance = parseFloat($("#balance").attr("data-value")),
+                    amount = parseInt($('.amount').val()),
                     productID = $(".invest-one").attr('data-protuctid');
-                if(amount % 100 != 0){
+                if(amount % 100 !== 0 || amount === 0){
                     return alert('请输入100的倍数金额');
                 }
                 if(amount > balance){
@@ -621,10 +621,13 @@ org.buy=(function(org){
                         $buyButton.text("抢购中...")
                     },
                     success: function(data){
-                       console.log(data)
+                       if(data.data){
+                           $('.balance-sign').text(balance-data.data);
+                           $(".sign-main").css("display","-webkit-box");
+                       }
                     },
                     error: function(data){
-                        console.log(data)
+                        alert(data.message)
                     },
                     complete:function(){
                        $buyButton.text("确定抢购")

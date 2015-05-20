@@ -1,0 +1,10 @@
+//充值，购买成功后提示弹层
+
+mixin signFn(signTit, signCallbackTxt, signCallbackURL)
+  .sign-main
+    .sign-body
+      img(src="/static/imgs/mobile/sign/sign_icon.png")
+      p=signTit
+      p 您目前账户余额
+        em.balance-sign
+      a(href=signCallbackURL)=signCallbackTxt
