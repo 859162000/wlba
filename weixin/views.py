@@ -486,14 +486,6 @@ class WeixinRecharge(TemplateView):
 
         banks = Bank.get_kuai_deposit_banks()
 
-        try:
-            card_list = Card.objects.filter(user=self.request.user).select_related('bank').order_by('-last_update')
-            bank_list = [c.bank.gate_id for c in card_list]
-            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x['gate_id']))
-            cards = cards_tmp
-        except:
-            pass
-
         return {
             'banks': banks,
         }
@@ -503,7 +495,7 @@ class WeixinRechargeSecond(TemplateView):
     template_name = 'weixin_recharge_second.jade'
 
     def get_context_data(self, **kwargs):
-        bank_no = self.request.GET.get('bank_no', '')
+        card_no = self.request.GET.get('card_no', '')
         gate_id = self.request.GET.get('gate_id', '')
         amount = self.request.GET.get('amount', 0)
 
@@ -513,7 +505,7 @@ class WeixinRechargeSecond(TemplateView):
             bank = None
 
         context = {
-            'bank_no': bank_no,
+            'card_no': card_no,
             'gate_id': gate_id,
             'amount': amount,
             'bank': bank,
