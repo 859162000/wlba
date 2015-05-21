@@ -474,7 +474,15 @@ if ENV == ENV_PRODUCTION:
     #SIGN_HOST = '115.28.151.49'
     SIGN_HOST = '10.160.18.243'
     SIGN_PORT = 8733
+
+    HUI_SHORT_MER_ID = "510793"
+    HUI_SHORT_SIGN_HOST = SIGN_HOST
+    HUI_SHORT_SIGN_PORT = "8734"
+    HUI_SHORT_OPER_ID = "bjwl"
     PAY_URL = 'https://mas.chinapnr.com'
+    HUI_SHORT_BIND_URL = "%s/gao/entry.do" % PAY_URL
+    HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
+    HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
@@ -483,10 +491,13 @@ if ENV == ENV_PRODUCTION:
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
 
-    KUAI_PAY_URL = "https://mas.99bill.com:443/cnp/purchase"
-    KUAI_QUERY_URL = "https://mas.99bill.com:443/cnp/pci_query"
-    KUAI_DEL_URL = "https://mas.99bill.com:443/cnp/pci_del"
-    KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
+    KUAI_PAY_URL = "https://mas.99bill.com:443/"
+
+    #KUAI_PAY_URL = "https://mas.99bill.com:443/cnp/purchase"
+    #KUAI_QUERY_URL = "https://mas.99bill.com:443/cnp/pci_query"
+    #KUAI_DEL_URL = "https://mas.99bill.com:443/cnp/pci_del"
+    #KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
+
     KUAI_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390.pem")
     KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
@@ -500,7 +511,15 @@ elif ENV == ENV_PREPRODUCTION:
     CUSTOM_ID = '000007522683'
     SIGN_HOST = 'www.wanglibao.com'
     SIGN_PORT = 8733
+
+    HUI_SHORT_MER_ID = "510793"
+    HUI_SHORT_SIGN_HOST = SIGN_HOST
+    HUI_SHORT_SIGN_PORT = "8734"
+    HUI_SHORT_OPER_ID = "bjwl"
     PAY_URL = 'https://mas.chinapnr.com'
+    HUI_SHORT_BIND_URL = "%s/gao/entry.do" % PAY_URL
+    HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
+    HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
@@ -509,10 +528,13 @@ elif ENV == ENV_PREPRODUCTION:
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
 
-    KUAI_PAY_URL = "https://mas.99bill.com:443/cnp/purchase"
-    KUAI_QUERY_URL = "https://mas.99bill.com:443/cnp/pci_query"
-    KUAI_DEL_URL = "https://mas.99bill.com:443/cnp/pci_del"
-    KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
+    KUAI_PAY_URL = "https://mas.99bill.com:443/"
+
+    #KUAI_PAY_URL = "https://mas.99bill.com:443/cnp/purchase"
+    #KUAI_QUERY_URL = "https://mas.99bill.com:443/cnp/pci_query"
+    #KUAI_DEL_URL = "https://mas.99bill.com:443/cnp/pci_del"
+    #KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
+
     KUAI_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390.pem")
     KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
@@ -526,7 +548,14 @@ else:
     CUSTOM_ID = '000010124821'
     SIGN_HOST = '127.0.0.1'
     SIGN_PORT = 8733
+    HUI_SHORT_MER_ID = "510793"
+    HUI_SHORT_SIGN_HOST = SIGN_HOST
+    HUI_SHORT_SIGN_PORT = "8734"
+    HUI_SHORT_OPER_ID = "bjwl"
     PAY_URL = 'http://test.chinapnr.com'
+    HUI_SHORT_BIND_URL = "%s/gar/entry.do" % PAY_URL
+    HUI_SHORT_DEBIND_URL = "%s/gar/entry.do" % PAY_URL
+    HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
     YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
@@ -534,10 +563,13 @@ else:
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'pkcs8_rsa_private_key144.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "rsa_public_key144.pem"), "r").read())
 
-    KUAI_PAY_URL = "https://sandbox.99bill.com:9445/cnp/purchase"
-    KUAI_QUERY_URL = "https://sandbox.99bill.com:9445/cnp/pci_query"
-    KUAI_DEL_URL = "https://sandbox.99bill.com:9445/cnp/pci_del"
-    KUAI_DYNNUM_URL = "https://sandbox.99bill.com:9445/cnp/getDynNum"
+    KUAI_PAY_URL = "https://sandbox.99bill.com:9445"
+
+    #KUAI_PAY_URL = "https://sandbox.99bill.com:9445/cnp/purchase"
+    #KUAI_QUERY_URL = "https://sandbox.99bill.com:9445/cnp/pci_query"
+    #KUAI_DEL_URL = "https://sandbox.99bill.com:9445/cnp/pci_del"
+    #KUAI_DYNNUM_URL = "https://sandbox.99bill.com:9445/cnp/getDynNum"
+
     KUAI_PEM_PATH = os.path.join(CERT_DIR, "10411004511201290.pem")
     KUAI_MER_ID = "104110045112012"
     KUAI_MER_PASS = "vpos123"
