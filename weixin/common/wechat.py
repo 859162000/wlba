@@ -10,7 +10,7 @@ class WeixinAccounts(object):
 
     data = {
         'main': {
-            'id': '',
+            'id': '1',
             'name': '网利宝',
             'app_id': 'wx896485cecdb4111d',
             'app_secret': 'b1e152144e4a4974cd06b8716faa98e1',
@@ -32,27 +32,46 @@ class WeixinAccounts(object):
         }
     }
 
-    @classmethod
-    def get(cls, key):
-        return cls.data.get(key)
+    id = None
+    name = None
+    app_id = None
+    app_secret = None
+    classify = None
+    mch_id = None
+    key = None
+    EncodingAESKey = None
+
+    client_cache = None
+
+    def __init__(self, key):
+        data = self.data.get(key)
+        for key, value in data.items():
+            setattr(self, key, value)
 
     @classmethod
-    def access_token(cls, key):
-        cache_key = 'access_token_{}'.format(key)
+    def get(cls, key):
+        return cls(key)
+
+    @property
+    def weixin_client(self):
+        if not self.client_cache:
+            self.client_cache = WeChatClient(self.app_id, self.app_secret, self.access_token)
+        return self.client_cache
+
+    @property
+    def access_token(self):
+        cache_key = 'access_token_{}'.format(self.id)
         if not cache.get(cache_key):
-            account = cls.get(key)
-            client = WeChatClient(account.get('app_id'), account.get('app_secret'))
-            res = client.fetch_access_token()
+            weixin_client = WeChatClient(self.app_id, self.app_secret)
+            res = weixin_client.fetch_access_token()
             cache.set(cache_key, res.get('access_token'), res.get('expires_in') - 60)
         return cache.get(cache_key)
 
-    @classmethod
-    def jsapi_ticket(cls, key):
-        cache_key = 'jsapi_ticket_{}'.format(key)
+    @property
+    def jsapi_ticket(self):
+        cache_key = 'jsapi_ticket_{}'.format(self.id)
         if not cache.get(cache_key):
-            account = cls.get(key)
-            client = WeChatClient(account.get('app_id'), account.get('app_secret'), cls.access_token(key))
-            res = client.jsapi.get_ticket()
+            res = self.weixin_client.jsapi.get_ticket()
             cache.set(cache_key, res.get('ticket'), res.get('expires_in') - 60)
         return cache.get(cache_key)
 

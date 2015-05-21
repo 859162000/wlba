@@ -22,7 +22,7 @@ from wanglibao_rest import utils
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
-from weixin.wechatpy.exceptions import InvalidSignatureException
+from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException
 from weixin.wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wechat import WeixinAccounts
@@ -38,12 +38,12 @@ import uuid
 
 account_main = WeixinAccounts.get('main')
 js_wxpay = JSWXpay(
-    appid=account_main.get('app_id'),
-    mch_id=account_main.get('mch_id'),
-    key=account_main.get('key'),
+    appid=account_main.app_id,
+    mch_id=account_main.mch_id,
+    key=account_main.key,
     ip='119.254.110.30',
     notify_url='http://pay.pythink.com/weixin/pay/notify/',
-    appsecret=account_main.get('app_secret')
+    appsecret=account_main.app_secret
 )
 
 
@@ -115,13 +115,16 @@ class WeixinJsapiConfig(APIView):
         timestamp = str(int(time.time()))
         url = (request.META.get('HTTP_REFERER') or '').split('#')[0]
 
-        # key = 'main'
-        # app_id = account_main.get('app_id')
-        # client = WeChatClient(WeixinAccounts.access_token(key))
-        # signature = client.jsapi.get_jsapi_signature(noncestr, WeixinAccounts.jsapi_ticket(key), timestamp, url)
+        # app_id = account_main.app_id
+        # signature = account_main.weixin_client.jsapi.get_jsapi_signature(
+        #     noncestr,
+        #     account_main.jsapi_ticket,
+        #     timestamp,
+        #     url
+        # )
 
         app_id = account.app_id
-        client = WeChatClient(account.access_token)
+        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
         signature = client.jsapi.get_jsapi_signature(noncestr, account.jsapi_ticket, timestamp, url)
 
         data = {
@@ -156,7 +159,7 @@ class WeixinLogin(TemplateView):
                 account.save()
                 WeixinUser.objects.get_or_create(openid=res.get('openid'))
                 context['openid'] = res.get('openid')
-            except WeChatClient, e:
+            except WeChatException, e:
                 pass
 
         return context
