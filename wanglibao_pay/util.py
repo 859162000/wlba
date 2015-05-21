@@ -51,8 +51,6 @@ def fmt_date_normal(dt):
         return dt.strftime("%Y-%m-%d")
     return ""
 
-
-
 def handle_kuai_bank_limit(limitstr):
     obj = {}
     try:

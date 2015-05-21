@@ -10,7 +10,7 @@ from django.forms import model_to_dict
 from django.db import transaction
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from wanglibao_pay import util, handle_kuai_bank_limit
+from wanglibao_pay import util
 from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
@@ -205,7 +205,7 @@ class KuaiPay:
                             card['bank_name'] = bank.name
                             card['gate_id'] = bank.gate_id
                             if bank.kuai_limit:
-                                card.update(handle_kuai_bank_limit(bank.kuai_limit))
+                                card.update(util.handle_kuai_bank_limit(bank.kuai_limit))
                         if "storablePan" in z:
                             card['storable_no'] = z["storablePan"]['value']
                     cards.append(card)
