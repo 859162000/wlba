@@ -669,6 +669,37 @@ org.calculator=(function(org){
     }
 })(org);
 
+/*org.transaction = (function(org){
+    var lib = {
+        lfetPageNum : 1,
+        centerPageNum : 1,
+        rightPageNum : 1,
+        arrStr: ['lfetPageNum', 'centerPageNum', 'rightPageNum'],
+        addPageStr: {'lfetPageNum': '#transaction-left', 'centerPageNum': '#transaction-center', 'rightPageNum': '#transaction-right'},
+        init :function(){
+            lib._getTransaction('lfetPageNum');
+        },
+        _getTransaction:function(objStr){
+            var pageNum = lib[objStr];
+            org.ajax({
+                type: 'GET',
+                url: '/api/home/p2precords/',
+                data: {page: pageNum, 'pagesize': lib.pageSize},
+                success: function(data){
+                    $(lib.addPageStr[objStr]).append(data.html_data);
+                    lib[objStr]++;
+                },
+                error: function(){
+
+                }
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);*/
+
 ;(function(org){
     $.each($('script'), function(){
       var src = $(this).attr('src');

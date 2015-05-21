@@ -19,6 +19,7 @@ urlpatterns = patterns(
     url(r'^recharge/', TemplateView.as_view(template_name="weixin_recharge.jade")),
     url(r'^pay/test/$', views.WeixinPayTest.as_view(), name="weixin_pay_test"),
     url(r'^pay/notify/$', views.WeixinPayNotify.as_view(), name='weixin_pay_notify'),
+    url(r'^transaction/$', TemplateView.as_view(template_name="weixin_transaction.jade")),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
