@@ -53,7 +53,7 @@ def fmt_date_normal(dt):
 
 
 
-def _handle_kuai_bank_limit(limitstr):
+def handle_kuai_bank_limit(limitstr):
     obj = {}
     try:
         first, second = limitstr.split("|")

@@ -9,7 +9,7 @@ import logging
 from django.forms import model_to_dict
 from django.db import transaction
 from django.utils.decorators import method_decorator
-from wanglibao_pay import util, _handle_kuai_bank_limit
+from wanglibao_pay import util, handle_kuai_bank_limit
 from wanglibao_pay.models import PayInfo, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
@@ -107,13 +107,13 @@ def list_bank(request):
     for x in banks:
         obj = {"name":x.name, "gate_id":x.gate_id, "bank_id":x.kuai_code}
         if x.kuai_limit:
-            obj.update(_handle_kuai_bank_limit(x.kuai_limit))
+            obj.update(handle_kuai_bank_limit(x.kuai_limit))
         rs.append(obj)
     if not rs:
         return {"ret_code":20051, "message":"没有可选择的银行"}
     return {"ret_code":0, "message":"ok", "banks":rs}
 
-#def _handle_kuai_bank_limit(limitstr):
+#def handle_kuai_bank_limit(limitstr):
 #    obj = {}
 #    try:
 #        first, second = limitstr.split("|")
