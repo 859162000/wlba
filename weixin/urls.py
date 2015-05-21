@@ -17,7 +17,6 @@ urlpatterns = patterns(
     url(r'^value/', TemplateView.as_view(template_name="weixin_value.jade")),
     url(r'^authentication/', TemplateView.as_view(template_name="weixin_authentication.jade")),
     url(r'^recharge/', TemplateView.as_view(template_name="weixin_recharge.jade")),
-    url(r'^calculator/(?P<id>\d+)/', views.CalculatorView.as_view(), name="weixin_calculator"),
     url(r'^pay/test/$', views.WeixinPayTest.as_view(), name="weixin_pay_test"),
     url(r'^pay/notify/$', views.WeixinPayNotify.as_view(), name='weixin_pay_notify'),
 
