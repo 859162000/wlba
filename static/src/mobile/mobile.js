@@ -672,6 +672,150 @@ org.calculator=(function(org){
     }
 })(org);
 
+org.recharge=(function(org){
+  var lib = {
+    init :function(){
+      lib._checkBindCard();
+      lib._getBankCardList();
+      lib._rechargeStepFirst();
+    },
+    _checkBindCard: function() {
+      org.ajax({
+        type: 'POST',
+        url: '/api/pay/gate/',
+        data: {},
+        success: function(data){
+          if(data.data){
+            $('.recharge-binding-bank').show();
+            $('.binding-sign').html(data.data.notice);
+            $("input[name='maxamount']").val(data.data.maxamount);
+          }
+        }
+      })
+    },
+    _getBankCardList: function(){
+      org.ajax({
+        type: 'POST',
+        url: '/api/pay/cnp/list/',
+        data: {},
+        success: function(data) {
+          //如果支付接口有返回已绑定的银行列表，将银行列表写入网页，银行卡：data.cards
+          if(data.cards){
+            // 1：允许点击选择银行的图标
+            // 2：循环银行列表，js写入html文件
+          }
+        }
+      })
+    },
+    _rechargeStepFirst:function(){
+      var firstBtn = $('#firstBtn');
+      firstBtn.on('click', function(){
+        var card_no = $("input[name='card_no']").val(),
+          gate_id = $("select[name='gate_id']").val(),
+          amount  = parseInt($("input[name='amount']").val()),
+          maxamount = parseInt($("input[name='maxamount']").val());
+        if(!card_no || !gate_id || amount <= 0) {
+          return alert('信息输入不完整');
+        }
+        if(amount > maxamount){
+          return alert('最高充值'+ maxamount +'元！')
+        }
+        window.location.href = '/weixin/recharge/second/?card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
+//        org.ajax({
+//          type: 'POST',
+//          url: '/api/pay/cnp/list/',
+//          data: {},
+//          success: function(data) {
+//            if(data.ret_code != 0) {
+//              alert(data.message);
+//              window.location.href = '/weixin/recharge/second/?card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
+//            } else {
+//              // 已绑定过银行卡，可以直接跳过获取验证码的步骤直接调用充值接口
+//              lib._rechargeSingleStep();
+//            }
+//          }
+//        })
+      })
+    },
+    _rechargeSingleStep: function() {
+      //已绑定银行卡，跳过发送手机验证码步骤，直接支付
+    }
+  }
+  return {
+    init : lib.init
+  }
+})(org);
+
+org.recharge_second=(function(org){
+  var lib = {
+    card_no : $("input[name='card_no']").val(),
+    gate_id : $("select[name='gate_id']").val(),
+    amount  : parseInt($("input[name='amount']").val()),
+    phone   : $("select[name='phone']").val(),
+    init :function(){
+      lib._getValidateCode();
+      lib._rechargeStepSecond();
+    },
+    _getValidateCode: function(){
+      var getValidateBtn = $('.request-check');
+      getValidateBtn.on('click', function(){
+        if(!lib.phone){
+          return alert('请填写手机号');
+        }
+        //增加60秒倒数计数
+
+        org.ajax({
+          type: 'POST',
+          url: '/api/pay/deposit/',
+          data: {card_no: lib.card_no, gate_id: lib.gate_id, phone: lib.phone, amount: lib.amount},
+          success: function(data) {
+            if(data.ret_code > 0) {
+              return alert(data.message);
+            } else {
+              alert('验证码已经发出，请注意查收！');
+              $("input[name='order_id']").val(data.order_id);
+              $("input[name='token']").val(data.token);
+            }
+          }
+        })
+      })
+    },
+    _rechargeStepSecond:function(){
+      var secondBtn = $('#secondBtn');
+      secondBtn.on('click', function(){
+        var order_id = $("input[name='order_id']").val(),
+          vcode = $("input[name='vcode']").val(),
+          token = $("input[name='token']").val();
+        if(!lib.phone || !vcode){
+          return alert('请填写手机号和验证码');
+        }
+        if(!order_id || !token) {
+          return alert('系统有错误，请重试获取验证码');
+        }
+        if(!vcode){
+          return alert('请输入手机验证码');
+        }
+        org.ajax({
+          type: 'POST',
+          url: '/api/pay/cnp/dynnum/',
+          data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
+          success: function(data) {
+            if(data.ret_code > 0) {
+              return alert(data.message);
+            } else {
+              alert('恭喜您，充值成功！本次充值金额：' + data.amount + '元');
+              window.location.href = '/weixin/accounts/';
+            }
+          }
+        })
+      })
+    }
+  }
+  return {
+    init : lib.init
+  }
+})(org);
+
 ;(function(org){
     $.each($('script'), function(){
       var src = $(this).attr('src');

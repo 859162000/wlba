@@ -16,7 +16,8 @@ urlpatterns = patterns(
     url(r'^security/', TemplateView.as_view(template_name="weixin_security.jade")),
     url(r'^value/', TemplateView.as_view(template_name="weixin_value.jade")),
     url(r'^authentication/', TemplateView.as_view(template_name="weixin_authentication.jade")),
-    url(r'^recharge/', TemplateView.as_view(template_name="weixin_recharge.jade")),
+    url(r'^recharge/$', login_required(views.WeixinRecharge.as_view(), login_url='/weixin/login/'), name='weixin_recharge_first'),
+    url(r'^recharge/second/', login_required(views.WeixinRechargeSecond.as_view(), login_url='/weixin/login/'), name='weixin_recharge_second'),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
