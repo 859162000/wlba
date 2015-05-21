@@ -1,6 +1,7 @@
 # encoding:utf-8
 from __future__ import unicode_literals
-from weixin.wechatpy import create_reply
+from django.core.cache import cache
+from weixin.wechatpy import create_reply, WeChatClient
 import urllib
 import requests
 
@@ -9,11 +10,13 @@ class WeixinAccounts(object):
 
     data = {
         'main': {
-            'id': '',
+            'id': '1',
             'name': '网利宝',
             'app_id': 'wx896485cecdb4111d',
             'app_secret': 'b1e152144e4a4974cd06b8716faa98e1',
-            'classify': '已认证服务号'
+            'classify': '已认证服务号',
+            'mch_id': '1237430102',
+            'key': 'mmeBOdBjuovQOgPPSp1qZFONbHS9pkZn'
         },
         'sub_1': {
             'id': 'gh_77c09ff2f3a3',
@@ -22,12 +25,55 @@ class WeixinAccounts(object):
             'app_secret': '2523d084edca65b6633dae215967a23f',
             'classify': '已认证订阅号',
             'EncodingAESKey': '3QXabFsqXV64Bvdc4EvRciOfvWbYw7Fud38J8ianHmx'
+        },
+        'test': {
+            'app_id': 'wx22c7a048569d3e7e',
+            'app_secret': '1340e746fb4c3719d405fdc27752bc6f'
         }
     }
 
+    id = None
+    name = None
+    app_id = None
+    app_secret = None
+    classify = None
+    mch_id = None
+    key = None
+    EncodingAESKey = None
+
+    client_cache = None
+
+    def __init__(self, key):
+        data = self.data.get(key)
+        for key, value in data.items():
+            setattr(self, key, value)
+
     @classmethod
     def get(cls, key):
-        return cls.data.get(key)
+        return cls(key)
+
+    @property
+    def weixin_client(self):
+        if not self.client_cache:
+            self.client_cache = WeChatClient(self.app_id, self.app_secret, self.access_token)
+        return self.client_cache
+
+    @property
+    def access_token(self):
+        cache_key = 'access_token_{}'.format(self.id)
+        if not cache.get(cache_key):
+            weixin_client = WeChatClient(self.app_id, self.app_secret)
+            res = weixin_client.fetch_access_token()
+            cache.set(cache_key, res.get('access_token'), res.get('expires_in') - 60)
+        return cache.get(cache_key)
+
+    @property
+    def jsapi_ticket(self):
+        cache_key = 'jsapi_ticket_{}'.format(self.id)
+        if not cache.get(cache_key):
+            res = self.weixin_client.jsapi.get_ticket()
+            cache.set(cache_key, res.get('ticket'), res.get('expires_in') - 60)
+        return cache.get(cache_key)
 
 
 class Permission(object):

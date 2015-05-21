@@ -24,9 +24,11 @@ from wanglibao_pay.models import Bank
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
-from weixin.wechatpy.exceptions import InvalidSignatureException
+from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException
 from weixin.wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
+from weixin.common.wechat import WeixinAccounts
+from weixin.common.wxpay import JSWXpay
 from .models import Account, WeixinUser
 from .common.wechat import tuling
 from decimal import Decimal
@@ -36,7 +38,16 @@ import time
 import uuid
 import urllib
 
-# Create your views here.
+
+account_main = WeixinAccounts.get('main')
+js_wxpay = JSWXpay(
+    appid=account_main.app_id,
+    mch_id=account_main.mch_id,
+    key=account_main.key,
+    ip='119.254.110.30',
+    notify_url='http://pay.pythink.com/weixin/pay/notify/',
+    appsecret=account_main.app_secret
+)
 
 
 class ConnectView(View):
@@ -91,7 +102,6 @@ class ConnectView(View):
         return super(ConnectView, self).dispatch(request, *args, **kwargs)
 
 
-
 class WeixinJsapiConfig(APIView):
     permission_classes = ()
     http_method_names = ['get']
@@ -106,17 +116,26 @@ class WeixinJsapiConfig(APIView):
 
         noncestr = uuid.uuid1().hex
         timestamp = str(int(time.time()))
-        url = request.META.get('HTTP_REFERER')
+        url = (request.META.get('HTTP_REFERER') or '').split('#')[0]
+
+        # app_id = account_main.app_id
+        # signature = account_main.weixin_client.jsapi.get_jsapi_signature(
+        #     noncestr,
+        #     account_main.jsapi_ticket,
+        #     timestamp,
+        #     url
+        # )
+
+        app_id = account.app_id
         client = WeChatClient(account.app_id, account.app_secret, account.access_token)
         signature = client.jsapi.get_jsapi_signature(noncestr, account.jsapi_ticket, timestamp, url)
 
         data = {
-            'appId': account.app_id,
+            'appId': app_id,
             'timestamp': timestamp,
             'nonceStr': noncestr,
             'signature': signature
         }
-
         return Response(data)
 
 
@@ -143,7 +162,7 @@ class WeixinLogin(TemplateView):
                 account.save()
                 WeixinUser.objects.get_or_create(openid=res.get('openid'))
                 context['openid'] = res.get('openid')
-            except WeChatClient, e:
+            except WeChatException, e:
                 pass
 
         return context
@@ -195,6 +214,71 @@ class WeixinOauthLoginRedirect(RedirectView):
         )
 
         return oauth.authorize_url
+
+
+class WeixinPayTest(TemplateView):
+    template_name = 'pay_test.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(WeixinPayTest, self).get_context_data(**kwargs)
+        code = self.request.GET.get('code')
+        openid = js_wxpay.generate_openid(code)
+        context['openid'] = openid
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.GET.get('code'):
+            info_dict = {
+                'redirect_uri': request.build_absolute_uri(reverse('weixin_pay_test')),
+                'state': '123',
+            }
+            url = js_wxpay.generate_redirect_url(info_dict)
+            return HttpResponseRedirect(url)
+
+        return super(WeixinPayTest, self).dispatch(request, *args, **kwargs)
+
+
+class WeixinPayOrder(APIView):
+    permission_classes = ()
+    http_method_names = ['post']
+
+    def post(self, request):
+        product = {
+            'attach': u'网利宝微信支付测试1分',
+            'body': u'网利宝微信支付测试1分',
+            'out_trade_no': uuid.uuid1().hex,
+            'total_fee': 0.01,
+        }
+        data = js_wxpay.generate_jsapi(product, request.POST.get('openid'))
+        return Response(data)
+
+
+class WeixinPayNotify(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        xml_str = request.body
+        print 'xml_str: {}'.format(xml_str)
+        ret, ret_dict = js_wxpay.verify_notify(xml_str)
+        print 'ret: {}'.format(ret)
+        print 'ret_dict: ', ret_dict
+        # 在这里添加订单更新逻辑
+        if ret:
+            ret_dict = {
+                'return_code': 'SUCCESS',
+                'return_msg': 'OK',
+            }
+            ret_xml = js_wxpay.generate_notify_resp(ret_dict)
+        else:
+            ret_dict = {
+                'return_code': 'FAIL',
+                'return_msg': 'verify error',
+            }
+            ret_xml = js_wxpay.generate_notify_resp(ret_dict)
+
+        print 'ret_xml: {}'.format(ret_xml)
+        return HttpResponse(ret_xml)
+
 
 
 class P2PListView(TemplateView):

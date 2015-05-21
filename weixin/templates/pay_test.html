@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>微信支付测试</title>
+</head>
+<body>
+<input type="hidden" name="openid" value="{{ openid }}"/>
+<form action="" id="weixin_pay_form">
+    <div><input type="text" placeholder="请输入充值金额"/></div>
+    <div><button>立即充值</button></div>
+</form>
+<div>{{ timeStamp }}</div>
+<div>{{ nonceStr }}</div>
+<div>{{ package }}</div>
+<div>{{ signType }}</div>
+<div>{{ paySign }}</div>
+<script src="/static/js/lib/jquery.min.js"></script>
+<script src="/static/src/mobile/lib/weixin/wx.js"></script>
+<script>
+
+    $.get('/weixin/api/jsapi_config/', function(res) {
+        wx.config({
+            debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: res['appId'], // 必填，公众号的唯一标识
+            timestamp: res['timestamp'], // 必填，生成签名的时间戳
+            nonceStr: res['nonceStr'], // 必填，生成签名的随机串
+            signature: res['signature'],// 必填，签名，见附录1
+            jsApiList: ['chooseWXPay'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+        });
+    });
+
+    wx.ready(function() {
+        wx.checkJsApi({
+            jsApiList: ['chooseWXPay'], // 需要检测的JS接口列表，所有JS接口列表见附录2,
+            success: function(res) {
+
+            }
+        });
+
+        $.post('/weixin/api/pay/order/', {'openid': $('input[name=openid]').val()}, function(res) {
+            alert(JSON.stringify(res));
+
+            wx.chooseWXPay({
+                timestamp: res['timeStamp'], // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                nonceStr: res['nonceStr'], // 支付签名随机串，不长于 32 位
+                package: res['package'], // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
+                signType: res['signType'], // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                paySign: res['paySign'], // 支付签名
+                success: function (res) {
+                    // 支付成功后的回调函数
+                }
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
