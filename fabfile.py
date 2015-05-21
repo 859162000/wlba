@@ -299,7 +299,7 @@ def init():
         create_folder('/var/log/wanglibao/', owner='www-data', group='www-data', mod='770')
 
         run('mkdir -p ~/.ssh && chmod 700 ~/.ssh')
-        put('deployment', '~/.ssh/id_rsa')
+        put('certificate/deployment', '~/.ssh/id_rsa')
         run('chmod 600 ~/.ssh/id_rsa')
 
         apt_get("git")
