@@ -15,7 +15,8 @@ class Rsa(object):
 
     @classmethod
     def encrypt(cls, data):
-        pub_key_file = os.path.join(settings.BASE_DIR, "pub_key.pem")
+        #pub_key_file = os.path.join(settings.BASE_DIR, "pub_key.pem")
+        pub_key_file = os.path.join(settings.CERT_DIR, "pub_key.pem")
         pub_key = RSA.load_pub_key(pub_key_file)
 
         print
