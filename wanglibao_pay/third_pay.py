@@ -9,7 +9,7 @@ import logging
 from django.forms import model_to_dict
 from django.db import transaction
 from django.utils.decorators import method_decorator
-from wanglibao_pay import util
+from wanglibao_pay import util, _handle_kuai_bank_limit
 from wanglibao_pay.models import PayInfo, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
@@ -113,19 +113,19 @@ def list_bank(request):
         return {"ret_code":20051, "message":"没有可选择的银行"}
     return {"ret_code":0, "message":"ok", "banks":rs}
 
-def _handle_kuai_bank_limit(limitstr):
-    obj = {}
-    try:
-        first, second = limitstr.split("|")
-        arr = first.split(",")
-        obj['first_one'] = arr[0].split("=")[1]
-        obj['first_day'] = arr[1].split("=")[1]
-        arr1 = second.split(",")
-        obj['second_one'] = arr1[0].split("=")[1]
-        obj['second_day'] = arr1[1].split("=")[1]
-    except:
-        pass
-    return obj
+#def _handle_kuai_bank_limit(limitstr):
+#    obj = {}
+#    try:
+#        first, second = limitstr.split("|")
+#        arr = first.split(",")
+#        obj['first_one'] = arr[0].split("=")[1]
+#        obj['first_day'] = arr[1].split("=")[1]
+#        arr1 = second.split(",")
+#        obj['second_one'] = arr1[0].split("=")[1]
+#        obj['second_day'] = arr1[1].split("=")[1]
+#    except:
+#        pass
+#    return obj
 
 @method_decorator(transaction.atomic)
 def withdraw(request):

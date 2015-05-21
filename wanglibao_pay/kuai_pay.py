@@ -10,7 +10,7 @@ from django.forms import model_to_dict
 from django.db import transaction
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from wanglibao_pay import util
+from wanglibao_pay import util, _handle_kuai_bank_limit
 from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
