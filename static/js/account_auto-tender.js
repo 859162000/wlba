@@ -12,6 +12,7 @@
   });
 
   require(['jquery', 'jquery.form', 'tools'], function($, form, tool) {
+    var csrfSafeMethod, getCookie, sameOrigin;
     getCookie = function(name) {
       var cookie, cookieValue, cookies, i;
       cookieValue = null;
@@ -51,33 +52,35 @@
     $('#dete-end').val($('#selectInput1').val());
     $('#invest-money').blur(function() {
       var checkStatus, r, self, val;
-      self = $('#invest-money');
-      val = $.trim(self.val());
-      checkStatus = false;
-      if (val !== '') {
-        if (val < 200) {
-          $('.error-style').text('投标金额不能小于200');
-          checkStatus = false;
-        } else {
-          if (parseInt(val) > parseInt($('#invest-total').val())) {
-            $('.error-style').text('投标金额必须小于账户可用余额!');
+      if ($('#is_no').is(':checked')) {
+        self = $('#invest-money');
+        val = $.trim(self.val());
+        checkStatus = false;
+        if (val !== '') {
+          if (val < 200) {
+            $('.error-style').text('投标金额不能小于200');
             checkStatus = false;
           } else {
-            r = /^[1-9]\d*00(\.00|\.0)?$/;
-            if (!r.test(val)) {
-              $('.error-style').text('投标金额必须是 100 的倍数!');
+            if (parseInt(val) > parseInt($('#invest-total').val())) {
+              $('.error-style').text('投标金额必须小于账户可用余额!');
               checkStatus = false;
             } else {
-              $('.error-style').text('');
-              checkStatus = true;
+              r = /^[1-9]\d*00(\.00|\.0)?$/;
+              if (!r.test(val)) {
+                $('.error-style').text('投标金额必须是 100 的倍数!');
+                checkStatus = false;
+              } else {
+                $('.error-style').text('');
+                checkStatus = true;
+              }
             }
           }
+        } else {
+          $('.error-style').text('请输入投标金额');
+          checkStatus = false;
         }
-      } else {
-        $('.error-style').text('请输入投标金额');
-        checkStatus = false;
+        return checkStatus;
       }
-      return checkStatus;
     });
     $('.add-ben').click(function() {
       var self, val;
@@ -103,24 +106,26 @@
     });
     $('.income-range').blur(function() {
       var r, self, val;
-      self = $('#scope-min');
-      val = $.trim(self.val());
-      r = /^[0-9]*[1-9][0-9]*$/;
-      if (val !== '') {
-        if (!r.test(val) || !r.test($('#scope-max').val())) {
-          $('.error-style').text('收益范围请输入正整数');
-          return false;
-        } else if (Number(val) > Number($.trim($('#scope-max').val()))) {
-          $('.error-style').text('请填写正确收益范围');
-          return false;
-        } else if (val > 30 || $('#scope-max').val() > 30) {
-          $('.error-style').text('请填写正确收益范围');
-          return false;
+      if ($('#is_no').is(':checked')) {
+        self = $('#scope-min');
+        val = $.trim(self.val());
+        r = /^[0-9]*[1-9][0-9]*$/;
+        if (val !== '') {
+          if (!r.test(val) || !r.test($('#scope-max').val())) {
+            $('.error-style').text('收益范围请输入正整数');
+            return false;
+          } else if (Number(val) > Number($.trim($('#scope-max').val()))) {
+            $('.error-style').text('请填写正确收益范围');
+            return false;
+          } else if (val > 30 || $('#scope-max').val() > 30) {
+            $('.error-style').text('请填写正确收益范围');
+            return false;
+          } else {
+            return $('.error-style').text('');
+          }
         } else {
-          return $('.error-style').text('');
+          return $('.error-style').text('请填写收益范围');
         }
-      } else {
-        return $('.error-style').text('请填写收益范围');
       }
     });
     $('.tender-ul-left li select').change(function() {
@@ -133,17 +138,21 @@
     });
     return $('#submit').click(function() {
       var isNo, tip;
-      $('#invest-money').blur();
-      if ($('.error-style').text() === '') {
-        $('.income-range').blur();
-      }
-      if (Number($('#dete-start').val()) > Number($('#dete-end').val()) || ($('#dete-start').val() === null || $('#dete-end').val() === null)) {
-        $('.error-style').text('请选择正确收益期限');
-        return false;
+      isNo = $('#is_no').is(':checked');
+      if (isNo) {
+        $('#invest-money').blur();
+        if ($('.error-style').text() === '') {
+          $('.income-range').blur();
+        }
+        if (Number($('#dete-start').val()) > Number($('#dete-end').val()) || ($('#dete-start').val() === null || $('#dete-end').val() === null)) {
+          $('.error-style').text('请选择正确收益期限');
+          return false;
+        }
+      } else {
+        $('.error-style').text('');
       }
       if ($('.error-style').text() === '') {
         if ($('#agree').is(':checked')) {
-          isNo = $('#is_no').is(':checked');
           if (isNo) {
             tip = "您将开启自动投标";
           } else {
