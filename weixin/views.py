@@ -102,6 +102,50 @@ class ConnectView(View):
         return super(ConnectView, self).dispatch(request, *args, **kwargs)
 
 
+class WeixinJoinView(View):
+    account = None
+
+    def check_signature(self, request, account_key):
+        account = WeixinAccounts.get(account_key)
+        try:
+            check_signature(
+                account.token,
+                request.GET.get('signature'),
+                request.GET.get('timestamp'),
+                request.GET.get('nonce')
+            )
+        except InvalidSignatureException:
+            return False
+
+        return True
+
+    def get(self, request, account_key):
+        if not self.check_signature(request, account_key):
+            return HttpResponseForbidden()
+
+        return HttpResponse(request.GET.get('echostr'))
+
+    def post(self, request, account_key):
+        if not self.check_signature(request, account_key):
+            return HttpResponseForbidden()
+
+        msg = parse_message(request.body)
+
+        if msg.type == 'text':
+            # 自动回复  5000次／天
+            reply = tuling(msg)
+            # 多客服转接
+            # reply = TransferCustomerServiceReply(message=msg)
+        else:
+            reply = create_reply(u'更多功能，敬请期待！', msg)
+
+        return HttpResponse(reply.render())
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(WeixinJoinView, self).dispatch(request, *args, **kwargs)
+
+
 class WeixinJsapiConfig(APIView):
     permission_classes = ()
     http_method_names = ['get']

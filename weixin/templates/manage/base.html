@@ -1,0 +1,26 @@
+{% block header %}
+    {% include 'manage/include/header.html' %}
+{% endblock %}
+
+{% block head %}
+    {% include 'manage/include/head.html' %}
+{% endblock %}
+
+{% block container %}
+<div class="container">
+    <div class="ui grid">
+        <div class="four wide column">
+            {% block nav %}
+                {% include 'manage/include/nav.html' %}
+            {% endblock %}
+        </div>
+        <div class="twelve wide column">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+    {% include 'manage/include/footer.html' %}
+{% endblock %}
