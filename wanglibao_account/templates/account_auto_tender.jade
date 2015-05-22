@@ -15,6 +15,7 @@ block main
     .right-content
         .auto-tender 自动投标
         form#tenderForm.tender-form(method="POST",action="/api/home/automatic/")
+            - csrf_token
             .ul-style
                 ul.tender-ul-left
                     li
