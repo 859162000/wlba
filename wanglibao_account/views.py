@@ -1463,12 +1463,27 @@ class AutomaticApiView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
+        # 开启功能，需要同时校验数据
+        # 关闭操作，用户自动投标设置数据，只更改状态
+        is_used = request.DATA.get('is_used', False)
+
+        if not is_used:
+            # close plan
+            plan = AutomaticPlan.objects.filter(user=request.user).first()
+            if plan:
+                plan.is_used = False
+                plan.save()
+
+            return Response({
+                'ret_code': 0,
+                'message': u'自动投标计划关闭成功'
+            })
+
         amounts_auto = request.DATA.get('amounts_auto', Decimal(0))
         period_min = request.DATA.get('period_min', 0)
         period_max = request.DATA.get('period_max', 0)
         rate_min = request.DATA.get('rate_min', 0)
         rate_max = request.DATA.get('rate_max', 0)
-        is_used = request.DATA.get('is_used', False)
 
         if not amounts_auto or not period_min or not period_max or not rate_min or not rate_max:
             return Response({'ret_code': 3001, 'message': u'信息输入不完整'})
