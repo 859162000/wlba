@@ -101,7 +101,14 @@ block main
                     else
                         input#is_no.is_no(type="checkbox",checked=true,name="is_used",style="display:none")
                         span#submit.submit-style 开启
-
+        .rule-content
+            p.rule-title 提示说明
+            p 1、单笔理财金额需为100的倍数.最低200元起.
+            p 2、自动投标投出的金额最高能达到借款标额度的100%.
+            p 3、当标的状态为100%时自动关闭自动投标，以避免借款被用作自动投标资金.
+            p 4、自动投标排序规则如下：
+            p.textP a）投标顺序按照开启自动投标功能的时间先后进行排序.
+            p.textP b）每个自动投标向每个标的仅自动借出一次，投标后，排到所有自动投标用户的队尾.
 block script
   script.
       require(['/static/js/account_auto-tender.js'])
