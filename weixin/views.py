@@ -274,7 +274,7 @@ class P2PListView(TemplateView):
         banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority').first()
 
         return {
-            'p2p_lists': p2p_lists,
+            'results': p2p_lists,
             'banner': banner,
         }
 
@@ -282,7 +282,7 @@ class P2PListView(TemplateView):
 def _generate_ajax_template(content, template_name=None):
 
     context = Context({
-        'p2p_lists': content,
+        'results': content,
     })
 
     if template_name:
@@ -377,7 +377,6 @@ class P2PDetailView(TemplateView):
 
         amount = self.request.GET.get('amount', 0)
         amount_profit = self.request.GET.get('amount_profit', 0)
-        print self.request.GET
         next = self.request.GET.get('next', '')
 
         context.update({
@@ -480,7 +479,7 @@ class WeixinRechargeSecond(TemplateView):
         card_no = self.request.GET.get('card_no', '')
         gate_id = self.request.GET.get('gate_id', '')
         amount = self.request.GET.get('amount', 0)
-
+        user = self.request.user.wanglibaouserprofile
         try:
             bank = Bank.objects.filter(gate_id=gate_id).first()
         except:
@@ -491,6 +490,14 @@ class WeixinRechargeSecond(TemplateView):
             'gate_id': gate_id,
             'amount': amount,
             'bank': bank,
+            'user': user
         }
         return context
 
+
+class WeixinTransaction(TemplateView):
+    template_name = 'weixin_transaction.jade'
+
+    def get_context_data(self, **kwargs):
+
+        return {}

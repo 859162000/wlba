@@ -1,0 +1,65 @@
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 已投项目
+      a(href="/weixin/account/")
+        span 返回
+    nav.transaction-nav
+      ul
+        li.active 回款中
+        li 投标中
+        li 已完成
+      .tab-line
+    include include/weixin_loading
+
+    section#transaction-left.transaction-main
+      .transaction-list
+        .transaction-tit
+          .tit-name 房屋抵押
+          .tit-time 2015-05-02 26:15:52
+        .transaction-cont
+          .cont-money-left
+            p 300
+            p 投资金额（元）
+          .cont-money-center
+            p 300
+            p 已收金额（元）
+          .cont-money-right
+            p 300
+            p 待收金额（元）
+        .transaction-footer
+          a(href="") 还款计划
+          a(href="") 合同
+    section#transaction-center.transaction-main
+      .transaction-list
+        .transaction-tit
+          .tit-name 房屋抵押
+          .tit-time 2015-05-02 26:15:52
+        .transaction-cont
+          .cont-money-left
+            p 300
+            p 投资金额（元）
+          .cont-money-center
+            p 300
+            p 已收金额（元）
+          .cont-money-right
+            p 300
+            p 待收金额（元）
+    section#transaction-right.transaction-main
+      .transaction-list
+        .transaction-tit
+          .tit-name 房屋抵押
+          .tit-time 2015-05-02 26:15:52
+        .transaction-cont
+          .cont-money-left
+            p 300
+            p 投资金额（元）
+          .cont-money-center
+            p 300
+            p 已收金额（元）
+          .cont-money-right
+            p 300
+            p 待收金额（元）

@@ -670,6 +670,226 @@ org.calculator=(function(org){
     }
 })(org);
 
+/*org.transaction = (function(org){
+    var lib = {
+        lfetPageNum : 1,
+        centerPageNum : 1,
+        rightPageNum : 1,
+        arrStr: ['lfetPageNum', 'centerPageNum', 'rightPageNum'],
+        addPageStr: {'lfetPageNum': '#transaction-left', 'centerPageNum': '#transaction-center', 'rightPageNum': '#transaction-right'},
+        init :function(){
+            lib._getTransaction('lfetPageNum');
+        },
+        _getTransaction:function(objStr){
+            var pageNum = lib[objStr];
+            org.ajax({
+                type: 'GET',
+                url: '/api/home/p2precords/',
+                data: {page: pageNum, 'pagesize': lib.pageSize},
+                success: function(data){
+                    $(lib.addPageStr[objStr]).append(data.html_data);
+                    lib[objStr]++;
+                },
+                error: function(){
+
+                }
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);*/
+
+org.recharge=(function(org){
+    var lib = {
+        init :function(){
+            lib._getBankCardList();
+            lib._rechargeStepFirst();
+        },
+        _getBankCardList: function(){
+            org.ajax({
+                type: 'POST',
+                url: '/api/pay/cnp/list/',
+                success: function(data) {
+                      //如果支付接口有返回已绑定的银行列表，将银行列表写入网页，银行卡：data.cards
+                    if(data.ret_code == 0){
+                        $(".spinner").hide();
+                        if(data.cards.length === 0){
+                            $('.card-none').show();
+                        }else if(data.cards.length > 0){
+                            $('.card-have').show();
+                            lib._initCard(data.cards,lib._cradStyle);
+                        }
+                    }
+                }
+            })
+        },
+        _initCard:function(data, callback){
+            var optionsDom = $("#card-select").find("option"),
+                optionsDomLength = optionsDom.length;
+            for(var val in data){
+                if (data[val]['is_default'] == 'true') {
+                    $("#card-val").val(data[val]['no']);
+                    for(var i =0 ; i < optionsDomLength; i++){
+                        if(optionsDom.eq(i).text() == data[val]['bank'].name){
+                            optionsDom.eq(i).attr("selected", true);
+                        }
+                    }
+                    return false
+                }
+            }
+            callback && callback();
+        },
+        _cradStyle:function(){
+
+        },
+        _rechargeStepFirst:function(){
+            var card_no,gate_id,amount,maxamount,
+                $firstBtn = $('#firstBtn'),
+                $secondBtn = $('#secondBtn');
+
+            $firstBtn.on('click', function(){
+                card_no = $("input[name='card_none_card']").val(),
+                gate_id = $("select[name='gate_id_none_card']").val(),
+                amount  = parseInt($("input[name='amount']").val()),
+                maxamount = parseInt($("input[name='maxamount']").val());
+                if(!card_no || !gate_id || amount <= 0) {
+                    return alert('信息输入不完整');
+                }
+                if(amount > maxamount){
+                     return alert('最高充值'+ maxamount +'元！')
+                }
+                window.location.href = '/weixin/recharge/second/?card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
+            });
+            $secondBtn.on('click', function(){
+                card_no = $("input[name='card_no']").val(),
+                gate_id = $("select[name='gate_id']").val(),
+                amount  = parseInt($("input[name='amount']").val()),
+                maxamount = parseInt($("input[name='maxamount']").val());
+                if(!card_no || !gate_id || amount <= 0) {
+                    return alert('信息输入不完整');
+                }
+                if(amount > maxamount){
+                     return alert('最高充值'+ maxamount +'元！')
+                }
+                lib._rechargeSingleStep(card_no,amount);
+            });
+        },
+        _rechargeSingleStep: function(card_no, amount) {
+            org.ajax({
+                type: 'POST',
+                url: '/api/pay/deposit/',
+                data: {card_no: card_no, amount: amount},
+                success: function(data) {
+                    if(data.ret_code > 0) {
+                        return alert(data.message);
+                    } else {
+                        alert('充值成功！');
+                    }
+                }
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+org.recharge_second=(function(org){
+    var lib = {
+        card_no : $("input[name='card_no']").val(),
+        gate_id : $("input[name='gate_id']").val(),
+        amount  : parseInt($("input[name='amount']").val()),
+        phone: null,
+        init :function(){
+            lib._getValidateCode();
+            lib._rechargeStepSecond();
+        },
+        _getValidateCode: function(){
+            var getValidateBtn = $('.request-check');
+
+
+            getValidateBtn.on('click', function(){
+                var count = 60, intervalId ; //定时器
+
+                lib.phone = $("input[name='phone']").val();
+                lib.card_no = $("input[name='card_no']").val();
+
+                if(!lib.phone){
+                    return alert('请填写手机号');
+                }
+                getValidateBtn.attr('disabled', 'disabled').addClass('alreay-request');
+                //倒计时
+                var timerFunction = function() {
+                    if (count >= 1) {
+                        count--;
+                        return getValidateBtn.text( count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        getValidateBtn.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
+                        return
+                    }
+                };
+
+                org.ajax({
+                    type: 'POST',
+                    url: '/api/pay/deposit/',
+                    data: {card_no: lib.card_no, gate_id: lib.gate_id, phone: lib.phone, amount: lib.amount},
+                    success: function(data) {
+                        if(data.ret_code > 0) {
+                            clearInterval(intervalId);
+                            getValidateBtn.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
+                            return alert(data.message);
+                        } else {
+                            //alert('验证码已经发出，请注意查收！');
+                            $("input[name='order_id']").val(data.order_id);
+                            $("input[name='token']").val(data.token);
+                        }
+                    },
+                    error:function(data){
+                        console.log(data)
+                    }
+                })
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
+            })
+        },
+        _rechargeStepSecond:function(){
+            var secondBtn = $('#secondBtn');
+            secondBtn.on('click', function(){
+                var order_id = $("input[name='order_id']").val(),
+                    vcode = $("input[name='vcode']").val(),
+                    token = $("input[name='token']").val();
+                if(!lib.phone || !vcode){
+                    return alert('请填写手机号和验证码');
+                }
+                if(!order_id || !token) {
+                    return alert('系统有错误，请重试获取验证码');
+                }
+                if(!vcode){
+                    return alert('请输入手机验证码');
+                }
+                org.ajax({
+                    type: 'POST',
+                    url: '/api/pay/cnp/dynnum/',
+                     data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
+                    success: function(data) {
+                        if(data.ret_code > 0) {
+                            return alert(data.message);
+                        } else {
+                           $('.sign-main').shouw()
+                        }
+                    }
+                })
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
 ;(function(org){
     $.each($('script'), function(){
       var src = $(this).attr('src');
