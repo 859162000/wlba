@@ -68,7 +68,7 @@ class AmortizationInline(admin.TabularInline):
 
     def get_readonly_fields(self, request, obj=None):
         read_only = ['term', 'principal', 'interest', 'penal_interest', 'description']
-        if obj.status == u'已完成':
+        if obj and obj.status == u'已完成':
             read_only.append('ready_for_settle')
         return tuple(read_only)
 
