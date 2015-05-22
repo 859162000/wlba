@@ -42,6 +42,7 @@ from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
     AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
+from wanglibao_p2p.tasks import automatic_trade
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
@@ -1510,6 +1511,15 @@ class AutomaticApiView(APIView):
             plan.is_used = True if is_used else False
 
             plan.save()
+
+            """
+            # 停止这个入口，从watch进入自动投标
+            if plan.is_used:
+                automatic_trade.apply_async(kwargs={
+                    "plan_id": plan.id,
+                })
+                pass
+            """
 
             return Response({
                 'ret_code': 0,
