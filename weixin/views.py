@@ -19,6 +19,8 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_margin.models import Margin
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
+# from wanglibao_pay import third_pay, trade_record
+from wanglibao_pay.models import Bank
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
@@ -34,6 +36,7 @@ import datetime
 import json
 import time
 import uuid
+import urllib
 
 
 account_main = WeixinAccounts.get('main')
@@ -436,6 +439,7 @@ class P2PDetailView(TemplateView):
 
         amount = self.request.GET.get('amount', 0)
         amount_profit = self.request.GET.get('amount_profit', 0)
+        print self.request.GET
         next = self.request.GET.get('next', '')
 
         context.update({
@@ -459,7 +463,11 @@ class P2PDetailView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
             if self.kwargs['template'] == 'buy':
-                return HttpResponseRedirect('/weixin/login/?next=/weixin/view/buy/%s/' % self.kwargs['id'])
+                amount = request.GET.get('amount', '')
+                amount_profit = request.GET.get('amount_profit', '')
+                next_str = '?amount=%s&amount_profit=%s' % (amount, amount_profit)
+                redirect_str = '/weixin/login/?next=/weixin/view/buy/%s/%s' % (self.kwargs['id'], urllib.quote(next_str))
+                return HttpResponseRedirect(redirect_str)
         return super(P2PDetailView, self).dispatch(request, *args, **kwargs)
 
 
@@ -513,4 +521,38 @@ class WeixinAccountHome(TemplateView):
             'p2p_total_interest': p2p_total_interest,  # P2P总收益
             'banner': banner,
         }
+
+
+class WeixinRecharge(TemplateView):
+    template_name = 'weixin_recharge.jade'
+
+    def get_context_data(self, **kwargs):
+
+        banks = Bank.get_kuai_deposit_banks()
+
+        return {
+            'banks': banks,
+        }
+
+
+class WeixinRechargeSecond(TemplateView):
+    template_name = 'weixin_recharge_second.jade'
+
+    def get_context_data(self, **kwargs):
+        card_no = self.request.GET.get('card_no', '')
+        gate_id = self.request.GET.get('gate_id', '')
+        amount = self.request.GET.get('amount', 0)
+
+        try:
+            bank = Bank.objects.filter(gate_id=gate_id).first()
+        except:
+            bank = None
+
+        context = {
+            'card_no': card_no,
+            'gate_id': gate_id,
+            'amount': amount,
+            'bank': bank,
+        }
+        return context
 
