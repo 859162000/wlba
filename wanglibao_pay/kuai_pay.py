@@ -205,7 +205,7 @@ class KuaiPay:
                             card['bank_name'] = bank.name
                             card['gate_id'] = bank.gate_id
                             if bank.kuai_limit:
-                                card.update(_handle_kuai_bank_limit(bank.kuai_limit))
+                                card.update(util.handle_kuai_bank_limit(bank.kuai_limit))
                         if "storablePan" in z:
                             card['storable_no'] = z["storablePan"]['value']
                     cards.append(card)
