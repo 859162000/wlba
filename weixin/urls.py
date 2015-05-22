@@ -3,10 +3,12 @@ from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
 import views
+import manage_view
 
 urlpatterns = patterns(
     '',
     url(r'^connect/(?P<id>\w+)/$', views.ConnectView.as_view(), name='weixin_connect'),
+    url(r'^join/(?P<account_key>\w+)/$', views.WeixinJoinView.as_view(), name='weixin_join'),
     url(r'^list/', views.P2PListView.as_view(), name='weixin_p2p_list'),
     url(r'^account/', login_required(views.WeixinAccountHome.as_view(), login_url='/weixin/login/'), name='weixin_account'),
     url(r'^view/(?P<template>\w+)/(?P<id>\w+)/', views.P2PDetailView.as_view(), name='weixin_p2p_detail'),
@@ -25,5 +27,10 @@ urlpatterns = patterns(
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
     url(r'^api/login/$', views.WeixinLoginApi.as_view(), name='weixin_login_api'),
     url(r'^api/pay/order/$', views.WeixinPayOrder.as_view(), name='weixin_pay_order_api'),
+)
 
+urlpatterns += patterns(
+    '',
+    url(r'^manage/$', manage_view.IndexView.as_view(), name='wx_manage_index'),
+    url(r'^manage/(?P<account_key>\w+)/$', manage_view.AccountView.as_view(), name='wx_manage_account'),
 )
