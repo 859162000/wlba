@@ -30,7 +30,7 @@ html
             input(type="tel", name="card_none_card", placeholder="请输入持卡人储蓄卡号").count-input
           .recharge-count
             .count-txt-left 开户银行
-            select(type="select", name="gate_id_none_card").bank-input.recharge-select
+            select(type="select", name="gate_id_none_card").count-input.recharge-select
               option(value = 'init')  请选择
               for bank in banks
                 option(value="{{bank.gate_id}}") {{bank.name}}
