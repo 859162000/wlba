@@ -336,7 +336,7 @@ class P2PListView(TemplateView):
         banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority').first()
 
         return {
-            'p2p_lists': p2p_lists,
+            'results': p2p_lists,
             'banner': banner,
         }
 
@@ -344,7 +344,7 @@ class P2PListView(TemplateView):
 def _generate_ajax_template(content, template_name=None):
 
     context = Context({
-        'p2p_lists': content,
+        'results': content,
     })
 
     if template_name:
@@ -556,3 +556,10 @@ class WeixinRechargeSecond(TemplateView):
         }
         return context
 
+
+class WeixinTransaction(TemplateView):
+    template_name = 'weixin_transaction.jade'
+
+    def get_context_data(self, **kwargs):
+
+        return {}
