@@ -153,9 +153,13 @@ class P2POperator(object):
             except P2PException, e:
                 cls.logger.error(u'%s, %s' % (amortization, e.message))
 
+
+        ## 停止在watchdog中每分钟循环自动投标，减轻celery任务
+        ## 将自动投标入口改在两处，一是标状态变成“正在招标”，二是用户保存并启用自动投标配置
         print('Getting automation trades')
         from wanglibao_p2p.automatic import Automatic
         Automatic().auto_trade()
+
 
     @classmethod
     #@transaction.commit_manually

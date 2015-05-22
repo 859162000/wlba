@@ -10,6 +10,7 @@ from wanglibao.celery import app
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization
 from wanglibao_p2p.trade import P2POperator
+from wanglibao_p2p.automatic import Automatic
 from django.db.models import Sum
 from django.contrib.auth.models import User
 from wanglibao_sms import messages
@@ -125,4 +126,9 @@ def build_earning(product_id):
 
 
     Earning.objects.bulk_create(earning_list)
+
+
+@app.task
+def automatic_trade(product_id=None, plan_id=None):
+    Automatic().auto_trade(product_id=product_id, plan_id=plan_id)
 
