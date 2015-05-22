@@ -717,7 +717,6 @@ org.recharge=(function(org){
                         $(".spinner").hide();
                         if(data.cards.length === 0){
                             $('.card-none').show();
-
                         }else if(data.cards.length > 0){
                             $('.card-have').show();
                             lib._initCard(data.cards,lib._cradStyle);
@@ -739,7 +738,6 @@ org.recharge=(function(org){
                     }
                     return false
                 }
-
             }
             callback && callback();
         },
@@ -750,6 +748,7 @@ org.recharge=(function(org){
             var card_no,gate_id,amount,maxamount,
                 $firstBtn = $('#firstBtn'),
                 $secondBtn = $('#secondBtn');
+
             $firstBtn.on('click', function(){
                 card_no = $("input[name='card_none_card']").val(),
                 gate_id = $("select[name='gate_id_none_card']").val(),
@@ -777,7 +776,7 @@ org.recharge=(function(org){
                 lib._rechargeSingleStep(card_no,amount);
             });
         },
-        _rechargeSingleStep: function(card_no, amount , gate_id, phone) {
+        _rechargeSingleStep: function(card_no, amount) {
             org.ajax({
                 type: 'POST',
                 url: '/api/pay/deposit/',
@@ -800,36 +799,61 @@ org.recharge=(function(org){
 org.recharge_second=(function(org){
     var lib = {
         card_no : $("input[name='card_no']").val(),
-        gate_id : $("select[name='gate_id']").val(),
+        gate_id : $("input[name='gate_id']").val(),
         amount  : parseInt($("input[name='amount']").val()),
-        phone   : $("select[name='phone']").val(),
+        phone: null,
         init :function(){
             lib._getValidateCode();
             lib._rechargeStepSecond();
         },
         _getValidateCode: function(){
             var getValidateBtn = $('.request-check');
-            getValidateBtn.on('click', function(){
-            if(!lib.phone){
-                return alert('请填写手机号');
-            }
-            //增加60秒倒数计数
 
-            org.ajax({
-                type: 'POST',
-                url: '/api/pay/deposit/',
-                data: {card_no: lib.card_no, gate_id: lib.gate_id, phone: lib.phone, amount: lib.amount},
-                success: function(data) {
-                    if(data.ret_code > 0) {
-                        return alert(data.message);
-                    } else {
-                        alert('验证码已经发出，请注意查收！');
-                        $("input[name='order_id']").val(data.order_id);
-                        $("input[name='token']").val(data.token);
-                    }
+
+            getValidateBtn.on('click', function(){
+                var count = 60, intervalId ; //定时器
+
+                lib.phone = $("input[name='phone']").val();
+                lib.card_no = $("input[name='card_no']").val();
+
+                if(!lib.phone){
+                    return alert('请填写手机号');
                 }
+                getValidateBtn.attr('disabled', 'disabled').addClass('alreay-request');
+                //倒计时
+                var timerFunction = function() {
+                    if (count >= 1) {
+                        count--;
+                        return getValidateBtn.text( count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        getValidateBtn.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
+                        return
+                    }
+                };
+
+                org.ajax({
+                    type: 'POST',
+                    url: '/api/pay/deposit/',
+                    data: {card_no: lib.card_no, gate_id: lib.gate_id, phone: lib.phone, amount: lib.amount},
+                    success: function(data) {
+                        if(data.ret_code > 0) {
+                            clearInterval(intervalId);
+                            getValidateBtn.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
+                            return alert(data.message);
+                        } else {
+                            //alert('验证码已经发出，请注意查收！');
+                            $("input[name='order_id']").val(data.order_id);
+                            $("input[name='token']").val(data.token);
+                        }
+                    },
+                    error:function(data){
+                        console.log(data)
+                    }
+                })
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
             })
-          })
         },
         _rechargeStepSecond:function(){
             var secondBtn = $('#secondBtn');
@@ -854,8 +878,7 @@ org.recharge_second=(function(org){
                         if(data.ret_code > 0) {
                             return alert(data.message);
                         } else {
-                            alert('恭喜您，充值成功！本次充值金额：' + data.amount + '元');
-                             window.location.href = '/weixin/accounts/';
+                           $('.sign-main').shouw()
                         }
                     }
                 })

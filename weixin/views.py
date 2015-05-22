@@ -442,7 +442,6 @@ class P2PDetailView(TemplateView):
 
         amount = self.request.GET.get('amount', 0)
         amount_profit = self.request.GET.get('amount_profit', 0)
-        print self.request.GET
         next = self.request.GET.get('next', '')
 
         context.update({
@@ -545,7 +544,7 @@ class WeixinRechargeSecond(TemplateView):
         card_no = self.request.GET.get('card_no', '')
         gate_id = self.request.GET.get('gate_id', '')
         amount = self.request.GET.get('amount', 0)
-
+        user = self.request.user.wanglibaouserprofile
         try:
             bank = Bank.objects.filter(gate_id=gate_id).first()
         except:
@@ -556,6 +555,7 @@ class WeixinRechargeSecond(TemplateView):
             'gate_id': gate_id,
             'amount': amount,
             'bank': bank,
+            'user': user
         }
         return context
 
