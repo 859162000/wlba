@@ -8,6 +8,7 @@ from django.contrib.auth import login as auth_login
 from django.template import Template, Context
 from django.template.loader import get_template
 from django.db.models import Q
+from django.conf import settings
 from django.shortcuts import render_to_response, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -29,9 +30,8 @@ from weixin.wechatpy.utils import check_signature
 from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException
 from weixin.wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
-from weixin.common.wechat import WeixinAccounts
-from weixin.common.wxpay import JSWXpay
-from .models import Account, WeixinUser
+from weixin.common.wx import generate_js_wxpay
+from .models import Account, WeixinUser, WeixinAccounts
 from .common.wechat import tuling
 from decimal import Decimal
 import datetime
@@ -40,69 +40,6 @@ import time
 import uuid
 import urllib
 import math
-
-
-account_main = WeixinAccounts.get('main')
-js_wxpay = JSWXpay(
-    appid=account_main.app_id,
-    mch_id=account_main.mch_id,
-    key=account_main.key,
-    ip='119.254.110.30',
-    notify_url='http://pay.pythink.com/weixin/pay/notify/',
-    appsecret=account_main.app_secret
-)
-
-
-class ConnectView(View):
-    account = None
-
-    def check_signature(self, request, id):
-        try:
-            self.account = Account.objects.get(pk=id)
-        except Account.DoesNotExist:
-            return False
-
-        try:
-            check_signature(
-                self.account.token,
-                request.GET.get('signature'),
-                request.GET.get('timestamp'),
-                request.GET.get('nonce')
-            )
-        except InvalidSignatureException:
-            return False
-
-        return True
-
-    def get(self, request, id):
-        if not self.check_signature(request, id):
-            return HttpResponseForbidden()
-
-        return HttpResponse(request.GET.get('echostr'))
-
-    def post(self, request, id):
-        if not self.check_signature(request, id):
-            return HttpResponseForbidden()
-
-        msg = parse_message(request.body)
-
-        # 更新公众号原始ID 更新公众号关注者数据
-        self.account.weixin_original_id = msg.target
-        WeixinUser.objects.get_or_create(openid=msg.source, account_original_id=msg.target)
-
-        if msg.type == 'text':
-            # 自动回复  5000次／天
-            reply = tuling(msg)
-            # 多客服转接
-            # reply = TransferCustomerServiceReply(message=msg)
-        else:
-            reply = create_reply(u'更多功能，敬请期待！', msg)
-
-        return HttpResponse(reply.render())
-
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super(ConnectView, self).dispatch(request, *args, **kwargs)
 
 
 class WeixinJoinView(View):
@@ -155,27 +92,24 @@ class WeixinJsapiConfig(APIView):
 
     @weixin_api_error
     def get(self, request):
-        try:
-            account = Account.objects.first()
-        except Account.DoesNotExist:
-            data = {'errcode': 1, 'errmsg': 'account does not exist'}
-            return Response(data, status=400)
+        if settings.ENV == settings.ENV_DEV:
+            request.session['account_key'] = 'test'
+            account = WeixinAccounts.get('test')
+        else:
+            request.session['account_key'] = 'sub_1'
+            account = WeixinAccounts.get('sub_1')
 
         noncestr = uuid.uuid1().hex
         timestamp = str(int(time.time()))
         url = (request.META.get('HTTP_REFERER') or '').split('#')[0]
 
-        # app_id = account_main.app_id
-        # signature = account_main.weixin_client.jsapi.get_jsapi_signature(
-        #     noncestr,
-        #     account_main.jsapi_ticket,
-        #     timestamp,
-        #     url
-        # )
-
         app_id = account.app_id
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-        signature = client.jsapi.get_jsapi_signature(noncestr, account.jsapi_ticket, timestamp, url)
+        signature = account.weixin_client.jsapi.get_jsapi_signature(
+            noncestr,
+            account.jsapi_ticket,
+            timestamp,
+            url
+        )
 
         data = {
             'appId': app_id,
@@ -268,6 +202,7 @@ class WeixinPayTest(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(WeixinPayTest, self).get_context_data(**kwargs)
+        js_wxpay = generate_js_wxpay(self.request)
         code = self.request.GET.get('code')
         openid = js_wxpay.generate_openid(code)
         context['openid'] = openid
@@ -279,6 +214,7 @@ class WeixinPayTest(TemplateView):
                 'redirect_uri': request.build_absolute_uri(reverse('weixin_pay_test')),
                 'state': '123',
             }
+            js_wxpay = generate_js_wxpay(request)
             url = js_wxpay.generate_redirect_url(info_dict)
             return HttpResponseRedirect(url)
 
@@ -296,6 +232,7 @@ class WeixinPayOrder(APIView):
             'out_trade_no': uuid.uuid1().hex,
             'total_fee': 0.01,
         }
+        js_wxpay = generate_js_wxpay(request)
         data = js_wxpay.generate_jsapi(product, request.POST.get('openid'))
         return Response(data)
 
@@ -304,6 +241,7 @@ class WeixinPayNotify(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
+        js_wxpay = generate_js_wxpay(request)
         xml_str = request.body
         print 'xml_str: {}'.format(xml_str)
         ret, ret_dict = js_wxpay.verify_notify(xml_str)

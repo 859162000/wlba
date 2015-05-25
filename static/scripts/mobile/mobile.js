@@ -731,6 +731,7 @@ org.recharge=(function(org){
             for(var val in data){
                 if (data[val]['is_default'] == 'true') {
                     $("#card-val").val(data[val]['no']);
+
                     for(var i =0 ; i < optionsDomLength; i++){
                         if(optionsDom.eq(i).text() == data[val]['bank'].name){
                             optionsDom.eq(i).attr("selected", true);
@@ -742,7 +743,7 @@ org.recharge=(function(org){
             callback && callback();
         },
         _cradStyle:function(){
-
+            
         },
         _rechargeStepFirst:function(){
             var card_no,gate_id,amount,maxamount,
@@ -890,13 +891,65 @@ org.recharge_second=(function(org){
     }
 })(org);
 
+org.authentication = (function(org){
+    var lib = {
+        init: function(){
+            lib._checkForm()
+        },
+        _checkForm :function(){
+            var $fromComplete = $(".from-four-complete"),
+                formName = ['name','id_number']
+                formError = ['.error-name', '.error-card'],
+                formSign = ['请输入姓名', '请输入身份证号', '请输入有效身份证'],
+                data = {},
+                reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; //身份证正则
+
+            $fromComplete.on('click',function(){
+                var isGet = true;
+                $('.sign-all').hide();
+                $('.check-input').each(function(i){
+                    if(!$(this).val()){
+                        $(formError[i]).text(formSign[i]).show();
+                        return isGet = false;
+                    }else{
+                        if(i == 1 && !reg.test($(this).val())){
+                            $(formError[i]).text(formSign[2]).show();
+                            return isGet = false;
+                        }
+                    }
+                    data[formName[i]] = $(this).val();
+                })
+                isGet && lib._forAuthentication(data)
+            });
+        },
+        _forAuthentication:function(ags){
+            org.ajax({
+                type: 'POST',
+                url : '/api/id_validate/',
+                data : ags,
+                success:function(result){
+                    console.log(result)
+                },
+                error:function(result){
+                    console.log(result)
+                }
+
+
+            })
+        }
+    };
+    return {
+        init :lib.init
+    }
+})(org);
+
 ;(function(org){
     $.each($('script'), function(){
-      var src = $(this).attr('src');
-      if(src && src.indexOf(org.scriptName) > 0){
-        if($(this).attr('data-init') && org[$(this).attr('data-init')]){
-            org[$(this).attr('data-init')].init();
+        var src = $(this).attr('src');
+        if(src && src.indexOf(org.scriptName) > 0){
+            if($(this).attr('data-init') && org[$(this).attr('data-init')]){
+                org[$(this).attr('data-init')].init();
+            }
         }
-      }
     })
-})(org)
+})(org);

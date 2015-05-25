@@ -1,2 +1,92 @@
 {% extends 'manage/base.html' %}
+{% block styles %}
+  <link rel="stylesheet" href="/static/styles/admin/weixin_menu.css"/>
+{% endblock %}
+{% block content %}
+  {% include 'manage/include/content_header.html' %}
+  <div class="ui two column grid" ng-controller="MenuCtl" ng-init="data.menu_api = '{% url 'wx_manage_menu_api' %}';">
+    <div class="column">
+      <div class="ui fluid vertical steps">
+        <div class="completed step">
+          <div id="weixin_menu">
+            <div class="weixin_menu_main"></div>
+            <div class="weixin_menu_body">
+              <div ng-repeat="menu in data.menu.button" class="weixin_menu_item" ng-click="">
+                <div ng-click="choice_menu(1, $index)">
+                  <span ng-bind="menu.name"></span>
+                  <i class="weixin_sub_button_icon" ng-hide="menu.type && menu.type != 'sub_button'"></i>
+                </div>
+                <div class="weixin_menu_sub_button_box" ng-hide="! menu.sub_button" ng-init="parent_index = $index;">
+                  <button type="button" ng-click="add_menu(2, $index);"
+                          ng-hide="(menu.type && menu.type != 'sub_button') || menu.sub_button.length >= 5">添加二级菜单
+                  </button>
+                  <div ng-repeat="sub_button in menu.sub_button" class="weixin_menu_sub_button"
+                       ng-click="choice_menu(2, $index, parent_index)"><span ng-bind="sub_button.name"></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="weixin_menu_handler">
+              <a href="javascript:void(0);" ng-click="add_menu(1);" ng-hide="data.menu.button.length >= 3">添加一级菜单</a>
+              <a href="javascript:void(0);" ng-click="create_menu();">生成菜单</a>
+              <a href="javascript:void(0);" ng-click="delete_menu();">删除菜单</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="ui fluid vertical steps">
+        <div class="completed step">
+          <div id="weixin_menu_set" ng-hide="data.new_menu == null;">
+            <div class="ui form">
+              <form name="new_menu_form" ng-submit="add_menu_confirm()">
+                <div class="field">
+                  <label>类型</label>
+                  <select class="ui dropdown"
+                          ng-model="data.new_menu.type"
+                          ng-options="item.value as item.text for item in data.menu_classify">
+                  </select>
+                </div>
+                <div class="field">
+                  <label>名称</label>
+                  <input type="text" name="name" ng-model="data.new_menu.name" ng-minlength="1"
+                         ng-maxlength="data.name_max_length" ng-required="true"/>
+                </div>
+                <div class="field" ng-hide="data.new_menu.type == 'view' || data.new_menu.type == 'sub_button'">
+                  <label>Key</label>
+                  <input type="text" name="key" id="" ng-model="data.new_menu.key"
+                         ng-required="data.new_menu.type != 'view' && data.new_menu.type != 'sub_button'"/>
+                </div>
+                <div class="field" ng-hide="data.new_menu.type != 'view'">
+                  <label>链接</label>
+                  <input type="url" name="url" id="" ng-model="data.new_menu.url"
+                         ng-required="data.new_menu.type == 'view'"/>
+                </div>
+                <div class="field">
+                  <button class="ui primary button" ng-disabled="new_menu_form.$invalid">确定</button>
+                </div>
+                <div class="field" ng-hide="data.current_menu_index == null">
+                  <button class="ui red button" type="button" ng-click="remove_menu()">删除</button>
+                  <button class="ui green button" type="button" ng-click="move_menu('left')"
+                          ng-bind="data.move_menu_left_btn" ng-hide="is_move_menu_left_hidden()"></button>
+                  <button class="ui green button" type="button" ng-click="move_menu('right')"
+                          ng-bind="data.move_menu_right_btn" ng-hide="is_move_menu_right_hidden()"></button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div>
+            <pre ng-bind="data.new_menu|json"></pre>
+            <pre ng-bind="data.menu|json"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
 
+{% block scripts %}
+  <script type="text/javascript" src="/static/js/lib/angular.min.js"></script>
+  <script type="text/javascript" src="/static/src/admin/weixin.js"></script>
+  <script type="text/javascript" src="/static/src/admin/weixin_menu.js"></script>
+{% endblock %}

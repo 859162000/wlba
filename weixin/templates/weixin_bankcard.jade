@@ -1,0 +1,21 @@
+-load formatters
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 添加银行卡
+      a(href="javascript:history.back()")
+        span 返回
+    .bank-main
+      .bank-list
+        p.bank-name 招商银行
+        p.bank-num 1546468679878
+      .bank-list
+        p.bank-name 招商银行
+        p.bank-num 1546468679878
+    .bank-add-btn
+      a(href="/weixin/account/bankcard/add/")
+        span.btn-icon +
+        span.btn-click 添加银行卡
