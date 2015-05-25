@@ -21,6 +21,8 @@ from wanglibao_margin.models import Margin
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 # from wanglibao_pay import third_pay, trade_record
+from django.utils import timezone
+from rest_framework.permissions import IsAuthenticated
 from wanglibao_pay.models import Bank
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
@@ -37,6 +39,7 @@ import json
 import time
 import uuid
 import urllib
+import math
 
 
 class WeixinJoinView(View):
@@ -499,5 +502,77 @@ class WeixinTransaction(TemplateView):
     template_name = 'weixin_transaction.jade'
 
     def get_context_data(self, **kwargs):
+        p2p_equities = P2PEquity.objects.filter(user=self.request.user)\
+            .filter(product__status=u'还款中').select_related('product')[:10]
 
-        return {}
+        p2p_records = [{
+            'equity_created_at': timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),  # 投标时间
+            'equity_product_short_name': equity.product.short_name,  # 产品名称
+            'equity_product_expected_earning_rate': equity.product.expected_earning_rate,  # 年化收益(%)
+            'equity_product_period': equity.product.period,  # 产品期限(月)*
+            'equity_equity': float(equity.equity),  # 用户所持份额(投资金额)
+            'equity_product_display_status': equity.product.display_status,  # 状态
+            'equity_term': equity.term,  # 还款期
+            'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
+            'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已经收益
+            'equity_total_interest': float(equity.pre_total_interest),  # 单个预期收益
+            'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
+                self.request.get_host(), equity.product.id),  # 合同
+            'product_id': equity.product_id,
+            'has_link': True,
+        } for equity in p2p_equities]
+
+        return {
+            'results': p2p_records
+        }
+
+
+class WeixinP2PRecordAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        user = request.user
+        p2p_status = request.GET.get('status', u'还款中')
+        if p2p_status not in [u'还款中', u'投标中', u'已完成']:
+            return Response({'ret_code': 20400, 'message': u'标的状态错误'})
+        has_link = False
+        if p2p_status == u'还款中':
+            has_link = True
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('pagesize', 10)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        if p2p_status == u'还款中':
+            p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+                u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'正在招标',
+            ]).select_related('product')[(page-1)*pagesize:page*pagesize]
+        else:
+            p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status=p2p_status)\
+                .select_related('product')[(page-1)*pagesize:page*pagesize]
+
+        p2p_records = [{
+             'equity_created_at': timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),  # 投标时间
+             'equity_product_short_name': equity.product.short_name,  # 产品名称
+             'equity_product_expected_earning_rate': equity.product.expected_earning_rate,  # 年化收益(%)
+             'equity_product_period': equity.product.period,  # 产品期限(月)*
+             'equity_equity': float(equity.equity),  # 用户所持份额(投资金额)
+             'equity_product_display_status': equity.product.display_status,  # 状态
+             'equity_term': equity.term,  # 还款期
+             'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
+             'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已经收益
+             'equity_total_interest': float(equity.pre_total_interest),  # 单个预期收益
+             'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
+                 request.get_host(), equity.product.id),  # 合同
+             'product_id': equity.product_id,
+             'has_link': has_link,
+        } for equity in p2p_equities]
+
+        html_data = _generate_ajax_template(p2p_records, 'include/ajax/ajax_transaction.jade')
+
+        return Response({
+            'html_data': html_data,
+            'page': page,
+            'pagesize': pagesize,
+        })
+
