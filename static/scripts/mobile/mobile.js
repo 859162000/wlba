@@ -427,7 +427,7 @@ org.detail = (function(org){
             })
         },
         _share: function(){
-            var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+            var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
             $.ajax({
                 type : 'GET',
                 url : lib.weiURL,

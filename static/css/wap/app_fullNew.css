@@ -67,6 +67,13 @@ body{
     padding: 8px 0;
     border: 1px solid #d6d6d6;
 }
+
+.explain-table table td span{
+    display: block;
+    width: 70%;
+    margin: 0 auto;
+    text-align: left;
+}
 .raise-act-count{
     padding: 20px 8px;
     color: #666;

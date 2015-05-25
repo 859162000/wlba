@@ -298,3 +298,15 @@ class HuifuPay(Pay):
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return result
+
+
+class HuifuShortPay:
+    FEE = 0
+    def __init__(self):
+        self.MER_ID = settings.HUI_SHORT_MER_ID
+        self.OPER_ID = settings.HUI_SHORT_OPER_ID
+        self.PAY_URL = settings.HUI_SHORT_PAY_URL
+        self.BIND_URL = settings.HUI_SHORT_BIND_URL
+        self.DEBIND_URL = settings.HUI_SHORT_DEBIND_URL
+        self.SIGN_HOST = settings.HUI_SHORT_SIGN_HOST
+        self.SIGN_PORT = settings.HUI_SHORT_SIGN_PORT
