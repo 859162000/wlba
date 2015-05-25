@@ -563,9 +563,35 @@ class WeixinRechargeSecond(TemplateView):
 class WeixinTransaction(TemplateView):
     template_name = 'weixin_transaction.jade'
 
-    def get_context_data(self, **kwargs):
-        p2p_equities = P2PEquity.objects.filter(user=self.request.user)\
-            .filter(product__status=u'还款中').select_related('product')[:10]
+    def get_template_names(self):
+        status = self.kwargs['status']
+        if status == 'buying':
+            template_name = 'weixin_transaction_buying.jade'
+        elif status == 'finished':
+            template_name = 'weixin_transaction_finished.jade'
+        else:
+            template_name = 'weixin_transaction.jade'
+
+        return template_name
+
+    def get_context_data(self, status, **kwargs):
+        if status not in ['repaying', 'buying', 'finished']:
+            return Response({'ret_code': 20400, 'message': u'标的状态错误'})
+        has_link = False
+        if status == 'repaying':
+            has_link = True
+            p2p_status = u'还款中'
+        elif status == 'finished':
+            p2p_status = u'已完成'
+        else:
+            p2p_status = u'正在招标'
+        if status == 'buying':
+            p2p_equities = P2PEquity.objects.filter(user=self.request.user).filter(product__status__in=[
+                u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'正在招标',
+            ]).select_related('product')[:10]
+        else:
+            p2p_equities = P2PEquity.objects.filter(user=self.request.user).filter(product__status=p2p_status) \
+                .select_related('product')[:10]
 
         p2p_records = [{
             'equity_created_at': timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),  # 投标时间
@@ -581,7 +607,7 @@ class WeixinTransaction(TemplateView):
             'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
                 self.request.get_host(), equity.product.id),  # 合同
             'product_id': equity.product_id,
-            'has_link': True,
+            'has_link': has_link,
         } for equity in p2p_equities]
 
         return {
@@ -594,18 +620,23 @@ class WeixinP2PRecordAPI(APIView):
 
     def get(self, request):
         user = request.user
-        p2p_status = request.GET.get('status', u'还款中')
-        if p2p_status not in [u'还款中', u'投标中', u'已完成']:
+        get_status = request.GET.get('status', 'repaying')
+        if get_status not in ['repaying', 'buying', 'finished']:
             return Response({'ret_code': 20400, 'message': u'标的状态错误'})
         has_link = False
-        if p2p_status == u'还款中':
+        if get_status == 'repaying':
             has_link = True
+            p2p_status = u'还款中'
+        elif get_status == 'finished':
+            p2p_status = u'已完成'
+        else:
+            p2p_status = u'正在招标'
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 10)
         page = int(page)
         pagesize = int(pagesize)
 
-        if p2p_status == u'还款中':
+        if get_status == 'buying':
             p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
                 u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'正在招标',
             ]).select_related('product')[(page-1)*pagesize:page*pagesize]
