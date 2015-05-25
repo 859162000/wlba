@@ -891,6 +891,58 @@ org.recharge_second=(function(org){
     }
 })(org);
 
+org.authentication = (function(org){
+    var lib = {
+        init: function(){
+            lib._checkForm()
+        },
+        _checkForm :function(){
+            var $fromComplete = $(".from-four-complete"),
+                formName = ['name','id_number']
+                formError = ['.error-name', '.error-card'],
+                formSign = ['请输入姓名', '请输入身份证号', '请输入有效身份证'],
+                data = {},
+                reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; //身份证正则
+
+            $fromComplete.on('click',function(){
+                var isGet = true;
+                $('.sign-all').hide();
+                $('.check-input').each(function(i){
+                    if(!$(this).val()){
+                        $(formError[i]).text(formSign[i]).show();
+                        return isGet = false;
+                    }else{
+                        if(i == 1 && !reg.test($(this).val())){
+                            $(formError[i]).text(formSign[2]).show();
+                            return isGet = false;
+                        }
+                    }
+                    data[formName[i]] = $(this).val();
+                })
+                isGet && lib._forAuthentication(data)
+            });
+        },
+        _forAuthentication:function(ags){
+            org.ajax({
+                type: 'POST',
+                url : '/api/id_validate/',
+                data : ags,
+                success:function(result){
+                    console.log(result)
+                },
+                error:function(result){
+                    console.log(result)
+                }
+
+
+            })
+        }
+    };
+    return {
+        init :lib.init
+    }
+})(org);
+
 ;(function(org){
     $.each($('script'), function(){
         var src = $(this).attr('src');
