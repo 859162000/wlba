@@ -1,110 +1,8 @@
 # encoding:utf-8
 from __future__ import unicode_literals
-from django.core.cache import cache
-from weixin.wechatpy import create_reply, WeChatClient
-from collections import OrderedDict
+from weixin.wechatpy import create_reply
 import urllib
 import requests
-
-# 公众号类型
-class WeixinAccounts(object):
-
-    data = OrderedDict()
-    account_main = {
-        'id': 'gh_f758af6347b6',
-        'name': '网利宝',
-        'app_id': 'wx896485cecdb4111d',
-        'app_secret': 'b1e152144e4a4974cd06b8716faa98e1',
-        'classify': '已认证服务号',
-        'mch_id': '1237430102',
-        'key': 'mmeBOdBjuovQOgPPSp1qZFONbHS9pkZn',
-        'token': '6d0dbaca',
-        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_f758af6347b6_258.jpg'
-
-    }
-    account_sub_1 = {
-        'id': 'gh_77c09ff2f3a3',
-        'name': '网利宝',
-        'app_id': 'wx110c1d06158c860b',
-        'app_secret': '2523d084edca65b6633dae215967a23f',
-        'classify': '已认证订阅号',
-        'EncodingAESKey': '3QXabFsqXV64Bvdc4EvRciOfvWbYw7Fud38J8ianHmx',
-        'token': '695bc700',
-        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_77c09ff2f3a3_258.jpg'
-    }
-    account_test = {
-        'id': 'gh_d852bc2cead2',
-        'name': '测试号',
-        'app_id': 'wx22c7a048569d3e7e',
-        'app_secret': '1340e746fb4c3719d405fdc27752bc6f',
-        'classify': '微信测试号',
-        'token': '6ad01528',
-        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
-    }
-
-    id = None
-    name = None
-    app_id = None
-    app_secret = None
-    classify = None
-    mch_id = None
-    key = None
-    EncodingAESKey = None
-    token = None
-
-    client_cache = None
-    host_url = None
-
-    def __init__(self, account_key):
-        self.append_account()
-        data = self.data.get(account_key)
-        self.account_key = account_key
-        for key, value in data.items():
-            setattr(self, key, value)
-
-    def append_account(self):
-        self.data['main'] = self.account_main
-        self.data['sub_1'] = self.account_sub_1
-        self.data['test'] = self.account_test
-
-    @classmethod
-    def get(cls, key):
-        return cls(key)
-
-    @classmethod
-    def all(cls):
-        _all = []
-        for account_key, _ in cls.data.items():
-            _all.append(cls(account_key))
-        return _all
-
-    @property
-    def weixin_client(self):
-        if not self.client_cache:
-            self.client_cache = WeChatClient(self.app_id, self.app_secret, self.access_token)
-        return self.client_cache
-
-    @property
-    def access_token(self):
-        cache_key = 'access_token_{}'.format(self.id)
-        if not cache.get(cache_key):
-            weixin_client = WeChatClient(self.app_id, self.app_secret)
-            res = weixin_client.fetch_access_token()
-            cache.set(cache_key, res.get('access_token'), res.get('expires_in') - 60)
-        return cache.get(cache_key)
-
-    @property
-    def jsapi_ticket(self):
-        cache_key = 'jsapi_ticket_{}'.format(self.id)
-        if not cache.get(cache_key):
-            res = self.weixin_client.jsapi.get_ticket()
-            cache.set(cache_key, res.get('ticket'), res.get('expires_in') - 60)
-        return cache.get(cache_key)
-
-    @property
-    def connect_url(self):
-        from django.core.urlresolvers import reverse
-        return '{}{}'.format(self.host_url, reverse('weixin_join', kwargs={'account_key': self.account_key}))
 
 
 class Permission(object):
@@ -211,3 +109,5 @@ def tuling(msg):
             reply = create_reply(data.get('text'), msg)
 
     return reply
+
+

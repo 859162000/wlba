@@ -1,49 +1,50 @@
 {% extends 'manage/base.html' %}
 
 {% block container %}
-<div class="container">
+  <div class="container">
     <div class="ui two column grid" id="indexList">
-        {% for account in items %}
+      {% for account in items %}
         <div class="column">
-            <div class="ui blue segment">
-                <div>
-                    <h4>{{ account.name }}
-                        <a class="ui mini blue animated button" style="float: right;" href="{% url 'wx_manage_account' account.account_key %}">
-                            <span class="visible content">管理</span>
-                            <span class="hidden content">
-                                <i class="setting icon"></i>
-                            </span>
-                        </a>
-                    </h4>
-                </div>
-                <h4 class="ui horizontal header divider">
-                    <i class="settings icon"></i>
-                    属性
-                </h4>
-                <table class="ui definition table">
-                    <tbody>
-                        <tr>
-                            <td class="three wide column">类型</td>
-                            <td>{{ account.classify }}</td>
-                        </tr>
-                        <tr>
-                            <td>URL</td>
-                            <td>{{ account.connect_url }}</td>
-                        </tr>
-                        <tr>
-                            <td>Token</td>
-                            <td>{{ account.token }}</td>
-                        </tr>
-                        <tr>
-                            <td>二维码</td>
-                            <td><img src="{{ account.qrcode_url }}" alt="" width="258"/></td>
-                        </tr>
-                    </tbody>
-                </table>
+          <div class="ui blue segment">
+            <div>
+              <h4>{{ account.name }}
+                <a class="ui mini blue animated button" style="float: right;"
+                   href="{% url 'wx_manage_account' account.account_key %}">
+                  <span class="visible content">管理</span>
+                  <span class="hidden content">
+                      <i class="setting icon"></i>
+                  </span>
+                </a>
+              </h4>
             </div>
+            <h4 class="ui horizontal header divider">
+              <i class="settings icon"></i>
+              属性
+            </h4>
+            <table class="ui definition table">
+              <tbody>
+              <tr>
+                <td class="three wide column">类型</td>
+                <td>{{ account.classify }}</td>
+              </tr>
+              <tr>
+                <td>URL</td>
+                <td>{{ account.connect_url }}</td>
+              </tr>
+              <tr>
+                <td>Token</td>
+                <td>{{ account.token }}</td>
+              </tr>
+              <tr>
+                <td>二维码</td>
+                <td><img src="{{ account.qrcode_url }}" alt="" width="258"/></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        {% endfor %}
-	</div>
-</div>
+      {% endfor %}
+    </div>
+  </div>
 
 {% endblock %}
