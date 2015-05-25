@@ -26,8 +26,8 @@ from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSe
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
-                            KuaiPayView, KuaiPayCallbackView, KuaiPayQueryView,
-                            KuaiPayDelView, KuaiPayDynNumView, TradeRecordAPIView)
+                            BindPayView, BindPayCallbackView, BindPayQueryView,
+                            BindPayDelView, BindPayDynNumView, TradeRecordAPIView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -145,11 +145,12 @@ urlpatterns = patterns(
     url(r'^pay/yee/app/deposit/callback/$', YeePayAppPayCallbackView.as_view(), name="yee-deposit-callback"),
     url(r'^pay/yee/app/deposit/complete/$', YeePayAppPayCompleteView.as_view(), name="yee-deposit-fcallback"),
 
-    url(r'^pay/cnp/list/$', KuaiPayQueryView.as_view()),
-    url(r'^pay/cnp/delete/$', KuaiPayDelView.as_view()),
-    url(r'^pay/cnp/dynnum/$', KuaiPayDynNumView.as_view()),
-    url(r'^pay/deposit/$', KuaiPayView.as_view(), name="kuai-deposit-view"),
-    url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
+    url(r'^pay/cnp/list/$', BindPayQueryView.as_view()),
+    url(r'^pay/cnp/delete/$', BindPayDelView.as_view()),
+    url(r'^pay/cnp/dynnum/$', BindPayDynNumView.as_view()),
+    url(r'^pay/deposit/$', BindPayView.as_view(), name="kuai-deposit-view"),
+    #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
+    url(r'^pay/deposit/callback/$', BindPayCallbackView.as_view(), name="kuai-deposit-callback"),
 
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
