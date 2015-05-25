@@ -10,7 +10,9 @@ urlpatterns = patterns(
     url(r'^connect/(?P<id>\w+)/$', views.ConnectView.as_view(), name='weixin_connect'),
     url(r'^join/(?P<account_key>\w+)/$', views.WeixinJoinView.as_view(), name='weixin_join'),
     url(r'^list/', views.P2PListView.as_view(), name='weixin_p2p_list'),
-    url(r'^account/', login_required(views.WeixinAccountHome.as_view(), login_url='/weixin/login/'), name='weixin_account'),
+    url(r'^account/$', login_required(views.WeixinAccountHome.as_view(), login_url='/weixin/login/'), name='weixin_account'),
+    url(r'^account/bankcard/$', TemplateView.as_view(template_name="weixin_bankcard.jade")),
+    url(r'^account/bankcard/add/$', TemplateView.as_view(template_name="weixin_bankcard_add.jade")),
     url(r'^view/(?P<template>\w+)/(?P<id>\w+)/', views.P2PDetailView.as_view(), name='weixin_p2p_detail'),
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
@@ -23,6 +25,9 @@ urlpatterns = patterns(
     url(r'^pay/test/$', views.WeixinPayTest.as_view(), name="weixin_pay_test"),
     url(r'^pay/notify/$', views.WeixinPayNotify.as_view(), name='weixin_pay_notify'),
     url(r'^transaction/$', login_required(views.WeixinTransaction.as_view(), login_url='/weixin/login/'), name="weixin_transaction"),
+
+
+
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),

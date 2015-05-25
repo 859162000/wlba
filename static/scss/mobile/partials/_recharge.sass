@@ -135,4 +135,47 @@
 .card-hide
   display: none
 
+.recharge-select-bank
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  background: rgba(0,0,0,.6)
+  display: -webkit-box
+  -webkit-box-pack: center
+  -webkit-box-align: center
+  padding: 0 1rem
+  .select-bank-body
+    border-radius: .6rem
+    background: #fff
+    border: 1px solid $color-grey-e8e8e8
+    padding: 0 .25rem
+    width: 100%
+    font-size: $font-size12
+    color: $color-grey-989898
+  .select-bank-tit
+    text-align: center
+    height: 2.5rem
+    line-height: 2.5rem
+  .select-bank-list
+    display: -webkit-box
+    -webkit-box-pack: center
+    padding: .5rem 0
+    border-top: 1px solid $color-grey-e8e8e8
+  .bank-type
+    width: 2.5rem
+    height: 2.5rem
+    line-height: 2.5rem
+    text-align: center
+  .bank-img
+    @extend .bank-type
+  .bank-cont
+    -webkit-box-flex: 1
+    text-align: left
+    p:first-child
+      font-size: $font-size14
+
+
+
 

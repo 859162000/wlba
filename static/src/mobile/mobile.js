@@ -730,6 +730,7 @@ org.recharge=(function(org){
             for(var val in data){
                 if (data[val]['is_default'] == 'true') {
                     $("#card-val").val(data[val]['no']);
+
                     for(var i =0 ; i < optionsDomLength; i++){
                         if(optionsDom.eq(i).text() == data[val]['bank'].name){
                             optionsDom.eq(i).attr("selected", true);
@@ -741,7 +742,7 @@ org.recharge=(function(org){
             callback && callback();
         },
         _cradStyle:function(){
-
+            
         },
         _rechargeStepFirst:function(){
             var card_no,gate_id,amount,maxamount,
