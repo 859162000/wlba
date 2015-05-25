@@ -9,12 +9,12 @@ html
         span 返回
     nav.transaction-nav
       ul
-        li.active
+        li
           a(href="/weixin/transaction/repaying/") 回款中
         li
           a(href="/weixin/transaction/buying/") 投标中
-        li
+        li.active
           a(href="/weixin/transaction/finished/") 已完成
       .tab-line
-    section#transaction-repaying.transaction-main
+    section#transaction-finished.transaction-main
       include include/ajax/ajax_transaction
