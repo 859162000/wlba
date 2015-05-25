@@ -713,7 +713,7 @@ org.recharge=(function(org){
                 success: function(data) {
                       //如果支付接口有返回已绑定的银行列表，将银行列表写入网页，银行卡：data.cards
                     if(data.ret_code == 0){
-                        $(".spinner").hide();
+                        $(".recharge-loding").hide();
                         if(data.cards.length === 0){
                             $('.card-none').show();
                         }else if(data.cards.length > 0){
@@ -893,7 +893,7 @@ org.recharge_second=(function(org){
 org.authentication = (function(org){
     var lib = {
         init: function(){
-            lib._checkForm()
+            lib._checkForm();
         },
         _checkForm :function(){
             var $fromComplete = $(".from-four-complete"),
