@@ -16,7 +16,7 @@ html
             if user.wanglibaouserprofile.id_is_valid
               p.thename-one(style="background: #fbfbfb;")
                 | 实名认证
-                span.thename-notadd(style="color: #6b6b6b") {{user | safe_phone}}
+                span.thename-notadd(style="color: #6b6b6b") {{user.wanglibaouserprofile.id_number | safe_id}}
                 label {{user.wanglibaouserprofile.name}}
             else
               a(href="/weixin/authentication/").thename-one(style="background: #fbfbfb;")
