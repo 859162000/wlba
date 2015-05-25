@@ -10,18 +10,26 @@
     li
       -webkit-box-flex: 1
       -ms-flex: 1
-      padding: .6rem 0
       font-size: $font-size14
       color: $color-grey-3e3e3e
       text-align: center
       background: #fff
       border-right: 1px solid $color-grey-e8e8e8
-      border-bottom: 1px solid $color-grey-e8e8e8
+
       &:last-child
         border-right: 0
+    a
+      display: block
+      height: 2.2rem
+      line-height: 2.2rem
+      text-align: center
+      border-bottom: 1px solid $color-grey-e8e8e8
     li.active
       color: $color-db493f
       background: $color-grey-fbfbfb
+      a
+        border-bottom: 2px solid $color-db493f
+
   .tab-line
     position: absolute
     left: 0
@@ -85,3 +93,13 @@
         border-right: 1px solid $color-grey-e8e8e8
 
 
+.none-data
+  text-align: center
+  font-size: $font-size12
+  color: $color-grey-989898
+  margin-top: 2rem
+  img
+    display: inline-block
+    width: 3.8rem
+    height: 1.2rem
+    margin-top: 1rem
