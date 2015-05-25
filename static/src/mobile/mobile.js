@@ -911,7 +911,7 @@ org.authentication = (function(org){
                         $(formError[i]).text(formSign[i]).show();
                         return isGet = false;
                     }else{
-                        if(i == 1 && !reg.test($(this).val())){
+                        if(i === 1 && !reg.test($(this).val())){
                             $(formError[i]).text(formSign[2]).show();
                             return isGet = false;
                         }
@@ -922,19 +922,26 @@ org.authentication = (function(org){
             });
         },
         _forAuthentication:function(ags){
-            org.ajax({
-                type: 'POST',
-                url : '/api/id_validate/',
-                data : ags,
-                success:function(result){
-                    console.log(result)
-                },
-                error:function(result){
-                    console.log(result)
-                }
-
-
-            })
+            var isPost = true;
+            if(isPost){
+                org.ajax({
+                    type: 'POST',
+                    url : '/api/id_validate/',
+                    data : ags,
+                    beforeSend:function(){
+                       isPost = false;
+                    },
+                    success:function(result){
+                        console.log(result)
+                    },
+                    error:function(result){
+                        console.log(result)
+                    },
+                    complete:function(){
+                        isPost = true;
+                    }
+                })
+            }
         }
     };
     return {
