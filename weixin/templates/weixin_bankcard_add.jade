@@ -1,0 +1,24 @@
+-load formatters
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 添加银行卡
+      a(href="javascript:history.back()")
+        span 返回
+    .bank-add-main
+      .add-row
+        p.row-name 开户名
+        p.row-value.value-right value
+      .add-row.add-select
+        select(name="type")
+          option(value = 'init') 请选择银行卡（暂不支持信用卡）
+      .add-row.add-input
+        p.row-name 银行卡号
+        input(type="tel", placeholder="请输入银行卡号").row-value.value-input
+    .bank-add-sign
+      p 请保证银行卡开户人和您在网利宝实名认证相同
+    .bank-add-btn
+      p 添加银行卡

@@ -11,21 +11,20 @@ html
         .security-thename
             p.thename-one
                 | 账户名
-                label 135*** **89
+                label {{user | safe_phone}}
             .line
-            //if 未认证样式
-            a(href="#").thename-one(style="background: #fbfbfb;display:none")
+            if user.wanglibaouserprofile.id_is_valid
+              p.thename-one(style="background: #fbfbfb;")
                 | 实名认证
-                span.thename-notadd 未设置
-                b.thename-add
-                    span
-                        label.project-one-angle
-            //elsr 认证样式
-            a(href="#").thename-one(style="background: #fbfbfb;")
-                | 实名认证
-                span.thename-notadd(style="color: #6b6b6b") 13*********
-                label 张三
-
+                span.thename-notadd(style="color: #6b6b6b") {{user.wanglibaouserprofile.id_number | safe_id}}
+                label {{user.wanglibaouserprofile.name}}
+            else
+              a(href="/weixin/authentication/").thename-one(style="background: #fbfbfb;")
+                  | 实名认证
+                  span.thename-notadd 未设置
+                  b.thename-add
+                      span
+                          label.project-one-angle
             .line
             //    if 未添加银行卡
             a(href="#").thename-one
