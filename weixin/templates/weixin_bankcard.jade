@@ -1,4 +1,5 @@
 -load formatters
+
 doctype html
 html
   head
@@ -6,15 +7,14 @@ html
   body
     header
       hgroup 添加银行卡
-      a(href="javascript:history.back()")
+      a(href="/weixin/security/")
         span 返回
     .bank-main
-      .bank-list
-        p.bank-name 招商银行
-        p.bank-num 1546468679878
-      .bank-list
-        p.bank-name 招商银行
-        p.bank-num 1546468679878
+      if p2p_cards
+        each card in p2p_cards
+          .bank-list
+            p.bank-name {{card.bank.name}}
+            p.bank-num {{card.no | bank_card}}
     .bank-add-btn
       a(href="/weixin/account/bankcard/add/")
         span.btn-icon +

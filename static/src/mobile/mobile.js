@@ -932,11 +932,13 @@ org.authentication = (function(org){
                     beforeSend:function(){
                        isPost = false;
                     },
-                    success:function(result){
-                        console.log(result)
+                    success:function(){
+                        alert("实名认证成功!");
+                        window.location.href = '/weixin/security/';
                     },
-                    error:function(result){
-                        console.log(result)
+                    error:function(xhr){
+                        result = JSON.parse(xhr.responseText);
+                        return alert(result.message);
                     },
                     complete:function(){
                         isPost = true;
@@ -947,6 +949,65 @@ org.authentication = (function(org){
     };
     return {
         init :lib.init
+    }
+})(org);
+
+org.bankcardAdd = (function(org){
+    var lib = {
+        init:function(){
+            lib._checkForm();
+        },
+        _checkForm:function(){
+            var reg = /^\d{10,20}$/;
+            $(".addBank-btn").on('click',function(){
+                var bank_id = $('#bank-select').val(),
+                    card_no = $('#card-no').val(),
+                    is_default = $('#default-checkbox').prop('checked'),
+                    data = {};
+
+                if (!bank_id) {
+                    return alert('请选择银行');
+                }
+                if(!reg.test(card_no)){
+                    return alert('请输入有效的银行卡号')
+                }
+                var data =  {
+                  no: card_no,
+                  bank : bank_id,
+                  is_default : is_default
+                }
+
+                lib._forAddbank(data);
+            });
+        },
+        _forAddbank:function(data){
+            org.ajax({
+                type: "POST",
+                url: '/api/card/',
+                data: data,
+                beforeSend:function(){
+                   $(".addBank-btn").attr("disabled","true").text("添加中...");
+                },
+                success:function(result){
+                    alert("添加成功！");
+                    window.location.href = '/weixin/account/bankcard/';
+                },
+                error:function(result){
+                    if (result.error_number === 5) {
+                      return alert(result.message);
+                    }else{
+                        return alert("添加银行卡失败");
+                    }
+                },
+                complete:function(){
+                    $(".addBank-btn").removeAttr("disabled").text("添加银行卡");
+                }
+
+            })
+        }
+    }
+    return {
+        init : lib.init
     }
 })(org);
 

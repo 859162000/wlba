@@ -34,6 +34,11 @@ from weixin.common.wx import generate_js_wxpay
 from .models import Account, WeixinUser, WeixinAccounts
 from .common.wechat import tuling
 from decimal import Decimal
+from shumi_backend.exception import *
+from shumi_backend.fetch import UserInfoFetcher
+from wanglibao_buy.models import BindBank
+from wanglibao_pay.models import Card
+from wanglibao_announcement.utility import AnnouncementAccounts
 import datetime
 import json
 import time
@@ -403,10 +408,11 @@ class P2PDetailView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
             if self.kwargs['template'] == 'buy':
-                amount = request.GET.get('amount', '')
-                amount_profit = request.GET.get('amount_profit', '')
-                next_str = '?amount=%s&amount_profit=%s' % (amount, amount_profit)
-                redirect_str = '/weixin/login/?next=/weixin/view/buy/%s/%s' % (self.kwargs['id'], urllib.quote(next_str))
+                #未登录状态下buy模板不需要取 amount 和 amount_profit
+                #amount = request.GET.get('amount', '')
+                #amount_profit = request.GET.get('amount_profit', '')
+                #next_str = '?amount=%s&amount_profit=%s' % (amount, amount_profit)
+                redirect_str = '/weixin/login/?next=/weixin/view/buy/%s/' % (self.kwargs['id'],)
                 return HttpResponseRedirect(redirect_str)
         return super(P2PDetailView, self).dispatch(request, *args, **kwargs)
 
@@ -607,3 +613,66 @@ class WeixinP2PRecordAPI(APIView):
             'pagesize': pagesize,
         })
 
+class WeixinAccountSecurity(TemplateView):
+    template_name = 'weixin_security.jade'
+
+    def get_context_data(self, **kwargs):
+        message = ''
+        try:
+            fetcher = UserInfoFetcher(self.request.user)
+            fetcher.fetch_bind_banks()
+        except FetchException:
+            message = u'获取数据失败，请稍后重试'
+        except AccessException:
+            pass
+
+        cards = BindBank.objects.filter(user__exact=self.request.user)
+        p2p_cards = Card.objects.filter(user__exact=self.request.user)
+        return {
+            "cards": cards,
+            'p2p_cards': p2p_cards,
+            'user_profile': self.request.user.wanglibaouserprofile,
+            "message": message,
+            'announcements': AnnouncementAccounts
+        }
+class WeixinAccountBankCard(TemplateView):
+    template_name = 'weixin_bankcard.jade'
+
+    def get_context_data(self, **kwargs):
+        message = ''
+        try:
+            fetcher = UserInfoFetcher(self.request.user)
+            fetcher.fetch_bind_banks()
+        except FetchException:
+            message = u'获取数据失败，请稍后重试'
+        except AccessException:
+            pass
+
+        cards = BindBank.objects.filter(user__exact=self.request.user)
+        p2p_cards = Card.objects.filter(user__exact=self.request.user)
+        return {
+            "cards": cards,
+            'p2p_cards': p2p_cards,
+            'user_profile': self.request.user.wanglibaouserprofile,
+            "message": message,
+            'announcements': AnnouncementAccounts
+        }
+class WeixinAccountBankCardAdd(TemplateView):
+    template_name = 'weixin_bankcard_add.jade'
+
+    def get_context_data(self, **kwargs):
+        message = ''
+        try:
+            fetcher = UserInfoFetcher(self.request.user)
+            fetcher.fetch_bind_banks()
+        except FetchException:
+            message = u'获取数据失败，请稍后重试'
+        except AccessException:
+            pass
+        banks = Bank.get_withdraw_banks()
+        return {
+            'banks': banks,
+            'user_profile': self.request.user.wanglibaouserprofile,
+            "message": message,
+            'announcements': AnnouncementAccounts
+        }

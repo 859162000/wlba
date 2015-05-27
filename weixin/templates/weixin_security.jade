@@ -6,7 +6,7 @@ html
     body
         header
             hgroup 账户安全
-            a(href="javascript:history.back()")
+            a(href="/weixin/account/")
                span 返回
         .security-thename
             p.thename-one
@@ -26,19 +26,21 @@ html
                       span
                           label.project-one-angle
             .line
-            //    if 未添加银行卡
-            a(href="#").thename-one
-                | 管理银行卡
-                span.thename-notadd 未添加
-                b.thename-add 添加&nbsp;&nbsp;&nbsp;
-                    span
-                        label.project-one-angle
-            //else
-            a(href="#", style="display:none").thename-one
-                | 管理银行卡
-                b.thename-add
-                    span
-                        label.project-one-angle
+            if p2p_cards
+              //else
+              a(href="/weixin/account/bankcard/").thename-one
+                  | 管理银行卡
+                  b.thename-add
+                      span
+                          label.project-one-angle
+            else
+              a(href="/weixin/account/bankcard/add/").thename-one
+                  | 管理银行卡
+                  span.thename-notadd 未添加
+                  b.thename-add 添加&nbsp;&nbsp;&nbsp;
+                      span
+                          label.project-one-angle
+
             .line(style="display:none")
             //    修改密码
             a(href="#" style="display:none").thename-one
