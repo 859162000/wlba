@@ -906,6 +906,7 @@ org.authentication = (function(org){
             $fromComplete.on('click',function(){
                 var isGet = true;
                 $('.sign-all').hide();
+
                 $('.check-input').each(function(i){
                     if(!$(this).val()){
                         $(formError[i]).text(formSign[i]).show();
