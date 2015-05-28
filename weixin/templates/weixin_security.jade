@@ -15,14 +15,14 @@ html
             .line
             if user.wanglibaouserprofile.id_is_valid
               p.thename-one
-                | 实名认证
+                | 实名认证&nbsp;&nbsp;&nbsp;&nbsp;
                 span.thename-notadd(style="color: #6b6b6b") {{user.wanglibaouserprofile.id_number | safe_id}}
                 label {{user.wanglibaouserprofile.name}}
             else
               a(href="/weixin/authentication/").thename-one
-                  | 实名认证
+                  | 实名认证&nbsp;&nbsp;&nbsp;&nbsp;
                   span.thename-notadd 未设置
-                  b.thename-add
+                  b.thename-add 设置&nbsp;&nbsp;&nbsp;&nbsp;
                       span
                           label.project-one-angle
             .line
@@ -37,7 +37,7 @@ html
               a(href="/weixin/account/bankcard/").thename-one
                   | 管理银行卡
                   span.thename-notadd 未添加
-                  b.thename-add 添加&nbsp;&nbsp;&nbsp;
+                  b.thename-add 添加&nbsp;&nbsp;&nbsp;&nbsp;
                       span
                           label.project-one-angle
 
