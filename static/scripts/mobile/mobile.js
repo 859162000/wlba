@@ -231,13 +231,12 @@ org.login = (function(org){
                             }else{
                                 if(data[key] == '验证码错误'){
                                     $('.error-' + key).text(data[key]).show()
-                                    lib._captcha_refresh()
                                 }else{
                                    $('.error-' + key).text(data[key]).show()
                                 }
-
                             }
                         }
+                        lib._captcha_refresh()
                     },
                     complete: function() {
                         $submit.removeAttr('disabled').text('登录');
@@ -626,8 +625,23 @@ org.buy=(function(org){
                            $(".sign-main").css("display","-webkit-box");
                        }
                     },
-                    error: function(data){
-                        alert(data.message)
+                    error: function(xhr){
+                        var  result;
+                        result = JSON.parse(xhr.responseText);
+                        if (result.error_number === 1) {
+                            alert("登录超时，请重新登录！");
+                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
+                        } else if (result.error_number === 2) {
+                            return alert('必须实名认证！');
+                        } else if (result.error_number === 4 && result.message === "余额不足") {
+                            $(".buy-sufficient").show();
+                            return;
+                        }else if (result.detail){
+                            alert("登录超时，请重新登录！");
+                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
+                        }else{
+                            return alert(result.message);
+                        }
                     },
                     complete:function(){
                        $buyButton.text("确定抢购")
