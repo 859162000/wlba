@@ -8,8 +8,8 @@ html
     link(rel="stylesheet",href="/static/css/wap/app_fullNew.css")
   body
       .raise-head
-        img(src="/static/images/app_full/app_full_banner.jpg")
-      .raise-act-time 活动时间： 2015年5月1日 - 2015年5月17日
+        img(src="/static/images/app_full/app_ban.jpg")
+      .raise-act-time 活动时间： 2015年5月23日 - 2015年6月10日
 
       .raise-act-explain
         .explain-tab 疯狂加息！激情豪礼!
@@ -25,15 +25,16 @@ html
             tbody
               mixin trList(leftTxt, shouyi)
                 tr
-                  td=leftTxt
+                  td
+                    span=leftTxt
                   td
                     em.highlight=shouyi
                     |年化收益
-              +trList('200万（含）以上', '2.5% ')
-              +trList('150万（含）- 200万', '2.0% ')
-              +trList('100万（含）- 150万', '1.5% ')
-              +trList('50万（含）- 100万', '1.0% ')
-              +trList('20万（含）- 50万', '0.5% ')
+              +trList('300万（含）以上', '2.0% ')
+              +trList('100万（含）- 300万', '1.6% ')
+              +trList('50万（含）- 100万', '1.2% ')
+              +trList('20万（含）- 50万', '0.8% ')
+              +trList('10万（含）- 20万', '0.2% ')
       .raise-act-count
         p
           em.highlight 计算公式：
@@ -45,11 +46,11 @@ html
         dl
           dt 活动规则
           dd 1.活动时间：
-            em.highlight 5月1日-5月17日
+            em.highlight 5月23日-6月10日
             |；
           dd 2.现金奖励在活动结束后的三个工作日内以红包形式发出，红包类型为现金红包；
           dd 3.红包有效期：
-            em.highlight 2015年5月1日-2015年7月1日
+            em.highlight 2015年5月23日-2015年8月22日
             |；
           dd 4.红包均只能使用一次，请在一次投资内全部使用，使用后是否有余额即失效；
           dd 5.获奖红包以站内信形式通知，完成一次投资回款后即可取现；
