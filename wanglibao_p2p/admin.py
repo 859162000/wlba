@@ -63,8 +63,14 @@ class AmortizationInline(admin.TabularInline):
     extra = 0
     exclude = ('version',)
     can_delete = False
-    readonly_fields = (
-        'term', 'principal', 'interest', 'penal_interest', 'description')
+    # readonly_fields = (
+    #     'term', 'principal', 'interest', 'penal_interest', 'description')
+
+    def get_readonly_fields(self, request, obj=None):
+        read_only = ['term', 'principal', 'interest', 'penal_interest', 'description']
+        if obj and obj.status == u'已完成':
+            read_only.append('ready_for_settle')
+        return tuple(read_only)
 
 
 class WarrantInline(admin.TabularInline):

@@ -22,7 +22,7 @@
   background: #FFFFFF
   margin: 0.55rem 0 0 4%
   .buy-balance-one,.buy-balance-two,.buy-balance-three
-    display: -webkit-flex
+    display: -webkit-box
     height: 2.2rem
     line-height: 2.2rem
     border-bottom: 1px solid $border-color
@@ -35,7 +35,8 @@
     .balance-middle
       font-size: 0.7rem
       display: block
-      -webkit-flex: 1
+      height: 100%
+      -webkit-box-flex: 1
       border: none
       color: #6b6b6b
       background: #fff
@@ -45,21 +46,21 @@
       color: #989898
   .buy-balance-three
     .balance-middle
-      margin-right: 0.625rem
       .balance-middle-select
         position: relative
         overflow: hidden
         background-color: transparent
         width: 100%
-        //border: 1px solid $border-color
+        padding-right: .625rem
         .balance-middle-select-select
-          width: 110%
-          border: none
+          -webkit-appearance: none
+          width: 100%
+          border: 0
           display: block
           overflow: hidden
-          line-height: 2.2rem
-          height: 2.2rem
-          background: url("/static/imgs/mobile/detail/buyjiantou.png") no-repeat right 10% center
+          line-height: 2.15rem
+          height: 2.15rem
+          background: url("/static/imgs/mobile/detail/buyjiantou.png") no-repeat right center
           background-size: 0.95rem 0.525rem
           color: #6b6b6b
 .buy-earnings

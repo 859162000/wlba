@@ -13,10 +13,10 @@ html
             .account-balance-one
                 p.balance-one-money 账户余额（元）
                 p.balance-one-yuan ￥{{p2p_margin|money_format}}
-            .account-balance-two
+            //.account-balance-two
                 a(href='#').account-withdrawal 提现
             .account-balance-three
-                a(href='/weixin/recharge/').account-top-up 充值
+                a(href='/weixin/recharge/?next=/weixin/account/').account-top-up 充值
 
         .account-assets
             .account-assets-one

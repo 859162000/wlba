@@ -392,8 +392,8 @@ org.regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            $submitBody.text('注册成功')
-                            window.location.href = '/weixin/account/';
+                            alert('注册成功,立即登录！');
+                            window.location.href = '/weixin/login/';
                         }else if(data.ret_code === 30014){
                            $('.'+signName['checkCode'][0]).show();
                             $submitBody.text('立即注册');
@@ -408,6 +408,9 @@ org.regist = (function(org){
                         }else{
                             alert(result.message);
                         }
+                    },
+                    complete:function(){
+                        $submitBody.text('立即注册');
                     }
                 });
             }
@@ -627,19 +630,23 @@ org.buy=(function(org){
                     error: function(xhr){
                         var  result;
                         result = JSON.parse(xhr.responseText);
-                        if (result.error_number === 1) {
-                            alert("登录超时，请重新登录！");
-                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
-                        } else if (result.error_number === 2) {
-                            return alert('必须实名认证！');
-                        } else if (result.error_number === 4 && result.message === "余额不足") {
-                            $(".buy-sufficient").show();
-                            return;
-                        }else if (result.detail){
-                            alert("登录超时，请重新登录！");
-                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
-                        }else{
-                            return alert(result.message);
+                        if(result.status === 400){
+                            if (result.error_number === 1) {
+                                alert("登录超时，请重新登录！");
+                                return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
+                            } else if (result.error_number === 2) {
+                                return alert('必须实名认证！');
+                            } else if (result.error_number === 4 && result.message === "余额不足") {
+                                $(".buy-sufficient").show();
+                                return;
+                            }else{
+                                return alert(result.message);
+                            }
+                        }else if(result.status === 403){
+                            if (result.detail) {
+                                alert("登录超时，请重新登录！");
+                                return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
+                            }
                         }
                     },
                     complete:function(){
@@ -774,7 +781,7 @@ org.recharge=(function(org){
                 if(amount > maxamount){
                      return alert('最高充值'+ maxamount +'元！')
                 }
-                window.location.href = '/weixin/recharge/second/?card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
+                window.location.href = '/weixin/recharge/second/?next='+$(this).attr('data-next')+'&card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
             });
             $secondBtn.on('click', function(){
                 card_no = $("input[name='card_no']").val(),

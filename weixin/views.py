@@ -475,9 +475,10 @@ class WeixinRecharge(TemplateView):
     def get_context_data(self, **kwargs):
 
         banks = Bank.get_kuai_deposit_banks()
-
+        next = self.request.GET.get('next', '')
         return {
             'banks': banks,
+            'next' : next,
         }
 
 
@@ -493,13 +494,14 @@ class WeixinRechargeSecond(TemplateView):
             bank = Bank.objects.filter(gate_id=gate_id).first()
         except:
             bank = None
-
+        next = self.request.GET.get('next', '')
         context = {
             'card_no': card_no,
             'gate_id': gate_id,
             'amount': amount,
             'bank': bank,
-            'user': user
+            'user': user,
+            'next': next,
         }
         return context
 
