@@ -473,7 +473,7 @@ class WeixinRecharge(TemplateView):
     template_name = 'weixin_recharge.jade'
 
     def get_context_data(self, **kwargs):
-        
+
         banks = Bank.get_kuai_deposit_banks()
         next = self.request.GET.get('next', '')
         return {
