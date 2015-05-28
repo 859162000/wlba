@@ -50,3 +50,17 @@ def fmt_date_normal(dt):
     if dt:
         return dt.strftime("%Y-%m-%d")
     return ""
+
+def handle_kuai_bank_limit(limitstr):
+    obj = {}
+    try:
+        first, second = limitstr.split("|")
+        arr = first.split(",")
+        obj['first_one'] = arr[0].split("=")[1]
+        obj['first_day'] = arr[1].split("=")[1]
+        arr1 = second.split(",")
+        obj['second_one'] = arr1[0].split("=")[1]
+        obj['second_day'] = arr1[1].split("=")[1]
+    except:
+        pass
+    return obj

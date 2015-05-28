@@ -82,7 +82,7 @@
       Y = data.getFullYear();
       m = data.getMonth() + 1;
       day = data.getDate();
-      if (m === 6 && day > 1) {
+      if (m === 6 && day > 10) {
         return;
       }
       g = 0;
@@ -345,7 +345,7 @@
         day = '0' + day;
       }
       date = Y + '-0' + zm + "-" + day;
-      if (time >= '2015-03-24' && time <= '2015-06-01' && time <= date) {
+      if (time >= '2015-05-23' && time <= '2015-06-10' && time <= date) {
         $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2');
         $(this).parent().siblings().children('span').removeClass('tap-hight2');
         $('#left-h1').html(+m + '月' + d + '日用户榜单');
@@ -355,3 +355,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=list_day.js.map
