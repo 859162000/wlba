@@ -382,39 +382,39 @@ org.regist = (function(org){
                     }
                 })
 
-            var $submitBody = $('.submit-body');
-            if(isSubmit){
-                org.ajax({
-                    url: '/api/register/',
-                    type: 'POST',
-                    data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': 'weixin'},
-                    beforeSend: function(xhr, settings) {
-                        $submitBody.text('注册中...');
-                    },
-                    success:function(data){
-                        if(data.ret_code === 0){
-                            alert('注册成功,立即登录！');
-                            window.location.href = '/weixin/login/';
-                        }else if(data.ret_code === 30014){
-                           $('.'+signName['checkCode'][0]).show();
+                var $submitBody = $('.submit-body');
+                if(isSubmit){
+                    org.ajax({
+                        url: '/api/register/',
+                        type: 'POST',
+                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': 'weixin'},
+                        beforeSend: function(xhr, settings) {
+                            $submitBody.text('注册中...');
+                        },
+                        success:function(data){
+                            if(data.ret_code === 0){
+                                alert('注册成功,立即登录！');
+                                window.location.href = '/weixin/login/';
+                            }else if(data.ret_code === 30014){
+                               $('.'+signName['checkCode'][0]).show();
+                                $submitBody.text('立即注册');
+                            }
+                        },
+                        error: function (xhr) {
+                            var result = JSON.parse(xhr.responseText);
+                            if(xhr.status === 429){
+                                alert('系统繁忙，请稍候重试')
+                            }else if(xhr.status === 400){
+                                $('.'+signName['phone'][1]).show()
+                            }else{
+                                alert(result.message);
+                            }
+                        },
+                        complete:function(){
                             $submitBody.text('立即注册');
                         }
-                    },
-                    error: function (xhr) {
-                        var result = JSON.parse(xhr.responseText);
-                        if(xhr.status === 429){
-                            alert('系统繁忙，请稍候重试')
-                        }else if(xhr.status === 400){
-                            $('.'+signName['phone'][1]).show()
-                        }else{
-                            alert(result.message);
-                        }
-                    },
-                    complete:function(){
-                        $submitBody.text('立即注册');
-                    }
-                });
-            }
+                    });
+                }
             })
         }
     }
