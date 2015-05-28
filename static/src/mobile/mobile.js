@@ -1010,13 +1010,15 @@ org.bankcardAdd = (function(org){
                    $(".addBank-btn").attr("disabled","true").text("添加中...");
                 },
                 success:function(result){
-                    // 返回json，判断ret_code是否等于0，0成功，大于0失败，如：{"ret_code":20021, "message":"错误提示信息"}
-                    // 成功时： {"ret_code":0, "message":"ok", "card_id":card.id}
-                    alert("添加成功！");
-                    window.location.href = '/weixin/account/bankcard/';
+                    if(result.ret_code === 0){
+                        alert("添加成功！");
+                        window.location.href = '/weixin/account/bankcard/';
+                    }else if(result.ret_code > 0){
+                        alert(result.message);
+                    }
                 },
                 error:function(result){
-                    if (result.error_number === 5) {
+                    if (result.error_number === 6) {
                       return alert(result.message);
                     }else{
                         return alert("添加银行卡失败");

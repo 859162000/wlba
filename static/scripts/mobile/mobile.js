@@ -982,20 +982,20 @@ org.bankcardAdd = (function(org){
         _checkForm:function(){
             var reg = /^\d{10,20}$/;
             $(".addBank-btn").on('click',function(){
-                var bank_id = $('#bank-select').val(),
-                    card_no = $('#card-no').val(),
+                var gate_id = $('#bank-select').val(),
+                    card_number = $('#card-no').val(),
                     is_default = $('#default-checkbox').prop('checked'),
                     data = {};
 
-                if (!bank_id) {
+                if (!gate_id) {
                     return alert('请选择银行');
                 }
-                if(!reg.test(card_no)){
+                if(!reg.test(card_number)){
                     return alert('请输入有效的银行卡号')
                 }
                 var data =  {
-                  no: card_no,
-                  bank : bank_id,
+                  card_number: card_number,
+                  gate_id : gate_id,
                   is_default : is_default
                 }
 
@@ -1005,17 +1005,21 @@ org.bankcardAdd = (function(org){
         _forAddbank:function(data){
             org.ajax({
                 type: "POST",
-                url: '/api/card/',
+                url: '/api/bank_card/add/',
                 data: data,
                 beforeSend:function(){
                    $(".addBank-btn").attr("disabled","true").text("添加中...");
                 },
                 success:function(result){
-                    alert("添加成功！");
-                    window.location.href = '/weixin/account/bankcard/';
+                    if(result.ret_code === 0){
+                        alert("添加成功！");
+                        window.location.href = '/weixin/account/bankcard/';
+                    }else if(result.ret_code > 0){
+                        alert(result.message);
+                    }
                 },
                 error:function(result){
-                    if (result.error_number === 5) {
+                    if (result.error_number === 6) {
                       return alert(result.message);
                     }else{
                         return alert("添加银行卡失败");
