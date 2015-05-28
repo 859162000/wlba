@@ -625,21 +625,25 @@ org.buy=(function(org){
                        }
                     },
                     error: function(xhr){
-                        var  result;
-                        result = JSON.parse(xhr.responseText);
-                        if (result.error_number === 1) {
-                            alert("登录超时，请重新登录！");
-                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
-                        } else if (result.error_number === 2) {
-                            return alert('必须实名认证！');
-                        } else if (result.error_number === 4 && result.message === "余额不足") {
-                            $(".buy-sufficient").show();
-                            return;
-                        }else if (result.detail){
-                            alert("登录超时，请重新登录！");
-                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
-                        }else{
-                            return alert(result.message);
+                        var result = JSON.parse(xhr.responseText);
+
+                        if(result.status === 400){
+                            if (result.error_number === 1) {
+                                alert("登录超时，请重新登录！");
+                                return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
+                            } else if (result.error_number === 2) {
+                                return alert('必须实名认证！');
+                            } else if (result.error_number === 4 && result.message === "余额不足") {
+                                $(".buy-sufficient").show();
+                                return;
+                            }else{
+                                return alert(result.message);
+                            }
+                        }else if(result.status === 403){
+                            if (result.detail) {
+                                alert("登录超时，请重新登录！");
+                                return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
+                            }
                         }
                     },
                     complete:function(){

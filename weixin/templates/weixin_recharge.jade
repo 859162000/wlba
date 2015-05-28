@@ -5,8 +5,12 @@ html
   body
     header
       hgroup 充值
-      a(href="javascript:history.back()")
-        span 返回
+      if next == ''
+        a(href="javascript:history.back(-1)")
+          span 返回
+      else
+        a(href="{{next}}")
+          span 返回
 
     .recharge-loding
       p 正在加载...
