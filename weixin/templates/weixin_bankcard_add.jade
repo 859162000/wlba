@@ -13,13 +13,13 @@ html
         p.row-name 开户名
         p.row-value.value-right {{user.wanglibaouserprofile.name}}
       .add-row.add-select
-        select(type="select")#bank-select
+        select(type="select", name="gate_id")#bank-select
           option(value = '')  请选择银行卡（暂不支持信用卡）
           for bank in banks
             option(value="{{bank.gate_id}}") {{bank.name}}
       .add-row.add-input
         p.row-name 银行卡号
-        input(type="tel", placeholder="请输入银行卡号")#card-no.row-value.value-input
+        input(type="text", name="card_number", placeholder="请输入银行卡号")#card-no.row-value.value-input
     .bank-add-sign.withdraw-checkbox
       label
         input#default-checkbox(type='checkbox', value='1')

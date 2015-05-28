@@ -630,9 +630,9 @@ class WeixinAccountBankCard(TemplateView):
     template_name = 'weixin_bankcard.jade'
 
     def get_context_data(self, **kwargs):
-        # p2p_cards = Card.objects.filter(user__exact=self.request.user)
+        p2p_cards = Card.objects.filter(user__exact=self.request.user)
         return {
-            # 'p2p_cards': p2p_cards,
+            'p2p_cards': p2p_cards,
         }
 
 
@@ -640,18 +640,7 @@ class WeixinAccountBankCardAdd(TemplateView):
     template_name = 'weixin_bankcard_add.jade'
 
     def get_context_data(self, **kwargs):
-        message = ''
-        try:
-            fetcher = UserInfoFetcher(self.request.user)
-            fetcher.fetch_bind_banks()
-        except FetchException:
-            message = u'获取数据失败，请稍后重试'
-        except AccessException:
-            pass
         banks = Bank.get_withdraw_banks()
         return {
             'banks': banks,
-            'user_profile': self.request.user.wanglibaouserprofile,
-            "message": message,
-            'announcements': AnnouncementAccounts
         }
