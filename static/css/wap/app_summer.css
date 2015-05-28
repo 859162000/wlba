@@ -1,0 +1,118 @@
+/*公共样式 start*/* {
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+body,div,h1,p,h2,header,ul,li,dl,dt,dd,ol,nav,input,footer{ margin:0; padding:0;}
+body{ color:#000;font-family:Arial, Helvetica,microsoft yahei, sans-serif;}
+body,html{ height:100%;-webkit-touch-callout: none;-webkit-user-select:none;}
+@media screen and (max-width:479px){
+body{font-size:10px;-webkit-text-size-adjust: none;}
+input{font-size:10px;}
+}
+@media screen and (min-width:480px) and (max-width:639px){
+body{font-size:15px;-webkit-text-size-adjust: none;}
+input{font-size:15px;}
+}
+@media screen and (min-width:640px) and (max-width:719px){
+body{font-size:20px;-webkit-text-size-adjust: none;}
+input{font-size:20px;}
+}
+@media screen and (min-width:720px){
+body{font-size:22.5px;-webkit-text-size-adjust: none;}
+input{font-size:22.5px;}
+}
+h1,h2,h3,h4,h5,h6{ margin:0; padding:0;font-size:100%; font-weight:normal;}
+ul,li{ list-style:none;}
+html{-webkit-text-size-adjust:none;}
+article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section {display:block;}
+img{border:none; vertical-align:middle; width:100%;}
+.clearfix:after {content:"\200B"; display:block; height:0; clear:both;}
+.clearfix{ *zoom:1;}
+input{ font-family:Arial, Helveetica, sans-serif;}
+a{ text-decoration:none; }
+a:hover{ text-decoration:none;}
+.clearfix:after {content:"\200B"; display:block; height:0; clear:both;}
+.clearfix{ *zoom:1;}
+/*公共样式 end*/
+.box,.footer-day,.top,.app_day,.line,.day-minge,.namee,.rule-one{
+    width: 100%;
+}
+
+body{
+    background: #3fd3fd;
+}
+
+.com{
+    background: url("/static/images/summer/app_common.png") no-repeat;
+}
+
+.icon1{
+    background-position: 0.3em 0;
+}
+
+.icon2{
+    background-position: 0.3em -2.5em;
+}
+
+.top{
+     position: relative;
+    text-align: center;
+}
+.time{
+    width: 100%;
+    position: absolute;
+    top: 78%;
+    font-size: 1.6em;
+    color: #fff;
+    text-align: center;
+}
+
+.tit{
+    width: 100%;
+    position: relative;
+    line-height: 2em;
+    font-size: 1.8em;
+    padding-left: 4em;
+    margin-top: 1em;
+}
+
+.tit span{
+    display: inline-block;
+    width: 4em;
+    height: 3em;
+    /*border: 1px solid #ccc;*/
+    position: absolute;
+    left: 0;
+    top: -0.6em;
+}
+
+.sum-song{
+    margin-top: 1em;
+}
+
+.sum-song li{
+    line-height: 2em;
+    color: #666666;
+    font-size: 1.2em;
+    padding: 0 1em;
+    position: relative;
+}
+
+.sum-song li span{
+    display: inline-block;
+    position: absolute;
+    right: 1em;
+    text-align: left;
+    width: 15em;
+}
+
+.wanglibao-footer p{
+     text-align: center;
+}
+.wanglibao-footer p a{
+     color: #fff;
+     line-height: 4em;
+     font-size: 1.5em;
+
+ }
