@@ -393,8 +393,8 @@ org.regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            $submitBody.text('注册成功')
-                            window.location.href = '/weixin/account/';
+                            alert('注册成功,立即登录！');
+                            window.location.href = '/weixin/login/';
                         }else if(data.ret_code === 30014){
                            $('.'+signName['checkCode'][0]).show();
                             $submitBody.text('立即注册');
@@ -409,6 +409,9 @@ org.regist = (function(org){
                         }else{
                             alert(result.message);
                         }
+                    },
+                    complete:function(){
+                        $submitBody.text('立即注册');
                     }
                 });
             }
