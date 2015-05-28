@@ -494,13 +494,14 @@ class WeixinRechargeSecond(TemplateView):
             bank = Bank.objects.filter(gate_id=gate_id).first()
         except:
             bank = None
-
+        next = self.request.GET.get('next', '')
         context = {
             'card_no': card_no,
             'gate_id': gate_id,
             'amount': amount,
             'bank': bank,
-            'user': user
+            'user': user,
+            'next': next,
         }
         return context
 

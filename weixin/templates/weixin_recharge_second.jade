@@ -6,7 +6,11 @@ html
     body
         header
             hgroup 充值
-            a(href="/weixin/recharge/")
+            if next = ''
+              a(href="/weixin/recharge/")
+                span 返回
+            else
+              a(href="/weixin/recharge/?next={{next}}")
                 span 返回
         .value-information
             p.information-one

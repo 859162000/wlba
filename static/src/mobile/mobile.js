@@ -625,8 +625,8 @@ org.buy=(function(org){
                        }
                     },
                     error: function(xhr){
-                        var result = JSON.parse(xhr.responseText);
-
+                        var  result;
+                        result = JSON.parse(xhr.responseText);
                         if(result.status === 400){
                             if (result.error_number === 1) {
                                 alert("登录超时，请重新登录！");
@@ -778,7 +778,7 @@ org.recharge=(function(org){
                 if(amount > maxamount){
                      return alert('最高充值'+ maxamount +'元！')
                 }
-                window.location.href = '/weixin/recharge/second/?card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
+                window.location.href = '/weixin/recharge/second/?next='+$(this).attr('data-next')+'&card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
             });
             $secondBtn.on('click', function(){
                 card_no = $("input[name='card_no']").val(),

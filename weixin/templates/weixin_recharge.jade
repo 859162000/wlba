@@ -6,7 +6,7 @@ html
     header
       hgroup 充值
       if next == ''
-        a(href="javascript:history.back(-1)")
+        a(href="/weixin/account/")
           span 返回
       else
         a(href="{{next}}")
@@ -49,7 +49,7 @@ html
             .count-txt-right 元
           .binding-bank-href 查看支持银行及限额
 
-        .recharge-btn#firstBtn.card-none.card-hide 下一步
+        .recharge-btn#firstBtn.card-none.card-hide(data-next="{{next}}") 下一步
         .recharge-btn#secondBtn.card-have.card-hide 充值
 
         .recharge-select-bank(style="display:none")
@@ -71,7 +71,6 @@ html
                 p 尾号 7424
                 p 限额 200000
               .bank-type 存储卡
-
     section.recharge-bank
     script(data-init="recharge", src="/static/scripts/mobile/mobile.js?v=222")
 
