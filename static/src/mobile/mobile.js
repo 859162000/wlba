@@ -981,20 +981,20 @@ org.bankcardAdd = (function(org){
         _checkForm:function(){
             var reg = /^\d{10,20}$/;
             $(".addBank-btn").on('click',function(){
-                var bank_id = $('#bank-select').val(),
-                    card_no = $('#card-no').val(),
+                var gate_id = $('#bank-select').val(),
+                    card_number = $('#card-no').val(),
                     is_default = $('#default-checkbox').prop('checked'),
                     data = {};
 
-                if (!bank_id) {
+                if (!gate_id) {
                     return alert('请选择银行');
                 }
-                if(!reg.test(card_no)){
+                if(!reg.test(card_number)){
                     return alert('请输入有效的银行卡号')
                 }
                 var data =  {
-                  no: card_no,
-                  bank : bank_id,
+                  card_number: card_number,
+                  gate_id : gate_id,
                   is_default : is_default
                 }
 
@@ -1004,12 +1004,14 @@ org.bankcardAdd = (function(org){
         _forAddbank:function(data){
             org.ajax({
                 type: "POST",
-                url: '/api/card/',
+                url: '/api/bank_card/add/',
                 data: data,
                 beforeSend:function(){
                    $(".addBank-btn").attr("disabled","true").text("添加中...");
                 },
                 success:function(result){
+                    // 返回json，判断ret_code是否等于0，0成功，大于0失败，如：{"ret_code":20021, "message":"错误提示信息"}
+                    // 成功时： {"ret_code":0, "message":"ok", "card_id":card.id}
                     alert("添加成功！");
                     window.location.href = '/weixin/account/bankcard/';
                 },
