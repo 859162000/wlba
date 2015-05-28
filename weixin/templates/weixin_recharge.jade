@@ -23,7 +23,7 @@ html
           input(type="tel", name="card_no", placeholder="输入银行卡号")#card-val.bank-input
           .bank-txt-right
             img(src="/static/imgs/mobile/recharge/select_bank.png")
-        .bank-count.card-have
+        .bank-count.card-have.bank-select
           .bank-txt-left 开户银行
           select(type="select", name="gate_id")#card-select.bank-input.recharge-select
             option(value = 'init')  请选择
@@ -35,7 +35,7 @@ html
           .recharge-count
             .count-txt-left 银行卡号
             input(type="tel", name="card_none_card", placeholder="请输入持卡人储蓄卡号").count-input
-          .recharge-count
+          .recharge-count.bank-select
             .count-txt-left 开户银行
             select(type="select", name="gate_id_none_card").count-input.recharge-select
               option(value = 'init')  请选择
