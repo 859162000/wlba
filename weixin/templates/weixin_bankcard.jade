@@ -1,0 +1,21 @@
+-load formatters
+
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 管理银行卡
+      a(href="/weixin/security/")
+        span 返回
+    .bank-main
+      if p2p_cards
+        each card in p2p_cards
+          .bank-list
+            p.bank-name {{card.bank.name}}
+            p.bank-num {{card.no | bank_card}}
+    .bank-add-btn
+      a(href="/weixin/account/bankcard/add/")
+        span.btn-icon +
+        span.btn-click 添加银行卡

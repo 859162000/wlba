@@ -14,7 +14,7 @@ class WeChatClient(BaseWeChatClient):
 
     API_BASE_URL = 'https://api.weixin.qq.com/cgi-bin/'
 
-    def __init__(self, appid, secret, access_token=None):
+    def __init__(self, appid=None, secret=None, access_token=None):
         self.appid = appid
         self.secret = secret
         self._access_token = access_token

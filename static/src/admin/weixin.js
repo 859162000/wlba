@@ -46,6 +46,7 @@ var weixin = (function() {
         40118: 'media_id大小不合法',
         40119: 'button类型错误',
         40120: 'button类型错误',
+        40125: '无效的公众号密钥',
         40121: '不合法的media_id类型',
         41001: '缺少access_token参数',
         41002: '缺少appid参数',
@@ -128,7 +129,11 @@ var weixin = (function() {
         9001036: '查询起始值begin不合法',
 
         echo: function(errcode) {
-            alert('操作失败：' + this[errcode]);
+            var msg = '';
+            if (this[errcode]) {
+                msg = '：' + this[errcode];
+            }
+            alert('操作失败' + msg);
         }
     };
 

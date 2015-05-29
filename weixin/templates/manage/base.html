@@ -1,0 +1,39 @@
+{% block header- %}
+  <!DOCTYPE html>
+  <html ng-app="app">
+  <head lang="zh-cn">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/static/src/semantic-ui/semantic.min.css"/>
+    <link rel="stylesheet" href="/static/styles/admin/style.css"/>
+    {% block styles %}{% endblock %}
+  </head>
+  <body>
+{% endblock %}
+
+{% block head %}
+  {% include 'manage/include/head.html' %}
+{% endblock %}
+
+{% block container %}
+  <div class="container">
+    <div class="ui grid">
+      <div class="four wide column">
+        {% block nav %}
+          {% include 'manage/include/nav.html' %}
+        {% endblock %}
+      </div>
+      <div class="twelve wide column">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script src="/static/js/lib/jquery.min.js"></script>
+  <script src="/static/src/semantic-ui/semantic.min.js"></script>
+  {% block scripts %}{% endblock %}
+  </body>
+  </html>
+{% endblock %}

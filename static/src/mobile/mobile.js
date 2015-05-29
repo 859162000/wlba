@@ -1,7 +1,91 @@
 
 var org = (function(){
+    document.body.addEventListener('touchstart', function () { }); //ios 触发active渲染
     var lib = {
         scriptName: 'mobile.js',
+        _ajax :function(options){
+            $.ajax({
+                url: options.url,
+                type: options.type,
+                data: options.data,
+                dataType : options.dataType,
+                beforeSend: function(xhr, settings) {
+                    options.beforeSend && options.beforeSend(xhr);
+                    //django配置post请求
+                    if (!lib._csrfSafeMethod(settings.type) && lib._sameOrigin(settings.url)) {
+                      xhr.setRequestHeader('X-CSRFToken', lib._getCookie('csrftoken'));
+                    }
+                },
+                success:function(data){
+                    options.success && options.success(data);
+                },
+                error: function (xhr) {
+                    options.error && options.error(xhr);
+                },
+                complete:function(){
+                    options.complete && options.complete();
+                }
+            });
+        },
+        _calculate :function(dom, callback){
+            var calculate = function(amount, rate, period, pay_method) {
+                var divisor, rate_pow, result, term_amount;
+                if (/等额本息/ig.test(pay_method)) {
+                    rate_pow = Math.pow(1 + rate, period);
+                    divisor = rate_pow - 1;
+                    term_amount = amount * (rate * rate_pow) / divisor;
+                    result = term_amount * period - amount;
+                } else if (/日计息/ig.test(pay_method)) {
+                    result = amount * rate * period / 360;
+                } else {
+                    result = amount * rate * period / 12;
+                }
+                return Math.floor(result * 100) / 100;
+            };
+            dom.on('input', function(e) {
+                var earning, earning_element, earning_elements, fee_earning, fee_element, fee_elements;
+                var target = $(e.target),
+                    existing = parseFloat(target.attr('data-existing')),
+                    period = target.attr('data-period'),
+                    rate = target.attr('data-rate')/100,
+                    pay_method = target.attr('data-paymethod');
+                    activity_rate = target.attr('activity-rate')/100;
+                    amount = parseFloat(target.val()) || 0;
+
+                if (amount > target.attr('data-max')) {
+                    amount = target.attr('data-max');
+                    target.val(amount);
+                }
+                amount = parseFloat(existing) + parseFloat(amount);
+                earning = calculate(amount, rate, period, pay_method);
+                fee_earning = calculate(amount, activity_rate, period, pay_method);
+
+                if (earning < 0) {
+                    earning = 0;
+                }
+                earning_elements = (target.attr('data-target')).split(',');
+                fee_elements = (target.attr('fee-target')).split(',');
+
+                for (var i = 0; i < earning_elements.length; i ++) {
+                    earning_element = earning_elements[i];
+                    if (earning) {
+                        earning += fee_earning;
+                        $(earning_element).text(earning.toFixed(2));
+                    } else {
+                        $(earning_element).text("0.00");
+                    }
+                }
+                for (var j = 0; j < fee_elements.length;  j++) {
+                    fee_element = fee_elements[j];
+                    if (fee_earning) {
+                       $(fee_element).text(fee_earning);
+                    } else {
+                        $(fee_element).text("0.00");
+                    }
+                }
+                callback && callback(target);
+            });
+        },
         _getQueryStringByName:function(name){
             var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
              if(result == null || result.length < 1){
@@ -65,9 +149,10 @@ var org = (function(){
         }
 
     }
-    document.body.addEventListener('touchstart', function () { }); //ios 触发active渲染
     return {
         scriptName             : lib.scriptName,
+        ajax                   : lib._ajax,
+        calculate              : lib._calculate,
         getQueryStringByName   : lib._getQueryStringByName,
         getCookie              : lib._getCookie,
         csrfSafeMethod         : lib._csrfSafeMethod,
@@ -118,22 +203,20 @@ org.login = (function(org){
                     'captcha_1': $.trim($form.find('input[name=captcha_1]').val()),
                     'openid': $.trim($form.find('input[name=openid]').val())
                 }
-                $.ajax({
+                org.ajax({
                     'type': 'post',
                     'url': $form.attr('action'),
                     'data': data,
-                    beforeSend: function (xhr, settings) {
+                    beforeSend: function (xhr) {
                         $submit.attr('disabled', true).text('登录中..');
-                        if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
-                            xhr.setRequestHeader('X-CSRFToken', org.getCookie('csrftoken'));
-                        }
                     },
                     success: function(res) {
                         var next = org.getQueryStringByName('next');
                         if (next) {
                             window.location.href = next;
+                        }else{
+                            window.location.href = '/weixin/account/';
                         }
-                        window.location.href = '/weixin/account/';
                     },
                     error: function(res) {
                         if (res['status'] == 403) {
@@ -147,13 +230,12 @@ org.login = (function(org){
                             }else{
                                 if(data[key] == '验证码错误'){
                                     $('.error-' + key).text(data[key]).show()
-                                    lib._captcha_refresh()
                                 }else{
                                    $('.error-' + key).text(data[key]).show()
                                 }
-
                             }
                         }
+                        lib._captcha_refresh()
                     },
                     complete: function() {
                         $submit.removeAttr('disabled').text('登录');
@@ -250,16 +332,10 @@ org.regist = (function(org){
                     intervalId ; //定时器
 
                 if(!check['phone'](phoneNumber, 'phone')) return //号码不符合退出
-                $.ajax({
-                    url: '/api/phone_validation_code/register/' + phoneNumber + '/',
-                    type: 'POST',
-                    beforeSend: function(xhr, settings) {
-                        //django配置post请求
-                        if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
-                          xhr.setRequestHeader('X-CSRFToken', org.getCookie('csrftoken'));
-                        }
-                    },
-                    error: function (xhr) {
+                org.ajax({
+                    url : '/api/phone_validation_code/register/' + phoneNumber + '/',
+                    type : 'POST',
+                    error :function(xhr){
                         clearInterval(intervalId);
                         var result = JSON.parse(xhr.responseText);
                         if(xhr.status === 429){
@@ -305,39 +381,39 @@ org.regist = (function(org){
                     }
                 })
 
-            var $submitBody = $('.submit-body');
-            if(isSubmit){
-                $.ajax({
-                    url: '/api/register/',
-                    type: 'POST',
-                    data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': 'weixin'},
-                    beforeSend: function(xhr, settings) {
-                        $submitBody.text('注册中...');
-                        if (!org.csrfSafeMethod(settings.type) && org.sameOrigin(settings.url)) {
-                          xhr.setRequestHeader('X-CSRFToken', org.getCookie('csrftoken'));
-                        }
-                    },
-                    success:function(data){
-                        if(data.ret_code === 0){
-                            $submitBody.text('注册成功')
-                            window.location.href = '/weixin/account/';
-                        }else if(data.ret_code === 30014){
-                           $('.'+signName['checkCode'][0]).show();
+                var $submitBody = $('.submit-body');
+                if(isSubmit){
+                    org.ajax({
+                        url: '/api/register/',
+                        type: 'POST',
+                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': 'weixin'},
+                        beforeSend: function(xhr, settings) {
+                            $submitBody.text('注册中...');
+                        },
+                        success:function(data){
+                            if(data.ret_code === 0){
+                                alert('注册成功,立即登录！');
+                                window.location.href = '/weixin/login/';
+                            }else if(data.ret_code === 30014){
+                               $('.'+signName['checkCode'][0]).show();
+                                $submitBody.text('立即注册');
+                            }
+                        },
+                        error: function (xhr) {
+                            var result = JSON.parse(xhr.responseText);
+                            if(xhr.status === 429){
+                                alert('系统繁忙，请稍候重试')
+                            }else if(xhr.status === 400){
+                                $('.'+signName['phone'][1]).show()
+                            }else{
+                                alert(result.message);
+                            }
+                        },
+                        complete:function(){
                             $submitBody.text('立即注册');
                         }
-                    },
-                    error: function (xhr) {
-                        var result = JSON.parse(xhr.responseText);
-                        if(xhr.status === 429){
-                            alert('系统繁忙，请稍候重试')
-                        }else if(xhr.status === 400){
-                            $('.'+signName['phone'][1]).show()
-                        }else{
-                            alert(result.message);
-                        }
-                    }
-                });
-            }
+                    });
+                }
             })
         }
     }
@@ -364,7 +440,7 @@ org.list = (function(org){
             });
         },
         _getNextPage :function(){
-            $.ajax({
+            org.ajax({
                 type: 'GET',
                 url: '/api/p2ps/wx/',
                 data: {page: lib.page, 'pagesize': lib.pageSize},
@@ -413,10 +489,10 @@ org.detail = (function(org){
                         $progress.addClass('progress-bolang')
                     },1000)
                 },300)
-                $payalert.on('click',function(){
+                /*$payalert.on('click',function(){
                     $(this).css('width', '0%');
                     $(this).siblings('p').css('width','100%');
-                })
+                })*/
             })
         },
         _tab:function(){
@@ -427,7 +503,7 @@ org.detail = (function(org){
         },
         _share: function(){
             var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
-            $.ajax({
+            org.ajax({
                 type : 'GET',
                 url : lib.weiURL,
                 dataType : 'json',
@@ -506,13 +582,467 @@ org.detail = (function(org){
     }
 })(org);
 
+org.buy=(function(org){
+    var lib = {
+        init :function(){
+            lib._calculate();
+            lib._buy();
+        },
+        _addEvenList: function(){
+
+        },
+        _calculate:function(){
+            org.calculate($('input[data-role=p2p-calculator]'))
+        },
+        _buy:function(){
+            var $buyButton = $('.snap-up');
+
+            $buyButton.on('click',function(){
+                var $redpack = $("#gifts-package"),
+                    $buySufficient = $('.buy-sufficient'),
+                    balance = parseFloat($("#balance").attr("data-value")),
+                    amount = parseInt($('.amount').val()),
+                    productID = $(".invest-one").attr('data-protuctid');
+                if(amount % 100 !== 0 || amount === 0){
+                    return alert('请输入100的倍数金额');
+                }
+                if(amount > balance){
+                    return $buySufficient.show();
+                }
+                var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
+                if(!redpackValue || redpackValue == 'init'){
+                    redpackValue = null;
+                }
+
+                org.ajax({
+                    type: 'POST',
+                    url: '/api/p2p/purchase/',
+                    data: {product: productID, amount: amount, redpack: redpackValue},
+                    beforeSend:function(){
+                        $buyButton.text("抢购中...")
+                    },
+                    success: function(data){
+                       if(data.data){
+                           $('.balance-sign').text(balance-data.data);
+                           $(".sign-main").css("display","-webkit-box");
+                       }
+                    },
+                    error: function(xhr){
+                        var  result;
+                        result = JSON.parse(xhr.responseText);
+                        if(result.status === 400){
+                            if (result.error_number === 1) {
+                                alert("登录超时，请重新登录！");
+                                return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
+                            } else if (result.error_number === 2) {
+                                return alert('必须实名认证！');
+                            } else if (result.error_number === 4 && result.message === "余额不足") {
+                                $(".buy-sufficient").show();
+                                return;
+                            }else{
+                                return alert(result.message);
+                            }
+                        }else if(result.status === 403){
+                            if (result.detail) {
+                                alert("登录超时，请重新登录！");
+                                return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
+                            }
+                        }
+                    },
+                    complete:function(){
+                       $buyButton.text("确定抢购");
+                    }
+                })
+            })
+
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+org.calculator=(function(org){
+    var lib = {
+        init :function(){
+            org.calculate($('input[data-role=p2p-calculator]'))
+            lib._addEvenList();
+        },
+        _addEvenList:function(){
+            var $calculatorBuy = $('.calculator-buy'),
+                $countInput = $('.count-input'),
+                productId, amount_profit, amount;
+            $calculatorBuy.on('click',function(){
+                productId = $(this).attr('data-productid');
+                amount  = $countInput.val();
+                amount_profit = $("#expected_income").text();
+                if(amount % 100 !== 0 || amount == ''){
+                    return alert("请输入100的整数倍")
+                }else{
+                    window.location.href = '/weixin/view/buy/' + productId + '/?amount='+ amount + '&amount_profit=' + amount_profit;
+                }
+            })
+        }
+
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+/*org.transaction = (function(org){
+    var lib = {
+        lfetPageNum : 1,
+        centerPageNum : 1,
+        rightPageNum : 1,
+        arrStr: ['lfetPageNum', 'centerPageNum', 'rightPageNum'],
+        addPageStr: {'lfetPageNum': '#transaction-left', 'centerPageNum': '#transaction-center', 'rightPageNum': '#transaction-right'},
+        init :function(){
+            lib._getTransaction('lfetPageNum');
+        },
+        _getTransaction:function(objStr){
+            var pageNum = lib[objStr];
+            org.ajax({
+                type: 'GET',
+                url: '/api/home/p2precords/',
+                data: {page: pageNum, 'pagesize': lib.pageSize},
+                success: function(data){
+                    $(lib.addPageStr[objStr]).append(data.html_data);
+                    lib[objStr]++;
+                },
+                error: function(){
+
+                }
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);*/
+
+org.recharge=(function(org){
+    var lib = {
+        init :function(){
+            lib._getBankCardList();
+            lib._rechargeStepFirst();
+        },
+        _getBankCardList: function(){
+            org.ajax({
+                type: 'POST',
+                url: '/api/pay/cnp/list/',
+                success: function(data) {
+                      //如果支付接口有返回已绑定的银行列表，将银行列表写入网页，银行卡：data.cards
+                    if(data.ret_code == 0){
+                        $(".recharge-loding").hide();
+                        if(data.cards.length === 0){
+                            $('.card-none').show();
+                        }else if(data.cards.length > 0){
+                            $('.card-have').show();
+                            lib._initCard(data.cards,lib._cradStyle);
+                        }
+                    }
+                }
+            })
+        },
+        _initCard:function(data, callback){
+            var optionsDom = $("#card-select").find("option"),
+                optionsDomLength = optionsDom.length;
+            for(var val in data){
+                if (data[val]['is_default'] == 'true') {
+                    $("#card-val").val(data[val]['no']);
+
+                    for(var i =0 ; i < optionsDomLength; i++){
+                        if(optionsDom.eq(i).text() == data[val]['bank'].name){
+                            optionsDom.eq(i).attr("selected", true);
+                        }
+                    }
+                    return false
+                }
+            }
+            callback && callback();
+        },
+        _cradStyle:function(){
+            
+        },
+        _rechargeStepFirst:function(){
+            var card_no,gate_id,amount,maxamount,
+                $firstBtn = $('#firstBtn'),
+                $secondBtn = $('#secondBtn');
+
+            $firstBtn.on('click', function(){
+                card_no = $("input[name='card_none_card']").val(),
+                gate_id = $("select[name='gate_id_none_card']").val(),
+                amount  = parseInt($("input[name='amount']").val()),
+                maxamount = parseInt($("input[name='maxamount']").val());
+                if(!card_no || !gate_id || amount <= 0) {
+                    return alert('信息输入不完整');
+                }
+                if(amount > maxamount){
+                     return alert('最高充值'+ maxamount +'元！')
+                }
+                window.location.href = '/weixin/recharge/second/?next='+$(this).attr('data-next')+'&card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
+            });
+            $secondBtn.on('click', function(){
+                card_no = $("input[name='card_no']").val(),
+                gate_id = $("select[name='gate_id']").val(),
+                amount  = parseInt($("input[name='amount']").val()),
+                maxamount = parseInt($("input[name='maxamount']").val());
+                if(!card_no || !gate_id || amount <= 0) {
+                    return alert('信息输入不完整');
+                }
+                if(amount > maxamount){
+                     return alert('最高充值'+ maxamount +'元！')
+                }
+                lib._rechargeSingleStep(card_no,amount);
+            });
+        },
+        _rechargeSingleStep: function(card_no, amount) {
+            org.ajax({
+                type: 'POST',
+                url: '/api/pay/deposit/',
+                data: {card_no: card_no, amount: amount},
+                success: function(data) {
+                    if(data.ret_code > 0) {
+                        return alert(data.message);
+                    } else {
+                        alert('充值成功！');
+                    }
+                }
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+org.recharge_second=(function(org){
+    var lib = {
+        card_no : $("input[name='card_no']").val(),
+        gate_id : $("input[name='gate_id']").val(),
+        amount  : parseInt($("input[name='amount']").val()),
+        phone: null,
+        init :function(){
+            lib._getValidateCode();
+            lib._rechargeStepSecond();
+        },
+        _getValidateCode: function(){
+            var getValidateBtn = $('.request-check');
+
+
+            getValidateBtn.on('click', function(){
+                var count = 60, intervalId ; //定时器
+
+                lib.phone = $("input[name='phone']").val();
+                lib.card_no = $("input[name='card_no']").val();
+
+                if(!lib.phone){
+                    return alert('请填写手机号');
+                }
+                getValidateBtn.attr('disabled', 'disabled').addClass('alreay-request');
+                //倒计时
+                var timerFunction = function() {
+                    if (count >= 1) {
+                        count--;
+                        return getValidateBtn.text( count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        getValidateBtn.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
+                        return
+                    }
+                };
+
+                org.ajax({
+                    type: 'POST',
+                    url: '/api/pay/deposit/',
+                    data: {card_no: lib.card_no, gate_id: lib.gate_id, phone: lib.phone, amount: lib.amount},
+                    success: function(data) {
+                        if(data.ret_code > 0) {
+                            clearInterval(intervalId);
+                            getValidateBtn.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
+                            return alert(data.message);
+                        } else {
+                            //alert('验证码已经发出，请注意查收！');
+                            $("input[name='order_id']").val(data.order_id);
+                            $("input[name='token']").val(data.token);
+                        }
+                    },
+                    error:function(data){
+                        console.log(data)
+                    }
+                })
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
+            })
+        },
+        _rechargeStepSecond:function(){
+            var secondBtn = $('#secondBtn');
+            secondBtn.on('click', function(){
+                var order_id = $("input[name='order_id']").val(),
+                    vcode = $("input[name='vcode']").val(),
+                    token = $("input[name='token']").val();
+                if(!lib.phone || !vcode){
+                    return alert('请填写手机号和验证码');
+                }
+                if(!order_id || !token) {
+                    return alert('系统有错误，请重试获取验证码');
+                }
+                if(!vcode){
+                    return alert('请输入手机验证码');
+                }
+                org.ajax({
+                    type: 'POST',
+                    url: '/api/pay/cnp/dynnum/',
+                     data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
+                    success: function(data) {
+                        if(data.ret_code > 0) {
+                            return alert(data.message);
+                        } else {
+                           $('.sign-main').shouw()
+                        }
+                    }
+                })
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+org.authentication = (function(org){
+    var lib = {
+        init: function(){
+            lib._checkForm();
+        },
+        _checkForm :function(){
+            var $fromComplete = $(".from-four-complete"),
+                formName = ['name','id_number']
+                formError = ['.error-name', '.error-card'],
+                formSign = ['请输入姓名', '请输入身份证号', '请输入有效身份证'],
+                data = {},
+                reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; //身份证正则
+
+            $fromComplete.on('click',function(){
+                var isGet = true;
+                $('.sign-all').hide();
+
+                $('.check-input').each(function(i){
+                    if(!$(this).val()){
+                        $(formError[i]).text(formSign[i]).show();
+                        return isGet = false;
+                    }else{
+                        if(i === 1 && !reg.test($(this).val())){
+                            $(formError[i]).text(formSign[2]).show();
+                            return isGet = false;
+                        }
+                    }
+                    data[formName[i]] = $(this).val();
+                })
+                isGet && lib._forAuthentication(data)
+            });
+        },
+        _forAuthentication:function(ags){
+            var isPost = true;
+            if(isPost){
+                org.ajax({
+                    type: 'POST',
+                    url : '/api/id_validate/',
+                    data : ags,
+                    beforeSend:function(){
+                       isPost = false;
+                    },
+                    success:function(){
+                        alert("实名认证成功!");
+                        window.location.href = '/weixin/security/';
+                    },
+                    error:function(xhr){
+                        result = JSON.parse(xhr.responseText);
+                        return alert(result.message);
+                    },
+                    complete:function(){
+                        isPost = true;
+                    }
+                })
+            }
+        }
+    };
+    return {
+        init :lib.init
+    }
+})(org);
+
+org.bankcardAdd = (function(org){
+    var lib = {
+        init:function(){
+            lib._checkForm();
+        },
+        _checkForm:function(){
+            var reg = /^\d{10,20}$/;
+            $(".addBank-btn").on('click',function(){
+                var gate_id = $('#bank-select').val(),
+                    card_number = $('#card-no').val(),
+                    is_default = $('#default-checkbox').prop('checked'),
+                    data = {};
+
+                if (!gate_id) {
+                    return alert('请选择银行');
+                }
+                if(!reg.test(card_number)){
+                    return alert('请输入有效的银行卡号')
+                }
+                var data =  {
+                  card_number: card_number,
+                  gate_id : gate_id,
+                  is_default : is_default
+                }
+
+                lib._forAddbank(data);
+            });
+        },
+        _forAddbank:function(data){
+            org.ajax({
+                type: "POST",
+                url: '/api/bank_card/add/',
+                data: data,
+                beforeSend:function(){
+                   $(".addBank-btn").attr("disabled","true").text("添加中...");
+                },
+                success:function(result){
+                    if(result.ret_code === 0){
+                        alert("添加成功！");
+                        window.location.href = '/weixin/account/bankcard/';
+                    }else if(result.ret_code > 0){
+                        alert(result.message);
+                    }
+                },
+                error:function(result){
+                    if (result.error_number === 6) {
+                      return alert(result.message);
+                    }else{
+                        return alert("添加银行卡失败");
+                    }
+                },
+                complete:function(){
+                    $(".addBank-btn").removeAttr("disabled").text("添加银行卡");
+                }
+
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
 ;(function(org){
     $.each($('script'), function(){
-      var src = $(this).attr('src');
-      if(src && src.indexOf(org.scriptName) > 0){
-        if($(this).attr('data-init') && org[$(this).attr('data-init')]){
-            org[$(this).attr('data-init')].init();
+        var src = $(this).attr('src');
+        if(src && src.indexOf(org.scriptName) > 0){
+            if($(this).attr('data-init') && org[$(this).attr('data-init')]){
+                org[$(this).attr('data-init')].init();
+            }
         }
-      }
     })
-})(org)
+})(org);
