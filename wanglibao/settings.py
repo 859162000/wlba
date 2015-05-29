@@ -471,8 +471,8 @@ if ENV == ENV_PRODUCTION:
     CALLBACK_HOST = 'https://www.wanglibao.com'
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
-    #SIGN_HOST = '115.28.151.49'
-    SIGN_HOST = '10.160.18.243'
+    SIGN_HOST = '10.171.17.243'
+    #SIGN_HOST = '10.160.18.243'
     SIGN_PORT = 8733
 
     HUI_SHORT_MER_ID = "510793"
@@ -511,7 +511,8 @@ elif ENV == ENV_PREPRODUCTION:
     CALLBACK_HOST = 'https://pre.wanglibao.com'
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
-    SIGN_HOST = 'www.wanglibao.com'
+    #SIGN_HOST = 'www.wanglibao.com'
+    SIGN_HOST = '10.171.17.243'
     SIGN_PORT = 8733
 
     HUI_SHORT_MER_ID = "510793"
