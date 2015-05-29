@@ -213,7 +213,10 @@ org.login = (function(org){
                     success: function(res) {
                         var next = org.getQueryStringByName('next');
                         if (next) {
-                            window.location.href = next;
+                            var x = next.replace(/%3F/g,'?'),
+                                y = x.replace(/%3D/g,'='),
+                                z = y.replace(/%26/g,'&');
+                            window.location.href = z;
                         }else{
                             window.location.href = '/weixin/account/';
                         }
@@ -690,37 +693,6 @@ org.calculator=(function(org){
     }
 })(org);
 
-/*org.transaction = (function(org){
-    var lib = {
-        lfetPageNum : 1,
-        centerPageNum : 1,
-        rightPageNum : 1,
-        arrStr: ['lfetPageNum', 'centerPageNum', 'rightPageNum'],
-        addPageStr: {'lfetPageNum': '#transaction-left', 'centerPageNum': '#transaction-center', 'rightPageNum': '#transaction-right'},
-        init :function(){
-            lib._getTransaction('lfetPageNum');
-        },
-        _getTransaction:function(objStr){
-            var pageNum = lib[objStr];
-            org.ajax({
-                type: 'GET',
-                url: '/api/home/p2precords/',
-                data: {page: pageNum, 'pagesize': lib.pageSize},
-                success: function(data){
-                    $(lib.addPageStr[objStr]).append(data.html_data);
-                    lib[objStr]++;
-                },
-                error: function(){
-
-                }
-            })
-        }
-    }
-    return {
-        init : lib.init
-    }
-})(org);*/
-
 org.recharge=(function(org){
     var lib = {
         init :function(){
@@ -739,10 +711,13 @@ org.recharge=(function(org){
                             $('.card-none').show();
                         }else if(data.cards.length > 0){
                             $('.card-have').show();
-                            lib._initCard(data.cards,lib._cradStyle);
+                            lib._initCard(data.cards,lib._cradStyle(data.cards));
                         }
                     }
                 }
+            })
+            $(".bank-txt-right").on('click',function(){
+                $('.recharge-select-bank').css('display','-webkit-box');
             })
         },
         _initCard:function(data, callback){
@@ -750,10 +725,9 @@ org.recharge=(function(org){
                 optionsDomLength = optionsDom.length;
             for(var val in data){
                 if (data[val]['is_default'] == 'true') {
-                    $("#card-val").val(data[val]['no']);
-
+                    $("#card-val").val(data[val]['no'].slice(0,4) + '********'+ data[val]['no'].slice(-4));
                     for(var i =0 ; i < optionsDomLength; i++){
-                        if(optionsDom.eq(i).text() == data[val]['bank'].name){
+                        if(optionsDom.eq(i).val() == data[val]['bank'].gate_id){
                             optionsDom.eq(i).attr("selected", true);
                         }
                     }
@@ -762,8 +736,35 @@ org.recharge=(function(org){
             }
             callback && callback();
         },
-        _cradStyle:function(){
-            
+        _cradStyle:function(cardList){
+            var str = '';
+            for(var card in cardList){
+                str += "<div class= 'select-bank-list' data-gate="+cardList[card].bank.gate_id+" data-no="+cardList[card].no+">";
+                str += "<div class='bank-cont'>";
+                str += "<p'>" + cardList[card].bank.name + "</p>";
+                str += "<p>尾号 " + cardList[card].no.slice(-4) + "</p>";
+                str += "<p>限额 200000</p>";
+                str += "</div>";
+                str += "<div class='bank-type'>存储卡</div>";
+                str += "</div>";
+            }
+            $(".select-bank-body").append(str);
+            $('.select-bank-list').on('click',function(event){
+                var optionsDom = $("#card-select").find("option"),
+                    optionsDomLength = optionsDom.length,
+                    that = this;
+                    $("#card-val").val($(that).attr("data-no").slice(0,4) + '********'+ $(that).attr("data-no").slice(-4));
+                    for(var i =0 ; i < optionsDomLength; i++){
+                        if(optionsDom.eq(i).val() == $(this).attr("data-gate")){
+                            optionsDom.eq(i).attr("selected", true);
+                            return $('.recharge-select-bank').hide();
+                        }
+                    }
+
+            });
+            $(".recharge-select-bank").on('click',function(){
+                 return $(this).hide();
+            })
         },
         _rechargeStepFirst:function(){
             var card_no,gate_id,amount,maxamount,
@@ -781,7 +782,7 @@ org.recharge=(function(org){
                 if(amount > maxamount){
                      return alert('最高充值'+ maxamount +'元！')
                 }
-                window.location.href = '/weixin/recharge/second/?next='+$(this).attr('data-next')+'&card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
+                window.location.href = '/weixin/recharge/second/?rechargeNext='+$(this).attr('data-next')+'&card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
             });
             $secondBtn.on('click', function(){
                 card_no = $("input[name='card_no']").val(),
@@ -806,7 +807,7 @@ org.recharge=(function(org){
                     if(data.ret_code > 0) {
                         return alert(data.message);
                     } else {
-                        alert('充值成功！');
+                         $('.sign-main').shouw().find(".balance-sign").text(data.amount);
                     }
                 }
             })
@@ -899,7 +900,7 @@ org.recharge_second=(function(org){
                         if(data.ret_code > 0) {
                             return alert(data.message);
                         } else {
-                           $('.sign-main').shouw()
+                           $('.sign-main').shouw().find(".balance-sign").text(data.amount);
                         }
                     }
                 })
