@@ -724,10 +724,15 @@ org.recharge=(function(org){
         _initCard:function(data, callback){
             var optionsDom = $("#card-select").find("option"),
                 optionsDomLength = optionsDom.length;
-            $("#card-val").val(data[0]['storable_no'].slice(0,6) + '********'+ data[0]['storable_no'].slice(-4)).attr('data-storable', data[0]['storable_no']);
-            for(var i =0 ; i < optionsDomLength; i++){
-                if(optionsDom.eq(i).val() == data[0]['gate_id']){
-                    optionsDom.eq(i).attr("selected", true);
+            for(var val in data){
+                if (data[val]['is_default'] == 'true') {
+                    $("#card-val").val(data[val]['no'].slice(0,4) + '********'+ data[val]['no'].slice(-4));
+                    for(var i =0 ; i < optionsDomLength; i++){
+                        if(optionsDom.eq(i).val() == data[val]['bank'].gate_id){
+                            optionsDom.eq(i).attr("selected", true);
+                        }
+                    }
+                    return false
                 }
             }
             callback && callback();
@@ -735,10 +740,10 @@ org.recharge=(function(org){
         _cradStyle:function(cardList){
             var str = '';
             for(var card in cardList){
-                str += "<div class= 'select-bank-list' data-gate="+cardList[card].gate_id+" data-storable="+cardList[card].storable_no+">";
+                str += "<div class= 'select-bank-list' data-gate="+cardList[card].bank.gate_id+" data-no="+cardList[card].no+">";
                 str += "<div class='bank-cont'>";
-                str += "<p'>" + cardList[card].bank_name + "</p>";
-                str += "<p>尾号 " + cardList[card].storable_no.slice(-4) + "</p>";
+                str += "<p'>" + cardList[card].bank.name + "</p>";
+                str += "<p>尾号 " + cardList[card].no.slice(-4) + "</p>";
                 str += "<p>限额 200000</p>";
                 str += "</div>";
                 str += "<div class='bank-type'>存储卡</div>";
@@ -749,7 +754,7 @@ org.recharge=(function(org){
                 var optionsDom = $("#card-select").find("option"),
                     optionsDomLength = optionsDom.length,
                     that = this;
-                    $("#card-val").val($(that).attr("data-storable").slice(0,4) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
+                    $("#card-val").val($(that).attr("data-no").slice(0,4) + '********'+ $(that).attr("data-no").slice(-4));
                     for(var i =0 ; i < optionsDomLength; i++){
                         if(optionsDom.eq(i).val() == $(this).attr("data-gate")){
                             optionsDom.eq(i).attr("selected", true);
@@ -781,7 +786,7 @@ org.recharge=(function(org){
                 window.location.href = '/weixin/recharge/second/?rechargeNext='+$(this).attr('data-next')+'&card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
             });
             $secondBtn.on('click', function(){
-                card_no = $("input[name='card_no']").attr('data-storable'),
+                card_no = $("input[name='card_no']").val(),
                 gate_id = $("select[name='gate_id']").val(),
                 amount  = parseInt($("input[name='amount']").val()),
                 maxamount = parseInt($("input[name='maxamount']").val());
@@ -804,11 +809,6 @@ org.recharge=(function(org){
                         return alert(data.message);
                     } else {
                          $('.sign-main').shouw().find(".balance-sign").text(data.amount);
-                    }
-                },
-                error:function(){
-                    if(data.status == 403){
-                        alert('登录超时，请重新登录！');
                     }
                 }
             })
