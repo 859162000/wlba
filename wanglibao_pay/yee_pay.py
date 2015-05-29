@@ -296,3 +296,6 @@ class YeePay:
             tools.despoit_ok(pay_info, device['device_type'])
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
+
+    def pre_pay(self, request):
+        self.app_pay(request)

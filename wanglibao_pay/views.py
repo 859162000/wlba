@@ -670,7 +670,17 @@ class BindPayView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        pay = third_pay.KuaiPay()
+        gate_id = request.DATA.get("gate_id")
+        if not gate_id:
+            return Response({"ret_code": -1, "message": "gate_id is null"})
+        bank = Bank.objects.filter(gate_id=gate_id).first()
+        if not bank:
+            return Response({"ret_code": -2, "message": "gate_id error"})
+        channel_dict = {"huifu":   third_pay.HuifuShortPay,
+                        "yeepay":  third_pay.YeePay,
+                        "kuaipay": third_pay.KuaiPay}
+        bank.channel = 'huifu'
+        pay = channel_dict[bank.channel]()
         result = pay.pre_pay(request)
         return Response(result)
 
