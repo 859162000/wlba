@@ -5,7 +5,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.core.cache import cache
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
@@ -13,18 +12,7 @@ from rest_framework.authentication import SessionAuthentication
 from .models import Account, Material, MaterialImage, MaterialNews
 from wechatpy.client import WeChatClient
 from weixin.wechatpy.exceptions import WeChatException
-from functools import wraps
-
-
-def weixin_api_error(f):
-    @wraps(f)
-    def decoration(*args, **kwargs):
-        try:
-            res = f(*args, **kwargs)
-        except WeChatException, e:
-            return Response(e.__dict__, status=400)
-        return res
-    return decoration
+from weixin.common.decorators import weixin_api_error
 
 
 class AdminWeixinAccountMixin(object):
@@ -266,9 +254,6 @@ class WeixinMenuApi(AdminAPIView):
 
     @weixin_api_error
     def post(self, request):
-        print request._is_secure()
-        from django.core.urlresolvers import reverse
-        print request.build_absolute_uri(reverse('weixin_oauth_login_redirect'))
         res = self.client.menu.create(request.body)
         return Response(res, status=201)
 

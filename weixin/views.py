@@ -1,6 +1,6 @@
 # encoding:utf-8
 from django.views.generic import View, TemplateView, RedirectView
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
@@ -8,6 +8,8 @@ from django.contrib.auth import login as auth_login
 from django.template import Template, Context
 from django.template.loader import get_template
 from django.db.models import Q
+from django.conf import settings
+from django.shortcuts import render_to_response, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
@@ -15,34 +17,44 @@ from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
 from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_p2p.amortization_plan import get_amortization_plan
+from wanglibao_margin.models import Margin
+from wanglibao_redpack import backends
+from wanglibao_rest import utils
+# from wanglibao_pay import third_pay, trade_record
+from django.utils import timezone
+from rest_framework.permissions import IsAuthenticated
+from wanglibao_pay.models import Bank
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
-from weixin.wechatpy.exceptions import InvalidSignatureException
+from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException
 from weixin.wechatpy.oauth import WeChatOAuth
-from .models import Account, WeixinUser
+from weixin.common.decorators import weixin_api_error
+from weixin.common.wx import generate_js_wxpay
+from .models import Account, WeixinUser, WeixinAccounts
 from .common.wechat import tuling
 from decimal import Decimal
+from shumi_backend.exception import *
+from shumi_backend.fetch import UserInfoFetcher
+from wanglibao_buy.models import BindBank
+from wanglibao_pay.models import Card
+from wanglibao_announcement.utility import AnnouncementAccounts
 import datetime
 import json
 import time
 import uuid
+import urllib
+import math
 
-# Create your views here.
 
-
-class ConnectView(View):
+class WeixinJoinView(View):
     account = None
 
-    def check_signature(self, request, id):
-        try:
-            self.account = Account.objects.get(pk=id)
-        except Account.DoesNotExist:
-            return False
-
+    def check_signature(self, request, account_key):
+        account = WeixinAccounts.get(account_key)
         try:
             check_signature(
-                self.account.token,
+                account.token,
                 request.GET.get('signature'),
                 request.GET.get('timestamp'),
                 request.GET.get('nonce')
@@ -52,21 +64,17 @@ class ConnectView(View):
 
         return True
 
-    def get(self, request, id):
-        if not self.check_signature(request, id):
+    def get(self, request, account_key):
+        if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
 
         return HttpResponse(request.GET.get('echostr'))
 
-    def post(self, request, id):
-        if not self.check_signature(request, id):
+    def post(self, request, account_key):
+        if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
 
         msg = parse_message(request.body)
-
-        # 更新公众号原始ID 更新公众号关注者数据
-        self.account.weixin_original_id = msg.target
-        WeixinUser.objects.get_or_create(openid=msg.source, account_original_id=msg.target)
 
         if msg.type == 'text':
             # 自动回复  5000次／天
@@ -80,30 +88,41 @@ class ConnectView(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(ConnectView, self).dispatch(request, *args, **kwargs)
+        return super(WeixinJoinView, self).dispatch(request, *args, **kwargs)
 
 
-class WeixinJsapiConfig(View):
+class WeixinJsapiConfig(APIView):
+    permission_classes = ()
+    http_method_names = ['get']
 
+    @weixin_api_error
     def get(self, request):
-        try:
-            account = Account.objects.first()
-        except Account.DoesNotExist:
-            data = {'errcode': 1, 'errmsg': 'account does not exist'}
-            return HttpResponse(json.dumps(data), 'application/json')
+        if settings.ENV == settings.ENV_DEV:
+            request.session['account_key'] = 'test'
+            account = WeixinAccounts.get('test')
+        else:
+            request.session['account_key'] = 'sub_1'
+            account = WeixinAccounts.get('sub_1')
 
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
         noncestr = uuid.uuid1().hex
         timestamp = str(int(time.time()))
-        url = request.META.get('HTTP_REFERER')
-        signature = client.jsapi.get_jsapi_signature(noncestr, account.jsapi_ticket, timestamp, url)
+        url = (request.META.get('HTTP_REFERER') or '').split('#')[0]
+
+        app_id = account.app_id
+        signature = account.weixin_client.jsapi.get_jsapi_signature(
+            noncestr,
+            account.jsapi_ticket,
+            timestamp,
+            url
+        )
+
         data = {
-            'appId': account.app_id,
+            'appId': app_id,
             'timestamp': timestamp,
             'nonceStr': noncestr,
             'signature': signature
         }
-        return HttpResponse(json.dumps(data), 'application/json')
+        return Response(data)
 
 
 class WeixinLogin(TemplateView):
@@ -120,15 +139,17 @@ class WeixinLogin(TemplateView):
             except Account.DoesNotExist:
                 return HttpResponseNotFound()
 
-            oauth = WeChatOAuth(account.app_id, account.app_secret)
-            res = oauth.fetch_access_token(code)
-            if not res.get('errcode'):
+            try:
+                oauth = WeChatOAuth(account.app_id, account.app_secret)
+                res = oauth.fetch_access_token(code)
                 account.oauth_access_token = res.get('access_token')
                 account.oauth_access_token_expires_in = res.get('expires_in')
                 account.oauth_refresh_token = res.get('refresh_token')
                 account.save()
                 WeixinUser.objects.get_or_create(openid=res.get('openid'))
                 context['openid'] = res.get('openid')
+            except WeChatException, e:
+                pass
 
         return context
 
@@ -181,6 +202,75 @@ class WeixinOauthLoginRedirect(RedirectView):
         return oauth.authorize_url
 
 
+class WeixinPayTest(TemplateView):
+    template_name = 'pay_test.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(WeixinPayTest, self).get_context_data(**kwargs)
+        js_wxpay = generate_js_wxpay(self.request)
+        code = self.request.GET.get('code')
+        openid = js_wxpay.generate_openid(code)
+        context['openid'] = openid
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.GET.get('code'):
+            info_dict = {
+                'redirect_uri': request.build_absolute_uri(reverse('weixin_pay_test')),
+                'state': '123',
+            }
+            js_wxpay = generate_js_wxpay(request)
+            url = js_wxpay.generate_redirect_url(info_dict)
+            return HttpResponseRedirect(url)
+
+        return super(WeixinPayTest, self).dispatch(request, *args, **kwargs)
+
+
+class WeixinPayOrder(APIView):
+    permission_classes = ()
+    http_method_names = ['post']
+
+    def post(self, request):
+        product = {
+            'attach': u'网利宝微信支付测试1分',
+            'body': u'网利宝微信支付测试1分',
+            'out_trade_no': uuid.uuid1().hex,
+            'total_fee': 0.01,
+        }
+        js_wxpay = generate_js_wxpay(request)
+        data = js_wxpay.generate_jsapi(product, request.POST.get('openid'))
+        return Response(data)
+
+
+class WeixinPayNotify(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        js_wxpay = generate_js_wxpay(request)
+        xml_str = request.body
+        print 'xml_str: {}'.format(xml_str)
+        ret, ret_dict = js_wxpay.verify_notify(xml_str)
+        print 'ret: {}'.format(ret)
+        print 'ret_dict: ', ret_dict
+        # 在这里添加订单更新逻辑
+        if ret:
+            ret_dict = {
+                'return_code': 'SUCCESS',
+                'return_msg': 'OK',
+            }
+            ret_xml = js_wxpay.generate_notify_resp(ret_dict)
+        else:
+            ret_dict = {
+                'return_code': 'FAIL',
+                'return_msg': 'verify error',
+            }
+            ret_xml = js_wxpay.generate_notify_resp(ret_dict)
+
+        print 'ret_xml: {}'.format(ret_xml)
+        return HttpResponse(ret_xml)
+
+
+
 class P2PListView(TemplateView):
     template_name = 'weixin_list.jade'
 
@@ -192,7 +282,7 @@ class P2PListView(TemplateView):
         banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority').first()
 
         return {
-            'p2p_lists': p2p_lists,
+            'results': p2p_lists,
             'banner': banner,
         }
 
@@ -200,7 +290,7 @@ class P2PListView(TemplateView):
 def _generate_ajax_template(content, template_name=None):
 
     context = Context({
-        'p2p_lists': content,
+        'results': content,
     })
 
     if template_name:
@@ -240,7 +330,17 @@ class P2PListWeixin(APIView):
 
 
 class P2PDetailView(TemplateView):
-    template_name = 'weixin_detail.jade'
+
+    def get_template_names(self):
+        template = self.kwargs['template']
+        if template == 'calculator':
+            template_name = 'weixin_calculator.jade'
+        elif template == 'buy':
+            template_name = 'weixin_buy.jade'
+        else:
+            template_name = 'weixin_detail.jade'
+
+        return template_name
 
     def get_context_data(self, id, **kwargs):
         context = super(P2PDetailView, self).get_context_data(**kwargs)
@@ -267,16 +367,25 @@ class P2PDetailView(TemplateView):
             total_fee_earning = Decimal(p2p.total_amount * p2p.activity.rule.rule_amount *
                                         (Decimal(p2p.period) / Decimal(12))).quantize(Decimal('0.01'))
 
+        user_margin = 0
         current_equity = 0
+        redpack = None
         user = self.request.user
         if user.is_authenticated():
+            user_margin = user.margin.margin
             equity_record = p2p.equities.filter(user=user).first()
             if equity_record is not None:
                 current_equity = equity_record.equity
 
+            device = utils.split_ua(self.request)
+            redpack = backends.list_redpack(user, 'available', device['device_type'])
+
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
         total_buy_user = P2PEquity.objects.filter(product=p2p).count()
 
+        amount = self.request.GET.get('amount', 0)
+        amount_profit = self.request.GET.get('amount_profit', 0)
+        next = self.request.GET.get('next', '')
 
         context.update({
             'p2p': p2p,
@@ -287,9 +396,25 @@ class P2PDetailView(TemplateView):
             'attachments': p2p.attachment_set.all(),
             'total_fee_earning': total_fee_earning,
             'total_buy_user': total_buy_user,
+            'margin': float(user_margin),
+            'amount': float(amount),
+            'redpack': redpack,
+            'next': next,
+            'amount_profit': amount_profit,
         })
 
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            if self.kwargs['template'] == 'buy':
+                #未登录状态下buy模板不需要取 amount 和 amount_profit
+                #amount = request.GET.get('amount', '')
+                #amount_profit = request.GET.get('amount_profit', '')
+                #next_str = '?amount=%s&amount_profit=%s' % (amount, amount_profit)
+                redirect_str = '/weixin/login/?next=/weixin/view/buy/%s/' % (self.kwargs['id'],)
+                return HttpResponseRedirect(redirect_str)
+        return super(P2PDetailView, self).dispatch(request, *args, **kwargs)
 
 
 class WeixinAccountHome(TemplateView):
@@ -343,3 +468,179 @@ class WeixinAccountHome(TemplateView):
             'banner': banner,
         }
 
+
+class WeixinRecharge(TemplateView):
+    template_name = 'weixin_recharge.jade'
+
+    def get_context_data(self, **kwargs):
+
+        banks = Bank.get_kuai_deposit_banks()
+        next = self.request.GET.get('next', '')
+        return {
+            'banks': banks,
+            'next' : next,
+        }
+
+
+class WeixinRechargeSecond(TemplateView):
+    template_name = 'weixin_recharge_second.jade'
+
+    def get_context_data(self, **kwargs):
+        card_no = self.request.GET.get('card_no', '')
+        gate_id = self.request.GET.get('gate_id', '')
+        amount = self.request.GET.get('amount', 0)
+        user = self.request.user.wanglibaouserprofile
+        try:
+            bank = Bank.objects.filter(gate_id=gate_id).first()
+        except:
+            bank = None
+        next = self.request.GET.get('next', '')
+        context = {
+            'card_no': card_no,
+            'gate_id': gate_id,
+            'amount': amount,
+            'bank': bank,
+            'user': user,
+            'next': next,
+        }
+        return context
+
+
+class WeixinTransaction(TemplateView):
+    template_name = 'weixin_transaction.jade'
+
+    def get_template_names(self):
+        status = self.kwargs['status']
+        if status == 'buying':
+            template_name = 'weixin_transaction_buying.jade'
+        elif status == 'finished':
+            template_name = 'weixin_transaction_finished.jade'
+        else:
+            template_name = 'weixin_transaction.jade'
+
+        return template_name
+
+    def get_context_data(self, status, **kwargs):
+        if status not in ['repaying', 'buying', 'finished']:
+            return Response({'ret_code': 20400, 'message': u'标的状态错误'})
+        has_link = False
+        if status == 'repaying':
+            has_link = True
+            p2p_status = u'还款中'
+        elif status == 'finished':
+            p2p_status = u'已完成'
+        else:
+            p2p_status = u'正在招标'
+        if status == 'buying':
+            p2p_equities = P2PEquity.objects.filter(user=self.request.user).filter(product__status__in=[
+                u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'正在招标',
+            ]).select_related('product')[:10]
+        else:
+            p2p_equities = P2PEquity.objects.filter(user=self.request.user).filter(product__status=p2p_status) \
+                .select_related('product')[:10]
+
+        p2p_records = [{
+            'equity_created_at': timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),  # 投标时间
+            'equity_product_short_name': equity.product.short_name,  # 产品名称
+            'equity_product_expected_earning_rate': equity.product.expected_earning_rate,  # 年化收益(%)
+            'equity_product_period': equity.product.period,  # 产品期限(月)*
+            'equity_equity': float(equity.equity),  # 用户所持份额(投资金额)
+            'equity_product_display_status': equity.product.display_status,  # 状态
+            'equity_term': equity.term,  # 还款期
+            'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
+            'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已经收益
+            'equity_total_interest': float(equity.pre_total_interest),  # 单个预期收益
+            'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
+                self.request.get_host(), equity.product.id),  # 合同
+            'product_id': equity.product_id,
+            'has_link': has_link,
+        } for equity in p2p_equities]
+
+        return {
+            'results': p2p_records
+        }
+
+
+class WeixinP2PRecordAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        user = request.user
+        get_status = request.GET.get('status', 'repaying')
+        if get_status not in ['repaying', 'buying', 'finished']:
+            return Response({'ret_code': 20400, 'message': u'标的状态错误'})
+        has_link = False
+        if get_status == 'repaying':
+            has_link = True
+            p2p_status = u'还款中'
+        elif get_status == 'finished':
+            p2p_status = u'已完成'
+        else:
+            p2p_status = u'正在招标'
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('pagesize', 10)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        if get_status == 'buying':
+            p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+                u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'正在招标',
+            ]).select_related('product')[(page-1)*pagesize:page*pagesize]
+        else:
+            p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status=p2p_status)\
+                .select_related('product')[(page-1)*pagesize:page*pagesize]
+
+        p2p_records = [{
+             'equity_created_at': timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),  # 投标时间
+             'equity_product_short_name': equity.product.short_name,  # 产品名称
+             'equity_product_expected_earning_rate': equity.product.expected_earning_rate,  # 年化收益(%)
+             'equity_product_period': equity.product.period,  # 产品期限(月)*
+             'equity_equity': float(equity.equity),  # 用户所持份额(投资金额)
+             'equity_product_display_status': equity.product.display_status,  # 状态
+             'equity_term': equity.term,  # 还款期
+             'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
+             'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已经收益
+             'equity_total_interest': float(equity.pre_total_interest),  # 单个预期收益
+             'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
+                 request.get_host(), equity.product.id),  # 合同
+             'product_id': equity.product_id,
+             'has_link': has_link,
+        } for equity in p2p_equities]
+
+        html_data = _generate_ajax_template(p2p_records, 'include/ajax/ajax_transaction.jade')
+
+        return Response({
+            'html_data': html_data,
+            'page': page,
+            'pagesize': pagesize,
+        })
+
+
+class WeixinAccountSecurity(TemplateView):
+    template_name = 'weixin_security.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_cards = Card.objects.filter(user__exact=self.request.user).count()
+        return {
+            'p2p_cards': p2p_cards,
+        }
+
+
+class WeixinAccountBankCard(TemplateView):
+    template_name = 'weixin_bankcard.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_cards = Card.objects.filter(user__exact=self.request.user)
+        return {
+            'p2p_cards': p2p_cards,
+        }
+
+
+class WeixinAccountBankCardAdd(TemplateView):
+    template_name = 'weixin_bankcard_add.jade'
+
+    def get_context_data(self, **kwargs):
+        banks = Bank.get_withdraw_banks()
+        return {
+            'banks': banks,
+        }

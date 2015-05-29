@@ -3,14 +3,6 @@ from __future__ import unicode_literals
 from weixin.wechatpy import create_reply
 import urllib
 import requests
-"""
-jiazhe51598169@163.com change to wangjianfei@wanglibank.com
-shibajiao
-13715219924
-于振洋
-150429195605035055
-"""
-# 公众号类型
 
 
 class Permission(object):
@@ -117,3 +109,5 @@ def tuling(msg):
             reply = create_reply(data.get('text'), msg)
 
     return reply
+
+
