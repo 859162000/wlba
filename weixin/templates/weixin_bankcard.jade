@@ -15,7 +15,12 @@ html
           .bank-list
             p.bank-name {{card.bank.name}}
             p.bank-num {{card.no | bank_card}}
-    .bank-add-btn
-      a(href="/weixin/account/bankcard/add/")
-        span.btn-icon +
-        span.btn-click 添加银行卡
+    if user.wanglibaouserprofile.id_is_valid
+      .bank-add-btn
+        a(href="/weixin/account/bankcard/add/")
+          span.btn-icon +
+          span.btn-click 添加银行卡
+    else
+      .no-authentication-sign 绑定银行卡要先通过实名认证哦
+          a(href="/weixin/authentication/").authentication-sign-btn 去实名认证
+

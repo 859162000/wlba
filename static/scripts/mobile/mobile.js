@@ -696,6 +696,7 @@ org.calculator=(function(org){
 
 org.recharge=(function(org){
     var lib = {
+        canRecharge: true,
         init :function(){
             lib._getBankCardList();
             lib._rechargeStepFirst();
@@ -711,8 +712,8 @@ org.recharge=(function(org){
                         if(data.cards.length === 0){
                             $('.card-none').show();
                         }else if(data.cards.length > 0){
-                            $('.card-have').show();
                             lib._initCard(data.cards,lib._cradStyle(data.cards));
+                            $('.card-have').show();
                         }
                     }
                 }
@@ -727,7 +728,7 @@ org.recharge=(function(org){
             $("#card-val").val(data[0]['storable_no'].slice(0,6) + '********'+ data[0]['storable_no'].slice(-4)).attr('data-storable', data[0]['storable_no']);
             for(var i =0 ; i < optionsDomLength; i++){
                 if(optionsDom.eq(i).val() == data[0]['gate_id']){
-                    optionsDom.eq(i).attr("selected", true);
+                    optionsDom.eq(i).attr("selected", "selected");
                 }
             }
             callback && callback();
@@ -749,10 +750,12 @@ org.recharge=(function(org){
                 var optionsDom = $("#card-select").find("option"),
                     optionsDomLength = optionsDom.length,
                     that = this;
-                    $("#card-val").val($(that).attr("data-storable").slice(0,4) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
+                    $("#card-val").val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
                     for(var i =0 ; i < optionsDomLength; i++){
                         if(optionsDom.eq(i).val() == $(this).attr("data-gate")){
-                            optionsDom.eq(i).attr("selected", true);
+                            $("#card-select").hide();
+                            optionsDom.eq(i).attr("selected", "selected").siblings().removeAttr("selected");
+                            $("#card-select").show();
                             return $('.recharge-select-bank').hide();
                         }
                     }
@@ -791,7 +794,7 @@ org.recharge=(function(org){
                 if(amount > maxamount){
                      return alert('最高充值'+ maxamount +'元！')
                 }
-                lib._rechargeSingleStep(card_no,amount);
+                lib.canRecharge && lib._rechargeSingleStep(card_no,amount);
             });
         },
         _rechargeSingleStep: function(card_no, amount) {
@@ -799,17 +802,25 @@ org.recharge=(function(org){
                 type: 'POST',
                 url: '/api/pay/deposit/',
                 data: {card_no: card_no, amount: amount},
+                beforeSend:function(){
+                    lib.canRecharge = false;
+                    $('#secondBtn').text("充值中..");
+                },
                 success: function(data) {
                     if(data.ret_code > 0) {
                         return alert(data.message);
                     } else {
-                         $('.sign-main').shouw().find(".balance-sign").text(data.amount);
+                         $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
                     }
                 },
                 error:function(){
                     if(data.status == 403){
                         alert('登录超时，请重新登录！');
                     }
+                },
+                complete:function(){
+                    $('#secondBtn').text("充值");
+                    lib.canRecharge = true;
                 }
             })
         }
@@ -879,7 +890,8 @@ org.recharge_second=(function(org){
             })
         },
         _rechargeStepSecond:function(){
-            var secondBtn = $('#secondBtn');
+            var secondBtn = $('#secondBtn'),
+                canPost = true;
             secondBtn.on('click', function(){
                 var order_id = $("input[name='order_id']").val(),
                     vcode = $("input[name='vcode']").val(),
@@ -893,18 +905,28 @@ org.recharge_second=(function(org){
                 if(!vcode){
                     return alert('请输入手机验证码');
                 }
-                org.ajax({
-                    type: 'POST',
-                    url: '/api/pay/cnp/dynnum/',
-                     data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
-                    success: function(data) {
-                        if(data.ret_code > 0) {
-                            return alert(data.message);
-                        } else {
-                           $('.sign-main').shouw().find(".balance-sign").text(data.amount);
+                if(canPost){
+                    org.ajax({
+                        type: 'POST',
+                        url: '/api/pay/cnp/dynnum/',
+                         data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
+                        beforeSend:function(){
+                            canPost = false;
+                            secondBtn.text("充值中...");
+                        },
+                        success: function(data) {
+                            if(data.ret_code > 0) {
+                                return alert(data.message);
+                            } else {
+                               $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
+                            }
+                        },
+                        complete:function(){
+                            canPost = true;
+                            secondBtn.text("充值");
                         }
-                    }
-                })
+                    })
+                }
             })
         }
     }
