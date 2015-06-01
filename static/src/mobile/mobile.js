@@ -695,6 +695,7 @@ org.calculator=(function(org){
 
 org.recharge=(function(org){
     var lib = {
+        canRecharge: true,
         init :function(){
             lib._getBankCardList();
             lib._rechargeStepFirst();
@@ -790,7 +791,7 @@ org.recharge=(function(org){
                 if(amount > maxamount){
                      return alert('最高充值'+ maxamount +'元！')
                 }
-                lib._rechargeSingleStep(card_no,amount);
+                lib.canRecharge && lib._rechargeSingleStep(card_no,amount);
             });
         },
         _rechargeSingleStep: function(card_no, amount) {
@@ -798,17 +799,25 @@ org.recharge=(function(org){
                 type: 'POST',
                 url: '/api/pay/deposit/',
                 data: {card_no: card_no, amount: amount},
+                beforeSend:function(){
+                    lib.canRecharge = false;
+                    $('#secondBtn').text("充值中..");
+                },
                 success: function(data) {
                     if(data.ret_code > 0) {
                         return alert(data.message);
                     } else {
-                         $('.sign-main').shouw().find(".balance-sign").text(data.amount);
+                         $('.sign-main').show().find(".balance-sign").text(data.amount);
                     }
                 },
                 error:function(){
                     if(data.status == 403){
                         alert('登录超时，请重新登录！');
                     }
+                },
+                complete:function(){
+                    $('#secondBtn').text("充值");
+                    lib.canRecharge = true;
                 }
             })
         }
@@ -878,7 +887,8 @@ org.recharge_second=(function(org){
             })
         },
         _rechargeStepSecond:function(){
-            var secondBtn = $('#secondBtn');
+            var secondBtn = $('#secondBtn'),
+                canPost = true;
             secondBtn.on('click', function(){
                 var order_id = $("input[name='order_id']").val(),
                     vcode = $("input[name='vcode']").val(),
@@ -892,18 +902,28 @@ org.recharge_second=(function(org){
                 if(!vcode){
                     return alert('请输入手机验证码');
                 }
-                org.ajax({
-                    type: 'POST',
-                    url: '/api/pay/cnp/dynnum/',
-                     data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
-                    success: function(data) {
-                        if(data.ret_code > 0) {
-                            return alert(data.message);
-                        } else {
-                           $('.sign-main').shouw().find(".balance-sign").text(data.amount);
+                if(canPost){
+                    org.ajax({
+                        type: 'POST',
+                        url: '/api/pay/cnp/dynnum/',
+                         data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
+                        beforeSend:function(){
+                            canPost = false;
+                            secondBtn.text("充值中...");
+                        },
+                        success: function(data) {
+                            if(data.ret_code > 0) {
+                                return alert(data.message);
+                            } else {
+                               $('.sign-main').show().find(".balance-sign").text(data.amount);
+                            }
+                        },
+                        complete:function(){
+                            canPost = true;
+                            secondBtn.text("充值");
                         }
-                    }
-                })
+                    })
+                }
             })
         }
     }
