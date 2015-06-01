@@ -6,10 +6,6 @@ html
     link(rel="prefetch", href="/static/imgs/mobile/detail/detail_banner.jpg")
     include include/weixin_head.jade
   body
-    header
-      hgroup 我要投资
-      //a(href="#1")
-        span 返回
     .list-banner
       a(href="{{banner.link}}")
         img(src="/media/{{banner.image}}")
@@ -17,5 +13,5 @@ html
       include include/ajax/ajax_list.jade
     include include/weixin_loading
     include include/weixin_footer
-    script(data-init='list', src="/static/scripts/mobile/dist/mobile.js?v=2")
+    script(data-init='list', src="/static/scripts/mobile/dist/mobile.js")
 

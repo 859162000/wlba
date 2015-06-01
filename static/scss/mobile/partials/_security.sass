@@ -1,9 +1,11 @@
 .security-thename
   border-bottom: 1px solid $border-color
-  -webkit-flex-flow: column
+  display: -webkit-box
+  -webkit-box-orient: vertical
   padding-top: 0
   background: #fbfbfb
   .thename-one
+    display: block
     padding-left: 0.75rem
     background: #ffffff
     color: #6b6b6b
@@ -19,6 +21,7 @@
       right: 0.705rem
     .thename-add
       @extend label
+      font-weight: normal
       span  //三角
         width: 0
         height: 0

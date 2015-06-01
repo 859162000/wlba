@@ -6,7 +6,11 @@ html
     body
         header
             hgroup 充值
-            a(href="/weixin/recharge/")
+            if next = ''
+              a(href="/weixin/recharge/")
+                span 返回
+            else
+              a(href="/weixin/recharge/?rechargeNext={{next}}")
                 span 返回
         .value-information
             p.information-one
@@ -50,4 +54,4 @@ html
         input(type="hidden", name="order_id", value="")
         input(type="hidden", name="token", value="")
 
-    script(data-init="recharge_second", src="/static/scripts/mobile/mobile.js?v=222")
+    script(data-init="recharge_second", src="/static/scripts/mobile/dist/mobile.js")

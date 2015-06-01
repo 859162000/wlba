@@ -1,3 +1,8 @@
+.recharge-loding
+  font-size: $font-size12
+  color: $color-grey-989898
+  margin-top: 1rem
+  text-align: center
 .sanjiao
   width: 0
   height: 0
@@ -42,7 +47,8 @@
       height: 1.1rem
 .recharge-body
   padding: 0 .75rem
-
+  .bank-select
+    padding-right: .75rem
   .recharge-count
     display: -webkit-box
     -webkit-box-align: center
@@ -54,8 +60,6 @@
     border: 1px solid $border-color
     text-align: center
     margin-bottom: $margin-bottom
-    select
-      color: $color-grey-b6b6b6
     .count-txt-left
       width: 4rem
     .count-input
@@ -71,6 +75,10 @@
         color: $color-grey-b6b6b6
     .count-txt-right
       width: 2.2rem
+    .recharge-select
+      color: $color-grey-b6b6b6
+      background: url("/static/imgs/mobile/select_icon.png") no-repeat right center #fff
+      background-size: .9rem
   .recharge-btn
     color: #fff
     font-size: $font-size18
@@ -118,7 +126,8 @@
     color: $color-grey-989898   
     -webkit-appearance: none
     margin-left: -.1rem
-    //background: url("/static/imgs/mobile/detail/toggle_icon.png") no-repeat right center
+    background: url("/static/imgs/mobile/select_icon.png") no-repeat right .75rem center #fff
+    background-size: .9rem
   .bank-txt-right
     width: 2.2rem
     height: 100%
@@ -134,5 +143,48 @@
   padding-top: .75rem
 .card-hide
   display: none
+
+.recharge-select-bank
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  background: rgba(0,0,0,.6)
+  display: -webkit-box
+  -webkit-box-pack: center
+  -webkit-box-align: center
+  padding: 0 1rem
+  .select-bank-body
+    border-radius: .6rem
+    background: #fff
+    border: 1px solid $color-grey-e8e8e8
+    padding: 0 .25rem
+    width: 100%
+    font-size: $font-size12
+    color: $color-grey-989898
+  .select-bank-tit
+    text-align: center
+    height: 2.5rem
+    line-height: 2.5rem
+  .select-bank-list
+    display: -webkit-box
+    -webkit-box-pack: center
+    padding: .5rem 0
+    border-top: 1px solid $color-grey-e8e8e8
+  .bank-type
+    width: 2.5rem
+    height: 2.5rem
+    line-height: 2.5rem
+    text-align: center
+  .bank-img
+    @extend .bank-type
+  .bank-cont
+    -webkit-box-flex: 1
+    text-align: left
+    p:first-child
+      font-size: $font-size14
+
+
 
 

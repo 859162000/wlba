@@ -1,6 +1,6 @@
 .account-balance
   padding: 1rem 0 0 0.75rem
-  display: -webkit-flex
+  display: -webkit-box
   width: 100%
   height: 3.4rem
   border-bottom: 1px solid $border-color
@@ -15,7 +15,7 @@
       color: $head-backgroundColor
       font-size: 0.805rem
   .account-balance-two
-    -webkit-flex: 1
+    -webkit-box-flex: 1
     .account-withdrawal
       display: block
       width: 3.35rem
@@ -28,9 +28,11 @@
       color: #abccf7
       display: none
   .account-balance-three
-    -webkit-flex: 1
+    -webkit-box-flex: 1
+    text-align: right
+    padding-right: .75rem
     .account-top-up
-      display: block
+      display: inline-block
       width: 3.35rem
       height: 1.75rem
       border-radius: 5px
@@ -39,6 +41,9 @@
       border: 1px solid #9cd292
       font-size: $body-fontSize
       color: #9cd292
+      &:active
+        background: #9cd292
+        color: #fff
 .account-assets
   @extend .account-balance
   height: 4.25rem
@@ -61,7 +66,6 @@
   //@extend .account-balance
   padding-left: 0.75rem
   background: #ffffff
-  border-top: 1px solid $border-color
   margin-top: 0.55rem
   -webkit-flex-flow: column
   padding-top: 0
@@ -151,11 +155,11 @@
         color: $head-backgroundColor
         //display: none
       .account-footer
-        display: -webkit-flex
+        display: -webkit-box
         margin-top: 0.2rem
         padding-bottom: 0.2rem
         a
-          -webkit-flex: 1
+          -webkit-box-flex: 1
           text-align: center
           font-size: 0.6rem
           line-height: 1.9rem

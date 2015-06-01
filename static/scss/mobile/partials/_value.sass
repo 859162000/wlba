@@ -1,6 +1,6 @@
 .value-information
   border-bottom: 1px solid $border-color
-  -webkit-flex-flow: column
+  -webkit-box-orient: vertical
   padding-top: 0
   background: #fbfbfb
   .information-one
@@ -46,7 +46,7 @@
       color: $color-grey-989898
   .value-input-body
     display: -webkit-box
-    padding: .3rem .75rem
+    -webkit-box-align: center
     height: $regitst-input-height
     border-radius: $regitst-border-radius
     border: 1px solid $color-grey-e8e8e8
@@ -54,20 +54,18 @@
   .value-input-public
     -webkit-box-flex: 1
     width: 100%
-    height: 1.5rem
-    line-height: 1.5rem
+    height: 100%
+    line-height: normal
     border: 0
     display: block
-    font-size: $font-size14
+    font-size: $font-size12
     &::-webkit-input-placeholder
       font-size: $font-size10
       color: $color-grey-b6b6b6
   .value-input-name
     font-size: $font-size12
     color: $color-grey-989898
-    width: $regitst-inputName-width
-    line-height: 1.5rem
-    height: 1.5rem
+    padding: 0 .75rem
     text-align: left
   .value-submit
     margin-top: 0.55rem

@@ -12,7 +12,7 @@ html
         .regist-list
           .input-main
             .input-body
-              .input-name=name
+              .input-name(class=name)
               input(placeholder=placeholder,id=inputID,type=type).input-public
           .input-sign
             span.pub-check(class=checkClass)=checkTxt
@@ -20,20 +20,20 @@ html
               |不能为空
             if checkClass2 != ''
               span.pub-check(class=checkClass2)=checkTxt2
-      +list("手机号", "请输入手机号", "phone", 'test', "phone-sign1", "请输入正确的手机号", "phone-sign2", "该手机号已被注册")
+      +list("phone", "请输入手机号", "phone", 'test', "phone-sign1", "请输入正确的手机号", "phone-sign2", "该手机号已被注册")
       .regist-list
 
         .input-main.input-check-main
           .input-body.input-check-body
-            .input-name 验证码
+            .input-name.checkCode
             input(placeholder="请输入验证码")#checkCode.input-public
           .input-check
             button(type="button").request-check 获取验证码
         .input-sign
           span.pub-check.check-sign 请输入正确的验证码
           span.pub-check.none-val 验证码不能为空
-      +list("设置密码", "请设置密码", "password", "password", "password-sign", "请输入6-20位数字/字母和符号/区分大小写")
-      +list("确认密码", "请重复密码", "passwordRepeat", "password", "password-repeat-sign", "两次输入的密码不一致")
+      +list("password", "请设置密码", "password", "password", "password-sign", "请输入6-20位数字/字母和符号/区分大小写")
+      +list("passwordRepeat", "请重复密码", "passwordRepeat", "password", "password-repeat-sign", "两次输入的密码不一致")
 
       .regits-submit
         button(type="button").submit-body 立即注册

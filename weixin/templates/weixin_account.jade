@@ -13,10 +13,10 @@ html
             .account-balance-one
                 p.balance-one-money 账户余额（元）
                 p.balance-one-yuan ￥{{p2p_margin|money_format}}
-            .account-balance-two
+            //.account-balance-two
                 a(href='#').account-withdrawal 提现
             .account-balance-three
-                a(href='/weixin/recharge/').account-top-up 充值
+                a(href='/weixin/recharge/?rechargeNext=/weixin/account/').account-top-up 充值
 
         .account-assets
             .account-assets-one
@@ -31,9 +31,8 @@ html
             //    p.assets-two-earning
 
         .account-project
-            a(href="#").project-one
+            a(href="/weixin/transaction/repaying/").project-one
              |已投项目
-             b &nbsp;敬请期待
              span
               .project-one-angle
             .line
@@ -61,4 +60,4 @@ html
                         .line-line
                         a(href="#") 确定
     include include/weixin_footer
-    script( src="/static/scripts/mobile/dist/mobile.js?v=222")
+    script( src="/static/scripts/mobile/dist/mobile.js")
