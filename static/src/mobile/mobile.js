@@ -774,7 +774,7 @@ org.recharge=(function(org){
                 gate_id = $("select[name='gate_id_none_card']").val(),
                 amount  = parseInt($("input[name='amount']").val()),
                 maxamount = parseInt($("input[name='maxamount']").val());
-                if(!card_no || !gate_id || amount <= 0) {
+                if(!card_no || !gate_id || amount <= 0 || !amount) {
                     return alert('信息输入不完整');
                 }
                 if(amount > maxamount){
@@ -787,7 +787,7 @@ org.recharge=(function(org){
                 gate_id = $("select[name='gate_id']").val(),
                 amount  = parseInt($("input[name='amount']").val()),
                 maxamount = parseInt($("input[name='maxamount']").val());
-                if(!card_no || !gate_id || amount <= 0) {
+                if(!card_no || !gate_id || amount <= 0 || !amount) {
                     return alert('信息输入不完整');
                 }
                 if(amount > maxamount){
@@ -845,13 +845,17 @@ org.recharge_second=(function(org){
 
             getValidateBtn.on('click', function(){
                 var count = 60, intervalId ; //定时器
-
+                var re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
                 lib.phone = $("input[name='phone']").val();
                 lib.card_no = $("input[name='card_no']").val();
 
                 if(!lib.phone){
                     return alert('请填写手机号');
                 }
+                if(!re.test(lib.phone)){
+                    return alert('请填写正确手机号');
+                }
+
                 getValidateBtn.attr('disabled', 'disabled').addClass('alreay-request');
                 //倒计时
                 var timerFunction = function() {
@@ -890,19 +894,23 @@ org.recharge_second=(function(org){
         },
         _rechargeStepSecond:function(){
             var secondBtn = $('#secondBtn'),
-                canPost = true;
+                canPost = true,
+                re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
             secondBtn.on('click', function(){
                 var order_id = $("input[name='order_id']").val(),
                     vcode = $("input[name='vcode']").val(),
                     token = $("input[name='token']").val();
-                if(!lib.phone || !vcode){
-                    return alert('请填写手机号和验证码');
+                if(!lib.phone){
+                    return alert('请填写手机号');
                 }
-                if(!order_id || !token) {
-                    return alert('系统有错误，请重试获取验证码');
+                if(!re.test(lib.phone)){
+                    return alert('请填写正确手机号');
                 }
                 if(!vcode){
                     return alert('请输入手机验证码');
+                }
+                if(!order_id || !token) {
+                    return alert('系统有错误，请重试获取验证码');
                 }
                 if(canPost){
                     org.ajax({
