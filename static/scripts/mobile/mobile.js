@@ -808,7 +808,7 @@ org.recharge=(function(org){
                     if(data.ret_code > 0) {
                         return alert(data.message);
                     } else {
-                         $('.sign-main').show().find(".balance-sign").text(data.amount);
+                         $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
                     }
                 },
                 error:function(){
@@ -916,7 +916,7 @@ org.recharge_second=(function(org){
                             if(data.ret_code > 0) {
                                 return alert(data.message);
                             } else {
-                               $('.sign-main').show().find(".balance-sign").text(data.amount);
+                               $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
                             }
                         },
                         complete:function(){
