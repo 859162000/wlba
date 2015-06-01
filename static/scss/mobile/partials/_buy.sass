@@ -79,17 +79,27 @@
   height: 2.45rem
   width: 92%
   margin-left: 4%
-  background: $head-backgroundColor
   border-radius: 0.3rem
+  overflow: hidden
   text-align: center
-  &:active
-    box-shadow: $active-shadow
+  color: #FFFFFF
   .snap-up
     display: block
+    background: $head-backgroundColor
     line-height: 2.45rem
-    color: #FFFFFF
     font-size: 0.85rem
-
+    &:active
+      box-shadow: $active-shadow
+  p
+    line-height: 2.45rem
+    color: #F0EEEE
+    background: #C8C5C5
+    font-size: 0.85rem
+.is_invested-sign
+  width: 92%
+  margin: .5rem 0 0 4%
+  color: #1f8ccd
+  font-size: $font-size12
 .buy-sufficient
   display: none
   position: absolute

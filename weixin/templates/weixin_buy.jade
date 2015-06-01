@@ -24,6 +24,8 @@ html
             .buy-balance-two
                 p.balance-left 投资金额
                 amount = int(amount)
+                if amount == 0
+                  amount = ''
                 input(type="tel",value="{{amount}}",placeholder="输入100的整数被金额",p2p-type="{{p2p.category}}",data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="#xunlei-vip-income-head",data-target="#expected_income", data-existing="0", data-rate="{{p2p.expected_earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").amount.balance-middle
                 p.balance-right 元
             if redpack
@@ -40,8 +42,13 @@ html
             p.earnings 预期收益：
               em#expected_income {{amount_profit}}
               |元
-        .buy-snap-up
-            a(href="#").snap-up 确认抢购
+        if user.is_authenticated and p2p.category == '新手标' and user.wanglibaouserprofile.is_invested
+          .buy-snap-up
+              P.invested-btn 确认抢购
+          .is_invested-sign 只有未进行投资的用户才可以购买
+        else
+          .buy-snap-up
+              a(href="#").snap-up 确认抢购
         .buy-sufficient
           p
            |余额不足，
@@ -52,5 +59,7 @@ html
             p.sign-tit 恭喜您，购买成功！
             p.balance-tit 您目前账户余额：
               em.balance-sign
-            a(href="/weixin/list/") 继续购买
+            .callban-url
+              a(href="/weixin/list/") 返回首页
+              a(href="/weixin/account/") 查看账户
     script(data-init="buy", src="/static/scripts/mobile/dist/mobile.js")

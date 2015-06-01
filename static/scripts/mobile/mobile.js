@@ -712,8 +712,8 @@ org.recharge=(function(org){
                         if(data.cards.length === 0){
                             $('.card-none').show();
                         }else if(data.cards.length > 0){
-                            $('.card-have').show();
                             lib._initCard(data.cards,lib._cradStyle(data.cards));
+                            $('.card-have').show();
                         }
                     }
                 }
@@ -728,7 +728,7 @@ org.recharge=(function(org){
             $("#card-val").val(data[0]['storable_no'].slice(0,6) + '********'+ data[0]['storable_no'].slice(-4)).attr('data-storable', data[0]['storable_no']);
             for(var i =0 ; i < optionsDomLength; i++){
                 if(optionsDom.eq(i).val() == data[0]['gate_id']){
-                    optionsDom.eq(i).attr("selected", true);
+                    optionsDom.eq(i).attr("selected", "selected");
                 }
             }
             callback && callback();
@@ -750,10 +750,12 @@ org.recharge=(function(org){
                 var optionsDom = $("#card-select").find("option"),
                     optionsDomLength = optionsDom.length,
                     that = this;
-                    $("#card-val").val($(that).attr("data-storable").slice(0,4) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
+                    $("#card-val").val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
                     for(var i =0 ; i < optionsDomLength; i++){
                         if(optionsDom.eq(i).val() == $(this).attr("data-gate")){
-                            optionsDom.eq(i).attr("selected", true);
+                            $("#card-select").hide();
+                            optionsDom.eq(i).attr("selected", "selected").siblings().removeAttr("selected");
+                            $("#card-select").show();
                             return $('.recharge-select-bank').hide();
                         }
                     }
