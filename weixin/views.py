@@ -146,7 +146,7 @@ class WeixinLogin(TemplateView):
         return context
 
 
-class WeixinLoginApi(APIView):
+class WeixinLoginAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
 

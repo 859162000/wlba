@@ -25,7 +25,7 @@ urlpatterns = patterns(
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
-    url(r'^api/login/$', views.WeixinLoginApi.as_view(), name='weixin_login_api'),
+    url(r'^api/login/$', views.WeixinLoginAPI.as_view(), name='weixin_login_api'),
     url(r'^api/pay/order/$', views.WeixinPayOrder.as_view(), name='weixin_pay_order_api'),
 )
 
@@ -35,8 +35,11 @@ urlpatterns += patterns(
     url(r'^manage/$', manage_view.IndexView.as_view(), name='wx_manage_index'),
     url(r'^manage/account/(?P<account_key>\w+)/$', manage_view.AccountView.as_view(), name='wx_manage_account'),
     url(r'^manage/menu/$', manage_view.MenuView.as_view(), name='wx_manage_menu'),
+    url(r'^manage/material/$', manage_view.MaterialView.as_view(), name='wx_manage_material'),
 
     # api
-    url(r'^manage/api/menu/$', manage_view.MenuApi.as_view(), name='wx_manage_menu_api'),
-
+    url(r'^manage/api/menu/$', manage_view.MenuAPI.as_view(), name='wx_manage_menu_api'),
+    url(r'^manage/api/materials/$', manage_view.MaterialListAPI.as_view(), name='wx_manage_material_list_api'),
+    url(r'^manage/api/materials/count/$', manage_view.MaterialCountAPI.as_view(), name='wx_manage_material_count_api'),
+    url(r'^manage/api/materials/(?P<media_id>\w+)/$', manage_view.MaterialDetailAPI.as_view(), name='wx_manage_material_detail_api'),
 )
