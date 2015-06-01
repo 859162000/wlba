@@ -46,7 +46,6 @@
         color: #fff
 .account-assets
   @extend .account-balance
-  height: 4.25rem
   .account-assets-one
     @extend .account-balance-one
     width: 100%
@@ -54,6 +53,13 @@
       @extend .balance-one-money
     .assets-one-yuan
       @extend .balance-one-yuan
+.account-assets-earnings
+  padding: 0.7rem 0 0.7rem 0.75rem
+  display: -webkit-box
+  width: 100%
+  border-bottom: 1px solid $border-color
+  background: #FFFFFF
+  .account-assets-earnings-one
     .assets-one-earnings
       font-size: $body-fontSize
       color: #989898
@@ -62,6 +68,7 @@
         display: inline-block
         span
           color: #6b6b6b
+
 .account-project
   //@extend .account-balance
   padding-left: 0.75rem
