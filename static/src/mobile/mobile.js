@@ -587,6 +587,10 @@ org.detail = (function(org){
 
 org.buy=(function(org){
     var lib = {
+        redPackSelect : $('#gifts-package'),
+        amountInout : $('input[data-role=p2p-calculator]'),
+        showredPackAmount:$(".redpack-amount"),
+        showAmount :$('.need-amount'),
         init :function(){
             lib._calculate();
             lib._buy();
@@ -595,14 +599,35 @@ org.buy=(function(org){
 
         },
         _calculate:function(){
-            org.calculate($('input[data-role=p2p-calculator]'))
+                org.calculate(lib.amountInout,lib._setRedpack)
+        },
+        _setRedpack:function(){
+            var redPack = parseInt(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount')),
+                allAmount = lib.amountInout.val() - redPack;
+            if(redPack){
+               lib.showredPackAmount.text(redPack);
+               lib.showAmount.text(allAmount);
+               $(".redpack-sign").show()
+            }else{
+               $(".redpack-sign").hide()
+            }
         },
         _buy:function(){
-            var $buyButton = $('.snap-up');
+            var $buyButton = $('.snap-up'),
+                $redpack = $("#gifts-package"), redpackAmount;
+
+            $redpack.on("change",function(){
+                redpackAmount = $(this).val();
+                if(redpackAmount){
+                    console.log(lib.amountInout.val())
+                    lib.amountInout.val() == '' ? alert("请输入投资金额"): lib._setRedpack();
+                }else{
+                    $(".redpack-sign").hide()
+                }
+            });
 
             $buyButton.on('click',function(){
-                var $redpack = $("#gifts-package"),
-                    $buySufficient = $('.buy-sufficient'),
+                var $buySufficient = $('.buy-sufficient'),
                     balance = parseFloat($("#balance").attr("data-value")),
                     amount = parseInt($('.amount').val()),
                     productID = $(".invest-one").attr('data-protuctid');
@@ -613,7 +638,7 @@ org.buy=(function(org){
                     return $buySufficient.show();
                 }
                 var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
-                if(!redpackValue || redpackValue == 'init'){
+                if(!redpackValue || redpackValue == ''){
                     redpackValue = null;
                 }
 
@@ -657,7 +682,6 @@ org.buy=(function(org){
                     }
                 })
             })
-
         }
     }
     return {

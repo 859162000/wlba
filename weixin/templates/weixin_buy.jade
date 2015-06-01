@@ -35,10 +35,15 @@ html
                     .balance-middle-select
                       redpack_num = len(redpack['packages']['available'])
                       select(name="type")#gifts-package.balance-middle-select-select
-                        option(value = 'init')  不使用红包
+                        option(value = '')  不使用红包
                         for redpack in redpack.packages.available
-                          option(value='{{redpack.id}}') {{redpack.name}}
+                          option(value='{{redpack.id}}',data-amount='{{redpack.amount}}') {{redpack.name}}  {{redpack.amount}}
         .buy-earnings
+            p.redpack-sign 红包使用
+              em.redpack-amount
+              |元，实际支付
+              em.need-amount
+              |元
             p.earnings 预期收益：
               em#expected_income {{amount_profit}}
               |元
@@ -62,4 +67,4 @@ html
             .callban-url
               a(href="/weixin/list/") 返回首页
               a(href="/weixin/account/") 查看账户
-    script(data-init="buy", src="/static/scripts/mobile/dist/mobile.js")
+    script(data-init="buy", src="/static/scripts/mobile/mobile.js")
