@@ -99,6 +99,34 @@
   padding-left: .75rem
   background: #fff
   margin-bottom: .75rem
+  overflow: hidden
+  .bank-list-btn
+    position: relative
+    .bank-list-nav
+      position: absolute
+      top: 0
+      right: 0
+      display: -webkit-box
+      height: 2.2rem
+      background: #fff
+      border-bottom: 1px solid #e8e8e8
+      border-top: 1px solid #e8e8e8
+      -webkit-transition: -webkit-transform 300ms
+      .bank-list-pub
+        -webkit-box-flex: 1
+        line-height: 2.15rem
+        height: 100%
+        text-align: center
+        padding: 0 .6rem
+        color: #fff
+      .bank-add
+        background: #bbb
+      .bank-card
+        background: #fac3c3
+      .bank-cancel
+        background: $color-db493f
+
+
   .bank-count
     display: -webkit-box
     -webkit-box-align: center
@@ -143,6 +171,14 @@
   padding-top: .75rem
 .card-hide
   display: none
+  -webkit-transition: opacity 200ms
+  -webkit-transform: translate3d( 0, 0, 0)
+  opacity: 0
+.card-none
+  display: none
+  opacity: 0
+  -webkit-transition: opacity 200ms
+  -webkit-transform: translate3d( 0, 0, 0)
 
 .recharge-select-bank
   position: fixed
@@ -154,7 +190,7 @@
   display: -webkit-box
   -webkit-box-pack: center
   -webkit-box-align: center
-  padding: 0 1rem
+  padding: 0 2rem
   .select-bank-body
     border-radius: .6rem
     background: #fff
