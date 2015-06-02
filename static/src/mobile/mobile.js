@@ -599,6 +599,7 @@ org.buy=(function(org){
         },
         /*
         *   购买提示信息
+        *   还没优化，if有点多哈哈
         *   触发_setRedpack条件 选择红包，投资金额大于0
         *
         *
@@ -625,6 +626,7 @@ org.buy=(function(org){
                     return $(".redpack-investamount").show();//未达到红包使用门槛
                 }else{
                     if(redPackMethod == '*'){ //百分比红包
+                        //如果反回来的百分比需要除于100 就把下面if改成if (inputAmount * redPackAmount/100 > redPackHighest_amount)
                         if(inputAmount * redPackAmount > redPackHighest_amount){//是否超过最高抵扣
                            repPackDikou = redPackHighest_amount;
                         }else{//没有超过最高抵扣
