@@ -213,10 +213,7 @@ org.login = (function(org){
                     success: function(res) {
                         var next = org.getQueryStringByName('next');
                         if (next) {
-                            var x = next.replace(/%3F/g,'?'),
-                                y = x.replace(/%3D/g,'='),
-                                z = y.replace(/%26/g,'&');
-                            window.location.href = z;
+                            window.location.href = decodeURIComponent(decodeURIComponent(next));;
                         }else{
                             window.location.href = '/weixin/account/';
                         }
@@ -607,9 +604,10 @@ org.buy=(function(org){
             if(redPack){
                lib.showredPackAmount.text(redPack);
                lib.showAmount.text(allAmount);
-               $(".redpack-sign").show()
+               $(".redpack-sign").show();
             }else{
-               $(".redpack-sign").hide()
+               $(".redpack-sign").hide();
+               $('.redpack-for-amount').hide();
             }
         },
         _buy:function(){
@@ -620,7 +618,7 @@ org.buy=(function(org){
                 redpackAmount = $(this).val();
                 if(redpackAmount){
                     console.log(lib.amountInout.val())
-                    lib.amountInout.val() == '' ? alert("请输入投资金额"): lib._setRedpack();
+                    lib.amountInout.val() == '' ? $('.redpack-for-amount').hide() : lib._setRedpack();
                 }else{
                     $(".redpack-sign").hide()
                 }
