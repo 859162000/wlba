@@ -631,7 +631,8 @@ org.buy=(function(org){
                 var $buySufficient = $('.buy-sufficient'),
                     balance = parseFloat($("#balance").attr("data-value")),
                     amount = parseInt($('.amount').val()),
-                    productID = $(".invest-one").attr('data-protuctid');
+                    productID = $(".invest-one").attr('data-protuctid'),
+                    redPackAmount = 0;
                 if(amount % 100 !== 0 || amount === 0){
                     return alert('请输入100的倍数金额');
                 }
@@ -641,6 +642,9 @@ org.buy=(function(org){
                 var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
                 if(!redpackValue || redpackValue == ''){
                     redpackValue = null;
+                }else{
+                    redPackAmount = parseInt(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount'));
+                    redPackAmount ? "" : redPackAmount = 0;
                 }
 
                 org.ajax({
@@ -652,7 +656,7 @@ org.buy=(function(org){
                     },
                     success: function(data){
                        if(data.data){
-                           $('.balance-sign').text(balance-data.data);
+                           $('.balance-sign').text(balance - data.data - redPackAmount);
                            $(".sign-main").css("display","-webkit-box");
                        }
                     },
