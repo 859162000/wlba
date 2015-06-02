@@ -214,9 +214,6 @@ org.login = (function(org){
                     success: function(res) {
                         var next = org.getQueryStringByName('next');
                         if (next) {
-                            var x = next.replace(/%3F/g,'?'),
-                                y = x.replace(/%3D/g,'='),
-                                z = y.replace(/%26/g,'&');
                             window.location.href = decodeURIComponent(decodeURIComponent(next));;
                         }else{
                             window.location.href = '/weixin/account/';
@@ -622,7 +619,7 @@ org.buy=(function(org){
                 redpackAmount = $(this).val();
                 if(redpackAmount){
                     console.log(lib.amountInout.val())
-                    lib.amountInout.val() == '' ? $('.redpack-for-amount').hide() : lib._setRedpack();
+                    lib.amountInout.val() == '' ? $('.redpack-for-amount').show() : lib._setRedpack();
                 }else{
                     $(".redpack-sign").hide()
                 }
