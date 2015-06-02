@@ -36,10 +36,17 @@ html
                       redpack_num = len(redpack['packages']['available'])
                       select(name="type")#gifts-package.balance-middle-select-select
                         option(value = '')  不使用红包
-                        option(value = '')  不使用红包不使用 30元 5000起用
                         for redpack in redpack.packages.available
-                          option(value='{{redpack.id}}',data-amount='{{redpack.amount}}') {{redpack.name}}  {{redpack.amount}}元
+                          //amount 金额（可能百分比） ，method（红包类型  “-” 直抵 /  “*”  百分比）
+                          //投资门槛investamount
+                           //百分比有个最高抵扣金额highest_amount
+                          if redpack.method == "*"
+                            packAmount = redpack.amount + '%'
+                          else
+                            packAmount = redpack.amount + '元'
+                          option(value='{{redpack.id}}', data-amount='{{redpack.amount}}',data-method='{{redpack.method}}',data-investamount='{{redpack.investamount}}',data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{packAmount}}/{{redpack.unavailable_at}}
         .buy-earnings
+            p.redpack-investamount * 未达到红包使用门槛
             p.redpack-for-amount * 请输入投资金额
             p.redpack-sign 红包使用
               em.redpack-amount
