@@ -607,10 +607,10 @@ org.buy=(function(org){
                lib.showAmount.text(allAmount);
                $(".redpack-sign").show();
             }else{
-
+                $(".redpack-sign").hide();
                $('.redpack-for-amount').hide();
             }
-            $(".redpack-sign").hide();
+            $(".redpack-for-amount").hide();
         },
         _buy:function(){
             var $buyButton = $('.snap-up'),
