@@ -36,6 +36,7 @@ html
                       redpack_num = len(redpack['packages']['available'])
                       select(name="type")#gifts-package.balance-middle-select-select
                         option(value = '')  不使用红包
+                        option(value = '')  不使用红包不使用 30元 5000起用
                         for redpack in redpack.packages.available
                           option(value='{{redpack.id}}',data-amount='{{redpack.amount}}') {{redpack.name}}  {{redpack.amount}}元
         .buy-earnings

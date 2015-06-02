@@ -602,7 +602,7 @@ org.buy=(function(org){
                 org.calculate(lib.amountInout,lib._setRedpack)
         },
         _setRedpack:function(){
-            var redPack = parseInt(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount')),
+            var redPack = parseFloat(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount')),
                 allAmount = lib.amountInout.val() - redPack;
             if(redPack){
                 lib.showredPackAmount.text(redPack);
@@ -620,7 +620,6 @@ org.buy=(function(org){
             $redpack.on("change",function(){
                 redpackAmount = $(this).val();
                 if(redpackAmount){
-                    console.log(lib.amountInout.val())
                     lib.amountInout.val() == '' ? $('.redpack-for-amount').show() : lib._setRedpack();
                 }else{
                     $(".redpack-sign").hide()
@@ -728,8 +727,46 @@ org.recharge=(function(org){
         init :function(){
             lib._getBankCardList();
             lib._rechargeStepFirst();
+            lib._initBankNav();
+        },
+        _initBankNav:function(){
+            var $nav = $(".bank-list-nav"),
+                $cardNone = $('.card-none'),
+                $cardHave = $('.card-have');
+            $nav.css("-webkit-transform","translate3d(10.2rem,0,0)");
+            $nav.on('click',function(e){
+                var $targetName = e.target.className.split(' ')[1];
+                switch ($targetName){
+                    case 'bank-add':
+                        closeNav(function(){
+                            $cardHave.hide();
+                            setTimeout(function(){
+                                $cardHave.css("opacity",0)
+                                $cardNone.show();
+                                setTimeout(function(){
+                                    $cardNone.css("opacity",1)
+                                },50)
+                            },50)
+                        })
+                        break;
+                    case 'bank-card':
+                        $('.recharge-select-bank').css('display','-webkit-box');
+                        closeNav();
+                        break;
+                    case 'bank-cancel':
+                        closeNav();
+                        break
+                }
+
+            });
+            function closeNav(callback){
+                $nav.css("-webkit-transform","translate3d(10.2rem,0,0)");
+                callback && callback();
+            }
         },
         _getBankCardList: function(){
+            var $cardNone = $('.card-none'),
+                $cardHave = $('.card-have');
             org.ajax({
                 type: 'POST',
                 url: '/api/pay/cnp/list/',
@@ -738,16 +775,22 @@ org.recharge=(function(org){
                     if(data.ret_code == 0){
                         $(".recharge-loding").hide();
                         if(data.cards.length === 0){
-                            $('.card-none').show();
+                            $cardNone.show();
+                            setTimeout(function(){
+                                $cardNone.css("opacity",1)
+                            },50)
                         }else if(data.cards.length > 0){
                             lib._initCard(data.cards,lib._cradStyle(data.cards));
-                            $('.card-have').show();
+                            $cardHave.show();
+                            setTimeout(function(){
+                                $cardHave.css("opacity",1)
+                            },50)
                         }
                     }
                 }
             })
             $(".bank-txt-right").on('click',function(){
-                $('.recharge-select-bank').css('display','-webkit-box');
+                    $(".bank-list-nav").css("-webkit-transform","translate3d(0,0,0)");
             })
         },
         _initCard:function(data, callback){
