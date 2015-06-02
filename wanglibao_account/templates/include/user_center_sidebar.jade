@@ -1,12 +1,18 @@
-mixin sidebar-item(name, link, target)
+mixin sidebar-item(name, link, target, mark)
   unless target
     target = '_self'
+  unless mark
+    mark = ''
   if activeItem == name or activeSubItem == name
     li.sidebar-item.active
       a(href=link, target=target)= name
+      if mark == '1'
+        span.newGif
   else
     li.sidebar-item
       a(href=link, target=target)= name
+      if mark == '1'
+          span.newGif
 
 ul.sidebar
   +sidebar-item('账户总览', '/accounts/home/')
@@ -27,7 +33,7 @@ ul.sidebar
     +sidebar-item('货基交易记录', '/accounts/transaction/fund/')
 
   +sidebar-item('银行卡', '/accounts/bankcard/')
-  +sidebar-item('自动投标', '/accounts/auto_tender/')
+  +sidebar-item('自动投标', '/accounts/auto_tender/', '_self', '1')
 
 ul.sidebar
   +sidebar-item('邀请奖励', '/accounts/invite/')
