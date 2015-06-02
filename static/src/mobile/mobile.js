@@ -586,6 +586,8 @@ org.buy=(function(org){
     var lib = {
         redPackSelect : $('#gifts-package'),
         amountInout : $('input[data-role=p2p-calculator]'),
+        $redpackSign : $('.redpack-sign'),
+        $redpackForAmount : $('.redpack-sign'),
         showredPackAmount:$(".redpack-amount"),
         showAmount :$('.need-amount'),
         init :function(){
@@ -602,14 +604,13 @@ org.buy=(function(org){
             var redPack = parseInt(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount')),
                 allAmount = lib.amountInout.val() - redPack;
             if(redPack){
-               lib.showredPackAmount.text(redPack);
-               lib.showAmount.text(allAmount);
-               $(".redpack-sign").show();
+                lib.showredPackAmount.text(redPack);
+                lib.showAmount.text(allAmount);
+                lib.$redpackSign.show();
             }else{
-                $(".redpack-sign").hide();
-               $('.redpack-for-amount').hide();
+                lib.$redpackSign.hide();
             }
-            $(".redpack-for-amount").hide();
+            lib.$redpackForAmount.hide();
         },
         _buy:function(){
             var $buyButton = $('.snap-up'),
@@ -768,7 +769,7 @@ org.recharge=(function(org){
                 str += "<p>尾号 " + cardList[card].storable_no.slice(-4) + "</p>";
                 str += "<p>限额 200000</p>";
                 str += "</div>";
-                str += "<div class='bank-type'>存储卡</div>";
+                str += "<div class='bank-type'>储蓄卡</div>";
                 str += "</div>";
             }
             $(".select-bank-body").append(str);
