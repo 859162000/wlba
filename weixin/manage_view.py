@@ -34,9 +34,7 @@ class ManageAccountMixin(object):
 
     @property
     def client(self):
-        if not self.client_cache:
-            self.client_cache = self.account.weixin_client
-        return self.client_cache
+        return self.account.weixin_client
 
 
 class ManageAPISessionAuthentication(SessionAuthentication):
@@ -88,8 +86,16 @@ class MenuView(ManageView):
         return context
 
 
-class MenuApi(ManageAPIView):
-    http_method_names = ['get', 'post', 'delete']
+class MaterialView(ManageView):
+    template_name = 'manage/material.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(MaterialView, self).get_context_data(**kwargs)
+        context['account'] = self.account
+        return context
+
+
+class MenuAPI(ManageAPIView):
 
     @weixin_api_error
     def get(self, request):
@@ -115,6 +121,73 @@ class MenuApi(ManageAPIView):
         return Response(res, status=204)
 
 
+class MaterialListAPI(ManageAPIView):
+
+    @weixin_api_error
+    def get(self, request):
+        media_type = request.GET.get('media_type')
+        offset = request.GET.get('offset')
+        count = request.GET.get('count')
+        res = self.client.material.batchget(media_type, offset, count)
+        return Response(res)
+
+    @weixin_api_error
+    def post(self, request):
+        media_type = request.POST.get('media_type')
+        if media_type == 'news':
+            article = request.POST.get('article')
+            res = self.client.material.add_articles(article)
+        else:
+            media_file = request.FILES.get('media_file')
+            title = request.POST.get('title')
+            introduction = request.POST.get('introduction')
+            res = self.client.material.add(media_type, media_file, title, introduction)
+        return Response(res, status=201)
 
 
+class MaterialCountAPI(ManageAPIView):
+
+    @weixin_api_error
+    def get(self, request):
+        res = self.client.material.get_count()
+        return Response(res)
+
+
+class MaterialDetailAPI(ManageAPIView):
+
+    @weixin_api_error
+    def get(self, request, media_id):
+        res = self.client.material.get(media_id)
+        return Response(res)
+
+    @weixin_api_error
+    def post(self, request, media_id):
+        """
+        {
+          "media_id":MEDIA_ID,
+          "index":INDEX,
+          "articles": {
+               "title": TITLE,
+               "thumb_media_id": THUMB_MEDIA_ID,
+               "author": AUTHOR,
+               "digest": DIGEST,
+               "show_cover_pic": SHOW_COVER_PIC(0 / 1),
+               "content": CONTENT,
+               "content_source_url": CONTENT_SOURCE_URL
+            }
+        }
+
+        :param request:
+        :param media_id:
+        :return:
+        """
+        index = request.POST.get('index')
+        articles = request.POST.get('articles')
+        res = self.client.material.update_articles(media_id, index, articles)
+        return Response(res)
+
+    @weixin_api_error
+    def delete(self, request, media_id):
+        res = self.client.material.delete(media_id)
+        return Response(res, status=204)
 

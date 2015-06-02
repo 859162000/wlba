@@ -64,32 +64,52 @@
           background-size: 0.95rem 0.525rem
           color: #6b6b6b
 .buy-earnings
-  height: 1.5rem
+  height: 1.5rem 
   width: 92%
   margin-left: 4%
   font-size: 0.6rem
   line-height: 1.5rem
   color: #989898
+  display: -webkit-box
+  -webkit-box-pack: end
+  em
+    font-style: normal
+    color: $color-db493f
+  .redpack-sign
+    -webkit-box-flex: 1
+    text-align: left
+    display: none
+
   .earnings
+    padding-left: 0.625rem
     text-align: right
-    margin-right: 0.625rem
-    em
-      font-style: normal
+
+
 .buy-snap-up
   height: 2.45rem
   width: 92%
   margin-left: 4%
-  background: $head-backgroundColor
   border-radius: 0.3rem
+  overflow: hidden
   text-align: center
-  &:active
-    box-shadow: $active-shadow
+  color: #FFFFFF
   .snap-up
     display: block
+    background: $head-backgroundColor
     line-height: 2.45rem
-    color: #FFFFFF
     font-size: 0.85rem
-
+    &:active
+      box-shadow: $active-shadow
+  p
+    line-height: 2.45rem
+    color: #F0EEEE
+    background: #C8C5C5
+    font-size: 0.85rem
+.is_invested-sign
+  width: 92%
+  margin: .5rem 0 0 4%
+  color: #1f8ccd
+  font-size: $font-size12
 .buy-sufficient
   display: none
   position: absolute

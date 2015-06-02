@@ -47,11 +47,11 @@ html
             p.sign-tit 恭喜您，充值成功！
             p.balance-tit 本次充值金额：
               em.balance-sign
-            a(href="/weixin/accounts/") 立即购买
+            a(href="/weixin/account/") 立即购买
         input(type="hidden", name="card_no", value="{{card_no}}")
         input(type="hidden", name="gate_id", value="{{gate_id}}")
         input(type="hidden", name="amount", value="{{amount}}")
         input(type="hidden", name="order_id", value="")
         input(type="hidden", name="token", value="")
 
-    script(data-init="recharge_second", src="/static/scripts/mobile/dist/mobile.js")
+    script(data-init="recharge_second", src="/static/scripts/mobile/mobile.js")

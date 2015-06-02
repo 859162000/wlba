@@ -76,7 +76,7 @@ class WeChatMaterial(BaseWeChatAPI):
         :param media_id: 素材的 media_id
         :return: 图文素材返回图文列表，其它类型为素材的内容
         """
-        res = requests.post(
+        res = self._post(
             url='https://api.weixin.qq.com/cgi-bin/material/get_material',
             params={
                 'access_token': self.access_token

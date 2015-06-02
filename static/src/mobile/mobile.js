@@ -587,6 +587,10 @@ org.detail = (function(org){
 
 org.buy=(function(org){
     var lib = {
+        redPackSelect : $('#gifts-package'),
+        amountInout : $('input[data-role=p2p-calculator]'),
+        showredPackAmount:$(".redpack-amount"),
+        showAmount :$('.need-amount'),
         init :function(){
             lib._calculate();
             lib._buy();
@@ -595,17 +599,39 @@ org.buy=(function(org){
 
         },
         _calculate:function(){
-            org.calculate($('input[data-role=p2p-calculator]'))
+                org.calculate(lib.amountInout,lib._setRedpack)
+        },
+        _setRedpack:function(){
+            var redPack = parseInt(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount')),
+                allAmount = lib.amountInout.val() - redPack;
+            if(redPack){
+               lib.showredPackAmount.text(redPack);
+               lib.showAmount.text(allAmount);
+               $(".redpack-sign").show()
+            }else{
+               $(".redpack-sign").hide()
+            }
         },
         _buy:function(){
-            var $buyButton = $('.snap-up');
+            var $buyButton = $('.snap-up'),
+                $redpack = $("#gifts-package"), redpackAmount;
+
+            $redpack.on("change",function(){
+                redpackAmount = $(this).val();
+                if(redpackAmount){
+                    console.log(lib.amountInout.val())
+                    lib.amountInout.val() == '' ? alert("请输入投资金额"): lib._setRedpack();
+                }else{
+                    $(".redpack-sign").hide()
+                }
+            });
 
             $buyButton.on('click',function(){
-                var $redpack = $("#gifts-package"),
-                    $buySufficient = $('.buy-sufficient'),
+                var $buySufficient = $('.buy-sufficient'),
                     balance = parseFloat($("#balance").attr("data-value")),
                     amount = parseInt($('.amount').val()),
-                    productID = $(".invest-one").attr('data-protuctid');
+                    productID = $(".invest-one").attr('data-protuctid'),
+                    redPackAmount = 0;
                 if(amount % 100 !== 0 || amount === 0){
                     return alert('请输入100的倍数金额');
                 }
@@ -613,8 +639,11 @@ org.buy=(function(org){
                     return $buySufficient.show();
                 }
                 var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
-                if(!redpackValue || redpackValue == 'init'){
+                if(!redpackValue || redpackValue == ''){
                     redpackValue = null;
+                }else{
+                    redPackAmount = parseInt(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount'));
+                    redPackAmount ? "" : redPackAmount = 0;
                 }
 
                 org.ajax({
@@ -626,7 +655,7 @@ org.buy=(function(org){
                     },
                     success: function(data){
                        if(data.data){
-                           $('.balance-sign').text(balance-data.data);
+                           $('.balance-sign').text(balance - data.data - redPackAmount);
                            $(".sign-main").css("display","-webkit-box");
                        }
                     },
@@ -657,7 +686,6 @@ org.buy=(function(org){
                     }
                 })
             })
-
         }
     }
     return {
@@ -695,6 +723,7 @@ org.calculator=(function(org){
 
 org.recharge=(function(org){
     var lib = {
+        canRecharge: true,
         init :function(){
             lib._getBankCardList();
             lib._rechargeStepFirst();
@@ -710,8 +739,8 @@ org.recharge=(function(org){
                         if(data.cards.length === 0){
                             $('.card-none').show();
                         }else if(data.cards.length > 0){
-                            $('.card-have').show();
                             lib._initCard(data.cards,lib._cradStyle(data.cards));
+                            $('.card-have').show();
                         }
                     }
                 }
@@ -726,7 +755,7 @@ org.recharge=(function(org){
             $("#card-val").val(data[0]['storable_no'].slice(0,6) + '********'+ data[0]['storable_no'].slice(-4)).attr('data-storable', data[0]['storable_no']);
             for(var i =0 ; i < optionsDomLength; i++){
                 if(optionsDom.eq(i).val() == data[0]['gate_id']){
-                    optionsDom.eq(i).attr("selected", true);
+                    optionsDom.eq(i).attr("selected", "selected");
                 }
             }
             callback && callback();
@@ -748,10 +777,12 @@ org.recharge=(function(org){
                 var optionsDom = $("#card-select").find("option"),
                     optionsDomLength = optionsDom.length,
                     that = this;
-                    $("#card-val").val($(that).attr("data-storable").slice(0,4) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
+                    $("#card-val").val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
                     for(var i =0 ; i < optionsDomLength; i++){
                         if(optionsDom.eq(i).val() == $(this).attr("data-gate")){
-                            optionsDom.eq(i).attr("selected", true);
+                            $("#card-select").hide();
+                            optionsDom.eq(i).attr("selected", "selected").siblings().removeAttr("selected");
+                            $("#card-select").show();
                             return $('.recharge-select-bank').hide();
                         }
                     }
@@ -771,7 +802,7 @@ org.recharge=(function(org){
                 gate_id = $("select[name='gate_id_none_card']").val(),
                 amount  = parseInt($("input[name='amount']").val()),
                 maxamount = parseInt($("input[name='maxamount']").val());
-                if(!card_no || !gate_id || amount <= 0) {
+                if(!card_no || !gate_id || amount <= 0 || !amount) {
                     return alert('信息输入不完整');
                 }
                 if(amount > maxamount){
@@ -784,13 +815,13 @@ org.recharge=(function(org){
                 gate_id = $("select[name='gate_id']").val(),
                 amount  = parseInt($("input[name='amount']").val()),
                 maxamount = parseInt($("input[name='maxamount']").val());
-                if(!card_no || !gate_id || amount <= 0) {
+                if(!card_no || !gate_id || amount <= 0 || !amount) {
                     return alert('信息输入不完整');
                 }
                 if(amount > maxamount){
                      return alert('最高充值'+ maxamount +'元！')
                 }
-                lib._rechargeSingleStep(card_no,amount);
+                lib.canRecharge && lib._rechargeSingleStep(card_no,amount);
             });
         },
         _rechargeSingleStep: function(card_no, amount) {
@@ -798,17 +829,25 @@ org.recharge=(function(org){
                 type: 'POST',
                 url: '/api/pay/deposit/',
                 data: {card_no: card_no, amount: amount},
+                beforeSend:function(){
+                    lib.canRecharge = false;
+                    $('#secondBtn').text("充值中..");
+                },
                 success: function(data) {
                     if(data.ret_code > 0) {
                         return alert(data.message);
                     } else {
-                         $('.sign-main').shouw().find(".balance-sign").text(data.amount);
+                         $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
                     }
                 },
                 error:function(){
                     if(data.status == 403){
                         alert('登录超时，请重新登录！');
                     }
+                },
+                complete:function(){
+                    $('#secondBtn').text("充值");
+                    lib.canRecharge = true;
                 }
             })
         }
@@ -834,13 +873,17 @@ org.recharge_second=(function(org){
 
             getValidateBtn.on('click', function(){
                 var count = 60, intervalId ; //定时器
-
+                var re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
                 lib.phone = $("input[name='phone']").val();
                 lib.card_no = $("input[name='card_no']").val();
 
                 if(!lib.phone){
                     return alert('请填写手机号');
                 }
+                if(!re.test(lib.phone)){
+                    return alert('请填写正确手机号');
+                }
+
                 getValidateBtn.attr('disabled', 'disabled').addClass('alreay-request');
                 //倒计时
                 var timerFunction = function() {
@@ -878,32 +921,47 @@ org.recharge_second=(function(org){
             })
         },
         _rechargeStepSecond:function(){
-            var secondBtn = $('#secondBtn');
+            var secondBtn = $('#secondBtn'),
+                canPost = true,
+                re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
             secondBtn.on('click', function(){
                 var order_id = $("input[name='order_id']").val(),
                     vcode = $("input[name='vcode']").val(),
                     token = $("input[name='token']").val();
-                if(!lib.phone || !vcode){
-                    return alert('请填写手机号和验证码');
+                if(!lib.phone){
+                    return alert('请填写手机号');
                 }
-                if(!order_id || !token) {
-                    return alert('系统有错误，请重试获取验证码');
+                if(!re.test(lib.phone)){
+                    return alert('请填写正确手机号');
                 }
                 if(!vcode){
                     return alert('请输入手机验证码');
                 }
-                org.ajax({
-                    type: 'POST',
-                    url: '/api/pay/cnp/dynnum/',
-                     data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
-                    success: function(data) {
-                        if(data.ret_code > 0) {
-                            return alert(data.message);
-                        } else {
-                           $('.sign-main').shouw().find(".balance-sign").text(data.amount);
+                if(!order_id || !token) {
+                    return alert('系统有错误，请重试获取验证码');
+                }
+                if(canPost){
+                    org.ajax({
+                        type: 'POST',
+                        url: '/api/pay/cnp/dynnum/',
+                         data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
+                        beforeSend:function(){
+                            canPost = false;
+                            secondBtn.text("充值中...");
+                        },
+                        success: function(data) {
+                            if(data.ret_code > 0) {
+                                return alert(data.message);
+                            } else {
+                               $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
+                            }
+                        },
+                        complete:function(){
+                            canPost = true;
+                            secondBtn.text("充值");
                         }
-                    }
-                })
+                    })
+                }
             })
         }
     }
