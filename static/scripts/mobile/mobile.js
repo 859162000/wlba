@@ -656,7 +656,7 @@ org.buy=(function(org){
                     },
                     success: function(data){
                        if(data.data){
-                           $('.balance-sign').text(balance - data.data - redPackAmount);
+                           $('.balance-sign').text(balance - data.data + redPackAmount);
                            $(".sign-main").css("display","-webkit-box");
                        }
                     },
