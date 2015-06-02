@@ -618,7 +618,7 @@ org.buy=(function(org){
                 redpackAmount = $(this).val();
                 if(redpackAmount){
                     console.log(lib.amountInout.val())
-                    lib.amountInout.val() == '' ? $('.redpack-for-amount').hide() : lib._setRedpack();
+                    lib.amountInout.val() == '' ? $('.redpack-for-amount').show() : lib._setRedpack();
                 }else{
                     $(".redpack-sign").hide()
                 }
