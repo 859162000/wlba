@@ -39,6 +39,7 @@ from shumi_backend.fetch import UserInfoFetcher
 from wanglibao_buy.models import BindBank
 from wanglibao_pay.models import Card
 from wanglibao_announcement.utility import AnnouncementAccounts
+from marketing.tops import Top
 import datetime
 import json
 import time
@@ -154,7 +155,7 @@ class WeixinLogin(TemplateView):
         return context
 
 
-class WeixinLoginApi(APIView):
+class WeixinLoginAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
 
@@ -386,7 +387,6 @@ class P2PDetailView(TemplateView):
         amount = self.request.GET.get('amount', 0)
         amount_profit = self.request.GET.get('amount_profit', 0)
         next = self.request.GET.get('next', '')
-
         context.update({
             'p2p': p2p,
             'end_time': end_time,
@@ -475,7 +475,7 @@ class WeixinRecharge(TemplateView):
     def get_context_data(self, **kwargs):
 
         banks = Bank.get_kuai_deposit_banks()
-        next = self.request.GET.get('next', '')
+        next = self.request.GET.get('rechargeNext', '')
         return {
             'banks': banks,
             'next' : next,
@@ -494,7 +494,7 @@ class WeixinRechargeSecond(TemplateView):
             bank = Bank.objects.filter(gate_id=gate_id).first()
         except:
             bank = None
-        next = self.request.GET.get('next', '')
+        next = self.request.GET.get('rechargeNext', '')
         context = {
             'card_no': card_no,
             'gate_id': gate_id,

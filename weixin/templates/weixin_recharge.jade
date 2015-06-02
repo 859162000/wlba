@@ -11,67 +11,63 @@ html
       else
         a(href="{{next}}")
           span 返回
-
-    .recharge-loding
-      p 正在加载...
-      include  include/weixin_loading
-    section.recharge-main
-      //card-have类名为绑定过银行卡状态，card-none类名为未绑定过银行卡状态
-      .recharge-bank-edit.card-have.card-hide
-        .bank-count
-          .bank-txt-left 银行卡号
-          input(type="tel", name="card_no", placeholder="输入银行卡号")#card-val.bank-input
-          .bank-txt-right
-            img(src="/static/imgs/mobile/recharge/select_bank.png")
-        .bank-count.card-have.bank-select
-          .bank-txt-left 开户银行
-          select(type="select", name="gate_id")#card-select.bank-input.recharge-select
-            option(value = 'init')  请选择
-            for bank in banks
-              option(value="{{bank.gate_id}}") {{bank.name}}
-
-      .recharge-body
-        .recharge-none-card.card-none.card-hide
-          .recharge-count
-            .count-txt-left 银行卡号
-            input(type="tel", name="card_none_card", placeholder="请输入持卡人储蓄卡号").count-input
-          .recharge-count.bank-select
-            .count-txt-left 开户银行
-            select(type="select", name="gate_id_none_card").count-input.recharge-select
-              option(value = 'init')  请选择
+    //是否实名认证
+    if user.wanglibaouserprofile.id_is_valid
+      .recharge-loding
+        p 正在加载...
+        include  include/weixin_loading
+      section.recharge-main
+        input(type="hidden",name="card_no_hidden")
+        //card-have类名为绑定过银行卡状态，card-none类名为未绑定过银行卡状态
+        .recharge-bank-edit.card-have.card-hide
+          .bank-count
+            .bank-txt-left 银行卡号
+            input(type="tel", name="card_no", placeholder="输入银行卡号")#card-val.bank-input
+            .bank-txt-right
+              img(src="/static/imgs/mobile/recharge/select_bank.png")
+          .bank-count.card-have.bank-select
+            .bank-txt-left 开户银行
+            select(type="select", name="gate_id")#card-select.bank-input.recharge-select
+              option(value = '')  请选择
               for bank in banks
                 option(value="{{bank.gate_id}}") {{bank.name}}
-        .recharge-all-show.card-hide.card-none.card-have
-          .recharge-count
-            .count-txt-left 充值金额
-            input(type="tel", name="amount", placeholder="请输入100的整数金额").count-input
-            input(type="hidden", name="maxamount", value="200000")
-            .count-txt-right 元
-          .binding-bank-href 查看支持银行及限额
 
-        .recharge-btn#firstBtn.card-none.card-hide(data-next="{{next}}") 下一步
-        .recharge-btn#secondBtn.card-have.card-hide 充值
+        .recharge-body
+          .recharge-none-card.card-none.card-hide
+            .recharge-count
+              .count-txt-left 银行卡号
+              input(type="tel", name="card_none_card", placeholder="请输入持卡人储蓄卡号").count-input
+            .recharge-count.bank-select
+              .count-txt-left 开户银行
+              select(type="select", name="gate_id_none_card").count-input.recharge-select
+                option(value = '')  请选择
+                for bank in banks
+                  option(value="{{bank.gate_id}}") {{bank.name}}
+          .recharge-all-show.card-hide.card-none.card-have
+            .recharge-count
+              .count-txt-left 充值金额
+              input(type="tel", name="amount", placeholder="请输入100的整数金额",value='').count-input
+              input(type="hidden", name="maxamount", value="200000")
+              .count-txt-right 元
+            //.binding-bank-href 查看支持银行及限额
 
-        .recharge-select-bank(style="display:none")
-          .select-bank-body
-            .select-bank-tit 选择银行卡
-            .select-bank-list
-              .bank-img
-                img(src="")
-              .bank-cont
-                p 招商银行
-                p 尾号 7424
-                p 限额 200000
-              .bank-type 存储卡
-            .select-bank-list
-              .bank-img
-                img(src="")
-              .bank-cont
-                p 招商银行
-                p 尾号 7424
-                p 限额 200000
-              .bank-type 存储卡
+          .recharge-btn#firstBtn.card-none.card-hide(data-next="{{next}}") 下一步
+          .recharge-btn#secondBtn.card-have.card-hide 充值
+
+          .recharge-select-bank(style="display:none")
+            .select-bank-body
+              .select-bank-tit 选择银行卡
+    else
+      .no-authentication-sign 为保证您的资金安全，请先进行实名认证
+          a(href="/weixin/authentication/").authentication-sign-btn 去实名认证
+    .sign-main
+          .sign-body
+            img(src="/static/imgs/mobile/sign/sign_icon.png")
+            p.sign-tit 恭喜您，充值成功！
+            p.balance-tit 本次充值金额：
+              em.balance-sign
+            a(href="/weixin/account/") 立即购买
     section.recharge-bank
-    script(data-init="recharge", src="/static/scripts/mobile/mobile.js?v=222")
+    script(data-init="recharge", src="/static/scripts/mobile/mobile.js")
 
 

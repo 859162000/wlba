@@ -316,11 +316,15 @@ class HuifuShortPay:
         self.SIGN_HOST = settings.HUI_SHORT_SIGN_HOST
         self.SIGN_PORT = settings.HUI_SHORT_SIGN_PORT
 
-        self.BIND_FIELDS = ['Version', 'CmdId', 'MerId', 'OperId', 'LoginPwd', 'CardNo', 'OpenAcctName', 'BankCode', 'CertType',
-                   'CertId', 'UsrMp', 'CardType', 'ChkValue']
+        self.BIND_FIELDS = ['Version', 'CmdId', 'MerId', 
+                            'OperId', 'LoginPwd', 'CardNo', 
+                            'OpenAcctName', 'BankCode', 'CertType', 
+                            'CertId', 'UsrMp', 'CardType', 'ChkValue']
 
-        self.PAY_FIELDS = ["Version", "CmdId", "MerId", "OperId", "CardNo", "OpenAcctName", "CertType", "CertId", "UsrMp", "TransAmt",
-                           "CardType", "Remark", "ChkValue"]
+        self.PAY_FIELDS = ["Version", "CmdId", "MerId", 
+                            "OperId", "CardNo", "OpenAcctName", 
+                            "CertType", "CertId", "UsrMp", "TransAmt",
+                            "CardType", "Remark", "ChkValue"]
 
     @classmethod
     def __format_len(cls, length):
@@ -419,23 +423,19 @@ class HuifuShortPay:
             card.save()
             return True
 
-    def pre_pay(self, request):
+    def pre_pay(self, request, bank=None):
         if not request.user.wanglibaouserprofile.id_is_valid:
             return {"ret_code":20111, "message":"请先进行实名认证"}
 
         amount = request.DATA.get("amount", "").strip()
         card_no = request.DATA.get("card_no", "").strip()
-        card_type = request.DATA.get("card_type", "").strip()
         input_phone = request.DATA.get("phone", "").strip()
-        gate_id = request.DATA.get("gate_id","").strip()
+        #gate_id = request.DATA.get("gate_id","").strip()
 
         if not amount or not card_no:
             return {"ret_code":20112, 'message':'信息输入不完整'}
-        if len(card_no) > 10 and (not input_phone or not gate_id):
+        if len(card_no) < 10 and not input_phone:
             return {"ret_code":20112, 'message':'信息输入不完整'}
-
-        #if card_no[0] in ("3", "4", "5"):
-        #    return {"ret_code":20113, "message":"不能使用信用卡"}
 
         try:
             float(amount)
@@ -443,10 +443,6 @@ class HuifuShortPay:
             return {"ret_code":20114, 'message':'金额格式错误'}
 
         amount = fmt_two_amount(amount)
-        #if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
-        #if amount < 10 or amount % 1 != 0 or len(str(amount)) > 20:
-        # if amount < 10 or len(str(amount)) > 20:
-        #     return {"ret_code":20115, 'message':'充值须大于等于10元'}
 
         user = request.user
         profile = user.wanglibaouserprofile
