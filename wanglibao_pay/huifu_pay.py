@@ -306,6 +306,7 @@ class HuifuPay(Pay):
 
 class HuifuShortPay:
     FEE = 0
+
     def __init__(self):
         self.MER_ID = settings.HUI_SHORT_MER_ID
         self.OPER_ID = settings.HUI_SHORT_OPER_ID
@@ -325,6 +326,9 @@ class HuifuShortPay:
                             "OperId", "CardNo", "OpenAcctName", 
                             "CertType", "CertId", "UsrMp", "TransAmt",
                             "CardType", "Remark", "ChkValue"]
+
+        self.DEBIND_FIELDS = ['Version', 'CmdId', 'MerId',
+                              'OperId', 'CardNo', 'ChkValue']
 
     @classmethod
     def __format_len(cls, length):
@@ -371,106 +375,130 @@ class HuifuShortPay:
             raise SignException("Error Code: " + code)
         return package[15:271]
 
+    def _request_huifu(self, url, data):
+        r = requests.post(url, data)
+        print 'url>>>', url
+        print 'data>>>', data
+        print 'response>>>', r.text
+        res_arr = map((lambda x: x.split('=')), r.text.rstrip('\r\n').split('\r\n'))
+        return dict([(arr[0], arr[1]) for arr in res_arr])
 
-    def bind_card_huifu(self, post):
+    def _common_post_fields(self):
+        post = dict()
         post['Version'] = '10'
-        post['CmdId'] = 'WHBindCard'
         post['MerId'] = self.MER_ID
         post['OperId'] = self.OPER_ID
 
-        post['LoginPwd'] = 'cathy123'#self.OPER_PWD
+        return post
 
+    def _unbind_card_huifu(self, post):
+        post.update(self._common_post_fields())
+        post['CmdId'] = 'WHCancelBindCard'
+        post['ChkValue'] = self.sign_data(post, self.DEBIND_FIELDS)
 
+        return self._request_huifu(self.DEBIND_URL, post)
+
+    def _bind_card_huifu(self, post):
+        post.update(self._common_post_fields())
+        post['CmdId'] = 'WHBindCard'
+        post['LoginPwd'] = self.OPER_PWD #'cathy123'
         post['ChkValue'] = self.sign_data(post, self.BIND_FIELDS)
 
-        r = requests.post(self.BIND_URL, post)
-        res_arr = map((lambda x:x.split('=')), r.text.rstrip('\r\n').split('\r\n'))
-        res = dict([(arr[0], arr[1]) for arr in res_arr])
+        return self._request_huifu(self.BIND_URL, post)
 
-        # root = ET.fromstring(r.text.encode('utf-8'))
-        # for result in root.findAll('result'):
-        #     data = dict()
-        #     for child in result:
-        #         data[child.tag] = child.text
-        return res
-
-    def card_pay_huifu(self, post):
-        post['Version'] = '10'
+    def _card_pay_huifu(self, post):
+        post.update(self._common_post_fields())
         post['CmdId'] = 'WHDebitDeductSave'
-        post['MerId'] = self.MER_ID
-        post['OperId'] = self.OPER_ID
-
         post['LoginPwd'] = self.OPER_PWD
         post['ChkValue'] = self.sign_data(post, self.PAY_FIELDS)
 
-        r = requests.post(self.BIND_URL, post)
-        res_arr = map((lambda x:x.split('=')), r.text.rstrip('\r\n').split('\r\n'))
-        res = dict([(arr[0], arr[1]) for arr in res_arr])
-        return res
+        return self._request_huifu(self.PAY_URL, post)
 
-    def bind_card_wlbk(self, pay_info):
-        #保存卡信息到个人名下
-        card_no = pay_info.card_no
+    def del_card_huifu(self, request):
+        """ 接触绑定接口 """
+        card_id = request.DATA.get('card_id', '')
+        if not card_id or not card_id.isdigit():
+            return {"ret_code": 20041, "message": "请输入正确的ID"}
+
+        card = Card.objects.filter(id=card_id, user=request.user).first()
+        if not card:
+            return {"ret_code": 20042, "message": "该银行卡不存在"}
+
+        post = dict()
+        post['CardNo'] = card.no
+        res = self._unbind_card_huifu(post)
+        if res['RespCode'] != u'000000':
+            return {"ret_code": -2, "message": res['ErrMsg']}
+
+        card.is_bind_huifu = False
+        card.save()
+
+        return {"ret_code": 0, "message": "删除成功"}
+
+    def bind_card_wlbk(self, user, card_no, bank, is_bind_huifu=False):
+        # 保存卡信息到个人名下
         if len(card_no) > 10:
-            exist_cards = Card.objects.filter(no=card_no, user=pay_info.user).first()
-            if exist_cards:
-                return False
-            card = Card()
-            card.bank = pay_info.bank
-            card.no = card_no
-            card.user = pay_info.user
-            card.is_default = False
+            card = Card.objects.filter(no=card_no, user=user).first()
+            if not card:
+                card = Card()
+                card.bank = bank
+                card.no = card_no
+                card.user = user
+                card.is_default = False
+
+            card.is_bind_huifu = is_bind_huifu
             card.save()
             return True
 
     def pre_pay(self, request, bank=None):
         if not request.user.wanglibaouserprofile.id_is_valid:
-            return {"ret_code":20111, "message":"请先进行实名认证"}
+            return {"ret_code": 20111, "message": "请先进行实名认证"}
 
         amount = request.DATA.get("amount", "").strip()
         card_no = request.DATA.get("card_no", "").strip()
         input_phone = request.DATA.get("phone", "").strip()
-        #gate_id = request.DATA.get("gate_id","").strip()
+        gate_id = request.DATA.get("gate_id", "").strip()
 
         if not amount or not card_no:
-            return {"ret_code":20112, 'message':'信息输入不完整'}
+            return {"ret_code": 20112, 'message': '信息输入不完整'}
         if len(card_no) < 10 and not input_phone:
-            return {"ret_code":20112, 'message':'信息输入不完整'}
+            return {"ret_code": 20112, 'message': '信息输入不完整'}
 
         try:
             float(amount)
         except:
-            return {"ret_code":20114, 'message':'金额格式错误'}
+            return {"ret_code": 20114, 'message': '金额格式错误'}
 
         amount = fmt_two_amount(amount)
 
         user = request.user
         profile = user.wanglibaouserprofile
-        card = None
-        bank = None
+        card, bank = None, None
         if gate_id:
             bank = Bank.objects.filter(gate_id=gate_id).first()
             if not bank or not bank.huifu_bind_code.strip():
-                return {"ret_code":201151, "message":"不支持该银行"}
+                return {"ret_code": 201151, "message": "不支持该银行"}
+
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
             if bank and card and bank != card.bank:
-                return {"ret_code":201153, "message":"银行卡与银行不匹配"}
+                return {"ret_code": 201153, "message": "银行卡与银行不匹配"}
 
-        if not card or True:
-            post = {}
+        if not card or (card and not card.is_bind_huifu):
+            post = dict()
             post['CardNo'] = card_no
-            post['OpenAcctName'] = profile.name#银行卡开户姓名
-            post['BankCode'] = bank.code  #银行编码
-            post['CertType'] = '00'  #证件类型
+            post['OpenAcctName'] = profile.name #银行卡开户姓名
+            post['BankCode'] = bank.huifu_bind_code #银行编码
+            post['CertType'] = '00' #证件类型
             post['CertId'] = request.user.wanglibaouserprofile.id_number  #证件号
             post['UsrMp'] = request.user.wanglibaouserprofile.phone       #手机号
-            post['CardType'] = card_type#卡类型
-            res = self.bind_card_huifu(post)
+            post['CardType'] = 'D' #card_type#卡类型
+            res = self._bind_card_huifu(post)
             if res['RespCode'] != u'000000':
-                return {"ret_code":-2, "message":res['ErrMsg']}
+                return {"ret_code": -2, "message": res['ErrMsg']}
+                pass
 
         try:
             pay_info = PayInfo()
@@ -483,7 +511,7 @@ class HuifuShortPay:
 
             pay_info.request_ip = get_client_ip(request)
             order = OrderHelper.place_order(user, Order.PAY_ORDER, pay_info.status,
-                                            pay_info = model_to_dict(pay_info))
+                                            pay_info=model_to_dict(pay_info))
             pay_info.order = order
 
             if card:
@@ -499,21 +527,21 @@ class HuifuShortPay:
             pay_info.save()
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
-            post = {}
+            post = dict()
             post['CardNo'] = card_no
-            post['OpenAcctName'] = profile.name#银行卡开户姓名
+            post['OpenAcctName'] = profile.name #银行卡开户姓名
             post['CertType'] = '00'  #证件类型
             post['CertId'] = request.user.wanglibaouserprofile.id_number  #证件号
             post['UsrMp'] = request.user.wanglibaouserprofile.phone       #手机号
-            post['CardType'] = card_type#卡类型
+            post['CardType'] = 'D' #card_type#卡类型
             post['TransAmt'] = pay_info.amount
             post['Remark'] = u"汇付天下快捷支付"
-            res = self.card_pay_huifu(post)
+            res = self._card_pay_huifu(post)
             if res['RespCode'] != u'000000':
                 pay_info.error_message = res['ErrMsg']
                 pay_info.response = res
                 pay_info.save()
-                return {"ret_code":-3, "message":res['ErrMsg']}
+                return {"ret_code": -3, "message": res['ErrMsg']}
             else:
                 pay_info.fee = self.FEE
                 keeper = MarginKeeper(pay_info.user, pay_info.order.pk)
@@ -521,11 +549,11 @@ class HuifuShortPay:
                 pay_info.margin_record = margin_record
                 pay_info.status = PayInfo.SUCCESS
                 pay_info.save()
-                rs = {"ret_code":0, "message":"success", "amount":amount, "margin":margin_record.margin_current}
+                rs = {"ret_code": 0, "message": "success", "amount": amount, "margin": margin_record.margin_current}
 
             if rs['ret_code'] == 0 and not card:
                 #保存卡信息到个人名下
-                self.bind_card_wlbk(pay_info)
+                self.bind_card_wlbk(user, card_no, bank, is_bind_huifu=True)
 
                 # tools.despoit_ok(pay_info, device_type)
 
@@ -538,7 +566,6 @@ class HuifuShortPay:
             OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
             return rs
         except Exception, e:
-        #     logger.error(traceback.format_exc())
             message = PayResult.RETRY
             pay_info.status = PayInfo.FAIL
             pay_info.error_message = str(e)
