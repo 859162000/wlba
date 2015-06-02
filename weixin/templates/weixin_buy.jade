@@ -37,8 +37,9 @@ html
                       select(name="type")#gifts-package.balance-middle-select-select
                         option(value = '')  不使用红包
                         for redpack in redpack.packages.available
-                          option(value='{{redpack.id}}',data-amount='{{redpack.amount}}') {{redpack.name}}  {{redpack.amount}}
+                          option(value='{{redpack.id}}',data-amount='{{redpack.amount}}') {{redpack.name}}  {{redpack.amount}}元
         .buy-earnings
+            p.redpack-for-amount * 请输入投资金额
             p.redpack-sign 红包使用
               em.redpack-amount
               |元，实际支付
