@@ -33,18 +33,18 @@ html
               .balance-middle
                 .balance-middle-select
                   select(name="redpack", type='select')#gifts-package.balance-middle-select-select
+                    option(value = '')  不使用红包
+                    //amount 金额（可能百分比） ，method（红包类型  “-” 直抵 /  “*”  百分比）
+                    //投资门槛investamount
+                    //百分比有个最高抵扣金额highest_amount
                     if redpacks
-                      option(value = '')  不使用红包
-                        redpack_num = len(redpack)
-                        each redpack in redpacks
-                          //amount 金额（可能百分比） ，method（红包类型  “-” 直抵 /  “*”  百分比）
-                          //投资门槛investamount
-                           //百分比有个最高抵扣金额highest_amount
-                          if redpack.method == "*"
-                            packAmount = redpack.amount + '%'
-                          else
-                            packAmount = redpack.amount + '元'
-                          option(value='{{redpack.id}}', data-amount='{{redpack.amount}}',data-method='{{redpack.method}}',data-investamount='{{redpack.investamount}}',data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{packAmount}}/{{redpack.unavailable_at}}
+                      redpack_num = len(redpacks)
+                      each redpack in redpacks
+                        if redpack.method == "-"
+                          pack_unit = '元'
+                        else
+                          pack_unit = '%'
+                        option(value="{{redpack.id}}", data-amount="{{redpack.amount}}", data-method="{{redpack.method}}", data-investamount='{{redpack.invest_amount}}', data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{redpack.amount}}{{pack_unit}}/{{redpack.unavailable_at|milldate_format}}过期
                     else
                       option(value = '') 无可用红包
         .buy-earnings
