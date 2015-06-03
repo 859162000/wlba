@@ -15,7 +15,7 @@ from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, A
 from wanglibao_p2p.views import AdminP2PUserRecord
 # from wanglibao_account.views import CjdaoApiView
 from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView, MilestoneView, \
-    ResponsibilityView, ContactView, AgreementView, DirectorateView
+    ResponsibilityView, ContactView, AgreementView, DirectorateView, AgreementAutoView
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser, TianmangInvestListAPIView, \
@@ -87,6 +87,8 @@ urlpatterns = patterns(
     url(r'^announcement/', include('wanglibao_announcement.urls')),
     url(r'^redpacket/', include('wanglibao_redpack.urls')),
     url(r'^templates/', include('wanglibao_activity.urls')),
+
+    url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
 )
 
 urlpatterns += patterns(

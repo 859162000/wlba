@@ -46,7 +46,7 @@ class P2PTrader(object):
         else:
             self.device_type = "pc"
 
-    def purchase(self, amount, redpack=0):
+    def purchase(self, amount, redpack=0, platform=u''):
         description = u'购买P2P产品 %s %s 份' % (self.product.short_name, amount)
         is_full = False
         if self.user.wanglibaouserprofile.frozen:
@@ -63,7 +63,7 @@ class P2PTrader(object):
                 OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
                                         amount=amount, deduct=result['deduct'], redpack=redpack)
 
-            product_record = self.product_keeper.reserve(amount, self.user, savepoint=False)
+            product_record = self.product_keeper.reserve(amount, self.user, savepoint=False, platform=platform)
             margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
             equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
 
@@ -152,6 +152,14 @@ class P2POperator(object):
                 cls().amortize(amortization)
             except P2PException, e:
                 cls.logger.error(u'%s, %s' % (amortization, e.message))
+
+
+        ## 停止在watchdog中每分钟循环自动投标，减轻celery任务
+        ## 将自动投标入口改在两处，一是标状态变成“正在招标”，二是用户保存并启用自动投标配置
+        print('Getting automation trades')
+        from wanglibao_p2p.automatic import Automatic
+        Automatic().auto_trade()
+
 
     @classmethod
     #@transaction.commit_manually

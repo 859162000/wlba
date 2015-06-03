@@ -28,7 +28,7 @@ class ProductKeeper(KeeperBaseMixin):
         super(ProductKeeper, self).__init__(product=product, order_id=order_id)
         self.product = product
 
-    def reserve(self, amount, user, savepoint=True):
+    def reserve(self, amount, user, savepoint=True, platform=u''):
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
             self.product = P2PProduct.objects.select_for_update().filter(pk=self.product.pk).first()
@@ -42,7 +42,7 @@ class ProductKeeper(KeeperBaseMixin):
 
             self.product.save()
             catalog = u'申购'
-            record = self.__tracer(catalog, amount, user, self.product.remain)
+            record = self.__tracer(catalog, amount, user, self.product.remain, platform=platform)
             return record
 
     def audit(self, user):
@@ -64,9 +64,9 @@ class ProductKeeper(KeeperBaseMixin):
         self.product.save()
         self.__tracer(u'状态变化', 0, None, self.product.remain, u'%s -> 流标' % prev_status)
 
-    def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
+    def __tracer(self, catalog, amount, user, product_balance_after, description=u'', platform=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
-                          description=description, order_id=self.order_id, product=self.product)
+                          description=description, order_id=self.order_id, product=self.product, platform=platform)
         trace.save()
         return trace
 
