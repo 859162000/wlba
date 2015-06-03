@@ -148,3 +148,13 @@ class DirectorateView(TemplateView):
         return {
             'directorate': directorate
         }
+
+
+class AgreementAutoView(TemplateView):
+    template_name = 'agreement.jade'
+
+    def get_context_data(self, **kwargs):
+        about_us = Aboutus.objects.filter(code='agreement_auto').first()
+        return {
+            'about_us': about_us
+        }

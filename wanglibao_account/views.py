@@ -7,9 +7,10 @@ import hashlib
 import urllib
 import urlparse
 
+from decimal import Decimal
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
@@ -43,7 +44,8 @@ from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
-    AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian
+    AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
+from wanglibao_p2p.tasks import automatic_trade
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
@@ -1466,6 +1468,121 @@ class AddressGetAPIView(APIView):
                 return Response({'ret_code': 3000, 'message': u'没有收货地址'})
         except:
             return Response({'ret_code': 3003, 'message': u'地址不存在'})
+
+
+class AutomaticView(TemplateView):
+    template_name = 'account_auto_tender.jade'
+
+    def get_context_data(self, **kwargs):
+        status, message, result = False, '', {}
+        automatic_manager = AutomaticManager.objects.filter(Q(is_used=True), Q(stop_plan=AutomaticManager.STOP_PLAN_STOP) | Q(stop_plan=AutomaticManager.STOP_PLAN_PAUSE) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))
+        if automatic_manager.exists():
+            status, message = True, automatic_manager.first().message
+
+        plan = AutomaticPlan.objects.filter(user=self.request.user).first()
+        if plan is not None:
+            result = {
+                'id': plan.id,
+                'amounts_auto': int(plan.amounts_auto),
+                'period_min': plan.period_min,
+                'period_max': plan.period_max,
+                'rate_min': int(plan.rate_min),
+                'rate_max': int(plan.rate_max),
+                'is_used': plan.is_used
+            }
+
+        return {
+            'margin': self.request.user.margin.margin,
+            'plan': result,
+            'status': status,
+            'message': message
+
+        }
+
+
+class AutomaticApiView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        # 开启功能，需要同时校验数据
+        # 关闭操作，用户自动投标设置数据，只更改状态
+        is_used = request.DATA.get('is_used', False)
+
+        if not is_used:
+            # close plan
+            plan = AutomaticPlan.objects.filter(user=request.user).first()
+            if plan:
+                plan.is_used = False
+                plan.save()
+
+            return Response({
+                'ret_code': 0,
+                'message': u'自动投标计划关闭成功'
+            })
+
+        amounts_auto = request.DATA.get('amounts_auto', Decimal(0))
+        period_min = request.DATA.get('period_min', 0)
+        period_max = request.DATA.get('period_max', 0)
+        rate_min = request.DATA.get('rate_min', 0)
+        rate_max = request.DATA.get('rate_max', 0)
+
+        if not amounts_auto or not period_min or not period_max or not rate_min or not rate_max:
+            return Response({'ret_code': 3001, 'message': u'信息输入不完整'})
+
+        try:
+            if Decimal(amounts_auto) < 100:
+                return Response({'ret_code': 3002, 'message': u'自动投标金额必须大于等于100'})
+            if Decimal(amounts_auto) % 100 != 0:
+                return Response({'ret_code': 3003, 'message': u'自动投标金额必须是100的整数倍'})
+            if Decimal(amounts_auto) > self.request.user.margin.margin:
+                return Response({'ret_code': 3003, 'message': u'自动投标金额不能够大于账户可用余额'})
+        except:
+            return Response({'ret_code': 3004, 'message': u'自动投标金额输入不合法'})
+
+        try:
+            if int(period_min) > int(period_max):
+                return Response({'ret_code': 3005, 'message': u'产品投资最大期限不允许小于最小期限'})
+        except:
+            return Response({'ret_code': 3006, 'message': u'产品投资期限输入不合法'})
+
+        try:
+            if float(rate_min) > float(rate_max):
+                return Response({'ret_code': 3007, 'message': u'产品投资最高收益率不允许小于最低收益率'})
+        except:
+            return Response({'ret_code': 3008, 'message': u'产品投资收益率输入不合法'})
+
+        try:
+            plan = AutomaticPlan.objects.filter(user=request.user)
+            if plan.exists():
+                plan = plan.first()
+            else:
+                plan = AutomaticPlan()
+                plan.user = request.user
+
+            plan.amounts_auto = Decimal(amounts_auto)
+            plan.period_min = int(period_min)
+            plan.period_max = int(period_max)
+            plan.rate_min = int(rate_min)
+            plan.rate_max = int(rate_max)
+            plan.is_used = True if is_used else False
+
+            plan.save()
+
+            """
+            # 停止这个入口，从watch进入自动投标
+            if plan.is_used:
+                automatic_trade.apply_async(kwargs={
+                    "plan_id": plan.id,
+                })
+                pass
+            """
+
+            return Response({
+                'ret_code': 0,
+                'message': u'自动投标计划设置成功'
+            })
+        except:
+            return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
 
 
 # class CjdaoApiView(APIView):

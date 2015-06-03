@@ -9,7 +9,7 @@
     alertOption = null;
     initAlert = function() {
       var html;
-      html = ['<div id= "', alert_container_id, '" class="', modal_container, '" style="display:none">', '<div class="modal-header"></div>', '<div class="modal-content"><p class="modal-content-inner">您确认吗?</p></div>', '<div class="modal-footer"><a href="#" class="ok button-alert-ok">确认</a>', '</div>'];
+      html = ['<div id= "', alert_container_id, '" class="', modal_container, '" style="display:none">', '<div class="modal-header"></div>', '<div class="modal-content"><p class="modal-content-inner">您确认吗?</p></div>', '<div class="modal-footer"><a href="javascript:void(0)" class="ok button-alert-ok">确认</a>', '</div>'];
       $(html.join('')).appendTo($(document.body));
       $('#' + alert_container_id).on('click', '.ok', function(event) {
         $.modal.close();
@@ -21,7 +21,7 @@
     };
     initConfirm = function() {
       var html;
-      html = ['<div id= "', confirm_container_id, '" class="', modal_container, '" style="display:none">', '<div class="modal-header"></div>', '<div class="modal-content"><div class="modal-content-inner">确认吗?</div></div>', '<div class="modal-footer"><a href="#" class="ok button-confirm-ok">确认</a><a href="#" class="cancel button-confirm-cancel">取消</a></div>', '</div>'];
+      html = ['<div id= "', confirm_container_id, '" class="', modal_container, '" style="display:none">', '<div class="modal-header"></div>', '<div class="modal-content"><div class="modal-content-inner">确认吗?</div></div>', '<div class="modal-footer"><a href="javascript:void(0)" class="ok button-confirm-ok">确认</a><a href="javascript:void(0)" class="cancel button-confirm-cancel">取消</a></div>', '</div>'];
       $(html.join('')).appendTo($(document.body));
       $('#' + confirm_container_id).on('click', '.ok', function(event) {
         $.modal.close();
@@ -72,3 +72,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=modal.tools.js.map

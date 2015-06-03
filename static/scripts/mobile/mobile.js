@@ -214,10 +214,7 @@ org.login = (function(org){
                     success: function(res) {
                         var next = org.getQueryStringByName('next');
                         if (next) {
-                            var x = next.replace(/%3F/g,'?'),
-                                y = x.replace(/%3D/g,'='),
-                                z = y.replace(/%26/g,'&');
-                            window.location.href = z;
+                            window.location.href = decodeURIComponent(decodeURIComponent(next));;
                         }else{
                             window.location.href = '/weixin/account/';
                         }
@@ -590,40 +587,79 @@ org.buy=(function(org){
     var lib = {
         redPackSelect : $('#gifts-package'),
         amountInout : $('input[data-role=p2p-calculator]'),
+        $redpackSign : $('.redpack-sign'),
+        $redpackForAmount : $('.redpack-for-amount'),
         showredPackAmount:$(".redpack-amount"),
         showAmount :$('.need-amount'),
         init :function(){
             lib._calculate();
             lib._buy();
         },
-        _addEvenList: function(){
-
-        },
         _calculate:function(){
-                org.calculate(lib.amountInout,lib._setRedpack)
+            org.calculate(lib.amountInout,lib._setRedpack)
         },
+        /*
+        *   购买提示信息
+        *   还没优化，if有点多哈哈
+        *   触发_setRedpack条件 选择红包，投资金额大于0
+        *
+        *
+         */
         _setRedpack:function(){
-            var redPack = parseInt(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount')),
-                allAmount = lib.amountInout.val() - redPack;
-            if(redPack){
-               lib.showredPackAmount.text(redPack);
-               lib.showAmount.text(allAmount);
-               $(".redpack-sign").show()
+            var redPack = lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex),//选择的select项
+                redPackVal = parseFloat(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount'))
+                inputAmount  =parseInt(lib.amountInout.val()), //输入框金额
+                redPackAmount = redPack.attr("data-amount"), //红包金额
+                redPackMethod = redPack.attr("data-method"), //红包类型
+                redPackInvestamount = parseInt(redPack.attr("data-investamount")),//红包门槛
+                redPackHighest_amount = parseInt(redPack.attr("data-highest_amount")),//红包最高抵扣（百分比红包才有）
+                repPackDikou = 0,
+                senderAmount = 0; //实际支付金额;
+            if(redPackVal){ //如果选择了红包
+                console.log(inputAmount)
+                if(!inputAmount){
+                    $(".redpack-investamount").hide();//未达到红包使用门槛
+                    lib.$redpackSign.hide();//红包直抵提示
+                    return
+                }
+                if(inputAmount < redPackInvestamount){
+                    lib.$redpackSign.hide();//红包直抵提示
+                    return $(".redpack-investamount").show();//未达到红包使用门槛
+                }else{
+                    if(redPackMethod == '*'){ //百分比红包
+                        //如果反回来的百分比需要除于100 就把下面if改成if (inputAmount * redPackAmount/100 > redPackHighest_amount)
+                        if(inputAmount * redPackAmount > redPackHighest_amount){//是否超过最高抵扣
+                           repPackDikou = redPackHighest_amount;
+                        }else{//没有超过最高抵扣
+                            repPackDikou = inputAmount * redPackAmount;
+                        }
+                    }else{  //直抵红包
+                        repPackDikou = parseInt(redPackAmount);
+                    }
+                    senderAmount = inputAmount - repPackDikou;
+                    lib.showredPackAmount.text(repPackDikou);//红包抵扣金额
+                    lib.showAmount.text(senderAmount);//实际支付金额
+                    $(".redpack-investamount").hide();//未达到红包使用门槛
+                    lib.$redpackSign.show();//红包直抵提示
+
+                }
             }else{
-               $(".redpack-sign").hide()
+                lib.$redpackSign.hide();//红包直抵提示
             }
+            lib.$redpackForAmount.hide();//请输入投资金额
+
         },
         _buy:function(){
             var $buyButton = $('.snap-up'),
                 $redpack = $("#gifts-package"), redpackAmount;
-
+            //红包select事件
             $redpack.on("change",function(){
-                redpackAmount = $(this).val();
-                if(redpackAmount){
-                    console.log(lib.amountInout.val())
-                    lib.amountInout.val() == '' ? alert("请输入投资金额"): lib._setRedpack();
+                console.log($(this).val())
+                if($(this).val() != ''){
+                    lib.amountInout.val() == '' ? $('.redpack-for-amount').show() : lib._setRedpack();
                 }else{
-                    $(".redpack-sign").hide()
+                    $(".redpack-investamount").hide();//未达到红包使用门槛
+                    lib.$redpackSign.hide();
                 }
             });
 
@@ -656,7 +692,7 @@ org.buy=(function(org){
                     },
                     success: function(data){
                        if(data.data){
-                           $('.balance-sign').text(balance - data.data - redPackAmount);
+                           $('.balance-sign').text(balance - data.data + redPackAmount);
                            $(".sign-main").css("display","-webkit-box");
                        }
                     },
@@ -728,8 +764,46 @@ org.recharge=(function(org){
         init :function(){
             lib._getBankCardList();
             lib._rechargeStepFirst();
+            lib._initBankNav();
+        },
+        _initBankNav:function(){
+            var $nav = $(".bank-list-nav"),
+                $cardNone = $('.card-none'),
+                $cardHave = $('.card-have');
+            $nav.css("-webkit-transform","translate3d(10.2rem,0,0)");
+            $nav.on('click',function(e){
+                var $targetName = e.target.className.split(' ')[1];
+                switch ($targetName){
+                    case 'bank-add':
+                        closeNav(function(){
+                            $cardHave.hide();
+                            setTimeout(function(){
+                                $cardHave.css("opacity",0)
+                                $cardNone.show();
+                                setTimeout(function(){
+                                    $cardNone.css("opacity",1)
+                                },50)
+                            },50)
+                        })
+                        break;
+                    case 'bank-card':
+                        $('.recharge-select-bank').css('display','-webkit-box');
+                        closeNav();
+                        break;
+                    case 'bank-cancel':
+                        closeNav();
+                        break
+                }
+
+            });
+            function closeNav(callback){
+                $nav.css("-webkit-transform","translate3d(10.2rem,0,0)");
+                callback && callback();
+            }
         },
         _getBankCardList: function(){
+            var $cardNone = $('.card-none'),
+                $cardHave = $('.card-have');
             org.ajax({
                 type: 'POST',
                 url: '/api/pay/cnp/list/',
@@ -738,16 +812,22 @@ org.recharge=(function(org){
                     if(data.ret_code == 0){
                         $(".recharge-loding").hide();
                         if(data.cards.length === 0){
-                            $('.card-none').show();
+                            $cardNone.show();
+                            setTimeout(function(){
+                                $cardNone.css("opacity",1)
+                            },50)
                         }else if(data.cards.length > 0){
                             lib._initCard(data.cards,lib._cradStyle(data.cards));
-                            $('.card-have').show();
+                            $cardHave.show();
+                            setTimeout(function(){
+                                $cardHave.css("opacity",1)
+                            },50)
                         }
                     }
                 }
             })
             $(".bank-txt-right").on('click',function(){
-                $('.recharge-select-bank').css('display','-webkit-box');
+                    $(".bank-list-nav").css("-webkit-transform","translate3d(0,0,0)");
             })
         },
         _initCard:function(data, callback){
@@ -770,7 +850,7 @@ org.recharge=(function(org){
                 str += "<p>尾号 " + cardList[card].storable_no.slice(-4) + "</p>";
                 str += "<p>限额 200000</p>";
                 str += "</div>";
-                str += "<div class='bank-type'>存储卡</div>";
+                str += "<div class='bank-type'>储蓄卡</div>";
                 str += "</div>";
             }
             $(".select-bank-body").append(str);
