@@ -370,7 +370,7 @@ class P2PDetailView(TemplateView):
 
         user_margin = 0
         current_equity = 0
-        redpack = None
+        redpacks = []
         user = self.request.user
         if user.is_authenticated():
             user_margin = user.margin.margin
@@ -379,7 +379,8 @@ class P2PDetailView(TemplateView):
                 current_equity = equity_record.equity
 
             device = utils.split_ua(self.request)
-            redpack = backends.list_redpack(user, 'available', device['device_type'])
+            result = backends.list_redpack(user, 'available', device['device_type'])
+            redpacks = result['packages'].get('available', [])
 
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
         total_buy_user = P2PEquity.objects.filter(product=p2p).count()
@@ -398,7 +399,7 @@ class P2PDetailView(TemplateView):
             'total_buy_user': total_buy_user,
             'margin': float(user_margin),
             'amount': float(amount),
-            'redpack': redpack,
+            'redpack': redpacks,
             'next': next,
             'amount_profit': amount_profit,
         })

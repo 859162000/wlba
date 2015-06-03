@@ -37,7 +37,7 @@ for product in results
           .time-num
             em.section-hui {{product.period}}
             |{{product.pay_method|period_unit}}
-          .time-tit 还款期限
+          .time-tit 投资期限
       .body-right
         if btnClass == 'btn-blue'
           a(href="/weixin/view/buy/{{product.id}}/?next=/weixin/list/").btn-body(class=btnClass) {{status}}
