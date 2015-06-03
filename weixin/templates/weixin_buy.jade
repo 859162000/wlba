@@ -28,15 +28,15 @@ html
                   amount = ''
                 input(type="tel",value="{{amount}}",placeholder="输入100的整数倍金额",p2p-type="{{p2p.category}}",data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="#xunlei-vip-income-head",data-target="#expected_income", data-existing="0", data-rate="{{p2p.expected_earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").amount.balance-middle
                 p.balance-right 元
-            if redpack
-              .buy-balance-three
-                p.balance-left 可用红包
-                .balance-middle
-                    .balance-middle-select
-                      redpack_num = len(redpack['packages']['available'])
-                      select(name="type")#gifts-package.balance-middle-select-select
-                        option(value = '')  不使用红包
-                        for redpack in redpack.packages.available
+            .buy-balance-three
+              p.balance-left 可用红包
+              .balance-middle
+                .balance-middle-select
+                  select(name="redpack", type='select')#gifts-package.balance-middle-select-select
+                    if redpacks
+                      option(value = '')  不使用红包
+                        redpack_num = len(redpack)
+                        each redpack in redpacks
                           //amount 金额（可能百分比） ，method（红包类型  “-” 直抵 /  “*”  百分比）
                           //投资门槛investamount
                            //百分比有个最高抵扣金额highest_amount
@@ -45,6 +45,8 @@ html
                           else
                             packAmount = redpack.amount + '元'
                           option(value='{{redpack.id}}', data-amount='{{redpack.amount}}',data-method='{{redpack.method}}',data-investamount='{{redpack.investamount}}',data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{packAmount}}/{{redpack.unavailable_at}}
+                    else
+                      option(value = '') 无可用红包
         .buy-earnings
             p.redpack-investamount * 未达到红包使用门槛
             p.redpack-for-amount * 请输入投资金额
