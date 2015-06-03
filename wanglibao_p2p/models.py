@@ -581,6 +581,8 @@ class P2PRecord(models.Model):
 
     description = models.CharField(u'摘要', default='', max_length=1000)
 
+    platform = models.CharField(u'购买平台', max_length=100, default=u'手动投标')
+
     class Meta:
         ordering = ['-create_time']
         verbose_name_plural = u'产品流水'
@@ -815,3 +817,39 @@ class P2PEquityJiuxian(models.Model):
         unique_together = (('user', 'product'),)
         verbose_name_plural = u'酒仙用户持仓'
         ordering = ('-created_at',)
+
+
+class AutomaticPlan(models.Model):
+    user = models.ForeignKey(User, related_name='plan_user')
+    amounts_auto = models.DecimalField(u'自动投资金额', max_digits=20, decimal_places=2, default=0)
+    amounts_left = models.DecimalField(u'账户保留金额', max_digits=20, decimal_places=2, default=0)
+    period_min = models.IntegerField(u'产品投资最小期限(月/天)*', default=0, blank=False)
+    period_max = models.IntegerField(u'产品投资最大期限(月/天)*', default=0, blank=False)
+    rate_min = models.FloatField(u'最低预期收益(%)*', default=0, blank=False)
+    rate_max = models.FloatField(u'最高预期收益(%)*', default=0, blank=False)
+    last_updated = models.DateTimeField(u'上次更新时间', auto_now=True, default=timezone.now())
+    is_used = models.BooleanField(u'是否启用', default=False)
+
+    class Meta:
+        verbose_name_plural = u'自动投标计划（用户）'
+
+
+class AutomaticManager(models.Model):
+    STOP_PLAN_PAUSE = u'暂停计划'
+    STOP_PLAN_STOP = u'停止计划'
+
+    STOP_PLAN = (
+        (STOP_PLAN_PAUSE, STOP_PLAN_PAUSE),
+        (STOP_PLAN_STOP, STOP_PLAN_STOP),
+    )
+
+    name = models.CharField(u'计划名称', max_length=60)
+    message = models.CharField(u'计划描述', max_length=1024, blank=True, null=True, help_text=u'此描述信息将在[我的账户]->[自动投标]向用户提示')
+    stop_plan = models.CharField(u'停止方案', max_length=30, null=False, choices=STOP_PLAN, help_text=u'选择暂停计划方案，必须填写计划开始时间和结束时间')
+    start_at = models.DateTimeField(u"暂停计划开始时间", null=True, blank=True, help_text=u'暂停计划方案开始时间，自动投标功能此时停止运行')
+    end_at = models.DateTimeField(u"暂停计划结束时间", null=True, blank=True, help_text=u'暂停计划方案结束时间，自动投标功能此时恢复运行')
+    last_updated = models.DateTimeField(u'上次更新时间', auto_now=True, default=timezone.now())
+    is_used = models.BooleanField(u'是否启用', default=False)
+
+    class Meta:
+        verbose_name_plural = u'自动投标计划（管理员）'
