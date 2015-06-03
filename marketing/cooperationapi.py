@@ -12,7 +12,7 @@ import datetime
 import logging
 
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.http import HttpResponse
 from django.utils import timezone, dateparse
 from rest_framework import renderers
@@ -626,5 +626,39 @@ class TianmangInvestListAPIView(TianmangBaseAPIView):
                 response_user_list.append(response_user)
         except:
             logger.error("TianmangInvestListAPIView error")
+
+        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
+
+class TianmangInvestNotConfirmListAPIView(TianmangBaseAPIView):
+    """天芒云 投资成功及金额获取用户接口"""
+    permission_classes = ()
+    def get(self, request, startday, endday):
+
+        response_user_list = []
+        try:
+            tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
+
+            for tianmang_promo_user in tianmang_promo_list:
+
+                total_equity = P2PEquity.objects.filter(user=tianmang_promo_user.user).filter(product__status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+                ]).aggregate(total_equity=Sum('equity')).get('total_equity', 0)
+
+                if not total_equity:
+                    continue
+                m=md5()
+                m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                uid = m.hexdigest()
+                response_user ={
+                    "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "uid": uid,
+                    "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                    "investment": float(total_equity),
+                    #"status": 1 if income_all > 0 else 0
+                }
+                response_user_list.append(response_user)
+        except Exception, e:
+            logger.error("TianmangInvestListNotConfirmAPIView error")
+            logger.error(e)
 
         return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
