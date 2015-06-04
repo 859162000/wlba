@@ -33,7 +33,7 @@ class Automatic(object):
             plans = self._access_plans(product=product, plan_id=plan_id)
             if not plans.exists():
                 print('do not has any access automatic plans, stop automatic trade for this product')
-                return
+                continue
 
             for plan in plans:
                 self._one_trade(product=product, plan=plan)
