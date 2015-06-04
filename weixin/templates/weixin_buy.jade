@@ -34,6 +34,9 @@ html
                 .balance-middle-select
                   select(name="redpack", type='select')#gifts-package.balance-middle-select-select
                     option(value = '')  不使用红包
+                    //amount 金额（可能百分比） ，method（红包类型  “-” 直抵 /  “*”  百分比）
+                    //投资门槛investamount
+                    //百分比有个最高抵扣金额highest_amount
                     if redpacks
                       redpack_num = len(redpacks)
                       each redpack in redpacks
