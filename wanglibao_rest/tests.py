@@ -4,7 +4,7 @@ from wanglibao_sms.models import PhoneValidateCode
 
 User = get_user_model()
 
-# test 123
+# test 1234
 
 class APITestCase(TestCase):
     def test_register_with_api(self):
