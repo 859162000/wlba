@@ -1,0 +1,60 @@
+{% extends 'manage/base.html' %}
+{% block content %}
+  {% include 'manage/include/content_header.html' %}
+  <div class="ui blue segment">
+    <div>
+      <h4>{{ account.name }}</h4>
+    </div>
+    <h4 class="ui horizontal header divider">
+      <i class="settings icon"></i>
+      属性
+    </h4>
+    <table class="ui definition table">
+      <tbody>
+      <tr>
+        <td class="three wide column">类型</td>
+        <td>{{ account.classify }}</td>
+      </tr>
+      <tr>
+        <td>URL</td>
+        <td>{{ account.connect_url }}</td>
+      </tr>
+      <tr>
+        <td>Token</td>
+        <td>{{ account.token }}</td>
+      </tr>
+      {% if account.EncodingAESKey %}
+        <tr>
+          <td>消息加解密密钥</td>
+          <td>{{ account.EncodingAESKey }}</td>
+        </tr>
+      {% endif %}
+      <tr>
+        <td>AppID</td>
+        <td>{{ account.app_id }}</td>
+      </tr>
+      <tr>
+        <td>AppSecret</td>
+        <td>{{ account.app_secret }}</td>
+      </tr>
+      {% if account.mch_id %}
+        <tr>
+          <td>商户ID</td>
+          <td>{{ account.mch_id }}</td>
+        </tr>
+      {% endif %}
+      {% if account.key %}
+        <tr>
+          <td>支付密钥</td>
+          <td>{{ account.key }}</td>
+        </tr>
+      {% endif %}
+      <tr>
+        <td>二维码</td>
+        <td><img src="{{ account.qrcode_url }}" alt="" width="258"/></td>
+      </tr>
+
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

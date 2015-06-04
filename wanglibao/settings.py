@@ -477,13 +477,15 @@ if ENV == ENV_PRODUCTION:
 
     HUI_SHORT_MER_ID = "510793"
     HUI_SHORT_SIGN_HOST = SIGN_HOST
-    HUI_SHORT_SIGN_PORT = "8734"
+    HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "bjwl"
     PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
+
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
@@ -515,13 +517,15 @@ elif ENV == ENV_PREPRODUCTION:
 
     HUI_SHORT_MER_ID = "510793"
     HUI_SHORT_SIGN_HOST = SIGN_HOST
-    HUI_SHORT_SIGN_PORT = "8734"
+    HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "bjwl"
     PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
+
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
@@ -551,8 +555,9 @@ else:
     SIGN_PORT = 8733
     HUI_SHORT_MER_ID = "510793"
     HUI_SHORT_SIGN_HOST = SIGN_HOST
-    HUI_SHORT_SIGN_PORT = "8734"
+    HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "bjwl"
     PAY_URL = 'http://test.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gar/entry.do" % PAY_URL

@@ -1,0 +1,31 @@
+-load formatters
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 添加银行卡
+      a(href="/weixin/account/bankcard/")
+        span 返回
+    .bank-add-main
+      .add-row
+        p.row-name 开户名
+        p.row-value.value-right {{user.wanglibaouserprofile.name}}
+      .add-row.add-select
+        select(type="select", name="gate_id")#bank-select
+          option(value = '')  请选择银行卡（暂不支持信用卡）
+          for bank in banks
+            option(value="{{bank.gate_id}}") {{bank.name}}
+      .add-row.add-input
+        p.row-name 银行卡号
+        input(type="text", name="card_number", placeholder="请输入银行卡号")#card-no.row-value.value-input
+    .bank-add-sign.withdraw-checkbox
+      label
+        input#default-checkbox(type='checkbox', value='1',checked)
+        |设为默认银行
+    .bank-add-sign
+      p 请保证银行卡开户人和您在网利宝实名认证相同
+    .bank-add-btn
+      button(type="submit").addBank-btn 添加银行卡
+    script(data-init="bankcardAdd", src="/static/scripts/mobile/dist/mobile.js")

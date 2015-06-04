@@ -1,8 +1,8 @@
 #weixin_menu {
     width: 360px;
     height: 640px;
+    margin: 0 auto;
     background: url("../../images/admin/weixin_menu_bg.jpg") no-repeat;
-    float: left;
 }
 .weixin_menu_main {
     height: 544px;
@@ -47,7 +47,7 @@
     right: 5px;
 }
 #weixin_menu_set {
-    margin-left: 400px;
+
 }
 .weixin_menu_sub_button_box {
     position: absolute;

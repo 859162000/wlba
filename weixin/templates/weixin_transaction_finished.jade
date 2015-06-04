@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 已投项目
+      a(href="/weixin/account/")
+        span 返回
+    nav.transaction-nav
+      ul
+        li
+          a(href="/weixin/transaction/buying/") 投标中
+        li
+          a(href="/weixin/transaction/repaying/") 回款中
+        li.active
+          a(href="/weixin/transaction/finished/") 已完成
+    section#transaction-finished.transaction-main
+      include include/ajax/ajax_transaction

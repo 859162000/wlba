@@ -1,0 +1,52 @@
+-load formatters
+doctype html
+html
+    head
+        include include/weixin_head.jade
+    body
+        header
+            hgroup 账户安全
+            a(href="/weixin/account/")
+               span 返回
+        .security-thename
+            p.thename-one
+                | 账户名
+                label {{user | safe_phone}}
+            .line
+            if user.wanglibaouserprofile.id_is_valid
+              p.thename-one
+                | 实名认证&nbsp;&nbsp;&nbsp;&nbsp;
+                span.thename-notadd(style="color: #6b6b6b") {{user.wanglibaouserprofile.id_number | safe_id}}
+                label {{user.wanglibaouserprofile.name}}
+            else
+              a(href="/weixin/authentication/").thename-one
+                  | 实名认证&nbsp;&nbsp;&nbsp;&nbsp;
+                  span.thename-notadd 未设置
+                  b.thename-add 设置&nbsp;&nbsp;&nbsp;&nbsp;
+                      span
+                          label.project-one-angle
+            .line
+            if p2p_cards
+              //else
+              a(href="/weixin/account/bankcard/").thename-one
+                  | 管理银行卡
+                  span.thename-notadd {{p2p_cards}} 张
+                  b.thename-add
+                      span
+                          label.project-one-angle
+            else
+              a(href="/weixin/account/bankcard/").thename-one
+                  | 管理银行卡
+                  span.thename-notadd 未添加
+                  b.thename-add 添加&nbsp;&nbsp;&nbsp;&nbsp;
+                      span
+                          label.project-one-angle
+
+            .line(style="display:none")
+            //    修改密码
+            a(href="#" style="display:none").thename-one
+                | 修改密码
+                b.thename-add
+                    span
+                        label.project-one-angle
+

@@ -9,18 +9,15 @@ html
             hgroup 我的账户
             //a(href="javascript:history.back()")
                span 返回
-        .account-balance
-            .account-balance-one
-                p.balance-one-money 账户余额（元）
-                p.balance-one-yuan ￥{{p2p_margin|money_format}}
-            .account-balance-two
-                a(href='#').account-withdrawal 提现
-            .account-balance-three
-                a(href='#').account-top-up 充值
         .account-assets
             .account-assets-one
-                p.assets-one-monery 总资产（元）
+                p.assets-one-monery 总资产(元)
                 p.assets-one-yuan ￥{{total_asset|money_format}}
+
+
+
+        .account-assets-earnings
+            .account-assets-earnings-one
                 p.assets-one-earnings(style="width:100%;")
                  strong 累计收益：
                     span ￥{{p2p_total_paid_interest|money_format}}
@@ -28,19 +25,24 @@ html
                     span ￥{{p2p_total_unpaid_interest|money_format}}
             //.account-assets-two
             //    p.assets-two-earning
-
+        .account-balance
+            .account-balance-one
+                p.balance-one-money 账户余额（元）
+                p.balance-one-yuan ￥{{p2p_margin|money_format}}
+            //.account-balance-two
+                a(href='#').account-withdrawal 提现
+            .account-balance-three
+                a(href='/weixin/recharge/?rechargeNext=/weixin/account/').account-top-up 充值
         .account-project
-            p.project-one
+            a(href="/weixin/transaction/buying/").project-one
              |已投项目
-             b &nbsp;敬请期待
              span
-              a(href="#").project-one-angle
+              .project-one-angle
             .line
-            p.project-one
+            a(href="/weixin/security/").project-one
              |账户安全
-             b &nbsp;敬请期待
              span
-              a(href="#").project-one-angle
+              .project-one-angle
         .account-exit
             a(href="/accounts/logout?next=/weixin/list/").account-exit-exit 退出登录
         .account-pop-up
@@ -61,4 +63,4 @@ html
                         .line-line
                         a(href="#") 确定
     include include/weixin_footer
-    script( src="/static/scripts/mobile/dist/mobile.js?v=222")
+    script( src="/static/scripts/mobile/dist/mobile.js")

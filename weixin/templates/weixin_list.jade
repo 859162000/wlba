@@ -6,61 +6,12 @@ html
     link(rel="prefetch", href="/static/imgs/mobile/detail/detail_banner.jpg")
     include include/weixin_head.jade
   body
-    header
-      hgroup 我要投资
-      //a(href="#1")
-        span 返回
     .list-banner
       a(href="{{banner.link}}")
         img(src="/media/{{banner.image}}")
     .list-body#list-body
-      for product in p2p_lists
-        status = product.display_status
-        if status == '抢购中'
-          listClass = 'profit-blue'
-          btnClass = 'btn-blue'
-          borderClass = 'progress-broderBold'
-        elif status == '已还款'
-          listClass = 'profit-hui'
-          btnClass = 'btn-grey'
-          borderClass = 'progress-broderNormal'
-        elif status == '还款中'
-          listClass = 'profit-hui'
-          btnClass = 'btn-lightblue'
-          borderClass = 'progress-broderNormal'
-        else
-          listClass = 'profit-hui'
-          btnClass = 'btn-red'
-          borderClass = 'progress-broderNormal'
-        .list-section
-          a(href="/weixin/detail/{{product.id}}").section-head
-            if product.category == '新手标'
-              span.head-prompt  新手福利
-            span.head-tit {{product.name}}
-          .section-body(class=borderClass)
-            a(href="/weixin/detail/{{product.id}}").body-left
-              .body-Profit
-                span.profit-cont
-                  .profit-math(class=listClass)
-                    earning_rate = str(product.expected_earning_rate)
-                    span.profit-num {{earning_rate}}
-                    span.profit-sign %
-                    if product.activity
-                      span.prpfit-add +
-                      span.profit-addNum {{product.activity.rule.percent_text}}
-                      span.profit-addNumsign %
-                  .profit-tit 年化收益
-              .body-time
-                .time-num
-                  em.section-hui {{product.period}}
-                  | {{product.pay_method|period_unit}}
-                .time-tit 还款期限
-            .body-right
-              a(href="/weixin/detail/{{product.id}}").btn-body(class=btnClass) {{status}}
-          percent = float(product.ordered_amount) / product.total_amount * 100
-          if status == '抢购中'
-            .section-progressd(style="width:{{percent | percentage}}")
+      include include/ajax/ajax_list.jade
     include include/weixin_loading
     include include/weixin_footer
-    script(data-init='list', src="/static/scripts/mobile/dist/mobile.js?v=2")
+    script(data-init='list', src="/static/scripts/mobile/dist/mobile.js")
 
