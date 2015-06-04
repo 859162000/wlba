@@ -20,6 +20,7 @@ from wanglibao_redpack import backends as redpack_backends
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
+import re
 
 from wanglibao_rest.utils import split_ua
 
@@ -77,7 +78,11 @@ class P2PTrader(object):
                                                "is_full": is_full})
 
         # 投标成功发站内信
-        pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
+        matches = re.search(u'日计息', self.product.pay_method)
+        if matches and matches.group():
+            pname = u"%s,期限%s天" % (self.product.name, self.product.period)
+        else:
+            pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
 
         title, content = messages.msg_bid_purchase(self.order_id, pname, amount)
         inside_message.send_one.apply_async(kwargs={
@@ -213,7 +218,11 @@ class P2POperator(object):
         })
 
 
-        pname = u"%s,期限%s个月" % (product.name, product.period)
+        matches = re.search(u'日计息', product.pay_method)
+        if matches and matches.group():
+            pname = u"%s,期限%s天" % (product.name, product.period)
+        else:
+            pname = u"%s,期限%s个月" % (product.name, product.period)
         title, content = messages.msg_bid_success(pname, timezone.now())
         inside_message.send_batch.apply_async(kwargs={
             "users": user_ids,
@@ -248,7 +257,11 @@ class P2POperator(object):
                 "messages": [messages.product_failed(product)]
             })
 
-            pname = u"%s,期限%s个月" % (product.name, product.period)
+            matches = re.search(u'日计息', product.pay_method)
+            if matches and matches.group():
+                pname = u"%s,期限%s天" % (product.name, product.period)
+            else:
+                pname = u"%s,期限%s个月" % (product.name, product.period)
             title, content = messages.msg_bid_fail(pname)
             inside_message.send_batch.apply_async(kwargs={
                 "users": user_ids,
