@@ -218,7 +218,11 @@ class P2POperator(object):
         })
 
 
-        pname = u"%s,期限%s个月" % (product.name, product.period)
+        matches = re.search(u'日计息', product.pay_method)
+        if matches and matches.group():
+            pname = u"%s,期限%s天" % (product.name, product.period)
+        else:
+            pname = u"%s,期限%s个月" % (product.name, product.period)
         title, content = messages.msg_bid_success(pname, timezone.now())
         inside_message.send_batch.apply_async(kwargs={
             "users": user_ids,
@@ -253,7 +257,11 @@ class P2POperator(object):
                 "messages": [messages.product_failed(product)]
             })
 
-            pname = u"%s,期限%s个月" % (product.name, product.period)
+            matches = re.search(u'日计息', product.pay_method)
+            if matches and matches.group():
+                pname = u"%s,期限%s天" % (product.name, product.period)
+            else:
+                pname = u"%s,期限%s个月" % (product.name, product.period)
             title, content = messages.msg_bid_fail(pname)
             inside_message.send_batch.apply_async(kwargs={
                 "users": user_ids,

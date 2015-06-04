@@ -19,6 +19,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -492,7 +493,12 @@ class AmortizationKeeper(KeeperBaseMixin):
             description = unicode(amortization)
             catalog = u'分期还款'
             product = amortization.product
-            pname = u"%s,期限%s个月" % (product.name, product.period)
+
+            matches = re.search(u'日计息', product.pay_method)
+            if matches and matches.group():
+                pname = u"%s,期限%s天" % (product.name, product.period)
+            else:
+                pname = u"%s,期限%s个月" % (product.name, product.period)
 
             phone_list = list()
             message_list = list()
