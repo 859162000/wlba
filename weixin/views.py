@@ -399,7 +399,7 @@ class P2PDetailView(TemplateView):
             'total_buy_user': total_buy_user,
             'margin': float(user_margin),
             'amount': float(amount),
-            'redpack': redpacks,
+            'redpacks': redpacks,
             'next': next,
             'amount_profit': amount_profit,
         })
