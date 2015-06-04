@@ -1,3 +1,31 @@
+//重写alert
+(function(){
+    window.alert = function(txt, callback){
+        if(document.getElementById("alert-cont")){
+            document.getElementById("alertTxt").innerHTML = txt;
+            document.getElementById("popubMask").style.display = "block";
+            document.getElementById("alert-cont").style.display = "block";
+        }else{
+            var shield = document.createElement("DIV");
+            shield.id = "popubMask";
+            shield.style.cssText="position:absolute;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
+            var alertFram = document.createElement("DIV");
+            alertFram.id="alert-cont";
+            alertFram.style.cssText="position:absolute; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
+            strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 1.25rem .75rem;'>"+txt+"</div>";
+            strHtml +=" <div class=\"popub-footer\" style=\"width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;\" onclick=\"doOk()\">确认</div>";
+            alertFram.innerHTML = strHtml;
+            document.body.appendChild(alertFram);
+            document.body.appendChild(shield);
+            this.doOk = function(){
+                alertFram.style.display = "none";
+                shield.style.display = "none";
+                callback && callback();
+            };
+        }
+        document.body.onselectstart = function(){return false;};
+    };
+})();
 
 var org = (function(){
     document.body.addEventListener('touchstart', function () { }); //ios 触发active渲染
@@ -392,8 +420,10 @@ org.regist = (function(org){
                         },
                         success:function(data){
                             if(data.ret_code === 0){
-                                alert('注册成功,立即登录！');
-                                window.location.href = '/weixin/login/';
+                                alert('注册成功,立即登录！',function(){
+                                    window.location.href = '/weixin/login/';
+                                });
+
                             }else if(data.ret_code === 30014){
                                $('.'+signName['checkCode'][0]).show();
                                 $submitBody.text('立即注册');
@@ -474,6 +504,9 @@ org.detail = (function(org){
             lib._share();
             lib.countDown.length > 0 && lib._countDown(lib.countDown)
         },
+        /*
+        * 页面动画
+         */
         _animate:function(){
             $(function(){
                 var $progress = $('.progress-percent')
@@ -489,18 +522,20 @@ org.detail = (function(org){
                         $progress.addClass('progress-bolang')
                     },1000)
                 },300)
-                /*$payalert.on('click',function(){
-                    $(this).css('width', '0%');
-                    $(this).siblings('p').css('width','100%');
-                })*/
             })
         },
+        /*
+        * 公司信息tab
+         */
         _tab:function(){
             $('.toggleTab').on('click',function(){
                 $(this).siblings().toggle();
                 $(this).find('span').toggleClass('icon-rotate');
             })
         },
+        /*
+        * 微信分享
+         */
         _share: function(){
             var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
             org.ajax({
@@ -552,6 +587,9 @@ org.detail = (function(org){
                 })
             })
         },
+        /*
+        * 倒计时
+         */
         _countDown:function(target){
             var endTimeList = target.attr('data-left').replace(/-/g,'/');
             var  TimeTo =function (dd){
@@ -590,16 +628,19 @@ org.buy=(function(org){
         $redpackForAmount : $('.redpack-for-amount'),
         showredPackAmount:$(".redpack-amount"),
         showAmount :$('.need-amount'),
+        isBuy: true, //防止多次请求，后期可修改布局用button的disable，代码罗辑会少一点
         init :function(){
             lib._calculate();
             lib._buy();
         },
+        /*
+        * 购买页收益计算器
+         */
         _calculate:function(){
             org.calculate(lib.amountInout,lib._setRedpack)
         },
         /*
         *   购买提示信息
-        *   还没优化，if有点多哈哈
         *   触发_setRedpack条件 选择红包，投资金额大于0
         *
         *
@@ -623,11 +664,12 @@ org.buy=(function(org){
                 }
                 if(inputAmount < redPackInvestamount){
                     lib.$redpackSign.hide();//红包直抵提示
+                    lib.$redpackForAmount.hide();//请输入投资金额
                     return $(".redpack-investamount").show();//未达到红包使用门槛
                 }else{
                     if(redPackMethod == '*'){ //百分比红包
                         //如果反回来的百分比需要除于100 就把下面if改成if (inputAmount * redPackAmount/100 > redPackHighest_amount)
-                        if(inputAmount * redPackAmount > redPackHighest_amount){//是否超过最高抵扣
+                        if(inputAmount * redPackAmount >= redPackHighest_amount){//是否超过最高抵扣
                            repPackDikou = redPackHighest_amount;
                         }else{//没有超过最高抵扣
                             repPackDikou = inputAmount * redPackAmount;
@@ -640,7 +682,6 @@ org.buy=(function(org){
                     lib.showAmount.text(senderAmount);//实际支付金额
                     $(".redpack-investamount").hide();//未达到红包使用门槛
                     lib.$redpackSign.show();//红包直抵提示
-
                 }
             }else{
                 lib.$redpackSign.hide();//红包直抵提示
@@ -650,10 +691,10 @@ org.buy=(function(org){
         },
         _buy:function(){
             var $buyButton = $('.snap-up'),
-                $redpack = $("#gifts-package"), redpackAmount;
+                $redpack = $("#gifts-package"), redpackAmount,
+                reg =/^\d+(\.\d+)?$/;;
             //红包select事件
             $redpack.on("change",function(){
-                console.log($(this).val())
                 if($(this).val() != ''){
                     lib.amountInout.val() == '' ? $('.redpack-for-amount').show() : lib._setRedpack();
                 }else{
@@ -665,14 +706,14 @@ org.buy=(function(org){
             $buyButton.on('click',function(){
                 var $buySufficient = $('.buy-sufficient'),
                     balance = parseFloat($("#balance").attr("data-value")),
-                    amount = parseInt($('.amount').val()),
+                    amount = $('.amount').val() *1,
                     productID = $(".invest-one").attr('data-protuctid'),
                     redPackAmount = 0;
-                if(amount % 100 !== 0 || amount === 0){
-                    return alert('请输入100的倍数金额');
-                }
-                if(amount > balance){
-                    return $buySufficient.show();
+                if(amount){
+                    if(amount % 100 !== 0) return alert('请输入100的倍数金额');
+                    if(amount > balance)  return $buySufficient.show();
+                }else{
+                     return alert('请输入正确的金额');
                 }
                 var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
                 if(!redpackValue || redpackValue == ''){
@@ -681,46 +722,56 @@ org.buy=(function(org){
                     redPackAmount = parseInt(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount'));
                     redPackAmount ? "" : redPackAmount = 0;
                 }
+                if(lib.isBuy){
+                   if(confirm("购买金额为" + amount)){
+                        org.ajax({
+                            type: 'POST',
+                            url: '/api/p2p/purchase/',
+                            data: {product: productID, amount: amount, redpack: redpackValue},
+                            beforeSend:function(){
+                                $buyButton.text("抢购中...");
+                                lib.isBuy = false;
+                            },
+                            success: function(data){
+                               if(data.data){
+                                   $('.balance-sign').text(balance - data.data + redPackAmount);
+                                   $(".sign-main").css("display","-webkit-box");
+                               }
+                            },
+                            error: function(xhr){
+                                var  result;
+                                result = JSON.parse(xhr.responseText);
+                                if(xhr.status === 400){
+                                    if (result.error_number === 1) {
+                                        alert("登录超时，请重新登录！",function(){
+                                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
+                                        });
+                                    } else if (result.error_number === 2) {
+                                        return alert('必须实名认证！');
+                                    } else if (result.error_number === 4 && result.message === "余额不足") {
+                                        $(".buy-sufficient").show();
+                                        return;
+                                    }else{
+                                        return alert(result.message);
+                                    }
+                                }else if(xhr.status === 403){
+                                    if (result.detail) {
+                                        alert("登录超时，请重新登录！",function(){
+                                            return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
+                                        });
 
-                org.ajax({
-                    type: 'POST',
-                    url: '/api/p2p/purchase/',
-                    data: {product: productID, amount: amount, redpack: redpackValue},
-                    beforeSend:function(){
-                        $buyButton.text("抢购中...")
-                    },
-                    success: function(data){
-                       if(data.data){
-                           $('.balance-sign').text(balance - data.data + redPackAmount);
-                           $(".sign-main").css("display","-webkit-box");
-                       }
-                    },
-                    error: function(xhr){
-                        var  result;
-                        result = JSON.parse(xhr.responseText);
-                        if(result.status === 400){
-                            if (result.error_number === 1) {
-                                alert("登录超时，请重新登录！");
-                                return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
-                            } else if (result.error_number === 2) {
-                                return alert('必须实名认证！');
-                            } else if (result.error_number === 4 && result.message === "余额不足") {
-                                $(".buy-sufficient").show();
-                                return;
-                            }else{
-                                return alert(result.message);
+                                    }
+                                }
+                            },
+                            complete:function(){
+                               $buyButton.text("确定抢购");
+                                lib.isBuy = true;
                             }
-                        }else if(result.status === 403){
-                            if (result.detail) {
-                                alert("登录超时，请重新登录！");
-                                return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
-                            }
-                        }
-                    },
-                    complete:function(){
-                       $buyButton.text("确定抢购");
-                    }
-                })
+                        })
+                   }
+                }else{
+                    alert("购买中，请稍后")
+                }
             })
         }
     }
@@ -739,6 +790,7 @@ org.calculator=(function(org){
             var $calculatorBuy = $('.calculator-buy'),
                 $countInput = $('.count-input'),
                 productId, amount_profit, amount;
+
             $calculatorBuy.on('click',function(){
                 productId = $(this).attr('data-productid');
                 amount  = $countInput.val();
@@ -765,6 +817,9 @@ org.recharge=(function(org){
             lib._rechargeStepFirst();
             lib._initBankNav();
         },
+        /*
+        * 充值nav动画及事件触发
+        */
         _initBankNav:function(){
             var $nav = $(".bank-list-nav"),
                 $cardNone = $('.card-none'),
@@ -800,6 +855,9 @@ org.recharge=(function(org){
                 callback && callback();
             }
         },
+        /*
+        * 页面初始化判断是否首次充值
+         */
         _getBankCardList: function(){
             var $cardNone = $('.card-none'),
                 $cardHave = $('.card-have');
@@ -829,23 +887,23 @@ org.recharge=(function(org){
                     $(".bank-list-nav").css("-webkit-transform","translate3d(0,0,0)");
             })
         },
+        /*
+        *  初始化默认银行卡，没有默认银行卡，现在为第一个，回调函数为银行卡列表
+         */
         _initCard:function(data, callback){
-            var optionsDom = $("#card-select").find("option"),
-                optionsDomLength = optionsDom.length;
             $("#card-val").val(data[0]['storable_no'].slice(0,6) + '********'+ data[0]['storable_no'].slice(-4)).attr('data-storable', data[0]['storable_no']);
-            for(var i =0 ; i < optionsDomLength; i++){
-                if(optionsDom.eq(i).val() == data[0]['gate_id']){
-                    optionsDom.eq(i).attr("selected", "selected");
-                }
-            }
+            $(".bank-txt-name").text(data[0]['bank_name']);
             callback && callback();
         },
+        /*
+        * 银行卡列表
+         */
         _cradStyle:function(cardList){
             var str = '';
             for(var card in cardList){
-                str += "<div class= 'select-bank-list' data-gate="+cardList[card].gate_id+" data-storable="+cardList[card].storable_no+">";
+                str += "<div class= 'select-bank-list' data-storable="+cardList[card].storable_no+">";
                 str += "<div class='bank-cont'>";
-                str += "<p'>" + cardList[card].bank_name + "</p>";
+                str += "<p class='bank-name-alert'>" + cardList[card].bank_name + "</p>";
                 str += "<p>尾号 " + cardList[card].storable_no.slice(-4) + "</p>";
                 str += "<p>限额 200000</p>";
                 str += "</div>";
@@ -853,34 +911,29 @@ org.recharge=(function(org){
                 str += "</div>";
             }
             $(".select-bank-body").append(str);
-            $('.select-bank-list').on('click',function(event){
-                var optionsDom = $("#card-select").find("option"),
-                    optionsDomLength = optionsDom.length,
-                    that = this;
-                    $("#card-val").val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
-                    for(var i =0 ; i < optionsDomLength; i++){
-                        if(optionsDom.eq(i).val() == $(this).attr("data-gate")){
-                            $("#card-select").hide();
-                            optionsDom.eq(i).attr("selected", "selected").siblings().removeAttr("selected");
-                            $("#card-select").show();
-                            return $('.recharge-select-bank').hide();
-                        }
-                    }
 
+            $('.select-bank-list').on('click',function(event){
+                var that = this;
+                $("#card-val").val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
+                $(".bank-txt-name").text($(this).find(".bank-name-alert").text());
             });
             $(".recharge-select-bank").on('click',function(){
                  return $(this).hide();
             })
         },
+        /*
+        *   $firstBtn 为首次充值 进到一下步
+        *   $secondBtn 为快捷充值
+         */
         _rechargeStepFirst:function(){
-            var card_no,gate_id,amount,maxamount,
+            var card_no, gate_id, amount, maxamount,
                 $firstBtn = $('#firstBtn'),
                 $secondBtn = $('#secondBtn');
 
             $firstBtn.on('click', function(){
                 card_no = $("input[name='card_none_card']").val(),
                 gate_id = $("select[name='gate_id_none_card']").val(),
-                amount  = parseInt($("input[name='amount']").val()),
+                amount  = $("input[name='amount']").val() * 1,
                 maxamount = parseInt($("input[name='maxamount']").val());
                 if(!card_no || !gate_id || amount <= 0 || !amount) {
                     return alert('信息输入不完整');
@@ -892,18 +945,25 @@ org.recharge=(function(org){
             });
             $secondBtn.on('click', function(){
                 card_no = $("input[name='card_no']").attr('data-storable'),
-                gate_id = $("select[name='gate_id']").val(),
-                amount  = parseInt($("input[name='amount']").val()),
+                amount  = $("input[name='amount']").val() * 1,
                 maxamount = parseInt($("input[name='maxamount']").val());
-                if(!card_no || !gate_id || amount <= 0 || !amount) {
+                if(!card_no || amount <= 0 || !amount) {
                     return alert('信息输入不完整');
                 }
                 if(amount > maxamount){
                      return alert('最高充值'+ maxamount +'元！')
                 }
-                lib.canRecharge && lib._rechargeSingleStep(card_no,amount);
+                if(lib.canRecharge){
+                    confirm("充值金额为"+amount) && lib._rechargeSingleStep(card_no,amount);
+                }else{
+                    return alert('充值中，请稍后');
+                }
+
             });
         },
+        /*
+        * 快捷充值接口业务
+         */
         _rechargeSingleStep: function(card_no, amount) {
             org.ajax({
                 type: 'POST',
@@ -920,7 +980,7 @@ org.recharge=(function(org){
                          $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
                     }
                 },
-                error:function(){
+                error:function(data){
                     if(data.status == 403){
                         alert('登录超时，请重新登录！');
                     }
@@ -937,6 +997,9 @@ org.recharge=(function(org){
     }
 })(org);
 
+/*
+* 首次充值进入下一个页面的业务
+ */
 org.recharge_second=(function(org){
     var lib = {
         card_no : $("input[name='card_no']").val(),
@@ -949,7 +1012,6 @@ org.recharge_second=(function(org){
         },
         _getValidateCode: function(){
             var getValidateBtn = $('.request-check');
-
 
             getValidateBtn.on('click', function(){
                 var count = 60, intervalId ; //定时器
@@ -1007,7 +1069,8 @@ org.recharge_second=(function(org){
             secondBtn.on('click', function(){
                 var order_id = $("input[name='order_id']").val(),
                     vcode = $("input[name='vcode']").val(),
-                    token = $("input[name='token']").val();
+                    token = $("input[name='token']").val(),
+                    amount = $("input[name='amount']").val();
                 if(!lib.phone){
                     return alert('请填写手机号');
                 }
@@ -1020,27 +1083,32 @@ org.recharge_second=(function(org){
                 if(!order_id || !token) {
                     return alert('系统有错误，请重试获取验证码');
                 }
+
                 if(canPost){
-                    org.ajax({
-                        type: 'POST',
-                        url: '/api/pay/cnp/dynnum/',
-                         data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
-                        beforeSend:function(){
-                            canPost = false;
-                            secondBtn.text("充值中...");
-                        },
-                        success: function(data) {
-                            if(data.ret_code > 0) {
-                                return alert(data.message);
-                            } else {
-                               $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
+                    if(confirm("充值金额为" + amount)){
+                        org.ajax({
+                            type: 'POST',
+                            url: '/api/pay/cnp/dynnum/',
+                             data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
+                            beforeSend:function(){
+                                canPost = false;
+                                secondBtn.text("充值中...");
+                            },
+                            success: function(data) {
+                                if(data.ret_code > 0) {
+                                    return alert(data.message);
+                                } else {
+                                   $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
+                                }
+                            },
+                            complete:function(){
+                                canPost = true;
+                                secondBtn.text("充值");
                             }
-                        },
-                        complete:function(){
-                            canPost = true;
-                            secondBtn.text("充值");
-                        }
-                    })
+                        })
+                    }
+                }else{
+                    return alert('充值中，请稍后');
                 }
             })
         }
@@ -1052,56 +1120,58 @@ org.recharge_second=(function(org){
 
 org.authentication = (function(org){
     var lib = {
+        isPost: true,
+        $fromComplete : $(".from-four-complete"),
         init: function(){
             lib._checkForm();
         },
         _checkForm :function(){
-            var $fromComplete = $(".from-four-complete"),
-                formName = ['name','id_number']
+            var formName = ['name','id_number'],
                 formError = ['.error-name', '.error-card'],
                 formSign = ['请输入姓名', '请输入身份证号', '请输入有效身份证'],
                 data = {},
                 reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; //身份证正则
 
-            $fromComplete.on('click',function(){
-                var isGet = true;
+            lib.$fromComplete.on('click',function(){
+                var isFor = true;
                 $('.sign-all').hide();
-
                 $('.check-input').each(function(i){
                     if(!$(this).val()){
-                        $(formError[i]).text(formSign[i]).show();
-                        return isGet = false;
+                        isFor =false;
+                        return $(formError[i]).text(formSign[i]).show();
                     }else{
                         if(i === 1 && !reg.test($(this).val())){
-                            $(formError[i]).text(formSign[2]).show();
-                            return isGet = false;
+                            isFor =false;
+                            return $(formError[i]).text(formSign[2]).show();
                         }
                     }
                     data[formName[i]] = $(this).val();
                 })
-                isGet && lib._forAuthentication(data)
+                isFor && lib._forAuthentication(data)
             });
         },
         _forAuthentication:function(ags){
-            var isPost = true;
-            if(isPost){
+            if(lib.isPost){
                 org.ajax({
                     type: 'POST',
                     url : '/api/id_validate/',
                     data : ags,
                     beforeSend:function(){
-                       isPost = false;
+                        lib.isPost = false;
+                        lib.$fromComplete.text("认证中，请等待...");
                     },
                     success:function(){
-                        alert("实名认证成功!");
-                        window.location.href = '/weixin/security/';
+                        alert("实名认证成功!",function(){
+                           window.location.href = '/weixin/security/';
+                        });
                     },
                     error:function(xhr){
                         result = JSON.parse(xhr.responseText);
                         return alert(result.message);
                     },
                     complete:function(){
-                        isPost = true;
+                        lib.isPost = true;
+                        lib.$fromComplete.text("完成");
                     }
                 })
             }
@@ -1122,8 +1192,7 @@ org.bankcardAdd = (function(org){
             $(".addBank-btn").on('click',function(){
                 var gate_id = $('#bank-select').val(),
                     card_number = $('#card-no').val(),
-                    is_default = $('#default-checkbox').prop('checked'),
-                    data = {};
+                    is_default = $('#default-checkbox').prop('checked');
 
                 if (!gate_id) {
                     return alert('请选择银行');
@@ -1150,8 +1219,9 @@ org.bankcardAdd = (function(org){
                 },
                 success:function(result){
                     if(result.ret_code === 0){
-                        alert("添加成功！");
-                        window.location.href = '/weixin/account/bankcard/';
+                        alert("添加成功！",function(){
+                             window.location.href = '/weixin/account/bankcard/';
+                        });
                     }else if(result.ret_code > 0){
                         alert(result.message);
                     }
