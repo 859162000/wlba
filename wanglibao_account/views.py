@@ -1049,21 +1049,8 @@ def ajax_register(request):
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
 
-                # # todo remove the try about cjdao callback
-                # try:
-                #     cjdaoinfo = request.session.get('cjdaoinfo')
-                #
-                #     if cjdaoinfo:
-                #         params = CjdaoUtils.return_register(cjdaoinfo, auth_user, CJDAOKEY)
-                #         cjdao_callback.apply_async(kwargs={'url': RETURN_REGISTER, 'params': params})
-                # except Exception, e:
-                #     print e
-
                 auth.login(request, auth_user)
 
-                # session lost, but I don't know why, rewrite the session
-                # if cjdaoinfo:
-                #     request.session['cjdaoinfo'] = cjdaoinfo
                 tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device_type":"pc"})
 
                 return HttpResponse(messenger('done', user=request.user))

@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger
 from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels
+from wanglibao_redpack import backends as redpack_backends
 import logging
 
 
@@ -19,6 +20,8 @@ def set_promo_user(request, user, invitecode=''):
     if not invitecode:
         invitecode = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
+    product_id = request.session.get(settings.PROMO_TOKEN_PRODUCT, None)
+
     if invitecode:
         record = Channels.objects.filter(code=invitecode).first()
         if record:
@@ -28,8 +31,10 @@ def set_promo_user(request, user, invitecode=''):
             if recordpromo:
                 introduced_by_user = User.objects.get(pk=recordpromo.pk)
                 save_introducedBy(user, introduced_by_user)
+                redpack_backends.increase_hike(introduced_by_user, product_id)
 
         request.session[settings.PROMO_TOKEN_QUERY_STRING] = None
+        request.session[settings.PROMO_TOKEN_PRODUCT] = None
 
        # user_id = request.session.get(settings.PROMO_TOKEN_USER_SESSION_KEY, None)
        # if user_id:

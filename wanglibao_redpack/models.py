@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
+from decimal import Decimal
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+from wanglibao_p2p.models import P2PProduct
 
 
 #class Rule(models.Model):
@@ -117,6 +119,21 @@ class RedPackRecord(models.Model):
         verbose_name = u"红包流水"
         verbose_name_plural = u"红包流水"
 
+class InterestHike(models.Model):
+    user = models.ForeignKey(User, verbose_name=u"用户")
+    product = models.ForeignKey(P2PProduct, verbose_name=u"产品")
+    rate = models.DecimalField(verbose_name=u'加息利率', max_digits=20, decimal_places=5, default=Decimal('0.00'))
+    intro_total = models.IntegerField(verbose_name=u"此产品的邀请人数", default=0, blank=False, null=False)
+    invalid = models.BooleanField(default=False, verbose_name=u"是否作废", null=False)
+    paid = models.BooleanField(default=False, verbose_name=u"是否支付", null=False)
+    amount = models.DecimalField(verbose_name=u'加息金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
+    updated_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"更新时间")
+    expired_at = models.DateTimeField(null=True, verbose_name=u"到期时间", blank=True)
+
+    class Meta:
+        verbose_name = u"加息券"
+        verbose_name_plural = u"加息券"
 
 
 #创建红包列表

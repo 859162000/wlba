@@ -149,6 +149,19 @@ class MarginKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
+    def hike_deposit(self, amount, description=u'', order_id=None, savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            margin.margin += amount
+            margin.save()
+            catalog = u'加息存入'
+            if not order_id:
+                order_id = self.order_id
+            record = self.__tracer(catalog, amount, margin.margin, description, order_id)
+            return record
+
     def __tracer(self, catalog, amount, margin_current, description=u'', order_id=None):
         if not order_id:
             order_id = self.order_id

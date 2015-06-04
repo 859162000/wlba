@@ -2,7 +2,7 @@
 # encoding:utf-8
 
 from django.contrib import admin
-from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
+from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent, InterestHike
 from import_export import resources
 from import_export.admin import ExportMixin
 
@@ -42,7 +42,13 @@ class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
     raw_id_fields = ('user', "redpack")
     list_filter = ('change_platform', 'apply_platform')
 
+class InterestHikeAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "product", "rate", "intro_total", "invalid", "paid", 
+                    "amount", "created_at", "expired_at")
+    search_fields = ('user__wanglibaouserprofile__phone', 'product__name')
+    raw_id_fields = ("user", "product")
 
 admin.site.register(RedPack, RedPackAdmin)
 admin.site.register(RedPackEvent, RedPackEventAdmin)
 admin.site.register(RedPackRecord, RedPackRecordAdmin)
+admin.site.register(InterestHike, InterestHikeAdmin)
