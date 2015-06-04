@@ -27,7 +27,6 @@
     };
 })();
 
-
 var org = (function(){
     document.body.addEventListener('touchstart', function () { }); //ios 触发active渲染
     var lib = {
@@ -999,7 +998,7 @@ org.recharge=(function(org){
 })(org);
 
 /*
-* 首次充值进入的下一个页面的业务
+* 首次充值进入下一个页面的业务
  */
 org.recharge_second=(function(org){
     var lib = {
@@ -1193,8 +1192,7 @@ org.bankcardAdd = (function(org){
             $(".addBank-btn").on('click',function(){
                 var gate_id = $('#bank-select').val(),
                     card_number = $('#card-no').val(),
-                    is_default = $('#default-checkbox').prop('checked'),
-                    data = {};
+                    is_default = $('#default-checkbox').prop('checked');
 
                 if (!gate_id) {
                     return alert('请选择银行');
