@@ -1,3 +1,30 @@
+//重写alert
+window.alert = function(txt, callback)
+{
+	if(document.getElementById("alert-cont")){
+		document.getElementById("alertTxt").innerHTML = txt;
+		document.getElementById("popubMask").style.display = "block";
+		document.getElementById("alert-cont").style.display = "block";
+	}else{
+		var shield = document.createElement("DIV");
+		shield.id = "popubMask";
+		shield.style.cssText="position:absolute;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
+		var alertFram = document.createElement("DIV");
+		alertFram.id="alert-cont";
+		alertFram.style.cssText="position:absolute; top:35%;left:50%; width:280px; margin:-55px 0 0 -140px; background:#fafafa; border-radius:5px;z-index:1000001;";
+		strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font: 16px/1.5 yahei!important;padding: 25px 15px;'>"+txt+"</div>";
+		strHtml +=" <div class=\"popub-footer\" style=\"width: 100%;padding: 10px 0;font: 18px yahei;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;\" onclick=\"doOk()\">确认</div>";
+		alertFram.innerHTML = strHtml;
+		document.body.appendChild(alertFram);
+		document.body.appendChild(shield);
+		this.doOk = function(){
+			alertFram.style.display = "none";
+			shield.style.display = "none";
+            callback && callback();
+		};
+	}
+	document.body.onselectstart = function(){return false;};
+};
 
 var org = (function(){
     document.body.addEventListener('touchstart', function () { }); //ios 触发active渲染
@@ -392,8 +419,10 @@ org.regist = (function(org){
                         },
                         success:function(data){
                             if(data.ret_code === 0){
-                                alert('注册成功,立即登录！');
-                                window.location.href = '/weixin/login/';
+                                alert('注册成功,立即登录！',function(){
+                                    window.location.href = '/weixin/login/';
+                                });
+
                             }else if(data.ret_code === 30014){
                                $('.'+signName['checkCode'][0]).show();
                                 $submitBody.text('立即注册');
@@ -489,10 +518,6 @@ org.detail = (function(org){
                         $progress.addClass('progress-bolang')
                     },1000)
                 },300)
-                /*$payalert.on('click',function(){
-                    $(this).css('width', '0%');
-                    $(this).siblings('p').css('width','100%');
-                })*/
             })
         },
         _tab:function(){
@@ -623,6 +648,7 @@ org.buy=(function(org){
                 }
                 if(inputAmount < redPackInvestamount){
                     lib.$redpackSign.hide();//红包直抵提示
+                    lib.$redpackForAmount.hide();//请输入投资金额
                     return $(".redpack-investamount").show();//未达到红包使用门槛
                 }else{
                     if(redPackMethod == '*'){ //百分比红包
@@ -640,7 +666,6 @@ org.buy=(function(org){
                     lib.showAmount.text(senderAmount);//实际支付金额
                     $(".redpack-investamount").hide();//未达到红包使用门槛
                     lib.$redpackSign.show();//红包直抵提示
-
                 }
             }else{
                 lib.$redpackSign.hide();//红包直抵提示
@@ -700,8 +725,9 @@ org.buy=(function(org){
                         result = JSON.parse(xhr.responseText);
                         if(result.status === 400){
                             if (result.error_number === 1) {
-                                alert("登录超时，请重新登录！");
-                                return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
+                                alert("登录超时，请重新登录！",function(){
+                                    return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
+                                });
                             } else if (result.error_number === 2) {
                                 return alert('必须实名认证！');
                             } else if (result.error_number === 4 && result.message === "余额不足") {
@@ -712,8 +738,10 @@ org.buy=(function(org){
                             }
                         }else if(result.status === 403){
                             if (result.detail) {
-                                alert("登录超时，请重新登录！");
-                                return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
+                                alert("登录超时，请重新登录！",function(){
+                                    return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
+                                });
+
                             }
                         }
                     },
@@ -830,22 +858,16 @@ org.recharge=(function(org){
             })
         },
         _initCard:function(data, callback){
-            var optionsDom = $("#card-select").find("option"),
-                optionsDomLength = optionsDom.length;
             $("#card-val").val(data[0]['storable_no'].slice(0,6) + '********'+ data[0]['storable_no'].slice(-4)).attr('data-storable', data[0]['storable_no']);
-            for(var i =0 ; i < optionsDomLength; i++){
-                if(optionsDom.eq(i).val() == data[0]['gate_id']){
-                    optionsDom.eq(i).attr("selected", "selected");
-                }
-            }
+            $(".bank-txt-name").text(data[0]['bank_name']);
             callback && callback();
         },
         _cradStyle:function(cardList){
             var str = '';
             for(var card in cardList){
-                str += "<div class= 'select-bank-list' data-gate="+cardList[card].gate_id+" data-storable="+cardList[card].storable_no+">";
+                str += "<div class= 'select-bank-list' data-storable="+cardList[card].storable_no+">";
                 str += "<div class='bank-cont'>";
-                str += "<p'>" + cardList[card].bank_name + "</p>";
+                str += "<p class='bank-name-alert'>" + cardList[card].bank_name + "</p>";
                 str += "<p>尾号 " + cardList[card].storable_no.slice(-4) + "</p>";
                 str += "<p>限额 200000</p>";
                 str += "</div>";
@@ -854,28 +876,19 @@ org.recharge=(function(org){
             }
             $(".select-bank-body").append(str);
             $('.select-bank-list').on('click',function(event){
-                var optionsDom = $("#card-select").find("option"),
-                    optionsDomLength = optionsDom.length,
-                    that = this;
+                var that = this;
                     $("#card-val").val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
-                    for(var i =0 ; i < optionsDomLength; i++){
-                        if(optionsDom.eq(i).val() == $(this).attr("data-gate")){
-                            $("#card-select").hide();
-                            optionsDom.eq(i).attr("selected", "selected").siblings().removeAttr("selected");
-                            $("#card-select").show();
-                            return $('.recharge-select-bank').hide();
-                        }
-                    }
-
+                    $(".bank-txt-name").text($(this).find(".bank-name-alert").text());
             });
             $(".recharge-select-bank").on('click',function(){
                  return $(this).hide();
             })
         },
         _rechargeStepFirst:function(){
-            var card_no,gate_id,amount,maxamount,
+            var card_no, gate_id, amount, maxamount,
                 $firstBtn = $('#firstBtn'),
-                $secondBtn = $('#secondBtn');
+                $secondBtn = $('#secondBtn'),
+                reg =/^\d+(\.\d+)?$/ ;
 
             $firstBtn.on('click', function(){
                 card_no = $("input[name='card_none_card']").val(),
@@ -892,16 +905,19 @@ org.recharge=(function(org){
             });
             $secondBtn.on('click', function(){
                 card_no = $("input[name='card_no']").attr('data-storable'),
-                gate_id = $("select[name='gate_id']").val(),
-                amount  = parseInt($("input[name='amount']").val()),
+                amount  = $("input[name='amount']").val(),
                 maxamount = parseInt($("input[name='maxamount']").val());
-                if(!card_no || !gate_id || amount <= 0 || !amount) {
+                if(!card_no || amount <= 0 || !amount) {
                     return alert('信息输入不完整');
+                }
+                if(!reg.test(amount)){
+                    return alert('请输入正确的金额');
                 }
                 if(amount > maxamount){
                      return alert('最高充值'+ maxamount +'元！')
                 }
-                lib.canRecharge && lib._rechargeSingleStep(card_no,amount);
+                if(confirm("充值金额为"+amount))
+                    lib.canRecharge && lib._rechargeSingleStep(card_no,amount);
             });
         },
         _rechargeSingleStep: function(card_no, amount) {
@@ -1052,56 +1068,58 @@ org.recharge_second=(function(org){
 
 org.authentication = (function(org){
     var lib = {
+        isPost: true,
+        $fromComplete : $(".from-four-complete"),
         init: function(){
             lib._checkForm();
         },
         _checkForm :function(){
-            var $fromComplete = $(".from-four-complete"),
-                formName = ['name','id_number']
+            var formName = ['name','id_number'],
                 formError = ['.error-name', '.error-card'],
                 formSign = ['请输入姓名', '请输入身份证号', '请输入有效身份证'],
                 data = {},
                 reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; //身份证正则
 
-            $fromComplete.on('click',function(){
-                var isGet = true;
+            lib.$fromComplete.on('click',function(){
+                var isFor = true;
                 $('.sign-all').hide();
-
                 $('.check-input').each(function(i){
                     if(!$(this).val()){
-                        $(formError[i]).text(formSign[i]).show();
-                        return isGet = false;
+                        isFor =false;
+                        return $(formError[i]).text(formSign[i]).show();
                     }else{
                         if(i === 1 && !reg.test($(this).val())){
-                            $(formError[i]).text(formSign[2]).show();
-                            return isGet = false;
+                            isFor =false;
+                            return $(formError[i]).text(formSign[2]).show();
                         }
                     }
                     data[formName[i]] = $(this).val();
                 })
-                isGet && lib._forAuthentication(data)
+                isFor && lib._forAuthentication(data)
             });
         },
         _forAuthentication:function(ags){
-            var isPost = true;
-            if(isPost){
+            if(lib.isPost){
                 org.ajax({
                     type: 'POST',
                     url : '/api/id_validate/',
                     data : ags,
                     beforeSend:function(){
-                       isPost = false;
+                        lib.isPost = false;
+                        lib.$fromComplete.text("认证中，请等待...");
                     },
                     success:function(){
-                        alert("实名认证成功!");
-                        window.location.href = '/weixin/security/';
+                        alert("实名认证成功!",function(){
+                           window.location.href = '/weixin/security/';
+                        });
                     },
                     error:function(xhr){
                         result = JSON.parse(xhr.responseText);
                         return alert(result.message);
                     },
                     complete:function(){
-                        isPost = true;
+                        lib.isPost = true;
+                        lib.$fromComplete.text("完成");
                     }
                 })
             }
@@ -1150,8 +1168,9 @@ org.bankcardAdd = (function(org){
                 },
                 success:function(result){
                     if(result.ret_code === 0){
-                        alert("添加成功！");
-                        window.location.href = '/weixin/account/bankcard/';
+                        alert("添加成功！",function(){
+                             window.location.href = '/weixin/account/bankcard/';
+                        });
                     }else if(result.ret_code > 0){
                         alert(result.message);
                     }

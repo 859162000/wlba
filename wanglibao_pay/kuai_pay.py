@@ -222,7 +222,7 @@ class KuaiPay:
         except:
             pass
 
-        return {"ret_code":0, "message":"test", "cards":cards}
+        return {"ret_code":0, "message":"test", "cards":[{"gate_id": "28", "bank_name": "招商银行", "first_one": "5000", "second_day": "10000000", "second_one": "50000", "storable_no": "6228482919"},{"gate_id": "29", "bank_name": "中国农业银行", "first_one": "10000", "second_day": "10000000", "second_one": "50000", "storable_no": "6228482966"}]}
 
     def _handle_dynnum_result(self, res):
         if res.status_code != 200 or "errorCode" in res.content:
