@@ -1038,7 +1038,8 @@ org.recharge_second=(function(org){
             secondBtn.on('click', function(){
                 var order_id = $("input[name='order_id']").val(),
                     vcode = $("input[name='vcode']").val(),
-                    token = $("input[name='token']").val();
+                    token = $("input[name='token']").val(),
+                    amount = $("input[name='amount']").val();
                 if(!lib.phone){
                     return alert('请填写手机号');
                 }
@@ -1053,7 +1054,7 @@ org.recharge_second=(function(org){
                 }
 
                 if(canPost){
-                    if(confirm("充值金额为" + data.amount)){
+                    if(confirm("充值金额为" + amount)){
                         org.ajax({
                             type: 'POST',
                             url: '/api/pay/cnp/dynnum/',
