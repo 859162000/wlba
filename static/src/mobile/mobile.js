@@ -1,30 +1,32 @@
 //重写alert
-window.alert = function(txt, callback)
-{
-	if(document.getElementById("alert-cont")){
-		document.getElementById("alertTxt").innerHTML = txt;
-		document.getElementById("popubMask").style.display = "block";
-		document.getElementById("alert-cont").style.display = "block";
-	}else{
-		var shield = document.createElement("DIV");
-		shield.id = "popubMask";
-		shield.style.cssText="position:absolute;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
-		var alertFram = document.createElement("DIV");
-		alertFram.id="alert-cont";
-		alertFram.style.cssText="position:absolute; top:35%;left:50%; width:280px; margin:-55px 0 0 -140px; background:#fafafa; border-radius:5px;z-index:1000001;";
-		strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font: 16px/1.5 yahei!important;padding: 25px 15px;'>"+txt+"</div>";
-		strHtml +=" <div class=\"popub-footer\" style=\"width: 100%;padding: 10px 0;font: 18px yahei;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;\" onclick=\"doOk()\">确认</div>";
-		alertFram.innerHTML = strHtml;
-		document.body.appendChild(alertFram);
-		document.body.appendChild(shield);
-		this.doOk = function(){
-			alertFram.style.display = "none";
-			shield.style.display = "none";
-            callback && callback();
-		};
-	}
-	document.body.onselectstart = function(){return false;};
-};
+(function(){
+    window.alert = function(txt, callback){
+        if(document.getElementById("alert-cont")){
+            document.getElementById("alertTxt").innerHTML = txt;
+            document.getElementById("popubMask").style.display = "block";
+            document.getElementById("alert-cont").style.display = "block";
+        }else{
+            var shield = document.createElement("DIV");
+            shield.id = "popubMask";
+            shield.style.cssText="position:absolute;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
+            var alertFram = document.createElement("DIV");
+            alertFram.id="alert-cont";
+            alertFram.style.cssText="position:absolute; top:35%;left:50%; width:280px; margin:-55px 0 0 -140px; background:#fafafa; border-radius:5px;z-index:1000001;";
+            strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font: 16px/1.5 yahei!important;padding: 25px 15px;'>"+txt+"</div>";
+            strHtml +=" <div class=\"popub-footer\" style=\"width: 100%;padding: 10px 0;font: 18px yahei;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;\" onclick=\"doOk()\">确认</div>";
+            alertFram.innerHTML = strHtml;
+            document.body.appendChild(alertFram);
+            document.body.appendChild(shield);
+            this.doOk = function(){
+                alertFram.style.display = "none";
+                shield.style.display = "none";
+                callback && callback();
+            };
+        }
+        document.body.onselectstart = function(){return false;};
+    };
+})();
+
 
 var org = (function(){
     document.body.addEventListener('touchstart', function () { }); //ios 触发active渲染
@@ -615,6 +617,7 @@ org.buy=(function(org){
         $redpackForAmount : $('.redpack-for-amount'),
         showredPackAmount:$(".redpack-amount"),
         showAmount :$('.need-amount'),
+        isBuy: true,
         init :function(){
             lib._calculate();
             lib._buy();
@@ -678,7 +681,6 @@ org.buy=(function(org){
                 $redpack = $("#gifts-package"), redpackAmount;
             //红包select事件
             $redpack.on("change",function(){
-                console.log($(this).val())
                 if($(this).val() != ''){
                     lib.amountInout.val() == '' ? $('.redpack-for-amount').show() : lib._setRedpack();
                 }else{
@@ -706,49 +708,56 @@ org.buy=(function(org){
                     redPackAmount = parseInt(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount'));
                     redPackAmount ? "" : redPackAmount = 0;
                 }
+                if(lib.isBuy){
+                   if(confirm("购买金额为" + amount)){
+                        org.ajax({
+                            type: 'POST',
+                            url: '/api/p2p/purchase/',
+                            data: {product: productID, amount: amount, redpack: redpackValue},
+                            beforeSend:function(){
+                                $buyButton.text("抢购中...");
+                                lib.isBuy = false;
+                            },
+                            success: function(data){
+                               if(data.data){
+                                   $('.balance-sign').text(balance - data.data + redPackAmount);
+                                   $(".sign-main").css("display","-webkit-box");
+                               }
+                            },
+                            error: function(xhr){
+                                var  result;
+                                result = JSON.parse(xhr.responseText);
+                                if(result.status === 400){
+                                    if (result.error_number === 1) {
+                                        alert("登录超时，请重新登录！",function(){
+                                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
+                                        });
+                                    } else if (result.error_number === 2) {
+                                        return alert('必须实名认证！');
+                                    } else if (result.error_number === 4 && result.message === "余额不足") {
+                                        $(".buy-sufficient").show();
+                                        return;
+                                    }else{
+                                        return alert(result.message);
+                                    }
+                                }else if(result.status === 403){
+                                    if (result.detail) {
+                                        alert("登录超时，请重新登录！",function(){
+                                            return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
+                                        });
 
-                org.ajax({
-                    type: 'POST',
-                    url: '/api/p2p/purchase/',
-                    data: {product: productID, amount: amount, redpack: redpackValue},
-                    beforeSend:function(){
-                        $buyButton.text("抢购中...")
-                    },
-                    success: function(data){
-                       if(data.data){
-                           $('.balance-sign').text(balance - data.data + redPackAmount);
-                           $(".sign-main").css("display","-webkit-box");
-                       }
-                    },
-                    error: function(xhr){
-                        var  result;
-                        result = JSON.parse(xhr.responseText);
-                        if(result.status === 400){
-                            if (result.error_number === 1) {
-                                alert("登录超时，请重新登录！",function(){
-                                    return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
-                                });
-                            } else if (result.error_number === 2) {
-                                return alert('必须实名认证！');
-                            } else if (result.error_number === 4 && result.message === "余额不足") {
-                                $(".buy-sufficient").show();
-                                return;
-                            }else{
-                                return alert(result.message);
+                                    }
+                                }
+                            },
+                            complete:function(){
+                               $buyButton.text("确定抢购");
+                                lib.isBuy = true;
                             }
-                        }else if(result.status === 403){
-                            if (result.detail) {
-                                alert("登录超时，请重新登录！",function(){
-                                    return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
-                                });
-
-                            }
-                        }
-                    },
-                    complete:function(){
-                       $buyButton.text("确定抢购");
-                    }
-                })
+                        })
+                   }
+                }else{
+                    alert("购买中，请稍后")
+                }
             })
         }
     }
@@ -916,8 +925,13 @@ org.recharge=(function(org){
                 if(amount > maxamount){
                      return alert('最高充值'+ maxamount +'元！')
                 }
-                if(confirm("充值金额为"+amount))
-                    lib.canRecharge && lib._rechargeSingleStep(card_no,amount);
+
+                if(lib.canRecharge){
+                    confirm("充值金额为"+amount) && lib._rechargeSingleStep(card_no,amount);
+                }else{
+                    return alert('充值中，请稍后');
+                }
+
             });
         },
         _rechargeSingleStep: function(card_no, amount) {
@@ -1036,27 +1050,32 @@ org.recharge_second=(function(org){
                 if(!order_id || !token) {
                     return alert('系统有错误，请重试获取验证码');
                 }
+
                 if(canPost){
-                    org.ajax({
-                        type: 'POST',
-                        url: '/api/pay/cnp/dynnum/',
-                         data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
-                        beforeSend:function(){
-                            canPost = false;
-                            secondBtn.text("充值中...");
-                        },
-                        success: function(data) {
-                            if(data.ret_code > 0) {
-                                return alert(data.message);
-                            } else {
-                               $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
+                    if(confirm("充值金额为" + data.amount)){
+                        org.ajax({
+                            type: 'POST',
+                            url: '/api/pay/cnp/dynnum/',
+                             data: {phone: lib.phone, vcode: vcode, order_id: order_id, token: token},
+                            beforeSend:function(){
+                                canPost = false;
+                                secondBtn.text("充值中...");
+                            },
+                            success: function(data) {
+                                if(data.ret_code > 0) {
+                                    return alert(data.message);
+                                } else {
+                                   $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
+                                }
+                            },
+                            complete:function(){
+                                canPost = true;
+                                secondBtn.text("充值");
                             }
-                        },
-                        complete:function(){
-                            canPost = true;
-                            secondBtn.text("充值");
-                        }
-                    })
+                        })
+                    }
+                }else{
+                    return alert('充值中，请稍后');
                 }
             })
         }
