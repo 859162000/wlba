@@ -11,9 +11,9 @@
             shield.style.cssText="position:absolute;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
             var alertFram = document.createElement("DIV");
             alertFram.id="alert-cont";
-            alertFram.style.cssText="position:absolute; top:35%;left:50%; width:280px; margin:-55px 0 0 -140px; background:#fafafa; border-radius:5px;z-index:1000001;";
-            strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font: 16px/1.5 yahei!important;padding: 25px 15px;'>"+txt+"</div>";
-            strHtml +=" <div class=\"popub-footer\" style=\"width: 100%;padding: 10px 0;font: 18px yahei;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;\" onclick=\"doOk()\">确认</div>";
+            alertFram.style.cssText="position:absolute; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
+            strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 1.25rem .75rem;'>"+txt+"</div>";
+            strHtml +=" <div class=\"popub-footer\" style=\"width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;\" onclick=\"doOk()\">确认</div>";
             alertFram.innerHTML = strHtml;
             document.body.appendChild(alertFram);
             document.body.appendChild(shield);
@@ -505,6 +505,9 @@ org.detail = (function(org){
             lib._share();
             lib.countDown.length > 0 && lib._countDown(lib.countDown)
         },
+        /*
+        * 页面动画
+         */
         _animate:function(){
             $(function(){
                 var $progress = $('.progress-percent')
@@ -522,12 +525,18 @@ org.detail = (function(org){
                 },300)
             })
         },
+        /*
+        * 公司信息tab
+         */
         _tab:function(){
             $('.toggleTab').on('click',function(){
                 $(this).siblings().toggle();
                 $(this).find('span').toggleClass('icon-rotate');
             })
         },
+        /*
+        * 微信分享
+         */
         _share: function(){
             var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
             org.ajax({
@@ -579,6 +588,9 @@ org.detail = (function(org){
                 })
             })
         },
+        /*
+        * 倒计时
+         */
         _countDown:function(target){
             var endTimeList = target.attr('data-left').replace(/-/g,'/');
             var  TimeTo =function (dd){
@@ -617,17 +629,19 @@ org.buy=(function(org){
         $redpackForAmount : $('.redpack-for-amount'),
         showredPackAmount:$(".redpack-amount"),
         showAmount :$('.need-amount'),
-        isBuy: true,
+        isBuy: true, //防止多次请求，后期可修改布局用button的disable，代码罗辑会少一点
         init :function(){
             lib._calculate();
             lib._buy();
         },
+        /*
+        * 购买页收益计算器
+         */
         _calculate:function(){
             org.calculate(lib.amountInout,lib._setRedpack)
         },
         /*
         *   购买提示信息
-        *   还没优化，if有点多哈哈
         *   触发_setRedpack条件 选择红包，投资金额大于0
         *
         *
@@ -777,6 +791,7 @@ org.calculator=(function(org){
             var $calculatorBuy = $('.calculator-buy'),
                 $countInput = $('.count-input'),
                 productId, amount_profit, amount;
+
             $calculatorBuy.on('click',function(){
                 productId = $(this).attr('data-productid');
                 amount  = $countInput.val();
@@ -803,6 +818,9 @@ org.recharge=(function(org){
             lib._rechargeStepFirst();
             lib._initBankNav();
         },
+        /*
+        * 充值nav动画及事件触发
+        */
         _initBankNav:function(){
             var $nav = $(".bank-list-nav"),
                 $cardNone = $('.card-none'),
@@ -838,6 +856,9 @@ org.recharge=(function(org){
                 callback && callback();
             }
         },
+        /*
+        * 页面初始化判断是否首次充值
+         */
         _getBankCardList: function(){
             var $cardNone = $('.card-none'),
                 $cardHave = $('.card-have');
@@ -867,11 +888,17 @@ org.recharge=(function(org){
                     $(".bank-list-nav").css("-webkit-transform","translate3d(0,0,0)");
             })
         },
+        /*
+        *  初始化默认银行卡，没有默认银行卡，现在为第一个，回调函数为银行卡列表
+         */
         _initCard:function(data, callback){
             $("#card-val").val(data[0]['storable_no'].slice(0,6) + '********'+ data[0]['storable_no'].slice(-4)).attr('data-storable', data[0]['storable_no']);
             $(".bank-txt-name").text(data[0]['bank_name']);
             callback && callback();
         },
+        /*
+        * 银行卡列表
+         */
         _cradStyle:function(cardList){
             var str = '';
             for(var card in cardList){
@@ -895,6 +922,10 @@ org.recharge=(function(org){
                  return $(this).hide();
             })
         },
+        /*
+        *   $firstBtn 为首次充值 进到一下步
+        *   $secondBtn 为快捷充值
+         */
         _rechargeStepFirst:function(){
             var card_no, gate_id, amount, maxamount,
                 $firstBtn = $('#firstBtn'),
@@ -931,6 +962,9 @@ org.recharge=(function(org){
 
             });
         },
+        /*
+        * 快捷充值接口业务
+         */
         _rechargeSingleStep: function(card_no, amount) {
             org.ajax({
                 type: 'POST',
@@ -964,6 +998,9 @@ org.recharge=(function(org){
     }
 })(org);
 
+/*
+* 首次充值进入的下一个页面的业务
+ */
 org.recharge_second=(function(org){
     var lib = {
         card_no : $("input[name='card_no']").val(),
@@ -976,7 +1013,6 @@ org.recharge_second=(function(org){
         },
         _getValidateCode: function(){
             var getValidateBtn = $('.request-check');
-
 
             getValidateBtn.on('click', function(){
                 var count = 60, intervalId ; //定时器
