@@ -656,7 +656,7 @@ org.buy=(function(org){
                 }else{
                     if(redPackMethod == '*'){ //百分比红包
                         //如果反回来的百分比需要除于100 就把下面if改成if (inputAmount * redPackAmount/100 > redPackHighest_amount)
-                        if(inputAmount * redPackAmount > redPackHighest_amount){//是否超过最高抵扣
+                        if(inputAmount * redPackAmount >= redPackHighest_amount){//是否超过最高抵扣
                            repPackDikou = redPackHighest_amount;
                         }else{//没有超过最高抵扣
                             repPackDikou = inputAmount * redPackAmount;
@@ -678,7 +678,8 @@ org.buy=(function(org){
         },
         _buy:function(){
             var $buyButton = $('.snap-up'),
-                $redpack = $("#gifts-package"), redpackAmount;
+                $redpack = $("#gifts-package"), redpackAmount,
+                reg =/^\d+(\.\d+)?$/;;
             //红包select事件
             $redpack.on("change",function(){
                 if($(this).val() != ''){
@@ -692,14 +693,14 @@ org.buy=(function(org){
             $buyButton.on('click',function(){
                 var $buySufficient = $('.buy-sufficient'),
                     balance = parseFloat($("#balance").attr("data-value")),
-                    amount = parseInt($('.amount').val()),
+                    amount = $('.amount').val() *1,
                     productID = $(".invest-one").attr('data-protuctid'),
                     redPackAmount = 0;
-                if(amount % 100 !== 0 || amount === 0){
-                    return alert('请输入100的倍数金额');
-                }
-                if(amount > balance){
-                    return $buySufficient.show();
+                if(amount){
+                    if(amount % 100 !== 0) return alert('请输入100的倍数金额');
+                    if(amount > balance)  return $buySufficient.show();
+                }else{
+                     return alert('请输入正确的金额');
                 }
                 var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
                 if(!redpackValue || redpackValue == ''){
@@ -727,7 +728,7 @@ org.buy=(function(org){
                             error: function(xhr){
                                 var  result;
                                 result = JSON.parse(xhr.responseText);
-                                if(result.status === 400){
+                                if(xhr.status === 400){
                                     if (result.error_number === 1) {
                                         alert("登录超时，请重新登录！",function(){
                                             return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
@@ -740,7 +741,7 @@ org.buy=(function(org){
                                     }else{
                                         return alert(result.message);
                                     }
-                                }else if(result.status === 403){
+                                }else if(xhr.status === 403){
                                     if (result.detail) {
                                         alert("登录超时，请重新登录！",function(){
                                             return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
@@ -884,10 +885,11 @@ org.recharge=(function(org){
                 str += "</div>";
             }
             $(".select-bank-body").append(str);
+
             $('.select-bank-list').on('click',function(event){
                 var that = this;
-                    $("#card-val").val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
-                    $(".bank-txt-name").text($(this).find(".bank-name-alert").text());
+                $("#card-val").val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
+                $(".bank-txt-name").text($(this).find(".bank-name-alert").text());
             });
             $(".recharge-select-bank").on('click',function(){
                  return $(this).hide();
@@ -896,13 +898,12 @@ org.recharge=(function(org){
         _rechargeStepFirst:function(){
             var card_no, gate_id, amount, maxamount,
                 $firstBtn = $('#firstBtn'),
-                $secondBtn = $('#secondBtn'),
-                reg =/^\d+(\.\d+)?$/ ;
+                $secondBtn = $('#secondBtn');
 
             $firstBtn.on('click', function(){
                 card_no = $("input[name='card_none_card']").val(),
                 gate_id = $("select[name='gate_id_none_card']").val(),
-                amount  = parseInt($("input[name='amount']").val()),
+                amount  = $("input[name='amount']").val() * 1,
                 maxamount = parseInt($("input[name='maxamount']").val());
                 if(!card_no || !gate_id || amount <= 0 || !amount) {
                     return alert('信息输入不完整');
@@ -914,18 +915,14 @@ org.recharge=(function(org){
             });
             $secondBtn.on('click', function(){
                 card_no = $("input[name='card_no']").attr('data-storable'),
-                amount  = $("input[name='amount']").val(),
+                amount  = $("input[name='amount']").val() * 1,
                 maxamount = parseInt($("input[name='maxamount']").val());
                 if(!card_no || amount <= 0 || !amount) {
                     return alert('信息输入不完整');
                 }
-                if(!reg.test(amount)){
-                    return alert('请输入正确的金额');
-                }
                 if(amount > maxamount){
                      return alert('最高充值'+ maxamount +'元！')
                 }
-
                 if(lib.canRecharge){
                     confirm("充值金额为"+amount) && lib._rechargeSingleStep(card_no,amount);
                 }else{
@@ -950,7 +947,7 @@ org.recharge=(function(org){
                          $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
                     }
                 },
-                error:function(){
+                error:function(data){
                     if(data.status == 403){
                         alert('登录超时，请重新登录！');
                     }
