@@ -31,12 +31,12 @@ class Automatic(object):
 
         for product in products:
             plans = self._access_plans(product=product, plan_id=plan_id)
-            if not plans.exists():
-                print('do not has any access automatic plans, stop automatic trade for this product')
-                continue
-
-            for plan in plans:
-                self._one_trade(product=product, plan=plan)
+            # if not plans.exists():
+            #     print('do not has any access automatic plans, stop automatic trade for this product')
+            #     continue
+            if plans.exists():
+                for plan in plans:
+                    self._one_trade(product=product, plan=plan)
 
     def _one_trade(self, product, plan):
         """ 针对一个标，对所有可投用户进行自动投资 """
