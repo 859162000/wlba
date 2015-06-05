@@ -1,0 +1,30 @@
+-load formatters
+-load mathfilters
+
+length  = len(results)
+if length > 0
+  for record in results
+    .transaction-list
+      .transaction-tit
+        .tit-name {{record.equity_product_short_name}}
+        .tit-time {{record.equity_created_at}}
+      .transaction-cont
+        .cont-money-left
+          p {{record.equity_equity}}
+          p 投资金额（元）
+        .cont-money-center
+          p {{record.equity_paid_interest}}
+          p 已收金额（元）
+        .cont-money-right
+          p {{record.equity_will_interest}}
+          p 待收金额（元）
+      if record.has_link
+        .transaction-footer
+          //a(href="") 还款计划
+          a(href="{{record.equity_contract}}") 合同
+else
+  .none-data
+    p 暂无交易记录
+    img(src="/static/imgs/mobile/wangli_none_data.png")
+
+

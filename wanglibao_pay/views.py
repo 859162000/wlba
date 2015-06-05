@@ -650,7 +650,7 @@ class YeePayAppPayCompleteView(TemplateView):
             'amount': amount
         })
 
-class KuaiPayQueryView(APIView):
+class BindPayQueryView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
@@ -658,7 +658,7 @@ class KuaiPayQueryView(APIView):
         result = pay.query_bind(request)
         return Response(result)
 
-class KuaiPayDelView(APIView):
+class BindPayDelView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
@@ -666,7 +666,7 @@ class KuaiPayDelView(APIView):
         result = pay.delete_bind(request)
         return Response(result)
 
-class KuaiPayView(APIView):
+class BindPayView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
@@ -674,7 +674,22 @@ class KuaiPayView(APIView):
         result = pay.pre_pay(request)
         return Response(result)
 
-class KuaiPayCallbackView(APIView):
+
+        #gate_id = request.DATA.get("gate_id")
+        #if not gate_id:
+        #    return Response({"ret_code": -1, "message": "gate_id is null"})
+        #bank = Bank.objects.filter(gate_id=gate_id).first()
+        #if not bank:
+        #    return Response({"ret_code": -2, "message": "gate_id error"})
+        #channel_dict = {"huifu":   third_pay.HuifuShortPay,
+        #                "yeepay":  third_pay.YeePay,
+        #                "kuaipay": third_pay.KuaiPay}
+        #bank.channel = 'huifu'
+        #pay = channel_dict[bank.channel]()
+        #result = pay.pre_pay(request)
+        #return Response(result)
+
+class BindPayCallbackView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
@@ -682,7 +697,7 @@ class KuaiPayCallbackView(APIView):
         result = pay.pay_callback(request)
         return Response(result)
 
-class KuaiPayDynNumView(APIView):
+class BindPayDynNumView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):

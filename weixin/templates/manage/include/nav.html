@@ -1,0 +1,24 @@
+{% load wx_tag %}
+<div class="ui vertical pointing menu fluid">
+  <div class="header item">
+    <i class="block layout icon"></i> 功能
+  </div>
+  {% nav_tag_item # "群发功能" %}
+  {% nav_tag_item # "自动回复" %}
+  {% nav_tag_item wx_manage_menu "自定义菜单" %}
+
+  <div class="header item">
+    <i class="archive icon"></i> 管理
+  </div>
+  {% nav_tag_item # "消息管理" %}
+  {% nav_tag_item # "用户管理" %}
+  {% nav_tag_item wx_manage_material "素材管理" %}
+
+  <div class="header item">
+    <i class="signal icon"></i> 统计
+  </div>
+  {% nav_tag_item # "用户分析" %}
+  {% nav_tag_item # "图文分析" %}
+  {% nav_tag_item # "消息分析" %}
+  {% nav_tag_item # "接口分析" %}
+</div>

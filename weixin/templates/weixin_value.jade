@@ -1,0 +1,42 @@
+-load formatters
+doctype html
+html
+    head
+        include include/weixin_head.jade
+    body
+        header
+            hgroup 充值
+            a(href="javascript:history.back()")
+                span 返回
+        .value-information
+            p.information-one
+                | 姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名
+                label 张**
+            .line
+            p.information-one
+                | 身&nbsp;&nbsp;份&nbsp;&nbsp;证
+                label 13*************
+            .line
+            p.information-one
+                | 开户银行
+                label 6214*****
+            .line
+            p.information-one
+                | 银行卡号
+                label 6214*****
+        .value-main
+            .value-input-main
+                .value-input-body
+                  .value-input-name 手机号
+                  input(placeholder="请输入银行预留手机号",id="",type="tel").value-input-public
+            .value-input-main.value-input-check-main
+              .value-input-body.value-input-check-body
+                .value-input-name 验证码
+                input(placeholder="请输入短信验证码").value-input-public
+              .value-input-check
+                button(type="button").request-check 获取验证码
+            .value-submit
+                button(type="button").value-submit-body 确认充值
+
+    include include/weixin_footer
+    script( src="/static/scripts/mobile/dist/mobile.js")

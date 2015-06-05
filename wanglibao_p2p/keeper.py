@@ -19,6 +19,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ class ProductKeeper(KeeperBaseMixin):
         super(ProductKeeper, self).__init__(product=product, order_id=order_id)
         self.product = product
 
-    def reserve(self, amount, user, savepoint=True):
+    def reserve(self, amount, user, savepoint=True, platform=u''):
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
             self.product = P2PProduct.objects.select_for_update().filter(pk=self.product.pk).first()
@@ -42,7 +43,7 @@ class ProductKeeper(KeeperBaseMixin):
 
             self.product.save()
             catalog = u'申购'
-            record = self.__tracer(catalog, amount, user, self.product.remain)
+            record = self.__tracer(catalog, amount, user, self.product.remain, platform=platform)
             return record
 
     def audit(self, user):
@@ -64,9 +65,9 @@ class ProductKeeper(KeeperBaseMixin):
         self.product.save()
         self.__tracer(u'状态变化', 0, None, self.product.remain, u'%s -> 流标' % prev_status)
 
-    def __tracer(self, catalog, amount, user, product_balance_after, description=u''):
+    def __tracer(self, catalog, amount, user, product_balance_after, description=u'', platform=u''):
         trace = P2PRecord(catalog=catalog, amount=amount, product_balance_after=product_balance_after, user=user,
-                          description=description, order_id=self.order_id, product=self.product)
+                          description=description, order_id=self.order_id, product=self.product, platform=platform)
         trace.save()
         return trace
 
@@ -492,7 +493,12 @@ class AmortizationKeeper(KeeperBaseMixin):
             description = unicode(amortization)
             catalog = u'分期还款'
             product = amortization.product
-            pname = u"%s,期限%s个月" % (product.name, product.period)
+
+            matches = re.search(u'日计息', product.pay_method)
+            if matches and matches.group():
+                pname = u"%s,期限%s天" % (product.name, product.period)
+            else:
+                pname = u"%s,期限%s个月" % (product.name, product.period)
 
             phone_list = list()
             message_list = list()

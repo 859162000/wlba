@@ -20,6 +20,7 @@ from wanglibao_redpack import backends as redpack_backends
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
+import re
 
 from wanglibao_rest.utils import split_ua
 
@@ -46,7 +47,7 @@ class P2PTrader(object):
         else:
             self.device_type = "pc"
 
-    def purchase(self, amount, redpack=0):
+    def purchase(self, amount, redpack=0, platform=u''):
         description = u'购买P2P产品 %s %s 份' % (self.product.short_name, amount)
         is_full = False
         if self.user.wanglibaouserprofile.frozen:
@@ -63,7 +64,7 @@ class P2PTrader(object):
                 OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
                                         amount=amount, deduct=result['deduct'], redpack=redpack)
 
-            product_record = self.product_keeper.reserve(amount, self.user, savepoint=False)
+            product_record = self.product_keeper.reserve(amount, self.user, savepoint=False, platform=platform)
             margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
             equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
 
@@ -77,7 +78,11 @@ class P2PTrader(object):
                                                "is_full": is_full})
 
         # 投标成功发站内信
-        pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
+        matches = re.search(u'日计息', self.product.pay_method)
+        if matches and matches.group():
+            pname = u"%s,期限%s天" % (self.product.name, self.product.period)
+        else:
+            pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
 
         title, content = messages.msg_bid_purchase(self.order_id, pname, amount)
         inside_message.send_one.apply_async(kwargs={
@@ -153,6 +158,14 @@ class P2POperator(object):
             except P2PException, e:
                 cls.logger.error(u'%s, %s' % (amortization, e.message))
 
+
+        ## 停止在watchdog中每分钟循环自动投标，减轻celery任务
+        ## 将自动投标入口改在两处，一是标状态变成“正在招标”，二是用户保存并启用自动投标配置
+        print('Getting automation trades')
+        from wanglibao_p2p.automatic import Automatic
+        Automatic().auto_trade()
+
+
     @classmethod
     #@transaction.commit_manually
     def preprocess_for_settle(cls, product):
@@ -205,7 +218,11 @@ class P2POperator(object):
         })
 
 
-        pname = u"%s,期限%s个月" % (product.name, product.period)
+        matches = re.search(u'日计息', product.pay_method)
+        if matches and matches.group():
+            pname = u"%s,期限%s天" % (product.name, product.period)
+        else:
+            pname = u"%s,期限%s个月" % (product.name, product.period)
         title, content = messages.msg_bid_success(pname, timezone.now())
         inside_message.send_batch.apply_async(kwargs={
             "users": user_ids,
@@ -240,7 +257,11 @@ class P2POperator(object):
                 "messages": [messages.product_failed(product)]
             })
 
-            pname = u"%s,期限%s个月" % (product.name, product.period)
+            matches = re.search(u'日计息', product.pay_method)
+            if matches and matches.group():
+                pname = u"%s,期限%s天" % (product.name, product.period)
+            else:
+                pname = u"%s,期限%s个月" % (product.name, product.period)
             title, content = messages.msg_bid_fail(pname)
             inside_message.send_batch.apply_async(kwargs={
                 "users": user_ids,

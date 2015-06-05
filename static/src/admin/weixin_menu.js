@@ -216,6 +216,11 @@ app.controller('MenuCtl', function($scope, $http) {
     };
 
     $scope.delete_menu = function() {
+        var confirm = window.confirm('确定删除吗');
+        if (! confirm) {
+            return false;
+        }
+
         $http.delete($scope.data.menu_api).success(function() {
             alert('删除成功');
         }).error(function(res) {

@@ -34,7 +34,8 @@ class CustomDateFilter(admin.SimpleListFilter):
         return (
             ('today', u'今天'),
             ('yesterday', u'昨天'),
-            ('before_yesterday', u'前天')
+            ('before_yesterday', u'前天'),
+            ('before_yesterday2', u'大前天')
         )
 
     def queryset(self, request, queryset):
@@ -43,11 +44,17 @@ class CustomDateFilter(admin.SimpleListFilter):
             return queryset.filter(trigger_at__gte=timezone.datetime(dt.year, dt.month, dt.day),
                                    trigger_at__lt=timezone.datetime(dt.year, dt.month, dt.day, 23, 59, 59))
         if self.value() == 'yesterday':
-            return queryset.filter(trigger_at__gte=timezone.datetime(dt.year, dt.month, dt.day - 1),
-                                   trigger_at__lt=timezone.datetime(dt.year, dt.month, dt.day - 1, 23, 59, 59))
+            ydt = dt - datetime.timedelta(days=1)
+            return queryset.filter(trigger_at__gte=timezone.datetime(ydt.year, ydt.month, ydt.day),
+                                   trigger_at__lt=timezone.datetime(ydt.year, ydt.month, ydt.day, 23, 59, 59))
         if self.value() == 'before_yesterday':
-            return queryset.filter(trigger_at__gte=timezone.datetime(dt.year, dt.month, dt.day - 2),
-                                   trigger_at__lt=timezone.datetime(dt.year, dt.month, dt.day - 2, 23, 59, 59))
+            bydt = dt - datetime.timedelta(days=2)
+            return queryset.filter(trigger_at__gte=timezone.datetime(bydt.year, bydt.month, bydt.day),
+                                   trigger_at__lt=timezone.datetime(bydt.year, bydt.month, bydt.day, 23, 59, 59))
+        if self.value() == 'before_yesterday2':
+            bydt2 = dt - datetime.timedelta(days=3)
+            return queryset.filter(trigger_at__gte=timezone.datetime(bydt2.year, bydt2.month, bydt2.day),
+                                   trigger_at__lt=timezone.datetime(bydt2.year, bydt2.month, bydt2.day, 23, 59, 59))
 
 
 class ActivityResource(resources.ModelResource):

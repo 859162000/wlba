@@ -1,0 +1,49 @@
+-load formatters
+-load mathfilters
+-load widget_tweaks
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 收益计算器
+      a(href="/weixin/view/detail/{{p2p.id}}/")
+        span 返回
+    .calculator-head
+      .head-profit
+        earning_rate = float(p2p.expected_earning_rate)
+        if p2p.activity
+          earning_rate = earning_rate + float(p2p.activity.rule.percent_text)
+        p.profit-numbe {{earning_rate}}
+          em %
+        p.profit-txt 年化收益
+      .head-time
+        p.time-number {{p2p.period}}
+          em {{p2p.pay_method|period_unit}}
+        p.time-txt 还款期限
+    .calculator-body
+      .calculator-count
+        .count-txt-left 投资金额
+        input(type="tel",placeholder="输入100的整数被金额",p2p-type="{{p2p.category}}",data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="#xunlei-vip-income-head",data-target="#expected_income", data-existing="0", data-rate="{{p2p.expected_earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").count-input
+        .count-txt-right 元
+      .calculator-result 预期收益：
+        em#expected_income 0.00
+        |元
+      //.calculator-table
+        table
+          tr.table-th
+            td(rowspan="2") 月/份
+            td(colspan="2") {{p2p.period}}{{p2p.pay_method|period_unit}}
+          tr.table-th
+            td 本金
+            td 本收
+          tr
+            td 本金2
+            td 本收2
+            td 本金1
+    a(href="#1",data-productId="{{p2p.id}}").calculator-buy 立即购买
+    script(data-init="calculator" src="/static/scripts/mobile/dist/mobile.js")
+
+
+

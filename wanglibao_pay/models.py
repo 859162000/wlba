@@ -13,14 +13,25 @@ class Bank(models.Model):
     name = models.CharField(verbose_name=u'银行', max_length=32)
     gate_id = models.CharField(max_length=8, verbose_name=u'gate id')
     code = models.CharField(max_length=16, verbose_name=u'银行代码')
-    limit = models.TextField(blank=True, verbose_name=u'银行限额信息')
+    limit = models.TextField(blank=True, verbose_name=u'汇付网银银行限额信息')
     logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'银行图标')
     sort_order = models.IntegerField(default=0, verbose_name=u'排序权值 从大到小')
     kuai_code = models.CharField(max_length=16, verbose_name=u'快钱侧银行代码', null=True, blank=True)
-    #快钱侧银行限额信息格式如下,"|"分隔第一次和第二次
+    #银行限额信息格式如下,"|"分隔第一次和第二次
     #单笔=5000,单日=5000|单笔=50000,单日=10000000
     kuai_limit = models.CharField(max_length=500, blank=True, verbose_name=u'快钱侧银行限额信息')
-    last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
+    huifu_bind_limit = models.CharField(max_length=500, blank=True, verbose_name=u"汇付快捷限额信息", default="")
+    huifu_bind_code = models.CharField(max_length=20, verbose_name=u'汇付侧银行代码', blank=True, default="")
+    yee_bind_limit = models.CharField(max_length=500, blank=True, verbose_name=u"易宝快捷限额信息", default="")
+    yee_bind_code = models.CharField(max_length=20, verbose_name=u'易宝侧银行代码', blank=True, default="")
+
+    #last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
+
+    channel = models.CharField(u'支付通道', max_length=20, blank=True, null=True, choices=(
+        ("huifu", "Huifu"),
+        ("yeepay", "Yeepay"),
+        ("kuaipay", "Kuaipay")
+    ))
 
     class Meta:
         ordering = '-sort_order',
@@ -47,6 +58,9 @@ class Card(models.Model):
     user = models.ForeignKey(User)
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
     add_at = models.DateTimeField(auto_now=True)
+    is_bind_huifu = models.BooleanField(verbose_name=u"是否绑定汇付快捷", default=False)
+    is_bind_kuai = models.BooleanField(verbose_name=u"是否绑定快钱快捷", default=False)
+    is_bind_yee = models.BooleanField(verbose_name=u"是否绑定易宝快捷", default=False)
     last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
     class Meta:
@@ -93,8 +107,10 @@ class PayInfo(models.Model):
     account_name = models.CharField(u'姓名', max_length=12, blank=True, null=True)
     card_no = models.CharField(u'卡号', max_length=25, blank=True, null=True)
     channel = models.CharField(u'支付通道', max_length=20, blank=True, null=True, choices=(
-        ("huifu", "Huifu"),
+        ("huifu", "Huifu"), #汇付网银
+        ("huifu_bind", "Huifu_bind"), #汇付快捷
         ("yeepay", "Yeepay"), #易宝
+        ("yeepay_bind", "Yeepay_bind"), #易宝快捷
         ("app", "App"), #app取现使用
         ("kuaipay", "Kuaipay") #快钱
     ))

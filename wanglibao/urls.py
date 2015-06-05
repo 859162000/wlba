@@ -15,11 +15,11 @@ from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, A
 from wanglibao_p2p.views import AdminP2PUserRecord
 # from wanglibao_account.views import CjdaoApiView
 from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView, MilestoneView, \
-    ResponsibilityView, ContactView, AgreementView, DirectorateView
+    ResponsibilityView, ContactView, AgreementView, DirectorateView, AgreementAutoView
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser, TianmangInvestListAPIView, \
-    TianmangRegisterListAPIView, TianmangIDVerificationListAPIView
+    TianmangInvestNotConfirmListAPIView, TianmangRegisterListAPIView, TianmangIDVerificationListAPIView
 from marketing.views import NewsListView, NewsDetailView
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
@@ -87,6 +87,8 @@ urlpatterns = patterns(
     url(r'^announcement/', include('wanglibao_announcement.urls')),
     url(r'^redpacket/', include('wanglibao_redpack.urls')),
     url(r'^templates/', include('wanglibao_activity.urls')),
+
+    url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
 )
 
 urlpatterns += patterns(
@@ -125,7 +127,7 @@ urlpatterns += patterns(
     url(r'^api/tmyun/getRegisterList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangRegisterListAPIView.as_view()),
     url(r'^api/tmyun/getIDVerificationList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangIDVerificationListAPIView.as_view()),
     url(r'^api/tmyun/getInvestList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestListAPIView.as_view()),
-
+    url(r'^api/tmyun/getInvestListNotConfirm/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestNotConfirmListAPIView.as_view()),
 
 
 )

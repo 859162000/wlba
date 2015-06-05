@@ -76,13 +76,13 @@ Deploy
     $ cd deploy
 
     deploy all
-    $ fab -f depoly.py depoly_www
+    $ fab -f deploy.py deploy_www
     deploy static
-    $ fab -f depoly.py depoly_static
+    $ fab -f deploy.py deploy_static
     deploy web
-    $ fab -f depoly.py depoly_web
+    $ fab -f deploy.py deploy_web
     deploy mq
-    $ fab -f depoly.py depoly_mq
+    $ fab -f deploy.py deploy_mq
 
 Query example
 -------------------

@@ -229,13 +229,18 @@
 
 .footerBtn-buy
   color: #fff
-  span
+  a.icon
     background: url("/static/imgs/mobile/detail/count_icon.png") no-repeat center center #af3a32
     background-size: .85rem
-  p
+    display: block
+    width: 2.45rem
+    height: 100%
+  .new-pay
+    -webkit-box-flex: 1
     background: $footerBtn-buy
-    -webkit-transition: width 300ms ease-out
-    -webkit-transform: translate3d(0,0,0)
+    display: -webkit-box
+    -webkit-box-pack: center
+    -webkit-box-align: center
   .new-pay
     width: 100%
     &:active
