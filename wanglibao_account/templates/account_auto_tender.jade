@@ -25,13 +25,12 @@ block main
                                span#status.status-style 自动投标已开启
                             else
                                span#status.status-style 自动投标已关闭
-                        .right-style （大于等于500元才可开启自动投标工具）
                     li
                         .left-style
                             label 账户可用余额：
                             b.money-format {{ margin | money_format }}
                             span 元
-                        .right-style （该数值须不小于200元，且为100的倍数）
+                        .right-style （大于等于200元才可开启自动投标工具）
                     li
                         .left-style
                             label 每次投标金额：
@@ -40,7 +39,7 @@ block main
                             span 元
                             i.add-ben
                             i.subtract
-                        .right-style （1%-30%为有效利率范围）
+                        .right-style （该数值须不小于200元，且为100的倍数）
                     li
                         .left-style
                             label 收益范围：
@@ -49,6 +48,7 @@ block main
                             span.heng-style -
                             input#scope-max.income-range(type="text", name="rate_max", autocomplete="off", value="{{ plan.rate_max }}")
                             span %
+                        .right-style （1%-30%为有效利率范围）
                     li
                         .left-style
                             label 收益期限：
