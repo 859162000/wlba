@@ -42,9 +42,11 @@ html
                       each redpack in redpacks
                         if redpack.method == "-"
                           pack_unit = '元'
+                          pack_amount = redpack.amount
                         else
+                          pack_amount = redpack.amount * 100
                           pack_unit = '%'
-                        option(value="{{redpack.id}}", data-amount="{{redpack.amount}}", data-method="{{redpack.method}}", data-investamount='{{redpack.invest_amount}}', data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{redpack.amount}}{{pack_unit}}/{{redpack.invest_amount}}元起投
+                        option(value="{{redpack.id}}", data-amount="{{redpack.amount}}", data-method="{{redpack.method}}", data-investamount='{{redpack.invest_amount}}', data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{pack_amount}}{{pack_unit}}/{{redpack.invest_amount}}元起投
                     else
                       option(value = '') 无可用红包
         .buy-earnings
