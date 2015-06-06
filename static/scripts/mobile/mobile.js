@@ -629,6 +629,7 @@ org.buy=(function(org){
         $redpackForAmount : $('.redpack-for-amount'),
         showredPackAmount:$(".redpack-amount"),
         showAmount :$('.need-amount'),
+        redPackAmount: 0,
         isBuy: true, //防止多次请求，后期可修改布局用button的disable，代码罗辑会少一点
         init :function(){
             lib._calculate();
@@ -656,6 +657,7 @@ org.buy=(function(org){
                 redPackHighest_amount = parseInt(redPack.attr("data-highest_amount")),//红包最高抵扣（百分比红包才有）
                 repPackDikou = 0,
                 senderAmount = 0; //实际支付金额;
+            lib.redPackAmountNew = 0 ;
             if(redPackVal){ //如果选择了红包
                 console.log(inputAmount)
                 if(!inputAmount){
@@ -679,6 +681,7 @@ org.buy=(function(org){
                         repPackDikou = parseInt(redPackAmount);
                     }
                     senderAmount = inputAmount - repPackDikou;
+                    lib.redPackAmountNew = repPackDikou;
                     lib.showredPackAmount.text(repPackDikou);//红包抵扣金额
                     lib.showAmount.text(senderAmount);//实际支付金额
                     $(".redpack-investamount").hide();//未达到红包使用门槛
@@ -693,7 +696,7 @@ org.buy=(function(org){
         _buy:function(){
             var $buyButton = $('.snap-up'),
                 $redpack = $("#gifts-package"), redpackAmount,
-                reg =/^\d+(\.\d+)?$/;;
+                reg =/^\d+(\.\d+)?$/;
             //红包select事件
             $redpack.on("change",function(){
                 if($(this).val() != ''){
@@ -735,7 +738,7 @@ org.buy=(function(org){
                             },
                             success: function(data){
                                if(data.data){
-                                   $('.balance-sign').text(balance - data.data + redPackAmount);
+                                   $('.balance-sign').text(balance - data.data + lib.redPackAmountNew);
                                    $(".sign-main").css("display","-webkit-box");
                                }
                             },

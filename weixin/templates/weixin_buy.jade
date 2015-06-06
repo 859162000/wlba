@@ -42,11 +42,14 @@ html
                       each redpack in redpacks
                         if redpack.method == "-"
                           pack_unit = '元'
+                          red_amountSet = redpack['amount']
                         else
+                          red_amountSet = redpack['amount'] * 100
                           pack_unit = '%'
-                        option(value="{{redpack.id}}", data-amount="{{redpack.amount}}", data-method="{{redpack.method}}", data-investamount='{{redpack.invest_amount}}', data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{redpack.amount}}{{pack_unit}}/{{redpack.invest_amount}}元起投
+                        option(value="{{redpack.id}}", data-amount="{{redpack.amount}}", data-method="{{redpack.method}}", data-investamount='{{redpack.invest_amount}}', data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{red_amountSet}}{{pack_unit}}/{{redpack.invest_amount}}元起投
                     else
                       option(value = '') 无可用红包
+
         .buy-earnings
             p.redpack-investamount * 未达到红包使用门槛
             p.redpack-for-amount * 请输入投资金额
@@ -78,4 +81,4 @@ html
             .callban-url
               a(href="/weixin/list/") 返回首页
               a(href="/weixin/account/") 查看账户
-    script(data-init="buy", src="/static/scripts/mobile/mobile.js")
+    script(data-init="buy", src="/static/scripts/mobile/dist/mobile.js")
