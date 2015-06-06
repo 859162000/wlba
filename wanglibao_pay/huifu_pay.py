@@ -393,14 +393,12 @@ class HuifuShortPay:
         print 'url>>>', url
         print 'data>>>', data
         print 'response>>>', r.text
-        res_arr = map((lambda x: x.split('=')), r.text.rstrip('\r\n').split('\r\n'))
-        return dict([(arr[0], arr[1]) for arr in res_arr])
+        return dict(d for d in map((lambda x: x.split('=')), r.text.strip('\r\n').split('\r\n')))
 
     def _common_post_fields(self):
         post = dict()
         post['Version'] = '10'
         post['MerId'] = self.MER_ID
-
         return post
 
     def _bind_card_huifu(self, user, bank, card_no):
@@ -418,7 +416,6 @@ class HuifuShortPay:
         post['CmdId'] = 'WHBindCard'
         post['LoginPwd'] = self.OPER_PWD
         post['ChkValue'] = self.sign_data(post, self.BIND_FIELDS)
-
         return self._request_huifu(self.BIND_URL, post)
 
     def _card_pay_huifu(self, user, amount, card_no):
@@ -437,8 +434,7 @@ class HuifuShortPay:
         post['CmdId'] = 'WHDebitDeductSave'
         post['LoginPwd'] = self.OPER_PWD
         post['ChkValue'] = self.sign_data(post, self.PAY_FIELDS)
-
-        return self._request_huifu(self.PAY_URL, post)
+        return post, self._request_huifu(self.PAY_URL, post)
 
     def _open_account_huifu(self, user):
         """ 开户 """
@@ -451,15 +447,14 @@ class HuifuShortPay:
         post['IdNo'] = user.wanglibaouserprofile.id_number
         post['UsrName'] = user.wanglibaouserprofile.name
         post['UsrPwd'] = self.OPER_PWD
-        post['UsrRole'] = '12' #用户所属角色的角色号
+        post['UsrRole'] = '12'            #用户所属角色的角色号
         post['UsrShortName'] = user.wanglibaouserprofile.name
-        post['IsCertChk'] = 'Y' #是否实名
-        post['IsActivate'] = 'Y' #是否激活
-        post['IsOperRecv'] = 'Y' #是否开通收款户
-        post['IsSignAutoPay'] = 'Y' #是否签约自动扣款
-        post['IsPrivateCash'] = 'Y' #是否允许对私结算
+        post['IsCertChk'] = 'Y'           #是否实名
+        post['IsActivate'] = 'Y'          #是否激活
+        post['IsOperRecv'] = 'Y'          #是否开通收款户
+        post['IsSignAutoPay'] = 'Y'       #是否签约自动扣款
+        post['IsPrivateCash'] = 'Y'       #是否允许对私结算
         post['ChkValue'] = self.sign_data(post, self.REGISTER_FIELDS)
-
         return self._request_huifu(self.PAY_URL, post)
 
     def _unbind_card_huifu(self, user, card_no):
@@ -470,7 +465,6 @@ class HuifuShortPay:
         post['OperId'] = '{mer_id}{phone}'.format(mer_id=self.MER_ID, phone=user.wanglibaouserprofile.phone)
         post['CmdId'] = 'WHCancelBindCard'
         post['ChkValue'] = self.sign_data(post, self.DEBIND_FIELDS)
-
         return self._request_huifu(self.DEBIND_URL, post)
 
     def del_card_huifu(self, request):
@@ -582,17 +576,21 @@ class HuifuShortPay:
                 pay_info.bank = bank
                 pay_info.card_no = card_no
 
-            pay_info.request = ""
             pay_info.status = PayInfo.PROCESSING
             pay_info.account_name = profile.name
             pay_info.save()
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
             # 充值
-            res = self._card_pay_huifu(user=user, amount=pay_info.amount, card_no=card_no)
+            req, res = self._card_pay_huifu(user=user, amount=pay_info.amount, card_no=card_no)
+
+            pay_info.error_code = res['RespCode']
+            pay_info.error_message = res['ErrMsg']
+            pay_info.request = req
+            pay_info.response = res
+            pay_info.response_ip = get_client_ip(request)
+
             if res['RespCode'] != u'000000':
-                pay_info.error_message = res['ErrMsg']
-                pay_info.response = res
                 pay_info.save()
                 return {"ret_code": -3, "message": res['ErrMsg']}
             else:
@@ -605,6 +603,8 @@ class HuifuShortPay:
                 rs = {"ret_code": 0, "message": "success", "amount": amount, "margin": margin_record.margin_current}
 
             if rs['ret_code'] == 0 and not card:
+                device = split_ua(request)
+                device_type = device['device_type']
                 tools.despoit_ok(pay_info, device_type)
 
                 # 充值成功后，更新本次银行使用的时间
