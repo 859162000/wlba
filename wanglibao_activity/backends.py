@@ -63,7 +63,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
                     if rule.is_introduced:
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
-                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full)
+                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full, user_ib)
                     else:
                         _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full)
             else:
@@ -72,7 +72,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, user_ib=None):
     """ check the trigger node """
     product_id = int(product_id)
     #注册 或 实名认证
@@ -110,6 +110,8 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                     _check_buy_product(user, rule, device_type, amount, product_id, is_full)
             else:
                 _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+            if user_ib:
+                redpack_backends.increase_hike(user_ib, product_id)
 
     #购买
     elif trigger_node == 'buy':

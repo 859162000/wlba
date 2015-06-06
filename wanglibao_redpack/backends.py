@@ -465,6 +465,8 @@ def increase_hike(user, product_id):
     pr = P2PRecord.objects.filter(user=user, product=product).first()
     if not pr:
         return
+    if (timezone.now() - pr.create_time).days > 10:
+        return
     #InterestHike.objects.select_for_update().filter(user=user, product=product, invalid=False).first()
     record = InterestHike.objects.filter(user=user, product=product, invalid=False).first()
     if not record:

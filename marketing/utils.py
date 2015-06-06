@@ -6,7 +6,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger
 from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels
-from wanglibao_redpack import backends as redpack_backends
+#from wanglibao_redpack import backends as redpack_backends
+from wanglibao_p2p.models import P2PProduct
 import logging
 
 
@@ -30,8 +31,8 @@ def set_promo_user(request, user, invitecode=''):
             recordpromo = PromotionToken.objects.filter(token=invitecode).first()
             if recordpromo:
                 introduced_by_user = User.objects.get(pk=recordpromo.pk)
-                save_introducedBy(user, introduced_by_user)
-                redpack_backends.increase_hike(introduced_by_user, product_id)
+                save_introducedBy(user, introduced_by_user, product_id)
+                #redpack_backends.increase_hike(introduced_by_user, product_id)
 
         request.session[settings.PROMO_TOKEN_QUERY_STRING] = None
         request.session[settings.PROMO_TOKEN_PRODUCT] = None
@@ -44,10 +45,14 @@ def set_promo_user(request, user, invitecode=''):
        #     # Clean the session
        #     del request.session[settings.PROMO_TOKEN_USER_SESSION_KEY]
 
-def save_introducedBy(user, introduced_by_user):
+def save_introducedBy(user, introduced_by_user, product_id=0):
     record = IntroducedBy()
     record.introduced_by = introduced_by_user
     record.user = user
+    if product_id:
+        pt = P2PProduct.objects.filter(id=product_id).first()
+        if pt:
+            record.product_id=product_id
     record.save()
 
 def save_introducedBy_channel(user, channel):

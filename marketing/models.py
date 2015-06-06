@@ -100,6 +100,7 @@ class IntroducedBy(models.Model):
     bought_at = models.DateTimeField(u'第一次购买时间', null=True, blank=True)
     gift_send_at = models.DateTimeField(u'奖品发放时间', null=True, blank=True)
     created_by = models.ForeignKey(User, null=True, blank=True, related_name='creator')
+    product_id = models.IntegerField(u'产品ID', default=0, null=False)
 
     class Meta:
         ordering = ['-created_at']
