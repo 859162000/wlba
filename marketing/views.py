@@ -348,8 +348,8 @@ class IntroducedAwardTemplate(TemplateView):
         if introduced_by_reward.count() == 0:
             # 不存在未审核记录，直接进行统计
             # 查询复合条件的首次交易的被邀请人和邀请人信息
-            from tasks import add_introduced_award
-            add_introduced_award.apply_async(kwargs={
+            from tasks import add_introduced_award_all
+            add_introduced_award_all.apply_async(kwargs={
                 "start": start.date().__str__(),
                 "end": end.date().__str__(),
                 "amount_min": amount_min,
@@ -412,9 +412,9 @@ class IntroducedAwardTemplate(TemplateView):
 
         if check == '1':
             if start and end and percent and amount_min:
-                from tasks import send_reward
+                from tasks import send_reward_all
 
-                send_reward.apply_async(kwargs={
+                send_reward_all.apply_async(kwargs={
                     "start": start,
                     "end": end,
                     "amount_min": amount_min,
