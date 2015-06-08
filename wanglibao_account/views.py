@@ -504,12 +504,8 @@ class AccountInviteHikeAPIView(APIView):
 
     def post(self, request, **kwargs):
         nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
-        hikes = InterestHike.objects.filter(user=request.user, invalid=False).aggregate(Sum('rate'))
-        if not hikes['rate__sum']:
-            rate = "0%"
-        else:
-            rate = "%.2f%%" % (hikes['rate__sum'] * 100)
-        return Response({"ret_code":0, "intro_nums":nums, "hikes":rate,
+        hikes = InterestHike.objects.filter(user=request.user, invalid=False).count()
+        return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
                         "call_charge":30, "total_hike":"2%"})
 
 class AccountP2PRecordAPI(APIView):
