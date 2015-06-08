@@ -509,7 +509,8 @@ class AccountInviteHikeAPIView(APIView):
             rate = "0%"
         else:
             rate = "%.2f%%" % (hikes['rate__sum'] * 100)
-        return Response({"ret_code":0, "intro_nums":nums, "hikes":rate})
+        return Response({"ret_code":0, "intro_nums":nums, "hikes":rate,
+                        "call_charge":30, "total_hike":"2%"})
 
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
