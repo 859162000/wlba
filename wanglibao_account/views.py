@@ -478,12 +478,25 @@ class AccountInviteAPIView(APIView):
     def post(self, request, **kwargs):
         introduces = IntroducedBy.objects.filter(introduced_by=request.user)
         res = []
-        if introduces:
-            for x in introduces:
-                invite = {"name":x.user.wanglibaouserprofile.name,
-                        "phone":safe_phone_str(x.user.wanglibaouserprofile.phone),
-                        "created_at":timezone.get_current_timezone().normalize(x.created_at).strftime("%Y-%m-%d %H:%M:%S")}
-                res.append(invite)
+        if not introduces:
+            return Response({"ret_code":0, "data":res})
+
+        for x in introduces:
+            invite = {"name":x.user.wanglibaouserprofile.name,
+                    "phone":safe_phone_str(x.user.wanglibaouserprofile.phone),
+                    "created_at":timezone.get_current_timezone().normalize(x.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "is_is_valid":x.user.wanglibaouserprofile.id_is_valid}
+            info = PayInfo.objects.filter(user=x.user, type="D", status=u"成功").first()
+            if not info:
+                invite['pay'] = False
+            else:
+                invite['pay'] = True
+            rd = P2PRecord.objects.filter(user=x.user, catalog=u"申购").first()
+            if not rd:
+                invite['buy'] = False
+            else:
+                invite['buy'] = True
+            res.append(invite)
         return Response({"ret_code":0, "data":res})
 
 class AccountInviteHikeAPIView(APIView):
