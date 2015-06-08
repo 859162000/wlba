@@ -58,6 +58,7 @@ from django.template.defaulttags import register
 from wanglibao_p2p.keeper import EquityKeeperDecorator
 from order.utils import OrderHelper
 from wanglibao_redpack import backends
+from wanglibao_redpack.models import InterestHike
 from wanglibao_rest import utils
 
 # from wanglibao.settings import CJDAOKEY
@@ -312,6 +313,8 @@ class AccountHome(TemplateView):
             obj = {"equity": equity}
             if earning_map.get(equity.product_id):
                 obj["earning"] = earning_map.get(equity.product_id)
+            #加息
+            obj['hike'] = InterestHike.objects.filter(user=user, product=equity.product_id, invalid=False).first()
 
             result.append(obj)
 
@@ -483,6 +486,17 @@ class AccountInviteAPIView(APIView):
                 res.append(invite)
         return Response({"ret_code":0, "data":res})
 
+class AccountInviteHikeAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, **kwargs):
+        nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
+        hikes = InterestHike.objects.filter(user=request.user, invalid=False).aggregate(Sum('rate'))
+        if not hikes['rate__sum']:
+            rate = "0%"
+        else:
+            rate = "%.2f%%" % (hikes['rate__sum'] * 100)
+        return Response({"ret_code":0, "intro_nums":nums, "hikes":rate})
 
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
