@@ -505,13 +505,18 @@ class AccountInviteHikeAPIView(APIView):
     def post(self, request, **kwargs):
         nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
         hikes = InterestHike.objects.filter(user=request.user, invalid=False).count()
+        amount = InterestHike.objects.filter(user=request.user, invalid=False, paid=True).aggregate(Sum('amount'))
         thity = Reward.objects.filter(type=u"30元话费").first()
         if thity:
             callfee = RewardRecord.objects.filter(user=request.user, reward=thity).count() * 30
         else:
             callfee = 0
+        if not amount['amount__sum']:
+            amount['amount__sum'] = 0
+
         return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
-                        "call_charge":30, "total_hike":"2%", "calls":callfee})
+                        "call_charge":30, "total_hike":"2%", "calls":callfee,
+                        "amount":amount['amount__sum']})
 
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
