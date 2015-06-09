@@ -272,6 +272,7 @@ class P2POperator(object):
                 cls.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
                 ProductKeeper(product).finish(None)
 
+    @classmethod
     def _settle_hike(self, product):
         result = redpack_backends.settle_hike(product)
         if not result:
