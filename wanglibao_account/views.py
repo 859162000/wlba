@@ -32,7 +32,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
-from marketing.models import IntroducedBy
+from marketing.models import IntroducedBy, Reward, RewardRecord
 from marketing.utils import set_promo_user
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
@@ -505,8 +505,13 @@ class AccountInviteHikeAPIView(APIView):
     def post(self, request, **kwargs):
         nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
         hikes = InterestHike.objects.filter(user=request.user, invalid=False).count()
+        thity = Reward.objects.filter(type=u"30元话费").first()
+        if thity:
+            callfee = RewardRecord.objects.filter(user=request.user, reward=thity).count() * 30
+        else:
+            callfee = 0
         return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
-                        "call_charge":30, "total_hike":"2%"})
+                        "call_charge":30, "total_hike":"2%", "calls":callfee})
 
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
