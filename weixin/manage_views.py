@@ -1,17 +1,17 @@
 # encoding:utf-8
 from __future__ import unicode_literals
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.utils.decorators import method_decorator
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.cache import cache
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework.authentication import SessionAuthentication
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import get_host_url
-from weixin.models import WeixinAccounts
+from weixin.models import WeixinAccounts, Material
 
 
 class ManageAccountMixin(object):
@@ -95,6 +95,16 @@ class MaterialView(ManageView):
         return context
 
 
+class MaterialImageView(View, ManageAccountMixin):
+
+    def get(self, request, media_id):
+        account = self.get_account()
+        res = account.weixin_client.media.download(media_id)
+        print res
+        print res.content
+        return HttpResponse('123')
+
+
 class MenuAPI(ManageAPIView):
 
     @weixin_api_error
@@ -126,8 +136,8 @@ class MaterialListAPI(ManageAPIView):
     @weixin_api_error
     def get(self, request):
         media_type = request.GET.get('media_type')
-        offset = request.GET.get('offset')
-        count = request.GET.get('count')
+        offset = int(request.GET.get('offset', 0))
+        count = int(request.GET.get('count', 20))
         res = self.client.material.batchget(media_type, offset, count)
         return Response(res)
 
@@ -149,7 +159,19 @@ class MaterialCountAPI(ManageAPIView):
 
     @weixin_api_error
     def get(self, request):
-        res = self.client.material.get_count()
+        account = self.get_account()
+        try:
+            material = account.db_account.material
+        except Material.DoesNotExist:
+            material, _ = Material.objects.get_or_create(account=account.db_account)
+
+        # 判断数据是否过期
+        if material.is_expires_in():
+            res = material.data()
+        else:
+            res = self.client.material.get_count()
+            material.update_data(res, account.material_count_cache_time)
+
         return Response(res)
 
 

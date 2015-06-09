@@ -40,7 +40,8 @@ class BaseWeChatClient(object):
             **kwargs
         )
         res.raise_for_status()
-        result = res.json()
+        # result = res.json()
+        result = json.loads(res.content)
         return self._handle_result(result, method, url, **kwargs)
 
     def _handle_result(self, result, method=None, url=None, **kwargs):
