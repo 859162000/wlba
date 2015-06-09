@@ -153,7 +153,8 @@ class InvestmentRewardView(TemplateView):
             data['day'] = datetime.now()
 
         # 不使用默认规则，则使用动态统计规则
-        rules = self._activity_rule(cat='investment')
+        # rules = self._activity_rule(cat='investment')
+        rules = self._activity_rule(cat='investment_three')
         if not rules: return False, u'目前不支持输入的活动类型', data
         rule = filter(lambda x: x[6] == redpack, rules)
         if rule:
