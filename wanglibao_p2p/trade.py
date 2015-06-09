@@ -266,9 +266,8 @@ class P2POperator(object):
             all_settled = reduce(lambda flag, a: flag & a.settled, product.amortizations.all(), True)
 
             if all_settled:
-                cls.logger.info("Product [%s]", cls)
-                cls.settle_hike(product)
-                cls.logger.info("Product [%s] [%s] paid hike", product.id, product.name)
+                #cls.settle_hike(product)
+                #cls.logger.info("Product [%s] [%s] paid hike", product.id, product.name)
 
                 cls.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
                 ProductKeeper(product).finish(None)
