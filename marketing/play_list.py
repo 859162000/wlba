@@ -1,10 +1,13 @@
 # encoding: utf-8
 
 from datetime import datetime
+from django.conf import settings
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
 from marketing.tasks import send_redpack
 from marketing.utils import local_to_utc, paginator_factory
 from models import PlayList
@@ -86,6 +89,11 @@ class InvestmentRewardView(TemplateView):
                 (30000, 39999, None, None, 30, None, u'每日打榜红包_30',),
                 (20000, 29999, None, None, 20, None, u'每日打榜红包_20',),
                 (10000, 19999, None, None, 10, None, u'每日打榜红包_10',),
+            )
+        elif cat == 'investment_three':
+            rules = (
+                (30000, None, None, 10, 1000, -100, u'每日打榜红包_1000-100', ),
+                (30000, None, 10, None, 60, None, u'每日打榜红包_60'),
             )
 
         return rules
@@ -239,3 +247,6 @@ class InvestmentRewardView(TemplateView):
             "day": day if isinstance(day, str) else day.date().__str__()
         })
 
+    @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
+    def dispatch(self, request, *args, **kwargs):
+        return super(InvestmentRewardView, self).dispatch(request, *args, **kwargs)
