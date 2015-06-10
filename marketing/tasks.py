@@ -303,11 +303,11 @@ def add_introduced_award_all(start, end, amount_min, percent):
 
             # 计算被邀请人首笔投资总收益（收益年化）
             # reward.first_reward = get_base_decimal(record.amount * record.product.expected_earning_rate * 0.01 * record.product.period / 12)
-            reward.first_reward = get_final_decimal(record.amount * record.product.expected_earning_rate * 0.01 * record.product.period / 12)
+            reward.first_reward = get_final_decimal(record.amount * record.product.expected_earning_rate * Decimal(0.01) * record.product.period / 12)
 
             # 邀请人活取被邀请人首笔投资（投资年化）
             # reward.introduced_reward = get_base_decimal(record.amount * percent * 0.01 * record.product.period / 12)
-            reward.introduced_reward = get_final_decimal(record.amount * percent * 0.01 * record.product.period / 12)
+            reward.introduced_reward = get_final_decimal(record.amount * percent * Decimal(0.01) * record.product.period / 12)
 
 
             reward.activity_start_at = start_utc
