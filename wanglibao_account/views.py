@@ -513,10 +513,15 @@ class AccountInviteHikeAPIView(APIView):
             callfee = 0
         if not amount['amount__sum']:
             amount['amount__sum'] = 0
+        prot = P2PRecord.objects.filter(user=request.user, catalog=u'申购').order_by('-create_time').first()
+        if not prot:
+            product_id = 0
+        else:
+            product_id = prot.product_id
 
         return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
                         "call_charge":30, "total_hike":"0.1%", "calls":callfee,
-                        "amount":amount['amount__sum']})
+                        "amount":amount['amount__sum'], "product_id":product_id})
 
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
