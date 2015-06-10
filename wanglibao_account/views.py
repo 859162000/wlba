@@ -515,7 +515,7 @@ class AccountInviteHikeAPIView(APIView):
             amount['amount__sum'] = 0
 
         return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
-                        "call_charge":30, "total_hike":"2%", "calls":callfee,
+                        "call_charge":30, "total_hike":"0.1%", "calls":callfee,
                         "amount":amount['amount__sum']})
 
 class AccountP2PRecordAPI(APIView):
