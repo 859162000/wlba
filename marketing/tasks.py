@@ -243,6 +243,8 @@ def add_introduced_award_all(start, end, amount_min, percent):
     from decimal import Decimal, ROUND_DOWN
     from wanglibao_p2p.models import P2PRecord
 
+    from wanglibao_p2p.amortization_plan import get_base_decimal, get_final_decimal
+
     start = datetime.strptime(start, '%Y-%m-%d')
     end = datetime.strptime(end, '%Y-%m-%d')
 
@@ -288,7 +290,7 @@ def add_introduced_award_all(start, end, amount_min, percent):
             continue
 
         # 首笔投资大于200才有收益
-        if records.first().amount <= Decimal(amount_min):
+        if records.first().amount < Decimal(amount_min):
             continue
 
         for record in records:
@@ -300,15 +302,13 @@ def add_introduced_award_all(start, end, amount_min, percent):
             reward.first_amount = record.amount
 
             # 计算被邀请人首笔投资总收益（收益年化）
-            amount_earning = Decimal(
-                Decimal(record.amount) * (Decimal(record.product.period) / Decimal(12)) * Decimal(record.product.expected_earning_rate) * Decimal('0.01')
-            ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
-            reward.first_reward = amount_earning
+            # reward.first_reward = get_base_decimal(record.amount * record.product.expected_earning_rate * 0.01 * record.product.period / 12)
+            reward.first_reward = get_final_decimal(record.amount * record.product.expected_earning_rate * 0.01 * record.product.period / 12)
 
             # 邀请人活取被邀请人首笔投资（投资年化）
-            reward.introduced_reward = Decimal(
-                Decimal(record.amount) * (Decimal(record.product.period) / Decimal(12)) * Decimal(percent) * Decimal('0.01')
-            ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+            # reward.introduced_reward = get_base_decimal(record.amount * percent * 0.01 * record.product.period / 12)
+            reward.introduced_reward = get_final_decimal(record.amount * percent * 0.01 * record.product.period / 12)
+
 
             reward.activity_start_at = start_utc
             reward.activity_end_at = end_utc
