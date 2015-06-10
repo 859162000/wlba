@@ -298,7 +298,7 @@ def add_introduced_award_all(start, end, amount_min, percent):
             reward.user = first_user.user
             reward.introduced_by_person = first_user.introduced_by
             reward.product = record.product
-            reward.first_bought_at = first_user.bought_at
+            reward.first_bought_at = record.create_time
             reward.first_amount = record.amount
 
             # 计算被邀请人首笔投资总收益（收益年化）
@@ -306,7 +306,6 @@ def add_introduced_award_all(start, end, amount_min, percent):
 
             # 邀请人活取被邀请人首笔投资（投资年化）
             reward.introduced_reward = get_base_decimal(Decimal(record.amount) * Decimal(percent) * Decimal(0.01) * Decimal(record.product.period) / 12)
-
 
             reward.activity_start_at = start_utc
             reward.activity_end_at = end_utc
