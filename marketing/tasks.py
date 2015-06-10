@@ -290,7 +290,7 @@ def add_introduced_award_all(start, end, amount_min, percent):
             continue
 
         # 首笔投资大于200才有收益
-        if records.first().amount <= Decimal(amount_min):
+        if records.first().amount < Decimal(amount_min):
             continue
 
         for record in records:
@@ -302,10 +302,10 @@ def add_introduced_award_all(start, end, amount_min, percent):
             reward.first_amount = record.amount
 
             # 计算被邀请人首笔投资总收益（收益年化）
-            reward.first_reward = Decimal(record.amount * record.product.expected_earning_rate * 0.01 * record.product.period / 12).quantize(Decimal('0.01'), ROUND_DOWN)
+            reward.first_reward = get_base_decimal(record.amount * record.product.expected_earning_rate * 0.01 * record.product.period / 12)
 
             # 邀请人活取被邀请人首笔投资（投资年化）
-            reward.introduced_reward = Decimal(record.amount * percent * 0.01 * record.product.period / 12).quantize(Decimal('0.01'), ROUND_DOWN)
+            reward.introduced_reward = get_base_decimal(record.amount * percent * 0.01 * record.product.period / 12)
 
 
             reward.activity_start_at = start_utc
