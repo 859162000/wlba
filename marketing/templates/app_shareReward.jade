@@ -24,7 +24,7 @@ html
             img(src="/static/imgs/app/shareReward/pig.png")
           .right-text
             p 加息券
-            p 1%
+            p 0.1%
 
       .app-invitation-reward
         .reward-title.title-public 邀请奖励对照表
@@ -39,11 +39,12 @@ html
                 td=num
                 td=reward
                 td=jiaReward
-            +tr(1, 30, 120)
-            +tr(2, 60, 180)
-            +tr(3, 90, 240)
-            +tr(4, 120, 300)
-            +tr(5, 150, 360)
+            +tr(1, 30, '0.1%')
+            +tr(2, 60, '0.2%')
+            +tr(3, 90, '0.3%')
+            +tr(4, 120, '0.4%')
+            +tr(5, 150, '0.5%')
+            +tr('...', '...', '...')
       .app-invitation-step
         .step-title.title-public 邀请步骤
         .step-body
