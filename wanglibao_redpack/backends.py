@@ -488,7 +488,8 @@ def settle_hike(product):
         term = decimal.Decimal(product.period) / decimal.Decimal(12)
 
     hike_list = []
-    records = InterestHike.objects.filter(product=product, invalid=False, paid=False).first()
+    #records = InterestHike.objects.filter(product=product, invalid=False, paid=False).first()
+    records = InterestHike.objects.filter(product=product, invalid=False, paid=False)
     for x in records:
         equity = P2PEquity.objects.filter(user=x.user, product=product).first()
         if equity:
