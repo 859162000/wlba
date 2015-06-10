@@ -485,7 +485,7 @@ class AccountInviteAPIView(APIView):
             invite = {"name":x.user.wanglibaouserprofile.name,
                     "phone":safe_phone_str(x.user.wanglibaouserprofile.phone),
                     "created_at":timezone.get_current_timezone().normalize(x.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                    "is_is_valid":x.user.wanglibaouserprofile.id_is_valid}
+                    "is_id_valid":x.user.wanglibaouserprofile.id_is_valid}
             info = PayInfo.objects.filter(user=x.user, type="D", status=u"成功").first()
             if not info:
                 invite['pay'] = False
