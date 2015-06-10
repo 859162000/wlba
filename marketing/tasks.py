@@ -406,6 +406,6 @@ def reward_earning(record, flag):
     earning.user = introduced_by
     earning.save()
 
-    IntroducedByReward.objects.filter(id=record.id).update(checked_status=1)
+    IntroducedByReward.objects.filter(id=record.id).update(checked_status=1, checked_at=timezone.now())
 
 
