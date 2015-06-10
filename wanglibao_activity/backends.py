@@ -110,10 +110,8 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                     _check_buy_product(user, rule, device_type, amount, product_id, is_full)
             else:
                 _check_buy_product(user, rule, device_type, amount, product_id, is_full)
-            logger.info(u"yqjx %s" % user_ib)
             if user_ib:
                 redpack_backends.increase_hike(user_ib, product_id)
-                logger.info(u"yqjx %s" % user_ib)
 
     #购买
     elif trigger_node == 'buy':
