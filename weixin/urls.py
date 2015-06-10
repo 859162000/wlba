@@ -23,6 +23,9 @@ urlpatterns = patterns(
     url(r'^pay/test/$', views.WeixinPayTest.as_view(), name="weixin_pay_test"),
     url(r'^pay/notify/$', views.WeixinPayNotify.as_view(), name='weixin_pay_notify'),
     url(r'^transaction/(?P<status>\w+)/$', login_required(views.WeixinTransaction.as_view(), login_url='/weixin/login/'), name="weixin_transaction"),
+    url(r'^more/$', TemplateView.as_view(template_name="weixin_more.jade")),
+    url(r'^more/contactus/$', TemplateView.as_view(template_name="weixin_contactus.jade")),
+    url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),

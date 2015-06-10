@@ -1,0 +1,27 @@
+-load formatters
+doctype html
+html(style="background: url('/static/imgs/mobile/login/loginback.png');")
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 网利宝
+      a(href="javascript:history.back()")
+       span 返回
+    .more-head
+      .more-head-bg
+      .more-top-logo
+        .logo-out
+          img(src="/static/imgs/mobile/login/login.png", alt="").img-logo
+        img(src="/static/imgs/mobile/login/loginsize.png", alt="").img-log-text
+        p 网利金融旗下产品
+    .more-link
+      mixin link(text)
+        .link-public
+          .link-body
+            .link-text=text
+      +link('kefu@wanglibank.com')
+      +link('010-8441 7763')
+      +link('北京市天元港霄云路天元港中心A座610室')
+    .more-about-btn
+      a(href='tel:4008588066') 客服电话
