@@ -507,7 +507,7 @@ class AccountInviteHikeAPIView(APIView):
         nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
         hikes = InterestHike.objects.filter(user=request.user, invalid=False).count()
         amount = InterestHike.objects.filter(user=request.user, invalid=False, paid=True).aggregate(Sum('amount'))
-        thity = ActivityRecord.objects.filter(user=request.user, gift_type='phonefare').aggregate(Sum('income'))
+        thity = ActivityRecord.objects.filter(user=request.user, gift_type='phonefare', msg_type='message').aggregate(Sum('income'))
         if thity['income__sum']:
             callfee = thity['income__sum']
         else:
