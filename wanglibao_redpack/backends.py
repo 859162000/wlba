@@ -457,25 +457,32 @@ def deduct_calc(amount, redpack_amount):
 
 
 def increase_hike(user, product_id):
+    logger.info(u"yqjx 1 %s" % product_id)
     if not user or not product_id:
         return
+    logger.info(u"yqjx 2 %s" % product_id)
     product = P2PProduct.objects.filter(id=product_id).first()
     if not product:
         return
+    logger.info(u"yqjx 3 %s" % product_id)
     pr = P2PRecord.objects.filter(user=user, product=product).first()
     if not pr:
         return
+    logger.info(u"yqjx 4 %s" % product_id)
     if (timezone.now() - pr.create_time).days > 10:
         return
     #InterestHike.objects.select_for_update().filter(user=user, product=product, invalid=False).first()
+    logger.info(u"yqjx 5 %s" % product_id)
     record = InterestHike.objects.filter(user=user, product=product, invalid=False).first()
     if not record:
+        logger.info(u"yqjx 6 %s" % product_id)
         record = InterestHike()
         record.user = user
         record.product = product
         record.rate = decimal.Decimal("0.001")
     record.intro_total += 1
     record.save()
+    logger.info(u"yqjx 7 %s" % product_id)
     return {"ret_code":0, "message":"ok"}
 
 def settle_hike(product):
