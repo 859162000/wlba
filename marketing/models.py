@@ -316,3 +316,6 @@ class PlayList(models.Model):
     start = models.IntegerField(u'奖励开始名次', max_length=2, null=True, blank=True)
     end = models.IntegerField(u'奖励截止名次', max_length=2, null=True, blank=True)
     reward = models.DecimalField(u'红包奖励金额', max_digits=20, decimal_places=2, default=0)
+
+    class Meta:
+        verbose_name_plural = u'打榜统计表'

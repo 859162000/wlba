@@ -60,6 +60,7 @@ from order.utils import OrderHelper
 from wanglibao_redpack import backends
 from wanglibao_redpack.models import InterestHike
 from wanglibao_rest import utils
+from wanglibao_activity.models import ActivityRecord
 
 # from wanglibao.settings import CJDAOKEY
 # from wanglibao_account.tasks import cjdao_callback
@@ -506,9 +507,9 @@ class AccountInviteHikeAPIView(APIView):
         nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
         hikes = InterestHike.objects.filter(user=request.user, invalid=False).count()
         amount = InterestHike.objects.filter(user=request.user, invalid=False, paid=True).aggregate(Sum('amount'))
-        thity = Reward.objects.filter(type=u"30元话费").first()
-        if thity:
-            callfee = RewardRecord.objects.filter(user=request.user, reward=thity).count() * 30
+        thity = ActivityRecord.objects.filter(user=request.user, gift_type=u'手机话费').aggregate(Sum('income'))
+        if thity['income__sum']:
+            callfee = thity['income__sum']
         else:
             callfee = 0
         if not amount['amount__sum']:
