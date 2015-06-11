@@ -505,9 +505,13 @@ class AccountInviteHikeAPIView(APIView):
 
     def post(self, request, **kwargs):
         nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
-        hikes = InterestHike.objects.filter(user=request.user, invalid=False).count()
+        hikes = InterestHike.objects.filter(user=request.user, invalid=False).aggregate(Sum('intro_total'))
         amount = InterestHike.objects.filter(user=request.user, invalid=False, paid=True).aggregate(Sum('amount'))
         thity = ActivityRecord.objects.filter(user=request.user, gift_type='phonefare', msg_type='message').aggregate(Sum('income'))
+        if hikes['intro_total__sum']:
+            hikes = hikes['intro_total__sum']
+        else:
+            hikes = 0
         if thity['income__sum']:
             callfee = thity['income__sum']
         else:
