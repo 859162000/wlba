@@ -12,8 +12,8 @@ import json
 import logging
 import decimal
 from django.utils import timezone
-from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
-from wanglibao_p2p.models import P2PRecord
+from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent, InterestHike
+from wanglibao_p2p.models import P2PRecord, P2PProduct, P2PEquity
 from marketing import  helper
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
@@ -454,3 +454,52 @@ def deduct_calc(amount, redpack_amount):
         real_deduct = t5
     real_deduct = real_deduct.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
     return {"ret_code":0, "deduct":real_deduct}
+
+
+def increase_hike(user, product_id):
+    if not user or not product_id:
+        return
+    product = P2PProduct.objects.filter(id=product_id).first()
+    if not product:
+        return
+    pr = P2PRecord.objects.filter(user=user, product=product).first()
+    if not pr:
+        return
+    if (timezone.now() - pr.create_time).days > 10:
+        return
+    #InterestHike.objects.select_for_update().filter(user=user, product=product, invalid=False).first()
+    record = InterestHike.objects.filter(user=user, product=product, invalid=False).first()
+    if not record:
+        record = InterestHike()
+        record.user = user
+        record.product = product
+        record.rate = decimal.Decimal("0.001")
+    record.intro_total += 1
+    record.save()
+    return {"ret_code":0, "message":"ok"}
+
+def settle_hike(product):
+    if not product:
+        return None
+    if product.pay_method.startswith(u"日计息"):
+        term = decimal.Decimal(product.period) / decimal.Decimal(360)
+    else:
+        term = decimal.Decimal(product.period) / decimal.Decimal(12)
+
+    hike_list = []
+    #records = InterestHike.objects.filter(product=product, invalid=False, paid=False).first()
+    records = InterestHike.objects.filter(product=product, invalid=False, paid=False)
+    for x in records:
+        equity = P2PEquity.objects.filter(user=x.user, product=product).first()
+        if equity:
+            intro_total = x.intro_total
+            if x.intro_total > 20:
+                intro_total = 20
+            amount = equity.equity * term * x.rate * intro_total
+            amount = amount.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
+            x.amount = amount
+            x.paid = True
+            x.updated_at = timezone.now()
+            x.save()
+            hike_list.append({"user":x.user, "amount":amount})
+    return hike_list

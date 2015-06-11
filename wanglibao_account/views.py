@@ -32,7 +32,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
-from marketing.models import IntroducedBy
+from marketing.models import IntroducedBy, Reward, RewardRecord
 from marketing.utils import set_promo_user
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
@@ -58,6 +58,7 @@ from django.template.defaulttags import register
 from wanglibao_p2p.keeper import EquityKeeperDecorator
 from order.utils import OrderHelper
 from wanglibao_redpack import backends
+from wanglibao_redpack.models import InterestHike
 from wanglibao_rest import utils
 
 # from wanglibao.settings import CJDAOKEY
@@ -312,6 +313,8 @@ class AccountHome(TemplateView):
             obj = {"equity": equity}
             if earning_map.get(equity.product_id):
                 obj["earning"] = earning_map.get(equity.product_id)
+            #加息
+            obj['hike'] = InterestHike.objects.filter(user=user, product=equity.product_id, invalid=False).first()
 
             result.append(obj)
 
@@ -475,14 +478,50 @@ class AccountInviteAPIView(APIView):
     def post(self, request, **kwargs):
         introduces = IntroducedBy.objects.filter(introduced_by=request.user)
         res = []
-        if introduces:
-            for x in introduces:
-                invite = {"name":x.user.wanglibaouserprofile.name,
-                        "phone":safe_phone_str(x.user.wanglibaouserprofile.phone),
-                        "created_at":timezone.get_current_timezone().normalize(x.created_at).strftime("%Y-%m-%d %H:%M:%S")}
-                res.append(invite)
+        if not introduces:
+            return Response({"ret_code":0, "data":res})
+
+        for x in introduces:
+            invite = {"name":x.user.wanglibaouserprofile.name,
+                    "phone":safe_phone_str(x.user.wanglibaouserprofile.phone),
+                    "created_at":timezone.get_current_timezone().normalize(x.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "is_id_valid":x.user.wanglibaouserprofile.id_is_valid}
+            info = PayInfo.objects.filter(user=x.user, type="D", status=u"成功").first()
+            if not info:
+                invite['pay'] = False
+            else:
+                invite['pay'] = True
+            rd = P2PRecord.objects.filter(user=x.user, catalog=u"申购").first()
+            if not rd:
+                invite['buy'] = False
+            else:
+                invite['buy'] = True
+            res.append(invite)
         return Response({"ret_code":0, "data":res})
 
+class AccountInviteHikeAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, **kwargs):
+        nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
+        hikes = InterestHike.objects.filter(user=request.user, invalid=False).count()
+        amount = InterestHike.objects.filter(user=request.user, invalid=False, paid=True).aggregate(Sum('amount'))
+        thity = Reward.objects.filter(type=u"30元话费").first()
+        if thity:
+            callfee = RewardRecord.objects.filter(user=request.user, reward=thity).count() * 30
+        else:
+            callfee = 0
+        if not amount['amount__sum']:
+            amount['amount__sum'] = 0
+        prot = P2PRecord.objects.filter(user=request.user, catalog=u'申购').order_by('-create_time').first()
+        if not prot:
+            product_id = 0
+        else:
+            product_id = prot.product_id
+
+        return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
+                        "call_charge":30, "total_hike":"0.1%", "calls":callfee,
+                        "amount":amount['amount__sum'], "product_id":product_id})
 
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -1049,21 +1088,8 @@ def ajax_register(request):
                 set_promo_user(request, user, invitecode=invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
 
-                # # todo remove the try about cjdao callback
-                # try:
-                #     cjdaoinfo = request.session.get('cjdaoinfo')
-                #
-                #     if cjdaoinfo:
-                #         params = CjdaoUtils.return_register(cjdaoinfo, auth_user, CJDAOKEY)
-                #         cjdao_callback.apply_async(kwargs={'url': RETURN_REGISTER, 'params': params})
-                # except Exception, e:
-                #     print e
-
                 auth.login(request, auth_user)
 
-                # session lost, but I don't know why, rewrite the session
-                # if cjdaoinfo:
-                #     request.session['cjdaoinfo'] = cjdaoinfo
                 tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device_type":"pc"})
 
                 return HttpResponse(messenger('done', user=request.user))

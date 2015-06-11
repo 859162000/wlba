@@ -11,6 +11,7 @@ PLATFORM = (
     ("ios", u"ios"),
     ("android", u"android"),
     ("pc", u"pc"),
+    ('weixin', u"weixin"),
 )
 ACTIVITY_CATEGORY = (
     ('wanglibao', u'站内活动'),
@@ -56,6 +57,10 @@ MSG_TYPE = (
     ('message', u'站内信'),
     ('sms', u'手机短信'),
     ('only_record', u'只记录')
+)
+SHARE_TYPE = (
+    ('both', u'邀请人和被邀请人双方共享'),
+    ('inviter', u'邀请人独自获得'),
 )
 
 
@@ -126,7 +131,8 @@ class ActivityRule(models.Model):
     is_introduced = models.BooleanField(u'邀请好友时才启用', default=False,
                                         help_text=u'勾选此项，则会先判断用户是否被别人邀请，是就触发该规则，不是则不做处理')
     both_share = models.BooleanField(u'参与邀请共享赠送礼品', default=False,
-                                     help_text=u'勾选此项则，则用户在满足规则的条件内邀请别人，双方共享选定“赠送类型”中的礼品')
+                                     help_text=u'【废弃字段】，则用户在满足规则的条件内邀请别人，双方共享选定“赠送类型”中的礼品')
+    share_type = models.CharField(u'选择参与赠送的人员', max_length=20, choices=SHARE_TYPE, blank=True, default='')
     is_invite_in_date = models.BooleanField(u'判断是否在活动区间内邀请好友', default=False,
                                             help_text=u'勾选此项则，则会先判断邀请关系的成立时间是否在活动期间，是就触发该规则，不是则不做处理')
     redpack = models.CharField(u'红包活动ID', max_length=60, blank=True,

@@ -93,24 +93,6 @@ class P2PTrader(object):
         })
 
 
-        # # 财经道购买回调
-        # # todo remove the try
-        # logger = logging.getLogger('p2p')
-        # try:
-        #     cjdaoinfo = self.request.session.get('cjdaoinfo')
-        #
-        #     logger.debug('购买购买购买购买购买购买购买 session %s' % cjdaoinfo)
-        #
-        #     if cjdaoinfo:
-        #         if cjdaoinfo.get('thirdproductid') == equity.product.id:
-        #             params = CjdaoUtils.return_purchase(cjdaoinfo, self.user, margin_record, equity.product, CJDAOKEY)
-        #             cjdao_callback.apply_async(kwargs={'url': RETURN_PURCHARSE_URL, 'params': params})
-        # except Exception, e:
-        #     print e
-        #     logger.debug('购买异常')
-        #     logger.debug(e)
-
-
         # 满标给管理员发短信
         if product_record.product_balance_after <= 0:
             from wanglibao_p2p.tasks import full_send_message
@@ -284,5 +266,19 @@ class P2POperator(object):
             all_settled = reduce(lambda flag, a: flag & a.settled, product.amortizations.all(), True)
 
             if all_settled:
+                cls.settle_hike(product)
+                cls.logger.info("Product [%s] [%s] paid hike", product.id, product.name)
+
                 cls.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
                 ProductKeeper(product).finish(None)
+
+    @classmethod
+    def settle_hike(cls, product):
+        result = redpack_backends.settle_hike(product)
+        if not result:
+            return
+        for x in result:
+            order_id = OrderHelper.place_order(x.user, order_type=u'加息', product_id=product.id, status=u'新建').id
+            margin_keeper = MarginKeeper(user=x.user, order_id=order_id)
+            margin_keeper.hike_deposit(x.amount, u"加息存入%s元" % x.amount, savepoint=False)
+            OrderHelper.update_order(Order.objects.get(pk=order_id), user=x.user, status=u'成功', amount=x.amount)

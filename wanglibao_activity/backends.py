@@ -63,7 +63,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
                     if rule.is_introduced:
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
-                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full)
+                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full, user_ib)
                     else:
                         _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full)
             else:
@@ -72,7 +72,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, user_ib=None):
     """ check the trigger node """
     product_id = int(product_id)
     #注册 或 实名认证
@@ -110,6 +110,8 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                     _check_buy_product(user, rule, device_type, amount, product_id, is_full)
             else:
                 _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+            if user_ib:
+                redpack_backends.increase_hike(user_ib, product_id)
 
     #购买
     elif trigger_node == 'buy':
@@ -256,15 +258,17 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_fu
     now = timezone.now()
     if rule.send_type == 'sys_auto':
         #do send
-        _send_reward(user, rule, rtype, reward_name, None, amount)
-        if rule.both_share:
+        if rule.share_type != 'inviter':
+            _send_reward(user, rule, rtype, reward_name, None, amount)
+        if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
     else:
         #只记录不发信息
-        _save_activity_record(rule, user, 'only_record', reward_name, False, is_full)
-        if rule.both_share:
+        if rule.share_type != 'inviter':
+            _save_activity_record(rule, user, 'only_record', reward_name, False, is_full)
+        if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _save_activity_record(rule, user_introduced_by, 'only_record', reward_name, True, is_full)
@@ -294,15 +298,17 @@ def _send_gift_income(user, rule, amount, is_full):
     income = rule.income
     if income > 0:
         if rule.send_type == 'sys_auto':
-            _send_message_sms(user, rule, None, None, amount)
-            if rule.both_share:
+            if rule.share_type != 'inviter':
+                _send_message_sms(user, rule, None, None, amount)
+            if rule.share_type == 'both' or rule.share_type == 'inviter':
                 user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                 if user_introduced_by:
                     _send_message_sms(user, rule, user_introduced_by, None, amount)
         else:
             #只记录不发信息
-            _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
-            if rule.both_share:
+            if rule.share_type != 'inviter':
+                _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
+            if rule.share_type == 'both' or rule.share_type == 'inviter':
                 user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                 if user_introduced_by:
                     _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
@@ -315,15 +321,17 @@ def _send_gift_phonefare(user, rule, amount, is_full):
     phone_fare = rule.income
     if phone_fare > 0:
         if rule.send_type == 'sys_auto':
-            _send_message_sms(user, rule, None, None, amount)
-            if rule.both_share:
+            if rule.share_type != 'inviter':
+                _send_message_sms(user, rule, None, None, amount)
+            if rule.share_type == 'both' or rule.share_type == 'inviter':
                 user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                 if user_introduced_by:
                     _send_message_sms(user, rule, user_introduced_by, None, amount)
         else:
             #只记录不发信息
-            _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
-            if rule.both_share:
+            if rule.share_type != 'inviter':
+                _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
+            if rule.share_type == 'both' or rule.share_type == 'inviter':
                 user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                 if user_introduced_by:
                     _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
@@ -336,12 +344,13 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, is_full):
         另外红包会发送短信和站内信，因此，此处记录流水时两者都记录。
     """
     if rule.send_type == 'sys_auto':
-        redpack_backends.give_activity_redpack_new(user, rtype, redpack_id, device_type, rule.id)
+        if rule.share_type != 'inviter':
+            redpack_backends.give_activity_redpack_new(user, rtype, redpack_id, device_type, rule.id)
     #记录流水，目前红包系同时发送站内信和短信，因此此处记录两条流水，下同
     _save_activity_record(rule, user, 'message', rule.rule_name, False, is_full)
     _save_activity_record(rule, user, 'sms', rule.rule_name, False, is_full)
     #检测是否有邀请关系
-    if rule.both_share:
+    if rule.share_type == 'both' or rule.share_type == 'inviter':
         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
         if user_ib:
             #给邀请人发红包

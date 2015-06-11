@@ -75,34 +75,34 @@ html
                       tr
                         th(rowspan="1") 用户id
                         th(rowspan="1") 邀请人id
-                        th(rowspan="1") 首笔投资产品
-                        th(rowspan="1") 首笔投资时间
-                        th(rowspan="1") 首笔投资金额
+                        th(rowspan="1") 投资产品
+                        th(rowspan="1") 投资时间
+                        th(rowspan="1") 投资金额
                         //th(rowspan="1") 首笔投资收益
-                        th(rowspan="1") 邀请人奖励
-                        //th(rowspan="1") 开始日期
-                        //th(rowspan="1") 截止日期
-                        //th(rowspan="1") 首笔投资最低额
-                        //th(rowspan="1") 收益百分比
+                        th(rowspan="1") 邀请奖励
+                        th(rowspan="1") 开始日期
+                        th(rowspan="1") 截止日期
+                        th(rowspan="1") 首笔投资最低额
+                        th(rowspan="1") 收益百分比
                         th(rowspan="1") 审核状态
-                        //th(rowspan="1") 审核时间
+                        th(rowspan="1") 审核时间
                     tbody
                       if result
                         for l in result
                           tr
-                            td {{l.user_id}}
+                            td {{l.user}}
                             td {{l.introduced_by_person}}
                             td {{l.product.name}}
                             td {{l.first_bought_at}}
                             td {{l.first_amount}}
                             //td {{l.first_reward}}
                             td {{l.introduced_reward}}
-                            //td {{l.activity_start_at}}
-                            //td {{l.activity_end_at}}
-                            //td {{l.activity_amount_min}}
-                            //td {{l.percent_reward}}
+                            td {{l.activity_start_at}}
+                            td {{l.activity_end_at}}
+                            td {{l.activity_amount_min}}
+                            td {{l.percent_reward}}
                             td {{l.get_checked_status_display}}
-                            //td {{l.checked_at}}
+                            td {{l.checked_at}}
                               .chart
                   form.form.span5(method="POST" action='/{{ "" | admin_address}}/statistics/introduced_by')
                     - csrf_token

@@ -45,7 +45,8 @@ class ProfileView(APIView):
             "is_invested": profile.is_invested,
             "cards_number":len(cards),
             "gesture_pwd": str_add_md5(str(profile.gesture_pwd)),
-            "gesture_is_enabled": profile.gesture_is_enabled
+            "gesture_is_enabled": profile.gesture_is_enabled,
+            "promo_token":user.promotiontoken.token
         }
         return Response(dic)
         #serializer = ProfileSerializer(user.wanglibaouserprofile)
