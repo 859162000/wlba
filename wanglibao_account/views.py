@@ -315,7 +315,15 @@ class AccountHome(TemplateView):
             if earning_map.get(equity.product_id):
                 obj["earning"] = earning_map.get(equity.product_id)
             #加息
-            obj['hike'] = InterestHike.objects.filter(user=user, product=equity.product_id, invalid=False).first()
+            _hike = InterestHike.objects.filter(user=user, product=equity.product_id, invalid=False).first()
+            if _hike:
+                if _hike.paid:
+                    obj['hike'] = _hike.amount
+                else:
+                    if _hike.intro_total > 20:
+                        obj['hike'] = "%.2f%%" % (_hike.rate * 20 * 100)
+                    else:
+                        obj['hike'] = "%.2f%%" % (_hike.rate * _hike.intro_total * 100)
 
             result.append(obj)
 
