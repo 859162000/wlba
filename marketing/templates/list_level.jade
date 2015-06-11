@@ -1,0 +1,585 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    meta(name="keywords", content="网利宝")
+    meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
+    link(rel="stylesheet",href="/static/stylesheets/day.css")
+    link(rel="stylesheet",href="/static/stylesheets/activity.css")
+  body.white-background
+    .top
+      .row
+        .day-logo.span6
+        .day-nav.span4
+          ul
+            li
+              a(href="https://www.wanglibao.com/", target="_blank") 网利宝官网
+            li
+              a#xiaz 下载APP
+            if user.is_authenticated
+              li
+                a(href="/accounts/home") {{user | display_name}} 的账户
+              li
+                a.logout(href="/accounts/logout?next={{ request.path }}") 退出
+            else
+              li
+                a(href="/accounts/login/?next=/", target="_blank") 登录
+              li
+                a(href="/accounts/register/?next=/", target="_blank") 注册
+    .list-banner
+    .list-content-div.clearfix
+        .list-content.clearfix
+            h1 活动时间：2015年6月11日——7月X日
+            .level-prize.clearfix
+                .level-prize-left
+                .level-prize-right
+                    dl.prize-title.clearfix
+                        dt
+                        dd
+                            .pdiv
+                                p.titlep 现金红包已垒好，等您来打擂赢取！
+                                p 本擂馆每日
+                                    font 零点数据清零
+                                    ，用户可每天重复参赛。用户每天的投标累计金额
+                                    font ≥3万元
+                                    ，将获得网站每日投资额外现金红包奖励。
+                            span
+                    .active-pop.clearfix 活动规则:每天投标金额≥3万元，当日投标累计金额排名
+                    ul.clearfix
+                        li
+                            span.jinbi1
+                                font ¥ 1000
+                            label 第一名
+                        li
+                            span.jinbi2
+                                font ¥ 900
+                            label 第二名
+                        li
+                            span.jinbi3
+                                font ¥ 800
+                            label 第三名
+                        li
+                            span.jinbi4
+                                font ¥ 700
+                            label 第四名
+                        li.lastli
+                            span.jinbi5
+                                font ¥ 600
+                            label 第五名
+                        li
+                            span.jinbi6
+                                font ¥ 500
+                            label 第六名
+                        li
+                            span.jinbi7
+                                font ¥ 400
+                            label 第七名
+                        li
+                            span.jinbi8
+                                font ¥ 300
+                            label 第八名
+                        li
+                            span.jinbi9
+                                font ¥ 200
+                            label 第九名
+                        li.lastli
+                            span.jinbi10
+                                font ¥ 100
+                            label 第十名
+                    p.notes.mt8
+                        font 注：
+                        若出现两名或两名以上客户投标金额相同，则按当日投标时间先后排位；
+                    p.notes
+                        每天投标累计金额
+                        font ≥3
+                        万元的用户未排入前十名将获得
+                        font 60元
+                        现金。
+            .ring-list
+                .min-nav
+                    span.day-list.curr 日榜
+                    span.history-list 历史榜单
+                .day-list-div
+                    p.red-font 擂台榜：每天投标累积金额≥3万元的英雄好汉排行
+                    p.black-font 本擂台馆奖励每天投标累计最高的
+                        font 前10名
+                        好汉，每天最高奖励
+                        font 1000元
+                        ！
+                    .list-content
+                        ul#list-day-user
+                            li.mb10
+                                span.list-span1.f16 榜单
+                                span.list-span2.f16 用户
+                                span.list-span3.f16 累计金额
+                            if top_ten
+                              for day in top_ten
+                                if forloop.counter < 4
+                                  li
+                                    span.list-span1
+                                    span.list-span2 {{day.phone | safe_phone_new }}
+                                    span.list-span3 {{day.amount_sum | money_format_int}}元
+                                else
+                                  li
+                                    span.list-span1
+                                    span.list-span2.back-span {{day.phone | safe_phone_new }}
+                                    span.list-span3.back-span {{day.amount_sum | money_format_int}}元
+                        span.list-img
+                        span.level-img
+                .history-list-div(style='display:none')
+                    .day-box1(style="padding:0;")
+                        .day-left
+                          h1.history-title#left-h1 3月17日用户榜单
+                          .left-ul
+                            ul.dan#dan
+                              li.day-user-hight
+                                span.span-one 榜单
+                                span.span-two 用户
+                                span.span-three 投标金额
+                            .num-style
+                        .day-right
+                          h1.history-title 点击历史查看相应榜单
+                          .day-tap
+                            .tap-top
+                              span.mon 3 月
+                              span.left-btn
+                              span.right-btn
+                            .tap-view
+                              .day-long
+                                .day-yue.day-san(data-num="0")
+                                  ul
+                                    li.tab-hight
+                                      span SUN
+                                      span MON
+                                      span TUE
+                                      span WED
+                                      span THU
+                                      span FRI
+                                      span SAT
+                                    li
+                                      span.spantag1 1
+                                      span.spantag2 2
+                                      span.spantag3 3
+                                      span.spantag4 4
+                                      span.spantag5 5
+                                      span.spantag6 6
+                                      span.spantag7 7
+                                    li
+                                      span.spantag8 8
+                                      span.spantag9 9
+                                      span.spantag10 10
+                                      span.spantag1 11
+                                      span.spantag12 12
+                                      span.spantag13 13
+                                      span.spantag14 14
+                                    li
+                                      span.spantag15 15
+                                      span.spantag16 16
+                                      span.spantag17 17
+                                      span.spantag18 18
+                                      span.spantag19 19
+                                      span.spantag20 20
+                                      span.spantag21 21
+                                    li
+                                      span.spantag22 22
+                                      span.spantag23 23
+                                      span.spantag24 24
+                                      span.spantag25 25
+                                      span.spantag26 26
+                                      span.spantag27 27
+                                      span.spantag28 28
+                                    li
+                                      span.spantag29 29
+                                      span.spantag30 30
+                                      span.spantag31 31
+                                .day-yue.day-si(data-num="1")
+                                  ul
+                                    li.tab-hight
+                                      span SUN
+                                      span MON
+                                      span TUE
+                                      span WED
+                                      span THU
+                                      span FRI
+                                      span SAT
+                                    li
+                                      span
+                                      span
+                                      span
+                                      span.spantag1 1
+                                      span.spantag2 2
+                                      span.spantag3 3
+                                      span.spantag4 4
+                                    li
+                                      span.spantag5 5
+                                      span.spantag6 6
+                                      span.spantag7 7
+                                      span.spantag8 8
+                                      span.spantag9 9
+                                      span.spantag10 10
+                                      span.spantag11 11
+                                    li
+                                      span.spantag12 12
+                                      span.spantag13 13
+                                      span.spantag14 14
+                                      span.spantag15 15
+                                      span.spantag16 16
+                                      span.spantag17 17
+                                      span.spantag18 18
+                                    li
+                                      span.spantag19 19
+                                      span.spantag20 20
+                                      span.spantag21 21
+                                      span.spantag22 22
+                                      span.spantag23 23
+                                      span.spantag24 24
+                                      span.spantag25 25
+                                    li
+                                      span.spantag26 26
+                                      span.spantag27 27
+                                      span.spantag28 28
+                                      span.spantag29 29
+                                      span.spantag30 30
+                                .day-yue.day-wu(data-num="2")
+                                  ul
+                                    li.tab-hight
+                                      span SUN
+                                      span MON
+                                      span TUE
+                                      span WED
+                                      span THU
+                                      span FRI
+                                      span SAT
+                                    li
+                                      span
+                                      span
+                                      span
+                                      span
+                                      span
+                                      span.spantag1 1
+                                      span.spantag2 2
+                                    li
+                                      span.spantag3 3
+                                      span.spantag4 4
+                                      span.spantag5 5
+                                      span.spantag6 6
+                                      span.spantag7 7
+                                      span.spantag8 8
+                                      span.spantag9 9
+                                    li
+                                      span.spantag10 10
+                                      span.spantag11 11
+                                      span.spantag12 12
+                                      span.spantag13 13
+                                      span.spantag14 14
+                                      span.spantag15 15
+                                      span.spantag16 16
+                                    li
+                                      span.spantag17 17
+                                      span.spantag18 18
+                                      span.spantag19 19
+                                      span.spantag20 20
+                                      span.spantag21 21
+                                      span.spantag22 22
+                                      span.spantag23 23
+                                    li
+                                      span.spantag24 24
+                                      span.spantag25 25
+                                      span.spantag26 26
+                                      span.spantag27 27
+                                      span.spantag28 28
+                                      span.spantag29 29
+                                      span.spantag30 30
+                                    li
+                                      span 31
+                                .day-yue.day-liu(data-num="3")
+                                  ul
+                                    li.tab-hight
+                                      span SUN
+                                      span MON
+                                      span TUE
+                                      span WED
+                                      span THU
+                                      span FRI
+                                      span SAT
+                                    li
+                                      span
+                                      span.spantag1 1
+                                      span.spantag2 2
+                                      span.spantag3 3
+                                      span.spantag4 4
+                                      span.spantag5 5
+                                      span.spantag6 6
+                                    li
+                                      span.spantag7 7
+                                      span.spantag8 8
+                                      span.spantag9 9
+                                      span.spantag10 10
+                                      span.spantag11 11
+                                      span.spantag12 12
+                                      span.spantag13 13
+                                    li
+                                      span.spantag14 14
+                                      span.spantag15 15
+                                      span.spantag16 16
+                                      span.spantag17 17
+                                      span.spantag18 18
+                                      span.spantag19 19
+                                      span.spantag20 20
+                                    li
+                                      span.spantag21 21
+                                      span.spantag22 22
+                                      span.spantag23 23
+                                      span.spantag24 24
+                                      span.spantag25 25
+                                      span.spantag26 26
+                                      span.spantag27 27
+                                    li
+                                      span.spantag28 28
+                                      span.spantag29 29
+                                      span.spantag30 30
+                                .day-yue.day-liu(data-num="4")
+                                  ul
+                                    li.tab-hight
+                                      span SUN
+                                      span MON
+                                      span TUE
+                                      span WED
+                                      span THU
+                                      span FRI
+                                      span SAT
+                                    li
+                                      span
+                                      span
+                                      span
+                                      span.spantag1 1
+                                      span.spantag2 2
+                                      span.spantag3 3
+                                      span.spantag4 4
+                                    li
+                                      span.spantag5 5
+                                      span.spantag6 6
+                                      span.spantag7 7
+                                      span.spantag8 8
+                                      span.spantag9 9
+                                      span.spantag10 10
+                                      span.spantag11 11
+                                    li
+                                      span.spantag12 12
+                                      span.spantag13 13
+                                      span.spantag14 14
+                                      span.spantag15 15
+                                      span.spantag16 16
+                                      span.spantag17 17
+                                      span.spantag18 18
+                                    li
+                                      span.spantag19 19
+                                      span.spantag20 20
+                                      span.spantag21 21
+                                      span.spantag22 22
+                                      span.spantag23 23
+                                      span.spantag24 24
+                                      span.spantag25 25
+                                    li
+                                      span.spantag26 26
+                                      span.spantag27 27
+                                      span.spantag28 28
+                                      span.spantag29 29
+                                      span.spantag30 30
+                                      span.spantag31 31
+                                .day-yue.day-liu(data-num="5")
+                                  ul
+                                    li.tab-hight
+                                      span SUN
+                                      span MON
+                                      span TUE
+                                      span WED
+                                      span THU
+                                      span FRI
+                                      span SAT
+                                    li
+                                      span
+                                      span
+                                      span
+                                      span
+                                      span
+                                      span
+                                      span.spantag1 1
+                                    li
+                                      span.spantag2 2
+                                      span.spantag3 3
+                                      span.spantag4 4
+                                      span.spantag5 5
+                                      span.spantag6 6
+                                      span.spantag7 7
+                                      span.spantag8 8
+                                    li
+                                      span.spantag9 9
+                                      span.spantag10 10
+                                      span.spantag11 11
+                                      span.spantag12 12
+                                      span.spantag13 13
+                                      span.spantag14 14
+                                      span.spantag15 15
+                                    li
+                                      span.spantag16 16
+                                      span.spantag17 17
+                                      span.spantag18 18
+                                      span.spantag19 19
+                                      span.spantag20 20
+                                      span.spantag21 21
+                                      span.spantag22 22
+                                    li
+                                      span.spantag23 23
+                                      span.spantag24 24
+                                      span.spantag25 25
+                                      span.spantag26 26
+                                      span.spantag27 27
+                                      span.spantag28 28
+                                      span.spantag29 29
+                                    li
+                                      span.spantag30 30
+                                      span 31
+                                .day-yue.day-liu(data-num="5")
+                                  ul
+                                    li.tab-hight
+                                      span SUN
+                                      span MON
+                                      span TUE
+                                      span WED
+                                      span THU
+                                      span FRI
+                                      span SAT
+                                    li
+                                      span
+                                      span
+                                      span.spantag1 1
+                                      span.spantag2 2
+                                      span.spantag3 3
+                                      span.spantag4 4
+                                      span.spantag5 5
+                                    li
+                                      span.spantag6 6
+                                      span.spantag7 7
+                                      span.spantag8 8
+                                      span.spantag9 9
+                                      span.spantag10 10
+                                      span.spantag11 11
+                                      span.spantag12 12
+                                    li
+                                      span.spantag13 13
+                                      span.spantag14 14
+                                      span.spantag15 15
+                                      span.spantag16 16
+                                      span.spantag17 17
+                                      span.spantag18 18
+                                      span.spantag19 19
+                                    li
+                                      span.spantag20 20
+                                      span.spantag21 21
+                                      span.spantag22 22
+                                      span.spantag23 23
+                                      span.spantag24 24
+                                      span.spantag25 25
+                                      span.spantag26 26
+                                    li
+                                      span.spantag27 27
+                                      span.spantag28 28
+                                      span.spantag29 29
+                                      span.spantag30 30
+                                      span.spantag31 31
+            p
+                a.my-invest(href="/p2p/list/",target="_blank")
+            .rule-style 红包规则
+            .rule-content
+                p
+                    span 1
+                    现金奖励在三个工作日内以红包形式发出，红包类型为现金红包；
+                p
+                    span 2
+                    红包有效期
+                    font 2015年6月11日-2015年9月10日
+                    ；
+                p
+                    span 3
+                    获奖红包以站内信形式通知，完成一次投资回款后即可取现；
+                p
+                    span 4
+                    红包均只能使用一次，使用后是否有余额即失效；
+                p
+                    span 5
+                    刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现；
+                p
+                    span 6
+                    本活动不收取任何费用，谨防上当受骗；
+                p
+                    span 7
+                    网利宝对此活动享有最终解释权。
+    .back-top#retop
+
+    .list-footer(style='background:#08A182;')
+      include include/activityFooter
+
+  script(src="/static/js/lib/jquery.min.js")
+  script.
+      var xz=document.getElementById("xiaz");
+       var v = new Date().getTime()
+        xz.onclick=function(v) {
+          xz.className='hight';
+          var android, iphone;
+          console.log(navigator.userAgent);
+          iphone = /iphone/i.test(navigator.userAgent.toLowerCase());
+          android = /android/i.test(navigator.userAgent.toLowerCase());
+          if (iphone) {
+            window.location.href = "https://itunes.apple.com/cn/app/id881326898";
+            return true;
+          }else if (android) {
+            window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao";
+            return true;
+          } else {
+            window.location.href = "http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao";
+            return true;
+          }
+      };
+      for(var i={{top_len}}+1;i<=10;i++){
+          var str="<li><span class='list-span1'></span><span class='list-span2 grey-span'>虚位以待</span><span class='list-span3 grey-span'>虚位以待</span></li>";
+          $('#list-day-user').append(str);
+      }
+  script.
+      $('#retop').click(function () {
+          $('body,html').animate({scrollTop: 0}, 600);
+          return false
+      });
+      var $retop = $('#retop');
+      function backTopLeft() {
+          var btLeft = $(window).width() / 2 + 550;
+          if (btLeft <= 950) {
+              $retop.css({'left': 955});
+          } else {
+              $retop.css({'left': btLeft});
+          }
+      }
+      backTopLeft();
+      $(window).resize(backTopLeft);
+      $(window).scroll(function () {
+          if ($(document).scrollTop() > 0) {
+              $("#retop").fadeIn();
+              $retop.fadeIn();
+          } else if ($(document).scrollTop() <= 0) {
+              $('#retop').stop().fadeOut();
+          }
+      });
+
+      function selectSpanFun(num,day){
+          $('.mon').html(num+' 月')
+          $('.day-long').animate({'left': '-'+(num-3)*369+'px'}, 500)
+          $('.day-long ul').find('.span-high').removeClass('span-high')
+          $('.day-long ul').eq(num-3).find('span[class=spantag'+ day +']').addClass('span-high')
+      }
+  script.
+    var v = new Date().getTime()
+    require(['/static/js/hover.js','/static/js/list_day.js'])

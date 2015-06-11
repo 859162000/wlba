@@ -44,6 +44,8 @@ urlpatterns = patterns(
     url(r'^ko_movie/$', TemplateView.as_view(template_name="ko_movie.jade")),
     url(r'^movie_login/$', TemplateView.as_view(template_name="app_movie_login.jade")),
     url(r'^agree_xieyi/$', TemplateView.as_view(template_name="agree_xieyi.jade")),
+    url(r'^list_level/$', TemplateView.as_view(template_name="list_level.jade")),
+    url(r'^app_level/$', TemplateView.as_view(template_name="app_level.jade")),
     # url(r'^summer/$', TemplateView.as_view(template_name="summer.jade")),
     # url(r'^app_summer/$', TemplateView.as_view(template_name="app_summer.jade")),
 )
