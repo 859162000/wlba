@@ -59,13 +59,13 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
                                                              is_used=True).order_by('-id')
 
             if activity_rules:
-                logger.info("yqjx 01 %s" % activity_rules)
+                #logger.info("yqjx 01 %s" % activity_rules)
                 for rule in activity_rules:
                     if rule.is_introduced:
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
                             _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full, user_ib)
-                        logger.info("yqjx 02 %s" % user_ib)
+                        #logger.info("yqjx 02 %s" % user_ib)
                     else:
                         _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full)
             else:
@@ -105,7 +105,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             first_buy_num = P2PRecord.objects.filter(user=user).count()
 
         if first_buy_num == 1:
-            logger.info("yqjx 03 %s" % user_ib)
+            #logger.info("yqjx 03 %s" % user_ib)
             #判断当前购买产品id是否在活动设置的id中
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
@@ -113,10 +113,10 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                     _check_buy_product(user, rule, device_type, amount, product_id, is_full)
             else:
                 _check_buy_product(user, rule, device_type, amount, product_id, is_full)
-            logger.info("yqjx 04 %s" % user_ib)
+            #logger.info("yqjx 04 %s" % user_ib)
             if user_ib:
                 redpack_backends.increase_hike(user_ib, product_id)
-                logger.info("yqjx 05 %s" % user_ib)
+                #logger.info("yqjx 05 %s" % user_ib)
 
     #购买
     elif trigger_node == 'buy':
