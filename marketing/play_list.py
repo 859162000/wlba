@@ -168,7 +168,7 @@ class InvestmentRewardView(TemplateView):
         play_list_checked = play_list.filter(checked_status=2)
         return {
             "message": message,
-            "result": paginator_factory(obj=play_list, page=self.request.GET.get('page'), limit=20),
+            "result": paginator_factory(obj=play_list, page=self.request.GET.get('page'), limit=100),
             "day": day.date().__str__(),
             "redpack": redpack,
             "amount_all": play_list.aggregate(reward=Sum('reward')) if play_list else 0.00,
@@ -228,9 +228,10 @@ class InvestmentRewardView(TemplateView):
 
         check_button = request.POST.get('check_button')
         if check_button == '1':
-            if datetime.now().date() <= day.date():
-                message = u'未到日终，不允许审核发放红包！'
-                return self.render_to_response(self._return_format(message, day, redpack))
+            # 上线前打开控制
+            # if datetime.now().date() <= day.date():
+            #     message = u'未到日终，不允许审核发放红包！'
+            #     return self.render_to_response(self._return_format(message, day, redpack))
 
             records.filter(checked_status=0).update(checked_status=1)
             send_redpack.apply_async(kwargs={
