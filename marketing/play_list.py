@@ -48,7 +48,7 @@ class InvestmentHistory(APIView):
                 "tops_len": 0
             }]
         else:
-            day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
+            day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'), amount_min=30000)
             for tmp in day_tops:
                 if 'phone' in tmp:
                     tmp['phone'] = safe_phone_str(tmp['phone'])
@@ -59,11 +59,14 @@ class InvestmentHistory(APIView):
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
-def _get_top_records(day=None):
+def _get_top_records(day=None, amount_min=None):
     if day is None:
         day = datetime.now()
     top = Top(limit=10)
-    return top.day_tops_activate(day)
+    if amount_min:
+        return top.day_tops_activate(day, amount_min=amount_min)
+    else:
+        return top.day_tops_activate(day)
 
 
 class InvestmentRewardView(TemplateView):
