@@ -169,7 +169,7 @@ admin.site.register(RewardRecord, RewardRecordAdmin)
 admin.site.register(ClientData, ClientDataAdmin)
 admin.site.register(Channels, ChannelsAdmin)
 admin.site.register(IntroducedByReward, IntroducedByRewardAdmin)
-admin.site.register(PlayList, PlayListAdmin)
+# admin.site.register(PlayList, PlayListAdmin)
 
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
 admin.site.register_view('statistics/tops', view=TopsView.as_view(), name=u'日周月榜名单')
