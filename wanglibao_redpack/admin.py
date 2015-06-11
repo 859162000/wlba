@@ -44,7 +44,7 @@ class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
 
 class InterestHikeAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "product", "rate", "intro_total", "invalid", "paid", 
-                    "amount", "created_at", "expired_at")
+                    "amount", "created_at")
     search_fields = ('user__wanglibaouserprofile__phone', 'product__name')
     raw_id_fields = ("user", "product")
 

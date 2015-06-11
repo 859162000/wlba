@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
 import views
-import manage_view
+import manage_views
 
 urlpatterns = patterns(
     '',
@@ -30,17 +30,19 @@ urlpatterns = patterns(
     url(r'^api/pay/order/$', views.WeixinPayOrder.as_view(), name='weixin_pay_order_api'),
 )
 
+# 微信管理后台
 urlpatterns += patterns(
     '',
     # view
-    url(r'^manage/$', manage_view.IndexView.as_view(), name='wx_manage_index'),
-    url(r'^manage/account/(?P<account_key>\w+)/$', manage_view.AccountView.as_view(), name='wx_manage_account'),
-    url(r'^manage/menu/$', manage_view.MenuView.as_view(), name='wx_manage_menu'),
-    url(r'^manage/material/$', manage_view.MaterialView.as_view(), name='wx_manage_material'),
+    url(r'^manage/$', manage_views.IndexView.as_view(), name='wx_manage_index'),
+    url(r'^manage/account/(?P<account_key>\w+)/$', manage_views.AccountView.as_view(), name='wx_manage_account'),
+    url(r'^manage/menu/$', manage_views.MenuView.as_view(), name='wx_manage_menu'),
+    url(r'^manage/material/$', manage_views.MaterialView.as_view(), name='wx_manage_material'),
+    url(r'^manage/material/img/(?P<media_id>[\w_-]+)/$', manage_views.MaterialImageView.as_view(), name='wx_manage_material_image'),
 
     # api
-    url(r'^manage/api/menu/$', manage_view.MenuAPI.as_view(), name='wx_manage_menu_api'),
-    url(r'^manage/api/materials/$', manage_view.MaterialListAPI.as_view(), name='wx_manage_material_list_api'),
-    url(r'^manage/api/materials/count/$', manage_view.MaterialCountAPI.as_view(), name='wx_manage_material_count_api'),
-    url(r'^manage/api/materials/(?P<media_id>\w+)/$', manage_view.MaterialDetailAPI.as_view(), name='wx_manage_material_detail_api'),
+    url(r'^manage/api/menu/$', manage_views.MenuAPI.as_view(), name='wx_manage_menu_api'),
+    url(r'^manage/api/materials/$', manage_views.MaterialListAPI.as_view(), name='wx_manage_material_list_api'),
+    url(r'^manage/api/materials/count/$', manage_views.MaterialCountAPI.as_view(), name='wx_manage_material_count_api'),
+    url(r'^manage/api/materials/(?P<media_id>\w+)/$', manage_views.MaterialDetailAPI.as_view(), name='wx_manage_material_detail_api'),
 )

@@ -191,7 +191,6 @@ def send_reward(start, end, amount_min, percent):
         # 发送短信
         text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
         send_messages.apply_async(kwargs={
-            #"phones": [introduced_by.wanglibaouserprofile.phone],
             "phones": [introduced_by.wanglibaouserprofile.phone],
             "messages": [text_content]
         })
@@ -229,3 +228,184 @@ def send_reward(start, end, amount_min, percent):
         })
 
         IntroducedByReward.objects.filter(id=record.id).update(checked_status=1)
+
+
+@app.task
+def add_introduced_award_all(start, end, amount_min, percent):
+    """ 邀请好友各的0.3%收益
+    1、活动期间邀请注册账户？
+    2、活动期间邀请注册账户购买产品
+    3、邀请人是经纪人怎么处理？
+    4、被邀请人是经纪人怎么处理？
+    """
+
+    from models import IntroducedBy
+    from decimal import Decimal, ROUND_DOWN
+    from wanglibao_p2p.models import P2PRecord
+
+    from wanglibao_p2p.amortization_plan import get_base_decimal, get_final_decimal
+
+    start = datetime.strptime(start, '%Y-%m-%d')
+    end = datetime.strptime(end, '%Y-%m-%d')
+
+    start_utc = local_to_utc(start, source_time='min')
+    end_utc = local_to_utc(end, source_time='max')
+
+    # 增加控制条件，没有被统计过才在统计生成
+    if IntroducedByReward.objects.filter(activity_start_at=start_utc, activity_end_at=end_utc).exists():
+        return False
+
+    new_user = IntroducedBy.objects.filter(
+        bought_at__range=(start_utc, end_utc)
+    ).filter(
+        created_at__range=(start_utc, end_utc)
+    ).filter(
+        introduced_by__isnull=False
+    ).select_related('user')
+
+    if not new_user.exists():
+        return
+
+    query_set_list = []
+    num = 0
+    for first_user in new_user:
+        num += 1
+
+        # 所有投资的产品
+        records = P2PRecord.objects.filter(
+            user=first_user.user,
+            create_time__range=(start_utc, end_utc),
+            catalog='申购',
+            product__status__in=[
+                u'满标待打款',
+                u'满标已打款',
+                u'满标待审核',
+                u'满标已审核',
+                u'还款中',
+                u'已完成', ]
+        ).order_by('create_time')
+
+        # 不存在投资记录，循环下一个用户
+        if not records.exists():
+            continue
+
+        # 首笔投资大于200才有收益
+        if records.first().amount < Decimal(amount_min):
+            continue
+
+        for record in records:
+            reward = IntroducedByReward()
+            reward.user = first_user.user
+            reward.introduced_by_person = first_user.introduced_by
+            reward.product = record.product
+            reward.first_bought_at = record.create_time
+            reward.first_amount = record.amount
+
+            # 计算被邀请人首笔投资总收益（收益年化）
+            reward.first_reward = get_base_decimal(Decimal(record.amount) * Decimal(record.product.expected_earning_rate) * Decimal(0.01) * Decimal(record.product.period) / 12)
+
+            # 邀请人活取被邀请人首笔投资（投资年化）
+            reward.introduced_reward = get_base_decimal(Decimal(record.amount) * Decimal(percent) * Decimal(0.01) * Decimal(record.product.period) / 12)
+
+            reward.activity_start_at = start_utc
+            reward.activity_end_at = end_utc
+            reward.activity_amount_min = Decimal(amount_min)
+            reward.percent_reward = Decimal(percent)
+            reward.checked_status = 0
+            query_set_list.append(reward)
+
+        if len(query_set_list) == 100:
+            IntroducedByReward.objects.bulk_create(query_set_list)
+            query_set_list = []
+
+    if len(query_set_list) > 0:
+        IntroducedByReward.objects.bulk_create(query_set_list)
+
+
+@app.task
+def send_reward_all(start, end, amount_min, percent):
+    from decimal import Decimal
+    from wanglibao_sms.tasks import send_messages
+
+    start = datetime.strptime(start, '%Y-%m-%d')
+    end = datetime.strptime(end, '%Y-%m-%d')
+
+    # 审核通过，给用户发放奖励
+    records = IntroducedByReward.objects.filter(
+        checked_status=0,
+        activity_start_at=local_to_utc(start, source_time='min'),
+        activity_end_at=local_to_utc(end, source_time='max'),
+        activity_amount_min=Decimal(amount_min),
+        percent_reward=Decimal(percent),
+    )
+
+    if not records.exists():
+        return
+
+    phone_user = []
+    for record in records:
+        reward_earning(record, flag=1)
+        reward_earning(record, flag=2)
+
+        if record.introduced_by_person.wanglibaouserprofile.utype == '0':
+            phone_user.append(record.introduced_by_person.wanglibaouserprofile.phone)
+        if record.user.wanglibaouserprofile.utype == '0':
+            phone_user.append(record.user.wanglibaouserprofile.phone)
+
+    phone_user = list(set(phone_user))
+    if phone_user:
+        # 发送短信
+        text_content = u'好友邀请收益已经到账，请在个人账户中进行查看。'
+        send_messages.apply_async(kwargs={
+            "phones": phone_user,
+            "messages": [text_content]
+        })
+
+        # 发放站内信
+        inside_message.send_batch.apply_async(kwargs={
+            "users": phone_user,
+            "title": u"邀请送收益活动",
+            "content": u'好友邀请收益已经到账，请在个人账户中进行查看。',
+            "mtype": "activity"
+        })
+
+
+def reward_earning(record, flag):
+    from wanglibao_p2p.models import Earning
+    from order.utils import OrderHelper
+    from order.models import Order
+    from django.forms import model_to_dict
+    from wanglibao_margin.marginkeeper import MarginKeeper
+
+    reward_type = u'邀请送收益'
+    if flag == 1:
+        user, introduced_by, reward_type, got_amount, product = record.user, record.introduced_by_person, reward_type, record.introduced_reward, record.product
+    else:
+        user, introduced_by, reward_type, got_amount, product = record.introduced_by_person, record.user, reward_type, record.introduced_reward, record.product
+
+    # 只给普通用户发放收益
+    if introduced_by.wanglibaouserprofile.utype != '0':
+        return
+
+    # 发放收益
+    earning = Earning()
+    earning.amount = got_amount
+    earning.type = 'I'
+    earning.product = product
+    order = OrderHelper.place_order(
+        introduced_by,
+        Order.ACTIVITY,
+        u"邀请送收益活动赠送",
+        earning=model_to_dict(earning))
+    earning.order = order
+    keeper = MarginKeeper(introduced_by, order.pk)
+
+    # 赠送活动描述
+    desc = u'%s,邀请好友理财活动中，获赠%s元' % (introduced_by.wanglibaouserprofile.name, got_amount)
+    earning.margin_record = keeper.deposit(got_amount, description=desc)
+    earning.user = introduced_by
+    earning.save()
+
+    IntroducedByReward.objects.filter(id=record.id).update(checked_status=1, checked_at=timezone.now())
+
+

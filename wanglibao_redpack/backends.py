@@ -476,7 +476,6 @@ def increase_hike(user, product_id):
         record.rate = decimal.Decimal("0.001")
     record.intro_total += 1
     record.save()
-    logger.info(u"yqjx %s %s %s" % (user.id, product_id, record.intro_total))
     return {"ret_code":0, "message":"ok"}
 
 def settle_hike(product):
@@ -488,7 +487,8 @@ def settle_hike(product):
         term = decimal.Decimal(product.period) / decimal.Decimal(12)
 
     hike_list = []
-    records = InterestHike.objects.filter(product=product, invalid=False, paid=False).first()
+    #records = InterestHike.objects.filter(product=product, invalid=False, paid=False).first()
+    records = InterestHike.objects.filter(product=product, invalid=False, paid=False)
     for x in records:
         equity = P2PEquity.objects.filter(user=x.user, product=product).first()
         if equity:

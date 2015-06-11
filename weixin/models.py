@@ -173,15 +173,20 @@ class WeixinAccounts(object):
             for key, value in data.items():
                 setattr(self, key, value)
 
-    def append_account(self):
-        self.data['main'] = self.account_main
-        self.data['sub_1'] = self.account_sub_1
-        self.data['test'] = self.account_test
+    @classmethod
+    def append_account(cls):
+        cls.data['main'] = cls.account_main
+        cls.data['sub_1'] = cls.account_sub_1
+        cls.data['test'] = cls.account_test
+
+    @classmethod
+    def account_classify(cls):
+        return dict(map(lambda item: (item[1], item[0]), dict(Account.ACCOUNT_CLASSIFY).items()))
 
     @classmethod
     def syncdb(cls):
         instance = cls()
-        account_classify = dict(map(lambda item: (item[1], item[0]), dict(Account.ACCOUNT_CLASSIFY).items()))
+        account_classify = cls.account_classify()
         for k, v in instance.data.items():
             account, created = Account.objects.get_or_create(original_id=v.get('id'))
             account_data = [account.name, account.classify, account.token, account.app_id, account.app_secret]
@@ -202,6 +207,7 @@ class WeixinAccounts(object):
     @classmethod
     def all(cls):
         _all = []
+        cls.append_account()
         for account_key, _ in cls.data.items():
             _all.append(cls(account_key))
         return _all
@@ -232,6 +238,15 @@ class WeixinAccounts(object):
         from django.core.urlresolvers import reverse
         return '{}{}'.format(self.host_url, reverse('weixin_join', kwargs={'account_key': self.account_key}))
 
+    @property
+    def material_count_cache_time(self):
+        # 公众号素材总数缓存时间 单位：秒
+        # 测试号 1000次／天 缓存300秒
+        # 公众号 5000次／天 缓存20秒
+        account_classify = self.account_classify()
+        if account_classify.get(self.classify) == 4:
+            return 300
+        return 20
 
 
 class WeixinUser(models.Model):
@@ -270,17 +285,26 @@ class Material(models.Model):
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         return now
 
-    def init(self):
+    def is_expires_in(self):
         now = self._now()
-        if now > self.expires_at:
-            client = WeChatClient(self.account.app_id, self.account.app_secret, self.account.access_token)
-            res = client.material.get_count()
-            self.voice_count = res.get('voice_count')
-            self.video_count = res.get('video_count')
-            self.image_count = res.get('image_count')
-            self.news_count = res.get('news_count')
-            self.expires_at = now + datetime.timedelta(hours=24)
-            self.save()
+        return now < self.expires_at
+
+    def data(self):
+        return {
+            'voice_count': self.voice_count,
+            'video_count': self.video_count,
+            'image_count': self.image_count,
+            'news_count': self.news_count
+        }
+
+    def update_data(self, data, expires_in=60):
+        now = self._now()
+        self.voice_count = data.get('voice_count')
+        self.video_count = data.get('video_count')
+        self.image_count = data.get('image_count')
+        self.news_count = data.get('news_count')
+        self.expires_at = now + datetime.timedelta(seconds=expires_in)
+        self.save()
 
 
 class MaterialImage(models.Model):
