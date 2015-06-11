@@ -1,0 +1,40 @@
+html{font-size:20px;background:#18bd9b}
+html *{outline:none;-webkit-text-size-adjust:none;-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-box-sizing:border-box}
+html,body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,input,textarea,p,th,td,hr,button,article,aside,footer,header,hgroup,menu,nav,section{margin:0;padding:0}
+input,select,textarea{font-size:100%}
+table{border-collapse:collapse;border-spacing:0}
+img{border:0}
+ol,ul{list-style:none}
+h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:500}
+a{text-decoration:none;cursor:auto;color:inherit}
+a:visited{color:inherit}.spinner{margin:0 auto;width:1.25rem;height:1.5rem;text-align:center;overflow:hidden}
+.clearfix:after {content:"\200B"; display:block; height:0; clear:both;}
+.clearfix{ *zoom:1;}
+.banner{width: 100%}
+.app_banner{width: 100%}
+h1{text-align: center;color: #ffffff;font-size: 0.6rem;width: 100%;margin-top: .075rem}
+.content{padding: 0 0.375rem}
+.activity{margin-top: 0.7rem}
+.activity .activity-icon{width:1.6rem;height:1.775rem;vertical-align: middle;}
+.activity label{font-size: 0.75rem;color:#ffffff;margin-left: 0.15rem;line-height: 1.775rem}
+.title{font-size: 0.6rem;color:#ffffff;padding: 0.35rem 0 0.225rem}
+.content-style{font-size: 0.5rem;color: #333333;line-height: 0.725rem}
+.content-style font{color:#b22621}
+.activity-content{position: relative}
+.activity-img{width:6.925rem;height:2.9rem;position: absolute;right: 0;bottom: 0}
+.money-list{margin-top: 0.75rem;}
+.money-list li{width:17%;position: relative;margin-right:3%;float: left}
+.money-list li.last{margin-right: 0}
+.money-list img{width: 100%}
+.money-list font{position: absolute;font-size: 0.45rem;color: #ffffff;bottom: 1rem;left: 0;width: 100%;text-align: center}
+.money-list label{font-size: 0.6rem;color: #333333;width: 100%;text-align: center;display: inline-block;float: left}
+.notes-content{font-size: 0.5rem;color: #333333;margin-top: 0.725rem}
+.notes-content span{float: left;color: #da3c34}
+.notes-content-div{float: left}
+.notes-content-div font{color: #da3c34}
+.rule-content{margin: 0.65rem 0 0.35rem}.rule-content p {padding-bottom:0.5rem }
+.rule-content span{border-radius: 50%;background: #b22621;color: #ffffff;font-size: 0.5rem;float: left;display: inline-block;width:13px;height:13px;text-align: center;margin-right: 0.1rem;line-height: 13px;vertical-align: middle}
+.rule-content label{float: left;color: #333333;font-size: 0.5rem;width: 95%;line-height: 13px}
+.rule-content label font{color: #b22621}
+.url-style{text-align: center;font-size: 0.65rem;color: #b22621;padding-bottom: 0.85rem}
