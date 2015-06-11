@@ -376,6 +376,7 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
         user.wanglibaouserprofile.id_is_valid = True
+        user.wanglibaouserprofile.id_valid_time = timezone.now()
         user.wanglibaouserprofile.save()
 
         tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device_type": device['device_type']})
@@ -673,6 +674,7 @@ class IdValidate(APIView):
             user.wanglibaouserprofile.id_number = id_number
             user.wanglibaouserprofile.name = name
             user.wanglibaouserprofile.id_is_valid = True
+            user.wanglibaouserprofile.id_valid_time = timezone.now()
             user.wanglibaouserprofile.save()
 
             # 判断时间间隔太短的话就认定他是黑客，需要电话找客服索要激活码
@@ -723,6 +725,7 @@ class AdminIdValidate(APIView):
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
         user.wanglibaouserprofile.id_is_valid = True
+        user.wanglibaouserprofile.id_valid_time = timezone.now()
         user.wanglibaouserprofile.save()
 
         return Response({
