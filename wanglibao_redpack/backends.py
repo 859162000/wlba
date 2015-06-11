@@ -12,6 +12,7 @@ import json
 import logging
 import decimal
 from django.utils import timezone
+from django.db.models import Sum
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent, InterestHike
 from wanglibao_p2p.models import P2PRecord, P2PProduct, P2PEquity
 from marketing import  helper
@@ -510,3 +511,36 @@ def settle_hike(product):
             x.save()
             hike_list.append({"user":x.user, "amount":amount})
     return hike_list
+
+def get_hike(user, product_id):
+    _hike = InterestHike.objects.filter(user=user, product=product_id, invalid=False).first()
+    if _hike:
+        if _hike.paid:
+            hike = _hike.amount
+        else:
+            if _hike.intro_total > 20:
+                hike = "%.2f%%" % (_hike.rate * 20 * 100) 
+            else:
+                hike = "%.2f%%" % (_hike.rate * _hike.intro_total * 100) 
+    else:
+        hike = ""
+    return hike
+
+#获取加息次数
+def get_hike_nums(user):
+    _nums = InterestHike.objects.filter(user=user, invalid=False).aggregate(Sum('intro_total'))
+    if _nums['intro_total__sum']:
+        nums = _nums['intro_total__sum']
+    else:
+        nums = 0
+    return nums
+
+#获取加息总额
+def get_hike_amount(user):
+    _amount = InterestHike.objects.filter(user=user, invalid=False, paid=True).aggregate(Sum('amount'))
+    if not _amount['amount__sum']:
+        amount = 0
+    else:
+        amount = _amount['amount__sum']
+    return amount
+
