@@ -11,7 +11,7 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AdminSendMessageAPIView, AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
                             MessageCountAPIView, MessageDetailAPIView,
-                            AutomaticApiView)
+                            AutomaticApiView, AccountInviteHikeAPIView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -133,8 +133,9 @@ urlpatterns = patterns(
     url(r'^home/p2passet', AccountP2PAssetAPI.as_view()),
     url(r'^home/fundasset', AccountFundAssetAPI.as_view()),
     url(r'^home/p2p/amortization/(?P<product_id>\d+)', P2PAmortizationAPI.as_view()),
-    url(r'^home/invite/', AccountInviteAPIView.as_view()),
+    url(r'^home/invite/$', AccountInviteAPIView.as_view()),
     url(r'^home/automatic/$', AutomaticApiView.as_view()),
+    url(r'^home/invite/hike/$', AccountInviteHikeAPIView.as_view()),
 
     url(r'^trade_record/', TradeRecordAPIView.as_view()),
 

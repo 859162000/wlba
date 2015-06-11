@@ -19,6 +19,7 @@ urlpatterns = patterns(
     url(r'^app_share/$', TemplateView.as_view(template_name="activity_app_share.jade")),
     url(r'^wap/share$', AppShareView.as_view(), name="app_share"),
     url(r'^wap/share_reg/$', AppShareRegView.as_view(), name="app_share_reg"),
+    url(r'^share_reg_new/$', TemplateView.as_view(template_name="app_share_reg_new.jade")),
     url(r'^wap/agreement/$', TemplateView.as_view(template_name="app_agreement.jade")),
     url(r'^newyear/$', NewYearView.as_view(), name="new year"),
     url(r'^shengyan/$', TemplateView.as_view(template_name="shengyan.jade")),
@@ -46,6 +47,7 @@ urlpatterns = patterns(
     url(r'^agree_xieyi/$', TemplateView.as_view(template_name="agree_xieyi.jade")),
     url(r'^list_level/$', TemplateView.as_view(template_name="list_level.jade")),
     url(r'^app_level/$', TemplateView.as_view(template_name="app_level.jade")),
+    url(r'^app_shareReward/$', TemplateView.as_view(template_name="app_shareReward.jade")),
     # url(r'^summer/$', TemplateView.as_view(template_name="summer.jade")),
     # url(r'^app_summer/$', TemplateView.as_view(template_name="app_summer.jade")),
 )

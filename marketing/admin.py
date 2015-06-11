@@ -6,7 +6,7 @@ from django.utils import timezone
 from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
 from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
-    Activity, ActivityRule, Reward, RewardRecord, ClientData, Channels, IntroducedByReward
+    Activity, ActivityRule, Reward, RewardRecord, ClientData, Channels, IntroducedByReward, PlayList
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -138,7 +138,7 @@ class ChannelsAdmin(admin.ModelAdmin):
 
 
 class IntroducedByRewardAdmin(admin.ModelAdmin):
-    t = ('id', 'user', 'introduced_by_person', 'product', 'first_bought_at', 'first_amount', 'introduced_reward', 'checked_status')
+    t = ('id', 'user', 'introduced_by_person', 'product', 'first_bought_at', 'first_amount', 'introduced_reward', 'checked_status', 'checked_at', 'activity_start_at', 'activity_end_at', 'activity_amount_min', 'percent_reward')
     list_display = t
     raw_id_fields = ('user', 'introduced_by_person', 'product')
     fieldsets = [(None, {'fields': t},)]
@@ -149,6 +149,12 @@ class IntroducedByRewardAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return self.readonly_fields
+
+
+class PlayListAdmin(admin.ModelAdmin):
+    list_display = ('id', 'play_at', 'user', 'amount', 'ranking', 'redpackevent', 'created_at', 'checked_status', 'reward')
+    search_fields = ('user__wanglibaouserprofile__phone', 'redpackevent', )
+    raw_id_fields = ('user', )
 
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
@@ -163,6 +169,7 @@ admin.site.register(RewardRecord, RewardRecordAdmin)
 admin.site.register(ClientData, ClientDataAdmin)
 admin.site.register(Channels, ChannelsAdmin)
 admin.site.register(IntroducedByReward, IntroducedByRewardAdmin)
+admin.site.register(PlayList, PlayListAdmin)
 
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
 admin.site.register_view('statistics/tops', view=TopsView.as_view(), name=u'日周月榜名单')

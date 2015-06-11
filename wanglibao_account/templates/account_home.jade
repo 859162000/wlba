@@ -197,6 +197,7 @@ block main
               th 状态
               th 已收益/预期收益
               th 活动收益
+              th 邀请加息
               th 还款计划
               th 借款合同
           tbody
@@ -228,6 +229,13 @@ block main
                       p 已发放
                     else
                       | -
+                  td
+                    if row.hike
+                      if row.hike.paid
+                        p {{row.hike.amount}}
+                      else
+                        rate = "%.2f%%" % (row['hike'].rate * 100)
+                        p {{rate}}
 
                   if row.equity.product.display_status == '还款中' or row.equity.product.display_status == '已完成'
                     td

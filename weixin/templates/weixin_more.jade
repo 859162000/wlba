@@ -1,0 +1,25 @@
+-load formatters
+doctype html
+html(style="background: url('/static/imgs/mobile/login/loginback.png');")
+    head
+        include include/weixin_head.jade
+    body
+        header
+            hgroup 网利宝
+        .more-head
+          .more-head-bg
+          .more-top-logo
+            .logo-out
+              img(src="/static/imgs/mobile/login/login.png", alt="").img-logo
+            img(src="/static/imgs/mobile/login/loginsize.png", alt="").img-log-text
+            p 网利金融旗下产品
+
+        .more-link
+          mixin link(text, url)
+            a(href=url).link-public
+              .link-body
+                .link-text=text
+                .link-icon
+          +link('关于网利', '/weixin/more/aboutus/')
+          +link('联系我们', '/weixin/more/contactus/')
+        include include/weixin_footer

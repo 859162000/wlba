@@ -456,3 +456,36 @@ button[type="button"].download-btn:focus {
   text-align: center;
 
 }
+
+.mainn{
+  width: 100%;
+  background: #fafafa;
+  border-top: 1px solid #e8e8e8;
+}
+.mainn dl{
+  width: 49%;
+  display: inline-block;
+  border: 0;
+  margin: 0.5em 0;
+}
+.mainn dl dt{
+  text-align: center;
+}
+.mainn dl dt>img{
+  width: 5em;
+}
+.mainn dl dd{
+  text-align: center;
+}
+.mainn dl dd>h3{
+    font-weight: normal;
+  font-size: 20px;
+  color: #212121;
+  line-height: 20px;
+  margin:4px 0 8px 0;
+}
+.mainn dl dd>p{
+  font-size: 14px;
+  color: #b1b1b1;
+  margin: 4px 0;
+}

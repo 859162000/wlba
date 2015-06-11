@@ -1,0 +1,62 @@
+- load formatters
+doctype html
+html
+  head
+    meta(name="format-detection" content="telephone=no,email=no")
+    title 有奖邀请
+    meta(charset="utf-8")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    script.
+      (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
+    link(href="/static/styles/app/app.css", rel="stylesheet")
+  body
+    .app-invitation-body
+      .app-invitation-ticket
+        .ticket-left
+          .left-text
+            p 话费（元）
+            p 30
+          .left-icon
+            img(src="/static/imgs/app/shareReward/phone.png")
+        .ticket-right
+          .right-icon
+            img(src="/static/imgs/app/shareReward/pig.png")
+          .right-text
+            p 加息券
+            p 0.1%
+
+      .app-invitation-reward
+        .reward-title.title-public 邀请奖励对照表
+        .reward-body
+          table.aiqiyi-table
+            tr
+              th 成功邀请人数
+              th.before 话费奖励
+              th.before 加息奖励
+            mixin tr(num, reward, jiaReward)
+              tr
+                td=num
+                td=reward
+                td=jiaReward
+            +tr(1, 30, '0.1%')
+            +tr(2, 60, '0.2%')
+            +tr(3, 90, '0.3%')
+            +tr(4, 120, '0.4%')
+            +tr(5, 150, '0.5%')
+            +tr('...', '...', '...')
+      .app-invitation-step
+        .step-title.title-public 邀请步骤
+        .step-body
+          img(src="/static/imgs/app/shareReward/rules.jpg")
+      .app-invitation-rule
+        .rule-title.title-public 详细规则
+        .step-body
+          p 1. 被邀请人投资200元即为成功邀请；
+          p 2. 在投资成功时邀请，被邀请人成功投资后，邀请人投资项目将在原有年化基础上加息0.1%；
+          p 3. 直接点击有奖邀请，邀请人最近一笔投资将在原有年化基础上加息0.1%；
+          p 4. 对单个标的加息上限为2%，即若当前标的年化为15%，则加息后的最高年化提升为17%，以此类推；
+          p 5. 邀请成功投资后，邀请者和被邀请者都能获得30元话费;
+          p 6. 项目收益目前是到项目满标还款之后才会开始计算，请关注您所投资标的的状态;
+          p 7. 项目收益会在标的结款时一并发给您.
+

@@ -1,0 +1,108 @@
+
+.more-head
+  position: relative
+  .more-head-bg
+    width: 100%
+    height: 2.8rem
+    background: $color-db493f
+  .more-top-logo
+    position: relative
+    top: -1.85rem
+    width: 100%
+    .logo-out
+      width: 3.7rem
+      height: 3.7rem
+      margin: 0 auto
+      border-radius: 1.85rem
+      background: #fff
+      display: -webkit-box
+      -webkit-box-pack: center
+      -webkit-box-align: center
+    .img-logo
+      width: 3.5rem
+      height: 3.5rem
+      display: block
+    .img-log-text
+      width: 3.6rem
+      display: block
+      margin: .5rem auto
+    p
+      text-align: center
+      color: $color-grey-6b6b6b
+      font-size: $font-size12
+
+.more-link
+  .link-public
+    padding-left: .75rem
+    display: block
+    background: #fff
+    &:last-child
+      .link-body
+        border-bottom: 0
+    &:active
+      box-shadow: $active-shadow
+      .link-icon
+        display: none
+  .link-body
+    display: -webkit-box
+    border-bottom: 1px solid $color-grey-e8e8e8
+    padding: .7rem .7rem .7rem 0
+
+    .link-text
+      -webkit-box-flex: 1
+      color: $color-grey-6b6b6b
+      font-size: $font-size12
+    .link-icon
+      width: 0
+      height: 0
+      border-bottom: 0.4rem solid transparent
+      border-top: 0.4rem solid transparent
+      border-left: 0.4rem solid #b6b6b6
+      font-size: 0
+      line-height: 0
+      position: relative
+      &:before
+        content: ''
+        width: 0
+        height: 0
+        border-bottom: 0.3rem solid transparent
+        border-top: 0.3rem solid transparent
+        border-left: 0.3rem solid #fff
+        font-size: 0
+        line-height: 0
+        position: absolute
+        right: 0.1rem
+        top: -0.3rem
+
+.more-about-btn
+  width: 100%
+  margin: 2rem 0 3.45rem 0
+  padding: 0 .75rem
+  a
+    width: 100%
+    background: $color-db493f
+    color: #fff
+    font-size: $font-size14
+    height: 2.2rem
+    line-height: 2.2rem
+    text-align: center
+    display: block
+    border-radius: $boder-radius
+    &:active
+      box-shadow: $active-shadow
+    &:visited
+      color: #fff
+
+.about-img
+  width: 100%
+  padding: .5rem 1rem
+  img
+    width: 100%
+.about-content
+  padding: .75rem
+  h1
+    font-size: $font-size18
+    margin: .75rem 0
+  p
+    font-size: $font-size14
+

@@ -1,0 +1,86 @@
+doctype html
+html
+  head
+    include include/weixin_head.jade
+    link(rel="stylesheet",href="/static/m_stylesheets/weixin.css")
+    style.
+      html{
+        background: #fff;
+      }
+      .mainn{
+        background: #fafafa;
+        border-top: 1px solid #e8e8e8;
+      }
+      .mainn dl dt > img {
+        width: 3.5rem;
+      }
+      .mainn dl {
+        margin: 0.5rem 0;
+      }
+      .mainn dl dd>p{
+        font-size: .7rem;
+      }
+  body
+    header
+      hgroup 注册
+      //a(href="javascript:history.back()")
+        span 返回
+    section
+      img(src="/static/m_images/share_banner.jpg")
+    section.regist-main
+      mixin list(name, placeholder, inputID, type, checkClass, checkTxt, checkClass2, checkTxt2)
+        .regist-list
+          .input-main
+            .input-body
+              .input-name(class=inputID)
+              input(placeholder=placeholder,id=inputID,type=type).input-public
+          .input-sign
+            span.pub-check(class=checkClass)=checkTxt
+            span.pub-check.none-val=name
+              |不能为空
+            if checkClass2 != ''
+              span.pub-check(class=checkClass2)=checkTxt2
+      +list("手机号", "请输入手机号", "phone", 'test', "phone-sign1", "请输入正确的手机号", "phone-sign2", "该手机号已被注册")
+      .regist-list
+
+        .input-main.input-check-main
+          .input-body.input-check-body
+            .input-name.checkCode
+            input(placeholder="请输入验证码")#checkCode.input-public
+          .input-check
+            button(type="button").request-check 获取验证码
+        .input-sign
+          span.pub-check.check-sign 请输入正确的验证码
+          span.pub-check.none-val 验证码不能为空
+      +list("密码", "请设置密码", "password", "password", "password-sign", "请输入6-20位数字/字母和符号/区分大小写")
+      +list("密码", "请重复密码", "passwordRepeat", "password", "password-repeat-sign", "两次输入的密码不一致")
+
+      .regits-protocol
+        label.protocol-left(for="agreement")
+          input(type="checkbox",checked="checked",name="agreement")#agreement
+          |我同意
+          span.xieyi-btn 《网利宝注册协议》
+
+      .regits-submit
+        button(type="button").submit-body 完成注册，立即奖励
+    section.regist-protocol-div
+      header.xieyi-head
+        hgroup 注册协议
+        a(href="javascript:void(0)").cancel-xiyie
+          span 返回
+      article.xieyi-cont
+        include include/weixin_xieyiFixed
+    section.mainn
+      mixin dlStyle(imgURL, text1, text2, text3)
+        dl
+          dt
+            img(src=imgURL)
+          dd
+            h3=text1
+            p=text2
+            p=text3
+      +dlStyle('/static/m_images/weixin_img/xinlai.png', '信赖', 'IDG资本投资', '100%本息保障')
+      +dlStyle('/static/m_images/weixin_img/quanwei.png', '权威', '资深金融团队', '全方位战略合作')
+      +dlStyle('/static/m_images/weixin_img/anquan.png', '安全', '账户资金安全', '由平安保险承保')
+      +dlStyle('/static/m_images/weixin_img/shouyiago.png', '高收益', '30倍银行活期收益', '100元起投 0手续费')
+    script(data-init='shareRegist', src="/static/scripts/mobile_activity/mobile_activity.js")

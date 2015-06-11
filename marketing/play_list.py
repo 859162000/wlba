@@ -1,10 +1,13 @@
 # encoding: utf-8
 
 from datetime import datetime
+from django.conf import settings
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
 from marketing.tasks import send_redpack
 from marketing.utils import local_to_utc, paginator_factory
 from models import PlayList
@@ -45,7 +48,7 @@ class InvestmentHistory(APIView):
                 "tops_len": 0
             }]
         else:
-            day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'))
+            day_tops = _get_top_records(datetime.strptime(day, '%Y-%m-%d'), amount_min=30000)
             for tmp in day_tops:
                 if 'phone' in tmp:
                     tmp['phone'] = safe_phone_str(tmp['phone'])
@@ -56,11 +59,14 @@ class InvestmentHistory(APIView):
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
-def _get_top_records(day=None):
+def _get_top_records(day=None, amount_min=None):
     if day is None:
         day = datetime.now()
     top = Top(limit=10)
-    return top.day_tops_activate(day)
+    if amount_min:
+        return top.day_tops_activate(day, amount_min=amount_min)
+    else:
+        return top.day_tops_activate(day)
 
 
 class InvestmentRewardView(TemplateView):
@@ -86,6 +92,11 @@ class InvestmentRewardView(TemplateView):
                 (30000, 39999, None, None, 30, None, u'每日打榜红包_30',),
                 (20000, 29999, None, None, 20, None, u'每日打榜红包_20',),
                 (10000, 19999, None, None, 10, None, u'每日打榜红包_10',),
+            )
+        elif cat == 'investment_three':
+            rules = (
+                (30000, None, None, 10, 1000, -100, u'每日打榜红包_1000-100', ),
+                (30000, None, 10, None, 60, None, u'每日打榜红包_60'),
             )
 
         return rules
@@ -145,7 +156,8 @@ class InvestmentRewardView(TemplateView):
             data['day'] = datetime.now()
 
         # 不使用默认规则，则使用动态统计规则
-        rules = self._activity_rule(cat='investment')
+        # rules = self._activity_rule(cat='investment')
+        rules = self._activity_rule(cat='investment_three')
         if not rules: return False, u'目前不支持输入的活动类型', data
         rule = filter(lambda x: x[6] == redpack, rules)
         if rule:
@@ -159,7 +171,7 @@ class InvestmentRewardView(TemplateView):
         play_list_checked = play_list.filter(checked_status=2)
         return {
             "message": message,
-            "result": paginator_factory(obj=play_list, page=self.request.GET.get('page'), limit=20),
+            "result": paginator_factory(obj=play_list, page=self.request.GET.get('page'), limit=100),
             "day": day.date().__str__(),
             "redpack": redpack,
             "amount_all": play_list.aggregate(reward=Sum('reward')) if play_list else 0.00,
@@ -219,9 +231,10 @@ class InvestmentRewardView(TemplateView):
 
         check_button = request.POST.get('check_button')
         if check_button == '1':
-            if datetime.now().date() <= day.date():
-                message = u'未到日终，不允许审核发放红包！'
-                return self.render_to_response(self._return_format(message, day, redpack))
+            # 上线前打开控制
+            # if datetime.now().date() <= day.date():
+            #     message = u'未到日终，不允许审核发放红包！'
+            #     return self.render_to_response(self._return_format(message, day, redpack))
 
             records.filter(checked_status=0).update(checked_status=1)
             send_redpack.apply_async(kwargs={
@@ -239,3 +252,6 @@ class InvestmentRewardView(TemplateView):
             "day": day if isinstance(day, str) else day.date().__str__()
         })
 
+    @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
+    def dispatch(self, request, *args, **kwargs):
+        return super(InvestmentRewardView, self).dispatch(request, *args, **kwargs)

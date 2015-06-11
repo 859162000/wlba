@@ -1,0 +1,109 @@
+@mixin center($height)
+  height: $height
+  line-height: $height
+  text-align: center
+
+.app-invitation-body
+  padding: 1rem .75rem
+
+.title-public
+  padding-left: .75rem
+  color: #9b9b9b
+  font-size: .6rem
+  margin: .75rem 0
+
+.app-invitation-ticket
+  width: 100%
+  color: #fff
+  border-radius: .3rem
+  display: -webkit-box
+  overflow: hidden
+  .ticket-left
+    -webkit-box-flex: 1
+    width: 50%
+    background: #ff4c2e
+    padding: 1.2rem 0
+    .left-icon
+      float: right
+      img
+        width: 2.25rem
+        height: 2.25rem
+    .left-text
+      float: right
+      font-size: .6rem
+      padding: 0 .7rem
+      p
+        margin-bottom: .4rem
+        &:last-child
+          font-size: 1.2rem
+          margin-bottom: 0
+  .ticket-right
+    -webkit-box-flex: 1
+    width: 50%
+    background: #ffc017
+    padding: 1.2rem 0
+
+    .right-icon
+      float: left
+      padding: 0 1rem
+      img
+        width: 2.25rem
+        height: 2.25rem
+    .right-text
+      float: left
+      font-size: .6rem
+      p
+        margin-bottom: .4rem
+        &:last-child
+          font-size: 1.2rem
+          margin-bottom: 0
+
+.app-invitation-reward
+  overflow: hidden
+  table
+    border: 1px solid #e8e8e8
+    background: #fff
+    width: 100%
+    th
+      position: relative
+      width: 33%
+      font-size: .6rem
+      background: #ff9800
+      color: #fff
+      font-weight: normal
+      +center(1.85rem)
+    .before
+      &:after
+        content: ""
+        height: .9rem
+        width: 1px
+        background: #fff
+        position: absolute
+        left: 0
+        top: 50%
+        margin-top: -.45rem
+    td
+      width: 33%
+      border: 1px solid #e8e8e8
+      color: #9b9b9b
+      font-size: .8rem
+      text-align: center
+      +center(2rem)
+.app-invitation-step
+  width: 100%
+  .step-body
+    width: 100%
+    overflow: hidden
+    img
+      display: block
+      width: 100%
+
+
+.app-invitation-rule
+  .step-body
+    padding-left: 0.75rem
+    p
+      font-size: .7rem
+      color: #666
+      line-height: 1.1rem
+      text-align: justify

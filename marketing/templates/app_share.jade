@@ -32,35 +32,19 @@ html
               a(href="/activity/wap/agreement/", target="_blank") 《网利宝用户注册协议》
       .why-select
         h1 为什么选择网利宝？
-        .why-select-row.clearfix
-          .why-span-icon
-            .icon.icon-why-1
-          dl
-            dt 信赖
-            dd IDG资本投资
-            dd 100%本息保障
-        .why-select-row.clearfix
-          .why-span-icon
-            .icon.icon-why-2
-          dl
-            dt 权威
-            dd 洛克菲勒家族
-            dd 全方位战略合作
-        .why-select-row.clearfix
-          .why-span-icon
-            .icon.icon-why-3
-          dl
-            dt 高收益
-            dd 30倍银行活期收益
-            dd 100元起投 0手续费
-        .why-select-row.clearfix
-          .why-span-icon
-            .icon.icon-why-4
-          dl
-            dt 安全
-            dd 招商银行全程监管
-            dd 平安保险全额承保
-      footer
+        section.mainn
+          mixin dlStyle(imgURL, text1, text2, text3)
+            dl
+              dt
+                img(src=imgURL)
+              dd
+                h3=text1
+                p=text2
+                p=text3
+          +dlStyle('/static/m_images/weixin_img/xinlai.png', '信赖', 'IDG资本投资', '100%本息保障')
+          +dlStyle('/static/m_images/weixin_img/quanwei.png', '权威', '资深金融团队', '全方位战略合作')
+          +dlStyle('/static/m_images/weixin_img/anquan.png', '安全', '账户资金安全', '由平安保险承保')
+          +dlStyle('/static/m_images/weixin_img/shouyiago.png', '高收益', '30倍银行活期收益', '100元起投 0手续费')
     else
       div.content
       if reg == "y"
@@ -80,7 +64,7 @@ html
           | 完成首次单笔
           span.red 200元
           | （含）以上的P2P理财交易，您将获得
-          span.red 20元
+          span.red 30元
           | 话费。
         p.padding-l-r-s.gray 话费将在3个工作日内发放至您的注册手机号。
 
