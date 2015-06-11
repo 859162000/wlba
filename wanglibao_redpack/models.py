@@ -129,7 +129,7 @@ class InterestHike(models.Model):
     amount = models.DecimalField(verbose_name=u'加息金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
     updated_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"更新时间")
-    expired_at = models.DateTimeField(null=True, verbose_name=u"到期时间", blank=True)
+    #expired_at = models.DateTimeField(null=True, verbose_name=u"到期时间", blank=True)
 
     class Meta:
         verbose_name = u"加息券"
