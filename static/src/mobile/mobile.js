@@ -420,10 +420,7 @@ org.regist = (function(org){
                         },
                         success:function(data){
                             if(data.ret_code === 0){
-                                alert('注册成功,立即登录！',function(){
-                                    window.location.href = '/weixin/login/';
-                                });
-
+                                window.location.href = '/weixin/login/';
                             }else if(data.ret_code === 30014){
                                $('.'+signName['checkCode'][0]).show();
                                 $submitBody.text('立即注册');
@@ -1165,7 +1162,7 @@ org.authentication = (function(org){
                     },
                     success:function(){
                         alert("实名认证成功!",function(){
-                           window.location.href = '/weixin/security/';
+                           return window.location.href = '/weixin/security/';
                         });
                     },
                     error:function(xhr){
