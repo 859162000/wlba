@@ -254,8 +254,8 @@ org.shareRegist = (function(org){
                         },
                         success:function(data){
                             if(data.ret_code === 0){
-                                alert('注册成功,立即登录！',function(){
-                                    window.location.href = '/weixin/login/';
+                                alert('注册成功,立即领取！',function(){
+                                    window.location.href = '/activity/share_regnew_href/';
                                 });
 
                             }else if(data.ret_code === 30014){
@@ -274,7 +274,7 @@ org.shareRegist = (function(org){
                             }
                         },
                         complete:function(){
-                            $submitBody.text('立即注册');
+                            $submitBody.text('完成注册，立即奖励');
                         }
                     });
                 }
