@@ -48,45 +48,44 @@ require ['jquery'], ($)->
     shuju(time)
     return
 
-  day_index=1;
 #  倒计时
-  count_down = (o) ->
-    sec=(new Date(o.replace(/-/ig,'/')).getTime() - new Date().getTime())/1000
-    sec=parseInt(sec)
-    timer=setTimeout (->
-      count_down o
-      return
-    ), 1000
-    if sec <=0
-      $('.mon').html('5 月')
-      $('.day-long').animate({'left':'-714px'},500)
-      hight(m,'.day-wu')
-      clearTimeout(timer)
-      day_index=2;
-    return
+#  count_down = (o) ->
+#    sec=(new Date(o.replace(/-/ig,'/')).getTime() - new Date().getTime())/1000
+#    sec=parseInt(sec)
+#    timer=setTimeout (->
+#      count_down o
+#      return
+#    ), 1000
+#    if sec <=0
+#      $('.mon').html('5 月')
+#      $('.day-long').animate({'left':'-714px'},500)
+#      #hight(m,'.day-wu')
+#      clearTimeout(timer)
+#      day_index=2;
+#    return
 
 
 
 #  high_day=parseInt()
-  hight=(high_m,ele)->
-    data=new Date()
-    Y=data.getFullYear()
-    m=data.getMonth()+1
-    day=data.getDate()
-    if m==6 and day>10
-      return
-    g=0
-    while g<$('.day-yue li').length-2
-      k=0
-      while k<$(ele+' li:eq('+g+')').children('span').length
-        if m==high_m and day==parseInt($(ele+' li:eq('+g+')').children('span:eq('+k+')').text())
-          $(ele+' li:eq('+g+')').children('span:eq('+k+')').addClass('span-high').siblings().removeClass('span-high')
-          $('.day-wu').children('span').removeClass('span-high')
-          $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'url("/static/images/list-img/small.png") no-repeat','background-position':'-187px -86px','color':'#000'})
-        if m!=high_m and day==parseInt($(ele+' li:eq('+g+')').children('span:eq('+k+')').text())
-          $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'#FFB7C5','color':'#666671','font-weight':'normal'})
-        k++
-      g++
+#  hight=(high_m,ele)->
+#    data=new Date()
+#    Y=data.getFullYear()
+#    m=data.getMonth()+1
+#    day=data.getDate()
+#    if m==6 and day>10
+#      return
+#    g=0
+#    while g<$('.day-yue li').length-2
+#      k=0
+#      while k<$(ele+' li:eq('+g+')').children('span').length
+#        if m==high_m and day==parseInt($(ele+' li:eq('+g+')').children('span:eq('+k+')').text())
+#          $(ele+' li:eq('+g+')').children('span:eq('+k+')').addClass('span-high').siblings().removeClass('span-high')
+#          $('.day-wu').children('span').removeClass('span-high')
+#          $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'url("/static/images/list-img/small.png") no-repeat','background-position':'-187px -86px','color':'#000'})
+#        if m!=high_m and day==parseInt($(ele+' li:eq('+g+')').children('span:eq('+k+')').text())
+#          $(ele+' li:eq('+g+')').children('span:eq('+k+')').css({'background':'#FFB7C5','color':'#666671','font-weight':'normal'})
+#        k++
+#      g++
 
 #  格式化金额
   fmoney = (s, n) ->
@@ -102,6 +101,7 @@ require ['jquery'], ($)->
     t.split('').reverse().join('')
   #  请求数据
   shuju=(time)->
+    $("#dan li").not(":first").remove()
     $.ajax {
       url: '/api/investment_history/'
       data: {
@@ -120,85 +120,44 @@ require ['jquery'], ($)->
           day='0'+day
       date=Y+'-0'+m+"-"+day
       j=0
-      str='<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>'
-      str2='<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>'
-      str3='<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>'
-      str4='<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>'
-      str5='<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>'
+      str=''
       if date!=time
         while j<10
           if data[0]['tops_len']==0
-            if j%2==0
-              str3+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
-              $('#dan').html(str3)
-            if j%2!=0
-              str4+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
-              $('#shuang').html(str4)
+            str+='<li class="color9"><span class="span-one"></span><span class="span-two">－－</span><span class="span-three">－－</span></li>'
           if data[0]['tops_len']!=0
             if data[0]['tops_len']==1
-              if j%2==0
-                if j< data[0]['tops_len']
-                  str+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
-                  $('#dan').html(str)
-                if j>data[0]['tops_len']
-                  str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
-                  $('#dan').append(str3)
-              if j%2!=0
-                str5+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
-                $('#shuang').html(str5)
+              if j< data[0]['tops_len']
+                str+='<li><span class="span-one"></span><span class="span-two">'+data[0]['tops'][j]['phone']+'</span><span class="span-three">'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
+              else
+                str+='<li class="color9"><span class="span-one"></span><span class="span-two">－－</span><span class="span-three">－－</span></li>'
             else
-              if j%2==0
-                if j< data[0]['tops_len']
-                  str+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
-                  $('#dan').html(str)
-                if j>=data[0]['tops_len']
-                  str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
-                  $('#dan').append(str3)
-              if j%2!=0
-                if j<data[0]['tops_len']
-                  str2+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
-                  $('#shuang').html(str2)
-                if j>=data[0]['tops_len']
-                  str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>－－</span><span>－－</span></li>'
-                  $('#shuang').append(str3)
+              if j< data[0]['tops_len']
+                str+='<li><span class="span-one"></span><span class="span-two">'+data[0]['tops'][j]['phone']+'</span><span class="span-three">'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
+              else
+                str+='<li class="color9"><span class="span-one"></span><span class="span-two">－－</span><span class="span-three">－－</span></li>'
           j++
+
       else
         while j<10
           if data[0]['tops_len']==0
-            if j%2==0
-              str3+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>虚位以待</span><span>虚位以待</span></li>'
-              $('#dan').html(str3)
-            if j%2!=0
-              str4+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>虚位以待</span><span>虚位以待</span></li>'
-              $('#shuang').html(str4)
+            str+='<li class="color6"><span class="span-one"></span><span class="span-two">虚位以待</span><span class="span-three">虚位以待</span></li>'
           if data[0]['tops_len']!=0
             if data[0]['tops_len']==1
-              if j%2==0
-                if j< data[0]['tops_len']
-                  str+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
-                  $('#dan').html(str)
-                if j>data[0]['tops_len']
-                  str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>虚位以待</span><span>虚位以待</span></li>'
-                  $('#dan').append(str3)
-              if j%2!=0
-                str5+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>虚位以待</span><span>虚位以待</span></li>'
-                $('#shuang').html(str5)
+              if j< data[0]['tops_len']
+                str+='<li><span class="span-one"></span><span class="span-two">'+data[0]['tops'][j]['phone']+'</span><span class="span-three">'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
+              else
+                str='<li class="color6"><span class="span-one"></span><span class="span-two">虚位以待</span><span class="span-three">虚位以待</span></li>'
             else
-              if j%2==0
-                if j< data[0]['tops_len']
-                  str+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
-                  $('#dan').html(str)
-                if j>=data[0]['tops_len']
-                  str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>虚位以待</span><span>虚位以待</span></li>'
-                  $('#dan').append(str3)
-              if j%2!=0
-                if j<data[0]['tops_len']
-                  str2+='<li><span class="day-user-hight2">'+(j+1)+'</span><span>'+data[0]['tops'][j]['phone']+'</span><span>'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
-                  $('#shuang').html(str2)
-                if j>=data[0]['tops_len']
-                  str3='<li><span class="day-user-hight2">'+(j+1)+'</span><span>虚位以待</span><span>虚位以待</span></li>'
-                  $('#shuang').append(str3)
+              if j< data[0]['tops_len']
+                str+='<li><span class="span-one"></span><span class="span-two">'+data[0]['tops'][j]['phone']+'</span><span class="span-three">'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
+              else
+                str+='<li class="color6"><span class="span-one"></span><span class="span-two">虚位以待</span><span class="span-three">虚位以待</span></li>'
           j++
+      if str != ''
+        $('#dan').html('<li class="day-user-hight"><span class="span-one">榜单</span><span class="span-two">用户</span><span class="span-three">投标金额</span></li>')
+        $('#dan').append(str)
+
 # 获取当天日期
   data=new Date()
   Y=data.getFullYear()
@@ -207,7 +166,10 @@ require ['jquery'], ($)->
   if day<10
       day='0'+day
   date=Y+'-0'+m+"-"+day
-  hight(m,'day-wu')
+  #hight(m,'day-wu')   .addClass('span-high')
+  selectSpanFun(m,day)
+  day_index = m - 3
+
   init(date)
   $('#left-h1').html(+m+'月'+day+'日用户榜单')
   wei=new Date()
@@ -225,21 +187,22 @@ require ['jquery'], ($)->
   gotime)
 
 #获取倒计时时间
-  if m==6
-    sec=(new Date('2015-06-01'.replace(/-/ig,'/')).getTime() - new Date().getTime())/1000
-    sec=parseInt(sec)
-    timer=setTimeout (->
-      count_down '2015-06-01'
-      return
-    ), 1000
-    if sec <=0
-      $('.mon').html('6 月')
-      $('.day-long').animate({'left':'-1071px'},500)
-      hight(m,'.day-liu')
-      clearTimeout(timer)
-      day_index=3;
-  else
-    count_down('2015-05-01 0:0:0')
+#  if m==6
+#    sec=(new Date('2015-06-01'.replace(/-/ig,'/')).getTime() - new Date().getTime())/1000
+#    sec=parseInt(sec)
+#    timer=setTimeout (->
+#      count_down '2015-06-01'
+#      return
+#    ), 1000
+#    if sec <=0
+#      $('.mon').html('6 月')
+#      $('.day-long').animate({'left':'-1107px'},500)
+#      #hight(m,'.day-liu')
+#      #selectSpanFun(m,day)
+#      clearTimeout(timer)
+#      day_index=3;
+#  else
+#    count_down('2015-05-01 0:0:0')
 
 
 #  tap切换
@@ -268,12 +231,14 @@ require ['jquery'], ($)->
       if day_index<$('.day-yue').length
         mon=day_index+3
         $('.mon').html(mon+' 月')
-        $('.day-long').animate({'left':-357*day_index+'px'},500)
+        $('.day-long').animate({'left':-369*day_index+'px'},500)
 #        high_m=parseInt($('.mon').text())
 #        high_num=$('.day-yue:eq('+day_index+')').attr('data-num')
 #        hight(high_m,high_num)
       else
-        day_index=3
+        day_index=6
+#        $('.day-long').animate({'left':'0px'},500)
+#        $('.mon').html(3+' 月')
   )
 
   $('.left-btn').on('click',()->
@@ -281,7 +246,7 @@ require ['jquery'], ($)->
       if day_index>=0
         mon=day_index+3
         $('.mon').html(mon+' 月')
-        $('.day-long').animate({'left':-357*day_index+'px'},500)
+        $('.day-long').animate({'left':-369*day_index+'px'},500)
 #        high_m=parseInt($('.mon').text())
 #        high_num=$('.day-yue:eq('+day_index+')').attr('data-num')
 #        hight(high_m,high_num)
@@ -303,14 +268,26 @@ require ['jquery'], ($)->
     if day<10
       day='0'+day
     date=Y+'-0'+zm+"-"+day
-    if time>='2015-05-23' and time<='2015-06-10' and time<=date
+    if time>='2015-06-13' and time<='2015-07-15' and time<=date
       $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2')
       $(this).parent().siblings().children('span').removeClass('tap-hight2')
       $('#left-h1').html(+m+'月'+d+'日用户榜单')
       shuju(time)
   )
-
-
+  $('.day-list').on('click',()->
+    if !$('.day-list').hasClass('curr')
+      $('.day-list').addClass('curr')
+      $('.day-list-div').show()
+      $('.history-list-div').hide()
+      $('.history-list').removeClass('curr')
+  )
+  $('.history-list').on('click',()->
+    if !$('.history-list').hasClass('curr')
+      $('.history-list').addClass('curr')
+      $('.history-list-div').show()
+      $('.day-list-div').hide()
+      $('.day-list').removeClass('curr')
+  )
 
 
 

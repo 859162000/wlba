@@ -7,7 +7,7 @@
   });
 
   require(['jquery'], function($) {
-    var Y, count_down, data, date, day, day_index, fmoney, gotime, hight, init, m, mon, sec, shuju, timer, wei, wei2;
+    var Y, data, date, day, day_index, fmoney, gotime, init, m, mon, shuju, wei, wei2;
     init = function(time) {
       var csrfSafeMethod, getCookie, sameOrigin;
       csrfSafeMethod = void 0;
@@ -58,60 +58,6 @@
       });
       shuju(time);
     };
-    day_index = 1;
-    count_down = function(o) {
-      var sec, timer;
-      sec = (new Date(o.replace(/-/ig, '/')).getTime() - new Date().getTime()) / 1000;
-      sec = parseInt(sec);
-      timer = setTimeout((function() {
-        count_down(o);
-      }), 1000);
-      if (sec <= 0) {
-        $('.mon').html('5 月');
-        $('.day-long').animate({
-          'left': '-714px'
-        }, 500);
-        hight(m, '.day-wu');
-        clearTimeout(timer);
-        day_index = 2;
-      }
-    };
-    hight = function(high_m, ele) {
-      var Y, data, day, g, k, m, _results;
-      data = new Date();
-      Y = data.getFullYear();
-      m = data.getMonth() + 1;
-      day = data.getDate();
-      if (m === 6 && day > 10) {
-        return;
-      }
-      g = 0;
-      _results = [];
-      while (g < $('.day-yue li').length - 2) {
-        k = 0;
-        while (k < $(ele + ' li:eq(' + g + ')').children('span').length) {
-          if (m === high_m && day === parseInt($(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').text())) {
-            $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').addClass('span-high').siblings().removeClass('span-high');
-            $('.day-wu').children('span').removeClass('span-high');
-            $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').css({
-              'background': 'url("/static/images/list-img/small.png") no-repeat',
-              'background-position': '-187px -86px',
-              'color': '#000'
-            });
-          }
-          if (m !== high_m && day === parseInt($(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').text())) {
-            $(ele + ' li:eq(' + g + ')').children('span:eq(' + k + ')').css({
-              'background': '#FFB7C5',
-              'color': '#666671',
-              'font-weight': 'normal'
-            });
-          }
-          k++;
-        }
-        _results.push(g++);
-      }
-      return _results;
-    };
     fmoney = function(s, n) {
       var i, l, r, t;
       n = n > 0 && n <= 20 ? n : 2;
@@ -127,6 +73,7 @@
       return t.split('').reverse().join('');
     };
     shuju = function(time) {
+      $("#dan li").not(":first").remove();
       return $.ajax({
         url: '/api/investment_history/',
         data: {
@@ -134,7 +81,7 @@
         },
         type: 'POST'
       }).done(function(data) {
-        var Y, date, day, j, m, str, str2, str3, str4, str5, _results, _results1;
+        var Y, date, day, j, m, str;
         data = JSON.parse(data);
         date = new Date();
         Y = date.getFullYear();
@@ -145,121 +92,55 @@
         }
         date = Y + '-0' + m + "-" + day;
         j = 0;
-        str = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
-        str2 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
-        str3 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
-        str4 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
-        str5 = '<li class="day-user-hight"><span>榜单</span><span>用户</span><span>投标金额</span></li>';
+        str = '';
         if (date !== time) {
-          _results = [];
           while (j < 10) {
             if (data[0]['tops_len'] === 0) {
-              if (j % 2 === 0) {
-                str3 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                $('#dan').html(str3);
-              }
-              if (j % 2 !== 0) {
-                str4 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                $('#shuang').html(str4);
-              }
+              str += '<li class="color9"><span class="span-one"></span><span class="span-two">－－</span><span class="span-three">－－</span></li>';
             }
             if (data[0]['tops_len'] !== 0) {
               if (data[0]['tops_len'] === 1) {
-                if (j % 2 === 0) {
-                  if (j < data[0]['tops_len']) {
-                    str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
-                    $('#dan').html(str);
-                  }
-                  if (j > data[0]['tops_len']) {
-                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                    $('#dan').append(str3);
-                  }
-                }
-                if (j % 2 !== 0) {
-                  str5 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                  $('#shuang').html(str5);
+                if (j < data[0]['tops_len']) {
+                  str += '<li><span class="span-one"></span><span class="span-two">' + data[0]['tops'][j]['phone'] + '</span><span class="span-three">' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
+                } else {
+                  str += '<li class="color9"><span class="span-one"></span><span class="span-two">－－</span><span class="span-three">－－</span></li>';
                 }
               } else {
-                if (j % 2 === 0) {
-                  if (j < data[0]['tops_len']) {
-                    str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
-                    $('#dan').html(str);
-                  }
-                  if (j >= data[0]['tops_len']) {
-                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                    $('#dan').append(str3);
-                  }
-                }
-                if (j % 2 !== 0) {
-                  if (j < data[0]['tops_len']) {
-                    str2 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
-                    $('#shuang').html(str2);
-                  }
-                  if (j >= data[0]['tops_len']) {
-                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>－－</span><span>－－</span></li>';
-                    $('#shuang').append(str3);
-                  }
+                if (j < data[0]['tops_len']) {
+                  str += '<li><span class="span-one"></span><span class="span-two">' + data[0]['tops'][j]['phone'] + '</span><span class="span-three">' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
+                } else {
+                  str += '<li class="color9"><span class="span-one"></span><span class="span-two">－－</span><span class="span-three">－－</span></li>';
                 }
               }
             }
-            _results.push(j++);
+            j++;
           }
-          return _results;
         } else {
-          _results1 = [];
           while (j < 10) {
             if (data[0]['tops_len'] === 0) {
-              if (j % 2 === 0) {
-                str3 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
-                $('#dan').html(str3);
-              }
-              if (j % 2 !== 0) {
-                str4 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
-                $('#shuang').html(str4);
-              }
+              str += '<li class="color6"><span class="span-one"></span><span class="span-two">虚位以待</span><span class="span-three">虚位以待</span></li>';
             }
             if (data[0]['tops_len'] !== 0) {
               if (data[0]['tops_len'] === 1) {
-                if (j % 2 === 0) {
-                  if (j < data[0]['tops_len']) {
-                    str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
-                    $('#dan').html(str);
-                  }
-                  if (j > data[0]['tops_len']) {
-                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
-                    $('#dan').append(str3);
-                  }
-                }
-                if (j % 2 !== 0) {
-                  str5 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
-                  $('#shuang').html(str5);
+                if (j < data[0]['tops_len']) {
+                  str += '<li><span class="span-one"></span><span class="span-two">' + data[0]['tops'][j]['phone'] + '</span><span class="span-three">' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
+                } else {
+                  str = '<li class="color6"><span class="span-one"></span><span class="span-two">虚位以待</span><span class="span-three">虚位以待</span></li>';
                 }
               } else {
-                if (j % 2 === 0) {
-                  if (j < data[0]['tops_len']) {
-                    str += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
-                    $('#dan').html(str);
-                  }
-                  if (j >= data[0]['tops_len']) {
-                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
-                    $('#dan').append(str3);
-                  }
-                }
-                if (j % 2 !== 0) {
-                  if (j < data[0]['tops_len']) {
-                    str2 += '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>' + data[0]['tops'][j]['phone'] + '</span><span>' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
-                    $('#shuang').html(str2);
-                  }
-                  if (j >= data[0]['tops_len']) {
-                    str3 = '<li><span class="day-user-hight2">' + (j + 1) + '</span><span>虚位以待</span><span>虚位以待</span></li>';
-                    $('#shuang').append(str3);
-                  }
+                if (j < data[0]['tops_len']) {
+                  str += '<li><span class="span-one"></span><span class="span-two">' + data[0]['tops'][j]['phone'] + '</span><span class="span-three">' + fmoney(data[0]['tops'][j]['amount_sum']) + ' 元</span></li>';
+                } else {
+                  str += '<li class="color6"><span class="span-one"></span><span class="span-two">虚位以待</span><span class="span-three">虚位以待</span></li>';
                 }
               }
             }
-            _results1.push(j++);
+            j++;
           }
-          return _results1;
+        }
+        if (str !== '') {
+          $('#dan').html('<li class="day-user-hight"><span class="span-one">榜单</span><span class="span-two">用户</span><span class="span-three">投标金额</span></li>');
+          return $('#dan').append(str);
         }
       });
     };
@@ -271,7 +152,8 @@
       day = '0' + day;
     }
     date = Y + '-0' + m + "-" + day;
-    hight(m, 'day-wu');
+    selectSpanFun(m, day);
+    day_index = m - 3;
     init(date);
     $('#left-h1').html(+m + '月' + day + '日用户榜单');
     wei = new Date();
@@ -286,24 +168,6 @@
       $('.ing li').eq(1).addClass('ing-hight');
       return $('.day-head h1').eq(1).addClass('h1-hight');
     }, gotime);
-    if (m === 6) {
-      sec = (new Date('2015-06-01'.replace(/-/ig, '/')).getTime() - new Date().getTime()) / 1000;
-      sec = parseInt(sec);
-      timer = setTimeout((function() {
-        count_down('2015-06-01');
-      }), 1000);
-      if (sec <= 0) {
-        $('.mon').html('6 月');
-        $('.day-long').animate({
-          'left': '-1071px'
-        }, 500);
-        hight(m, '.day-liu');
-        clearTimeout(timer);
-        day_index = 3;
-      }
-    } else {
-      count_down('2015-05-01 0:0:0');
-    }
     mon = 0;
     $('.right-btn').on('click', function() {
       day_index++;
@@ -311,10 +175,10 @@
         mon = day_index + 3;
         $('.mon').html(mon + ' 月');
         return $('.day-long').animate({
-          'left': -357 * day_index + 'px'
+          'left': -369 * day_index + 'px'
         }, 500);
       } else {
-        return day_index = 3;
+        return day_index = 6;
       }
     });
     $('.left-btn').on('click', function() {
@@ -323,13 +187,13 @@
         mon = day_index + 3;
         $('.mon').html(mon + ' 月');
         return $('.day-long').animate({
-          'left': -357 * day_index + 'px'
+          'left': -369 * day_index + 'px'
         }, 500);
       } else {
         return day_index = 0;
       }
     });
-    return $('.day-yue span').on('click', function() {
+    $('.day-yue span').on('click', function() {
       var d, time, zm;
       m = parseInt($('.mon').text());
       d = $(this).text();
@@ -345,11 +209,27 @@
         day = '0' + day;
       }
       date = Y + '-0' + zm + "-" + day;
-      if (time >= '2015-05-23' && time <= '2015-06-10' && time <= date) {
+      if (time >= '2015-06-13' && time <= '2015-07-15' && time <= date) {
         $(this).addClass('tap-hight2').siblings().removeClass('tap-hight2');
         $(this).parent().siblings().children('span').removeClass('tap-hight2');
         $('#left-h1').html(+m + '月' + d + '日用户榜单');
         return shuju(time);
+      }
+    });
+    $('.day-list').on('click', function() {
+      if (!$('.day-list').hasClass('curr')) {
+        $('.day-list').addClass('curr');
+        $('.day-list-div').show();
+        $('.history-list-div').hide();
+        return $('.history-list').removeClass('curr');
+      }
+    });
+    return $('.history-list').on('click', function() {
+      if (!$('.history-list').hasClass('curr')) {
+        $('.history-list').addClass('curr');
+        $('.history-list-div').show();
+        $('.day-list-div').hide();
+        return $('.day-list').removeClass('curr');
       }
     });
   });
