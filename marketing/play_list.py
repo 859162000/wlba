@@ -19,7 +19,7 @@ from wanglibao.templatetags.formatters import safe_phone_str
 
 class Investment(TemplateView):
     """ 实时活动打榜页面"""
-    template_name = 'day.jade'
+    template_name = 'list_level.jade'
 
     def get_context_data(self, **kwargs):
         now = datetime.now()
@@ -29,7 +29,7 @@ class Investment(TemplateView):
                 "top_len": 0
             }
 
-        day_tops = _get_top_records()
+        day_tops = _get_top_records(amount_min=30000)
         return {
             "top_ten": day_tops,
             "top_len": len(day_tops)
