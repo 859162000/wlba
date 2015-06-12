@@ -9,7 +9,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }else{
             var shield = document.createElement("DIV");
             shield.id = "popubMask";
-            shield.style.cssText="position:absolute;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
+            shield.style.cssText="position:fixed;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
             var alertFram = document.createElement("DIV");
             alertFram.id="alert-cont";
             alertFram.style.cssText="position:absolute; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
