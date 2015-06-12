@@ -137,7 +137,7 @@ require ['jquery'], ($)->
               else
                 str+='<li class="color9"><span class="span-one"></span><span class="span-two">－－</span><span class="span-three">－－</span></li>'
           j++
-        $('#dan').append(str)
+
       else
         while j<10
           if data[0]['tops_len']==0
@@ -154,7 +154,10 @@ require ['jquery'], ($)->
               else
                 str+='<li class="color6"><span class="span-one"></span><span class="span-two">虚位以待</span><span class="span-three">虚位以待</span></li>'
           j++
+      if str != ''
+        $('#dan').html('<li class="day-user-hight"><span class="span-one">榜单</span><span class="span-two">用户</span><span class="span-three">投标金额</span></li>')
         $('#dan').append(str)
+
 # 获取当天日期
   data=new Date()
   Y=data.getFullYear()
