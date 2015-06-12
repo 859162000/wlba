@@ -421,7 +421,11 @@ org.regist = (function(org){
                         },
                         success:function(data){
                             if(data.ret_code === 0){
-                                window.location.href = '/weixin/login/';
+                                alert("注册成功，立即登陆");
+                                setTimeout(function(){
+                                    window.location.href = '/weixin/login/';
+                                },1000)
+
                             }else if(data.ret_code === 30014){
                                $('.'+signName['checkCode'][0]).show();
                                 $submitBody.text('立即注册');

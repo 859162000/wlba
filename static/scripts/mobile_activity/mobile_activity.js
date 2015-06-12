@@ -255,7 +255,7 @@ org.shareRegist = (function(org){
                         },
                         success:function(data){
                             if(data.ret_code === 0){
-                                window.location.href = '/activity/share_regnew_href/';
+                                window.location.href = '/accounts/logout?next=/activity/share_regnew_href/';
 
                             }else if(data.ret_code === 30014){
                                $('.'+signName['checkCode'][0]).show();
