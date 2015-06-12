@@ -286,6 +286,35 @@ org.shareRegist = (function(org){
     }
 })(org);
 
+org.shareDownload = (function(org){
+    var lib = {
+        init:function(){
+            lib.downAddEvent()
+        },
+        downAddEvent:function(){
+            $('.download-app').on('click', function (e) {
+                var userAgent = navigator.userAgent;
+                  $.os = {};
+                  $.os.weixin = userAgent.match(/MicroMessenger\/([\d.]+)/) ? true : false;
+                  $.os.android = userAgent.match(/(Android)\s+([\d.]+)/) || userAgent.match(/Silk-Accelerated/) ? true : false;
+                  $.os.ipad = userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false;
+                  $.os.iphone = !$.os.ipad && userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false;
+                  $.os.ios = $.os.ipad || $.os.iphone;
+                if ($.os.ios){
+                    window.location.href = 'https://itunes.apple.com/cn/app/id881326898';
+                }else if($.os.android){
+                    window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao';
+                }else{
+                    alert("请在手机中打开该页面进行下载！")
+                }
+            })
+        }
+
+    }
+    return {
+        init :lib.init
+    }
+})(org);
 
 ;(function(org){
     $.each($('script'), function(){
