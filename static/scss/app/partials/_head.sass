@@ -1,0 +1,22 @@
+header
+  position: relative
+  background: $head-backgroundColor
+  font-size: $header-fontSize
+  color: $head-fontColo
+  height: $header-height
+  hgroup
+    text-align: center
+    line-height: $header-height
+  a
+    position: absolute
+    left: 0
+    top: 0
+    padding: 0 .3rem
+    &:active
+      box-shadow: $active-shadow
+    span
+      padding-left: .8rem
+      line-height: $header-height
+      height: $header-height
+      background: url("/static/imgs/mobile/head_back.png") no-repeat left center
+      background-size: .5rem .975rem
