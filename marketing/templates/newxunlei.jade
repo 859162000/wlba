@@ -65,7 +65,7 @@ html
 
     .wrap#new-xl-banner
       .gold2
-         //img(src="/static/images/xunlei-denglu/xun-wang.png").xun-wang
+         .xl-text.xl-com.xl-ele#xl-text
          .denelu-form
             h1.biaoyu 轻松拿380元红包
             //.align-center
@@ -110,6 +110,11 @@ html
             p.xun-p 已有账号,
               a(href="/accounts/login/") 立即登录
     .new-xl-big
+      .xl-backtop
+        span.xl-com.xl-twe
+        .backtop 回到顶部
+        img(src="/static/images/xunlei/weixin.jpg")#xl-weixin
+        .erweima
       h1.xl-time 活动时间：2015年6月10日——2015年6月30日
       .xl-box1
         h2.xl-jiang
@@ -191,16 +196,225 @@ html
               dt.xl-com.xl-ten
                 span.money ¥ 100
               dd.rank 第十名
+            p(style="top:17px")
+              b 注：
+              |若出现两名或两名以上客户投标金额相同，则按当日投标时间先后排位；
+              br
+              |每天投标累计金额
+              b ≥3
+              |万元的用户未排入前十名将获得
+              b 60元
+              |现金。
+      .xl-box1(style="height:337px")
+        h2.xl-jiang
+          .xl-center
+             .xl-left
+               span.xl-hua
+               .line
+               span.xl-xin
+             |投资流程
+             .xl-left.xl-right
+               span.xl-hua
+               .line
+               span.xl-xin
+        .content-process
+          .content-pptv(style="background:#fff")
+            .process-text(style="height:50px")
+            .process-list
+              .circle-free.circle-float
+                .close
+                .last
+                .next
+                img(src="/static/images/pptv/free.jpg")
+              .triangle-start
+                .start-cont
+              .circle
+                .circle-body.free
+                .circle-txt 免费注册
+                .circle-txt2 送
+                  em 50
+                  |元红包
+              .triangle-center#xl-triangle-center(style="width:0px")
+                //.center-cont
+              //.circle
+              //  .circle-body.atte
+              //  .circle-txt 进行认证
+              //  .circle-txt2 送
+              //    em 1
+              //    |个月PPTV会员
+              .triangle-center
+                .center-cont
+              .circle
+                .circle-body.recharge
+                .circle-txt 充值账户
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.tender
+                .circle-txt 成功投标
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.collec
+                .circle-txt 自动收款
+              .triangle-end
+                .end-cont
+      .xl-box1(style="height:450px")
+        h2.xl-jiang
+          .xl-center
+             .xl-left(style="width:338px")
+               span.xl-hua
+               .line(style="width:287px")
+               span.xl-xin
+             |迅雷投资用户前来打擂可以获得什么？
+             .xl-left.xl-right(style="width:338px")
+               span.xl-hua
+               .line(style="width:287px")
+               span.xl-xin
+        .xl-get
+           .get1
+              span 迅雷会员
+                br
+                |免费送
+           p(style="top:20px;font-size:12px") 迅雷会员免费送
+             br
+             |注册并充值送7天迅雷会员
+        .xl-get
+           .get1.get2
+              span 最高年化
+                br
+                |收益率15%
+           p(style="top:20px;font-size:12px") 最高年化收益率15%
+             br
+             |是余额宝的3倍，银行活期存款的30倍
+        .xl-get
+           .get1.get3
+              span 每日投资最高
+                br
+                |奖上有奖
+           p(style="top:20px;font-size:12px") 每日投资最高奖上有奖
+             br
+             |每日最高奖投资奖1000元，可天天参与
+        .xl-get
+           .get1.get4
+              span 现金红包
+                br
+                |注册送
+           p(style="top:20px;font-size:12px;") 现金红包注册送
+             br
+             |注册就送380元现金直抵红包
+        button.xl-btn#xl-btn 立即领取现金红包
+        .xl-small-zc
+          span.xl-off ×
+          .denelu-form
+            h1.biaoyu 轻松拿380元红包
+            //.align-center
+            //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
+            form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
+              - csrf_token
+              .form-row
+                .form-control-group
+                  .span12
+                    input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                .form-row-error
+              .form-row.voice
+                .span12-omega.hidden.show
+                  没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                .form-control-group
+                  .span6
+                     input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                  .span6-omega
+                     button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px") 获取验证码
+                .form-row-error
+
+              .form-row
+                input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                .password-strength-container
+                  span.password-strength-1
+                  span.password-strength-2
+                  span.password-strength-3
+                .form-row-error
+              .form-row
+                input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                .form-row-error
+              .form-row.form-bottom-bar
+                .agreement(style="padding:0 0 10px 10px;text-align:left")
+                  label(for="agreement")
+                    input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
+                  | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                  .form-row-error
+                button#register_submit.button-account.span10.xun-zhuce(type='submit') 立即注册
+
+              .space-vertical-s
+
+            p.xun-p(style="top:0px;") 已有账号,
+              a(href="/accounts/login/",style="color:#3ea7eb") 立即登录
+      .xl-box1(style="height:644px")
+        h2.xl-jiang
+          .xl-center
+             .xl-left
+               span.xl-hua
+               .line
+               span.xl-xin
+             |活动规则
+             .xl-left.xl-right
+               span.xl-hua
+               .line
+               span.xl-xin
+        ul
+          li 1、手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账号；
+          li 2、红包使用细则：
+            br
+            b 新用户注册即送380元现金红包，投资300元可使用30元现金红包，350元红包按投资额1%抵扣使用 ；
+            br
+            b 所有现金奖励在7个工作日内以红包形式发出，红包类型为直抵红包；
+            br
+            b 获奖红包以站内信形式通知，完成一次投资回款后即可取现；
+            br
+            b 红包均只能使用一次，使用后是否有余额红包即失效；
+          li 3、红包有效期：2015年X月X日-2015年X月X日；
+          li 4、本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+          li 5、网利宝客服热线：4008-588-066（服务时间：9:00-20:00 工作日）。网利宝对此活动享有最终解释权。
+        .san-new
+          .san-new-content.container
+            .row.gold-dl-row
+              .san-span
+                dl
+                 dt.com.com-trust
+                 dd.pp-zi
+                   p
+                    b IDG资本
+                    br
+                    | 百亿市值
+                    b A股上市公司
+                    |入股
+              .san-span
+                dl
+                 dt.com.com-security
+                 dd.pp-zi
+                   p 账户资金安全
+                    br
+                    |由
+                    b 平安保险
+                    |承保
+              .san-span
+                dl
+                 dt.com.com-authority(style="background: url('/static/images/xunlei/one.jpg') no-repeat center")
+                 dd.pp-zi
+                   p 第三方
+                    br
+                    b 100%
+                    |本息保障
 
 
 
 
-    .warp-footer
-      img(src="/static/images/xunlei-denglu/ditu.jpg").foot-img
+    .pptv-bottom.content-process
+      img(src="/static/images/pptv/pptv-bottom.png")
 
       include include/tracking
 
       script.
           var v = new Date().getTime()
-          require(['/static/js/hover.js','/static/js/xun-newzhuce.js?v='+v])
+          require(['/static/js/hover.js','/static/js/xun-newzhuce.js?v='+v,'/static/js/newxunlei.js'])
 
