@@ -255,9 +255,7 @@ org.shareRegist = (function(org){
                         },
                         success:function(data){
                             if(data.ret_code === 0){
-                                alert('注册成功,立即领取！',function(){
-                                    window.location.href = '/activity/share_regnew_href/';
-                                });
+                                window.location.href = '/activity/share_regnew_href/';
 
                             }else if(data.ret_code === 30014){
                                $('.'+signName['checkCode'][0]).show();
