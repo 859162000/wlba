@@ -55,14 +55,15 @@
     var t = $('body').scrollTop();
     var winH = $(window).height();
     if (t>=winH){
-      $('.xl-backtop').show();
+      $('.xl-backtop').fadeIn(500);
     }else{
-      $('.xl-backtop').hide();
+      $('.xl-backtop').fadeOut(500);
     }
   };
 
   $('.backtop').on('click',function(){
-    window.scrollTop();
+    $('body,html').animate({scrollTop: 0}, 600);
+    return false
   })
 
 }).call(this);
