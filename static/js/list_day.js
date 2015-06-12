@@ -115,7 +115,6 @@
             }
             j++;
           }
-          return $('#dan').append(str);
         } else {
           while (j < 10) {
             if (data[0]['tops_len'] === 0) {
@@ -138,6 +137,9 @@
             }
             j++;
           }
+        }
+        if (str !== '') {
+          $('#dan').html('<li class="day-user-hight"><span class="span-one">榜单</span><span class="span-two">用户</span><span class="span-three">投标金额</span></li>');
           return $('#dan').append(str);
         }
       });
