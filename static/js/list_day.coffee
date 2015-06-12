@@ -129,12 +129,12 @@ require ['jquery'], ($)->
             if data[0]['tops_len']==1
               if j< data[0]['tops_len']
                 str+='<li><span class="span-one"></span><span class="span-two">'+data[0]['tops'][j]['phone']+'</span><span class="span-three">'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
-              if j>data[0]['tops_len']
+              else
                 str+='<li class="color9"><span class="span-one"></span><span class="span-two">－－</span><span class="span-three">－－</span></li>'
             else
               if j< data[0]['tops_len']
                 str+='<li><span class="span-one"></span><span class="span-two">'+data[0]['tops'][j]['phone']+'</span><span class="span-three">'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
-              if j>=data[0]['tops_len']
+              else
                 str+='<li class="color9"><span class="span-one"></span><span class="span-two">－－</span><span class="span-three">－－</span></li>'
           j++
         $('#dan').append(str)
@@ -146,12 +146,12 @@ require ['jquery'], ($)->
             if data[0]['tops_len']==1
               if j< data[0]['tops_len']
                 str+='<li><span class="span-one"></span><span class="span-two">'+data[0]['tops'][j]['phone']+'</span><span class="span-three">'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
-              if j>data[0]['tops_len']
+              else
                 str='<li class="color6"><span class="span-one"></span><span class="span-two">虚位以待</span><span class="span-three">虚位以待</span></li>'
             else
               if j< data[0]['tops_len']
                 str+='<li><span class="span-one"></span><span class="span-two">'+data[0]['tops'][j]['phone']+'</span><span class="span-three">'+fmoney(data[0]['tops'][j]['amount_sum'])+' 元</span></li>'
-              if j>=data[0]['tops_len']
+              else
                 str+='<li class="color6"><span class="span-one"></span><span class="span-two">虚位以待</span><span class="span-three">虚位以待</span></li>'
           j++
         $('#dan').append(str)
