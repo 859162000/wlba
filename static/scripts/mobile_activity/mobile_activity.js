@@ -249,13 +249,13 @@ org.shareRegist = (function(org){
                     org.ajax({
                         url: '/api/register/',
                         type: 'POST',
-                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': invite_code},
+                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1] },
                         beforeSend: function(xhr, settings) {
                             $submitBody.text('注册中...');
                         },
                         success:function(data){
                             if(data.ret_code === 0){
-                                window.location.href = '/accounts/logout?next=/activity/share_regnew_href/';
+                                window.location.href = '/activity/share_regnew_href/';
 
                             }else if(data.ret_code === 30014){
                                $('.'+signName['checkCode'][0]).show();
