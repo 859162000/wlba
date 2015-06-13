@@ -245,11 +245,11 @@ org.shareRegist = (function(org){
 
                 var $submitBody = $('.submit-body');
                 if(isSubmit){
-                    var invite_code =org.getQueryStringByName('token');
+                    var invite_code =org.getQueryStringByName('promo_token');
                     org.ajax({
                         url: '/api/register/',
                         type: 'POST',
-                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1] },
+                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': invite_code },
                         beforeSend: function(xhr, settings) {
                             $submitBody.text('注册中...');
                         },
