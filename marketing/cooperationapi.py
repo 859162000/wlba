@@ -10,6 +10,7 @@ from decimal import Decimal
 from hashlib import md5
 import datetime
 import logging
+import re
 
 from django.contrib.auth.models import User
 from django.db.models import Q, Sum
@@ -298,6 +299,12 @@ class WangdaiEyeListAPIView(APIView):
 
                 rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'))
 
+                matches = re.search(u'日计息', p2pproduct.pay_method)
+                if matches and matches.group():
+                    p_type = 0
+                else:
+                    p_type = 1
+
                 obj = {
                     "id": str(p2pproduct.id),
                     "platform_name": u"网利宝",
@@ -312,7 +319,7 @@ class WangdaiEyeListAPIView(APIView):
                     "rate": rate,
                     # "period": u'{}个月'.format(p2pproduct.period),
                     "period": p2pproduct.period,
-                    "p_type": 1,#期限类型,0 代表天,1 代表月
+                    "p_type": p_type,#期限类型,0 代表天,1 代表月
                     # "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6)),
                     "pay_way": P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0),
                     "process": process,
