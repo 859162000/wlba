@@ -414,7 +414,7 @@ org.regist = (function(org){
                     org.ajax({
                         url: '/api/register/',
                         type: 'POST',
-                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': 'weixin'},
+                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1]},
                         beforeSend: function(xhr, settings) {
                             $submitBody.text('注册中...');
                         },
@@ -461,7 +461,18 @@ org.list = (function(org){
         pageSize: 10, //每次请求的个数
         page: 2, //从第二页开始
         init :function(){
+            lib._swiper();
             lib._scrollListen();
+        },
+        _swiper:function(){
+            var myswiper = new Swiper('.swiper-container', {
+                pagination: '.swiper-pagination',
+                loop:true,
+                lazyLoading: true,
+                autoplay: 3000,
+                autoplayDisableOnInteraction: false,
+
+            });
         },
         _scrollListen:function(){
             $(document).scroll(function(){
