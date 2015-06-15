@@ -565,10 +565,13 @@ class TianmangIDVerificationListAPIView(TianmangBaseAPIView):
                     created_at = IdVerification.objects.get(\
                         id_number=tianmang_promo_user.user.wanglibaouserprofile.id_number).created_at
 
+                    t_phone = tianmang_promo_user.user.wanglibaouserprofile.phone
+                    phone = t_phone.replace(str(t_phone).strip()[3:], "*"*8)
                     response_user ={
                         "time": timezone.localtime(created_at).strftime("%Y-%m-%d %H:%M:%S"),
                         "uid": uid,
-                        "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                        "uname": tianmang_promo_user.user.username,
+                        "phone": phone,
                         #"status":tianmang_promo_user.user.wanglibaouserprofile.id_is_valid and 1 or 0,
                     }
                     response_user_list.append(response_user)
@@ -592,7 +595,7 @@ class TianmangRegisterListAPIView(TianmangBaseAPIView):
                 response_user ={
                     "time": timezone.localtime(tianmang_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
                     "uid": uid,
-                    "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                    "uname": tianmang_promo_user.user.username,
                     #"status":tianmang_promo_user.user.wanglibaouserprofile.phone_verified and 1 or 0,
                 }
                 response_user_list.append(response_user)
@@ -626,7 +629,7 @@ class TianmangInvestListAPIView(TianmangBaseAPIView):
                 response_user ={
                     "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
                     "uid": uid,
-                    "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                    "uname": tianmang_promo_user.user.username,
                     "investment": float(income_all),
                     #"status": 1 if income_all > 0 else 0
                 }
@@ -659,7 +662,7 @@ class TianmangInvestNotConfirmListAPIView(TianmangBaseAPIView):
                 response_user ={
                     "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
                     "uid": uid,
-                    "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                    "uname": tianmang_promo_user.user.username,
                     "investment": float(total_equity),
                     #"status": 1 if income_all > 0 else 0
                 }
