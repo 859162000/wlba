@@ -289,6 +289,10 @@ class IntroducedByReward(models.Model):
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     checked_status = models.IntegerField(u'审核状态', max_length=2, choices=STATUS)
     checked_at = models.DateTimeField(u'审核时间', null=True, blank=True)
+    user_send_status = models.BooleanField(u'被邀请人发放状态', default=False)
+    user_send_amount = models.DecimalField(u'被邀请人发放金额', max_digits=20, decimal_places=2, default=0)
+    introduced_send_status = models.BooleanField(u'邀请人发放状态', default=False)
+    introduced_send_amount = models.DecimalField(u'邀请人发放金额', max_digits=20, decimal_places=2, default=0)
 
     class Meta:
         ordering = ['-created_at']
