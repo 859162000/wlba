@@ -6,16 +6,16 @@
     padding: 35px 40px 30px
     font-size: 18px
     color: #5a5a5a
-    font-family: STHeiti,"Microsoft Yahei","微软雅黑",tahoma,arial,"Hiragino Sans GB",宋体,sans-serif
+    font-family: STHeiti,"Microsoft Yahei","微软雅黑",tahoma,arial,"Hiragino Sans GB",'宋体',sans-serif
   .tender-form
-    +clearfix
+    @extend .clearfix
     .ul-style
       +clearfix
       .tender-ul-left
         margin-left: 40px
         li
           margin-bottom: 15px
-          +clearfix
+          @extend .clearfix
           .left-style
             width: 450px
             float: left
@@ -101,9 +101,9 @@
       display: inline-block
       width: 100%
       height: 30px
-      +clearfix
+      @extend .clearfix
     .submit-div
-      +clearfix
+      @extend .clearfix
       text-align: center
       .submit-style
         width: 210px
@@ -117,7 +117,7 @@
       span.button-gray
         background: #d9d9d9
   .rule-content
-    +clearfix
+    @extend .clearfix
     padding: 50px 0 80px
     p
       font-size: 12px

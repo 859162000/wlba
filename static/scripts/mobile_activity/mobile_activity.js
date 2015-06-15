@@ -9,10 +9,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }else{
             var shield = document.createElement("DIV");
             shield.id = "popubMask";
-            shield.style.cssText="position:absolute;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
+            shield.style.cssText="position:fixed;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
             var alertFram = document.createElement("DIV");
             alertFram.id="alert-cont";
-            alertFram.style.cssText="position:absolute; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
+            alertFram.style.cssText="position:fixed; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
             strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 1.25rem .75rem;'>"+txt+"</div>";
             strHtml +=" <div class=\"popub-footer\" style=\"width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;\" onclick=\"doOk()\">确认</div>";
             alertFram.innerHTML = strHtml;
@@ -245,18 +245,17 @@ org.shareRegist = (function(org){
 
                 var $submitBody = $('.submit-body');
                 if(isSubmit){
+                    var invite_code =org.getQueryStringByName('promo_token');
                     org.ajax({
                         url: '/api/register/',
                         type: 'POST',
-                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': 'weixin'},
+                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': invite_code },
                         beforeSend: function(xhr, settings) {
                             $submitBody.text('注册中...');
                         },
                         success:function(data){
                             if(data.ret_code === 0){
-                                alert('注册成功,立即登录！',function(){
-                                    window.location.href = '/weixin/login/';
-                                });
+                                window.location.href = '/activity/share_regnew_href/';
 
                             }else if(data.ret_code === 30014){
                                $('.'+signName['checkCode'][0]).show();
@@ -274,7 +273,7 @@ org.shareRegist = (function(org){
                             }
                         },
                         complete:function(){
-                            $submitBody.text('立即注册');
+                            $submitBody.text('完成注册，立即奖励');
                         }
                     });
                 }
@@ -286,6 +285,35 @@ org.shareRegist = (function(org){
     }
 })(org);
 
+org.shareDownload = (function(org){
+    var lib = {
+        init:function(){
+            lib.downAddEvent()
+        },
+        downAddEvent:function(){
+            $('.download-app').on('click', function (e) {
+                var userAgent = navigator.userAgent;
+                  $.os = {};
+                  $.os.weixin = userAgent.match(/MicroMessenger\/([\d.]+)/) ? true : false;
+                  $.os.android = userAgent.match(/(Android)\s+([\d.]+)/) || userAgent.match(/Silk-Accelerated/) ? true : false;
+                  $.os.ipad = userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false;
+                  $.os.iphone = !$.os.ipad && userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false;
+                  $.os.ios = $.os.ipad || $.os.iphone;
+                if ($.os.ios){
+                    window.location.href = 'https://itunes.apple.com/cn/app/id881326898';
+                }else if($.os.android){
+                    window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao';
+                }else{
+                    alert("请在手机中打开该页面进行下载！")
+                }
+            })
+        }
+
+    }
+    return {
+        init :lib.init
+    }
+})(org);
 
 ;(function(org){
     $.each($('script'), function(){
