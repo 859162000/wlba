@@ -466,11 +466,19 @@ org.list = (function(org){
             lib._scrollListen();
         },
         _swiper:function(){
+            var autoplay = 3000,
+                loop = true,
+                $swiperSlide = $('.swiper-slide');
+            console.log($swiperSlide.length/2)
+            if($swiperSlide.length/2 < 1){
+                autoplay= 0;
+                loop = false;
+            }
             var myswiper = new Swiper('.swiper-container', {
                 pagination: '.swiper-pagination',
-                loop:true,
+                loop: loop,
                 lazyLoading: true,
-                autoplay: 3000,
+                autoplay: autoplay,
                 autoplayDisableOnInteraction: false,
 
             });
