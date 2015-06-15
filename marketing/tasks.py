@@ -305,13 +305,20 @@ def add_introduced_award_all(start, end, amount_min, percent):
             reward.first_reward = get_base_decimal(Decimal(record.amount) * Decimal(record.product.expected_earning_rate) * Decimal(0.01) * Decimal(record.product.period) / 12)
 
             # 邀请人活取被邀请人首笔投资（投资年化）
-            reward.introduced_reward = get_base_decimal(Decimal(record.amount) * Decimal(percent) * Decimal(0.01) * Decimal(record.product.period) / 12)
+            got_amount = get_base_decimal(Decimal(record.amount) * Decimal(percent) * Decimal(0.01) * Decimal(record.product.period) / 12)
+            reward.introduced_reward = got_amount
 
             reward.activity_start_at = start_utc
             reward.activity_end_at = end_utc
             reward.activity_amount_min = Decimal(amount_min)
             reward.percent_reward = Decimal(percent)
             reward.checked_status = 0
+            # 新增字段
+            if first_user.user.wanglibaouserprofile.utype == '0':
+                reward.user_send_amount = got_amount
+            if first_user.introduced_by.wanglibaouserprofile.utype == '0':
+                reward.introduced_send_amount = got_amount
+
             query_set_list.append(reward)
 
         if len(query_set_list) == 100:
@@ -343,14 +350,18 @@ def send_reward_all(start, end, amount_min, percent):
         return
 
     phone_user = []
+    # A 邀请 B
+    # A 邀请人， B 被邀请人
     for record in records:
-        reward_earning(record, flag=1)
-        reward_earning(record, flag=2)
-
-        if record.introduced_by_person.wanglibaouserprofile.utype == '0':
-            phone_user.append(record.introduced_by_person.wanglibaouserprofile.phone)
+        # 为被邀请人发收益
         if record.user.wanglibaouserprofile.utype == '0':
+            reward_earning(record, record.user, record.introduced_reward, record.product, flag=1)
             phone_user.append(record.user.wanglibaouserprofile.phone)
+
+        # 为邀请人发收益
+        if record.introduced_by_person.wanglibaouserprofile.utype == '0':
+            reward_earning(record, record.introduced_by_person, record.introduced_reward, record.product, flag=2)
+            phone_user.append(record.introduced_by_person.wanglibaouserprofile.phone)
 
     phone_user = list(set(phone_user))
     if phone_user:
@@ -370,22 +381,12 @@ def send_reward_all(start, end, amount_min, percent):
         })
 
 
-def reward_earning(record, flag):
+def reward_earning(record, reward_user, got_amount, product, flag):
     from wanglibao_p2p.models import Earning
     from order.utils import OrderHelper
     from order.models import Order
     from django.forms import model_to_dict
     from wanglibao_margin.marginkeeper import MarginKeeper
-
-    reward_type = u'邀请送收益'
-    if flag == 1:
-        user, introduced_by, reward_type, got_amount, product = record.user, record.introduced_by_person, reward_type, record.introduced_reward, record.product
-    else:
-        user, introduced_by, reward_type, got_amount, product = record.introduced_by_person, record.user, reward_type, record.introduced_reward, record.product
-
-    # 只给普通用户发放收益
-    if introduced_by.wanglibaouserprofile.utype != '0':
-        return
 
     # 发放收益
     earning = Earning()
@@ -393,19 +394,20 @@ def reward_earning(record, flag):
     earning.type = 'I'
     earning.product = product
     order = OrderHelper.place_order(
-        introduced_by,
+        reward_user,
         Order.ACTIVITY,
         u"邀请送收益活动赠送",
         earning=model_to_dict(earning))
     earning.order = order
-    keeper = MarginKeeper(introduced_by, order.pk)
+    keeper = MarginKeeper(reward_user, order.pk)
 
     # 赠送活动描述
-    desc = u'%s,邀请好友理财活动中，获赠%s元' % (introduced_by.wanglibaouserprofile.name, got_amount)
+    desc = u'%s,邀请好友理财活动中，获赠%s元' % (reward_user.wanglibaouserprofile.name, got_amount)
     earning.margin_record = keeper.deposit(got_amount, description=desc)
-    earning.user = introduced_by
+    earning.user = reward_user
     earning.save()
 
-    IntroducedByReward.objects.filter(id=record.id).update(checked_status=1, checked_at=timezone.now())
-
-
+    if flag == 1:
+        IntroducedByReward.objects.filter(id=record.id).update(checked_status=1, checked_at=timezone.now(), user_send_status=True)
+    else:
+        IntroducedByReward.objects.filter(id=record.id).update(checked_status=1, checked_at=timezone.now(), introduced_send_status=True)

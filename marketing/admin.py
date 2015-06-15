@@ -138,7 +138,9 @@ class ChannelsAdmin(admin.ModelAdmin):
 
 
 class IntroducedByRewardAdmin(admin.ModelAdmin):
-    t = ('id', 'user', 'introduced_by_person', 'product', 'first_bought_at', 'first_amount', 'introduced_reward', 'checked_status', 'checked_at', 'activity_start_at', 'activity_end_at', 'activity_amount_min', 'percent_reward')
+    t = ('id', 'user', 'introduced_by_person', 'product', 'first_bought_at', 'first_amount', 'introduced_reward',
+         'checked_status', 'checked_at', 'activity_start_at', 'activity_end_at', 'activity_amount_min', 'percent_reward',
+         'user_send_status', 'user_send_amount', 'introduced_send_status', 'introduced_send_amount', )
     list_display = t
     raw_id_fields = ('user', 'introduced_by_person', 'product')
     fieldsets = [(None, {'fields': t},)]
