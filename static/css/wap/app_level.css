@@ -34,7 +34,7 @@ h1{text-align: center;color: #ffffff;font-size: 0.6rem;width: 100%;margin-top: .
 .notes-content-div{float: left}
 .notes-content-div font{color: #da3c34}
 .rule-content{margin: 0.65rem 0 0.35rem}.rule-content p {padding-bottom:0.5rem }
-.rule-content span{border-radius: 50%;background: #b22621;color: #ffffff;font-size: 0.5rem;float: left;display: inline-block;width:13px;height:13px;text-align: center;margin-right: 0.1rem;line-height: 13px;vertical-align: middle}
-.rule-content label{float: left;color: #333333;font-size: 0.5rem;width: 95%;line-height: 13px}
+.rule-content span{border-radius: 1.5em;background: #b22621;color: #ffffff;font-size: 0.5rem;float: left;display: inline-block;width:1.5em;height:1.5em;text-align: center;margin-right: 0.1rem;line-height:1.5em;}
+.rule-content label{float: left;color: #333333;font-size: 0.5rem;width: 94%;line-height: 1.5em}
 .rule-content label font{color: #b22621}
 .url-style{text-align: center;font-size: 0.65rem;color: #b22621;padding-bottom: 0.85rem}
