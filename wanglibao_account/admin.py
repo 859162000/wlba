@@ -14,6 +14,7 @@ from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.views import AdminIdVerificationView, IntroduceRelation, AdminSendMessageView
+from wanglibao.templatetags.formatters import safe_phone_str, safe_name
 
 
 class ProfileInline(admin.StackedInline):
@@ -45,7 +46,7 @@ class UserResource(resources.ModelResource):
         fields = ('id', 'phone', 'name', 'joined_date')
 
 
-class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin, ImportExportModelAdmin):
+class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin):
     actions = None
     inlines = [ProfileInline, MarginInline, PromotionTokenInline, P2PEquityInline]
     list_display = ('id', 'username', 'phone', 'name', 'utype', 'id_num', 'is_active', 'date_joined', 'is_staff')
