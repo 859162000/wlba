@@ -23,6 +23,7 @@ from wanglibao_p2p.models import P2PProduct, P2PEquity, P2PRecord
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
 from .models import IntroducedBy
 from wanglibao_account.models import IdVerification
+from wanglibao_pay.models import Card
 
 logger = logging.getLogger(__name__)
 
@@ -670,5 +671,30 @@ class TianmangInvestNotConfirmListAPIView(TianmangBaseAPIView):
         except Exception, e:
             logger.error("TianmangInvestListNotConfirmAPIView error")
             logger.error(e)
+
+        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
+
+class TianmangCardBindListAPIView(TianmangBaseAPIView):
+    """天芒云 批量查询通过天芒云渠道完成注册并成功绑定银行卡的用户列表接口"""
+    permission_classes = ()
+    def get(self, request, startday, endday):
+        response_user_list = []
+        try :
+            tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
+            for tianmang_promo_user in tianmang_promo_list:
+                if tianmang_promo_user.user.wanglibaouserprofile.id_is_valid:
+                    m=md5()
+                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                    uid = m.hexdigest()
+                    add_at = Card.objects.get(user=tianmang_promo_user.user).add_at
+
+                    response_user ={
+                        "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
+                        "uid": uid,
+                        "uname": tianmang_promo_user.user.username,
+                    }
+                    response_user_list.append(response_user)
+        except:
+            logger.error("TianmangCardBindListAPIView error")
 
         return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
