@@ -1,6 +1,6 @@
 # encoding: utf8
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader, Context
 from django.utils import timezone
 from django.views.generic import TemplateView
@@ -11,6 +11,8 @@ from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
 from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
+from django.core.urlresolvers import reverse
+import re
 
 
 class IndexView(TemplateView):
@@ -65,6 +67,18 @@ class IndexView(TemplateView):
             'all_tops': all_tops,
             'is_valid': top.is_valid()
         }
+
+    def get(self, request, *args, **kwargs):
+        device_list = ['Android', 'iPhone', 'iPad']
+        user_agent = request.META['HTTP_USER_AGENT']
+        try:
+            for device in device_list:
+                if re.search(device, user_agent).group():
+                    return HttpResponseRedirect(reverse('weixin_p2p_list'))
+        except Exception:
+            pass
+
+        return super(IndexView, self).get(request, *args, **kwargs)
 
 
 class PartnerView(TemplateView):
