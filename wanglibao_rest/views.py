@@ -47,6 +47,7 @@ from wanglibao.templatetags.formatters import safe_phone_str
 from marketing.utils import save_client
 from marketing.tops import Top
 from marketing import tools
+from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
@@ -222,6 +223,8 @@ class RegisterAPIView(APIView):
                         raise
             except:
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
+        else:
+            invite_code = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
         user = create_user(identifier, password, "")
         if not user:
