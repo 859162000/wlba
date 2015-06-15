@@ -9,23 +9,17 @@ html
     .logo
       img(src='/static/imgs/mobile/list/logo.jpg')
       .head-right
-        a(href="/weixin/regist/") 免费注册
+        a(href="/weixin/regist/?promo_token=weixin") 免费注册
         |&nbsp|&nbsp
         a(href="/weixin/login/") 登录
     .list-banner
       .swiper-container
         .swiper-wrapper
-          a(href="{{banner.link}}").swiper-slide
-            img(data-src="/static/images/app_full/banner-new.jpg", class="swiper-lazy")
-            .swiper-lazy-help
-          a(href="{{banner.link}}").swiper-slide
-            img(data-src="/media/{{banner.image}}", class="swiper-lazy")
-            .swiper-lazy-help
-          a(href="{{banner.link}}").swiper-slide
-            img(data-src="/media/{{banner.image}}", class="swiper-lazy")
-            .swiper-lazy-help
+          for item in banner
+            a(href="{{item.link}}").swiper-slide
+              img(data-src="/media/{{item.image}}", class="swiper-lazy")
+              .swiper-lazy-help
         .swiper-pagination
-
     .list-body#list-body
       include include/ajax/ajax_list.jade
     include include/weixin_loading

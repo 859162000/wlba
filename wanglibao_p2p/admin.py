@@ -37,7 +37,7 @@ class UserEquityResource(resources.ModelResource):
         return timezone.localtime(obj.created_at).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class UserEquityAdmin(ExportMixin, admin.ModelAdmin):
+class UserEquityAdmin(admin.ModelAdmin):
     actions = None
     list_display = (
         'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest',
@@ -45,7 +45,7 @@ class UserEquityAdmin(ExportMixin, admin.ModelAdmin):
     list_filter = ('confirm',)
     search_fields = ('product__name', 'user__wanglibaouserprofile__phone')
     raw_id_fields = ('user', 'product')
-    resource_class = UserEquityResource
+    # resource_class = UserEquityResource
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
@@ -341,13 +341,13 @@ class P2PRecordResource(resources.ModelResource):
         return timezone.localtime(obj.create_time).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
+class P2PRecordAdmin(ReadPermissionModelAdmin):
     actions = None
     list_display = (
         'catalog', 'order_id', 'product_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time',
         'description', 'platform')
-    resource_class = P2PRecordResource
-    change_list_template = 'admin/import_export/change_list_export.html'
+    # resource_class = P2PRecordResource
+    # change_list_template = 'admin/import_export/change_list_export.html'
     search_fields = ('user__wanglibaouserprofile__phone','product__name')
     list_filter = ('catalog', )
 
@@ -397,11 +397,11 @@ class EquityResource(resources.ModelResource):
         return timezone.localtime(obj.create_time).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class EquityRecordAdmin(ExportMixin, ReadPermissionModelAdmin):
+class EquityRecordAdmin(ReadPermissionModelAdmin):
     actions = None
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
     search_fields = ('user__wanglibaouserprofile__phone', 'product__name')
-    resource_class = EquityResource
+    # resource_class = EquityResource
 
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]
