@@ -12,7 +12,9 @@ from wanglibao_account.utils import verify_id
 from wanglibao_pay.models import Card
 from wanglibao_account.utils import str_add_md5
 from django.db.models import F
-
+from wanglibao_redpack.backends import local_transform_str
+from django.contrib.auth.models import User
+from django.utils import timezone
 
 class ProfileView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -34,6 +36,7 @@ class ProfileView(APIView):
             "name":profile.name,
             "id_number":profile.id_number,
             "id_is_valid":profile.id_is_valid,
+            "id_valid_time":profile.id_valid_time if not profile.id_valid_time else local_transform_str(profile.id_valid_time),
             "shumi_request_token":profile.shumi_request_token,
             "shumi_request_token_secret":profile.shumi_request_token_secret,
             "shumi_access_token":profile.shumi_access_token,

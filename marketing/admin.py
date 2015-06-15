@@ -20,12 +20,17 @@ class NewsAndReportAdmin(admin.ModelAdmin):
 
 
 class SiteDataAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ("id", "invest_threshold", "p2p_total_earning", "p2p_total_trade", "earning_rate", "highest_earning_rate", "demand_deposit_interest_rate", "one_year_interest_rate", "product_release_time")
     list_editable = ("invest_threshold", "p2p_total_earning", "p2p_total_trade", "earning_rate", "highest_earning_rate", "demand_deposit_interest_rate", "one_year_interest_rate", "product_release_time")
     list_display_link = ('id',)
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class PromotionTokenAdmin(ReadPermissionModelAdmin):
+    actions = None
     list_display = ("user", "token")
     search_fields = ['user__wanglibaouserprofile__phone', 'token']
     raw_id_fields = ('user', )
@@ -34,6 +39,9 @@ class PromotionTokenAdmin(ReadPermissionModelAdmin):
         if not request.user.has_perm('marketing.view_promotiontoken'):
             return ("user", "token")
         return ()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 class IntroducedByResource(resources.ModelResource):
 
@@ -61,6 +69,7 @@ class IntroducedByResource(resources.ModelResource):
 
 
 class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
+    actions = None
     list_display = ("id", "user", "introduced_by", "channel", "created_at", "bought_at", "gift_send_at")
     list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
@@ -78,12 +87,21 @@ class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
             return ("bought_at", "user", "introduced_by")
         return ()
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class TimelySitedataAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ("created_at", "p2p_margin", "freeze_amount", "total_amount", "user_count")
     readonly_fields = ("p2p_margin", "freeze_amount", "total_amount", "user_count")
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class InviteCodeAdmin(ReadPermissionModelAdmin):
+    actions = None
     list_display = ('id', 'code', 'is_used')
     list_filter = ('is_used',)
     search_fields = ['code']
@@ -95,13 +113,24 @@ class InviteCodeAdmin(ReadPermissionModelAdmin):
             return ('id', 'code', 'is_used')
         return ()
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class ActivityAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'name', 'description')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class ActivityRuleAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'name', 'description', 'rule_type', 'rule_amount')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class RewardResource(resources.ModelResource):
@@ -115,30 +144,53 @@ class RewardResource(resources.ModelResource):
 
 
 class RewardAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'type', 'content', 'description', 'is_used', 'end_time', 'create_time')
     search_fields = ('type', 'content')
     list_filter = ('is_used', 'type')
     resource_class = RewardResource
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 class RewardRecordAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'user', 'reward', 'description', 'create_time')
     search_fields = ('user__wanglibaouserprofile__phone', 'description', "reward__type")
     raw_id_fields = ('user', 'reward')
 
-class ClientDataAdmin(admin.ModelAdmin):
+    def has_delete_permission(self, request, obj=None):
+        return False
 
+
+class ClientDataAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'version', 'userdevice', 'network', 'channelid', 'phone', 'action', 'create_time')
     search_fields = ('phone', )
     list_filter = ('network', 'action')
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class ChannelsAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ("id", "code", "name", "description")
     search_fields = ("name",)
     list_filter = ("name",)
 
+    def __init__(self, *args, **kwargs):
+        super(ChannelsAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None, )
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class IntroducedByRewardAdmin(admin.ModelAdmin):
-    t = ('id', 'user', 'introduced_by_person', 'product', 'first_bought_at', 'first_amount', 'introduced_reward', 'checked_status', 'checked_at', 'activity_start_at', 'activity_end_at', 'activity_amount_min', 'percent_reward')
+    t = ('id', 'user', 'introduced_by_person', 'product', 'first_bought_at', 'first_amount', 'introduced_reward',
+         'checked_status', 'checked_at', 'activity_start_at', 'activity_end_at', 'activity_amount_min', 'percent_reward',
+         'user_send_status', 'user_send_amount', 'introduced_send_status', 'introduced_send_amount', )
     list_display = t
     raw_id_fields = ('user', 'introduced_by_person', 'product')
     fieldsets = [(None, {'fields': t},)]
@@ -181,5 +233,5 @@ admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view
 
 admin.site.register_view('statistics/aggregate', view=AggregateView.as_view(), name=u'累计购买金额统计单')
 # 停止邀请收益统计使用
-# admin.site.register_view('statistics/introduced_by', view=IntroducedAwardTemplate.as_view(), name=u'邀请收益统计')
+admin.site.register_view('statistics/introduced_by', view=IntroducedAwardTemplate.as_view(), name=u'邀请收益统计')
 admin.site.register_view('statistics/investment_reward', view=InvestmentRewardView.as_view(), name=u'打榜统计发红包')

@@ -14,6 +14,7 @@ from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.views import AdminIdVerificationView, IntroduceRelation, AdminSendMessageView
+from wanglibao.templatetags.formatters import safe_phone_str, safe_name
 
 
 class ProfileInline(admin.StackedInline):
@@ -45,7 +46,8 @@ class UserResource(resources.ModelResource):
         fields = ('id', 'phone', 'name', 'joined_date')
 
 
-class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin, ImportExportModelAdmin):
+class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin):
+    actions = None
     inlines = [ProfileInline, MarginInline, PromotionTokenInline, P2PEquityInline]
     list_display = ('id', 'username', 'phone', 'name', 'utype', 'id_num', 'is_active', 'date_joined', 'is_staff')
     list_display_links = ('id', 'username', 'phone')
@@ -75,6 +77,9 @@ class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin, ImportExportModelAdm
         qs = qs.select_related('user').select_related('wanglibaouserprofile__phone')
         return qs
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 def user_unicode(self):
     if hasattr(self, 'wanglibaouserprofile'):
@@ -86,6 +91,7 @@ User.__unicode__ = user_unicode
 
 
 class IdVerificationAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'name', 'id_number', 'is_valid', 'created_at')
     search_fields = ('name', 'id_number')
     list_filter = ('is_valid', )
@@ -95,7 +101,12 @@ class IdVerificationAdmin(admin.ModelAdmin):
             return ( 'name', 'id_number', 'is_valid', 'created_at')
         return ()
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class VerifyCounterAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'user', 'count')
 
     def get_readonly_fields(self, request, obj=None):
@@ -103,17 +114,32 @@ class VerifyCounterAdmin(admin.ModelAdmin):
             return ( 'user', 'count')
         return ()
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class UserPushIdAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ("user", "device_type", "push_user_id", "push_channel_id")
     raw_id_fields = ('user', )
     search_fields = ('user__wanglibaouserprofile__phone',)
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class BindingAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ("user", "bid", "btype", "isvip")
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('user', )
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class MessageAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ("id", "target_user", "message_text", "read_status", "format_read_at")
     raw_id_fields = ('target_user', 'message_text')
     search_fields = ('target_user__wanglibaouserprofile__phone',)
@@ -122,13 +148,22 @@ class MessageAdmin(admin.ModelAdmin):
         return datetime.datetime.fromtimestamp(obj.read_at)
     format_read_at.short_description = u"查看时间"
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class MessageTextAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ("id", "mtype", "title", "content")
     list_filter = ('mtype', )
     # search_fields = ('content', )
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class UserAddressAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ("id", "name", "phone_number", "address", "province", "city", "area", "postcode", "is_default")
     search_fields = ('user__wanglibaouserprofile__phone', 'phone_number')
     raw_id_fields = ('user', )

@@ -188,7 +188,7 @@ class P2PProduct(ProductBase):
         verbose_name_plural = u'P2P产品'
 
     def __unicode__(self):
-        return u'<%s>' % self.name
+        return u'%s<%s>' % (self.id,self.name)
 
     @property
     def remain(self):
