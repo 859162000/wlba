@@ -1,0 +1,31 @@
+- load formatters
+doctype html
+html
+  head
+    meta(name="format-detection" content="telephone=no,email=no")
+    title 下载APP
+    meta(charset="utf-8")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    script.
+      (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
+    link(href="/static/styles/app/app.css", rel="stylesheet")
+  body
+    header
+      hgroup 网利宝手机客户端
+      a(href="/activity/share_reg_new/")
+        span 返回
+
+    section.download-app-main
+      .APP-title 互联网私人银行
+      .APP-title-h2 恭喜您获得2000元红包
+        br
+        |完成首次体验后即可使用
+      .APP-image
+        img(src="/static/imgs/app/share_reg_download/regitEnd.jpg")
+      .APP-btn
+        a(href="/weixin/list/") 立即理财
+        a(href="javascript:void(0)").download-app 下载网利宝手机客户端
+    script(data-init='shareDownload', src="/static/scripts/mobile_activity/mobile_activity.js")
+
+

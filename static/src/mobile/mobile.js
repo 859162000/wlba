@@ -1,6 +1,6 @@
 //重写alert
 (function(){
-    window.alert = function(txt, callback){
+    window.alertUtil = function(txt, callback){
         if(document.getElementById("alert-cont")){
             document.getElementById("alertTxt").innerHTML = txt;
             document.getElementById("popubMask").style.display = "block";
@@ -248,13 +248,13 @@ org.login = (function(org){
                     },
                     error: function(res) {
                         if (res['status'] == 403) {
-                            alert('请勿重复提交');
+                            alertUtil('请勿重复提交');
                             return false;
                         }
                         var data = JSON.parse(res.responseText);
                         for (var key in data) {
                             if(key == '__all__'){
-                                alert(data[key])
+                                alertUtil(data[key])
                             }else{
                                 if(data[key] == '验证码错误'){
                                     $('.error-' + key).text(data[key]).show()
@@ -367,13 +367,13 @@ org.regist = (function(org){
                         clearInterval(intervalId);
                         var result = JSON.parse(xhr.responseText);
                         if(xhr.status === 429){
-                            alert('系统繁忙，请稍候重试')
+                            alertUtil('系统繁忙，请稍候重试')
                             $that.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
                         }else if(xhr.status === 400){
                             $('.'+signName['phone'][1]).show()
                             $that.text('获取验证码').removeAttr('disabled').removeClass('alreay-request');
                         }else{
-                            alert(result.message);
+                            alertUtil(result.message);
                         }
                     }
                 });
@@ -420,9 +420,10 @@ org.regist = (function(org){
                         },
                         success:function(data){
                             if(data.ret_code === 0){
-                                alert('注册成功,立即登录！',function(){
+                                alertUtil("注册成功，立即登陆", function(){
                                     window.location.href = '/weixin/login/';
                                 });
+
 
                             }else if(data.ret_code === 30014){
                                $('.'+signName['checkCode'][0]).show();
@@ -432,11 +433,11 @@ org.regist = (function(org){
                         error: function (xhr) {
                             var result = JSON.parse(xhr.responseText);
                             if(xhr.status === 429){
-                                alert('系统繁忙，请稍候重试')
+                                alertUtil('系统繁忙，请稍候重试')
                             }else if(xhr.status === 400){
                                 $('.'+signName['phone'][1]).show()
                             }else{
-                                alert(result.message);
+                                alertUtil(result.message);
                             }
                         },
                         complete:function(){
@@ -483,7 +484,7 @@ org.list = (function(org){
                     lib.canGetPage = true;
                 },
                 error: function(){
-                    alert('Ajax error!')
+                    alertUtil('Ajax error!')
                 }
             })
         }
@@ -713,10 +714,10 @@ org.buy=(function(org){
                     productID = $(".invest-one").attr('data-protuctid'),
                     redPackAmount = 0;
                 if(amount){
-                    if(amount % 100 !== 0) return alert('请输入100的倍数金额');
+                    if(amount % 100 !== 0) return alertUtil('请输入100的倍数金额');
                     if(amount > balance)  return $buySufficient.show();
                 }else{
-                     return alert('请输入正确的金额');
+                     return alertUtil('请输入正确的金额');
                 }
                 var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
                 if(!redpackValue || redpackValue == ''){
@@ -746,20 +747,20 @@ org.buy=(function(org){
                                 result = JSON.parse(xhr.responseText);
                                 if(xhr.status === 400){
                                     if (result.error_number === 1) {
-                                        alert("登录超时，请重新登录！",function(){
+                                        alertUtil("登录超时，请重新登录！",function(){
                                             return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
                                         });
                                     } else if (result.error_number === 2) {
-                                        return alert('必须实名认证！');
+                                        return alertUtil('必须实名认证！');
                                     } else if (result.error_number === 4 && result.message === "余额不足") {
                                         $(".buy-sufficient").show();
                                         return;
                                     }else{
-                                        return alert(result.message);
+                                        return alertUtil(result.message);
                                     }
                                 }else if(xhr.status === 403){
                                     if (result.detail) {
-                                        alert("登录超时，请重新登录！",function(){
+                                        alertUtil("登录超时，请重新登录！",function(){
                                             return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
                                         });
 
@@ -773,7 +774,7 @@ org.buy=(function(org){
                         })
                    }
                 }else{
-                    alert("购买中，请稍后")
+                    alertUtil("购买中，请稍后")
                 }
             })
         }
@@ -799,7 +800,7 @@ org.calculator=(function(org){
                 amount  = $countInput.val();
                 amount_profit = $("#expected_income").text();
                 if(amount % 100 !== 0 || amount == ''){
-                    return alert("请输入100的整数倍")
+                    return alertUtil("请输入100的整数倍")
                 }else{
                     window.location.href = '/weixin/view/buy/' + productId + '/?amount='+ amount + '&amount_profit=' + amount_profit;
                 }
@@ -939,10 +940,10 @@ org.recharge=(function(org){
                 amount  = $("input[name='amount']").val() * 1,
                 maxamount = parseInt($("input[name='maxamount']").val());
                 if(!card_no || !gate_id || amount <= 0 || !amount) {
-                    return alert('信息输入不完整');
+                    return alertUtil('信息输入不完整');
                 }
                 if(amount > maxamount){
-                     return alert('最高充值'+ maxamount +'元！')
+                     return alertUtil('最高充值'+ maxamount +'元！')
                 }
                 window.location.href = '/weixin/recharge/second/?rechargeNext='+$(this).attr('data-next')+'&card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
             });
@@ -951,15 +952,15 @@ org.recharge=(function(org){
                 amount  = $("input[name='amount']").val() * 1,
                 maxamount = parseInt($("input[name='maxamount']").val());
                 if(!card_no || amount <= 0 || !amount) {
-                    return alert('信息输入不完整');
+                    return alertUtil('信息输入不完整');
                 }
                 if(amount > maxamount){
-                     return alert('最高充值'+ maxamount +'元！')
+                     return alertUtil('最高充值'+ maxamount +'元！')
                 }
                 if(lib.canRecharge){
                     confirm("充值金额为"+amount) && lib._rechargeSingleStep(card_no,amount);
                 }else{
-                    return alert('充值中，请稍后');
+                    return alertUtil('充值中，请稍后');
                 }
 
             });
@@ -978,14 +979,14 @@ org.recharge=(function(org){
                 },
                 success: function(data) {
                     if(data.ret_code > 0) {
-                        return alert(data.message);
+                        return alertUtil(data.message);
                     } else {
                          $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
                     }
                 },
                 error:function(data){
                     if(data.status == 403){
-                        alert('登录超时，请重新登录！');
+                        alertUtil('登录超时，请重新登录！');
                     }
                 },
                 complete:function(){
@@ -1023,10 +1024,10 @@ org.recharge_second=(function(org){
                 lib.card_no = $("input[name='card_no']").val();
 
                 if(!lib.phone){
-                    return alert('请填写手机号');
+                    return alertUtil('请填写手机号');
                 }
                 if(!re.test(lib.phone)){
-                    return alert('请填写正确手机号');
+                    return alertUtil('请填写正确手机号');
                 }
 
                 getValidateBtn.attr('disabled', 'disabled').addClass('alreay-request');
@@ -1050,7 +1051,7 @@ org.recharge_second=(function(org){
                         if(data.ret_code > 0) {
                             clearInterval(intervalId);
                             getValidateBtn.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
-                            return alert(data.message);
+                            return alertUtil(data.message);
                         } else {
                             //alert('验证码已经发出，请注意查收！');
                             $("input[name='order_id']").val(data.order_id);
@@ -1075,16 +1076,16 @@ org.recharge_second=(function(org){
                     token = $("input[name='token']").val(),
                     amount = $("input[name='amount']").val();
                 if(!lib.phone){
-                    return alert('请填写手机号');
+                    return alertUtil('请填写手机号');
                 }
                 if(!re.test(lib.phone)){
-                    return alert('请填写正确手机号');
+                    return alertUtil('请填写正确手机号');
                 }
                 if(!vcode){
-                    return alert('请输入手机验证码');
+                    return alertUtil('请输入手机验证码');
                 }
                 if(!order_id || !token) {
-                    return alert('系统有错误，请重试获取验证码');
+                    return alertUtil('系统有错误，请重试获取验证码');
                 }
 
                 if(canPost){
@@ -1099,7 +1100,7 @@ org.recharge_second=(function(org){
                             },
                             success: function(data) {
                                 if(data.ret_code > 0) {
-                                    return alert(data.message);
+                                    return alertUtil(data.message);
                                 } else {
                                    $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
                                 }
@@ -1111,7 +1112,7 @@ org.recharge_second=(function(org){
                         })
                     }
                 }else{
-                    return alert('充值中，请稍后');
+                    return alertUtil('充值中，请稍后');
                 }
             })
         }
@@ -1164,13 +1165,13 @@ org.authentication = (function(org){
                         lib.$fromComplete.text("认证中，请等待...");
                     },
                     success:function(){
-                        alert("实名认证成功!",function(){
-                           window.location.href = '/weixin/security/';
+                        alertUtil("实名认证成功!",function(){
+                           return window.location.href = '/weixin/security/';
                         });
                     },
                     error:function(xhr){
                         result = JSON.parse(xhr.responseText);
-                        return alert(result.message);
+                        return alertUtil(result.message);
                     },
                     complete:function(){
                         lib.isPost = true;
@@ -1198,10 +1199,10 @@ org.bankcardAdd = (function(org){
                     is_default = $('#default-checkbox').prop('checked');
 
                 if (!gate_id) {
-                    return alert('请选择银行');
+                    return alertUtil('请选择银行');
                 }
                 if(!reg.test(card_number)){
-                    return alert('请输入有效的银行卡号')
+                    return alertUtil('请输入有效的银行卡号')
                 }
                 var data =  {
                   card_number: card_number,
@@ -1222,18 +1223,18 @@ org.bankcardAdd = (function(org){
                 },
                 success:function(result){
                     if(result.ret_code === 0){
-                        alert("添加成功！",function(){
+                        alertUtil("添加成功！",function(){
                              window.location.href = '/weixin/account/bankcard/';
                         });
                     }else if(result.ret_code > 0){
-                        alert(result.message);
+                        alertUtil(result.message);
                     }
                 },
                 error:function(result){
                     if (result.error_number === 6) {
-                      return alert(result.message);
+                      return alertUtil(result.message);
                     }else{
-                        return alert("添加银行卡失败");
+                        return alertUtil("添加银行卡失败");
                     }
                 },
                 complete:function(){

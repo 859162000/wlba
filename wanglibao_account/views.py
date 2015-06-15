@@ -58,7 +58,6 @@ from django.template.defaulttags import register
 from wanglibao_p2p.keeper import EquityKeeperDecorator
 from order.utils import OrderHelper
 from wanglibao_redpack import backends
-from wanglibao_redpack.models import InterestHike
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 
@@ -71,8 +70,6 @@ from wanglibao_account.tasks import tianmang_callback
 from wanglibao.settings import RETURN_TINMANG_URL
 
 logger = logging.getLogger(__name__)
-
-#User = get_user_model()
 
 
 class RegisterView(RegistrationView):
@@ -315,7 +312,7 @@ class AccountHome(TemplateView):
             if earning_map.get(equity.product_id):
                 obj["earning"] = earning_map.get(equity.product_id)
             #加息
-            obj['hike'] = InterestHike.objects.filter(user=user, product=equity.product_id, invalid=False).first()
+            obj['hike'] = backends.get_hike(user, equity.product_id)
 
             result.append(obj)
 
@@ -505,15 +502,14 @@ class AccountInviteHikeAPIView(APIView):
 
     def post(self, request, **kwargs):
         nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
-        hikes = InterestHike.objects.filter(user=request.user, invalid=False).count()
-        amount = InterestHike.objects.filter(user=request.user, invalid=False, paid=True).aggregate(Sum('amount'))
+
+        hikes = backends.get_hike_nums(request.user)
+        amount = backends.get_hike_amount(request.user)
         thity = ActivityRecord.objects.filter(user=request.user, gift_type='phonefare', msg_type='message').aggregate(Sum('income'))
         if thity['income__sum']:
             callfee = thity['income__sum']
         else:
             callfee = 0
-        if not amount['amount__sum']:
-            amount['amount__sum'] = 0
         prot = P2PRecord.objects.filter(user=request.user, catalog=u'申购').order_by('-create_time').first()
         if not prot:
             product_id = 0
@@ -522,7 +518,7 @@ class AccountInviteHikeAPIView(APIView):
 
         return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
                         "call_charge":30, "total_hike":"0.1%", "calls":callfee,
-                        "amount":amount['amount__sum'], "product_id":product_id})
+                        "amount":amount, "product_id":product_id})
 
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )

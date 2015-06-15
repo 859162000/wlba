@@ -6,6 +6,12 @@ html
     link(rel="prefetch", href="/static/imgs/mobile/detail/detail_banner.jpg")
     include include/weixin_head.jade
   body
+    .logo
+      img(src='/static/imgs/mobile/list/logo.jpg')
+      .head-right
+        a(href="/weixin/regist/") 免费注册
+        |&nbsp|&nbsp
+        a(href="/weixin/login/") 登录
     .list-banner
       a(href="{{banner.link}}")
         img(src="/media/{{banner.image}}")
