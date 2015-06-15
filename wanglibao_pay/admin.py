@@ -31,14 +31,21 @@ class PayInfoAdmin(admin.ModelAdmin):
 class BankAdmin(admin.ModelAdmin):
     list_display = ('name', 'gate_id', 'code', "kuai_code")
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class CardAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('get_phone', 'no', 'bank')
     search_fields = ['user__wanglibaouserprofile__phone', 'no']
     raw_id_fields = ('user', 'bank')
 
     def get_phone(self, obj):
         return obj.user.wanglibaouserprofile.phone
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     get_phone.short_description = u'手机'
 
