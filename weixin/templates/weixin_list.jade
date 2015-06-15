@@ -13,11 +13,23 @@ html
         |&nbsp|&nbsp
         a(href="/weixin/login/") 登录
     .list-banner
-      a(href="{{banner.link}}")
-        img(src="/media/{{banner.image}}")
+      .swiper-container
+        .swiper-wrapper
+          a(href="{{banner.link}}").swiper-slide
+            img(data-src="/static/images/app_full/banner-new.jpg", class="swiper-lazy")
+            .swiper-lazy-help
+          a(href="{{banner.link}}").swiper-slide
+            img(data-src="/media/{{banner.image}}", class="swiper-lazy")
+            .swiper-lazy-help
+          a(href="{{banner.link}}").swiper-slide
+            img(data-src="/media/{{banner.image}}", class="swiper-lazy")
+            .swiper-lazy-help
+        .swiper-pagination
+
     .list-body#list-body
       include include/ajax/ajax_list.jade
     include include/weixin_loading
     include include/weixin_footer
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
     script(data-init='list', src="/static/scripts/mobile/dist/mobile.js")
 
