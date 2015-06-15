@@ -46,6 +46,8 @@ from order.utils import OrderHelper
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from exceptions import PrepaymentException
+from django.core.urlresolvers import reverse
+import re
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -123,6 +125,18 @@ class P2PDetailView(TemplateView):
         })
 
         return context
+
+    def get(self, request, *args, **kwargs):
+        device_list = ['Android', 'iPhone', 'iPad']
+        user_agent = request.META['HTTP_USER_AGENT']
+        try:
+            for device in device_list:
+                if re.search(device, user_agent).group():
+                    return HttpResponseRedirect(reverse('weixin_p2p_list'))
+        except Exception:
+            pass
+
+        return super(P2PDetailView, self).get(request, *args, **kwargs)
 
 
 class PurchaseP2P(APIView):
@@ -532,6 +546,18 @@ class P2PListView(TemplateView):
             'show_slider': show_slider,
             'announcements': AnnouncementP2P
         }
+
+    def get(self, request, *args, **kwargs):
+        device_list = ['Android', 'iPhone', 'iPad']
+        user_agent = request.META['HTTP_USER_AGENT']
+        try:
+            for device in device_list:
+                if re.search(device, user_agent).group():
+                    return HttpResponseRedirect(reverse('weixin_p2p_list'))
+        except Exception:
+            pass
+
+        return super(P2PListView, self).get(request, *args, **kwargs)
 
 
 class GenP2PUserProfileReport(TemplateView):
