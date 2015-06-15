@@ -51,15 +51,14 @@
  })
 
   //返回顶部
-  window.onscroll = function(){
-    var t = $('body').scrollTop();
-    var winH = $(window).height();
-    if (t>=winH){
-      $('.xl-backtop').fadeIn(500);
-    }else{
-      $('.xl-backtop').fadeOut(500);
-    }
-  };
+  $(window).scroll(function () {
+      if ($(document).scrollTop() > 0) {
+          $(".xl-backtop").fadeIn();
+          $(".xl-backtop").fadeIn();
+      } else if ($(document).scrollTop() <= 0) {
+          $('.xl-backtop').stop().fadeOut();
+      }
+  });
 
   $('.backtop').on('click',function(){
     $('body,html').animate({scrollTop: 0}, 600);
