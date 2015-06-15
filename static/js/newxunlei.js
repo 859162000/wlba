@@ -54,7 +54,6 @@
   $(window).scroll(function () {
       if ($(document).scrollTop() > 0) {
           $(".xl-backtop").fadeIn();
-          $(".xl-backtop").fadeIn();
       } else if ($(document).scrollTop() <= 0) {
           $('.xl-backtop').stop().fadeOut();
       }
