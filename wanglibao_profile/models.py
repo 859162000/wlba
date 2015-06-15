@@ -3,7 +3,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
+from django.utils import timezone
 from wanglibao_p2p.models import P2PRecord
+
 
 USER_TYPE = (
     ('0', u'正常用户'),
@@ -24,6 +26,7 @@ class WanglibaoUserProfile(models.Model):
     name = models.CharField(max_length=12, blank=True, help_text=u'姓名')
     id_number = models.CharField(max_length=64, blank=True, help_text=u'身份证号', db_index=True)
     id_is_valid = models.BooleanField(help_text=u'身份证是否通过验证', default=False)
+    id_valid_time = models.DateTimeField(blank=True, null=True, verbose_name=u"实名认证时间")
 
     shumi_request_token = models.CharField(max_length=64, blank=True, help_text=u'数米基金request token')
     shumi_request_token_secret = models.CharField(max_length=64, blank=True, help_text=u'数米基金request token secret')

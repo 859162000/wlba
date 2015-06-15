@@ -10,6 +10,7 @@ from decimal import Decimal
 from hashlib import md5
 import datetime
 import logging
+import re
 
 from django.contrib.auth.models import User
 from django.db.models import Q, Sum
@@ -22,6 +23,7 @@ from wanglibao_p2p.models import P2PProduct, P2PEquity, P2PRecord
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
 from .models import IntroducedBy
 from wanglibao_account.models import IdVerification
+from wanglibao_pay.models import Card
 
 logger = logging.getLogger(__name__)
 
@@ -298,6 +300,12 @@ class WangdaiEyeListAPIView(APIView):
 
                 rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'))
 
+                matches = re.search(u'日计息', p2pproduct.pay_method)
+                if matches and matches.group():
+                    p_type = 0
+                else:
+                    p_type = 1
+
                 obj = {
                     "id": str(p2pproduct.id),
                     "platform_name": u"网利宝",
@@ -312,7 +320,7 @@ class WangdaiEyeListAPIView(APIView):
                     "rate": rate,
                     # "period": u'{}个月'.format(p2pproduct.period),
                     "period": p2pproduct.period,
-                    "p_type": 1,#期限类型,0 代表天,1 代表月
+                    "p_type": p_type,#期限类型,0 代表天,1 代表月
                     # "pay_way": str(P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 6)),
                     "pay_way": P2PEYE_PAY_WAY.get(p2pproduct.pay_method, 0),
                     "process": process,
@@ -558,10 +566,13 @@ class TianmangIDVerificationListAPIView(TianmangBaseAPIView):
                     created_at = IdVerification.objects.get(\
                         id_number=tianmang_promo_user.user.wanglibaouserprofile.id_number).created_at
 
+                    t_phone = tianmang_promo_user.user.wanglibaouserprofile.phone
+                    phone = t_phone.replace(str(t_phone).strip()[3:], "*"*8)
                     response_user ={
                         "time": timezone.localtime(created_at).strftime("%Y-%m-%d %H:%M:%S"),
                         "uid": uid,
-                        "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                        "uname": tianmang_promo_user.user.username,
+                        "phone": phone,
                         #"status":tianmang_promo_user.user.wanglibaouserprofile.id_is_valid and 1 or 0,
                     }
                     response_user_list.append(response_user)
@@ -585,7 +596,7 @@ class TianmangRegisterListAPIView(TianmangBaseAPIView):
                 response_user ={
                     "time": timezone.localtime(tianmang_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
                     "uid": uid,
-                    "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                    "uname": tianmang_promo_user.user.username,
                     #"status":tianmang_promo_user.user.wanglibaouserprofile.phone_verified and 1 or 0,
                 }
                 response_user_list.append(response_user)
@@ -619,7 +630,7 @@ class TianmangInvestListAPIView(TianmangBaseAPIView):
                 response_user ={
                     "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
                     "uid": uid,
-                    "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                    "uname": tianmang_promo_user.user.username,
                     "investment": float(income_all),
                     #"status": 1 if income_all > 0 else 0
                 }
@@ -652,7 +663,7 @@ class TianmangInvestNotConfirmListAPIView(TianmangBaseAPIView):
                 response_user ={
                     "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
                     "uid": uid,
-                    "uname": tianmang_promo_user.user.wanglibaouserprofile.name,
+                    "uname": tianmang_promo_user.user.username,
                     "investment": float(total_equity),
                     #"status": 1 if income_all > 0 else 0
                 }
@@ -660,5 +671,30 @@ class TianmangInvestNotConfirmListAPIView(TianmangBaseAPIView):
         except Exception, e:
             logger.error("TianmangInvestListNotConfirmAPIView error")
             logger.error(e)
+
+        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
+
+class TianmangCardBindListAPIView(TianmangBaseAPIView):
+    """天芒云 批量查询通过天芒云渠道完成注册并成功绑定银行卡的用户列表接口"""
+    permission_classes = ()
+    def get(self, request, startday, endday):
+        response_user_list = []
+        try :
+            tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
+            for tianmang_promo_user in tianmang_promo_list:
+                if tianmang_promo_user.user.wanglibaouserprofile.id_is_valid:
+                    m=md5()
+                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                    uid = m.hexdigest()
+                    add_at = Card.objects.get(user=tianmang_promo_user.user).add_at
+
+                    response_user ={
+                        "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
+                        "uid": uid,
+                        "uname": tianmang_promo_user.user.username,
+                    }
+                    response_user_list.append(response_user)
+        except:
+            logger.error("TianmangCardBindListAPIView error")
 
         return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))

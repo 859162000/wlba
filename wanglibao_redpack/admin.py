@@ -7,7 +7,6 @@ from import_export import resources
 from import_export.admin import ExportMixin
 
 
-
 class RedPackEventAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "rtype", "red_amount", "invest_amount", "describe", "red_num", "give_mode", "give_platform", "apply_platform", "give_start_at", "give_end_at",
                     "available_at", "unavailable_at", "invalid", "created_at")
@@ -29,18 +28,29 @@ class RedPackResource(resources.ModelResource):
         model = RedPack
         fields = ('token',)
 
+
 class RedPackAdmin(ExportMixin, admin.ModelAdmin):
+    actions = None
     list_display = ("id", "event", "token", "status")
     search_fields = ("token","event__name")
     list_filter = ("status",)
     resource_class = RedPackResource
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
+    actions = None
     list_display = ("id", "redpack", "user", "change_platform", "apply_platform", "created_at",
                     "apply_amount", "apply_at", "order_id")
     search_fields = ('user__wanglibaouserprofile__phone', 'redpack__event__name')
     raw_id_fields = ('user', "redpack")
     list_filter = ('change_platform', 'apply_platform')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class InterestHikeAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "product", "rate", "intro_total", "invalid", "paid", 
