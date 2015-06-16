@@ -685,14 +685,15 @@ class TianmangCardBindListAPIView(TianmangBaseAPIView):
                 m=md5()
                 m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
                 uid = m.hexdigest()
-                add_at = Card.objects.get(user=tianmang_promo_user.user).add_at
-
-                response_user ={
-                    "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
-                    "uid": uid,
-                    "uname": tianmang_promo_user.user.username,
-                }
-                response_user_list.append(response_user)
+                add_at_list = Card.objects.filter(user=tianmang_promo_user.user).order_by('add_at')
+                if add_at_list.exists():
+                    add_at = add_at_list[0]
+                    response_user = {
+                        "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
+                        "uid": uid,
+                        "uname": tianmang_promo_user.user.username,
+                    }
+                    response_user_list.append(response_user)
         except:
             logger.error("TianmangCardBindListAPIView error")
 
