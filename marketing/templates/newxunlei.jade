@@ -115,7 +115,7 @@ html
         .backtop 回到顶部
         img(src="/static/images/xunlei/weixin.jpg")#xl-weixin
         .erweima
-      h1.xl-time 活动时间：2015年6月10日——2015年6月30日
+      h1.xl-time 活动时间：2015年6月16日——2015年7月2日
       .xl-box1
         h2.xl-jiang
           .xl-center
@@ -304,7 +304,6 @@ html
             //.align-center
             //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
             form#register-modal-form2.login-form.dale(method='post', action='/accounts/register/ajax/')
-              - csrf_token
               .form-row
                 .form-control-group
                   .span12
@@ -365,7 +364,7 @@ html
             b 获奖红包以站内信形式通知，完成一次投资回款后即可取现；
             br
             b 红包均只能使用一次，使用后是否有余额红包即失效；
-          li 3、红包有效期：2015年X月X日-2015年X月X日；
+          li 3、红包有效期：2015年6月16日-2015年9月15日；
           li 4、本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
           li 5、网利宝客服热线：4008-588-066（服务时间：9:00-20:00 工作日）。网利宝对此活动享有最终解释权。
         .san-new
@@ -421,7 +420,7 @@ html
 
       include include/tracking
 
-      script.
-          var v = new Date().getTime()
-          require(['/static/js/hover.js','/static/js/xun-newzhuce.js?v='+v,'/static/js/newxunlei.js'])
+  script.
+      var v = new Date().getTime()
+      require(['/static/js/hover.js','/static/js/xun-newzhuce.js?v='+v,'/static/js/newxunlei.js'])
 
