@@ -465,8 +465,8 @@ org.list = (function(org){
             lib._scrollListen();
         },
         _swiper:function(){
-            var autoplay = 3000,
-                loop = true,
+            var autoplay = 5000, //焦点图切换时间
+                loop = true,  //是否无缝滚动
                 $swiperSlide = $('.swiper-slide');
 
             if($swiperSlide.length/2 < 1){
