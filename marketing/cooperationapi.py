@@ -679,21 +679,20 @@ class TianmangCardBindListAPIView(TianmangBaseAPIView):
     permission_classes = ()
     def get(self, request, startday, endday):
         response_user_list = []
-        try :
+        try:
             tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
             for tianmang_promo_user in tianmang_promo_list:
-                if tianmang_promo_user.user.wanglibaouserprofile.id_is_valid:
-                    m=md5()
-                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                    uid = m.hexdigest()
-                    add_at = Card.objects.get(user=tianmang_promo_user.user).add_at
+                m=md5()
+                m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                uid = m.hexdigest()
+                add_at = Card.objects.get(user=tianmang_promo_user.user).add_at
 
-                    response_user ={
-                        "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
-                        "uid": uid,
-                        "uname": tianmang_promo_user.user.username,
-                    }
-                    response_user_list.append(response_user)
+                response_user ={
+                    "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "uid": uid,
+                    "uname": tianmang_promo_user.user.username,
+                }
+                response_user_list.append(response_user)
         except:
             logger.error("TianmangCardBindListAPIView error")
 
