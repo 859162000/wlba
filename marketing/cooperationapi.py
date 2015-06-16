@@ -687,7 +687,7 @@ class TianmangCardBindListAPIView(TianmangBaseAPIView):
                 uid = m.hexdigest()
                 add_at_list = Card.objects.filter(user=tianmang_promo_user.user).order_by('add_at')
                 if add_at_list.exists():
-                    add_at = add_at_list[0]
+                    add_at = add_at_list[0].add_at
                     response_user = {
                         "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
                         "uid": uid,
