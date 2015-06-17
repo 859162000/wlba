@@ -34,6 +34,7 @@ html
           span.pub-check.none-val 验证码不能为空
       +list("密码", "请设置密码", "password", "password", "password-sign", "请输入6-20位数字/字母和符号/区分大小写")
       +list("密码", "请重复密码", "passwordRepeat", "password", "password-repeat-sign", "两次输入的密码不一致")
+      input(type="hidden", name="token", id="token", value="{{token}}").input-public
 
       .regits-submit
         button(type="button").submit-body 立即注册
@@ -51,6 +52,6 @@ html
           span 返回
       article.xieyi-cont
         include include/weixin_xieyiFixed
-    script(data-init='regist', src="/static/scripts/mobile/dist/mobile.js")
+    script(data-init='regist', src="/static/scripts/mobile/mobile.js")
 
 
