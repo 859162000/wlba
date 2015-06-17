@@ -28,7 +28,8 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
                             BindPayView, BindPayCallbackView, BindPayQueryView,
-                            BindPayDelView, BindPayDynNumView, TradeRecordAPIView)
+                            BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
+                            BindCardQueryView, UnbindCardView, DelCardView, BindPayNewView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -120,7 +121,8 @@ urlpatterns = patterns(
     url(r'^id_validation/$', IdValidateAPIView.as_view()),
     url(r'^bank_card/add/$', BankCardAddView.as_view()),
     url(r'^bank_card/list/$', BankCardListView.as_view()),
-    url(r'^bank_card/del/$', BankCardDelView.as_view()),
+    # url(r'^bank_card/del/$', BankCardDelView.as_view()),
+    url(r'^bank_card/del/$', DelCardView.as_view()),
     url(r'^bank/list/$', BankListAPIView.as_view()),
 
     url(r'^id_validate/', IdValidate.as_view()),
@@ -148,10 +150,13 @@ urlpatterns = patterns(
     url(r'^pay/yee/app/deposit/callback/$', YeePayAppPayCallbackView.as_view(), name="yee-deposit-callback"),
     url(r'^pay/yee/app/deposit/complete/$', YeePayAppPayCompleteView.as_view(), name="yee-deposit-fcallback"),
 
-    url(r'^pay/cnp/list/$', BindPayQueryView.as_view()),
-    url(r'^pay/cnp/delete/$', BindPayDelView.as_view()),
+    # url(r'^pay/cnp/list/$', BindPayQueryView.as_view()),
+    # url(r'^pay/cnp/delete/$', BindPayDelView.as_view()),
+    url(r'^pay/cnp/list/$', BindCardQueryView()),
+    url(r'^pay/cnp/delete/$', UnbindCardView.as_view()),
     url(r'^pay/cnp/dynnum/$', BindPayDynNumView.as_view()),
-    url(r'^pay/deposit/$', BindPayView.as_view(), name="kuai-deposit-view"),
+    # url(r'^pay/deposit/$', BindPayView.as_view(), name="kuai-deposit-view"),
+    url(r'^pay/deposit/$', BindPayNewView.as_view(), name="kuai-deposit-view"),
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
     url(r'^pay/deposit/callback/$', BindPayCallbackView.as_view(), name="kuai-deposit-callback"),
 

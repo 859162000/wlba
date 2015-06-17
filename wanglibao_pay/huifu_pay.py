@@ -488,6 +488,18 @@ class HuifuShortPay:
 
         return {"ret_code": 0, "message": "删除成功"}
 
+    def delete_bind(self, user, card, bank):
+        """ 解除绑定接口 """
+        if card.is_bind_huifu:
+            res = self._unbind_card_huifu(user=user, card_no=card.no)
+            if res['RespCode'] != u'000000':
+                return {"ret_code": -2, "message": res['ErrMsg']}
+
+            card.is_bind_huifu = False
+            card.save()
+
+        return {"ret_code": 0, "message": "解除绑定成功"}
+
     def bind_card_wlbk(self, user, card_no, bank):
         """ 保存卡信息到个人名下 """
         if len(card_no) == 10:
@@ -505,6 +517,25 @@ class HuifuShortPay:
         card.is_bind_huifu = True
         card.save()
         return True
+
+    def open_bind_card(self, user, bank, card):
+        # 汇付天下需要先开户，才能够邦卡
+        # 开户
+        res = self._open_account_huifu(user)
+        if res['RespCode'] not in (u'000000', '220001'):
+            return {"ret_code": -3, "message": res['ErrMsg']}
+
+        # 邦卡
+        res = self._bind_card_huifu(user=user, bank=bank, card_no=card.no)
+        if res['RespCode'] not in (u'000000', u'223153'):
+            return {"ret_code": -2, "message": res['ErrMsg']}
+
+        # 保存卡信息到个人名下
+        if not self.bind_card_wlbk(user, card.no, bank):
+            return {"ret_code": -1, "message": '银行卡保存失败'}
+
+        return {"ret_code": 0, "message": 'ok'}
+
 
     def pre_pay(self, request, bank=None):
         if not request.user.wanglibaouserprofile.id_is_valid:
@@ -543,18 +574,9 @@ class HuifuShortPay:
                 return {"ret_code": 201153, "message": "银行卡与银行不匹配"}
 
         if not card or (card and not card.is_bind_huifu):
-            # 开户
-            res = self._open_account_huifu(user)
-            if res['RespCode'] not in (u'000000', '220001'):
-                return {"ret_code": -3, "message": res['ErrMsg']}
-
-            # 邦卡
-            res = self._bind_card_huifu(user=user, bank=bank, card_no=card_no)
-            if res['RespCode'] not in (u'000000', u'223153'):
-                return {"ret_code": -2, "message": res['ErrMsg']}
-
-            # 保存卡信息到个人名下
-            self.bind_card_wlbk(user, card_no, bank)
+            res = self.open_bind_card(user, bank, card)
+            if res['ret_code'] != 0:
+                return res
 
         try:
             pay_info = PayInfo()
