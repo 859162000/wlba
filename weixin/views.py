@@ -155,6 +155,19 @@ class WeixinLogin(TemplateView):
         return context
 
 
+class WeixinRegister(TemplateView):
+    template_name = 'weixin_regist.jade'
+
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get('promo_token', '')
+        if not token:
+            token = self.request.session.get('promo_token', 'weixin')
+
+        return {
+            'token': token,
+        }
+
+
 class WeixinLoginAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']

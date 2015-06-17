@@ -414,7 +414,7 @@ org.regist = (function(org){
                     org.ajax({
                         url: '/api/register/',
                         type: 'POST',
-                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1]},
+                        data: {'identifier': dataList[0], 'password': dataList[2], 'validate_code': dataList[1], 'invite_code': dataList[4]},
                         beforeSend: function(xhr, settings) {
                             $submitBody.text('注册中...');
                         },
