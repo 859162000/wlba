@@ -27,6 +27,14 @@ class ProfileView(APIView):
         cards = Card.objects.filter(user=user)
         profile = user.wanglibaouserprofile
 
+        idn = profile.id_number
+        if len(idn) == 18:
+            id_number = "%s********%s" % (idn[:6], idn[-4:])
+        elif len(idn) == 15:
+            id_number = "%s******%s" % (idn[:6], idn[-3:])
+        else:
+            id_number = "%s******%s" % (idn[:1], idn[-1:])
+
         dic = {
             "user":profile.user_id,
             "frozen":profile.frozen,
@@ -34,7 +42,7 @@ class ProfileView(APIView):
             "phone":profile.phone,
             "phone_verified":profile.phone_verified,
             "name":profile.name,
-            "id_number":profile.id_number,
+            "id_number":id_number,
             "id_is_valid":profile.id_is_valid,
             "id_valid_time":profile.id_valid_time if not profile.id_valid_time else local_transform_str(profile.id_valid_time),
             "shumi_request_token":profile.shumi_request_token,
