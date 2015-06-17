@@ -210,7 +210,7 @@ def send_reward(start, end, amount_min, percent):
 
         # 赠送活动描述
         desc = u'%s,邀请好友首次理财活动中，活赠%s元' % (introduced_by.wanglibaouserprofile.name, got_amount)
-        earning.margin_record = keeper.deposit(got_amount, description=desc)
+        earning.margin_record = keeper.deposit(got_amount, description=desc, catalog=u"邀请首次赠送")
         earning.user = introduced_by
         earning.save()
 
@@ -403,7 +403,7 @@ def reward_earning(record, reward_user, got_amount, product, flag):
 
     # 赠送活动描述
     desc = u'%s,邀请好友理财活动中，获赠%s元' % (reward_user.wanglibaouserprofile.name, got_amount)
-    earning.margin_record = keeper.deposit(got_amount, description=desc)
+    earning.margin_record = keeper.deposit(got_amount, description=desc, catalog=u"邀请赠送")
     earning.user = reward_user
     earning.save()
 
