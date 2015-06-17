@@ -657,6 +657,11 @@ RETURN_TINMANG_URL = "http://www.bangwoya.com/callback/callback.php"
 RETURN_TINMANG_URL_DEBUG = "http://demo.bangwoya.com/callback/callback.php"
 TINMANGKEY= '65'
 
+# 易瑞特
+YIRUITE_PROMO_TOKEN = "yiruite"
+YIRUITE_AD_KEY_TEST = "al9e4ys5"
+RETURN_YIRUITE_URL_TEST = "http://app.offer99.com/callback/callback_test.php"
+
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }

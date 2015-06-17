@@ -65,3 +65,12 @@ def tianmang_callback(url, params):
     ret = requests.get(url, params=params)
     logger.info(ret.url)
     logger.info(ret.text)
+
+@app.task
+def yiruite_callback(url, params):
+    logger.info("Enter yiruite_callback task")
+    params = urllib.urlencode(params)
+    logger.info(params)
+    ret = requests.get(url, params=params)
+    logger.info(ret.url)
+    logger.info(ret.text)

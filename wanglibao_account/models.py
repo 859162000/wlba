@@ -66,8 +66,9 @@ class Binding(models.Model):
     user = models.ForeignKey(User)
     btype = models.CharField(max_length=10, choices=(
         ('xunlei', 'xunlei'),
+        ('yiruite', 'yiruite')
     ), verbose_name=u"类型")
-    bid = models.CharField(max_length=20, db_index=True, verbose_name=u"第三方用户id")
+    bid = models.CharField(max_length=50, db_index=True, verbose_name=u"第三方用户id")
     bname = models.CharField(max_length=50, blank=True, verbose_name=u"第三方用户昵称")
     gender = models.CharField(max_length=5, choices=(
         ("m", "m"),

@@ -65,9 +65,9 @@ from wanglibao_activity.models import ActivityRecord
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import RETURN_REGISTER
 
-from wanglibao.settings import TINMANGKEY
-from wanglibao_account.tasks import tianmang_callback
-from wanglibao.settings import RETURN_TINMANG_URL
+from wanglibao.settings import TINMANGKEY, YIRUITE_PROMO_TOKEN, YIRUITE_AD_KEY_TEST
+from wanglibao_account.tasks import tianmang_callback, yiruite_callback
+from wanglibao.settings import RETURN_TINMANG_URL, RETURN_YIRUITE_URL_TEST
 
 logger = logging.getLogger(__name__)
 
@@ -1079,10 +1079,16 @@ def ajax_register(request):
                 user = create_user(identifier, password, nickname)
                 if not user:
                     return HttpResponse(messenger('error'))
+
                 #天芒注册
                 invitecode = tianmang_process(request, user, invitecode)
 
-                set_promo_user(request, user, invitecode=invitecode)
+                if request.session.get('yiruite_from') == YIRUITE_PROMO_TOKEN:
+                    set_promo_user(request, user, invitecode=YIRUITE_PROMO_TOKEN)
+                    yiruite_process(request, user)
+                else:
+                    set_promo_user(request, user, invitecode=invitecode)
+
                 auth_user = authenticate(identifier=identifier, password=password)
 
                 auth.login(request, auth_user)
@@ -1096,6 +1102,32 @@ def ajax_register(request):
             return HttpResponseForbidden('not valid ajax request')
     else:
         return HttpResponseNotAllowed(["GET"])
+
+def yiruite_process(request, user):
+    """
+    易瑞特回调处理，需要保存yiruite_tid到Binding表中
+    :param request:
+    :param user:
+    :return:
+    """
+    yiruite_tid = request.session.get('yiruite_tid', None)
+    if yiruite_tid:
+        binding = Binding()
+        binding.user = user
+        binding.btype = 'yiruite'
+        binding.bid = yiruite_tid
+        binding.save()
+
+        sign = yiruite_tid + user.wanglibaouserprofile.phone + YIRUITE_AD_KEY_TEST
+        params = {
+            "tid": yiruite_tid,
+            "uid": hashlib.md5(user.wanglibaouserprofile.phone).hexdigest(),
+            "ad_key": YIRUITE_AD_KEY_TEST,
+            "sign": hashlib.md5(sign).hexdigest(),
+        }
+        yiruite_callback.apply_async(kwargs={'ip': RETURN_YIRUITE_URL_TEST, 'params': params})
+
+    return True
 
 def tianmang_process(request, user, invitecode):
     """
