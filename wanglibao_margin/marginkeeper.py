@@ -114,14 +114,15 @@ class MarginKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def deposit(self, amount, description=u'', savepoint=True):
+    def deposit(self, amount, description=u'', savepoint=True, catalog=u"现金存入"):
         amount = Decimal(amount)
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             margin.margin += amount
             margin.save()
-            catalog = u'现金存入'
+            #catalog = u'现金存入'
+            catalog = catalog
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
