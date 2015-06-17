@@ -337,6 +337,9 @@ org.regist = (function(org){
                 checkCode:function(val){
                     return true
                 },
+                token:function(val){
+                    return true
+                },
                 password:function(val, id){
                    if(6 > val.length || val.length > 20 ){
                        $('.'+signName[id][0]).show();
