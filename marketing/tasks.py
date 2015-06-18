@@ -363,6 +363,9 @@ def send_reward_all(start, end, amount_min, percent):
             reward_earning(record, record.introduced_by_person, record.introduced_reward, record.product, flag=2)
             phone_user.append(record.introduced_by_person.wanglibaouserprofile.phone)
 
+        if record.user.wanglibaouserprofile.utype != '0' and record.introduced_by_person.wanglibaouserprofile.utype != '0':
+            IntroducedByReward.objects.filter(id=record.id).update(checked_status=1, checked_at=timezone.now())
+
     phone_user = list(set(phone_user))
     if phone_user:
         # 发送短信
