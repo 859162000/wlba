@@ -49,6 +49,7 @@ urlpatterns = patterns(
     url(r'^agree_xieyi/$', TemplateView.as_view(template_name="agree_xieyi.jade")),
     url(r'^list_level/$', TemplateView.as_view(template_name="list_level.jade")),
     url(r'^app_level/$', TemplateView.as_view(template_name="app_level.jade")),
+    url(r'^app_invite/$', TemplateView.as_view(template_name="app_invite.jade")),
     url(r'^app_shareReward/$', TemplateView.as_view(template_name="app_shareReward.jade")),
     # url(r'^summer/$', TemplateView.as_view(template_name="summer.jade")),
     # url(r'^app_summer/$', TemplateView.as_view(template_name="app_summer.jade")),
