@@ -19,18 +19,18 @@ env.environment = "ENV_STAGING"
 who = env.get("who", "")
 
 workers = {"lizhenjing":{"app":8051, "mysql":33051}, 
-            "hetao":{"app":8052, "mysql":33052}, 
+            #"hetao":{"app":8052, "mysql":33052}, 
             "lili":{"app":8053, "mysql":33053},
             "wangruyue":{"app":8054, "mysql":33054}, 
             "qifeifei":{"app":8055, "mysql":33055}, 
             "zhanghe":{"app":8056, "mysql":33056},
             "limengting":{"app":8057, "mysql":33057}, 
             "wangxiaoqing":{"app":8058, "mysql":33058}, 
-            "jinlong":{"app":8059, "mysql":33059},
-            "jianghao":{"app":8061, "mysql":33061},
-            "wangjianfei":{"app":8062, "mysql":33062},
+            #"jinlong":{"app":8059, "mysql":33059},
+            #"jianghao":{"app":8061, "mysql":33061},
+            #"wangjianfei":{"app":8062, "mysql":33062},
             "huomeimei":{"app":8063, "mysql":33063},
-            "caowenhai":{"app":8064, "mysql":33064},
+            #"caowenhai":{"app":8064, "mysql":33064},
             "qijinjin":{"app":8065, "mysql":33065}}
 
 @roles("staging")

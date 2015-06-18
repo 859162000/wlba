@@ -382,7 +382,9 @@ class IntroducedAwardTemplate(TemplateView):
             "end": end.date().__str__(),
             "amount_min": amount_min,
             "percent": percent,
-            "amount_all": introduced_by_reward.aggregate(sum_introduced_reward=Sum('introduced_reward')) if introduced_by_reward else 0.00
+            "amount_all": introduced_by_reward.aggregate(sum_introduced_reward=Sum('introduced_reward')) if introduced_by_reward else 0.00,
+            "amount_user_all": introduced_by_reward.aggregate(sum_user_send_amount=Sum('user_send_amount')) if introduced_by_reward else 0.00,
+            "amount_introduced_all": introduced_by_reward.aggregate(sum_introduced_send_amount=Sum('introduced_send_amount')) if introduced_by_reward else 0.00,
         }
 
     @method_decorator(permission_required('marketing.change_sitedata', login_url='/' + settings.ADMIN_ADDRESS))
@@ -464,7 +466,7 @@ class IntroducedAwardTemplate(TemplateView):
 
             # 赠送活动描述
             desc = u'%s,邀请好友首次理财活动中，活赠%s元' % (introduced_by.wanglibaouserprofile.name, got_amount)
-            earning.margin_record = keeper.deposit(got_amount, description=desc)
+            earning.margin_record = keeper.deposit(got_amount, description=desc, catalog=u"邀请首次赠送")
             earning.user = introduced_by
             earning.save()
 

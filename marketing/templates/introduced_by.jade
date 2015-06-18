@@ -65,10 +65,13 @@ html
                         button(type="submit").btn.btn-default.btn-cha 统计
 
                 .row
-
                   h4
                     | &nbsp;&nbsp;&nbsp;&nbsp;
-                    | 邀请人奖励总金额为： {{amount_all.sum_introduced_reward}}
+                    | 被邀请人计划发放金额： {{amount_user_all.sum_user_send_amount}}
+                  h4
+                    | &nbsp;&nbsp;&nbsp;&nbsp;
+                    | 邀请人计划发放金额： {{amount_introduced_all.sum_introduced_send_amount}}
+
                     .table-responsive
                   table.table.table-striped.table-bordered.table-hover
                     thead
@@ -86,6 +89,10 @@ html
                         th(rowspan="1") 收益百分比
                         th(rowspan="1") 审核状态
                         th(rowspan="1") 审核时间
+                        th(rowspan="1") 被邀请人发放状态
+                        th(rowspan="1") 被邀请人发放金额
+                        th(rowspan="1") 邀请人发放状态
+                        th(rowspan="1") 邀请人发放金额
                     tbody
                       if result
                         for l in result
@@ -103,6 +110,10 @@ html
                             td {{l.percent_reward}}
                             td {{l.get_checked_status_display}}
                             td {{l.checked_at}}
+                            td {{l.user_send_status}}
+                            td {{l.user_send_amount}}
+                            td {{l.introduced_send_status}}
+                            td {{l.introduced_send_amount}}
                               .chart
                   form.form.span5(method="POST" action='/{{ "" | admin_address}}/statistics/introduced_by')
                     - csrf_token

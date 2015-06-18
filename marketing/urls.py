@@ -39,6 +39,7 @@ urlpatterns = patterns(
     url(r'^full_login/$', TemplateView.as_view(template_name="fullLogin.jade")),
     url(r'^day_login/$', TemplateView.as_view(template_name="dayLogin.jade")),
     url(r'^full_xin/$', TemplateView.as_view(template_name="full_xin.jade")),
+    url(r'^full_send/$', TemplateView.as_view(template_name="full_send.jade")),
     # url(r'^list_day/$', TemplateView.as_view(template_name="list_day.jade")),
     url(r'^list_history/$', TemplateView.as_view(template_name="list_history.jade")),
     url(r'^day_mobile/$', TemplateView.as_view(template_name="day_mobile.jade")),
@@ -48,10 +49,13 @@ urlpatterns = patterns(
     url(r'^agree_xieyi/$', TemplateView.as_view(template_name="agree_xieyi.jade")),
     url(r'^list_level/$', TemplateView.as_view(template_name="list_level.jade")),
     url(r'^app_level/$', TemplateView.as_view(template_name="app_level.jade")),
+    url(r'^app_invite/$', TemplateView.as_view(template_name="app_invite.jade")),
     url(r'^app_shareReward/$', TemplateView.as_view(template_name="app_shareReward.jade")),
     url(r'^father_day/$', TemplateView.as_view(template_name="father_day.jade")),
     # url(r'^summer/$', TemplateView.as_view(template_name="summer.jade")),
     # url(r'^app_summer/$', TemplateView.as_view(template_name="app_summer.jade")),
+    url(r'^newxunlei/$', TemplateView.as_view(template_name="newxunlei.jade")),
+    url(r'^father/$', TemplateView.as_view(template_name="app_fatherday.jade")),
 )
 
 urlpatterns += patterns(

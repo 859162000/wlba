@@ -8,16 +8,26 @@ html
   body
     .logo
       img(src='/static/imgs/mobile/list/logo.jpg')
-      .head-right
-        a(href="/weixin/regist/") 免费注册
-        |&nbsp|&nbsp
-        a(href="/weixin/login/") 登录
+      if user.is_authenticated
+        .head-right
+          a(href="/accounts/logout?next=/weixin/list/") 退出登录
+      else
+        .head-right
+          a(href="/weixin/regist/") 免费注册
+          |&nbsp|&nbsp
+          a(href="/weixin/login/") 登录
     .list-banner
-      a(href="{{banner.link}}")
-        img(src="/media/{{banner.image}}")
+      .swiper-container
+        .swiper-wrapper
+          for item in banner
+            a(href="{{item.link}}").swiper-slide
+              img(data-src="/media/{{item.image}}", class="swiper-lazy")
+              .swiper-lazy-help
+        .swiper-pagination
     .list-body#list-body
       include include/ajax/ajax_list.jade
     include include/weixin_loading
     include include/weixin_footer
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
     script(data-init='list', src="/static/scripts/mobile/dist/mobile.js")
 

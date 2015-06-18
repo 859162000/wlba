@@ -1,0 +1,131 @@
+- load formatters
+doctype html
+html(style="background:#fff")
+  head
+    meta(name="format-detection" content="telephone=no,email=no")
+    title 父亲节
+    meta(charset="utf-8")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    script.
+      (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
+    link(href="/static/styles/mobile_activity/app.css", rel="stylesheet")
+  body
+    .father-super-banner
+      img(src='/static/imgs/mobile_activity/father/father_banner.jpg')
+    .father-body
+      .father-why-hard
+        .hard-hui
+        mixin hardList(text1, text2, text3, text4)
+          p
+            span=text1
+            =text2
+            em.father-highlight=text3
+            =text4
+        +hardList('准爸爸小Z', '攒钱结婚，月结余', '5000元', '投网利宝，老婆戒指就靠它。')
+        +hardList('奶爸大Z', '孩子出生，月结余', '10000元', '投网利宝，孩子奶粉钱就靠它。')
+        +hardList('父亲老W', '闺女北漂，养老金', '50万元', '投网利宝，给孩子攒钱买房就靠它。')
+
+      .father-is-cool
+        .cool-left
+          img(src='/static/imgs/mobile_activity/father/f_cool1.jpg')
+          p
+            em.father-highlight 1000元
+            |微信红包
+            br
+            |活动期间累计
+            br
+            |最高投资
+            em.father-highlight 男性
+            |用户
+        .cool-right
+          img(src='/static/imgs/mobile_activity/father/f_cool2.jpg').right-icon
+          .right-text
+            |男人辛苦，男人不哭。
+            br
+            |做男人不易，网利宝和您一起扛！！！
+            br
+            |父亲，是男人的蜕变。
+            br
+            |鸡汤无益，来点实际。
+            br
+            |好吧，网利宝父亲节投资领微信红包，
+            |最高可领
+            em.father-highlight 5000元。
+
+      .father-for-mother
+        .cool-left
+          img(src='/static/imgs/mobile_activity/father/f_cool3.jpg')
+          p
+            em.father-highlight 1000元
+            |微信红包
+            br
+            |活动期间累计
+            br
+            |最高投资
+            em.father-highlight 女性
+            |用户
+        .cool-right
+          img(src='/static/imgs/mobile_activity/father/f_cool4.jpg').right-icon
+          .right-text
+            |什么女性也要？
+            br
+            |研究表明：每一个投资网利的女性，
+            br
+            |背后有一个成功的男人。
+            br
+            | 女性财权在握，背后也是一个好男人。
+            br
+            |奖金一定要交给爸爸哦~~
+      .father-line
+        .line-text 你认为这样就结束了。native ！！！
+      .father-have-reward
+        .reward-tit-icon
+          img(src='/static/imgs/mobile_activity/father/f_reward1.jpg').reward-num
+          img(src='/static/imgs/mobile_activity/father/f_reward2.jpg').reward-blue
+        .reward-tit 不限性别，不限次数，按笔领奖，单笔投资满：
+        .reward-table
+          table
+            tr
+              th 单笔投资额
+              th(colspan='2') 奖品设置
+              th
+            mixin tr(money, reward, reward2, bgcolor)
+              tr(class=bgcolor)
+                td=money
+                td=reward
+                td=reward2
+            +tr('500-999', '5元(微信红包)', '+100元满减红包', 'white')
+            +tr('1000-4999', '10元(微信红包)', '+100元满减红包', 'blue')
+            +tr('5000-9999', '20元(微信红包)', '+100元满减红包', 'white')
+            +tr('10000-19999', '50元(微信红包)', '+100元满减红包', 'blue')
+            +tr('20000-49999', '100元(微信红包)', '+100元满减红包', 'white')
+            +tr('50000以上', '200元(微信红包)', '+100元满减红包', 'blue')
+      .father-activity-rules
+        h4 活动规则：
+        ol
+          li 活动时间：
+            em.father-highlight 2015年6月19日—2015年6月26日。
+          li 活动期间，阳光普照奖，微信红包多投多得，不限次数，
+            em.father-highlight 5000元
+            |封顶。
+          li
+            em.father-highlight 100元
+            |满减红包在二次投资中单笔投资满
+            em.father-highlight 5000元
+            |时（包含5000元），方可使用；完成一次投资回款后即可取现；有效期
+            em.father-highlight 3个月
+            |。
+          li 微信红包领取方式：用户在投资后
+            em.father-highlight 24小时
+            |内添加个人微信（bejuli），经网利宝工作人员核实后，
+            em.father-highlight 2个工作日
+            |内
+            em.father-highlight 9:00-18:00
+            |发送。过期不联系者，视为自动放弃红包权益，网利宝不予补发。
+          li 网利宝对此活动享有最终解释权。
+      .father-for-pc 详情关注网利宝官网：www.wanglibao.com
+
+
+
+

@@ -98,7 +98,7 @@ def build_earning(product_id):
 
         #赠送活动描述
         desc = u'%s,%s赠送%s%s' % (p2p.name, p2p.activity.name, p2p.activity.rule.rule_amount*100, '%')
-        earning.margin_record = keeper.deposit(amount,description=desc)
+        earning.margin_record = keeper.deposit(amount,description=desc, catalog=u"活动赠送")
         earning.user = user
 
         #earning.save()

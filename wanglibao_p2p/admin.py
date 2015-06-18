@@ -37,19 +37,23 @@ class UserEquityResource(resources.ModelResource):
         return timezone.localtime(obj.created_at).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class UserEquityAdmin(ExportMixin, admin.ModelAdmin):
+class UserEquityAdmin(admin.ModelAdmin):
+    actions = None
     list_display = (
         'id', 'user', 'product', 'equity', 'confirm', 'confirm_at', 'ratio', 'paid_principal', 'paid_interest',
         'penal_interest')
     list_filter = ('confirm',)
     search_fields = ('product__name', 'user__wanglibaouserprofile__phone')
     raw_id_fields = ('user', 'product')
-    resource_class = UserEquityResource
+    # resource_class = UserEquityResource
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
             return [f.name for f in self.model._meta.fields]
         return ()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     def get_export_filename(self, file_format):
         date_str = timezone.now().strftime('%Y-%m-%d')
@@ -268,6 +272,7 @@ class P2PProductForm(forms.ModelForm):
 
 
 class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, ConcurrentModelAdmin, VersionAdmin):
+    actions = None
     inlines = [
         P2PProductContractInline, WarrantInline, AttachementInline, AmortizationInline#, P2PEquityInline
     ]
@@ -307,11 +312,18 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
             })
         """
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
+    actions = None
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
     search_fields = ('user__wanglibaouserprofile__phone', 'product_amortization__product__name')
     raw_id_fields = ('product_amortization', 'user')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class P2PRecordResource(resources.ModelResource):
@@ -329,12 +341,13 @@ class P2PRecordResource(resources.ModelResource):
         return timezone.localtime(obj.create_time).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
+class P2PRecordAdmin(ReadPermissionModelAdmin):
+    actions = None
     list_display = (
         'catalog', 'order_id', 'product_id', 'product', 'user', 'amount', 'product_balance_after', 'create_time',
         'description', 'platform')
-    resource_class = P2PRecordResource
-    change_list_template = 'admin/import_export/change_list_export.html'
+    # resource_class = P2PRecordResource
+    # change_list_template = 'admin/import_export/change_list_export.html'
     search_fields = ('user__wanglibaouserprofile__phone','product__name')
     list_filter = ('catalog', )
 
@@ -344,16 +357,27 @@ class P2PRecordAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
     def product_id(self, obj):
         return "%s" % obj.product.id
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class WarrantAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('product', 'name')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class AmortizationRecordAdmin(admin.ModelAdmin):
+    actions = None
     list_display = (
         'catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('amortization', 'user')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class EquityResource(resources.ModelResource):
@@ -373,10 +397,11 @@ class EquityResource(resources.ModelResource):
         return timezone.localtime(obj.create_time).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class EquityRecordAdmin(ExportMixin, ReadPermissionModelAdmin):
+class EquityRecordAdmin(ReadPermissionModelAdmin):
+    actions = None
     list_display = ('catalog', 'order_id', 'product', 'user', 'amount', 'create_time', 'description')
     search_fields = ('user__wanglibaouserprofile__phone', 'product__name')
-    resource_class = EquityResource
+    # resource_class = EquityResource
 
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]
@@ -388,8 +413,12 @@ class EquityRecordAdmin(ExportMixin, ReadPermissionModelAdmin):
                                  file_format.get_extension())
         return filename
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class ProductAmortizationAdmin(ReadPermissionModelAdmin):
+    actions = None
     list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled',
                     'settlement_time', 'created_time', 'status', 'description', )
 
@@ -403,13 +432,18 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
 
         return status
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class EarningAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'user', 'product', 'amount', )
     raw_id_fields = ('order', 'margin_record', 'user', 'product',)
     search_fields = ('user__wanglibaouserprofile__phone',)
 
-
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_productamortization'):
@@ -418,13 +452,17 @@ class EarningAdmin(admin.ModelAdmin):
 
 
 class P2PProductContractAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'signing_date', 'party_b', 'party_b_name', 'party_c', 'party_c_name',
                     'party_c_id_number', 'party_c_address', 'bill_drawer_bank', 'bill_accepting_bank',
                     'bill_number', 'bill_amount', 'bill_due_date')
 
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class InterestPrecisionAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'equity_product', 'equity_phone', 'equity_name', 'equity_number',
                     'principal', 'interest_receivable', 'interest_actual', 'balance',)
     raw_id_fields = ('equity',)
@@ -448,16 +486,26 @@ class InterestPrecisionAdmin(admin.ModelAdmin):
             return Decimal(0)
         return instance.interest_precision_balance
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class InterestInAdvanceAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'product', 'user', 'interest')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class ProductInterestPrecisionAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'product_name', 'principal', 'interest_receivable',
                     'interest_actual', 'balance',)
     search_fields = ('product__id', 'product__name')
 
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     def product_name(self, instance):
         return instance.product.name
@@ -525,6 +573,7 @@ class P2PEquityJiuxianAdmin(ExportMixin, admin.ModelAdmin):
 
 
 class AutomaticPlanAdmin(admin.ModelAdmin):
+    actions = None
     display = ('id', 'user', 'amounts_auto', 'amounts_left', 'period_min', 'period_max', 'rate_min', 'rate_max', 'last_updated', 'is_used')
     list_display = display
     readonly_fields = display
@@ -532,10 +581,17 @@ class AutomaticPlanAdmin(admin.ModelAdmin):
     search_fields = ('user__wanglibaouserprofile__phone',)
     ordering = ('id', '-last_updated')
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class AutomaticManagerAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'name', 'stop_plan', 'start_at', 'end_at', 'last_updated', 'is_used', 'message')
     ordering = ('id', '-last_updated')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(P2PProduct, P2PProductAdmin)

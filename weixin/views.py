@@ -155,6 +155,19 @@ class WeixinLogin(TemplateView):
         return context
 
 
+class WeixinRegister(TemplateView):
+    template_name = 'weixin_regist.jade'
+
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get('promo_token', '')
+        if not token:
+            token = self.request.session.get('promo_token', 'weixin')
+
+        return {
+            'token': token,
+        }
+
+
 class WeixinLoginAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
@@ -280,7 +293,7 @@ class P2PListView(TemplateView):
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
         ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')[:10]
 
-        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority').first()
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority')
 
         return {
             'results': p2p_lists,

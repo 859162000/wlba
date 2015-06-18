@@ -1,0 +1,152 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    meta(name="description", content="迅雷+网利宝狂欢节，错过绝对会后悔”")
+    //link(href="/static/stylesheets/screen.css", media="screen, projection", rel="stylesheet", type="text/css")
+    link(rel="stylesheet",href="/static/stylesheets/fulls.css")
+    link(rel="stylesheet",href="/static/stylesheets/newxunlei.css")
+    link(rel="stylesheet",href="/static/stylesheets/activity.css")
+  body(style='background:#ffffff')
+    .full-container
+      .topbar
+        .container.row
+          .user-div
+            i.icon-phone.font-l &nbsp;
+            span 客服热线：
+            span 4008-588-066
+
+            span.margin-left-m 在线客服：
+            a.topbar-anchor.icon.icon-qq#top-qq(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", data-role="hover", target="_blank")
+
+            span.margin-left-m 关注我们：
+            a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
+            a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
+            a#qrweibo-top.weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
+              img(src="/static/images/weibo-nqr.png")
+            img#qrcode-top.icon.weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none", data-name="hoverbox")
+            span.mobile-app-top
+              span.icon.icon-mobile-app
+              span 手机网利宝
+              .mobile-app-top-prompt
+                div(style="height:30px; top:-20px; position:relative;")
+                a.mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+                a.mobile-app-android(href="https://www.wanglibao.com/static/wanglibao.apk", title="Android版")
+
+    .full-container-white.fudong
+      .container-navigation
+        .row
+          .span2
+            a(href='/')
+              .logo
+          .span10
+            .nav-items.xiao-nav
+              ul
+                mixin nav-item(name, link, new_class, free)
+                  if activeItem == name
+                    li.nav-item.active
+                      a.nav-item-anchor(href=link, class=new_class)= name
+                      if free == 'yes'
+                        span.icon.icon-free 免费
+                  else
+                    li.nav-item
+                      a.nav-item-anchor(href=link, class=new_class)= name
+                      if free == 'yes'
+                        span.icon.icon-free 免费
+
+                +nav-item('首页', '/', '', '')
+                +nav-item('理财专区', '/p2p/list/', '', '')
+                +nav-item('基金', '/fund/products', '', '')
+
+                +nav-item('安全保障', '/security', 'left-line', '')
+                +nav-item('帮助中心', '/help', '', '')
+    .fullbanner
+    .full-container
+
+      .full-gold
+        h1 活动时间：2015-06-20至2015-07-31
+        h2 活动奖励
+        .full-frenda
+            img(src="/static/images/full-img/hongbao.png")
+            img(src="/static/images/full-img/huanfei.png" style='margin-left: 35px')
+
+
+
+
+        .content-title
+          .title-inner-line
+            h2 新手投资流程
+        .investment-process-container(style='background: #fef4e0')
+          .row
+            .step.first-step
+              span.icon.icon-first-step
+              .process-title 第一步&nbsp;免费注册
+              .process-content 30秒轻松免费注册成为会员
+            .step-arrow
+              ins
+            .step.second-step
+              span.icon.icon-second-step
+              .process-title 第二步&nbsp;进行认证
+              .process-content 完成实名认证
+            .step-arrow
+              ins
+            .step.third-step
+              span.icon.icon-third-step
+              .process-title 第三步&nbsp;充值账户
+              .process-content 在线充值，免收手续费
+            .step-arrow
+              ins
+            .step.fourth-step
+              span.icon.icon-fourth-step
+              .process-title 第四步&nbsp;成功投标
+              .process-content 按需筛选借款标并进行投标
+            .step-arrow
+              ins
+            .step.fifth-step
+              span.icon.icon-fifth-step
+              .process-title 第五步&nbsp;自动收款
+              .process-content 借款期满后自动回款
+
+        .full-gold-footer
+          .full-gold-declare
+            dl
+              dt 红包使用规则：
+              dd 1、红包在完成注册后即刻发放，请在我的账户里-红包里面查看；
+              dd 2、红包投资不可叠加使用，一次回款后可提现；
+              dd 3、50元现金红包可在收到红包日起三个月期间内投资使用；
+              dd 4、每个红包只能使用一次，无论是否有余额即失效；
+            dl(style='margin-top: 20px;padding-bottom: 20px')
+              dt 活动规则:
+              dd 1、手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账号；
+              dd 2、被推荐人注册送50元现金红包，投资满300元即可使用；
+              dd 3、邀请好友送话费。赠送条件：被推荐人首次交易≥200元，推荐人送30元话费，多邀多送上不封顶！
+              dd 4、奖品信息将发送至您的网利宝站内信，话费将充值进您的交易手机号；
+              dd 5、刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+              dd 6、网利宝对此活动享有最终解释权。
+    .new-footer
+        .wry-act-footer#xl-footer
+          .wry-act-copy
+            div
+              .wry-footer-logo.footer-com.footer-one
+              p(style="color:#666")
+                span.footer-com.footer-two
+                |官方微信：iwanglibao
+                span.footer-com.footer-three
+                |在线客服：4008 588 066
+                span.footer-com.footer-four
+                |客服电话：4008 588 066
+              p(style="color:#666").act-hot Copyright&copy;2014-2015 wanglibao.com Inc. All Rigth Reserved. 北京网利科技有限公司 此次活动解释权归网利宝官方网站所有
+          .wry-act-img
+            a.footer-com.footer-five(style="width: 59px;display: inline-block;height: 60px;",href="http://www.itrust.org.cn/yz/pjwx.asp?wm=1091876832", target="_blank")
+            a.footer-com.footer-seven(style="width: 80px;display: inline-block;height: 60px;",href="http://www.instantssl.com/wildcard-ssl.html", target="_blank")
+          .wry-act-sao.footer-com.footer-six
+        include include/tracking
+
+  script.
+   var v = new Date().getTime()
+   require(['/static/js/hover.js','/static/js/aiqiyi_redpack.js?v='+v])

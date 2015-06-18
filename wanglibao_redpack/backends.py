@@ -97,7 +97,10 @@ def utc_transform(dt):
     dt = datetime.datetime.fromtimestamp(stamp,pytz.utc)
     return dt.replace(tzinfo=None)
 
-
+def local_transform_str(dt):
+    dt = dt.replace(tzinfo=pytz.utc)
+    newdt = dt.astimezone(pytz.timezone("Asia/Shanghai"))
+    return newdt.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
 def exchange_redpack(token, device_type, user):
     if token == "":
