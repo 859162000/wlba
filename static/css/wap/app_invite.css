@@ -74,7 +74,7 @@ body,html{
 
 .rule li{
     line-height: 2em;
-    padding-left: 1em;
+    padding: 0 1em;
     font-size: 1em;
     color: #333333;
 }
