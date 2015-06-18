@@ -1,0 +1,228 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(href="/static/stylesheets/activity.css", media="screen, projection", rel="stylesheet", type="text/css")
+        link(href="/static/stylesheets/fatherday.css", media="screen, projection", rel="stylesheet", type="text/css")
+    body
+        .act-full-container
+            .act-topbar
+                .container.row
+                    .act-user-div
+                        i(style="padding:0px;margin:0px;border:0px;font:inherit;").act-icon-phone.font-l &nbsp;
+                        span 客服热线：
+                        span 4008-588-066
+                        span.act-margin-left-m 关注我们：
+                        a.topbar-anchor.act-icon.act-icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
+                        a.topbar-anchor.act-icon.act-icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
+                        a#qrweibo-top.act-weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank",  data-name="hoverbox",style="display:none")
+                            img.act-weibo-qr-code(src="/static/images/weibo-nqr.png")
+                        img#qrcode-top.act-icon.act-weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none",data-name="hoverbox")
+                        span.act-mobile-app-top
+                            span.act-icon.act-icon-mobile-app
+                            span 手机网利宝
+                            .act-mobile-app-top-prompt
+                                div(style="height:30px; top:-20px; position:relative;")
+                                a.act-mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+                                a.act-mobile-app-android(href="https://www.wanglibao.com/static/wanglibao1.apk", title="Android版")
+        .activity-nav
+            .act-container-login-nav
+                a(href='/')
+                    img.wanglibaologo(src="/static/images/logo.png")
+                .login-nav
+                    include include/nav_common
+        .father-banner
+        .father-content.clearfix
+            .clearfix.m50
+                .father-detail
+                    span.detail-icon1 准爸爸小Z
+                    span.chapter
+                    span.people1
+                    .detail-content
+                        p 状况：
+                        p 攒钱结婚
+                        p 月结余
+                            font 5000元
+                        p 投网利宝
+                        p
+                            font 利息14%
+                        p 老婆戒指
+                        p 就靠它
+                .father-detail
+                    span.detail-icon1 奶爸大L
+                    span.chapter
+                    span.people2
+                    .detail-content
+                        p 状况：
+                        p 孩子出生
+                        p 月结余
+                            font 10000元
+                        p 投网利宝
+                        p
+                            font 利息14%
+                        p 孩子奶粉钱
+                        p 就靠它
+                .father-detail.mr0
+                    span.detail-icon1 父亲老W
+                    span.chapter
+                    span.people3
+                    .detail-content
+                        p 状况：
+                        p 闺女北漂
+                        p 养老金
+                            font 50万元
+                        p 投网利宝
+                        p
+                            font 利息14%
+                        p 给孩子攒钱买房
+                        p 就靠它
+            .level
+                span.number-style.number1
+                .level-people.level-people1
+                .level-content
+                    p 男人辛苦，男人不哭。
+                    p 做男人不易，网利宝和您一起扛！！！父亲，是男人的蜕变。
+                    p 鸡汤无益，来点实际。
+                    p 好吧，网利宝父亲节投资领微信红包，最高可领
+                      font 5000元。
+                .money-style.money-style1
+                .money-font
+                    p
+                        font 1000元
+                        微信红包
+                    p   活动期间累计最高投资
+                        font 男性
+                        用户
+            .level.mt50
+                span.number-style.number2
+                .level-people.level-people2
+                .level-content.red-style
+                    p 什么?女性也要！
+                    p 研究表明：每一个投资网利宝的女性，背后有一个成功的男人。
+                    p 女性财权在握，背后也有一个好男人。
+                    p 奖金一定要交给爸爸哦~~
+                .money-style.money-style2
+                .money-font
+                    p
+                        font 1000元
+                        微信红包
+                    p   活动期间累计最高投资
+                        font 女性
+                        用户
+            .three-div
+                span.span-font 你认为这样就结束了？native！！！
+                span.number-style.number3
+            .img-div.clearfix
+                .three-img
+            .three-title 不限性别，不限次数，按笔领奖：
+            .th-style
+                label 单笔投资额
+                span 奖品设置
+            ul.list-ul.clearfix
+                li.clearfix
+                    span 500-999
+                    span.li-span2 5元  （微信红包）
+                    span + 100元红包
+                li.clearfix.even-style
+                    span 1000-4999
+                    span.li-span2 10元 （微信红包）
+                    span + 100元红包
+                li.clearfix
+                    span 5000-9999
+                    span.li-span2 20元 （微信红包）
+                    span + 100元红包
+                li.clearfix.even-style
+                    span 10000-19999
+                    span.li-span2 50元 （微信红包）
+                    span + 100元红包
+                li.clearfix
+                    span 20000-49999
+                    span.li-span2 100元 （微信红包）
+                    span + 100元红包
+                li.clearfix.even-style
+                    span 50000以上
+                    span.li-span2 200元 （微信红包）
+                    span + 100元红包
+            .rule-style
+                p.h-style 活动规则：
+                p 1. 活动时间：
+                    font 2015年6月19日—2015年6月26日。
+                p 2. 活动期间，阳光普照奖，微信红包多投多得，不限次数，
+                    font 5000元
+                    封顶。
+                p 3.
+                    font 100元
+                    红包在二次投资中单笔投资满
+                    font 5000元
+                    时（包含5000元），方可使用；完成一次投资回款后即可取现；有效期
+                    font 3个月
+                    。
+                p 4. 微信红包领取方式：用户在投资后
+                    font 24小时
+                    内添加个人微信（bejuli），经网利宝工作人员核实后，2个工作日内
+                    font 9:00-18:00
+                    发送。
+                p.text-indent 过期不联系者，视为自动放弃红包权益，网利宝不予补发。
+                p 5. 网利宝对此活动享有最终解释权。
+                span.logo-style
+        .bottom-div
+            .clearfix
+                span.bottom-logo
+            .about-wanglibao.clearfix
+                span.bottom-weixin
+                    i
+                    官方微信：iwanglibao
+                span.bottom-qq
+                    i
+                    在线客服：4008 588 066
+                span.bottom-tel
+                    i
+                    客服电话：4008 588 066
+            p.copyright Copyright©2014-2015 wanglibao.com Inc. All Rigth Reserved. 北京网利科技有限公司 此次活动解释权归网利宝官方网站所有
+            span.bottom-icon
+    //script(src="/static/js/require.js", data-main="/static/js/header")
+    script(src="/static/js/lib/jquery.min.js")
+    //script(src="/static/js/login_modal.js")
+    script.
+        $('.act-mobile-app-top').bind('mouseenter', function (e) {
+            return $('.act-mobile-app-top-prompt').show();
+        }).bind('mouseleave', function (e) {
+            return $('.act-mobile-app-top-prompt').hide();
+        });
+        $('.act-mobile-app-top-prompt').bind('mouseenter', function (e) {
+            return $(this).show();
+        }).bind('mouseleave', function (e) {
+            return $(this).hide();
+        });
+        $('.act-icon-weixin').bind('mouseenter', function () {
+            $('#qrcode-top').show();
+        }).bind('mouseleave', function () {
+            $('#qrcode-top').hide();
+        })
+        $('#qrcode-top').bind('mouseenter', function (e) {
+            return $(this).show();
+        }).bind('mouseleave', function (e) {
+            return $(this).hide();
+        });
+        $('.act-icon-weibo').bind('mouseenter', function () {
+            $('#qrweibo-top').show();
+        }).bind('mouseleave', function () {
+            $('#qrweibo-top').hide();
+        })
+        $('#qrweibo-top').bind('mouseenter', function (e) {
+            return $(this).show();
+        }).bind('mouseleave', function (e) {
+            return $(this).hide();
+        });
+        $('.nologin').on('click',function(){
+          {% if user.is_authenticated == False %}
+            window.location.href='/accounts/home/'
+          {% endif %}
+          {% if user.is_authenticated == True %}
+            window.location.href='/accounts/login/'
+          {% endif %}
+        });
