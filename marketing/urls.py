@@ -52,6 +52,7 @@ urlpatterns = patterns(
     # url(r'^summer/$', TemplateView.as_view(template_name="summer.jade")),
     # url(r'^app_summer/$', TemplateView.as_view(template_name="app_summer.jade")),
     url(r'^newxunlei/$', TemplateView.as_view(template_name="newxunlei.jade")),
+    url(r'^father/$', TemplateView.as_view(template_name="app_fatherday.jade")),
 )
 
 urlpatterns += patterns(
