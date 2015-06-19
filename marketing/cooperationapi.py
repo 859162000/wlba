@@ -22,8 +22,9 @@ from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_p2p.models import P2PProduct, P2PEquity, P2PRecord
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags
 from .models import IntroducedBy
-from wanglibao_account.models import IdVerification
+from wanglibao_account.models import IdVerification, Binding
 from wanglibao_pay.models import Card
+from wanglibao.settings import YIRUITE_KEY
 
 logger = logging.getLogger(__name__)
 
@@ -698,3 +699,89 @@ class TianmangCardBindListAPIView(TianmangBaseAPIView):
             logger.error("TianmangCardBindListAPIView error")
 
         return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
+
+
+class YiruiteBaseAPIView(APIView):
+    permission_classes = ()
+
+    def check_sign(self, startday, endday, sign):
+        m = md5()
+        m.update(startday+endday+YIRUITE_KEY)
+        local_sign = m.hexdigest()
+        if sign != local_sign:
+            logger.error(u"易瑞特查询接口中，sign参数校验失败")
+            return False
+        return True
+
+    def get_yiruite_promo_user(self, startday, endday):
+        startday= datetime.datetime.strptime(startday, "%Y-%m-%d")
+        endday = datetime.datetime.strptime(endday, "%Y-%m-%d")
+        if startday > endday:
+            endday, startday = startday, endday
+
+        #daydelta = datetime.timedelta(days=1)
+        daydelta = datetime.timedelta(hours=23, minutes=59, seconds=59, milliseconds=59)
+        endday += daydelta
+
+        if (endday - startday).days > 31:
+            endday = startday + datetime.timedelta(hours=23*31, minutes=59, seconds=59, milliseconds=59)
+
+        yiruite_promo_list = IntroducedBy.objects.filter(channel__code="yiruite", created_at__gte=startday, created_at__lte=endday)
+        return yiruite_promo_list
+
+class YiruiteInfoListAPIView(YiruiteBaseAPIView):
+    """易瑞特 信息查询列表接口"""
+    permission_classes = ()
+    def post(self, request):
+        startday = request.DATA.get('startday', '')
+        endday = request.DATA.get('endday', '')
+
+        sign = request.DATA.get('sign', '')
+        sign_res = self.check_sign(startday, endday, sign)
+        if not sign_res:
+            return HttpResponse(renderers.JSONRenderer().render(
+                {"errorcode": 2, "errormsg": "sign error"}, 'application/json'))
+
+        response_user_list = []
+        try:
+            yiruite_promo_list = self.get_yiruite_promo_user(startday, endday)
+            for yiruite_promo_user in yiruite_promo_list:
+                # 易瑞特用户是否实名认证
+                is_valid = IdVerification.objects.get(\
+                    id_number=yiruite_promo_user.user.wanglibaouserprofile.id_number).is_valid
+
+                # 易瑞特用户标识
+                tid_list = Binding.objects.filter(user=yiruite_promo_user.user).first()
+                tid = tid_list[0].tid
+
+                amount = P2PEquity.objects.filter(user=yiruite_promo_user.user, confirm=True).filter(product__status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+                ]).first()[0].equity
+
+                if not amount:
+                    continue
+
+                response_user = {
+                    "UserName": yiruite_promo_user.user.username,
+                    "RegsiterTime": timezone.localtime(
+                        yiruite_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "IsValidateIdentity": is_valid,
+                    "tid": tid,
+                    "amount": amount,
+                    "FirstInvestTime": timezone.localtime(
+                        yiruite_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
+                }
+                response_user_list.append(response_user)
+            result = {
+                "errorcode": 0,
+                "errormsg": "success",
+                "info": response_user_list
+            }
+        except Exception, e:
+            logger.error("YiruiteInfoListAPIView error")
+            logger.error(e)
+            result = {
+                "errorcode": 1,
+                "errormsg": "api error"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
