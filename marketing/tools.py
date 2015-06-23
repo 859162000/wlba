@@ -8,16 +8,13 @@
 from wanglibao.celery import app
 from django.utils import timezone
 from django.contrib.auth.models import User
-# from marketing.helper import RewardStrategy
-# from wanglibao_pay.models import PayInfo
-# from wanglibao_p2p.models import P2PRecord
+from django.db import transaction
+from wanglibao_p2p.models import P2PRecord, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao_sms import messages
-# from marketing import helper
 from marketing.models import IntroducedBy, Reward, RewardRecord
-# from wanglibao.templatetags.formatters import safe_phone_str
 # from wanglibao_sms.tasks import send_messages
-# from wanglibao_redpack import backends as redpack_backends
+from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
 #from datetime import datetime
 
@@ -77,3 +74,20 @@ def despoit_ok(pay_info, device_type='pc'):
     #活动检测，充值
     activity_backends.check_activity(pay_info.user, 'recharge', device_type, pay_info.amount)
 
+
+#全民淘金收益计算
+@app.task
+def calc_broker_commission(product_id):
+    if not product_id:
+        return
+
+    product = P2PProduct.objects.filter(id=product_id).first()
+    _method = product.pay_method
+    _period = product.period
+    if _method.startswith(u"日计息") and _period <= 31 or _period <=1:
+        return
+
+    start = timezone.datetime(2015, 6, 22, 16,0,0, tzinfo=timezone.utc)
+    with transaction.atomic():
+        for equity in product.equities.all():
+            redpack_backends.commission(equity.user, product, equity.equity, start)
