@@ -7,7 +7,7 @@ module.exports = function( grunt ) {
         compass: {
             dist: {
                 options: {
-                    config: 'config_weixin.rb'
+                    config: 'config.rb'
                 }
             }
         },
