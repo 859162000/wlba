@@ -129,11 +129,23 @@ class InterestHike(models.Model):
     amount = models.DecimalField(verbose_name=u'加息金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
     updated_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"更新时间")
-    #expired_at = models.DateTimeField(null=True, verbose_name=u"到期时间", blank=True)
 
     class Meta:
         verbose_name = u"加息券"
         verbose_name_plural = u"加息券"
+
+#佣金,加息等
+#todo: move p2p earning to here
+class Income(models.Model):
+    user = models.ForeignKey(User, verbose_name=u"用户", related_name="user")
+    invite = models.ForeignKey(User, verbose_name=u"被邀请用户", related_name="invite")
+    level = models.IntegerField(verbose_name=u"级别", default=0, blank=False, null=False)
+    product = models.ForeignKey(P2PProduct, verbose_name=u"产品")
+    amount = models.DecimalField(verbose_name=u'投资金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    earning = models.DecimalField(verbose_name=u'收益金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    order_id = models.IntegerField(verbose_name=u"订单号", default=0, blank=False, null=False)
+    paid = models.BooleanField(verbose_name=u'已打款', default=False)
+    created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
 
 
 #创建红包列表

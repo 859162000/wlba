@@ -48,6 +48,7 @@ from wanglibao_rest import utils
 from exceptions import PrepaymentException
 from django.core.urlresolvers import reverse
 import re
+from celery.execute import send_task
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -298,11 +299,13 @@ class AuditProductView(TemplateView):
         ProductKeeper(p2p).audit(request.user)
 
         if p2p.activity:
-            from celery.execute import send_task
-
             send_task("wanglibao_p2p.tasks.build_earning", kwargs={
                 "product_id": pk
             })
+
+        send_task("marketing.tools.calc_broker_commission", kwargs={
+            "product_id": pk
+        })
 
         return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/p2pproduct/')
 
