@@ -68,7 +68,7 @@ urlpatterns += patterns(
     '',
     url(r'^introduced_by/$', IntroducedAwardTemplate.as_view(template_name="introduced_by.jade")),
     url(r'^investment_reward/$', InvestmentRewardView.as_view(template_name="investment_reward.jade")),
-    #url(r'^investment/$', Investment.as_view(), name='day'),
+    url(r'^investment/$', Investment.as_view(), name='day'),
     # url(r'^list_day/$', Investment.as_view(), name='list_day'),
 )
 
