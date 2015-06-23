@@ -223,15 +223,15 @@ admin.site.register(Channels, ChannelsAdmin)
 admin.site.register(IntroducedByReward, IntroducedByRewardAdmin)
 # admin.site.register(PlayList, PlayListAdmin)
 
-admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
-admin.site.register_view('statistics/tops', view=TopsView.as_view(), name=u'日周月榜名单')
+# admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
+# admin.site.register_view('statistics/tops', view=TopsView.as_view(), name=u'日周月榜名单')
 admin.site.register_view('statistics/tv', view=TvView.as_view(), name=u'统计数据汇总')
 admin.site.register(InviteCode, InviteCodeAdmin)
 
 admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')
 
 
-admin.site.register_view('statistics/aggregate', view=AggregateView.as_view(), name=u'累计购买金额统计单')
+# admin.site.register_view('statistics/aggregate', view=AggregateView.as_view(), name=u'累计购买金额统计单')
 # 停止邀请收益统计使用
-admin.site.register_view('statistics/introduced_by', view=IntroducedAwardTemplate.as_view(), name=u'邀请收益统计')
-admin.site.register_view('statistics/investment_reward', view=InvestmentRewardView.as_view(), name=u'打榜统计发红包')
+# admin.site.register_view('statistics/introduced_by', view=IntroducedAwardTemplate.as_view(), name=u'邀请收益统计')
+# admin.site.register_view('statistics/investment_reward', view=InvestmentRewardView.as_view(), name=u'打榜统计发红包')
