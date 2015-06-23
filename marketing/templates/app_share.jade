@@ -11,11 +11,11 @@ html
     if not reg
       header
       div.content
-        p 你的朋友
+        p 您的朋友
           span.red {{ identifier|safe_phone_new }}
-          | 邀请你使用网利宝理财，首次体验可获赠
-          span.red 30元
-          | 话费。
+          | 邀请您来网利宝赚钱，首次可获
+          span.red 50元
+          | 红包。
         #validate-modal-form
           - csrf_token
           .form-row
@@ -42,7 +42,7 @@ html
                 p=text2
                 p=text3
           +dlStyle('/static/m_images/weixin_img/xinlai.png', '信赖', 'IDG资本投资', '100%本息保障')
-          +dlStyle('/static/m_images/weixin_img/quanwei.png', '权威', 'A股百亿上市公司', '鸿利光电B轮投资')
+          +dlStyle('/static/m_images/weixin_img/quanwei.png', '权威', 'A股百亿上市公司', '鸿利光电战略入股')
           +dlStyle('/static/m_images/weixin_img/anquan.png', '安全', '账户资金安全', '由平安保险承保')
           +dlStyle('/static/m_images/weixin_img/shouyiago.png', '高收益', '30倍银行活期收益', '100元起投 0手续费')
     else

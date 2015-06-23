@@ -99,10 +99,10 @@ class P2PDetailView(TemplateView):
         site_data = SiteData.objects.all()[0]
         #排行榜
 
-        top = Top()
-        day_tops = top.day_tops(datetime.datetime.now())
-        week_tops = Top().week_tops(datetime.datetime.now())
-        all_tops = Top().all_tops()
+        # top = Top()
+        # day_tops = top.day_tops(datetime.datetime.now())
+        # week_tops = Top().week_tops(datetime.datetime.now())
+        # all_tops = Top().all_tops()
 
         device = utils.split_ua(self.request)
         red_packets = backends.list_redpack(user, 'available', device['device_type'])
@@ -118,10 +118,10 @@ class P2PDetailView(TemplateView):
             'attachments': p2p.attachment_set.all(),
             'announcements': AnnouncementP2P,
             'total_fee_earning': total_fee_earning,
-            'day_tops': day_tops,
-            'week_tops': week_tops,
-            'all_tops': all_tops,
-            'is_valid': top.is_valid(),
+            'day_tops': [],
+            'week_tops': [],
+            'all_tops': [],
+            'is_valid': False,
             'red_packets': len(red_packets['packages']['available'])
         })
 
