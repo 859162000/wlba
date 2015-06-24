@@ -43,7 +43,8 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
         return
     channel = helper.which_channel(user)
     #查询符合条件的活动
-    activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False, channel__contains=channel)\
+    activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False)\
+                                    .filter(Q(channel__contains=channel) | Q(is_all_channel=True))\
                                     .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
     if activity_list:
         for activity in activity_list:
@@ -59,13 +60,11 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
                                                              is_used=True).order_by('-id')
 
             if activity_rules:
-                #logger.info("yqjx 01 %s" % activity_rules)
                 for rule in activity_rules:
                     if rule.is_introduced:
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
                             _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full, user_ib)
-                        #logger.info("yqjx 02 %s" % user_ib)
                     else:
                         _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full)
             else:
@@ -105,7 +104,6 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             first_buy_num = P2PRecord.objects.filter(user=user).count()
 
         if first_buy_num == 1:
-            #logger.info("yqjx 03 %s" % user_ib)
             #判断当前购买产品id是否在活动设置的id中
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
@@ -113,11 +111,9 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                     _check_buy_product(user, rule, device_type, amount, product_id, is_full)
             else:
                 _check_buy_product(user, rule, device_type, amount, product_id, is_full)
-            #logger.info("yqjx 04 %s" % user_ib)
-            if user_ib:
-                pid = _check_introduced_by_product(user)
-                redpack_backends.increase_hike(user_ib, pid)
-                #logger.info("yqjx 05 %s" % user_ib)
+            #if user_ib:
+            #    pid = _check_introduced_by_product(user)
+            #    redpack_backends.increase_hike(user_ib, pid)
 
     #购买
     elif trigger_node == 'buy':
@@ -359,7 +355,7 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, is_full):
     """
     if rule.send_type == 'sys_auto':
         if rule.share_type != 'inviter':
-            redpack_backends.give_activity_redpack_new(user, rtype, redpack_id, device_type, rule.id)
+            redpack_backends.give_activity_redpack_new(user, rtype, redpack_id, device_type, rule)
     #记录流水，目前红包系同时发送站内信和短信，因此此处记录两条流水，下同
     _save_activity_record(rule, user, 'message', rule.rule_name, False, is_full)
     _save_activity_record(rule, user, 'sms', rule.rule_name, False, is_full)
@@ -369,7 +365,7 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, is_full):
         if user_ib:
             #给邀请人发红包
             if rule.send_type == 'sys_auto':
-                redpack_backends.give_activity_redpack_new(user_ib, rtype, redpack_id, device_type, rule.id)
+                redpack_backends.give_activity_redpack_new(user_ib, rtype, redpack_id, device_type, rule)
             _save_activity_record(rule, user_ib, 'message', rule.rule_name, True, is_full)
             _save_activity_record(rule, user_ib, 'sms', rule.rule_name, True, is_full)
 

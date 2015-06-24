@@ -13,7 +13,7 @@ import logging
 import decimal
 from django.utils import timezone
 from django.db.models import Sum
-from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent, InterestHike
+from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent, InterestHike, Income
 from wanglibao_p2p.models import P2PRecord, P2PProduct, P2PEquity
 from marketing import  helper
 from wanglibao_sms import messages
@@ -21,6 +21,8 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_pay.util import fmt_two_amount
 from misc.models import Misc
+from wanglibao_margin.marginkeeper import MarginKeeper
+from marketing.models import IntroducedBy
 
 logger = logging.getLogger(__name__)
 
@@ -247,7 +249,7 @@ def give_buy_redpack(user, device_type, rtype='buy', describe=''):
         give_activity_redpack(user=user, event=x, device_type=device_type)
 
 
-def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id):
+def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule):
     """ rule_id: get message template """
     now = timezone.now()
     user_channel = helper.which_channel(user)
@@ -255,7 +257,7 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id):
     rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id, \
                                       give_start_at__lt=now, give_end_at__gt=now).first()
     if rps:
-        if rps.target_channel != "":
+        if rps.target_channel != "" and rule.activity.is_all_channel is False:
             chs = rps.target_channel.split(",")
             chs = [m for m in chs if m.strip() != ""]
             if user_channel not in chs:
@@ -461,32 +463,25 @@ def deduct_calc(amount, redpack_amount):
 
 
 def increase_hike(user, product_id):
-    #logger.info(u"yqjx 1 %s" % product_id)
     if not user or not product_id:
         return
-    #logger.info(u"yqjx 2 %s" % product_id)
     product = P2PProduct.objects.filter(id=product_id).first()
     if not product:
         return
-    #logger.info(u"yqjx 3 %s" % product_id)
     pr = P2PRecord.objects.filter(user=user, product=product).first()
     if not pr:
         return
-    #logger.info(u"yqjx 4 %s" % product_id)
     if (timezone.now() - pr.create_time).days > 10:
         return
     #InterestHike.objects.select_for_update().filter(user=user, product=product, invalid=False).first()
-    #logger.info(u"yqjx 5 %s" % product_id)
     record = InterestHike.objects.filter(user=user, product=product, invalid=False).first()
     if not record:
-        #logger.info(u"yqjx 6 %s" % product_id)
         record = InterestHike()
         record.user = user
         record.product = product
         record.rate = decimal.Decimal("0.001")
     record.intro_total += 1
     record.save()
-    #logger.info(u"yqjx 7 %s" % product_id)
     return {"ret_code":0, "message":"ok"}
 
 def settle_hike(product):
@@ -547,3 +542,27 @@ def get_hike_amount(user):
         amount = _amount['amount__sum']
     return amount
 
+def commission(user, product, equity, start):
+    _amount = P2PRecord.objects.filter(user=user, product=product, create_time__gt=start).aggregate(Sum('amount'))
+    if _amount['amount__sum'] and _amount['amount__sum'] <= equity:
+        commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
+        commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
+        first_intro = IntroducedBy.objects.filter(user=user).first()
+        if first_intro:
+            first = MarginKeeper(first_intro.introduced_by)
+            first.deposit(commission, catalog=u"全民淘金")
+
+            income = Income(user=first_intro.introduced_by, invite=user, level=1,
+                            product=product, amount=_amount['amount__sum'],
+                            earning=commission, order_id=first.order_id, paid=True, created_at=timezone.now())
+            income.save()
+
+            sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
+            if sec_intro:
+                second = MarginKeeper(sec_intro.introduced_by)
+                second.deposit(commission, catalog=u"全民淘金")
+
+                income = Income(user=sec_intro.introduced_by, invite=user, level=2,
+                                product=product, amount=_amount['amount__sum'],
+                                earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
+                income.save()

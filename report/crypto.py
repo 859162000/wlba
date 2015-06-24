@@ -25,7 +25,8 @@ class Rsa(object):
 
     @classmethod
     def decrypt(cls, data):
-        string = open("pri_key.pem", "rb").read()
+        #string = open("pri_key.pem", "rb").read()
+        string = open(settings.CERT_DIR + "pri_key.pem", "rb").read()
         bio = BIO.MemoryBuffer(string)
         pri_key = RSA.load_key_bio(bio)
         return pri_key.private_decrypt(data, RSA.pkcs1_oaep_padding)
