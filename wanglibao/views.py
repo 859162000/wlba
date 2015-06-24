@@ -45,13 +45,6 @@ class IndexView(TemplateView):
         site_data = SiteData.objects.all().first()
         partners = Partner.objects.filter(type='partner')
 
-        #排行榜
-
-        #top = Top()
-        # day_tops = top.day_tops(datetime.now())
-        #week_tops = top.week_tops(datetime.now())
-        #all_tops = top.all_tops()
-
         return {
             "p2p_products": p2p_products,
             "trade_records": trade_records,
@@ -62,10 +55,6 @@ class IndexView(TemplateView):
             'announcements': AnnouncementHomepage,
             'announcements_p2p': AnnouncementP2PNew,
             'partners': partners,
-            'day_tops': [],
-            'week_tops': [],
-            'all_tops': [],
-            'is_valid': False
         }
 
     def get(self, request, *args, **kwargs):
