@@ -215,83 +215,8 @@ html
 
         .span4-omega
           div
-            if is_valid
-              .panel.tops-container
-                .panel-title-bar__tops
-                .panel-content-container
-                  .tabs
-                    .tabs-nav
-                      ul
-                        li
-                          a(href="#day").active 日排行
-                        li
-                          a(href="#week") 周排行
-                        li
-                          a(href="#month") 月排行
-                    .tabs-content
-                      .tab-content#day
-
-                        table
-                          for day in day_tops
-                            if forloop.counter < 4
-                              tr.tops-three
-                                td
-                                  .order {{forloop.counter}}
-                                td
-                                  .phone {{day.phone | safe_phone_new}}
-                                td
-                                  .amount-sum ￥{{day.amount_sum|money_format_int}}
-                            else
-                              tr
-                                td
-                                  .order {{forloop.counter}}
-                                td
-                                  .phone {{day.phone | safe_phone_new}}
-                                td
-                                  .amount-sum ￥{{day.amount_sum|money_format_int}}
-
-                      .tab-content#week
-                        table
-                          for week in week_tops
-                            if forloop.counter < 4
-                              tr.tops-three
-                                td
-                                  .order {{forloop.counter}}
-                                td
-                                  .phone {{week.phone | safe_phone_new}}
-                                td
-                                  .amount-sum ￥{{week.amount_sum|money_format_int}}
-                            else
-                              tr
-                                td
-                                  .order {{forloop.counter}}
-                                td
-                                  .phone {{week.phone | safe_phone_new}}
-                                td
-                                  .amount-sum ￥{{week.amount_sum|money_format_int}}
-
-                      .tab-content#month
-                        table
-                          for month in all_tops
-                            if forloop.counter < 4
-                              tr.tops-three
-                                td
-                                  .order {{forloop.counter}}
-                                td
-                                  .phone {{month.phone | safe_phone_new}}
-                                td
-                                  .amount-sum ￥{{month.amount_sum|money_format_int}}
-                            else
-                              tr
-                                td
-                                  .order {{forloop.counter}}
-                                td
-                                  .phone {{month.phone | safe_phone_new}}
-                                td
-                                  .amount-sum ￥{{month.amount_sum|money_format_int}}
-            else
-              .panel_top_finish
-                a(href="http://www.bj.xinhuanet.com/hbpd/jrpd/jrpd/2015-05/07/c_1115211539.htm", target="_blank")
+            .panel_top_finish
+              a(href="http://www.bj.xinhuanet.com/hbpd/jrpd/jrpd/2015-05/07/c_1115211539.htm", target="_blank")
 
           div
             .panel.news-list-container
