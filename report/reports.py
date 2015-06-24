@@ -178,46 +178,46 @@ class WithDrawReportGenerator(ReportGeneratorBase):
         return output.getvalue()
 
 
-class WithDrawDetailReportGenerator(ReportGeneratorBase):
-    prefix = 'txxxjl'
-    reportname_format = u'提现详细记录 %s--%s'
-
-    @classmethod
-    def generate_report_content(cls, start_time, end_time):
-        margins = MarginRecord.objects.filter(catalog__icontains=u'取款',
-                                              create_time__gte=start_time, create_time__lt=end_time) \
-            .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
-
-        output = cStringIO.StringIO()
-
-        writer = UnicodeWriter(output, delimiter='\t')
-        writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号',
-                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'编号'])
-
-        for margin in margins:
-            payinfo = margin.payinfo_set.all().first()
-            bank_name = payinfo.bank.name if payinfo.bank else ''
-
-            writer.writerow([
-                str(margin.id),
-                margin.user.username,
-                margin.user.wanglibaouserprofile.name,
-                margin.user.wanglibaouserprofile.id_number,
-                margin.user.wanglibaouserprofile.phone,
-                bank_name,
-                '-',
-                '-',
-                margin.payinfo_set.first().card_no,
-                str(margin.payinfo_set.first().total_amount),
-                str(margin.payinfo_set.first().amount),
-                str(margin.payinfo_set.first().fee),
-                timezone.localtime(margin.payinfo_set.first().create_time).strftime("%Y-%m-%d %H:%M:%S"),
-                str(margin.payinfo_set.first().request_ip),
-                unicode(margin.payinfo_set.first().status),
-                unicode(margin.payinfo_set.first().uuid)
-            ])
-
-        return output.getvalue()
+#class WithDrawDetailReportGenerator(ReportGeneratorBase):
+#    prefix = 'txxxjl'
+#    reportname_format = u'提现详细记录 %s--%s'
+#
+#    @classmethod
+#    def generate_report_content(cls, start_time, end_time):
+#        margins = MarginRecord.objects.filter(catalog__icontains=u'取款',
+#                                              create_time__gte=start_time, create_time__lt=end_time) \
+#            .prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
+#
+#        output = cStringIO.StringIO()
+#
+#        writer = UnicodeWriter(output, delimiter='\t')
+#        writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号',
+#                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'编号'])
+#
+#        for margin in margins:
+#            payinfo = margin.payinfo_set.all().first()
+#            bank_name = payinfo.bank.name if payinfo.bank else ''
+#
+#            writer.writerow([
+#                str(margin.id),
+#                margin.user.username,
+#                margin.user.wanglibaouserprofile.name,
+#                margin.user.wanglibaouserprofile.id_number,
+#                margin.user.wanglibaouserprofile.phone,
+#                bank_name,
+#                '-',
+#                '-',
+#                margin.payinfo_set.first().card_no,
+#                str(margin.payinfo_set.first().total_amount),
+#                str(margin.payinfo_set.first().amount),
+#                str(margin.payinfo_set.first().fee),
+#                timezone.localtime(margin.payinfo_set.first().create_time).strftime("%Y-%m-%d %H:%M:%S"),
+#                str(margin.payinfo_set.first().request_ip),
+#                unicode(margin.payinfo_set.first().status),
+#                unicode(margin.payinfo_set.first().uuid)
+#            ])
+#
+#        return output.getvalue()
 
 
 class ProductionRecordReportGenerator(ReportGeneratorBase):
@@ -675,7 +675,7 @@ class RedpackReportGenerator(ReportGeneratorBase):
     @classmethod
     def generate_report_content(cls, start_time, end_time):
 
-        redpackrecord = RedPackRecord.objects.filter(created_at__gte=start_time, created_at__lt=end_time).\
+        redpackrecord = RedPackRecord.objects.filter(apply_at__gte=start_time, apply_at__lt=end_time).\
             prefetch_related('redpack').prefetch_related('redpack__event').\
             prefetch_related('user').prefetch_related('user__wanglibaouserprofile')
 
@@ -706,49 +706,49 @@ class RedpackReportGenerator(ReportGeneratorBase):
         return output.getvalue()
 
 
-class IntroducedRewardGenerator(ReportGeneratorBase):
-    prefix = 'yqsytj'
-    reportname_format = u'邀请收益统计 %s--%s'
-
-    @classmethod
-    def generate_report_content(cls, start_time, end_time):
-        from marketing.models import IntroducedByReward
-
-        introduced_records = IntroducedByReward.objects.filter(
-            checked_status=0,
-            activity_start_at=start_time,
-            activity_end_at=end_time
-        ).prefetch_related('user').prefetch_related('user__wanglibaouserprofile').select_related('introduced_by_person__wanglibaouserprofile')
-
-        output = cStringIO.StringIO()
-
-        writer = UnicodeWriter(output, delimiter='\t')
-        writer.writerow([u'序号', u'被邀请人名称', u'被邀请人手机号', u'邀请人名称', u'邀请人手机号', u'产品名称',
-                         u'首笔购买时间', u'投资金额', u'奖励金额', u'发放状态'])
-        user, phone, user_parent, phone_parent = '', '', '', ''
-        for index, record in enumerate(introduced_records):
-            if record.user:
-                user = record.user.wanglibaouserprofile.name
-                phone = record.user.wanglibaouserprofile.phone,
-
-            if record.introduced_by_person:
-                try:
-                    user_parent = record.introduced_by_person.wanglibaouserprofile.name
-                    phone_parent = record.introduced_by_person.wanglibaouserprofile.phone
-                except:
-                    user_parent, phone_parent = '', ''
-
-            writer.writerow([
-                str(index + 1),
-                user,
-                unicode(phone),
-                user_parent,
-                unicode(phone_parent),
-                record.product.name,
-                timezone.localtime(record.first_bought_at,).strftime("%Y-%m-%d %H:%M:%S"),
-                str(record.first_amount),
-                str(record.introduced_reward),
-                str(record.checked_status)
-            ])
-
-        return output.getvalue()
+#class IntroducedRewardGenerator(ReportGeneratorBase):
+#    prefix = 'yqsytj'
+#    reportname_format = u'邀请收益统计 %s--%s'
+#
+#    @classmethod
+#    def generate_report_content(cls, start_time, end_time):
+#        from marketing.models import IntroducedByReward
+#
+#        introduced_records = IntroducedByReward.objects.filter(
+#            checked_status=0,
+#            activity_start_at=start_time,
+#            activity_end_at=end_time
+#        ).prefetch_related('user').prefetch_related('user__wanglibaouserprofile').select_related('introduced_by_person__wanglibaouserprofile')
+#
+#        output = cStringIO.StringIO()
+#
+#        writer = UnicodeWriter(output, delimiter='\t')
+#        writer.writerow([u'序号', u'被邀请人名称', u'被邀请人手机号', u'邀请人名称', u'邀请人手机号', u'产品名称',
+#                         u'首笔购买时间', u'投资金额', u'奖励金额', u'发放状态'])
+#        user, phone, user_parent, phone_parent = '', '', '', ''
+#        for index, record in enumerate(introduced_records):
+#            if record.user:
+#                user = record.user.wanglibaouserprofile.name
+#                phone = record.user.wanglibaouserprofile.phone,
+#
+#            if record.introduced_by_person:
+#                try:
+#                    user_parent = record.introduced_by_person.wanglibaouserprofile.name
+#                    phone_parent = record.introduced_by_person.wanglibaouserprofile.phone
+#                except:
+#                    user_parent, phone_parent = '', ''
+#
+#            writer.writerow([
+#                str(index + 1),
+#                user,
+#                unicode(phone),
+#                user_parent,
+#                unicode(phone_parent),
+#                record.product.name,
+#                timezone.localtime(record.first_bought_at,).strftime("%Y-%m-%d %H:%M:%S"),
+#                str(record.first_amount),
+#                str(record.introduced_reward),
+#                str(record.checked_status)
+#            ])
+#
+#        return output.getvalue()
