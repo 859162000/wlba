@@ -556,9 +556,9 @@ def commission(user, product, equity, start):
                             product=product, amount=_amount['amount__sum'],
                             earning=commission, order_id=first.order_id, paid=True, created_at=timezone.now())
             income.save()
-        sec_intro = IntroducedBy.objects.filter(user=first_intro.user).first()
+        sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
         if sec_intro:
-            second = MarginKeeper(first_intro.introduced_by)
+            second = MarginKeeper(sec_intro.introduced_by)
             second.deposit(commission, catalog=u"全民淘金")
 
             income = Income(user=sec_intro.introduced_by, invite=user, level=2,
