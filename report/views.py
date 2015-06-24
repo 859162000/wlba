@@ -8,8 +8,8 @@ from django.contrib import messages
 from django.db.models import Sum
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
     PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator, \
-    EearningReportGenerator, WithDrawDetailReportGenerator, P2PstatusReportGenerator, ClientInfoGenerator, \
-    RedpackReportGenerator, ProductionAmortizationsReportAllGenerator, IntroducedRewardGenerator
+    EearningReportGenerator, P2PstatusReportGenerator, ClientInfoGenerator, \
+    RedpackReportGenerator, ProductionAmortizationsReportAllGenerator
 from wanglibao_margin.models import Margin
 
 type = (
