@@ -4,9 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader, Context
 from django.utils import timezone
 from django.views.generic import TemplateView
-from datetime import datetime
 from marketing.models import NewsAndReport, SiteData
-from marketing.tops import Top
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
