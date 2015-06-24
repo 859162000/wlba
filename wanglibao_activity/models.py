@@ -73,8 +73,9 @@ class Activity(models.Model):
     product_ids = models.CharField(u'指定产品ID', max_length=200, blank=True, default='',
                                    help_text=u"如果有多个产品，则产品ID之间用英文逗号分割")
     description = models.TextField(u'描述', null=True, blank=True)
-    channel = models.CharField(u'渠道名称', max_length=64, blank=True,
+    channel = models.CharField(u'渠道名称', max_length=200, blank=True,
                                help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao，多个渠道用英文逗号间隔')
+    is_all_channel = models.BooleanField(u'所有渠道', default=False, help_text=u'如果勾选“所有渠道”，则系统不再限定渠道')
     start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动开始时间*")
     end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动结束时间*")
     is_stopped = models.BooleanField(u'是否停止', default=False)
