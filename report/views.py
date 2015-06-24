@@ -20,12 +20,12 @@ type = (
     (u'用户还款', 4),
     (u'满标复审', 5),
     (u'赠送记录', 6),
-    (u'提现详细记录', 7),
+    #(u'提现详细记录', 7),
     (u'满标状态变化', 8),
     (u'客户端信息', 9),
     (u'红包流水', 10),
     (u'产品还款计划all', 11),
-    (u'邀请收益统计', 12),
+    #(u'邀请收益统计', 12),
 )
 
 
@@ -68,8 +68,8 @@ class AdminReportExport(TemplateView):
             self._generate_p2paudit(request, start_time, end_time)
         if type == '6':
             self._generate_earning(request, start_time, end_time, request.POST.get('earning_type'))
-        if type == '7':
-            self._generate_withdrawdetail(request, start_time, end_time)
+        #if type == '7':
+        #    self._generate_withdrawdetail(request, start_time, end_time)
         if type == '8':
             self._generate_p2pstatus(request, start_time, end_time)
         if type == '9':
@@ -78,8 +78,8 @@ class AdminReportExport(TemplateView):
             self._generate_redpackdrecord(request, start_time, end_time)
         if type == '11':
             self._generate_production_amortizations_all(request, start_time, end_time)
-        if type == '12':
-            self._generate_introduced_reward(request, start_time, end_time)
+        #if type == '12':
+        #    self._generate_introduced_reward(request, start_time, end_time)
 
         return HttpResponseRedirect('export')
 
