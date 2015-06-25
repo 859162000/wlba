@@ -14,7 +14,7 @@ from models import Activity, ActivityRule, ActivityRecord
 from marketing import helper
 from marketing.models import IntroducedBy, Reward, RewardRecord
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_redpack.models import RedPackEvent
+from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_pay.models import PayInfo
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_account import message as inside_message
@@ -144,7 +144,7 @@ def _send_gift(user, rule, device_type, is_full, amount=0):
     if rule.gift_type == 'redpack':
         redpack_id = int(rule.redpack)
         #此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
-        _send_gift_redpack(user, rule, rtype, redpack_id, device_type, is_full)
+        _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_full)
 
     #送现金或收益
     if rule.gift_type == 'income':
@@ -349,25 +349,58 @@ def _send_gift_phonefare(user, rule, amount, is_full):
         return
 
 
-def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, is_full):
-    """ 红包模板目前仍沿用红包模块的模板，以后需要时再更改；
-        另外红包会发送短信和站内信，因此，此处记录流水时两者都记录。
-    """
+def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_full):
+    """ 活动中发送的红包使用规则里边配置的模板，其他的使用系统原有的模板。 """
     if rule.send_type == 'sys_auto':
         if rule.share_type != 'inviter':
-            redpack_backends.give_activity_redpack_new(user, rtype, redpack_id, device_type, rule)
-    #记录流水，目前红包系同时发送站内信和短信，因此此处记录两条流水，下同
-    _save_activity_record(rule, user, 'message', rule.rule_name, False, is_full)
-    _save_activity_record(rule, user, 'sms', rule.rule_name, False, is_full)
-    #检测是否有邀请关系
-    if rule.share_type == 'both' or rule.share_type == 'inviter':
-        user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
-        if user_ib:
-            #给邀请人发红包
-            if rule.send_type == 'sys_auto':
-                redpack_backends.give_activity_redpack_new(user_ib, rtype, redpack_id, device_type, rule)
-            _save_activity_record(rule, user_ib, 'message', rule.rule_name, True, is_full)
-            _save_activity_record(rule, user_ib, 'sms', rule.rule_name, True, is_full)
+            _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, None, amount)
+        if rule.share_type == 'both' or rule.share_type == 'inviter':
+            user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_introduced_by, amount)
+    else:
+        if rule.share_type != 'inviter':
+            _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
+        if rule.share_type == 'both' or rule.share_type == 'inviter':
+            user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
+
+
+def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_ib=None, amount=0):
+    """ rule: get message template """
+    now = timezone.now()
+    if user_ib:
+        this_user = user_ib
+    else:
+        this_user = user
+    user_channel = helper.which_channel(this_user)
+    device_type = _decide_device(device_type)
+    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id,
+                                      give_start_at__lt=now, give_end_at__gt=now).first()
+    if rps:
+        if rps.target_channel != "" and rule.activity.is_all_channel is False:
+            chs = rps.target_channel.split(",")
+            chs = [m for m in chs if m.strip() != ""]
+            if user_channel not in chs:
+                return
+        redpack = RedPack.objects.filter(event=rps, status="unused").first()
+        if redpack:
+            event = redpack.event
+            give_pf = event.give_platform
+            if give_pf == "all" or give_pf == device_type:
+                if redpack.token != "":
+                    redpack.status = "used"
+                    redpack.save()
+                record = RedPackRecord()
+                record.user = this_user
+                record.redpack = redpack
+                record.change_platform = device_type
+                record.save()
+                if user_ib:
+                    _send_message_sms(user, rule, user_ib, None, amount)
+                else:
+                    _send_message_sms(user, rule, None, None, amount)
 
 
 def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=False, is_full=False):
@@ -404,32 +437,40 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
     title = rule.rule_name
     mobile = user.wanglibaouserprofile.phone
     inviter_phone, invited_phone, reward_content = '', '', ''
-    end_date, name, highest_amount = '', rule.rule_name, ''
+    end_date, name, highest_amount, redpack_amount, invest_amount = '', rule.rule_name, '', '', ''
+    fmt_str = "%Y年%m月%d日"
     if reward:
         reward_content = reward.content
-        fmt_str = "%Y年%m月%d日"
         end_date = timezone.localtime(reward.end_time).strftime(fmt_str)
         name = reward.type
     if rule.redpack:
         red_pack = RedPackEvent.objects.filter(id=int(rule.redpack)).first()
         if red_pack:
+            redpack_amount = red_pack.amount
+            invest_amount = red_pack.invest_amount
             highest_amount = red_pack.highest_amount
             name = red_pack.name
+            end_date = timezone.localtime(red_pack.unavailable_at).strftime(fmt_str)
+    context = Context({
+        'mobile': safe_phone_str(mobile),
+        'reward': reward_content,
+        'income': rule.income,
+        'amount': amount,
+        'end_date': end_date,
+        'name': name,
+        'redpack_amount': redpack_amount,
+        'invest_amount': invest_amount,
+        'highest_amount': highest_amount
+    })
+
     if user_introduced_by:
         msg_template = rule.msg_template_introduce
         sms_template = rule.sms_template_introduce
         inviter_phone = safe_phone_str(user_introduced_by.wanglibaouserprofile.phone)
         invited_phone = safe_phone_str(mobile)
-        context = Context({
-            'mobile': safe_phone_str(mobile),
-            'reward': reward_content,
+        context.update({
             'inviter': inviter_phone,
             'invited': invited_phone,
-            'income': rule.income,
-            'amount': amount,
-            'end_date': end_date,
-            'name': name,
-            'highest_amount': highest_amount
         })
         if msg_template:
             msg = Template(msg_template)
@@ -448,16 +489,9 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
         introduced_by = IntroducedBy.objects.filter(user=user).first()
         if introduced_by and introduced_by.introduced_by:
             inviter_phone = safe_phone_str(introduced_by.introduced_by.wanglibaouserprofile.phone)
-        context = Context({
-            'mobile': invited_phone,
-            'reward': reward_content,
+        context.update({
             'inviter': inviter_phone,
             'invited': invited_phone,
-            'income': rule.income,
-            'amount': amount,
-            'end_date': end_date,
-            'name': name,
-            'highest_amount': highest_amount
         })
         if msg_template:
             msg = Template(msg_template)

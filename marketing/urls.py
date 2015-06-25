@@ -75,3 +75,6 @@ urlpatterns += patterns(
     # url(r'^list_day/$', Investment.as_view(), name='list_day'),
 )
 
+urlpatterns += patterns('',
+    url(r'^xunlei/july/$', TemplateView.as_view(template_name="xunlei-july.jade"), name='xunlei-july-activity')
+)

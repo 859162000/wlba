@@ -236,10 +236,6 @@ def give_first_buy_redpack(user, device_type):
     _give_redpack(user, "first_buy", device_type)
 
 
-def give_activity_redpack_new(user, rtype, redpack_id, device_type, rule):
-    _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule)
-
-
 def give_buy_redpack(user, device_type, rtype='buy', describe=''):
     now = timezone.now()
     rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
@@ -247,35 +243,6 @@ def give_buy_redpack(user, device_type, rtype='buy', describe=''):
         rps = rps.filter(describe=describe)
     for x in rps:
         give_activity_redpack(user=user, event=x, device_type=device_type)
-
-
-def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule):
-    """ rule_id: get message template """
-    now = timezone.now()
-    user_channel = helper.which_channel(user)
-    device_type = _decide_device(device_type)
-    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id, \
-                                      give_start_at__lt=now, give_end_at__gt=now).first()
-    if rps:
-        if rps.target_channel != "" and rule.activity.is_all_channel is False:
-            chs = rps.target_channel.split(",")
-            chs = [m for m in chs if m.strip() != ""]
-            if user_channel not in chs:
-                return
-        redpack = RedPack.objects.filter(event=rps, status="unused").first()
-        if redpack:
-            event = redpack.event
-            give_pf = event.give_platform
-            if give_pf == "all" or give_pf == device_type:
-                if redpack.token != "":
-                    redpack.status = "used"
-                    redpack.save()
-                record = RedPackRecord()
-                record.user = user
-                record.redpack = redpack
-                record.change_platform = device_type
-                record.save()
-                _send_message(user, event)
 
 
 def _give_redpack(user, rtype, device_type):
