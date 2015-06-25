@@ -516,8 +516,15 @@ class AccountInviteAllGoldAPIView(APIView):
                 second_earning += rd.earning
                 second_count += 1
 
-        for k, v in commission.items():
-            first_intro.append([safe_phone_str(users[k].phone), v['amount'], v['earning']])
+        introduces = IntroducedBy.objects.filter(introduced_by=request.user).select_related("user__wanglibaouserprofile").all()
+        keys = commission.keys()
+        for x in introduces:
+            user_id = x.user.id
+            if user_id in keys:
+                first_intro.append([safe_phone_str(users[user_id].phone), 
+                                commission[user_id]['amount'], commission[user_id]['earning']])
+            else:
+                first_intro.append([safe_phone_str(x.user.wanglibaouserprofile.phone), 0, 0])
 
         return Response({"ret_code":0, "first":{"amount":first_amount, 
                         "earning":first_earning, "count":first_count, "intro":first_intro},
