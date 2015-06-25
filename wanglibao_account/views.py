@@ -412,14 +412,10 @@ class AccountHomeAPIView(APIView):
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = \
-            DailyIncome.objects.filter(user=user, date__gt=today + datetime.timedelta(days=-8)).aggregate(
-                Sum('income'))[
-                'income__sum'] or 0
-        fund_income_month = \
-            DailyIncome.objects.filter(user=user, date__gt=today + datetime.timedelta(days=-31)).aggregate(
-                Sum('income'))[
-                'income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(user=user, 
+                            date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))[ 'income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(user=user, 
+                            date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
         res = {
             'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
@@ -499,27 +495,42 @@ class AccountInviteAllGoldAPIView(APIView):
     def post(self, request, **kwargs):
         users = {}
         records = Income.objects.filter(user=request.user, paid=True).all()
-        first_amount = first_earning = second_amount = second_earning = first_count = second_count = 0
+        second_amount = second_earning = first_count = second_count = 0
         first_intro = []
+        commission = {}
         for rd in records:
             if rd.user_id not in users:
                 users[rd.user_id] = rd.user.wanglibaouserprofile
             if rd.invite_id not in users:
                 users[rd.invite_id] = rd.invite.wanglibaouserprofile
+            if rd.invite_id not in commission:
+                commission[rd.invite_id] = {"amount":0, "earning":0}
             if rd.level == 1:
-                first_amount += rd.amount
-                first_earning += rd.earning
                 first_count += 1
-                first_intro.append(safe_phone_str(users[rd.invite_id].phone))
+                commission[rd.invite_id]["amount"] += rd.amount
+                commission[rd.invite_id]["earning"] += rd.earning
             else:
                 second_amount += rd.amount
                 second_earning += rd.earning
                 second_count += 1
 
-        return Response({"ret_code":0, "first":{"amount":first_amount,
-                        "earning":first_earning, "count":first_count, "intro":first_intro},
+        for k, v in commission.items():
+            first_intro.append([safe_phone_str(users[k].phone), v['amount'], v['earning']])
+
+        return Response({"ret_code":0, "first":{"count":first_count, "intro":first_intro},
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}})
+
+class AccountInviteIncomeAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, **kwargs):
+        amount = Income.objects.filter(user=request.user, paid=True).aggregate(Sum('earning'))
+        if amount['earning__sum']:
+            earning = amount['earning__sum']
+        else:
+            earning = 0
+        return Response({"ret_code":0, "earning":earning})
 
 class AccountInviteHikeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
