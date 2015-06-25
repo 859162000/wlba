@@ -84,7 +84,7 @@ def calc_broker_commission(product_id):
     product = P2PProduct.objects.filter(id=product_id).first()
     _method = product.pay_method
     _period = product.period
-    if _method.startswith(u"日计息") and _period <= 31 or _period <=1:
+    if _method.startswith(u"日计息") and _period <= 61 or _period <=2:
         return
     if redpack_backends.commission_exist(product):
         return
