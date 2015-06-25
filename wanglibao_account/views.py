@@ -37,7 +37,7 @@ from marketing.utils import set_promo_user
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
-from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract#, CjdaoUtils
+from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
@@ -61,10 +61,6 @@ from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from wanglibao_redpack.models import Income
 from wanglibao_activity.models import ActivityRecord
-
-# from wanglibao.settings import CJDAOKEY
-# from wanglibao_account.tasks import cjdao_callback
-# from wanglibao.settings import RETURN_REGISTER
 
 from wanglibao.settings import TINMANGKEY
 from wanglibao_account.tasks import tianmang_callback
@@ -334,7 +330,7 @@ class AccountHome(TemplateView):
 
         total_asset = p2p_total_asset
 
-        xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
+        #xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
 
         #酒仙众筹用户
         tab_jiuxian = False
@@ -362,7 +358,6 @@ class AccountHome(TemplateView):
             'total_asset': total_asset,
             'mode': mode,
             'announcements': AnnouncementAccounts,
-            'xunlei_vip': xunlei_vip,
             'tab_jiuxian': tab_jiuxian,
             'equity_jiuxian': equity_jiuxian,
             'jiuxian_selected': jiuxian_selected
@@ -498,25 +493,33 @@ class AccountInviteAPIView(APIView):
             res.append(invite)
         return Response({"ret_code":0, "data":res})
 
-from wanglibao_profile.models import WanglibaoUserProfile
 class AccountInviteAllGoldAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, **kwargs):
-        first_intro_infos = []
-        first_intro_list = Income.objects.filter(user=request.user, level=1).values("invite").annotate(amount_sum=Sum('amount'), earning_sum=Sum("earning"))
+        users = {}
+        records = Income.objects.filter(user=request.user, paid=True).all()
+        first_amount = first_earning = second_amount = second_earning = first_count = second_count = 0
+        first_intro = []
+        for rd in records:
+            if rd.user_id not in users:
+                users[rd.user_id] = rd.user.wanglibaouserprofile
+            if rd.invite_id not in users:
+                users[rd.invite_id] = rd.invite.wanglibaouserprofile
+            if rd.level == 1:
+                first_amount += rd.amount
+                first_earning += rd.earning
+                first_count += 1
+                first_intro.append(safe_phone_str(users[rd.invite_id].phone))
+            else:
+                second_amount += rd.amount
+                second_earning += rd.earning
+                second_count += 1
 
-        for first_intro in first_intro_list:
-            invite_profile = WanglibaoUserProfile.objects.filter(user=first_intro['invite']).first()
-            first_intro_infos.append({"friend_phone": invite_profile.phone, "amount_sum": first_intro['amount_sum'], "earning_sum": ["earning_sum"]})
-        second_intro_count = Income.objects.filter(user=request.user, level=2).count()
-        second_intro = Income.objects.filter(user=request.user, level=2).aggregate(second_amount_sum=Sum('amount'), second_earning_sum=Sum("earning"))
-        res={"first_intro_infos":first_intro_infos, "second_intro_info": {"second_intro_count":second_intro_count,
-                                                                        "second_amount_sum": second_intro["second_amount_sum"],
-                                                                        "second_earning_sum": second_intro["second_earning_sum"]
-                                                                        }
-                                                                }
-        return Response({"ret_code":0, "data":res})
+        return Response({"ret_code":0, "first":{"amount":first_amount,
+                        "earning":first_earning, "count":first_count, "intro":first_intro},
+                        "second":{"amount":second_amount, "earning":second_earning,
+                        "count":second_count}})
 
 class AccountInviteHikeAPIView(APIView):
     permission_classes = (IsAuthenticated, )

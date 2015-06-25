@@ -542,6 +542,10 @@ def get_hike_amount(user):
         amount = _amount['amount__sum']
     return amount
 
+def commission_exist(product):
+    record = Income.objects.filter(product=product).first()
+    return record
+
 def commission(user, product, equity, start):
     _amount = P2PRecord.objects.filter(user=user, product=product, create_time__gt=start).aggregate(Sum('amount'))
     if _amount['amount__sum'] and _amount['amount__sum'] <= equity:
