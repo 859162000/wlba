@@ -136,7 +136,7 @@ urlpatterns = patterns(
     url(r'^home/invite/$', AccountInviteAPIView.as_view()),
     url(r'^home/automatic/$', AutomaticApiView.as_view()),
     url(r'^home/invite/hike/$', AccountInviteHikeAPIView.as_view()),
-    url(r'^home/invite/quanmin/$', AccountInviteAllGoldAPIView.as_view()),
+    url(r'^home/invite/broker/$', AccountInviteAllGoldAPIView.as_view()),
     url(r'^trade_record/', TradeRecordAPIView.as_view()),
 
     url(r'^p2p/contract/(?P<product_id>\d+)', UserProductContract.as_view()),
