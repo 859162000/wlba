@@ -86,6 +86,8 @@ def calc_broker_commission(product_id):
     _period = product.period
     if _method.startswith(u"日计息") and _period <= 31 or _period <=1:
         return
+    if redpack_backends.commission_exist(product):
+        return
 
     start = timezone.datetime(2015, 6, 22, 16,0,0, tzinfo=timezone.utc)
     with transaction.atomic():
