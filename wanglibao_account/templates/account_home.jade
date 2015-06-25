@@ -20,12 +20,6 @@ block main
       else
         span
           a#name-hight(href="/accounts/id_verify/") 立即进行实名认证
-      //|&nbsp;&nbsp;&nbsp;
-      //if xunlei_vip.isvip == True
-      //  span.icon.xunlei-vip-yes(title="已绑定迅雷会员")
-      //else
-      //  a.xunlei-binding-modal(href="#xunlei-binding-modal")
-      //    span.icon.xunlei-vip-no(title="未绑定迅雷会员")
 
     .card-panel
       .total-asset-money-card
@@ -303,30 +297,6 @@ block main
                 td(colspan='4') 无持仓记录
 
         .space-vertical-m
-
-  if not xunlei_vip.isvip
-        #xunlei-binding-modal(style="display:none;")
-          .modal-header
-            .modal-title-bar
-              .modal-title 绑定迅雷会员
-          .modal-body
-            .modal-content-padding
-              p.align-center
-                img(src="/static/images/activity/xunlei_wanglibao.png")
-              ul.clearfix
-                li &bull; 绑定迅雷会员后，投资指定P2P产品，即可额外获得
-                  span.blue 1%
-                  |年化收益！
-                li &bull; 奖励收益将在满标后2个工作日内发放。
-              .space-vertical-l
-              .row
-                .span7
-                  a.button.button-account(href='/accounts/login/xunlei', target="_blank")
-                    span.font-s.padding-l-r-m 立即绑定迅雷会员
-                .span5-omega.padding-top-xs.align-center.font-s
-                  span 我还不是会员，
-                  a.blue(href="http://act.vip.xunlei.com/vip/2014/xlhyk/?referfrom=wlb", target="_blank") 立即开通
-            .space-vertical-s
 
 block script
   script.

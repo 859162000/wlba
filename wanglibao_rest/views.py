@@ -204,15 +204,18 @@ class RegisterAPIView(APIView):
         if status != 200:
             return Response({"ret_code": 30014, "message": u"验证码输入错误"})
 
-        #if User.objects.filter(wanglibaouserprofile__phone=identifier,
-        #                       wanglibaouserprofile__phone_verified=True).exists():
         if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30015, "message": u"该手机号已经注册"})
 
         device = split_ua(request)
         invite_code = request.DATA.get('invite_code', "")
-        if not invite_code and ("channel_id" in device and device['channel_id'] == "baidu"):
-            invite_code = "baidushouji"
+        if not invite_code and "channel_id" in device:
+            if device['channel_id'] == "baidu":
+                invite_code = "baidushouji"
+            else:
+                invite_code = device['channel_id']
+        #if not invite_code and ("channel_id" in device and device['channel_id'] == "baidu"):
+        #    invite_code = "baidushouji"
 
         if invite_code:
             try:
