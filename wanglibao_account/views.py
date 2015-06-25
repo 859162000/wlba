@@ -59,6 +59,7 @@ from wanglibao_p2p.keeper import EquityKeeperDecorator
 from order.utils import OrderHelper
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
+from wanglibao_redpack.models import Income
 from wanglibao_activity.models import ActivityRecord
 
 # from wanglibao.settings import CJDAOKEY
@@ -495,6 +496,26 @@ class AccountInviteAPIView(APIView):
             else:
                 invite['buy'] = True
             res.append(invite)
+        return Response({"ret_code":0, "data":res})
+
+from wanglibao_profile.models import WanglibaoUserProfile
+class AccountInviteAllGoldAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, **kwargs):
+        first_intro_infos = []
+        first_intro_list = Income.objects.filter(user=request.user, level=1).values("invite").annotate(amount_sum=Sum('amount'), earning_sum=Sum("earning"))
+
+        for first_intro in first_intro_list:
+            invite_profile = WanglibaoUserProfile.objects.filter(user=first_intro['invite']).first()
+            first_intro_infos.append({"friend_phone": invite_profile.phone, "amount_sum": first_intro['amount_sum'], "earning_sum": ["earning_sum"]})
+        second_intro_count = Income.objects.filter(user=request.user, level=2).count()
+        second_intro = Income.objects.filter(user=request.user, level=2).aggregate(second_amount_sum=Sum('amount'), second_earning_sum=Sum("earning"))
+        res={"first_intro_infos":first_intro_infos, "second_intro_info": {"second_intro_count":second_intro_count,
+                                                                        "second_amount_sum": second_intro["second_amount_sum"],
+                                                                        "second_earning_sum": second_intro["second_earning_sum"]
+                                                                        }
+                                                                }
         return Response({"ret_code":0, "data":res})
 
 class AccountInviteHikeAPIView(APIView):
