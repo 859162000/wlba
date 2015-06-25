@@ -88,6 +88,7 @@ urlpatterns = patterns(
     url(r'^announcement/', include('wanglibao_announcement.urls')),
     url(r'^redpacket/', include('wanglibao_redpack.urls')),
     url(r'^templates/', include('wanglibao_activity.urls')),
+    url(r'^taojin/', RedirectView.as_view(url="/activity/pan_gold/")),
 
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
 )

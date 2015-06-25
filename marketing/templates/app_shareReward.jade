@@ -1,62 +1,53 @@
 - load formatters
 doctype html
-html
+html(style="background:#F8F2CF")
   head
-    meta(name="format-detection" content="telephone=no,email=no")
-    title 有奖邀请
-    meta(charset="utf-8")
-    meta(content="telephone=no,email=no" ,name="format-detection")
-    meta(content="yes" ,name="apple-mobile-web-app-capable")
-    script.
-      (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
-    link(href="/static/styles/mobile_activity/app.css", rel="stylesheet")
+    title 全民淘金
+    include include/app_head
   body
-    .app-invitation-body
-      .app-invitation-ticket
-        .ticket-left
-          .left-text
-            p 话费（元）
-            p 30
-          .left-icon
-            img(src="/static/imgs/app/shareReward/phone.png")
-        .ticket-right
-          .right-icon
-            img(src="/static/imgs/app/shareReward/pig.png")
-          .right-text
-            p 加息
-            p 0.1%
-
-      .app-invitation-reward
-        .reward-title.title-public 邀请奖励对照表
-        .reward-body
-          table.aiqiyi-table
-            tr
-              th 成功邀请人数
-              th.before 话费奖励
-              th.before 加息奖励
-            mixin tr(num, reward, jiaReward)
-              tr
-                td=num
-                td=reward
-                td=jiaReward
-            +tr(1, 30, '0.1%')
-            +tr(2, 60, '0.2%')
-            +tr(3, 90, '0.3%')
-            +tr(4, 120, '0.4%')
-            +tr(5, 150, '0.5%')
-            +tr('...', '...', '...')
-      .app-invitation-step
-        .step-title.title-public 邀请步骤
-        .step-body
-          img(src="/static/imgs/app/shareReward/rules.jpg")
-      .app-invitation-rule
-        .rule-title.title-public 详细规则
-        .step-body
-          p 1. 被邀请人投资200元即为成功邀请；
-          p 2. 在投资成功时邀请，被邀请人成功投资后，邀请人投资项目将在原有年化基础上加息0.1%；
-          p 3. 直接点击有奖邀请，邀请人最近一笔投资将在原有年化基础上加息0.1%；
-          p 4. 对单个标的加息上限为2%，即若当前标的年化为15%，则加息后的最高年化提升为17%，以此类推；
-          p 5. 邀请成功投资后，邀请者和被邀请者都能获得30元话费；
-          p 6. 项目收益目前是到项目满标还款之后才会开始计算，请关注您所投资标的的状态；
-          p 7. 项目收益会在标的结款时一并发给您。
-
+    .m-gold-banner
+      img(src='/static/imgs/mobile_activity/people_gold/gold_banner.jpg')
+    .m-gold-body
+      .gold-body-date 活动开始时间 ：2015-06-23
+      .gold-body-rule-img
+        .rule-img-title 赚钱流程
+        .rule-img-title2 简单三步，轻松赚现金
+        img(src='/static/imgs/mobile_activity/people_gold/gold_rule1.jpg')
+        img(src='/static/imgs/mobile_activity/people_gold/gold_rule2.jpg')
+      .gold-body-rule-text
+        .rule-text.rule-img-title 活动细则
+        .rule-text-main
+          mixin ruleText(title, items)
+            h2=title
+            each item in items
+              p
+                span —
+                span.item-list=item
+          - var item1 = ['邀请人资格：网利宝注册用户', '被邀请人资格：需在注册时使用邀请人提供的专属链接或专属邀请码，网利宝仅以此确认邀请关系', '邀请关系：活动截止之日前产生的邀请关系均可享受活动邀请奖金']
+          +ruleText('1、邀请规则：', item1)
+          - var item2 = ['用户A邀请新用户B，并享有新用户B每笔投资额3‰的邀请奖金', '用户B再邀请新用户C，则用户B享有新用户C每笔交易额3‰的邀请奖金。同时，用户A也可以享有新用户C每笔投资额3‰的邀请奖金', '用户C再邀请新用户D，则用户C享有新用户D每笔投资额3‰的邀请奖金。同时，用户B也可以享有新用户D每笔投资额3‰的邀请奖金。此时，用户A不再享有新用户D的邀请奖金，以此类推']
+          +ruleText('2、邀请奖金规则', item2)
+          - var item3 = ['按照受邀请人在活动期间每笔投资额的3‰实时计算', '受邀请人投资标满起息日，邀请奖金发放至邀请人账户']
+          +ruleText('3、奖金结算：', item3)
+          - var item4 = ['邀请人所获奖金可提现可投资']
+          +ruleText('4、奖励提取：', item4)
+          - var item5 = ['被邀请用户还可享用50元现金红包，投资满300元即可使用', '购买理财产品，完成首次单笔200元（含）以上交易，邀请关系建立，邀请者可享30元话费', '赠送话费将于好友理财成功后3个工作日内发放至您的交易手机号']
+          +ruleText('5、其他奖励：', item5)
+      .gold-body-explam
+        h2 示例：
+        p 活动期内用户小王新邀请好友30名。30名受邀人活动期内每人投资2月标10万元共三次，同时这些人每人再邀请30人，被邀请（30*30）=900人每位投资2月标10万元共三次。小王可获邀请奖金：30 x 10 万元 x 3次 x 3‰ + 30 x 30 x 10万元 x3次 x 3‰ = 837,000元
+        p.explam-gle 如果您有300邀请好友，呵呵…………
+        p 您的奖金将是812,70,000元！
+      .gold-body-rule-end
+        .rule-end.rule-img-title 活动规则
+        p 活动有效期：2015年6月23日-2016年6月23日
+        p 本活动可与网利宝其他优惠活动共享
+        p 网利宝两月期(包含两月期)以下的投资产品不参加本活动
+        p 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现
+        p 本活动不收取任何费用，谨防上当受骗
+        p 网利宝对此活动享有最终解释权
+    .m-gold-footer
+      .up-body
+        span.logo 官方微信：iwanglibao
+        span 理财热线：4008-588-066
+      .bottom-body Copyright©2015 wanglibao.com Inc. All Right Reserved.
