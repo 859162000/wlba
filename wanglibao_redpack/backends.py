@@ -249,7 +249,7 @@ def give_buy_redpack(user, device_type, rtype='buy', describe=''):
         give_activity_redpack(user=user, event=x, device_type=device_type)
 
 
-def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id):
+def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule):
     """ rule_id: get message template """
     now = timezone.now()
     user_channel = helper.which_channel(user)
@@ -257,7 +257,7 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule_id):
     rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id, \
                                       give_start_at__lt=now, give_end_at__gt=now).first()
     if rps:
-        if rps.target_channel != "":
+        if rps.target_channel != "" and rule.activity.is_all_channel is False:
             chs = rps.target_channel.split(",")
             chs = [m for m in chs if m.strip() != ""]
             if user_channel not in chs:
@@ -556,12 +556,13 @@ def commission(user, product, equity, start):
                             product=product, amount=_amount['amount__sum'],
                             earning=commission, order_id=first.order_id, paid=True, created_at=timezone.now())
             income.save()
-        sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
-        if sec_intro:
-            second = MarginKeeper(sec_intro.introduced_by)
-            second.deposit(commission, catalog=u"全民淘金")
 
-            income = Income(user=sec_intro.introduced_by, invite=user, level=2,
-                            product=product, amount=_amount['amount__sum'],
-                            earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
-            income.save()
+            sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
+            if sec_intro:
+                second = MarginKeeper(sec_intro.introduced_by)
+                second.deposit(commission, catalog=u"全民淘金")
+
+                income = Income(user=sec_intro.introduced_by, invite=user, level=2,
+                                product=product, amount=_amount['amount__sum'],
+                                earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
+                income.save()

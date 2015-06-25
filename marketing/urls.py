@@ -56,6 +56,8 @@ urlpatterns = patterns(
     # url(r'^app_summer/$', TemplateView.as_view(template_name="app_summer.jade")),
     url(r'^newxunlei/$', TemplateView.as_view(template_name="newxunlei.jade")),
     url(r'^father/$', TemplateView.as_view(template_name="app_fatherday.jade")),
+    url(r'^weipai/$', TemplateView.as_view(template_name="app_share_weipai.jade")),
+    url(r'^app_gold/$', TemplateView.as_view(template_name="app_gold.jade")),
     url(r'^pan_gold/$', TemplateView.as_view(template_name="pan_gold.jade")),
 )
 
