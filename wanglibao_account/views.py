@@ -494,7 +494,7 @@ class AccountInviteAllGoldAPIView(APIView):
 
     def post(self, request, **kwargs):
         users = {}
-        records = Income.objects.filter(user=request.user, paid=True).all()
+        records = Income.objects.filter(user=request.user, paid=True).select_related('user__wanglibaouserprofile', 'invite__wanglibaouserprofile').all()
         second_amount = second_earning = first_count = second_count = 0
         first_intro = []
         commission = {}
