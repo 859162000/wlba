@@ -412,14 +412,10 @@ class AccountHomeAPIView(APIView):
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = \
-            DailyIncome.objects.filter(user=user, date__gt=today + datetime.timedelta(days=-8)).aggregate(
-                Sum('income'))[
-                'income__sum'] or 0
-        fund_income_month = \
-            DailyIncome.objects.filter(user=user, date__gt=today + datetime.timedelta(days=-31)).aggregate(
-                Sum('income'))[
-                'income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(user=user, 
+                            date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))[ 'income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(user=user, 
+                            date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
         res = {
             'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
@@ -520,6 +516,17 @@ class AccountInviteAllGoldAPIView(APIView):
                         "earning":first_earning, "count":first_count, "intro":first_intro},
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}})
+
+class AccountInviteIncomeAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, **kwargs):
+        amount = Income.objects.filter(user=request.user, paid=True).aggregate(Sum('earning'))
+        if amount['earning__sum']:
+            earning = amount['earning__sum']
+        else:
+            earning = 0
+        return Response({"ret_code":0, "earning":earning})
 
 class AccountInviteHikeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
