@@ -495,7 +495,7 @@ class AccountInviteAllGoldAPIView(APIView):
     def post(self, request, **kwargs):
         users = {}
         records = Income.objects.filter(user=request.user, paid=True).all()
-        second_amount = second_earning = first_count = second_count = 0
+        first_amount = first_earning = second_amount = second_earning = first_count = second_count = 0
         first_intro = []
         commission = {}
         for rd in records:
@@ -506,6 +506,8 @@ class AccountInviteAllGoldAPIView(APIView):
             if rd.invite_id not in commission:
                 commission[rd.invite_id] = {"amount":0, "earning":0}
             if rd.level == 1:
+                first_amount += rd.amount
+                first_earning += rd.earning
                 first_count += 1
                 commission[rd.invite_id]["amount"] += rd.amount
                 commission[rd.invite_id]["earning"] += rd.earning
@@ -517,7 +519,8 @@ class AccountInviteAllGoldAPIView(APIView):
         for k, v in commission.items():
             first_intro.append([safe_phone_str(users[k].phone), v['amount'], v['earning']])
 
-        return Response({"ret_code":0, "first":{"count":first_count, "intro":first_intro},
+        return Response({"ret_code":0, "first":{"amount":first_amount, 
+                        "earning":first_earning, "count":first_count, "intro":first_intro},
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}})
 
