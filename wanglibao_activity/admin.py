@@ -16,7 +16,7 @@ class ActivityAdmin(admin.ModelAdmin):
                     'activity_status', 'is_stopped', 'priority')
     search_fields = ('name', 'channel')
     list_filter = ('category', 'platform', 'is_stopped')
-    ordering = ('-priority', '-end_at')
+    ordering = ('-priority', '-created_at')
 
 
 class ActivityRuleAdmin(admin.ModelAdmin):

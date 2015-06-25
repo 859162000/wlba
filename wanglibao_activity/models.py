@@ -160,7 +160,8 @@ class ActivityRule(models.Model):
                                     help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\
                                               内置：注册人手机：“{{mobile}}，奖品激活码：{{reward}}，截止日期{{end_date}}<br/>\
                                               邀请人：{{inviter}}，被邀请人：{{invited}}，赠送金额/比率{{income}}<br/>\
-                                              活动名称：{{name}}，红包最高抵扣金额：{{highest_amount}}，充值/投资金额{{amount}}”')
+                                              活动名称：{{name}}，红包最高抵扣金额：{{highest_amount}}，充值/投资金额{{amount}}<br/>\
+                                              红包金额/百分比：{{redpack_amount}}，红包投资门槛：{{invest_amount}}”')
     sms_template = models.TextField(u'短信模板（不填则不发）', blank=True,
                                     help_text=u'短信模板不填写则触发该规则时不发手机短信，变量写在2个大括号之间，变量：同上')
     msg_template_introduce = models.TextField(u'邀请人站内信模板', blank=True,
