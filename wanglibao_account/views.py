@@ -529,7 +529,7 @@ class AccountInviteAllGoldAPIView(APIView):
         return Response({"ret_code":0, "first":{"amount":first_amount, 
                         "earning":first_earning, "count":first_count, "intro":first_intro},
                         "second":{"amount":second_amount, "earning":second_earning,
-                        "count":second_count}})
+                        "count":second_count}, "count":len(introduces)})
 
 class AccountInviteIncomeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
