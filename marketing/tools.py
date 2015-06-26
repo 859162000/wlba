@@ -90,7 +90,7 @@ def calc_broker_commission(product_id):
         return
 
     start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
-    end = timezone.datetime(2016, 6, 23, 15, 59, 59, tzinfo=timezone.utc)
+    end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
     with transaction.atomic():
         for equity in product.equities.all():
             redpack_backends.commission(equity.user, product, equity.equity, start, end)
