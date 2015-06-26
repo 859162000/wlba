@@ -2,9 +2,49 @@
 import logging
 from django.conf import settings
 import requests
+from django.db.models import Sum
 from wanglibao_account.models import IdVerification
+from wanglibao_redpack.models import Income
 
 logger = logging.getLogger(__name__)
+
+
+def broker_invite_list(user):
+    users = {}
+    records = Income.objects.filter(user=user, paid=True).select_related('user__wanglibaouserprofile', 'invite__wanglibaouserprofile').all()
+    first_amount = first_earning = second_amount = second_earning = first_count = second_count = 0
+    first_intro = [] 
+    commission = {} 
+    for rd in records:
+        if rd.user_id not in users:
+            users[rd.user_id] = rd.user.wanglibaouserprofile
+        if rd.invite_id not in users:
+            users[rd.invite_id] = rd.invite.wanglibaouserprofile
+        if rd.invite_id not in commission:
+            commission[rd.invite_id] = {"amount":0, "earning":0}
+        if rd.level == 1:
+            first_amount += rd.amount
+            first_earning += rd.earning
+            first_count += 1 
+            commission[rd.invite_id]["amount"] += rd.amount
+            commission[rd.invite_id]["earning"] += rd.earning
+        else:
+            second_amount += rd.amount
+            second_earning += rd.earning
+            second_count += 1 
+    return {"first_amount":first_amount, "first_earning":first_earning,
+            "second_amount":second_amount, "second_earning":second_earning,
+            "first_count":first_count, "second_count":second_count,
+            "first_intro":first_intro, "commission":commission,
+            "users":users}
+
+def invite_earning(user):
+    amount = Income.objects.filter(user=user, paid=True).aggregate(Sum('earning'))
+    if amount['earning__sum']:
+        earning = amount['earning__sum']
+    else:
+        earning = 0
+    return earning
 
 
 class TestIDVerifyBackEnd(object):

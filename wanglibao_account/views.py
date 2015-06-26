@@ -39,7 +39,7 @@ from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
-from wanglibao_account import third_login, message as inside_message
+from wanglibao_account import third_login, backends as account_backends, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
@@ -59,7 +59,6 @@ from wanglibao_p2p.keeper import EquityKeeperDecorator
 from order.utils import OrderHelper
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
-from wanglibao_redpack.models import Income
 from wanglibao_activity.models import ActivityRecord
 
 from wanglibao.settings import TINMANGKEY
@@ -457,8 +456,16 @@ class AccountInviteView(TemplateView):
             friends_list = paginator.page(1)
         except Exception:
             friends_list = paginator.page(paginator.num_pages)
+
+        dic = account_backends.broker_invite_list(self.request.user)
         return {
-            'friends': friends_list
+            'friends': friends_list,
+            "earning": dic['first_earning'] + dic['second_earning'],
+            "amount": dic['first_amount'] + dic['second_amount'],
+            "first_amount": dic['first_amount'],
+            "first_count": dic['first_count'],
+            "second_amount": dic['second_amount'],
+            "second_count": dic['second_count']
         }
 
 
@@ -493,28 +500,14 @@ class AccountInviteAllGoldAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, **kwargs):
-        users = {}
-        records = Income.objects.filter(user=request.user, paid=True).select_related('user__wanglibaouserprofile', 'invite__wanglibaouserprofile').all()
-        first_amount = first_earning = second_amount = second_earning = first_count = second_count = 0
-        first_intro = []
-        commission = {}
-        for rd in records:
-            if rd.user_id not in users:
-                users[rd.user_id] = rd.user.wanglibaouserprofile
-            if rd.invite_id not in users:
-                users[rd.invite_id] = rd.invite.wanglibaouserprofile
-            if rd.invite_id not in commission:
-                commission[rd.invite_id] = {"amount":0, "earning":0}
-            if rd.level == 1:
-                first_amount += rd.amount
-                first_earning += rd.earning
-                first_count += 1
-                commission[rd.invite_id]["amount"] += rd.amount
-                commission[rd.invite_id]["earning"] += rd.earning
-            else:
-                second_amount += rd.amount
-                second_earning += rd.earning
-                second_count += 1
+        dic = account_backends.broker_invite_list(request.user)
+        users = dic['users']
+        first_amount, first_earning, second_amount, second_earning = dic['first_amount'],\
+                dic['first_earning'], dic['second_amount'], dic['second_earning']
+        first_count, second_count = dic['first_count'], dic['second_count']
+        first_intro = dic['first_intro']
+        commission = dic['commission']
+        
 
         introduces = IntroducedBy.objects.filter(introduced_by=request.user).select_related("user__wanglibaouserprofile").all()
         keys = commission.keys()
@@ -535,11 +528,7 @@ class AccountInviteIncomeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, **kwargs):
-        amount = Income.objects.filter(user=request.user, paid=True).aggregate(Sum('earning'))
-        if amount['earning__sum']:
-            earning = amount['earning__sum']
-        else:
-            earning = 0
+        earning = account_backends.invite_earning(request.user)
         return Response({"ret_code":0, "earning":earning})
 
 class AccountInviteHikeAPIView(APIView):
