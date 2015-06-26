@@ -25,6 +25,7 @@ from .models import IntroducedBy
 from wanglibao_account.models import IdVerification, Binding
 from wanglibao_pay.models import Card
 from wanglibao.settings import YIRUITE_KEY
+from wanglibao_profile.models import WanglibaoUserProfile
 
 logger = logging.getLogger(__name__)
 
@@ -536,6 +537,16 @@ class XunleiP2PbyUser(APIView):
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
+def _get_phone_for_tianmang(user_id):
+    phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
+    return phone_number[:3] + '***' + phone_number[-2:]
+
+
+def _get_username_for_tianmang(user_id):
+    user_name = WanglibaoUserProfile.objects.get(user_id=user_id).name
+    return u'*' + user_name[1:]
+
+
 class TianmangBaseAPIView(APIView):
     permission_classes = ()
 
@@ -559,24 +570,25 @@ class TianmangIDVerificationListAPIView(TianmangBaseAPIView):
         try :
             tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
             for tianmang_promo_user in tianmang_promo_list:
-                if tianmang_promo_user.user.wanglibaouserprofile.id_is_valid:
-                    m=md5()
-                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                    uid = m.hexdigest()
-                    #获取身份认证的时间
-                    created_at = IdVerification.objects.get(\
-                        id_number=tianmang_promo_user.user.wanglibaouserprofile.id_number).created_at
+                try:
+                    if tianmang_promo_user.user.wanglibaouserprofile.id_is_valid:
+                        m=md5()
+                        m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                        uid = m.hexdigest()
+                        #获取身份认证的时间
+                        created_at = IdVerification.objects.get(\
+                            id_number=tianmang_promo_user.user.wanglibaouserprofile.id_number).created_at
 
-                    t_phone = tianmang_promo_user.user.wanglibaouserprofile.phone
-                    phone = t_phone.replace(str(t_phone).strip()[3:], "*"*8)
-                    response_user ={
-                        "time": timezone.localtime(created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                        "uid": uid,
-                        "uname": tianmang_promo_user.user.username,
-                        "phone": phone,
-                        #"status":tianmang_promo_user.user.wanglibaouserprofile.id_is_valid and 1 or 0,
-                    }
-                    response_user_list.append(response_user)
+                        response_user ={
+                            "time": timezone.localtime(created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                            "uid": uid,
+                            "uname": _get_username_for_tianmang(tianmang_promo_user.user_id),
+                            "phone": _get_phone_for_tianmang(tianmang_promo_user.user_id),
+                            #"status":tianmang_promo_user.user.wanglibaouserprofile.id_is_valid and 1 or 0,
+                        }
+                        response_user_list.append(response_user)
+                except:
+                    pass
         except:
             logger.error("TianmangIDVerificationListAPIView error")
 
@@ -591,16 +603,19 @@ class TianmangRegisterListAPIView(TianmangBaseAPIView):
             tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
 
             for tianmang_promo_user in tianmang_promo_list:
-                m=md5()
-                m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                uid = m.hexdigest()
-                response_user ={
-                    "time": timezone.localtime(tianmang_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                    "uid": uid,
-                    "uname": tianmang_promo_user.user.username,
-                    #"status":tianmang_promo_user.user.wanglibaouserprofile.phone_verified and 1 or 0,
-                }
-                response_user_list.append(response_user)
+                try:
+                    m=md5()
+                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                    uid = m.hexdigest()
+                    response_user ={
+                        "time": timezone.localtime(tianmang_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                        "uid": uid,
+                        "uname": _get_username_for_tianmang(tianmang_promo_user.user_id),
+                        #"status":tianmang_promo_user.user.wanglibaouserprofile.phone_verified and 1 or 0,
+                    }
+                    response_user_list.append(response_user)
+                except:
+                    pass
         except:
             logger.error("TianmangRegisterListAPIView error")
 
@@ -615,27 +630,30 @@ class TianmangInvestListAPIView(TianmangBaseAPIView):
             tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
 
             for tianmang_promo_user in tianmang_promo_list:
-                p2p_equities = P2PEquity.objects.filter(user=tianmang_promo_user.user).filter(product__status__in=[
-                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
-                    ])
-                income_all = 0
-                for equity in p2p_equities:
-                    if equity.confirm:
-                        income_all += equity.equity
+                try:
+                    p2p_equities = P2PEquity.objects.filter(user=tianmang_promo_user.user).filter(product__status__in=[
+                        u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+                        ])
+                    income_all = 0
+                    for equity in p2p_equities:
+                        if equity.confirm:
+                            income_all += equity.equity
 
-                if not income_all:
-                    continue
-                m=md5()
-                m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                uid = m.hexdigest()
-                response_user ={
-                    "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
-                    "uid": uid,
-                    "uname": tianmang_promo_user.user.username,
-                    "investment": float(income_all),
-                    #"status": 1 if income_all > 0 else 0
-                }
-                response_user_list.append(response_user)
+                    if not income_all:
+                        continue
+                    m=md5()
+                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                    uid = m.hexdigest()
+                    response_user ={
+                        "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
+                        "uid": uid,
+                        "uname": _get_username_for_tianmang(tianmang_promo_user.user_id),
+                        "investment": float(income_all),
+                        #"status": 1 if income_all > 0 else 0
+                    }
+                    response_user_list.append(response_user)
+                except:
+                    pass
         except:
             logger.error("TianmangInvestListAPIView error")
 
@@ -651,24 +669,26 @@ class TianmangInvestNotConfirmListAPIView(TianmangBaseAPIView):
             tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
 
             for tianmang_promo_user in tianmang_promo_list:
+                try:
+                    total_equity = P2PEquity.objects.filter(user=tianmang_promo_user.user).filter(product__status__in=[
+                        u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+                    ]).aggregate(total_equity=Sum('equity')).get('total_equity', 0)
 
-                total_equity = P2PEquity.objects.filter(user=tianmang_promo_user.user).filter(product__status__in=[
-                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
-                ]).aggregate(total_equity=Sum('equity')).get('total_equity', 0)
-
-                if not total_equity:
-                    continue
-                m=md5()
-                m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                uid = m.hexdigest()
-                response_user ={
-                    "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
-                    "uid": uid,
-                    "uname": tianmang_promo_user.user.username,
-                    "investment": float(total_equity),
-                    #"status": 1 if income_all > 0 else 0
-                }
-                response_user_list.append(response_user)
+                    if not total_equity:
+                        continue
+                    m=md5()
+                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                    uid = m.hexdigest()
+                    response_user ={
+                        "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
+                        "uid": uid,
+                        "uname": _get_username_for_tianmang(tianmang_promo_user.user_id),
+                        "investment": float(total_equity),
+                        #"status": 1 if income_all > 0 else 0
+                    }
+                    response_user_list.append(response_user)
+                except:
+                    pass
         except Exception, e:
             logger.error("TianmangInvestListNotConfirmAPIView error")
             logger.error(e)
@@ -683,18 +703,21 @@ class TianmangCardBindListAPIView(TianmangBaseAPIView):
         try:
             tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
             for tianmang_promo_user in tianmang_promo_list:
-                m=md5()
-                m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                uid = m.hexdigest()
-                add_at_list = Card.objects.filter(user=tianmang_promo_user.user).order_by('add_at')
-                if add_at_list.exists():
-                    add_at = add_at_list[0].add_at
-                    response_user = {
-                        "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
-                        "uid": uid,
-                        "uname": tianmang_promo_user.user.username,
-                    }
-                    response_user_list.append(response_user)
+                try:
+                    m=md5()
+                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
+                    uid = m.hexdigest()
+                    add_at_list = Card.objects.filter(user=tianmang_promo_user.user).order_by('add_at')
+                    if add_at_list.exists():
+                        add_at = add_at_list[0].add_at
+                        response_user = {
+                            "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
+                            "uid": uid,
+                            "uname": _get_username_for_tianmang(tianmang_promo_user.user_id),
+                        }
+                        response_user_list.append(response_user)
+                except:
+                    pass
         except:
             logger.error("TianmangCardBindListAPIView error")
 
@@ -746,32 +769,30 @@ class YiruiteInfoListAPIView(YiruiteBaseAPIView):
         try:
             yiruite_promo_list = self.get_yiruite_promo_user(startday, endday)
             for yiruite_promo_user in yiruite_promo_list:
-                # 易瑞特用户是否实名认证
-                is_valid = IdVerification.objects.get(\
-                    id_number=yiruite_promo_user.user.wanglibaouserprofile.id_number).is_valid
+                try:
+                    # 易瑞特用户是否实名认证
+                    is_valid = IdVerification.objects.get(\
+                        id_number=yiruite_promo_user.user.wanglibaouserprofile.id_number).is_valid
 
-                # 易瑞特用户标识
-                tid_list = Binding.objects.filter(user=yiruite_promo_user.user).first()
-                tid = tid_list[0].tid
+                    # 易瑞特用户标识
+                    tid_list = Binding.objects.filter(user=yiruite_promo_user.user)
+                    tid = tid_list.first().bid
 
-                amount = P2PEquity.objects.filter(user=yiruite_promo_user.user, confirm=True).filter(product__status__in=[
-                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
-                ]).first()[0].equity
-
-                if not amount:
-                    continue
-
-                response_user = {
-                    "UserName": yiruite_promo_user.user.username,
-                    "RegsiterTime": timezone.localtime(
-                        yiruite_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                    "IsValidateIdentity": is_valid,
-                    "tid": tid,
-                    "amount": amount,
-                    "FirstInvestTime": timezone.localtime(
-                        yiruite_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
-                }
-                response_user_list.append(response_user)
+                    p2p_record = P2PRecord.objects.filter(user=yiruite_promo_user.user, catalog=u'申购').order_by('create_time')
+                    amount = p2p_record[0].amount
+                    response_user = {
+                        "UserName": yiruite_promo_user.user.username,
+                        "RegisterTime": timezone.localtime(
+                            yiruite_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                        "IsValidateIdentity": is_valid,
+                        "tid": tid,
+                        "amount": amount,
+                        "FirstInvestTime": timezone.localtime(
+                            p2p_record[0].create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                    }
+                    response_user_list.append(response_user)
+                except :
+                    pass
             result = {
                 "errorcode": 0,
                 "errormsg": "success",
