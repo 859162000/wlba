@@ -9,6 +9,30 @@ block sidebar
     include include/user_center_sidebar
 block main
   .account-home-panel
+      .invite-box.clearfix
+          .invite-left
+              p.mt57 {{earning}}
+              p.mt10
+                span.invite-span1
+                理财佣金（元）
+          .invite-right
+              .right-top
+                  p.mt20 {{amount}}
+                  p.fs14
+                    span.invite-span2
+                    邀请投资总额（元）
+              .right-bottom
+                  .bottom-left
+                      p.mt20 {{first_amount}}人/{{first_count}}
+                      p.fs14
+                        span.invite-span3
+                        好友/投资额（元）
+                  .bottom-right
+                      p.mt20 {{second_amount}}人/{{second_count}}
+                      p.fs14
+                        span.invite-span4
+                        好友的好友/投资额（元）
+  .account-home-panel
     .well-s.lh-m
       dl.font-s
         dt.font-xl.dark-text 邀请小伙伴理财，可享30元话费
