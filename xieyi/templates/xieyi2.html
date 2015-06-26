@@ -1,5 +1,6 @@
 {% load formatters %}
-{% __pyjade_set contract = product.contract_info %}
+{% __pyjade_set product = equity.product %}
+{% __pyjade_set contract = equity.contract_info %}
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -62,15 +63,14 @@
 <p>本协议由以下各方于<span class="border-bot">{{product.make_loans_time|date:"Y"}}</span>年<span class="border-bot">{{product.make_loans_time|date:"m"}}</span>月<span class="border-bot">{{product.make_loans_time|date:"d"}}</span>日签订：
 </p><br>
 <p class="bold">甲方(出借方):网利宝平台协议编号 【{{product.contract_serial_number}}】 线上投资人</p>
-<br>
+<br><br>
 <p class="bold">乙方（借款方）：【{{ contract.party_b|safe_name_last }}】</p>
-<p>法定代表人/经营者：【{{ contract.party_b_name|safe_name_last }}】</p>
+<p>法定代表人：【{{ contract.party_b_name|safe_name_last }}】</p>
 <p>工商注册号：【{{ product.borrower_id_number|safe_id }}】</p>
 <p>地址：【{{ product.borrower_address|safe_address }}】</p>
 <p>网利宝平台用户名：</p><br>
 <p class="bold">丙方（推荐方/服务方/代偿方）： 【{{ contract.party_c }}】</p>
 <p>法定代表人：【{{ contract.party_c_name }}】</p>
-<p>工商注册号： 【{{ contract.party_c_id_number }}】</p>
 <p>地址：【{{ contract.party_c_address }}】</p><br>
 <p class="bold">丁方（见证方/服务方）：北京网利科技有限公司</p>
 <p>法定代表人：杨华</p>
@@ -99,7 +99,7 @@
     <li>提前到期：指因乙方出现本协议第七条第1款约定之情形而导致本协议项下借款提前到期。</li>
     <li>提前到期日：指本协议项下借款提前到期之日。</li>
     <li>提前到期违约金：指乙方在提前到期日后，因逾期支付拖欠总额而应当向甲方和/或丁方支付的违约金。</li>
-    <li>信息技术服务费：指丁方为甲乙双方提供信息技术服务而收取的费用。</li>
+    <li>信息技术服务费：指丁方为甲乙双方提供信息技术服务而收取的费用。。</li>
     <li>当期应还本息：指乙方在某当期还款日应当向甲方支付本金（如有）、利息（如有）金额之和。</li>
     <li>拖欠金额：指乙方根据本协议约定，截止某时间点，应当向甲方或/和丁方支付而尚未支付的本金、利息、逾期罚息、逾期管理费（如有）之和。</li>
     <li>拖欠总额：指乙方根据本协议约定，截止某时间点，应当向甲方或/和丁方支付而尚未支付的所有费用之和，包括：本金、利息、逾期罚息、逾期管理费。</li>
@@ -147,10 +147,8 @@
         </tr>
         <tr>
             <td>总还款本息</td>
-            {% if productAmortizations %}
-            {% __pyjade_set total_principal_interest = reduce(lambda v, i: v + i, [amort.principal + amort.interest for amort in productAmortizations]) %}
+            {% __pyjade_set total_principal_interest = reduce(lambda v, i: v + i, [amort.principal + amort.interest for amort in equity.productAmortizations]) %}
             {% __pyjade_set total_interest = total_principal_interest - product.total_amount %}
-            {% endif %}
             <td>【￥{{total_principal_interest}}】</td>
         </tr>
         </tbody>
@@ -188,7 +186,7 @@
             <td>还款利息</td>
         </tr>
         </thead>
-        <tbody>{% if  product.pay_method == '按月付息' %}{% for amortization in productAmortizations|__pyjade_iter:1 %}
+        <tbody>{% if  product.pay_method == '按月付息' %}{% for amortization in equity.amortizations_all|__pyjade_iter:1 %}
         <tr>
             <td>第{{amortization.term}}期</td>
             <td>{{amortization.term_date|date:"Y年m月d日"}}</td>{% __pyjade_set total = amortization.principal + amortization.interest %}
@@ -213,7 +211,7 @@
             <td>还款利息</td>
         </tr>
         </thead>
-        <tbody>{% if  product.pay_method == '到期还本付息' %}{% for amortization in productAmortizations|__pyjade_iter:1 %}
+        <tbody>{% if  product.pay_method == '到期还本付息' %}{% for amortization in equity.amortizations_all|__pyjade_iter:1 %}
         <tr>
             <td>第{{amortization.term}}期</td>
             <td>{{amortization.term_date|date:"Y年m月d日"}}</td>{% __pyjade_set total = amortization.principal + amortization.interest %}
@@ -236,7 +234,7 @@
             <td>还款利息</td>
         </tr>
         </thead>
-        <tbody>{% if  product.pay_method == '等额本息' %}{% for amortization in productAmortizations|__pyjade_iter:1 %}
+        <tbody>{% if  product.pay_method == '等额本息' %}{% for amortization in equity.amortizations_all|__pyjade_iter:1 %}
         <tr>
             <td>第{{amortization.term}}期</td>
             <td>{{amortization.term_date|date:"Y年m月d日"}}</td>{% __pyjade_set total = amortization.principal + amortization.interest %}
@@ -250,7 +248,7 @@
         </tbody>
     </table><br>
     <li>乙方保证按本协议约定的借款用途使用借款，并保证在本协议约定的当期还款日前将足额当期应还本息及当期应付其他相关费用支付给丙方。具体支付方式由乙方、丙方另行签署协议约定。如乙方未依约按时还款或者支付其他相关费用，则应依本协议之约定承担违约责任及由此而产生的各项费用。</li>
-    <li>乙方保证在本协议约定的当期还款日当日[16]时前将足额当期乙方应还本息及当期乙方应付其他相关费用存入乙方账户，且同意并授权丁方通过向第三方支付平台发出指令于当期还款日将当期乙方应还本息及当期乙方应付其他相关费用划扣至甲方账户。如乙方未依约按时还款或者支付其他相关费用，则应依本协议之约定承担违约责任及由此而产生的各项费用。</li>
+    <li>乙方保证在本协议约定的当期还款日当日[15]时前将足额当期乙方应还本息及当期乙方应付其他相关费用存入乙方账户，且同意并授权丁方通过向第三方支付平台发出指令于当期还款日将当期乙方应还本息及当期乙方应付其他相关费用划扣至甲方账户。如乙方未依约按时还款或者支付其他相关费用，则应依本协议之约定承担违约责任及由此而产生的各项费用。</li>
     <li>如果还款日遇到法定假日或公休日，还款日期顺延至节后第一个工作日。</li>
     <li>如果还款日为每月30或31日，则遇到无还款日对应日的月份，还款日为应还款当月的最后一日。</li>
     <li>乙方支付的各项费用（如有）均应按照如下顺序清偿：
@@ -293,20 +291,20 @@
 <h3>第八条  第三人代偿</h3>
 <ol>
     <li>当以下情形之一出现时,丁方有权向乙方、丙方、第三人发送《代偿通知书》,将本协议项下甲方对乙方的剩余债权及对应抵押权转让给第三人。第三人自收到丁方发出的《代偿通知书》次日(如遇非工作日延长至下一个工作日),将代偿价款存入丁方指定银行托管账户:
-    <p>(1)乙方违反本协议约定逾期还款超过 1 日的。</p>
-    <p>(2)乙方违反本协议约定,丁方按照本协议第七条约定决定本协议项下借款提前到期的。</p>
-    </li>
-    <li>第三人追偿权
-    <p>甲乙丙丁四方同意,当乙方、丙方、第三人收到《代偿通知书》时,甲方的全部剩余债权及对应担保权利(如有)转让第三人。第三人支付代偿款项后,立即取得本协议项下债权及对应担保权利,第三人有权要求乙方承担本协议项下还款义务,有权要求丙方承担本协议项下连带保证责任。</p>
+        <p>（1） 乙方违反本协议约定逾期还款超过 1 日的。</p>
+        <p>（2）乙方违反本协议约定,丁方按照本协议第七条约定决定本协议项下借款提前到期的。</p>
+   </li>
+   <li>第三人追偿权
+        <p>甲乙丙丁四方同意,当乙方、丙方、第三人收到《代偿通知书》时,甲方的全部剩余债权及对应担保权利(如有)转让第三人。第三人支付代偿款项后,立即取得本协议项下债权及对应担保权利,第三人有权要求乙方承担本协议项下还款义务,有权要求丙方承担本协议项下连带保证责任。 </p>
     </li>
 </ol>
-<h3>第九条  丙方连带责任</h3>
+<h3>第九条  丙方连带清偿责任</h3>
 <ol>
-    <li>丙方同意为本协议下甲、乙双方的债权债务提供咨询服务和贷后管理工作,并在乙方未能按时足额偿还债务时立刻承担连带清偿责任。如在本协议约定还款日乙方未能将足额当期应还本息及当期应付其他相关费用支付给丙方,丙方须在本协议约定还款日当日[16]时前在丙方账户中存入等同于乙方当期应还的借款本息及当期应付其他相关费用。自丁方成功划扣前述费用后,丙方即受让甲方对乙方相应金额债权。</li>
-    <li>如乙方违反本协议第七条约定时,甲方在此不可撤销的授权丁方作为其代表,在前述情形下向丙方发起提前到期通知要求乙方提前清偿,要求丙方承担本协议约定的连带清偿责任。丙方须在收到丁方发出要求后的 1 个工作日内在丙方账户中存入等同于乙方全部应还的借款本息,以及根据本协议约定计算的逾期罚息和逾期违约金的金额,以履行其在本协议下的连带清偿责任。</li>
-    <li>如第三人按照本协议第 8 条约定代偿相应款项后,甲方在本协议项下的对应权利视为已经得到满足和实现,甲方不再对乙方提出相应请求或主张,甲方在本协议项下所享的对应权利和主张,包括但不限于对借款本息、逾期罚息、违约金、赔偿金等所享有权利和主张,均由第三人享有,第三人有权向乙方、丙方行使代位追偿权,各方须提供合理及必要的协助。</li>
-    <li>丙方根据上述约定完全履行连带清偿责任后,甲方在本协议项下的所有权利视为已经得到满足和实现,甲方不再对乙方提出任何请求或主张,甲方在本协议项下所享的全部权利和主张,包括但不限于对借款本息、逾期罚息、违约金、赔偿金等所享有权利和主张,均由丙方享有,丙方有权向乙方代位追偿,甲方须提供合理及必要的协助。</li>
-    <li>丙方代乙方向甲方清偿债务后,有权向乙方追索债务。丙方有权以诉讼、债权转让等方式处理丙方对乙方的债权。丙方以债权转让方式处理债权,无需就该债权转让另行通知乙方,乙方保证继续按照本协议及/或新债权人指令履行乙方在本协议项下的义务。</li>
+    <li>丙方同意为本协议下甲、乙双方的债权债务提供咨询服务和贷后管理工作,并在乙方未能按时足额偿还债务时立刻承担连带清偿责任。如在本协议约定还款日乙方未能将足额当期应还本息及当期应付其他相关费用支付给丙方,丙方须在本协议约定还款日[15]时前在丙方账户中存入等同于乙方当期应还的借款本息及当期应付其他相关费用。自丁方成功划扣前述费用后,丙方即受让甲方对乙方相应金额债权。</li>
+    <li>如乙方违反本协议第七条约定时，甲方在此不可撤销的授权丁方作为其代表，在前述情形下向丙方发起提前到期通知要求乙方提前清偿，要求丙方承担本协议约定的连带清偿责任。丙方须在收到丁方发出要求后的 1 个工作日内在丙方账户中存入等同于乙方全部应还的借款本息，以及根据本协议约定计算的逾期罚息和逾期违约金的金额，以履行其在本协议下的连带清偿责任。</li>
+    <li>如第三人按照本协议第 8 条约定代偿相应款项后，甲方在本协议项下的对应权利视为已经得到满足和实现，甲方不再对乙方提出相应请求或主张，甲方在本协议项下所享的对应权利和主张，包括但不限于对借款本息、逾期罚息、违约金、赔偿金等所享有权利和主张，均由第三人享有，第三人有权向乙方、丙方行使代位追偿权，各方须提供合理及必要的协助。</li>
+    <li>丙方根据上述约定完全履行连带清偿责任后，甲方在本协议项下的所有权利视为已经得到满足和实现，甲方不再对乙方提出任何请求或主张，甲方在本协议项下所享的全部权利和主张，包括但不限于对借款本息、逾期罚息、违约金、赔偿金等所享有权利和主张，均由丙方享有，丙方有权向乙方代位追偿，甲方须提供合理及必要的协助。</li>
+    <li>丙方代乙方向甲方清偿债务后，有权向乙方追索债务。丙方有权以诉讼、债权转让等方式处理丙方对乙方的债权。丙方以债权转让方式处理债权，无需就该债权转让另行通知乙方，乙方保证继续按照本协议及/或新债权人指令履行乙方在本协议项下的义务。</li>
 </ol>
 <h3>第十条  信息技术服务费及其他税费</h3>
 <ol>
