@@ -27,7 +27,16 @@ module.exports = function( grunt ) {
                 }
 
             }
-        }
+        },
+        watch: {
+          css: {
+            files: [
+              'sass/**/*.sass',
+              'scss/**/*.sass',
+            ],
+            tasks: ['compass']
+          }
+        },
         /*
         imagemin: {
             static: {
@@ -42,7 +51,8 @@ module.exports = function( grunt ) {
 
     });
 
-    grunt.registerTask('default', ['compass', 'concat', 'uglify']);
+    grunt.registerTask('default', ['watch', 'compass', 'concat', 'uglify']);
+    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-compass');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
