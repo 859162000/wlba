@@ -519,7 +519,7 @@ def commission(user, product, equity, start):
         commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
         commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
         first_intro = IntroducedBy.objects.filter(user=user).first()
-        if first_intro:
+        if first_intro and first_intro.introduced_by:
             first = MarginKeeper(first_intro.introduced_by)
             first.deposit(commission, catalog=u"全民淘金")
 
