@@ -530,7 +530,7 @@ def commission(user, product, equity, start, end):
             income.save()
 
             sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
-            if sec_intro:
+            if sec_intro and sec_intro.introduced_by:
                 second = MarginKeeper(sec_intro.introduced_by)
                 second.deposit(commission, catalog=u"全民淘金")
 
