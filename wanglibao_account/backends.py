@@ -16,22 +16,26 @@ def broker_invite_list(user):
     first_intro = [] 
     commission = {} 
     for rd in records:
+        isNew = False
         if rd.user_id not in users:
             users[rd.user_id] = rd.user.wanglibaouserprofile
         if rd.invite_id not in users:
+            isNew = True
             users[rd.invite_id] = rd.invite.wanglibaouserprofile
         if rd.invite_id not in commission:
             commission[rd.invite_id] = {"amount":0, "earning":0}
         if rd.level == 1:
             first_amount += rd.amount
             first_earning += rd.earning
-            first_count += 1 
+            if isNew:
+                first_count += 1
             commission[rd.invite_id]["amount"] += rd.amount
             commission[rd.invite_id]["earning"] += rd.earning
         else:
             second_amount += rd.amount
             second_earning += rd.earning
-            second_count += 1 
+            if isNew:
+                second_count += 1
     return {"first_amount":first_amount, "first_earning":first_earning,
             "second_amount":second_amount, "second_earning":second_earning,
             "first_count":first_count, "second_count":second_count,
