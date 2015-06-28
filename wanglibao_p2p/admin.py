@@ -48,9 +48,9 @@ class UserEquityAdmin(admin.ModelAdmin):
     # resource_class = UserEquityResource
 
     def get_readonly_fields(self, request, obj=None):
-        if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
-            return [f.name for f in self.model._meta.fields]
-        return ()
+        # if not request.user.has_perm('wanglibao_p2p.view_p2pequity'):
+        return [f.name for f in self.model._meta.fields]
+        # return ()
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -61,6 +61,9 @@ class UserEquityAdmin(admin.ModelAdmin):
                                  date_str,
                                  file_format.get_extension())
         return filename
+
+    def has_add_permission(self, request):
+        return False
 
 
 class AmortizationInline(admin.TabularInline):
@@ -316,13 +319,16 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
         return False
 
 
-class UserAmortizationAdmin(ConcurrentModelAdmin, VersionAdmin):
+class UserAmortizationAdmin(ConcurrentModelAdmin):
     actions = None
     list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
     search_fields = ('user__wanglibaouserprofile__phone', 'product_amortization__product__name')
     raw_id_fields = ('product_amortization', 'user')
 
     def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
         return False
 
 
@@ -360,6 +366,9 @@ class P2PRecordAdmin(ReadPermissionModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
 
 class WarrantAdmin(admin.ModelAdmin):
     actions = None
@@ -378,6 +387,12 @@ class AmortizationRecordAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
 
 
 class EquityResource(resources.ModelResource):
@@ -416,6 +431,9 @@ class EquityRecordAdmin(ReadPermissionModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
 
 class ProductAmortizationAdmin(ReadPermissionModelAdmin):
     actions = None
@@ -435,6 +453,9 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
 
 class EarningAdmin(admin.ModelAdmin):
     actions = None
@@ -446,9 +467,12 @@ class EarningAdmin(admin.ModelAdmin):
         return False
 
     def get_readonly_fields(self, request, obj=None):
-        if not request.user.has_perm('wanglibao_p2p.view_productamortization'):
-            return [f.name for f in self.model._meta.fields]
-        return ()
+        # if not request.user.has_perm('wanglibao_p2p.view_productamortization'):
+        return [f.name for f in self.model._meta.fields]
+        # return ()
+
+    def has_add_permission(self, request):
+        return False
 
 
 class P2PProductContractAdmin(admin.ModelAdmin):
@@ -458,6 +482,9 @@ class P2PProductContractAdmin(admin.ModelAdmin):
                     'bill_number', 'bill_amount', 'bill_due_date')
 
     def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
         return False
 
 
@@ -489,12 +516,21 @@ class InterestPrecisionAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display + ('equity', 'interest_precision_balance')
+
 
 class InterestInAdvanceAdmin(admin.ModelAdmin):
     actions = None
     list_display = ('id', 'product', 'user', 'interest')
 
     def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
         return False
 
 
@@ -515,6 +551,12 @@ class ProductInterestPrecisionAdmin(admin.ModelAdmin):
         if instance.interest_precision_balance == Decimal('0'):
             return Decimal(0)
         return instance.interest_precision_balance
+
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
 
 
 class EquityJiuxianResource(resources.ModelResource):
@@ -571,6 +613,9 @@ class P2PEquityJiuxianAdmin(ExportMixin, admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
 
 class AutomaticPlanAdmin(admin.ModelAdmin):
     actions = None
@@ -584,6 +629,9 @@ class AutomaticPlanAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
 
 class AutomaticManagerAdmin(admin.ModelAdmin):
     actions = None
@@ -594,12 +642,20 @@ class AutomaticManagerAdmin(admin.ModelAdmin):
         return False
 
 
+class ContractTemplateAdmin(admin.ModelAdmin):
+    actions = None
+
+
+class WarrantCompanyAdmin(admin.ModelAdmin):
+    actions = None
+
+
 admin.site.register(P2PProduct, P2PProductAdmin)
 admin.site.register(Warrant, WarrantAdmin)
 admin.site.register(P2PEquity, UserEquityAdmin)
-admin.site.register(WarrantCompany)
+admin.site.register(WarrantCompany, WarrantCompanyAdmin)
 admin.site.register(UserAmortization, UserAmortizationAdmin)
-admin.site.register(ContractTemplate)
+admin.site.register(ContractTemplate, ContractTemplateAdmin)
 admin.site.register(P2PRecord, P2PRecordAdmin)
 admin.site.register(EquityRecord, EquityRecordAdmin)
 admin.site.register(AmortizationRecord, AmortizationRecordAdmin)
