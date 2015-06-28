@@ -114,6 +114,7 @@ class IdVerificationAdmin(admin.ModelAdmin):
 class VerifyCounterAdmin(admin.ModelAdmin):
     actions = None
     list_display = ('id', 'user', 'count')
+    raw_id_fields = ('user',)
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_account.view_verifycounter'):
