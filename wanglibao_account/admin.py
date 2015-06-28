@@ -80,6 +80,9 @@ class UserProfileAdmin(ReadPermissionModelAdmin, UserAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
 
 def user_unicode(self):
     if hasattr(self, 'wanglibaouserprofile'):
@@ -104,10 +107,14 @@ class IdVerificationAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
 
 class VerifyCounterAdmin(admin.ModelAdmin):
     actions = None
     list_display = ('id', 'user', 'count')
+    raw_id_fields = ('user',)
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_account.view_verifycounter'):
@@ -115,6 +122,9 @@ class VerifyCounterAdmin(admin.ModelAdmin):
         return ()
 
     def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
         return False
 
 
@@ -127,6 +137,9 @@ class UserPushIdAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
 
 class BindingAdmin(admin.ModelAdmin):
     actions = None
@@ -135,6 +148,9 @@ class BindingAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', )
 
     def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
         return False
 
 
@@ -151,6 +167,12 @@ class MessageAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.raw_id_fields
+
 
 class MessageTextAdmin(admin.ModelAdmin):
     actions = None
@@ -161,12 +183,21 @@ class MessageTextAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
+
 
 class UserAddressAdmin(admin.ModelAdmin):
     actions = None
     list_display = ("id", "name", "phone_number", "address", "province", "city", "area", "postcode", "is_default")
     search_fields = ('user__wanglibaouserprofile__phone', 'phone_number')
     raw_id_fields = ('user', )
+
+    def has_add_permission(self, request):
+        return False
 
 
 admin.site.unregister(User)
