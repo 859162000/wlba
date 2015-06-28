@@ -174,6 +174,9 @@ class RewardRecordAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
+
 
 class ClientDataAdmin(admin.ModelAdmin):
     actions = None
@@ -186,6 +189,9 @@ class ClientDataAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
 
 
 class ChannelsAdmin(admin.ModelAdmin):
