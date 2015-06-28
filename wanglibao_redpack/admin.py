@@ -39,6 +39,12 @@ class RedPackAdmin(ExportMixin, admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
+
 
 class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
     actions = None
@@ -51,6 +57,11 @@ class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
 
 class InterestHikeAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "product", "rate", "intro_total", "invalid", "paid", 

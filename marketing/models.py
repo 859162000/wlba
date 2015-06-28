@@ -323,3 +323,11 @@ class PlayList(models.Model):
 
     class Meta:
         verbose_name_plural = u'打榜统计表'
+
+
+# class ActivityUserRecord(models.Model):
+#     """参加活动的用户记录"""
+#     user = models.ForeignKey(User)
+#     object_name = models.CharField(u'活动名称', max_length=200)
+#     object_type = models.CharField(u'活动类型', max_length=100)
+#     created_at = models.DateTimeField(u'创建时间', auto_created=True)

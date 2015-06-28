@@ -11,6 +11,7 @@ import models as m
 
 
 class ActivityAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('name', 'code', 'category', 'platform', 'product_cats', 'product_ids',
                     'channel', 'description', 'start_at', 'end_at',
                     'activity_status', 'is_stopped', 'priority')
@@ -110,6 +111,9 @@ class ActivityRecordAdmin(ExportMixin, admin.ModelAdmin):
     #     return False
 
     def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
         return False
 
 
