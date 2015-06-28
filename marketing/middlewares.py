@@ -6,8 +6,13 @@ from .models import PromotionToken
 class PromotionTokenMiddleWare(object):
     def process_request(self, request):
         token = request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, None)
-        product_id = request.GET.get(settings.PROMO_TOKEN_PRODUCT, None)
+        #product_id = request.GET.get(settings.PROMO_TOKEN_PRODUCT, None)
 
+        if token:
+            request.session[settings.PROMO_TOKEN_QUERY_STRING] = token
+            #request.session[settings.PROMO_TOKEN_PRODUCT] = product_id
+
+        """
         # 天芒云
         tianmang_source = request.GET.get('source', None)
         tianmang_sn = request.GET.get('sn', None)
@@ -31,3 +36,4 @@ class PromotionTokenMiddleWare(object):
             request.session['yiruite_tid'] = yiruite_tid
         else:
             pass
+        """
