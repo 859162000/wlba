@@ -12,5 +12,8 @@ class ReportAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
 admin.site.register(Report, ReportAdmin)
 admin.site.register_view('report/export', view=AdminReportExport.as_view(),name=u'自定义导出表格')

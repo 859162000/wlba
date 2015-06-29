@@ -43,6 +43,9 @@ class PromotionTokenAdmin(ReadPermissionModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
 class IntroducedByResource(resources.ModelResource):
 
     user_name = fields.Field(attribute="user__wanglibaouserprofile__name")
@@ -68,7 +71,7 @@ class IntroducedByResource(resources.ModelResource):
             return timezone.localtime(obj.gift_send_at).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
+class IntroducedByAdmin(ReadPermissionModelAdmin):
     actions = None
     list_display = ("id", "user", "introduced_by", "channel", "created_at", "bought_at", "gift_send_at")
     list_editable = ("gift_send_at",)
@@ -83,11 +86,14 @@ class IntroducedByAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin):
         return qs
 
     def get_readonly_fields(self, request, obj=None):
-        if not request.user.has_perm('marketing.view_introducedby'):
-            return ("bought_at", "user", "introduced_by")
-        return ()
+        # if not request.user.has_perm('marketing.view_introducedby'):
+        #     return ("bought_at", "user", "introduced_by")
+        return ("bought_at", "user", "introduced_by", 'created_by')
 
     def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
         return False
 
 
@@ -97,6 +103,9 @@ class TimelySitedataAdmin(admin.ModelAdmin):
     readonly_fields = ("p2p_margin", "freeze_amount", "total_amount", "user_count")
 
     def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
         return False
 
 
@@ -109,9 +118,9 @@ class InviteCodeAdmin(ReadPermissionModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         """ 如果没有设置 view 权限，则返回字段为只读
         """
-        if not request.user.has_perm('marketing.view_invitecode'):
-            return ('id', 'code', 'is_used')
-        return ()
+        # if not request.user.has_perm('marketing.view_invitecode'):
+        #     return ('id', 'code', 'is_used')
+        return ('code', 'is_used')
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -162,6 +171,12 @@ class RewardRecordAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
+
 
 class ClientDataAdmin(admin.ModelAdmin):
     actions = None
@@ -171,6 +186,12 @@ class ClientDataAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
 
 
 class ChannelsAdmin(admin.ModelAdmin):
@@ -202,6 +223,8 @@ class IntroducedByRewardAdmin(admin.ModelAdmin):
         if obj:
             return self.readonly_fields
 
+    def has_add_permission(self, request):
+        return False
 
 class PlayListAdmin(admin.ModelAdmin):
     list_display = ('id', 'play_at', 'user', 'amount', 'ranking', 'redpackevent', 'created_at', 'checked_status', 'reward')

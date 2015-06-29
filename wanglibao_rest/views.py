@@ -212,8 +212,11 @@ class RegisterAPIView(APIView):
         if not invite_code and "channel_id" in device:
             if device['channel_id'] == "baidu":
                 invite_code = "baidushouji"
+            elif device['channel_id'] == "mi":
+                invite_code = "mi"
             else:
-                invite_code = device['channel_id']
+                invite_code = ""
+                #invite_code = device['channel_id']
         #if not invite_code and ("channel_id" in device and device['channel_id'] == "baidu"):
         #    invite_code = "baidushouji"
 

@@ -87,7 +87,7 @@ class Activity(models.Model):
     priority = models.IntegerField(u'优先级*', help_text=u'越大越优先', default=0, blank=False)
 
     def __unicode__(self):
-        return self.name
+        return '(%s)%s' % (self.id, self.name)
 
     class Meta:
         ordering = ['-priority']

@@ -27,6 +27,12 @@ class PayInfoAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
+
 
 class BankAdmin(admin.ModelAdmin):
     list_display = ('name', 'gate_id', 'code', "kuai_code")
@@ -46,6 +52,12 @@ class CardAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
 
     get_phone.short_description = u'手机'
 
