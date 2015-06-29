@@ -1120,7 +1120,7 @@ def ajax_register(request):
                 if not user:
                     return HttpResponse(messenger('error'))
 
-                cooperation_process(request, user)
+                cooperation_process(request, user, invitecode)
 
                 auth_user = authenticate(identifier=identifier, password=password)
 
