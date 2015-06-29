@@ -803,18 +803,18 @@ class UnbindCardView(APIView):
         return Response(result)
 
 
-class DelCardView(APIView):
+class BindPayDepositView(APIView):
+    """ 获取验证码或快捷支付 """
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        result = third_pay.del_bank_card_new(request)
+        result = third_pay.bind_pay_deposit(request)
         return Response(result)
 
-
-class BindPayNewView(APIView):
+class BindPayDynnumView(APIView):
+    """ 确认支付 """
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        pay = third_pay.KuaiPay()
-        result = pay.pre_pay(request)
+        result = third_pay.bind_pay_dynnum(request)
         return Response(result)
