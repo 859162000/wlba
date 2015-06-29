@@ -1120,17 +1120,7 @@ def ajax_register(request):
                 if not user:
                     return HttpResponse(messenger('error'))
 
-                #天芒注册
-                # invitecode = tianmang_process(request, user, invitecode)
-
-                if (request.session.get(PROMO_TOKEN_QUERY_STRING) == 'yiruite') and request.session.get('yiruite_tid'):
-                    set_promo_user(request, user, invitecode=request.session.get(PROMO_TOKEN_QUERY_STRING))
-                    yiruite_process(request, user)
-                elif (request.session.get('tianmang_source') == 'tianmang') and request.session.get('tianmang_sn'):
-                    set_promo_user(request, user, invitecode=request.session.get('tianmang_source'))
-                    tianmang_process(request, user)
-                else:
-                    set_promo_user(request, user, invitecode=invitecode)
+                cooperation_process(request, user, invitecode)
 
                 auth_user = authenticate(identifier=identifier, password=password)
 
@@ -1145,6 +1135,20 @@ def ajax_register(request):
             return HttpResponseForbidden('not valid ajax request')
     else:
         return HttpResponseNotAllowed(["GET"])
+
+def cooperation_process(request, user, invitecode):
+    """
+    处理第三方渠道
+    """
+    if (request.session.get(PROMO_TOKEN_QUERY_STRING) == 'yiruite') and request.session.get('yiruite_tid'):
+        set_promo_user(request, user, invitecode=request.session.get(PROMO_TOKEN_QUERY_STRING))
+        yiruite_process(request, user)
+    elif (request.session.get('tianmang_source') == 'tianmang') and request.session.get('tianmang_sn'):
+        set_promo_user(request, user, invitecode=request.session.get('tianmang_source'))
+        tianmang_process(request, user)
+    else:
+        set_promo_user(request, user, invitecode=invitecode)
+
 
 def yiruite_process(request, user):
     """
