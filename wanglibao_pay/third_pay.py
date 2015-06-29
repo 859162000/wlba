@@ -241,7 +241,7 @@ def _unbind_common(request, card, bank):
         res = _unbind_kuaipay(request, card, bank)
         if res['ret_code'] != 0: return res
 
-    return {"ret_code": 20104, "message": "银行未绑定支付渠道"}
+    return {"ret_code": 0, "message": "银行未绑定支付渠道"}
 
 
 def card_unbind(request):
