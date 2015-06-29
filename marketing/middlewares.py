@@ -6,7 +6,7 @@ from .models import PromotionToken
 class PromotionTokenMiddleWare(object):
     def process_request(self, request):
         token = request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, None)
-        product_id = request.GET.get(settings.PROMO_TOKEN_PRODUCT, None)
+        #product_id = request.GET.get(settings.PROMO_TOKEN_PRODUCT, None)
 
         # 天芒云
         tianmang_source = request.GET.get('source', None)
@@ -18,10 +18,7 @@ class PromotionTokenMiddleWare(object):
 
         if token:
             request.session[settings.PROMO_TOKEN_QUERY_STRING] = token
-            request.session[settings.PROMO_TOKEN_PRODUCT] = product_id
-            #record = PromotionToken.objects.filter(token=token).first()
-            #if record:
-            #    request.session[settings.PROMO_TOKEN_USER_SESSION_KEY] = record.pk
+            #request.session[settings.PROMO_TOKEN_PRODUCT] = product_id
         elif (tianmang_source == 'tianmang') and tianmang_sn:
             request.session['tianmang_source'] = tianmang_source
             request.session['tianmang_sn'] = tianmang_sn
