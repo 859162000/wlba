@@ -29,7 +29,8 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
                             BindPayView, BindPayCallbackView, BindPayQueryView,
-                            BindPayDelView, BindPayDynNumView, TradeRecordAPIView)
+                            BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
+                            BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -154,6 +155,13 @@ urlpatterns = patterns(
     url(r'^pay/cnp/delete/$', BindPayDelView.as_view()),
     url(r'^pay/cnp/dynnum/$', BindPayDynNumView.as_view()),
     url(r'^pay/deposit/$', BindPayView.as_view(), name="kuai-deposit-view"),
+
+    # 切换支付渠道重新
+    url(r'^pay/cnp/list_new/$', BindCardQueryView()),
+    url(r'^pay/cnp/delete_new/$', UnbindCardView.as_view()),
+    url(r'^pay/cnp/dynnum_new/$', BindPayDynNumView.as_view()),
+    url(r'^pay/deposit_new/$', BindPayDepositView.as_view(), name="kuai-deposit-view"),
+
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
     url(r'^pay/deposit/callback/$', BindPayCallbackView.as_view(), name="kuai-deposit-callback"),
 

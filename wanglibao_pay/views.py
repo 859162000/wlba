@@ -783,3 +783,38 @@ class WithdrawAPIView(APIView):
                 "mtype": "withdraw"
             })
         return Response(result)
+
+
+class BindCardQueryView(APIView):
+    """ 查询用户绑定卡号列表接口 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.card_bind_list(request)
+        return Response(result)
+
+
+class UnbindCardView(APIView):
+    """ 解绑卡接口 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.card_unbind(request)
+        return Response(result)
+
+
+class BindPayDepositView(APIView):
+    """ 获取验证码或快捷支付 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.bind_pay_deposit(request)
+        return Response(result)
+
+class BindPayDynnumView(APIView):
+    """ 确认支付 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.bind_pay_dynnum(request)
+        return Response(result)
