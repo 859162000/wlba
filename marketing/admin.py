@@ -6,7 +6,7 @@ from django.utils import timezone
 from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
 from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
-    Activity, ActivityRule, Reward, RewardRecord, ClientData, Channels, IntroducedByReward, PlayList
+    Activity, ActivityRule, Reward, RewardRecord, ClientData, Channels, IntroducedByReward, PlayList, ActivityJoinLog
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -226,10 +226,24 @@ class IntroducedByRewardAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+
 class PlayListAdmin(admin.ModelAdmin):
     list_display = ('id', 'play_at', 'user', 'amount', 'ranking', 'redpackevent', 'created_at', 'checked_status', 'reward')
     search_fields = ('user__wanglibaouserprofile__phone', 'redpackevent', )
     raw_id_fields = ('user', )
+
+
+class ActivityJoinLogAdmin(admin.ModelAdmin):
+    actions = None
+    raw_id_fields = ('user',)
+    list_display = ('id', 'user', 'action_name', 'action_type', 'gift_name', 'amount', 'action_message', 'join_times', 'create_time')
+    search_fields = ('user', 'action_name')
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
+
+    def has_add_permission(self, request):
+        return False
 
 
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
@@ -244,6 +258,7 @@ admin.site.register(RewardRecord, RewardRecordAdmin)
 admin.site.register(ClientData, ClientDataAdmin)
 admin.site.register(Channels, ChannelsAdmin)
 admin.site.register(IntroducedByReward, IntroducedByRewardAdmin)
+admin.site.register(ActivityJoinLog, ActivityJoinLogAdmin)
 # admin.site.register(PlayList, PlayListAdmin)
 
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
