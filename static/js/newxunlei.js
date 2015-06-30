@@ -8,16 +8,30 @@
 
   require(['jquery'], function($) {
     //banner的主题文字效果
+//    $('.xl-small-zc').show()
     $('#xl-text').show();
     $('#xl-text').animate({'top': '37px'},500);
     //点击按钮出现注册框
     $('#xl-btn').on('click',function(){
         if ($(this).attr('data-num') == 'false'){
           $('.xl-small-zc').show()
+        }else{
+          $.ajax({
+            url: "/api/xunlei/join/",
+            type: "POST"
+          }).done(function(data) {
+            console.log(data);
+            if(data['ret_code']==3002 || data['ret_code']==3001){
+              $('#redpack-fail').show();
+            }
+            if(data['ret_code']==0){
+              smallgame();
+            }
+          })
         }
-        if ($(this).attr('data-num') == 'true'){
-          smallgame();
-        }
+//        if ($(this).attr('data-num') == 'true'){
+//          smallgame();
+//        }
     });
     //游戏
     function smallgame(){
@@ -78,7 +92,14 @@
     });
     //弹出领取红包提示
     $('#give-btn').on('click',function(){
-      $('#redpack-success').show();
+      var money=$('#money').html();
+      $.ajax({
+        url: "/api/xunlei/join/",
+        type: "POST",
+        data:{amount:money}
+      }).done(function(){
+        $('#redpack-success').show();
+      })
     })
   });
 
