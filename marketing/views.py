@@ -554,7 +554,7 @@ class ActivityJoinLogAPIView(APIView):
         if not user:
             return Response({'ret_code': 3001, 'message': u'用户没有登陆，请先登陆'})
 
-        start_time = timezone.datetime(2015, 7, 3)
+        start_time = timezone.datetime(2015, 6, 29)
         user_ib = IntroducedBy.objects.filter(user=user, channel__name='xunlei', created_at__gt=start_time).first()
         if user_ib:
             has_log = ActivityJoinLog.objects.filter(user=user).first()
