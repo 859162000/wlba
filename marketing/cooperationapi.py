@@ -537,6 +537,12 @@ class XunleiP2PbyUser(APIView):
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
+def _get_uid_for_tianmang(user_id):
+    m=md5()
+    m.update('wlb' + user_id)
+    uid = m.hexdigest()
+    return uid
+
 def _get_phone_for_tianmang(user_id):
     phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
     return phone_number[:3] + '***' + phone_number[-2:]
@@ -572,16 +578,13 @@ class TianmangIDVerificationListAPIView(TianmangBaseAPIView):
             for tianmang_promo_user in tianmang_promo_list:
                 try:
                     if tianmang_promo_user.user.wanglibaouserprofile.id_is_valid:
-                        m=md5()
-                        m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                        uid = m.hexdigest()
                         #获取身份认证的时间
                         created_at = IdVerification.objects.get(\
                             id_number=tianmang_promo_user.user.wanglibaouserprofile.id_number).created_at
 
                         response_user ={
                             "time": timezone.localtime(created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                            "uid": uid,
+                            "uid": _get_uid_for_tianmang(tianmang_promo_user.user_id),
                             "uname": _get_username_for_tianmang(tianmang_promo_user.user_id),
                             "phone": _get_phone_for_tianmang(tianmang_promo_user.user_id),
                             #"status":tianmang_promo_user.user.wanglibaouserprofile.id_is_valid and 1 or 0,
@@ -601,15 +604,11 @@ class TianmangRegisterListAPIView(TianmangBaseAPIView):
         response_user_list = []
         try :
             tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
-
             for tianmang_promo_user in tianmang_promo_list:
                 try:
-                    m=md5()
-                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                    uid = m.hexdigest()
                     response_user ={
                         "time": timezone.localtime(tianmang_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                        "uid": uid,
+                        "uid": _get_uid_for_tianmang(tianmang_promo_user.user_id),
                         "uname": _get_username_for_tianmang(tianmang_promo_user.user_id),
                         #"status":tianmang_promo_user.user.wanglibaouserprofile.phone_verified and 1 or 0,
                     }
@@ -641,12 +640,9 @@ class TianmangInvestListAPIView(TianmangBaseAPIView):
 
                     if not income_all:
                         continue
-                    m=md5()
-                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                    uid = m.hexdigest()
                     response_user ={
                         "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
-                        "uid": uid,
+                        "uid": _get_uid_for_tianmang(tianmang_promo_user.user_id),
                         "uname": _get_username_for_tianmang(tianmang_promo_user.user_id),
                         "investment": float(income_all),
                         #"status": 1 if income_all > 0 else 0
@@ -676,12 +672,9 @@ class TianmangInvestNotConfirmListAPIView(TianmangBaseAPIView):
 
                     if not total_equity:
                         continue
-                    m=md5()
-                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                    uid = m.hexdigest()
                     response_user ={
                         "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
-                        "uid": uid,
+                        "uid": _get_uid_for_tianmang(tianmang_promo_user.user_id),
                         "uname": _get_username_for_tianmang(tianmang_promo_user.user_id),
                         "investment": float(total_equity),
                         #"status": 1 if income_all > 0 else 0
@@ -704,15 +697,12 @@ class TianmangCardBindListAPIView(TianmangBaseAPIView):
             tianmang_promo_list = self.get_tianmang_promo_user(startday, endday)
             for tianmang_promo_user in tianmang_promo_list:
                 try:
-                    m=md5()
-                    m.update(str(tianmang_promo_user.user.wanglibaouserprofile.phone))
-                    uid = m.hexdigest()
                     add_at_list = Card.objects.filter(user=tianmang_promo_user.user).order_by('add_at')
                     if add_at_list.exists():
                         add_at = add_at_list[0].add_at
                         response_user = {
                             "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
-                            "uid": uid,
+                            "uid": _get_uid_for_tianmang(tianmang_promo_user.user_id),
                             "uname": _get_username_for_tianmang(tianmang_promo_user.user_id),
                         }
                         response_user_list.append(response_user)
