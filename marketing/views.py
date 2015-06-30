@@ -559,50 +559,40 @@ class ActivityJoinLogAPIView(APIView):
         if user_ib:
             has_log = ActivityJoinLog.objects.filter(user=user).first()
             if has_log:
-                if has_log.join_times > 0:
-                    return Response({'ret_code': 3002, 'message': u'已经参加过该活动，不能重复参加'})
-                else:
-                    if amount:
-                        self._send_red_pack(amount, user, True)
-                        return Response({'ret_code': 0, 'message': u'红包发放成功，请到用户中心查看'})
+                return Response({'ret_code': 3002, 'message': u'已经参加过该活动，不能重复参加'})
             else:
-                ActivityJoinLog.objects.create(
-                    user=user,
-                    action_name=u'迅雷15年7月数钱活动',
-                    action_type=u'注册',
-                    action_message=u'用户参加数钱游戏得红包，3秒内每点击一次得10元，得多少钱送多少红包',
-                    channel=u'xunlei',
-                    gift_name=u'迅雷7月数钱红包',
-                    amount=amount,
-                    create_time=timezone.now(),
-                )
                 if amount:
-                    self._send_red_pack(amount, user, False)
+                    ActivityJoinLog.objects.create(
+                        user=user,
+                        action_name=u'迅雷15年7月数钱活动',
+                        action_type=u'注册',
+                        action_message=u'用户参加数钱游戏得红包，3秒内每点击一次得10元，得多少钱送多少红包',
+                        channel=u'xunlei',
+                        gift_name=u'迅雷7月数钱红包',
+                        join_times=1,
+                        amount=amount,
+                        create_time=timezone.now(),
+                    )
+                    divisor = amount / 50    # 50元红包的个数
+                    remainder = amount % 50  # 金额除以50的余数，剩余红包金额
+                    numbers = []
+                    if divisor > 0:
+                        numbers = [50] * divisor
 
-                return Response({'ret_code': 0, 'message': u'红包发放成功，请到用户中心查看'})
+                    numbers = numbers + [remainder]
+                    for number in numbers:
+                        describe = 'xunlei_july_' + str(number)
+                        redpack_event = RedPackEvent.objects.filter(invalid=False,
+                                                                    describe=describe,
+                                                                    target_channel='xunlei').first()
+                        if redpack_event:
+                            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+
+                    return Response({'ret_code': 0, 'message': u'红包发放成功，请到用户中心查看'})
+                else:
+                    return Response({'ret_code': 3000, 'message': u'倒计时开始'})
         else:
             return Response({'ret_code': 3002, 'message': u'不符合参加条件'})
-
-    @staticmethod
-    def _send_red_pack(amount, user, exist=False):
-        divisor = amount / 50    # 50元红包的个数
-        remainder = amount % 50  # 金额除以50的余数，剩余红包金额
-        numbers = []
-        if divisor > 0:
-            numbers = [50] * divisor
-
-        numbers = numbers + [remainder]
-        for number in numbers:
-            describe = 'xunlei_july_' + str(number)
-            redpack_event = RedPackEvent.objects.filter(invalid=False,
-                                                        describe=describe,
-                                                        target_channel='xunlei').first()
-            if redpack_event:
-                redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
-
-        if exist:
-            #更新参加活动记录
-            ActivityJoinLog.objects.filter(user=user).update(join_times=1, amount=amount)
 
 
 class ActivityJoinLogCountAPIView(APIView):
