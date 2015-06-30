@@ -157,10 +157,10 @@ urlpatterns = patterns(
     url(r'^pay/deposit/$', BindPayView.as_view(), name="kuai-deposit-view"),
 
     # 切换支付渠道重新
-    url(r'^pay/cnp/list_new/$', BindCardQueryView()),
+    url(r'^pay/cnp/list_new/$', BindCardQueryView.as_view()),
     url(r'^pay/cnp/delete_new/$', UnbindCardView.as_view()),
     url(r'^pay/cnp/dynnum_new/$', BindPayDynNumView.as_view()),
-    url(r'^pay/deposit_new/$', BindPayDepositView.as_view(), name="kuai-deposit-view"),
+    url(r'^pay/deposit_new/$', BindPayDepositView.as_view()),
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
     url(r'^pay/deposit/callback/$', BindPayCallbackView.as_view(), name="kuai-deposit-callback"),
