@@ -637,7 +637,7 @@ if ENV == ENV_DEV:
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
-PROMO_TOKEN_PRODUCT = "product_id"
+#PROMO_TOKEN_PRODUCT = "product_id"
 
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 # CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
@@ -672,11 +672,11 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-ISCJDAO = False
-CJDAOKEY = '1234'
-RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
-RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
-POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
+#ISCJDAO = False
+#CJDAOKEY = '1234'
+#RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
+#RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
+#POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
 
 RETURN_TINMANG_URL = "http://www.bangwoya.com/callback/callback.php"
 RETURN_TINMANG_URL_DEBUG = "http://demo.bangwoya.com/callback/callback.php"

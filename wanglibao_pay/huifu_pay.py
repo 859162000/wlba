@@ -283,23 +283,6 @@ class HuifuPay(Pay):
         if flag:
             device = split_ua(request)
             tools.despoit_ok(pay_info, device['device_type'])
-            """
-            # 迅雷活动, 12.8 首次充值
-            start_time = timezone.datetime(2014, 12, 7)
-            if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
-                                      status=PayInfo.SUCCESS).count() == 1:
-                rs = RewardStrategy(pay_info.user)
-                rs.reward_user(u'三天迅雷会员')
-
-
-            title, content = messages.msg_pay_ok(amount)
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": pay_info.user.id,
-                "title": title,
-                "content": content,
-                "mtype": "activityintro"
-            })
-            """
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return result
