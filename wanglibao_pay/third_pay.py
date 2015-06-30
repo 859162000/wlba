@@ -196,9 +196,9 @@ def card_bind_list(request):
         cards = Card.objects.filter(Q(user=request.user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
-            bank_list = [card.bank.gate_id for card in cards]
-            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x['gate_id']))
-            cards = cards_tmp
+            #bank_list = [card.bank.gate_id for card in cards]
+            #cards_tmp = sorted(cards, key=lambda x: bank_list.index(x['gate_id']))
+            #cards = cards_tmp
 
             cards = [
                 {
