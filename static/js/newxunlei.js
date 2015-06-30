@@ -11,6 +11,21 @@
 //    $('.xl-small-zc').show()
     $('#xl-text').show();
     $('#xl-text').animate({'top': '37px'},500);
+    //banner数字
+    $.ajax({
+      url: "/api/xunlei/join/count/",
+      type: "GET"
+    }).done(function(data) {
+      var number=parseInt(data['amount_sum']);
+      var rednum=500+number/10;
+      var str=rednum.toString();
+      for(var i=0,len=str.length;i<len;i++){
+        console.log(str[i]);
+        if(i>=$('#redpacknum li').length){
+            $('#redpacknum').append('<li>'+str[i]+'<hr></li>');
+        }
+      }
+    });
     //点击按钮出现注册框
     $('#xl-btn').on('click',function(){
         if ($(this).attr('data-num') == 'false'){
@@ -29,9 +44,6 @@
             }
           })
         }
-//        if ($(this).attr('data-num') == 'true'){
-//          smallgame();
-//        }
     });
     //游戏
     function smallgame(){
