@@ -490,12 +490,20 @@ if ENV == ENV_PRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
-
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
+
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/bindcard/bind/request' % YEE_URL
+    YEE_SHORT_UNBIND = '%s/api/bankcard/unbind' % YEE_URL
+    YEE_SHORT_BIND_SEND_SMS = '%s/api/bindcard/bind/sendsms' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/bindcard/bind/checksms' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/bankcard/bind/pay/request' % YEE_URL
+    YEE_SHORT_BIND_PAY_VALIDATE = '%s/api/async/bankcard/pay/confirm/validatecode' % YEE_URL
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/"
 
@@ -530,12 +538,20 @@ elif ENV == ENV_PREPRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
-
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
+
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/bindcard/bind/request' % YEE_URL
+    YEE_SHORT_UNBIND = '%s/api/bankcard/unbind' % YEE_URL
+    YEE_SHORT_SEND_SMS = '%s/api/bindcard/bind/sendsms' % YEE_URL
+    YEE_SHORT_CHECK_SMS = '%s/api/bindcard/bind/checksms' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/bankcard/bind/pay/request' % YEE_URL
+    YEE_SHORT_BIND_PAY_VALIDATE = '%s/api/async/bankcard/pay/confirm/validatecode' % YEE_URL
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/"
 
@@ -572,6 +588,15 @@ else:
     YEE_MER_ID = "YB01000000144"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'pkcs8_rsa_private_key144.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "rsa_public_key144.pem"), "r").read())
+
+    YEE_URL = 'http://mobiletest.yeepay.com/testpayapi'
+    YEE_SHORT_BIND = '%s/api/bindcard/bind/request' % YEE_URL
+    YEE_SHORT_UNBIND = '%s/api/bankcard/unbind' % YEE_URL
+    YEE_SHORT_SEND_SMS = '%s/api/bindcard/bind/sendsms' % YEE_URL
+    YEE_SHORT_CHECK_SMS = '%s/api/bindcard/bind/checksms' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/bankcard/bind/pay/request' % YEE_URL
+    YEE_SHORT_BIND_PAY_VALIDATE = '%s/api/async/bankcard/pay/confirm/validatecode' % YEE_URL
 
     KUAI_PAY_URL = "https://sandbox.99bill.com:9445"
 

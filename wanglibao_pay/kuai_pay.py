@@ -320,6 +320,28 @@ class KuaiPay:
         elif result['ret_code']:
             return {"ret_code":20103, "message":result['message']}
         return {"ret_code":0, "message":"ok"}
+
+    def delete_bind_new(self, request, card, bank):
+        storable_no = card.no if len(card.no) == 10 else card.no[:6] + card.no[-4:]
+        dic = {"user_id": request.user.id, "bank_id": card.bank.kuai_code, "storable_no": storable_no}
+
+        data = self._sp_delbind_xml(dic)
+        res = self._request(data, self.DEL_URL)
+        logger.error(data)
+        logger.error(res.content)
+
+        if res.status_code != 200 or "errorCode" in res.content:
+            return {"ret_code": 20101, "message": "解除绑定失败"}
+        result = self._handle_del_result(res)
+        if not result:
+            return {"ret_code": 20102, "message": "解除信息不匹配"}
+        elif result['ret_code']:
+            return {"ret_code": 20103, "message": result['message']}
+
+        card.is_bind_kuai = False
+        card.save()
+
+        return {"ret_code": 0, "message": "ok"}
     
     def pre_pay(self, request):
         if not request.user.wanglibaouserprofile.id_is_valid:
