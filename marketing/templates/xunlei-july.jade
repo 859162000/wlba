@@ -142,18 +142,32 @@ html
         p 现金红包拿多少？你数你做主！快来数钱，3秒时间数多少拿多少！
           br
           |网利宝联合迅雷年中大返利，马上数钱！
-        .seven-redpack.seven-com.seven-eight(style="width:1000px")
+        .seven-redpack.seven-com.seven-eight(style="width:1000px;-moz-user-select:none;",onselectstart="return false")
+          .game-start
           .seven-money#seven-money ￥10
           .seven-time#seven-time 3
-        button.xl-btn#xl-btn(style="margin-bottom:30px;padding:10px 40px") 开始数钱
+          .seven-text#seven-text 来 点 我
+        if user.is_authenticated
+          button.xl-btn#xl-btn(style="margin-bottom:30px;padding:10px 40px",data-num="true") 开始数钱
+        else
+          button.xl-btn#xl-btn(style="margin-bottom:30px;padding:10px 40px",data-num="false") 开始数钱
+        button.xl-btn#give-btn(style="margin-bottom:30px;padding:10px 40px",data-num="false") 领取红包
         p 说明：用户在3秒时间内，点击红包次数越多，所获得红包金额越大。点击1次得10元。
-        .seven-success
+        .seven-success#seven-success
           span.xl-off2 ×
           span.seven-happy.seven-com.seven-nine 恭喜你
           p 注册成功！
             br
-            a 立即去数钱
+            a#now 立即去数钱
             |，数多少拿多少！
+        .seven-success#redpack-success
+          span.xl-off2 ×
+          span.seven-happy.seven-com.seven-nine 恭喜你
+          p 成功领取了
+            span#money
+            |元红包！
+            br
+            a 立即去投资
         .xl-small-zc(style="top:113px")
           span.xl-off ×
           .denelu-form
