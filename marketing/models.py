@@ -333,6 +333,7 @@ class ActivityJoinLog(models.Model):
     join_times = models.IntegerField(u'参加次数', max_length=6, default=0)
     gift_name = models.CharField(u'奖品名称', max_length=200, blank=True)
     amount = models.DecimalField(u'奖品金额', max_digits=10, decimal_places=2, default=0)
+    channel = models.CharField(u'渠道', max_length=100, blank=True)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
     class Meta:
