@@ -796,7 +796,7 @@ class BindPayDepositView(APIView):
         result = third_pay.bind_pay_deposit(request)
         return Response(result)
 
-class BindPayDynnumView(APIView):
+class BindPayDynnumNewView(APIView):
     """ 确认支付 """
     permission_classes = (IsAuthenticated, )
 
