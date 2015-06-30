@@ -22,9 +22,10 @@
           }).done(function(data) {
             console.log(data);
             if(data['ret_code']==3002 || data['ret_code']==3001){
-              $('#redpack-fail').show();
+//              $('#redpack-fail').show();
+              alert(data.message);
             }
-            if(data['ret_code']==0){
+            if(data['ret_code']==3000){
               smallgame();
             }
           })
@@ -96,9 +97,10 @@
       $.ajax({
         url: "/api/xunlei/join/",
         type: "POST",
-        data:{amount:money}
-      }).done(function(){
-        $('#redpack-success').show();
+        data:{'amount':money}
+      }).done(function(data){
+        alert(data.message)
+//        $('#redpack-success').show();
       })
     })
   });
