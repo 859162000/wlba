@@ -547,8 +547,8 @@ elif ENV == ENV_PREPRODUCTION:
     YEE_URL = 'https://ok.yeepay.com/payapi'
     YEE_SHORT_BIND = '%s/api/bindcard/bind/request' % YEE_URL
     YEE_SHORT_UNBIND = '%s/api/bankcard/unbind' % YEE_URL
-    YEE_SHORT_SEND_SMS = '%s/api/bindcard/bind/sendsms' % YEE_URL
-    YEE_SHORT_CHECK_SMS = '%s/api/bindcard/bind/checksms' % YEE_URL
+    YEE_SHORT_BIND_SEND_SMS = '%s/api/bindcard/bind/sendsms' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/bindcard/bind/checksms' % YEE_URL
     YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
     YEE_SHORT_BIND_PAY_REQUEST = '%s/api/bankcard/bind/pay/request' % YEE_URL
     YEE_SHORT_BIND_PAY_VALIDATE = '%s/api/async/bankcard/pay/confirm/validatecode' % YEE_URL
@@ -592,8 +592,8 @@ else:
     YEE_URL = 'http://mobiletest.yeepay.com/testpayapi'
     YEE_SHORT_BIND = '%s/api/bindcard/bind/request' % YEE_URL
     YEE_SHORT_UNBIND = '%s/api/bankcard/unbind' % YEE_URL
-    YEE_SHORT_SEND_SMS = '%s/api/bindcard/bind/sendsms' % YEE_URL
-    YEE_SHORT_CHECK_SMS = '%s/api/bindcard/bind/checksms' % YEE_URL
+    YEE_SHORT_BIND_SEND_SMS = '%s/api/bindcard/bind/sendsms' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/bindcard/bind/checksms' % YEE_URL
     YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
     YEE_SHORT_BIND_PAY_REQUEST = '%s/api/bankcard/bind/pay/request' % YEE_URL
     YEE_SHORT_BIND_PAY_VALIDATE = '%s/api/async/bankcard/pay/confirm/validatecode' % YEE_URL
@@ -683,8 +683,8 @@ TINMANGKEY= '65'
 
 # 易瑞特
 YIRUITE_KEY = '1989'
-YIRUITE_AD_KEY_TEST = "al9e4ys5"
-RETURN_YIRUITE_URL_TEST = "http://app.offer99.com/callback/callback_test.php"
+YIRUITE_AD_KEY = "esn4s2enki"
+RETURN_YIRUITE_URL = "http://app.offer99.com/callback/callback_adv/callback_adv_w345fe267d9149fcd3dabc7e9e39b783.php"
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

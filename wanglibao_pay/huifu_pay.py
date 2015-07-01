@@ -532,9 +532,9 @@ class HuifuShortPay:
 
         if not amount or not card_no or not gate_id:
             return {"ret_code": 20112, 'message': '信息输入不完整'}
-        if len(card_no) < 10 and not input_phone:
+        if len(card_no) > 10 and not input_phone:
             return {"ret_code": 20112, 'message': '信息输入不完整'}
-        if card_no and len(card_no) != 10:
+        if card_no and len(card_no) == 10:
             return {'ret_code': 20013, 'message': '卡号格式不正确'}
 
         try:
