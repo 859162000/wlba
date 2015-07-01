@@ -261,7 +261,6 @@ class ClientData(models.Model):
         ordering = ['-create_time']
         verbose_name_plural = u'客户端信息'
 
-
     def __unicode__(self):
         return u'<%s>' % self.userdevice
 
@@ -325,9 +324,20 @@ class PlayList(models.Model):
         verbose_name_plural = u'打榜统计表'
 
 
-# class ActivityUserRecord(models.Model):
-#     """参加活动的用户记录"""
-#     user = models.ForeignKey(User)
-#     object_name = models.CharField(u'活动名称', max_length=200)
-#     object_type = models.CharField(u'活动类型', max_length=100)
-#     created_at = models.DateTimeField(u'创建时间', auto_created=True)
+class ActivityJoinLog(models.Model):
+    """参加活动的用户记录"""
+    user = models.ForeignKey(User)
+    action_name = models.CharField(u'活动名称', max_length=200)
+    action_type = models.CharField(u'参加类型', max_length=100)
+    action_message = models.TextField(u'摘要', blank=True)
+    join_times = models.IntegerField(u'参加次数', max_length=6, default=0)
+    gift_name = models.CharField(u'奖品名称', max_length=200, blank=True)
+    amount = models.DecimalField(u'奖品金额', max_digits=10, decimal_places=2, default=0)
+    channel = models.CharField(u'渠道', max_length=100, blank=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = u'用户参加活动记录'
+
+    def __unicode__(self):
+        return self.action_name

@@ -1,6 +1,5 @@
 -load formatters
 -load mathfilters
-
 doctype html
 html
   head
@@ -67,9 +66,23 @@ html
               else
                 +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav button-dif nologin')
 
-    .wrap#new-xl-banner
+    .wrap#seven-xl-banner
       .gold2
-         .xl-text.xl-com.xl-ele#xl-text
+         //.xl-text.xl-com.xl-ele#xl-text
+         #sev-num
+            span 已有
+            ul
+              li 5
+                hr
+              li 0
+                hr
+              li 0
+                hr
+              li 0
+                hr
+              li 0
+                hr
+            span 个
          .denelu-form
             h1.biaoyu 轻松拿380元红包
             //.align-center
@@ -115,112 +128,223 @@ html
               a(href="/accounts/login/") 立即登录
     .new-xl-big
       .xl-backtop
-        span.xl-com.xl-twe
-        .backtop 回到顶部
-        img(src="/static/images/xunlei/weixin.jpg")#xl-weixin
+        span.seven-com.seven-ten
+        .backtop.sev-backtop 回到顶部
+        img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+        img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
         .erweima
-      h1.xl-time 活动时间：2015年6月16日——2015年7月2日
-      .xl-box1
+      h1.xl-time 活动时间：2015年7月3日——2015年8月3日
+      .xl-box1(style="height:600px;")
         h2.xl-jiang
-          .xl-center
-             .xl-left
-               span.xl-hua
-               .line
-               span.xl-xin
+          .xl-center#seven-center
+             |游戏互动
+        p 现金红包拿多少？你数你做主！快来数钱，3秒时间数多少拿多少！
+          br
+          |网利宝联合迅雷年中大返利，马上数钱！
+        .seven-redpack.seven-com.seven-eight(style="width:1000px;-moz-user-select:none;",onselectstart="return false")
+          .game-start
+          .seven-money#seven-money ￥10
+          .seven-time#seven-time 3
+          .seven-text#seven-text 来 点 我
+        if user.is_authenticated
+          button.xl-btn#xl-btn(style="margin-bottom:30px;padding:10px 40px",data-num="true") 开始数钱
+        else
+          button.xl-btn#xl-btn(style="margin-bottom:30px;padding:10px 40px",data-num="false") 开始数钱
+        button.xl-btn#give-btn(style="margin-bottom:30px;padding:10px 40px",data-num="false") 领取红包
+        p 说明：用户在3秒时间内，点击红包次数越多，所获得红包金额越大。点击1次得10元。
+
+        .seven-success#seven-success
+          span.xl-off2 ×
+          span.seven-happy.seven-com.seven-nine 恭喜你
+          p 注册成功！
+            br
+            a#now 立即去数钱
+            |，数多少拿多少！
+        .seven-success#redpack-success
+          span.xl-off2 ×
+          span.seven-happy.seven-com.seven-nine 恭喜你
+          p 成功领取了
+            span#money
+            |元红包！
+            br
+            a 立即去投资
+        .seven-success#redpack-fail
+          span.xl-off2 ×
+          span.seven-happy
+          p 不符合参加条件
+        .xl-small-zc(style="top:113px")
+          span.xl-off ×
+          .denelu-form
+            h1.biaoyu 轻松拿380元红包
+            //.align-center
+            //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
+            form#register-modal-form2.login-form.dale(method='post', action='/accounts/register/ajax/')
+              .form-row
+                .form-control-group
+                  .span12
+                    input#reg_identifier2.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                .form-row-error
+              .form-row.voice
+                .span12-omega.hidden.show
+                  没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                .form-control-group
+                  .span6
+                    input#id_validate_code2.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                  .span6-omega
+                    button#button-get-validate-code-modal2.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px") 获取验证码
+                .form-row-error
+              .form-row
+                input#reg_password4.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                .password-strength-container
+                  span.password-strength-1
+                  span.password-strength-2
+                  span.password-strength-3
+                .form-row-error
+              .form-row
+                input#reg_password3.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                .form-row-error
+              .form-row.form-bottom-bar
+                .agreement(style="padding:0 0 10px 10px;text-align:left")
+                  label(for="agreement")
+                    input(type="checkbox", name="agreement", checked="checked", id="agreement2", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
+                  | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                  .form-row-error
+                button#register_submit2.button-account.span10.xun-zhuce(type='submit') 立即注册
+              .space-vertical-s
+      .xl-box1(style="height:307px")
+        h2.xl-jiang
+          .xl-center#seven-center
              |活动奖励
-             .xl-left.xl-right
-               span.xl-hua
-               .line
-               span.xl-xin
-        h3.xl-own 【全民擂专场】
-        div.xl-qi.qi1
-          p.xl-old 注册就送380元
-            br
-            |现金红包
-        div.xl-qi.qi2
-          p.xl-old 充值送7天
-            br
-            |迅雷白金会员
-        div.xl-qi.qi3
-          p.xl-old 首次投资送1年
-            br
-            |迅雷白金会员
-        div.xl-qi.qi4(style="margin-right:0")
-          p.xl-old 单笔投资5000元
-            br
-            |再送50元现金红包
-        h3.xl-own 【精英擂专场】
-        div.xl-elite-left
-        div.xl-elite-right
-          .xl-elite-top
-            img(src="/static/images/xunlei/xiaoqi.jpg").xiaoqi
-            p.xl-explain 本擂馆每日
-              b 零点数据清零
-              |，用户可每天重复参赛。用户每天的投标累计金额
-              b ≥3万元
-              |，将获得网站每日投资额外现金红包奖励。
-          .xl-elite-bottom
-            dl
-              dt.xl-com.xl-one
-                span.money ¥ 1000
-              dd.rank 第一名
-            dl
-              dt.xl-com.xl-two
-                span.money ¥ 900
-              dd.rank 第二名
-            dl
-              dt.xl-com.xl-three
-                span.money ¥ 800
-              dd.rank 第三名
-            dl
-              dt.xl-com.xl-four
-                span.money ¥ 700
-              dd.rank 第四名
-            dl(style="margin-right:0")
-              dt.xl-com.xl-five
-                span.money ¥ 600
-              dd.rank 第五名
-            dl.xl-twice
-              dt.xl-com.xl-six
-                span.money ¥ 500
-              dd.rank 第六名
-            dl.xl-twice
-              dt.xl-com.xl-seven
-                span.money ¥ 400
-              dd.rank 第七名
-            dl.xl-twice
-              dt.xl-com.xl-eight
-                span.money ¥ 300
-              dd.rank 第八名
-            dl.xl-twice
-              dt.xl-com.xl-nine
-                span.money ¥ 200
-              dd.rank 第九名
-            dl.xl-twice(style="margin-right:0")
-              dt.xl-com.xl-ten
-                span.money ¥ 100
-              dd.rank 第十名
-            p(style="top:17px")
-              b 注：
-              |若出现两名或两名以上客户投标金额相同，则按当日投标时间先后排位；
+        .seven-prize
+          dl
+            dt.seven-first
+            dd 注册
               br
-              |每天投标累计金额
-              b ≥3
-              |万元的用户未排入前十名将获得
-              b 60元
-              |现金。
-      .xl-box1(style="height:337px")
+              |送200元红包
+          dl(style="background:#f56177")
+            dt.seven-com.seven-two
+            dd 充值送1个月
+              br
+              | 迅雷白金会员
+          dl(style="background:#41b0f8")
+            dt.seven-com.seven-three
+            dd 首投送1年
+              br
+              | 迅雷白金会员
+          dl(style="background:#8675ff")
+            dt.seven-com.seven-four
+            dd 新手专享16%
+              br
+              | 年化收益
+          dl(style="margin-right:0;background:#fc7965")
+            dt.seven-com.seven-five
+            dd 额外现金红包
+              br
+              | 数多少拿多少
+      .xl-box1(style="height:auto;margin-top:20px")
+        h4.seven-h.seven-com.seven-six
+        p 投资网利宝新手标，最高16%年化收益！还等什么，闲钱能挣钱，马上去投！！
+      .xl-box1(style="height:auto;margin-top:20px")
+        .act-back(style="margin-top:45px")
+          h3.avariety 【高收益】
+            .content-desc
+              .row
+                .span12
+                  img(src="/static/images/xunlei-denglu/xunlei-hight-gaoshouyi.png")
+      .xl-box1(style="height:auto")
+        .acartiety-top
+          h3.avariety 【多种选择】
+          .avariety-a
+            .avariety-s
+              .tu-one
+                .font-zi
+              div.avariety-tu
+                .avariety-tu1
+                  .circle
+                    p 7%
+                  .circle.circle-two
+                    p 10%
+                  .circle.circle-three
+                    p 11%
+                  .circle.circle-four
+                    p 13%
+                  .circle.circle-five
+                    p 15%
+                p
+                  span
+                    img(src="/static/images/xunlei-denglu/xunlei-anquan.png")
+                  | 100%本息保障
+            .avariety-s
+              .tu-one.tu-two
+                .font-zi.zi-on
+              div.avariety-tu
+                .avariety-tu1
+                  .datea
+                    p(style='border-right: 1px solid #dedede')
+                      span 1
+                      | 个月
+                    p
+                      span(style='color: #7360ff') 2
+                      | 个月
+                    p(style='border-right: 1px solid #dedede')
+                      span(style='color: #3ea7eb') 3
+                      | 个月
+                    p
+                      span(style='color: #ffaa19') 4
+                      | 个月
+                  h5.xia 多重选择，从心开始
+                p
+                  span
+                    img(src="/static/images/xunlei-denglu/xunlei-anquan.png")
+                  | 100%本息保障
+            .avariety-s
+              .tu-one.tu-three
+                .font-zi.zi-oa
+              div.avariety-tu
+                .avariety-tu1
+                  .datea
+                    dl(style='border-right: 1px solid #dedede')
+                      dt
+                      dd 按月付息还款
+                    dl
+                      dt.dt-one
+                      dd 等额本息还款
+                    dl(style='border-right: 1px solid #dedede')
+                      dt.dt-two
+                      dd 一次还本付息
+                    dl
+                      dt.dt-three
+                      dd 先息后本
+                p
+                  span
+                    img(src="/static/images/xunlei-denglu/xunlei-anquan.png")
+                  | 100%本息保障
+            .avariety-s
+              .tu-one.tu-four
+                .font-zi.zi-ob
+              div.avariety-tu
+                .avariety-tu1
+                  .datea
+                    dl(style='border-right: 1px solid #dedede')
+                      dt.dt-onea
+                      dd 按月付息还款
+                    dl
+                      dt.dt-oneb
+                      dd 等额本息还款
+                    dl(style='border-right: 1px solid #dedede')
+                      dt.dt-twoa
+                      dd 一次还本付息
+                    dl
+                      dt.dt-threea
+                      dd 先息后本
+                p
+                  span
+                    img(src="/static/images/xunlei-denglu/xunlei-anquan.png")
+                  | 100%本息保障
+      .xl-box1(style="height:auto;margin-top:30px")
         h2.xl-jiang
-          .xl-center
-             .xl-left
-               span.xl-hua
-               .line
-               span.xl-xin
+          .xl-center#seven-center
              |投资流程
-             .xl-left.xl-right
-               span.xl-hua
-               .line
-               span.xl-xin
         .content-process
           .content-pptv(style="background:#fff")
             .process-text(style="height:50px")
@@ -256,51 +380,9 @@ html
                   |（激活迅雷会员）
               .triangle-end(style="width:120px")
                 .end-cont
-      .xl-box1(style="height:450px")
+      .xl-box1(style="display:none")
         h2.xl-jiang
-          .xl-center
-             .xl-left(style="width:338px")
-               span.xl-hua
-               .line(style="width:287px")
-               span.xl-xin
-             |迅雷投资用户前来打擂可以获得什么？
-             .xl-left.xl-right(style="width:338px")
-               span.xl-hua
-               .line(style="width:287px")
-               span.xl-xin
-        .xl-get
-           .get1
-              span 迅雷会员
-                br
-                |免费送
-           p(style="top:20px;font-size:12px") 迅雷会员免费送
-             br
-             |注册并充值送7天迅雷会员
-        .xl-get
-           .get1.get2
-              span 最高年化
-                br
-                |收益率15%
-           p(style="top:20px;font-size:12px") 最高年化收益率15%
-             br
-             |是余额宝的3倍，银行活期存款的30倍
-        .xl-get
-           .get1.get3
-              span 每日投资最高
-                br
-                |奖上有奖
-           p(style="top:20px;font-size:12px") 每日投资最高奖上有奖
-             br
-             |每日最高奖投资奖1000元，可天天参与
-        .xl-get
-           .get1.get4
-              span 现金红包
-                br
-                |注册送
-           p(style="top:20px;font-size:12px;") 现金红包注册送
-             br
-             |注册就送380元现金直抵红包
-        button.xl-btn#xl-btn 立即领取现金红包
+        //button.xl-btn#xl-btn 立即领取现金红包
         .xl-small-zc
           span.xl-off ×
           .denelu-form
@@ -343,34 +425,20 @@ html
 
               .space-vertical-s
 
-            p.xun-p(style="top:0px;") 已有账号,
-              a(href="/accounts/login/",style="color:#3ea7eb") 立即登录
       .xl-box1(style="height:644px")
         h2.xl-jiang
-          .xl-center
-             .xl-left
-               span.xl-hua
-               .line
-               span.xl-xin
+          .xl-center#seven-center
              |活动规则
-             .xl-left.xl-right
-               span.xl-hua
-               .line
-               span.xl-xin
         ul
-          li 1、手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账号；
-          li 2、红包使用细则：
+          li 1. 手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账号；
+          li 2. 新用户注册即送200元现金红包，其中含50元的直抵红包和150元抵扣红包（投资满300元可使用50元红包，150元红包按投资额1%抵扣使用）；
+          li 3. 数钱所得现金红包均为折扣红包，所得金额分解成50元*N个，按投资额1%折扣使用（比如得到170元红包，完成注册后将有3个50元折扣红包，一个20元折扣红包发放到
             br
-            b 新用户注册即送380元现金红包，投资300元可使用30元现金红包，350元红包按投资额1%抵扣使用 ；
-            br
-            b 所有现金奖励在7个工作日内以红包形式发出，红包类型为直抵红包；
-            br
-            b 获奖红包以站内信形式通知，完成一次投资回款后即可取现；
-            br
-            b 红包均只能使用一次，使用后是否有余额红包即失效；
-          li 3、红包有效期：2015年6月16日-2015年9月15日；
-          li 4、本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
-          li 5、网利宝客服热线：4008-588-066（服务时间：9:00-20:00 工作日）。网利宝对此活动享有最终解释权。
+            b 用户账户）；
+          li 4. 红包统一在获奖红包以站内信形式通知，完成一次投资回款后即可取现；
+          li 5. 红包有效期：2015年7月1日-2015年10月1日；
+          li 6. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+          li 7. 网利宝对此活动享有最终解释权。
         .san-new
           .san-new-content.container
             .row.gold-dl-row

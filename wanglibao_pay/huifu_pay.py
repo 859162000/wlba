@@ -6,6 +6,7 @@ import logging
 from django.forms import model_to_dict
 from django.utils.decorators import method_decorator
 from django.utils import timezone
+import hashlib
 import traceback
 #from marketing.helper import RewardStrategy
 import requests
@@ -282,23 +283,6 @@ class HuifuPay(Pay):
         if flag:
             device = split_ua(request)
             tools.despoit_ok(pay_info, device['device_type'])
-            """
-            # 迅雷活动, 12.8 首次充值
-            start_time = timezone.datetime(2014, 12, 7)
-            if PayInfo.objects.filter(user=pay_info.user, type='D', update_time__gt=start_time,
-                                      status=PayInfo.SUCCESS).count() == 1:
-                rs = RewardStrategy(pay_info.user)
-                rs.reward_user(u'三天迅雷会员')
-
-
-            title, content = messages.msg_pay_ok(amount)
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": pay_info.user.id,
-                "title": title,
-                "content": content,
-                "mtype": "activityintro"
-            })
-            """
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return result
@@ -308,7 +292,7 @@ class HuifuShortPay:
     FEE = 0
 
     def __init__(self):
-        import hashlib
+
         self.MER_ID = settings.HUI_SHORT_MER_ID
         self.OPER_ID = settings.HUI_SHORT_OPER_ID
 
@@ -488,6 +472,18 @@ class HuifuShortPay:
 
         return {"ret_code": 0, "message": "删除成功"}
 
+    def delete_bind(self, user, card, bank):
+        """ 解除绑定接口 """
+        if card.is_bind_huifu:
+            res = self._unbind_card_huifu(user=user, card_no=card.no)
+            if res['RespCode'] != u'000000':
+                return {"ret_code": -2, "message": res['ErrMsg']}
+
+            card.is_bind_huifu = False
+            card.save()
+
+        return {"ret_code": 0, "message": "解除绑定成功"}
+
     def bind_card_wlbk(self, user, card_no, bank):
         """ 保存卡信息到个人名下 """
         if len(card_no) == 10:
@@ -506,7 +502,26 @@ class HuifuShortPay:
         card.save()
         return True
 
+    def open_bind_card(self, user, bank, card):
+        # 汇付天下需要先开户，才能够邦卡
+        # 开户
+        res = self._open_account_huifu(user)
+        if res['RespCode'] not in (u'000000', '220001'):
+            return {"ret_code": -3, "message": res['ErrMsg']}
+
+        # 邦卡
+        res = self._bind_card_huifu(user=user, bank=bank, card_no=card.no)
+        if res['RespCode'] not in (u'000000', u'223153'):
+            return {"ret_code": -2, "message": res['ErrMsg']}
+
+        # 保存卡信息到个人名下
+        if not self.bind_card_wlbk(user, card.no, bank):
+            return {"ret_code": -1, "message": '银行卡保存失败'}
+
+        return {"ret_code": 0, "message": 'ok'}
+
     def pre_pay(self, request, bank=None):
+        """ 汇付天下直接进行邦卡支付，不能够获取验证码 """
         if not request.user.wanglibaouserprofile.id_is_valid:
             return {"ret_code": 20111, "message": "请先进行实名认证"}
 
@@ -515,10 +530,12 @@ class HuifuShortPay:
         input_phone = request.DATA.get("phone", "").strip()
         gate_id = request.DATA.get("gate_id", "").strip()
 
-        if not amount or not card_no:
+        if not amount or not card_no or not gate_id:
             return {"ret_code": 20112, 'message': '信息输入不完整'}
-        if len(card_no) < 10 and not input_phone:
+        if len(card_no) > 10 and not input_phone:
             return {"ret_code": 20112, 'message': '信息输入不完整'}
+        if card_no and len(card_no) == 10:
+            return {'ret_code': 20013, 'message': '卡号格式不正确'}
 
         try:
             float(amount)
@@ -529,32 +546,19 @@ class HuifuShortPay:
 
         user = request.user
         profile = user.wanglibaouserprofile
-        card, bank = None, None
-        if gate_id:
-            bank = Bank.objects.filter(gate_id=gate_id).first()
-            if not bank or not bank.huifu_bind_code.strip():
-                return {"ret_code": 201151, "message": "不支持该银行"}
 
-        if len(card_no) == 10:
-            card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
-        else:
-            card = Card.objects.filter(no=card_no, user=user).first()
-            if bank and card and bank != card.bank:
-                return {"ret_code": 201153, "message": "银行卡与银行不匹配"}
+        bank = Bank.objects.filter(gate_id=gate_id).first()
+        if not bank or not bank.huifu_bind_code.strip():
+            return {"ret_code": 201151, "message": "不支持该银行"}
+
+        card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+        if bank and card and bank != card.bank:
+            return {"ret_code": 201153, "message": "银行卡与银行不匹配"}
 
         if not card or (card and not card.is_bind_huifu):
-            # 开户
-            res = self._open_account_huifu(user)
-            if res['RespCode'] not in (u'000000', '220001'):
-                return {"ret_code": -3, "message": res['ErrMsg']}
-
-            # 邦卡
-            res = self._bind_card_huifu(user=user, bank=bank, card_no=card_no)
-            if res['RespCode'] not in (u'000000', u'223153'):
-                return {"ret_code": -2, "message": res['ErrMsg']}
-
-            # 保存卡信息到个人名下
-            self.bind_card_wlbk(user, card_no, bank)
+            res = self.open_bind_card(user, bank, card)
+            if res['ret_code'] != 0:
+                return res
 
         try:
             pay_info = PayInfo()
@@ -608,10 +612,7 @@ class HuifuShortPay:
                 tools.despoit_ok(pay_info, device_type)
 
                 # 充值成功后，更新本次银行使用的时间
-                if len(pay_info.card_no) == 10:
-                    Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now())
-                else:
-                    Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now())
+                Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now())
 
             OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
             return rs

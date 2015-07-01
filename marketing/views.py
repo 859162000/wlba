@@ -18,7 +18,7 @@ from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward, Reward
+from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
 from marketing.tops import Top
 from utils import local_to_utc
 
@@ -32,6 +32,12 @@ from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_account import message as inside_message
 from order.models import Order
 from order.utils import OrderHelper
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
+from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
+from wanglibao_redpack import backends as redpack_backends
 
 
 class YaoView(TemplateView):
@@ -538,3 +544,64 @@ class NewsDetailView(TemplateView):
 
         return context
 
+
+class ActivityJoinLogAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        amount = int(request.POST.get('amount', 0))
+        if not user:
+            return Response({'ret_code': 3001, 'message': u'用户没有登陆，请先登陆'})
+
+        start_time = timezone.datetime(2015, 6, 29)
+        user_ib = IntroducedBy.objects.filter(user=user, channel__name='xunlei', created_at__gt=start_time).first()
+        if user_ib:
+            has_log = ActivityJoinLog.objects.filter(user=user).first()
+            if has_log:
+                return Response({'ret_code': 3002, 'message': u'已经参加过该活动，不能重复参加'})
+            else:
+                if amount:
+                    ActivityJoinLog.objects.create(
+                        user=user,
+                        action_name=u'迅雷15年7月数钱活动',
+                        action_type=u'注册',
+                        action_message=u'用户参加数钱游戏得红包，3秒内每点击一次得10元，得多少钱送多少红包',
+                        channel=u'xunlei',
+                        gift_name=u'迅雷7月数钱红包',
+                        join_times=1,
+                        amount=amount,
+                        create_time=timezone.now(),
+                    )
+                    divisor = amount / 50    # 50元红包的个数
+                    remainder = amount % 50  # 金额除以50的余数，剩余红包金额
+                    numbers = []
+                    if divisor > 0:
+                        numbers = [50] * divisor
+
+                    numbers = numbers + [remainder]
+                    for number in numbers:
+                        describe = 'xunlei_july_' + str(number)
+                        redpack_event = RedPackEvent.objects.filter(invalid=False,
+                                                                    describe=describe,
+                                                                    target_channel='xunlei').first()
+                        if redpack_event:
+                            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+
+                    return Response({'ret_code': 0, 'message': u'红包发放成功，请到用户中心查看'})
+                else:
+                    return Response({'ret_code': 3000, 'message': u'倒计时开始'})
+        else:
+            return Response({'ret_code': 3002, 'message': u'不符合参加条件'})
+
+
+class ActivityJoinLogCountAPIView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        join_log = ActivityJoinLog.objects.filter(channel='xunlei').aggregate(amount_sum=Sum('amount'))
+
+        return Response({'ret_code': 0,
+                         'redpack_total': join_log['amount_sum']/10,
+                         'amount_total': join_log['amount_sum'] if join_log['amount_sum'] else 0
+        })

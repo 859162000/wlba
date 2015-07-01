@@ -8,18 +8,103 @@
 
   require(['jquery'], function($) {
     //banner的主题文字效果
+//    $('.xl-small-zc').show()
     $('#xl-text').show();
-    $('#xl-text').animate({'top': '37px'},500)
+    $('#xl-text').animate({'top': '37px'},500);
     //点击按钮出现注册框
     $('#xl-btn').on('click',function(){
-      $('.xl-small-zc').show()
+        if ($(this).attr('data-num') == 'false'){
+          $('.xl-small-zc').show()
+        }else{
+          $.ajax({
+            url: "/api/xunlei/join/",
+            type: "POST"
+          }).done(function(data) {
+            console.log(data);
+            if(data['ret_code']==3002 || data['ret_code']==3001){
+//              $('#redpack-fail').show();
+              alert(data.message);
+            }
+            if(data['ret_code']==3000){
+              smallgame();
+            }
+          })
+        }
+//        if ($(this).attr('data-num') == 'true'){
+//          smallgame();
+//        }
     });
-
+    //游戏
+    function smallgame(){
+      $('#seven-text').html('准备数钱');
+          var n=3;
+          var timer;
+          if (n!==0){
+            timer=setInterval(function(){
+              n--;
+              $('#seven-time').html(n);
+              if (n<0){
+                clearInterval(timer);
+                $('#seven-text').html('来 点 我');
+                $('#seven-time').html('3');
+                $('.game-start').show();
+                $('#xl-btn').css({'background':'#988B8B','box-shadow':'0px 4px #A09C9B'});
+                $('#xl-btn').attr('disabled','false');
+              }
+            },1000)
+          }
+      //点击开始游戏
+      var num=1;
+      $('.game-start').on('click',function(){
+        if (!$('.game-start').hasClass('start')){
+          $(this).addClass('start');
+          //游戏时间倒计时
+          var k=3;
+          var timer2;
+          timer2=setInterval(function(){
+            k--;
+            $('#seven-time').html(k);
+            if (k==0){
+              clearInterval(timer2);
+              $('#xl-btn').hide();
+              $('#give-btn').show();
+            }
+          },1000);
+          setTimeout(function(){
+            $('.game-start').removeClass('game-start');
+          },3000)
+        }
+        num++;
+        $('#seven-money').html('￥'+num*10);
+        $('#money').html(num*10);
+      })
+    }
     //点击×关闭注册框
-    $('.xl-off').on('click',function(){
+    $('.xl-off,#now').on('click',function(){
       $('.xl-small-zc').hide()
     });
+    //点击×关闭提示框
+    $('.xl-off2,#now').on('click',function(){
+      $('.seven-success').hide();
+    });
+
+    $('#now').on('click',function(){
+      smallgame();
+    });
+    //弹出领取红包提示
+    $('#give-btn').on('click',function(){
+      var money=$('#money').html();
+      $.ajax({
+        url: "/api/xunlei/join/",
+        type: "POST",
+        data:{'amount':money}
+      }).done(function(data){
+        alert(data.message)
+//        $('#redpack-success').show();
+      })
+    })
   });
+
 
   //固定回到顶部
    function backtop(){
@@ -183,7 +268,7 @@
           type: "POST",
           data: $(form).serialize()
         }).done(function(data, textStatus) {
-          return window.location.href='/';
+          return $('#seven-success').show();
         }).fail(function(xhr) {
           var error_message, message, result;
           result = JSON.parse(xhr.responseText);

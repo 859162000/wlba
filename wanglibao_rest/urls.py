@@ -29,7 +29,8 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
                             BindPayView, BindPayCallbackView, BindPayQueryView,
-                            BindPayDelView, BindPayDynNumView, TradeRecordAPIView)
+                            BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
+                            BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -45,6 +46,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
+from marketing.views import ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
 from weixin.views import P2PListWeixin
 
 router = DefaultRouter()
@@ -154,6 +156,13 @@ urlpatterns = patterns(
     url(r'^pay/cnp/delete/$', BindPayDelView.as_view()),
     url(r'^pay/cnp/dynnum/$', BindPayDynNumView.as_view()),
     url(r'^pay/deposit/$', BindPayView.as_view(), name="kuai-deposit-view"),
+
+    # 切换支付渠道重新
+    url(r'^pay/cnp/list_new/$', BindCardQueryView.as_view()),
+    url(r'^pay/cnp/delete_new/$', UnbindCardView.as_view()),
+    url(r'^pay/cnp/dynnum_new/$', BindPayDynnumNewView.as_view()),
+    url(r'^pay/deposit_new/$', BindPayDepositView.as_view()),
+
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
     url(r'^pay/deposit/callback/$', BindPayCallbackView.as_view(), name="kuai-deposit-callback"),
 
@@ -203,4 +212,10 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns('',
     url(r'^investment_history/', InvestmentHistory.as_view()),
+)
+
+urlpatterns += patterns(
+    '',
+    url(r'^xunlei/join/$', ActivityJoinLogAPIView.as_view()),
+    url(r'^xunlei/join/count/$', ActivityJoinLogCountAPIView.as_view()),
 )

@@ -674,21 +674,6 @@ class BindPayView(APIView):
         result = pay.pre_pay(request)
         return Response(result)
 
-
-        #gate_id = request.DATA.get("gate_id")
-        #if not gate_id:
-        #    return Response({"ret_code": -1, "message": "gate_id is null"})
-        #bank = Bank.objects.filter(gate_id=gate_id).first()
-        #if not bank:
-        #    return Response({"ret_code": -2, "message": "gate_id error"})
-        #channel_dict = {"huifu":   third_pay.HuifuShortPay,
-        #                "yeepay":  third_pay.YeePay,
-        #                "kuaipay": third_pay.KuaiPay}
-        #bank.channel = 'huifu'
-        #pay = channel_dict[bank.channel]()
-        #result = pay.pre_pay(request)
-        #return Response(result)
-
 class BindPayCallbackView(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -782,4 +767,39 @@ class WithdrawAPIView(APIView):
                 "content": content,
                 "mtype": "withdraw"
             })
+        return Response(result)
+
+
+class BindCardQueryView(APIView):
+    """ 查询用户绑定卡号列表接口 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.card_bind_list(request)
+        return Response(result)
+
+
+class UnbindCardView(APIView):
+    """ 解绑卡接口 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.card_unbind(request)
+        return Response(result)
+
+
+class BindPayDepositView(APIView):
+    """ 获取验证码或快捷支付 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.bind_pay_deposit(request)
+        return Response(result)
+
+class BindPayDynnumNewView(APIView):
+    """ 确认支付 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.bind_pay_dynnum(request)
         return Response(result)
