@@ -17,7 +17,6 @@
       type: "GET"
     }).done(function(data) {
       var number=parseInt(data['redpack_total']);
-        console.log(number);
       if (number==0){
         var str1='500';
         for(var j=0,len2=str1.length;j<len2;j++){
