@@ -17,12 +17,12 @@
       type: "GET"
     }).done(function(data) {
       var number=parseInt(data['redpack_total']);
+        console.log(number);
       if (number==0){
         var str1='500';
-        $('#redpacknum').html();
-        for(var j=0,len2=str1.length;j<len;j++){
-          if(i>=$('#redpacknum li').length){
-              $('#redpacknum').append('<li>'+str1[i]+'<hr></li>');
+        for(var j=0,len2=str1.length;j<len2;j++){
+          if(j>=$('#redpacknum li').length){
+              $('#redpacknum').append('<li>'+str1[j]+'<hr></li>');
           }
         }
       }else{
