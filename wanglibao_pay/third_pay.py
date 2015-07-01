@@ -273,28 +273,25 @@ def bind_pay_deposit(request):
         1、获取验证码
         2、快捷支付功能
     """
-    user = request.user
-    card_no = request.DATA.get("card_no", "").strip()
+    gate_id = request.DATA.get("gate_id", "").strip()
 
-    if not card_no:
+    if not gate_id:
         return {"ret_code": 20001, 'message': '信息输入不完整'}
 
-    if len(card_no) == 10:
-        card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
-    else:
-        card = Card.objects.filter(no=card_no, user=user).first()
+    bank = Bank.objects.filter(gate_id=gate_id).first()
 
-    if not card:
-        return {"ret_code": 20002, "message": "银行卡未绑定"}
+    if not bank:
+        return {"ret_code": 20002, "message": "银行ID不正确"}
 
-    if card.bank.channel == 'huifu':
+    if bank.channel == 'huifu':
         return HuifuShortPay().pre_pay(request)
 
-    elif card.bank.channel == 'yeepay':
+    elif bank.channel == 'yeepay':
         return YeeShortPay().pre_pay(request)
 
-    elif card.bank.channel == 'kuaipay':
+    elif bank.channel == 'kuaipay':
         return KuaiPay().pre_pay(request)
+
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
 
