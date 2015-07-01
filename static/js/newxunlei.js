@@ -11,6 +11,21 @@
 //    $('.xl-small-zc').show()
     $('#xl-text').show();
     $('#xl-text').animate({'top': '37px'},500);
+    //banner数字
+    $.ajax({
+      url: "/api/xunlei/join/count/",
+      type: "GET"
+    }).done(function(data) {
+      var number=parseInt(data['amount_sum']);
+      var rednum=500+number/10;
+      var str=rednum.toString();
+      for(var i=0,len=str.length;i<len;i++){
+        console.log(str[i]);
+        if(i>=$('#redpacknum li').length){
+            $('#redpacknum').append('<li>'+str[i]+'<hr></li>');
+        }
+      }
+    });
     //点击按钮出现注册框
     $('#xl-btn').on('click',function(){
         if ($(this).attr('data-num') == 'false'){
@@ -22,17 +37,14 @@
           }).done(function(data) {
             console.log(data);
             if(data['ret_code']==3002 || data['ret_code']==3001){
-//              $('#redpack-fail').show();
-              alert(data.message);
+              $('#redpack-fail p').html(data.message);
+              $('#redpack-fail').show();
             }
             if(data['ret_code']==3000){
               smallgame();
             }
           })
         }
-//        if ($(this).attr('data-num') == 'true'){
-//          smallgame();
-//        }
     });
     //游戏
     function smallgame(){
@@ -99,8 +111,8 @@
         type: "POST",
         data:{'amount':money}
       }).done(function(data){
-        alert(data.message)
-//        $('#redpack-success').show();
+        $('#redpack-success p').html(data.message+'<br><a href="/accounts/home/">立即查看</a>');
+        $('#redpack-success').show();
       })
     })
   });
