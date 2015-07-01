@@ -16,11 +16,10 @@
       url: "/api/xunlei/join/count/",
       type: "GET"
     }).done(function(data) {
-      var number=parseInt(data['amount_sum']);
-      var rednum=500+number/10;
+      var number=parseInt(data['redpack_total']);
+      var rednum=500+number;
       var str=rednum.toString();
       for(var i=0,len=str.length;i<len;i++){
-        console.log(str[i]);
         if(i>=$('#redpacknum li').length){
             $('#redpacknum').append('<li>'+str[i]+'<hr></li>');
         }
