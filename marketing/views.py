@@ -602,6 +602,6 @@ class ActivityJoinLogCountAPIView(APIView):
         join_log = ActivityJoinLog.objects.filter(channel='xunlei').aggregate(amount_sum=Sum('amount'))
 
         return Response({'ret_code': 0,
-                         'redpack_total': join_log['amount_sum']/10,
+                         'redpack_total': join_log['amount_sum']/10 if join_log['amount_sum'] else 0,
                          'amount_total': join_log['amount_sum'] if join_log['amount_sum'] else 0
         })
