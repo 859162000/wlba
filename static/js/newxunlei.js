@@ -17,13 +17,24 @@
       type: "GET"
     }).done(function(data) {
       var number=parseInt(data['redpack_total']);
-      var rednum=500+number;
-      var str=rednum.toString();
-      for(var i=0,len=str.length;i<len;i++){
-        if(i>=$('#redpacknum li').length){
-            $('#redpacknum').append('<li>'+str[i]+'<hr></li>');
+      if (number==0){
+        var str1='500';
+        $('#redpacknum').html();
+        for(var j=0,len2=str1.length;j<len;j++){
+          if(i>=$('#redpacknum li').length){
+              $('#redpacknum').append('<li>'+str1[i]+'<hr></li>');
+          }
+        }
+      }else{
+        var rednum=500+number;
+        var str=rednum.toString();
+        for(var i=0,len=str.length;i<len;i++){
+          if(i>=$('#redpacknum li').length){
+              $('#redpacknum').append('<li>'+str[i]+'<hr></li>');
+          }
         }
       }
+
     });
     //点击按钮出现注册框
     $('#xl-btn').on('click',function(){
