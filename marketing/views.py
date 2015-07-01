@@ -565,7 +565,7 @@ class ActivityJoinLogAPIView(APIView):
                     ActivityJoinLog.objects.create(
                         user=user,
                         action_name=u'xunlei_july',
-                        action_type=u'注册',
+                        action_type=u'register',
                         action_message=u'用户参加数钱游戏得红包，3秒内每点击一次得10元，得多少钱送多少红包',
                         channel=u'xunlei',
                         gift_name=u'迅雷7月数钱红包',
