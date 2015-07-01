@@ -42,5 +42,5 @@ urlpatterns += patterns(
 )
 
 urlpatterns += patterns('',
-    url(r'^xunlei/july/$', TemplateView.as_view(template_name="xunlei-july.jade"), name='xunlei-july-activity')
+    url(r'^xunlei/july/$', TemplateView.as_view(template_name="xunlei_july.jade"), name='xunlei_july_activity')
 )
