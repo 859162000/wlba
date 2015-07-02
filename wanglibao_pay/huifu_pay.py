@@ -374,9 +374,6 @@ class HuifuShortPay:
 
     def _request_huifu(self, url, data):
         r = requests.post(url, data)
-        print 'url>>>', url
-        print 'data>>>', data
-        print 'response>>>', r.text
         return dict(d for d in map((lambda x: x.split('=')), r.text.strip('\r\n').split('\r\n')))
 
     def _common_post_fields(self):
@@ -548,6 +545,7 @@ class HuifuShortPay:
 
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+            card_no = card.no
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
 
