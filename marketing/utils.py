@@ -20,8 +20,6 @@ def set_promo_user(request, user, invitecode=''):
     if not invitecode:
         invitecode = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
-    #product_id = request.session.get(settings.PROMO_TOKEN_PRODUCT, None)
-
     if invitecode:
         record = Channels.objects.filter(code=invitecode).first()
         if record:
@@ -33,7 +31,6 @@ def set_promo_user(request, user, invitecode=''):
                 save_introducedBy(user, introduced_by_user)
 
         request.session[settings.PROMO_TOKEN_QUERY_STRING] = None
-        request.session[settings.PROMO_TOKEN_PRODUCT] = None
 
 def save_introducedBy(user, introduced_by_user, product_id=0):
     record = IntroducedBy()

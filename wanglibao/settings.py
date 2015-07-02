@@ -637,7 +637,6 @@ if ENV == ENV_DEV:
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
-#PROMO_TOKEN_PRODUCT = "product_id"
 
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 # CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
@@ -684,8 +683,8 @@ TINMANGKEY= '65'
 
 # 易瑞特
 YIRUITE_KEY = '1989'
-YIRUITE_AD_KEY_TEST = "al9e4ys5"
-RETURN_YIRUITE_URL_TEST = "http://app.offer99.com/callback/callback_test.php"
+YIRUITE_AD_KEY = "esn4s2enki"
+RETURN_YIRUITE_URL = "http://app.offer99.com/callback/callback_adv/callback_adv_w345fe267d9149fcd3dabc7e9e39b783.php"
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

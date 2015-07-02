@@ -67,8 +67,8 @@ from wanglibao_activity.models import ActivityRecord
 # from wanglibao.settings import RETURN_REGISTER
 
 from wanglibao.settings import TINMANGKEY, RETURN_TINMANG_URL, \
-    PROMO_TOKEN_QUERY_STRING, CALLBACK_HOST, YIRUITE_AD_KEY_TEST, \
-    RETURN_YIRUITE_URL_TEST
+    PROMO_TOKEN_QUERY_STRING, CALLBACK_HOST, YIRUITE_AD_KEY, \
+    RETURN_YIRUITE_URL
 from wanglibao_account.tasks import tianmang_callback, yiruite_callback
 
 logger = logging.getLogger(__name__)
@@ -1162,15 +1162,15 @@ def yiruite_process(request, user):
         binding.bid = yiruite_tid
         binding.save()
 
-        sign = yiruite_tid + user.wanglibaouserprofile.phone + YIRUITE_AD_KEY_TEST
+        sign = yiruite_tid + user.wanglibaouserprofile.phone + YIRUITE_AD_KEY
         params = {
             "tid": yiruite_tid,
             "uid": hashlib.md5(user.wanglibaouserprofile.phone).hexdigest(),
-            "ad_key": YIRUITE_AD_KEY_TEST,
+            "ad_key": YIRUITE_AD_KEY,
             "sign": hashlib.md5(sign).hexdigest(),
             "ip": CALLBACK_HOST
         }
-        yiruite_callback.apply_async(kwargs={'url': RETURN_YIRUITE_URL_TEST, 'params': params})
+        yiruite_callback.apply_async(kwargs={'url': RETURN_YIRUITE_URL, 'params': params})
 
         # request.session['yiruite_from'] = None
         request.session['yiruite_tid'] = None

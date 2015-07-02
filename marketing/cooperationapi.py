@@ -767,22 +767,28 @@ class YiruiteInfoListAPIView(YiruiteBaseAPIView):
                     # 易瑞特用户标识
                     tid_list = Binding.objects.filter(user=yiruite_promo_user.user)
                     tid = tid_list.first().bid
+                except:
+                    continue
 
+                try:
+                    # 用户首次投资
                     p2p_record = P2PRecord.objects.filter(user=yiruite_promo_user.user, catalog=u'申购').order_by('create_time')
                     amount = p2p_record[0].amount
-                    response_user = {
-                        "UserName": yiruite_promo_user.user.username,
-                        "RegisterTime": timezone.localtime(
-                            yiruite_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                        "IsValidateIdentity": is_valid,
-                        "tid": tid,
-                        "amount": amount,
-                        "FirstInvestTime": timezone.localtime(
-                            p2p_record[0].create_time).strftime("%Y-%m-%d %H:%M:%S"),
-                    }
-                    response_user_list.append(response_user)
-                except :
-                    pass
+                    first_invest_time = timezone.localtime(p2p_record[0].create_time).strftime("%Y-%m-%d %H:%M:%S")
+                except:
+                    amount = 0
+                    first_invest_time = '0000-00-00 00:00:00'
+
+                response_user = {
+                    "UserName": yiruite_promo_user.user.username,
+                    "RegisterTime": timezone.localtime(
+                        yiruite_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "IsValidateIdentity": is_valid,
+                    "tid": tid,
+                    "amount": amount,
+                    "FirstInvestTime": first_invest_time,
+                }
+                response_user_list.append(response_user)
             result = {
                 "errorcode": 0,
                 "errormsg": "success",

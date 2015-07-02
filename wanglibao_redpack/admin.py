@@ -8,6 +8,7 @@ from import_export.admin import ExportMixin
 
 
 class RedPackEventAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ("id", "name", "rtype", "red_amount", "invest_amount", "describe", "red_num", "give_mode", "give_platform", "apply_platform", "give_start_at", "give_end_at",
                     "available_at", "unavailable_at", "invalid", "created_at")
     search_fields = ("name", "give_mode")
