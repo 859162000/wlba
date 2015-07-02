@@ -1,6 +1,7 @@
 # coding=utf-8
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 from django.db.models.signals import post_save
 from wanglibao_pay.util import get_a_uuid
 from django.db import transaction
@@ -257,7 +258,7 @@ class ClientData(models.Model):
     os = models.CharField(max_length=20, blank=False, null=False, default="")
     os_version = models.CharField(max_length=30, blank=False, null=False, default="")
     network = models.CharField(max_length=30, blank=False, null=False, default="")
-    channel = models.CharField(max_length=120, blank=False, null=False, default="")
+    channel = models.CharField(max_length=50, blank=False, null=False, default="")
     user_id = models.IntegerField(u"用户ID", blank=False, null=False, default=0)
     amount = models.DecimalField(u'金额', max_digits=20, decimal_places=2, default=0)
     action = models.CharField(max_length=10, blank=False, null=False, choices=ACTION)
