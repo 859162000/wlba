@@ -43,7 +43,7 @@ class P2PTrader(object):
         self.equity_keeper = EquityKeeper(user=user, product=product, order_id=self.order_id)
         if request:
             self.device = split_ua(request)
-            self.device_type = device['device_type']
+            self.device_type = self.device['device_type']
         else:
             self.device = split_ua(request)
             self.device_type = "pc"
