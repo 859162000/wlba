@@ -198,7 +198,7 @@ def card_bind_list(request):
         if cards.exists():
             # 排序
             bank_list = [card.bank.gate_id for card in cards]
-            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x['gate_id']))
+            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x.bank.gate_id))
             cards = cards_tmp
 
             card_list = [
@@ -206,9 +206,8 @@ def card_bind_list(request):
                     'bank_id': card.bank.id,
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,
-                    'storable_no': card[:6] + card[-4:]
+                    'storable_no': card.no[:6] + card.no[-4:]
                 } for card in cards]
-
         return {"ret_code": 0, "message": "ok", "cards": card_list}
 
     except Exception, e:
