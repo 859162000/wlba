@@ -46,7 +46,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
-from marketing.views import ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
+from marketing.views import ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView, ThousandRedPackCountAPIView
 from weixin.views import P2PListWeixin
 
 router = DefaultRouter()
@@ -218,4 +218,6 @@ urlpatterns += patterns(
     '',
     url(r'^xunlei/join/$', ActivityJoinLogAPIView.as_view()),
     url(r'^xunlei/join/count/$', ActivityJoinLogCountAPIView.as_view()),
+    url(r'^thousand/redpack/$', ThousandRedPackAPIView.as_view()),
+    url(r'^thousand/redpack/count/$', ThousandRedPackCountAPIView.as_view()),
 )

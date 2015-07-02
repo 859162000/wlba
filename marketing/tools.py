@@ -12,7 +12,8 @@ from django.db import transaction
 from wanglibao_p2p.models import P2PRecord, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao_sms import messages
-from marketing.models import IntroducedBy, Reward, RewardRecord
+from marketing.models import IntroducedBy
+from marketing import utils
 # from wanglibao_sms.tasks import send_messages
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
@@ -20,9 +21,10 @@ from wanglibao_activity import backends as activity_backends
 
 #投资成功
 @app.task
-def decide_first(user_id, amount, device_type='pc', product_id=0, is_full=False):
+def decide_first(user_id, amount, device, product_id=0, is_full=False):
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
+    device_type = device['device_type']
 
     introduced_by = IntroducedBy.objects.filter(user=user).first()
 
@@ -32,14 +34,14 @@ def decide_first(user_id, amount, device_type='pc', product_id=0, is_full=False)
 
     #活动检测
     activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full)
+    utils.log_clientinfo(device, "buy", user_id, amount)
 
 
 #注册成功
 @app.task
-def register_ok(user_id, device_type):
+def register_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
-
-    # channel = helper.which_channel(user)
+    device_type = device['device_type']
 
     title, content = messages.msg_register()
     inside_message.send_one.apply_async(kwargs={
@@ -50,19 +52,22 @@ def register_ok(user_id, device_type):
     })
     #活动检测
     activity_backends.check_activity(user, 'register', device_type)
+    utils.log_clientinfo(device, "register", user_id)
 
 #实名认证
 @app.task
-def idvalidate_ok(user_id, device_type):
+def idvalidate_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
+    device_type = device['device_type']
 
     #活动检测
     activity_backends.check_activity(user, 'validation', device_type)
+    utils.log_clientinfo(device, "validation", user_id)
 
 
 #充值成功
-def despoit_ok(pay_info, device_type='pc'):
-
+def despoit_ok(pay_info, device):
+    device_type = device['device_type']
     title, content = messages.msg_pay_ok(pay_info.amount)
     inside_message.send_one.apply_async(kwargs={
         "user_id": pay_info.user.id,
@@ -71,8 +76,8 @@ def despoit_ok(pay_info, device_type='pc'):
         "mtype": "activityintro"
     })
 
-    #活动检测，充值
     activity_backends.check_activity(pay_info.user, 'recharge', device_type, pay_info.amount)
+    utils.log_clientinfo(device, "deposit", pay_info.user_id, pay_info.amount)
 
 
 #全民淘金收益计算

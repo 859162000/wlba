@@ -20,7 +20,7 @@ from marketing import tools
 
 from wanglibao_rest.utils import split_ua
 
-from wanglibao_pay.kuai_pay import KuaiPay
+from wanglibao_pay.kuai_pay import KuaiPay, KuaiShortPay
 from wanglibao_pay.huifu_pay import HuifuShortPay
 from wanglibao_pay.yee_pay import YeePay, YeeShortPay
 
@@ -193,24 +193,23 @@ def withdraw(request):
 def card_bind_list(request):
     # 查询已经绑定支付渠道的银行卡列表
     try:
+        card_list = []
         cards = Card.objects.filter(Q(user=request.user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
-            #bank_list = [card.bank.gate_id for card in cards]
-            #cards_tmp = sorted(cards, key=lambda x: bank_list.index(x['gate_id']))
-            #cards = cards_tmp
+            bank_list = [card.bank.gate_id for card in cards]
+            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x.bank.gate_id))
+            cards = cards_tmp
 
-            cards = [
+            card_list = [
                 {
                     'bank_id': card.bank.id,
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,
-                    'storable_no': card[:6] + card[-4:]
+                    'storable_no': card.no[:6] + card.no[-4:]
                 } for card in cards]
+        return {"ret_code": 0, "message": "ok", "cards": card_list}
 
-            return {"ret_code": 0, "message": "ok", "cards": cards}
-        else:
-            return {"ret_code": 20031, "message": "请添加银行卡"}
     except Exception, e:
         logger.error(e.message)
         return {"ret_code": 20031, "message": "请添加银行卡"}
@@ -221,7 +220,7 @@ def _unbind_huifu(request, card, bank=None):
 
 
 def _unbind_kuaipay(request, card, bank=None):
-    return KuaiPay().delete_bind_new(request.user, card, bank)
+    return KuaiShortPay().delete_bind_new(request.user, card, bank)
 
 
 def _unbind_yeepay(request, card, bank=None):
@@ -241,7 +240,7 @@ def _unbind_common(request, card, bank):
         res = _unbind_kuaipay(request, card, bank)
         if res['ret_code'] != 0: return res
 
-    return {"ret_code": 0, "message": "银行未绑定支付渠道"}
+    return {"ret_code": 0, "message": "银行卡解绑成功"}
 
 
 def card_unbind(request):
@@ -265,7 +264,7 @@ def card_unbind(request):
     if not card:
         return {"ret_code": 20103, "message": "银行卡未绑定"}
 
-    return _unbind_common(request, bank, card)
+    return _unbind_common(request, card, bank)
 
 
 def bind_pay_deposit(request):
@@ -290,7 +289,7 @@ def bind_pay_deposit(request):
         return YeeShortPay().pre_pay(request)
 
     elif bank.channel == 'kuaipay':
-        return KuaiPay().pre_pay(request)
+        return KuaiShortPay().pre_pay(request)
 
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
@@ -321,6 +320,6 @@ def bind_pay_dynnum(request):
         return YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
-        return KuaiPay().dynnum_bind_pay(request)
+        return KuaiShortPay().dynnum_bind_pay(request)
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
