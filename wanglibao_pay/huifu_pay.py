@@ -498,9 +498,8 @@ class HuifuShortPay:
             card.is_default = False
 
         card.bank = bank
-        card.is_bind_huifu = True
         card.save()
-        return True
+        return card
 
     def open_bind_card(self, user, bank, card):
         # 汇付天下需要先开户，才能够邦卡
@@ -513,10 +512,6 @@ class HuifuShortPay:
         res = self._bind_card_huifu(user=user, bank=bank, card_no=card.no)
         if res['RespCode'] not in (u'000000', u'223153'):
             return {"ret_code": -2, "message": res['ErrMsg']}
-
-        # 保存卡信息到个人名下
-        if not self.bind_card_wlbk(user, card.no, bank):
-            return {"ret_code": -1, "message": '银行卡保存失败'}
 
         return {"ret_code": 0, "message": 'ok'}
 
@@ -551,14 +546,27 @@ class HuifuShortPay:
         if not bank or not bank.huifu_bind_code.strip():
             return {"ret_code": 201151, "message": "不支持该银行"}
 
-        card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+        if len(card_no) == 10:
+            card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+        else:
+            card = Card.objects.filter(no=card_no, user=user).first()
+
+        if not card:
+            card = self.bind_card_wlbk(user, card_no, bank)
+
+        if not card:
+            return {"ret_code": -1, "message": '银行卡不存在'}
+
         if bank and card and bank != card.bank:
             return {"ret_code": 201153, "message": "银行卡与银行不匹配"}
 
-        if not card or (card and not card.is_bind_huifu):
+        if card and not card.is_bind_huifu:
             res = self.open_bind_card(user, bank, card)
             if res['ret_code'] != 0:
                 return res
+
+            card.is_bind_huifu = True
+            card.save()
 
         try:
             pay_info = PayInfo()
