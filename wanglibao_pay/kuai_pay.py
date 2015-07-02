@@ -916,9 +916,9 @@ class KuaiShortPay:
             return {"ret_code":20103, "message":result['message']}
         return {"ret_code":0, "message":"ok"}
 
-    def delete_bind_new(self, request, card, bank):
+    def delete_bind_new(self, user, card, bank):
         storable_no = card.no if len(card.no) == 10 else card.no[:6] + card.no[-4:]
-        dic = {"user_id": request.user.id, "bank_id": card.bank.kuai_code, "storable_no": storable_no}
+        dic = {"user_id": user.id, "bank_id": card.bank.kuai_code, "storable_no": storable_no}
 
         data = self._sp_delbind_xml(dic)
         res = self._request(data, self.DEL_URL)
