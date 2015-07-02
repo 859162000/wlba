@@ -20,7 +20,7 @@ from marketing import tools
 
 from wanglibao_rest.utils import split_ua
 
-from wanglibao_pay.kuai_pay import KuaiPay
+from wanglibao_pay.kuai_pay import KuaiPay, KuaiShortPay
 from wanglibao_pay.huifu_pay import HuifuShortPay
 from wanglibao_pay.yee_pay import YeePay, YeeShortPay
 
@@ -221,7 +221,7 @@ def _unbind_huifu(request, card, bank=None):
 
 
 def _unbind_kuaipay(request, card, bank=None):
-    return KuaiPay().delete_bind_new(request.user, card, bank)
+    return KuaiShortPay().delete_bind_new(request.user, card, bank)
 
 
 def _unbind_yeepay(request, card, bank=None):
@@ -290,7 +290,7 @@ def bind_pay_deposit(request):
         return YeeShortPay().pre_pay(request)
 
     elif bank.channel == 'kuaipay':
-        return KuaiPay().pre_pay(request)
+        return KuaiShortPay().pre_pay(request)
 
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
@@ -321,6 +321,6 @@ def bind_pay_dynnum(request):
         return YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
-        return KuaiPay().dynnum_bind_pay(request)
+        return KuaiShortPay().dynnum_bind_pay(request)
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
