@@ -219,5 +219,5 @@ urlpatterns += patterns(
     url(r'^xunlei/join/$', ActivityJoinLogAPIView.as_view()),
     url(r'^xunlei/join/count/$', ActivityJoinLogCountAPIView.as_view()),
     url(r'^thousand/redpack/$', ThousandRedPackAPIView.as_view()),
-    url(r'^thousand/redapck/count/$', ThousandRedPackCountAPIView.as_view()),
+    url(r'^thousand/redpack/count/$', ThousandRedPackCountAPIView.as_view()),
 )
