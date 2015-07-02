@@ -557,15 +557,15 @@ class ActivityJoinLogAPIView(APIView):
         start_time = timezone.datetime(2015, 6, 29)
         user_ib = IntroducedBy.objects.filter(user=user, channel__name='xunlei', created_at__gt=start_time).first()
         if user_ib:
-            has_log = ActivityJoinLog.objects.filter(user=user).first()
+            has_log = ActivityJoinLog.objects.filter(user=user, action_name='xunlei_july').first()
             if has_log:
                 return Response({'ret_code': 3002, 'message': u'已经参加过该活动，不能重复参加'})
             else:
                 if amount:
                     ActivityJoinLog.objects.create(
                         user=user,
-                        action_name=u'迅雷15年7月数钱活动',
-                        action_type=u'注册',
+                        action_name=u'xunlei_july',
+                        action_type=u'register',
                         action_message=u'用户参加数钱游戏得红包，3秒内每点击一次得10元，得多少钱送多少红包',
                         channel=u'xunlei',
                         gift_name=u'迅雷7月数钱红包',
@@ -602,6 +602,6 @@ class ActivityJoinLogCountAPIView(APIView):
         join_log = ActivityJoinLog.objects.filter(channel='xunlei').aggregate(amount_sum=Sum('amount'))
 
         return Response({'ret_code': 0,
-                         'redpack_total': join_log['amount_sum']/10 if join_log['amount_sum'] else 0,
+                         'redpack_total': int(join_log['amount_sum']/10) if join_log['amount_sum'] else 0,
                          'amount_total': join_log['amount_sum'] if join_log['amount_sum'] else 0
         })
