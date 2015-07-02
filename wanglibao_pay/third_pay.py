@@ -264,7 +264,7 @@ def card_unbind(request):
     if not card:
         return {"ret_code": 20103, "message": "银行卡未绑定"}
 
-    return _unbind_common(request, bank, card)
+    return _unbind_common(request, card, bank)
 
 
 def bind_pay_deposit(request):
