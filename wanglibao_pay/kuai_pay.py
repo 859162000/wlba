@@ -448,8 +448,7 @@ class KuaiPay:
                     pay_info.save()
                     return {"ret_code":201181, "message":result['message']}
                 device = split_ua(request)
-                device_type = device['device_type']
-                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
+                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
 
                 return ms
             else:
@@ -509,12 +508,11 @@ class KuaiPay:
         elif result['ret_code'] > 0:
             return {"ret_code":20124, "message":result['message']}
         device = split_ua(request)
-        device_type = device['device_type']
-        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
+        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
         return ms
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content, device_type):
+    def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info:
             return {"ret_code":20131, "message":"order not exist"}
@@ -558,7 +556,7 @@ class KuaiPay:
            #         card.user = pay_info.user
            #         card.is_default = False
            #         card.save()
-            tools.despoit_ok(pay_info, device_type)
+            tools.despoit_ok(pay_info, device)
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:

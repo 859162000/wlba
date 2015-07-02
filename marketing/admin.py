@@ -6,7 +6,7 @@ from django.utils import timezone
 from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
 from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
-    Activity, ActivityRule, Reward, RewardRecord, ClientData, Channels, IntroducedByReward, PlayList, ActivityJoinLog
+    Activity, ActivityRule, Reward, RewardRecord, Channels, IntroducedByReward, PlayList, ActivityJoinLog
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -178,20 +178,20 @@ class RewardRecordAdmin(admin.ModelAdmin):
         return self.list_display
 
 
-class ClientDataAdmin(admin.ModelAdmin):
-    actions = None
-    list_display = ('id', 'version', 'userdevice', 'network', 'channelid', 'phone', 'action', 'create_time')
-    search_fields = ('phone', )
-    list_filter = ('network', 'action')
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request):
-        return False
-
-    def get_readonly_fields(self, request, obj=None):
-        return self.list_display
+#class ClientDataAdmin(admin.ModelAdmin):
+#    actions = None
+#    list_display = ('id', 'version', 'userdevice', 'network', 'channelid', 'phone', 'action', 'create_time')
+#    search_fields = ('phone', )
+#    list_filter = ('network', 'action')
+#
+#    def has_delete_permission(self, request, obj=None):
+#        return False
+#
+#    def has_add_permission(self, request):
+#        return False
+#
+#    def get_readonly_fields(self, request, obj=None):
+#        return self.list_display
 
 
 class ChannelsAdmin(admin.ModelAdmin):
@@ -255,7 +255,7 @@ admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ActivityRule, ActivityRuleAdmin)
 admin.site.register(Reward, RewardAdmin)
 admin.site.register(RewardRecord, RewardRecordAdmin)
-admin.site.register(ClientData, ClientDataAdmin)
+#admin.site.register(ClientData, ClientDataAdmin)
 admin.site.register(Channels, ChannelsAdmin)
 admin.site.register(IntroducedByReward, IntroducedByRewardAdmin)
 admin.site.register(ActivityJoinLog, ActivityJoinLogAdmin)
