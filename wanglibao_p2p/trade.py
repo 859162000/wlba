@@ -45,6 +45,7 @@ class P2PTrader(object):
             self.device = split_ua(request)
             self.device_type = device['device_type']
         else:
+            self.device = split_ua(request)
             self.device_type = "pc"
 
     def purchase(self, amount, redpack=0, platform=u''):
