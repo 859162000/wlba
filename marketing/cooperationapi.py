@@ -210,6 +210,12 @@ class WangDaiByDateAPI(APIView):
 
             reward = p2p.activity.rule.rule_amount * 100 if p2p.activity else 0
 
+            matches = re.search(u'日计息', p2p.pay_method)
+            if matches and matches.group():
+                deadlineUnit = u"天"
+            else:
+                deadlineUnit = u"月"
+
             temp_p2p = {
                 "projectId": str(p2p.pk),
                 "title": p2p.name,
@@ -217,7 +223,7 @@ class WangDaiByDateAPI(APIView):
                 "schedule": schedule,
                 "interestRate": '{}%'.format(p2p.expected_earning_rate),
                 "deadline": str(p2p.period),
-                "deadlineUnit": u"月",
+                "deadlineUnit": deadlineUnit,
                 "reward": '{}%'.format(reward),
                 "type": u"信用标" if p2p.category == u'证大速贷'else u"抵押标",
                 "repaymentType": str(repaymentType),
