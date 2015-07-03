@@ -77,6 +77,7 @@
           url: "/api/thousand/redpack/",
           type: "POST"
         }).done(function(data) {
+          console.log(data['ret_code']);
           if(data['ret_code']==3002 || data['ret_code']==3003){
             $('#first-redpack-fail p').html(data.message);
             $('#first-redpack-fail').show();
@@ -218,6 +219,24 @@
         }).done(function(data, textStatus) {
           $('.xl-box1').hide();
           $('#seven-success').show();
+          $.ajax({
+            url: "/api/thousand/redpack/",
+            type: "POST"
+          }).done(function(data) {
+            console.log(data['ret_code']);
+            if(data['ret_code']==3002 || data['ret_code']==3003){
+              $('#first-redpack-fail p').html(data.message);
+              $('#first-redpack-fail').show();
+            }
+            if(data['ret_code']==3001){
+              $('#small-zc').show();
+            }
+            if(data['ret_code']==0){
+              $('#small-zc').show();
+              $('.xl-box1').hide();
+              $('#seven-success').show();
+            }
+          })
         }).fail(function(xhr) {
           var error_message, message, result;
           result = JSON.parse(xhr.responseText);
@@ -389,8 +408,10 @@
     $("#agreement2").change(function(value) {
       if ($(this).attr("checked")) {
         $("#register_submit2").addClass("disabled");
+        $("#register_submit2").css({'background':'#ccc'});
         return $(this).removeAttr("checked");
       } else {
+        $("#register_submit2").css({'background':'#ff5252'});
         $("#register_submit2").removeClass("disabled");
         return $(this).attr("checked", "checked");
       }

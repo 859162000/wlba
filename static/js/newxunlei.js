@@ -147,7 +147,7 @@
     left = backtop();
   };
   //赋值
-  $('.xl-backtop').css({'left':left})
+  $('.xl-backtop').css({'left':left});
 
   //显示微信二维码
  $('#xl-weixin').on('mouseover',function(){
