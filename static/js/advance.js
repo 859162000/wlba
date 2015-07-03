@@ -55,8 +55,10 @@
               type: "POST"
             }).done(function(data) {
               if(data['ret_code']==3002 || data['ret_code']==3003){
-                $('#first-redpack-fail p').html(data.message);
+                $('#small-zc').show();
+                $('.xl-box1').hide();
                 $('#first-redpack-fail').show();
+                $('#first-redpack-fail p').html(data.message);
               }
               if(data['ret_code']==3001){
                 $('#small-zc').show();
@@ -69,11 +71,14 @@
 
     });
     //显示模态窗口
+    $('#first-redpack-fail').hide();
     $('#first-btn').on('click',function(){
       if($(this).hasClass('selected')){
-        $('.xl-box1').show()
-        $('#first-redpack-fail p').html('您今天已经参加过该活动,不能重复参加');
+        $('#small-zc').show();
+        $('.xl-box1').hide();
         $('#first-redpack-fail').show();
+        $('#seven-success').hide();
+        $('#first-redpack-fail p').html('您今天已经参加过该活动,不能重复参加');
       }else{
         if ($(this).attr('data-num') == 'false'){
           $('#small-zc').show();
@@ -83,9 +88,12 @@
             type: "POST"
           }).done(function(data) {
             if(data['ret_code']==3002 || data['ret_code']==3003){
-              $('.xl-box1').show();
-              $('#first-redpack-fail p').html(data.message);
+              $('#small-zc').show();
+              $('.xl-box1').hide();
+              $('#seven-success').hide();
               $('#first-redpack-fail').show();
+              $('#first-redpack-fail p').html(data.message);
+
             }
             if(data['ret_code']==3001){
               $('#small-zc').show();
@@ -229,8 +237,10 @@
           }).done(function(data) {
             console.log(data['ret_code']);
             if(data['ret_code']==3002 || data['ret_code']==3003){
-              $('#first-redpack-fail p').html(data.message);
+              $('#small-zc').show();
+              $('.xl-box1').hide();
               $('#first-redpack-fail').show();
+              $('#first-redpack-fail p').html(data.message);
             }
             if(data['ret_code']==3001){
               $('#small-zc').show();
