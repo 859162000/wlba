@@ -503,7 +503,7 @@ class HuifuShortPay:
         # 开户
         res = self._open_account_huifu(user)
         if res['RespCode'] not in (u'000000', '220001'):
-            return {"ret_code": -3, "message": res['ErrMsg']}
+            return {"ret_code": -1, "message": res['ErrMsg']}
 
         # 邦卡
         res = self._bind_card_huifu(user=user, bank=bank, card_no=card.no)
