@@ -54,9 +54,9 @@
               url: "/api/thousand/redpack/",
               type: "POST"
             }).done(function(data) {
+
               if(data['ret_code']==3002 || data['ret_code']==3003){
                 $('#small-zc').show();
-                $('.xl-box1').hide();
                 $('#first-redpack-fail').show();
                 $('#first-redpack-fail p').html(data.message);
               }
@@ -75,9 +75,9 @@
     $('#first-btn').on('click',function(){
       if($(this).hasClass('selected')){
         $('#small-zc').show();
-        $('.xl-box1').hide();
         $('#first-redpack-fail').show();
         $('#seven-success').hide();
+        $('#box1').hide();
         $('#first-redpack-fail p').html('您今天已经参加过该活动,不能重复参加');
       }else{
         if ($(this).attr('data-num') == 'false'){
@@ -89,18 +89,17 @@
           }).done(function(data) {
             if(data['ret_code']==3002 || data['ret_code']==3003){
               $('#small-zc').show();
-              $('.xl-box1').hide();
               $('#seven-success').hide();
+              $('#box1').hide();
               $('#first-redpack-fail').show();
               $('#first-redpack-fail p').html(data.message);
-
             }
             if(data['ret_code']==3001){
               $('#small-zc').show();
             }
             if(data['ret_code']==0){
               $('#small-zc').show();
-              $('.xl-box1').hide();
+              $('#box1').hide();
               $('#seven-success').show();
             }
           })
@@ -228,18 +227,16 @@
           type: "POST",
           data: $(form).serialize()
         }).done(function(data, textStatus) {
-          $('.xl-box1').hide();
           $('#seven-success').show();
           $('#first-btn').addClass('selected');
           $.ajax({
             url: "/api/thousand/redpack/",
             type: "POST"
           }).done(function(data) {
-            console.log(data['ret_code']);
+
             if(data['ret_code']==3002 || data['ret_code']==3003){
-              $('#small-zc').show();
-              $('.xl-box1').hide();
               $('#first-redpack-fail').show();
+              $('#box1').hide();
               $('#first-redpack-fail p').html(data.message);
             }
             if(data['ret_code']==3001){
@@ -247,7 +244,6 @@
             }
             if(data['ret_code']==0){
               $('#small-zc').show();
-              $('.xl-box1').hide();
               $('#seven-success').show();
             }
           })

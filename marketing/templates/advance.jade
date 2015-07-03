@@ -79,16 +79,16 @@ html
               //  hr
             span 个
     .new-xl-big
-      h1.first-xl-time 活动时间：2015年7月2日——2015年7月15日
+      h1.first-xl-time 活动时间：2015年7月3日——2015年7月15日
       p.first-text 网利宝首次
         b 1000元
         |红包福袋大放送，网利菌已经将红包装好，每天限量
         b 3000份
         |红包，立即伸手领钱，先到先得！
       if user.is_authenticated
-        button(data-num="true")#first-btn 立即领取
+        a(data-num="true")#first-btn.first-user 立即领取
       else
-        button(data-num="false")#first-btn 立即领取
+        a(data-num="false")#first-btn.first-user 立即领取
       .xl-box1(style="height:20px")
         //.seven-success#first-redpack-fail
         //  span.xl-off2 ×
@@ -148,7 +148,7 @@ html
           li 2. 所得现金红包均为折扣红包。所得红包金额，按对应红包金额的百分比折扣使用（比如用户投资5000元，即可满额使用100元红包）；
           li 3. 红包均只能使用一次，使用后是否有余额红包即失效；
           li 4. 红包发放统一以站内信形式通知；
-          li 5. 红包有效期：2015年7月2日-2015年7月31日；
+          li 5. 红包有效期：2015年7月3日-2015年7月31日；
           li 6. 网利宝对此活动享有最终解释权。
 
 
@@ -160,7 +160,7 @@ html
   #small-zc
     .wrap(style="background:none")
       .gold2
-        .xl-box1
+        .xl-box1#box1
           .xl-small-zc
             span.first-xl-off ×
             .denelu-form(style="top:20px;left:32px")
