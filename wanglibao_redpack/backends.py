@@ -513,8 +513,9 @@ def commission_exist(product):
     record = Income.objects.filter(product=product).first()
     return record
 
-def commission(user, product, equity, start):
-    _amount = P2PRecord.objects.filter(user=user, product=product, create_time__gt=start).aggregate(Sum('amount'))
+def commission(user, product, equity, start, end):
+    _amount = P2PRecord.objects.filter(user=user, product=product, create_time__gt=start,
+                            create_time__lt=end).aggregate(Sum('amount'))
     if _amount['amount__sum'] and _amount['amount__sum'] <= equity:
         commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
         commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
@@ -529,7 +530,7 @@ def commission(user, product, equity, start):
             income.save()
 
             sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
-            if sec_intro:
+            if sec_intro and sec_intro.introduced_by:
                 second = MarginKeeper(sec_intro.introduced_by)
                 second.deposit(commission, catalog=u"全民淘金")
 

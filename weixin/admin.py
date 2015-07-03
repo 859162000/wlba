@@ -33,12 +33,12 @@ class AccountAdmin(admin.ModelAdmin):
                 url = url.replace('http://', 'https://')
             return url
 
-        def connect_url(obj):
-            url = request.build_absolute_uri(reverse('weixin_connect', kwargs={'id': obj.id}))
-            return replace_url(url)
+        # def connect_url(obj):
+        #     url = request.build_absolute_uri(reverse('weixin_connect', kwargs={'id': obj.id}))
+        #     return replace_url(url)
 
-        self.connect_url = connect_url
-        self.connect_url.short_description = u'微信接口配置URL'
+        # self.connect_url = connect_url
+        # self.connect_url.short_description = u'微信接口配置URL'
 
         def oauth_login_url(obj):
             url = request.build_absolute_uri(reverse('weixin_oauth_login_redirect'))

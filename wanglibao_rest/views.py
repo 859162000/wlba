@@ -44,7 +44,6 @@ from wanglibao_account.forms import IdVerificationForm
 from wanglibao_rest.utils import split_ua
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
-from marketing.utils import save_client
 from marketing.tops import Top
 from marketing import tools
 from django.conf import settings
@@ -212,8 +211,11 @@ class RegisterAPIView(APIView):
         if not invite_code and "channel_id" in device:
             if device['channel_id'] == "baidu":
                 invite_code = "baidushouji"
+            elif device['channel_id'] == "mi":
+                invite_code = "mi"
             else:
-                invite_code = device['channel_id']
+                invite_code = ""
+                #invite_code = device['channel_id']
         #if not invite_code and ("channel_id" in device and device['channel_id'] == "baidu"):
         #    invite_code = "baidushouji"
 
@@ -236,10 +238,8 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
-        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device_type":device['device_type']})
-        # save client info
-        save_client(request, phone=identifier, action=0)
-
+        tools.register_ok.apply_async(kwargs={"user_id": user.id, 
+                        "device":device})
 
         return Response({"ret_code": 0, "message": u"注册成功"})
 
@@ -289,14 +289,7 @@ class WeixinRegisterAPIView(APIView):
         send_rand_pass(identifier, password)
 
         device = split_ua(request)
-        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device_type":device['device_type']})
-        #title, content = messages.msg_register()
-        #inside_message.send_one.apply_async(kwargs={
-        #    "user_id": auth_user.id,
-        #    "title": title,
-        #    "content": content,
-        #    "mtype": "activityinfo"
-        #})
+        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device":device})
         return Response({"ret_code": 0, "message": "注册成功"})
 
 
@@ -385,7 +378,8 @@ class IdValidateAPIView(APIView):
         user.wanglibaouserprofile.id_valid_time = timezone.now()
         user.wanglibaouserprofile.save()
 
-        tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device_type": device['device_type']})
+        device = split_ua(request)
+        tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
         return Response({"ret_code": 0, "message": u"验证成功"})
 
 
@@ -683,24 +677,8 @@ class IdValidate(APIView):
             user.wanglibaouserprofile.id_valid_time = timezone.now()
             user.wanglibaouserprofile.save()
 
-            # 判断时间间隔太短的话就认定他是黑客，需要电话找客服索要激活码
-            # if interval < 60:
-            #     title,content = messages.msg_validate_fake()
-            #     inside_message.send_one.apply_async(kwargs={
-            #         "user_id":user.id,
-            #         "title":title,
-            #         "content":content,
-            #         "mtype":"activity"
-            #     })
-            # else:
-
-            # 实名认证 活动赠送
-            tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device_type": "pc"})
-            #channel = which_channel(user)
-            #rs = RewardStrategy(user)
-            #if channel == Channel.KUAIPAN:
-            #    rs.reward_user(u'50G快盘容量')
-
+            device = split_ua(request)
+            tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
             return Response({ "validate": True }, status=200)
 
         else:

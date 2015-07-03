@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger
 from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels
-#from wanglibao_redpack import backends as redpack_backends
 from wanglibao_p2p.models import P2PProduct
 import logging
 
@@ -21,8 +20,6 @@ def set_promo_user(request, user, invitecode=''):
     if not invitecode:
         invitecode = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
-    product_id = request.session.get(settings.PROMO_TOKEN_PRODUCT, None)
-
     if invitecode:
         record = Channels.objects.filter(code=invitecode).first()
         if record:
@@ -31,28 +28,19 @@ def set_promo_user(request, user, invitecode=''):
             recordpromo = PromotionToken.objects.filter(token=invitecode).first()
             if recordpromo:
                 introduced_by_user = User.objects.get(pk=recordpromo.pk)
-                save_introducedBy(user, introduced_by_user, product_id)
-                #redpack_backends.increase_hike(introduced_by_user, product_id)
+                save_introducedBy(user, introduced_by_user)
 
         request.session[settings.PROMO_TOKEN_QUERY_STRING] = None
-        request.session[settings.PROMO_TOKEN_PRODUCT] = None
-
-       # user_id = request.session.get(settings.PROMO_TOKEN_USER_SESSION_KEY, None)
-       # if user_id:
-       #     introduced_by_user = User.objects.get(pk=user_id)
-       #     save_introducedBy(user, introduced_by_user)
-
-       #     # Clean the session
-       #     del request.session[settings.PROMO_TOKEN_USER_SESSION_KEY]
 
 def save_introducedBy(user, introduced_by_user, product_id=0):
     record = IntroducedBy()
     record.introduced_by = introduced_by_user
     record.user = user
-    if product_id:
-        pt = P2PProduct.objects.filter(id=product_id).first()
-        if pt:
-            record.product_id=product_id
+    #if product_id:
+    #    pt = P2PProduct.objects.filter(id=product_id).first()
+    #    if pt:
+    #        record.product_id=product_id
+    record.product_id=product_id
     record.save()
 
 def save_introducedBy_channel(user, channel):
@@ -61,26 +49,29 @@ def save_introducedBy_channel(user, channel):
     record.user = user
     record.save()
 
+def log_clientinfo(device, atype, user_id=0, amount=0):
+    if "device_type" not in device or "device_type" in device and device['device_type'] == "pc":
+        return
+    ci = ClientData()
+    if atype=="register": action='R'
+    elif atype=="login": action='L'
+    elif atype=="validation": action='V'
+    elif atype=="deposit": action='D'
+    elif atype=="buy": action='B'
+    elif atype=="withdraw": action='W'
 
-def save_client(request, phone, action):
-    """
-    保存客户端信息
-    :param request: 客户端请求
-    :param phone:   请求用户电话号码
-    :param action:  动作，0表示注册，1表示购买
-    :return:
-    """
-
-    version = request.DATA.get('version', '')
-    userdevice = request.DATA.get('userDevice', '')
-    network = request.DATA.get('network', '')
-    channelid = request.DATA.get('channelId', '')
-    try:
-        c = ClientData(version=version, userdevice=userdevice, network=network, channelid=channelid,
-                       phone=phone, action=action)
-        c.save()
-    except:
-        logger.error(u"客户端信息失败，请检查参数")
+    if device['device_type'] == "android":
+        device['model'] = device['model'][:-8]
+    ci.version = device['app_version']
+    ci.userdevice = device['model']
+    ci.os = device['device_type']
+    ci.os_version = device['os_version']
+    ci.network = device['network']
+    ci.channel = device['channel_id']
+    ci.user_id = user_id
+    ci.amount = amount
+    ci.action = action
+    ci.save()
 
 
 def local_to_utc(source_date, source_time='min'):

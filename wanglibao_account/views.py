@@ -61,9 +61,15 @@ from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 
-from wanglibao.settings import TINMANGKEY
-from wanglibao_account.tasks import tianmang_callback
-from wanglibao.settings import RETURN_TINMANG_URL
+
+# from wanglibao.settings import CJDAOKEY
+# from wanglibao_account.tasks import cjdao_callback
+# from wanglibao.settings import RETURN_REGISTER
+
+from wanglibao.settings import TINMANGKEY, RETURN_TINMANG_URL, \
+    PROMO_TOKEN_QUERY_STRING, CALLBACK_HOST, YIRUITE_AD_KEY, \
+    RETURN_YIRUITE_URL
+from wanglibao_account.tasks import tianmang_callback, yiruite_callback
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +94,8 @@ class RegisterView(RegistrationView):
         set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
-        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device_type":"pc"})
+        device = utils.split_ua(request)
+        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
         return user
 
     def get_success_url(self, request=None, user=None):
@@ -1113,15 +1120,15 @@ def ajax_register(request):
                 user = create_user(identifier, password, nickname)
                 if not user:
                     return HttpResponse(messenger('error'))
-                #天芒注册
-                invitecode = tianmang_process(request, user, invitecode)
 
-                set_promo_user(request, user, invitecode=invitecode)
+                cooperation_process(request, user, invitecode)
+
                 auth_user = authenticate(identifier=identifier, password=password)
 
                 auth.login(request, auth_user)
 
-                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device_type":"pc"})
+                device = utils.split_ua(request)
+                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
 
                 return HttpResponse(messenger('done', user=request.user))
             else:
@@ -1131,7 +1138,47 @@ def ajax_register(request):
     else:
         return HttpResponseNotAllowed(["GET"])
 
-def tianmang_process(request, user, invitecode):
+def cooperation_process(request, user, invitecode):
+    """
+    处理第三方渠道
+    """
+    if (request.session.get(PROMO_TOKEN_QUERY_STRING) == 'yiruite') and request.session.get('yiruite_tid'):
+        set_promo_user(request, user, invitecode=request.session.get(PROMO_TOKEN_QUERY_STRING))
+        yiruite_process(request, user)
+    elif (request.session.get('tianmang_source') == 'tianmang') and request.session.get('tianmang_sn'):
+        set_promo_user(request, user, invitecode=request.session.get('tianmang_source'))
+        tianmang_process(request, user)
+    else:
+        set_promo_user(request, user, invitecode=invitecode)
+
+
+def yiruite_process(request, user):
+    """
+    易瑞特回调处理，需要保存yiruite_tid到Binding表中
+    """
+    yiruite_tid = request.session.get('yiruite_tid', None)
+    if yiruite_tid:
+        binding = Binding()
+        binding.user = user
+        binding.btype = 'yiruite'
+        binding.bid = yiruite_tid
+        binding.save()
+
+        sign = yiruite_tid + user.wanglibaouserprofile.phone + YIRUITE_AD_KEY
+        params = {
+            "tid": yiruite_tid,
+            "uid": hashlib.md5(user.wanglibaouserprofile.phone).hexdigest(),
+            "ad_key": YIRUITE_AD_KEY,
+            "sign": hashlib.md5(sign).hexdigest(),
+            "ip": CALLBACK_HOST
+        }
+        yiruite_callback.apply_async(kwargs={'url': RETURN_YIRUITE_URL, 'params': params})
+
+        # request.session['yiruite_from'] = None
+        request.session['yiruite_tid'] = None
+    return True
+
+def tianmang_process(request, user):
     """
     根据url判断是否是从天芒注册的, 如果是返回invitecode为tianmang
     :param request:
@@ -1139,31 +1186,22 @@ def tianmang_process(request, user, invitecode):
     :param invitecode:
     :return: 如果是天芒注册的返回invitecode为"tianmang" 否则是原始的invitecode
     """
-    url=request.META.get("HTTP_REFERER", "")
+    sn = request.session.get('tianmang_sn', None)
+    if sn:
+        #注册成功后向天芒云 发送注册成功请求
 
-    parsed_url = urlparse.urlparse(url)
-    query_dic=urlparse.parse_qs(parsed_url.query, True)
+        params={
+            "oid": TINMANGKEY,
+            "sn" : sn,
+            "uid": hashlib.md5(user.wanglibaouserprofile.phone).hexdigest(),
+            "uname": user.wanglibaouserprofile.name,
+            "method": "json"
+        }
+        tianmang_callback.apply_async(kwargs={'url': RETURN_TINMANG_URL, 'params': params})
 
-    source_list = query_dic.get("source", "")
-    source = "" if not source_list else source_list[0]
-
-    if (not invitecode) and ("tianmang" == source):
-        sn_list = query_dic.get("sn","")
-        sn = "" if not sn_list else sn_list[0]
-        if sn:
-            #注册成功后向天芒云 发送注册成功请求
-            invitecode = "tianmang"
-
-            params={
-                "oid": TINMANGKEY,
-                "sn" : sn,
-                "uid": hashlib.md5(user.wanglibaouserprofile.phone).hexdigest(),
-                "uname": user.wanglibaouserprofile.name,
-                "method": "json"
-            }
-            tianmang_callback.apply_async(kwargs={'url': RETURN_TINMANG_URL, 'params': params})
-
-    return invitecode
+        request.session['tianmang_source'] = None
+        request.session['tianmang_sn'] = None
+    return True
 
 class P2PAmortizationView(TemplateView):
     template_name = 'p2p_amortization_plan.jade'

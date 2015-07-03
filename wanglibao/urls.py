@@ -20,7 +20,7 @@ from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView,
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser, TianmangInvestListAPIView, \
     TianmangInvestNotConfirmListAPIView, TianmangRegisterListAPIView, TianmangIDVerificationListAPIView, \
-    TianmangCardBindListAPIView
+    TianmangCardBindListAPIView, YiruiteInfoListAPIView
 from marketing.views import NewsListView, NewsDetailView
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
@@ -131,7 +131,8 @@ urlpatterns += patterns(
     url(r'^api/tmyun/getInvestList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestListAPIView.as_view()),
     url(r'^api/tmyun/getInvestListNotConfirm/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestNotConfirmListAPIView.as_view()),
     url(r'^api/tmyun/getCardBindList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangCardBindListAPIView.as_view()),
-
+    # 易瑞特
+    url(r'^api/yiruite/getInfoList/$', YiruiteInfoListAPIView.as_view()),
 )
 
 # 微信
