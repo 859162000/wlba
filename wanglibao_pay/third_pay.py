@@ -80,6 +80,28 @@ def list_bank_card(request):
     return {"ret_code":0, "message":"ok", "cards":rs}
 
 def del_bank_card(request):
+    card_id = request.DATA.get("card_id", "")
+    if not card_id or not card_id.isdigit():
+        return {"ret_code":20041, "message":"请输入正确的ID"}
+
+    card = Card.objects.filter(id=card_id, user=request.user).first()
+    if not card:
+        return {"ret_code":20042, "message":"该银行卡不存在"}
+    # 删除快捷支付信息
+    storable_no = card.no[:6] + card.no[-4:]
+    pay = KuaiPay()
+    dic = {"user_id":request.user.id, "bank_id":card.bank.kuai_code,
+            "storable_no":storable_no}
+
+    data = pay._sp_delbind_xml(dic)
+    res = pay._request(data, pay.DEL_URL)
+    logger.error("#api delete card")
+    logger.error(res.content)
+
+    card.delete()
+    return {"ret_code":0, "message":"删除成功"}
+
+def del_bank_card_new(request):
     """ 删除银行卡，需要解绑所有已绑定渠道"""
     card_id = request.DATA.get("card_id", "")
     if not card_id or not card_id.isdigit():
