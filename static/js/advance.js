@@ -70,30 +70,33 @@
     });
     //显示模态窗口
     $('#first-btn').on('click',function(){
-      if ($(this).attr('data-num') == 'false'){
-        $('#small-zc').show();
+      if($(this).hasClass('selected')){
+        $('.xl-box1').show()
+        $('#first-redpack-fail p').html('您今天已经参加过该活动,不能重复参加');
+        $('#first-redpack-fail').show();
       }else{
-        $.ajax({
-          url: "/api/thousand/redpack/",
-          type: "POST"
-        }).done(function(data) {
-          console.log(data['ret_code']);
-          if(data['ret_code']==3002 || data['ret_code']==3003){
-            $('#first-redpack-fail p').html(data.message);
-            $('#first-redpack-fail').show();
-          }
-          if(data['ret_code']==3001){
-            $('#small-zc').show();
-          }
-          if(data['ret_code']==0){
-            $('#small-zc').show();
-            $('.xl-box1').hide();
-            $('#seven-success').show();
-          }
-        })
-
-
-
+        if ($(this).attr('data-num') == 'false'){
+          $('#small-zc').show();
+        }else{
+          $.ajax({
+            url: "/api/thousand/redpack/",
+            type: "POST"
+          }).done(function(data) {
+            if(data['ret_code']==3002 || data['ret_code']==3003){
+              $('.xl-box1').show();
+              $('#first-redpack-fail p').html(data.message);
+              $('#first-redpack-fail').show();
+            }
+            if(data['ret_code']==3001){
+              $('#small-zc').show();
+            }
+            if(data['ret_code']==0){
+              $('#small-zc').show();
+              $('.xl-box1').hide();
+              $('#seven-success').show();
+            }
+          })
+        }
       }
     })
   });
@@ -219,6 +222,7 @@
         }).done(function(data, textStatus) {
           $('.xl-box1').hide();
           $('#seven-success').show();
+          $('#first-btn').addClass('selected');
           $.ajax({
             url: "/api/thousand/redpack/",
             type: "POST"

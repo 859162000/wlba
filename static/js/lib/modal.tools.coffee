@@ -9,7 +9,7 @@ define ['jquery', 'lib/modal'], ($, modal)->
     html = ['<div id= "', alert_container_id, '" class="', modal_container, '" style="display:none">',
             '<div class="modal-header"></div>',
             '<div class="modal-content"><p class="modal-content-inner">您确认吗?</p></div>',
-            '<div class="modal-footer"><a href="javascript:void(0)" class="ok button-alert-ok">确认</a>',
+            '<div class="modal-footer"><a href="javascript:void(0)" class="ok button-alert-ok" style="margin-right:0">确认</a>',
             '</div>']
     $(html.join('')).appendTo($(document.body))
     $('#' + alert_container_id).on 'click', '.ok', (event) ->
