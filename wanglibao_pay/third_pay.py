@@ -8,6 +8,7 @@ sys.setdefaultencoding("utf-8")
 import logging
 from django.forms import model_to_dict
 from django.db import transaction
+from django.db.models import Q
 from django.utils.decorators import method_decorator
 from wanglibao_pay import util
 from wanglibao_pay.models import PayInfo, Bank, Card
@@ -19,9 +20,9 @@ from marketing import tools
 
 from wanglibao_rest.utils import split_ua
 
-from wanglibao_pay.kuai_pay import KuaiPay
+from wanglibao_pay.kuai_pay import KuaiPay, KuaiShortPay
 from wanglibao_pay.huifu_pay import HuifuShortPay
-from wanglibao_pay.yee_pay import YeePay
+from wanglibao_pay.yee_pay import YeePay, YeeShortPay
 
 logger = logging.getLogger(__name__)
 
@@ -83,10 +84,10 @@ def del_bank_card(request):
     if not card_id or not card_id.isdigit():
         return {"ret_code":20041, "message":"请输入正确的ID"}
 
-    card =  Card.objects.filter(id=card_id, user=request.user).first()
+    card = Card.objects.filter(id=card_id, user=request.user).first()
     if not card:
         return {"ret_code":20042, "message":"该银行卡不存在"}
-    #删除快捷支付信息
+    # 删除快捷支付信息
     storable_no = card.no[:6] + card.no[-4:]
     pay = KuaiPay()
     dic = {"user_id":request.user.id, "bank_id":card.bank.kuai_code,
@@ -99,6 +100,23 @@ def del_bank_card(request):
 
     card.delete()
     return {"ret_code":0, "message":"删除成功"}
+
+def del_bank_card_new(request):
+    """ 删除银行卡，需要解绑所有已绑定渠道"""
+    card_id = request.DATA.get("card_id", "")
+    if not card_id or not card_id.isdigit():
+        return {"ret_code": 20041, "message": "请输入正确的ID"}
+
+    card = Card.objects.filter(id=card_id, user=request.user).first()
+    if not card:
+        return {"ret_code": 20042, "message": "该银行卡不存在"}
+
+    # 删除快捷支付信息
+    res = _unbind_common(request, card, card.bank)
+    if res['ret_code'] != 0: return res
+
+    card.delete()
+    return {"ret_code": 0, "message": "删除成功"}
 
 def list_bank(request):
     #banks = Bank.get_deposit_banks()
@@ -192,3 +210,138 @@ def withdraw(request):
         pay_info.status = PayInfo.FAIL
         pay_info.save()
         return {"ret_code":20065, 'message':u'余额不足'}
+
+
+def card_bind_list(request):
+    # 查询已经绑定支付渠道的银行卡列表
+    try:
+        card_list = []
+        cards = Card.objects.filter(Q(user=request.user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
+        if cards.exists():
+            # 排序
+            bank_list = [card.bank.gate_id for card in cards]
+            cards_tmp = sorted(cards, key=lambda x: bank_list.index(x.bank.gate_id))
+            cards = cards_tmp
+
+            card_list = [
+                {
+                    'bank_id': card.bank.id,
+                    'bank_name': card.bank.name,
+                    'gate_id': card.bank.gate_id,
+                    'storable_no': card.no[:6] + card.no[-4:]
+                } for card in cards]
+        return {"ret_code": 0, "message": "ok", "cards": card_list}
+
+    except Exception, e:
+        logger.error(e.message)
+        return {"ret_code": 20031, "message": "请添加银行卡"}
+
+
+def _unbind_huifu(request, card, bank=None):
+    return HuifuShortPay().delete_bind(request.user, card, bank)
+
+
+def _unbind_kuaipay(request, card, bank=None):
+    return KuaiShortPay().delete_bind_new(request.user, card, bank)
+
+
+def _unbind_yeepay(request, card, bank=None):
+    return YeeShortPay().delete_bind(request.user, card, bank)
+
+
+def _unbind_common(request, card, bank):
+    if card.is_bind_huifu:
+        res = _unbind_huifu(request, card, bank)
+        if res['ret_code'] != 0: return res
+
+    if card.is_bind_yee:
+        res = _unbind_yeepay(request, card, bank)
+        if res['ret_code'] != 0: return res
+
+    if card.is_bind_kuai:
+        res = _unbind_kuaipay(request, card, bank)
+        if res['ret_code'] != 0: return res
+
+    return {"ret_code": 0, "message": "银行卡解绑成功"}
+
+
+def card_unbind(request):
+    """ 请求解绑银行卡 """
+    user = request.user
+    card_no = request.DATA.get("storable_no", "").strip()
+    bank_id = request.DATA.get("bank_id", "").strip()
+
+    bank = Bank.objects.filter(id=bank_id).first()
+    if not bank:
+        return {"ret_code": 20101, "message": "解除信息不匹配"}
+
+    if len(card_no) < 10:
+        return {"ret_code": 20102, "message": "银行卡号不正确"}
+
+    if len(card_no) == 10:
+        card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+    else:
+        card = Card.objects.filter(no=card_no, user=user).first()
+
+    if not card:
+        return {"ret_code": 20103, "message": "银行卡未绑定"}
+
+    return _unbind_common(request, card, bank)
+
+
+def bind_pay_deposit(request):
+    """ 根据银行设置的支付渠道进行支付渠道的支付
+        1、获取验证码
+        2、快捷支付功能
+    """
+    gate_id = request.DATA.get("gate_id", "").strip()
+
+    if not gate_id:
+        return {"ret_code": 20001, 'message': '信息输入不完整'}
+
+    bank = Bank.objects.filter(gate_id=gate_id).first()
+
+    if not bank:
+        return {"ret_code": 20002, "message": "银行ID不正确"}
+
+    if bank.channel == 'huifu':
+        return HuifuShortPay().pre_pay(request)
+
+    elif bank.channel == 'yeepay':
+        return YeeShortPay().pre_pay(request)
+
+    elif bank.channel == 'kuaipay':
+        return KuaiShortPay().pre_pay(request)
+
+    else:
+        return {"ret_code": 20004, "message": "请选择支付渠道"}
+
+
+def bind_pay_dynnum(request):
+    """ 根据银行设置的支付渠道进行支付渠道的支付
+        1、确认支付功能
+    """
+    user = request.user
+    card_no = request.DATA.get("card_no", "").strip()
+
+    if not card_no:
+        return {"ret_code": 20001, 'message': '信息输入不完整'}
+
+    if len(card_no) == 10:
+        card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+    else:
+        card = Card.objects.filter(no=card_no, user=user).first()
+
+    if not card:
+        return {"ret_code": 20002, "message": "银行卡未绑定"}
+
+    if card.bank.channel == 'huifu':
+        return {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
+
+    elif card.bank.channel == 'yeepay':
+        return YeeShortPay().dynnum_bind_pay(request)
+
+    elif card.bank.channel == 'kuaipay':
+        return KuaiShortPay().dynnum_bind_pay(request)
+    else:
+        return {"ret_code": 20004, "message": "请选择支付渠道"}

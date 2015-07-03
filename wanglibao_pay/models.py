@@ -62,6 +62,7 @@ class Card(models.Model):
     is_bind_kuai = models.BooleanField(verbose_name=u"是否绑定快钱快捷", default=False)
     is_bind_yee = models.BooleanField(verbose_name=u"是否绑定易宝快捷", default=False)
     last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
+    yee_bind_id = models.CharField(max_length=50, verbose_name=u'易宝帮卡id', blank=True, default="")
 
     class Meta:
         verbose_name_plural = "银行卡"

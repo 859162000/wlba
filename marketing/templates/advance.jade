@@ -1,0 +1,225 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    //link(rel="stylesheet",href="/static/stylesheets/activity.css")
+    link(rel="stylesheet",href="/static/css/bootstrap.min.css")
+    link(rel="stylesheet",href="/static/stylesheets/newxunlei.css")
+
+  body(style="background:#fff")
+    .full-container
+      .topbar
+        .container.row(style="margin:0 auto")
+          .user-div
+            i.icon-phone.font-l &nbsp;
+            span 客服热线：
+            span 4008-588-066
+
+            span.margin-left-m 在线客服：
+            a.topbar-anchor.icon.icon-qq#top-qq(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", data-role="hover", target="_blank")
+
+            span.margin-left-m 关注我们：
+            a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
+            a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
+            a#qrweibo-top.weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
+              img(src="/static/images/weibo-nqr.png")
+            img#qrcode-top.icon.weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none", data-name="hoverbox")
+            span.mobile-app-top
+              span.icon.icon-mobile-app
+              span 手机网利宝
+              .mobile-app-top-prompt
+                div(style="height:30px; top:-20px; position:relative;")
+                a.mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+                a.mobile-app-android(href="https://www.wanglibao.com/static/wanglibao.apk", title="Android版")
+    .activity-nav
+      .act-container-login-nav
+        a(href='/',style="position: absolute;left: 0;")
+          .act-logo
+        .login-nav
+          .nav-items
+            ul
+              mixin nav-item(name, link, new_class, free)
+                if activeItem == name
+                  li.nav-item.active
+                    a.nav-item-anchor(href=link, class=new_class)= name
+                    if free == 'yes'
+                      span.icon.icon-free 免费
+                else
+                  li.nav-item
+                    a.nav-item-anchor(href=link, class=new_class)= name
+                    if free == 'yes'
+                      span.icon.icon-free 免费
+
+              +nav-item('首页', '/', '', '')
+              +nav-item('理财专区', '/p2p/list/', '', '')
+              +nav-item('基金', '/fund/products', '', '')
+
+              +nav-item('安全保障', '/security', 'left-line', '')
+              +nav-item('帮助中心', '/help', '', '')
+
+              if user.is_authenticated
+                +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav button-dif')
+              else
+                +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav button-dif nologin')
+    .wrap#first-banner
+      .gold2
+         //.xl-text.xl-com.xl-ele#xl-text
+         #sev-num(style="left:329px")
+            span 已有
+            ul#redpacknum(style="width:210px;height:37px")
+              //li 5
+              //  hr
+              //li 0
+              //  hr
+              //li 0
+              //  hr
+            span 个
+    .new-xl-big
+      h1.first-xl-time 活动时间：2015年7月3日——2015年7月15日
+      p.first-text 网利宝首次
+        b 1000元
+        |红包福袋大放送，网利菌已经将红包装好，每天限量
+        b 3000份
+        |红包，立即伸手领钱，先到先得！
+      if user.is_authenticated
+        a(data-num="true")#first-btn.first-user 立即领取
+      else
+        a(data-num="false")#first-btn.first-user 立即领取
+      .xl-box1(style="height:20px")
+        //.seven-success#first-redpack-fail
+        //  span.xl-off2 ×
+        //  span.seven-happy
+        //  p 不符合参加条件
+      .xl-box1(style="height:247px")
+        .first-prize
+          dl(style="margin-left:20px")
+            span ￥100元
+            dt.first-com.first-one
+            dd
+              b 100元
+              |红包
+              br
+              |按投资额的
+              b 2%
+              |折扣使用
+          dl
+            span ￥200元
+            dt.first-com.first-two
+            dd
+              b 200元
+              |红包
+              br
+              |按投资额的
+              b 1.5%
+              |折扣使用
+          dl
+            span ￥300元
+            dt.first-com.first-three
+            dd
+              b 300元
+              |红包
+              br
+              |按投资额的
+              b 1%
+              |折扣使用
+          dl
+            span ￥400元
+            dt.first-com.first-four
+            dd
+              b 400元
+              |红包
+              br
+              |按投资额的
+              b 0.5%
+              |折扣使用
+
+      .space-vertical-s
+
+      .xl-box1(style="height:300px")
+        h2.xl-jiang
+          .xl-center#seven-center
+             |红包规则
+        ul(style="margin:6px 0 0 20px")
+          li 1. 用户完成注册后，即可参加活动领取红包，每日均可领取，每个账户当天限领取一次；
+          li 2. 所得现金红包均为折扣红包。所得红包金额，按对应红包金额的百分比折扣使用（比如用户投资5000元，即可满额使用100元红包）；
+          li 3. 红包均只能使用一次，使用后是否有余额红包即失效；
+          li 4. 红包发放统一以站内信形式通知；
+          li 5. 红包有效期：2015年7月3日-2015年7月31日；
+          li 6. 网利宝对此活动享有最终解释权。
+
+
+
+  .footer(style="background:#f7f7f7")
+    include include/activityFooterTwo
+
+    include include/tracking
+  #small-zc
+    .wrap(style="background:none")
+      .gold2
+        .xl-box1#box1
+          .xl-small-zc
+            span.first-xl-off ×
+            .denelu-form(style="top:20px;left:32px")
+              h1.biaoyu  领取1000元现金红包
+              //.align-center
+              //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
+              form#register-modal-form2.login-form.dale(method='post', action='/accounts/register/ajax/')
+                .form-row
+                  .form-control-group
+                    .span12
+                      input#reg_identifier2.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                  .form-row-error
+                .form-row.voice
+                  .span12-omega.hidden.show
+                    没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                  .form-control-group
+                    .span6
+                      input#id_validate_code2.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                    .span6-omega
+                      button#button-get-validate-code-modal2.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px") 获取验证码
+                  .form-row-error
+                .form-row
+                  input#reg_password4.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                  .password-strength-container
+                    span.password-strength-1
+                    span.password-strength-2
+                    span.password-strength-3
+                  .form-row-error
+                .form-row
+                  input#reg_password3.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                  .form-row-error
+                .form-row.form-bottom-bar
+                  .agreement(style="padding:0 0 10px 10px;text-align:left")
+                    label(for="agreement")
+                      input(type="checkbox", name="agreement", checked="checked", id="agreement2", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
+                    | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                    .form-row-error
+                  button#register_submit2.button-account.span10.xun-zhuce(type='submit') 立即注册
+                p.xun-p(style="font-size:14px;margin-top:9px") 已有账号,
+                  a(href="/accounts/login/") 立即登录
+                .space-vertical-s
+        .seven-success#seven-success
+          span.first-xl-off2 ×
+          span.seven-happy.seven-com.seven-nine 亲，恭喜您
+            br
+            b 今天伸手领钱成功
+          p 1000元现金组合红包已发送到亲的账户，
+            br
+            |落袋为安妥妥哒！
+            br
+            |7月钜惠季，全场加息3%即刻用起！
+          .first-money
+          a(href="/").first-user 立即使用
+        #first-redpack-fail
+          span.first-xl-off2 ×
+          p 不符合参加条件
+
+
+  script.
+      var v = new Date().getTime()
+      require(['/static/js/hover.js','/static/js/xun-newzhuce.js?v='+v,'/static/js/advance.js'])
+
