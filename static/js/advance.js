@@ -7,169 +7,90 @@
   });
 
   require(['jquery'], function($) {
-    //banner的主题文字效果
-//    $('.xl-small-zc').show()
-    $('#xl-text').show();
-    $('#xl-text').animate({'top': '37px'},500);
+    //模态口
+    var body_h=$('body').height();
+    $('#small-zc').height(body_h);
+    //关闭模态窗
+    $('.first-xl-off,.first-xl-off2').on('click',function(){
+      $('#small-zc').hide();
+    });
+    $('#small-zc').on('click',function(){
+      $('#small-zc').hide();
+    });
+    //阻止冒泡
+     $('.xl-box1,#seven-success').on('click',function(event){
+        event.stopPropagation();
+     });
+    //关闭提示
+    $('.xl-off2').on('click',function(){
+      $('#first-redpack-fail').hide()
+    })
     //banner数字
     $.ajax({
-      url: "/api/xunlei/join/count/",
+      url: "/api/thousand/redpack/count/",
       type: "GET"
     }).done(function(data) {
-      console.log(data);
       var number=parseInt(data['redpack_total']);
       if (number==0){
-        var str1='500';
+        var str1='4543';
         for(var j=0,len2=str1.length;j<len2;j++){
           if(j>=$('#redpacknum li').length){
               $('#redpacknum').append('<li>'+str1[j]+'<hr></li>');
           }
         }
       }else{
-        var rednum=500+number;
+        var rednum=4543+number;
         var str=rednum.toString();
         for(var i=0,len=str.length;i<len;i++){
           if(i>=$('#redpacknum li').length){
               $('#redpacknum').append('<li>'+str[i]+'<hr></li>');
+          }else{
+            $.ajax({
+              url: "/api/thousand/redpack/",
+              type: "POST"
+            }).done(function(data) {
+              if(data['ret_code']==3002 || data['ret_code']==3003){
+                $('#first-redpack-fail p').html(data.message);
+                $('#first-redpack-fail').show();
+              }
+              if(data['ret_code']==3001){
+                $('#small-zc').show();
+              }
+            })
+
           }
         }
       }
 
     });
-    //点击按钮出现注册框
-    $('#xl-btn').on('click',function(){
-        if ($(this).attr('data-num') == 'false'){
-          $('.xl-small-zc').show()
-        }else{
-          $.ajax({
-            url: "/api/xunlei/join/",
-            type: "POST"
-          }).done(function(data) {
-            console.log(data);
-            if(data['ret_code']==3002 || data['ret_code']==3001){
-              $('#redpack-fail p').html(data.message);
-              $('#redpack-fail').show();
-            }
-            if(data['ret_code']==3000){
-              smallgame();
-            }
-          })
-        }
-    });
-    //游戏
-    function smallgame(){
-      $('#seven-text').html('准备数钱');
-          var n=3;
-          var timer;
-          if (n!==0){
-            timer=setInterval(function(){
-              n--;
-              $('#seven-time').html(n);
-              if (n<0){
-                clearInterval(timer);
-                $('#seven-text').html('来 点 我');
-                $('#seven-time').html('3');
-                $('.game-start').show();
-                $('#xl-btn').css({'background':'#988B8B','box-shadow':'0px 4px #A09C9B'});
-                $('#xl-btn').attr('disabled','false');
-              }
-            },1000)
+    //显示模态窗口
+    $('#first-btn').on('click',function(){
+      if ($(this).attr('data-num') == 'false'){
+        $('#small-zc').show();
+      }else{
+        $.ajax({
+          url: "/api/thousand/redpack/",
+          type: "POST"
+        }).done(function(data) {
+          if(data['ret_code']==3002 || data['ret_code']==3003){
+            $('#first-redpack-fail p').html(data.message);
+            $('#first-redpack-fail').show();
           }
-      //点击开始游戏
-      var num=1;
-      $('.game-start').on('click',function(){
-        if (!$('.game-start').hasClass('start')){
-          $(this).addClass('start');
-          //游戏时间倒计时
-          var k=3;
-          var timer2;
-          timer2=setInterval(function(){
-            k--;
-            $('#seven-time').html(k);
-            if (k==0){
-              clearInterval(timer2);
-              $('#xl-btn').hide();
-              $('#give-btn').show();
-            }
-          },1000);
-          setTimeout(function(){
-            $('.game-start').removeClass('game-start');
-          },3000)
-        }
-        num++;
-        $('#seven-money').html('￥'+num*10);
-        $('#money').html(num*10);
-      })
-    }
-    //点击×关闭注册框
-    $('.xl-off,#now').on('click',function(){
-      $('.xl-small-zc').hide()
-    });
-    //点击×关闭提示框
-    $('.xl-off2,#now').on('click',function(){
-      $('.seven-success').hide();
-    });
+          if(data['ret_code']==3001){
+            $('#small-zc').show();
+          }
+          if(data['ret_code']==0){
+            $('#small-zc').show();
+            $('.xl-box1').hide();
+            $('#seven-success').show();
+          }
+        })
 
-    $('#now').on('click',function(){
-      smallgame();
-    });
-    //弹出领取红包提示
-    $('#give-btn').on('click',function(){
-      var money=$('#money').html();
-      $.ajax({
-        url: "/api/xunlei/join/",
-        type: "POST",
-        data:{'amount':money}
-      }).done(function(data){
-        $('#redpack-success p').html(data.message+'<br><a href="/accounts/home/">立即查看</a>');
-        $('#redpack-success').show();
-      })
+
+
+      }
     })
   });
-
-
-  //固定回到顶部
-   function backtop(){
-     var k=document.body.clientWidth,
-       e=$(".new-xl-big").width();
-       q=k-e;
-       w=q/2;
-       r= e+w;
-       a=r+20+'px';
-     return a;
-   }
-
-  var left;
-  left=backtop();
-  //浏览器大小改变触发的事件
-  window.onresize = function(){
-    left = backtop();
-  };
-  //赋值
-  $('.xl-backtop').css({'left':left})
-
-  //显示微信二维码
- $('#xl-weixin').on('mouseover',function(){
-   $('.erweima').show();
- });
-
-  $('#xl-weixin').on('mouseout',function(){
-   $('.erweima').hide();
- })
-
-  //返回顶部
-  $(window).scroll(function () {
-      if ($(document).scrollTop() > 0) {
-          $(".xl-backtop").fadeIn();
-      } else if ($(document).scrollTop() <= 0) {
-          $('.xl-backtop').stop().fadeOut();
-      }
-  });
-
-  $('.backtop').on('click',function(){
-    $('body,html').animate({scrollTop: 0}, 600);
-    return false
-  })
 
 }).call(this);
 
@@ -290,7 +211,8 @@
           type: "POST",
           data: $(form).serialize()
         }).done(function(data, textStatus) {
-          return $('#seven-success').show();
+          $('.xl-box1').hide();
+          $('#seven-success').show();
         }).fail(function(xhr) {
           var error_message, message, result;
           result = JSON.parse(xhr.responseText);
