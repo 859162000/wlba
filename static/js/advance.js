@@ -18,7 +18,7 @@
       $('#small-zc').hide();
     });
     //阻止冒泡
-     $('.xl-box1').on('click',function(event){
+     $('.xl-box1,#seven-success').on('click',function(event){
         event.stopPropagation();
      });
     //关闭提示
