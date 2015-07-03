@@ -58,6 +58,8 @@
     });
     //游戏
     function smallgame(){
+      $('#xl-btn').css({'background':'#988B8B','box-shadow':'0px 4px #A09C9B'});
+      $('#xl-btn').attr('disabled','false');
       $('#seven-text').html('准备数钱');
           var n=3;
           var timer;
@@ -70,8 +72,7 @@
                 $('#seven-text').html('来 点 我');
                 $('#seven-time').html('3');
                 $('.game-start').show();
-                $('#xl-btn').css({'background':'#988B8B','box-shadow':'0px 4px #A09C9B'});
-                $('#xl-btn').attr('disabled','false');
+
               }
             },1000)
           }
