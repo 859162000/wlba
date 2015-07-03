@@ -19,7 +19,12 @@
     });
     //阻止冒泡
      $('.xl-box1,#seven-success').on('click',function(event){
-        event.stopPropagation();
+       if (event.stopPropagation){
+         event.stopPropagation();
+       }else{
+         event.cancelBubble = true;
+       }
+
      });
     //关闭提示
     $('.xl-off2').on('click',function(){
