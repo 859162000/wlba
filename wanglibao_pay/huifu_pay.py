@@ -503,11 +503,15 @@ class HuifuShortPay:
         # 开户
         res = self._open_account_huifu(user)
         if res['RespCode'] not in (u'000000', '220001'):
-            return {"ret_code": -3, "message": res['ErrMsg']}
+            logger.error('huifu open error>>>')
+            logger.error(res)
+            return {"ret_code": -1, "message": res['ErrMsg']}
 
         # 邦卡
         res = self._bind_card_huifu(user=user, bank=bank, card_no=card.no)
         if res['RespCode'] not in (u'000000', u'223153'):
+            logger.error('huifu bind error>>>')
+            logger.error(res)
             return {"ret_code": -2, "message": res['ErrMsg']}
 
         return {"ret_code": 0, "message": 'ok'}
@@ -557,8 +561,9 @@ class HuifuShortPay:
 
         if bank and card and bank != card.bank:
             return {"ret_code": 201153, "message": "银行卡与银行不匹配"}
-
+        logger.error('begin >>>>>>')
         if card and not card.is_bind_huifu:
+            logger.error('begin bind card>>>')
             res = self.open_bind_card(user, bank, card)
             if res['ret_code'] != 0:
                 return res
