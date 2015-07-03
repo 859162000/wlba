@@ -40,8 +40,8 @@ class RedPackAdmin(ExportMixin, admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def has_add_permission(self, request):
-        return False
+    # def has_add_permission(self, request):
+    #     return False
 
     def get_readonly_fields(self, request, obj=None):
         return self.list_display
