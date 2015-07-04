@@ -223,7 +223,7 @@ def card_bind_list(request):
             cards = sorted(cards, key=lambda x: bank_list.index(x.bank.gate_id))
 
             for card in cards:
-                tmp = {
+                base_dict = {
                     'bank_id': card.bank.id,
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,
@@ -231,20 +231,25 @@ def card_bind_list(request):
                 }
 
                 # 将银行卡对应银行的绑定的支付通道限额信息返回
+                tmp = dict()
                 channel = card.bank.channel
-                if channel == 'huifu':
+                if channel == 'huifu' and card.is_bind_huifu:
+                    tmp.update(base_dict)
                     if card.bank.huifu_bind_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.huifu_bind_limit))
 
-                elif channel == 'yeepay':
+                elif channel == 'yeepay' and card.is_bind_yee:
+                    tmp.update(base_dict)
                     if card.bank.yee_bind_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.yee_bind_limit))
 
-                elif channel == 'kuaipay':
+                elif channel == 'kuaipay' and card.is_bind_kuai:
+                    tmp.update(base_dict)
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
-
-                card_list.append(tmp)
+                
+                if tmp:
+                    card_list.append(tmp)
 
         return {"ret_code": 0, "message": "ok", "cards": card_list}
 
