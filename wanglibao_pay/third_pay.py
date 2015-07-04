@@ -344,6 +344,10 @@ def bind_pay_dynnum(request):
     """
     user = request.user
     order_id = request.DATA.get("order_id", "").strip()
+    token = request.DATA.get("token", "").strip()
+
+    if not order_id or not token:
+        return {"ret_code": 20120, "message": "请重新获取验证码"}
 
     pay_info = PayInfo.objects.filter(order_id=order_id).first()
     if not pay_info or pay_info.status == PayInfo.SUCCESS:
