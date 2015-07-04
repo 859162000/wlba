@@ -288,6 +288,7 @@ def _unbind_common(request, card, bank):
 
 def card_unbind(request):
     """ 请求解绑银行卡 """
+    logger.error(request.DATA)
     user = request.user
     card_no = request.DATA.get("storable_no", "").strip()
     bank_id = request.DATA.get("bank_id", "").strip()
@@ -315,6 +316,7 @@ def bind_pay_deposit(request):
         1、获取验证码
         2、快捷支付功能
     """
+    logger.error(request.DATA)
     gate_id = request.DATA.get("gate_id", "").strip()
 
     if not gate_id:
@@ -342,6 +344,7 @@ def bind_pay_dynnum(request):
     """ 根据银行设置的支付渠道进行支付渠道的支付
         1、确认支付功能
     """
+    logger.error(request.DATA)
     user = request.user
     order_id = request.DATA.get("order_id", "").strip()
     token = request.DATA.get("token", "").strip()
