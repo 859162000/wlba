@@ -247,7 +247,7 @@ def card_bind_list(request):
                     tmp.update(base_dict)
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
-                
+
                 if tmp:
                     card_list.append(tmp)
 
@@ -343,10 +343,13 @@ def bind_pay_dynnum(request):
         1、确认支付功能
     """
     user = request.user
-    card_no = request.DATA.get("card_no", "").strip()
+    order_id = request.DATA.get("order_id", "").strip()
 
-    if not card_no:
-        return {"ret_code": 20001, 'message': '信息输入不完整'}
+    pay_info = PayInfo.objects.filter(order_id=order_id).first()
+    if not pay_info or pay_info.status == PayInfo.SUCCESS:
+        return {"ret_code": 20121, "message": "订单不存在或已支付成功"}
+
+    card_no = pay_info.card_no
 
     if len(card_no) == 10:
         card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
@@ -365,4 +368,4 @@ def bind_pay_dynnum(request):
     elif card.bank.channel == 'kuaipay':
         return KuaiShortPay().dynnum_bind_pay(request)
     else:
-        return {"ret_code": 20004, "message": "请选择支付渠道"}
+        return {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
