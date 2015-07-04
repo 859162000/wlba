@@ -317,12 +317,27 @@ def bind_pay_deposit(request):
         2、快捷支付功能
     """
     logger.error(request.DATA)
+
+    card_no = request.DATA.get("card_no", "").strip()
     gate_id = request.DATA.get("gate_id", "").strip()
 
-    if not gate_id:
+    if not card_no and not gate_id:
         return {"ret_code": 20001, 'message': '信息输入不完整'}
 
-    bank = Bank.objects.filter(gate_id=gate_id).first()
+    if gate_id:
+        bank = Bank.objects.filter(gate_id=gate_id).first()
+
+    else:
+        user = request.user
+        if len(card_no) == 10:
+            card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+        else:
+            card = Card.objects.filter(no=card_no, user=user).first()
+
+        if not card:
+            return {"ret_code": 20001, 'message': '信息输入不完整'}
+
+        bank = card.bank
 
     if not bank:
         return {"ret_code": 20002, "message": "银行ID不正确"}
