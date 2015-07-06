@@ -131,6 +131,25 @@ def list_bank(request):
         return {"ret_code":20051, "message":"没有可选择的银行"}
     return {"ret_code":0, "message":"ok", "banks":rs}
 
+
+def list_bank_new(request):
+    banks = Bank.get_bind_channel_banks()
+    rs = []
+    for bank in banks:
+        obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code}
+        if bank.kuai_limit:
+            obj.update(util.handle_kuai_bank_limit(bank.kuai_limit))
+        elif bank.huifu_bind_limit:
+            obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
+        elif bank.yee_bind_limit:
+            obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
+
+        rs.append(obj)
+
+    if not rs:
+        return {"ret_code": 20051, "message": "没有可选择的银行"}
+    return {"ret_code": 0, "message": "ok", "banks": rs}
+
 #def handle_kuai_bank_limit(limitstr):
 #    obj = {}
 #    try:
@@ -224,7 +243,7 @@ def card_bind_list(request):
 
             for card in cards:
                 base_dict = {
-                    'bank_id': card.bank.id,
+                    'bank_id': card.bank.code,
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,
                     'storable_no': card.no[:6] + card.no[-4:]
@@ -293,7 +312,7 @@ def card_unbind(request):
     card_no = request.DATA.get("storable_no", "").strip()
     bank_id = request.DATA.get("bank_id", "").strip()
 
-    bank = Bank.objects.filter(id=bank_id).first()
+    bank = Bank.objects.filter(code=bank_id).first()
     if not bank:
         return {"ret_code": 20101, "message": "解除信息不匹配"}
 
