@@ -540,7 +540,7 @@ class YeeShortPay:
         post = dict()
         post['merchantaccount'] = self.MER_ID
         post['bindid'] = str(card.yee_bind_id)
-        post['orderid'] = order_id
+        post['orderid'] = str(order_id)
         post['transtime'] = int(time.time())
         post['amount'] = int(pay_info.amount * 100)
         post['productcatalog'] = '18'
@@ -556,7 +556,7 @@ class YeeShortPay:
         """ 确认支付 """
         post = dict()
         post['merchantaccount'] = self.MER_ID
-        post['orderid'] = order_id
+        post['orderid'] = str(order_id)
         return self._request_yee(url=self.BIND_PAY_VALIDATE, data=post)
 
     def add_card_unbind(self, user, card_no, bank):
@@ -592,7 +592,7 @@ class YeeShortPay:
         # 易宝支付需要设备信息
         deviceid = request.DATA.get("device_id", "").strip()
 
-        if not amount or not card_no or not deviceid or not gate_id:
+        if not amount or not card_no or not deviceid:
             return {"ret_code": 20112, 'message': '信息输入不完整'}
         if len(card_no) > 10 and (not input_phone or not gate_id):
             return {"ret_code": 20113, 'message': '卡号格式不正确'}
@@ -608,10 +608,11 @@ class YeeShortPay:
 
         user = request.user
         profile = user.wanglibaouserprofile
-
-        bank = Bank.objects.filter(gate_id=gate_id).first()
-        if not bank or not bank.yee_bind_code.strip():
-            return {"ret_code": 201116, "message": "不支持该银行"}
+        card, bank = None, None
+        if gate_id:
+            bank = Bank.objects.filter(gate_id=gate_id).first()
+            if not bank or not bank.yee_bind_code.strip():
+                return {"ret_code": 201116, "message": "不支持该银行"}
 
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
@@ -621,7 +622,7 @@ class YeeShortPay:
         if not card:
             card = self.add_card_unbind(user, card_no, bank)
 
-        if not card or not bank:
+        if not card and not bank:
             return {'ret_code': 200117, 'message': '卡号不存在或银行不存在'}
 
         if bank and card and bank != card.bank:
