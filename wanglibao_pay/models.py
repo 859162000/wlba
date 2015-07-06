@@ -52,6 +52,10 @@ class Bank(models.Model):
     def get_kuai_deposit_banks(cls):
         return Bank.objects.all().exclude(kuai_code='').exclude(kuai_code__isnull=True).select_related()
 
+    @classmethod
+    def get_bind_channel_banks(cls):
+        return Bank.objects.all().exclude(channel='').exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True).exclude(yee_bind_code__isnull=True).select_related()
+
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号')
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
