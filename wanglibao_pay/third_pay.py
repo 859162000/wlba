@@ -333,7 +333,6 @@ def bind_pay_deposit(request):
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
-
         if not card:
             return {"ret_code": 20001, 'message': '信息输入不完整'}
 
