@@ -63,7 +63,11 @@ class ManDaoSMSBackEnd(SMSBackEnd):
             'sn': settings.SMS_MANDAO_SN,
             'pwd': settings.SMS_MANDAO_MD5_PWD,
             'mobile': phone,
-            'content': text
+            'content': text,
+            'ext': '',
+            'stime': '',
+            'rrid': '',
+            'msgfmt': ''
         }
 
         response = requests.post(url, params)
@@ -134,6 +138,7 @@ class EmaySMS:
         ws = Client(settings.SMS_EMAY_URL).service
         rs = ws.getReport(settings.SMS_EMAY_SN, settings.SMS_EMAY_KEY)
         print(rs)
+
 
 class YTXVoice:
     @classmethod
