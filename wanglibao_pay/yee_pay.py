@@ -295,7 +295,7 @@ class YeePay:
         pay_info.save()
         if rs['ret_code'] == 0:
             device = split_ua(request)
-            tools.despoit_ok(pay_info, device['device_type'])
+            tools.despoit_ok(pay_info, device)
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
@@ -336,7 +336,8 @@ class YeeShortPay:
 
     def _sort(self, dic):
         keys = dic.keys()
-        return reduce(lambda x, y: str(dic[x]) + str(dic[y]), keys.sort())
+        keys.sort()
+        return "".join([str(dic[k]) for k in keys])
 
     def aes_base64_encrypt(self,data,key):
         cipher = AES.new(key)
@@ -439,32 +440,32 @@ class YeeShortPay:
     def _request_yee(self, url, data):
         post = self._format_post(data)
         res = requests.post(url, post)
-        print 'url>>>', url
-        print 'data>>>>', data
-        print 'response text>>>', res.text
         return self._response_data_change(res=json.loads(res.text))
 
     def _response_data_change(self, res):
         """ 将易宝返回的数据格式化成程序通用数据 """
-        if not self._response_decode(res=res):
-            return {'ret_code': 20011, 'message': '签名验证失败'}
         if 'data' not in res:
             return {'ret_code': 20012, 'message': '易宝数据有误'}
-        if 'error_code' in res['data']:
-            return {'ret_code': res['data']['error_code'], 'message': res['data']['error_msg'], 'data': res['data']}
 
-        return {'ret_code': 0, 'message': 'ok', 'data': res['data']}
+        flag, data = self._response_decode(res=res)
+        if not flag:
+            return {'ret_code': 20011, 'message': '签名验证失败'}
+
+        if 'error_code' in data:
+            return {'ret_code': data['error_code'], 'message': data['error_msg'], 'data': data}
+
+        return {'ret_code': 0, 'message': 'ok', 'data': data}
 
     def _response_decode(self, res):
         """ 返回数据合法性校验 """
         if 'encryptkey' in res and 'data' in res:
             ybaeskey = self.rsa_base64_decrypt(res['encryptkey'], self.PRIV_KEY)
             data = json.loads(self.aes_base64_decrypt(res['data'], ybaeskey))
-            if 'sign' in data and data['merchantaccount'] == self.MER_ID:
+            if 'sign' in data:
                 sign = data.pop('sign')
                 if self._verify(data, sign):
-                    return True
-        return False
+                    return True, data
+        return False, res
 
     def _bind_card_request(self, request, phone, card_no, request_id, terminaltype, terminalid):
         """ 邦卡请求 """
@@ -528,6 +529,7 @@ class YeeShortPay:
     def _unbind_card(self, user, bind_id):
         """ 解绑银行卡 """
         post = dict()
+        post['merchantaccount'] = self.MER_ID
         post['bindid'] = bind_id  # 绑卡ID
         post['identityid'] = user.wanglibaouserprofile.id_number
         post['identitytype'] = 5
@@ -537,10 +539,10 @@ class YeeShortPay:
         """ 支付请求 """
         post = dict()
         post['merchantaccount'] = self.MER_ID
-        post['bindid'] = card.yee_bind_id
+        post['bindid'] = str(card.yee_bind_id)
         post['orderid'] = order_id
         post['transtime'] = int(time.time())
-        post['amount'] = pay_info.amount
+        post['amount'] = int(pay_info.amount * 100)
         post['productcatalog'] = '18'
         post['productname'] = '网利宝-APP充值'
         post['identityid'] = request.user.wanglibaouserprofile.id_number
@@ -617,7 +619,7 @@ class YeeShortPay:
             card = Card.objects.filter(no=card_no, user=user).first()
 
         if not card:
-            card = self.add_card_unbind(user, bank, card_no)
+            card = self.add_card_unbind(user, card_no, bank)
 
         if not card or not bank:
             return {'ret_code': 200117, 'message': '卡号不存在或银行不存在'}
@@ -784,12 +786,11 @@ class YeeShortPay:
             return res
 
         device = split_ua(request)
-        device_type = device['device_type']
-        ms = self.handle_margin(pay_info.amount, order_id, user.id, util.get_client_ip(request), res['data'], device_type)
+        ms = self.handle_margin(pay_info.amount, order_id, user.id, util.get_client_ip(request), res['data'], device)
         return ms
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content, device_type):
+    def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info:
             return {"ret_code": 20131, "message": "order not exist"}
@@ -821,7 +822,7 @@ class YeeShortPay:
 
         pay_info.save()
         if rs['ret_code'] == 0:
-            tools.despoit_ok(pay_info, device_type)
+            tools.despoit_ok(pay_info, device)
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:

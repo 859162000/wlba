@@ -483,7 +483,7 @@ if ENV == ENV_PRODUCTION:
     HUI_SHORT_SIGN_HOST = SIGN_HOST
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
-    HUI_SHORT_LOGIN_PWD = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "cathy123"
     PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
@@ -531,7 +531,7 @@ elif ENV == ENV_PREPRODUCTION:
     HUI_SHORT_SIGN_HOST = SIGN_HOST
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
-    HUI_SHORT_LOGIN_PWD = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "cathy123"
     PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
@@ -577,7 +577,7 @@ else:
     HUI_SHORT_SIGN_HOST = SIGN_HOST
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
-    HUI_SHORT_LOGIN_PWD = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "cathy123"
     PAY_URL = 'http://test.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gar/entry.do" % PAY_URL

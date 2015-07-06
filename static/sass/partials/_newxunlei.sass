@@ -45,7 +45,16 @@
   background-position: -952px -95px
 .seven-erweima
   background-position: -952px -95px
-
+.first-com
+  background: url("/static/imgs/pc_activity/xunlei/july_first/zhe.png") no-repeat
+.first-one
+  background-position: -30px 4px
+.first-two
+  background-position: -192px 4px
+.first-three
+  background-position: -359px 4px
+.first-four
+  background-position: -513px 4px
 .xl-text
   width: 364px
   height: 166px
@@ -67,6 +76,9 @@
 #seven-xl-banner
   background: url("/static/imgs/pc_activity/xunlei/seven/banner2.jpg") no-repeat center center
   height: 502px
+#first-banner
+  background: url("/static/imgs/pc_activity/xunlei/july_first/banner.jpg") no-repeat center center
+  height: 502px
 
 .new-xl-big
   width: 1100px
@@ -74,6 +86,17 @@
   //background: #cccccc
   margin: 0 auto
   position: relative
+  .first-user
+    width: 265px
+    height: 40px
+    background: #ff5252
+    font-size: 18px
+    color: #fff
+    border: none
+    margin: 20px 0 0 50px
+    display: inline-block
+    text-align: center
+    line-height: 40px
   .xl-backtop
     width: 50px
     height: 251px
@@ -91,7 +114,6 @@
     .backtop
       background: #b22621
       width: 27px
-      //height: 89px
       color: #fff
       text-align: center
       padding: 10px 0
@@ -107,6 +129,8 @@
       left: -158px
       background: url("/static/images/xunlei/erweima.png") no-repeat center center
       display: none
+    a
+      display: inline-block
 
   .xl-time
     padding: 30px 0
@@ -115,13 +139,71 @@
     font-size: 24px
     color: #de284e
     text-align:  center
+  .first-xl-time
+    font-size: 24px
+    color: #df2c4a
+    text-align: center
+    background: url("/static/imgs/pc_activity/xunlei/july_first/bj.jpg") no-repeat center center
+    height: 80px
+    line-height: 80px
+  #first-btn
+    width: 190px
+    height: 42px
+    background: #ff5252
+    color: #fff
+    border-radius: 5px
+    font-size: 18px
+    border: none
+    margin: 10px auto
+    position: relative
+    left: 449px
+
+  .first-text
+    font-size: 18px
+    text-align: center
+    margin-top: 20px
+    b
+      font-weight: normal
+      color: #ff5252
+
   .xl-box1
     width: 1100px
     height: 1100px
     position: relative
-    #redpack-success,#redpack-fail
+    .first-prize
+      dl
+        width: 267px
+        height: 188px
+        position: relative
+        display: inline-block
+        background: url("/static/imgs/pc_activity/xunlei/july_first/redpack_bj.jpg") no-repeat center center
+      span
+        display: inline-block
+        position: absolute
+        font-size: 20px
+        color: #e83c24
+        left: 100px
+        top: 72px
+        font-weight: bold
+      dt
+        width: 118px
+        height: 100%
+      dd
+        line-height: 20px
+        text-align:  center
+        margin-top: 15px
+        font-size: 16px
+        b
+          font-weight: normal
+          color: #ff5252
+    #redpack-success,#redpack-fail,#first-redpack-fail
       left: 380px
       background: #fff
+    #first-redpack-fail
+      position: relative
+      top: -250px
+      left: 336px
+      width: 400px
     .seven-success
       width: 286px
       height: 150px
@@ -132,21 +214,17 @@
       border-radius: 10px
       display: none
       .xl-off2
-        display: inline-block
-        width: 30px
-        height: 30px
         border: 2px solid #ea5152
         border-radius: 15px
         background: #fff
         font-weight: bold
         color: #ea5152
         position: absolute
-        text-align: center
-        font-size: 30px
-        line-height: 26px
+        font-size: 21px
         right: -13px
         top: -10px
         cursor: default
+        padding: 0 8px
       .seven-happy
         width: 114px
         height: 31px
@@ -189,9 +267,9 @@
         position: absolute
         width: 372px
         height: 339px
-        border: 1px solid #ccc
         left: 335px
         display: none
+        cursor: pointer
     .seven-h
       width: 100%
       height: 55px
@@ -465,6 +543,7 @@
         b
           font-weight: normal
           color: #eb6262
+
     .xl-small-zc
       border: 2px solid #ea5152
       width: 341px
@@ -476,21 +555,17 @@
       top: 439px
       display: none
       .xl-off
-        display: inline-block
-        width: 30px
-        height: 30px
         border: 2px solid #ea5152
         border-radius: 15px
         background: #fff
         font-weight: bold
         color: #ea5152
         position: absolute
-        text-align: center
-        font-size: 30px
-        line-height: 26px
+        font-size: 21px
         right: -13px
         top: -10px
         cursor: default
+        padding: 0 8px
 #sev-num
   width: 330px
   height: 60px
@@ -508,7 +583,6 @@
     font-size: 18px
   ul
     display: inline-block
-    margin: 0 5px
     li
       display: inline-block
       width: 40px
@@ -521,8 +595,132 @@
       hr
         position: relative
         top: -53px
-        width: 37px
+        width: 34px
         border-top: 4px solid #ec4e4f
+#small-zc
+  width: 100%
+  height: 100%
+  position: absolute
+  background: rgba(0, 0, 0, 0.69)
+  top: 0
+  display: none
+  .xl-box1
+    width: 324px
+    height: auto
+    position: fixed
+    background: #fff
+    margin: 0 auto
+    border-radius: 10px
+    top: 50%
+    left: 50%
+    margin-left: -162px
+    margin-top: -220px
+    //display: none
+    .xl-small-zc
+      width: 341px
+      border-radius: 5px
+      background: #fff
+      position: absolute
+      z-index: 5
+      left: -25px
+      .first-xl-off
+        border-radius: 15px
+        background: #fff
+        font-weight: bold
+        color: #999
+        position: absolute
+        font-size: 21px
+        right: -6px
+        top: 21px
+        cursor: default
+        padding: 0 8px
+        z-index: 100
+  .seven-success
+    width: 370px
+    height: 410px
+    position: fixed
+    top: 50%
+    left: 50%
+    border-radius: 10px
+    background: #fff
+    z-index: 100
+    display: none
+    margin-top: -205px
+    margin-left: -185px
+    .first-xl-off2
+      border-radius: 15px
+      background: #fff
+      font-weight: bold
+      color: #999
+      position: absolute
+      font-size: 21px
+      right: 3px
+      top: 2px
+      cursor: default
+      padding: 0 8px
+    .seven-happy
+      width: 273px
+      height: 31px
+      display: inline-block
+      color: #ff5252
+      font-size: 24px
+      margin: 40px 0 20px 111px
+      b
+        font-weight: normal
+        position: relative
+        left: -50px
+    p
+      font-size: 18px
+      line-height: 30px
+      color: #738289
+      margin: 20px 0 0 30px
+    .first-money
+      width: 100%
+      height: 65px
+      background: url("/static/imgs/pc_activity/xunlei/july_first/redpack.jpg") no-repeat center center
+      margin-top: 20px
+    .first-user
+      width: 265px
+      height: 40px
+      background: #ff5252
+      font-size: 18px
+      color: #fff
+      border: none
+      margin: 20px 0 0 50px
+      display: inline-block
+      text-align: center
+      line-height: 40px
+      a
+        font-size: 18px
+        color: #fff
+  #first-redpack-fail
+    width: 400px
+    height: 200px
+    display: none
+    position: fixed
+    top: 50%
+    left: 50%
+    margin-top: -100px
+    margin-left: -200px
+    border-radius: 10px
+    background: #fff
+    .first-xl-off2
+      border-radius: 15px
+      background: #fff
+      font-weight: bold
+      color: #999
+      position: absolute
+      font-size: 21px
+      right: 3px
+      top: 2px
+      cursor: default
+      padding: 0 8px
+    p
+      text-align: center
+      line-height: 200px
+      margin: 0
+      font-size: 18px
+
 
 
 

@@ -90,7 +90,8 @@ class RegisterView(RegistrationView):
         set_promo_user(request, user, invitecode=invitecode)
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
-        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device_type":"pc"})
+        device = utils.split_ua(request)
+        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
         return user
 
     def get_success_url(self, request=None, user=None):
@@ -1122,7 +1123,8 @@ def ajax_register(request):
 
                 auth.login(request, auth_user)
 
-                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device_type":"pc"})
+                device = utils.split_ua(request)
+                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
 
                 return HttpResponse(messenger('done', user=request.user))
             else:

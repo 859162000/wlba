@@ -27,6 +27,7 @@ urlpatterns = patterns(
     url(r'^weipai/$', TemplateView.as_view(template_name="app_share_weipai.jade")),
     url(r'^app_gold/$', TemplateView.as_view(template_name="app_gold.jade")),
     url(r'^pan_gold/$', TemplateView.as_view(template_name="pan_gold.jade")),
+    url(r'^advance/$', TemplateView.as_view(template_name="advance.jade")),
 )
 
 urlpatterns += patterns(
@@ -42,5 +43,5 @@ urlpatterns += patterns(
 )
 
 urlpatterns += patterns('',
-    url(r'^xunlei/july/$', TemplateView.as_view(template_name="xunlei-july.jade"), name='xunlei-july-activity')
+    url(r'^xunlei/july/$', TemplateView.as_view(template_name="xunlei_july.jade"), name='xunlei_july_activity')
 )
