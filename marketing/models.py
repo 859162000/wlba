@@ -7,6 +7,7 @@ from wanglibao_pay.util import get_a_uuid
 from django.db import transaction
 from decimal import *
 from ckeditor.fields import RichTextField
+from django.core.exceptions import ValidationError
 
 
 class NewsAndReport(models.Model):
@@ -86,6 +87,10 @@ class Channels(models.Model):
 
     class Meta:
         verbose_name_plural = u"渠道"
+
+    def clean(self):
+        if len(self.code) == 6:
+            raise ValidationError(u'为避免和邀请码重复，渠道代码长度不能等于6位')
 
     def __unicode__(self):
         return self.name
