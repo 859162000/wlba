@@ -54,7 +54,7 @@ class Bank(models.Model):
 
     @classmethod
     def get_bind_channel_banks(cls):
-        return Bank.objects.all().exclude(channel='').exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True).exclude(yee_bind_code__isnull=True).select_related()
+        return Bank.objects.all().exclude(channel__isnull=True).exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True).exclude(yee_bind_code__isnull=True).select_related()
 
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号')
