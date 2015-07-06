@@ -37,6 +37,7 @@ from marketing.utils import set_promo_user
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
@@ -65,11 +66,6 @@ from wanglibao_activity.models import ActivityRecord
 # from wanglibao.settings import CJDAOKEY
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import RETURN_REGISTER
-
-from wanglibao.settings import TINMANGKEY, RETURN_TINMANG_URL, \
-    PROMO_TOKEN_QUERY_STRING, CALLBACK_HOST, YIRUITE_AD_KEY, \
-    RETURN_YIRUITE_URL
-from wanglibao_account.tasks import tianmang_callback, yiruite_callback
 
 logger = logging.getLogger(__name__)
 
@@ -1120,8 +1116,8 @@ def ajax_register(request):
                 if not user:
                     return HttpResponse(messenger('error'))
 
-                cooperation_process(request, user, invitecode)
-
+                #处理第三方渠道的用户信息
+                CoopRegister(request).all_processors_for_user_register(user, invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
 
                 auth.login(request, auth_user)
@@ -1136,70 +1132,6 @@ def ajax_register(request):
     else:
         return HttpResponseNotAllowed(["GET"])
 
-def cooperation_process(request, user, invitecode):
-    """
-    处理第三方渠道
-    """
-    if (request.session.get(PROMO_TOKEN_QUERY_STRING) == 'yiruite') and request.session.get('yiruite_tid'):
-        set_promo_user(request, user, invitecode=request.session.get(PROMO_TOKEN_QUERY_STRING))
-        yiruite_process(request, user)
-    elif (request.session.get('tianmang_source') == 'tianmang') and request.session.get('tianmang_sn'):
-        set_promo_user(request, user, invitecode=request.session.get('tianmang_source'))
-        tianmang_process(request, user)
-    else:
-        set_promo_user(request, user, invitecode=invitecode)
-
-
-def yiruite_process(request, user):
-    """
-    易瑞特回调处理，需要保存yiruite_tid到Binding表中
-    """
-    yiruite_tid = request.session.get('yiruite_tid', None)
-    if yiruite_tid:
-        binding = Binding()
-        binding.user = user
-        binding.btype = 'yiruite'
-        binding.bid = yiruite_tid
-        binding.save()
-
-        sign = yiruite_tid + user.wanglibaouserprofile.phone + YIRUITE_AD_KEY
-        params = {
-            "tid": yiruite_tid,
-            "uid": hashlib.md5(user.wanglibaouserprofile.phone).hexdigest(),
-            "ad_key": YIRUITE_AD_KEY,
-            "sign": hashlib.md5(sign).hexdigest(),
-            "ip": CALLBACK_HOST
-        }
-        yiruite_callback.apply_async(kwargs={'url': RETURN_YIRUITE_URL, 'params': params})
-
-        # request.session['yiruite_from'] = None
-        request.session['yiruite_tid'] = None
-    return True
-
-def tianmang_process(request, user):
-    """
-    根据url判断是否是从天芒注册的, 如果是返回invitecode为tianmang
-    :param request:
-    :param user:
-    :param invitecode:
-    :return: 如果是天芒注册的返回invitecode为"tianmang" 否则是原始的invitecode
-    """
-    sn = request.session.get('tianmang_sn', None)
-    if sn:
-        #注册成功后向天芒云 发送注册成功请求
-
-        params={
-            "oid": TINMANGKEY,
-            "sn" : sn,
-            "uid": hashlib.md5(user.wanglibaouserprofile.phone).hexdigest(),
-            "uname": user.wanglibaouserprofile.name,
-            "method": "json"
-        }
-        tianmang_callback.apply_async(kwargs={'url': RETURN_TINMANG_URL, 'params': params})
-
-        request.session['tianmang_source'] = None
-        request.session['tianmang_sn'] = None
-    return True
 
 class P2PAmortizationView(TemplateView):
     template_name = 'p2p_amortization_plan.jade'
