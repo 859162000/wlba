@@ -7,7 +7,7 @@ from django.utils import timezone
 #from django.utils.module_loading import import_by_path
 #from django.template.loader import render_to_string
 from wanglibao_sms import messages, backends
-from wanglibao_sms.models import PhoneValidateCode, ShortMessage
+from wanglibao_sms.models import PhoneValidateCode, ShortMessage, RateThrottle
 import logging
 logger = logging.getLogger(__name__)
 
@@ -58,9 +58,36 @@ def send_sms(phone, message):
 def send_rand_pass(phone, password):
     return send_messages([phone], [messages.rand_pass(password)])
 
-def send_validation_code(phone, validate_code=None):
+def check_rate(ip):
+    if not ip:
+        return True
+    rate = RateThrottle.objects.filter(ip=ip).first()
+    if not rate:
+        rate = RateThrottle()
+        rate.ip = ip
+        rate.send_count = 1
+        rate.last_send_time = timezone.now()
+        rate.save()
+        return True
+    else:
+        now = timezone.now()
+        gap = now - rate.last_send_time
+        seconds = gap.total_seconds()
+        if seconds <= 60:
+            rate.send_count += 1
+            if rate.send_count > rate.max_count:
+                return False
+        else:
+            rate.send_count = 1
+        rate.last_send_time = now
+        rate.save()
+        return True
+
+def send_validation_code(phone, validate_code=None, ip=""):
     if validate_code is None:
         validate_code = generate_validate_code()
+    if not check_rate(ip):
+        return 403, u"已达到最大发送限制"
 
     now = timezone.now()
     code = PhoneValidateCode.objects.filter(phone=phone).first()

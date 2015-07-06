@@ -25,3 +25,12 @@ def split_ua(request):
     return {"device_type":device_type, "app_version":arr[0],
             "channel_id":arr[2], "model":arr[1],
             "os_version":arr[3], "network":arr[4]}
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        return x_forwarded_for
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
