@@ -70,11 +70,15 @@ def send_validation_code(phone, validate_code=None):
         code.code_send_count = 1
         code.vcount = 1
     else:
-        if now - code.last_send_time <= datetime.timedelta(seconds=180):
+        seconds = now - code.last_send_time
+        seconds = seconds.total_seconds()
+        if seconds <= 180:
             return 429, u"请180秒之后重试"
-        if code.code_send_count >= 4:
+        if code.code_send_count >= 6:
+            return 429, u"请联系客服进行验证"
+        if code.code_send_count >= 4 and seconds < 86400:
             return 429, u"请24小时后进行重试"
-        if code.code_send_count >= 2:
+        if code.code_send_count >= 2 and seconds < 3600:
             return 429, u"请1小时后进行重试"
         code.code_send_count += 1
 
