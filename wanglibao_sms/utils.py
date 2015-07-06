@@ -63,23 +63,42 @@ def send_validation_code(phone, validate_code=None):
         validate_code = generate_validate_code()
 
     now = timezone.now()
-    try:
-        phone_validate_code_item = PhoneValidateCode.objects.get(phone=phone)
+    code = PhoneValidateCode.objects.filter(phone=phone).first()
+    if not code:
+        code = PhoneValidateCode()
+        code.phone = phone
+        code.code_send_count = 1
+        code.vcount = 1
+    else:
+        if now - code.last_send_time <= datetime.timedelta(seconds=180):
+            return 429, u"请180秒之后重试"
+        if code.code_send_count >= 4:
+            return 429, u"请24小时后进行重试"
+        if code.code_send_count >= 2:
+            return 429, u"请1小时后进行重试"
+        code.code_send_count += 1
 
-        if (now - phone_validate_code_item.last_send_time) <= datetime.timedelta(seconds=30):
-            return 429, u"请60秒之后重试"
-        else:
-            phone_validate_code_item.validate_code = validate_code
-            phone_validate_code_item.last_send_time = now
-            phone_validate_code_item.code_send_count += 1
-            phone_validate_code_item.is_validated = False
-            phone_validate_code_item.save()
-    except PhoneValidateCode.DoesNotExist:
-        PhoneValidateCode.objects.create(
-            phone=phone,
-            validate_code=validate_code,
-            last_send_time=now,
-            code_send_count=1)
+    code.validate_code = validate_code
+    code.last_send_time = now
+    code.is_validated = False
+    code.save()
+    #try:
+    #    phone_validate_code_item = PhoneValidateCode.objects.get(phone=phone)
+
+    #    if (now - phone_validate_code_item.last_send_time) <= datetime.timedelta(seconds=60):
+    #        return 429, u"请60秒之后重试"
+    #    else:
+    #        phone_validate_code_item.validate_code = validate_code
+    #        phone_validate_code_item.last_send_time = now
+    #        phone_validate_code_item.code_send_count += 1
+    #        phone_validate_code_item.is_validated = False
+    #        phone_validate_code_item.save()
+    #except PhoneValidateCode.DoesNotExist:
+    #    PhoneValidateCode.objects.create(
+    #        phone=phone,
+    #        validate_code=validate_code,
+    #        last_send_time=now,
+    #        code_send_count=1)
 
     status, message = send_sms(phone, messages.validate_code(validate_code))
 
@@ -91,25 +110,47 @@ def send_validation_code(phone, validate_code=None):
 
 def validate_validation_code(phone, code):
     status_code, message = 404, ''
-    try:
-        phone_validate_item = PhoneValidateCode.objects.get(phone=phone)
-        now = timezone.now()
+    item = PhoneValidateCode.objects.filter(phone=phone).first()
+    if not item:
+        return status_code, message
 
-        if phone_validate_item.validate_code == code:
-            if (now - phone_validate_item.last_send_time) >= datetime.timedelta(minutes=30):
-                status_code, message = 410, 'The code is expired'
-            elif phone_validate_item.is_validated == True:
-                status_code, message = 410, 'The code is validated'
-            else:
-                phone_validate_item.is_validated = True
-                phone_validate_item.save()
+    if item.vcount >= 3:
+        return 410, "The maximum number of verify"
+    if item.validate_code != code:
+        item.vcount += 1
+        item.save()
+        return 410, "code error"
+    now = timezone.now()
+    if (now - item.last_send_time) >= datetime.timedelta(minutes=180):
+        return 410, "code is expired"
+    if item.is_validated:
+        return 410, "code is validated"
 
-                status_code, message = 200, ''
+    item.is_validated = True
+    item.code_send_count = 0
+    item.vcount = 0
+    item.save()
+    return 200, ""
 
-        else:
-            pass
+    #try:
+    #    phone_validate_item = PhoneValidateCode.objects.get(phone=phone)
+    #    now = timezone.now()
 
-    except PhoneValidateCode.DoesNotExist:
-        pass
+    #    if phone_validate_item.validate_code == code:
+    #        if (now - phone_validate_item.last_send_time) >= datetime.timedelta(minutes=30):
+    #            status_code, message = 410, 'The code is expired'
+    #        elif phone_validate_item.is_validated == True:
+    #            status_code, message = 410, 'The code is validated'
+    #        else:
+    #            phone_validate_item.is_validated = True
+    #            phone_validate_item.save()
 
-    return status_code, message
+    #            status_code, message = 200, ''
+
+    #    else:
+    #        pass
+
+    #except PhoneValidateCode.DoesNotExist:
+    #    pass
+
+    #return status_code, message
