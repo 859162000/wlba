@@ -31,7 +31,7 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
                             BindPayView, BindPayCallbackView, BindPayQueryView,
                             BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
                             BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView,
-                            BankCardDelNewView)
+                            BankCardDelNewView, BankListNewAPIView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -127,6 +127,7 @@ urlpatterns = patterns(
     url(r'^bank_card/del/$', BankCardDelView.as_view()),
     url(r'^bank_card/del_new/$', BankCardDelNewView.as_view()),
     url(r'^bank/list/$', BankListAPIView.as_view()),
+    url(r'^bank/list_new/$', BankListNewAPIView.as_view()),
 
     url(r'^id_validate/', IdValidate.as_view()),
     url(r'^admin_id_validate/$', AdminIdValidate.as_view()),

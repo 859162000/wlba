@@ -811,3 +811,11 @@ class BankCardDelNewView(APIView):
     def post(self, request):
         result = third_pay.del_bank_card_new(request)
         return Response(result)
+
+class BankListNewAPIView(APIView):
+    """ 可充值银行列表 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.list_bank_new(request)
+        return Response(result)
