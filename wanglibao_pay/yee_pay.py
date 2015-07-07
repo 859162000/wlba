@@ -516,7 +516,7 @@ class YeeShortPay:
 
     def delete_bind(self, user, card, bank):
         """ 解绑银行卡 """
-        if card.is_bind_yee and card.yee_bind_id:
+        if card.is_bind_yee:
             # 易宝通卡进出，不允许用户解绑，解绑线下进行
             # card.is_bind_yee = False
             # card.yee_bind_id = ''
