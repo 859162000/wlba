@@ -208,7 +208,7 @@ org.ui = (function(){
                         setTimeout(function(){
                             $sign.hide();
                             return callback && callback();
-                        },200)
+                        },300)
                     },1000)
                 },0)
             }()
@@ -446,7 +446,7 @@ org.regist = (function(org){
             $('.request-check').on('click',function(){
                 var phoneNumber = $identifier.val(),
                     $that = $(this), //保存指针
-                    count = 180,  //60秒倒计时
+                    count = 180,  //180秒倒计时
                     intervalId ; //定时器
 
                 if(!check['identifier'](phoneNumber, 'phone')) return //号码不符合退出
@@ -485,7 +485,7 @@ org.regist = (function(org){
                 },
                 password:function(val){
                    if(6 > $.trim(val).length || $.trim(val).length > 20 ){
-                       org.ui.showSign('密码不符合规则')
+                       org.ui.showSign('密码为6-20位数字/字母/符号/区分大小写')
                        return false
                    }
                    return true
