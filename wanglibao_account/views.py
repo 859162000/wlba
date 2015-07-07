@@ -63,10 +63,6 @@ from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 
 
-# from wanglibao.settings import CJDAOKEY
-# from wanglibao_account.tasks import cjdao_callback
-# from wanglibao.settings import RETURN_REGISTER
-
 logger = logging.getLogger(__name__)
 
 
@@ -214,7 +210,7 @@ def send_validation_phone_code(request, **kwargs):
     user_phone = User.objects.get(pk=user_id).wanglibaouserprofile.phone
     phone_number = user_phone.strip()
 
-    status, message = send_validation_code(phone_number)
+    status, message = send_validation_code(phone_number, ip=utils.get_client_ip(request))
 
     return HttpResponse(
         str({"message": message}), status=status)
