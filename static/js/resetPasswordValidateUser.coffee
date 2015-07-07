@@ -36,7 +36,7 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
       $('#nextStep').prop('disabled', false)
     .fail (xhr)->
       if xhr.status > 400
-        tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
+        tool.modalAlert({title: '温馨提示', msg: result.message})
 
 
     _countDown()
@@ -112,4 +112,4 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
         element.html('系统繁忙请尝试短信验证码')
     .fail (xhr)->
       if xhr.status > 400
-        tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
+        tool.modalAlert({title: '温馨提示', msg: result.message})

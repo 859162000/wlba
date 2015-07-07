@@ -72,7 +72,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
       type: "POST"
     .fail (xhr)->
       if xhr.status > 400
-        tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
+        tool.modalAlert({title: '温馨提示', msg: result.message})
 
     intervalId
     count = 180
@@ -145,4 +145,4 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
         element.html('系统繁忙请尝试短信验证码')
     .fail (xhr)->
       if xhr.status > 400
-        tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
+        tool.modalAlert({title: '温馨提示', msg: result.message})

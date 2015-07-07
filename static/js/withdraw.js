@@ -88,8 +88,7 @@
         if (xhr.status > 400) {
           return tool.modalAlert({
             title: '温馨提示',
-            msg: result.message,
-            callback_ok: _showModal
+            msg: result.message
           });
         }
       });
@@ -161,8 +160,7 @@
         if (xhr.status > 400) {
           return tool.modalAlert({
             title: '温馨提示',
-            msg: result.message,
-            callback_ok: _showModal
+            msg: result.message
           });
         }
       });
