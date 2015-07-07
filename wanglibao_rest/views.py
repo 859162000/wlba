@@ -236,6 +236,9 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
+        auth_user = authenticate(identifier=identifier, password=password)
+        auth_login(request, auth_user)
+
         tools.register_ok.apply_async(kwargs={"user_id": user.id, 
                         "device":device})
 
