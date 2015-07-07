@@ -7,7 +7,7 @@ module.exports = function( grunt ) {
         compass: {
             dist: {
                 options: {
-                    config: 'config.rb'
+                    config: 'config_weixin.rb'
                 }
             }
         },
@@ -59,4 +59,3 @@ module.exports = function( grunt ) {
     //grunt.loadNpmTasks('grunt-contrib-imagemin');
 
 };
-

@@ -1,0 +1,76 @@
+doctype html
+html(style="background: #f5f5f5")
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 注册网利宝
+
+    //banner
+    section.regist-banner
+      img(src='/static/imgs/mobile/regist/regist_banner.png')
+
+
+    //表单
+    section.form-box
+
+      //表单单个模版
+      .form-list
+        .form-icon.user-phone.identifier-icon
+        .form-input
+          input(type="tel",name='identifier', placeholder="请输入手机号", data-target2='identifier-icon', data-icon='user-phone', data-target="identifier-edit", data-empty='', data-val='input-clear')
+          .form-edit-icon.identifier-edit
+
+      .form-code
+        .form-list.form-validation
+          .form-icon.user-validation.validation-icon
+          .form-input
+            input(type="text",name="validation", placeholder="请输入验证码",data-target2='validation-icon', data-icon='user-validation')
+        .login-validation
+          button(type="button").request-check.regist-validation 获取验证码
+      .form-list
+        .form-icon.user-password.password-icon
+        .form-input
+          input(type="password", name="password", placeholder="请设置密码",data-target2='password-icon', data-icon='user-password')
+          .form-edit-icon.password-handle.hide-password
+      .form-list
+        .form-icon.user-invitation.invitation-icon
+        .form-input
+          input(type="tel",name="invitation", placeholder="请填写邀请码，若无，请忽略", data-target2='invitation-icon', data-icon='user-invitation')
+          .form-edit-icon
+      //注册协议
+      section.regist-protocol-n
+        span.checkbox.agreement#agreement
+          input(type='checkbox',name='agreement', checked=true)
+        span.xieyi-btn 同意网利宝注册协议
+
+      //账户安全
+      section.regist-safe
+        span 账户资金安全由平安银行承保
+         //注册按钮
+      section#regist-submit.login-submit
+        button(type="submit", disabled=true) 立即注册 ｜ 领取奖励
+
+    //宣传文案
+    section.regist-propagate
+      ul
+        mixin li(imgName, title, bodyTxt1, bodyTxt2)
+          li
+            span(class=imgName)
+            h4=title
+            p=bodyTxt1
+            p=bodyTxt2
+        +li('trust', '信赖', 'IDG资本A轮投资', '100%本息保障')
+        +li('authority', '权威', 'A股百亿上市公司', '鸿利光电投资入股')
+        +li('safe', '安全', '账户资金安全', '由平安保险承保')
+        +li('profit', '高收益', '37倍银行活期收益', '100元起投0手续')
+
+    //协议内容
+    section.regist-protocol-div
+      header.xieyi-head
+        hgroup 注册协议
+        a(href="javascript:void(0)").cancel-xiyie
+          span 返回
+      article.xieyi-cont
+        include include/weixin_xieyiFixed
+    script(data-init='regist', src="/static/scripts/mobile/mobile.js")
