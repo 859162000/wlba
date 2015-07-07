@@ -613,7 +613,6 @@ class ThousandRedPackAPIView(APIView):
 
     def post(self, request):
         user = request.user
-        amount = int(request.POST.get('amount', 0))
         if not user:
             return Response({'ret_code': 3001, 'message': u'用户没有登陆，请先登陆'})
 

@@ -56,7 +56,7 @@ class IndexView(TemplateView):
         }
 
     def get(self, request, *args, **kwargs):
-        device_list = ['mobile', 'android', 'iphone', 'ipad']
+        device_list = ['mobile', 'android', 'iphone']
         user_agent = request.META['HTTP_USER_AGENT']
         for device in device_list:
             match = re.search(device, user_agent.lower())

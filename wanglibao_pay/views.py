@@ -803,3 +803,19 @@ class BindPayDynnumNewView(APIView):
     def post(self, request):
         result = third_pay.bind_pay_dynnum(request)
         return Response(result)
+
+class BankCardDelNewView(APIView):
+    """ 删除银行卡新接口，需要解绑三个渠道"""
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.del_bank_card_new(request)
+        return Response(result)
+
+class BankListNewAPIView(APIView):
+    """ 可充值银行列表 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        result = third_pay.list_bank_new(request)
+        return Response(result)

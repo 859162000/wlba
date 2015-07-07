@@ -30,7 +30,8 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
                             BindPayView, BindPayCallbackView, BindPayQueryView,
                             BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
-                            BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView)
+                            BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView,
+                            BankCardDelNewView, BankListNewAPIView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -124,7 +125,9 @@ urlpatterns = patterns(
     url(r'^bank_card/add/$', BankCardAddView.as_view()),
     url(r'^bank_card/list/$', BankCardListView.as_view()),
     url(r'^bank_card/del/$', BankCardDelView.as_view()),
+    url(r'^bank_card/del_new/$', BankCardDelNewView.as_view()),
     url(r'^bank/list/$', BankListAPIView.as_view()),
+    url(r'^bank/list_new/$', BankListNewAPIView.as_view()),
 
     url(r'^id_validate/', IdValidate.as_view()),
     url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
@@ -219,5 +222,5 @@ urlpatterns += patterns(
     url(r'^xunlei/join/$', ActivityJoinLogAPIView.as_view()),
     url(r'^xunlei/join/count/$', ActivityJoinLogCountAPIView.as_view()),
     url(r'^thousand/redpack/$', ThousandRedPackAPIView.as_view()),
-    url(r'^thousand/redapck/count/$', ThousandRedPackCountAPIView.as_view()),
+    url(r'^thousand/redpack/count/$', ThousandRedPackCountAPIView.as_view()),
 )

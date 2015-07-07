@@ -288,10 +288,17 @@ EMAIL_HOST_PASSWORD = '83x1ln8w5p64'
 DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 
 # ManDao sms service
+# 旧的漫道请求设置
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/mdgxsend.ashx'
 SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/mdsmssend.ashx'
 SMS_MANDAO_SN = 'SDK-BBX-010-20599'
 SMS_MANDAO_MD5_PWD = '4A4080BB5FCCC3422E14EA8247D1062C'
+
+# 新的漫道请求设置
+# SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
+# SMS_MANDAO_MULTICAST_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
+# SMS_MANDAO_SN = 'SDK-SKY-010-02839'
+# SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
 
 SMS_BACKEND = 'wanglibao_sms.backends.ManDaoSMSBackEnd'
 
@@ -483,7 +490,7 @@ if ENV == ENV_PRODUCTION:
     HUI_SHORT_SIGN_HOST = SIGN_HOST
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
-    HUI_SHORT_LOGIN_PWD = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "cathy123"
     PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
@@ -531,7 +538,7 @@ elif ENV == ENV_PREPRODUCTION:
     HUI_SHORT_SIGN_HOST = SIGN_HOST
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
-    HUI_SHORT_LOGIN_PWD = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "cathy123"
     PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
@@ -577,7 +584,7 @@ else:
     HUI_SHORT_SIGN_HOST = SIGN_HOST
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
-    HUI_SHORT_LOGIN_PWD = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "cathy123"
     PAY_URL = 'http://test.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gar/entry.do" % PAY_URL
@@ -677,14 +684,52 @@ CKEDITOR_CONFIGS = {
 #RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
 #POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
 
-RETURN_TINMANG_URL = "http://www.bangwoya.com/callback/callback.php"
-RETURN_TINMANG_URL_DEBUG = "http://demo.bangwoya.com/callback/callback.php"
-TINMANGKEY= '65'
+# 天芒
+if ENV == ENV_PRODUCTION:
+    TIANMANG_CALL_BACK_URL = "http://www.bangwoya.com/callback/callback.php"
+else:
+    TIANMANG_CALL_BACK_URL = "http://demo.bangwoya.com/callback/callback.php"
+TINMANG_KEY= '65'
+TIANMANG_INVITE_CODE = 'tianmang'
 
 # 易瑞特
-YIRUITE_KEY = '1989'
-YIRUITE_AD_KEY = "esn4s2enki"
-RETURN_YIRUITE_URL = "http://app.offer99.com/callback/callback_adv/callback_adv_w345fe267d9149fcd3dabc7e9e39b783.php"
+if ENV == ENV_PRODUCTION:
+    #我们提供给第三方的加密秘钥
+    WLB_FOR_YIRUITE_KEY = '1989'
+    #第三方提供给我们的加密秘钥
+    YIRUITE_KEY = "esn4s2enki"
+    YIRUITE_CALL_BACK_URL = "http://app.offer99.com/callback/callback_adv/callback_adv_w345fe267d9149fcd3dabc7e9e39b783.php"
+else:
+    WLB_FOR_YIRUITE_KEY = '1989'
+    YIRUITE_KEY = "al9e4ys5"
+    YIRUITE_CALL_BACK_URL = "http://app.offer99.com/callback/callback_test.php"
+YIRUITE_INVITE_CODE = 'yiruite'
+
+# 蹦蹦网
+if ENV == ENV_PRODUCTION:
+    #蹦蹦网提供的本次合作ID
+    BENGBENG_COOP_ID = '7539'
+    WLB_FOR_BENGBENG_KEY = '1990'
+    BENGBENG_KEY = "af0ee5f72c55cdd6"
+    BENGBENG_CALL_BACK_URL = "www.bengbeng.com/reannal.php"
+else:
+    BENGBENG_COOP_ID = '10'
+    WLB_FOR_BENGBENG_KEY = '1990'
+    BENGBENG_KEY = "080cd5f1b5c179c2"
+    BENGBENG_CALL_BACK_URL = "http://www.bengbeng.com/retaste.php"
+BENGBENG_INVITE_CODE = 'bengbeng'
+
+# 聚享游
+if ENV == ENV_PRODUCTION:
+    JUXIANGYOU_COOP_ID = ''
+    JUXIANGYOU_KEY = ''
+    JUXIANGYOU_CALL_BACK_URL = 'http://api.juxiangyou.com/web/p2pApi.php'
+else:
+    JUXIANGYOU_COOP_ID = '10'
+    JUXIANGYOU_KEY = 'b0cj391b90p421n8'
+    JUXIANGYOU_CALL_BACK_URL = 'http://api.juxiangyou.com/web/p2pApi_test.php'
+JUXIANGYOU_INVITE_CODE = 'juxiangyou'
+
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

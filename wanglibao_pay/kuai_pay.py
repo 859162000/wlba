@@ -1044,8 +1044,7 @@ class KuaiShortPay:
                     pay_info.save()
                     return {"ret_code":201181, "message":result['message']}
                 device = split_ua(request)
-                device_type = device['device_type']
-                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
+                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
 
                 return ms
             else:
@@ -1056,9 +1055,6 @@ class KuaiShortPay:
                     pay_info.error_message = token['message']
                     pay_info.save()
                     return {"ret_code":201182, "message":token['message']}
-
-                card.is_bind_kuai = True
-                card.save()
 
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
@@ -1108,12 +1104,11 @@ class KuaiShortPay:
         elif result['ret_code'] > 0:
             return {"ret_code":20124, "message":result['message']}
         device = split_ua(request)
-        device_type = device['device_type']
-        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device_type)
+        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
         return ms
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content, device_type):
+    def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info:
             return {"ret_code":20131, "message":"order not exist"}
@@ -1147,13 +1142,14 @@ class KuaiShortPay:
         if rs['ret_code'] == 0:
             # #保存卡信息到个人名下
             # self.bind_card(pay_info)
-            tools.despoit_ok(pay_info, device_type)
+
+            tools.despoit_ok(pay_info, device)
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:
-                Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now())
+                Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now(), is_bind_kuai=True)
             else:
-                Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now())
+                Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now(), is_bind_kuai=True)
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs

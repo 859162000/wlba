@@ -7,6 +7,8 @@ from django.contrib import admin
 from django.conf import settings
 from django.views.generic import TemplateView, RedirectView
 from wanglibao.views import IndexView, SecurityView, PartnerView
+from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
+    TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
@@ -18,9 +20,7 @@ from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView,
     ResponsibilityView, ContactView, AgreementView, DirectorateView, AgreementAutoView
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
-    WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser, TianmangInvestListAPIView, \
-    TianmangInvestNotConfirmListAPIView, TianmangRegisterListAPIView, TianmangIDVerificationListAPIView, \
-    TianmangCardBindListAPIView, YiruiteInfoListAPIView
+    WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
 from marketing.views import NewsListView, NewsDetailView
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
@@ -126,13 +126,15 @@ urlpatterns += patterns(
     # 财经道
     # url(r'^accounts/cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
     # 天芒云
-    url(r'^api/tmyun/getRegisterList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangRegisterListAPIView.as_view()),
-    url(r'^api/tmyun/getIDVerificationList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangIDVerificationListAPIView.as_view()),
-    url(r'^api/tmyun/getInvestList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestListAPIView.as_view()),
-    url(r'^api/tmyun/getInvestListNotConfirm/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestNotConfirmListAPIView.as_view()),
-    url(r'^api/tmyun/getCardBindList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangCardBindListAPIView.as_view()),
+    url(r'^api/tmyun/getRegisterList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangRegisterQuery.as_view()),
+    url(r'^api/tmyun/getIDVerificationList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangIDVerificationQuery.as_view()),
+    url(r'^api/tmyun/getInvestList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestQuery.as_view()),
+    url(r'^api/tmyun/getInvestListNotConfirm/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestNotConfirmQuery.as_view()),
+    url(r'^api/tmyun/getCardBindList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangCardBindQuery.as_view()),
     # 易瑞特
-    url(r'^api/yiruite/getInfoList/$', YiruiteInfoListAPIView.as_view()),
+    url(r'^api/yiruite/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', YiruiteQuery.as_view()),
+    # 蹦蹦网
+    url(r'^api/bengbeng/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', BengbengQuery.as_view())
 )
 
 # 微信
