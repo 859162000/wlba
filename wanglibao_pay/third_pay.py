@@ -409,3 +409,7 @@ def bind_pay_dynnum(request):
         return KuaiShortPay().dynnum_bind_pay(request)
     else:
         return {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+
+
+def yee_callback(request):
+    return YeeShortPay().pay_callback(request)
