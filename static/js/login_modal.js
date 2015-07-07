@@ -408,7 +408,7 @@
         var button, count, intervalId, timerFunction;
         if (json.ret_code === 0) {
           intervalId;
-          count = 60;
+          count = 180;
           button = $("#button-get-validate-modal");
           button.attr('disabled', 'disabled');
           button.addClass('button-gray');
