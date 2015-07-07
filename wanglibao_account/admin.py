@@ -47,6 +47,7 @@ class P2PEquityInline(admin.StackedInline):
     raw_id_fields = ('product',)
     readonly_fields = ('product', 'equity', 'confirm', 'confirm_at', 'contract', 'created_at')
     formset = P2PEquityFormSet
+    verbose_name_plural = u'用户持仓（最近10条）'
 
     def has_delete_permission(self, request, obj=None):
         return False
