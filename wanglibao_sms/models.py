@@ -1,5 +1,6 @@
 # coding=utf-8
 from django.db import models
+from django.utils import timezone
 from django.db.models.signals import post_save
 
 
@@ -22,6 +23,7 @@ class PhoneValidateCode(models.Model):
     is_validated = models.BooleanField(default=False)
     last_send_time = models.DateTimeField()
     code_send_count = models.IntegerField(default=0)
+    vcount = models.IntegerField(u"验证次数", null=False, blank=False, default=0)
     data = models.TextField(default="")
 
     class Meta:
@@ -62,6 +64,12 @@ class ShortMessage(models.Model):
 
     def __unicode__(self):
         return u'手机号：%s 内容：%s' % (self.phones, self.contents)
+
+class RateThrottle(models.Model):
+    ip = models.CharField(u'ip', max_length=24, db_index=True)
+    max_count = models.IntegerField(u"最大发送次数", null=False, blank=False, default=10)
+    send_count = models.IntegerField(u"已发送次数", null=False, blank=False, default=0)
+    last_send_time = models.DateTimeField(default=timezone.now)
 
 
 def send_manual_message(sender, instance, **kwargs):

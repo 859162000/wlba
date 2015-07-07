@@ -6,13 +6,11 @@ import logging
 from datetime import timedelta, datetime, time
 
 import re
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, F
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
-#from django.db.models import Q
-from django.db.models import F
 from rest_framework import generics, renderers
 from django.http import HttpResponse
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -41,7 +39,7 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm
 #from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import split_ua
+from wanglibao_rest.utils import split_ua, get_client_ip
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str
 from marketing.tops import Top
@@ -70,7 +68,7 @@ class SendValidationCodeView(APIView):
 
     def post(self, request, phone, format=None):
         phone_number = phone.strip()
-        status, message = send_validation_code(phone_number)
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         return Response({
                             'message': message
                         }, status=status)
@@ -117,16 +115,16 @@ class SendRegisterValidationCodeView(APIView):
                                 "error_number": ErrorNumber.duplicate
                             }, status=400)
 
-        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
-        if phone_validate_code_item:
-            count = phone_validate_code_item.code_send_count
-            if count > 6:
-                return Response({
-                                    "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
-                                    "error_number": ErrorNumber.duplicate
-                                }, status=400)
+        #phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        #if phone_validate_code_item:
+        #    count = phone_validate_code_item.code_send_count
+        #    if count > 6:
+        #        return Response({
+        #                            "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
+        #                            "error_number": ErrorNumber.duplicate
+        #                        }, status=400)
 
-        status, message = send_validation_code(phone_number)
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         return Response({
                             'message': message
                         }, status=status)
@@ -160,16 +158,16 @@ class WeixinSendRegisterValidationCodeView(APIView):
                                 "error_number": ErrorNumber.duplicate
                             }, status=400)
 
-        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
-        if phone_validate_code_item:
-            count = phone_validate_code_item.code_send_count
-            if count > 6:
-                return Response({
-                                    "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
-                                    "error_number": ErrorNumber.duplicate
-                                }, status=400)
+        #phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        #if phone_validate_code_item:
+        #    count = phone_validate_code_item.code_send_count
+        #    if count > 6:
+        #        return Response({
+        #                            "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
+        #                            "error_number": ErrorNumber.duplicate
+        #                        }, status=400)
 
-        status, message = send_validation_code(phone_number)
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         return Response({
                             'message': message
                         }, status=status)
@@ -237,6 +235,9 @@ class RegisterAPIView(APIView):
 
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
+
+        auth_user = authenticate(identifier=identifier, password=password)
+        auth_login(request, auth_user)
 
         tools.register_ok.apply_async(kwargs={"user_id": user.id, 
                         "device":device})
