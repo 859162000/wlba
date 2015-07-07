@@ -568,9 +568,8 @@ org.list = (function(org){
                 pagination: '.swiper-pagination',
                 loop: loop,
                 lazyLoading: true,
-                lazyLoadingInPrevNext: true,
                 autoplay: autoplay,
-                autoplayDisableOnInteraction: false,
+                autoplayDisableOnInteraction: true,
 
             });
         },

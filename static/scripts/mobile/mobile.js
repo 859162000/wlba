@@ -182,7 +182,7 @@ org.ui = (function(){
                 alertFram.innerHTML = strHtml;
                 document.body.appendChild(alertFram);
                 document.body.appendChild(shield);
-                
+
                 $('.popub-footer').on('touchend click',function(){
                     alertFram.style.display = "none";
                     shield.style.display = "none";
@@ -569,9 +569,8 @@ org.list = (function(org){
                 pagination: '.swiper-pagination',
                 loop: loop,
                 lazyLoading: true,
-                lazyLoadingInPrevNext: true,
                 autoplay: autoplay,
-                autoplayDisableOnInteraction: false,
+                autoplayDisableOnInteraction: true,
 
             });
         },
