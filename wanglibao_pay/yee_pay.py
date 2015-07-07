@@ -663,6 +663,7 @@ class YeeShortPay:
                 # 直接支付交易，已经绑定了银行卡，直接进行支付操作
                 res = self._pay_request(request, order.id, card, pay_info, terminaltype, deviceid)
                 if res['ret_code'] != 0:
+                    logger.error(res)
                     pay_info.error_code = res['ret_code']
                     pay_info.error_message = res['message']
                     if 'data' in res:
@@ -672,6 +673,7 @@ class YeeShortPay:
 
                 res = self._pay_validity(order.id)
                 if res['ret_code'] != 0:
+                    logger.error(res)
                     pay_info.error_code = res['ret_code']
                     pay_info.error_message = res['message']
                     if 'data' in res:
@@ -692,6 +694,7 @@ class YeeShortPay:
                 # 请求绑定银行卡
                 res = self._bind_card_request(request, input_phone, card_no, request_id, terminaltype, deviceid)
                 if res['ret_code'] != 0:
+                    logger.error(res)
                     pay_info.error_code = res['ret_code']
                     pay_info.error_message = res['message']
                     if 'data' in res:
@@ -702,6 +705,7 @@ class YeeShortPay:
                 # 请求绑定银行卡发送验证码
                 res = self._bind_send_sms(request_id)
                 if res['ret_code'] != 0:
+                    logger.error(res)
                     pay_info.error_code = res['ret_code']
                     pay_info.error_message = res['message']
                     if 'data' in res:
@@ -748,6 +752,7 @@ class YeeShortPay:
 
         res = self._bind_check_sms(request_id, vcode)
         if res['ret_code'] != 0:
+            logger.error(res)
             pay_info.error_code = res['ret_code']
             pay_info.error_message = res['message']
             if 'data' in res:
@@ -770,6 +775,7 @@ class YeeShortPay:
 
         res = self._pay_request(request, order_id, card, pay_info, terminaltype, deviceid)
         if res['ret_code'] != 0:
+            logger.error(res)
             pay_info.error_code = res['ret_code']
             pay_info.error_message = res['message']
             if 'data' in res:
@@ -779,6 +785,7 @@ class YeeShortPay:
 
         res = self._pay_validity(order_id)
         if res['ret_code'] != 0:
+            logger.error(res)
             pay_info.error_code = res['ret_code']
             pay_info.error_message = res['message']
             if 'data' in res:
