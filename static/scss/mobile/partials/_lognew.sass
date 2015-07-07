@@ -1,0 +1,283 @@
+.login-logo
+  position: relative
+  margin-bottom: 4rem
+.login-logo-bg
+  height: 3rem
+  width: 100%
+  background: $color-db493f
+
+.login-logo-icon
+  position: absolute
+  width: 100%
+  top: .5rem
+  img
+    display: block
+    width: 5rem
+    height: 5rem
+    margin: 0 auto
+
+//form-start
+.form-box
+  padding: 0 .5rem
+
+.form-list
+  display: -webkit-box
+  -webkit-box-align: center
+  padding: 0 1rem 0 .5rem
+  background: #fff
+  border-radius: .2rem
+  border: 1px solid #e5e5e5
+  margin-bottom: .6rem
+
+.form-icon
+  width: .9rem
+  background-image: url('/static/imgs/mobile/login/login_icons.png')
+  background-repeat: no-repeat
+  background-size: 100%
+
+.user-phone
+  height: 1.2rem
+  background-position: 0 0
+
+.user-phone-active
+  height: 1.2rem
+  background-position: 0 -1.2rem
+
+.user-password
+  height: 1.1rem
+  background-position: 0 -2.4rem
+
+.user-password-active
+  height: 1.1rem
+  background-position: 0 -3.5rem
+
+.user-validation
+  height: .9rem
+  background-position: 0 -6.1rem
+
+.user-validation-active
+  height: .9rem
+  background-position: 0 -7rem
+
+.user-invitation
+  height: .75rem
+  background-position: 0 -4.6rem
+
+.user-invitation-active
+  height: .75rem
+  background-position: 0 -5.35rem
+
+.line-style
+  position: absolute
+  top: .5rem
+  left: .25rem
+  width: .5rem
+  height: 1px
+  background: white
+
+.form-input
+  width: 100%
+  -webkit-box-flex: 1
+  display: -webkit-box
+  -webkit-box-align: center
+  input
+    display: block
+    -webkit-box-flex: 1
+    width: 100%
+    outline: 0
+    border: 0
+    font-size: $font-size14
+    color: #666
+    padding: .8rem .2rem .8rem .9rem
+    &::-webkit-input-placeholder
+      color: #ccc
+      font-size: $font-size14
+
+  .input-clear
+    position: relative
+    width: 1rem
+    height: 1rem
+    background: #c8c8c8
+    border-radius: .5rem
+    &:before
+      content: ""
+      @extend .line-style
+      -webkit-transform: rotateZ(45deg)
+    &:after
+      content: ""
+      @extend .line-style
+      -webkit-transform: rotateZ(-45deg)
+  .hide-password
+    width: 1rem
+    height: 1rem
+    background: url("/static/imgs/mobile/login/eyes_show.png") no-repeat center
+    background-size: 100%
+  .show-password
+    @extend  .hide-password
+    background: url("/static/imgs/mobile/login/eyes_hide.png") no-repeat center
+    background-size: 100%
+
+.form-code
+  display: -webkit-box
+  .form-validation
+    -webkit-box-flex: 1
+  .login-validation
+    background: #fff
+    width: 5rem
+    margin-left: .5rem
+    height: 2.475rem
+    border-radius: .2rem
+    img
+      border-radius: .2rem
+//form-end
+
+.login-submit
+  button
+    -webkit-appearance: none
+    width: 100%
+    font-size: $font-size16
+    color: #fff
+    text-align: center
+    padding: .9rem 0
+    background: rgba(219, 73, 63,.5)
+    border-radius: .2rem
+    border: 0
+    &:active
+      box-shadow: $active-shadow
+
+.login-for-regist
+  display: block
+  font-size: $font-size14
+  text-align: center
+  color: #5DB5F2
+  margin: 1rem 0
+  &:visited
+    color: #5db5f2
+   
+.bank-safe
+  text-align: center
+  span
+    background: url("/static/imgs/mobile/login/bank_safe.png") no-repeat left center
+    font-size: $font-size12
+    color: #50B143
+    background-size: 1.1rem
+    line-height: 1.5rem
+    padding-left: 1.2rem
+    display: inline-block
+//注册
+
+.regist-banner
+  width: 100%
+  margin-bottom: .8rem
+  img
+    width: 100%
+    display: block
+
+.regist-safe
+  @extend .bank-safe
+  margin: .5rem 0
+
+.regist-validation
+  -webkit-appearance: none
+  background: #50B143
+  color: #fff
+  height: 2.475rem
+  line-height: 2.475rem
+  text-align: center
+  font-size: $font-size14
+  border: 0
+  width: 100%
+  border-radius: .2rem
+.regist-alreay-request
+  background: #bbb
+
+$checkbox-width: .8rem
+.regist-protocol-n
+  color: #5DB5F2
+  font-size: $font-size14
+  line-height: 1.1rem
+  padding-left: .4rem
+  .xieyi-btn
+    padding-left: 1.2rem
+  .checkbox
+    position: relative
+    width: $checkbox-width
+    height: $checkbox-width
+    background: #fff
+    input
+      visibility: hidden
+    &:before
+      content: ''
+      position: absolute
+      top: 0
+      left: 0
+      width: $checkbox-width
+      height: $checkbox-width
+      background: #fff
+      border: 1px solid #5DB5F2
+  .agreement
+    &:after
+      content: ''
+      position: absolute
+      top: 0.05rem
+      left: .25rem
+      border: 3px solid #5DB5F2
+      border-left: 0
+      border-top: 0
+      width: .25rem
+      height: .5rem
+      -webkit-transform: rotateZ(45deg)
+
+$progress-h4-color: #666
+$progress-p-color: #9b9b9b
+.regist-propagate
+  padding: 0 .5rem
+  li
+    float: left
+    text-align: center
+    width: 50%
+    margin-top: 1.2rem
+    &:last-child, &:nth-child(3)
+      margin-bottom: 1.2rem
+  span
+    display: block
+    width: 4.75rem
+    height: 4.75rem
+    margin: 0 auto
+    background-image: url('/static/imgs/mobile/regist/regist_icons.png')
+    background-repeat: no-repeat
+    background-size: 100%
+  h4
+    color: $progress-h4-color
+    font-size: $font-size14
+    margin: .5rem 0
+  p
+    color: $progress-p-color
+    font-size: $font-size12
+  .trust
+    background-position: 0 0
+  .authority
+    background-position: 0 -4.75rem
+  .safe
+    background-position: 0 -9.5rem
+  .profit
+    background-position: 0 -14.25rem
+
+.error-sign
+  position: fixed
+  left: 0
+  top: 2.2rem
+  width: 100%
+  height: 2.2rem
+  line-height: 2.2rem
+  text-align: center
+  background: rgba(93,181,242,.8)
+  color: #fff
+  font-size: $font-size14
+  display: none
+  opacity : 0
+  -webkit-transition: opacity 250ms ease-out
+  -webkit-transform: translateZ(0)
+
+
+

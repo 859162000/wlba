@@ -1,0 +1,43 @@
+-load formatters
+doctype html
+html(style="background: #f5f5f5")
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 赚钱哪里好 就在网利宝
+      a(href="/weixin/list/")
+        span 返回
+    section.login-logo
+      .login-logo-bg
+      .login-logo-icon
+          img(src="/static/imgs/mobile/logo.png", alt="")
+    section.form-box
+      from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
+        - csrf_token
+        input(name="openid", type="hidden", value="{{ openid }}")
+        input(name="captcha_0", type="hidden", value="")
+        .form-list
+          .form-icon.user-phone.identifier-icon
+          .form-input
+            input(type="tel", name="identifier", placeholder="请输入手机号",data-target2='identifier-icon', data-icon='user-phone', data-target="identifier-edit", data-empty='', data-val='input-clear')
+            .form-edit-icon.identifier-edit
+        .form-list
+          .form-icon.user-password.password-icon
+          .form-input
+            input(type="password", name="password", placeholder="请输入密码",data-target2='password-icon', data-icon='user-password')
+            .form-edit-icon.password-handle.hide-password
+        .form-code
+          .form-list.form-validation
+            .form-icon.user-validation.captcha_1-icon
+            .form-input
+              input(type="text", name="captcha_1", placeholder="请输入验证码", data-target2='captcha_1-icon', data-icon='user-validation')
+          .login-validation
+            img(src="", alt="", width="100%", height="100%")#captcha
+        section.login-submit
+          button(type="submit", disabled=true) 登录网利宝
+    section.login-for-regist
+      a(href="/weixin/regist/") 免费注册
+    section.bank-safe
+      span 账户资金安全由平安银行承保
+  script(data-init='login', src="/static/scripts/mobile/mobile.js")

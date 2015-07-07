@@ -127,7 +127,7 @@ class WeixinJsapiConfig(APIView):
 
 
 class WeixinLogin(TemplateView):
-    template_name = 'weixin_login.jade'
+    template_name = 'weixin_login_new.jade'
 
     def get_context_data(self, **kwargs):
         context = super(WeixinLogin, self).get_context_data(**kwargs)
@@ -156,7 +156,7 @@ class WeixinLogin(TemplateView):
 
 
 class WeixinRegister(TemplateView):
-    template_name = 'weixin_regist.jade'
+    template_name = 'weixin_regist_new.jade'
 
     def get_context_data(self, **kwargs):
         token = self.request.GET.get('promo_token', '')
