@@ -6,7 +6,7 @@ require.config
 require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
   _countDown = ()->
     element = $('#sendValidateCodeButton')
-    count = 60
+    count = 180
     $(element).prop 'disabled', true
 
     $('.voice').attr 'disabled','disabled'
@@ -34,6 +34,10 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
     $.post target
     .done ->
       $('#nextStep').prop('disabled', false)
+    .fail (xhr)->
+      if xhr.status > 400
+        tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
+
 
     _countDown()
 
@@ -81,7 +85,7 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
         #TODO
 
         intervalId
-        count = 60
+        count = 180
         button = $("#sendValidateCodeButton")
 
         button.attr 'disabled', 'disabled'
@@ -106,3 +110,6 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
       else
         #TODO
         element.html('系统繁忙请尝试短信验证码')
+    .fail (xhr)->
+      if xhr.status > 400
+        tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
