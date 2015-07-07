@@ -183,7 +183,7 @@ org.ui = (function(){
                 document.body.appendChild(alertFram);
                 document.body.appendChild(shield);
 
-                $('.popub-footer').on('touchend click',function(){
+                $('.popub-footer').on('click',function(){
                     alertFram.style.display = "none";
                     shield.style.display = "none";
                     callback && callback();
