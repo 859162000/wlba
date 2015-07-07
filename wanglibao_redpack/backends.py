@@ -192,15 +192,17 @@ def _send_message(user, event):
     fmt_str = "%Y年%m月%d日"
     give_time = timezone.localtime(event.unavailable_at).strftime(fmt_str)
     if event.rtype == 'percent':
-        send_messages.apply_async(kwargs={
-            'phones': [user.wanglibaouserprofile.phone],
-            'messages': [messages.redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)]
-        })
+        pass
+        #send_messages.apply_async(kwargs={
+        #    'phones': [user.wanglibaouserprofile.phone],
+        #    'messages': [messages.redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)]
+        #})
     else:
-        send_messages.apply_async(kwargs={
-            'phones': [user.wanglibaouserprofile.phone],
-            'messages': [messages.redpack_give(event.amount, event.name, give_time)]
-        })
+        pass
+        #send_messages.apply_async(kwargs={
+        #    'phones': [user.wanglibaouserprofile.phone],
+        #    'messages': [messages.redpack_give(event.amount, event.name, give_time)]
+        #})
     if event.rtype == 'percent':
         title, content = messages.msg_redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)
     else:
