@@ -290,10 +290,6 @@ def _unbind_yeepay(request, card, bank=None):
 
 
 def _unbind_common(request, card, bank):
-    if card.is_bind_huifu:
-        res = _unbind_huifu(request, card, bank)
-        if res['ret_code'] != 0: return res
-
     if card.is_bind_yee:
         res = _unbind_yeepay(request, card, bank)
         if res['ret_code'] != 0: return res
@@ -302,6 +298,10 @@ def _unbind_common(request, card, bank):
         res = _unbind_kuaipay(request, card, bank)
         if res['ret_code'] != 0: return res
 
+    if card.is_bind_huifu:
+        res = _unbind_huifu(request, card, bank)
+        if res['ret_code'] != 0: return res
+        
     return {"ret_code": 0, "message": "银行卡解绑成功"}
 
 
