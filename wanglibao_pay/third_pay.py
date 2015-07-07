@@ -136,7 +136,7 @@ def list_bank_new(request):
     banks = Bank.get_bind_channel_banks()
     rs = []
     for bank in banks:
-        obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code}
+        obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
         if bank.kuai_limit:
             obj.update(util.handle_kuai_bank_limit(bank.kuai_limit))
         elif bank.huifu_bind_limit:
