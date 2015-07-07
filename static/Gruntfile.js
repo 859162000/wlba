@@ -35,6 +35,12 @@ module.exports = function( grunt ) {
               'scss/**/*.sass',
             ],
             tasks: ['compass']
+          },
+          js: {
+              files: [
+                 'src/mobile/mobile.js',
+              ],
+              tasks: ['concat']
           }
         },
         /*
