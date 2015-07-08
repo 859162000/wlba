@@ -10,6 +10,7 @@ from django.utils import timezone
 from rest_framework import renderers
 from rest_framework.views import APIView
 from marketing.models import Channels, IntroducedBy, PromotionToken
+from marketing.utils import set_promo_user
 from wanglibao import settings
 from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
         TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
@@ -108,27 +109,28 @@ class CoopRegister(object):
         """
         处理使用邀请码注册的用户
         """
-        try:
-            channel = Channels.objects.filter(code=invite_code).get()
-            introduced_by_record = IntroducedBy()
-            introduced_by_record.channel = channel
-            introduced_by_record.user = user
-            introduced_by_record.save()
-            logger.debug('save user %s introduced by channel to introducedby ' %user)
-        except:
-            pass
+        set_promo_user(self.request, user, invite_code)
+        #try:
+        #    channel = Channels.objects.filter(code=invite_code).get()
+        #    introduced_by_record = IntroducedBy()
+        #    introduced_by_record.channel = channel
+        #    introduced_by_record.user = user
+        #    introduced_by_record.save()
+        #    logger.debug('save user %s introduced by channel to introducedby ' %user)
+        #except:
+        #    pass
 
-        try:
-            user_promote_token = PromotionToken.objects.filter(token=invite_code).get()
-            #使用user_id查询
-            introduced_by_user = User.objects.get(pk=user_promote_token.pk)
-            introduced_by_record = IntroducedBy()
-            introduced_by_record.introduced_by = introduced_by_user
-            introduced_by_record.user = user
-            introduced_by_record.save()
-            logger.debug('save user %s introduced by user to introducedby ' %user)
-        except:
-            pass
+        #try:
+        #    user_promote_token = PromotionToken.objects.filter(token=invite_code).get()
+        #    #使用user_id查询
+        #    introduced_by_user = User.objects.get(pk=user_promote_token.pk)
+        #    introduced_by_record = IntroducedBy()
+        #    introduced_by_record.introduced_by = introduced_by_user
+        #    introduced_by_record.user = user
+        #    introduced_by_record.save()
+        #    logger.debug('save user %s introduced by user to introducedby ' %user)
+        #except:
+        #    pass
 
     def save_to_binding(self, user):
         """
