@@ -50,7 +50,9 @@ def save_introducedBy_channel(user, channel):
     record.save()
 
 def log_clientinfo(device, atype, user_id=0, amount=0):
-    if "device_type" not in device or "device_type" in device and device['device_type'] == "pc":
+    if type(device) != "dict":
+        return
+    if "device_type" not in device or device['device_type'] == "pc":
         return
     ci = ClientData()
     if atype=="register": action='R'
