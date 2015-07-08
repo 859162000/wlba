@@ -1129,7 +1129,7 @@ org.recharge_second=(function(org){
             var getValidateBtn = $('.request-check');
 
             getValidateBtn.on('click', function(){
-                var count = 60, intervalId ; //定时器
+                var count = 180, intervalId ; //定时器
                 var re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
                 lib.phone = $("input[name='phone']").val();
                 lib.card_no = $("input[name='card_no']").val();

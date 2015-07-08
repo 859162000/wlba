@@ -313,12 +313,10 @@ class YeeShortPay:
         self.YEE_PUB_KEY = settings.YEE_PUB_KEY
         self.MER_ID = settings.YEE_MER_ID
         self.BIND_URL = settings.YEE_SHORT_BIND
-        self.UNBIND_URL = settings.YEE_SHORT_UNBIND
-        self.BIND_SEND_SMS = settings.YEE_SHORT_BIND_SEND_SMS
         self.BIND_CHECK_SMS = settings.YEE_SHORT_BIND_CHECK_SMS
         self.BIND_CARD_QUERY = settings.YEE_SHORT_BIND_CARD_QUERY
         self.BIND_PAY_REQUEST = settings.YEE_SHORT_BIND_PAY_REQUEST
-        self.BIND_PAY_VALIDATE = settings.YEE_SHORT_BIND_PAY_VALIDATE
+        self.YEE_CALLBACK = settings.YEE_SHORT_CALLBACK
 
     def _sign(self, dic):
         values = self._sort(dic)
@@ -444,7 +442,12 @@ class YeeShortPay:
 
     def _response_data_change(self, res):
         """ 将易宝返回的数据格式化成程序通用数据 """
+        if 'error_code' in res:
+            logger.error(res)
+            return {'ret_code': res['error_code'], 'message': res['error_msg']}
+
         if 'data' not in res:
+            logger.error(res)
             return {'ret_code': 20012, 'message': '易宝数据有误'}
 
         flag, data = self._response_decode(res=res)
@@ -452,6 +455,7 @@ class YeeShortPay:
             return {'ret_code': 20011, 'message': '签名验证失败'}
 
         if 'error_code' in data:
+            logger.error(data)
             return {'ret_code': data['error_code'], 'message': data['error_msg'], 'data': data}
 
         return {'ret_code': 0, 'message': 'ok', 'data': data}
@@ -467,33 +471,22 @@ class YeeShortPay:
                     return True, data
         return False, res
 
-    def _bind_card_request(self, request, phone, card_no, request_id, terminaltype, terminalid):
+    def _bind_card_request(self, request, phone, card_no, request_id):
         """ 邦卡请求 """
         user = request.user
 
         post = dict()
         post['merchantaccount'] = self.MER_ID
+        post['identityid'] = str(user.wanglibaouserprofile.id_number)
+        post['identitytype'] = 5
+        post['requestid'] = request_id
         post['cardno'] = card_no
         post['idcardtype'] = '01'
-        post['idcardno'] = user.wanglibaouserprofile.id_number
+        post['idcardno'] = str(user.wanglibaouserprofile.id_number)
         post['username'] = user.wanglibaouserprofile.name
         post['phone'] = phone
-        post['requestid'] = request_id
         post['userip'] = util.get_client_ip(request)
-        post['productcatalog'] = '18'
-        post['identityid'] = user.wanglibaouserprofile.id_number
-        post['identitytype'] = 5
-        post['terminaltype'] = terminaltype  # 终端标识类型
-        post['terminalid'] = terminalid  # 终端设备id
-
         return self._request_yee(url=self.BIND_URL, data=post)
-
-    def _bind_send_sms(self, request_id):
-        """ 绑卡发送验证码 """
-        post = dict()
-        post['merchantaccount'] = self.MER_ID
-        post['requestid'] = request_id
-        return self._request_yee(url=self.BIND_SEND_SMS, data=post)
 
     def _bind_check_sms(self, request_id, validatecode):
         """ 绑卡校验验证码 """
@@ -510,54 +503,35 @@ class YeeShortPay:
 
         post = dict()
         post['merchantaccount'] = self.MER_ID
-        post['identityid'] = user.wanglibaouserprofile.id_number
+        post['identityid'] = str(user.wanglibaouserprofile.id_number)
         post['identitytype'] = 5
         return self._request_yee(url=self.BIND_CARD_QUERY, data=post)
 
     def delete_bind(self, user, card, bank):
         """ 解绑银行卡 """
-        if card.is_bind_yee and card.yee_bind_id:
-            res = self._unbind_card(user, card.yee_bind_id)
-            if res['ret_code'] !=0:
-                return {'ret_code': res['ret_code'], 'message': res['message']}
+        if card.is_bind_yee:
+            # 易宝通卡进出，不允许用户解绑，解绑线下进行
+            # card.is_bind_yee = False
+            # card.yee_bind_id = ''
+            # card.save()
+            return {'ret_code': 21110, 'message': '易宝支付解绑请联系客服'}
+        return {'ret_code': 0, 'message': 'ok'}
 
-            card.is_bind_yee = False
-            card.yee_bind_id = ''
-            card.save()
-            return res
-
-    def _unbind_card(self, user, bind_id):
-        """ 解绑银行卡 """
-        post = dict()
-        post['merchantaccount'] = self.MER_ID
-        post['bindid'] = bind_id  # 绑卡ID
-        post['identityid'] = user.wanglibaouserprofile.id_number
-        post['identitytype'] = 5
-        return self._request_yee(url=self.UNBIND_URL, data=post)
-
-    def _pay_request(self, request, order_id, card, pay_info, terminaltype, terminalid):
+    def _pay_request(self, request, order_id, card, pay_info):
         """ 支付请求 """
         post = dict()
         post['merchantaccount'] = self.MER_ID
-        post['bindid'] = str(card.yee_bind_id)
         post['orderid'] = str(order_id)
         post['transtime'] = int(time.time())
         post['amount'] = int(pay_info.amount * 100)
-        post['productcatalog'] = '18'
         post['productname'] = '网利宝-APP充值'
-        post['identityid'] = request.user.wanglibaouserprofile.id_number
+        post['identityid'] = str(request.user.wanglibaouserprofile.id_number)
         post['identitytype'] = 5
-        post['terminaltype'] = terminaltype  # 终端标识类型
-        post['terminalid'] = terminalid  # 终端设备id
+        post['card_top'] = pay_info.card_no[:6]
+        post['card_last'] = pay_info.card_no[-4:]
+        post['callbackurl'] = self.YEE_CALLBACK
         post['userip'] = util.get_client_ip(request)
         return self._request_yee(url=self.BIND_PAY_REQUEST, data=post)
-
-    def _pay_validity(self, order_id):
-        """ 确认支付 """
-        post = dict()
-        post['merchantaccount'] = self.MER_ID
-        post['orderid'] = str(order_id)
-        return self._request_yee(url=self.BIND_PAY_VALIDATE, data=post)
 
     def add_card_unbind(self, user, card_no, bank):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
@@ -589,10 +563,7 @@ class YeeShortPay:
         input_phone = request.DATA.get("phone", "").strip()
         gate_id = request.DATA.get("gate_id", "").strip()
 
-        # 易宝支付需要设备信息
-        deviceid = request.DATA.get("device_id", "").strip()
-
-        if not amount or not card_no or not deviceid:
+        if not amount or not card_no:
             return {"ret_code": 20112, 'message': '信息输入不完整'}
         if len(card_no) > 10 and (not input_phone or not gate_id):
             return {"ret_code": 20113, 'message': '卡号格式不正确'}
@@ -603,8 +574,11 @@ class YeeShortPay:
             return {"ret_code": 20114, 'message': '金额格式错误'}
 
         amount = util.fmt_two_amount(amount)
-        if amount < 10 or len(str(amount)) > 20:
-            return {"ret_code": 20115, 'message': '充值须大于等于10元'}
+        # if amount < 10 or len(str(amount)) > 20:
+        #     return {"ret_code": 20115, 'message': '充值须大于等于10元'}
+
+        if amount > 1 or len(str(amount)) > 20:
+            return {"ret_code": 20115, 'message': '真实交易金额大hold不住'}
 
         user = request.user
         profile = user.wanglibaouserprofile
@@ -628,14 +602,24 @@ class YeeShortPay:
         if bank and card and bank != card.bank:
             return {"ret_code": 200118, "message": "银行卡与银行不匹配"}
 
-        # 获取设备标识
-        terminal = deviceid.split(":")
-        deviceid = terminal[-1]
-        tmpdic = {"imei": 0, "mac": 1, "uuid": 2, "other": 3}
-        if terminal[0] in tmpdic:
-            terminaltype = tmpdic[terminal[0]]
-        else:
-            terminaltype = tmpdic['other']
+        if len(card_no) != 10:
+            # 未绑定银行卡，需要先绑定银行卡获取验证码，然后在确认支付
+            # 商户生成的唯一绑卡请求号，最长50位
+            request_id = '{phone}{time}'.format(phone=profile.phone, time=timezone.now().strftime("%Y%m%d%H%M%S"))
+            try:
+                # 请求绑定银行卡
+                res = self._bind_card_request(request, input_phone, card_no, request_id)
+                if res['ret_code'] != 0:
+                    if res['ret_code'] == '600326':
+                        card.is_bind_yee = True
+                        card.save()
+                        return {'ret_code': '20119', 'message': '银行卡已绑定，请返回使用快捷充值'}
+                    else:
+                        logger.error(res)
+                        return res
+            except Exception, e:
+                logger.error(e.message)
+                return {"ret_code": "20120", "message": '绑定银行卡失败'}
 
         try:
             pay_info = PayInfo()
@@ -661,7 +645,7 @@ class YeeShortPay:
 
             if len(card_no) == 10:
                 # 直接支付交易，已经绑定了银行卡，直接进行支付操作
-                res = self._pay_request(request, order.id, card, pay_info, terminaltype, deviceid)
+                res = self._pay_request(request, order.id, card, pay_info)
                 if res['ret_code'] != 0:
                     logger.error(res)
                     pay_info.error_code = res['ret_code']
@@ -671,47 +655,9 @@ class YeeShortPay:
                     pay_info.save()
                     return res
 
-                res = self._pay_validity(order.id)
-                if res['ret_code'] != 0:
-                    logger.error(res)
-                    pay_info.error_code = res['ret_code']
-                    pay_info.error_message = res['message']
-                    if 'data' in res:
-                        pay_info.response = res['data']
-                    pay_info.save()
-                    return res
+                return {'ret_code': 0, 'message': '支付请求成功'}
 
-                device = split_ua(request)
-                device_type = device['device_type']
-                ms = self.handle_margin(pay_info.amount, order.id, user.id, util.get_client_ip(request), res['data'], device_type)
-                return ms
             else:
-                # 未绑定银行卡，需要先绑定银行卡获取验证码，然后在确认支付
-
-                # 商户生成的唯一绑卡请求号，最长50位
-                request_id = '{phone}{time}'.format(phone=profile.phone, time=timezone.now().strftime("%Y%m%d%H%M%S"))
-
-                # 请求绑定银行卡
-                res = self._bind_card_request(request, input_phone, card_no, request_id, terminaltype, deviceid)
-                if res['ret_code'] != 0:
-                    logger.error(res)
-                    pay_info.error_code = res['ret_code']
-                    pay_info.error_message = res['message']
-                    if 'data' in res:
-                        pay_info.response = res['data']
-                    pay_info.save()
-                    return res
-
-                # 请求绑定银行卡发送验证码
-                res = self._bind_send_sms(request_id)
-                if res['ret_code'] != 0:
-                    logger.error(res)
-                    pay_info.error_code = res['ret_code']
-                    pay_info.error_message = res['message']
-                    if 'data' in res:
-                        pay_info.response = res['data']
-                    pay_info.save()
-                    return res
 
                 return {"ret_code": 0, "message": "ok", "order_id": order.id, "token": request_id}
 
@@ -732,9 +678,6 @@ class YeeShortPay:
         order_id = request.DATA.get("order_id", "").strip()
         request_id = request.DATA.get("token", "").strip()
         input_phone = request.DATA.get("phone", "").strip()
-
-        # 易宝支付需要设备信息
-        deviceid = request.DATA.get("device_id", "").strip()
 
         if not order_id.isdigit():
             return {"ret_code": 20125, "message": "订单号错误"}
@@ -761,19 +704,9 @@ class YeeShortPay:
             return res
         # 绑定银行卡成功
         card.is_bind_yee = True
-        card.yee_bind_id = res['data']['bindid']
         card.save()
 
-        # 获取设备标识
-        terminal = deviceid.split(":")
-        deviceid = terminal[-1]
-        tmpdic = {"imei": 0, "mac": 1, "uuid": 2, "other": 3}
-        if terminal[0] in tmpdic:
-            terminaltype = tmpdic[terminal[0]]
-        else:
-            terminaltype = tmpdic['other']
-
-        res = self._pay_request(request, order_id, card, pay_info, terminaltype, deviceid)
+        res = self._pay_request(request, order_id, card, pay_info)
         if res['ret_code'] != 0:
             logger.error(res)
             pay_info.error_code = res['ret_code']
@@ -783,19 +716,7 @@ class YeeShortPay:
             pay_info.save()
             return res
 
-        res = self._pay_validity(order_id)
-        if res['ret_code'] != 0:
-            logger.error(res)
-            pay_info.error_code = res['ret_code']
-            pay_info.error_message = res['message']
-            if 'data' in res:
-                pay_info.response = res['data']
-            pay_info.save()
-            return res
-
-        device = split_ua(request)
-        ms = self.handle_margin(pay_info.amount, order_id, user.id, util.get_client_ip(request), res['data'], device)
-        return ms
+        return {'ret_code': 0, 'message': '支付请求成功'}
 
     @method_decorator(transaction.atomic)
     def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
@@ -839,4 +760,82 @@ class YeeShortPay:
                 Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now())
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+        return rs
+
+    @method_decorator(transaction.atomic)
+    def pay_callback(self, request):
+        encryptkey = request.GET.get("encryptkey", "")
+        data = request.GET.get("data", "")
+
+        if not encryptkey or not data:
+            return {"ret_code": 20081, "message": "params invalid"}
+
+        try:
+            ybaeskey = self.rsa_base64_decrypt(encryptkey, self.PRIV_KEY)
+            params = json.loads(self.aes_base64_decrypt(data, ybaeskey))
+        except Exception,e:
+            logger.error(traceback.format_exc())
+            return {"ret_code": 20088, "message": "data decrypt error"}
+
+        logger.error("%s" % params)
+
+        amount = util.fmt_two_amount(params['amount']) / 100
+
+        if "sign" not in params:
+            return {"ret_code": 20082, "message": "params sign not exist"}
+        sign = params.pop("sign")
+        if not self._verify(params, sign):
+            return {"ret_code": 20083, "message": "params sign invalid"}
+
+        if params['merchantaccount'] != self.MER_ID:
+            return {"ret_code": 20084, "message": "params merhantaccount invalid"}
+
+        orderId = params['orderid']
+        pay_info = PayInfo.objects.filter(order_id=orderId).first()
+        if not pay_info:
+            return {"ret_code": 20085, "message": "order not exist"}
+        if pay_info.status == PayInfo.SUCCESS:
+            return {"ret_code": 0, "message": PayResult.DEPOSIT_SUCCESS, "amount": amount}
+
+        pay_info.error_message = str(params['status'])
+        pay_info.response = "%s" % params
+        pay_info.response_ip = util.get_client_ip(request)
+
+        if not pay_info.bank and "bank" in params:
+            bank = Bank.objects.filter(name=params['bank']).first()
+            if bank:
+                pay_info.bank = bank
+
+        if pay_info.amount != amount:
+            pay_info.status = PayInfo.FAIL
+            pay_info.error_message += u' 金额不匹配'
+            logger.error("orderId:%s amount:%s, response amount:%s" % (orderId, pay_info.amount, amount))
+            rs = {"ret_code":20086, "message":PayResult.EXCEPTION}
+        else:
+            if params['status'] == 1:
+                pay_info.fee = self.FEE
+                keeper = MarginKeeper(pay_info.user, pay_info.order.pk)
+                margin_record = keeper.deposit(amount)
+                pay_info.margin_record = margin_record
+                pay_info.status = PayInfo.SUCCESS
+                logger.error("orderId:%s yeepay response status:%s" % (orderId, params['status']))
+                rs = {"ret_code":0, "message":"success", "amount":amount, "uid":pay_info.user.id}
+            else:
+                pay_info.status = PayInfo.FAIL
+                logger.error("orderId:%s yeepay response status: %s" % (orderId, params['status']))
+                rs = {"ret_code":20087, "message":PayResult.DEPOSIT_FAIL}
+
+        pay_info.save()
+        if rs['ret_code'] == 0:
+            device = split_ua(request)
+            tools.despoit_ok(pay_info, device)
+
+            # 充值成功后，更新本次银行使用的时间
+            if len(pay_info.card_no) == 10:
+                Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now())
+            else:
+                Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now())
+
+        OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+
         return rs

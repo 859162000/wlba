@@ -819,3 +819,12 @@ class BankListNewAPIView(APIView):
     def post(self, request):
         result = third_pay.list_bank_new(request)
         return Response(result)
+
+class YeeShortPayCallbackView(APIView):
+    """ 易宝回调 """
+    permission_classes = ()
+
+    def post(self, request):
+        request.GET = request.DATA
+        result = third_pay.yee_callback(request)
+        return Response(result)

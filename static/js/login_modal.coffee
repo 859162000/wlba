@@ -206,14 +206,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
           $(element).addClass 'button-red'
           $(element).removeClass 'button-gray'
           result = JSON.parse xhr.responseText
-          if xhr.status == 429
-
-            tool.modalAlert({title: '温馨提示', msg: "系统繁忙，请稍候重试", callback_ok: _showModal})
-          else
+          if xhr.status > 400
             tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
 
         intervalId
-        count = 60
+        count = 180
 
         $(element).attr 'disabled', 'disabled'
         $(element).removeClass 'button-red'
@@ -386,7 +383,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         #TODO
 
         intervalId
-        count = 60
+        count = 180
         button = $("#button-get-validate-modal")
 
         button.attr 'disabled', 'disabled'
@@ -412,4 +409,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       else
         #TODO
         element.html('系统繁忙请尝试短信验证码')
+    .fail (xhr)->
+      if xhr.status > 400
+        tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
 

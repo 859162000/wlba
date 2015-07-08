@@ -10,12 +10,12 @@ from django.utils import timezone
 from rest_framework import renderers
 from rest_framework.views import APIView
 from marketing.models import Channels, IntroducedBy, PromotionToken
+from marketing.utils import set_promo_user
 from wanglibao import settings
 from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
         TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
     WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
-    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, TIANMANG_INVITE_CODE, YIRUITE_INVITE_CODE, BENGBENG_INVITE_CODE, \
-    JUXIANGYOU_INVITE_CODE
+    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import  yiruite_callback,  common_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord
@@ -52,15 +52,14 @@ class CoopRegister(object):
     """
     def __init__(self, request):
         #本渠道的名称
-        self.c_name = None
+        self.c_code = None
         self.request = request
-        #传递渠道名称时使用的变量名
+        #传递渠道邀请码时使用的变量名
         self.external_channel_key = settings.PROMO_TOKEN_QUERY_STRING
-        self.internal_channel_key = 'channel_name'
+        self.internal_channel_key = 'channel_code'
         #传递渠道用户时使用的变量名
         self.external_channel_user_key = None
         self.internal_channel_user_key = 'channel_user'
-        self.invite_code = None
         #渠道提供给我们的秘钥
         self.coop_key = None
         #我们提供给渠道的秘钥
@@ -68,26 +67,36 @@ class CoopRegister(object):
         self.call_back_url = None
 
     @property
+    def channel_code(self):
+        """
+        从GET请求中获取的渠道邀请码
+        """
+        return self.request.session.get(self.internal_channel_key, None)
+
+    def get_channel_code_from_request(self):
+        return self.request.GET.get(self.external_channel_key, None)
+
+    @property
     def channel_name(self):
         """
-        从请求中获取的渠道名称
+        渠道名
         """
-        channel_name  = self.request.session.get(self.internal_channel_key, None)
-        if channel_name:
-            return  channel_name
+        try:
+            channel_name = Channels.objects.filter(code=self.channel_code).get().name
+        except:
+            channel_name = None
+        return channel_name
 
     @property
     def channel_user(self):
-        channel_user  = self.request.session.get(self.internal_channel_user_key, None)
-        if channel_user:
-            return  channel_user
+        return self.request.session.get(self.internal_channel_user_key, None)
 
     def save_to_session(self):
-        channel_name  = self.request.GET.get(self.external_channel_key, None)
+        channel_code  = self.get_channel_code_from_request()
         channel_user  = self.request.GET.get(self.external_channel_user_key, None)
-        if channel_name:
-            self.request.session[self.internal_channel_key] = channel_name
-            logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_name))
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+            logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
             logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
@@ -100,29 +109,28 @@ class CoopRegister(object):
         """
         处理使用邀请码注册的用户
         """
-        if not invite_code:
-            invite_code = self.invite_code
-        try:
-            channel = Channels.objects.filter(code=invite_code).get()
-            introduced_by_record = IntroducedBy()
-            introduced_by_record.channel = channel
-            introduced_by_record.user = user
-            introduced_by_record.save()
-            logger.debug('save user %s introduced by channel to introducedby ' %user)
-        except:
-            pass
+        set_promo_user(self.request, user, invite_code)
+        #try:
+        #    channel = Channels.objects.filter(code=invite_code).get()
+        #    introduced_by_record = IntroducedBy()
+        #    introduced_by_record.channel = channel
+        #    introduced_by_record.user = user
+        #    introduced_by_record.save()
+        #    logger.debug('save user %s introduced by channel to introducedby ' %user)
+        #except:
+        #    pass
 
-        try:
-            user_promote_token = PromotionToken.objects.filter(token=invite_code).get()
-            #使用user_id查询
-            introduced_by_user = User.objects.get(pk=user_promote_token.pk)
-            introduced_by_record = IntroducedBy()
-            introduced_by_record.introduced_by = introduced_by_user
-            introduced_by_record.user = user
-            introduced_by_record.save()
-            logger.debug('save user %s introduced by user to introducedby ' %user)
-        except:
-            pass
+        #try:
+        #    user_promote_token = PromotionToken.objects.filter(token=invite_code).get()
+        #    #使用user_id查询
+        #    introduced_by_user = User.objects.get(pk=user_promote_token.pk)
+        #    introduced_by_record = IntroducedBy()
+        #    introduced_by_record.introduced_by = introduced_by_user
+        #    introduced_by_record.user = user
+        #    introduced_by_record.save()
+        #    logger.debug('save user %s introduced by user to introducedby ' %user)
+        #except:
+        #    pass
 
     def save_to_binding(self, user):
         """
@@ -158,31 +166,33 @@ class CoopRegister(object):
 
     def all_processors_for_session(self):
         for processor in self.processors:
-            request_channel_name = self.request.GET.get(processor.external_channel_key, None)
-            if processor.c_name == request_channel_name:
+            channel_code = processor.get_channel_code_from_request()
+            if processor.c_code == channel_code:
                 processor.save_to_session()
+                return
+        self.save_to_session()
 
     def all_processors_for_user_register(self, user, invite_code):
-        #使用邀请码注册,只会保存到introduceby这张表
+        if not invite_code:
+            invite_code = self.channel_code
+        logger.debug('get invite code %s'%(invite_code))
         if invite_code:
-            logger.debug('register by invite code %s'%invite_code)
-            self.save_to_introduceby(user, invite_code)
-            return
-        #通过渠道注册
-        for processor in self.processors:
-            logger.debug('register by channel %s %s'%(processor.c_name, processor.channel_name))
-            if processor.c_name == processor.channel_name:
-                processor.process_for_register(user, invite_code)
+            #通过渠道注册
+            for processor in self.processors:
+                if processor.c_code == processor.channel_code:
+                    processor.process_for_register(user, invite_code)
+                    return
+            #默认注册
+            self.process_for_register(user, invite_code)
 
 class TianMangRegister(CoopRegister):
     def __init__(self, request):
         super(TianMangRegister, self).__init__(request)
-        self.c_name = 'tianmang'
+        self.c_code = 'tianmang'
         self.external_channel_key = 'source'
         self.external_channel_user_key = 'sn'
         self.coop_key = TINMANG_KEY
         self.call_back_url = TIANMANG_CALL_BACK_URL
-        self.invite_code = TIANMANG_INVITE_CODE
 
     @property
     def tianmang_sn(self):
@@ -214,13 +224,12 @@ class TianMangRegister(CoopRegister):
 class YiRuiTeRegister(CoopRegister):
     def __init__(self, request):
         super(YiRuiTeRegister, self).__init__(request)
-        self.c_name = 'yiruite'
+        self.c_code = 'yiruite'
         self.external_channel_key = 'from'
         self.external_channel_user_key = 'tid'
         self.coop_key = YIRUITE_KEY
         self.key = WLB_FOR_YIRUITE_KEY
         self.call_back_url = YIRUITE_CALL_BACK_URL
-        self.invite_code = YIRUITE_INVITE_CODE
 
     def call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
@@ -236,13 +245,12 @@ class YiRuiTeRegister(CoopRegister):
 class BengbengRegister(CoopRegister):
     def __init__(self, request):
         super(BengbengRegister, self).__init__(request)
-        self.c_name = 'bengbeng'
+        self.c_code = 'bengbeng'
         self.external_channel_user_key = 'bengbeng_id'
         self.coop_id = BENGBENG_COOP_ID
         self.coop_key = BENGBENG_KEY
         self.key = WLB_FOR_BENGBENG_KEY
         self.call_back_url = BENGBENG_CALL_BACK_URL
-        self.invite_code = BENGBENG_INVITE_CODE
 
     def call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
@@ -255,17 +263,16 @@ class BengbengRegister(CoopRegister):
             'idName': get_username_for_coop(user.id)
         }
         common_callback.apply_async(
-            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_name})
+            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
 class JuxiangyouRegister(CoopRegister):
     def __init__(self, request):
         super(JuxiangyouRegister, self).__init__(request)
-        self.c_name = 'juxiangyou'
+        self.c_code = 'juxiangyou'
         self.external_channel_user_key = 'jxy_id'
         self.coop_id = JUXIANGYOU_COOP_ID
         self.coop_key = JUXIANGYOU_KEY
         self.call_back_url = JUXIANGYOU_CALL_BACK_URL
-        self.invite_code = JUXIANGYOU_INVITE_CODE
 
     def call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
@@ -277,7 +284,7 @@ class JuxiangyouRegister(CoopRegister):
             'accessKey' : sign
         }
         common_callback.apply_async(
-            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_name})
+            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
 
 #注册第三方通道
