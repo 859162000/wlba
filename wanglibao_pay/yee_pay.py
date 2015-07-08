@@ -16,6 +16,7 @@ from wanglibao_pay import util
 from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
+from wanglibao_margin.models import Margin
 from wanglibao_margin.marginkeeper import MarginKeeper
 from marketing import tools
 
@@ -602,10 +603,10 @@ class YeeShortPay:
         if bank and card and bank != card.bank:
             return {"ret_code": 200118, "message": "银行卡与银行不匹配"}
 
+        # 商户生成的唯一绑卡请求号，最长50位
+        request_id = '{phone}{time}'.format(phone=profile.phone, time=timezone.now().strftime("%Y%m%d%H%M%S"))
         if len(card_no) != 10:
             # 未绑定银行卡，需要先绑定银行卡获取验证码，然后在确认支付
-            # 商户生成的唯一绑卡请求号，最长50位
-            request_id = '{phone}{time}'.format(phone=profile.phone, time=timezone.now().strftime("%Y%m%d%H%M%S"))
             try:
                 # 请求绑定银行卡
                 res = self._bind_card_request(request, input_phone, card_no, request_id)
@@ -655,7 +656,8 @@ class YeeShortPay:
                     pay_info.save()
                     return res
 
-                return {'ret_code': 0, 'message': '支付请求成功'}
+                margin = Margin.objects.filter(user=user).first()
+                return {"ret_code": 22000, "message": u"充值申请已提交，请稍候查询余额。", "amount": amount, "margin": margin.margin}
 
             else:
 
@@ -716,7 +718,8 @@ class YeeShortPay:
             pay_info.save()
             return res
 
-        return {'ret_code': 0, 'message': '支付请求成功'}
+        margin = Margin.objects.filter(user=user).first()
+        return {"ret_code": 22000, "message": u"充值申请已提交，请稍候查询余额。", "amount": pay_info.amount, "margin": margin.margin}
 
     @method_decorator(transaction.atomic)
     def handle_margin(self, amount, order_id, user_id, ip, response_content, device):

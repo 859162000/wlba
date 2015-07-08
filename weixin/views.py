@@ -159,9 +159,9 @@ class WeixinRegister(TemplateView):
     template_name = 'weixin_regist_new.jade'
 
     def get_context_data(self, **kwargs):
-        token = self.request.GET.get('promo_token', '')
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
         if not token:
-            token = self.request.session.get('promo_token', 'weixin')
+            token = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'weixin')
 
         return {
             'token': token,
