@@ -16,6 +16,7 @@ from wanglibao_pay import util
 from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
+from wanglibao_margin.models import Margin
 from wanglibao_margin.marginkeeper import MarginKeeper
 from marketing import tools
 
@@ -655,7 +656,8 @@ class YeeShortPay:
                     pay_info.save()
                     return res
 
-                return {'ret_code': 0, 'message': '支付请求成功'}
+                margin = Margin.objects.filter(user=user).first()
+                return {"ret_code": 0, "message": "success", "amount": amount, "margin": margin.margin}
 
             else:
 
@@ -715,8 +717,9 @@ class YeeShortPay:
                 pay_info.response = res['data']
             pay_info.save()
             return res
-
-        return {'ret_code': 0, 'message': '支付请求成功'}
+        
+        margin = Margin.objects.filter(user=user).first()
+        return {"ret_code": 0, "message": "success", "amount": pay_info.amount, "margin": margin.margin}
 
     @method_decorator(transaction.atomic)
     def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
