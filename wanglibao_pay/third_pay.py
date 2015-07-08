@@ -136,7 +136,7 @@ def list_bank_new(request):
     banks = Bank.get_bind_channel_banks()
     rs = []
     for bank in banks:
-        obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code}
+        obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
         if bank.kuai_limit:
             obj.update(util.handle_kuai_bank_limit(bank.kuai_limit))
         elif bank.huifu_bind_limit:
@@ -290,10 +290,6 @@ def _unbind_yeepay(request, card, bank=None):
 
 
 def _unbind_common(request, card, bank):
-    if card.is_bind_huifu:
-        res = _unbind_huifu(request, card, bank)
-        if res['ret_code'] != 0: return res
-
     if card.is_bind_yee:
         res = _unbind_yeepay(request, card, bank)
         if res['ret_code'] != 0: return res
@@ -302,6 +298,10 @@ def _unbind_common(request, card, bank):
         res = _unbind_kuaipay(request, card, bank)
         if res['ret_code'] != 0: return res
 
+    if card.is_bind_huifu:
+        res = _unbind_huifu(request, card, bank)
+        if res['ret_code'] != 0: return res
+        
     return {"ret_code": 0, "message": "银行卡解绑成功"}
 
 
@@ -409,3 +409,7 @@ def bind_pay_dynnum(request):
         return KuaiShortPay().dynnum_bind_pay(request)
     else:
         return {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+
+
+def yee_callback(request):
+    return YeeShortPay().pay_callback(request)

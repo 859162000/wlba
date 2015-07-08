@@ -127,7 +127,7 @@ class P2PDetailView(TemplateView):
         return context
 
     def get(self, request, *args, **kwargs):
-        device_list = ['mobile', 'android', 'iphone', 'ipad']
+        device_list = ['android', 'iphone']
         user_agent = request.META['HTTP_USER_AGENT']
         for device in device_list:
             match = re.search(device, user_agent.lower())
@@ -545,7 +545,7 @@ class P2PListView(TemplateView):
         }
 
     def get(self, request, *args, **kwargs):
-        device_list = ['mobile', 'android', 'iphone', 'ipad']
+        device_list = ['android', 'iphone']
         user_agent = request.META['HTTP_USER_AGENT']
         for device in device_list:
             match = re.search(device, user_agent.lower())
