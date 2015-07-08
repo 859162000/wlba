@@ -8,6 +8,7 @@ from django.test import TestCase
 from forms import EmailOrPhoneRegisterForm
 from utils import detect_identifier_type, verify_id, create_user
 from wanglibao_account.backends import parse_id_verify_response
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_sms.utils import send_validation_code
 
@@ -274,3 +275,8 @@ class IdVerificationTestCase(TestCase):
         })
 
         self.assertEqual(response.status_code, 200)
+
+class CooperationTestCase(TestCase):
+    def setUp(self):
+        coop_register = CoopRegister()
+    def test_all_processors_for_session(self):
