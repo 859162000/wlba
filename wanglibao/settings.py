@@ -685,7 +685,6 @@ if ENV == ENV_PRODUCTION:
 else:
     TIANMANG_CALL_BACK_URL = "http://demo.bangwoya.com/callback/callback.php"
 TINMANG_KEY= '65'
-TIANMANG_INVITE_CODE = 'tianmang'
 
 # 易瑞特
 if ENV == ENV_PRODUCTION:
@@ -698,7 +697,6 @@ else:
     WLB_FOR_YIRUITE_KEY = '1989'
     YIRUITE_KEY = "al9e4ys5"
     YIRUITE_CALL_BACK_URL = "http://app.offer99.com/callback/callback_test.php"
-YIRUITE_INVITE_CODE = 'yiruite'
 
 # 蹦蹦网
 if ENV == ENV_PRODUCTION:
@@ -712,7 +710,6 @@ else:
     WLB_FOR_BENGBENG_KEY = '1990'
     BENGBENG_KEY = "080cd5f1b5c179c2"
     BENGBENG_CALL_BACK_URL = "http://www.bengbeng.com/retaste.php"
-BENGBENG_INVITE_CODE = 'bengbeng'
 
 # 聚享游
 if ENV == ENV_PRODUCTION:
@@ -723,7 +720,6 @@ else:
     JUXIANGYOU_COOP_ID = '10'
     JUXIANGYOU_KEY = 'b0cj391b90p421n8'
     JUXIANGYOU_CALL_BACK_URL = 'http://api.juxiangyou.com/web/p2pApi_test.php'
-JUXIANGYOU_INVITE_CODE = 'juxiangyou'
 
 
 SUIT_CONFIG = {
