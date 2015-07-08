@@ -152,7 +152,7 @@ def validate_validation_code(phone, code):
         item.save()
         return 410, "code error"
     now = timezone.now()
-    if (now - item.last_send_time) >= datetime.timedelta(minutes=180):
+    if (now - item.last_send_time) >= datetime.timedelta(minutes=600):
         return 410, "code is expired"
     if item.is_validated:
         return 410, "code is validated"
