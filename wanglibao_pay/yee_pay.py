@@ -436,26 +436,26 @@ class YeeShortPay:
         return {"data": data, "encryptkey": encryptkey, "merchantaccount": self.MER_ID}
 
     def _request_yee(self, url, data):
-        logger.error('before format>>>')
-        logger.error(url)
-        logger.error(data)
         post = self._format_post(data)
-        logger.error(post)
         res = requests.post(url, post)
         return self._response_data_change(res=json.loads(res.text))
 
     def _response_data_change(self, res):
         """ 将易宝返回的数据格式化成程序通用数据 """
+        if 'error_code' in res:
+            logger.error(res)
+            return {'ret_code': res['error_code'], 'message': res['error_msg']}
+
         if 'data' not in res:
+            logger.error(res)
             return {'ret_code': 20012, 'message': '易宝数据有误'}
 
         flag, data = self._response_decode(res=res)
-        logger.error('response data>>>')
-        logger.error(data)
         if not flag:
             return {'ret_code': 20011, 'message': '签名验证失败'}
 
         if 'error_code' in data:
+            logger.error(data)
             return {'ret_code': data['error_code'], 'message': data['error_msg'], 'data': data}
 
         return {'ret_code': 0, 'message': 'ok', 'data': data}
@@ -488,13 +488,6 @@ class YeeShortPay:
         post['userip'] = util.get_client_ip(request)
         return self._request_yee(url=self.BIND_URL, data=post)
 
-    def _bind_send_sms(self, request_id):
-        """ 绑卡发送验证码 """
-        post = dict()
-        post['merchantaccount'] = self.MER_ID
-        post['requestid'] = request_id
-        return self._request_yee(url=self.BIND_SEND_SMS, data=post)
-
     def _bind_check_sms(self, request_id, validatecode):
         """ 绑卡校验验证码 """
         post = dict()
@@ -510,7 +503,7 @@ class YeeShortPay:
 
         post = dict()
         post['merchantaccount'] = self.MER_ID
-        post['identityid'] = user.wanglibaouserprofile.id_number
+        post['identityid'] = str(user.wanglibaouserprofile.id_number)
         post['identitytype'] = 5
         return self._request_yee(url=self.BIND_CARD_QUERY, data=post)
 
@@ -539,13 +532,6 @@ class YeeShortPay:
         post['callbackurl'] = self.YEE_CALLBACK
         post['userip'] = util.get_client_ip(request)
         return self._request_yee(url=self.BIND_PAY_REQUEST, data=post)
-
-    def _pay_validity(self, order_id):
-        """ 确认支付 """
-        post = dict()
-        post['merchantaccount'] = self.MER_ID
-        post['orderid'] = str(order_id)
-        return self._request_yee(url=self.BIND_PAY_VALIDATE, data=post)
 
     def add_card_unbind(self, user, card_no, bank):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
@@ -616,12 +602,11 @@ class YeeShortPay:
         if bank and card and bank != card.bank:
             return {"ret_code": 200118, "message": "银行卡与银行不匹配"}
 
-        try:
+        if len(card_no) != 10:
             # 未绑定银行卡，需要先绑定银行卡获取验证码，然后在确认支付
             # 商户生成的唯一绑卡请求号，最长50位
             request_id = '{phone}{time}'.format(phone=profile.phone, time=timezone.now().strftime("%Y%m%d%H%M%S"))
-
-            if len(card_no) != 10:
+            try:
                 # 请求绑定银行卡
                 res = self._bind_card_request(request, input_phone, card_no, request_id)
                 if res['ret_code'] != 0:
@@ -632,7 +617,11 @@ class YeeShortPay:
                     else:
                         logger.error(res)
                         return res
+            except Exception, e:
+                logger.error(e.message)
+                return {"ret_code": "20120", "message": '绑定银行卡失败'}
 
+        try:
             pay_info = PayInfo()
             pay_info.amount = amount
             pay_info.total_amount = amount
