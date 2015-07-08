@@ -178,6 +178,7 @@ if LOCAL_MYSQL:
 import sys
 
 if 'test' in sys.argv:
+    SOUTH_TESTS_MIGRATE = False
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '/tmp/db.sqlite3'
@@ -288,10 +289,17 @@ EMAIL_HOST_PASSWORD = '83x1ln8w5p64'
 DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 
 # ManDao sms service
+# 旧的漫道请求设置
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/mdgxsend.ashx'
 SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/mdsmssend.ashx'
 SMS_MANDAO_SN = 'SDK-BBX-010-20599'
 SMS_MANDAO_MD5_PWD = '4A4080BB5FCCC3422E14EA8247D1062C'
+
+# 新的漫道请求设置
+# SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
+# SMS_MANDAO_MULTICAST_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
+# SMS_MANDAO_SN = 'SDK-SKY-010-02839'
+# SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
 
 SMS_BACKEND = 'wanglibao_sms.backends.ManDaoSMSBackEnd'
 
@@ -483,19 +491,25 @@ if ENV == ENV_PRODUCTION:
     HUI_SHORT_SIGN_HOST = SIGN_HOST
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
-    HUI_SHORT_LOGIN_PWD = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "cathy123"
     PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
-
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
+
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
+    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/"
 
@@ -523,19 +537,25 @@ elif ENV == ENV_PREPRODUCTION:
     HUI_SHORT_SIGN_HOST = SIGN_HOST
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
-    HUI_SHORT_LOGIN_PWD = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "cathy123"
     PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
-
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
+
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
+    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/"
 
@@ -561,7 +581,7 @@ else:
     HUI_SHORT_SIGN_HOST = SIGN_HOST
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
-    HUI_SHORT_LOGIN_PWD = "bjwl"
+    HUI_SHORT_LOGIN_PWD = "cathy123"
     PAY_URL = 'http://test.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gar/entry.do" % PAY_URL
@@ -569,9 +589,16 @@ else:
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
     YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
-    YEE_MER_ID = "YB01000000144"
-    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'pkcs8_rsa_private_key144.pem'), 'r').read())
-    YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "rsa_public_key144.pem"), "r").read())
+    YEE_MER_ID = "10000419568"
+    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'staging_yee_mer_priv_key.pem'), 'r').read())
+    YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "staging_yee_public_key.pem"), "r").read())
+
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
+    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
 
     KUAI_PAY_URL = "https://sandbox.99bill.com:9445"
 
@@ -612,7 +639,6 @@ if ENV == ENV_DEV:
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
-PROMO_TOKEN_PRODUCT = "product_id"
 
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 # CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
@@ -647,20 +673,54 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-ISCJDAO = False
-CJDAOKEY = '1234'
-RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
-RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
-POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
+#ISCJDAO = False
+#CJDAOKEY = '1234'
+#RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
+#RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
+#POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
 
-RETURN_TINMANG_URL = "http://www.bangwoya.com/callback/callback.php"
-RETURN_TINMANG_URL_DEBUG = "http://demo.bangwoya.com/callback/callback.php"
-TINMANGKEY= '65'
+# 天芒
+if ENV == ENV_PRODUCTION:
+    TIANMANG_CALL_BACK_URL = "http://www.bangwoya.com/callback/callback.php"
+else:
+    TIANMANG_CALL_BACK_URL = "http://demo.bangwoya.com/callback/callback.php"
+TINMANG_KEY= '65'
 
 # 易瑞特
-YIRUITE_KEY = '1989'
-YIRUITE_AD_KEY_TEST = "al9e4ys5"
-RETURN_YIRUITE_URL_TEST = "http://app.offer99.com/callback/callback_test.php"
+if ENV == ENV_PRODUCTION:
+    #我们提供给第三方的加密秘钥
+    WLB_FOR_YIRUITE_KEY = '1989'
+    #第三方提供给我们的加密秘钥
+    YIRUITE_KEY = "esn4s2enki"
+    YIRUITE_CALL_BACK_URL = "http://app.offer99.com/callback/callback_adv/callback_adv_w345fe267d9149fcd3dabc7e9e39b783.php"
+else:
+    WLB_FOR_YIRUITE_KEY = '1989'
+    YIRUITE_KEY = "al9e4ys5"
+    YIRUITE_CALL_BACK_URL = "http://app.offer99.com/callback/callback_test.php"
+
+# 蹦蹦网
+if ENV == ENV_PRODUCTION:
+    #蹦蹦网提供的本次合作ID
+    BENGBENG_COOP_ID = '7539'
+    WLB_FOR_BENGBENG_KEY = '1990'
+    BENGBENG_KEY = "af0ee5f72c55cdd6"
+    BENGBENG_CALL_BACK_URL = "www.bengbeng.com/reannal.php"
+else:
+    BENGBENG_COOP_ID = '10'
+    WLB_FOR_BENGBENG_KEY = '1990'
+    BENGBENG_KEY = "080cd5f1b5c179c2"
+    BENGBENG_CALL_BACK_URL = "http://www.bengbeng.com/retaste.php"
+
+# 聚享游
+if ENV == ENV_PRODUCTION:
+    JUXIANGYOU_COOP_ID = ''
+    JUXIANGYOU_KEY = ''
+    JUXIANGYOU_CALL_BACK_URL = 'http://api.juxiangyou.com/web/p2pApi.php'
+else:
+    JUXIANGYOU_COOP_ID = '10'
+    JUXIANGYOU_KEY = 'b0cj391b90p421n8'
+    JUXIANGYOU_CALL_BACK_URL = 'http://api.juxiangyou.com/web/p2pApi_test.php'
+
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

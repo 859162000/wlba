@@ -15,7 +15,8 @@ class PhoneValidateCodeAdmin(admin.ModelAdmin):
         return False
 
     def get_readonly_fields(self, request, obj=None):
-        return [f.name for f in self.model._meta.fields]
+        # return [f.name for f in self.model._meta.fields]
+        return self.list_display + ('data',)
 
 admin.site.register(PhoneValidateCode, PhoneValidateCodeAdmin)
 

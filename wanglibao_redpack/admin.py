@@ -8,6 +8,7 @@ from import_export.admin import ExportMixin
 
 
 class RedPackEventAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ("id", "name", "rtype", "red_amount", "invest_amount", "describe", "red_num", "give_mode", "give_platform", "apply_platform", "give_start_at", "give_end_at",
                     "available_at", "unavailable_at", "invalid", "created_at")
     search_fields = ("name", "give_mode")
@@ -39,8 +40,8 @@ class RedPackAdmin(ExportMixin, admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def has_add_permission(self, request):
-        return False
+    # def has_add_permission(self, request):
+    #     return False
 
     def get_readonly_fields(self, request, obj=None):
         return self.list_display
@@ -52,12 +53,9 @@ class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
                     "apply_amount", "apply_at", "order_id")
     search_fields = ('user__wanglibaouserprofile__phone', 'redpack__event__name')
     raw_id_fields = ('user', "redpack")
-    list_filter = ('change_platform', 'apply_platform')
+    list_filter = ('change_platform', 'apply_platform', "apply_at")
 
     def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request):
         return False
 
     def get_readonly_fields(self, request, obj=None):

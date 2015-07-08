@@ -42,9 +42,10 @@ class P2PTrader(object):
         self.product_keeper = ProductKeeper(product, order_id=self.order_id)
         self.equity_keeper = EquityKeeper(user=user, product=product, order_id=self.order_id)
         if request:
-            device = split_ua(request)
-            self.device_type = device['device_type']
+            self.device = split_ua(request)
+            self.device_type = self.device['device_type']
         else:
+            self.device = split_ua(request)
             self.device_type = "pc"
 
     def purchase(self, amount, redpack=0, platform=u''):
@@ -74,7 +75,7 @@ class P2PTrader(object):
                 is_full = True
 
         tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
-                                               "device_type": self.device_type, "product_id": self.product.id,
+                                               "device": self.device, "product_id": self.product.id,
                                                "is_full": is_full})
 
         # 投标成功发站内信

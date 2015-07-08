@@ -1,11 +1,13 @@
 # coding=utf-8
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 from django.db.models.signals import post_save
 from wanglibao_pay.util import get_a_uuid
 from django.db import transaction
 from decimal import *
 from ckeditor.fields import RichTextField
+from django.core.exceptions import ValidationError
 
 
 class NewsAndReport(models.Model):
@@ -85,6 +87,10 @@ class Channels(models.Model):
 
     class Meta:
         verbose_name_plural = u"渠道"
+
+    def clean(self):
+        if len(self.code) == 6:
+            raise ValidationError(u'为避免和邀请码重复，渠道代码长度不能等于6位')
 
     def __unicode__(self):
         return self.name
@@ -245,22 +251,28 @@ class RewardRecord(models.Model):
 class ClientData(models.Model):
     """ 统计客户端信息 """
     ACTION = (
-        (0, u'注册'),
-        (1, u'购买'),
+        ('R', u'注册'),
+        ('L', u'登录'),
+        ('V', u'实名认证'),
+        ('D', u'充值'),
+        ('B', u'购买'),
+        ('W', u'提现'),
     )
-    version = models.CharField(max_length=40)
-    userdevice = models.CharField(max_length=120)
-    network = models.CharField(max_length=30)
-    channelid = models.CharField(max_length=120)
-    phone = models.CharField(max_length=20)
-    action = models.IntegerField(max_length=2, choices=ACTION)
-    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    version = models.CharField(max_length=40, blank=False, null=False, default="")
+    userdevice = models.CharField(max_length=40, blank=False, null=False, default="")
+    os = models.CharField(max_length=20, blank=False, null=False, default="")
+    os_version = models.CharField(max_length=30, blank=False, null=False, default="")
+    network = models.CharField(max_length=30, blank=False, null=False, default="")
+    channel = models.CharField(max_length=50, blank=False, null=False, default="")
+    user_id = models.IntegerField(u"用户ID", blank=False, null=False, default=0)
+    amount = models.DecimalField(u'金额', max_digits=20, decimal_places=2, default=0)
+    action = models.CharField(max_length=10, blank=False, null=False, choices=ACTION)
+    create_time = models.DateTimeField(u'创建时间', blank=False, null=False, default=timezone.now)
 
 
     class Meta:
         ordering = ['-create_time']
         verbose_name_plural = u'客户端信息'
-
 
     def __unicode__(self):
         return u'<%s>' % self.userdevice
@@ -325,9 +337,20 @@ class PlayList(models.Model):
         verbose_name_plural = u'打榜统计表'
 
 
-# class ActivityUserRecord(models.Model):
-#     """参加活动的用户记录"""
-#     user = models.ForeignKey(User)
-#     object_name = models.CharField(u'活动名称', max_length=200)
-#     object_type = models.CharField(u'活动类型', max_length=100)
-#     created_at = models.DateTimeField(u'创建时间', auto_created=True)
+class ActivityJoinLog(models.Model):
+    """参加活动的用户记录"""
+    user = models.ForeignKey(User)
+    action_name = models.CharField(u'活动名称', max_length=200)
+    action_type = models.CharField(u'参加类型', max_length=100)
+    action_message = models.TextField(u'摘要', blank=True)
+    join_times = models.IntegerField(u'参加次数', max_length=6, default=0)
+    gift_name = models.CharField(u'奖品名称', max_length=200, blank=True)
+    amount = models.DecimalField(u'奖品金额', max_digits=10, decimal_places=2, default=0)
+    channel = models.CharField(u'渠道', max_length=100, blank=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = u'用户参加活动记录'
+
+    def __unicode__(self):
+        return self.action_name

@@ -9,7 +9,7 @@ def search(client, string):
 
 
 def split_ua(request):
-    if "HTTP_USER_AGENT" not in request.META:
+    if not request or "HTTP_USER_AGENT" not in request.META:
         return {"device_type":"pc"}
     ua = request.META['HTTP_USER_AGENT']
     arr = ua.split("/")
@@ -25,3 +25,12 @@ def split_ua(request):
     return {"device_type":device_type, "app_version":arr[0],
             "channel_id":arr[2], "model":arr[1],
             "os_version":arr[3], "network":arr[4]}
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        return x_forwarded_for
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip

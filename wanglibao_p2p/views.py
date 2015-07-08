@@ -40,8 +40,7 @@ from wanglibao_account.utils import generate_contract_preview
 from wanglibao_pay.util import get_a_uuid
 from django.contrib import messages
 from django.shortcuts import redirect, render_to_response
-from marketing.utils import save_client
-from marketing.tops import Top
+#from marketing.tops import Top
 from order.utils import OrderHelper
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
@@ -128,7 +127,7 @@ class P2PDetailView(TemplateView):
         return context
 
     def get(self, request, *args, **kwargs):
-        device_list = ['mobile', 'android', 'iphone', 'ipad']
+        device_list = ['android', 'iphone']
         user_agent = request.META['HTTP_USER_AGENT']
         for device in device_list:
             match = re.search(device, user_agent.lower())
@@ -255,9 +254,6 @@ class PurchaseP2PMobile(APIView):
             try:
                 trader = P2PTrader(product=p2p, user=request.user, request=request)
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
-
-                # save client info
-                save_client(request, phone=phone, action=1)
 
                 return Response({
                     'data': product_info.amount
@@ -549,7 +545,7 @@ class P2PListView(TemplateView):
         }
 
     def get(self, request, *args, **kwargs):
-        device_list = ['mobile', 'android', 'iphone', 'ipad']
+        device_list = ['android', 'iphone']
         user_agent = request.META['HTTP_USER_AGENT']
         for device in device_list:
             match = re.search(device, user_agent.lower())

@@ -15,24 +15,50 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.views import AdminIdVerificationView, IntroduceRelation, AdminSendMessageView
 from wanglibao.templatetags.formatters import safe_phone_str, safe_name
+from django.forms.models import BaseInlineFormSet
 
 
 class ProfileInline(admin.StackedInline):
     model = WanglibaoUserProfile
+    readonly_fields = ('deposit_default_bank_name',)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class MarginInline(admin.StackedInline):
     model = Margin
-    readonly_fields = ('margin', 'freeze', 'withdrawing')
+    readonly_fields = ('margin', 'freeze', 'withdrawing', 'invest')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class P2PEquityFormSet(BaseInlineFormSet):
+
+    def get_queryset(self):
+        query_set = super(P2PEquityFormSet, self).get_queryset().order_by('-created_at')
+        return query_set[:10]
 
 
 class P2PEquityInline(admin.StackedInline):
     model = P2PEquity
     extra = 0
+    raw_id_fields = ('product',)
+    readonly_fields = ('product', 'equity', 'confirm', 'confirm_at', 'contract', 'created_at')
+    formset = P2PEquityFormSet
+    verbose_name_plural = u'用户持仓（最近10条）'
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class PromotionTokenInline(admin.StackedInline):
     model = PromotionToken
+    readonly_fields = ('token',)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class UserResource(resources.ModelResource):

@@ -59,29 +59,28 @@ logger = logging.getLogger(__name__)
 #         logger.debug(r.text)
 #         logger.debug(p2p.id)
 
+
+def callback(url, params, channel_name):
+    logger.info("Enter %s_callback task===>>>"%channel_name)
+    try:
+        params = urllib.urlencode(params)
+        logger.info(params)
+        ret = requests.get(url, params=params)
+        logger.info('%s callback url: %s'%(channel_name,ret.url))
+        logger.info('%s callback return: %s' % (channel_name, ret.text))
+        return ret
+    except Exception, e:
+        logger.info(" {'%s callback':'failed to connect'} "%channel_name)
+        logger.info(e)
+
+
 @app.task
-def tianmang_callback(url, params):
-    logger.info("Enter tianmang_callback task")
-    params = urllib.urlencode(params)
-    logger.info(params)
-    ret = requests.get(url, params=params)
-    logger.info(ret.url)
-    logger.info(ret.text)
+def common_callback(url, params, channel):
+    callback(url, params, channel)
 
 @app.task
 def yiruite_callback(url, params):
-    logger.info("Enter yiruite_callback task===>>>")
-    params = urllib.urlencode(params)
-    logger.info(params)
-    params = params.replace('%3A', ':').replace('%2F', '/', 2)
-    logger.info(params)
-    try:
-        ret = requests.get(url, params=params)
-        logger.info(ret.url)
-        logger.info(ret.text)
-    except Exception, e:
-        logger.info(" {'errormsg':'other error'} ")
-        logger.info(e)
+    ret = callback(url, params, 'yiruite')
     if ret.text == 'success':
         logger.info(" {'msg':'success'} ")
     elif ret.text == 'error_tid':
@@ -100,3 +99,4 @@ def yiruite_callback(url, params):
         logger.info(" {'errorcode':'error_sign', 'errormsg':'签名不正确'} ")
     else:
         pass
+

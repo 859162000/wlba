@@ -52,6 +52,10 @@ class Bank(models.Model):
     def get_kuai_deposit_banks(cls):
         return Bank.objects.all().exclude(kuai_code='').exclude(kuai_code__isnull=True).select_related()
 
+    @classmethod
+    def get_bind_channel_banks(cls):
+        return Bank.objects.all().exclude(channel__isnull=True).exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True).exclude(yee_bind_code__isnull=True).select_related()
+
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号')
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
@@ -62,6 +66,7 @@ class Card(models.Model):
     is_bind_kuai = models.BooleanField(verbose_name=u"是否绑定快钱快捷", default=False)
     is_bind_yee = models.BooleanField(verbose_name=u"是否绑定易宝快捷", default=False)
     last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
+    yee_bind_id = models.CharField(max_length=50, verbose_name=u'易宝帮卡id', blank=True, default="")
 
     class Meta:
         verbose_name_plural = "银行卡"
