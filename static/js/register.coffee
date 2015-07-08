@@ -56,7 +56,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
           tool.modalAlert({title: '温馨提示', msg: result.message})
 
       intervalId
-      count = 60
+      count = 180
 
       $(element).removeClass 'button-red'
       $(element).addClass 'button-gray'
@@ -180,7 +180,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
         #TODO
 
         intervalId
-        count = 60
+        count = 180
         button = $("#button-get-validate-code")
 
         button.attr 'disabled', 'disabled'
@@ -206,3 +206,6 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       else
         #TODO
         element.html('系统繁忙请尝试短信验证码')
+    .fail (xhr)->
+      if xhr.status > 400
+        tool.modalAlert({title: '温馨提示', msg: result.message})
