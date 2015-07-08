@@ -178,6 +178,7 @@ if LOCAL_MYSQL:
 import sys
 
 if 'test' in sys.argv:
+    SOUTH_TESTS_MIGRATE = False
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '/tmp/db.sqlite3'
