@@ -319,6 +319,12 @@ class KuaiPay:
             return {"ret_code":20102, "message":"解除信息不匹配"}
         elif result['ret_code']:
             return {"ret_code":20103, "message":result['message']}
+
+        if len(card_no) == 10:
+            Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).update(is_bind_kuai=False)
+        else:
+            Card.objects.filter(no=card_no, user=user).update(is_bind_kuai=False)
+
         return {"ret_code":0, "message":"ok"}
 
     def delete_bind_new(self, request, card, bank):
@@ -560,9 +566,9 @@ class KuaiPay:
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:
-                Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now())
+                Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now(), is_bind_kuai=True)
             else:
-                Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now())
+                Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now(), is_bind_kuai=True)
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
