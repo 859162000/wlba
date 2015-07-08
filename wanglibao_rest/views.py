@@ -395,14 +395,10 @@ class SendVoiceCodeAPIView(APIView):
         if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
             return Response({"ret_code": 30112, "message": u"手机号输入有误"})
 
-        # phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
-        # if phone_check:
-        #    return Response({"ret_code":30112, "message": u"该手机号已经被注册，不能重复注册"})
-
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
         if phone_validate_code_item:
             count = phone_validate_code_item.code_send_count
-            if count > 6:
+            if count >= 6:
                 return Response({"ret_code": 30113, "message": u"该手机号验证次数过于频繁，请联系客服人工注册"})
 
             phone_validate_code_item.code_send_count += 1
