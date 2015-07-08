@@ -31,7 +31,7 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
                             BindPayView, BindPayCallbackView, BindPayQueryView,
                             BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
                             BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView,
-                            BankCardDelNewView, BankListNewAPIView)
+                            BankCardDelNewView, BankListNewAPIView, YeeShortPayCallbackView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -165,6 +165,7 @@ urlpatterns = patterns(
     url(r'^pay/cnp/delete_new/$', UnbindCardView.as_view()),
     url(r'^pay/cnp/dynnum_new/$', BindPayDynnumNewView.as_view()),
     url(r'^pay/deposit_new/$', BindPayDepositView.as_view()),
+    url(r'^pay/cnp/yee/callback/$', YeeShortPayCallbackView.as_view(), name="yee-deposit-callback"),
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
     url(r'^pay/deposit/callback/$', BindPayCallbackView.as_view(), name="kuai-deposit-callback"),

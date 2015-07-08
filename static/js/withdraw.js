@@ -84,9 +84,16 @@
       $.ajax({
         url: "/api/phone_validation_code/" + phoneNumber + "/",
         type: "POST"
+      }).fail(function(xhr) {
+        if (xhr.status > 400) {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: result.message
+          });
+        }
       });
       intervalId;
-      count = 60;
+      count = 180;
       $(element).attr('disabled', 'disabled');
       $(element).addClass('disabled');
       $('.voice-validate').attr('disabled', 'disabled');
@@ -125,7 +132,7 @@
         var button, count, intervalId, timerFunction;
         if (json.ret_code === 0) {
           intervalId;
-          count = 60;
+          count = 180;
           button = $("#button-get-validate-code");
           button.attr('disabled', 'disabled');
           button.addClass('button-gray');
@@ -149,8 +156,17 @@
         } else {
           return element.html('系统繁忙请尝试短信验证码');
         }
+      }).fail(function(xhr) {
+        if (xhr.status > 400) {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: result.message
+          });
+        }
       });
     });
   });
 
 }).call(this);
+
+//# sourceMappingURL=withdraw.js.map

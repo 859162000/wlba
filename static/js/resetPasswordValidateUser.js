@@ -12,7 +12,7 @@
     _countDown = function() {
       var count, element, intervalId, timerFunction;
       element = $('#sendValidateCodeButton');
-      count = 60;
+      count = 180;
       $(element).prop('disabled', true);
       $('.voice').attr('disabled', 'disabled');
       $('.voice-validate').attr('disabled', 'disabled');
@@ -39,6 +39,13 @@
       target = $(event.target).attr('data-url');
       $.post(target).done(function() {
         return $('#nextStep').prop('disabled', false);
+      }).fail(function(xhr) {
+        if (xhr.status > 400) {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: result.message
+          });
+        }
       });
       return _countDown();
     });
@@ -86,7 +93,7 @@
         var button, count, intervalId, timerFunction;
         if (json.ret_code === 0) {
           intervalId;
-          count = 60;
+          count = 180;
           button = $("#sendValidateCodeButton");
           button.attr('disabled', 'disabled');
           $('.voice').addClass('tip');
@@ -109,8 +116,17 @@
         } else {
           return element.html('系统繁忙请尝试短信验证码');
         }
+      }).fail(function(xhr) {
+        if (xhr.status > 400) {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: result.message
+          });
+        }
       });
     });
   });
 
 }).call(this);
+
+//# sourceMappingURL=resetPasswordValidateUser.js.map
