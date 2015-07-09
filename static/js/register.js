@@ -65,10 +65,17 @@
           $(element).addClass('button-red');
           $(element).removeClass('button-gray');
           result = JSON.parse(xhr.responseText);
-          return tool.modalAlert({
-            title: '温馨提示',
-            msg: result.message
-          });
+          if (xhr.status > 400) {
+            tool.modalAlert({
+              title: '温馨提示',
+              msg: result.message,
+              callback_ok: _showModal
+            });
+            clearInterval(intervalId);
+            $(element).html('重新获取');
+            $(element).prop('disabled', false);
+            return $(element).removeClass("disabled");
+          }
         });
         intervalId;
         count = 180;
@@ -235,11 +242,15 @@
           return element.html('系统繁忙请尝试短信验证码');
         }
       }).fail(function(xhr) {
+        element = $('#sendValidateCodeButton');
         if (xhr.status > 400) {
-          return tool.modalAlert({
+          tool.modalAlert({
             title: '温馨提示',
-            msg: result.message
+            msg: xhr.message
           });
+          $(element).html('重新获取');
+          $(element).prop('disabled', false);
+          return $(element).removeClass("disabled");
         }
       });
     });

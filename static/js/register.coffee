@@ -52,15 +52,20 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       $.ajax
           url: "/api/phone_validation_code/register/" + phoneNumber + "/"
           type: "POST"
-        .fail (xhr)->
-          $.modal.close()
+      .fail (xhr)->
+        $.modal.close()
+        clearInterval(intervalId)
+        $(element).text('重新获取')
+        $(element).removeAttr 'disabled'
+        $(element).addClass 'button-red'
+        $(element).removeClass 'button-gray'
+        result = JSON.parse xhr.responseText
+        if xhr.status > 400
+          tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
           clearInterval(intervalId)
-          $(element).text('重新获取')
-          $(element).removeAttr 'disabled'
-          $(element).addClass 'button-red'
-          $(element).removeClass 'button-gray'
-          result = JSON.parse xhr.responseText
-          tool.modalAlert({title: '温馨提示', msg: result.message})
+          $(element).html('重新获取')
+          $(element).prop 'disabled', false
+          $(element).removeClass("disabled")
 
       intervalId
       count = 180
@@ -222,5 +227,9 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
         #TODO
         element.html('系统繁忙请尝试短信验证码')
     .fail (xhr)->
+      element = $('#sendValidateCodeButton')
       if xhr.status > 400
-        tool.modalAlert({title: '温馨提示', msg: result.message})
+        tool.modalAlert({title: '温馨提示', msg: xhr.message})
+        $(element).html('重新获取')
+        $(element).prop 'disabled', false
+        $(element).removeClass("disabled")

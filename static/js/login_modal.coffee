@@ -214,6 +214,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
           result = JSON.parse xhr.responseText
           if xhr.status > 400
             tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
+            clearInterval(intervalId)
+            $(element).text('重新获取')
+            $(element).removeAttr 'disabled'
+            $(element).addClass 'button-red'
+            $(element).removeClass 'button-gray'
 
         intervalId
         count = 180
@@ -416,6 +421,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         #TODO
         element.html('系统繁忙请尝试短信验证码')
     .fail (xhr)->
+      element = $('#sendValidateCodeButton')
       if xhr.status > 400
-        tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
+        tool.modalAlert({title: '温馨提示', msg: xhr.message, callback_ok: _showModal})
+        $(element).html('重新获取')
+        $(element).prop 'disabled', false
+        $(element).removeClass("disabled")
 

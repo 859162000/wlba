@@ -240,11 +240,16 @@
           $(element).removeClass('button-gray');
           result = JSON.parse(xhr.responseText);
           if (xhr.status > 400) {
-            return tool.modalAlert({
+            tool.modalAlert({
               title: '温馨提示',
               msg: result.message,
               callback_ok: _showModal
             });
+            clearInterval(intervalId);
+            $(element).text('重新获取');
+            $(element).removeAttr('disabled');
+            $(element).addClass('button-red');
+            return $(element).removeClass('button-gray');
           }
         });
         intervalId;
@@ -434,12 +439,16 @@
           return element.html('系统繁忙请尝试短信验证码');
         }
       }).fail(function(xhr) {
+        element = $('#sendValidateCodeButton');
         if (xhr.status > 400) {
-          return tool.modalAlert({
+          tool.modalAlert({
             title: '温馨提示',
-            msg: result.message,
+            msg: xhr.message,
             callback_ok: _showModal
           });
+          $(element).html('重新获取');
+          $(element).prop('disabled', false);
+          return $(element).removeClass("disabled");
         }
       });
     });
