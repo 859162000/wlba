@@ -823,6 +823,30 @@ class KuaiShortPay:
 
         return {"ret_code":0, "message":"test", "cards":cards}
 
+    def query_bind_new(self, user_id):
+        data = self._sp_bind_xml(user_id)
+        res = self._request(data, self.QUERY_URL)
+        if res.status_code != 200:
+            return {"ret_code": -1, "message": "fetch error"}
+        if "errorCode" in res.content:
+            return {"ret_code": -1, "message": "fetch error"}
+        dic = self._result2dict(res.content)
+        pqc = dic['MasMessage'][0]['PciQueryContent']['value']
+        cards = []
+        for x in pqc:
+            if "responseCode" in x: res_code = x['responseCode']['value'];continue
+            if "merchantId" in x: merchantId = x['merchantId']['value'];continue
+            if "customerId" in x: customerId = x['customerId']['value'];continue
+            if "responseTextMessage" in x: message = x['responseTextMessage']['value'];continue
+            if "pciInfos" in x:
+                pis = x['pciInfos']['value']
+                for y in pis:
+                    for z in y['pciInfo']['value']:
+                        if "storablePan" in z:
+                            cards.append(z["storablePan"]['value'])
+
+        return {"ret_code": 0, "message": "success", "cards": cards}
+
     def _handle_dynnum_result(self, res):
         if res.status_code != 200 or "errorCode" in res.content:
             return False
