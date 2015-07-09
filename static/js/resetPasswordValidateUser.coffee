@@ -36,7 +36,7 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
     .done ->
       $('#nextStep').prop('disabled', false)
     .fail (xhr)->
-      if xhr.status > 400
+      if xhr.status >= 400
         tool.modalAlert({title: '温馨提示', msg: xhr.message})
         $(element).html('重新获取')
         $(element).prop 'disabled', false
@@ -116,7 +116,7 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
         element.html('系统繁忙请尝试短信验证码')
     .fail (xhr)->
       element = $('#sendValidateCodeButton')
-      if xhr.status > 400
+      if xhr.status >= 400
         tool.modalAlert({title: '温馨提示', msg: xhr.message})
         $(element).html('重新获取')
         $(element).prop 'disabled', false

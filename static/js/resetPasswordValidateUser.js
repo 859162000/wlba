@@ -41,7 +41,7 @@
       $.post(target).done(function() {
         return $('#nextStep').prop('disabled', false);
       }).fail(function(xhr) {
-        if (xhr.status > 400) {
+        if (xhr.status >= 400) {
           tool.modalAlert({
             title: '温馨提示',
             msg: xhr.message
@@ -122,7 +122,7 @@
         }
       }).fail(function(xhr) {
         element = $('#sendValidateCodeButton');
-        if (xhr.status > 400) {
+        if (xhr.status >= 400) {
           tool.modalAlert({
             title: '温馨提示',
             msg: xhr.message
