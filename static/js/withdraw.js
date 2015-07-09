@@ -51,6 +51,10 @@
         },
         validate_code: {
           required: true
+        },
+        captcha_1: {
+          required: true,
+          minlength: 1
         }
       },
       messages: {
@@ -66,6 +70,10 @@
         },
         validate_code: {
           required: '请输入验证码'
+        },
+        captcha_1: {
+          required: '不能为空',
+          minlength: $.format("验证码至少输入1位")
         }
       }
     });
