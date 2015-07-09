@@ -319,6 +319,12 @@ class KuaiPay:
             return {"ret_code":20102, "message":"解除信息不匹配"}
         elif result['ret_code']:
             return {"ret_code":20103, "message":result['message']}
+
+        if len(card_no) == 10:
+            Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).update(is_bind_kuai=False)
+        else:
+            Card.objects.filter(no=card_no, user=user).update(is_bind_kuai=False)
+
         return {"ret_code":0, "message":"ok"}
 
     def delete_bind_new(self, request, card, bank):
@@ -560,9 +566,9 @@ class KuaiPay:
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:
-                Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now())
+                Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now(), is_bind_kuai=True)
             else:
-                Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now())
+                Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now(), is_bind_kuai=True)
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
@@ -816,6 +822,30 @@ class KuaiShortPay:
             pass
 
         return {"ret_code":0, "message":"test", "cards":cards}
+
+    def query_bind_new(self, user_id):
+        data = self._sp_bind_xml(user_id)
+        res = self._request(data, self.QUERY_URL)
+        if res.status_code != 200:
+            return {"ret_code": -1, "message": "fetch error"}
+        if "errorCode" in res.content:
+            return {"ret_code": -1, "message": "fetch error"}
+        dic = self._result2dict(res.content)
+        pqc = dic['MasMessage'][0]['PciQueryContent']['value']
+        cards = []
+        for x in pqc:
+            if "responseCode" in x: res_code = x['responseCode']['value'];continue
+            if "merchantId" in x: merchantId = x['merchantId']['value'];continue
+            if "customerId" in x: customerId = x['customerId']['value'];continue
+            if "responseTextMessage" in x: message = x['responseTextMessage']['value'];continue
+            if "pciInfos" in x:
+                pis = x['pciInfos']['value']
+                for y in pis:
+                    for z in y['pciInfo']['value']:
+                        if "storablePan" in z:
+                            cards.append(z["storablePan"]['value'])
+
+        return {"ret_code": 0, "message": "success", "cards": cards}
 
     def _handle_dynnum_result(self, res):
         if res.status_code != 200 or "errorCode" in res.content:
