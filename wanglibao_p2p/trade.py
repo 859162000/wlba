@@ -192,14 +192,14 @@ class P2POperator(object):
             product.status = u'还款中'
             product.save()
 
-        phones = {}.fromkeys(phones).keys()
+        # 将手机号进行拆分，单个发送
+        for phone in phones:
+            send_messages.apply_async(kwargs={
+                "phones": phone,
+                "messages": [messages.product_settled(product, timezone.now())]
+            })
+
         user_ids = {}.fromkeys(user_ids).keys()
-
-        send_messages.apply_async(kwargs={
-            "phones": phones,
-            "messages": [messages.product_settled(product, timezone.now())]
-        })
-
 
         matches = re.search(u'日计息', product.pay_method)
         if matches and matches.group():
@@ -232,13 +232,14 @@ class P2POperator(object):
                 phones.append(equity.user.wanglibaouserprofile.phone)
             ProductKeeper(product).fail()
 
-        phones = {}.fromkeys(phones).keys()
+        # phones = {}.fromkeys(phones).keys()
         user_ids = {}.fromkeys(user_ids).keys()
         if phones:
-            send_messages.apply_async(kwargs={
-                "phones": phones,
-                "messages": [messages.product_failed(product)]
-            })
+            for phone in phones:
+                send_messages.apply_async(kwargs={
+                    "phones": phone,
+                    "messages": [messages.product_failed(product)]
+                })
 
             matches = re.search(u'日计息', product.pay_method)
             if matches and matches.group():
