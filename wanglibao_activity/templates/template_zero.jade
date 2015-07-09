@@ -19,18 +19,18 @@ html
 
     if result.is_background == 0
       //模块盒子
-      .gold(style='width:1100px;margin:0 auto;padding-right:0;')
+      .gold(style='width:1100px;margin:0 auto;padding-right:0;background:#fff')
         for module in sequence
           {% include module %}
     else
-      .gold(style='width:1100px;margin:0 auto;padding-right:0;')
+      .gold(style='width:1100px;margin:0 auto;padding-right:0;background:#fff')
         for module in sequence_one
           {% include module %}
 
       include include/activity_background
 
 
-      .gold(style='width:1100px;margin:0 auto;padding-right:0;')
+      .gold(style='width:1100px;margin:0 auto;padding-right:0;background:#fff')
         for module in sequence_two
           {% include module %}
 
