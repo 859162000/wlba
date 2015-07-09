@@ -92,6 +92,7 @@ html
         a(href="/weixin/view/buy/{{p2p.id}}/").new-pay {{status}}
       else
         p {{status}}
+  include include/tracking
   script(src="/static/src/mobile/lib/weixin/wx.js")
   script(data-init='detail', src="/static/scripts/mobile/dist/mobile.js")
 
