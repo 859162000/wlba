@@ -57,9 +57,10 @@ class IndexView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         device_list = ['android', 'iphone']
-        user_agent = request.META['HTTP_USER_AGENT']
+        #user_agent = request.META['HTTP_USER_AGENT']
+        user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
         for device in device_list:
-            match = re.search(device, user_agent.lower())
+            match = re.search(device, user_agent)
             if match and match.group():
                 return HttpResponseRedirect(reverse('weixin_p2p_list'))
 
