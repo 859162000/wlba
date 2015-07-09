@@ -74,9 +74,10 @@ class IntroducedByResource(resources.ModelResource):
 class IntroducedByAdmin(ReadPermissionModelAdmin):
     actions = None
     list_display = ("id", "user", "introduced_by", "channel", "created_at", "bought_at", "gift_send_at")
-    list_editable = ("gift_send_at",)
+    # list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
     raw_id_fields = ('user', 'introduced_by', 'created_by')
+    list_filter = ('channel__code', 'channel__name')
     resource_class = IntroducedByResource
 
     def get_queryset(self, request):
@@ -88,7 +89,7 @@ class IntroducedByAdmin(ReadPermissionModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         # if not request.user.has_perm('marketing.view_introducedby'):
         #     return ("bought_at", "user", "introduced_by")
-        return ("bought_at", "user", "introduced_by", 'created_by')
+        return ("bought_at", "user", "introduced_by", 'created_by', 'channel', 'gift_send_at', 'product_id')
 
     def has_delete_permission(self, request, obj=None):
         return False
